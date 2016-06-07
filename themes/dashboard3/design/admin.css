@@ -2700,7 +2700,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content li
 .tabbed-content > a, .plugins table
 .tabbed-content li .Info > a,
-.tabbed-content li .plugins table .Info > a,
+.tabbed-content li .plugins table .Info > a, .FilterMenu .btn-group > .FilterButton, .Tabs .FilterMenu ul > .FilterButton, .FilterMenu .Tabs ul > .FilterButton, .FilterMenu
+.tabbed-content > .FilterButton, .plugins table .FilterMenu .Info > .FilterButton, .FilterMenu .plugins table .Info > .FilterButton,
 .btn-group-vertical > .btn,
 .btn-group-vertical > .file-upload-browse,
 .btn-group-vertical > .Button,
@@ -2710,7 +2711,8 @@ a.text-danger:focus, a.text-danger:hover {
 .btn-group-vertical > span, .Tabs ul li
 .btn-group-vertical > a,
 .tabbed-content li
-.btn-group-vertical > a {
+.btn-group-vertical > a, .FilterMenu
+.btn-group-vertical > .FilterButton {
   position: relative;
   float: left;
 }
@@ -2733,7 +2735,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content li
 .tabbed-content > a:focus, .plugins table
 .tabbed-content li .Info > a:focus,
-.tabbed-content li .plugins table .Info > a:focus, .btn-group > .btn:active, .Tabs ul > .btn:active,
+.tabbed-content li .plugins table .Info > a:focus, .FilterMenu .btn-group > .FilterButton:focus, .Tabs .FilterMenu ul > .FilterButton:focus, .FilterMenu .Tabs ul > .FilterButton:focus, .FilterMenu
+.tabbed-content > .FilterButton:focus, .plugins table .FilterMenu .Info > .FilterButton:focus, .FilterMenu .plugins table .Info > .FilterButton:focus, .btn-group > .btn:active, .Tabs ul > .btn:active,
 .tabbed-content > .btn:active, .plugins table .Info > .btn:active, .btn-group > .file-upload-browse:active, .Tabs ul > .file-upload-browse:active,
 .tabbed-content > .file-upload-browse:active, .plugins table .Info > .file-upload-browse:active, .btn-group > .Button:active, .Tabs ul > .Button:active,
 .tabbed-content > .Button:active, .plugins table .Info > .Button:active, .btn-group >
@@ -2751,7 +2754,8 @@ a.text-danger:focus, a.text-danger:hover {
 .tabbed-content li
 .tabbed-content > a:active, .plugins table
 .tabbed-content li .Info > a:active,
-.tabbed-content li .plugins table .Info > a:active, .btn-group > .btn.active, .Tabs ul > .btn.active,
+.tabbed-content li .plugins table .Info > a:active, .FilterMenu .btn-group > .FilterButton:active, .Tabs .FilterMenu ul > .FilterButton:active, .FilterMenu .Tabs ul > .FilterButton:active, .FilterMenu
+.tabbed-content > .FilterButton:active, .plugins table .FilterMenu .Info > .FilterButton:active, .FilterMenu .plugins table .Info > .FilterButton:active, .btn-group > .btn.active, .Tabs ul > .btn.active,
 .tabbed-content > .btn.active, .plugins table .Info > .btn.active, .btn-group > .active.file-upload-browse, .Tabs ul > .active.file-upload-browse,
 .tabbed-content > .active.file-upload-browse, .plugins table .Info > .active.file-upload-browse, .Tabs ul li.Active .btn-group > a.file-upload-browse, .Tabs ul li.Active ul > a.file-upload-browse, .Tabs ul li.Active
 .tabbed-content > a.file-upload-browse, .plugins table .Tabs ul li.Active .Info > a.file-upload-browse, .Tabs ul li.Active .plugins table .Info > a.file-upload-browse,
@@ -2959,6 +2963,16 @@ a.current-theme,
 .Tabs ul .Info > a.current-tab,
 .tabbed-content li
 .Tabs ul .plugins table .Info > a.current-tab,
+.Tabs ul .FilterMenu .btn-group > .current-tab.FilterButton, .Tabs ul .FilterMenu ul > .current-tab.FilterButton,
+.Tabs ul .FilterMenu
+.tabbed-content > .current-tab.FilterButton, .plugins table
+.Tabs ul .FilterMenu .Info > .current-tab.FilterButton,
+.Tabs ul .FilterMenu .plugins table .Info > .current-tab.FilterButton, .FilterMenu
+.Tabs ul .btn-group > .current-tab.FilterButton, .FilterMenu .Tabs ul > .current-tab.FilterButton, .FilterMenu
+.Tabs ul
+.tabbed-content > .current-tab.FilterButton, .plugins table .FilterMenu
+.Tabs ul .Info > .current-tab.FilterButton, .FilterMenu
+.Tabs ul .plugins table .Info > .current-tab.FilterButton,
 .tabbed-content .btn-group > .btn.current-tab, .Tabs
 .tabbed-content ul > .btn.current-tab,
 .tabbed-content .Tabs ul > .btn.current-tab,
@@ -2969,13 +2983,45 @@ a.current-theme,
 .tabbed-content ul > a.current-tab, .Tabs ul li
 .tabbed-content > a.current-tab, .plugins table .Tabs ul li
 .tabbed-content .Info > a.current-tab, .Tabs ul li
-.tabbed-content .plugins table .Info > a.current-tab, .btn-group > .btn.Current, .Tabs ul > .btn.Current,
-.tabbed-content > .btn.Current, .plugins table .Info > .btn.Current, .btn-group >
+.tabbed-content .plugins table .Info > a.current-tab,
+.tabbed-content .FilterMenu .btn-group > .current-tab.FilterButton, .Tabs
+.tabbed-content .FilterMenu ul > .current-tab.FilterButton,
+.tabbed-content .FilterMenu .Tabs ul > .current-tab.FilterButton,
+.tabbed-content .FilterMenu
+.tabbed-content > .current-tab.FilterButton, .plugins table
+.tabbed-content .FilterMenu .Info > .current-tab.FilterButton,
+.tabbed-content .FilterMenu .plugins table .Info > .current-tab.FilterButton, .FilterMenu
+.tabbed-content .btn-group > .current-tab.FilterButton, .Tabs .FilterMenu
+.tabbed-content ul > .current-tab.FilterButton, .FilterMenu
+.tabbed-content .Tabs ul > .current-tab.FilterButton, .FilterMenu
+.tabbed-content > .current-tab.FilterButton, .plugins table .FilterMenu
+.tabbed-content .Info > .current-tab.FilterButton, .FilterMenu
+.tabbed-content .plugins table .Info > .current-tab.FilterButton, .btn-group > .btn.Current, .Tabs ul > .btn.Current,
+.tabbed-content > .btn.Current, .plugins table .Info > .btn.Current, .FilterMenu .btn-group > .Current.FilterButton, .Tabs .FilterMenu ul > .Current.FilterButton, .FilterMenu .Tabs ul > .Current.FilterButton, .FilterMenu
+.tabbed-content > .Current.FilterButton, .plugins table .FilterMenu .Info > .Current.FilterButton, .FilterMenu .plugins table .Info > .Current.FilterButton, .btn-group >
 .btn.current-theme, .Tabs ul >
 .btn.current-theme,
 .tabbed-content >
 .btn.current-theme, .plugins table .Info >
-.btn.current-theme,
+.btn.current-theme, .FilterMenu .btn-group > .current-theme.FilterButton, .Tabs .FilterMenu ul > .current-theme.FilterButton, .FilterMenu .Tabs ul > .current-theme.FilterButton, .FilterMenu
+.tabbed-content > .current-theme.FilterButton, .plugins table .FilterMenu .Info > .current-theme.FilterButton, .FilterMenu .plugins table .Info > .current-theme.FilterButton, .FilterMenu .btn-group > .active.FilterButton, .Tabs .FilterMenu ul > .active.FilterButton, .FilterMenu .Tabs ul > .active.FilterButton, .FilterMenu
+.tabbed-content > .active.FilterButton, .plugins table .FilterMenu .Info > .active.FilterButton, .FilterMenu .plugins table .Info > .active.FilterButton, .FilterMenu .Tabs ul li.Active .btn-group > a.FilterButton, .FilterMenu .Tabs ul li.Active ul > a.FilterButton, .FilterMenu .Tabs ul li.Active
+.tabbed-content > a.FilterButton, .plugins table .FilterMenu .Tabs ul li.Active .Info > a.FilterButton, .FilterMenu .Tabs ul li.Active .plugins table .Info > a.FilterButton, .Tabs ul li.Active .FilterMenu .btn-group > a.FilterButton, .Tabs ul li.Active .FilterMenu ul > a.FilterButton, .Tabs ul li.Active .FilterMenu
+.tabbed-content > a.FilterButton, .plugins table .Tabs ul li.Active .FilterMenu .Info > a.FilterButton, .Tabs ul li.Active .FilterMenu .plugins table .Info > a.FilterButton, .FilterMenu
+.tabbed-content li.Active .btn-group > a.FilterButton, .Tabs .FilterMenu
+.tabbed-content li.Active ul > a.FilterButton, .FilterMenu
+.tabbed-content li.Active .Tabs ul > a.FilterButton, .FilterMenu
+.tabbed-content li.Active
+.tabbed-content > a.FilterButton, .plugins table .FilterMenu
+.tabbed-content li.Active .Info > a.FilterButton, .FilterMenu
+.tabbed-content li.Active .plugins table .Info > a.FilterButton,
+.tabbed-content li.Active .FilterMenu .btn-group > a.FilterButton, .Tabs
+.tabbed-content li.Active .FilterMenu ul > a.FilterButton,
+.tabbed-content li.Active .FilterMenu .Tabs ul > a.FilterButton,
+.tabbed-content li.Active .FilterMenu
+.tabbed-content > a.FilterButton, .plugins table
+.tabbed-content li.Active .FilterMenu .Info > a.FilterButton,
+.tabbed-content li.Active .FilterMenu .plugins table .Info > a.FilterButton,
 .btn-group-vertical > .btn:focus,
 .btn-group-vertical > .file-upload-browse:focus,
 .btn-group-vertical > .Button:focus,
@@ -2985,7 +3031,8 @@ a.current-theme,
 .btn-group-vertical > span:focus, .Tabs ul li
 .btn-group-vertical > a:focus,
 .tabbed-content li
-.btn-group-vertical > a:focus,
+.btn-group-vertical > a:focus, .FilterMenu
+.btn-group-vertical > .FilterButton:focus,
 .btn-group-vertical > .btn:active,
 .btn-group-vertical > .file-upload-browse:active,
 .btn-group-vertical > .Button:active,
@@ -2995,7 +3042,8 @@ a.current-theme,
 .btn-group-vertical > span:active, .Tabs ul li
 .btn-group-vertical > a:active,
 .tabbed-content li
-.btn-group-vertical > a:active,
+.btn-group-vertical > a:active, .FilterMenu
+.btn-group-vertical > .FilterButton:active,
 .btn-group-vertical > .btn.active,
 .btn-group-vertical > .active.file-upload-browse,
 .Tabs ul
@@ -3062,13 +3110,27 @@ a.current-theme,
 .tabbed-content li
 .Tabs ul
 .btn-group-vertical > a.current-tab,
+.Tabs ul .FilterMenu
+.btn-group-vertical > .current-tab.FilterButton, .FilterMenu
+.Tabs ul
+.btn-group-vertical > .current-tab.FilterButton,
 .tabbed-content
 .btn-group-vertical > .btn.current-tab, .Tabs ul li
 .tabbed-content
 .btn-group-vertical > a.current-tab,
-.btn-group-vertical > .btn.Current,
+.tabbed-content .FilterMenu
+.btn-group-vertical > .current-tab.FilterButton, .FilterMenu
+.tabbed-content
+.btn-group-vertical > .current-tab.FilterButton,
+.btn-group-vertical > .btn.Current, .FilterMenu
+.btn-group-vertical > .Current.FilterButton,
 .btn-group-vertical >
-.btn.current-theme {
+.btn.current-theme, .FilterMenu
+.btn-group-vertical > .current-theme.FilterButton, .FilterMenu
+.btn-group-vertical > .active.FilterButton, .Tabs ul li.Active .FilterMenu
+.btn-group-vertical > a.FilterButton,
+.tabbed-content li.Active .FilterMenu
+.btn-group-vertical > a.FilterButton {
   z-index: 2;
 }
 
@@ -3090,7 +3152,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a:hover, .plugins table
 .tabbed-content li .Info > a:hover,
-.tabbed-content li .plugins table .Info > a:hover,
+.tabbed-content li .plugins table .Info > a:hover, .FilterMenu .btn-group > .FilterButton:hover, .Tabs .FilterMenu ul > .FilterButton:hover, .FilterMenu .Tabs ul > .FilterButton:hover, .FilterMenu
+.tabbed-content > .FilterButton:hover, .plugins table .FilterMenu .Info > .FilterButton:hover, .FilterMenu .plugins table .Info > .FilterButton:hover,
 .btn-group-vertical > .btn:hover,
 .btn-group-vertical > .file-upload-browse:hover,
 .btn-group-vertical > .Button:hover,
@@ -3100,7 +3163,8 @@ a.current-theme,
 .btn-group-vertical > span:hover, .Tabs ul li
 .btn-group-vertical > a:hover,
 .tabbed-content li
-.btn-group-vertical > a:hover {
+.btn-group-vertical > a:hover, .FilterMenu
+.btn-group-vertical > .FilterButton:hover {
   z-index: 2;
 }
 
@@ -3123,7 +3187,9 @@ a.current-theme,
 .tabbed-content li a + .btn,
 .tabbed-content li .Tabs ul a + .btn, .tabbed-content li a + .btn, .plugins table .Info
 .tabbed-content li a + .btn,
-.tabbed-content li .plugins table .Info a + .btn, .btn-group .btn + .file-upload-browse, .Tabs ul .btn + .file-upload-browse,
+.tabbed-content li .plugins table .Info a + .btn, .btn-group .FilterMenu .FilterButton + .btn, .FilterMenu .btn-group .FilterButton + .btn, .Tabs ul .FilterMenu .FilterButton + .btn, .FilterMenu .Tabs ul .FilterButton + .btn,
+.tabbed-content .FilterMenu .FilterButton + .btn, .FilterMenu
+.tabbed-content .FilterButton + .btn, .plugins table .Info .FilterMenu .FilterButton + .btn, .FilterMenu .plugins table .Info .FilterButton + .btn, .btn-group .btn + .file-upload-browse, .Tabs ul .btn + .file-upload-browse,
 .tabbed-content .btn + .file-upload-browse, .plugins table .Info .btn + .file-upload-browse, .btn-group .file-upload-browse + .file-upload-browse, .Tabs ul .file-upload-browse + .file-upload-browse,
 .tabbed-content .file-upload-browse + .file-upload-browse, .plugins table .Info .file-upload-browse + .file-upload-browse, .btn-group .Button + .file-upload-browse, .Tabs ul .Button + .file-upload-browse,
 .tabbed-content .Button + .file-upload-browse, .plugins table .Info .Button + .file-upload-browse, .btn-group
@@ -3142,7 +3208,9 @@ a.current-theme,
 .tabbed-content li a + .file-upload-browse,
 .tabbed-content li .Tabs ul a + .file-upload-browse, .tabbed-content li a + .file-upload-browse, .plugins table .Info
 .tabbed-content li a + .file-upload-browse,
-.tabbed-content li .plugins table .Info a + .file-upload-browse, .btn-group .btn + .Button, .Tabs ul .btn + .Button,
+.tabbed-content li .plugins table .Info a + .file-upload-browse, .btn-group .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .btn-group .FilterButton + .file-upload-browse, .Tabs ul .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .Tabs ul .FilterButton + .file-upload-browse,
+.tabbed-content .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu
+.tabbed-content .FilterButton + .file-upload-browse, .plugins table .Info .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .plugins table .Info .FilterButton + .file-upload-browse, .btn-group .btn + .Button, .Tabs ul .btn + .Button,
 .tabbed-content .btn + .Button, .plugins table .Info .btn + .Button, .btn-group .file-upload-browse + .Button, .Tabs ul .file-upload-browse + .Button,
 .tabbed-content .file-upload-browse + .Button, .plugins table .Info .file-upload-browse + .Button, .btn-group .Button + .Button, .Tabs ul .Button + .Button,
 .tabbed-content .Button + .Button, .plugins table .Info .Button + .Button, .btn-group
@@ -3161,7 +3229,9 @@ a.current-theme,
 .tabbed-content li a + .Button,
 .tabbed-content li .Tabs ul a + .Button, .tabbed-content li a + .Button, .plugins table .Info
 .tabbed-content li a + .Button,
-.tabbed-content li .plugins table .Info a + .Button, .btn-group .btn +
+.tabbed-content li .plugins table .Info a + .Button, .btn-group .FilterMenu .FilterButton + .Button, .FilterMenu .btn-group .FilterButton + .Button, .Tabs ul .FilterMenu .FilterButton + .Button, .FilterMenu .Tabs ul .FilterButton + .Button,
+.tabbed-content .FilterMenu .FilterButton + .Button, .FilterMenu
+.tabbed-content .FilterButton + .Button, .plugins table .Info .FilterMenu .FilterButton + .Button, .FilterMenu .plugins table .Info .FilterButton + .Button, .btn-group .btn +
 .TextButton, .Tabs ul .btn +
 .TextButton,
 .tabbed-content .btn +
@@ -3222,6 +3292,16 @@ a.current-theme,
 .tabbed-content li a +
 .TextButton,
 .tabbed-content li .plugins table .Info a +
+.TextButton, .btn-group .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .btn-group .FilterButton +
+.TextButton, .Tabs ul .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .Tabs ul .FilterButton +
+.TextButton,
+.tabbed-content .FilterMenu .FilterButton +
+.TextButton, .FilterMenu
+.tabbed-content .FilterButton +
+.TextButton, .plugins table .Info .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .plugins table .Info .FilterButton +
 .TextButton, .btn-group .btn + .SmallButton, .Tabs ul .btn + .SmallButton,
 .tabbed-content .btn + .SmallButton, .plugins table .Info .btn + .SmallButton, .btn-group .file-upload-browse + .SmallButton, .Tabs ul .file-upload-browse + .SmallButton,
 .tabbed-content .file-upload-browse + .SmallButton, .plugins table .Info .file-upload-browse + .SmallButton, .btn-group .Button + .SmallButton, .Tabs ul .Button + .SmallButton,
@@ -3241,7 +3321,9 @@ a.current-theme,
 .tabbed-content li a + .SmallButton,
 .tabbed-content li .Tabs ul a + .SmallButton, .tabbed-content li a + .SmallButton, .plugins table .Info
 .tabbed-content li a + .SmallButton,
-.tabbed-content li .plugins table .Info a + .SmallButton, .btn-group #Head h1 a .btn + span, #Head h1 a .btn-group .btn + span, .Tabs ul #Head h1 a .btn + span, #Head h1 a .Tabs ul .btn + span,
+.tabbed-content li .plugins table .Info a + .SmallButton, .btn-group .FilterMenu .FilterButton + .SmallButton, .FilterMenu .btn-group .FilterButton + .SmallButton, .Tabs ul .FilterMenu .FilterButton + .SmallButton, .FilterMenu .Tabs ul .FilterButton + .SmallButton,
+.tabbed-content .FilterMenu .FilterButton + .SmallButton, .FilterMenu
+.tabbed-content .FilterButton + .SmallButton, .plugins table .Info .FilterMenu .FilterButton + .SmallButton, .FilterMenu .plugins table .Info .FilterButton + .SmallButton, .btn-group #Head h1 a .btn + span, #Head h1 a .btn-group .btn + span, .Tabs ul #Head h1 a .btn + span, #Head h1 a .Tabs ul .btn + span,
 .tabbed-content #Head h1 a .btn + span, #Head h1 a
 .tabbed-content .btn + span, .plugins table .Info #Head h1 a .btn + span, #Head h1 a .plugins table .Info .btn + span, .btn-group #Head h1 a .file-upload-browse + span, #Head h1 a .btn-group .file-upload-browse + span, .Tabs ul #Head h1 a .file-upload-browse + span, #Head h1 a .Tabs ul .file-upload-browse + span,
 .tabbed-content #Head h1 a .file-upload-browse + span, #Head h1 a
@@ -3277,7 +3359,11 @@ a.current-theme,
 .tabbed-content li #Head h1 a a + span, #Head h1 a .plugins table .Info
 .tabbed-content li a + span,
 .tabbed-content li .plugins table .Info #Head h1 a a + span, #Head h1 a
-.tabbed-content li .plugins table .Info a + span, .btn-group .Tabs ul li .btn + a, .Tabs ul li .btn-group .btn + a, .Tabs ul li .btn + a,
+.tabbed-content li .plugins table .Info a + span, .btn-group .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .btn-group .FilterMenu .FilterButton + span, .FilterMenu .btn-group #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .btn-group .FilterButton + span, .Tabs ul .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .Tabs ul .FilterMenu .FilterButton + span, .FilterMenu .Tabs ul #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .Tabs ul .FilterButton + span,
+.tabbed-content .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a
+.tabbed-content .FilterMenu .FilterButton + span, .FilterMenu
+.tabbed-content #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu
+.tabbed-content .FilterButton + span, .plugins table .Info .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .plugins table .Info .FilterMenu .FilterButton + span, .FilterMenu .plugins table .Info #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .plugins table .Info .FilterButton + span, .btn-group .Tabs ul li .btn + a, .Tabs ul li .btn-group .btn + a, .Tabs ul li .btn + a,
 .tabbed-content .Tabs ul li .btn + a, .Tabs ul li
 .tabbed-content .btn + a, .plugins table .Info .Tabs ul li .btn + a, .Tabs ul li .plugins table .Info .btn + a, .btn-group .Tabs ul li .file-upload-browse + a, .Tabs ul li .btn-group .file-upload-browse + a, .Tabs ul li .file-upload-browse + a,
 .tabbed-content .Tabs ul li .file-upload-browse + a, .Tabs ul li
@@ -3310,7 +3396,11 @@ a.current-theme,
 .tabbed-content .Tabs ul li a + a, .Tabs ul .plugins table .Info
 .tabbed-content li a + a,
 .tabbed-content .Tabs ul li .plugins table .Info a + a, .Tabs ul
-.tabbed-content li .plugins table .Info a + a, .btn-group
+.tabbed-content li .plugins table .Info a + a, .btn-group .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .btn-group .FilterMenu .FilterButton + a, .FilterMenu .btn-group .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .btn-group .FilterButton + a, .Tabs ul .FilterMenu li .FilterButton + a, .Tabs ul li .FilterMenu .FilterButton + a, .FilterMenu .Tabs ul li .FilterButton + a,
+.tabbed-content .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li
+.tabbed-content .FilterMenu .FilterButton + a, .FilterMenu
+.tabbed-content .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu
+.tabbed-content .FilterButton + a, .plugins table .Info .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .plugins table .Info .FilterMenu .FilterButton + a, .FilterMenu .plugins table .Info .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .plugins table .Info .FilterButton + a, .btn-group
 .tabbed-content li .btn + a,
 .tabbed-content li .btn-group .btn + a, .Tabs ul
 .tabbed-content li .btn + a,
@@ -3369,7 +3459,59 @@ a.current-theme,
 .tabbed-content li a + a,
 .tabbed-content .plugins table .Info .Tabs ul li a + a, .Tabs ul
 .tabbed-content li .plugins table .Info a + a,
-.tabbed-content .Tabs ul li .plugins table .Info a + a, .btn-group .tabbed-content li a + a, .tabbed-content li .btn-group a + a, .Tabs ul .tabbed-content li a + a, .tabbed-content li .Tabs ul a + a, .tabbed-content li a + a, .plugins table .Info .tabbed-content li a + a, .tabbed-content li .plugins table .Info a + a,
+.tabbed-content .Tabs ul li .plugins table .Info a + a, .btn-group .tabbed-content li a + a, .tabbed-content li .btn-group a + a, .Tabs ul .tabbed-content li a + a, .tabbed-content li .Tabs ul a + a, .tabbed-content li a + a, .plugins table .Info .tabbed-content li a + a, .tabbed-content li .plugins table .Info a + a, .btn-group .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .btn-group .FilterMenu .FilterButton + a, .FilterMenu .btn-group
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .btn-group .FilterButton + a, .Tabs ul .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .Tabs ul .FilterMenu .FilterButton + a, .FilterMenu .Tabs ul
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .Tabs ul .FilterButton + a, .tabbed-content .FilterMenu li .FilterButton + a, .tabbed-content li .FilterMenu .FilterButton + a, .FilterMenu .tabbed-content li .FilterButton + a, .plugins table .Info .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .plugins table .Info .FilterMenu .FilterButton + a, .FilterMenu .plugins table .Info
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .plugins table .Info .FilterButton + a, .btn-group .FilterMenu .btn + .FilterButton, .FilterMenu .btn-group .btn + .FilterButton, .Tabs ul .FilterMenu .btn + .FilterButton, .FilterMenu .Tabs ul .btn + .FilterButton,
+.tabbed-content .FilterMenu .btn + .FilterButton, .FilterMenu
+.tabbed-content .btn + .FilterButton, .plugins table .Info .FilterMenu .btn + .FilterButton, .FilterMenu .plugins table .Info .btn + .FilterButton, .btn-group .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .btn-group .file-upload-browse + .FilterButton, .Tabs ul .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .Tabs ul .file-upload-browse + .FilterButton,
+.tabbed-content .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu
+.tabbed-content .file-upload-browse + .FilterButton, .plugins table .Info .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .plugins table .Info .file-upload-browse + .FilterButton, .btn-group .FilterMenu .Button + .FilterButton, .FilterMenu .btn-group .Button + .FilterButton, .Tabs ul .FilterMenu .Button + .FilterButton, .FilterMenu .Tabs ul .Button + .FilterButton,
+.tabbed-content .FilterMenu .Button + .FilterButton, .FilterMenu
+.tabbed-content .Button + .FilterButton, .plugins table .Info .FilterMenu .Button + .FilterButton, .FilterMenu .plugins table .Info .Button + .FilterButton, .btn-group .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .btn-group
+.TextButton + .FilterButton, .Tabs ul .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .Tabs ul
+.TextButton + .FilterButton,
+.tabbed-content .FilterMenu
+.TextButton + .FilterButton, .FilterMenu
+.tabbed-content
+.TextButton + .FilterButton, .plugins table .Info .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .plugins table .Info
+.TextButton + .FilterButton, .btn-group .FilterMenu .SmallButton + .FilterButton, .FilterMenu .btn-group .SmallButton + .FilterButton, .Tabs ul .FilterMenu .SmallButton + .FilterButton, .FilterMenu .Tabs ul .SmallButton + .FilterButton,
+.tabbed-content .FilterMenu .SmallButton + .FilterButton, .FilterMenu
+.tabbed-content .SmallButton + .FilterButton, .plugins table .Info .FilterMenu .SmallButton + .FilterButton, .FilterMenu .plugins table .Info .SmallButton + .FilterButton, .btn-group #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .btn-group #Head h1 a span + .FilterButton, #Head h1 a .btn-group .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .btn-group span + .FilterButton, .Tabs ul #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .Tabs ul #Head h1 a span + .FilterButton, #Head h1 a .Tabs ul .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .Tabs ul span + .FilterButton,
+.tabbed-content #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu
+.tabbed-content #Head h1 a span + .FilterButton, #Head h1 a
+.tabbed-content .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a
+.tabbed-content span + .FilterButton, .plugins table .Info #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .plugins table .Info #Head h1 a span + .FilterButton, #Head h1 a .plugins table .Info .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .plugins table .Info span + .FilterButton, .btn-group .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .btn-group .Tabs ul li a + .FilterButton, .Tabs ul li .btn-group .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .btn-group a + .FilterButton, .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li a + .FilterButton,
+.tabbed-content .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content .Tabs ul li a + .FilterButton, .Tabs ul li
+.tabbed-content .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li
+.tabbed-content a + .FilterButton, .plugins table .Info .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .plugins table .Info .Tabs ul li a + .FilterButton, .Tabs ul li .plugins table .Info .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .plugins table .Info a + .FilterButton, .btn-group
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .btn-group
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .btn-group .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .btn-group a + .FilterButton, .Tabs ul
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .Tabs ul .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .Tabs ul a + .FilterButton, .tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .tabbed-content li a + .FilterButton, .plugins table .Info
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .plugins table .Info
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .plugins table .Info .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .plugins table .Info a + .FilterButton, .btn-group .FilterMenu .FilterButton + .FilterButton, .FilterMenu .btn-group .FilterButton + .FilterButton, .Tabs ul .FilterMenu .FilterButton + .FilterButton, .FilterMenu .Tabs ul .FilterButton + .FilterButton,
+.tabbed-content .FilterMenu .FilterButton + .FilterButton, .FilterMenu
+.tabbed-content .FilterButton + .FilterButton, .plugins table .Info .FilterMenu .FilterButton + .FilterButton, .FilterMenu .plugins table .Info .FilterButton + .FilterButton,
 .btn-group .btn + .btn-group, .Tabs ul .btn + .btn-group,
 .tabbed-content .btn + .btn-group, .plugins table .Info .btn + .btn-group,
 .btn-group .file-upload-browse + .btn-group, .Tabs ul .file-upload-browse + .btn-group,
@@ -3400,6 +3542,10 @@ a.current-theme,
 .tabbed-content li .Tabs ul a + .btn-group, .tabbed-content li a + .btn-group, .plugins table .Info
 .tabbed-content li a + .btn-group,
 .tabbed-content li .plugins table .Info a + .btn-group,
+.btn-group .FilterMenu .FilterButton + .btn-group, .FilterMenu
+.btn-group .FilterButton + .btn-group, .Tabs ul .FilterMenu .FilterButton + .btn-group, .FilterMenu .Tabs ul .FilterButton + .btn-group,
+.tabbed-content .FilterMenu .FilterButton + .btn-group, .FilterMenu
+.tabbed-content .FilterButton + .btn-group, .plugins table .Info .FilterMenu .FilterButton + .btn-group, .FilterMenu .plugins table .Info .FilterButton + .btn-group,
 .btn-group .Tabs .btn + ul, .Tabs
 .btn-group .btn + ul, .Tabs ul .btn + ul,
 .tabbed-content .Tabs .btn + ul, .Tabs
@@ -3453,6 +3599,14 @@ a.current-theme,
 .tabbed-content li a + ul,
 .tabbed-content li .plugins table .Info .Tabs a + ul, .Tabs
 .tabbed-content li .plugins table .Info a + ul,
+.btn-group .FilterMenu .Tabs .FilterButton + ul, .Tabs
+.btn-group .FilterMenu .FilterButton + ul, .FilterMenu
+.btn-group .Tabs .FilterButton + ul, .Tabs .FilterMenu
+.btn-group .FilterButton + ul, .Tabs ul .FilterMenu .FilterButton + ul, .FilterMenu .Tabs ul .FilterButton + ul,
+.tabbed-content .FilterMenu .Tabs .FilterButton + ul, .Tabs
+.tabbed-content .FilterMenu .FilterButton + ul, .FilterMenu
+.tabbed-content .Tabs .FilterButton + ul, .Tabs .FilterMenu
+.tabbed-content .FilterButton + ul, .plugins table .Info .FilterMenu .Tabs .FilterButton + ul, .Tabs .plugins table .Info .FilterMenu .FilterButton + ul, .FilterMenu .plugins table .Info .Tabs .FilterButton + ul, .Tabs .FilterMenu .plugins table .Info .FilterButton + ul,
 .btn-group .btn +
 .tabbed-content, .Tabs ul .btn +
 .tabbed-content,
@@ -3525,6 +3679,18 @@ a.current-theme,
 .tabbed-content,
 .tabbed-content li .plugins table .Info a +
 .tabbed-content,
+.btn-group .FilterMenu .FilterButton +
+.tabbed-content, .FilterMenu
+.btn-group .FilterButton +
+.tabbed-content, .Tabs ul .FilterMenu .FilterButton +
+.tabbed-content, .FilterMenu .Tabs ul .FilterButton +
+.tabbed-content,
+.tabbed-content .FilterMenu .FilterButton +
+.tabbed-content, .FilterMenu
+.tabbed-content .FilterButton +
+.tabbed-content, .plugins table .Info .FilterMenu .FilterButton +
+.tabbed-content, .FilterMenu .plugins table .Info .FilterButton +
+.tabbed-content,
 .btn-group .plugins table .btn + .Info, .plugins table
 .btn-group .btn + .Info, .Tabs ul .plugins table .btn + .Info, .plugins table .Tabs ul .btn + .Info,
 .tabbed-content .plugins table .btn + .Info, .plugins table
@@ -3582,6 +3748,14 @@ a.current-theme,
 .tabbed-content li .Tabs ul a + .Info, .tabbed-content li .plugins table a + .Info, .plugins table .tabbed-content li a + .Info, .plugins table .Info
 .tabbed-content li a + .Info,
 .tabbed-content li .plugins table .Info a + .Info,
+.btn-group .FilterMenu .plugins table .FilterButton + .Info, .plugins table
+.btn-group .FilterMenu .FilterButton + .Info, .FilterMenu
+.btn-group .plugins table .FilterButton + .Info, .plugins table .FilterMenu
+.btn-group .FilterButton + .Info, .Tabs ul .FilterMenu .plugins table .FilterButton + .Info, .plugins table .Tabs ul .FilterMenu .FilterButton + .Info, .FilterMenu .Tabs ul .plugins table .FilterButton + .Info, .plugins table .FilterMenu .Tabs ul .FilterButton + .Info,
+.tabbed-content .FilterMenu .plugins table .FilterButton + .Info, .plugins table
+.tabbed-content .FilterMenu .FilterButton + .Info, .FilterMenu
+.tabbed-content .plugins table .FilterButton + .Info, .plugins table .FilterMenu
+.tabbed-content .FilterButton + .Info, .plugins table .Info .FilterMenu .FilterButton + .Info, .FilterMenu .plugins table .Info .FilterButton + .Info,
 .btn-group .btn-group + .btn, .Tabs ul .btn-group + .btn,
 .tabbed-content .btn-group + .btn, .plugins table .Info .btn-group + .btn,
 .btn-group .Tabs ul + .btn, .Tabs
@@ -3796,6 +3970,38 @@ a.current-theme,
 .tabbed-content li .plugins table .Tabs ul .Info + a, .tabbed-content .plugins table li .Info + a, .tabbed-content li .plugins table .Info + a, .plugins table .tabbed-content li .Info + a, .plugins table .Info
 .tabbed-content li .Info + a,
 .tabbed-content li .plugins table .Info .Info + a,
+.btn-group .FilterMenu .btn-group + .FilterButton, .FilterMenu
+.btn-group .btn-group + .FilterButton, .Tabs ul .FilterMenu .btn-group + .FilterButton, .FilterMenu .Tabs ul .btn-group + .FilterButton,
+.tabbed-content .FilterMenu .btn-group + .FilterButton, .FilterMenu
+.tabbed-content .btn-group + .FilterButton, .plugins table .Info .FilterMenu .btn-group + .FilterButton, .FilterMenu .plugins table .Info .btn-group + .FilterButton,
+.btn-group .Tabs .FilterMenu ul + .FilterButton, .FilterMenu
+.btn-group .Tabs ul + .FilterButton, .Tabs
+.btn-group .FilterMenu ul + .FilterButton, .FilterMenu .Tabs
+.btn-group ul + .FilterButton, .Tabs ul .FilterMenu ul + .FilterButton, .FilterMenu .Tabs ul ul + .FilterButton,
+.tabbed-content .Tabs .FilterMenu ul + .FilterButton, .FilterMenu
+.tabbed-content .Tabs ul + .FilterButton, .Tabs
+.tabbed-content .FilterMenu ul + .FilterButton, .FilterMenu .Tabs
+.tabbed-content ul + .FilterButton, .plugins table .Info .Tabs .FilterMenu ul + .FilterButton, .FilterMenu .plugins table .Info .Tabs ul + .FilterButton, .Tabs .plugins table .Info .FilterMenu ul + .FilterButton, .FilterMenu .Tabs .plugins table .Info ul + .FilterButton,
+.btn-group .FilterMenu
+.tabbed-content + .FilterButton, .FilterMenu
+.btn-group
+.tabbed-content + .FilterButton, .Tabs ul .FilterMenu
+.tabbed-content + .FilterButton, .FilterMenu .Tabs ul
+.tabbed-content + .FilterButton,
+.tabbed-content .FilterMenu
+.tabbed-content + .FilterButton, .FilterMenu
+.tabbed-content
+.tabbed-content + .FilterButton, .plugins table .Info .FilterMenu
+.tabbed-content + .FilterButton, .FilterMenu .plugins table .Info
+.tabbed-content + .FilterButton,
+.btn-group .plugins table .FilterMenu .Info + .FilterButton, .FilterMenu
+.btn-group .plugins table .Info + .FilterButton, .plugins table
+.btn-group .FilterMenu .Info + .FilterButton, .FilterMenu .plugins table
+.btn-group .Info + .FilterButton, .Tabs ul .plugins table .FilterMenu .Info + .FilterButton, .FilterMenu .Tabs ul .plugins table .Info + .FilterButton, .plugins table .Tabs ul .FilterMenu .Info + .FilterButton, .FilterMenu .plugins table .Tabs ul .Info + .FilterButton,
+.tabbed-content .plugins table .FilterMenu .Info + .FilterButton, .FilterMenu
+.tabbed-content .plugins table .Info + .FilterButton, .plugins table
+.tabbed-content .FilterMenu .Info + .FilterButton, .FilterMenu .plugins table
+.tabbed-content .Info + .FilterButton, .plugins table .Info .FilterMenu .Info + .FilterButton, .FilterMenu .plugins table .Info .Info + .FilterButton,
 .btn-group .btn-group + .btn-group, .Tabs ul .btn-group + .btn-group,
 .tabbed-content .btn-group + .btn-group, .plugins table .Info .btn-group + .btn-group,
 .btn-group .Tabs ul + .btn-group, .Tabs
@@ -3925,7 +4131,7 @@ a.current-theme,
 
 .btn-toolbar > .btn, .btn-toolbar > .file-upload-browse, .btn-toolbar > .Button, .btn-toolbar >
 .TextButton, .btn-toolbar > .SmallButton, #Head h1 a .btn-toolbar > span, .Tabs ul li .btn-toolbar > a,
-.tabbed-content li .btn-toolbar > a,
+.tabbed-content li .btn-toolbar > a, .FilterMenu .btn-toolbar > .FilterButton,
 .btn-toolbar > .btn-group, .Tabs
 .btn-toolbar > ul,
 .btn-toolbar >
@@ -3953,7 +4159,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a:not(:first-child):not(:last-child):not(.dropdown-toggle), .plugins table
 .tabbed-content li .Info > a:not(:first-child):not(:last-child):not(.dropdown-toggle),
-.tabbed-content li .plugins table .Info > a:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+.tabbed-content li .plugins table .Info > a:not(:first-child):not(:last-child):not(.dropdown-toggle), .FilterMenu .btn-group > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle), .Tabs .FilterMenu ul > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle), .FilterMenu .Tabs ul > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle), .FilterMenu
+.tabbed-content > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle), .plugins table .FilterMenu .Info > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle), .FilterMenu .plugins table .Info > .FilterButton:not(:first-child):not(:last-child):not(.dropdown-toggle) {
   border-radius: 0;
 }
 
@@ -3975,7 +4182,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a:first-child, .plugins table
 .tabbed-content li .Info > a:first-child,
-.tabbed-content li .plugins table .Info > a:first-child {
+.tabbed-content li .plugins table .Info > a:first-child, .FilterMenu .btn-group > .FilterButton:first-child, .Tabs .FilterMenu ul > .FilterButton:first-child, .FilterMenu .Tabs ul > .FilterButton:first-child, .FilterMenu
+.tabbed-content > .FilterButton:first-child, .plugins table .FilterMenu .Info > .FilterButton:first-child, .FilterMenu .plugins table .Info > .FilterButton:first-child {
   margin-left: 0;
 }
 
@@ -3997,7 +4205,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a:first-child:not(:last-child):not(.dropdown-toggle), .plugins table
 .tabbed-content li .Info > a:first-child:not(:last-child):not(.dropdown-toggle),
-.tabbed-content li .plugins table .Info > a:first-child:not(:last-child):not(.dropdown-toggle) {
+.tabbed-content li .plugins table .Info > a:first-child:not(:last-child):not(.dropdown-toggle), .FilterMenu .btn-group > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle), .Tabs .FilterMenu ul > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle), .FilterMenu .Tabs ul > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle), .FilterMenu
+.tabbed-content > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle), .plugins table .FilterMenu .Info > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle), .FilterMenu .plugins table .Info > .FilterButton:first-child:not(:last-child):not(.dropdown-toggle) {
   border-bottom-right-radius: 0;
   border-top-right-radius: 0;
 }
@@ -4020,7 +4229,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a:last-child:not(:first-child), .plugins table
 .tabbed-content li .Info > a:last-child:not(:first-child),
-.tabbed-content li .plugins table .Info > a:last-child:not(:first-child),
+.tabbed-content li .plugins table .Info > a:last-child:not(:first-child), .FilterMenu .btn-group > .FilterButton:last-child:not(:first-child), .Tabs .FilterMenu ul > .FilterButton:last-child:not(:first-child), .FilterMenu .Tabs ul > .FilterButton:last-child:not(:first-child), .FilterMenu
+.tabbed-content > .FilterButton:last-child:not(:first-child), .plugins table .FilterMenu .Info > .FilterButton:last-child:not(:first-child), .FilterMenu .plugins table .Info > .FilterButton:last-child:not(:first-child),
 .btn-group > .dropdown-toggle:not(:first-child), .Tabs ul > .dropdown-toggle:not(:first-child),
 .tabbed-content > .dropdown-toggle:not(:first-child), .plugins table .Info > .dropdown-toggle:not(:first-child) {
   border-bottom-left-radius: 0;
@@ -4163,7 +4373,19 @@ a.current-theme,
 .tabbed-content li .plugins table
 .tabbed-content > .Info:not(:first-child):not(:last-child) > a, .plugins table
 .tabbed-content li .Info > .Info:not(:first-child):not(:last-child) > a,
-.tabbed-content li .plugins table .Info > .Info:not(:first-child):not(:last-child) > a {
+.tabbed-content li .plugins table .Info > .Info:not(:first-child):not(:last-child) > a, .FilterMenu .btn-group > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu ul > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs ul > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu
+.tabbed-content > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu .Info > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .Info > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu .btn-group > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs .btn-group > ul:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu ul > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs ul > ul:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu
+.tabbed-content > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs
+.tabbed-content > ul:not(:first-child):not(:last-child) > .FilterButton, .plugins table .Tabs .FilterMenu .Info > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .Tabs .Info > ul:not(:first-child):not(:last-child) > .FilterButton, .Tabs .plugins table .FilterMenu .Info > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs .plugins table .Info > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .btn-group >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu ul >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs ul >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu
+.tabbed-content >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu .Info >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .Info >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu .btn-group > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .btn-group > .Info:not(:first-child):not(:last-child) > .FilterButton, .Tabs .plugins table .FilterMenu ul > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs .plugins table ul > .Info:not(:first-child):not(:last-child) > .FilterButton, .plugins table .Tabs .FilterMenu ul > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .Tabs ul > .Info:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu
+.tabbed-content > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table
+.tabbed-content > .Info:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu .Info > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .Info > .Info:not(:first-child):not(:last-child) > .FilterButton {
   border-radius: 0;
 }
 
@@ -4291,7 +4513,19 @@ a.current-theme,
 .tabbed-content li .plugins table
 .tabbed-content > .Info:first-child:not(:last-child) > a:last-child, .plugins table
 .tabbed-content li .Info > .Info:first-child:not(:last-child) > a:last-child,
-.tabbed-content li .plugins table .Info > .Info:first-child:not(:last-child) > a:last-child,
+.tabbed-content li .plugins table .Info > .Info:first-child:not(:last-child) > a:last-child, .FilterMenu .btn-group > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu ul > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs ul > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu
+.tabbed-content > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu .Info > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .Info > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu .btn-group > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs .btn-group > ul:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu ul > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs ul > ul:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu
+.tabbed-content > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs
+.tabbed-content > ul:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .Tabs .FilterMenu .Info > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .Tabs .Info > ul:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .plugins table .FilterMenu .Info > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs .plugins table .Info > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .btn-group >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu ul >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs ul >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu
+.tabbed-content >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu .Info >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .Info >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu .btn-group > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .btn-group > .Info:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .plugins table .FilterMenu ul > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs .plugins table ul > .Info:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .Tabs .FilterMenu ul > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .Tabs ul > .Info:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu
+.tabbed-content > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table
+.tabbed-content > .Info:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu .Info > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .Info > .Info:first-child:not(:last-child) > .FilterButton:last-child,
 .btn-group > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .Tabs ul > .btn-group:first-child:not(:last-child) > .dropdown-toggle,
 .tabbed-content > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .plugins table .Info > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .Tabs
 .btn-group > ul:first-child:not(:last-child) > .dropdown-toggle, .Tabs ul > ul:first-child:not(:last-child) > .dropdown-toggle, .Tabs
@@ -4432,7 +4666,19 @@ a.current-theme,
 .tabbed-content li .plugins table
 .tabbed-content > .Info:last-child:not(:first-child) > a:first-child, .plugins table
 .tabbed-content li .Info > .Info:last-child:not(:first-child) > a:first-child,
-.tabbed-content li .plugins table .Info > .Info:last-child:not(:first-child) > a:first-child {
+.tabbed-content li .plugins table .Info > .Info:last-child:not(:first-child) > a:first-child, .FilterMenu .btn-group > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu ul > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs ul > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu
+.tabbed-content > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu .Info > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .Info > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu .btn-group > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs .btn-group > ul:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu ul > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs ul > ul:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu
+.tabbed-content > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs
+.tabbed-content > ul:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .Tabs .FilterMenu .Info > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .Tabs .Info > ul:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .plugins table .FilterMenu .Info > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs .plugins table .Info > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .btn-group >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu ul >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs ul >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu
+.tabbed-content >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu .Info >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .Info >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu .btn-group > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .btn-group > .Info:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .plugins table .FilterMenu ul > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs .plugins table ul > .Info:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .Tabs .FilterMenu ul > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .Tabs ul > .Info:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu
+.tabbed-content > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table
+.tabbed-content > .Info:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu .Info > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .Info > .Info:last-child:not(:first-child) > .FilterButton:first-child {
   border-bottom-left-radius: 0;
   border-top-left-radius: 0;
 }
@@ -4462,7 +4708,8 @@ a.current-theme,
 .tabbed-content li
 .tabbed-content > a + .dropdown-toggle, .plugins table
 .tabbed-content li .Info > a + .dropdown-toggle,
-.tabbed-content li .plugins table .Info > a + .dropdown-toggle {
+.tabbed-content li .plugins table .Info > a + .dropdown-toggle, .FilterMenu .btn-group > .FilterButton + .dropdown-toggle, .Tabs .FilterMenu ul > .FilterButton + .dropdown-toggle, .FilterMenu .Tabs ul > .FilterButton + .dropdown-toggle, .FilterMenu
+.tabbed-content > .FilterButton + .dropdown-toggle, .plugins table .FilterMenu .Info > .FilterButton + .dropdown-toggle, .FilterMenu .plugins table .Info > .FilterButton + .dropdown-toggle {
   padding-right: 8px;
   padding-left: 8px;
 }
@@ -4485,7 +4732,8 @@ a.current-theme,
 .tabbed-content li
 .btn-group-lg.tabbed-content > a + .dropdown-toggle, .plugins table
 .tabbed-content li .btn-group-lg.Info > a + .dropdown-toggle,
-.tabbed-content li .plugins table .btn-group-lg.Info > a + .dropdown-toggle, #Head h1 a .btn-group > span + .dropdown-toggle, .Tabs #Head h1 a ul > span + .dropdown-toggle, #Head h1 a .Tabs ul > span + .dropdown-toggle, #Head h1 a
+.tabbed-content li .plugins table .btn-group-lg.Info > a + .dropdown-toggle, .FilterMenu .btn-group-lg.btn-group > .FilterButton + .dropdown-toggle, .Tabs .FilterMenu ul.btn-group-lg > .FilterButton + .dropdown-toggle, .FilterMenu .Tabs ul.btn-group-lg > .FilterButton + .dropdown-toggle, .FilterMenu
+.btn-group-lg.tabbed-content > .FilterButton + .dropdown-toggle, .plugins table .FilterMenu .btn-group-lg.Info > .FilterButton + .dropdown-toggle, .FilterMenu .plugins table .btn-group-lg.Info > .FilterButton + .dropdown-toggle, #Head h1 a .btn-group > span + .dropdown-toggle, .Tabs #Head h1 a ul > span + .dropdown-toggle, #Head h1 a .Tabs ul > span + .dropdown-toggle, #Head h1 a
 .tabbed-content > span + .dropdown-toggle, .plugins table #Head h1 a .Info > span + .dropdown-toggle, #Head h1 a .plugins table .Info > span + .dropdown-toggle {
   padding-right: 12px;
   padding-left: 12px;
@@ -4493,25 +4741,25 @@ a.current-theme,
 
 .btn .caret, .file-upload-browse .caret, .Button .caret,
 .TextButton .caret, .SmallButton .caret, #Head h1 a span .caret, .Tabs ul li a .caret,
-.tabbed-content li a .caret, .btn .nav-heading::before, .file-upload-browse .nav-heading::before, .Button .nav-heading::before,
+.tabbed-content li a .caret, .FilterMenu .FilterButton .caret, .btn .nav-heading::before, .file-upload-browse .nav-heading::before, .Button .nav-heading::before,
 .TextButton .nav-heading::before, .SmallButton .nav-heading::before, #Head h1 a span .nav-heading::before, .Tabs ul li a .nav-heading::before,
-.tabbed-content li a .nav-heading::before, .btn .panel-nav h4::before, .panel-nav .btn h4::before, .file-upload-browse .panel-nav h4::before, .panel-nav .file-upload-browse h4::before, .Button .panel-nav h4::before, .panel-nav .Button h4::before,
+.tabbed-content li a .nav-heading::before, .FilterMenu .FilterButton .nav-heading::before, .btn .panel-nav h4::before, .panel-nav .btn h4::before, .file-upload-browse .panel-nav h4::before, .panel-nav .file-upload-browse h4::before, .Button .panel-nav h4::before, .panel-nav .Button h4::before,
 .TextButton .panel-nav h4::before, .panel-nav
 .TextButton h4::before, .SmallButton .panel-nav h4::before, .panel-nav .SmallButton h4::before, #Head h1 a span .panel-nav h4::before, .panel-nav #Head h1 a span h4::before, .Tabs ul li a .panel-nav h4::before, .panel-nav .Tabs ul li a h4::before,
 .tabbed-content li a .panel-nav h4::before, .panel-nav
-.tabbed-content li a h4::before {
+.tabbed-content li a h4::before, .FilterMenu .FilterButton .panel-nav h4::before, .panel-nav .FilterMenu .FilterButton h4::before {
   margin-left: 0;
 }
 
 .btn-lg .caret, .btn-group-lg > .btn .caret, .btn-group-lg > .file-upload-browse .caret, .btn-group-lg > .Button .caret, .btn-group-lg >
 .TextButton .caret, .btn-group-lg > .SmallButton .caret, .Tabs ul li .btn-group-lg > a .caret,
-.tabbed-content li .btn-group-lg > a .caret, #Head h1 a span .caret, .btn-lg .nav-heading::before, .btn-group-lg > .btn .nav-heading::before, .btn-group-lg > .file-upload-browse .nav-heading::before, .btn-group-lg > .Button .nav-heading::before, .btn-group-lg >
+.tabbed-content li .btn-group-lg > a .caret, .FilterMenu .btn-group-lg > .FilterButton .caret, #Head h1 a span .caret, .btn-lg .nav-heading::before, .btn-group-lg > .btn .nav-heading::before, .btn-group-lg > .file-upload-browse .nav-heading::before, .btn-group-lg > .Button .nav-heading::before, .btn-group-lg >
 .TextButton .nav-heading::before, .btn-group-lg > .SmallButton .nav-heading::before, .Tabs ul li .btn-group-lg > a .nav-heading::before,
-.tabbed-content li .btn-group-lg > a .nav-heading::before, #Head h1 a span .nav-heading::before, .btn-lg .panel-nav h4::before, .panel-nav .btn-lg h4::before, .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .btn-group-lg > .btn h4::before, .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .btn-group-lg > .file-upload-browse h4::before, .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .btn-group-lg > .Button h4::before, .btn-group-lg >
+.tabbed-content li .btn-group-lg > a .nav-heading::before, .FilterMenu .btn-group-lg > .FilterButton .nav-heading::before, #Head h1 a span .nav-heading::before, .btn-lg .panel-nav h4::before, .panel-nav .btn-lg h4::before, .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .btn-group-lg > .btn h4::before, .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .btn-group-lg > .file-upload-browse h4::before, .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .btn-group-lg > .Button h4::before, .btn-group-lg >
 .TextButton .panel-nav h4::before, .panel-nav .btn-group-lg >
 .TextButton h4::before, .btn-group-lg > .SmallButton .panel-nav h4::before, .panel-nav .btn-group-lg > .SmallButton h4::before, .Tabs ul li .btn-group-lg > a .panel-nav h4::before, .panel-nav .Tabs ul li .btn-group-lg > a h4::before,
 .tabbed-content li .btn-group-lg > a .panel-nav h4::before, .panel-nav
-.tabbed-content li .btn-group-lg > a h4::before, #Head h1 a span .panel-nav h4::before, .panel-nav #Head h1 a span h4::before {
+.tabbed-content li .btn-group-lg > a h4::before, .FilterMenu .btn-group-lg > .FilterButton .panel-nav h4::before, .panel-nav .FilterMenu .btn-group-lg > .FilterButton h4::before, #Head h1 a span .panel-nav h4::before, .panel-nav #Head h1 a span h4::before {
   border-width: 0.375em 0.375em 0;
   border-bottom-width: 0;
 }
@@ -4519,22 +4767,22 @@ a.current-theme,
 .dropup .btn-lg .caret, .dropup .btn-group-lg > .btn .caret, .dropup .btn-group-lg > .file-upload-browse .caret, .dropup .btn-group-lg > .Button .caret, .dropup .btn-group-lg >
 .TextButton .caret, .dropup .btn-group-lg > .SmallButton .caret, .dropup .Tabs ul li .btn-group-lg > a .caret, .Tabs ul li .dropup .btn-group-lg > a .caret, .dropup
 .tabbed-content li .btn-group-lg > a .caret,
-.tabbed-content li .dropup .btn-group-lg > a .caret, .dropup #Head h1 a span .caret, #Head h1 a .dropup span .caret, .dropup .btn-lg .nav-heading::before, .dropup .btn-group-lg > .btn .nav-heading::before, .dropup .btn-group-lg > .file-upload-browse .nav-heading::before, .dropup .btn-group-lg > .Button .nav-heading::before, .dropup .btn-group-lg >
+.tabbed-content li .dropup .btn-group-lg > a .caret, .dropup .FilterMenu .btn-group-lg > .FilterButton .caret, .FilterMenu .dropup .btn-group-lg > .FilterButton .caret, .dropup #Head h1 a span .caret, #Head h1 a .dropup span .caret, .dropup .btn-lg .nav-heading::before, .dropup .btn-group-lg > .btn .nav-heading::before, .dropup .btn-group-lg > .file-upload-browse .nav-heading::before, .dropup .btn-group-lg > .Button .nav-heading::before, .dropup .btn-group-lg >
 .TextButton .nav-heading::before, .dropup .btn-group-lg > .SmallButton .nav-heading::before, .dropup .Tabs ul li .btn-group-lg > a .nav-heading::before, .Tabs ul li .dropup .btn-group-lg > a .nav-heading::before, .dropup
 .tabbed-content li .btn-group-lg > a .nav-heading::before,
-.tabbed-content li .dropup .btn-group-lg > a .nav-heading::before, .dropup #Head h1 a span .nav-heading::before, #Head h1 a .dropup span .nav-heading::before, .dropup .btn-lg .panel-nav h4::before, .panel-nav .dropup .btn-lg h4::before, .dropup .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .btn h4::before, .dropup .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .file-upload-browse h4::before, .dropup .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .Button h4::before, .dropup .btn-group-lg >
+.tabbed-content li .dropup .btn-group-lg > a .nav-heading::before, .dropup .FilterMenu .btn-group-lg > .FilterButton .nav-heading::before, .FilterMenu .dropup .btn-group-lg > .FilterButton .nav-heading::before, .dropup #Head h1 a span .nav-heading::before, #Head h1 a .dropup span .nav-heading::before, .dropup .btn-lg .panel-nav h4::before, .panel-nav .dropup .btn-lg h4::before, .dropup .btn-group-lg > .btn .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .btn h4::before, .dropup .btn-group-lg > .file-upload-browse .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .file-upload-browse h4::before, .dropup .btn-group-lg > .Button .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .Button h4::before, .dropup .btn-group-lg >
 .TextButton .panel-nav h4::before, .panel-nav .dropup .btn-group-lg >
 .TextButton h4::before, .dropup .btn-group-lg > .SmallButton .panel-nav h4::before, .panel-nav .dropup .btn-group-lg > .SmallButton h4::before, .dropup .Tabs ul li .btn-group-lg > a .panel-nav h4::before, .panel-nav .dropup .Tabs ul li .btn-group-lg > a h4::before, .Tabs ul li .dropup .btn-group-lg > a .panel-nav h4::before, .panel-nav .Tabs ul li .dropup .btn-group-lg > a h4::before, .dropup
 .tabbed-content li .btn-group-lg > a .panel-nav h4::before, .panel-nav .dropup
 .tabbed-content li .btn-group-lg > a h4::before,
 .tabbed-content li .dropup .btn-group-lg > a .panel-nav h4::before, .panel-nav
-.tabbed-content li .dropup .btn-group-lg > a h4::before, .dropup #Head h1 a span .panel-nav h4::before, .panel-nav .dropup #Head h1 a span h4::before, #Head h1 a .dropup span .panel-nav h4::before, .panel-nav #Head h1 a .dropup span h4::before {
+.tabbed-content li .dropup .btn-group-lg > a h4::before, .dropup .FilterMenu .btn-group-lg > .FilterButton .panel-nav h4::before, .panel-nav .dropup .FilterMenu .btn-group-lg > .FilterButton h4::before, .FilterMenu .dropup .btn-group-lg > .FilterButton .panel-nav h4::before, .panel-nav .FilterMenu .dropup .btn-group-lg > .FilterButton h4::before, .dropup #Head h1 a span .panel-nav h4::before, .panel-nav .dropup #Head h1 a span h4::before, #Head h1 a .dropup span .panel-nav h4::before, .panel-nav #Head h1 a .dropup span h4::before {
   border-width: 0 0.375em 0.375em;
 }
 
 .btn-group-vertical > .btn, .btn-group-vertical > .file-upload-browse, .btn-group-vertical > .Button, .btn-group-vertical >
 .TextButton, .btn-group-vertical > .SmallButton, #Head h1 a .btn-group-vertical > span, .Tabs ul li .btn-group-vertical > a,
-.tabbed-content li .btn-group-vertical > a,
+.tabbed-content li .btn-group-vertical > a, .FilterMenu .btn-group-vertical > .FilterButton,
 .btn-group-vertical > .btn-group, .Tabs
 .btn-group-vertical > ul,
 .btn-group-vertical >
@@ -4594,7 +4842,14 @@ a.current-theme,
 .tabbed-content li
 .btn-group-vertical > .Info > a,
 .tabbed-content li .plugins table
-.btn-group-vertical > .Info > a {
+.btn-group-vertical > .Info > a, .FilterMenu
+.btn-group-vertical > .btn-group > .FilterButton, .Tabs .FilterMenu
+.btn-group-vertical > ul > .FilterButton, .FilterMenu .Tabs
+.btn-group-vertical > ul > .FilterButton, .FilterMenu
+.btn-group-vertical >
+.tabbed-content > .FilterButton, .plugins table .FilterMenu
+.btn-group-vertical > .Info > .FilterButton, .FilterMenu .plugins table
+.btn-group-vertical > .Info > .FilterButton {
   display: block;
   float: none;
   width: 100%;
@@ -4626,17 +4881,18 @@ a.current-theme,
 .tabbed-content li .btn-group-vertical >
 .tabbed-content > a, .plugins table
 .tabbed-content li .btn-group-vertical > .Info > a,
-.tabbed-content li .plugins table .btn-group-vertical > .Info > a {
+.tabbed-content li .plugins table .btn-group-vertical > .Info > a, .FilterMenu .btn-group-vertical > .btn-group > .FilterButton, .Tabs .FilterMenu .btn-group-vertical > ul > .FilterButton, .FilterMenu .Tabs .btn-group-vertical > ul > .FilterButton, .FilterMenu .btn-group-vertical >
+.tabbed-content > .FilterButton, .plugins table .FilterMenu .btn-group-vertical > .Info > .FilterButton, .FilterMenu .plugins table .btn-group-vertical > .Info > .FilterButton {
   float: none;
 }
 
 .btn-group-vertical > .btn + .btn, .btn-group-vertical > .file-upload-browse + .btn, .btn-group-vertical > .Button + .btn, .btn-group-vertical >
 .TextButton + .btn, .btn-group-vertical > .SmallButton + .btn, #Head h1 a .btn-group-vertical > span + .btn, .Tabs ul li .btn-group-vertical > a + .btn,
-.tabbed-content li .btn-group-vertical > a + .btn, .btn-group-vertical > .btn + .file-upload-browse, .btn-group-vertical > .file-upload-browse + .file-upload-browse, .btn-group-vertical > .Button + .file-upload-browse, .btn-group-vertical >
+.tabbed-content li .btn-group-vertical > a + .btn, .FilterMenu .btn-group-vertical > .FilterButton + .btn, .btn-group-vertical > .btn + .file-upload-browse, .btn-group-vertical > .file-upload-browse + .file-upload-browse, .btn-group-vertical > .Button + .file-upload-browse, .btn-group-vertical >
 .TextButton + .file-upload-browse, .btn-group-vertical > .SmallButton + .file-upload-browse, #Head h1 a .btn-group-vertical > span + .file-upload-browse, .Tabs ul li .btn-group-vertical > a + .file-upload-browse,
-.tabbed-content li .btn-group-vertical > a + .file-upload-browse, .btn-group-vertical > .btn + .Button, .btn-group-vertical > .file-upload-browse + .Button, .btn-group-vertical > .Button + .Button, .btn-group-vertical >
+.tabbed-content li .btn-group-vertical > a + .file-upload-browse, .FilterMenu .btn-group-vertical > .FilterButton + .file-upload-browse, .btn-group-vertical > .btn + .Button, .btn-group-vertical > .file-upload-browse + .Button, .btn-group-vertical > .Button + .Button, .btn-group-vertical >
 .TextButton + .Button, .btn-group-vertical > .SmallButton + .Button, #Head h1 a .btn-group-vertical > span + .Button, .Tabs ul li .btn-group-vertical > a + .Button,
-.tabbed-content li .btn-group-vertical > a + .Button, .btn-group-vertical > .btn +
+.tabbed-content li .btn-group-vertical > a + .Button, .FilterMenu .btn-group-vertical > .FilterButton + .Button, .btn-group-vertical > .btn +
 .TextButton, .btn-group-vertical > .file-upload-browse +
 .TextButton, .btn-group-vertical > .Button +
 .TextButton, .btn-group-vertical >
@@ -4646,13 +4902,14 @@ a.current-theme,
 .TextButton, .Tabs ul li .btn-group-vertical > a +
 .TextButton,
 .tabbed-content li .btn-group-vertical > a +
+.TextButton, .FilterMenu .btn-group-vertical > .FilterButton +
 .TextButton, .btn-group-vertical > .btn + .SmallButton, .btn-group-vertical > .file-upload-browse + .SmallButton, .btn-group-vertical > .Button + .SmallButton, .btn-group-vertical >
 .TextButton + .SmallButton, .btn-group-vertical > .SmallButton + .SmallButton, #Head h1 a .btn-group-vertical > span + .SmallButton, .Tabs ul li .btn-group-vertical > a + .SmallButton,
-.tabbed-content li .btn-group-vertical > a + .SmallButton, #Head h1 a .btn-group-vertical > .btn + span, #Head h1 a .btn-group-vertical > .file-upload-browse + span, #Head h1 a .btn-group-vertical > .Button + span, #Head h1 a .btn-group-vertical >
+.tabbed-content li .btn-group-vertical > a + .SmallButton, .FilterMenu .btn-group-vertical > .FilterButton + .SmallButton, #Head h1 a .btn-group-vertical > .btn + span, #Head h1 a .btn-group-vertical > .file-upload-browse + span, #Head h1 a .btn-group-vertical > .Button + span, #Head h1 a .btn-group-vertical >
 .TextButton + span, #Head h1 a .btn-group-vertical > .SmallButton + span, #Head h1 a .btn-group-vertical > span + span, .Tabs ul li #Head h1 a .btn-group-vertical > a + span, #Head h1 a .Tabs ul li .btn-group-vertical > a + span,
 .tabbed-content li #Head h1 a .btn-group-vertical > a + span, #Head h1 a
-.tabbed-content li .btn-group-vertical > a + span, .Tabs ul li .btn-group-vertical > .btn + a, .Tabs ul li .btn-group-vertical > .file-upload-browse + a, .Tabs ul li .btn-group-vertical > .Button + a, .Tabs ul li .btn-group-vertical >
-.TextButton + a, .Tabs ul li .btn-group-vertical > .SmallButton + a, #Head h1 a .Tabs ul li .btn-group-vertical > span + a, .Tabs ul li #Head h1 a .btn-group-vertical > span + a, .Tabs ul li .btn-group-vertical > a + a,
+.tabbed-content li .btn-group-vertical > a + span, .FilterMenu #Head h1 a .btn-group-vertical > .FilterButton + span, #Head h1 a .FilterMenu .btn-group-vertical > .FilterButton + span, .Tabs ul li .btn-group-vertical > .btn + a, .Tabs ul li .btn-group-vertical > .file-upload-browse + a, .Tabs ul li .btn-group-vertical > .Button + a, .Tabs ul li .btn-group-vertical >
+.TextButton + a, .Tabs ul li .btn-group-vertical > .SmallButton + a, #Head h1 a .Tabs ul li .btn-group-vertical > span + a, .Tabs ul li #Head h1 a .btn-group-vertical > span + a, .Tabs ul li .btn-group-vertical > a + a, .FilterMenu .Tabs ul li .btn-group-vertical > .FilterButton + a, .Tabs ul li .FilterMenu .btn-group-vertical > .FilterButton + a,
 .tabbed-content li .btn-group-vertical > .btn + a,
 .tabbed-content li .btn-group-vertical > .file-upload-browse + a,
 .tabbed-content li .btn-group-vertical > .Button + a,
@@ -4662,7 +4919,12 @@ a.current-theme,
 .tabbed-content li .btn-group-vertical > span + a,
 .tabbed-content li #Head h1 a .btn-group-vertical > span + a, .Tabs ul
 .tabbed-content li .btn-group-vertical > a + a,
-.tabbed-content .Tabs ul li .btn-group-vertical > a + a, .tabbed-content li .btn-group-vertical > a + a,
+.tabbed-content .Tabs ul li .btn-group-vertical > a + a, .tabbed-content li .btn-group-vertical > a + a, .FilterMenu
+.tabbed-content li .btn-group-vertical > .FilterButton + a,
+.tabbed-content li .FilterMenu .btn-group-vertical > .FilterButton + a, .FilterMenu .btn-group-vertical > .btn + .FilterButton, .FilterMenu .btn-group-vertical > .file-upload-browse + .FilterButton, .FilterMenu .btn-group-vertical > .Button + .FilterButton, .FilterMenu .btn-group-vertical >
+.TextButton + .FilterButton, .FilterMenu .btn-group-vertical > .SmallButton + .FilterButton, #Head h1 a .FilterMenu .btn-group-vertical > span + .FilterButton, .FilterMenu #Head h1 a .btn-group-vertical > span + .FilterButton, .Tabs ul li .FilterMenu .btn-group-vertical > a + .FilterButton, .FilterMenu .Tabs ul li .btn-group-vertical > a + .FilterButton,
+.tabbed-content li .FilterMenu .btn-group-vertical > a + .FilterButton, .FilterMenu
+.tabbed-content li .btn-group-vertical > a + .FilterButton, .FilterMenu .btn-group-vertical > .FilterButton + .FilterButton,
 .btn-group-vertical > .btn + .btn-group,
 .btn-group-vertical > .file-upload-browse + .btn-group,
 .btn-group-vertical > .Button + .btn-group,
@@ -4672,7 +4934,8 @@ a.current-theme,
 .btn-group-vertical > span + .btn-group, .Tabs ul li
 .btn-group-vertical > a + .btn-group,
 .tabbed-content li
-.btn-group-vertical > a + .btn-group, .Tabs
+.btn-group-vertical > a + .btn-group, .FilterMenu
+.btn-group-vertical > .FilterButton + .btn-group, .Tabs
 .btn-group-vertical > .btn + ul, .Tabs
 .btn-group-vertical > .file-upload-browse + ul, .Tabs
 .btn-group-vertical > .Button + ul, .Tabs
@@ -4685,7 +4948,9 @@ a.current-theme,
 .tabbed-content li .Tabs
 .btn-group-vertical > a + ul, .Tabs
 .tabbed-content li
-.btn-group-vertical > a + ul,
+.btn-group-vertical > a + ul, .FilterMenu .Tabs
+.btn-group-vertical > .FilterButton + ul, .Tabs .FilterMenu
+.btn-group-vertical > .FilterButton + ul,
 .btn-group-vertical > .btn +
 .tabbed-content,
 .btn-group-vertical > .file-upload-browse +
@@ -4703,6 +4968,8 @@ a.current-theme,
 .tabbed-content,
 .tabbed-content li
 .btn-group-vertical > a +
+.tabbed-content, .FilterMenu
+.btn-group-vertical > .FilterButton +
 .tabbed-content, .plugins table
 .btn-group-vertical > .btn + .Info, .plugins table
 .btn-group-vertical > .file-upload-browse + .Info, .plugins table
@@ -4717,7 +4984,9 @@ a.current-theme,
 .tabbed-content li .plugins table
 .btn-group-vertical > a + .Info, .plugins table
 .tabbed-content li
-.btn-group-vertical > a + .Info,
+.btn-group-vertical > a + .Info, .FilterMenu .plugins table
+.btn-group-vertical > .FilterButton + .Info, .plugins table .FilterMenu
+.btn-group-vertical > .FilterButton + .Info,
 .btn-group-vertical > .btn-group + .btn, .Tabs
 .btn-group-vertical > ul + .btn,
 .btn-group-vertical >
@@ -4772,7 +5041,14 @@ a.current-theme,
 .tabbed-content li
 .btn-group-vertical > .Info + a,
 .tabbed-content li .plugins table
-.btn-group-vertical > .Info + a,
+.btn-group-vertical > .Info + a, .FilterMenu
+.btn-group-vertical > .btn-group + .FilterButton, .Tabs .FilterMenu
+.btn-group-vertical > ul + .FilterButton, .FilterMenu .Tabs
+.btn-group-vertical > ul + .FilterButton, .FilterMenu
+.btn-group-vertical >
+.tabbed-content + .FilterButton, .plugins table .FilterMenu
+.btn-group-vertical > .Info + .FilterButton, .FilterMenu .plugins table
+.btn-group-vertical > .Info + .FilterButton,
 .btn-group-vertical > .btn-group + .btn-group, .Tabs
 .btn-group-vertical > ul + .btn-group,
 .btn-group-vertical >
@@ -4805,13 +5081,13 @@ a.current-theme,
 
 .btn-group-vertical > .btn:not(:first-child):not(:last-child), .btn-group-vertical > .file-upload-browse:not(:first-child):not(:last-child), .btn-group-vertical > .Button:not(:first-child):not(:last-child), .btn-group-vertical >
 .TextButton:not(:first-child):not(:last-child), .btn-group-vertical > .SmallButton:not(:first-child):not(:last-child), #Head h1 a .btn-group-vertical > span:not(:first-child):not(:last-child), .Tabs ul li .btn-group-vertical > a:not(:first-child):not(:last-child),
-.tabbed-content li .btn-group-vertical > a:not(:first-child):not(:last-child) {
+.tabbed-content li .btn-group-vertical > a:not(:first-child):not(:last-child), .FilterMenu .btn-group-vertical > .FilterButton:not(:first-child):not(:last-child) {
   border-radius: 0;
 }
 
 .btn-group-vertical > .btn:first-child:not(:last-child), .btn-group-vertical > .file-upload-browse:first-child:not(:last-child), .btn-group-vertical > .Button:first-child:not(:last-child), .btn-group-vertical >
 .TextButton:first-child:not(:last-child), .btn-group-vertical > .SmallButton:first-child:not(:last-child), #Head h1 a .btn-group-vertical > span:first-child:not(:last-child), .Tabs ul li .btn-group-vertical > a:first-child:not(:last-child),
-.tabbed-content li .btn-group-vertical > a:first-child:not(:last-child) {
+.tabbed-content li .btn-group-vertical > a:first-child:not(:last-child), .FilterMenu .btn-group-vertical > .FilterButton:first-child:not(:last-child) {
   border-top-right-radius: 0.1rem;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
@@ -4819,7 +5095,7 @@ a.current-theme,
 
 .btn-group-vertical > .btn:last-child:not(:first-child), .btn-group-vertical > .file-upload-browse:last-child:not(:first-child), .btn-group-vertical > .Button:last-child:not(:first-child), .btn-group-vertical >
 .TextButton:last-child:not(:first-child), .btn-group-vertical > .SmallButton:last-child:not(:first-child), #Head h1 a .btn-group-vertical > span:last-child:not(:first-child), .Tabs ul li .btn-group-vertical > a:last-child:not(:first-child),
-.tabbed-content li .btn-group-vertical > a:last-child:not(:first-child) {
+.tabbed-content li .btn-group-vertical > a:last-child:not(:first-child), .FilterMenu .btn-group-vertical > .FilterButton:last-child:not(:first-child) {
   border-bottom-left-radius: 0.1rem;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
@@ -4843,7 +5119,8 @@ a.current-theme,
 .tabbed-content li .btn-group-vertical >
 .tabbed-content:not(:first-child):not(:last-child) > a, .plugins table
 .tabbed-content li .btn-group-vertical > .Info:not(:first-child):not(:last-child) > a,
-.tabbed-content li .plugins table .btn-group-vertical > .Info:not(:first-child):not(:last-child) > a {
+.tabbed-content li .plugins table .btn-group-vertical > .Info:not(:first-child):not(:last-child) > a, .FilterMenu .btn-group-vertical > .btn-group:not(:first-child):not(:last-child) > .FilterButton, .Tabs .FilterMenu .btn-group-vertical > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .Tabs .btn-group-vertical > ul:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .btn-group-vertical >
+.tabbed-content:not(:first-child):not(:last-child) > .FilterButton, .plugins table .FilterMenu .btn-group-vertical > .Info:not(:first-child):not(:last-child) > .FilterButton, .FilterMenu .plugins table .btn-group-vertical > .Info:not(:first-child):not(:last-child) > .FilterButton {
   border-radius: 0;
 }
 
@@ -4865,7 +5142,8 @@ a.current-theme,
 .tabbed-content li .btn-group-vertical >
 .tabbed-content:first-child:not(:last-child) > a:last-child, .plugins table
 .tabbed-content li .btn-group-vertical > .Info:first-child:not(:last-child) > a:last-child,
-.tabbed-content li .plugins table .btn-group-vertical > .Info:first-child:not(:last-child) > a:last-child,
+.tabbed-content li .plugins table .btn-group-vertical > .Info:first-child:not(:last-child) > a:last-child, .FilterMenu .btn-group-vertical > .btn-group:first-child:not(:last-child) > .FilterButton:last-child, .Tabs .FilterMenu .btn-group-vertical > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .Tabs .btn-group-vertical > ul:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .btn-group-vertical >
+.tabbed-content:first-child:not(:last-child) > .FilterButton:last-child, .plugins table .FilterMenu .btn-group-vertical > .Info:first-child:not(:last-child) > .FilterButton:last-child, .FilterMenu .plugins table .btn-group-vertical > .Info:first-child:not(:last-child) > .FilterButton:last-child,
 .btn-group-vertical > .btn-group:first-child:not(:last-child) > .dropdown-toggle, .Tabs
 .btn-group-vertical > ul:first-child:not(:last-child) > .dropdown-toggle,
 .btn-group-vertical >
@@ -4893,14 +5171,15 @@ a.current-theme,
 .tabbed-content li .btn-group-vertical >
 .tabbed-content:last-child:not(:first-child) > a:first-child, .plugins table
 .tabbed-content li .btn-group-vertical > .Info:last-child:not(:first-child) > a:first-child,
-.tabbed-content li .plugins table .btn-group-vertical > .Info:last-child:not(:first-child) > a:first-child {
+.tabbed-content li .plugins table .btn-group-vertical > .Info:last-child:not(:first-child) > a:first-child, .FilterMenu .btn-group-vertical > .btn-group:last-child:not(:first-child) > .FilterButton:first-child, .Tabs .FilterMenu .btn-group-vertical > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .Tabs .btn-group-vertical > ul:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .btn-group-vertical >
+.tabbed-content:last-child:not(:first-child) > .FilterButton:first-child, .plugins table .FilterMenu .btn-group-vertical > .Info:last-child:not(:first-child) > .FilterButton:first-child, .FilterMenu .plugins table .btn-group-vertical > .Info:last-child:not(:first-child) > .FilterButton:first-child {
   border-top-right-radius: 0;
   border-top-left-radius: 0;
 }
 
 [data-toggle="buttons"] > .btn input[type="radio"], [data-toggle="buttons"] > .file-upload-browse input[type="radio"], [data-toggle="buttons"] > .Button input[type="radio"], [data-toggle="buttons"] >
 .TextButton input[type="radio"], [data-toggle="buttons"] > .SmallButton input[type="radio"], #Head h1 a [data-toggle="buttons"] > span input[type="radio"], .Tabs ul li [data-toggle="buttons"] > a input[type="radio"],
-.tabbed-content li [data-toggle="buttons"] > a input[type="radio"],
+.tabbed-content li [data-toggle="buttons"] > a input[type="radio"], .FilterMenu [data-toggle="buttons"] > .FilterButton input[type="radio"],
 [data-toggle="buttons"] > .btn input[type="checkbox"],
 [data-toggle="buttons"] > .file-upload-browse input[type="checkbox"],
 [data-toggle="buttons"] > .Button input[type="checkbox"],
@@ -4910,7 +5189,8 @@ a.current-theme,
 [data-toggle="buttons"] > span input[type="checkbox"], .Tabs ul li
 [data-toggle="buttons"] > a input[type="checkbox"],
 .tabbed-content li
-[data-toggle="buttons"] > a input[type="checkbox"],
+[data-toggle="buttons"] > a input[type="checkbox"], .FilterMenu
+[data-toggle="buttons"] > .FilterButton input[type="checkbox"],
 [data-toggle="buttons"] > .btn-group > .btn input[type="radio"], .Tabs
 [data-toggle="buttons"] > ul > .btn input[type="radio"],
 [data-toggle="buttons"] >
@@ -4965,7 +5245,14 @@ a.current-theme,
 .tabbed-content li
 [data-toggle="buttons"] > .Info > a input[type="radio"],
 .tabbed-content li .plugins table
-[data-toggle="buttons"] > .Info > a input[type="radio"],
+[data-toggle="buttons"] > .Info > a input[type="radio"], .FilterMenu
+[data-toggle="buttons"] > .btn-group > .FilterButton input[type="radio"], .Tabs .FilterMenu
+[data-toggle="buttons"] > ul > .FilterButton input[type="radio"], .FilterMenu .Tabs
+[data-toggle="buttons"] > ul > .FilterButton input[type="radio"], .FilterMenu
+[data-toggle="buttons"] >
+.tabbed-content > .FilterButton input[type="radio"], .plugins table .FilterMenu
+[data-toggle="buttons"] > .Info > .FilterButton input[type="radio"], .FilterMenu .plugins table
+[data-toggle="buttons"] > .Info > .FilterButton input[type="radio"],
 [data-toggle="buttons"] > .btn-group > .btn input[type="checkbox"], .Tabs
 [data-toggle="buttons"] > ul > .btn input[type="checkbox"],
 [data-toggle="buttons"] >
@@ -5020,7 +5307,14 @@ a.current-theme,
 .tabbed-content li
 [data-toggle="buttons"] > .Info > a input[type="checkbox"],
 .tabbed-content li .plugins table
-[data-toggle="buttons"] > .Info > a input[type="checkbox"] {
+[data-toggle="buttons"] > .Info > a input[type="checkbox"], .FilterMenu
+[data-toggle="buttons"] > .btn-group > .FilterButton input[type="checkbox"], .Tabs .FilterMenu
+[data-toggle="buttons"] > ul > .FilterButton input[type="checkbox"], .FilterMenu .Tabs
+[data-toggle="buttons"] > ul > .FilterButton input[type="checkbox"], .FilterMenu
+[data-toggle="buttons"] >
+.tabbed-content > .FilterButton input[type="checkbox"], .plugins table .FilterMenu
+[data-toggle="buttons"] > .Info > .FilterButton input[type="checkbox"], .FilterMenu .plugins table
+[data-toggle="buttons"] > .Info > .FilterButton input[type="checkbox"] {
   position: absolute;
   clip: rect(0, 0, 0, 0);
   pointer-events: none;
@@ -5543,13 +5837,13 @@ a.current-theme,
 .modal-footer .btn + .btn, .modal-footer .file-upload-browse + .btn, .modal-footer .Button + .btn, .modal-footer
 .TextButton + .btn, .modal-footer .SmallButton + .btn, .modal-footer #Head h1 a span + .btn, #Head h1 a .modal-footer span + .btn, .modal-footer .Tabs ul li a + .btn, .Tabs ul li .modal-footer a + .btn, .modal-footer
 .tabbed-content li a + .btn,
-.tabbed-content li .modal-footer a + .btn, .modal-footer .btn + .file-upload-browse, .modal-footer .file-upload-browse + .file-upload-browse, .modal-footer .Button + .file-upload-browse, .modal-footer
+.tabbed-content li .modal-footer a + .btn, .modal-footer .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .FilterButton + .btn, .modal-footer .btn + .file-upload-browse, .modal-footer .file-upload-browse + .file-upload-browse, .modal-footer .Button + .file-upload-browse, .modal-footer
 .TextButton + .file-upload-browse, .modal-footer .SmallButton + .file-upload-browse, .modal-footer #Head h1 a span + .file-upload-browse, #Head h1 a .modal-footer span + .file-upload-browse, .modal-footer .Tabs ul li a + .file-upload-browse, .Tabs ul li .modal-footer a + .file-upload-browse, .modal-footer
 .tabbed-content li a + .file-upload-browse,
-.tabbed-content li .modal-footer a + .file-upload-browse, .modal-footer .btn + .Button, .modal-footer .file-upload-browse + .Button, .modal-footer .Button + .Button, .modal-footer
+.tabbed-content li .modal-footer a + .file-upload-browse, .modal-footer .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .FilterButton + .file-upload-browse, .modal-footer .btn + .Button, .modal-footer .file-upload-browse + .Button, .modal-footer .Button + .Button, .modal-footer
 .TextButton + .Button, .modal-footer .SmallButton + .Button, .modal-footer #Head h1 a span + .Button, #Head h1 a .modal-footer span + .Button, .modal-footer .Tabs ul li a + .Button, .Tabs ul li .modal-footer a + .Button, .modal-footer
 .tabbed-content li a + .Button,
-.tabbed-content li .modal-footer a + .Button, .modal-footer .btn +
+.tabbed-content li .modal-footer a + .Button, .modal-footer .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .FilterButton + .Button, .modal-footer .btn +
 .TextButton, .modal-footer .file-upload-browse +
 .TextButton, .modal-footer .Button +
 .TextButton, .modal-footer
@@ -5563,20 +5857,22 @@ a.current-theme,
 .tabbed-content li a +
 .TextButton,
 .tabbed-content li .modal-footer a +
+.TextButton, .modal-footer .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .modal-footer .FilterButton +
 .TextButton, .modal-footer .btn + .SmallButton, .modal-footer .file-upload-browse + .SmallButton, .modal-footer .Button + .SmallButton, .modal-footer
 .TextButton + .SmallButton, .modal-footer .SmallButton + .SmallButton, .modal-footer #Head h1 a span + .SmallButton, #Head h1 a .modal-footer span + .SmallButton, .modal-footer .Tabs ul li a + .SmallButton, .Tabs ul li .modal-footer a + .SmallButton, .modal-footer
 .tabbed-content li a + .SmallButton,
-.tabbed-content li .modal-footer a + .SmallButton, .modal-footer #Head h1 a .btn + span, #Head h1 a .modal-footer .btn + span, .modal-footer #Head h1 a .file-upload-browse + span, #Head h1 a .modal-footer .file-upload-browse + span, .modal-footer #Head h1 a .Button + span, #Head h1 a .modal-footer .Button + span, .modal-footer #Head h1 a
+.tabbed-content li .modal-footer a + .SmallButton, .modal-footer .FilterMenu .FilterButton + .SmallButton, .FilterMenu .modal-footer .FilterButton + .SmallButton, .modal-footer #Head h1 a .btn + span, #Head h1 a .modal-footer .btn + span, .modal-footer #Head h1 a .file-upload-browse + span, #Head h1 a .modal-footer .file-upload-browse + span, .modal-footer #Head h1 a .Button + span, #Head h1 a .modal-footer .Button + span, .modal-footer #Head h1 a
 .TextButton + span, #Head h1 a .modal-footer
 .TextButton + span, .modal-footer #Head h1 a .SmallButton + span, #Head h1 a .modal-footer .SmallButton + span, .modal-footer #Head h1 a span + span, #Head h1 a .modal-footer span + span, .modal-footer .Tabs ul li #Head h1 a a + span, #Head h1 a .modal-footer .Tabs ul li a + span, .Tabs ul li .modal-footer #Head h1 a a + span, #Head h1 a .Tabs ul li .modal-footer a + span, .modal-footer
 .tabbed-content li #Head h1 a a + span, #Head h1 a .modal-footer
 .tabbed-content li a + span,
 .tabbed-content li .modal-footer #Head h1 a a + span, #Head h1 a
-.tabbed-content li .modal-footer a + span, .modal-footer .Tabs ul li .btn + a, .Tabs ul li .modal-footer .btn + a, .modal-footer .Tabs ul li .file-upload-browse + a, .Tabs ul li .modal-footer .file-upload-browse + a, .modal-footer .Tabs ul li .Button + a, .Tabs ul li .modal-footer .Button + a, .modal-footer .Tabs ul li
+.tabbed-content li .modal-footer a + span, .modal-footer .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .modal-footer .FilterMenu .FilterButton + span, .FilterMenu .modal-footer #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .modal-footer .FilterButton + span, .modal-footer .Tabs ul li .btn + a, .Tabs ul li .modal-footer .btn + a, .modal-footer .Tabs ul li .file-upload-browse + a, .Tabs ul li .modal-footer .file-upload-browse + a, .modal-footer .Tabs ul li .Button + a, .Tabs ul li .modal-footer .Button + a, .modal-footer .Tabs ul li
 .TextButton + a, .Tabs ul li .modal-footer
 .TextButton + a, .modal-footer .Tabs ul li .SmallButton + a, .Tabs ul li .modal-footer .SmallButton + a, .modal-footer #Head h1 a .Tabs ul li span + a, .Tabs ul li .modal-footer #Head h1 a span + a, #Head h1 a .modal-footer .Tabs ul li span + a, .Tabs ul li #Head h1 a .modal-footer span + a, .modal-footer .Tabs ul li a + a, .Tabs ul li .modal-footer a + a, .modal-footer
 .tabbed-content .Tabs ul li a + a, .Tabs ul .modal-footer
-.tabbed-content li a + a, .modal-footer
+.tabbed-content li a + a, .modal-footer .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .modal-footer .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .modal-footer .FilterButton + a, .modal-footer
 .tabbed-content li .btn + a,
 .tabbed-content li .modal-footer .btn + a, .modal-footer
 .tabbed-content li .file-upload-browse + a,
@@ -5596,7 +5892,17 @@ a.current-theme,
 .tabbed-content li a + a,
 .tabbed-content .modal-footer .Tabs ul li a + a, .Tabs ul
 .tabbed-content li .modal-footer a + a,
-.tabbed-content .Tabs ul li .modal-footer a + a, .modal-footer .tabbed-content li a + a, .tabbed-content li .modal-footer a + a {
+.tabbed-content .Tabs ul li .modal-footer a + a, .modal-footer .tabbed-content li a + a, .tabbed-content li .modal-footer a + a, .modal-footer .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .modal-footer .FilterMenu .FilterButton + a, .FilterMenu .modal-footer
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .modal-footer .FilterButton + a, .modal-footer .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .btn + .FilterButton, .modal-footer .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .file-upload-browse + .FilterButton, .modal-footer .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .Button + .FilterButton, .modal-footer .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .modal-footer
+.TextButton + .FilterButton, .modal-footer .FilterMenu .SmallButton + .FilterButton, .FilterMenu .modal-footer .SmallButton + .FilterButton, .modal-footer #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .modal-footer #Head h1 a span + .FilterButton, #Head h1 a .modal-footer .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .modal-footer span + .FilterButton, .modal-footer .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .Tabs ul li a + .FilterButton, .Tabs ul li .modal-footer .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .modal-footer a + .FilterButton, .modal-footer
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .modal-footer .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .modal-footer a + .FilterButton, .modal-footer .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .FilterButton + .FilterButton {
   margin-bottom: 0;
   margin-left: 5px;
 }
@@ -5626,7 +5932,9 @@ a.current-theme,
 .tabbed-content li a + .btn,
 .tabbed-content li .modal-footer .plugins table .Info a + .btn, .plugins table .modal-footer .Info
 .tabbed-content li a + .btn,
-.tabbed-content li .plugins table .modal-footer .Info a + .btn, .modal-footer .btn-group .btn + .file-upload-browse, .modal-footer .Tabs ul .btn + .file-upload-browse, .Tabs .modal-footer ul .btn + .file-upload-browse, .modal-footer
+.tabbed-content li .plugins table .modal-footer .Info a + .btn, .modal-footer .btn-group .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .btn-group .FilterButton + .btn, .modal-footer .Tabs ul .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .Tabs ul .FilterButton + .btn, .Tabs .modal-footer ul .FilterMenu .FilterButton + .btn, .FilterMenu .Tabs .modal-footer ul .FilterButton + .btn, .modal-footer
+.tabbed-content .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer
+.tabbed-content .FilterButton + .btn, .modal-footer .plugins table .Info .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .plugins table .Info .FilterButton + .btn, .plugins table .modal-footer .Info .FilterMenu .FilterButton + .btn, .FilterMenu .plugins table .modal-footer .Info .FilterButton + .btn, .modal-footer .btn-group .btn + .file-upload-browse, .modal-footer .Tabs ul .btn + .file-upload-browse, .Tabs .modal-footer ul .btn + .file-upload-browse, .modal-footer
 .tabbed-content .btn + .file-upload-browse, .modal-footer .plugins table .Info .btn + .file-upload-browse, .plugins table .modal-footer .Info .btn + .file-upload-browse, .modal-footer .btn-group .file-upload-browse + .file-upload-browse, .modal-footer .Tabs ul .file-upload-browse + .file-upload-browse, .Tabs .modal-footer ul .file-upload-browse + .file-upload-browse, .modal-footer
 .tabbed-content .file-upload-browse + .file-upload-browse, .modal-footer .plugins table .Info .file-upload-browse + .file-upload-browse, .plugins table .modal-footer .Info .file-upload-browse + .file-upload-browse, .modal-footer .btn-group .Button + .file-upload-browse, .modal-footer .Tabs ul .Button + .file-upload-browse, .Tabs .modal-footer ul .Button + .file-upload-browse, .modal-footer
 .tabbed-content .Button + .file-upload-browse, .modal-footer .plugins table .Info .Button + .file-upload-browse, .plugins table .modal-footer .Info .Button + .file-upload-browse, .modal-footer .btn-group
@@ -5651,7 +5959,9 @@ a.current-theme,
 .tabbed-content li a + .file-upload-browse,
 .tabbed-content li .modal-footer .plugins table .Info a + .file-upload-browse, .plugins table .modal-footer .Info
 .tabbed-content li a + .file-upload-browse,
-.tabbed-content li .plugins table .modal-footer .Info a + .file-upload-browse, .modal-footer .btn-group .btn + .Button, .modal-footer .Tabs ul .btn + .Button, .Tabs .modal-footer ul .btn + .Button, .modal-footer
+.tabbed-content li .plugins table .modal-footer .Info a + .file-upload-browse, .modal-footer .btn-group .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .btn-group .FilterButton + .file-upload-browse, .modal-footer .Tabs ul .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .Tabs ul .FilterButton + .file-upload-browse, .Tabs .modal-footer ul .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .Tabs .modal-footer ul .FilterButton + .file-upload-browse, .modal-footer
+.tabbed-content .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer
+.tabbed-content .FilterButton + .file-upload-browse, .modal-footer .plugins table .Info .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .plugins table .Info .FilterButton + .file-upload-browse, .plugins table .modal-footer .Info .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .plugins table .modal-footer .Info .FilterButton + .file-upload-browse, .modal-footer .btn-group .btn + .Button, .modal-footer .Tabs ul .btn + .Button, .Tabs .modal-footer ul .btn + .Button, .modal-footer
 .tabbed-content .btn + .Button, .modal-footer .plugins table .Info .btn + .Button, .plugins table .modal-footer .Info .btn + .Button, .modal-footer .btn-group .file-upload-browse + .Button, .modal-footer .Tabs ul .file-upload-browse + .Button, .Tabs .modal-footer ul .file-upload-browse + .Button, .modal-footer
 .tabbed-content .file-upload-browse + .Button, .modal-footer .plugins table .Info .file-upload-browse + .Button, .plugins table .modal-footer .Info .file-upload-browse + .Button, .modal-footer .btn-group .Button + .Button, .modal-footer .Tabs ul .Button + .Button, .Tabs .modal-footer ul .Button + .Button, .modal-footer
 .tabbed-content .Button + .Button, .modal-footer .plugins table .Info .Button + .Button, .plugins table .modal-footer .Info .Button + .Button, .modal-footer .btn-group
@@ -5676,7 +5986,9 @@ a.current-theme,
 .tabbed-content li a + .Button,
 .tabbed-content li .modal-footer .plugins table .Info a + .Button, .plugins table .modal-footer .Info
 .tabbed-content li a + .Button,
-.tabbed-content li .plugins table .modal-footer .Info a + .Button, .modal-footer .btn-group .btn +
+.tabbed-content li .plugins table .modal-footer .Info a + .Button, .modal-footer .btn-group .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .btn-group .FilterButton + .Button, .modal-footer .Tabs ul .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .Tabs ul .FilterButton + .Button, .Tabs .modal-footer ul .FilterMenu .FilterButton + .Button, .FilterMenu .Tabs .modal-footer ul .FilterButton + .Button, .modal-footer
+.tabbed-content .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer
+.tabbed-content .FilterButton + .Button, .modal-footer .plugins table .Info .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .plugins table .Info .FilterButton + .Button, .plugins table .modal-footer .Info .FilterMenu .FilterButton + .Button, .FilterMenu .plugins table .modal-footer .Info .FilterButton + .Button, .modal-footer .btn-group .btn +
 .TextButton, .modal-footer .Tabs ul .btn +
 .TextButton, .Tabs .modal-footer ul .btn +
 .TextButton, .modal-footer
@@ -5764,6 +6076,20 @@ a.current-theme,
 .tabbed-content li a +
 .TextButton,
 .tabbed-content li .plugins table .modal-footer .Info a +
+.TextButton, .modal-footer .btn-group .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .modal-footer .btn-group .FilterButton +
+.TextButton, .modal-footer .Tabs ul .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .modal-footer .Tabs ul .FilterButton +
+.TextButton, .Tabs .modal-footer ul .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .Tabs .modal-footer ul .FilterButton +
+.TextButton, .modal-footer
+.tabbed-content .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .modal-footer
+.tabbed-content .FilterButton +
+.TextButton, .modal-footer .plugins table .Info .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .modal-footer .plugins table .Info .FilterButton +
+.TextButton, .plugins table .modal-footer .Info .FilterMenu .FilterButton +
+.TextButton, .FilterMenu .plugins table .modal-footer .Info .FilterButton +
 .TextButton, .modal-footer .btn-group .btn + .SmallButton, .modal-footer .Tabs ul .btn + .SmallButton, .Tabs .modal-footer ul .btn + .SmallButton, .modal-footer
 .tabbed-content .btn + .SmallButton, .modal-footer .plugins table .Info .btn + .SmallButton, .plugins table .modal-footer .Info .btn + .SmallButton, .modal-footer .btn-group .file-upload-browse + .SmallButton, .modal-footer .Tabs ul .file-upload-browse + .SmallButton, .Tabs .modal-footer ul .file-upload-browse + .SmallButton, .modal-footer
 .tabbed-content .file-upload-browse + .SmallButton, .modal-footer .plugins table .Info .file-upload-browse + .SmallButton, .plugins table .modal-footer .Info .file-upload-browse + .SmallButton, .modal-footer .btn-group .Button + .SmallButton, .modal-footer .Tabs ul .Button + .SmallButton, .Tabs .modal-footer ul .Button + .SmallButton, .modal-footer
@@ -5789,7 +6115,9 @@ a.current-theme,
 .tabbed-content li a + .SmallButton,
 .tabbed-content li .modal-footer .plugins table .Info a + .SmallButton, .plugins table .modal-footer .Info
 .tabbed-content li a + .SmallButton,
-.tabbed-content li .plugins table .modal-footer .Info a + .SmallButton, .modal-footer .btn-group #Head h1 a .btn + span, #Head h1 a .modal-footer .btn-group .btn + span, .modal-footer .Tabs ul #Head h1 a .btn + span, #Head h1 a .modal-footer .Tabs ul .btn + span, .Tabs .modal-footer ul #Head h1 a .btn + span, #Head h1 a .Tabs .modal-footer ul .btn + span, .modal-footer
+.tabbed-content li .plugins table .modal-footer .Info a + .SmallButton, .modal-footer .btn-group .FilterMenu .FilterButton + .SmallButton, .FilterMenu .modal-footer .btn-group .FilterButton + .SmallButton, .modal-footer .Tabs ul .FilterMenu .FilterButton + .SmallButton, .FilterMenu .modal-footer .Tabs ul .FilterButton + .SmallButton, .Tabs .modal-footer ul .FilterMenu .FilterButton + .SmallButton, .FilterMenu .Tabs .modal-footer ul .FilterButton + .SmallButton, .modal-footer
+.tabbed-content .FilterMenu .FilterButton + .SmallButton, .FilterMenu .modal-footer
+.tabbed-content .FilterButton + .SmallButton, .modal-footer .plugins table .Info .FilterMenu .FilterButton + .SmallButton, .FilterMenu .modal-footer .plugins table .Info .FilterButton + .SmallButton, .plugins table .modal-footer .Info .FilterMenu .FilterButton + .SmallButton, .FilterMenu .plugins table .modal-footer .Info .FilterButton + .SmallButton, .modal-footer .btn-group #Head h1 a .btn + span, #Head h1 a .modal-footer .btn-group .btn + span, .modal-footer .Tabs ul #Head h1 a .btn + span, #Head h1 a .modal-footer .Tabs ul .btn + span, .Tabs .modal-footer ul #Head h1 a .btn + span, #Head h1 a .Tabs .modal-footer ul .btn + span, .modal-footer
 .tabbed-content #Head h1 a .btn + span, #Head h1 a .modal-footer
 .tabbed-content .btn + span, .modal-footer .plugins table .Info #Head h1 a .btn + span, #Head h1 a .modal-footer .plugins table .Info .btn + span, .plugins table .modal-footer .Info #Head h1 a .btn + span, #Head h1 a .plugins table .modal-footer .Info .btn + span, .modal-footer .btn-group #Head h1 a .file-upload-browse + span, #Head h1 a .modal-footer .btn-group .file-upload-browse + span, .modal-footer .Tabs ul #Head h1 a .file-upload-browse + span, #Head h1 a .modal-footer .Tabs ul .file-upload-browse + span, .Tabs .modal-footer ul #Head h1 a .file-upload-browse + span, #Head h1 a .Tabs .modal-footer ul .file-upload-browse + span, .modal-footer
 .tabbed-content #Head h1 a .file-upload-browse + span, #Head h1 a .modal-footer
@@ -5837,7 +6165,11 @@ a.current-theme,
 .tabbed-content li #Head h1 a a + span, #Head h1 a .plugins table .modal-footer .Info
 .tabbed-content li a + span,
 .tabbed-content li .plugins table .modal-footer .Info #Head h1 a a + span, #Head h1 a
-.tabbed-content li .plugins table .modal-footer .Info a + span, .modal-footer .btn-group .Tabs ul li .btn + a, .Tabs ul li .modal-footer .btn-group .btn + a, .modal-footer .Tabs ul li .btn + a, .Tabs .modal-footer ul li .btn + a, .modal-footer
+.tabbed-content li .plugins table .modal-footer .Info a + span, .modal-footer .btn-group .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .modal-footer .btn-group .FilterMenu .FilterButton + span, .FilterMenu .modal-footer .btn-group #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .modal-footer .btn-group .FilterButton + span, .modal-footer .Tabs ul .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .modal-footer .Tabs ul .FilterMenu .FilterButton + span, .FilterMenu .modal-footer .Tabs ul #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .modal-footer .Tabs ul .FilterButton + span, .Tabs .modal-footer ul .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .Tabs .modal-footer ul .FilterMenu .FilterButton + span, .FilterMenu .Tabs .modal-footer ul #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .Tabs .modal-footer ul .FilterButton + span, .modal-footer
+.tabbed-content .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .modal-footer
+.tabbed-content .FilterMenu .FilterButton + span, .FilterMenu .modal-footer
+.tabbed-content #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .modal-footer
+.tabbed-content .FilterButton + span, .modal-footer .plugins table .Info .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .modal-footer .plugins table .Info .FilterMenu .FilterButton + span, .FilterMenu .modal-footer .plugins table .Info #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .modal-footer .plugins table .Info .FilterButton + span, .plugins table .modal-footer .Info .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .plugins table .modal-footer .Info .FilterMenu .FilterButton + span, .FilterMenu .plugins table .modal-footer .Info #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .plugins table .modal-footer .Info .FilterButton + span, .modal-footer .btn-group .Tabs ul li .btn + a, .Tabs ul li .modal-footer .btn-group .btn + a, .modal-footer .Tabs ul li .btn + a, .Tabs .modal-footer ul li .btn + a, .modal-footer
 .tabbed-content .Tabs ul li .btn + a, .Tabs ul li .modal-footer
 .tabbed-content .btn + a, .modal-footer .plugins table .Info .Tabs ul li .btn + a, .Tabs ul li .modal-footer .plugins table .Info .btn + a, .plugins table .modal-footer .Info .Tabs ul li .btn + a, .Tabs ul li .plugins table .modal-footer .Info .btn + a, .modal-footer .btn-group .Tabs ul li .file-upload-browse + a, .Tabs ul li .modal-footer .btn-group .file-upload-browse + a, .modal-footer .Tabs ul li .file-upload-browse + a, .Tabs .modal-footer ul li .file-upload-browse + a, .modal-footer
 .tabbed-content .Tabs ul li .file-upload-browse + a, .Tabs ul li .modal-footer
@@ -5879,7 +6211,11 @@ a.current-theme,
 .tabbed-content .Tabs ul li a + a, .Tabs ul .plugins table .modal-footer .Info
 .tabbed-content li a + a,
 .tabbed-content .Tabs ul li .plugins table .modal-footer .Info a + a, .Tabs ul
-.tabbed-content li .plugins table .modal-footer .Info a + a, .modal-footer .btn-group
+.tabbed-content li .plugins table .modal-footer .Info a + a, .modal-footer .btn-group .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .modal-footer .btn-group .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .btn-group .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .modal-footer .btn-group .FilterButton + a, .modal-footer .Tabs ul .FilterMenu li .FilterButton + a, .modal-footer .Tabs ul li .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .Tabs ul li .FilterButton + a, .Tabs .modal-footer ul .FilterMenu li .FilterButton + a, .Tabs .modal-footer ul li .FilterMenu .FilterButton + a, .FilterMenu .Tabs .modal-footer ul li .FilterButton + a, .modal-footer
+.tabbed-content .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .modal-footer
+.tabbed-content .FilterMenu .FilterButton + a, .FilterMenu .modal-footer
+.tabbed-content .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .modal-footer
+.tabbed-content .FilterButton + a, .modal-footer .plugins table .Info .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .modal-footer .plugins table .Info .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .plugins table .Info .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .modal-footer .plugins table .Info .FilterButton + a, .plugins table .modal-footer .Info .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .plugins table .modal-footer .Info .FilterMenu .FilterButton + a, .FilterMenu .plugins table .modal-footer .Info .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .plugins table .modal-footer .Info .FilterButton + a, .modal-footer .btn-group
 .tabbed-content li .btn + a,
 .tabbed-content li .modal-footer .btn-group .btn + a, .modal-footer .Tabs ul
 .tabbed-content li .btn + a,
@@ -5976,7 +6312,79 @@ a.current-theme,
 .tabbed-content li a + a,
 .tabbed-content .plugins table .modal-footer .Info .Tabs ul li a + a, .Tabs ul
 .tabbed-content li .plugins table .modal-footer .Info a + a,
-.tabbed-content .Tabs ul li .plugins table .modal-footer .Info a + a, .modal-footer .btn-group .tabbed-content li a + a, .tabbed-content li .modal-footer .btn-group a + a, .modal-footer .Tabs ul .tabbed-content li a + a, .tabbed-content li .modal-footer .Tabs ul a + a, .Tabs .modal-footer ul .tabbed-content li a + a, .tabbed-content li .Tabs .modal-footer ul a + a, .modal-footer .tabbed-content li a + a, .modal-footer .plugins table .Info .tabbed-content li a + a, .tabbed-content li .modal-footer .plugins table .Info a + a, .plugins table .modal-footer .Info .tabbed-content li a + a, .tabbed-content li .plugins table .modal-footer .Info a + a {
+.tabbed-content .Tabs ul li .plugins table .modal-footer .Info a + a, .modal-footer .btn-group .tabbed-content li a + a, .tabbed-content li .modal-footer .btn-group a + a, .modal-footer .Tabs ul .tabbed-content li a + a, .tabbed-content li .modal-footer .Tabs ul a + a, .Tabs .modal-footer ul .tabbed-content li a + a, .tabbed-content li .Tabs .modal-footer ul a + a, .modal-footer .tabbed-content li a + a, .modal-footer .plugins table .Info .tabbed-content li a + a, .tabbed-content li .modal-footer .plugins table .Info a + a, .plugins table .modal-footer .Info .tabbed-content li a + a, .tabbed-content li .plugins table .modal-footer .Info a + a, .modal-footer .btn-group .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .modal-footer .btn-group .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .btn-group
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .modal-footer .btn-group .FilterButton + a, .modal-footer .Tabs ul .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .modal-footer .Tabs ul .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .Tabs ul
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .modal-footer .Tabs ul .FilterButton + a, .Tabs .modal-footer ul .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .Tabs .modal-footer ul .FilterMenu .FilterButton + a, .FilterMenu .Tabs .modal-footer ul
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .Tabs .modal-footer ul .FilterButton + a, .modal-footer .tabbed-content .FilterMenu li .FilterButton + a, .modal-footer .tabbed-content li .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .tabbed-content li .FilterButton + a, .modal-footer .plugins table .Info .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .modal-footer .plugins table .Info .FilterMenu .FilterButton + a, .FilterMenu .modal-footer .plugins table .Info
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .modal-footer .plugins table .Info .FilterButton + a, .plugins table .modal-footer .Info .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .plugins table .modal-footer .Info .FilterMenu .FilterButton + a, .FilterMenu .plugins table .modal-footer .Info
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .plugins table .modal-footer .Info .FilterButton + a, .modal-footer .btn-group .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .btn-group .btn + .FilterButton, .modal-footer .Tabs ul .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .Tabs ul .btn + .FilterButton, .Tabs .modal-footer ul .FilterMenu .btn + .FilterButton, .FilterMenu .Tabs .modal-footer ul .btn + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .btn + .FilterButton, .modal-footer .plugins table .Info .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .btn + .FilterButton, .plugins table .modal-footer .Info .FilterMenu .btn + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .btn + .FilterButton, .modal-footer .btn-group .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .btn-group .file-upload-browse + .FilterButton, .modal-footer .Tabs ul .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .Tabs ul .file-upload-browse + .FilterButton, .Tabs .modal-footer ul .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .Tabs .modal-footer ul .file-upload-browse + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .file-upload-browse + .FilterButton, .modal-footer .plugins table .Info .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .file-upload-browse + .FilterButton, .plugins table .modal-footer .Info .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .file-upload-browse + .FilterButton, .modal-footer .btn-group .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .btn-group .Button + .FilterButton, .modal-footer .Tabs ul .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .Tabs ul .Button + .FilterButton, .Tabs .modal-footer ul .FilterMenu .Button + .FilterButton, .FilterMenu .Tabs .modal-footer ul .Button + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .Button + .FilterButton, .modal-footer .plugins table .Info .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .Button + .FilterButton, .plugins table .modal-footer .Info .FilterMenu .Button + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .Button + .FilterButton, .modal-footer .btn-group .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .modal-footer .btn-group
+.TextButton + .FilterButton, .modal-footer .Tabs ul .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .modal-footer .Tabs ul
+.TextButton + .FilterButton, .Tabs .modal-footer ul .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .Tabs .modal-footer ul
+.TextButton + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content
+.TextButton + .FilterButton, .modal-footer .plugins table .Info .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .modal-footer .plugins table .Info
+.TextButton + .FilterButton, .plugins table .modal-footer .Info .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .plugins table .modal-footer .Info
+.TextButton + .FilterButton, .modal-footer .btn-group .FilterMenu .SmallButton + .FilterButton, .FilterMenu .modal-footer .btn-group .SmallButton + .FilterButton, .modal-footer .Tabs ul .FilterMenu .SmallButton + .FilterButton, .FilterMenu .modal-footer .Tabs ul .SmallButton + .FilterButton, .Tabs .modal-footer ul .FilterMenu .SmallButton + .FilterButton, .FilterMenu .Tabs .modal-footer ul .SmallButton + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu .SmallButton + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .SmallButton + .FilterButton, .modal-footer .plugins table .Info .FilterMenu .SmallButton + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .SmallButton + .FilterButton, .plugins table .modal-footer .Info .FilterMenu .SmallButton + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .SmallButton + .FilterButton, .modal-footer .btn-group #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .modal-footer .btn-group #Head h1 a span + .FilterButton, #Head h1 a .modal-footer .btn-group .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .modal-footer .btn-group span + .FilterButton, .modal-footer .Tabs ul #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .modal-footer .Tabs ul #Head h1 a span + .FilterButton, #Head h1 a .modal-footer .Tabs ul .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .modal-footer .Tabs ul span + .FilterButton, .Tabs .modal-footer ul #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .Tabs .modal-footer ul #Head h1 a span + .FilterButton, #Head h1 a .Tabs .modal-footer ul .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .Tabs .modal-footer ul span + .FilterButton, .modal-footer
+.tabbed-content #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content #Head h1 a span + .FilterButton, #Head h1 a .modal-footer
+.tabbed-content .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .modal-footer
+.tabbed-content span + .FilterButton, .modal-footer .plugins table .Info #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .modal-footer .plugins table .Info #Head h1 a span + .FilterButton, #Head h1 a .modal-footer .plugins table .Info .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .modal-footer .plugins table .Info span + .FilterButton, .plugins table .modal-footer .Info #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu .plugins table .modal-footer .Info #Head h1 a span + .FilterButton, #Head h1 a .plugins table .modal-footer .Info .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a .plugins table .modal-footer .Info span + .FilterButton, .modal-footer .btn-group .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .btn-group .Tabs ul li a + .FilterButton, .Tabs ul li .modal-footer .btn-group .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .modal-footer .btn-group a + .FilterButton, .modal-footer .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .Tabs ul li a + .FilterButton, .Tabs .modal-footer ul li .FilterMenu a + .FilterButton, .FilterMenu .Tabs .modal-footer ul li a + .FilterButton, .modal-footer
+.tabbed-content .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .Tabs ul li a + .FilterButton, .Tabs ul li .modal-footer
+.tabbed-content .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .modal-footer
+.tabbed-content a + .FilterButton, .modal-footer .plugins table .Info .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .Tabs ul li a + .FilterButton, .Tabs ul li .modal-footer .plugins table .Info .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .modal-footer .plugins table .Info a + .FilterButton, .plugins table .modal-footer .Info .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .Tabs ul li a + .FilterButton, .Tabs ul li .plugins table .modal-footer .Info .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li .plugins table .modal-footer .Info a + .FilterButton, .modal-footer .btn-group
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .btn-group
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .modal-footer .btn-group .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .modal-footer .btn-group a + .FilterButton, .modal-footer .Tabs ul
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .Tabs ul
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .modal-footer .Tabs ul .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .modal-footer .Tabs ul a + .FilterButton, .Tabs .modal-footer ul
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .Tabs .modal-footer ul
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .Tabs .modal-footer ul .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .Tabs .modal-footer ul a + .FilterButton, .modal-footer .tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .tabbed-content li a + .FilterButton, .modal-footer .plugins table .Info
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .modal-footer .plugins table .Info
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .modal-footer .plugins table .Info .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .modal-footer .plugins table .Info a + .FilterButton, .plugins table .modal-footer .Info
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu .plugins table .modal-footer .Info
+.tabbed-content li a + .FilterButton,
+.tabbed-content li .plugins table .modal-footer .Info .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li .plugins table .modal-footer .Info a + .FilterButton, .modal-footer .btn-group .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .btn-group .FilterButton + .FilterButton, .modal-footer .Tabs ul .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .Tabs ul .FilterButton + .FilterButton, .Tabs .modal-footer ul .FilterMenu .FilterButton + .FilterButton, .FilterMenu .Tabs .modal-footer ul .FilterButton + .FilterButton, .modal-footer
+.tabbed-content .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer
+.tabbed-content .FilterButton + .FilterButton, .modal-footer .plugins table .Info .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .plugins table .Info .FilterButton + .FilterButton, .plugins table .modal-footer .Info .FilterMenu .FilterButton + .FilterButton, .FilterMenu .plugins table .modal-footer .Info .FilterButton + .FilterButton {
   margin-left: -1px;
 }
 
@@ -7940,7 +8348,7 @@ output {
 
 .btn, .file-upload-browse, .Button,
 .TextButton, .SmallButton, #Head h1 a span, .Tabs ul li a,
-.tabbed-content li a {
+.tabbed-content li a, .FilterMenu .FilterButton {
   display: inline-block;
   font-weight: normal;
   text-align: center;
@@ -7960,13 +8368,13 @@ output {
 
 .btn:focus, .file-upload-browse:focus, .Button:focus,
 .TextButton:focus, .SmallButton:focus, #Head h1 a span:focus, .Tabs ul li a:focus,
-.tabbed-content li a:focus, .btn.focus, .focus.file-upload-browse, .focus.Button,
+.tabbed-content li a:focus, .FilterMenu .FilterButton:focus, .btn.focus, .focus.file-upload-browse, .focus.Button,
 .focus.TextButton, .focus.SmallButton, #Head h1 a span.focus, .Tabs ul li a.focus,
-.tabbed-content li a.focus, .btn:active:focus, .file-upload-browse:active:focus, .Button:active:focus,
+.tabbed-content li a.focus, .FilterMenu .focus.FilterButton, .btn:active:focus, .file-upload-browse:active:focus, .Button:active:focus,
 .TextButton:active:focus, .SmallButton:active:focus, #Head h1 a span:active:focus, .Tabs ul li a:active:focus,
-.tabbed-content li a:active:focus, .btn:active.focus, .file-upload-browse:active.focus, .Button:active.focus,
+.tabbed-content li a:active:focus, .FilterMenu .FilterButton:active:focus, .btn:active.focus, .file-upload-browse:active.focus, .Button:active.focus,
 .TextButton:active.focus, .SmallButton:active.focus, #Head h1 a span:active.focus, .Tabs ul li a:active.focus,
-.tabbed-content li a:active.focus, .btn.active:focus, .active.file-upload-browse:focus,
+.tabbed-content li a:active.focus, .FilterMenu .FilterButton:active.focus, .btn.active:focus, .active.file-upload-browse:focus,
 .Tabs ul .file-upload-browse.current-tab:focus,
 .tabbed-content .file-upload-browse.current-tab:focus, .file-upload-browse.Current:focus,
 .file-upload-browse.current-theme:focus, .active.Button:focus,
@@ -7991,8 +8399,12 @@ a.current-theme:focus,
 .tabbed-content li
 a.current-theme:focus,
 .Tabs ul .btn.current-tab:focus,
-.tabbed-content .btn.current-tab:focus, .btn.Current:focus,
-.btn.current-theme:focus, .btn.active.focus, .active.focus.file-upload-browse,
+.Tabs ul .FilterMenu .current-tab.FilterButton:focus, .FilterMenu
+.Tabs ul .current-tab.FilterButton:focus,
+.tabbed-content .btn.current-tab:focus,
+.tabbed-content .FilterMenu .current-tab.FilterButton:focus, .FilterMenu
+.tabbed-content .current-tab.FilterButton:focus, .btn.Current:focus, .FilterMenu .Current.FilterButton:focus,
+.btn.current-theme:focus, .FilterMenu .current-theme.FilterButton:focus, .FilterMenu .active.FilterButton:focus, .btn.active.focus, .active.focus.file-upload-browse,
 .Tabs ul .focus.file-upload-browse.current-tab,
 .tabbed-content .focus.file-upload-browse.current-tab, .focus.file-upload-browse.Current,
 .focus.file-upload-browse.current-theme, .active.focus.Button,
@@ -8017,28 +8429,32 @@ a.focus.current-theme,
 .tabbed-content li
 a.focus.current-theme,
 .Tabs ul .btn.focus.current-tab,
-.tabbed-content .btn.focus.current-tab, .btn.focus.Current,
-.btn.focus.current-theme {
+.Tabs ul .FilterMenu .focus.current-tab.FilterButton, .FilterMenu
+.Tabs ul .focus.current-tab.FilterButton,
+.tabbed-content .btn.focus.current-tab,
+.tabbed-content .FilterMenu .focus.current-tab.FilterButton, .FilterMenu
+.tabbed-content .focus.current-tab.FilterButton, .btn.focus.Current, .FilterMenu .focus.Current.FilterButton,
+.btn.focus.current-theme, .FilterMenu .focus.current-theme.FilterButton, .FilterMenu .active.focus.FilterButton {
   outline: 0;
 }
 
 .btn:focus, .file-upload-browse:focus, .Button:focus,
 .TextButton:focus, .SmallButton:focus, #Head h1 a span:focus, .Tabs ul li a:focus,
-.tabbed-content li a:focus, .btn:hover, .file-upload-browse:hover, .Button:hover,
+.tabbed-content li a:focus, .FilterMenu .FilterButton:focus, .btn:hover, .file-upload-browse:hover, .Button:hover,
 .TextButton:hover, .SmallButton:hover, #Head h1 a span:hover, .Tabs ul li a:hover,
-.tabbed-content li a:hover {
+.tabbed-content li a:hover, .FilterMenu .FilterButton:hover {
   text-decoration: none;
 }
 
 .btn.focus, .focus.file-upload-browse, .focus.Button,
 .focus.TextButton, .focus.SmallButton, #Head h1 a span.focus, .Tabs ul li a.focus,
-.tabbed-content li a.focus {
+.tabbed-content li a.focus, .FilterMenu .focus.FilterButton {
   text-decoration: none;
 }
 
 .btn:active, .file-upload-browse:active, .Button:active,
 .TextButton:active, .SmallButton:active, #Head h1 a span:active, .Tabs ul li a:active,
-.tabbed-content li a:active, .btn.active, .active.file-upload-browse,
+.tabbed-content li a:active, .FilterMenu .FilterButton:active, .btn.active, .active.file-upload-browse,
 .Tabs ul .file-upload-browse.current-tab,
 .tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
 .file-upload-browse.current-theme, .active.Button,
@@ -8063,24 +8479,28 @@ a.current-theme,
 .tabbed-content li
 a.current-theme,
 .Tabs ul .btn.current-tab,
-.tabbed-content .btn.current-tab, .btn.Current,
-.btn.current-theme {
+.Tabs ul .FilterMenu .current-tab.FilterButton, .FilterMenu
+.Tabs ul .current-tab.FilterButton,
+.tabbed-content .btn.current-tab,
+.tabbed-content .FilterMenu .current-tab.FilterButton, .FilterMenu
+.tabbed-content .current-tab.FilterButton, .btn.Current, .FilterMenu .Current.FilterButton,
+.btn.current-theme, .FilterMenu .current-theme.FilterButton, .FilterMenu .active.FilterButton {
   background-image: none;
   outline: 0;
 }
 
 .btn.disabled, .disabled.file-upload-browse, .disabled.Button,
 .disabled.TextButton, .disabled.SmallButton, #Head h1 a span.disabled, .Tabs ul li a.disabled,
-.tabbed-content li a.disabled, .btn:disabled, .file-upload-browse:disabled, .Button:disabled,
+.tabbed-content li a.disabled, .FilterMenu .disabled.FilterButton, .btn:disabled, .file-upload-browse:disabled, .Button:disabled,
 .TextButton:disabled, .SmallButton:disabled, #Head h1 a span:disabled, .Tabs ul li a:disabled,
-.tabbed-content li a:disabled {
+.tabbed-content li a:disabled, .FilterMenu .FilterButton:disabled {
   cursor: not-allowed;
   opacity: .65;
 }
 
 a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button,
 a.disabled.TextButton, a.disabled.SmallButton, .Tabs ul li a.disabled,
-.tabbed-content li a.disabled,
+.tabbed-content li a.disabled, .FilterMenu a.disabled.FilterButton,
 fieldset[disabled] a.btn,
 fieldset[disabled] a.file-upload-browse,
 fieldset[disabled] a.Button,
@@ -8092,34 +8512,36 @@ fieldset[disabled] a,
 fieldset[disabled]
 .tabbed-content li a,
 .tabbed-content li
-fieldset[disabled] a {
+fieldset[disabled] a,
+fieldset[disabled] .FilterMenu a.FilterButton, .FilterMenu
+fieldset[disabled] a.FilterButton {
   pointer-events: none;
 }
 
 .btn-primary, .Button,
-.TextButton, .SmallButton, #Head h1 a span {
+.TextButton, .SmallButton, #Head h1 a span, .FilterMenu .FilterButton {
   color: #0291db;
   background-color: #fff;
   border-color: #0291db;
 }
 
 .btn-primary:hover, .Button:hover,
-.TextButton:hover, .SmallButton:hover, #Head h1 a span:hover {
+.TextButton:hover, .SmallButton:hover, #Head h1 a span:hover, .FilterMenu .FilterButton:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
 .btn-primary:focus, .Button:focus,
-.TextButton:focus, .SmallButton:focus, #Head h1 a span:focus, .btn-primary.focus, .focus.Button,
-.focus.TextButton, .focus.SmallButton, #Head h1 a span.focus {
+.TextButton:focus, .SmallButton:focus, #Head h1 a span:focus, .FilterMenu .FilterButton:focus, .btn-primary.focus, .focus.Button,
+.focus.TextButton, .focus.SmallButton, #Head h1 a span.focus, .FilterMenu .focus.FilterButton {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
 .btn-primary:active, .Button:active,
-.TextButton:active, .SmallButton:active, #Head h1 a span:active, .btn-primary.active, .active.Button, .Tabs ul li.Active a.Button,
+.TextButton:active, .SmallButton:active, #Head h1 a span:active, .FilterMenu .FilterButton:active, .btn-primary.active, .active.Button, .Tabs ul li.Active a.Button,
 .Tabs ul .Button.current-tab,
 .tabbed-content li.Active a.Button,
 .tabbed-content .Button.current-tab, .Button.Current,
@@ -8137,17 +8559,24 @@ fieldset[disabled] a {
 .Tabs ul #Head h1 a span.current-tab, #Head h1 a
 .tabbed-content span.current-tab,
 .tabbed-content #Head h1 a span.current-tab, #Head h1 a span.Current, #Head h1 a
-span.current-theme, .Tabs ul li.Active a.btn-primary,
+span.current-theme, .Tabs ul li.Active a.btn-primary, .Tabs ul li.Active .FilterMenu a.FilterButton, .FilterMenu .Tabs ul li.Active a.FilterButton,
 .Tabs ul .btn-primary.current-tab,
+.Tabs ul .FilterMenu .current-tab.FilterButton, .FilterMenu
+.Tabs ul .current-tab.FilterButton,
 .tabbed-content li.Active a.btn-primary,
-.tabbed-content .btn-primary.current-tab, .btn-primary.Current,
-.btn-primary.current-theme,
+.tabbed-content li.Active .FilterMenu a.FilterButton, .FilterMenu
+.tabbed-content li.Active a.FilterButton,
+.tabbed-content .btn-primary.current-tab,
+.tabbed-content .FilterMenu .current-tab.FilterButton, .FilterMenu
+.tabbed-content .current-tab.FilterButton, .btn-primary.Current, .FilterMenu .Current.FilterButton,
+.btn-primary.current-theme, .FilterMenu .current-theme.FilterButton, .FilterMenu .active.FilterButton,
 .open > .btn-primary.dropdown-toggle,
 .open > .dropdown-toggle.Button,
 .open >
 .dropdown-toggle.TextButton,
 .open > .dropdown-toggle.SmallButton, #Head h1 a
-.open > span.dropdown-toggle {
+.open > span.dropdown-toggle, .FilterMenu
+.open > .dropdown-toggle.FilterButton {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
@@ -8155,17 +8584,17 @@ span.current-theme, .Tabs ul li.Active a.btn-primary,
 }
 
 .btn-primary.disabled:focus, .disabled.Button:focus,
-.disabled.TextButton:focus, .disabled.SmallButton:focus, #Head h1 a span.disabled:focus, .btn-primary.disabled.focus, .disabled.focus.Button,
-.disabled.focus.TextButton, .disabled.focus.SmallButton, #Head h1 a span.disabled.focus, .btn-primary:disabled:focus, .Button:disabled:focus,
-.TextButton:disabled:focus, .SmallButton:disabled:focus, #Head h1 a span:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus,
-.TextButton:disabled.focus, .SmallButton:disabled.focus, #Head h1 a span:disabled.focus {
+.disabled.TextButton:focus, .disabled.SmallButton:focus, #Head h1 a span.disabled:focus, .FilterMenu .disabled.FilterButton:focus, .btn-primary.disabled.focus, .disabled.focus.Button,
+.disabled.focus.TextButton, .disabled.focus.SmallButton, #Head h1 a span.disabled.focus, .FilterMenu .disabled.focus.FilterButton, .btn-primary:disabled:focus, .Button:disabled:focus,
+.TextButton:disabled:focus, .SmallButton:disabled:focus, #Head h1 a span:disabled:focus, .FilterMenu .FilterButton:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus,
+.TextButton:disabled.focus, .SmallButton:disabled.focus, #Head h1 a span:disabled.focus, .FilterMenu .FilterButton:disabled.focus {
   background-color: #fff;
   border-color: #0291db;
 }
 
 .btn-primary.disabled:hover, .disabled.Button:hover,
-.disabled.TextButton:hover, .disabled.SmallButton:hover, #Head h1 a span.disabled:hover, .btn-primary:disabled:hover, .Button:disabled:hover,
-.TextButton:disabled:hover, .SmallButton:disabled:hover, #Head h1 a span:disabled:hover {
+.disabled.TextButton:hover, .disabled.SmallButton:hover, #Head h1 a span.disabled:hover, .FilterMenu .disabled.FilterButton:hover, .btn-primary:disabled:hover, .Button:disabled:hover,
+.TextButton:disabled:hover, .SmallButton:disabled:hover, #Head h1 a span:disabled:hover, .FilterMenu .FilterButton:disabled:hover {
   background-color: #fff;
   border-color: #0291db;
 }
@@ -8515,7 +8944,7 @@ a.current-theme,
 
 .btn-lg, .btn-group-lg > .btn, .btn-group-lg > .file-upload-browse, .btn-group-lg > .Button, .btn-group-lg >
 .TextButton, .btn-group-lg > .SmallButton, .Tabs ul li .btn-group-lg > a,
-.tabbed-content li .btn-group-lg > a, #Head h1 a span {
+.tabbed-content li .btn-group-lg > a, .FilterMenu .btn-group-lg > .FilterButton, #Head h1 a span {
   padding: 0.75rem 1.25rem;
   font-size: 1.25rem;
   line-height: 1.3333333333;
@@ -8524,7 +8953,7 @@ a.current-theme,
 
 .btn-sm, .btn-group-sm > .btn, .btn-group-sm > .file-upload-browse, .btn-group-sm > .Button, .btn-group-sm >
 .TextButton, .btn-group-sm > .SmallButton, #Head h1 a .btn-group-sm > span, .Tabs ul li .btn-group-sm > a,
-.tabbed-content li .btn-group-sm > a, .SmallButton {
+.tabbed-content li .btn-group-sm > a, .FilterMenu .btn-group-sm > .FilterButton, .SmallButton {
   padding: 0.125rem 0.75rem;
   font-size: 0.75rem;
   line-height: 1.5;
@@ -8566,7 +8995,9 @@ input[type="button"].btn-block {
 .tabbed-content li a,
 .tabbed-content li .btn-group a, .tabbed-content li a, .plugins table .Info
 .tabbed-content li a,
-.tabbed-content li .plugins table .Info a {
+.tabbed-content li .plugins table .Info a, .btn-group .FilterMenu .FilterButton, .FilterMenu .btn-group .FilterButton, .Tabs ul .FilterMenu .FilterButton, .FilterMenu .Tabs ul .FilterButton,
+.tabbed-content .FilterMenu .FilterButton, .FilterMenu
+.tabbed-content .FilterButton, .plugins table .Info .FilterMenu .FilterButton, .FilterMenu .plugins table .Info .FilterButton {
   border-radius: 0;
   margin-right: -1px;
 }
@@ -9415,7 +9846,11 @@ select::-ms-expand {
 .HomeOptions
 .tabbed-content li .buttons > a,
 .tabbed-content li
-.HomeOptions .buttons > a {
+.HomeOptions .buttons > a, .label-selector .FilterMenu .buttons > .FilterButton, .FilterMenu .label-selector .buttons > .FilterButton, .emojiext-list .FilterMenu .buttons > .FilterButton, .FilterMenu .emojiext-list .buttons > .FilterButton,
+.LayoutOptions .FilterMenu .buttons > .FilterButton, .FilterMenu
+.LayoutOptions .buttons > .FilterButton,
+.HomeOptions .FilterMenu .buttons > .FilterButton, .FilterMenu
+.HomeOptions .buttons > .FilterButton {
   min-width: 5rem;
   margin-left: .125rem;
   margin-right: .125rem;
@@ -9949,6 +10384,12 @@ div.Popup .Buttons {
   border-color: #fff;
 }
 
+.pager {
+  position: absolute;
+  top: 4.5rem;
+  right: 1rem;
+}
+
 .panel {
   padding-top: 4rem;
   padding-left: 4rem;
@@ -10006,6 +10447,7 @@ div.Popup .Buttons {
   z-index: 5;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-top: 0;
+  padding-bottom: 4rem;
 }
 
 .table-wrap {
@@ -10142,6 +10584,10 @@ p {
   display: inline-block;
 }
 
+.SmallButton + .SmallButton {
+  margin-left: 0.25rem;
+}
+
 .Sortable,
 .DataList {
   padding-left: 0;
@@ -10223,6 +10669,15 @@ p {
 
 .Homepage .SpBestOf {
   background-position: -540px 0;
+}
+
+.FilterMenu select {
+  display: inline-block;
+  width: inherit;
+}
+
+.FilterMenu .FilterButton {
+  display: inline-block;
 }
 
 .DataList li .IconWrap {

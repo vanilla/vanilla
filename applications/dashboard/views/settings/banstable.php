@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans'))));
+PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans')), 'View' => 'pager-dashboard'));
 ?>
 <div class="table-wrap">
     <table id="Log" class="AltColumns">
@@ -35,9 +35,9 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td><?php echo htmlspecialchars($Row['Notes']); ?></td>
                 <td>
                     <?php
-                    echo Gdn_Theme::link("/dashboard/settings/bans/edit?id={$Row['BanID']}", t('Edit'), null, array('class' => 'SmallButton Edit'));
+                    echo Gdn_Theme::link("/dashboard/settings/bans/edit?id={$Row['BanID']}", t('Edit'), null, array('class' => 'btn btn-edit Edit'));
                     echo ' ';
-                    echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'SmallButton Delete'));
+                    echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'btn btn-delete Delete'));
                     ?>
                 </td>
             </tr>
@@ -47,5 +47,3 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
         </tbody>
     </table>
 </div>
-<?php
-PagerModule::write();

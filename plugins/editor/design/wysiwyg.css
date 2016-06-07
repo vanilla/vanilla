@@ -16,7 +16,9 @@
 .post-font-size-large {
   font-size: 18px; }
 
-.post-font-size-medium, .post-font-size-normal, .post-font-size-default {
+.post-font-size-medium,
+.post-font-size-normal,
+.post-font-size-default {
   font-size: 13px; }
 
 .post-font-size-small {
@@ -47,103 +49,120 @@ cell-* are used for the dropdown */
 .post-color-black {
   color: #111111; }
 
-.cell-color-black, .post-highlightcolor-black {
+.cell-color-black,
+.post-highlightcolor-black {
   background-color: #111111; }
 
 .post-color-silver {
   color: #dddddd; }
 
-.cell-color-silver, .post-highlightcolor-silver {
+.cell-color-silver,
+.post-highlightcolor-silver {
   background-color: #dddddd; }
 
 .post-color-gray {
   color: #aaaaaa; }
 
-.cell-color-gray, .post-highlightcolor-gray {
+.cell-color-gray,
+.post-highlightcolor-gray {
   background-color: #aaaaaa; }
 
 .post-color-white {
   color: #ffffff; }
 
-.cell-color-white, .post-highlightcolor-white {
+.cell-color-white,
+.post-highlightcolor-white {
   background-color: #ffffff; }
 
 .post-color-maroon {
   color: #85144b; }
 
-.cell-color-maroon, .post-highlightcolor-maroon {
+.cell-color-maroon,
+.post-highlightcolor-maroon {
   background-color: #85144b; }
 
 .post-color-red {
   color: #ff4136; }
 
-.cell-color-red, .post-highlightcolor-red {
+.cell-color-red,
+.post-highlightcolor-red {
   background-color: #ff4136; }
 
 .post-color-purple {
   color: #7b11d0; }
 
-.cell-color-purple, .post-highlightcolor-purple {
+.cell-color-purple,
+.post-highlightcolor-purple {
   background-color: #7b11d0; }
 
 .post-color-fuchsia {
   color: #f012be; }
 
-.cell-color-fuchsia, .post-highlightcolor-fuchsia {
+.cell-color-fuchsia,
+.post-highlightcolor-fuchsia {
   background-color: #f012be; }
 
 .post-color-green {
   color: #2ecc40; }
 
-.cell-color-green, .post-highlightcolor-green {
+.cell-color-green,
+.post-highlightcolor-green {
   background-color: #2ecc40; }
 
 .post-color-lime {
   color: #01ff70; }
 
-.cell-color-lime, .post-highlightcolor-lime {
+.cell-color-lime,
+.post-highlightcolor-lime {
   background-color: #01ff70; }
 
 .post-color-olive {
   color: #3d9970; }
 
-.cell-color-olive, .post-highlightcolor-olive {
+.cell-color-olive,
+.post-highlightcolor-olive {
   background-color: #3d9970; }
 
 .post-color-yellow {
   color: #ffdc00; }
 
-.cell-color-yellow, .post-highlightcolor-yellow {
+.cell-color-yellow,
+.post-highlightcolor-yellow {
   background-color: #ffdc00; }
 
 .post-color-navy {
   color: #001f3f; }
 
-.cell-color-navy, .post-highlightcolor-navy {
+.cell-color-navy,
+.post-highlightcolor-navy {
   background-color: #001f3f; }
 
 .post-color-blue {
   color: #0074d9; }
 
-.cell-color-blue, .post-highlightcolor-blue {
+.cell-color-blue,
+.post-highlightcolor-blue {
   background-color: #0074d9; }
 
 .post-color-teal {
   color: #39cccc; }
 
-.cell-color-teal, .post-highlightcolor-teal {
+.cell-color-teal,
+.post-highlightcolor-teal {
   background-color: #39cccc; }
 
 .post-color-aqua {
   color: #7fdbff; }
 
-.cell-color-aqua, .post-highlightcolor-aqua {
+.cell-color-aqua,
+.post-highlightcolor-aqua {
   background-color: #7fdbff; }
 
 .post-color-orange {
   color: #ffa500; }
 
-.cell-color-orange, .post-highlightcolor-orange {
+.cell-color-orange,
+.post-highlightcolor-orange {
   background-color: #ffa500; }
 
 .post-text-align-right {
@@ -203,7 +222,6 @@ cell-* are used for the dropdown */
   font-family: Verdana, Geneva, sans-serif; }
 
 /* Custom classes */
-
 blockquote.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
@@ -215,7 +233,6 @@ blockquote.Quote {
 pre.CodeBlock {
   background-color: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.07); }
-
 
 .AlignLeft {
   text-align: left; }
@@ -235,7 +252,6 @@ pre.CodeBlock {
  * this).
  */
 /* iframe */
-
 /* body within iframe */
 .editor-composer {
   margin: 0;
@@ -252,6 +268,7 @@ pre.CodeBlock {
  */
 .editor-composer h1 {
   font-size: 21px; }
+
 .editor-composer h2 {
   font-size: 18px; }
 /*# sourceMappingURL=wysiwyg.css.map */

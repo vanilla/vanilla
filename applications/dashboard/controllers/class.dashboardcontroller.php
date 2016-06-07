@@ -59,6 +59,9 @@ class DashboardController extends Gdn_Controller {
     /**
      * Build and add the Dashboard's side navigation menu.
      *
+     * EXACT COPY OF VanillaController::addSideMenu(). KEEP IN SYNC.
+     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
+     *
      * @since 2.0.0
      * @access public
      *

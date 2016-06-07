@@ -439,11 +439,11 @@ class Gdn_Form extends Gdn_Pluggable {
             $CategoryData = array();
         }
 
-        $Permission = GetValue('Permission', $Options, 'add');
+        $Permission = val('Permission', $Options, 'add');
 
         // Grab the category data.
         if (!$CategoryData) {
-            $CategoryData = CategoryModel::GetByPermission(
+            $CategoryData = CategoryModel::getByPermission(
                 'Discussions.View',
                 $Value,
                 val('Filter', $Options, array('Archived' => 0)),
@@ -526,7 +526,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
 
                 if ($Category['AllowDiscussions']) {
-                    if($Permission == 'add' && !$Category['PermsDiscussionsAdd']) {
+                    if ($Permission == 'add' && !$Category['PermsDiscussionsAdd']) {
                         $Disabled = true;
                     }
                 }

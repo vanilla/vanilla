@@ -705,14 +705,14 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     * Adds items to dashboard menu.
+     * Adds items to Dashboard menu.
      *
      * @since 2.0.0
      * @package Vanilla
      *
      * @param object $Sender DashboardController.
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
+    public function base_earlyAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
         $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));

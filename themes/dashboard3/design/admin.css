@@ -6919,6 +6919,27 @@ input[type="checkbox"].disabled {
   border-radius: .25rem;
 }
 
+.file-custom::after {
+  content: "Choose file...";
+}
+
+.file-custom::before {
+  position: absolute;
+  top: -.075rem;
+  right: -.075rem;
+  bottom: -.075rem;
+  z-index: 6;
+  display: block;
+  height: 2.5rem;
+  padding: .5rem 1rem;
+  line-height: 1.5;
+  color: #555;
+  content: "Browse";
+  background-color: #eee;
+  border: 1px solid #ddd;
+  border-radius: 0 .25rem .25rem 0;
+}
+
 .container {
   margin-left: auto;
   margin-right: auto;

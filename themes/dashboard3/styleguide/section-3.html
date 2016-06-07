@@ -208,6 +208,122 @@
               <hr />
               </div><!-- // closes .component-description -->
             </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-5">
+                    <span class="kss-ref badge pull-right">3-5</span> Label selectors
+                  </h2>
+
+
+              <div class="kss-box"><p>Label selectors replace checkboxes and radios with a image and/or text selector.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+&lt;ul class=&quot;label-selector&quot;&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;babySeal&quot; name=&quot;babyAnimals&quot;&gt;
+    &lt;label for=&quot;babySeal&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/baby-seal.jpg&quot; alt=&quot;Baby Seal&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;a class=&quot;btn btn-transparent&quot;&gt;Button&lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Baby Seal&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;p class=&quot;description&quot;&gt;Choose this happy baby seal. It&#x27;s so very happy.&lt;/p&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;puppy&quot; name=&quot;babyAnimals&quot;&gt;
+    &lt;label for=&quot;puppy&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/puppy.jpg&quot; alt=&quot;Puppy&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;a class=&quot;btn btn-transparent&quot;&gt;Button&lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Puppy&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;p class=&quot;description&quot;&gt;Choose this sleepy puppy. Sooo tired, puppy.&lt;/p&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+<ul class="label-selector">
+  <li class="label-selector-item">
+    <input type="radio" id="babySeal" name="babyAnimals">
+    <label for="babySeal">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
+        <div class="overlay">
+          <div class="buttons">
+            <a class="btn btn-transparent">Button</a>
+          </div>
+        </div>
+      </div>
+      <div class="title">Baby Seal</div>
+      <div class="info">by Author</div>
+      <p class="description">Choose this happy baby seal. It's so very happy.</p>
+    </label>
+  </li>
+  <li class="label-selector-item">
+    <input type="radio" id="puppy" name="babyAnimals">
+    <label for="puppy">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
+        <div class="overlay">
+          <div class="buttons">
+            <a class="btn btn-transparent">Button</a>
+          </div>
+        </div>
+      </div>
+      <div class="title">Puppy</div>
+      <div class="info">by Author</div>
+      <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
+    </label>
+  </li>
+</ul>
+</form></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-6">
+                    <span class="kss-ref badge pull-right">3-6</span> Search input
+                  </h2>
+
+
+              <div class="kss-box"><p>Search inputs have a hidden button and a search icon on the input.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+  &lt;div class=&quot;search-wrap&quot;&gt;
+    &lt;input class=&quot;form-control&quot;&gt;
+    &lt;button type=&quot;submit&quot; class=&quot;search-submit&quot;&gt;Search&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+  <div class="search-wrap">
+    <input class="form-control">
+    <button type="submit" class="search-submit">Search</button>
+  </div>
+</form></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
         </article>
         <div class="col-xs-6 col-sm-3" id="sidebar">
           <div class="list-group" data-spy="affix">
@@ -217,6 +333,8 @@
                 <a class="list-group-item" href="#3-1"><!--<span class="kss-ref badge" >3-1</span> -->Forms</a>
                 <a class="list-group-item" href="#3-3"><!--<span class="kss-ref badge" >3-3</span> -->Toggles</a>
                 <a class="list-group-item" href="#3-4"><!--<span class="kss-ref badge" >3-4</span> -->Color Pickers</a>
+                <a class="list-group-item" href="#3-5"><!--<span class="kss-ref badge" >3-5</span> -->Label selectors</a>
+                <a class="list-group-item" href="#3-6"><!--<span class="kss-ref badge" >3-6</span> -->Search input</a>
           </div>
         </div>
       </div>

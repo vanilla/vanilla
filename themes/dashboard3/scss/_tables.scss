@@ -1,13 +1,41 @@
-.plugins {
-  table {
-    .Info {
-      @extend .btn-group;
+.table-wrap {
+  display: block;
+  margin: $padding-default (-$padding-default);
+}
+
+table {
+  td {
+    vertical-align: middle;
+  }
+
+  thead {
+    tr {
+      background-color: $grey-light;
+    }
+
+    th {
+      padding: .5rem .75rem;
+      border: 1px solid #eee;
+      border-top: 1px solid #ddd;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: $font-size-sm;
+      line-height: $line-height-lg;
+      vertical-align: middle;
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+  }
+
+  tbody {
+    font-size: $font-size-tables;
+    tr {
+      &:hover {
+        background-color: #f9fdfe;
+      }
     }
   }
 }
 
-table {
-  .btn {
-    min-width: inherit;
-  }
-}

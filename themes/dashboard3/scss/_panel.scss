@@ -9,12 +9,38 @@
   padding-left: $spacer * 4;
 }
 
-$border-color: rgba(0,0,0,.125);
-
 .panel-left {
   padding-right: 0;
 }
 
 .panel-right {
-  padding-left: 0;
+  padding-left: $spacer;
+  padding-right: $spacer * 4;
+  color: $grey-dark;
+  font-weight: 200;
+
+  h2 {
+    padding-bottom: $spacer;
+    margin-bottom: $spacer / 2;
+    border-bottom: 1px dotted $grey;
+    font-weight: 100;
+    text-transform: uppercase;
+  }
+
+  a {
+    color: $brand-primary;
+  }
+
+  ul {
+    @include list-reset();
+  }
+
+  li {
+    margin-bottom: $spacer / 2;
+  }
+
+  .Aside,
+  .aside {
+    margin-bottom: $spacer * 3;
+  }
 }

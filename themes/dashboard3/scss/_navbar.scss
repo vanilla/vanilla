@@ -28,14 +28,14 @@ $navbar-border-color: rgba(0,0,0,.125);
     height: $spacer * 2.75;
   }
 
-  .nav-item + .nav-item {
-    margin: 0;
-  }
-
   .nav-item {
     min-width: 11.25rem;
     text-align: center;
     border-right: 1px solid $navbar-border-color;
+
+    + .nav-item {
+      margin: 0;
+    }
 
     &:first-child {
       border-left: 1px solid $navbar-border-color;
@@ -47,16 +47,16 @@ $navbar-border-color: rgba(0,0,0,.125);
     padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
 
     &.active {
-
       &,
       &:hover {
+        background-color: $nav-navbar-active-link-active-bg;
+
         > * {
           opacity: 1;
         }
-        background-color: $nav-navbar-active-link-active-bg;
       }
 
-      &:before {
+      &::before {
         position: absolute;
         display: block;
         width: $spacer;
@@ -101,9 +101,6 @@ $navbar-border-color: rgba(0,0,0,.125);
 
 }
 
-
-
-
 .btn-navbar {
   display: inline-block;
   font-weight: 300;
@@ -112,5 +109,5 @@ $navbar-border-color: rgba(0,0,0,.125);
   opacity: .75;
 
   @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
-  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, 0.575rem, $line-height-sm, $btn-border-radius-navbar);
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);
 }

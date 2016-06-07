@@ -4,9 +4,9 @@
   @extend .btn-primary;
 }
 
-button.btn {
-  @extend .btn-primary;
-}
+//button.btn {
+//  @extend .btn-primary;
+//}
 
 .SmallButton {
   @extend .btn;
@@ -21,9 +21,8 @@ button.btn {
 }
 
 .Buttons {
-  @extend .btn-group;
+  //@extend .btn-group;
 }
-
 
 .panel-nav h4 {
   @extend .nav-heading;
@@ -31,6 +30,8 @@ button.btn {
 
 .Tabs ul,
 .tabbed-content {
+  padding-left: 0;
+
   @extend .btn-group;
 
   li {
@@ -42,8 +43,12 @@ button.btn {
     @extend .btn-secondary;
   }
 
-  .Active a,
+  li.Active a,
   .current-tab {
     @extend .active;
   }
+}
+
+.SmallButton + .SmallButton {
+  margin-left: $spacer / 4;
 }

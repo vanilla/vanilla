@@ -1,3 +1,11 @@
 table {
   @extend .table;
 }
+
+.plugins {
+  table {
+    .Info {
+      @extend .btn-group;
+    }
+  }
+}

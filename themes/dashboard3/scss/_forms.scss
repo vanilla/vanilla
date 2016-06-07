@@ -4,24 +4,12 @@
 //
 // Styleguide 3.
 
-.Sortable,
-.DataList {
+@mixin list-reset() {
   padding-left: 0;
 
   li {
     list-style: none;
-  }
-}
-
-form {
-  ul,
-  ol {
-    padding-left: 0;
-
-    li {
-      list-style: none;
-      justify-content: space-between;
-    }
+    justify-content: space-between;
   }
 
   label {
@@ -30,25 +18,30 @@ form {
   }
 }
 
+form {
+  ul,
+  ol {
+    @include list-reset();
+  }
+}
+
 // Quick and dirty horizontal form
 .form-horizontal {
   li {
     @extend .form-group;
     @extend .row;
-    padding-left: $padding-default;
-    padding-right: $padding-default;
-  }
 
-  li > label {
-    @extend .label-wrap;
-  }
+    > label {
+      @extend .label-wrap;
+    }
 
-  li > input {
-    @extend .input-wrap;
-  }
+    > input {
+      @extend .input-wrap;
+    }
 
-  li > select {
-    @extend .input-wrap;
+    > select {
+      @extend .input-wrap;
+    }
   }
 }
 
@@ -82,19 +75,20 @@ form {
 // Styleguide 3.1.1
 
 .label-wrap {
-  .Info,
-  .info {
-    display: block;
-    font-size: $font-size-sm;
-    line-height: $line-height-lg;
-    color: $grey;
-  }
-
   img {
     @extend .padded;
     max-width: 50%;
     max-height: 200px;
   }
+}
+
+.Info,
+.Info2,
+.info {
+  display: block;
+  font-size: $font-size-sm;
+  line-height: $line-height-lg;
+  color: $grey;
 }
 
 // Form grid
@@ -109,10 +103,10 @@ form {
 
   > .label-wrap-wide {
     @extend .col-sm-8;
-  }
 
-  > .label-wrap-wide + .input-wrap {
-    @extend .col-sm-4;
+    + .input-wrap {
+      @extend .col-sm-4;
+    }
   }
 
   .input-wrap-right {
@@ -184,7 +178,7 @@ form {
   background-color: $white;
   border-radius: $toggle-height / 2;
   border: $toggle-border-width solid $grey;
-  transition: background 0.4s;
+  transition: background .4s;
   cursor: pointer;
 }
 
@@ -194,13 +188,13 @@ form {
   top: $toggle-padding + $toggle-border-width;
   left: $toggle-padding + $toggle-border-width;
   bottom: $toggle-padding + $toggle-border-width;
-  width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width *2);
+  width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
   height: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
   border-radius: ($toggle-height - ($toggle-padding)) / 2;
   border: $toggle-border-width solid $grey;
   background-color: $white;
   outline: 0;
-  transition: left 0.4s;
+  transition: left .4s;
   cursor: pointer;
 }
 
@@ -214,7 +208,7 @@ form {
 
 .toggle-slider-active {
   left: ($toggle-height / 2) + $toggle-padding;
-  transition: left 0.4s;
+  transition: left .4s;
 }
 
 .toggle-wrap-on {
@@ -258,74 +252,30 @@ form {
     position: absolute;
     margin-left: -9999px;
     visibility: hidden;
-  }
 
-  input[type="checkbox"] + label {
-    &:before,
-    &:after {
-      content: "";
-    }
+    + label {
+      &::before,
+      &::after {
+        content: '';
+      }
 
-    &:before {
-      @extend .toggle-well;
-    }
+      &::before {
+        @extend .toggle-well;
+      }
 
-    &:after {
-      @extend .toggle-slider;
+      &::after {
+        @extend .toggle-slider;
+      }
     }
   }
 
   // When checked, move and change background color
-  input[type="checkbox"]:checked + label:before {
+  input[type="checkbox"]:checked + label::before {
     @extend .toggle-well-on;
   }
-  input[type="checkbox"]:checked + label:after {
+
+  input[type="checkbox"]:checked + label::after {
     @extend .toggle-slider-on;
-  }
-}
-
-.ActivateSlider {
-  @extend .toggle-wrap;
-
-  a {
-    &,
-    &:focus,
-    &:hover,
-    &:active,
-    &:hover:active {
-      @extend .text-hide;
-      outline: 0;
-    }
-
-    &:before {
-      @extend .toggle-well;
-      content: '';
-    }
-
-    &:after {
-      @extend .toggle-slider;
-      content: '';
-    }
-  }
-
-  .InProgress {
-    &:after {
-      @extend .toggle-slider-active;
-    }
-  }
-}
-
-.ActivateSlider-Active{
-  a {
-    &:before {
-      @extend .toggle-well-on;
-      content: '';
-    }
-
-    &:after {
-      @extend .toggle-slider-on;
-      content: '';
-    }
   }
 }
 
@@ -360,7 +310,7 @@ form {
 .color-picker-preview {
   position: absolute;
   top: $padding-default / 4;
-  right: $padding-default + ($padding-default / 4);
+  right: ($padding-default / 4) + $border-width-rem;
   width: 40px;
   height: 27px;
   background: $black;
@@ -445,11 +395,204 @@ select {
   &:focus {
     border-color: #51a7e8;
     outline: none;
-    @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, 0.075), 0 0 5px rgba(81, 167, 232, 0.5));
+    @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, .075), 0 0 5px rgba(81, 167, 232, .5));
   }
 
   // Hides the default caret in IE11
   &::-ms-expand {
     opacity: 0;
   }
+}
+
+
+// Label selectors
+//
+// Label selectors replace checkboxes and radios with a image and/or text selector.
+//
+// Markup:
+// <form>
+// <ul class="label-selector">
+//   <li class="label-selector-item">
+//     <input type="radio" id="babySeal" name="babyAnimals">
+//     <label for="babySeal">
+//       <div class="image-wrap">
+//         <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
+//         <div class="overlay">
+//           <div class="buttons">
+//             <a class="btn btn-transparent">Button</a>
+//           </div>
+//         </div>
+//       </div>
+//       <div class="title">Baby Seal</div>
+//       <div class="info">by Author</div>
+//       <p class="description">Choose this happy baby seal. It's so very happy.</p>
+//     </label>
+//   </li>
+//   <li class="label-selector-item">
+//     <input type="radio" id="puppy" name="babyAnimals">
+//     <label for="puppy">
+//       <div class="image-wrap">
+//         <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
+//         <div class="overlay">
+//           <div class="buttons">
+//             <a class="btn btn-transparent">Button</a>
+//           </div>
+//         </div>
+//       </div>
+//       <div class="title">Puppy</div>
+//       <div class="info">by Author</div>
+//       <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
+//     </label>
+//   </li>
+// </ul>
+// </form>
+//
+// Styleguide 3.5.
+
+.label-selector {
+  @extend .row;
+  @include list-reset();
+
+  label {
+    cursor: pointer;
+  }
+
+  input[type=radio],
+  input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .active,
+  input[type=radio]:checked ~ label,
+  input[type=radio]:checked ~ label {
+    cursor: default;
+
+    .overlay {
+      display: none;
+    }
+
+    .image-wrap {
+      &::after {
+        opacity: 1;
+      }
+    }
+
+    .label-selector-image {
+      opacity: .5;
+    }
+  }
+
+  .label-selector-image {
+    display: block;
+    width: 100%;
+    border: 1px solid $grey-light;
+  }
+
+  .title {
+    text-align: center;
+    font-weight: 500;
+  }
+
+  .image-wrap {
+    position: relative;
+    display: block;
+    margin-bottom: $spacer;
+
+    &:hover .overlay {
+      height: 100%;
+    }
+
+    &::after {
+      position: absolute;
+      top: 35%;
+      left: auto;
+      right: auto;
+      height: 30%;
+      width: 100%;
+      @include icon;
+      font-size: 4rem;
+      color: $brand-success;
+      text-align: center;
+      opacity: 0;
+      transition: opacity .1s;
+      @include char-content($icon-ok-circle);
+    }
+  }
+
+  .overlay {
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 0;
+    z-index: 20;
+    background-color: $brand-primary;
+    opacity: .9;
+    overflow: hidden;
+    transition: all .1s;
+    text-align: center;
+  }
+
+  .buttons {
+    position: relative;
+    top: 40%;
+    left: auto;
+    right: auto;
+    height: 20%;
+
+    > .btn {
+      min-width: 5rem;
+      margin-left: .125rem;
+      margin-right: .125rem;
+    }
+  }
+
+  .description {
+    display: none;
+  }
+}
+
+.label-selector-item {
+  @extend .col-md-6;
+  @extend .col-lg-4;
+  @extend .col-xl-3;
+
+  padding: ($spacer / 2) $spacer $spacer;
+}
+
+// Search input
+//
+// Search inputs have a hidden button and a search icon on the input.
+//
+// Markup:
+// <form>
+//   <div class="search-wrap">
+//     <input class="form-control">
+//     <button type="submit" class="search-submit">Search</button>
+//   </div>
+// </form>
+//
+// Styleguide 3.6.
+
+
+.search-wrap {
+  position: relative;
+
+  &::before {
+    position: absolute;
+    top: .375rem;
+    right: 1rem;
+    line-height: $font-size-base * $line-height;
+    @extend %icon;
+    @include char-content($icon-search);
+  }
+}
+
+// Hide the button
+.search-submit {
+  position: absolute;
+  left: -9999px;
 }

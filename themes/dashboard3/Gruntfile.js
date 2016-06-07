@@ -23,7 +23,8 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        // , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        , tasks: ['scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -64,6 +65,37 @@ module.exports = function (grunt) {
           },
           {
             expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'ace-builds/src-min/ace.js'
+              , 'ace-builds/src-min/mode-html.js'
+              , 'ace-builds/src-min/mode-css.js'
+              , 'ace-builds/src-min/theme-clouds.js'
+            ],
+            dest: 'js/vendors/ace'
+          },
+          {
+            expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'google-code-prettify/src/lang-html.js'
+              , 'google-code-prettify/src/prettify.js'
+            ],
+            dest: 'js/vendors/prettify'
+          },
+          {
+            expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'google-code-prettify/src/prettify.css'
+            ],
+            dest: 'design/vendors'
+          },
+          {
+            expand: true,
             // flatten: true,
             cwd: 'bower_components',
             src: [
@@ -88,7 +120,17 @@ module.exports = function (grunt) {
             dest: 'template/public/admin.css'
           }
         ]
-
+      },
+      styleguidefonts: {
+        files: [
+          {
+            flatten: true,
+            src: [
+              '../../resources/fonts/*'
+            ],
+            dest: 'template/public/resources/fonts'
+          }
+        ]
       }
     },
 
@@ -164,6 +206,7 @@ module.exports = function (grunt) {
     sass_globbing: {
       vendors: {
         files: {
+          'scss/maps/_vanillicon.scss': 'scss/vanillicon/*.scss',
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',

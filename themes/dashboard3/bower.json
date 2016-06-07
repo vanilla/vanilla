@@ -2,6 +2,10 @@
   "name": "dashboard3",
   "private": true,
   "dependencies": {
-    "bootstrap": "^4.0.0"
+    "bootstrap": "^4.0.0",
+    "google-code-prettify": "^1.0.4",
+    "ace": "^1.2.3",
+    "ace-builds": "^1.2.3",
+    "color-themes-for-google-code-prettify": "*"
   }
 }

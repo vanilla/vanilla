@@ -2,16 +2,10 @@
 //
 // No styleguide reference.
 
-$border-color: rgba(0,0,0,.125);
-
 .main {
   background-color: $white;
   z-index: 5;
   border: 1px solid $border-color;
   border-top: 0;
-}
-
-.footer {
-  border-left: 1px solid $border-color;
-  border-right: 1px solid $border-color;
+  padding-bottom: 4rem;
 }

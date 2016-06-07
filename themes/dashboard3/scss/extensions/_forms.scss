@@ -1,24 +1,150 @@
 // PROBLEMS: Need checkboxes to have outer div class
 //           Text input needs to have label separate from input, not wrapped
 
-form {
-  //> div > ul {
-  //  @extend .input-group;
-  //
-  //  > li {
-  //    @extend .form-group;
-  //    @extend .row;
-  //  }
-  //}
+.Sortable,
+.DataList {
+  padding-left: 0;
 
-  //input[type="text"],
-  //textarea,
-  //select {
-  //  @extend .form-control;
-  //}
+  li {
+    list-style: none;
+  }
+}
+
+.ActivateSlider {
+  @extend .toggle-wrap;
+
+  a {
+    &,
+    &:focus,
+    &:hover,
+    &:active,
+    &:hover:active {
+      @extend .text-hide;
+      outline: 0;
+    }
+
+    &::before {
+      @extend .toggle-well;
+      content: '';
+    }
+
+    &::after {
+      @extend .toggle-slider;
+      content: '';
+    }
+  }
+
+  .InProgress {
+    &::after {
+      @extend .toggle-slider-active;
+    }
+  }
+}
+
+.ActivateSlider-Active {
+  a {
+    &::before {
+      @extend .toggle-well-on;
+      content: '';
+    }
+
+    &::after {
+      @extend .toggle-slider-on;
+      content: '';
+    }
+  }
 }
 
 // Temp. Kludge
 #UrlCode {
   padding-left: $grid-gutter-width / 2;
+}
+
+.emojiset-author {
+  @extend .info;
+}
+
+.emojiext-list,
+.LayoutOptions,
+.HomeOptions {
+  @extend .label-selector;
+}
+
+.LayoutOptions,
+.HomeOptions {
+  > a {
+    text-decoration: none;
+    color: $grey-dark;
+    @extend .title;
+  }
+
+  .Sprite {
+    @extend img;
+  }
+
+  .image-wrap {
+    height: 124px;
+    width: 180px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// Homepage page
+.Homepage .Sprite {
+  display: block;
+  height: 124px;
+  width: 180px;
+  background: url("./images/homepage-sprites.png") 0 0 no-repeat;
+
+  @extend .label-selector-image;
+}
+
+.Homepage .SpDiscussionsTable {
+  background-position: 0 0;
+}
+
+.Homepage .SpDiscussions {
+  background-position: -180px 0;
+}
+
+.Homepage .SpCategories {
+  background-position: -360px 0;
+}
+
+.Homepage .SpCategoriesTable {
+  background-position: 0 -124px;
+}
+
+.Homepage .SpCategoriesMixed {
+  background-position: -180px -124px;
+}
+
+.Homepage .SpActivity {
+  background-position: -360px -124px;
+}
+
+.Homepage .SpBestOf {
+  background-position: -540px 0;
+}
+
+.Current,
+.current-theme {
+  @extend .active;
+}
+
+#Form_Go {
+  @extend .search-submit;
+}
+
+.FilterMenu {
+  select {
+    display: inline-block;
+    width: inherit;
+  }
+  .FilterButton {
+    display: inline-block;
+    @extend .btn;
+    @extend .btn-primary;
+  }
 }

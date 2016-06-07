@@ -49,7 +49,8 @@ $font-family-monospace:      Menlo, Monaco, Consolas, "Courier New", monospace !
 $font-family-base:           $font-family-sans-serif !default;
 
 // Pixel value used to responsively scale all typography. Applied to the `<html>` element.
-$font-size-root:             16px;
+$rem-base:                   16;
+$font-size-root:             $rem-base * 1px;
 
 $font-size-base:             .875rem;
 $font-size-lg:               1.25rem !default;
@@ -89,6 +90,7 @@ $spacer:                     1rem !default;
 $spacer-x:                   $spacer !default;
 $spacer-y:                   $spacer !default;
 $border-width:               1px !default;
+$border-width-rem:           (1rem / $rem-base);
 
 // Body
 //
@@ -192,11 +194,14 @@ $navbar-height:                             $spacer * 4;
 $nav-navbar-active-link-active-bg:          #0cb0f8;
 
 // Checkbox toggles
-$toggle-border-width:                       0.05rem;
+$toggle-border-width:                       $border-width-rem;
 $toggle-height:                             2rem;
-$toggle-padding:                            $toggle-height / 16;
+$toggle-padding:                            $toggle-height / 32;
 
 // Padding
 $padding-default:                           $grid-gutter-width / 2;
 
+$border-color: rgba(0,0,0,.125);
 $input-border-color: #ccc;
+
+$font-size-tables:                          .8125rem; //13px

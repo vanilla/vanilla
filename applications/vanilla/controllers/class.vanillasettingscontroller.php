@@ -159,23 +159,44 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Configures navigation sidebar in Dashboard.
+     * Build and add the Dashboard's side navigation menu.
+     *
+     * EXACT COPY OF DashboardController::addSideMenu(). KEEP IN SYNC.
+     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
      *
      * @since 2.0.0
      * @access public
      *
-     * @param $CurrentUrl Path to current location in dashboard.
+     * @param string|bool $CurrentUrl Path to current location; used to highlight correct item in menu.
      */
-    public function addSideMenu($CurrentUrl) {
+    public function addSideMenu($CurrentUrl = false) {
+        if (!$CurrentUrl) {
+            $CurrentUrl = strtolower($this->SelfUrl);
+        }
+
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             $SideMenu = new SideMenuModule($this);
+
+            // Add the heading here so that they sort properly.
+            $SideMenu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
+            $SideMenu->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
+            $SideMenu->addItem('Users', t('Users'), false, array('class' => 'Users'));
+            $SideMenu->addItem('Moderation', t('Moderation'), false, array('class' => 'Moderation'));
+
+            // Hook for initial setup. Do NOT use this for addons.
+            $this->EventArguments['SideMenu'] = $SideMenu;
+            $this->fireEvent('earlyAppSettingsMenuItems');
+
+            // Module setup.
             $SideMenu->HtmlId = '';
             $SideMenu->highlightRoute($CurrentUrl);
             $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-            $this->EventArguments['SideMenu'] = &$SideMenu;
+
+            // Hook for adding to menu. USE THIS FOR YOUR ADDON.
             $this->fireAs('SettingsController');
             $this->fireEvent('GetAppSettingsMenuItems');
+
             $this->addModule($SideMenu, 'Panel');
         }
     }

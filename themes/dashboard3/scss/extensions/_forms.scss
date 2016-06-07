@@ -136,3 +136,15 @@
 #Form_Go {
   @extend .search-submit;
 }
+
+.FilterMenu {
+  select {
+    display: inline-block;
+    width: inherit;
+  }
+  .FilterButton {
+    display: inline-block;
+    @extend .btn;
+    @extend .btn-primary;
+  }
+}

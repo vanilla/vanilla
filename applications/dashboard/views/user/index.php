@@ -54,6 +54,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         ?>
    </span>-->
     </div>
+    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
     <div class="table-wrap">
         <table id="Users" class="AltColumns">
             <thead>
@@ -80,5 +81,5 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         </table>
     </div>
 <?php
-PagerModule::write(array('Sender' => $this));
+PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard'));
 echo $this->Form->close();

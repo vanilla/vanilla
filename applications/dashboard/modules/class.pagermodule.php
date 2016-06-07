@@ -79,7 +79,7 @@ class PagerModule extends Gdn_Module {
      * it is not retrieved and simple "next/previous" links are displayed
      * instead. Default is FALSE, meaning that the simple pager is displayed.
      */
-    private $_Totalled;
+    public $_Totalled;
 
     /**
      *
@@ -441,7 +441,9 @@ class PagerModule extends Gdn_Module {
             }
         }
         $Pager = self::$_CurrentPager;
-
+        if ($view = val('View', $Options)) {
+            $Pager->setView($view);
+        }
         $Pager->Wrapper = val('Wrapper', $Options, $Pager->Wrapper);
         $Pager->MoreCode = val('MoreCode', $Options, $Pager->MoreCode);
         $Pager->LessCode = val('LessCode', $Options, $Pager->LessCode);
@@ -476,7 +478,12 @@ class PagerModule extends Gdn_Module {
             $Pager->Url = $Url;
         }
 
-        echo $Pager->toString($WriteCount > 0 ? 'more' : 'less');
+        if ($view) {
+            Gdn::controller()->setData('Pager', $Pager);
+            echo $Pager->fetchView($view);
+        } else {
+            echo $Pager->toString($WriteCount > 0 ? 'more' : 'less');
+        }
         $WriteCount++;
 
 //      list($Offset, $Limit) = offsetLimit(GetValue, 20);

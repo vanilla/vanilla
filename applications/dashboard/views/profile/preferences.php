@@ -95,6 +95,9 @@
                     }
                     // Check if there are config values in this row.
                     if ($RowHasConfigValues) {
+                        // Make sure we have complete numeric indexes.
+                        $Settings = array_values($Settings);
+
                         $Description = val($Settings[0], $Descriptions);
                         if (is_array($Description)) {
                             $Description = $Description[0];

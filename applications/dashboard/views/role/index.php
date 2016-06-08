@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-$Advanced = TRUE;
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
@@ -12,7 +10,10 @@ $Advanced = TRUE;
         ?>
     </div>
 <?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
     <h1><?php echo t('Manage Roles & Permissions'); ?></h1>
+    <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'btn btn-primary'); ?></div>
+</div>
 <?php
 echo $this->Form->open();
 $this->DefaultRolesWarning();
@@ -21,15 +22,13 @@ $this->DefaultRolesWarning();
         echo t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
         $this->fireEvent('AfterRolesInfo');
         ?></div>
-<?php if ($Advanced) { ?>
-    <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'SmallButton'); ?></div>
-<?php } ?>
 <div class="table-wrap">
     <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
         <thead>
         <tr id="0">
             <th><?php echo t('Role'); ?></th>
             <th class="Alt"><?php echo t('Description'); ?></th>
+            <th><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -39,17 +38,8 @@ $this->DefaultRolesWarning();
             $Alt = !$Alt;
             ?>
             <tr id="<?php echo $Role['RoleID']; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-                <td class="Info">
-                    <strong><?php echo $Role['Name']; ?></strong>
-                    <?php if ($Advanced && $Role['CanModify']) { ?>
-                        <div>
-                            <?php
-                            echo anchor(t('Edit'), "/role/edit/{$Role['RoleID']}", 'SmallButton');
-                            if ($Role['Deletable'])
-                                echo anchor(t('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup SmallButton');
-                            ?>
-                        </div>
-                    <?php } ?>
+                <td>
+                    <?php echo $Role['Name']; ?>
                 </td>
                 <td class="Alt">
                     <?php
@@ -60,6 +50,16 @@ $this->DefaultRolesWarning();
                             t('default type', 'default').': '.
                             t(val('Type', $Role)).
                             '</span></div>';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if ($Role['CanModify']) {
+                        echo anchor(t('Edit'), "/role/edit/{$Role['RoleID']}", 'btn btn-edit');
+                        if ($Role['Deletable']) {
+                            echo anchor(t('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup btn btn-delete');
+                        }
                     }
                     ?>
                 </td>

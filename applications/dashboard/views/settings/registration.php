@@ -20,42 +20,44 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
     <ul>
         <li id="RegistrationMethods">
             <div class="Info"><?php echo t('Change the way that new users register with the site.'); ?></div>
-            <table class="Label AltColumns">
-                <thead>
-                <tr>
-                    <th><?php echo t('Method'); ?></th>
-                    <th class="Alt"><?php echo t('Description'); ?></th>
-                </tr>
-                </thead>
-                <tbody>
-                <?php
-                $Count = count($this->RegistrationMethods);
-                $i = 0;
-                $Alt = false;
-                foreach ($this->RegistrationMethods as $Method => $Description) {
-                    $Alt = !$Alt;
-                    $CssClass = '';
-                    if ($Alt) {
-                        $CssClass = 'Alt';
-                    }
-                    ++$i;
-                    if ($Count == $i)
-                        $CssClass .= ' Last';
-
-                    $CssClass = trim($CssClass);
-                    ?>
-                    <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
-                        <th><?php
-                            $MethodName = $Method;
-                            echo $this->Form->radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
-                            ?></th>
-                        <td class="Alt"><?php echo t($Description); ?></td>
+            <div class="table-wrap">
+                <table class="Label AltColumns">
+                    <thead>
+                    <tr>
+                        <th><?php echo t('Method'); ?></th>
+                        <th class="Alt"><?php echo t('Description'); ?></th>
                     </tr>
-                <?php
-                }
-                ?>
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $Count = count($this->RegistrationMethods);
+                    $i = 0;
+                    $Alt = false;
+                    foreach ($this->RegistrationMethods as $Method => $Description) {
+                        $Alt = !$Alt;
+                        $CssClass = '';
+                        if ($Alt) {
+                            $CssClass = 'Alt';
+                        }
+                        ++$i;
+                        if ($Count == $i)
+                            $CssClass .= ' Last';
+
+                        $CssClass = trim($CssClass);
+                        ?>
+                        <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
+                            <th><?php
+                                $MethodName = $Method;
+                                echo $this->Form->radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
+                                ?></th>
+                            <td class="Alt"><?php echo t($Description); ?></td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                    </tbody>
+                </table>
+            </div>
         </li>
 
         <?php Captcha::settings($this); ?>

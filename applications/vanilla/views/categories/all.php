@@ -13,17 +13,13 @@ $CatList = '';
 $DoHeadings = c('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Category.Depth', 0);
 $ChildCategories = '';
-$this->EventArguments['NumRows'] = count($this->data('Categories'));
 
-//if (c('Vanilla.Categories.ShowTabs')) {
-////   $ViewLocation = Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'vanilla');
-////   include_once $ViewLocation;
-////   WriteFilterTabs($this);
-//   echo Gdn_Theme::Module('DiscussionFilterModule');
-//}
+$CategoryTree = $this->data('CategoryTree');
+$Categories = CategoryModel::flattenTree($CategoryTree);
+$this->EventArguments['NumRows'] = $Categories;
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
-foreach ($this->data('Categories') as $CategoryRow) {
+foreach ($Categories as $CategoryRow) {
     $Category = (object)$CategoryRow;
 
     $this->EventArguments['CatList'] = &$CatList;

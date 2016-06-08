@@ -709,6 +709,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setData($ConfigurationModel->Data);
         } else {
             if ($this->Form->save() !== false) {
+                CategoryModel::clearCache();
                 $this->informMessage(t("Your settings have been saved."));
             }
         }

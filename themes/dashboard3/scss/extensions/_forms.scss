@@ -148,3 +148,7 @@
     @extend .btn-primary;
   }
 }
+
+.SmallInput {
+  @extend .form-control;
+}

@@ -120,10 +120,15 @@ $caret-width-lg:         $caret-width !default;
 //
 // For each of Bootstrap's buttons, define text, background and border color.
 
+$control-height:                 36;
+$control-height-rem:             ($control-height / $rem-base * 1rem);
+$control-padding-y:              ($control-height-rem - ($border-width-rem * 2) - ($font-size-base * $line-height)) / 2;
+
 $btn-min-width:                  $spacer * 6.75;
 $btn-padding-x:                  1rem !default;
-$btn-padding-y:                  .425rem;
+$btn-padding-y:                  $control-padding-y;
 $btn-font-weight:                normal !default;
+$btn-line-height:                1;
 
 $btn-primary-color:              $brand-primary;
 $btn-primary-bg:                 $white;
@@ -195,13 +200,12 @@ $nav-navbar-active-link-active-bg:          #0cb0f8;
 
 // Checkbox toggles
 $toggle-border-width:                       $border-width-rem;
-$toggle-height:                             2rem;
+$toggle-height:                             $control-height-rem;
 $toggle-padding:                            $toggle-height / 32;
 
 // Padding
 $padding-default:                           $grid-gutter-width / 2;
-
-$border-color: rgba(0,0,0,.125);
-$input-border-color: #ccc;
+$border-color:                              #ddd;
 
 $font-size-tables:                          .8125rem; //13px
+

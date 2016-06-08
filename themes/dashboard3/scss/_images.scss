@@ -9,7 +9,7 @@
   @include img-fluid();
 }
 
-@mixin image-wrap($width: 4rem, $height: 4rem, $radius: .25rem, $background-color: $grey-light) {
+@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $background-color: $grey-light) {
   position: relative;
   height: $height;
   border-radius: $radius;
@@ -46,12 +46,32 @@
   @include image-wrap();
 }
 
-.user-image-wrap {
-  display: inline-block;
-  @include image-wrap(2rem, 2rem, .125rem);
-}
+// Components
+//
+//
+//
+// Styleguide 6.
 
 // User block
+//
+// Small user block
+//
+// Markup:
+// <div class="user-block">
+//   <div class="user-image-wrap">
+//     <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
+//   </div>
+//   <div class="user-info">
+//     <div class="username">
+//       <a href="#">amelia</a>
+//     </div>
+//     <div class="info">
+//       <a href="#">name@email.com</a>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 6.1.
 
 .user-block {
   display: flex;
@@ -59,9 +79,13 @@
   align-items: center;
 
   .user-image-wrap {
+    display: inline-block;
+    @include image-wrap(2rem, 2rem, .125rem);
     margin-right: $spacer / 2;
   }
+}
 
+.user-info {
   .username {
     line-height: 1.125rem;
   }

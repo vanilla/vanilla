@@ -1099,7 +1099,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->addJsFile('addons.js');
+//        $this->addJsFile('addons.js');
         $this->title(t('Plugins'));
         $this->addSideMenu('dashboard/settings/plugins');
 
@@ -1123,7 +1123,8 @@ class SettingsController extends DashboardController {
         if ($PluginName != '') {
             try {
                 $this->EventArguments['PluginName'] = $PluginName;
-                if (array_key_exists($PluginName, $this->EnabledPlugins) === true) {
+                $enabled = array_key_exists($PluginName, $this->EnabledPlugins) === true;
+                if ($enabled) {
                     Gdn::pluginManager()->disablePlugin($PluginName);
                     Gdn_LibraryMap::clearCache();
                     $this->fireEvent('AfterDisablePlugin');
@@ -1142,9 +1143,18 @@ class SettingsController extends DashboardController {
                 $this->Form->addError($e);
             }
             if ($this->Form->errorCount() == 0) {
-                redirect('/settings/plugins/'.$this->Filter);
+                if (strtolower($this->Filter) == 'all') {
+                    if (!$enabled) {
+                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/' . $this->Filter . '/' . $PluginName . '/' . $Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Disable %s'), $PluginName)]), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider-Active"));
+                    } else {
+                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/' . $this->Filter . '/' . $PluginName . '/' . $Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Enable %s'), $PluginName)]), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider-InActive"));
+                    }
+                    $this->jsonTarget('#' . $PluginName . '-toggle', $newToggle);
+                    $this->render('Blank', 'Utility');
+                }
             }
         }
+
         $this->render();
     }
 

@@ -32,105 +32,107 @@ $DisabledCount = $AppCount - $EnabledCount;
         <li><?php echo t('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
     </ul>
 </div>
-<table class="AltRows">
-    <thead>
-    <tr>
-        <th><?php echo t('Application'); ?></th>
-        <th class="Alt"><?php echo t('Description'); ?></th>
-    </tr>
-    </thead>
-    <tbody>
-    <?php
-    $Alt = false;
-    foreach ($this->AvailableApplications as $AppName => $AppInfo) {
-        $Css = array_key_exists($AppName, $this->EnabledApplications) ? 'Enabled' : 'Disabled';
-        $State = strtolower($Css);
-        if ($this->Filter == 'all' || $this->Filter == $State) {
-            $Alt = !$Alt;
-            $Version = val('Version', $AppInfo, '');
-            $ScreenName = val('Name', $AppInfo, $AppName);
-            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $AppInfo, '') : '';
-            $AppUrl = val('Url', $AppInfo, '');
-            $Author = val('Author', $AppInfo, '');
-            $AuthorUrl = val('AuthorUrl', $AppInfo, '');
-            $NewVersion = val('NewVersion', $AppInfo, '');
-            $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-            $RowClass = $Css;
-            if ($Alt) {
-                $RowClass .= ' Alt';
-            }
-            ?>
-            <tr class="More <?php echo $RowClass; ?>">
-                <th><?php echo $ScreenName; ?></th>
-                <td><?php echo val('Description', $AppInfo, ''); ?></td>
-            </tr>
-            <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
-                <td class="Info"><?php
-                    $ToggleText = array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable';
-                    echo anchor(
-                        t($ToggleText),
-                        '/settings/applications/'.$this->Filter.'/'.$AppName.'/'.$Session->TransientKey(),
-                        $ToggleText.'Addon SmallButton'
-                    );
-
-                    if ($SettingsUrl != '') {
-                        echo anchor(t('Settings'), $SettingsUrl, 'SmallButton');
-                    }
-                    ?></td>
-                <td class="Alt Info"><?php
-                    $RequiredApplications = val('RequiredApplications', $AppInfo, false);
-                    $Info = '';
-                    if ($Version != '')
-                        $Info = sprintf(t('Version %s'), $Version);
-
-                    if (is_array($RequiredApplications)) {
-                        if ($Info != '')
-                            $Info .= '<span>|</span>';
-
-                        $Info .= t('Requires: ');
-                    }
-
-                    $i = 0;
-                    if (is_array($RequiredApplications)) {
-                        if ($i > 0)
-                            $Info .= ', ';
-
-                        foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                            $Info .= sprintf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-                            ++$i;
-                        }
-                    }
-
-                    if ($Author != '') {
-                        $Info .= '<span>|</span>';
-                        $Info .= sprintf('By %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author);
-                    }
-
-                    if ($AppUrl != '') {
-                        $Info .= '<span>|</span>';
-                        $Info .= anchor(t('Visit Site'), $AppUrl);
-                    }
-
-                    echo $Info != '' ? $Info : '&#160;';
-                    ?>
-                </td>
-            </tr>
-            <?php
-            if ($Upgrade) {
+<div class="table-wrap">
+    <table class="AltRows">
+        <thead>
+        <tr>
+            <th><?php echo t('Application'); ?></th>
+            <th class="Alt"><?php echo t('Description'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php
+        $Alt = false;
+        foreach ($this->AvailableApplications as $AppName => $AppInfo) {
+            $Css = array_key_exists($AppName, $this->EnabledApplications) ? 'Enabled' : 'Disabled';
+            $State = strtolower($Css);
+            if ($this->Filter == 'all' || $this->Filter == $State) {
+                $Alt = !$Alt;
+                $Version = val('Version', $AppInfo, '');
+                $ScreenName = val('Name', $AppInfo, $AppName);
+                $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $AppInfo, '') : '';
+                $AppUrl = val('Url', $AppInfo, '');
+                $Author = val('Author', $AppInfo, '');
+                $AuthorUrl = val('AuthorUrl', $AppInfo, '');
+                $NewVersion = val('NewVersion', $AppInfo, '');
+                $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+                $RowClass = $Css;
+                if ($Alt) {
+                    $RowClass .= ' Alt';
+                }
                 ?>
-                <tr class="<?php echo $RowClass; ?>">
-                    <td colspan="2">
-                        <div class="Alert"><a href="<?php
-                            echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
-                            ?>"><?php
-                                printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
-                                ?></a></div>
+                <tr class="More <?php echo $RowClass; ?>">
+                    <th><?php echo $ScreenName; ?></th>
+                    <td><?php echo val('Description', $AppInfo, ''); ?></td>
+                </tr>
+                <tr class="<?php echo ($Upgrade ? 'More ' : '').$RowClass; ?>">
+                    <td class="Info"><?php
+                        $ToggleText = array_key_exists($AppName, $this->EnabledApplications) ? 'Disable' : 'Enable';
+                        echo anchor(
+                            t($ToggleText),
+                            '/settings/applications/'.$this->Filter.'/'.$AppName.'/'.$Session->TransientKey(),
+                            $ToggleText.'Addon SmallButton'
+                        );
+
+                        if ($SettingsUrl != '') {
+                            echo anchor(t('Settings'), $SettingsUrl, 'SmallButton');
+                        }
+                        ?></td>
+                    <td class="Alt Info"><?php
+                        $RequiredApplications = val('RequiredApplications', $AppInfo, false);
+                        $Info = '';
+                        if ($Version != '')
+                            $Info = sprintf(t('Version %s'), $Version);
+
+                        if (is_array($RequiredApplications)) {
+                            if ($Info != '')
+                                $Info .= '<span>|</span>';
+
+                            $Info .= t('Requires: ');
+                        }
+
+                        $i = 0;
+                        if (is_array($RequiredApplications)) {
+                            if ($i > 0)
+                                $Info .= ', ';
+
+                            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
+                                $Info .= sprintf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                                ++$i;
+                            }
+                        }
+
+                        if ($Author != '') {
+                            $Info .= '<span>|</span>';
+                            $Info .= sprintf('By %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author);
+                        }
+
+                        if ($AppUrl != '') {
+                            $Info .= '<span>|</span>';
+                            $Info .= anchor(t('Visit Site'), $AppUrl);
+                        }
+
+                        echo $Info != '' ? $Info : '&#160;';
+                        ?>
                     </td>
                 </tr>
-            <?php
+                <?php
+                if ($Upgrade) {
+                    ?>
+                    <tr class="<?php echo $RowClass; ?>">
+                        <td colspan="2">
+                            <div class="Alert"><a href="<?php
+                                echo CombinePaths(array($UpdateUrl, 'find', urlencode($AppName)), '/');
+                                ?>"><?php
+                                    printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+                                    ?></a></div>
+                        </td>
+                    </tr>
+                <?php
+                }
             }
         }
-    }
-    ?>
-    </tbody>
-</table>
+        ?>
+        </tbody>
+    </table>
+</div>

@@ -1976,7 +1976,7 @@ a.text-danger:focus, a.text-danger:hover {
   font-size: 1.25rem;
   line-height: 1;
   background: none;
-  border: 1px solid transparent;
+  border: 0.0625rem solid transparent;
   border-radius: 0.1rem;
 }
 
@@ -4110,7 +4110,7 @@ a.current-theme,
 .btn-group .Info + .Info, .Tabs ul .plugins table .Info + .Info, .plugins table .Tabs ul .Info + .Info,
 .tabbed-content .plugins table .Info + .Info, .plugins table
 .tabbed-content .Info + .Info, .plugins table .Info .Info + .Info {
-  margin-left: -1px;
+  margin-left: -0.0625rem;
 }
 
 .btn-toolbar {
@@ -5075,7 +5075,7 @@ a.current-theme,
 .btn-group-vertical >
 .tabbed-content + .Info, .plugins table
 .btn-group-vertical > .Info + .Info {
-  margin-top: -1px;
+  margin-top: -0.0625rem;
   margin-left: 0;
 }
 
@@ -5331,16 +5331,16 @@ a.current-theme,
   padding: 0.75rem;
   line-height: 1.5;
   vertical-align: top;
-  border-top: 1px solid #f4f6fb;
+  border-top: 0.0625rem solid #f4f6fb;
 }
 
 .table thead th, table thead th {
   vertical-align: bottom;
-  border-bottom: 2px solid #f4f6fb;
+  border-bottom: 0.125rem solid #f4f6fb;
 }
 
 .table tbody + tbody, table tbody + tbody {
-  border-top: 2px solid #f4f6fb;
+  border-top: 0.125rem solid #f4f6fb;
 }
 
 .table .table, table .table, .table table, table table {
@@ -5353,17 +5353,17 @@ a.current-theme,
 }
 
 .table-bordered {
-  border: 1px solid #f4f6fb;
+  border: 0.0625rem solid #f4f6fb;
 }
 
 .table-bordered th,
 .table-bordered td {
-  border: 1px solid #f4f6fb;
+  border: 0.0625rem solid #f4f6fb;
 }
 
 .table-bordered thead th,
 .table-bordered thead td {
-  border-bottom-width: 2px;
+  border-bottom-width: 0.125rem;
 }
 
 .table-striped tbody tr:nth-of-type(odd) {
@@ -5492,13 +5492,13 @@ a.current-theme,
 
 .table-reflow th,
 .table-reflow td {
-  border-top: 1px solid #f4f6fb;
-  border-left: 1px solid #f4f6fb;
+  border-top: 0.0625rem solid #f4f6fb;
+  border-left: 0.0625rem solid #f4f6fb;
 }
 
 .table-reflow th:last-child,
 .table-reflow td:last-child {
-  border-right: 1px solid #f4f6fb;
+  border-right: 0.0625rem solid #f4f6fb;
 }
 
 .table-reflow thead:last-child tr:last-child th,
@@ -5507,7 +5507,7 @@ a.current-theme,
 .table-reflow tbody:last-child tr:last-child td,
 .table-reflow tfoot:last-child tr:last-child th,
 .table-reflow tfoot:last-child tr:last-child td {
-  border-bottom: 1px solid #f4f6fb;
+  border-bottom: 0.0625rem solid #f4f6fb;
 }
 
 .table-reflow tr {
@@ -5517,7 +5517,7 @@ a.current-theme,
 .table-reflow tr th,
 .table-reflow tr td {
   display: block !important;
-  border: 1px solid #f4f6fb;
+  border: 0.0625rem solid #f4f6fb;
 }
 
 .media, .Feed, .FeedItem, .DataList li {
@@ -5610,7 +5610,7 @@ a.current-theme,
   list-style: none;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.15);
   border-radius: 0.1rem;
 }
 
@@ -6416,7 +6416,7 @@ a.current-theme,
   }
 }
 
-.form-control {
+.form-control, .SmallInput {
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
@@ -6425,46 +6425,46 @@ a.current-theme,
   color: #949aa2;
   background-color: #fff;
   background-image: none;
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   border-radius: 0.1rem;
 }
 
-.form-control::-ms-expand {
+.form-control::-ms-expand, .SmallInput::-ms-expand {
   background-color: transparent;
   border: 0;
 }
 
-.form-control:focus {
+.form-control:focus, .SmallInput:focus {
   border-color: #66afe9;
   outline: none;
 }
 
-.form-control::-webkit-input-placeholder {
+.form-control::-webkit-input-placeholder, .SmallInput::-webkit-input-placeholder {
   color: #999;
   opacity: 1;
 }
 
-.form-control::-moz-placeholder {
+.form-control::-moz-placeholder, .SmallInput::-moz-placeholder {
   color: #999;
   opacity: 1;
 }
 
-.form-control:-ms-input-placeholder {
+.form-control:-ms-input-placeholder, .SmallInput:-ms-input-placeholder {
   color: #999;
   opacity: 1;
 }
 
-.form-control::placeholder {
+.form-control::placeholder, .SmallInput::placeholder {
   color: #999;
   opacity: 1;
 }
 
-.form-control:disabled, .form-control[readonly] {
+.form-control:disabled, .SmallInput:disabled, .form-control[readonly], [readonly].SmallInput {
   background-color: #f4f6fb;
   opacity: 1;
 }
 
-.form-control:disabled {
+.form-control:disabled, .SmallInput:disabled {
   cursor: not-allowed;
 }
 
@@ -6479,36 +6479,47 @@ a.current-theme,
 }
 
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
-  input[type="date"].form-control,
+  input[type="date"].form-control, input[type="date"].SmallInput,
   input[type="time"].form-control,
+  input[type="time"].SmallInput,
   input[type="datetime-local"].form-control,
-  input[type="month"].form-control {
+  input[type="datetime-local"].SmallInput,
+  input[type="month"].form-control,
+  input[type="month"].SmallInput {
     line-height: 2.0625rem;
   }
   input[type="date"].input-sm,
   .input-group-sm input[type="date"].form-control,
+  .input-group-sm input[type="date"].SmallInput,
   input[type="time"].input-sm,
   .input-group-sm
   input[type="time"].form-control,
+  .input-group-sm input[type="time"].SmallInput,
   input[type="datetime-local"].input-sm,
   .input-group-sm
   input[type="datetime-local"].form-control,
+  .input-group-sm input[type="datetime-local"].SmallInput,
   input[type="month"].input-sm,
   .input-group-sm
-  input[type="month"].form-control {
+  input[type="month"].form-control,
+  .input-group-sm input[type="month"].SmallInput {
     line-height: 1.675rem;
   }
   input[type="date"].input-lg,
   .input-group-lg input[type="date"].form-control,
+  .input-group-lg input[type="date"].SmallInput,
   input[type="time"].input-lg,
   .input-group-lg
   input[type="time"].form-control,
+  .input-group-lg input[type="time"].SmallInput,
   input[type="datetime-local"].input-lg,
   .input-group-lg
   input[type="datetime-local"].form-control,
+  .input-group-lg input[type="datetime-local"].SmallInput,
   input[type="month"].input-lg,
   .input-group-lg
-  input[type="month"].form-control {
+  input[type="month"].form-control,
+  .input-group-lg input[type="month"].SmallInput {
     line-height: 3.1666666667rem;
   }
 }
@@ -6632,7 +6643,7 @@ input[type="checkbox"].disabled {
   color: #60bd68;
 }
 
-.has-success .form-control {
+.has-success .form-control, .has-success .SmallInput {
   border-color: #60bd68;
 }
 
@@ -6663,7 +6674,7 @@ input[type="checkbox"].disabled {
   color: #faa43a;
 }
 
-.has-warning .form-control {
+.has-warning .form-control, .has-warning .SmallInput {
   border-color: #faa43a;
 }
 
@@ -6694,7 +6705,7 @@ input[type="checkbox"].disabled {
   color: #f9281d;
 }
 
-.has-danger .form-control {
+.has-danger .form-control, .has-danger .SmallInput {
   border-color: #f9281d;
 }
 
@@ -6718,7 +6729,7 @@ input[type="checkbox"].disabled {
     margin-bottom: 0;
     vertical-align: middle;
   }
-  .form-inline .form-control {
+  .form-inline .form-control, .form-inline .SmallInput {
     display: inline-block;
     width: auto;
     vertical-align: middle;
@@ -6732,10 +6743,11 @@ input[type="checkbox"].disabled {
   }
   .form-inline .input-group .input-group-addon,
   .form-inline .input-group .input-group-btn,
-  .form-inline .input-group .form-control {
+  .form-inline .input-group .form-control,
+  .form-inline .input-group .SmallInput {
     width: auto;
   }
-  .form-inline .input-group > .form-control {
+  .form-inline .input-group > .form-control, .form-inline .input-group > .SmallInput {
     width: 100%;
   }
   .form-inline .form-control-label {
@@ -6861,7 +6873,7 @@ input[type="checkbox"].disabled {
   background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC) no-repeat right 0.75rem center;
   background-image: none \9;
   background-size: 8px 10px;
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   -moz-appearance: none;
   -webkit-appearance: none;
 }
@@ -6915,7 +6927,7 @@ input[type="checkbox"].disabled {
   -ms-user-select: none;
   user-select: none;
   background-color: #fff;
-  border: 1px solid #ddd;
+  border: 0.0625rem solid #ddd;
   border-radius: .25rem;
 }
 
@@ -6936,7 +6948,7 @@ input[type="checkbox"].disabled {
   color: #555;
   content: "Browse";
   background-color: #eee;
-  border: 1px solid #ddd;
+  border: 0.0625rem solid #ddd;
   border-radius: 0 .25rem .25rem 0;
 }
 
@@ -8359,8 +8371,8 @@ output {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-  border: 1px solid transparent;
-  padding: 0.425rem 1rem;
+  border: 0.0625rem solid transparent;
+  padding: 0.40625rem 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
   border-radius: 0.1rem;
@@ -8999,7 +9011,7 @@ input[type="button"].btn-block {
 .tabbed-content .FilterMenu .FilterButton, .FilterMenu
 .tabbed-content .FilterButton, .plugins table .Info .FilterMenu .FilterButton, .FilterMenu .plugins table .Info .FilterButton {
   border-radius: 0;
-  margin-right: -1px;
+  margin-right: -0.0625rem;
 }
 
 .btn-icon, .btn-edit, .btn-delete, .btn-settings {
@@ -9058,8 +9070,8 @@ input[type="button"].btn-block {
   -ms-flex-align: center;
   align-items: center;
   font-color: #000;
-  border-left: 1px solid rgba(0, 0, 0, 0.125);
-  border-right: 1px solid rgba(0, 0, 0, 0.125);
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
 }
 
 .vanilla-logo {
@@ -9107,7 +9119,7 @@ input[type="button"].btn-block {
   line-height: 1.3333333333;
   display: inline-block;
   padding-left: 1rem;
-  border-left: 1px solid rgba(0, 0, 0, 0.125);
+  border-left: 1px solid #ddd;
 }
 
 form ul,
@@ -9126,6 +9138,13 @@ form ul label,
 form ol label {
   font-weight: 500;
   margin-bottom: 0;
+}
+
+.form-control, .SmallInput {
+  line-height: 1.5;
+  padding-top: 0.40625rem;
+  padding-bottom: 0.40625rem;
+  border: .0625rem solid #ccc;
 }
 
 .label-wrap img, .form-horizontal li > label img, .label-wrap .LayoutOptions .Sprite, .LayoutOptions .label-wrap .Sprite, .form-horizontal li > label .LayoutOptions .Sprite, .LayoutOptions .form-horizontal li > label .Sprite, .label-wrap
@@ -9161,14 +9180,18 @@ form ol label {
   padding-right: 0.9375rem;
 }
 
-.form-group, .form-horizontal li {
+.form-group.row, .form-group.footer, .form-horizontal li, .form-group.label-selector, .form-group.emojiext-list,
+.form-group.LayoutOptions,
+.form-group.HomeOptions, .form-group.media, .form-group.Feed, .form-group.FeedItem, .DataList li.form-group {
   -ms-flex-align: center;
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted #f4f4f5;
 }
 
-.form-group:first-child, .form-horizontal li:first-child {
+.form-group.row:first-child, .form-group.footer:first-child, .form-horizontal li:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
+.form-group.LayoutOptions:first-child,
+.form-group.HomeOptions:first-child, .form-group.media:first-child, .form-group.Feed:first-child, .form-group.FeedItem:first-child, .DataList li.form-group:first-child {
   padding-top: 1rem;
   border-top: 1px dotted #f4f4f5;
 }
@@ -9176,8 +9199,8 @@ form ol label {
 .toggle-wrap, .ActivateSlider {
   display: block;
   position: relative;
-  width: 4rem;
-  height: 2rem;
+  width: 4.5rem;
+  height: 2.25rem;
 }
 
 .toggle-well, .toggle-wrap input[type="checkbox"] + label::before, .ActivateSlider input[type="checkbox"] + label::before, .ActivateSlider a::before {
@@ -9185,10 +9208,10 @@ form ol label {
   position: absolute;
   top: 0;
   left: 0;
-  width: 4rem;
-  height: 2rem;
+  width: 4.5rem;
+  height: 2.25rem;
   background-color: #fff;
-  border-radius: 1rem;
+  border-radius: 1.125rem;
   border: 0.0625rem solid #949aa2;
   transition: background .4s;
   cursor: pointer;
@@ -9197,12 +9220,12 @@ form ol label {
 .toggle-slider, .toggle-wrap input[type="checkbox"] + label::after, .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider a::after {
   display: block;
   position: absolute;
-  top: 0.125rem;
-  left: 0.125rem;
-  bottom: 0.125rem;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.96875rem;
+  top: 0.1328125rem;
+  left: 0.1328125rem;
+  bottom: 0.1328125rem;
+  width: 1.984375rem;
+  height: 1.984375rem;
+  border-radius: 1.08984375rem;
   border: 0.0625rem solid #949aa2;
   background-color: #fff;
   outline: 0;
@@ -9215,11 +9238,11 @@ form ol label {
 }
 
 .toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap-on .ActivateSlider a::after, .ActivateSlider .toggle-wrap-on a::after, .toggle-wrap input[type="checkbox"]:checked + label::after, .ActivateSlider input[type="checkbox"]:checked + label::after, .ActivateSlider-Active a::after {
-  left: 2.0625rem;
+  left: 2.3203125rem;
 }
 
 .toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider input[type="checkbox"] + label::after, .ActivateSlider .InProgress input[type="checkbox"] + label::after, .InProgress .ActivateSlider a::after, .ActivateSlider .InProgress a::after, .ActivateSlider .InProgress::after {
-  left: 1.0625rem;
+  left: 1.1953125rem;
   transition: left .4s;
 }
 
@@ -9283,10 +9306,10 @@ form ol label {
   top: 0;
   right: 0;
   left: 0;
-  padding: .375rem .75rem;
-  line-height: 1.5;
+  padding: .625rem .75rem;
+  line-height: 1;
   color: #949aa2;
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   border-radius: 0.1rem;
 }
 
@@ -9294,10 +9317,10 @@ form ol label {
   position: absolute;
   top: 0;
   right: 0;
-  padding: .375rem .75rem;
+  padding: .625rem .75rem;
 }
 
-select.form-control {
+select.form-control, select.SmallInput {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
 }
 
@@ -9314,7 +9337,7 @@ select {
   background-position: right .75rem center;
   background-image: none \9;
   background-size: 8px 10px;
-  border: 1px solid #ccc;
+  border: 0.0625rem solid #ccc;
   -moz-appearance: none;
   -webkit-appearance: none;
 }
@@ -9920,7 +9943,7 @@ select::-ms-expand {
 
 .DataList .IconWrap {
   position: relative;
-  height: 4rem;
+  height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
   background-color: #f4f4f5;
@@ -9933,7 +9956,7 @@ select::-ms-expand {
   left: 0;
   width: 100%;
   height: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.125);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
   content: '';
 }
@@ -9941,7 +9964,7 @@ select::-ms-expand {
 .DataList .IconWrap img, .DataList .IconWrap .LayoutOptions .Sprite, .LayoutOptions .DataList .IconWrap .Sprite, .DataList .IconWrap
 .HomeOptions .Sprite,
 .HomeOptions .DataList .IconWrap .Sprite {
-  width: 4rem;
+  width: 5.25rem;
 }
 
 .addon-image-wrap {
@@ -9950,7 +9973,7 @@ select::-ms-expand {
   -ms-flex-align: center;
   align-items: center;
   position: relative;
-  height: 4rem;
+  height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
   background-color: #f4f4f5;
@@ -9963,7 +9986,7 @@ select::-ms-expand {
   left: 0;
   width: 100%;
   height: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.125);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
   content: '';
 }
@@ -9971,34 +9994,7 @@ select::-ms-expand {
 .addon-image-wrap img, .addon-image-wrap .LayoutOptions .Sprite, .LayoutOptions .addon-image-wrap .Sprite, .addon-image-wrap
 .HomeOptions .Sprite,
 .HomeOptions .addon-image-wrap .Sprite {
-  width: 4rem;
-}
-
-.user-image-wrap {
-  display: inline-block;
-  position: relative;
-  height: 2rem;
-  border-radius: 0.125rem;
-  overflow: hidden;
-  background-color: #f4f4f5;
-}
-
-.user-image-wrap::after {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.125rem;
-  content: '';
-}
-
-.user-image-wrap img, .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .user-image-wrap .Sprite, .user-image-wrap
-.HomeOptions .Sprite,
-.HomeOptions .user-image-wrap .Sprite {
-  width: 2rem;
+  width: 5.25rem;
 }
 
 .user-block {
@@ -10011,23 +10007,78 @@ select::-ms-expand {
 }
 
 .user-block .user-image-wrap {
+  display: inline-block;
+  position: relative;
+  height: 2rem;
+  border-radius: 0.125rem;
+  overflow: hidden;
+  background-color: #f4f4f5;
   margin-right: 0.5rem;
 }
 
-.user-block .username {
+.user-block .user-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.125rem;
+  content: '';
+}
+
+.user-block .user-image-wrap img, .user-block .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .user-block .user-image-wrap .Sprite, .user-block .user-image-wrap
+.HomeOptions .Sprite,
+.HomeOptions .user-block .user-image-wrap .Sprite {
+  width: 2rem;
+}
+
+.user-info .username {
   line-height: 1.125rem;
 }
 
-.user-block .user-email {
+.user-info .user-email {
   line-height: .875rem;
 }
 
 .media, .Feed, .FeedItem, .DataList li {
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
-  margin-bottom: .5rem;
-  padding-bottom: .5rem;
-  border-bottom: 1px dotted #f4f4f5;
+  padding: 1rem 0.9375rem;
+  margin-bottom: 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.media:first-child, .Feed:first-child, .FeedItem:first-child, .DataList li:first-child {
+  border-top: 1px solid #ddd;
+}
+
+.media-options {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-item-align: center;
+  align-self: center;
+}
+
+.media-right, .DataList li .Connection-Buttons {
+  padding-left: 1rem;
+}
+
+.media-left {
+  padding-right: 1rem;
+}
+
+.media-heading, .FeedItem > a, .DataList li .Connection-Name {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.media-title {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.media-description {
+  line-height: 1.3333333333;
 }
 
 .close, .Close {
@@ -10384,12 +10435,6 @@ div.Popup .Buttons {
   border-color: #fff;
 }
 
-.pager {
-  position: absolute;
-  top: 4.5rem;
-  right: 1rem;
-}
-
 .panel {
   padding-top: 4rem;
   padding-left: 4rem;
@@ -10445,7 +10490,7 @@ div.Popup .Buttons {
 .main {
   background-color: #fff;
   z-index: 5;
-  border: 1px solid rgba(0, 0, 0, 0.125);
+  border: 1px solid #ddd;
   border-top: 0;
   padding-bottom: 4rem;
 }
@@ -10484,6 +10529,135 @@ table tbody {
 
 table tbody tr:hover {
   background-color: #f9fdfe;
+}
+
+/* Do not customize these unless you enjoy pain. */
+/* Note: InformMessages are "growl" style messages that appear in a fixed
+position on the page to notify users of things like drafts being saved, etc. */
+.InformMessages {
+  text-align: left !important;
+  position: fixed;
+  top: auto;
+  bottom: 20px;
+  left: 20px;
+  z-index: 200;
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+  font-size: 12px;
+  display: block;
+  width: auto;
+}
+
+* html .InformMessages {
+  position: absolute;
+  width: 100%;
+  /*IE5.5*/
+  top: auto;
+  left: 20px;
+  overflow: visible;
+}
+
+.InformMessages .InformWrapper {
+  display: block;
+}
+
+.InformMessages .InformMessage {
+  color: #fff !important;
+  text-shadow: 0 1px 1px #000;
+  text-align: left !important;
+  border-radius: 2px;
+  background: black !important;
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: none !important;
+  width: auto !important;
+  max-width: 400px !important;
+  margin: 10px auto 0 !important;
+  padding: 9px 14px 8px !important;
+  display: inline-block;
+  zoom: 1;
+  position: relative;
+  line-height: 1.6;
+}
+
+.InformMessages .InformMessage:hover {
+  background: #111111;
+  background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.InformMessages .InformMessage a {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.InformMessages .InformMessage a:hover {
+  text-decoration: none;
+}
+
+.InformMessages .InformMessage a.Close {
+  border: none;
+  background: transparent;
+  border-top-right-radius: 2px;
+  color: #ddd;
+  font-size: 14px;
+  text-align: center;
+  display: none;
+  height: 12px;
+  width: 12px;
+  line-height: 1;
+  text-decoration: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.InformMessages .InformMessage a.Close span {
+  display: inline;
+}
+
+.InformMessages .InformMessage a.Close:hover {
+  background: #000;
+  color: #fff;
+}
+
+.InformMessages .InformMessage:hover a.Close {
+  display: block;
+}
+
+/* Inform Sprites */
+.InformMessages .InformWrapper.HasIcon .InformMessage {
+  padding-left: 42px !important;
+  min-height: 20px;
+}
+
+.InformMessages .InformWrapper.HasSprite .InformMessage {
+  padding-left: 40px !important;
+}
+
+.InformMessages .InformMessage a.Icon {
+  display: block;
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: 28px;
+  width: 28px;
+}
+
+.InformMessages .InformMessage a.Icon img, .InformMessages .InformMessage a.Icon .LayoutOptions .Sprite, .LayoutOptions .InformMessages .InformMessage a.Icon .Sprite, .InformMessages .InformMessage a.Icon
+.HomeOptions .Sprite,
+.HomeOptions .InformMessages .InformMessage a.Icon .Sprite {
+  height: 28px;
+  width: 28px;
+}
+
+.InformSprite {
+  background: url("images/inform-sprites.png") -9px -9px no-repeat;
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 5px;
+  height: 30px;
+  width: 30px;
 }
 
 h1, .h1,

@@ -25,6 +25,13 @@ form {
   }
 }
 
+.form-control {
+  line-height: 1.5;
+  padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  border: .0625rem solid #ccc;
+}
+
 // Quick and dirty horizontal form
 .form-horizontal {
   li {
@@ -126,7 +133,7 @@ form {
   padding-right: $padding-default;
 }
 
-.form-group {
+.form-group.row {
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted $grey-light;
@@ -341,8 +348,8 @@ form {
   top: 0;
   right: 0;
   left: 0;
-  padding: .375rem .75rem;
-  line-height: 1.5;
+  padding: .625rem .75rem;
+  line-height: 1;
   color: $grey;
   border: $input-btn-border-width solid $input-border-color;
   border-radius: $border-radius;
@@ -352,7 +359,7 @@ form {
   position: absolute;
   top: 0;
   right: 0;
-  padding: .375rem .75rem;
+  padding: .625rem .75rem;
   @extend .btn;
   @extend .btn-secondary;
 }

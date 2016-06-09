@@ -101,7 +101,11 @@ p {
   align-items: center;
   padding-top: $padding-default / 2;
   padding-bottom: $padding-default / 2;
-  margin-bottom: $padding-default;
+
+  &.padded {
+    margin-bottom: $padding-default;
+  }
+
   @extend .full-border;
 
   h1 {
@@ -109,4 +113,29 @@ p {
     padding: 0;
     border-bottom: 0;
   }
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
+}
+
+$line-height-flag: 1.75;
+
+.flag {
+  display: inline-block;
+  padding-left: .125rem;
+  padding-right: .75rem;
+  line-height: 0;
+  font-size: $font-size-xs;
+  color: $white;
+  border-style: solid;
+  border-color: $brand-secondary;
+  border-right-color: transparent;
+  border-width: ($font-size-xs * $line-height-flag / 2) ($font-size-xs * $line-height-flag / 3);
+  text-transform: uppercase;
 }

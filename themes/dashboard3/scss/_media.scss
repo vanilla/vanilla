@@ -30,7 +30,7 @@
 
 
 //
-// Headings
+// Media item
 //
 
 .media-heading {
@@ -45,4 +45,32 @@
 
 .media-description {
   line-height: $line-height-lg;
+}
+
+
+.media-callout {
+  background-color: $grey-lighter;
+
+  .info {
+    font-size: $font-size-tables;
+    font-weight: 300;
+  }
+
+  .flag {
+    margin-top: -.0625rem;
+    margin-bottom: $spacer / 2;
+  }
+
+  .media-title {
+    margin-bottom: $spacer / (3/2);
+  }
+
+  .media-description {
+    font-weight: 300;
+  }
+
+  img {
+    height: 10rem;
+    border: 1px solid $border-color;
+  }
 }

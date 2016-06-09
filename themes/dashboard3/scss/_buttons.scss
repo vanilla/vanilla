@@ -209,10 +209,11 @@ input[type="button"] {
   @include text-hide();
   width: $font-size-lg + .5rem;
   height: $font-size-lg;
-  padding: 0 0 0 .5rem;
+  padding: 0;
+  margin: 0 0 0 .5rem;
 
   &:first-child {
-    padding-left: 0;
+    margin-left: 0;
   }
 
   &:hover {
@@ -244,6 +245,16 @@ input[type="button"] {
 
   &:before {
     @include char-content($icon-trash);
+  }
+}
+
+
+.btn-ok {
+  @extend .btn-icon;
+
+
+  &:before {
+    @include char-content($icon-ok);
   }
 }
 

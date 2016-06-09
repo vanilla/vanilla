@@ -1,6 +1,14 @@
 .table-wrap {
   display: block;
-  margin: $padding-default (-$padding-default);
+  margin-top: $padding-default;
+  margin-right: (-$padding-default);
+  margin-bottom: $padding-default;
+  margin-left: (-$padding-default);
+}
+
+.header-block + .table-wrap {
+  // TODO: collapse border
+  margin-top: 0;
 }
 
 table {

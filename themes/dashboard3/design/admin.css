@@ -1,4 +1,4 @@
-.icon:before, .btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-settings:before, .search-wrap::before {
+.icon:before, .btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-ok:before, .btn-settings:before, .search-wrap::before {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -8905,13 +8905,13 @@ a.current-theme,
   border-color: #fc8780;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-settings {
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
   font-weight: normal;
   color: #0291db;
   border-radius: 0;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-settings, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-settings:active, .btn-link.active, .active.btn-icon, .active.btn-edit, .Tabs ul li.Active a.btn-edit,
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active, .btn-link.active, .active.btn-icon, .active.btn-edit, .Tabs ul li.Active a.btn-edit,
 .Tabs ul .btn-edit.current-tab,
 .tabbed-content li.Active a.btn-edit,
 .tabbed-content .btn-edit.current-tab, .btn-edit.Current,
@@ -8919,7 +8919,11 @@ a.current-theme,
 .Tabs ul .btn-delete.current-tab,
 .tabbed-content li.Active a.btn-delete,
 .tabbed-content .btn-delete.current-tab, .btn-delete.Current,
-.btn-delete.current-theme, .active.btn-settings, .Tabs ul li.Active a.btn-settings,
+.btn-delete.current-theme, .active.btn-ok, .Tabs ul li.Active a.btn-ok,
+.Tabs ul .btn-ok.current-tab,
+.tabbed-content li.Active a.btn-ok,
+.tabbed-content .btn-ok.current-tab, .btn-ok.Current,
+.btn-ok.current-theme, .active.btn-settings, .Tabs ul li.Active a.btn-settings,
 .Tabs ul .btn-settings.current-tab,
 .tabbed-content li.Active a.btn-settings,
 .tabbed-content .btn-settings.current-tab, .btn-settings.Current,
@@ -8931,25 +8935,25 @@ a.current-theme,
 .Tabs ul .btn-link.current-tab,
 .tabbed-content li.Active a.btn-link,
 .tabbed-content .btn-link.current-tab, .btn-link.Current,
-.btn-link.current-theme, .btn-link:disabled, .btn-icon:disabled, .btn-edit:disabled, .btn-delete:disabled, .btn-settings:disabled {
+.btn-link.current-theme, .btn-link:disabled, .btn-icon:disabled, .btn-edit:disabled, .btn-delete:disabled, .btn-ok:disabled, .btn-settings:disabled {
   background-color: transparent;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-settings, .btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-settings:focus, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-settings:active {
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active {
   border-color: transparent;
 }
 
-.btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-settings:hover {
+.btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
   border-color: transparent;
 }
 
-.btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-settings:focus, .btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-settings:hover {
+.btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
   color: #015f8f;
   text-decoration: underline;
   background-color: transparent;
 }
 
-.btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-edit:disabled:focus, .btn-delete:disabled:focus, .btn-settings:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .btn-edit:disabled:hover, .btn-delete:disabled:hover, .btn-settings:disabled:hover {
+.btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-edit:disabled:focus, .btn-delete:disabled:focus, .btn-ok:disabled:focus, .btn-settings:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .btn-edit:disabled:hover, .btn-delete:disabled:hover, .btn-ok:disabled:hover, .btn-settings:disabled:hover {
   color: #f4f4f5;
   text-decoration: none;
 }
@@ -9014,7 +9018,7 @@ input[type="button"].btn-block {
   margin-right: -0.0625rem;
 }
 
-.btn-icon, .btn-edit, .btn-delete, .btn-settings {
+.btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
   font: "0/0" a;
   color: transparent;
   text-shadow: none;
@@ -9022,14 +9026,15 @@ input[type="button"].btn-block {
   border: 0;
   width: 1.75rem;
   height: 1.25rem;
-  padding: 0 0 0 .5rem;
+  padding: 0;
+  margin: 0 0 0 .5rem;
 }
 
-.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-settings:first-child {
-  padding-left: 0;
+.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-ok:first-child, .btn-settings:first-child {
+  margin-left: 0;
 }
 
-.btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-settings:hover {
+.btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
   font: "0/0" a;
   color: transparent;
   text-shadow: none;
@@ -9038,7 +9043,7 @@ input[type="button"].btn-block {
   text-decoration: none;
 }
 
-.btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-settings:before {
+.btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-ok:before, .btn-settings:before {
   display: block;
   font-size: 1.25rem;
   color: #555a62;
@@ -9050,6 +9055,10 @@ input[type="button"].btn-block {
 
 .btn-delete:before {
   content: "\f1aa";
+}
+
+.btn-ok:before {
+  content: "\f171";
 }
 
 .btn-settings:before {
@@ -9749,7 +9758,7 @@ select::-ms-expand {
 .HomeOptions .Sprite {
   display: block;
   width: 100%;
-  border: 1px solid #f4f4f5;
+  border: 1px solid #ddd;
 }
 
 .label-selector .title, .emojiext-list .title,
@@ -10079,6 +10088,35 @@ select::-ms-expand {
 
 .media-description {
   line-height: 1.3333333333;
+}
+
+.media-callout {
+  background-color: #f4f6fb;
+}
+
+.media-callout .info, .media-callout .emojiset-author {
+  font-size: 0.8125rem;
+  font-weight: 300;
+}
+
+.media-callout .flag {
+  margin-top: -.0625rem;
+  margin-bottom: 0.5rem;
+}
+
+.media-callout .media-title {
+  margin-bottom: 0.6666666667rem;
+}
+
+.media-callout .media-description {
+  font-weight: 300;
+}
+
+.media-callout img, .media-callout .LayoutOptions .Sprite, .LayoutOptions .media-callout .Sprite, .media-callout
+.HomeOptions .Sprite,
+.HomeOptions .media-callout .Sprite {
+  height: 10rem;
+  border: 1px solid #ddd;
 }
 
 .close, .Close {
@@ -10438,6 +10476,7 @@ div.Popup .Buttons {
 .panel {
   padding-top: 4rem;
   padding-left: 4rem;
+  overflow: hidden;
 }
 
 .panel-left {
@@ -10497,7 +10536,14 @@ div.Popup .Buttons {
 
 .table-wrap {
   display: block;
-  margin: 0.9375rem -0.9375rem;
+  margin-top: 0.9375rem;
+  margin-right: -0.9375rem;
+  margin-bottom: 0.9375rem;
+  margin-left: -0.9375rem;
+}
+
+.header-block + .table-wrap {
+  margin-top: 0;
 }
 
 table td {
@@ -10739,6 +10785,13 @@ p {
   align-items: center;
   padding-top: 0.46875rem;
   padding-bottom: 0.46875rem;
+}
+
+.header-block.padded, .label-wrap img.header-block, .form-horizontal li > label img.header-block, .label-wrap .LayoutOptions .header-block.Sprite, .LayoutOptions .label-wrap .header-block.Sprite, .form-horizontal li > label .LayoutOptions .header-block.Sprite, .LayoutOptions .form-horizontal li > label .header-block.Sprite, .label-wrap
+.HomeOptions .header-block.Sprite,
+.HomeOptions .label-wrap .header-block.Sprite, .form-horizontal li > label
+.HomeOptions .header-block.Sprite,
+.HomeOptions .form-horizontal li > label .header-block.Sprite {
   margin-bottom: 0.9375rem;
 }
 
@@ -10746,6 +10799,29 @@ p {
   margin: 0;
   padding: 0;
   border-bottom: 0;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
+}
+
+.flag {
+  display: inline-block;
+  padding-left: .125rem;
+  padding-right: .75rem;
+  line-height: 0;
+  font-size: 0.675rem;
+  color: #fff;
+  border-style: solid;
+  border-color: #f5296d;
+  border-right-color: transparent;
+  border-width: 0.590625rem 0.39375rem;
+  text-transform: uppercase;
 }
 
 .Tabs ul,

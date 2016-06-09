@@ -81,6 +81,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 echo t('Choose who can send out invitations to new members:');
                 ?>
             </div>
+            <div class="table-wrap">
             <table class="Label AltColumns">
                 <thead>
                 <tr>
@@ -121,6 +122,7 @@ echo Gdn::slice('/dashboard/role/defaultroleswarning');
                 ?>
                 </tbody>
             </table>
+            </div>
         </li>
         <li>
             <div class="Info">

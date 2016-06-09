@@ -29,15 +29,15 @@
     </ul>
 
     <div id="StatsSlotSelector">
-        <input id="StatsSlotDay" type="button" value="<?php echo t('Day');?>" />
-        <input id="StatsSlotMonth" type="button" value="<?php echo t('Month'); ?>" />
+        <input disabled="disabled" id="StatsSlotDay" type="button" value="<?php echo t('Day');?>" />
+        <input disabled="disabled" id="StatsSlotMonth" type="button" value="<?php echo t('Month'); ?>" />
     </div>
 
     <div id="StatsNavigation">
         <p id="StatsCurrentTimeframe"></p>
-        <input type="button" id="StatsNavPrev" value="<" />
-        <input type="button" id="StatsNavNext" value=">" />
-        <input type="button" id="StatsNavToday" value="<?php echo t('Today'); ?>"/>
+        <input disabled="disabled" id="StatsNavPrev" type="button" value="<" />
+        <input disabled="disabled" id="StatsNavNext" type="button" value=">" />
+        <input disabled="disabled" id="StatsNavToday" type="button" value="<?php echo t('Today'); ?>"/>
     </div>
 </div>
 

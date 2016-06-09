@@ -127,6 +127,9 @@ vanillaStats = (function() {
                                     format: (function(date) { return this.formatDate(date) }).bind(this)
                                 },
                                 type: "timeseries"
+                            },
+                            y:{
+                                padding: 0
                             }
                         },
                         bindto: statsChart,
@@ -170,7 +173,7 @@ vanillaStats = (function() {
             if (this.getSlotType() === "m") {
                 dateFormat = "%b %Y";
             } else {
-                dateFormat = "%Y-%m-%d"
+                dateFormat = "%b %d"
             }
 
             var formatter = d3.time.format(dateFormat);
@@ -189,9 +192,9 @@ vanillaStats = (function() {
 
                     switch (type) {
                         case "next":
-                            return links["Next"];
+                            return links.Next;
                         case "prev":
-                            return links["Prev"];
+                            return links.Prev;
                     }
                 } else {
                     return null;
@@ -266,6 +269,9 @@ vanillaStats = (function() {
                 this.toggleUI("Overview", eventObject.currentTarget.id);
             }).bind(this));
 
+            document.getElementById("StatsSlotDay").disabled = false;
+            document.getElementById("StatsSlotMonth").disabled = false;
+
             $("#StatsSlotSelector").find("input").click((function (eventObject) {
                 switch (eventObject.currentTarget.id) {
                     case "StatsSlotDay":
@@ -278,9 +284,23 @@ vanillaStats = (function() {
                 }
             }).bind(this));
 
-            $("#StatsNavigation").find("input").click(function (eventObject) {
-                console.log(eventObject);
-            });
+            $("#StatsNavigation").find("input").click((function (eventObject) {
+                switch (eventObject.currentTarget.id) {
+                    case "StatsNavNext":
+                        this.apiRequest(this.getLinks("Next"), null, this.timelineResponseHandler);
+                        break;
+                    case "StatsNavPrev":
+                        this.apiRequest(this.getLinks("Prev"), null, this.timelineResponseHandler);
+                        break;
+                    default:
+                        this.apiRequest(
+                            this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
+                            { slotType: this.getSlotType() },
+                            this.timelineResponseHandler
+                        );
+                        break;
+                }
+            }).bind(this));
         };
 
         /**
@@ -347,7 +367,8 @@ vanillaStats = (function() {
          */
         this.setLinks = function(newLinks) {
             if (typeof newLinks === "object") {
-                links = newLinks;
+                links.Next = (typeof newLinks.Next === "string") ? newLinks.Next : null;
+                links.Prev = (typeof newLinks.Prev === "string") ? newLinks.Prev : null;
             }
 
             return this;
@@ -455,6 +476,10 @@ vanillaStats = (function() {
      * @returns {string}
      */
     VanillaStats.prototype.buildUrl = function(path) {
+        if (typeof path === "string" && path.match(/^https?:\/\//)) {
+            return path;
+        }
+
         var baseUrl = this.getApiUrl();
 
         if (typeof path !== "string") {
@@ -512,6 +537,24 @@ vanillaStats = (function() {
                 }
                 this.updateStats();
                 break;
+        }
+    };
+
+    /**
+     *
+     */
+    VanillaStats.prototype.updateUI = function() {
+        var navNext = document.getElementById("StatsNavNext");
+        var navPrev = document.getElementById("StatsNavPrev");
+        var navToday = document.getElementById("StatsNavToday");
+
+        if (navPrev !== null) {
+            navPrev.disabled = this.getLinks("Prev") === null;
+        }
+        if (navNext !== null) {
+            var navNextDisabled = this.getLinks("Next") === null;
+            navNext.disabled = navNextDisabled;
+            navToday.disabled = navNextDisabled;
         }
     };
 
@@ -574,6 +617,7 @@ vanillaStats = (function() {
         }
 
         this.getChart().load(newData);
+        this.updateUI();
     };
 
     /**

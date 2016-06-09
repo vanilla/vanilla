@@ -64,6 +64,33 @@ vanillaStats = (function() {
         };
 
         /**
+         *
+         */
+        this.getActiveType = function() {
+            var activeTypeElement = $("#StatsOverview").find("li.Active");
+            var activeType = "NewUsers";
+
+            if (activeTypeElement.length > 0) {
+                switch (activeTypeElement.get(0).id) {
+                    case "StatsNewComments":
+                        activeType = "Comments";
+                        break;
+                    case "StatsNewDiscussions":
+                        activeType = "Discussions";
+                        break;
+                    case "StatsPageViews":
+                        activeType = "PageViews";
+                        break;
+                    case "StatsNewUsers":
+                        activeType = "Users";
+                        break;
+                }
+            }
+
+            return activeType;
+        };
+
+        /**
          * @returns {string}
          */
         this.getApiUrl = function() {
@@ -111,6 +138,8 @@ vanillaStats = (function() {
                         }
                     });
                 }
+
+                this.initializeUI();
             }
 
             return chart;
@@ -227,6 +256,31 @@ vanillaStats = (function() {
             }
 
             return vanillaID;
+        };
+
+        /**
+         *
+         */
+        this.initializeUI = function() {
+            $("#StatsOverview").find("li").click((function (eventObject) {
+                this.toggleUI("Overview", eventObject.currentTarget.id);
+            }).bind(this));
+
+            $("#StatsSlotSelector").find("input").click((function (eventObject) {
+                switch (eventObject.currentTarget.id) {
+                    case "StatsSlotDay":
+                        this.setSlotType("d");
+                        this.toggleUI("SlotSelector", "StatsSlotDay");
+                        break;
+                    default:
+                        this.setSlotType("m");
+                        this.toggleUI("SlotSelector", "StatsSlotMonth");
+                }
+            }).bind(this));
+
+            $("#StatsNavigation").find("input").click(function (eventObject) {
+                console.log(eventObject);
+            });
         };
 
         /**
@@ -425,6 +479,43 @@ vanillaStats = (function() {
     };
 
     /**
+     * @param {string} control
+     * @param {string} activeElementID
+     */
+    VanillaStats.prototype.toggleUI = function(control, activeElementID) {
+        switch (control) {
+            case "Overview":
+                var typeSelector = document.getElementById("StatsOverview");
+                if (typeSelector) {
+                    var typeElements = typeSelector.getElementsByTagName("li");
+                    for (var i = 0; i < typeElements.length; i++) {
+                        if (typeElements[i].id === activeElementID) {
+                            $(typeElements[i]).addClass("Active");
+                        } else {
+                            $(typeElements[i]).removeClass("Active");
+                        }
+                    }
+                }
+                this.writeData();
+                break;
+            case "SlotSelector":
+                var slotSelector = document.getElementById("StatsSlotSelector");
+                if (slotSelector) {
+                    var slotElements = slotSelector.getElementsByTagName("input");
+                    for (var x = 0; x < slotElements.length; x++) {
+                        if (slotElements[x].id === activeElementID) {
+                            $(slotElements[x]).addClass("Active");
+                        } else {
+                            $(slotElements[x]).removeClass("Active");
+                        }
+                    }
+                }
+                this.updateStats();
+                break;
+        }
+    };
+
+    /**
      * @param {string} key
      */
     VanillaStats.prototype.updateChart = function(key) {
@@ -434,7 +525,7 @@ vanillaStats = (function() {
 
         var dataIndex, label;
         switch (key.toLowerCase()) {
-            case "views":
+            case "pageviews":
                 dataIndex = "CountViews";
                 label = "Views";
                 break;
@@ -459,9 +550,8 @@ vanillaStats = (function() {
             json: [],
             keys: {
                 x: "Date",
-                value: [label]
-            },
-            unload: true
+                value: ["Count"]
+            }
         };
         var timeline = this.getTimeline();
 
@@ -476,7 +566,7 @@ vanillaStats = (function() {
                     newInterval.Date = value["Date"];
                 }
                 if (typeof value[dataIndex] === "number") {
-                    newInterval[label] = value[dataIndex];
+                    newInterval["Count"] = value[dataIndex];
                 }
 
                 newData.json.push(newInterval);
@@ -544,12 +634,12 @@ vanillaStats = (function() {
      *
      */
     VanillaStats.prototype.writeData = function() {
-        this.writeCount("NewComments", this.getCounts("Comments"));
-        this.writeCount("NewDiscussions", this.getCounts("Discussions"));
-        this.writeCount("NewUsers", this.getCounts("Users"));
-        this.writeCount("PageViews", this.getCounts("Views"));
+        this.writeCount("StatsNewComments", this.getCounts("Comments"));
+        this.writeCount("StatsNewDiscussions", this.getCounts("Discussions"));
+        this.writeCount("StatsNewUsers", this.getCounts("Users"));
+        this.writeCount("StatsPageViews", this.getCounts("Views"));
 
-        this.updateChart("Views");
+        this.updateChart(this.getActiveType());
     };
 
     return new VanillaStats();

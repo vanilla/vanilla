@@ -686,11 +686,13 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param DashboardNavModule $sender
      */
     public function dashboardNavModule_init_handler($sender) {
-        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories')
-            ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced')
-            ->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), '/dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments')
-            ->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), '/dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site')
-            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control');
+        $sort = -1;
+
+        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), '/dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), '/dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
     }
 
     /**

@@ -169,30 +169,11 @@ class VanillaSettingsController extends Gdn_Controller {
      *
      */
     public function addSideMenu() {
-        if (!$CurrentUrl) {
-            $CurrentUrl = strtolower($this->SelfUrl);
-        }
-
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-
             $nav = new DashboardNavModule();
-            $SideMenu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
-            $SideMenu->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
-            // Configure SideMenu module.
             $navAdapter = new NestedCollectionAdapter($nav);
-
-            // Hook for initial setup. Do NOT use this for addons.
             $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('earlyAppSettingsMenuItems');
-
-            // Module setup.
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-
-            // Hook for adding to menu. USE THIS FOR YOUR ADDON.
-            $this->fireAs('SettingsController');
             $this->fireEvent('GetAppSettingsMenuItems');
 
             // Add the module
@@ -652,12 +633,14 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function manageCategories() {
+
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->addSideMenu('vanilla/settings/managecategories');
-
         $this->addJsFile('categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
+
+
 
 
         // This now works on latest jQuery version 1.10.2

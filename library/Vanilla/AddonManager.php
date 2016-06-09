@@ -200,7 +200,7 @@ class AddonManager {
         if (!isset($this->multiCache)) {
             if (!empty($this->cacheDir)) {
                 $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
-                if (file_exists($cachePath)) {
+                if (is_readable($cachePath)) {
                     $this->multiCache = require $cachePath;
                 } else {
                     $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);

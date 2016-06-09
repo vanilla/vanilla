@@ -334,7 +334,7 @@ class AddonManager {
         if (!isset($this->singleIndex[$type])) {
             $cachePath = $this->cacheDir."/$type-index.php";
 
-            if (file_exists($cachePath)) {
+            if (is_readable($cachePath)) {
                 $this->singleIndex[$type] = require $cachePath;
             } else {
                 $addonDirs = $this->scanAddonDirs($type);
@@ -382,7 +382,7 @@ class AddonManager {
         // Look at the file cache.
         if (!empty($this->cacheDir)) {
             $cachePath = "{$this->cacheDir}/$type/$key.php";
-            if (file_exists($cachePath)) {
+            if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$key] = $addon;
                 return $addon;

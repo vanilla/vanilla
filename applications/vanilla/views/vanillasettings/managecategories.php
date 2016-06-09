@@ -1,14 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-    <style>
-        .CategoryPhoto {
-            float: left;
-            margin-right: 8px;
-            max-height: 64px;
-            max-width: 64px;
-        }
-    </style>
     <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
@@ -19,7 +11,7 @@ $Session = Gdn::session();
         echo '</ul>';
         ?>
     </div>
-    <?php Gdn_Theme::assetEnd('Help'); ?>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Manage Categories'); ?></h1>
     <div class="Info">
         <?php

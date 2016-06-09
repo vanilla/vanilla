@@ -10,10 +10,8 @@
 
 /**
  * Handles displaying the dashboard "settings" pages for Vanilla via /settings endpoint.
- *
- * @todo Remove this controller in favor of Dashboard's settings controller.
  */
-class SettingsController extends Gdn_Controller {
+class VanillaSettingsController extends Gdn_Controller {
 
     /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'CategoryModel');
@@ -48,10 +46,9 @@ class SettingsController extends Gdn_Controller {
             'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
-            'Vanilla.Discussions.SortField' => 'd.DateLastComment',
-            'Vanilla.Discussions.UserSortField',
             'Vanilla.Comment.MaxLength',
-            'Vanilla.Comment.MinLength'
+            'Vanilla.Comment.MinLength',
+            'Garden.TrustedDomains'
         ));
 
         // Set the model on the form.
@@ -59,6 +56,14 @@ class SettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
+            // Format trusted domains as a string
+            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
+            if (is_array($TrustedDomains)) {
+                $TrustedDomains = implode("\n", $TrustedDomains);
+            }
+
+            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
         } else {
@@ -77,6 +82,13 @@ class SettingsController extends Gdn_Controller {
             $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
             $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
+            // Format the trusted domains as an array based on newlines & spaces
+            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
+            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
+            $TrustedDomains = array_unique(array_filter($TrustedDomains));
+            $TrustedDomains = implode("\n", $TrustedDomains);
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved) {
@@ -89,6 +101,10 @@ class SettingsController extends Gdn_Controller {
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
+
+            // Reformat array as string so it displays properly in the form
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+
         }
 
         $this->addSideMenu('vanilla/settings/advanced');
@@ -143,7 +159,10 @@ class SettingsController extends Gdn_Controller {
     }
 
     /**
-     * Configures navigation sidebar in Dashboard.
+     * Build and add the Dashboard's side navigation menu.
+     *
+     * EXACT COPY OF DashboardController::addSideMenu(). KEEP IN SYNC.
+     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
      *
      * @since 2.0.0
      * @access public
@@ -152,9 +171,7 @@ class SettingsController extends Gdn_Controller {
     public function addSideMenu() {
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-
             $nav = new DashboardNavModule();
-            // Configure SideMenu module.
             $navAdapter = new NestedCollectionAdapter($nav);
             $this->EventArguments['SideMenu'] = $navAdapter;
             $this->fireEvent('GetAppSettingsMenuItems');
@@ -180,7 +197,7 @@ class SettingsController extends Gdn_Controller {
         $this->addSideMenu('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.
-        $IsConversationsEnabled = Gdn::applicationManager()->checkApplication('Conversations');
+        $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
 
         $ConfigurationFields = array(
             'Vanilla.Discussion.SpamCount',
@@ -265,7 +282,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function addCategory() {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -282,6 +299,7 @@ class SettingsController extends Gdn_Controller {
         // Load all roles with editable permissions.
         $this->RoleArray = $RoleModel->getArray();
 
+        $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
         $this->setupDiscussionTypes(array());
 
@@ -336,7 +354,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function getCategory($categoryID) {
         // Check permission
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         if (!$categoryID) {
             throw new Gdn_UserException(sprintf(t('ValidationRequired'), 'CategoryID'));
@@ -372,7 +390,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('categories.js');
@@ -464,7 +482,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
 
@@ -552,6 +570,7 @@ class SettingsController extends Gdn_Controller {
         // Load all roles with editable permissions
         $this->RoleArray = $RoleModel->getArray();
 
+        $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
 
         if ($this->Form->authenticatedPostBack()) {
@@ -614,12 +633,14 @@ class SettingsController extends Gdn_Controller {
      * @access public
      */
     public function manageCategories() {
-        // Check permission
-        $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('vanilla/settings/managecategories');
 
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->addSideMenu('vanilla/settings/managecategories');
         $this->addJsFile('categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
+
+
 
 
         // This now works on latest jQuery version 1.10.2
@@ -638,8 +659,8 @@ class SettingsController extends Gdn_Controller {
         $CategoryData = $this->CategoryModel->getAll('TreeLeft');
 
         // Set CanDelete per-category so we can override later if we want.
-        $canDelete = checkPermission('Garden.Settings.Manage');
-        array_walk($CategoryData->result(), function (&$value) use ($canDelete) {
+        $canDelete = checkPermission(['Garden.Community.Manage', 'Garden.Settings.Manage']);
+        array_walk($CategoryData->result(), function(&$value) use ($canDelete) {
             setvalr('CanDelete', $value, $canDelete);
         });
 
@@ -671,6 +692,7 @@ class SettingsController extends Gdn_Controller {
             $this->Form->setData($ConfigurationModel->Data);
         } else {
             if ($this->Form->save() !== false) {
+                CategoryModel::clearCache();
                 $this->informMessage(t("Your settings have been saved."));
             }
         }
@@ -714,7 +736,7 @@ class SettingsController extends Gdn_Controller {
      */
     public function sortCategories() {
         // Check permission
-        $this->permission('Garden.Settings.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {

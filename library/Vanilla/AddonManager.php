@@ -301,7 +301,7 @@ class AddonManager {
         if (!($fp = @fopen($temp, 'wb'))) {
             $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
             if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
+                trigger_error("AddonManager::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
                 return false;
             }
         }
@@ -310,8 +310,12 @@ class AddonManager {
         fclose($fp);
 
         if (!@rename($temp, $filename)) {
-            @unlink($filename);
-            @rename($temp, $filename);
+            $r = @unlink($filename);
+            $r &= @rename($temp, $filename);
+            if (!$r) {
+                trigger_error("AddonManager::filePutContents(): error writing file '$filename'", E_USER_WARNING);
+                return false;
+            }
         }
         if (function_exists('apc_delete_file')) {
             // This fixes a bug with some configurations of apc.

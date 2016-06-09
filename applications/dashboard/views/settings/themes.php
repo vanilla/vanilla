@@ -4,6 +4,8 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
 ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
+        <?php echo '<h2>', t('About Themes'), '</h2>'; ?>
+        <?php echo sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>'); ?>
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
         echo '<ul>';
@@ -14,29 +16,35 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
         ?>
     </div>
 <?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
     <h1><?php echo t('Manage Themes'); ?></h1>
-    <div class="Info">
-        <?php
-        printf(
-            t('ThemeHelp'),
-            '<code>'.PATH_THEMES.'</code>'
-        );
-        ?></div>
-<?php
-if ($AddonUrl != '')
-    echo '<div class="FilterMenu">',
-    anchor(t('Get More Themes'), $AddonUrl, 'SmallButton'),
-    '</div>';
-
-?>
+    <?php
+    if ($AddonUrl != '') {
+        echo anchor(t('Get More Themes'), $AddonUrl, 'btn btn-primary');
+    }
+    ?>
+</div>
 <?php echo $this->Form->errors(); ?>
     <div class="Messages Errors TestAddonErrors Hidden">
         <ul>
             <li><?php echo t('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
         </ul>
     </div>
-    <div class="CurrentTheme">
-        <h3><?php echo t('Current Theme'); ?></h3>
+    <div class="media media-callout CurrentTheme">
+        <?php
+        $PreviewUrl = $this->data('EnabledTheme.IconUrl', false);
+        echo '<div class="media-left">';
+        echo '<div class="image-wrap">';
+        if ($PreviewUrl !== FALSE) {
+            echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName')));
+        } else {
+            echo img('themes/default/screenshot.png', array('alt' => $ScreenName));
+        }
+        echo '</div>';
+        echo '</div>'; ?>
+
+        <div class="media-body">
+            <div class="flag"><?php echo t('Current Theme'); ?></div>
         <?php
         $Version = $this->data('EnabledTheme.Version');
         $ThemeUrl = $this->data('EnabledTheme.Url');
@@ -45,20 +53,46 @@ if ($AddonUrl != '')
         $NewVersion = $this->data('EnabledTheme.NewVersion');
         $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
 
-        $PreviewUrl = $this->data('EnabledTheme.IconUrl', false);
-        if ($PreviewUrl !== FALSE)
-            echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'height' => '112', 'width' => '150'));
-
-        echo '<h4>';
+        echo '<div class="media-title">';
+        echo '<h3 class="media-heading theme-name">';
         echo $ThemeUrl != '' ? anchor($this->data('EnabledThemeName'), $ThemeUrl) : $this->data('EnabledThemeName');
-        if ($Version != '')
-            echo '<span class="Version">'.sprintf(t('version %s'), $Version).'</span>';
+        echo '</h3>';
+        echo '<div class="info">';
 
-        if ($Author != '')
-            echo '<span class="Author">'.sprintf('by %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author).'</span>';
+        $info = [];
+        if ($Author != '') {
+            $info[] = '<span class="Author">'.sprintf('Created by %s', $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author).'</span>';
+        }
 
-        echo '</h4>';
-        echo '<div class="Description">'.$this->data('EnabledTheme.Description', '').'</div>';
+        if ($Version != '') {
+            $info[] = '<span class="Version">'.sprintf(t('Version %s'), $Version).'</span>';
+        }
+
+        $RequiredApplications = val('RequiredApplications', $this->data('EnabledTheme'), false);
+        $required = '';
+        if (is_array($RequiredApplications)) {
+            $required .= '<div class="Requirements">'.t('Requires: ');
+
+            $i = 0;
+            if ($i > 0)
+                $required .= ', ';
+
+            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
+                $required .= printf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                ++$i;
+            }
+            $required .= '</div>';
+        }
+
+        if ($required) {
+            $info[] = $required;
+        }
+
+        echo implode('<span class="spacer">|</span>', $info);
+        echo '</div>';
+        echo '</div>';
+        echo '<div class="media-description Description"><div class="description">'.$this->data('EnabledTheme.Description', '').'</div>';
+
         if ($this->data('EnabledTheme.Options')) {
             $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
                 anchor(t('Theme Options'), '/dashboard/settings/themeoptions'));
@@ -71,23 +105,8 @@ if ($AddonUrl != '')
 
         $this->fireEvent('AfterCurrentTheme');
 
-        $RequiredApplications = val('RequiredApplications', $this->data('EnabledTheme'), false);
-        if (is_array($RequiredApplications)) {
-            echo '<div class="Requirements">'.t('Requires: ');
-
-            $i = 0;
-            if ($i > 0)
-                echo ', ';
-
-            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                printf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-                ++$i;
-            }
-            echo '</div>';
-        }
-
         if ($Upgrade) {
-            echo '<div class="Alert">';
+            echo '<div class="Alert alert">';
             echo url(
                 sprintf(t('%1$s version %2$s is available.'), $this->data('EnabledThemeName'), $NewVersion),
                 CombinePaths(array($AddonUrl, 'find', urlencode($this->data('EnabledThemeName'))), '/')
@@ -95,10 +114,11 @@ if ($AddonUrl != '')
             echo '</div>';
         }
         ?>
+        </div>
     </div>
+</div>
 <?php if (count($this->data('AvailableThemes', array())) > 1) { ?>
     <div class="BrowseThemes">
-        <h3><?php echo t('Other Themes'); ?></h3>
         <ul class="label-selector">
             <?php
             foreach ($this->data('AvailableThemes') as $ThemeName => $ThemeInfo) {

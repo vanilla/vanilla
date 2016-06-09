@@ -18,10 +18,11 @@ if ($NumApplicants == 0) : ?>
         <table>
             <thead>
                 <tr>
-                    <th width="130px"><?php echo t('Action'); ?></th>
                     <th><?php echo t('Applicant'); ?></th>
+                    <th><?php echo t('Reason'); ?></th>
                     <th><?php echo t('IP Address'); ?></th>
                     <th><?php echo t('Date'); ?></th>
+                    <th><?php echo t('Options'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -31,24 +32,14 @@ if ($NumApplicants == 0) : ?>
                 $this->EventArguments['ApplicantMeta'] = array();
                 $this->fireEvent("ApplicantInfo"); ?>
                 <tr class="ApplicantMeta">
-                    <td style="border-bottom:none;"><?php
-                        echo anchor(t('Approve'), '/user/approve/'.$User->UserID, 'SmallButton ApproveApplicant');
-                        echo anchor(t('Decline'), '/user/decline/'.$User->UserID, 'CancelButton DeclineApplicant');
-                        ?>
-                    </td>
                     <td style="border-bottom:none;">
                         <div class="user-info">
                             <div class="username"><?php echo htmlspecialchars($User->Name); ?></div>
                             <div class="info user-email"><?php echo anchor($User->Email, 'mailto:'.$User->Email); ?></div>
                         </div>
                     </td>
-                    <td style="border-bottom:none;"><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
-                    <td style="border-bottom:none;"><?php echo Gdn_Format::date($User->DateInserted); ?></td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td colspan="4">
-                    <?php
+                    <td>
+                        <?php
                         // Output a definition list if a plugin passed us ordered data.
                         if (count($this->EventArguments['ApplicantMeta'])) {
                             foreach ($this->EventArguments['ApplicantMeta'] as $label => $value) {
@@ -57,10 +48,17 @@ if ($NumApplicants == 0) : ?>
                         }
                         // Only make a blockquote if we got a reason.
                         if ($User->DiscoveryText) {
-                            echo '<blockquote>'.wrap(t('Reason for joining', 'Reason: '), 'em').Gdn_Format::text($User->DiscoveryText).'</blockquote>';
+                            echo Gdn_Format::text($User->DiscoveryText);
                         }
                         // Opportunity for plugins to do arbitrary appending.
                         $this->fireEvent("AppendApplicantInfo");
+                        ?>
+                    </td>
+                    <td style="border-bottom:none;"><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
+                    <td style="border-bottom:none;"><?php echo Gdn_Format::date($User->DateInserted); ?></td>
+                    <td style="border-bottom:none;"><?php
+                        echo anchor(t('Approve'), '/user/approve/'.$User->UserID, 'btn btn-ok ApproveApplicant');
+                        echo anchor(t('Decline'), '/user/decline/'.$User->UserID, 'btn btn-delete CancelButton DeclineApplicant');
                         ?>
                     </td>
                 </tr>

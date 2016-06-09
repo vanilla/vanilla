@@ -133,7 +133,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
                             $Info[] = anchor(t('Visit Site'), $PluginUrl);
                         }
 
-                        echo implode(' • ', $Info);
+                        echo implode('<span class="spacer">•</span>', $Info);
 
                         ?>
                         <?php

@@ -753,8 +753,8 @@ if (!function_exists('deprecated')) {
         if ($date && debug()) {
             $expires = strtotime('+3 months', strtotime($date));
             if ($expires <= time()) {
-                trigger_error($message, E_USER_ERROR);
-                return;
+                // Escalate to also log a warning.
+                Logger::log(Logger::WARNING, $message);
             }
         }
         trigger_error($message, E_USER_DEPRECATED);

@@ -98,7 +98,6 @@ class SettingsController extends DashboardController {
                 } catch (Exception $e) {
                     $this->Form->addError(strip_tags($e->getMessage()));
                 }
-                $enabled = true;
             } else {
                 try {
                     $ApplicationManager->checkRequirements($ApplicationName);
@@ -114,15 +113,7 @@ class SettingsController extends DashboardController {
 
             }
             if ($this->Form->errorCount() == 0) {
-                if (strtolower($this->Filter) == 'all') {
-                    if (!$enabled) {
-                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/'.$this->Filter.'/'.$ApplicationName.'/'.$Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Disable %s'), $ApplicationName)]), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider-Active"));
-                    } else {
-                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/'.$this->Filter.'/'.$ApplicationName.'/'.$Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Enable %s'), $ApplicationName)]), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider-InActive"));
-                    }
-                    $this->jsonTarget('#'.$ApplicationName.'-toggle', $newToggle);
-                    $this->render('Blank', 'Utility');
-                }
+                redirect('settings/applications/'.$this->Filter);
             }
         }
         $this->render();
@@ -1108,7 +1099,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-//        $this->addJsFile('addons.js');
+        $this->addJsFile('addons.js');
         $this->title(t('Plugins'));
         $this->addSideMenu('dashboard/settings/plugins');
 
@@ -1132,8 +1123,7 @@ class SettingsController extends DashboardController {
         if ($PluginName != '') {
             try {
                 $this->EventArguments['PluginName'] = $PluginName;
-                $enabled = array_key_exists($PluginName, $this->EnabledPlugins) === true;
-                if ($enabled) {
+                if (array_key_exists($PluginName, $this->EnabledPlugins) === true) {
                     Gdn::pluginManager()->disablePlugin($PluginName);
                     Gdn_LibraryMap::clearCache();
                     $this->fireEvent('AfterDisablePlugin');
@@ -1152,18 +1142,9 @@ class SettingsController extends DashboardController {
                 $this->Form->addError($e);
             }
             if ($this->Form->errorCount() == 0) {
-                if (strtolower($this->Filter) == 'all') {
-                    if (!$enabled) {
-                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/' . $this->Filter . '/' . $PluginName . '/' . $Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Disable %s'), $PluginName)]), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider-Active"));
-                    } else {
-                        $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/' . $this->Filter . '/' . $PluginName . '/' . $Session->TransientKey(), 'Hijack', ['aria-label' => sprintf(t('Enable %s'), $PluginName)]), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider-InActive"));
-                    }
-                    $this->jsonTarget('#' . $PluginName . '-toggle', $newToggle);
-                    $this->render('Blank', 'Utility');
-                }
+                redirect('/settings/plugins/'.$this->Filter);
             }
         }
-
         $this->render();
     }
 

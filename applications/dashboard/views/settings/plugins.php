@@ -1,48 +1,44 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::session();
-$UpdateUrl = c('Garden.UpdateCheckUrl');
-$AddonUrl = c('Garden.AddonUrl');
-$PluginCount = count($this->AvailablePlugins);
-$EnabledCount = count($this->EnabledPlugins);
-$DisabledCount = $PluginCount - $EnabledCount;
-?>
-<script type="text/javascript">
-//    jQuery(document).ready(function($) {
-//        var selectors = '.plugins-all, .plugins-enabled, .plugins-disabled';
-//        $(selectors).click(function() {
-//            $(selectors).parents('li').removeClass('Active');
-//            $(this).parents('li').addClass('Active');
-//            if ($(this).hasClass('plugins-disabled')) {
-//                $('tr.Enabled').hide();
-//                $('tr.Disabled').show();
-//            } else if ($(this).hasClass('plugins-enabled')) {
-//                $('tr.Enabled').show();
-//                $('tr.Disabled').hide();
-//            } else {
-//                $('tr.Enabled').show();
-//                $('tr.Disabled').show();
-//            }
-//            return false;
-//        });
-//    });
-</script>
-<h1><?php echo t('Manage Plugins'); ?></h1>
-<div class="Info">
-    <?php
-    printf(
+$session = Gdn::session();
+$updateUrl = c('Garden.UpdateCheckUrl');
+$addonUrl = c('Garden.AddonUrl');
+if ($this->addonType !== 'applications') {
+    $this->addonType = 'plugins';
+    $title = t('Manage Plugins');
+    $pathHelp = sprintf(
         t('PluginHelp'),
         '<code>'.PATH_PLUGINS.'</code>'
     );
-    ?>
+    $getMore = wrap(Anchor(t('Get More Plugins'), $addonUrl), 'li');
+    $availableAddons = $this->AvailablePlugins;
+    $enabledAddons = $this->EnabledPlugins;
+} else {
+    $title = t('Manage Applications');
+    $pathHelp = sprintf(
+        t('ApplicationHelp'),
+        '<code>'.PATH_APPLICATIONS.'</code>'
+    );
+    $getMore = wrap(Anchor(t('Get More Applications'), $addonUrl), 'li');
+    $availableAddons = $this->AvailableApplications;
+    $enabledAddons = $this->EnabledApplications;
+}
+$addonCount = count($availableAddons);
+$enabledCount = count($enabledAddons);
+$disabledCount = $addonCount - $enabledCount;
+
+?>
+<h1><?php echo $title; ?></h1>
+<div class="Info">
+    <?php echo $pathHelp; ?>
 </div>
 <div class="Tabs FilterTabs">
     <ul>
-        <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('All %1$s'), wrap($PluginCount)), 'settings/plugins/all', 'plugins-all'); ?></li>
-        <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($EnabledCount)), 'settings/plugins/enabled', 'plugins-enabled'); ?></li>
-        <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($DisabledCount)), 'settings/plugins/disabled', 'plugins-disabled'); ?></li>
+        <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all'); ?></li>
+        <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount)), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled'); ?></li>
+        <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount)), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled'); ?></li>
         <?php
-        if ($AddonUrl != '')
-            echo wrap(Anchor(t('Get More Plugins'), $AddonUrl), 'li');
+        if ($addonUrl != '')
+            echo $getMore;
         ?>
     </ul>
 </div>
@@ -55,34 +51,34 @@ $DisabledCount = $PluginCount - $EnabledCount;
 <ul class="media-list addon-list">
     <?php
     $Alt = false;
-    foreach ($this->AvailablePlugins as $PluginName => $PluginInfo) {
+    foreach ($availableAddons as $addonName => $addonInfo) {
         // Skip Hidden & Trigger plugins
-        if (isset($PluginInfo['Hidden']) && $PluginInfo['Hidden'] === TRUE)
+        if (isset($addonInfo['Hidden']) && $addonInfo['Hidden'] === TRUE)
             continue;
-        if (isset($PluginInfo['Trigger']) && $PluginInfo['Trigger'] == TRUE) // Any 'true' value.
+        if (isset($addonInfo['Trigger']) && $addonInfo['Trigger'] == TRUE) // Any 'true' value.
             continue;
 
-        $Css = array_key_exists($PluginName, $this->EnabledPlugins) ? 'Enabled' : 'Disabled';
+        $Css = array_key_exists($addonName, $enabledAddons) ? 'Enabled' : 'Disabled';
         $State = strtolower($Css);
         if ($this->Filter == 'all' || $this->Filter == $State) {
             $Alt = !$Alt;
-            $Version = Gdn_Format::Display(val('Version', $PluginInfo, ''));
-            $ScreenName = Gdn_Format::Display(val('Name', $PluginInfo, $PluginName));
-            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $PluginInfo, '') : '';
-            $PluginUrl = val('PluginUrl', $PluginInfo, '');
-            $Author = val('Author', $PluginInfo, '');
-            $AuthorUrl = val('AuthorUrl', $PluginInfo, '');
-            $NewVersion = val('NewVersion', $PluginInfo, '');
+            $Version = Gdn_Format::Display(val('Version', $addonInfo, ''));
+            $ScreenName = Gdn_Format::Display(val('Name', $addonInfo, $addonName));
+            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $addonInfo, '') : '';
+            $PluginUrl = val('PluginUrl', $addonInfo, '');
+            $Author = val('Author', $addonInfo, '');
+            $AuthorUrl = val('AuthorUrl', $addonInfo, '');
+            $NewVersion = val('NewVersion', $addonInfo, '');
             $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
             $RowClass = $Css;
             if ($Alt) {
                 $RowClass .= ' Alt';
             }
 
-            $IconPath = val('IconUrl', $PluginInfo, '/applications/dashboard/design/images/plugin-icon.png');
+            $IconPath = val('IconUrl', $addonInfo, '/applications/dashboard/design/images/plugin-icon.png');
 
             ?>
-            <li <?php echo 'id="'.Gdn_Format::url(strtolower($PluginName)).'-plugin"', ' class="media More '.$RowClass.'"'; ?>>
+            <li <?php echo 'id="'.Gdn_Format::url(strtolower($addonName)).'-plugin"', ' class="media More '.$RowClass.'"'; ?>>
                 <div class="media-left">
                 <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
                 </div>
@@ -91,8 +87,8 @@ $DisabledCount = $PluginCount - $EnabledCount;
                     <div class="info"><?php
                         $Info = [];
 
-                        $RequiredApplications = val('RequiredApplications', $PluginInfo, false);
-                        $RequiredPlugins = val('RequiredPlugins', $PluginInfo, false);
+                        $RequiredApplications = val('RequiredApplications', $addonInfo, false);
+                        $RequiredPlugins = val('RequiredPlugins', $addonInfo, false);
                         $requirements = '';
                         if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
                             $requirements = t('Requires: ');
@@ -141,7 +137,7 @@ $DisabledCount = $PluginCount - $EnabledCount;
                             ?>
                             <div class="<?php echo $RowClass; ?>">
                                 <div class="Alert"><a href="<?php
-                                    echo CombinePaths(array($UpdateUrl, 'find', urlencode($ScreenName)), '/');
+                                    echo CombinePaths(array($updateUrl, 'find', urlencode($ScreenName)), '/');
                                     ?>"><?php
                                         printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
                                         ?></a></div>
@@ -151,24 +147,24 @@ $DisabledCount = $PluginCount - $EnabledCount;
                         ?>
                     </div>
                 </div>
-                <div class="media-description"><?php echo Gdn_Format::Html(t(val('Name', $PluginInfo, $PluginName).' Description', val('Description', $PluginInfo, ''))); ?></div>
+                <div class="media-description"><?php echo Gdn_Format::Html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, ''))); ?></div>
                 </div>
                 <div class="media-right media-options">
                     <?php if ($SettingsUrl != '') {
                         echo wrap(anchor('<span class="icon icon-edit">', $SettingsUrl, 'btn btn-secondary Button', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
                     }
                     ?>
-                    <div id="<?php echo $PluginName; ?>-toggle">
+                    <div id="<?php echo $addonName; ?>-toggle">
                     <?php
-                    $Enabled = array_key_exists($PluginName, $this->EnabledPlugins);
+                    $Enabled = array_key_exists($addonName, $enabledAddons);
                     if ($Enabled) {
                         $SliderState = 'Active';
                         $toggleState = 'on';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/'.$this->Filter.'/'.$PluginName.'/'.$Session->TransientKey(), 'Hijack', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$this->Filter.'/'.$addonName.'/'.$session->TransientKey(), 'Hijack', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
                     } else {
                         $SliderState = 'InActive';
                         $toggleState = 'off';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/plugins/'.$this->Filter.'/'.$PluginName.'/'.$Session->TransientKey(), 'Hijack', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$this->Filter.'/'.$addonName.'/'.$session->TransientKey(), 'Hijack', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
                     } ?>
                     </div>
                 </div>

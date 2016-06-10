@@ -17,11 +17,19 @@ $navbar-border-color: rgba(0,0,0,.125);
   background-color: $brand-primary;
   font-weight: 100;
   letter-spacing: .0375rem;
-  z-index: 10;
   border: 1px solid $navbar-border-color;
+  z-index: 1;
 
-  a {
+  .vanilla-logo {
+    width: 5rem;
+  }
+
+  .title {
     color: $white;
+  }
+
+  .logo + .title {
+    margin-left: $spacer;
   }
 
   img {
@@ -45,6 +53,7 @@ $navbar-border-color: rgba(0,0,0,.125);
   .nav-link {
     position: relative;
     padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
+    color: $white;
 
     &.active {
       &,
@@ -84,6 +93,10 @@ $navbar-border-color: rgba(0,0,0,.125);
     justify-content: center;
   }
 
+  .navbar-brand {
+    float: none;
+  }
+
   .nav {
     display: flex;
   }
@@ -98,7 +111,14 @@ $navbar-border-color: rgba(0,0,0,.125);
     line-height: $line-height-lg;
     opacity: .75;
   }
+}
 
+.navbar-profile {
+  cursor: pointer;
+
+  .icon {
+    opacity: .75;
+  }
 }
 
 .btn-navbar {

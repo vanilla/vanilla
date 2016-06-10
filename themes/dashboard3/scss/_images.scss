@@ -9,31 +9,6 @@
   @include img-fluid();
 }
 
-@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $background-color: $grey-light) {
-  position: relative;
-  height: $height;
-  border-radius: $radius;
-  overflow: hidden;
-  background-color: $background-color;
-
-  &::after {
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: ($border-width * 1) solid rgba(0,0,0,.125);
-    border-radius: $radius;
-    content: '';
-  }
-
-  img {
-    width: $width;
-  }
-}
-
-
 .DataList {
   .IconWrap {
     @include image-wrap();
@@ -93,4 +68,12 @@
   .user-email {
     line-height: .875rem;
   }
+}
+
+.btn-userblock {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  @extend .btn-secondary;
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);
 }

@@ -23,8 +23,8 @@ module.exports = function (grunt) {
       }
       , sass: {
         files: ['scss/**/*.scss']
-        // , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
-        , tasks: ['scsslint', 'sass', 'autoprefixer']
+        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        // , tasks: ['scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -221,6 +221,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_media.scss',
             'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_modal.scss',
+            'scss/vendors/bootstrap/scss/_list-group.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',
             'scss/vendors/bootstrap/scss/_custom-forms.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',

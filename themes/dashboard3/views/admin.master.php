@@ -16,6 +16,47 @@ $dropdown->setTrigger('A New Name')
     ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
     ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
     ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
+
+Gdn_Theme::assetBegin('DashboardUserDropDown');
+$user = Gdn::session()->User;
+$rm = new RoleModel();
+$roles = $rm->getByUserID(val('UserID', $user))->resultArray();
+$roleTitlesArray = [];
+foreach($roles as $role) {
+    $roleTitlesArray[] = val('Name', $role);
+}
+$roleTitles = implode(', ', $roleTitlesArray);
+
+/** var UserController $user */
+?>
+<div class="card card-user">
+    <div class="card-block user-block">
+        <div class="user-image-wrap">
+            <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
+        </div>
+        <div class="user-info">
+            <div class="username">
+                <?php echo userAnchor($user); ?>
+            </div>
+            <div class="info">
+                <?php echo $roleTitles; ?>
+            </div>
+            <a class="btn btn-userblock" href="<?php echo url(userUrl($user)); ?>">
+                <?php echo t('My Profile'); ?> <span class="icon icon-external-link"></span>
+            </a>
+        </div>
+    </div>
+    <div class="list-group list-group-flush">
+        <a class="list-group-item" href="#"><?php echo t('Take The Tour'); ?><span class="icon icon-external-link"></span></a>
+        <a class="list-group-item" href="#"><?php echo t('Help & Tutorials'); ?><span class="icon icon-external-link"></span></a>
+        <a class="list-group-item" href="#"><?php echo t('Customer Support'); ?><span class="icon icon-external-link"></span></a>
+    </div>
+    <div class="card-footer">
+        <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary Leave'); ?>
+    </div>
+</div>
+<?php
+Gdn_Theme::assetEnd();
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
@@ -28,11 +69,13 @@ $dropdown->setTrigger('A New Name')
 <div class="navbar">
     <div class="navbar-brand">
         <?php $title = c('Garden.Title'); ?>
-        <?php if ($logo = c('Garden.Logo', false)) { ?>
-        <div class="navbar-image logo"><?php echo img(Gdn_Upload::url($logo), array('alt' => $title));?></div>
-        <?php } else { ?>
-        <div class="title"><?php echo anchor($title, '/'); ?></div>
-        <?php } ?>
+<!--        --><?php //if ($logo = c('Garden.Logo', false)) { ?>
+<!--        <div class="navbar-image logo">--><?php //echo img(Gdn_Upload::url($logo), array('alt' => $title));?><!--</div>-->
+<!--        --><?php //} else { ?>
+<!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
+<!--        --><?php //} ?>
+        <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
+        <?php echo anchor($title, '/', 'title'); ?>
         <?php echo anchor(t('Visit Site'), '/', 'btn btn-navbar'); ?>
     </div>
     <?php $dashboardNav = new DashboardNavModule(); ?>
@@ -51,13 +94,13 @@ $dropdown->setTrigger('A New Name')
         <?php
         if (Gdn::session()->isValid()) {
             $this->fireEvent('BeforeUserOptionsMenu');
-            $photo = userPhoto(Gdn::session()->User);
+            $photo = '<img src="'.userPhotoUrl($user).'">';
             $CountNotifications = Gdn::session()->User->CountNotifications;
             if (is_numeric($CountNotifications) && $CountNotifications > 0) {
                 $photo .= wrap($CountNotifications);
             }
-            echo '<div class="navbar-profile">'.$photo.'</div>';
-            echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-navbar Leave');
+            echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
+//            echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-navbar Leave');
         }
         ?>
     </div>
@@ -90,6 +133,9 @@ $dropdown->setTrigger('A New Name')
             </div>
         </div>
     </div>
+</div>
+<div class="hidden js-dashboard-user-dropdown">
+    <?php $this->renderAsset('DashboardUserDropDown'); ?>
 </div>
 <?php $this->fireEvent('AfterBody'); ?>
 </body>

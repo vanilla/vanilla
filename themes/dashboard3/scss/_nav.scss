@@ -45,8 +45,19 @@
     font-weight: 300;
 
     &.active {
-      color: $white;
       border-radius: $nav-pills-panel-border-radius;
+
+      &,
+      &:hover {
+        color: $white;
+        background-color: $nav-pills-active-link-hover-bg;
+      }
+    }
+
+    &:hover,
+    &.hover {
+      color: $grey;
+      background-color: $nav-pills-link-hover-bg;
     }
   }
 

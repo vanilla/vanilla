@@ -1,0 +1,45 @@
+.card {
+  .list-group-item {
+    font-weight: 500;
+    background-color: $grey-lighter;
+
+    &:hover {
+      background-color: lighten($grey-lighter, 1%);
+    }
+
+    .icon {
+      float: right;
+    }
+  }
+
+  .username {
+    margin-bottom: $spacer / 4;
+    a {
+      color: $grey-dark;
+    }
+  }
+
+  .user-block {
+    align-items: flex-start;
+
+    .user-image-wrap {
+      @include image-wrap();
+      margin-right: $spacer * 1.5;
+    }
+
+    .btn-userblock {
+      margin-top: $spacer;
+    }
+  }
+}
+
+.card-user {
+  .card-footer {
+    border-top: 0;
+    padding: $spacer * 1.25;
+  }
+}
+
+.card-footer {
+  text-align: center;
+}

@@ -80,6 +80,17 @@
         codeInput.init($('#Form_CustomHtml'), 'html', 800);
         codeInput.init($('#Form_CustomCSS'), 'css', 800);
         codeInput.start();
+
+        $('.navbar .js-card-user').popover(
+            {
+                'html': true,
+                'placement': 'bottom',
+                'content': $('.js-dashboard-user-dropdown').html()
+            }
+        );
     });
+
+
+
 
 })(jQuery);

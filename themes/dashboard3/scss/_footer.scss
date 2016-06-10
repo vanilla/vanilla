@@ -6,19 +6,31 @@
   font-color: $black;
   border-left: 1px solid $border-color;
   border-right: 1px solid $border-color;
+
+  .vanilla-logo {
+    width: 4rem;
+    height: 2rem;
+  }
 }
 
-
 .vanilla-logo {
-  @include text-hide();
-  display: block;
-  width: 4rem;
-  height: 2rem;
+
+  &,
+  &:hover {
+    @include text-hide();
+  }
+
+  display: inline-block;
   background: 0;
   background-image: url('images/vanilla-black.png');
   background-image: url('images/vanilla-black.svg');
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: contain;
+}
+
+.vanilla-logo-white {
+  background-image: url('images/vanilla-white.png');
+  background-image: url('images/vanilla-white.svg');
 }
 
 @mixin rule($font-size, $line-height, $color) {

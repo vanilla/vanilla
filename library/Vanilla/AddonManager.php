@@ -200,7 +200,7 @@ class AddonManager {
         if (!isset($this->multiCache)) {
             if (!empty($this->cacheDir)) {
                 $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
-                if (file_exists($cachePath)) {
+                if (is_readable($cachePath)) {
                     $this->multiCache = require $cachePath;
                 } else {
                     $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
@@ -301,7 +301,7 @@ class AddonManager {
         if (!($fp = @fopen($temp, 'wb'))) {
             $temp = dirname($filename).DIRECTORY_SEPARATOR.uniqid('atomic');
             if (!($fp = @fopen($temp, 'wb'))) {
-                trigger_error("file_put_contents_safe() : error writing temporary file '$temp'", E_USER_WARNING);
+                trigger_error("AddonManager::filePutContents(): error writing temporary file '$temp'", E_USER_WARNING);
                 return false;
             }
         }
@@ -310,8 +310,12 @@ class AddonManager {
         fclose($fp);
 
         if (!@rename($temp, $filename)) {
-            @unlink($filename);
-            @rename($temp, $filename);
+            $r = @unlink($filename);
+            $r &= @rename($temp, $filename);
+            if (!$r) {
+                trigger_error("AddonManager::filePutContents(): error writing file '$filename'", E_USER_WARNING);
+                return false;
+            }
         }
         if (function_exists('apc_delete_file')) {
             // This fixes a bug with some configurations of apc.
@@ -334,7 +338,7 @@ class AddonManager {
         if (!isset($this->singleIndex[$type])) {
             $cachePath = $this->cacheDir."/$type-index.php";
 
-            if (file_exists($cachePath)) {
+            if (is_readable($cachePath)) {
                 $this->singleIndex[$type] = require $cachePath;
             } else {
                 $addonDirs = $this->scanAddonDirs($type);
@@ -382,7 +386,7 @@ class AddonManager {
         // Look at the file cache.
         if (!empty($this->cacheDir)) {
             $cachePath = "{$this->cacheDir}/$type/$key.php";
-            if (file_exists($cachePath)) {
+            if (is_readable($cachePath)) {
                 $addon = require $cachePath;
                 $this->singleCache[$type][$key] = $addon;
                 return $addon;

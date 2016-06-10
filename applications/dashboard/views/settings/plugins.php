@@ -18,7 +18,7 @@ if ($this->addonType !== 'applications') {
         t('ApplicationHelp'),
         '<code>'.PATH_APPLICATIONS.'</code>'
     );
-    $getMore = wrap(Anchor(t('Get More Applications'), $addonUrl), 'li');
+    $getMore = wrap(Anchor(t('Get More Applications').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailableApplications;
     $enabledAddons = $this->EnabledApplications;
 }

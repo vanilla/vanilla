@@ -14,11 +14,13 @@ class DashboardV3ThemeHooks implements Gdn_IPlugin {
      */
     public function base_render_before($sender) {
         $sender->addJsFile('custom.js', 'themes/dashboard3');
+        $sender->addJsFile('vendors/tether.min.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/util.js', 'themes/dashboard3');
+        $sender->addJsFile('vendors/tooltip.js', 'themes/dashboard3');
+        $sender->addJsFile('vendors/popover.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/dropdown.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/prettify/prettify.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/ace/ace.js', 'themes/dashboard3');
-
         $sender->addCssFile('vendors/tomorrow.css', 'themes/dashboard3');
     }
 }

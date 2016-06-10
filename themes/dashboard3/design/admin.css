@@ -1639,7 +1639,7 @@ a.text-danger:focus, a.text-danger:hover {
   display: block;
   margin-bottom: 0.75rem;
   background-color: #fff;
-  border: 1px solid #e5e5e5;
+  border: 1px solid #ddd;
   border-radius: 0.1rem;
 }
 
@@ -1678,8 +1678,8 @@ a.text-danger:focus, a.text-danger:hover {
 
 .card-header {
   padding: 0.75rem 1.25rem;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #e5e5e5;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
 }
 
 .card-header:first-child {
@@ -1688,8 +1688,8 @@ a.text-danger:focus, a.text-danger:hover {
 
 .card-footer {
   padding: 0.75rem 1.25rem;
-  background-color: #f5f5f5;
-  border-top: 1px solid #e5e5e5;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
 }
 
 .card-footer:last-child {
@@ -6416,6 +6416,425 @@ a.current-theme,
   }
 }
 
+.list-group {
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: .75rem 1.25rem;
+  margin-bottom: -0.0625rem;
+  background-color: #fff;
+  border: 0.0625rem solid #ddd;
+}
+
+.list-group-item:first-child {
+  border-top-right-radius: 0.1rem;
+  border-top-left-radius: 0.1rem;
+}
+
+.list-group-item:last-child {
+  margin-bottom: 0;
+  border-bottom-right-radius: 0.1rem;
+  border-bottom-left-radius: 0.1rem;
+}
+
+.list-group-flush .list-group-item {
+  border-width: 0.0625rem 0;
+  border-radius: 0;
+}
+
+.list-group-flush:first-child .list-group-item:first-child {
+  border-top: 0;
+}
+
+.list-group-flush:last-child .list-group-item:last-child {
+  border-bottom: 0;
+}
+
+a.list-group-item,
+button.list-group-item {
+  width: 100%;
+  color: #555;
+  text-align: inherit;
+}
+
+a.list-group-item .list-group-item-heading,
+button.list-group-item .list-group-item-heading {
+  color: #333;
+}
+
+a.list-group-item:focus, a.list-group-item:hover,
+button.list-group-item:focus,
+button.list-group-item:hover {
+  color: #555;
+  text-decoration: none;
+  background-color: #f5f5f5;
+}
+
+.list-group-item.disabled, .list-group-item.disabled:focus, .list-group-item.disabled:hover {
+  color: #f4f4f5;
+  cursor: not-allowed;
+  background-color: #f4f6fb;
+}
+
+.list-group-item.disabled .list-group-item-heading, .list-group-item.disabled:focus .list-group-item-heading, .list-group-item.disabled:hover .list-group-item-heading {
+  color: inherit;
+}
+
+.list-group-item.disabled .list-group-item-text, .list-group-item.disabled:focus .list-group-item-text, .list-group-item.disabled:hover .list-group-item-text {
+  color: #f4f4f5;
+}
+
+.list-group-item.active, .Tabs ul li.Active a.list-group-item,
+.Tabs ul .list-group-item.current-tab,
+.tabbed-content li.Active a.list-group-item,
+.tabbed-content .list-group-item.current-tab, .list-group-item.Current,
+.list-group-item.current-theme, .list-group-item.active:focus, .Tabs ul li.Active a.list-group-item:focus,
+.Tabs ul .list-group-item.current-tab:focus,
+.tabbed-content li.Active a.list-group-item:focus,
+.tabbed-content .list-group-item.current-tab:focus, .list-group-item.Current:focus,
+.list-group-item.current-theme:focus, .list-group-item.active:hover, .Tabs ul li.Active a.list-group-item:hover,
+.Tabs ul .list-group-item.current-tab:hover,
+.tabbed-content li.Active a.list-group-item:hover,
+.tabbed-content .list-group-item.current-tab:hover, .list-group-item.Current:hover,
+.list-group-item.current-theme:hover {
+  z-index: 2;
+  color: #fff;
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.list-group-item.active .list-group-item-heading, .Tabs ul li.Active a.list-group-item .list-group-item-heading,
+.Tabs ul .list-group-item.current-tab .list-group-item-heading,
+.tabbed-content li.Active a.list-group-item .list-group-item-heading,
+.tabbed-content .list-group-item.current-tab .list-group-item-heading, .list-group-item.Current .list-group-item-heading,
+.list-group-item.current-theme .list-group-item-heading,
+.list-group-item.active .list-group-item-heading > small, .Tabs ul li.Active a.list-group-item .list-group-item-heading > small,
+.Tabs ul .list-group-item.current-tab .list-group-item-heading > small,
+.tabbed-content li.Active a.list-group-item .list-group-item-heading > small,
+.tabbed-content .list-group-item.current-tab .list-group-item-heading > small, .list-group-item.Current .list-group-item-heading > small,
+.list-group-item.current-theme .list-group-item-heading > small,
+.list-group-item.active .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.active .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active a.list-group-item .Connection-Name .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active a.list-group-item .Connection-Name .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active .Connection-Name a.list-group-item .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active .Connection-Name a.list-group-item .list-group-item-heading > .Addendums,
+.Tabs ul .list-group-item.current-tab .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.Tabs ul .list-group-item.current-tab .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active a.list-group-item .Connection-Name .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active a.list-group-item .Connection-Name .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active .Connection-Name a.list-group-item .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active .Connection-Name a.list-group-item .list-group-item-heading > .Addendums,
+.tabbed-content .list-group-item.current-tab .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.tabbed-content .list-group-item.current-tab .list-group-item-heading > .Addendums, .list-group-item.Current .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name .list-group-item.Current .list-group-item-heading > .Addendums,
+.list-group-item.current-theme .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.current-theme .list-group-item-heading > .Addendums,
+.list-group-item.active .list-group-item-heading > .small, .Tabs ul li.Active a.list-group-item .list-group-item-heading > .small,
+.Tabs ul .list-group-item.current-tab .list-group-item-heading > .small,
+.tabbed-content li.Active a.list-group-item .list-group-item-heading > .small,
+.tabbed-content .list-group-item.current-tab .list-group-item-heading > .small, .list-group-item.Current .list-group-item-heading > .small,
+.list-group-item.current-theme .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .Tabs ul li.Active a.list-group-item:focus .list-group-item-heading,
+.Tabs ul .list-group-item.current-tab:focus .list-group-item-heading,
+.tabbed-content li.Active a.list-group-item:focus .list-group-item-heading,
+.tabbed-content .list-group-item.current-tab:focus .list-group-item-heading, .list-group-item.Current:focus .list-group-item-heading,
+.list-group-item.current-theme:focus .list-group-item-heading,
+.list-group-item.active:focus .list-group-item-heading > small, .Tabs ul li.Active a.list-group-item:focus .list-group-item-heading > small,
+.Tabs ul .list-group-item.current-tab:focus .list-group-item-heading > small,
+.tabbed-content li.Active a.list-group-item:focus .list-group-item-heading > small,
+.tabbed-content .list-group-item.current-tab:focus .list-group-item-heading > small, .list-group-item.Current:focus .list-group-item-heading > small,
+.list-group-item.current-theme:focus .list-group-item-heading > small,
+.list-group-item.active:focus .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.active:focus .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active a.list-group-item:focus .Connection-Name .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active a.list-group-item:focus .Connection-Name .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active .Connection-Name a.list-group-item:focus .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active .Connection-Name a.list-group-item:focus .list-group-item-heading > .Addendums,
+.Tabs ul .list-group-item.current-tab:focus .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.Tabs ul .list-group-item.current-tab:focus .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active a.list-group-item:focus .Connection-Name .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active a.list-group-item:focus .Connection-Name .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active .Connection-Name a.list-group-item:focus .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active .Connection-Name a.list-group-item:focus .list-group-item-heading > .Addendums,
+.tabbed-content .list-group-item.current-tab:focus .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.tabbed-content .list-group-item.current-tab:focus .list-group-item-heading > .Addendums, .list-group-item.Current:focus .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name .list-group-item.Current:focus .list-group-item-heading > .Addendums,
+.list-group-item.current-theme:focus .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.current-theme:focus .list-group-item-heading > .Addendums,
+.list-group-item.active:focus .list-group-item-heading > .small, .Tabs ul li.Active a.list-group-item:focus .list-group-item-heading > .small,
+.Tabs ul .list-group-item.current-tab:focus .list-group-item-heading > .small,
+.tabbed-content li.Active a.list-group-item:focus .list-group-item-heading > .small,
+.tabbed-content .list-group-item.current-tab:focus .list-group-item-heading > .small, .list-group-item.Current:focus .list-group-item-heading > .small,
+.list-group-item.current-theme:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .Tabs ul li.Active a.list-group-item:hover .list-group-item-heading,
+.Tabs ul .list-group-item.current-tab:hover .list-group-item-heading,
+.tabbed-content li.Active a.list-group-item:hover .list-group-item-heading,
+.tabbed-content .list-group-item.current-tab:hover .list-group-item-heading, .list-group-item.Current:hover .list-group-item-heading,
+.list-group-item.current-theme:hover .list-group-item-heading,
+.list-group-item.active:hover .list-group-item-heading > small, .Tabs ul li.Active a.list-group-item:hover .list-group-item-heading > small,
+.Tabs ul .list-group-item.current-tab:hover .list-group-item-heading > small,
+.tabbed-content li.Active a.list-group-item:hover .list-group-item-heading > small,
+.tabbed-content .list-group-item.current-tab:hover .list-group-item-heading > small, .list-group-item.Current:hover .list-group-item-heading > small,
+.list-group-item.current-theme:hover .list-group-item-heading > small,
+.list-group-item.active:hover .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.active:hover .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active a.list-group-item:hover .Connection-Name .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active a.list-group-item:hover .Connection-Name .list-group-item-heading > .Addendums, .Tabs ul .DataList li.Active .Connection-Name a.list-group-item:hover .list-group-item-heading > .Addendums, .DataList .Tabs ul li.Active .Connection-Name a.list-group-item:hover .list-group-item-heading > .Addendums,
+.Tabs ul .list-group-item.current-tab:hover .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.Tabs ul .list-group-item.current-tab:hover .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active a.list-group-item:hover .Connection-Name .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active a.list-group-item:hover .Connection-Name .list-group-item-heading > .Addendums,
+.tabbed-content .DataList li.Active .Connection-Name a.list-group-item:hover .list-group-item-heading > .Addendums, .DataList
+.tabbed-content li.Active .Connection-Name a.list-group-item:hover .list-group-item-heading > .Addendums,
+.tabbed-content .list-group-item.current-tab:hover .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.tabbed-content .list-group-item.current-tab:hover .list-group-item-heading > .Addendums, .list-group-item.Current:hover .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name .list-group-item.Current:hover .list-group-item-heading > .Addendums,
+.list-group-item.current-theme:hover .DataList li .Connection-Name .list-group-item-heading > .Addendums, .DataList li .Connection-Name
+.list-group-item.current-theme:hover .list-group-item-heading > .Addendums,
+.list-group-item.active:hover .list-group-item-heading > .small, .Tabs ul li.Active a.list-group-item:hover .list-group-item-heading > .small,
+.Tabs ul .list-group-item.current-tab:hover .list-group-item-heading > .small,
+.tabbed-content li.Active a.list-group-item:hover .list-group-item-heading > .small,
+.tabbed-content .list-group-item.current-tab:hover .list-group-item-heading > .small, .list-group-item.Current:hover .list-group-item-heading > .small,
+.list-group-item.current-theme:hover .list-group-item-heading > .small {
+  color: inherit;
+}
+
+.list-group-item.active .list-group-item-text, .Tabs ul li.Active a.list-group-item .list-group-item-text,
+.Tabs ul .list-group-item.current-tab .list-group-item-text,
+.tabbed-content li.Active a.list-group-item .list-group-item-text,
+.tabbed-content .list-group-item.current-tab .list-group-item-text, .list-group-item.Current .list-group-item-text,
+.list-group-item.current-theme .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .Tabs ul li.Active a.list-group-item:focus .list-group-item-text,
+.Tabs ul .list-group-item.current-tab:focus .list-group-item-text,
+.tabbed-content li.Active a.list-group-item:focus .list-group-item-text,
+.tabbed-content .list-group-item.current-tab:focus .list-group-item-text, .list-group-item.Current:focus .list-group-item-text,
+.list-group-item.current-theme:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .Tabs ul li.Active a.list-group-item:hover .list-group-item-text,
+.Tabs ul .list-group-item.current-tab:hover .list-group-item-text,
+.tabbed-content li.Active a.list-group-item:hover .list-group-item-text,
+.tabbed-content .list-group-item.current-tab:hover .list-group-item-text, .list-group-item.Current:hover .list-group-item-text,
+.list-group-item.current-theme:hover .list-group-item-text {
+  color: #abe2fe;
+}
+
+.list-group-item-success {
+  color: #3c763d;
+  background-color: #dff0d8;
+}
+
+a.list-group-item-success,
+button.list-group-item-success {
+  color: #3c763d;
+}
+
+a.list-group-item-success .list-group-item-heading,
+button.list-group-item-success .list-group-item-heading {
+  color: inherit;
+}
+
+a.list-group-item-success:focus, a.list-group-item-success:hover,
+button.list-group-item-success:focus,
+button.list-group-item-success:hover {
+  color: #3c763d;
+  background-color: #d0e9c6;
+}
+
+a.list-group-item-success.active, .Tabs ul li.Active a.list-group-item-success,
+.Tabs ul a.list-group-item-success.current-tab,
+.tabbed-content li.Active a.list-group-item-success,
+.tabbed-content a.list-group-item-success.current-tab, a.list-group-item-success.Current,
+a.list-group-item-success.current-theme, a.list-group-item-success.active:focus, .Tabs ul li.Active a.list-group-item-success:focus,
+.Tabs ul a.list-group-item-success.current-tab:focus,
+.tabbed-content li.Active a.list-group-item-success:focus,
+.tabbed-content a.list-group-item-success.current-tab:focus, a.list-group-item-success.Current:focus,
+a.list-group-item-success.current-theme:focus, a.list-group-item-success.active:hover, .Tabs ul li.Active a.list-group-item-success:hover,
+.Tabs ul a.list-group-item-success.current-tab:hover,
+.tabbed-content li.Active a.list-group-item-success:hover,
+.tabbed-content a.list-group-item-success.current-tab:hover, a.list-group-item-success.Current:hover,
+a.list-group-item-success.current-theme:hover,
+button.list-group-item-success.active,
+.Tabs ul button.list-group-item-success.current-tab,
+.tabbed-content button.list-group-item-success.current-tab,
+button.list-group-item-success.Current,
+button.list-group-item-success.current-theme,
+button.list-group-item-success.active:focus,
+.Tabs ul button.list-group-item-success.current-tab:focus,
+.tabbed-content button.list-group-item-success.current-tab:focus,
+button.list-group-item-success.Current:focus,
+button.list-group-item-success.current-theme:focus,
+button.list-group-item-success.active:hover,
+.Tabs ul button.list-group-item-success.current-tab:hover,
+.tabbed-content button.list-group-item-success.current-tab:hover,
+button.list-group-item-success.Current:hover,
+button.list-group-item-success.current-theme:hover {
+  color: #fff;
+  background-color: #3c763d;
+  border-color: #3c763d;
+}
+
+.list-group-item-info {
+  color: #31708f;
+  background-color: #d9edf7;
+}
+
+a.list-group-item-info,
+button.list-group-item-info {
+  color: #31708f;
+}
+
+a.list-group-item-info .list-group-item-heading,
+button.list-group-item-info .list-group-item-heading {
+  color: inherit;
+}
+
+a.list-group-item-info:focus, a.list-group-item-info:hover,
+button.list-group-item-info:focus,
+button.list-group-item-info:hover {
+  color: #31708f;
+  background-color: #c4e3f3;
+}
+
+a.list-group-item-info.active, .Tabs ul li.Active a.list-group-item-info,
+.Tabs ul a.list-group-item-info.current-tab,
+.tabbed-content li.Active a.list-group-item-info,
+.tabbed-content a.list-group-item-info.current-tab, a.list-group-item-info.Current,
+a.list-group-item-info.current-theme, a.list-group-item-info.active:focus, .Tabs ul li.Active a.list-group-item-info:focus,
+.Tabs ul a.list-group-item-info.current-tab:focus,
+.tabbed-content li.Active a.list-group-item-info:focus,
+.tabbed-content a.list-group-item-info.current-tab:focus, a.list-group-item-info.Current:focus,
+a.list-group-item-info.current-theme:focus, a.list-group-item-info.active:hover, .Tabs ul li.Active a.list-group-item-info:hover,
+.Tabs ul a.list-group-item-info.current-tab:hover,
+.tabbed-content li.Active a.list-group-item-info:hover,
+.tabbed-content a.list-group-item-info.current-tab:hover, a.list-group-item-info.Current:hover,
+a.list-group-item-info.current-theme:hover,
+button.list-group-item-info.active,
+.Tabs ul button.list-group-item-info.current-tab,
+.tabbed-content button.list-group-item-info.current-tab,
+button.list-group-item-info.Current,
+button.list-group-item-info.current-theme,
+button.list-group-item-info.active:focus,
+.Tabs ul button.list-group-item-info.current-tab:focus,
+.tabbed-content button.list-group-item-info.current-tab:focus,
+button.list-group-item-info.Current:focus,
+button.list-group-item-info.current-theme:focus,
+button.list-group-item-info.active:hover,
+.Tabs ul button.list-group-item-info.current-tab:hover,
+.tabbed-content button.list-group-item-info.current-tab:hover,
+button.list-group-item-info.Current:hover,
+button.list-group-item-info.current-theme:hover {
+  color: #fff;
+  background-color: #31708f;
+  border-color: #31708f;
+}
+
+.list-group-item-warning {
+  color: #8a6d3b;
+  background-color: #fcf8e3;
+}
+
+a.list-group-item-warning,
+button.list-group-item-warning {
+  color: #8a6d3b;
+}
+
+a.list-group-item-warning .list-group-item-heading,
+button.list-group-item-warning .list-group-item-heading {
+  color: inherit;
+}
+
+a.list-group-item-warning:focus, a.list-group-item-warning:hover,
+button.list-group-item-warning:focus,
+button.list-group-item-warning:hover {
+  color: #8a6d3b;
+  background-color: #faf2cc;
+}
+
+a.list-group-item-warning.active, .Tabs ul li.Active a.list-group-item-warning,
+.Tabs ul a.list-group-item-warning.current-tab,
+.tabbed-content li.Active a.list-group-item-warning,
+.tabbed-content a.list-group-item-warning.current-tab, a.list-group-item-warning.Current,
+a.list-group-item-warning.current-theme, a.list-group-item-warning.active:focus, .Tabs ul li.Active a.list-group-item-warning:focus,
+.Tabs ul a.list-group-item-warning.current-tab:focus,
+.tabbed-content li.Active a.list-group-item-warning:focus,
+.tabbed-content a.list-group-item-warning.current-tab:focus, a.list-group-item-warning.Current:focus,
+a.list-group-item-warning.current-theme:focus, a.list-group-item-warning.active:hover, .Tabs ul li.Active a.list-group-item-warning:hover,
+.Tabs ul a.list-group-item-warning.current-tab:hover,
+.tabbed-content li.Active a.list-group-item-warning:hover,
+.tabbed-content a.list-group-item-warning.current-tab:hover, a.list-group-item-warning.Current:hover,
+a.list-group-item-warning.current-theme:hover,
+button.list-group-item-warning.active,
+.Tabs ul button.list-group-item-warning.current-tab,
+.tabbed-content button.list-group-item-warning.current-tab,
+button.list-group-item-warning.Current,
+button.list-group-item-warning.current-theme,
+button.list-group-item-warning.active:focus,
+.Tabs ul button.list-group-item-warning.current-tab:focus,
+.tabbed-content button.list-group-item-warning.current-tab:focus,
+button.list-group-item-warning.Current:focus,
+button.list-group-item-warning.current-theme:focus,
+button.list-group-item-warning.active:hover,
+.Tabs ul button.list-group-item-warning.current-tab:hover,
+.tabbed-content button.list-group-item-warning.current-tab:hover,
+button.list-group-item-warning.Current:hover,
+button.list-group-item-warning.current-theme:hover {
+  color: #fff;
+  background-color: #8a6d3b;
+  border-color: #8a6d3b;
+}
+
+.list-group-item-danger {
+  color: #a94442;
+  background-color: #f2dede;
+}
+
+a.list-group-item-danger,
+button.list-group-item-danger {
+  color: #a94442;
+}
+
+a.list-group-item-danger .list-group-item-heading,
+button.list-group-item-danger .list-group-item-heading {
+  color: inherit;
+}
+
+a.list-group-item-danger:focus, a.list-group-item-danger:hover,
+button.list-group-item-danger:focus,
+button.list-group-item-danger:hover {
+  color: #a94442;
+  background-color: #ebcccc;
+}
+
+a.list-group-item-danger.active, .Tabs ul li.Active a.list-group-item-danger,
+.Tabs ul a.list-group-item-danger.current-tab,
+.tabbed-content li.Active a.list-group-item-danger,
+.tabbed-content a.list-group-item-danger.current-tab, a.list-group-item-danger.Current,
+a.list-group-item-danger.current-theme, a.list-group-item-danger.active:focus, .Tabs ul li.Active a.list-group-item-danger:focus,
+.Tabs ul a.list-group-item-danger.current-tab:focus,
+.tabbed-content li.Active a.list-group-item-danger:focus,
+.tabbed-content a.list-group-item-danger.current-tab:focus, a.list-group-item-danger.Current:focus,
+a.list-group-item-danger.current-theme:focus, a.list-group-item-danger.active:hover, .Tabs ul li.Active a.list-group-item-danger:hover,
+.Tabs ul a.list-group-item-danger.current-tab:hover,
+.tabbed-content li.Active a.list-group-item-danger:hover,
+.tabbed-content a.list-group-item-danger.current-tab:hover, a.list-group-item-danger.Current:hover,
+a.list-group-item-danger.current-theme:hover,
+button.list-group-item-danger.active,
+.Tabs ul button.list-group-item-danger.current-tab,
+.tabbed-content button.list-group-item-danger.current-tab,
+button.list-group-item-danger.Current,
+button.list-group-item-danger.current-theme,
+button.list-group-item-danger.active:focus,
+.Tabs ul button.list-group-item-danger.current-tab:focus,
+.tabbed-content button.list-group-item-danger.current-tab:focus,
+button.list-group-item-danger.Current:focus,
+button.list-group-item-danger.current-theme:focus,
+button.list-group-item-danger.active:hover,
+.Tabs ul button.list-group-item-danger.current-tab:hover,
+.tabbed-content button.list-group-item-danger.current-tab:hover,
+button.list-group-item-danger.Current:hover,
+button.list-group-item-danger.current-theme:hover {
+  color: #fff;
+  background-color: #a94442;
+  border-color: #a94442;
+}
+
+.list-group-item-heading {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+.list-group-item-text {
+  margin-bottom: 0;
+  line-height: 1.3;
+}
+
 .form-control, .SmallInput {
   display: block;
   width: 100%;
@@ -8611,33 +9030,36 @@ span.current-theme, .Tabs ul li.Active a.btn-primary, .Tabs ul li.Active .Filter
   border-color: #0291db;
 }
 
-.btn-secondary, .file-upload-browse, .Tabs ul li a,
+.btn-secondary, .file-upload-browse, .btn-userblock, .Tabs ul li a,
 .tabbed-content li a {
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary:hover, .file-upload-browse:hover, .Tabs ul li a:hover,
+.btn-secondary:hover, .file-upload-browse:hover, .btn-userblock:hover, .Tabs ul li a:hover,
 .tabbed-content li a:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:focus, .file-upload-browse:focus, .Tabs ul li a:focus,
-.tabbed-content li a:focus, .btn-secondary.focus, .focus.file-upload-browse, .Tabs ul li a.focus,
+.btn-secondary:focus, .file-upload-browse:focus, .btn-userblock:focus, .Tabs ul li a:focus,
+.tabbed-content li a:focus, .btn-secondary.focus, .focus.file-upload-browse, .focus.btn-userblock, .Tabs ul li a.focus,
 .tabbed-content li a.focus {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:active, .file-upload-browse:active, .Tabs ul li a:active,
+.btn-secondary:active, .file-upload-browse:active, .btn-userblock:active, .Tabs ul li a:active,
 .tabbed-content li a:active, .btn-secondary.active, .active.file-upload-browse,
 .Tabs ul .file-upload-browse.current-tab,
 .tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
-.file-upload-browse.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
+.file-upload-browse.current-theme, .active.btn-userblock,
+.Tabs ul .btn-userblock.current-tab,
+.tabbed-content .btn-userblock.current-tab, .btn-userblock.Current,
+.btn-userblock.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
 a.current-theme,
 .tabbed-content li a.active, .tabbed-content li.Active a, .tabbed-content li a.current-tab,
 .tabbed-content li a.Current,
@@ -8647,7 +9069,8 @@ a.current-theme,
 .tabbed-content .btn-secondary.current-tab, .btn-secondary.Current,
 .btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
-.open > .dropdown-toggle.file-upload-browse, .Tabs ul li
+.open > .dropdown-toggle.file-upload-browse,
+.open > .dropdown-toggle.btn-userblock, .Tabs ul li
 .open > a.dropdown-toggle,
 .tabbed-content li
 .open > a.dropdown-toggle {
@@ -8657,17 +9080,17 @@ a.current-theme,
   background-image: none;
 }
 
-.btn-secondary.disabled:focus, .disabled.file-upload-browse:focus, .Tabs ul li a.disabled:focus,
-.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.file-upload-browse, .Tabs ul li a.disabled.focus,
-.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .file-upload-browse:disabled:focus, .Tabs ul li a:disabled:focus,
-.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .file-upload-browse:disabled.focus, .Tabs ul li a:disabled.focus,
+.btn-secondary.disabled:focus, .disabled.file-upload-browse:focus, .disabled.btn-userblock:focus, .Tabs ul li a.disabled:focus,
+.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.file-upload-browse, .disabled.focus.btn-userblock, .Tabs ul li a.disabled.focus,
+.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .file-upload-browse:disabled:focus, .btn-userblock:disabled:focus, .Tabs ul li a:disabled:focus,
+.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .file-upload-browse:disabled.focus, .btn-userblock:disabled.focus, .Tabs ul li a:disabled.focus,
 .tabbed-content li a:disabled.focus {
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary.disabled:hover, .disabled.file-upload-browse:hover, .Tabs ul li a.disabled:hover,
-.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .file-upload-browse:disabled:hover, .Tabs ul li a:disabled:hover,
+.btn-secondary.disabled:hover, .disabled.file-upload-browse:hover, .disabled.btn-userblock:hover, .Tabs ul li a.disabled:hover,
+.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .file-upload-browse:disabled:hover, .btn-userblock:disabled:hover, .Tabs ul li a:disabled:hover,
 .tabbed-content li a:disabled:hover {
   background-color: #fff;
   border-color: #ccc;
@@ -9065,6 +9488,72 @@ input[type="button"].btn-block {
   content: "\f12d";
 }
 
+.card .list-group-item {
+  font-weight: 500;
+  background-color: #f4f6fb;
+}
+
+.card .list-group-item:hover {
+  background-color: #f8f9fc;
+}
+
+.card .list-group-item .icon {
+  float: right;
+}
+
+.card .username {
+  margin-bottom: 0.25rem;
+}
+
+.card .username a {
+  color: #555a62;
+}
+
+.card .user-block {
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+
+.card .user-block .user-image-wrap {
+  position: relative;
+  height: 5.25rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: #f4f4f5;
+  margin-right: 1.5rem;
+}
+
+.card .user-block .user-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  content: '';
+}
+
+.card .user-block .user-image-wrap img, .card .user-block .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .card .user-block .user-image-wrap .Sprite, .card .user-block .user-image-wrap
+.HomeOptions .Sprite,
+.HomeOptions .card .user-block .user-image-wrap .Sprite {
+  width: 5.25rem;
+}
+
+.card .user-block .btn-userblock {
+  margin-top: 1rem;
+}
+
+.card-user .card-footer {
+  border-top: 0;
+  padding: 1.25rem;
+}
+
+.card-footer {
+  text-align: center;
+}
+
 .dropdown-menu {
   margin: 0;
 }
@@ -9083,20 +9572,31 @@ input[type="button"].btn-block {
   border-right: 1px solid #ddd;
 }
 
+.footer .vanilla-logo {
+  width: 4rem;
+  height: 2rem;
+}
+
 .vanilla-logo {
+  display: inline-block;
+  background: 0;
+  background-image: url("images/vanilla-black.png");
+  background-image: url("images/vanilla-black.svg");
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.vanilla-logo, .vanilla-logo:hover {
   font: "0/0" a;
   color: transparent;
   text-shadow: none;
   background-color: transparent;
   border: 0;
-  display: block;
-  width: 4rem;
-  height: 2rem;
-  background: 0;
-  background-image: url("images/vanilla-black.png");
-  background-image: url("images/vanilla-black.svg");
-  background-repeat: no-repeat;
-  background-size: cover;
+}
+
+.vanilla-logo-white {
+  background-image: url("images/vanilla-white.png");
+  background-image: url("images/vanilla-white.svg");
 }
 
 .footer-logo-powered-text {
@@ -10051,6 +10551,16 @@ select::-ms-expand {
   line-height: .875rem;
 }
 
+.btn-userblock {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.575rem;
+  line-height: 1.5;
+  border-radius: 0.875rem;
+}
+
 .media, .Feed, .FeedItem, .DataList li {
   padding: 1rem 0.9375rem;
   margin-bottom: 0;
@@ -10228,8 +10738,47 @@ div.Popup .Buttons {
 .tabbed-content a.current-tab, .PanelInfo li
 .tabbed-content .panel a.current-tab, .panel .nav-link.Current, .panel .PanelInfo li a.Current, .PanelInfo li .panel a.Current, .panel
 .nav-link.current-theme, .panel .PanelInfo li a.current-theme, .PanelInfo li .panel a.current-theme, .panel .PanelInfo li a.active, .PanelInfo li .panel a.active, .panel .PanelInfo .Active a, .PanelInfo .Active .panel a, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
-  color: #fff;
   border-radius: 0.1rem 0 0 0.1rem;
+}
+
+.panel .nav-link.active, .panel .Tabs ul li.Active a.nav-link, .Tabs ul li.Active .panel a.nav-link, .panel
+.Tabs ul .nav-link.current-tab,
+.Tabs ul .panel .nav-link.current-tab, .panel
+.Tabs ul .PanelInfo li a.current-tab,
+.Tabs ul .PanelInfo li .panel a.current-tab, .panel .PanelInfo li
+.Tabs ul a.current-tab, .PanelInfo li
+.Tabs ul .panel a.current-tab, .panel
+.tabbed-content li.Active a.nav-link,
+.tabbed-content li.Active .panel a.nav-link, .panel
+.tabbed-content .nav-link.current-tab,
+.tabbed-content .panel .nav-link.current-tab, .panel
+.tabbed-content .PanelInfo li a.current-tab,
+.tabbed-content .PanelInfo li .panel a.current-tab, .panel .PanelInfo li
+.tabbed-content a.current-tab, .PanelInfo li
+.tabbed-content .panel a.current-tab, .panel .nav-link.Current, .panel .PanelInfo li a.Current, .PanelInfo li .panel a.Current, .panel
+.nav-link.current-theme, .panel .PanelInfo li a.current-theme, .PanelInfo li .panel a.current-theme, .panel .PanelInfo li a.active, .PanelInfo li .panel a.active, .panel .PanelInfo .Active a, .PanelInfo .Active .panel a, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover, .panel .nav-link.active:hover, .panel .Tabs ul li.Active a.nav-link:hover, .Tabs ul li.Active .panel a.nav-link:hover, .panel
+.Tabs ul .nav-link.current-tab:hover,
+.Tabs ul .panel .nav-link.current-tab:hover, .panel
+.Tabs ul .PanelInfo li a.current-tab:hover,
+.Tabs ul .PanelInfo li .panel a.current-tab:hover, .panel .PanelInfo li
+.Tabs ul a.current-tab:hover, .PanelInfo li
+.Tabs ul .panel a.current-tab:hover, .panel
+.tabbed-content li.Active a.nav-link:hover,
+.tabbed-content li.Active .panel a.nav-link:hover, .panel
+.tabbed-content .nav-link.current-tab:hover,
+.tabbed-content .panel .nav-link.current-tab:hover, .panel
+.tabbed-content .PanelInfo li a.current-tab:hover,
+.tabbed-content .PanelInfo li .panel a.current-tab:hover, .panel .PanelInfo li
+.tabbed-content a.current-tab:hover, .PanelInfo li
+.tabbed-content .panel a.current-tab:hover, .panel .nav-link.Current:hover, .panel .PanelInfo li a.Current:hover, .PanelInfo li .panel a.Current:hover, .panel
+.nav-link.current-theme:hover, .panel .PanelInfo li a.current-theme:hover, .PanelInfo li .panel a.current-theme:hover, .panel .PanelInfo li a.active:hover, .PanelInfo li .panel a.active:hover, .panel .PanelInfo .Active a:hover, .PanelInfo .Active .panel a:hover, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover {
+  color: #fff;
+  background-color: #0291db;
+}
+
+.panel .nav-link:hover, .panel .PanelInfo li a:hover, .PanelInfo li .panel a:hover, .panel .nav-link.hover, .panel .PanelInfo li a.hover, .PanelInfo li .panel a.hover {
+  color: #949aa2;
+  background-color: #e8ecf2;
 }
 
 .panel .nav-stacked .nav-item + .nav-item, .panel .PanelInfo .nav-item + .nav-item, .panel .nav-stacked .PanelInfo li + .nav-item, .PanelInfo .panel .nav-stacked li + .nav-item, .panel .PanelInfo li + .nav-item, .panel .nav-stacked .PanelInfo .nav-item + li, .PanelInfo .panel .nav-stacked .nav-item + li, .panel .PanelInfo .nav-item + li, .panel .nav-stacked .PanelInfo li + li, .PanelInfo .panel .nav-stacked li + li, .panel .PanelInfo li + li {
@@ -10264,12 +10813,22 @@ div.Popup .Buttons {
   background-color: #0291db;
   font-weight: 100;
   letter-spacing: .0375rem;
-  z-index: 10;
   border: 1px solid rgba(0, 0, 0, 0.125);
+  z-index: 1;
 }
 
-.navbar a {
+.navbar .vanilla-logo {
+  width: 5rem;
+}
+
+.navbar .title, .navbar .LayoutOptions > a, .navbar
+.HomeOptions > a {
   color: #fff;
+}
+
+.navbar .logo + .title, .navbar .LayoutOptions > .logo + a, .navbar
+.HomeOptions > .logo + a {
+  margin-left: 1rem;
 }
 
 .navbar img, .navbar .LayoutOptions .Sprite, .LayoutOptions .navbar .Sprite, .navbar
@@ -10295,6 +10854,7 @@ div.Popup .Buttons {
 .navbar .nav-link, .navbar .PanelInfo li a, .PanelInfo li .navbar a {
   position: relative;
   padding: 0.9666666667rem;
+  color: #fff;
 }
 
 .navbar .nav-link.active, .navbar .Tabs ul li.Active a.nav-link, .Tabs ul li.Active .navbar a.nav-link, .navbar
@@ -10408,6 +10968,10 @@ div.Popup .Buttons {
   justify-content: center;
 }
 
+.navbar .navbar-brand {
+  float: none;
+}
+
 .navbar .nav, .navbar .PanelInfo {
   display: -ms-flexbox;
   display: flex;
@@ -10421,6 +10985,14 @@ div.Popup .Buttons {
 
 .navbar .nav-link-heading {
   line-height: 1.3333333333;
+  opacity: .75;
+}
+
+.navbar-profile {
+  cursor: pointer;
+}
+
+.navbar-profile .icon {
   opacity: .75;
 }
 
@@ -10528,7 +11100,6 @@ div.Popup .Buttons {
 
 .main {
   background-color: #fff;
-  z-index: 5;
   border: 1px solid #ddd;
   border-top: 0;
   padding-bottom: 4rem;

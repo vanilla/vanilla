@@ -567,7 +567,20 @@ if (!function_exists('formatIP')) {
      * @return string Returns the formatted IP address.
      */
     function formatIP($IP, $html = true) {
-        return $html ? htmlspecialchars($IP) : $IP;
+        $result = '';
+
+        // Is this a packed IP address?
+        if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6) && $unpackedIP = @inet_ntop($IP)) {
+            $IP = $unpackedIP;
+        }
+
+        if (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+            $result = $html ? htmlspecialchars($IP) : $IP;
+        } elseif (filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            $result = $html ? wrap(t('IPv6'), 'span', ['title' => $IP]) : $IP;
+        }
+
+        return $result;
     }
 }
 

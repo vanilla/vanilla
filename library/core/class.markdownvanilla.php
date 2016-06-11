@@ -26,6 +26,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $this->addStrikeout();
         $this->addBreaks();
         $this->addSpoilers();
+        $this->addListFix();
 
 		// Sort gamuts by their priority.
 		asort($this->block_gamut);
@@ -65,6 +66,19 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
             "doSpoilers" => 55
         ]);
     }
+
+
+    /**
+     * Don't require a newline for unordered lists to be recognized.
+     *
+     * @return void
+     */
+    public function addListFix() {
+        $this->block_gamut = array_replace($this->block_gamut, [
+            'doListFix' => 39
+        ]);
+    }
+
 
     /**
      * Add Spoilers implementation (3 methods).
@@ -138,6 +152,17 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
 	}
 	protected function _doSoftBreaks_callback($matches) {
 		return $this->hashPart("<br$this->empty_element_suffix\n");
+	}
+
+    /**
+     * Work around php-markdown's non-standard implementation of lists.
+     * Allows starting unordered lists without a newline.
+     *
+     * @param string $text
+     * @return string
+     */
+	protected function doListFix($text) {
+        return preg_replace('/(^[^*+-].*\n)([*+-] )/m', "$1\n$2", $text);
 	}
 
 }

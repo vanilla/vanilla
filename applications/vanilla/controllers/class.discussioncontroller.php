@@ -536,6 +536,8 @@ class DiscussionController extends VanillaController {
             if ($Target) {
                 $this->RedirectUrl = url($Target);
             }
+            
+            $this->jsonTarget('', '', 'Refresh');
         } else {
             if (!$Discussion->Announce) {
                 $Discussion->Announce = 2;

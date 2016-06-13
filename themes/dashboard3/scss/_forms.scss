@@ -101,15 +101,15 @@ form {
 // Form grid
 .row {
   > .input-wrap {
-    @extend .col-sm-7;
+    @extend .col-sm-16;
   }
 
   > .label-wrap {
-    @extend .col-sm-5;
+    @extend .col-sm-8;
   }
 
   > .label-wrap-wide {
-    @extend .col-sm-8;
+    @extend .col-sm-20;
 
     + .input-wrap {
       @extend .col-sm-4;
@@ -348,7 +348,6 @@ form {
   top: 0;
   right: 0;
   left: 0;
-  padding: .625rem .75rem;
   line-height: 1;
   color: $grey;
   border: $input-btn-border-width solid $input-border-color;
@@ -359,7 +358,6 @@ form {
   position: absolute;
   top: 0;
   right: 0;
-  padding: .625rem .75rem;
   @extend .btn;
   @extend .btn-secondary;
 }
@@ -476,12 +474,16 @@ select {
     cursor: default;
 
     .overlay {
-      display: none;
-    }
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      opacity: 1;
+      background-color: $white;
+      background-color: rgba(255,255,255,.7);
 
-    .image-wrap {
-      &::after {
-        opacity: 1;
+      > * {
+        display: none;
       }
     }
 
@@ -509,22 +511,6 @@ select {
     &:hover .overlay {
       height: 100%;
     }
-
-    &::after {
-      position: absolute;
-      top: 35%;
-      left: auto;
-      right: auto;
-      height: 30%;
-      width: 100%;
-      @include icon;
-      font-size: 4rem;
-      color: $brand-success;
-      text-align: center;
-      opacity: 0;
-      transition: opacity .1s;
-      @include char-content($icon-ok-circle);
-    }
   }
 
   .overlay {
@@ -541,19 +527,35 @@ select {
     overflow: hidden;
     transition: all .1s;
     text-align: center;
+
+
+    &::after {
+      @include icon;
+      font-size: 4rem;
+      color: $brand-success;
+      text-align: center;
+      transition: opacity .1s;
+      opacity: 1;
+      @include char-content($icon-ok-circle);
+    }
   }
 
   .buttons {
-    position: relative;
-    top: 40%;
-    left: auto;
-    right: auto;
-    height: 20%;
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+    padding: $spacer / 2;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
 
     > .btn {
+      display: block;
+      margin: ($spacer / 6) ($spacer / 4);
+      max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
       min-width: 5rem;
-      margin-left: .125rem;
-      margin-right: .125rem;
     }
   }
 
@@ -563,9 +565,10 @@ select {
 }
 
 .label-selector-item {
-  @extend .col-md-6;
-  @extend .col-lg-4;
-  @extend .col-xl-3;
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-8;
+  @extend .col-xl-6;
 
   padding: ($spacer / 2) $spacer $spacer;
 }

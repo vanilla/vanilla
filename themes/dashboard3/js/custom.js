@@ -81,14 +81,21 @@
         codeInput.init($('#Form_CustomCSS'), 'css', 800);
         codeInput.start();
 
-        $('.navbar .js-card-user').popover(
-            {
-                'html': true,
-                'placement': 'bottom',
-                'content': $('.js-dashboard-user-dropdown').html()
+        var html = $('.js-dashboard-user-dropdown').html();
+        new Drop({
+            target: document.querySelector('.navbar .js-card-user'),
+            content: html,
+            constrainToWindow: true,
+            tetherOptions: {
+                attachment: 'top right',
+                targetAttachment: 'top right',
+                offset: '2rem 0'
             }
-        );
+        });
     });
+
+
+
 
 
 

@@ -1497,7 +1497,7 @@ class UserModel extends Gdn_Model {
 
         try {
             $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
-        } catch (Gdn_UserException $e) {
+        } catch (\Exception $e) {
             return $IPs;
         }
 
@@ -2915,7 +2915,7 @@ class UserModel extends Gdn_Model {
         try {
             Gdn::database()->query($query, $values);
             $result = true;
-        } catch (Gdn_UserException $e) {
+        } catch (\Exception $e) {
             $result = false;
         }
 

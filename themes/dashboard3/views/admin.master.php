@@ -75,8 +75,8 @@ Gdn_Theme::assetEnd();
 <!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
 <!--        --><?php //} ?>
         <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
-        <?php echo anchor($title, '/', 'title'); ?>
-        <?php echo anchor(t('Visit Site'), '/', 'btn btn-navbar'); ?>
+<!--        --><?php //echo anchor($title, '/', 'title'); ?>
+        <?php echo anchor(t('Visit Site').' <span class="icon icon-external-link"></span>', '/', 'btn btn-navbar'); ?>
     </div>
     <?php $dashboardNav = new DashboardNavModule(); ?>
     <nav class="nav nav-pills">
@@ -106,21 +106,26 @@ Gdn_Theme::assetEnd();
     </div>
 </div>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-3 col-lg-3 col-xl-2 panel panel-nav panel-left">
-            <?php echo $dashboardNav; ?>
+    <div class="row main-row">
+        <div class="col-sm-0 col-md-8 col-lg-6 col-xl-5 panel panel-nav panel-left">
+            <div class="panel-content">
+                <?php echo anchor($title, '/', 'title'); ?>
+                <?php echo $dashboardNav; ?>
+            </div>
         </div>
-        <div class="col-sm-9 col-lg-6 col-xl-8 main">
+        <div class="col-sm-24 col-md-16 col-lg-12 col-xl-14 main">
             <?php $this->renderAsset('Content'); ?>
         </div>
-        <div class="col-sm-0 col-lg-3 col-xl-2 panel panel-help panel-right">
-            <?php $this->renderAsset('Help'); ?>
+        <div class="col-sm-0 col-md-0 col-lg-6 col-xl-5 panel panel-help panel-right">
+            <div class="panel-content">
+                <?php $this->renderAsset('Help'); ?>
+            </div>
         </div>
     </div>
 </div>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-6 col-md-8 col-md-offset-2 col-sm-offset-3 footer">
+    <div class="row footer-row">
+        <div class="col-xs-24 col-md-24 col-lg-12 col-xl-14 footer">
             <?php $this->renderAsset('Foot'); ?>
             <div class="footer-logo logo-wrap">
                 <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>

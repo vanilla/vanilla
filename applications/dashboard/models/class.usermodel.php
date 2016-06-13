@@ -3734,7 +3734,11 @@ class UserModel extends Gdn_Model {
             setValue('PhotoUrl', $User, $PhotoUrl);
         }
 
-        setValue('AllIPAddresses', $User, $this->getIPs(val('UserID', $User)));
+        // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
+        setValue('AllIPAddresses', $User, [
+            val('InsertIPAddress', $User),
+            val('LastIPAddress', $User)
+        ]);
 
         setValue('_CssClass', $User, '');
         if (val('Banned', $User)) {

@@ -8,10 +8,31 @@
   padding-top: $spacer * 4;
   padding-left: $spacer * 4;
   overflow: hidden;
+
+}
+
+.panel-content {
+  width: 240px;
+}
+
+@include media-breakpoint-down(sm) {
+  .panel {
+    display: none;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .panel-right {
+    display: none;
+  }
 }
 
 .panel-left {
   padding-right: 0;
+
+  .panel-content {
+    float: right;
+  }
 }
 
 .panel-right {
@@ -19,6 +40,10 @@
   padding-right: $spacer * 4;
   color: $grey-dark;
   font-weight: 200;
+
+  .panel-content {
+    float: left;
+  }
 
   h2 {
     padding-bottom: $spacer;

@@ -5,11 +5,14 @@ $Session = Gdn::session();
     <h1><?php echo t('Manage Routes'); ?></h1>
     <div class="btn-group"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'AddRoute btn btn-primary'); ?></div>
 </div>
-<div class="Info"><?php
-    echo t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.'),
-    ' ',
-    anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
-    ?></div>
+<?php
+    Gdn_Theme::assetBegin('Help');
+    echo '<h2>'.sprintf(t('About %s'), t('Routes')).'</h2>';
+    echo t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
+    echo anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
+    Gdn_Theme::assetEnd();
+?>
+
 <div class="table-wrap">
     <table class="AltColumns" id="RouteTable">
         <thead>

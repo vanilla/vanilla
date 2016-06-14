@@ -2,18 +2,9 @@
 $session = Gdn::session();
 $updateUrl = c('Garden.UpdateCheckUrl');
 $addonUrl = c('Garden.AddonUrl');
-if ($this->addonType !== 'applications') {
-    $this->addonType = 'plugins';
-    $title = t('Manage Plugins');
-    $pathHelp = sprintf(
-        t('PluginHelp'),
-        '<code>'.PATH_PLUGINS.'</code>'
-    );
-    $getMore = wrap(Anchor(t('Get More Plugins'), $addonUrl), 'li');
-    $availableAddons = $this->AvailablePlugins;
-    $enabledAddons = $this->EnabledPlugins;
-} else {
+if ($this->addonType === 'applications') {
     $title = t('Manage Applications');
+    $helpTitle = sprintf(t('About %s'), t('Applications'));
     $pathHelp = sprintf(
         t('ApplicationHelp'),
         '<code>'.PATH_APPLICATIONS.'</code>'
@@ -21,16 +12,44 @@ if ($this->addonType !== 'applications') {
     $getMore = wrap(Anchor(t('Get More Applications').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailableApplications;
     $enabledAddons = $this->EnabledApplications;
+
+} elseif ($this->addonType === 'locales') {
+    $title = t('Manage Locales');
+    $helpTitle = sprintf(t('About %s'), t('Locales'));
+    $pathHelp = sprintf(
+        t('LocaleHelp', 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.'),
+        '<code>'.PATH_ROOT.'/locales</code>'
+    );
+    $getMore = wrap(Anchor(t('Get More Locales'), $addonUrl), 'li');
+    $availableAddons = $this->data('AvailableLocales');
+    $enabledAddons = $this->data('EnabledLocales');
+    $this->Filter = 'all';
+} else {
+    $this->addonType = 'plugins';
+    $title = t('Manage Plugins');
+    $helpTitle = sprintf(t('About %s'), t('Plugins'));
+    $pathHelp = sprintf(
+        t('PluginHelp'),
+        '<code>'.PATH_PLUGINS.'</code>'
+    );
+    $getMore = wrap(Anchor(t('Get More Plugins'), $addonUrl), 'li');
+    $availableAddons = $this->AvailablePlugins;
+    $enabledAddons = $this->EnabledPlugins;
 }
+
 $addonCount = count($availableAddons);
 $enabledCount = count($enabledAddons);
 $disabledCount = $addonCount - $enabledCount;
 
-?>
-<h1><?php echo $title; ?></h1>
-<div class="Info">
+Gdn_Theme::assetBegin('Help'); ?>
+<div>
+    <h2><?php echo $helpTitle; ?></h2>
     <?php echo $pathHelp; ?>
 </div>
+<?php Gdn_Theme::assetEnd();
+?>
+<h1><?php echo $title; ?></h1>
+<?php if ($this->addonType !== 'locales') { ?>
 <div class="Tabs FilterTabs">
     <ul>
         <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all'); ?></li>
@@ -42,6 +61,7 @@ $disabledCount = $addonCount - $enabledCount;
         ?>
     </ul>
 </div>
+<?php } ?>
 <?php echo $this->Form->errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">
     <ul>
@@ -151,7 +171,7 @@ $disabledCount = $addonCount - $enabledCount;
                 </div>
                 <div class="media-right media-options">
                     <?php if ($SettingsUrl != '') {
-                        echo wrap(anchor('<span class="icon icon-edit">', $SettingsUrl, 'btn btn-secondary Button', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
+                        echo wrap(anchor('', $SettingsUrl, 'btn btn-settings-border', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
                     }
                     ?>
                     <div id="<?php echo $addonName; ?>-toggle">

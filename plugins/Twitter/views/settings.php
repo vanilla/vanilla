@@ -1,56 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 ?>
-    <style type="text/css">
-        .Configuration {
-            margin: 0 20px 20px;
-            background: #f5f5f5;
-            float: left;
-        }
-
-        .ConfigurationForm {
-            padding: 20px;
-            float: left;
-        }
-
-        #Content form .ConfigurationForm ul {
-            padding: 0;
-        }
-
-        #Content form .ConfigurationForm input.Button {
-            margin: 0;
-        }
-
-        .ConfigurationHelp {
-            border-left: 1px solid #aaa;
-            margin-left: 340px;
-            padding: 20px;
-        }
-
-        .ConfigurationHelp img {
-            width: 99%;
-        }
-
-        .ConfigurationHelp a img {
-            border: 1px solid #aaa;
-        }
-
-        .ConfigurationHelp a:hover img {
-            border: 1px solid #777;
-        }
-
-        .ConfigurationHelp ol {
-            list-style-type: decimal;
-            padding-left: 20px;
-        }
-
-        input.CopyInput {
-            font-family: monospace;
-            color: #000;
-            width: 240px;
-            font-size: 12px;
-            padding: 4px 3px;
-        }
-    </style>
     <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open();

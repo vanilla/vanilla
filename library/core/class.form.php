@@ -1865,11 +1865,12 @@ PASSWORDMETER;
      */
     public function radioList($FieldName, $DataSet, $Attributes = array()) {
         $List = val('list', $Attributes);
+
         $Return = '';
 
         if ($List) {
             $Return .= '<ul'.(isset($Attributes['listclass']) ? " class=\"{$Attributes['listclass']}\"" : '').'>';
-            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '')).'>';
+            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '').' '.val('list-item-class', $Attributes)).'>';
             $LiClose = '</li>';
         } elseif ($this->getStyle('radio-container', '') && stripos(val('class', $Attributes), 'inline') === false) {
             $class = $this->getStyle('radio-container');

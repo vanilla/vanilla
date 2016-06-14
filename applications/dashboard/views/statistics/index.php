@@ -1,17 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <style type="text/css">
-        body .NotifyMessage {
-            margin: 0 20px 20px;
-            padding: 20px;
-            background: #dbf3fc;
-            color: #222222;
-        }
+    <?php Gdn_Theme::assetBegin('Help');
 
-        body .NotifyMessage strong {
-            color: #252525;
-        }
-    </style>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
+    echo '<h2>'.sprintf(t('About %s'), t('Vanilla Statistics')).'</h2>';
+    echo '<p>'.t("The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool",
+            "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://vanillaforums.org/docs/vanillastatistics\">read more about Vanilla Statistics</a> in our documentation.")
+        .'</p>';
+    ?>
+
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -27,9 +22,6 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-    <div class="Info">
-        <?php echo t("The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool", "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://vanillaforums.org/docs/vanillastatistics\">read more about Vanilla Statistics</a> in our documentation."); ?>
-    </div>
 <?php if ($this->data('NotifyMessage') !== FALSE) { ?>
     <div class="Info NotifyMessage">
         <?php

@@ -2,6 +2,13 @@
 $Session = Gdn::session();
 ?>
     <?php Gdn_Theme::assetBegin('Help'); ?>
+    <h2><?php echo t('Heads up!'); ?></h2>
+    <div>
+        <?php
+        echo t('Spend a little time thinking about how you describe your site here.',
+            'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
+        ?>
+    </div>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Need More Help?'), '</h2>';
@@ -12,17 +19,6 @@ $Session = Gdn::session();
     </div>
     <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Banner'); ?></h1>
-    <div class="PageInfo">
-        <h2><?php echo t('Heads up!'); ?></h2>
-
-        <p>
-            <?php
-            echo t('Spend a little time thinking about how you describe your site here.',
-                'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
-            ?>
-        </p>
-    </div>
-
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();

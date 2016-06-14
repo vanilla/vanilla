@@ -174,6 +174,7 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Messages'), '/dashboard/message', 'appearance.messages', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
+            ->addLinkIf('Garden.Community.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
             ->addGroup(t('Users'), 'users', '', ['after' => 'appearance'])
             ->addLinkIf(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), t('Users'), '/dashboard/user', 'users.users', '', $sort)
             ->addLinkIf($session->checkPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)

@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
+    <div><?php
+        echo wrap(sprintf(t('About %s'), t('Roles & Permissions')), 'h2');
+        echo t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
+        ?>
+    </div>
     <div class="Help Aside">
         <?php
         echo wrap(t('Need More Help?'), 'h2');
@@ -15,13 +20,10 @@
     <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'btn btn-primary'); ?></div>
 </div>
 <?php
+$this->fireEvent('AfterRolesInfo');
 echo $this->Form->open();
 $this->DefaultRolesWarning();
 ?>
-    <div class="Info"><?php
-        echo t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
-        $this->fireEvent('AfterRolesInfo');
-        ?></div>
 <div class="table-wrap">
     <table border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable" id="RoleTable">
         <thead>

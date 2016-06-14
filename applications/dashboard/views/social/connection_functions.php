@@ -48,7 +48,7 @@ function writeConnection($Connection, $wrap = true) {
             <div class="btn-group">
             <?php
             if ($Enabled && !empty($SettingsUrl)) {
-                echo anchor('<span class="icon icon-edit">', $SettingsUrl, 'btn btn-secondary', ['aria-label' => sprintf(t('Settings for %s'), val('Name', $Connection, t('Unknown')))]);
+                echo anchor('', $SettingsUrl, 'btn btn-settings-border', ['aria-label' => sprintf(t('Settings for %s'), val('Name', $Connection, t('Unknown')))]);
             } ?>
             </div>
             <div class="toggle">

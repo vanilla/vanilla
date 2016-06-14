@@ -1,20 +1,17 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
+
+Gdn_Theme::assetBegin('Help'); ?>
+<h2><?php echo sprintf(t('About %s'), t('Mobile Themes')); ?></h2>
+<p class="P"><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
+<p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+<?php Gdn_Theme::assetEnd();
 ?>
 
 <h1>
     <?php echo t('Manage Mobile Themes'); ?>
 </h1>
-
-<div class="Info">
-    <p class="P"><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
-
-    <p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
-</div>
-
-<h3>Available Mobile Themes</h3>
-
 <?php echo $this->Form->errors(); ?>
 
 <div class="Messages Errors TestAddonErrors Hidden">

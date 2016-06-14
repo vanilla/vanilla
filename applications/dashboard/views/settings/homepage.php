@@ -68,7 +68,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
     </div>
     <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Homepage'); ?></h1>
-    <div class="Info">
+    <div>
         <?php printf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true)) ?>
     </div>
 

@@ -20,7 +20,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
     <h1><?php echo t('Manage Themes'); ?></h1>
     <?php
     if ($AddonUrl != '') {
-        echo anchor(t('Get More Themes'), $AddonUrl, 'btn btn-primary');
+        echo anchor(t('Get More Themes').' <span class="icon icon-external-link"></span>', $AddonUrl, 'btn btn-primary');
     }
     ?>
 </div>

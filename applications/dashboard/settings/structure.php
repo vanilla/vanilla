@@ -643,7 +643,7 @@ if (!$FullNameColumnExists) {
         ->put();
 
     $Construct->table('Tag')
-        ->column('FullName', 'varchar(255)', false, 'index')
+        ->column('FullName', 'varchar(100)', false, 'index')
         ->set();
 }
 

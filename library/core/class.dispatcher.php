@@ -578,7 +578,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     $Found = false;
                     do {
                         $ControllerPath = $Reflect->getFilename();
-                        $Found = (bool)preg_match('`\/controllers\/`i', $ControllerPath);
+                        $escapedSeparator = str_replace('\\', '\\\\', DS);
+                        $regex = '`'.$escapedSeparator.'controllers'.$escapedSeparator.'`i';
+                        $Found = (bool)preg_match($regex, $ControllerPath);
                         if (!$Found) {
                             $Reflect = $Reflect->getParentClass();
                         }
@@ -589,9 +591,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 }
 
                 if ($ControllerPath) {
-                    $InterimPath = explode('/controllers/', $ControllerPath);
+                    $InterimPath = explode(DS.'controllers'.DS, $ControllerPath);
                     array_pop($InterimPath); // Get rid of the end. Useless;
-                    $InterimPath = explode('/', trim(array_pop($InterimPath)));
+                    $InterimPath = explode(DS, trim(array_pop($InterimPath)));
                     $Application = array_pop($InterimPath);
                     $AddonType = array_pop($InterimPath);
                     switch ($AddonType) {

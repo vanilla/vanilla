@@ -24,7 +24,7 @@ ob_start();
 
 // Define the constants we need to get going.
 
-define('DS', '/');
+define('DS', DIRECTORY_SEPARATOR);
 define('PATH_ROOT', getcwd());
 
 // Include the bootstrap to configure the framework.

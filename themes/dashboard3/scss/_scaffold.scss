@@ -3,18 +3,27 @@
 // No styleguide reference.
 
 .main {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  margin-top: -$navbar-height;
+  padding-top: $navbar-height;
+  max-width: 1024px;
   background-color: $white;
   border: 1px solid $border-color;
   border-top: 0;
-  padding-bottom: 4rem;
-}
+  border-bottom: 0;
 
-.main-row,
-.footer-row {
-  justify-content: center;
-}
+  .content,
+  .footer {
+    flex: 1 100%;
+  }
 
-.main,
-.footer {
-  max-width: 1024px;
+  .footer {
+    max-height: 4rem;
+  }
+
+  .content {
+    padding-bottom: 4rem;
+  }
 }

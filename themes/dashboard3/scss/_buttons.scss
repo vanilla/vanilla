@@ -265,3 +265,14 @@ input[type="button"] {
     @include char-content($icon-cog);
   }
 }
+
+// Icon buttons with border
+
+.btn-settings-border {
+  @extend .btn-secondary;
+  @extend .icon;
+
+  &:before {
+    @include char-content($icon-edit);
+  }
+}

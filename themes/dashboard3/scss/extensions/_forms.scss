@@ -1,5 +1,3 @@
-// PROBLEMS: Need checkboxes to have outer div class
-//           Text input needs to have label separate from input, not wrapped
 
 .Sortable,
 .DataList {
@@ -151,4 +149,9 @@
 
 .SmallInput {
   @extend .form-control;
+  max-width: 20rem;
+
+  .input-wrap & {
+    max-width: inherit;
+  }
 }

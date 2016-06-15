@@ -9,6 +9,9 @@
   padding-left: $spacer * 4;
   overflow: hidden;
 
+  code {
+    word-wrap: break-word;
+  }
 }
 
 .panel-content {
@@ -16,7 +19,7 @@
 }
 
 @include media-breakpoint-down(sm) {
-  .panel {
+  .panel-left {
     display: none;
   }
 }
@@ -48,6 +51,7 @@
   h2 {
     padding-bottom: $spacer;
     margin-bottom: $spacer / 2;
+    letter-spacing: .0625rem;
     border-bottom: 1px dotted $grey;
     font-weight: 100;
     text-transform: uppercase;

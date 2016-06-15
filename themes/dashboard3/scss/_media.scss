@@ -12,6 +12,10 @@
 .media-options {
   display: flex;
   align-self: center;
+
+  .btn {
+    margin-right: $spacer * 2;
+  }
 }
 
 

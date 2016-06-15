@@ -220,6 +220,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_tables.scss',
             'scss/vendors/bootstrap/scss/_media.scss',
             'scss/vendors/bootstrap/scss/_dropdown.scss',
+            'scss/vendors/bootstrap/scss/_animation.scss',
             'scss/vendors/bootstrap/scss/_modal.scss',
             'scss/vendors/bootstrap/scss/_list-group.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',

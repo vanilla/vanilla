@@ -1487,6 +1487,30 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Retrieve IP addresses associated with a user.
+     *
+     * @param int $userID Unique ID for a user.
+     * @return array IP addresses for the user.
+     */
+    public function getIPs($userID) {
+        $IPs = [];
+
+        try {
+            $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
+        } catch (\Exception $e) {
+            return $IPs;
+        }
+
+        foreach ($packedIPs as $UserIP) {
+            if ($unpackedIP = ipDecode($UserIP['IPAddress'])) {
+                $IPs[] = $unpackedIP;
+            }
+        }
+
+        return $IPs;
+    }
+
+    /**
      *
      *
      * @param bool $Like
@@ -2013,11 +2037,6 @@ class UserModel extends Gdn_Model {
         // Add & apply any extra validation rules:
         if (array_key_exists('Email', $FormPostValues) && val('ValidateEmail', $Settings, true)) {
             $this->Validation->applyRule('Email', 'Email');
-        }
-
-        // AllIPAdresses is stored as a CSV, so handle the case where an array is submitted.
-        if (array_key_exists('AllIPAddresses', $FormPostValues) && is_array($FormPostValues['AllIPAddresses'])) {
-            $FormPostValues['AllIPAddresses'] = implode(',', $FormPostValues['AllIPAddresses']);
         }
 
         if ($this->validate($FormPostValues, $Insert) && $UniqueValid) {
@@ -2871,6 +2890,39 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Record an IP address for a user.
+     *
+     * @param int $userID Unique ID of the user.
+     * @param string $IP Human-readable IP address.
+     * @return bool Was the operation successful?
+     */
+    public function saveIP($userID, $IP) {
+        $packedIP = ipEncode($IP);
+        $px = Gdn::database()->DatabasePrefix;
+        $currentDateTime = Gdn_Format::toDateTime();
+
+        $query = "insert into {$px}UserIP (UserID, IPAddress, DateInserted, DateUpdated)
+            values (:UserID, :IPAddress, :DateInserted, :DateUpdated)
+            on duplicate key update DateUpdated = :DateUpdated2";
+        $values = [
+            ':UserID' => $userID,
+            ':IPAddress' => $packedIP,
+            ':DateInserted' => $currentDateTime,
+            ':DateUpdated' => $currentDateTime,
+            ':DateUpdated2' => $currentDateTime
+        ];
+
+        try {
+            Gdn::database()->query($query, $values);
+            $result = true;
+        } catch (\Exception $e) {
+            $result = false;
+        }
+
+        return $result;
+    }
+
+    /**
      * Updates visit level information such as date last active and the user's ip address.
      *
      * @param int $UserID
@@ -2895,31 +2947,13 @@ class UserModel extends Gdn_Model {
         if ($UserID == Gdn::session()->UserID) {
             $IP = Gdn::request()->ipAddress();
             $Fields['LastIPAddress'] = $IP;
+            $this->saveIP($UserID, $IP);
 
             if (Gdn::session()->newVisit()) {
                 $Fields['CountVisits'] = val('CountVisits', $User, 0) + 1;
                 $this->fireEvent('Visit');
             }
         }
-
-        // Generate the AllIPs field.
-        $AllIPs = val('AllIPAddresses', $User, []);
-        if (is_string($AllIPs)) {
-            $AllIPs = explode(',', $AllIPs);
-            setValue('AllIPAddresses', $User, $AllIPs);
-        }
-        if (!is_array($AllIPs)) {
-            $AllIPs = [];
-        }
-        if ($IP = val('InsertIPAddress', $User)) {
-            array_unshift($AllIPs, forceIPv4($IP));
-        }
-        if ($IP = val('LastIPAddress', $User)) {
-            array_unshift($AllIPs, $IP);
-        }
-        // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
-        $AllIPs = array_unique($AllIPs);
-        $Fields['AllIPAddresses'] = $AllIPs;
 
         // Set the hour offset based on the client's clock.
         if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
@@ -3699,15 +3733,12 @@ class UserModel extends Gdn_Model {
 
             setValue('PhotoUrl', $User, $PhotoUrl);
         }
-        if ($v = val('AllIPAddresses', $User)) {
-            if (is_string($v)) {
-                $IPAddresses = explode(',', $v);
-                foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = forceIPv4($IPAddress);
-                }
-                setValue('AllIPAddresses', $User, $IPAddresses);
-            }
-        }
+
+        // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
+        setValue('AllIPAddresses', $User, [
+            val('InsertIPAddress', $User),
+            val('LastIPAddress', $User)
+        ]);
 
         setValue('_CssClass', $User, '');
         if (val('Banned', $User)) {
@@ -4247,19 +4278,6 @@ class UserModel extends Gdn_Model {
 
         $this->defineSchema();
         $Fields = $this->Schema->fields();
-
-        if (isset($Property['AllIPAddresses'])) {
-            if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
-                $IPs = array_unique($IPs);
-                $Property['AllIPAddresses'] = implode(',', $IPs);
-                // Ensure this isn't too big for our column
-                while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
-                    array_pop($IPs);
-                    $Property['AllIPAddresses'] = implode(',', $IPs);
-                }
-            }
-        }
 
         $Set = array_intersect_key($Property, $Fields);
         self::serializeRow($Set);

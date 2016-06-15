@@ -218,11 +218,10 @@ class SplitMergePlugin extends Gdn_Plugin {
                     $CommentModel->Validation->results(true);
                     $CommentID = $CommentModel->save($Comment);
                     if ($CommentID) {
-                        // Move any attachments (FileUpload plugin awareness)
-                        if (class_exists('MediaModel')) {
-                            $MediaModel = new MediaModel();
-                            $MediaModel->reassign($Discussion['DiscussionID'], 'discussion', $CommentID, 'comment');
-                        }
+                        $Comment['CommentID'] = $CommentID;
+                        $this->EventArguments['SourceDiscussion'] = $Discussion;
+                        $this->EventArguments['TargetComment'] = $Comment;
+                        $this->fireEvent('TransformDiscussionToComment');
 
                         if ($RedirectLink) {
                             // The discussion needs to be changed to a moved link.

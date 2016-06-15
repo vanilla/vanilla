@@ -251,7 +251,7 @@ class PostController extends VanillaController {
                         $DraftID = $this->DraftModel->save($FormValues);
                         $this->Form->setValidationResults($this->DraftModel->validationResults());
                     } else {
-                        $DiscussionID = $this->DiscussionModel->save($FormValues, $this->CommentModel);
+                        $DiscussionID = $this->DiscussionModel->save($FormValues);
                         $this->Form->setValidationResults($this->DiscussionModel->validationResults());
 
                         if ($DiscussionID > 0) {
@@ -899,7 +899,6 @@ class PostController extends VanillaController {
      */
     public function initialize() {
         parent::initialize();
-        $this->addModule('NewDiscussionModule');
 
         $this->CssClass = 'NoPanel';
     }

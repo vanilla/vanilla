@@ -41,12 +41,14 @@ $Session = Gdn::session();
                 <td class="Alt"><?php echo $Target; ?></td>
                 <td class="Alt"><?php echo $RouteType; ?></td>
                 <td>
+                    <div class="btn-group">
                     <?php
                     echo anchor(t('Edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute btn btn-edit');
                     if (!$Reserved)
                         echo anchor(t('Delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute btn btn-delete');
 
                     ?>
+                    </div>
                 </td>
             </tr>
             <?php

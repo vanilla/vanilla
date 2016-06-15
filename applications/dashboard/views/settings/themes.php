@@ -16,14 +16,15 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
         ?>
     </div>
 <?php Gdn_Theme::assetEnd(); ?>
-<div class="header-block">
-    <h1><?php echo t('Manage Themes'); ?></h1>
-    <?php
-    if ($AddonUrl != '') {
-        echo anchor(t('Get More Themes').' <span class="icon icon-external-link"></span>', $AddonUrl, 'btn btn-primary');
-    }
-    ?>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
 </div>
+<?php
+//if ($AddonUrl != '') {
+//    echo anchor(t('Get More Themes').' <span class="icon icon-external-link"></span>', $AddonUrl, 'btn btn-primary');
+//}
+?>
 <?php echo $this->Form->errors(); ?>
     <div class="Messages Errors TestAddonErrors Hidden">
         <ul>

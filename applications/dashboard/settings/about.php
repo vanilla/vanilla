@@ -12,5 +12,6 @@ $ApplicationInfo['Dashboard'] = array(
     'AuthorUrl' => 'http://vanillaforums.org',
     'License' => 'GNU GPL v2',
     'Priority' => 5,
-    'Hidden' => true
+    'Hidden' => true,
+    'Icon' => 'dashboard.png'
 );

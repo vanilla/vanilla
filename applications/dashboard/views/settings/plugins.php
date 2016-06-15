@@ -20,7 +20,7 @@ if ($this->addonType === 'applications') {
         t('LocaleHelp', 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.'),
         '<code>'.PATH_ROOT.'/locales</code>'
     );
-    $getMore = wrap(Anchor(t('Get More Locales'), $addonUrl), 'li');
+    $getMore = wrap(Anchor(t('Get More Locales').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->data('AvailableLocales');
     $enabledAddons = $this->data('EnabledLocales');
     $this->Filter = 'all';
@@ -32,7 +32,7 @@ if ($this->addonType === 'applications') {
         t('PluginHelp'),
         '<code>'.PATH_PLUGINS.'</code>'
     );
-    $getMore = wrap(Anchor(t('Get More Plugins'), $addonUrl), 'li');
+    $getMore = wrap(Anchor(t('Get More Plugins').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailablePlugins;
     $enabledAddons = $this->EnabledPlugins;
 }
@@ -95,7 +95,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                 $RowClass .= ' Alt';
             }
 
-            $IconPath = val('IconUrl', $addonInfo, '/applications/dashboard/design/images/plugin-icon.png');
+            $IconPath = val('IconUrl', $addonInfo, '/applications/dashboard/design/images/addon-place-holder.png');
 
             ?>
             <li <?php echo 'id="'.Gdn_Format::url(strtolower($addonName)).'-plugin"', ' class="media More '.$RowClass.'"'; ?>>

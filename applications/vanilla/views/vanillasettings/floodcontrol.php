@@ -8,12 +8,15 @@ $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5
 
 $ConversationsEnabled = Gdn::ApplicationManager()->IsEnabled('Conversations');
 
+Gdn_Theme::assetBegin('Help');
+echo '<h2>'.$this->data('Title').'</h2>';
+echo '<p>'.t('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.').'</p>';
+Gdn_Theme::assetEnd();
+
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <h1><?php echo t('Flood Control'); ?></h1>
-<div
-    class="Info"><?php echo t('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.'); ?></div>
 <div class="table-wrap">
     <table class="AltColumns">
         <thead>

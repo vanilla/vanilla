@@ -18,7 +18,9 @@ $Session = Gdn::session();
         ?>
     </div>
     <?php Gdn_Theme::assetEnd(); ?>
+<div class="header-block">
     <h1><?php echo t('Banner'); ?></h1>
+</div>
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();

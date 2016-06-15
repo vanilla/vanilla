@@ -1,8 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
-    <div
-        class="Info"><?php echo t('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'); ?></div>
 <?php
+
+Gdn_Theme::assetBegin('Help');
+echo '<h2>'.$this->data('Title').'</h2>';
+echo '<p>'.t('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.').'</p>';
+Gdn_Theme::assetEnd();
+
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>

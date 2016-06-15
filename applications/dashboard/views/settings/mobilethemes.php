@@ -8,10 +8,10 @@ Gdn_Theme::assetBegin('Help'); ?>
 <p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
 <?php Gdn_Theme::assetEnd();
 ?>
-
-<h1>
-    <?php echo t('Manage Mobile Themes'); ?>
-</h1>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>" class="active"><?php echo t('Mobile Themes'); ?></a>
+</div>
 <?php echo $this->Form->errors(); ?>
 
 <div class="Messages Errors TestAddonErrors Hidden">

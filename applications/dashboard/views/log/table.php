@@ -1,6 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
 include $this->fetchViewLocation('helper_functions');
-PagerModule::write(array('Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard'));
 ?>
 <div class="table-wrap">
     <table id="Log" class="AltColumns">

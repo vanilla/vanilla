@@ -56,6 +56,7 @@ $this->DefaultRolesWarning();
                     ?>
                 </td>
                 <td>
+                    <div class="btn-group">
                     <?php
                     if ($Role['CanModify']) {
                         echo anchor(t('Edit'), "/role/edit/{$Role['RoleID']}", 'btn btn-edit');
@@ -64,6 +65,7 @@ $this->DefaultRolesWarning();
                         }
                     }
                     ?>
+                    </div>
                 </td>
             </tr>
         <?php } ?>

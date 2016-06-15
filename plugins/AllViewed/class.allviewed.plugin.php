@@ -17,7 +17,8 @@ $PluginInfo['AllViewed'] = array(
     'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',
     'AuthorUrl' => 'http://lincolnwebs.com',
     'License' => 'GNU GPLv2',
-    'MobileFriendly' => true
+    'MobileFriendly' => true,
+    'Icon' => 'all-viewed.png'
 );
 
 /**

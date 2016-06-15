@@ -5,29 +5,28 @@ if (!function_exists('renderDashboardNav')) {
     {
         foreach ($items as $item) {
             if (val('type', $item) == 'group') { ?>
-                <div class="Box Group <?php echo val('cssClass', $item); ?>">
-                <h4><?php echo val('text', $item); ?></h4>
-                <ul class="PanelInfo">
+                <h4><a data-toggle="collapse" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
+                <ul class="nav nav-pills nav-stacked collapse" id="<?php echo trim(val('headerCssClass', $item)); ?>">
                 <?php
                 if (val('items', $item)) {
                     renderDashboardNav(val('items', $item));
                 }
-                echo '</ul></div>';
+                echo '</ul>';
             }
             if (val('type', $item) == 'link') { ?>
-                <li role="presentation"
-                    <?php if (val('listItemCssClass', $item)) { ?>class="<?php echo val('listItemCssClass', $item); ?>"<?php } ?>>
-                    <?php if (val('icon', $item)) {
-                        echo icon(val('icon', $item));
-                    } ?>
-                    <a role="menuitem" class="nav-link <?php echo val('cssClass', $item); ?>" tabindex="-1"
-                       href="<?php echo val('url', $item); ?>"><?php echo val('text', $item); ?></a>
-                    <?php if (val('badge', $item)) {
-                        echo badge(val('badge', $item));
-		    } if (val('popinRel', $item)) {
-			decho('here');
-			echo '<span class="Popin" rel="'.val('popinRel', $item).'"></span >';
-                    } ?>
+                <li role="presentation" <?php if (val('listItemCssClass', $item)) { ?>class="nav-item <?php echo strtolower(val('listItemCssClass', $item)); ?>"<?php } ?>>
+                    <a role="menuitem" class="nav-link <?php echo val('cssClass', $item).' '.strtolower(val('listItemCssClass', $item));?>" tabindex="-1" href="<?php echo val('url', $item); ?>">
+                        <?php
+                        if (val('icon', $item)) {
+                            echo icon(val('icon', $item)).' ';
+                        }
+                        echo val('text', $item);
+                        if (val('popinRel', $item)) {
+                            echo ' <span class="Popin badge" rel="'.val('popinRel', $item).'"></span >';
+                        }
+                        ?>
+                    </a>
+		   <?php }?>
 		</li>
 	    <?php }
 	    if (val('type', $item) == 'dropdown') {
@@ -39,7 +38,7 @@ if (!function_exists('renderDashboardNav')) {
 	    </li>
 	<?php }
 	}
-    }
-}
-
-renderDashboardNav($items);
+} ?>
+<div class="panel-nav js-panel-nav">
+    <?php renderDashboardNav($items); ?>
+</div>

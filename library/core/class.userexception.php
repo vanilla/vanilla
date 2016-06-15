@@ -21,6 +21,6 @@ class Gdn_UserException extends Exception {
      * @param Exception $Previous The previous exception used for exception chaining.
      */
     public function __construct($Message, $Code = 400, $Previous = null) {
-        parent::__construct($Message, $Code, $Previous);
+        parent::__construct($Message, (int)$Code, $Previous);
     }
 }

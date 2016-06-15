@@ -19,6 +19,8 @@ class DashboardV3ThemeHooks implements Gdn_IPlugin {
         $sender->addJsFile('vendors/tooltip.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/popover.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/drop.min.js', 'themes/dashboard3');
+        $sender->addJsFile('vendors/collapse.js', 'themes/dashboard3');
+        $sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/prettify/prettify.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/ace/ace.js', 'themes/dashboard3');
         $sender->addCssFile('vendors/tomorrow.css', 'themes/dashboard3');

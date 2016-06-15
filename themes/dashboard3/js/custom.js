@@ -11,8 +11,8 @@
 (function($) {
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
-        start: function() {
-            $('.js-code-input').each(function () {
+        start: function(element) {
+            $('.js-code-input', element).each(function () {
                 codeInput.makeAceTextArea($(this));
             });
         },
@@ -66,24 +66,53 @@
         }
     });
 
-    $(document).on('contentLoad', function () {
+    function prettyPrintInit(element) {
         // Pretty print
-        $('#Pockets td:nth-child(4)').each(function () {
+        $('#Pockets td:nth-child(4)', element).each(function () {
             var html = $(this).html();
             $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
         });
-        $('pre').addClass('prettyprint lang-html');
+        $('pre', element).addClass('prettyprint lang-html');
         prettyPrint();
+    }
 
+    function aceInit(element) {
         // Editor classes
-        codeInput.init($('.pockets #Form_Body'), 'html', 200);
-        codeInput.init($('#Form_CustomHtml'), 'html', 800);
-        codeInput.init($('#Form_CustomCSS'), 'css', 800);
-        codeInput.start();
+        codeInput.init($('.pockets #Form_Body', element), 'html', 200);
+        codeInput.init($('#Form_CustomHtml', element), 'html', 800);
+        codeInput.init($('#Form_CustomCSS', element), 'css', 800);
+        codeInput.start(element);
+    }
 
+    function scrollToFixedInit(element) {
+        var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
+        var minOffset = $('.navbar').outerHeight(true) + panelPadding;
+
+        $('.js-sticky > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+        $('.js-sticky > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+
+        $('.js-sticky', element).each(function() {
+            $(this).scrollToFixed({
+                zIndex: 1000,
+                marginTop: function () {
+                    var marginTop = $(window).height() - $(this).outerHeight(true) - minOffset;
+                    if (marginTop >= 0) {
+                        return minOffset;
+                    }
+                    return marginTop;
+                }
+            });
+        });
+
+        $('.navbar', element).scrollToFixed({
+            zIndex: 1005
+        });
+    }
+
+    function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
         new Drop({
-            target: document.querySelector('.navbar .js-card-user'),
+            target: document.querySelector('.navbar .js-card-user', element),
             content: html,
             constrainToWindow: true,
             tetherOptions: {
@@ -91,13 +120,22 @@
                 targetAttachment: 'top right',
                 offset: '2rem 0'
             }
-        });
+        })
+    }
+
+    function collapseInit(element) {
+        var active = $('.js-panel-nav a.active', element);
+        var collapsible = active.parents('.collapse');
+        collapsible.addClass('in');
+        $('a[href=#'+ collapsible.attr('id') +']').attr('aria-expanded', 'true');
+    }
+
+    $(document).on('contentLoad', function(e) {
+        prettyPrintInit(e.target);
+        aceInit(e.target);
+        scrollToFixedInit(e.target);
+        userDropDownInit(e.target);
+        collapseInit(e.target);
     });
-
-
-
-
-
-
 
 })(jQuery);

@@ -405,7 +405,7 @@ if (!function_exists('writeFilterTabs')) :
         }
 
         if (c('Vanilla.Discussions.ShowCounts', true)) {
-            $Bookmarked .= countString($CountBookmarks, url('/discussions/UserBookmarkCount'));
+            $Bookmarked .= countString($CountBookmarks, '/discussions/UserBookmarkCount');
             $MyDiscussions .= countString($CountDiscussions);
             $MyDrafts .= countString($CountDrafts);
         }

@@ -29,7 +29,7 @@ form {
   line-height: 1.5;
   padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
   padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-  border: .0625rem solid #ccc;
+  border: $border-width solid #ccc;
 }
 
 // Quick and dirty horizontal form
@@ -109,15 +109,20 @@ form {
   }
 
   > .label-wrap-wide {
-    @extend .col-sm-20;
-
-    + .input-wrap {
-      @extend .col-sm-4;
-    }
+    @extend .row-padding-left;
+    flex-grow: 3;
   }
 
   .input-wrap-right {
     @extend .row-padding-right;
+  }
+}
+
+.input-wrap-multiple {
+  display: flex;
+
+  > *:last-child {
+    margin-left: $spacer / 2;
   }
 }
 
@@ -316,12 +321,12 @@ form {
 
 .color-picker-preview {
   position: absolute;
-  top: $padding-default / 4;
-  right: ($padding-default / 4) + $border-width-rem;
-  width: 40px;
-  height: 27px;
+  top: $spacer / 4;
+  right: ($spacer / 4) + $border-width-rem;
+  width: 2.5rem;
+  height: 2rem - ($spacer / 4);
   background: $black;
-  border: 1px solid transparent;
+  border: $border-width solid $border-color;
   cursor: pointer;
 }
 
@@ -348,7 +353,7 @@ form {
   top: 0;
   right: 0;
   left: 0;
-  line-height: 1;
+  padding: $control-padding-y $spacer * 3 / 4;
   color: $grey;
   border: $input-btn-border-width solid $input-border-color;
   border-radius: $border-radius;
@@ -459,6 +464,10 @@ select {
   @include list-reset();
 
   label {
+    padding-left: 0;
+  }
+
+  label {
     cursor: pointer;
   }
 
@@ -506,7 +515,7 @@ select {
   .image-wrap {
     position: relative;
     display: block;
-    margin-bottom: $spacer;
+    margin-bottom: $spacer / 2;
 
     &:hover .overlay {
       height: 100%;
@@ -570,7 +579,7 @@ select {
   @extend .col-lg-8;
   @extend .col-xl-6;
 
-  padding: ($spacer / 2) $spacer $spacer;
+  padding: $spacer $spacer ($spacer / 2);
 }
 
 // Search input
@@ -591,10 +600,14 @@ select {
 .search-wrap {
   position: relative;
 
+  .form-control {
+    border-radius: 1.25rem;
+  }
+
   &::before {
     position: absolute;
     top: .375rem;
-    right: 1rem;
+    left: 1rem;
     line-height: $font-size-base * $line-height;
     @extend %icon;
     @include char-content($icon-search);

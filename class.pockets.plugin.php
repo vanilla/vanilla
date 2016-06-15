@@ -17,7 +17,8 @@ $PluginInfo['Pockets'] = array(
     'SettingsPermission' => 'Plugins.Pockets.Manage',
     'MobileFriendly' => true,
     'HasLocale' => true,
-    'License' => 'GNU GPLv2'
+    'License' => 'GNU GPLv2',
+    'Icon' => 'pocket.png'
 );
 
 /**

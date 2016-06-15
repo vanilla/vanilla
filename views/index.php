@@ -1,24 +1,26 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-
+<?php if (!defined('APPLICATION')) exit();
+Gdn_Theme::assetBegin('Help');
+echo '<h2>'.sprintf(t('About %s'), t('Pockets')).'</h2>';
+echo '<div>'.t('Pockets allow you to add free-form HTML to various places around the application.').'</div>';
+Gdn_Theme::assetEnd();
+?>
 <div class="header-block">
 <?php echo wrap($this->data('Title'), 'h1');
 echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary'); ?>
 </div>
-<div class="Info"><?php echo t('Pockets allow you to add free-form HTML to various places around the application.'); ?>
-    <div class="table-wrap">
-        <table>
-            <tr>
-                <td width="200"><?php
-                if (C('Plugins.Pockets.ShowLocations')) {
-                    echo anchor(t('Hide Pocket Locations'), '/settings/pockets/hidelocations', 'SmallButton');
-                } else {
-                    echo anchor(t('Show Pocket Locations'), '/settings/pockets/showlocations', 'SmallButton');
-                }
-                ?></td>
-                <td><?php echo t('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
-            </tr>
-        </table>
-    </div>
+<div class="table-wrap">
+    <table>
+        <tr>
+            <td width="200"><?php
+            if (C('Plugins.Pockets.ShowLocations')) {
+                echo anchor(t('Hide Pocket Locations'), '/settings/pockets/hidelocations', 'SmallButton');
+            } else {
+                echo anchor(t('Show Pocket Locations'), '/settings/pockets/showlocations', 'SmallButton');
+            }
+            ?></td>
+            <td><?php echo t('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
+        </tr>
+    </table>
 </div>
 <div class="table-wrap">
     <table id="Pockets" class="AltColumns">
@@ -61,7 +63,6 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
                     if ($NoAds) {
                         echo '<div class="info">(', t('Users with the no ads permission will not see this pocket.'), ')</div>';
                     }
-                    echo'</div>';
                     '</td>';
                 echo '<td><pre style="white-space: pre-wrap;">', nl2br(htmlspecialchars(substr($PocketRow['Body'], 0, 200))), '</pre></td>';
                 echo '<td><div class="btn-group">',
@@ -74,4 +75,3 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
         </tbody>
     </table>
 </div>
-<?php echo $this->Form->close(''); ?>

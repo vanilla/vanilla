@@ -34,11 +34,13 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
                 <td><?php echo htmlspecialchars($Row['Notes']); ?></td>
                 <td>
+                    <div class="btn-group">
                     <?php
                     echo Gdn_Theme::link("/dashboard/settings/bans/edit?id={$Row['BanID']}", t('Edit'), null, array('class' => 'btn btn-edit Edit'));
                     echo ' ';
                     echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'btn btn-delete Delete'));
                     ?>
+                    </div>
                 </td>
             </tr>
         <?php

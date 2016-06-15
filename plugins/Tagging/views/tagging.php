@@ -6,26 +6,25 @@ $TagType = $this->data('_TagType');
 $TagTypes = $this->data('_TagTypes');
 $CanAddTags = $this->data('_CanAddTags');
 
+Gdn_Theme::assetBegin('Help');
+echo '<h2>'.sprintf(t('About %s'), t('Tagging')).'</h2>';
+echo t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
+Gdn_Theme::assetEnd();
 ?>
 
     <h1><?php echo t($this->Data['Title']); ?></h1>
-    <div class="Info">
-        <?php echo t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.'); ?>
-    </div>
 
 <?php echo $this->Form->open(); ?>
-    <div class="Wrap">
+    <?php echo '<p>', t('Search for a tag.', 'Search for all or part of a tag.'), '</p>'; ?>
+    <div class="search-wrap">
         <?php
         echo $this->Form->errors();
-
-        echo '<p>', t('Search for a tag.', 'Search for all or part of a tag.'), '</p>';
-
         echo $this->Form->textBox('Search');
         echo ' '.$this->Form->button(t('Go'));
         //printf(t('%s tag(s) found.'), $this->data('RecordCount'));
         ?>
     </div>
-    <div class="Wrap">
+    <div class="Wrap padded">
         <?php
         echo t('Click a tag name to edit. Click x to remove.');
         echo ' ';

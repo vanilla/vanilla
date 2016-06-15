@@ -13,5 +13,6 @@ $ApplicationInfo['Vanilla'] = array(
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'License' => 'GPL v2',
-    'Hidden' => true
+    'Hidden' => true,
+    'Icon' => 'vanilla.png'
 );

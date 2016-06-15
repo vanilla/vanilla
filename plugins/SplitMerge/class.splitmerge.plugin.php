@@ -15,7 +15,8 @@ $PluginInfo['SplitMerge'] = array(
     'HasLocale' => true,
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'split-merge.png'
 );
 
 /**

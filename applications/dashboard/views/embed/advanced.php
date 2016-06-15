@@ -1,26 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 $AllowEmbed = c('Garden.Embed.Allow');
 ?>
-<style type="text/css">
-    .Info form ul {
-        margin: 0;
-        padding: 0;
-    }
-
-    .Info form li {
-        list-style: none;
-    }
-
-    form em {
-        font-size: 11px;
-        color: #999;
-    }
-
-    p.WarningMessage {
-        padding: 6px;
-        margin-bottom: 20px;
-    }
-</style>
 <h1><?php echo t('Advanced Embed Settings'); ?></h1>
 <div class="Info">
     <?php

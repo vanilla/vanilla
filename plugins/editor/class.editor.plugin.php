@@ -20,7 +20,8 @@ $PluginInfo['editor'] = array(
       'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
    ),
    'SettingsUrl' => '/settings/editor',
-   'SettingsPermission' => 'Garden.Settings.Manage'
+   'SettingsPermission' => 'Garden.Settings.Manage',
+   'Icon' => 'advanced-editor.png'
 );
 
 /**

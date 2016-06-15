@@ -18,7 +18,8 @@ $PluginInfo['OpenID'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'open-id.png'
 );
 
 // 0.2 - Remove redundant enable toggle (2012-03-08 Lincoln)

@@ -30,8 +30,12 @@ $Fields = $this->data('ExtendedFields');
                 <td><?php echo (val('OnRegister', $Field, 0)) ? t('Yes') : t('No'); ?></td>
                 <td><?php echo (val('OnProfile', $Field, 1)) ? t('Yes') : t('No'); ?></td>
                 <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? t('Yes') : t('No'); ?></td>-->
-                <td><?php echo anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup btn btn-edit').
-                        ' '.anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup btn btn-delete'); ?></td>
+                <td>
+                    <div class="btn-group">
+                    <?php echo anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup btn btn-edit').
+                        ' '.anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup btn btn-delete'); ?>
+                    </div>
+                </td>
             </tr>
         <?php endforeach; ?>
         </tbody>

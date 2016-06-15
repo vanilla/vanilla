@@ -6,6 +6,8 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
+        echo wrap(t('Heads up!'), 'h2');
+        echo '<div>', t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
         echo wrap(t('Need More Help?'), 'h2');
         echo '<ul>';
         echo wrap(Anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'), 'li');
@@ -25,12 +27,11 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
     ?>
     </div>
 </div>
-<?php echo $this->Form->open(array('action' => url('/user/browse'))); ?>
-    <div class="Wrap">
+<div class="toolbar">
+    <div class="toolbar-search">
         <?php
+        echo $this->Form->open(array('action' => url('/user/browse')));
         echo $this->Form->errors();
-
-        echo '<div>', t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
 
         echo '<div class="search-wrap input-wrap">';
         echo $this->Form->textBox('Keywords');
@@ -42,7 +43,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
             echo ' ', sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
         }
         echo '</div>';
-
+        echo $this->Form->close();
         ?>
     </div>
     <div class="Wrap">
@@ -55,6 +56,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
    </span>-->
     </div>
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
+</div>
     <div class="table-wrap">
         <table id="Users" class="AltColumns">
             <thead>
@@ -81,5 +83,3 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         </table>
     </div>
 <?php
-PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard'));
-echo $this->Form->close();

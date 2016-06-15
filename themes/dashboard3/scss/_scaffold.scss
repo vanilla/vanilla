@@ -3,11 +3,15 @@
 // No styleguide reference.
 
 .main {
+
+  // Ensure the footer is flush with the bottom of the window if the
+  // page height is less than the window height.
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   margin-top: -$navbar-height;
   padding-top: $navbar-height;
+
   max-width: 1024px;
   background-color: $white;
   border: 1px solid $border-color;

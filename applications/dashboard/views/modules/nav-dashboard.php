@@ -5,7 +5,7 @@ if (!function_exists('renderDashboardNav')) {
     {
         foreach ($items as $item) {
             if (val('type', $item) == 'group') { ?>
-                <h4><a data-toggle="collapse" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
+                <h4><a data-toggle="collapse" class="collapsed" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
                 <ul class="nav nav-pills nav-stacked collapse" id="<?php echo trim(val('headerCssClass', $item)); ?>">
                 <?php
                 if (val('items', $item)) {
@@ -39,6 +39,6 @@ if (!function_exists('renderDashboardNav')) {
 	<?php }
 	}
 } ?>
-<div class="panel-nav js-panel-nav">
+<div class="nav-collapsible js-nav-collapsible">
     <?php renderDashboardNav($items); ?>
 </div>

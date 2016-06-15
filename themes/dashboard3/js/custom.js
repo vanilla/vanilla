@@ -56,16 +56,6 @@
         }
     };
 
-    $(document).on('change', '.js-file-upload', function () {
-        var filename = $(this).val();
-        if (filename.substring(3, 11) === 'fakepath') {
-            filename = filename.substring(12);
-        }
-        if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
-        }
-    });
-
     function prettyPrintInit(element) {
         // Pretty print
         $('#Pockets td:nth-child(4)', element).each(function () {
@@ -88,10 +78,9 @@
         var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
         var minOffset = $('.navbar').outerHeight(true) + panelPadding;
 
-        $('.js-sticky > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-        $('.js-sticky > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-
-        $('.js-sticky', element).each(function() {
+        $('.js-scroll-to-fixed > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+        $('.js-scroll-to-fixed > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+        $('.js-scroll-to-fixed', element).each(function() {
             $(this).scrollToFixed({
                 zIndex: 1000,
                 marginTop: function () {
@@ -124,10 +113,10 @@
     }
 
     function collapseInit(element) {
-        var active = $('.js-panel-nav a.active', element);
+        var active = $('.js-nav-collapsible a.active', element);
         var collapsible = active.parents('.collapse');
         collapsible.addClass('in');
-        $('a[href=#'+ collapsible.attr('id') +']').attr('aria-expanded', 'true');
+        $('a[href=#' + collapsible.attr('id') + ']').attr('aria-expanded', 'true');
     }
 
     $(document).on('contentLoad', function(e) {
@@ -136,6 +125,21 @@
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
         collapseInit(e.target);
+    });
+
+    $(document).on('click', '.panel-nav .collapsed', function () {
+        $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
+        scrollToFixedInit($('.panel-nav'));
+    });
+
+    $(document).on('change', '.js-file-upload', function () {
+        var filename = $(this).val();
+        if (filename.substring(3, 11) === 'fakepath') {
+            filename = filename.substring(12);
+        }
+        if (filename) {
+            $(this).parent().find('.file-upload-choose').html(filename);
+        }
     });
 
 })(jQuery);

@@ -107,9 +107,9 @@ Gdn_Theme::assetEnd();
 </div>
 <div class="container-fluid body">
     <div class="row main-row">
-        <div class="col-sm-0 col-md-8 col-lg-6 col-xl-5 panel panel-nav panel-left">
-            <div class="panel-content">
-                <div class="js-sticky">
+        <div class="col-sm-0 col-md-8 col-lg-6 col-xl-5 panel panel-left">
+            <div class="panel-content panel-nav">
+                <div class="js-scroll-to-fixed">
                 <?php echo anchor($title, '/', 'title'); ?>
                 <?php echo $dashboardNav; ?>
                 </div>
@@ -134,7 +134,7 @@ Gdn_Theme::assetEnd();
         </div>
         <div class="col-sm-0 col-md-0 col-lg-6 col-xl-5 panel panel-help panel-right">
             <div class="panel-content">
-                <div class="js-sticky">
+                <div class="js-scroll-to-fixed">
                     <?php $this->renderAsset('Help'); ?>
                 </div>
             </div>

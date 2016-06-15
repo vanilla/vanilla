@@ -1,0 +1,9 @@
+.toolbar {
+  display: flex;
+  padding-top: $spacer;
+  padding-bottom: 0;
+
+  .toolbar-search {
+    flex-grow: 4;
+  }
+}

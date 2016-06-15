@@ -62,6 +62,7 @@ $PhotoIDExists = $Construct->columnExists('PhotoID');
 $PhotoExists = $Construct->columnExists('Photo');
 $UserExists = $Construct->tableExists();
 $ConfirmedExists = $Construct->columnExists('Confirmed');
+$AllIPAddressesExists = $Construct->columnExists('AllIPAddresses');
 
 $Construct
     ->primaryKey('UserID')
@@ -765,54 +766,56 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->set($Explicit, $Drop);
 
-// Migrate legacy IP data into UserIP table in batches of 10,000.
-$limit = 10000;
-$offset = 1;
-$legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
-    ->from('User')
-    ->where('AllIPAddresses is not null')
-    ->get()
-    ->resultArray();
-
-do {
-    foreach ($legacyIPAddresses as $currentLegacy) {
-        $allIPAddresses = explode(',', $currentLegacy['AllIPAddresses']);
-        $dateLastActive = val('DateLastActive', $currentLegacy);
-        $insertIPAddress = val('InsertIPAddress', $currentLegacy);
-        $lastIPAddress = val('LastIPAddress', $currentLegacy);
-        $userID = val('UserID', $currentLegacy);
-
-        if (!empty($lastIPAddress)) {
-            Gdn::userModel()->saveIP(
-                $userID,
-                $lastIPAddress,
-                $dateLastActive
-            );
-        }
-
-        if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
-            Gdn::userModel()->saveIP(
-                $userID,
-                $insertIPAddress
-            );
-        }
-
-        $this->SQL->update('User')
-            ->set('AllIPAddresses', null)
-            ->where('UserID', $userID)
-            ->limit(1)
-            ->put();
-    }
-
-    $offset += $limit;
+// If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
+if ($AllIPAddressesExists) {
+    $limit = 10000;
+    $offset = 1;
     $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
         ->from('User')
         ->where('AllIPAddresses is not null')
-        ->limit($limit, $offset)
         ->get()
         ->resultArray();
-} while (count($legacyIPAddresses) > 0);
-unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $offset);
+
+    do {
+        foreach ($legacyIPAddresses as $currentLegacy) {
+            $allIPAddresses = explode(',', $currentLegacy['AllIPAddresses']);
+            $dateLastActive = val('DateLastActive', $currentLegacy);
+            $insertIPAddress = val('InsertIPAddress', $currentLegacy);
+            $lastIPAddress = val('LastIPAddress', $currentLegacy);
+            $userID = val('UserID', $currentLegacy);
+
+            if (!empty($lastIPAddress)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $lastIPAddress,
+                    $dateLastActive
+                );
+            }
+
+            if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $insertIPAddress
+                );
+            }
+
+            $this->SQL->update('User')
+                ->set('AllIPAddresses', null)
+                ->where('UserID', $userID)
+                ->limit(1)
+                ->put();
+        }
+
+        $offset += $limit;
+        $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+            ->from('User')
+            ->where('AllIPAddresses is not null')
+            ->limit($limit, $offset)
+            ->get()
+            ->resultArray();
+    } while (count($legacyIPAddresses) > 0);
+    unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $offset);
+}
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.

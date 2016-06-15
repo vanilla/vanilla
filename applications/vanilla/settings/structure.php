@@ -403,55 +403,6 @@ if (!$LastDiscussionIDExists) {
         ->put();
 }
 
-// Migrate legacy IP data into UserIP table in batches of 10,000.
-$limit = 10000;
-$offset = 1;
-$legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
-    ->from('User')
-    ->where('AllIPAddresses is not null')
-    ->get()
-    ->resultArray();
-
-do {
-    foreach ($legacyIPAddresses as $currentLegacy) {
-        $allIPAddresses = explode(',', $currentLegacy['AllIPAddresses']);
-        $dateLastActive = val('DateLastActive', $currentLegacy);
-        $insertIPAddress = val('InsertIPAddress', $currentLegacy);
-        $lastIPAddress = val('LastIPAddress', $currentLegacy);
-        $userID = val('UserID', $currentLegacy);
-
-        if (!empty($lastIPAddress)) {
-            Gdn::userModel()->saveIP(
-                $userID,
-                $lastIPAddress,
-                $dateLastActive
-            );
-        }
-
-        if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
-            Gdn::userModel()->saveIP(
-                $userID,
-                $insertIPAddress
-            );
-        }
-
-        $this->SQL->update('User')
-            ->set('AllIPAddresses', null)
-            ->where('UserID', $userID)
-            ->limit(1)
-            ->put();
-    }
-
-    $offset += $limit;
-    $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
-        ->from('User')
-        ->where('AllIPAddresses is not null')
-        ->limit($limit, $offset)
-        ->get()
-        ->resultArray();
-} while (count($legacyIPAddresses) > 0);
-unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $offset);
-
 // Add stub content
 include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 

@@ -4,22 +4,27 @@
 //
 // No styleguide reference.
 
-.nav-heading {
+.nav-heading a {
   display: block;
   padding-top: 1rem;
   padding-bottom: 1rem;
   padding-left: .75rem;
-  margin-top: 0;
-  margin-bottom: .25rem;
   border-bottom: 1px dotted rgba(0,0,0,.0875);
   font-size: $font-size-sm;
   font-weight: 500;
   text-transform: uppercase;
+  text-decoration: none;
+  transition: rotate .5s;
 
   &::before {
     @extend .caret;
+    rotate: -90deg;
     margin-left: -1rem;
     margin-right: .5rem;
+  }
+
+  &[aria-expanded=true]::before {
+    rotate: 0deg;
   }
 }
 
@@ -36,9 +41,21 @@
   }
 }
 
-.panel {
+.panel-nav {
   a {
     color: $grey;
+  }
+
+  .badge {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 ($spacer / 4);
+    margin-left: $spacer / 4;
+    font-size: $font-size-xs;
+    background-color: $grey;
+    background-color: rgba(0,0,0,.1875);
+    color: $white;
+    border-radius: .25rem;
   }
 
   .nav-link {
@@ -77,4 +94,3 @@
     cursor: pointer;
   }
 }
-

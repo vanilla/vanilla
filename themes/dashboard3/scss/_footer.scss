@@ -2,10 +2,11 @@
   @extend .row;
   justify-content: space-between;
   align-items: center;
-
+  padding-left: $padding-default;
+  padding-right: $padding-default;
+  border-top: 1px solid $border-color;
   font-color: $black;
-  border-left: 1px solid $border-color;
-  border-right: 1px solid $border-color;
+  background-color: $body-bg;
 
   .vanilla-logo {
     width: 4rem;

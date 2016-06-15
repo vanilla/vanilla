@@ -14,28 +14,3 @@
     @extend .media-heading;
   }
 }
-
-.DataList li {
-  @extend .media;
-
-  .IconWrap {
-    margin-right: $spacer / 2;
-  }
-
-  .Connection-Info {
-    @extend .media-body;
-  }
-
-  .Connection-Buttons {
-    @extend .media-right;
-  }
-
-  .Connection-Name {
-    @extend .h4;
-    @extend .media-heading;
-
-    .Addendums {
-      @extend small;
-    }
-  }
-}

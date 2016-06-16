@@ -36,8 +36,4 @@ $dispatcher = Gdn::dispatcher();
 
 // Process the request.
 $dispatcher->start();
-$foo = Gdn_Upload::isUploadUri('userpics/679/FPNH7GFCMGBA.jpg');
-$foo2 = Gdn_Upload::isUploadUri('http://foo.com/userpics/679/FPNH7GFCMGBA.jpg');
-$foo3 = Gdn_Upload::isUploadUri('cc://foo.com/userpics/679/FPNH7GFCMGBA.jpg');
-
 $dispatcher->dispatch();

@@ -32,4 +32,4 @@ $PageParam = 'p'.($CurrentPage + 1);
 $Pager .= anchor('', $pager->PageUrl($CurrentPage + 1), $disabled.' Next btn btn-secondary icon icon-chevron-right', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
 $Pager .= '</div>';
 
-echo sprintf($pager->Wrapper, Attribute(array('class' => $pager->CssClass)), $Pager);
+echo '<div class="pager-wrap">'.$Pager.'</div>';

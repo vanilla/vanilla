@@ -20,7 +20,7 @@ foreach ($this->UserData->result() as $User) {
                         <?php echo userAnchor($User, 'Username'); ?>
                     </div>
                     <?php if ($ViewPersonalInfo) : ?>
-                    <div class="Info info"><?php echo Gdn_Format::Email($User->Email); ?></div>
+                    <div class="user-email info"><?php echo Gdn_Format::Email($User->Email); ?></div>
                     <?php endif; ?>
                 </div>
             </div>

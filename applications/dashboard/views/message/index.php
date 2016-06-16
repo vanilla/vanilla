@@ -23,7 +23,7 @@ $Session = Gdn::session();
         <tr id="0">
             <th><?php echo t('Location'); ?></th>
             <th class="Alt"><?php echo t('Message'); ?></th>
-            <th><?php echo t('Options'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

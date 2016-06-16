@@ -4,10 +4,13 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
 
 Gdn_Theme::assetBegin('Help'); ?>
 <h2><?php echo sprintf(t('About %s'), t('Mobile Themes')); ?></h2>
-<p class="P"><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
-<p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+<p><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
+<p><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
 <?php Gdn_Theme::assetEnd();
 ?>
+<svg display="none">
+    <symbol viewBox="0 0 252 281" id="mobile-frame"><g fill-rule="evenodd"><path d="M3.15,15.7582284 C3.15,8.79489615 8.78765609,3.15 15.7571747,3.15 L236.242825,3.15 C243.205576,3.15 248.85,8.78126062 248.85,15.7582284 L248.85,280.35 L3.15,280.35 L3.15,15.7582284 L3.15,15.7582284 L3.15,15.7582284 Z M243.6,279.201172 L243.6,15.7582284 C243.6,11.6862452 240.311573,8.4 236.242825,8.4 L15.7571747,8.4 C11.6900229,8.4 8.4,11.6915185 8.4,15.7582284 L8.60057618,279.102293 L243.6,279.201172 Z M1.13686838e-13,67.7172107 C1.13686838e-13,66.8516641 0.699087095,66.15 1.575,66.15 L3.15,66.15 L3.15,151.2 L1.575,151.2 C0.705151519,151.2 1.13686838e-13,150.490284 1.13686838e-13,149.632789 L1.13686838e-13,67.7172107 L1.13686838e-13,67.7172107 Z M252,67.7263729 C252,66.8557662 251.300913,66.15 250.425,66.15 L248.85,66.15 L248.85,91.35 L250.425,91.35 C251.294848,91.35 252,90.6497064 252,89.7736271 L252,67.7263729 L252,67.7263729 Z M252,99.2263729 C252,98.3557662 251.300913,97.65 250.425,97.65 L248.85,97.65 L248.85,122.85 L250.425,122.85 C251.294848,122.85 252,122.149706 252,121.273627 L252,99.2263729 L252,99.2263729 Z M186.376373,-8.06113616e-15 C185.505766,-7.90120831e-15 184.8,0.699087095 184.8,1.575 L184.8,3.15 L210,3.15 L210,1.575 C210,0.705151519 209.299706,-1.22720842e-14 208.423627,-1.21111511e-14 L186.376373,-8.06113616e-15 L186.376373,-8.06113616e-15 Z M105,23.4015945 C105,22.2961444 105.89666,21.4 106.997492,21.4 L145.002508,21.4 C146.105692,21.4 147,22.290712 147,23.4015945 L147,23.5984055 C147,24.7038556 146.10334,25.6 145.002508,25.6 L106.997492,25.6 C105.894308,25.6 105,24.709288 105,23.5984055 L105,23.4015945 L105,23.4015945 Z"/></g></symbol>
+</svg>
 <div class="header-menu">
     <a href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
     <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>" class="active"><?php echo t('Mobile Themes'); ?></a>
@@ -22,7 +25,7 @@ Gdn_Theme::assetBegin('Help'); ?>
 
 <?php if (count($this->data('AvailableThemes', array()))): ?>
 
-    <ul class="browser-mobile-themes SelectionGrid Themes label-selector">
+    <ul class="browser-mobile-themes label-selector">
         <?php
         // Get currently enabled theme data.
         $EnabledThemeInfo = $this->data('EnabledThemeInfo');
@@ -70,33 +73,30 @@ Gdn_Theme::assetBegin('Help'); ?>
                 ? '<em class="theme-description">'.$Description.'</em>'
                 : '';
 
-            $Col++;
-            if ($Col == 1) {
-                $ColClass = 'FirstCol';
-                echo '<tr>';
-            } elseif ($Col == 2) {
-                $ColClass = 'MiddleCol';
-            } else {
-                $ColClass = 'LastCol';
-                $Col = 0;
-            }
 
             ?>
 
-            <li class="label-selector-item themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
+            <li class="label-selector-item themeblock <?php echo $ClassCurrentTheme; ?>">
 
                 <!--<div class="author-name">
                <?php echo $Author; ?>
             </div>-->
-                <div class="image-wrap">
-                <?php echo $PreviewImageHtml; ?>
-                    <div class="overlay">
-                        <div class="buttons">
-                            <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-transparent', array('target' => '_top'));
-                            //echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
-                            $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                            $this->fireEvent('AfterThemeButtons');
-                            ?>
+                <div class="mobile-wrap">
+                    <div class="mobile-frame">
+                        <svg class="icon icon-48 icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
+                    </div>
+                    <div class="image-wrap">
+                    <?php echo $PreviewImageHtml; ?>
+                        <div class="overlay">
+                            <div class="buttons">
+                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-transparent', array('target' => '_top'));
+                                $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+                                $this->fireEvent('AfterThemeButtons');
+                                ?>
+                            </div>
+                            <div class="selected">
+                                <?php echo dashboardSymbol('checkmark'); ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -141,18 +141,6 @@ Gdn_Theme::assetBegin('Help'); ?>
 
             </li>
 
-            <?php
-            if ($Col == 0) {
-                echo '</tr>';
-            }
-            ?>
-
         <?php endforeach; ?>
-
-        <?php
-        if ($Col > 0) {
-            echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
-        }
-        ?>
 
 <?php endif; ?>

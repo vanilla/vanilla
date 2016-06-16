@@ -66,6 +66,7 @@ Gdn_Theme::assetEnd();
     <meta name="robots" content="noindex,nofollow"/>
 </head>
 <body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
+<?php $this->renderAsset('Symbols'); ?>
 <div class="navbar">
     <div class="navbar-brand">
         <?php $title = c('Garden.Title'); ?>

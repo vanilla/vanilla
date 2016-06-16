@@ -32,7 +32,7 @@ $roleTitles = implode(', ', $roleTitlesArray);
 <div class="card card-user">
     <div class="card-block user-block">
         <div class="user-image-wrap">
-            <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
+            <?php echo userPhoto($user); ?>
         </div>
         <div class="user-info">
             <div class="username">

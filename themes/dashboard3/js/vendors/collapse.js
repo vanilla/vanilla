@@ -166,7 +166,6 @@ var Collapse = (function ($) {
           _this._element.style[dimension] = '';
 
           _this.setTransitioning(false);
-
           $(_this._element).trigger(Event.SHOWN);
         };
 

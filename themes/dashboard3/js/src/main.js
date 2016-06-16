@@ -9,6 +9,7 @@
 'use strict';
 
 (function($) {
+
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
@@ -75,24 +76,26 @@
     }
 
     function scrollToFixedInit(element) {
-        var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
-        var minOffset = $('.navbar').outerHeight(true) + panelPadding;
+        if ($('.js-scroll-to-fixed', element).length) {
+            var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
+            var minOffset = $('.navbar').outerHeight(true) + panelPadding;
 
-        $('.js-scroll-to-fixed > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-        $('.js-scroll-to-fixed > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-        $('.js-scroll-to-fixed', element).each(function() {
-            $(this).scrollToFixed({
-                zIndex: 1000,
-                marginTop: function () {
-                    var marginTop = $(window).height() - $(this).outerHeight(true) - minOffset;
-                    if (marginTop >= 0) {
-                        return minOffset;
+            $('.js-scroll-to-fixed > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+            $('.js-scroll-to-fixed > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+
+            $('.js-scroll-to-fixed', element).each(function () {
+                $(this).scrollToFixed({
+                    zIndex: 1000,
+                    marginTop: function () {
+                        var marginTop = $(window).height() - $(this).outerHeight(true) - minOffset;
+                        if (marginTop >= 0) {
+                            return minOffset;
+                        }
+                        return marginTop;
                     }
-                    return marginTop;
-                }
+                });
             });
-        });
-
+        }
         $('.navbar', element).scrollToFixed({
             zIndex: 1005
         });
@@ -104,10 +107,11 @@
             target: document.querySelector('.navbar .js-card-user', element),
             content: html,
             constrainToWindow: true,
+            remove: true,
             tetherOptions: {
                 attachment: 'top right',
-                targetAttachment: 'top right',
-                offset: '2rem 0'
+                targetAttachment: 'bottom right',
+                offset: '-10 0'
             }
         })
     }
@@ -122,17 +126,22 @@
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target);
         aceInit(e.target);
+        collapseInit(e.target);
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
-        collapseInit(e.target);
     });
 
-    $(document).on('click', '.panel-nav .collapsed', function () {
+    $(document).on('click', '.js-clear-search', function() {
+        $(this).parent('.search-wrap').find('input').val('');
+    });
+
+    $(document).on('shown.bs.collapse', function(e) {
+        console.log(e);
         $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
         scrollToFixedInit($('.panel-nav'));
     });
 
-    $(document).on('change', '.js-file-upload', function () {
+    $(document).on('change', '.js-file-upload', function() {
         var filename = $(this).val();
         if (filename.substring(3, 11) === 'fakepath') {
             filename = filename.substring(12);

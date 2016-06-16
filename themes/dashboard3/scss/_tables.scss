@@ -6,7 +6,8 @@
   margin-left: (-$padding-default);
 }
 
-.header-block + .table-wrap {
+.header-block + .table-wrap,
+.toolbar + .table-wrap {
   // TODO: collapse border
   margin-top: 0;
 }
@@ -14,6 +15,10 @@
 table {
   td {
     vertical-align: middle;
+  }
+
+  .options {
+    width: 5rem;
   }
 
   thead {

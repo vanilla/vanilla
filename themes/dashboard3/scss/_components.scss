@@ -1,9 +1,72 @@
+// Components
+//
+//
+//
+// Styleguide 6.
+
+// User block
+//
+// Small user block
+//
+// Markup:
+// <div class="user-block">
+//   <div class="user-image-wrap">
+//     <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
+//   </div>
+//   <div class="user-info">
+//     <div class="username">
+//       <a href="#">amelia</a>
+//     </div>
+//     <div class="info user-email">
+//       <a href="#">name@email.com</a>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 6.1.
+
+.user-block {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  .user-image-wrap {
+    display: inline-block;
+    @include image-wrap(to-rem(30), to-rem(30), .0625rem);
+    margin-right: $spacer / 2;
+  }
+}
+
+.user-info {
+  .username {
+    line-height: 1;
+    margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+  }
+
+  .user-email {
+    line-height: 1;
+  }
+}
+
+.btn-userblock {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  @extend .btn-secondary;
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);
+}
+
 .toolbar {
   display: flex;
-  padding-top: $spacer;
-  padding-bottom: 0;
+  justify-content: space-between;
+  padding: ($spacer / 2) 0;
 
   .toolbar-search {
-    flex-grow: 4;
+    flex-grow: 1;
+    padding-right: $spacer;
+  }
+
+  .PagerWrap {
+    padding-left: $spacer;
   }
 }

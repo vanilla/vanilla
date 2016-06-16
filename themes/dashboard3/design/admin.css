@@ -4267,11 +4267,7 @@ a.current-theme,
 .TextButton .nav-heading a::before, .nav-heading
 .TextButton a::before, .SmallButton .nav-heading a::before, .nav-heading .SmallButton a::before, #Head h1 a span .nav-heading a::before, .nav-heading #Head h1 a span a::before, .Tabs ul li a .nav-heading a::before, .nav-heading .Tabs ul li a a::before,
 .tabbed-content li a .nav-heading a::before, .nav-heading
-.tabbed-content li a a::before, .FilterMenu .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .FilterButton a::before, .btn .panel-nav h4 a::before, .panel-nav h4 .btn a::before, .file-upload-browse .panel-nav h4 a::before, .panel-nav h4 .file-upload-browse a::before, .Button .panel-nav h4 a::before, .panel-nav h4 .Button a::before,
-.TextButton .panel-nav h4 a::before, .panel-nav h4
-.TextButton a::before, .SmallButton .panel-nav h4 a::before, .panel-nav h4 .SmallButton a::before, #Head h1 a span .panel-nav h4 a::before, .panel-nav h4 #Head h1 a span a::before, .Tabs ul li a .panel-nav h4 a::before, .panel-nav h4 .Tabs ul li a a::before,
-.tabbed-content li a .panel-nav h4 a::before, .panel-nav h4
-.tabbed-content li a a::before, .FilterMenu .FilterButton .panel-nav h4 a::before, .panel-nav h4 .FilterMenu .FilterButton a::before {
+.tabbed-content li a a::before, .FilterMenu .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .FilterButton a::before {
   margin-left: 0;
 }
 
@@ -4281,11 +4277,7 @@ a.current-theme,
 .TextButton .nav-heading a::before, .nav-heading .btn-group-lg >
 .TextButton a::before, .btn-group-lg > .SmallButton .nav-heading a::before, .nav-heading .btn-group-lg > .SmallButton a::before, .Tabs ul li .btn-group-lg > a .nav-heading a::before, .nav-heading .Tabs ul li .btn-group-lg > a a::before,
 .tabbed-content li .btn-group-lg > a .nav-heading a::before, .nav-heading
-.tabbed-content li .btn-group-lg > a a::before, .FilterMenu .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .btn-group-lg > .FilterButton a::before, #Head h1 a span .nav-heading a::before, .nav-heading #Head h1 a span a::before, .btn-lg .panel-nav h4 a::before, .panel-nav h4 .btn-lg a::before, .btn-group-lg > .btn .panel-nav h4 a::before, .panel-nav h4 .btn-group-lg > .btn a::before, .btn-group-lg > .file-upload-browse .panel-nav h4 a::before, .panel-nav h4 .btn-group-lg > .file-upload-browse a::before, .btn-group-lg > .Button .panel-nav h4 a::before, .panel-nav h4 .btn-group-lg > .Button a::before, .btn-group-lg >
-.TextButton .panel-nav h4 a::before, .panel-nav h4 .btn-group-lg >
-.TextButton a::before, .btn-group-lg > .SmallButton .panel-nav h4 a::before, .panel-nav h4 .btn-group-lg > .SmallButton a::before, .Tabs ul li .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4 .Tabs ul li .btn-group-lg > a a::before,
-.tabbed-content li .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4
-.tabbed-content li .btn-group-lg > a a::before, .FilterMenu .btn-group-lg > .FilterButton .panel-nav h4 a::before, .panel-nav h4 .FilterMenu .btn-group-lg > .FilterButton a::before, #Head h1 a span .panel-nav h4 a::before, .panel-nav h4 #Head h1 a span a::before {
+.tabbed-content li .btn-group-lg > a a::before, .FilterMenu .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .btn-group-lg > .FilterButton a::before, #Head h1 a span .nav-heading a::before, .nav-heading #Head h1 a span a::before {
   border-width: 0.375em 0.375em 0;
   border-bottom-width: 0;
 }
@@ -4299,13 +4291,7 @@ a.current-theme,
 .tabbed-content li .btn-group-lg > a .nav-heading a::before, .nav-heading .dropup
 .tabbed-content li .btn-group-lg > a a::before,
 .tabbed-content li .dropup .btn-group-lg > a .nav-heading a::before, .nav-heading
-.tabbed-content li .dropup .btn-group-lg > a a::before, .dropup .FilterMenu .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .dropup .FilterMenu .btn-group-lg > .FilterButton a::before, .FilterMenu .dropup .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .dropup .btn-group-lg > .FilterButton a::before, .dropup #Head h1 a span .nav-heading a::before, .nav-heading .dropup #Head h1 a span a::before, #Head h1 a .dropup span .nav-heading a::before, .nav-heading #Head h1 a .dropup span a::before, .dropup .btn-lg .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-lg a::before, .dropup .btn-group-lg > .btn .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-group-lg > .btn a::before, .dropup .btn-group-lg > .file-upload-browse .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-group-lg > .file-upload-browse a::before, .dropup .btn-group-lg > .Button .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-group-lg > .Button a::before, .dropup .btn-group-lg >
-.TextButton .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-group-lg >
-.TextButton a::before, .dropup .btn-group-lg > .SmallButton .panel-nav h4 a::before, .panel-nav h4 .dropup .btn-group-lg > .SmallButton a::before, .dropup .Tabs ul li .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4 .dropup .Tabs ul li .btn-group-lg > a a::before, .Tabs ul li .dropup .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4 .Tabs ul li .dropup .btn-group-lg > a a::before, .dropup
-.tabbed-content li .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4 .dropup
-.tabbed-content li .btn-group-lg > a a::before,
-.tabbed-content li .dropup .btn-group-lg > a .panel-nav h4 a::before, .panel-nav h4
-.tabbed-content li .dropup .btn-group-lg > a a::before, .dropup .FilterMenu .btn-group-lg > .FilterButton .panel-nav h4 a::before, .panel-nav h4 .dropup .FilterMenu .btn-group-lg > .FilterButton a::before, .FilterMenu .dropup .btn-group-lg > .FilterButton .panel-nav h4 a::before, .panel-nav h4 .FilterMenu .dropup .btn-group-lg > .FilterButton a::before, .dropup #Head h1 a span .panel-nav h4 a::before, .panel-nav h4 .dropup #Head h1 a span a::before, #Head h1 a .dropup span .panel-nav h4 a::before, .panel-nav h4 #Head h1 a .dropup span a::before {
+.tabbed-content li .dropup .btn-group-lg > a a::before, .dropup .FilterMenu .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .dropup .FilterMenu .btn-group-lg > .FilterButton a::before, .FilterMenu .dropup .btn-group-lg > .FilterButton .nav-heading a::before, .nav-heading .FilterMenu .dropup .btn-group-lg > .FilterButton a::before, .dropup #Head h1 a span .nav-heading a::before, .nav-heading .dropup #Head h1 a span a::before, #Head h1 a .dropup span .nav-heading a::before, .nav-heading #Head h1 a .dropup span a::before {
   border-width: 0 0.375em 0.375em;
 }
 
@@ -5101,7 +5087,7 @@ a.current-theme,
   position: relative;
 }
 
-.dropdown-toggle::after, .caret, .nav-heading a::before, .panel-nav h4 a::before {
+.dropdown-toggle::after, .caret, .nav-heading a::before {
   display: inline-block;
   width: 0;
   height: 0;
@@ -5118,7 +5104,7 @@ a.current-theme,
   outline: 0;
 }
 
-.dropup .dropdown-toggle::after, .dropup .caret, .dropup .nav-heading a::before, .nav-heading .dropup a::before, .dropup .panel-nav h4 a::before, .panel-nav h4 .dropup a::before {
+.dropup .dropdown-toggle::after, .dropup .caret, .dropup .nav-heading a::before, .nav-heading .dropup a::before {
   border-top: 0;
   border-bottom: 0.375em solid;
 }
@@ -5242,11 +5228,9 @@ a.current-theme,
   left: auto;
 }
 
-.dropup .caret, .dropup .nav-heading a::before, .nav-heading .dropup a::before, .dropup .panel-nav h4 a::before, .panel-nav h4 .dropup a::before,
+.dropup .caret, .dropup .nav-heading a::before, .nav-heading .dropup a::before,
 .navbar-fixed-bottom .dropdown .caret,
 .navbar-fixed-bottom .dropdown .nav-heading a::before, .nav-heading
-.navbar-fixed-bottom .dropdown a::before,
-.navbar-fixed-bottom .dropdown .panel-nav h4 a::before, .panel-nav h4
 .navbar-fixed-bottom .dropdown a::before {
   content: "";
   border-top: 0;
@@ -9358,39 +9342,39 @@ span.current-theme, .Tabs ul li.Active a.btn-primary, .Tabs ul li.Active .Filter
   border-color: #0291db;
 }
 
-.btn-secondary, .btn-settings-border, .file-upload-browse, .btn-userblock, .Tabs ul li a,
+.btn-secondary, .btn-settings-border, .btn-userblock, .file-upload-browse, .Tabs ul li a,
 .tabbed-content li a {
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary:hover, .btn-settings-border:hover, .file-upload-browse:hover, .btn-userblock:hover, .Tabs ul li a:hover,
+.btn-secondary:hover, .btn-settings-border:hover, .btn-userblock:hover, .file-upload-browse:hover, .Tabs ul li a:hover,
 .tabbed-content li a:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:focus, .btn-settings-border:focus, .file-upload-browse:focus, .btn-userblock:focus, .Tabs ul li a:focus,
-.tabbed-content li a:focus, .btn-secondary.focus, .focus.btn-settings-border, .focus.file-upload-browse, .focus.btn-userblock, .Tabs ul li a.focus,
+.btn-secondary:focus, .btn-settings-border:focus, .btn-userblock:focus, .file-upload-browse:focus, .Tabs ul li a:focus,
+.tabbed-content li a:focus, .btn-secondary.focus, .focus.btn-settings-border, .focus.btn-userblock, .focus.file-upload-browse, .Tabs ul li a.focus,
 .tabbed-content li a.focus {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:active, .btn-settings-border:active, .file-upload-browse:active, .btn-userblock:active, .Tabs ul li a:active,
+.btn-secondary:active, .btn-settings-border:active, .btn-userblock:active, .file-upload-browse:active, .Tabs ul li a:active,
 .tabbed-content li a:active, .btn-secondary.active, .active.btn-settings-border,
 .Tabs ul .btn-settings-border.current-tab,
 .tabbed-content .btn-settings-border.current-tab, .btn-settings-border.Current,
-.btn-settings-border.current-theme, .active.file-upload-browse,
-.Tabs ul .file-upload-browse.current-tab,
-.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
-.file-upload-browse.current-theme, .active.btn-userblock,
+.btn-settings-border.current-theme, .active.btn-userblock,
 .Tabs ul .btn-userblock.current-tab,
 .tabbed-content .btn-userblock.current-tab, .btn-userblock.Current,
-.btn-userblock.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
+.btn-userblock.current-theme, .active.file-upload-browse,
+.Tabs ul .file-upload-browse.current-tab,
+.tabbed-content .file-upload-browse.current-tab, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .Tabs ul li a.active, .Tabs ul li.Active a, .Tabs ul li a.current-tab, .Tabs ul li a.Current, .Tabs ul li
 a.current-theme,
 .tabbed-content li a.active, .tabbed-content li.Active a, .tabbed-content li a.current-tab,
 .tabbed-content li a.Current,
@@ -9401,8 +9385,8 @@ a.current-theme,
 .btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
 .open > .dropdown-toggle.btn-settings-border,
-.open > .dropdown-toggle.file-upload-browse,
-.open > .dropdown-toggle.btn-userblock, .Tabs ul li
+.open > .dropdown-toggle.btn-userblock,
+.open > .dropdown-toggle.file-upload-browse, .Tabs ul li
 .open > a.dropdown-toggle,
 .tabbed-content li
 .open > a.dropdown-toggle {
@@ -9412,17 +9396,17 @@ a.current-theme,
   background-image: none;
 }
 
-.btn-secondary.disabled:focus, .disabled.btn-settings-border:focus, .disabled.file-upload-browse:focus, .disabled.btn-userblock:focus, .Tabs ul li a.disabled:focus,
-.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-settings-border, .disabled.focus.file-upload-browse, .disabled.focus.btn-userblock, .Tabs ul li a.disabled.focus,
-.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .btn-settings-border:disabled:focus, .file-upload-browse:disabled:focus, .btn-userblock:disabled:focus, .Tabs ul li a:disabled:focus,
-.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .btn-settings-border:disabled.focus, .file-upload-browse:disabled.focus, .btn-userblock:disabled.focus, .Tabs ul li a:disabled.focus,
+.btn-secondary.disabled:focus, .disabled.btn-settings-border:focus, .disabled.btn-userblock:focus, .disabled.file-upload-browse:focus, .Tabs ul li a.disabled:focus,
+.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-settings-border, .disabled.focus.btn-userblock, .disabled.focus.file-upload-browse, .Tabs ul li a.disabled.focus,
+.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .btn-settings-border:disabled:focus, .btn-userblock:disabled:focus, .file-upload-browse:disabled:focus, .Tabs ul li a:disabled:focus,
+.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .btn-settings-border:disabled.focus, .btn-userblock:disabled.focus, .file-upload-browse:disabled.focus, .Tabs ul li a:disabled.focus,
 .tabbed-content li a:disabled.focus {
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary.disabled:hover, .disabled.btn-settings-border:hover, .disabled.file-upload-browse:hover, .disabled.btn-userblock:hover, .Tabs ul li a.disabled:hover,
-.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .btn-settings-border:disabled:hover, .file-upload-browse:disabled:hover, .btn-userblock:disabled:hover, .Tabs ul li a:disabled:hover,
+.btn-secondary.disabled:hover, .disabled.btn-settings-border:hover, .disabled.btn-userblock:hover, .disabled.file-upload-browse:hover, .Tabs ul li a.disabled:hover,
+.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .btn-settings-border:disabled:hover, .btn-userblock:disabled:hover, .file-upload-browse:disabled:hover, .Tabs ul li a:disabled:hover,
 .tabbed-content li a:disabled:hover {
   background-color: #fff;
   border-color: #ccc;
@@ -9890,14 +9874,82 @@ input[type="button"].btn-block {
   text-align: center;
 }
 
+.drop {
+  z-index: 1005;
+}
+
+.user-block {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.user-block .user-image-wrap {
+  display: inline-block;
+  position: relative;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: #f4f4f5;
+  margin-right: 0.5rem;
+}
+
+.user-block .user-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.0625rem;
+  content: '';
+}
+
+.user-block .user-image-wrap img, .user-block .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .user-block .user-image-wrap .Sprite, .user-block .user-image-wrap
+.HomeOptions .Sprite,
+.HomeOptions .user-block .user-image-wrap .Sprite {
+  width: 1.875rem;
+}
+
+.user-info .username {
+  line-height: 1;
+  margin-bottom: 0.3125rem;
+}
+
+.user-info .user-email {
+  line-height: 1;
+}
+
+.btn-userblock {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.575rem;
+  line-height: 1.5;
+  border-radius: 0.875rem;
+}
+
 .toolbar {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 0.5rem 0;
 }
 
 .toolbar .toolbar-search {
-  -ms-flex-positive: 4;
-  flex-grow: 4;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  padding-right: 1rem;
+}
+
+.toolbar .PagerWrap {
+  padding-left: 1rem;
 }
 
 .dropdown-menu {
@@ -9979,6 +10031,24 @@ input[type="button"].btn-block {
   border-left: 1px solid #ddd;
 }
 
+.list-reset ul,
+.list-reset ol {
+  padding-left: 0;
+}
+
+.list-reset ul li,
+.list-reset ol li {
+  list-style: none;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
+.list-reset ul label,
+.list-reset ol label {
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
 form ul,
 form ol {
   padding-left: 0;
@@ -10026,8 +10096,8 @@ form ol label {
 .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
 .HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
-  -ms-flex-positive: 3;
-  flex-grow: 3;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
 }
 
 .input-wrap-multiple {
@@ -10396,64 +10466,124 @@ select::-ms-expand {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-.label-selector .active .overlay > *, .emojiext-list .active .overlay > *,
-.LayoutOptions .active .overlay > *,
-.HomeOptions .active .overlay > *, .label-selector .Tabs ul li.Active a .overlay > *, .Tabs ul li.Active .label-selector a .overlay > *, .emojiext-list .Tabs ul li.Active a .overlay > *, .Tabs ul li.Active .emojiext-list a .overlay > *,
-.LayoutOptions .Tabs ul li.Active a .overlay > *, .Tabs ul li.Active
-.LayoutOptions a .overlay > *,
-.HomeOptions .Tabs ul li.Active a .overlay > *, .Tabs ul li.Active
-.HomeOptions a .overlay > *, .label-selector
-.Tabs ul .current-tab .overlay > *,
-.Tabs ul .label-selector .current-tab .overlay > *, .emojiext-list
-.Tabs ul .current-tab .overlay > *,
-.Tabs ul .emojiext-list .current-tab .overlay > *,
+.label-selector .active .overlay > .buttons, .emojiext-list .active .overlay > .buttons,
+.LayoutOptions .active .overlay > .buttons,
+.HomeOptions .active .overlay > .buttons, .label-selector .Tabs ul li.Active a .overlay > .buttons, .Tabs ul li.Active .label-selector a .overlay > .buttons, .emojiext-list .Tabs ul li.Active a .overlay > .buttons, .Tabs ul li.Active .emojiext-list a .overlay > .buttons,
+.LayoutOptions .Tabs ul li.Active a .overlay > .buttons, .Tabs ul li.Active
+.LayoutOptions a .overlay > .buttons,
+.HomeOptions .Tabs ul li.Active a .overlay > .buttons, .Tabs ul li.Active
+.HomeOptions a .overlay > .buttons, .label-selector
+.Tabs ul .current-tab .overlay > .buttons,
+.Tabs ul .label-selector .current-tab .overlay > .buttons, .emojiext-list
+.Tabs ul .current-tab .overlay > .buttons,
+.Tabs ul .emojiext-list .current-tab .overlay > .buttons,
 .LayoutOptions
-.Tabs ul .current-tab .overlay > *,
+.Tabs ul .current-tab .overlay > .buttons,
 .Tabs ul
-.LayoutOptions .current-tab .overlay > *,
+.LayoutOptions .current-tab .overlay > .buttons,
 .HomeOptions
-.Tabs ul .current-tab .overlay > *,
+.Tabs ul .current-tab .overlay > .buttons,
 .Tabs ul
-.HomeOptions .current-tab .overlay > *, .label-selector
-.tabbed-content li.Active a .overlay > *,
-.tabbed-content li.Active .label-selector a .overlay > *, .emojiext-list
-.tabbed-content li.Active a .overlay > *,
-.tabbed-content li.Active .emojiext-list a .overlay > *,
+.HomeOptions .current-tab .overlay > .buttons, .label-selector
+.tabbed-content li.Active a .overlay > .buttons,
+.tabbed-content li.Active .label-selector a .overlay > .buttons, .emojiext-list
+.tabbed-content li.Active a .overlay > .buttons,
+.tabbed-content li.Active .emojiext-list a .overlay > .buttons,
 .LayoutOptions
-.tabbed-content li.Active a .overlay > *,
+.tabbed-content li.Active a .overlay > .buttons,
 .tabbed-content li.Active
-.LayoutOptions a .overlay > *,
+.LayoutOptions a .overlay > .buttons,
 .HomeOptions
-.tabbed-content li.Active a .overlay > *,
+.tabbed-content li.Active a .overlay > .buttons,
 .tabbed-content li.Active
-.HomeOptions a .overlay > *, .label-selector
-.tabbed-content .current-tab .overlay > *,
-.tabbed-content .label-selector .current-tab .overlay > *, .emojiext-list
-.tabbed-content .current-tab .overlay > *,
-.tabbed-content .emojiext-list .current-tab .overlay > *,
+.HomeOptions a .overlay > .buttons, .label-selector
+.tabbed-content .current-tab .overlay > .buttons,
+.tabbed-content .label-selector .current-tab .overlay > .buttons, .emojiext-list
+.tabbed-content .current-tab .overlay > .buttons,
+.tabbed-content .emojiext-list .current-tab .overlay > .buttons,
 .LayoutOptions
-.tabbed-content .current-tab .overlay > *,
+.tabbed-content .current-tab .overlay > .buttons,
 .tabbed-content
-.LayoutOptions .current-tab .overlay > *,
+.LayoutOptions .current-tab .overlay > .buttons,
 .HomeOptions
-.tabbed-content .current-tab .overlay > *,
+.tabbed-content .current-tab .overlay > .buttons,
 .tabbed-content
-.HomeOptions .current-tab .overlay > *, .label-selector .Current .overlay > *, .emojiext-list .Current .overlay > *,
-.LayoutOptions .Current .overlay > *,
-.HomeOptions .Current .overlay > *, .label-selector
-.current-theme .overlay > *, .emojiext-list
-.current-theme .overlay > *,
+.HomeOptions .current-tab .overlay > .buttons, .label-selector .Current .overlay > .buttons, .emojiext-list .Current .overlay > .buttons,
+.LayoutOptions .Current .overlay > .buttons,
+.HomeOptions .Current .overlay > .buttons, .label-selector
+.current-theme .overlay > .buttons, .emojiext-list
+.current-theme .overlay > .buttons,
 .LayoutOptions
-.current-theme .overlay > *,
+.current-theme .overlay > .buttons,
 .HomeOptions
-.current-theme .overlay > *,
-.label-selector input[type=radio]:checked ~ label .overlay > *, .emojiext-list input[type=radio]:checked ~ label .overlay > *,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > *,
-.HomeOptions input[type=radio]:checked ~ label .overlay > *,
-.label-selector input[type=radio]:checked ~ label .overlay > *, .emojiext-list input[type=radio]:checked ~ label .overlay > *,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > *,
-.HomeOptions input[type=radio]:checked ~ label .overlay > * {
+.current-theme .overlay > .buttons,
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons,
+.LayoutOptions input[type=radio]:checked ~ label .overlay > .buttons,
+.HomeOptions input[type=radio]:checked ~ label .overlay > .buttons,
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons,
+.LayoutOptions input[type=radio]:checked ~ label .overlay > .buttons,
+.HomeOptions input[type=radio]:checked ~ label .overlay > .buttons {
   display: none;
+}
+
+.label-selector .active .overlay > .selected, .emojiext-list .active .overlay > .selected,
+.LayoutOptions .active .overlay > .selected,
+.HomeOptions .active .overlay > .selected, .label-selector .Tabs ul li.Active a .overlay > .selected, .Tabs ul li.Active .label-selector a .overlay > .selected, .emojiext-list .Tabs ul li.Active a .overlay > .selected, .Tabs ul li.Active .emojiext-list a .overlay > .selected,
+.LayoutOptions .Tabs ul li.Active a .overlay > .selected, .Tabs ul li.Active
+.LayoutOptions a .overlay > .selected,
+.HomeOptions .Tabs ul li.Active a .overlay > .selected, .Tabs ul li.Active
+.HomeOptions a .overlay > .selected, .label-selector
+.Tabs ul .current-tab .overlay > .selected,
+.Tabs ul .label-selector .current-tab .overlay > .selected, .emojiext-list
+.Tabs ul .current-tab .overlay > .selected,
+.Tabs ul .emojiext-list .current-tab .overlay > .selected,
+.LayoutOptions
+.Tabs ul .current-tab .overlay > .selected,
+.Tabs ul
+.LayoutOptions .current-tab .overlay > .selected,
+.HomeOptions
+.Tabs ul .current-tab .overlay > .selected,
+.Tabs ul
+.HomeOptions .current-tab .overlay > .selected, .label-selector
+.tabbed-content li.Active a .overlay > .selected,
+.tabbed-content li.Active .label-selector a .overlay > .selected, .emojiext-list
+.tabbed-content li.Active a .overlay > .selected,
+.tabbed-content li.Active .emojiext-list a .overlay > .selected,
+.LayoutOptions
+.tabbed-content li.Active a .overlay > .selected,
+.tabbed-content li.Active
+.LayoutOptions a .overlay > .selected,
+.HomeOptions
+.tabbed-content li.Active a .overlay > .selected,
+.tabbed-content li.Active
+.HomeOptions a .overlay > .selected, .label-selector
+.tabbed-content .current-tab .overlay > .selected,
+.tabbed-content .label-selector .current-tab .overlay > .selected, .emojiext-list
+.tabbed-content .current-tab .overlay > .selected,
+.tabbed-content .emojiext-list .current-tab .overlay > .selected,
+.LayoutOptions
+.tabbed-content .current-tab .overlay > .selected,
+.tabbed-content
+.LayoutOptions .current-tab .overlay > .selected,
+.HomeOptions
+.tabbed-content .current-tab .overlay > .selected,
+.tabbed-content
+.HomeOptions .current-tab .overlay > .selected, .label-selector .Current .overlay > .selected, .emojiext-list .Current .overlay > .selected,
+.LayoutOptions .Current .overlay > .selected,
+.HomeOptions .Current .overlay > .selected, .label-selector
+.current-theme .overlay > .selected, .emojiext-list
+.current-theme .overlay > .selected,
+.LayoutOptions
+.current-theme .overlay > .selected,
+.HomeOptions
+.current-theme .overlay > .selected,
+.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected,
+.LayoutOptions input[type=radio]:checked ~ label .overlay > .selected,
+.HomeOptions input[type=radio]:checked ~ label .overlay > .selected,
+.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected,
+.LayoutOptions input[type=radio]:checked ~ label .overlay > .selected,
+.HomeOptions input[type=radio]:checked ~ label .overlay > .selected {
+  display: block;
 }
 
 .label-selector .active .label-selector-image, .emojiext-list .active .label-selector-image,
@@ -10637,7 +10767,6 @@ select::-ms-expand {
 .HomeOptions .Sprite {
   display: block;
   width: 100%;
-  border: 1px solid #ddd;
 }
 
 .label-selector .title, .emojiext-list .title,
@@ -10661,10 +10790,37 @@ select::-ms-expand {
   margin-bottom: 0.5rem;
 }
 
+.label-selector .image-wrap::after, .emojiext-list .image-wrap::after,
+.LayoutOptions .image-wrap::after,
+.HomeOptions .image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0;
+  content: '';
+}
+
 .label-selector .image-wrap:hover .overlay, .emojiext-list .image-wrap:hover .overlay,
 .LayoutOptions .image-wrap:hover .overlay,
 .HomeOptions .image-wrap:hover .overlay {
   height: 100%;
+}
+
+.label-selector .selected, .emojiext-list .selected,
+.LayoutOptions .selected,
+.HomeOptions .selected {
+  display: none;
+}
+
+.label-selector .selected svg, .emojiext-list .selected svg,
+.LayoutOptions .selected svg,
+.HomeOptions .selected svg {
+  width: 84px;
+  fill: #60bd68;
 }
 
 .label-selector .overlay, .emojiext-list .overlay,
@@ -10683,28 +10839,6 @@ select::-ms-expand {
   overflow: hidden;
   transition: all .1s;
   text-align: center;
-}
-
-.label-selector .overlay::after, .emojiext-list .overlay::after,
-.LayoutOptions .overlay::after,
-.HomeOptions .overlay::after {
-  display: inline-block;
-  min-width: 1em;
-  font-family: "vanillicon";
-  font-variant: normal;
-  font-weight: normal;
-  font-style: normal;
-  line-height: 1;
-  text-align: center;
-  text-decoration: inherit;
-  text-transform: none;
-  -webkit-font-smoothing: antialiased;
-  font-size: 4rem;
-  color: #60bd68;
-  text-align: center;
-  transition: opacity .1s;
-  opacity: 1;
-  content: "\f172";
 }
 
 .label-selector .buttons, .emojiext-list .buttons,
@@ -10776,6 +10910,47 @@ select::-ms-expand {
   display: none;
 }
 
+.mobile-wrap {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.mobile-wrap .mobile-frame {
+  position: relative;
+  bottom: 0;
+}
+
+.mobile-wrap svg {
+  fill: rgba(85, 90, 98, 0.27);
+}
+
+.mobile-wrap .image-wrap {
+  position: absolute;
+  bottom: .7%;
+  left: 8%;
+  width: 84%;
+  height: 86%;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.mobile-wrap .image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0;
+  content: '';
+}
+
+.mobile-wrap .image-wrap::after {
+  border-bottom: 0;
+}
+
 .label-selector-item {
   padding: 1rem 1rem 0.5rem;
 }
@@ -10785,15 +10960,35 @@ select::-ms-expand {
 }
 
 .search-wrap .form-control, .search-wrap .SmallInput {
-  border-radius: 1.25rem;
+  border-radius: 1.125rem;
+  padding-left: 2.5rem;
 }
 
 .search-wrap::before {
   position: absolute;
   top: .375rem;
   left: 1rem;
+  font-size: 0.875rem;
   line-height: 1.3125rem;
+  color: #949aa2;
   content: "\f18e";
+}
+
+.search-wrap .btn-clear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 2.25rem;
+  padding: 1rem 1.5rem;
+  font-size: 1.25rem;
+  line-height: 0;
+  font-weight: 100;
+  color: #949aa2;
+}
+
+.search-wrap .search-info {
+  margin-top: 0.25rem;
+  font-style: italic;
 }
 
 .search-submit, #Form_Go {
@@ -10823,7 +11018,7 @@ select::-ms-expand {
   padding: 1rem 0;
 }
 
-.imagewrap-table, table .PhotoWrap {
+.imagewrap-table {
   display: block;
   height: 2rem;
   width: 2rem;
@@ -10900,59 +11095,8 @@ select::-ms-expand {
   width: 5.25rem;
 }
 
-.user-block {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.user-block .user-image-wrap {
-  display: inline-block;
-  position: relative;
-  height: 2rem;
-  border-radius: 0.125rem;
-  overflow: hidden;
-  background-color: #f4f4f5;
-  margin-right: 0.5rem;
-}
-
-.user-block .user-image-wrap::after {
-  position: absolute;
+svg.icon, svg.btn-settings-border {
   display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.125rem;
-  content: '';
-}
-
-.user-block .user-image-wrap img, .user-block .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .user-block .user-image-wrap .Sprite, .user-block .user-image-wrap
-.HomeOptions .Sprite,
-.HomeOptions .user-block .user-image-wrap .Sprite {
-  width: 2rem;
-}
-
-.user-info .username {
-  line-height: 1.125rem;
-}
-
-.user-info .user-email {
-  line-height: .875rem;
-}
-
-.btn-userblock {
-  display: inline-block;
-  font-weight: 300;
-  text-transform: uppercase;
-  padding: 0.125rem 0.75rem;
-  font-size: 0.575rem;
-  line-height: 1.5;
-  border-radius: 0.875rem;
 }
 
 .media {
@@ -11078,7 +11222,7 @@ div.Popup .Buttons {
   background: rgba(255, 255, 255, 0.7);
 }
 
-.nav-heading a, .panel-nav h4 a {
+.nav-heading a {
   display: block;
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -11091,14 +11235,15 @@ div.Popup .Buttons {
   transition: rotate .5s;
 }
 
-.nav-heading a::before, .panel-nav h4 a::before {
-  rotate: -90deg;
+.nav-heading a::before {
+  tranform: rotate(-90deg);
   margin-left: -1rem;
   margin-right: .5rem;
 }
 
-.nav-heading a[aria-expanded=true]::before, .panel-nav h4 a[aria-expanded=true]::before {
-  rotate: 0deg;
+.nav-heading a[aria-expanded=true]::before {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
 }
 
 .nav-inline {
@@ -11289,7 +11434,8 @@ div.Popup .Buttons {
   height: 1rem;
   bottom: -0.5rem;
   left: 5.125rem;
-  rotate: 45deg;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
   background-color: #0cb0f8;
   border-bottom: 1px solid rgba(0, 0, 0, 0.125);
   border-right: 1px solid rgba(0, 0, 0, 0.125);
@@ -11506,12 +11652,17 @@ div.Popup .Buttons {
   margin-left: -0.9375rem;
 }
 
-.header-block + .table-wrap {
+.header-block + .table-wrap,
+.toolbar + .table-wrap {
   margin-top: 0;
 }
 
 table td {
   vertical-align: middle;
+}
+
+table .options {
+  width: 5rem;
 }
 
 table thead tr {

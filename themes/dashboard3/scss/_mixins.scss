@@ -83,13 +83,7 @@
   }
 }
 
-@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $background-color: $grey-light) {
-  position: relative;
-  height: $height;
-  border-radius: $radius;
-  overflow: hidden;
-  background-color: $background-color;
-
+@mixin image-wrap-border($radius) {
   &::after {
     position: absolute;
     display: block;
@@ -101,8 +95,23 @@
     border-radius: $radius;
     content: '';
   }
+}
+
+@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $background-color: $grey-light) {
+  position: relative;
+  height: $height;
+  border-radius: $radius;
+  overflow: hidden;
+  background-color: $background-color;
+
+  @include image-wrap-border($radius);
 
   img {
     width: $width;
   }
+}
+
+
+@function to-rem($px) {
+  @return ($px / $rem-base * 1rem);
 }

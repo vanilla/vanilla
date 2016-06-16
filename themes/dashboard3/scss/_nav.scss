@@ -18,13 +18,13 @@
 
   &::before {
     @extend .caret;
-    rotate: -90deg;
+    tranform: rotate(-90deg);
     margin-left: -1rem;
     margin-right: .5rem;
   }
 
   &[aria-expanded=true]::before {
-    rotate: 0deg;
+    transform: rotate(0deg);
   }
 }
 

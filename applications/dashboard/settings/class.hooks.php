@@ -144,6 +144,11 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+
+        // Add symbols.
+        if ($Sender->addDefinition('InDashboard')) {
+            $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
+        }
     }
 
     public function dashboardNavModule_init_handler($sender) {

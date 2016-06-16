@@ -3,7 +3,7 @@
 function writeCategoryTree($categories, $indent = 0) {
     $i = str_repeat('  ', $indent);
 
-    echo "$i<ol class=\"dd-list tree-list\">\n";
+    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
 
     foreach ($categories as $category) {
         writeCategoryItem($category, $indent + 1);
@@ -110,7 +110,7 @@ function writeCategoryOptions($category) {
 }
 
 function writeCategoryBreadcrumbs($ancestors) {
-    echo '<div class="bigcrumbs">';
+    echo '<div class="bigcrumbs full-border">';
 
     writeCategoryBreadcrumb(
         t('Home'),

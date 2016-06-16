@@ -1,10 +1,12 @@
-<div class="heading-bar">
-    <div class="actions">
+<div class="header-block">
+    <div class="header-title">
+        <h1><?php echo t('Manage Categories') ?></h1>
+    </div>
+    <div class="header-buttons">
         <?php
-        echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'Button');
+        echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'btn btn-primary');
         ?>
     </div>
-<h1><?php echo t('Manage Categories'); ?></h1>
 </div>
 
 <?php

@@ -1,0 +1,139 @@
+.ToggleFlyout {
+  position: relative;
+
+  &.Open {
+    z-index: 110; /* above Item:hover */
+
+    .Button-Options {
+      color: $link-color;
+      fill: $link-color;
+
+      .SpFlyoutHandle {
+        border-top-color: $link-color;
+      }
+    }
+  }
+
+  .Flyout {
+    position: absolute;
+    top: 100%;
+    /* right: -10px; This causes text overflows when flyout items are long */
+    display: none;
+  }
+}
+.ToggleFlyout,
+.Button-Options,
+.OptionsTitle {
+  display: inline-block;
+}
+
+.Button-Options {
+  cursor: pointer;
+  line-height: 1;
+  &:hover {
+    color: $link-color;
+    fill: $link-color;
+
+    .SpFlyoutHandle {
+      border-top-color: $link-color;
+    }
+  }
+}
+
+.OptionsMenu .Flyout {
+  right: -0;
+}
+
+.Flyout .Author .PhotoWrap {
+  margin: 0;
+}
+
+.FlyoutMenu {
+  width: 300px;
+  background: #fff;
+  //color: $black;
+  border-radius: 2px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border: solid 1px;
+}
+
+.FlyoutButton {
+  cursor: pointer;
+}
+
+.FlyoutLeft .Flyout {
+  right: inherit;
+}
+
+.SpFlyoutHandle,
+.DropHandle {
+  display: inline-block;
+  height: 0;
+  width: 0;
+  border-style: solid;
+  border-width: 4px;
+  border-color: $body-color transparent transparent transparent;
+  position: relative;
+  bottom: -2px;
+  vertical-align: middle;
+}
+
+
+$dropdown-item-line-height: floor($dropdown-font-size * 1.2);
+$dropdown-item-padding-y: (30 - $icon-size) / 2;
+
+.MenuItems {
+  color: $dropdown-color;
+  background: $dropdown-bg;
+  font-size: $dropdown-font-size;
+  box-shadow: $dropdown-box-shadow;
+  line-height: $dropdown-item-line-height;
+  min-width: $dropdown-min-width;
+  padding: 6px 0;
+
+  .icon {
+    fill: transparentize($dropdown-color, .2);
+    margin-right: 6px;
+    vertical-align: top;
+  }
+
+  .dropdown-header {
+    color: #A3A3A3;
+    font-size: 12px;
+    padding: 6px $dropdown-item-padding-x;
+  }
+
+  .dropdown-menu-link {
+    display: block;
+    color: inherit;
+    padding: $dropdown-item-padding-y $dropdown-item-padding-x $dropdown-item-padding-y $dropdown-item-padding-x;
+
+    &.danger {
+      color: #FF1010;
+    }
+
+    &:hover {
+      background: $dropdown-link-hover-bg;
+    }
+  }
+
+  .selected {
+    &:after {
+      content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%230291DB%22%3E%3Cpath%20d%3D%22M7.5721325%2C12.1125141%20C7.5714572%2C12.1131928%207.57078083%2C12.1138709%207.57010342%2C12.1145483%20C7.35254964%2C12.3321021%207.0688103%2C12.4422832%206.78434933%2C12.4429854%20C6.49721771%2C12.4413055%206.21268196%2C12.3329648%205.99426545%2C12.1145483%20L3.32760891%2C9.44789175%20C2.89237254%2C9.01265538%202.88927326%2C8.31009706%203.32746273%2C7.8719076%20C3.76261837%2C7.43675196%204.46257481%2C7.43118171%204.90344688%2C7.87205378%20L6.78218443%2C9.75079133%20L11.2025906%2C5.3303852%20C11.6399896%2C4.89298617%2012.3443011%2C4.88813372%2012.7824905%2C5.32632319%20C13.2176462%2C5.76147883%2013.224448%2C6.46020374%2012.7784285%2C6.90622316%20L7.57416542%2C12.1104863%20C7.57348803%2C12.1111637%207.57281%2C12.11184%207.57213133%2C12.1125153%20L7.5721325%2C12.1125141%20Z%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E);
+      display: block;
+      height: 16px;
+      width: 16px;
+      float: right;
+    }
+  }
+
+  .no-icon .dropdown-menu-link {
+    padding-left: 16px + $dropdown-item-padding-x + 6px;
+  }
+
+  hr {
+    border-color: $dropdown-divider-bg;
+    border-top-style: dotted;
+    margin: 6px 0;
+  }
+}

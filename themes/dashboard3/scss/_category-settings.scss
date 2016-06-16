@@ -1,0 +1,196 @@
+.dd {
+  color: $body-color;
+  position: relative;
+  fill: $body-color;
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+.dd-list {
+  position: relative;
+
+  .dd-list {
+    padding-left: 30px;
+  }
+}
+
+.dd-item,
+.dd-empty,
+.dd-placeholder {
+  display: block;
+  position: relative;
+  margin: 0;
+  padding: 0;
+  min-height: $tree-item-height;
+}
+
+.dd-item {
+  > button {
+    border: 0;
+    background: none;
+    position: absolute;
+    top: 0;
+    left: 30px;
+    padding: $tree-icon-padding 6px;
+    cursor: pointer;
+
+    &:active,
+    &:hover {
+      color: $link-color;
+      fill: $link-color;
+    }
+  }
+
+  .options {
+    float: right;
+    fill: $icon-color;
+    margin-top: -$tree-padding - 1px;
+    margin-right: -$tree-padding;
+  }
+
+  .OptionsTitle {
+    display: inline-block;
+    padding-right: 2px;
+    line-height: 1;
+  }
+  .Button-Options {
+    padding: $tree-icon-padding;
+  }
+
+  .ToggleFlyout {
+    .Flyout {
+      top: $tree-item-height - $tree-icon-padding + 2px;
+    }
+  }
+}
+
+.dd-handle {
+  padding: $tree-icon-padding;
+  position: absolute;
+  margin: 0;
+  left: 0;
+  top: 0;
+  cursor: move;
+  cursor: grab;
+  line-height: 1;
+  fill: $tree-border;
+
+  &:hover {
+    fill: transparentize($body-color, .4);
+  }
+}
+
+.dd-content {
+  display: block;
+  border: solid 1px $tree-border;
+  background: $tree-background;
+  border-radius: 2px;
+  padding: 6px 9px 6px 60px;
+  margin: 3px 0;
+}
+
+.dd-dragel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  margin-top: 0; //-15px;
+  margin-left: 0; //-9px;
+  opacity: .8;
+  cursor: grabbing;
+
+  > .dd-item > .dd-handle {
+    fill: $body-color;
+  }
+}
+
+.dd-placeholder,
+.dd-empty {
+  margin: 3px 0;
+  padding: 0;
+  background: $placeholder-background;
+  border: 1px dashed $placeholder-border;
+  min-height: $tree-item-height;
+  border-radius: 2px;
+  cursor: grabbing;
+}
+
+.SpFlyoutHandle,
+.DropHandle {
+  border-top-color: $icon-color;
+}
+
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.icon-16 {
+  height: 16px;
+  width: 16px;
+}
+
+.bigcrumbs {
+  border-bottom: solid 1px $border-color;
+  fill: $body-color;
+  padding-left: 6px;
+
+  .crumb {
+    display: inline-block;
+    line-height: 24px;
+    padding: 6px (12px + 12px) 6px 12px;
+    position: relative;
+    fill: $body-color;
+    color: $body-color;
+
+    &:hover {
+      fill: $link-color;
+      color: $link-color;
+    }
+
+    &:before,
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      right: -12px;
+      width: 0;
+      border: solid 12px transparent;
+      border-top-width: 19px;
+      border-bottom-width: 19px;
+      border-left-color: $border-color;
+    }
+
+    &:after {
+      content: '';
+      border-left-color: #fff;
+      right: -11px;
+    }
+    &:before {
+      content: '';
+    }
+
+    &:last-child {
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  .icon-root {
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+}
+
+.heading-bar {
+  .actions {
+    float: right;
+    padding: 6px 18px 0 0;
+  }
+}

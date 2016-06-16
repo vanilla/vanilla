@@ -256,6 +256,24 @@ $grid-breakpoints: (
   xl: 1200px
 ) !default;
 
+// Dropdowns
+$dropdown-font-size: 14px !default;
+$dropdown-min-width: 180px !default;
+$dropdown-padding-y: 5px !default;
+$dropdown-margin-top: 2px !default;
+$dropdown-color: $body-color !default;
+$dropdown-bg: #fff !default;
+//$dropdown-border-color: rgba(0, 0, 0, .15) !default;
+//$dropdown-border-width: 0 !default;
+$dropdown-divider-bg: #e5e5e5 !default;
+$dropdown-box-shadow: 0 1px 3px rgba(0, 0, 0, .3) !default;
+$dropdown-link-color: $body-color !default;
+$dropdown-link-hover-bg: #f2f5fa !default;
+
+$dropdown-item-padding-x: 12px !default;
+
+$dropdown-header-font-size: 12px;
+$dropdown-header-color: #a3a3a3 !default;
 
 // Form states and alerts
 //
@@ -286,3 +304,16 @@ $drawer-width:                   222px;
 
 
 $modal-inner-padding:            to-rem(18);
+
+// Category settings stuff.
+$icon-color: transparentize($body-color, .4);
+$icon-size: 16px;
+
+$tree-background: #fdfdff;
+$tree-border: $border-color;
+$tree-item-height: 36px;
+$tree-padding: 6px;
+$tree-icon-padding: (($tree-item-height - $icon-size - 1px) / 2);
+
+$placeholder-background: #f1faff;
+$placeholder-border: #0291db;

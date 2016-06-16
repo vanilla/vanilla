@@ -18,6 +18,15 @@
   }
 }
 
+.list-reset {
+  ul,
+  ol {
+    @include list-reset();
+  }
+
+
+}
+
 form {
   ul,
   ol {
@@ -110,7 +119,7 @@ form {
 
   > .label-wrap-wide {
     @extend .row-padding-left;
-    flex-grow: 3;
+    flex-grow: 1;
   }
 
   .input-wrap-right {
@@ -431,6 +440,9 @@ select {
 //           <div class="buttons">
 //             <a class="btn btn-transparent">Button</a>
 //           </div>
+//           <div class="selected">
+//             selected icon
+//           </div>
 //         </div>
 //       </div>
 //       <div class="title">Baby Seal</div>
@@ -446,6 +458,9 @@ select {
 //         <div class="overlay">
 //           <div class="buttons">
 //             <a class="btn btn-transparent">Button</a>
+//           </div>
+//           <div class="selected">
+//             selected icon
 //           </div>
 //         </div>
 //       </div>
@@ -491,8 +506,12 @@ select {
       background-color: $white;
       background-color: rgba(255,255,255,.7);
 
-      > * {
+      > .buttons {
         display: none;
+      }
+
+      > .selected {
+        display: block;
       }
     }
 
@@ -504,7 +523,6 @@ select {
   .label-selector-image {
     display: block;
     width: 100%;
-    border: 1px solid $border-color;
   }
 
   .title {
@@ -516,9 +534,19 @@ select {
     position: relative;
     display: block;
     margin-bottom: $spacer / 2;
+    @include image-wrap-border(0);
 
     &:hover .overlay {
       height: 100%;
+    }
+  }
+
+  .selected {
+    display: none;
+
+    svg {
+      width: 84px;
+      fill: $brand-success;
     }
   }
 
@@ -536,17 +564,6 @@ select {
     overflow: hidden;
     transition: all .1s;
     text-align: center;
-
-
-    &::after {
-      @include icon;
-      font-size: 4rem;
-      color: $brand-success;
-      text-align: center;
-      transition: opacity .1s;
-      opacity: 1;
-      @include char-content($icon-ok-circle);
-    }
   }
 
   .buttons {
@@ -573,6 +590,36 @@ select {
   }
 }
 
+.mobile-wrap {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $spacer / 2;
+
+  .mobile-frame {
+    position: relative;
+    bottom: 0;
+  }
+
+  svg {
+    fill: rgba(85,90,98,.27);
+  }
+
+  .image-wrap {
+    position: absolute;
+    bottom: .7%;
+    left: 8%;
+    width: 84%;
+    height: 86%;
+    margin-bottom: 0;
+    overflow: hidden;
+    @include image-wrap-border(0);
+
+    &::after {
+      border-bottom: 0;
+    }
+  }
+}
+
 .label-selector-item {
   @extend .col-xs-12;
   @extend .col-sm-8;
@@ -591,6 +638,7 @@ select {
 //   <div class="search-wrap">
 //     <input class="form-control">
 //     <button type="submit" class="search-submit">Search</button>
+//     <div class="btn js-clear-search btn-clear"><span class="clear">x</span></div>
 //   </div>
 // </form>
 //
@@ -601,16 +649,36 @@ select {
   position: relative;
 
   .form-control {
-    border-radius: 1.25rem;
+    border-radius: $control-height / $rem-base / 2 * 1rem;
+    padding-left: $spacer * 2.5;
   }
 
   &::before {
     position: absolute;
     top: .375rem;
-    left: 1rem;
+    left: $spacer;
+    font-size: $font-size-base;
     line-height: $font-size-base * $line-height;
+    color: $grey;
     @extend %icon;
     @include char-content($icon-search);
+  }
+
+  .btn-clear {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: $control-height / $rem-base * 1rem;
+    padding: $spacer ($spacer * 1.5);
+    font-size: $font-size-lg;
+    line-height: 0;
+    font-weight: 100;
+    color: $grey;
+  }
+
+  .search-info {
+    margin-top: $spacer / 4;
+    font-style: italic;
   }
 }
 

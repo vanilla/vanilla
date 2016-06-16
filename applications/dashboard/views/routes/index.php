@@ -18,9 +18,9 @@ $Session = Gdn::session();
         <thead>
         <tr>
             <th><?php echo t('Route'); ?></th>
-            <th class="Alt"><?php echo t('Target'); ?></th>
-            <th class="Alt"><?php echo t('Type'); ?></th>
-            <th class="Alt"><?php echo t('Options'); ?></th>
+            <th><?php echo t('Target'); ?></th>
+            <th><?php echo t('Type'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

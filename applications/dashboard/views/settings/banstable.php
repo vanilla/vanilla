@@ -11,7 +11,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
             <th class="CenterCell"><?php echo '<span title="'.t('Number of blocked registrations').'">', t('Blocked'), '</span>'; ?></th>
             <th class="UsernameCell"><?php echo t('Added By'); ?></th>
             <th><?php echo t('Notes'); ?></th>
-            <th><?php echo t('Options'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

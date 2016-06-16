@@ -36,6 +36,8 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         echo '<div class="search-wrap input-wrap">';
         echo $this->Form->textBox('Keywords');
         echo ' ', $this->Form->button(t('Go'));
+        echo '<div class="btn js-clear-search btn-clear"><span class="clear">x</span></div>';
+        echo '<div class="info search-info">';
         $count = $this->data('RecordCount', $this->data('UserCount', null));
         if ($count !== null) {
             echo ' ', sprintf(plural($count, '%s user found.', '%s users found.'), $count);
@@ -43,10 +45,11 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
             echo ' ', sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
         }
         echo '</div>';
+        echo '</div>';
         echo $this->Form->close();
         ?>
     </div>
-    <div class="Wrap">
+<!--    <div class="Wrap">-->
         <!--   <span class="ButtonList">
       <?php
         echo anchor(t('Ban'), '#', 'Popup SmallButton');
@@ -54,7 +57,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
         echo anchor(t('Delete'), '#', 'Popup SmallButton');
         ?>
    </span>-->
-    </div>
+<!--    </div>-->
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
     <div class="table-wrap">
@@ -73,7 +76,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
                 $this->fireEvent('UserCell');
                 ?>
                 <?php if ($EditUser) { ?>
-                    <th><?php echo t('Options'); ?></th>
+                    <th class="options"><?php echo t('Options'); ?></th>
                 <?php } ?>
             </tr>
             </thead>

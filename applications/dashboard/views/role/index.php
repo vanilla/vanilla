@@ -30,7 +30,7 @@ $this->DefaultRolesWarning();
         <tr id="0">
             <th><?php echo t('Role'); ?></th>
             <th class="Alt"><?php echo t('Description'); ?></th>
-            <th><?php echo t('Options'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

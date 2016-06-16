@@ -22,7 +22,7 @@ if ($NumApplicants == 0) : ?>
                     <th><?php echo t('Reason'); ?></th>
                     <th><?php echo t('IP Address'); ?></th>
                     <th><?php echo t('Date'); ?></th>
-                    <th><?php echo t('Options'); ?></th>
+                    <th class="options"><?php echo t('Options'); ?></th>
                 </tr>
             </thead>
             <tbody>
@@ -56,10 +56,13 @@ if ($NumApplicants == 0) : ?>
                     </td>
                     <td style="border-bottom:none;"><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
                     <td style="border-bottom:none;"><?php echo Gdn_Format::date($User->DateInserted); ?></td>
-                    <td style="border-bottom:none;"><?php
+                    <td style="border-bottom:none;">
+                        <div class="btn-group">
+                        <?php
                         echo anchor(t('Approve'), '/user/approve/'.$User->UserID, 'btn btn-ok ApproveApplicant');
                         echo anchor(t('Decline'), '/user/decline/'.$User->UserID, 'btn btn-delete CancelButton DeclineApplicant');
                         ?>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>

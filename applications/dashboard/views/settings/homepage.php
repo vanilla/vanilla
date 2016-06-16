@@ -17,13 +17,16 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
     $CssClass .= ' Choice';
 
     echo wrap(
-        '<span class="image-wrap">'
+        '<div class="image-wrap">'
         .sprite($SpriteClass)
         .'<div class="overlay">'
         .'<div class="buttons">'
         .anchor(t('Select'), $Url, 'btn btn-transparent', ['title' => $Description, 'rel' => $Url])
         .'</div>'
-        .'</div></span>'
+        .'<div class="selected">'
+        .dashboardSymbol('checkmark')
+        .'</div>'
+        .'</div></div>'
         .'<div class="title">'
         .t($Title)
         .'</div>',

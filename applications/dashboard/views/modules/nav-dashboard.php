@@ -5,8 +5,8 @@ if (!function_exists('renderDashboardNav')) {
     {
         foreach ($items as $item) {
             if (val('type', $item) == 'group') { ?>
-                <h4><a data-toggle="collapse" class="collapsed" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
-                <ul class="nav nav-pills nav-stacked collapse" id="<?php echo trim(val('headerCssClass', $item)); ?>">
+                <h4 class="nav-heading"><a data-toggle="collapse" class="collapsed" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
+                <ul class="nav nav-pills nav-stacked collapse in" id="<?php echo trim(val('headerCssClass', $item)); ?>">
                 <?php
                 if (val('items', $item)) {
                     renderDashboardNav(val('items', $item));

@@ -9,12 +9,12 @@
 </svg>
 <?php
 
-function dashboardSymbol($name, $alt = '') {
+function dashboardSymbol($name, $alt = '', $class = '') {
     if (!empty($alt)) {
         $alt = 'alt="'.htmlspecialchars($alt).'" ';
     }
     $r = <<<EOT
-<svg {$alt}class="icon icon-17 icon-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
+<svg {$alt}class="icon $class icon-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
 EOT;
     return $r;
 }

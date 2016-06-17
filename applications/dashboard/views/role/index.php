@@ -59,9 +59,9 @@ $this->DefaultRolesWarning();
                     <div class="btn-group">
                     <?php
                     if ($Role['CanModify']) {
-                        echo anchor(t('Edit'), "/role/edit/{$Role['RoleID']}", 'btn btn-edit');
+                        echo anchor(dashboardSymbol('edit'), "/role/edit/{$Role['RoleID']}", 'btn btn-icon', ['aria-label' => t('Edit')]);
                         if ($Role['Deletable']) {
-                            echo anchor(t('Delete'), "/role/delete/{$Role['RoleID']}", 'Popup btn btn-delete');
+                            echo anchor(dashboardSymbol('delete'), "/role/delete/{$Role['RoleID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete')]);
                         }
                     }
                     ?>

@@ -55,10 +55,7 @@ Gdn_Theme::assetBegin('Help'); ?>
         <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all'); ?></li>
         <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount)), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled'); ?></li>
         <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount)), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled'); ?></li>
-        <?php
-        if ($addonUrl != '')
-            echo $getMore;
-        ?>
+<!--        --><?php //if ($addonUrl != '') echo $getMore; ?>
     </ul>
 </div>
 <?php } ?>
@@ -171,7 +168,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                 </div>
                 <div class="media-right media-options">
                     <?php if ($SettingsUrl != '') {
-                        echo wrap(anchor('', $SettingsUrl, 'btn btn-settings-border', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
+                        echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
                     }
                     ?>
                     <div id="<?php echo $addonName; ?>-toggle">

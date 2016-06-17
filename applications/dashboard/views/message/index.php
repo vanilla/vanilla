@@ -66,8 +66,8 @@ $Session = Gdn::session();
                 <td>
                     <div class="btn-group">
                         <?php
-                        echo anchor(t('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage btn-edit btn');
-                        echo anchor(t('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage btn-delete btn');
+                        echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage btn btn-icon', ['aria-label' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage btn btn-icon', ['aria-label' => t('Delete')]);
                         ?>
                     </div>
                 </td>

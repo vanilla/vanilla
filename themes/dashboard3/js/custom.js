@@ -136,7 +136,6 @@
     });
 
     $(document).on('shown.bs.collapse', function(e) {
-        console.log(e);
         $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
         scrollToFixedInit($('.panel-nav'));
     });

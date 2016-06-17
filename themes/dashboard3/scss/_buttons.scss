@@ -205,27 +205,24 @@ input[type="button"] {
 }
 
 .btn-icon {
-  @extend .btn-link;
-  @include text-hide();
-  width: $font-size-lg + .5rem;
-  height: $font-size-lg;
-  padding: 0;
+  $btn-icon-height: 28;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
 
   &:first-child {
     margin-left: 0;
   }
 
-  &:hover {
-    @include text-hide();
-    text-decoration: none;
+  svg {
+    display: block;
+    height: to-rem($btn-icon-height);
   }
 
-  &:before {
-    @extend %icon;
-    display: block;
-    font-size: $font-size-lg;
-    color: $grey-dark;
+  &:hover {
+    svg {
+      fill: $white;
+    }
   }
 }
 
@@ -275,4 +272,13 @@ input[type="button"] {
   &:before {
     @include char-content($icon-edit);
   }
+}
+
+.btn-settings-border {
+  @extend .btn-secondary;
+}
+
+.btn-icon-border {
+  @extend .btn-secondary;
+  @extend .btn-icon;
 }

@@ -1,4 +1,4 @@
-.icon:before, .btn-settings-border:before, .btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-ok:before, .btn-settings:before, .search-wrap::before {
+.icon:before, .btn-settings-border:before, .search-wrap::before {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -5035,7 +5035,7 @@ a.current-theme,
   border: 0.0625rem solid #f4f6fb;
 }
 
-.media {
+.media, .Feed, .FeedItem {
   display: -ms-flexbox;
   display: flex;
   margin-bottom: 1rem;
@@ -5072,7 +5072,7 @@ a.current-theme,
   padding-right: 10px;
 }
 
-.media-heading {
+.media-heading, .FeedItem > a {
   margin-top: 0;
   margin-bottom: 5px;
 }
@@ -6878,8 +6878,8 @@ input[type="checkbox"].disabled {
 .container {
   margin-left: auto;
   margin-right: auto;
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
 }
 
 @media (min-width: 544px) {
@@ -6909,38 +6909,38 @@ input[type="checkbox"].disabled {
 .container-fluid {
   margin-left: auto;
   margin-right: auto;
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
 }
 
 .row, .footer, .form-horizontal li, .label-selector, .emojiext-list,
 .LayoutOptions,
-.HomeOptions, .media {
+.HomeOptions, .media, .Feed, .FeedItem {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-  margin-left: -0.9375rem;
-  margin-right: -0.9375rem;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
 }
 
 .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
 .LayoutOptions > .label-wrap,
-.HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+.HomeOptions > .label-wrap, .media > .label-wrap, .Feed > .label-wrap, .FeedItem > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
 li.LayoutOptions > label, .form-horizontal
-li.HomeOptions > label, .form-horizontal li.media > label, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
+li.HomeOptions > label, .form-horizontal li.media > label, .form-horizontal li.Feed > label, .form-horizontal li.FeedItem > label, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
 .LayoutOptions > .input-wrap,
-.HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
+.HomeOptions > .input-wrap, .media > .input-wrap, .Feed > .input-wrap, .FeedItem > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
 li.LayoutOptions > input, .form-horizontal
-li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
+li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.Feed > input, .form-horizontal li.FeedItem > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
 li.LayoutOptions > select, .form-horizontal
-li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
+li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li.Feed > select, .form-horizontal li.FeedItem > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
 .LayoutOptions > .color-picker,
-.HomeOptions > .color-picker, .media > .color-picker, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.HomeOptions > .color-picker, .media > .color-picker, .Feed > .color-picker, .FeedItem > .color-picker, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
 }
 
 .col-xs-1 {
@@ -7394,9 +7394,9 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   }
   .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
   .LayoutOptions > .label-wrap,
-  .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+  .HomeOptions > .label-wrap, .media > .label-wrap, .Feed > .label-wrap, .FeedItem > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
   li.LayoutOptions > label, .form-horizontal
-  li.HomeOptions > label, .form-horizontal li.media > label, .label-selector-item {
+  li.HomeOptions > label, .form-horizontal li.media > label, .form-horizontal li.Feed > label, .form-horizontal li.FeedItem > label, .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -7430,13 +7430,13 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   }
   .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
   .LayoutOptions > .input-wrap,
-  .HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
+  .HomeOptions > .input-wrap, .media > .input-wrap, .Feed > .input-wrap, .FeedItem > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
   li.LayoutOptions > input, .form-horizontal
-  li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
+  li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.Feed > input, .form-horizontal li.FeedItem > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
   li.LayoutOptions > select, .form-horizontal
-  li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
+  li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li.Feed > select, .form-horizontal li.FeedItem > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
   .LayoutOptions > .color-picker,
-  .HomeOptions > .color-picker, .media > .color-picker {
+  .HomeOptions > .color-picker, .media > .color-picker, .Feed > .color-picker, .FeedItem > .color-picker {
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
@@ -9342,33 +9342,36 @@ span.current-theme, .Tabs ul li.Active a.btn-primary, .Tabs ul li.Active .Filter
   border-color: #0291db;
 }
 
-.btn-secondary, .btn-settings-border, .btn-userblock, .file-upload-browse, .Tabs ul li a,
+.btn-secondary, .btn-settings-border, .btn-icon-border, .btn-userblock, .file-upload-browse, .Tabs ul li a,
 .tabbed-content li a {
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary:hover, .btn-settings-border:hover, .btn-userblock:hover, .file-upload-browse:hover, .Tabs ul li a:hover,
+.btn-secondary:hover, .btn-settings-border:hover, .btn-icon-border:hover, .btn-userblock:hover, .file-upload-browse:hover, .Tabs ul li a:hover,
 .tabbed-content li a:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:focus, .btn-settings-border:focus, .btn-userblock:focus, .file-upload-browse:focus, .Tabs ul li a:focus,
-.tabbed-content li a:focus, .btn-secondary.focus, .focus.btn-settings-border, .focus.btn-userblock, .focus.file-upload-browse, .Tabs ul li a.focus,
+.btn-secondary:focus, .btn-settings-border:focus, .btn-icon-border:focus, .btn-userblock:focus, .file-upload-browse:focus, .Tabs ul li a:focus,
+.tabbed-content li a:focus, .btn-secondary.focus, .focus.btn-settings-border, .focus.btn-icon-border, .focus.btn-userblock, .focus.file-upload-browse, .Tabs ul li a.focus,
 .tabbed-content li a.focus {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-secondary:active, .btn-settings-border:active, .btn-userblock:active, .file-upload-browse:active, .Tabs ul li a:active,
+.btn-secondary:active, .btn-settings-border:active, .btn-icon-border:active, .btn-userblock:active, .file-upload-browse:active, .Tabs ul li a:active,
 .tabbed-content li a:active, .btn-secondary.active, .active.btn-settings-border,
 .Tabs ul .btn-settings-border.current-tab,
 .tabbed-content .btn-settings-border.current-tab, .btn-settings-border.Current,
-.btn-settings-border.current-theme, .active.btn-userblock,
+.btn-settings-border.current-theme, .active.btn-icon-border,
+.Tabs ul .btn-icon-border.current-tab,
+.tabbed-content .btn-icon-border.current-tab, .btn-icon-border.Current,
+.btn-icon-border.current-theme, .active.btn-userblock,
 .Tabs ul .btn-userblock.current-tab,
 .tabbed-content .btn-userblock.current-tab, .btn-userblock.Current,
 .btn-userblock.current-theme, .active.file-upload-browse,
@@ -9385,6 +9388,7 @@ a.current-theme,
 .btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
 .open > .dropdown-toggle.btn-settings-border,
+.open > .dropdown-toggle.btn-icon-border,
 .open > .dropdown-toggle.btn-userblock,
 .open > .dropdown-toggle.file-upload-browse, .Tabs ul li
 .open > a.dropdown-toggle,
@@ -9396,17 +9400,17 @@ a.current-theme,
   background-image: none;
 }
 
-.btn-secondary.disabled:focus, .disabled.btn-settings-border:focus, .disabled.btn-userblock:focus, .disabled.file-upload-browse:focus, .Tabs ul li a.disabled:focus,
-.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-settings-border, .disabled.focus.btn-userblock, .disabled.focus.file-upload-browse, .Tabs ul li a.disabled.focus,
-.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .btn-settings-border:disabled:focus, .btn-userblock:disabled:focus, .file-upload-browse:disabled:focus, .Tabs ul li a:disabled:focus,
-.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .btn-settings-border:disabled.focus, .btn-userblock:disabled.focus, .file-upload-browse:disabled.focus, .Tabs ul li a:disabled.focus,
+.btn-secondary.disabled:focus, .disabled.btn-settings-border:focus, .disabled.btn-icon-border:focus, .disabled.btn-userblock:focus, .disabled.file-upload-browse:focus, .Tabs ul li a.disabled:focus,
+.tabbed-content li a.disabled:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-settings-border, .disabled.focus.btn-icon-border, .disabled.focus.btn-userblock, .disabled.focus.file-upload-browse, .Tabs ul li a.disabled.focus,
+.tabbed-content li a.disabled.focus, .btn-secondary:disabled:focus, .btn-settings-border:disabled:focus, .btn-icon-border:disabled:focus, .btn-userblock:disabled:focus, .file-upload-browse:disabled:focus, .Tabs ul li a:disabled:focus,
+.tabbed-content li a:disabled:focus, .btn-secondary:disabled.focus, .btn-settings-border:disabled.focus, .btn-icon-border:disabled.focus, .btn-userblock:disabled.focus, .file-upload-browse:disabled.focus, .Tabs ul li a:disabled.focus,
 .tabbed-content li a:disabled.focus {
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary.disabled:hover, .disabled.btn-settings-border:hover, .disabled.btn-userblock:hover, .disabled.file-upload-browse:hover, .Tabs ul li a.disabled:hover,
-.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .btn-settings-border:disabled:hover, .btn-userblock:disabled:hover, .file-upload-browse:disabled:hover, .Tabs ul li a:disabled:hover,
+.btn-secondary.disabled:hover, .disabled.btn-settings-border:hover, .disabled.btn-icon-border:hover, .disabled.btn-userblock:hover, .disabled.file-upload-browse:hover, .Tabs ul li a.disabled:hover,
+.tabbed-content li a.disabled:hover, .btn-secondary:disabled:hover, .btn-settings-border:disabled:hover, .btn-icon-border:disabled:hover, .btn-userblock:disabled:hover, .file-upload-browse:disabled:hover, .Tabs ul li a:disabled:hover,
 .tabbed-content li a:disabled:hover {
   background-color: #fff;
   border-color: #ccc;
@@ -9644,55 +9648,35 @@ a.current-theme,
   border-color: #fc8780;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
+.btn-link {
   font-weight: normal;
   color: #0291db;
   border-radius: 0;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active, .btn-link.active, .active.btn-icon, .active.btn-edit, .Tabs ul li.Active a.btn-edit,
-.Tabs ul .btn-edit.current-tab,
-.tabbed-content li.Active a.btn-edit,
-.tabbed-content .btn-edit.current-tab, .btn-edit.Current,
-.btn-edit.current-theme, .active.btn-delete, .Tabs ul li.Active a.btn-delete,
-.Tabs ul .btn-delete.current-tab,
-.tabbed-content li.Active a.btn-delete,
-.tabbed-content .btn-delete.current-tab, .btn-delete.Current,
-.btn-delete.current-theme, .active.btn-ok, .Tabs ul li.Active a.btn-ok,
-.Tabs ul .btn-ok.current-tab,
-.tabbed-content li.Active a.btn-ok,
-.tabbed-content .btn-ok.current-tab, .btn-ok.Current,
-.btn-ok.current-theme, .active.btn-settings, .Tabs ul li.Active a.btn-settings,
-.Tabs ul .btn-settings.current-tab,
-.tabbed-content li.Active a.btn-settings,
-.tabbed-content .btn-settings.current-tab, .btn-settings.Current,
-.btn-settings.current-theme, .Tabs ul li.Active a.btn-icon,
-.Tabs ul .btn-icon.current-tab,
-.tabbed-content li.Active a.btn-icon,
-.tabbed-content .btn-icon.current-tab, .btn-icon.Current,
-.btn-icon.current-theme, .Tabs ul li.Active a.btn-link,
+.btn-link, .btn-link:active, .btn-link.active, .Tabs ul li.Active a.btn-link,
 .Tabs ul .btn-link.current-tab,
 .tabbed-content li.Active a.btn-link,
 .tabbed-content .btn-link.current-tab, .btn-link.Current,
-.btn-link.current-theme, .btn-link:disabled, .btn-icon:disabled, .btn-edit:disabled, .btn-delete:disabled, .btn-ok:disabled, .btn-settings:disabled {
+.btn-link.current-theme, .btn-link:disabled {
   background-color: transparent;
 }
 
-.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active {
+.btn-link, .btn-link:focus, .btn-link:active {
   border-color: transparent;
 }
 
-.btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
+.btn-link:hover {
   border-color: transparent;
 }
 
-.btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
+.btn-link:focus, .btn-link:hover {
   color: #015f8f;
   text-decoration: underline;
   background-color: transparent;
 }
 
-.btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-edit:disabled:focus, .btn-delete:disabled:focus, .btn-ok:disabled:focus, .btn-settings:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .btn-edit:disabled:hover, .btn-delete:disabled:hover, .btn-ok:disabled:hover, .btn-settings:disabled:hover {
+.btn-link:disabled:focus, .btn-link:disabled:hover {
   color: #f4f4f5;
   text-decoration: none;
 }
@@ -9757,35 +9741,22 @@ input[type="button"].btn-block {
   margin-right: -0.0625rem;
 }
 
-.btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
-  font: "0/0" a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-  width: 1.75rem;
-  height: 1.25rem;
-  padding: 0;
+.btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-icon-border {
+  padding: 0.1875rem 0.375rem;
   margin: 0 0 0 .5rem;
 }
 
-.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-ok:first-child, .btn-settings:first-child {
+.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-ok:first-child, .btn-settings:first-child, .btn-icon-border:first-child {
   margin-left: 0;
 }
 
-.btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
-  font: "0/0" a;
-  color: transparent;
-  text-shadow: none;
-  background-color: transparent;
-  border: 0;
-  text-decoration: none;
+.btn-icon svg, .btn-edit svg, .btn-delete svg, .btn-ok svg, .btn-settings svg, .btn-icon-border svg {
+  display: block;
+  height: 1.75rem;
 }
 
-.btn-icon:before, .btn-edit:before, .btn-delete:before, .btn-ok:before, .btn-settings:before {
-  display: block;
-  font-size: 1.25rem;
-  color: #555a62;
+.btn-icon:hover svg, .btn-edit:hover svg, .btn-delete:hover svg, .btn-ok:hover svg, .btn-settings:hover svg, .btn-icon-border:hover svg {
+  fill: #fff;
 }
 
 .btn-edit:before {
@@ -9965,8 +9936,8 @@ input[type="button"].btn-block {
   justify-content: space-between;
   -ms-flex-align: center;
   align-items: center;
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
   border-top: 1px solid #ddd;
   font-color: #000;
   background-color: #f4f4f5;
@@ -10031,11 +10002,13 @@ input[type="button"].btn-block {
   border-left: 1px solid #ddd;
 }
 
+.list-reset,
 .list-reset ul,
 .list-reset ol {
   padding-left: 0;
 }
 
+.list-reset li,
 .list-reset ul li,
 .list-reset ol li {
   list-style: none;
@@ -10043,6 +10016,7 @@ input[type="button"].btn-block {
   justify-content: space-between;
 }
 
+.list-reset label,
 .list-reset ul label,
 .list-reset ol label {
   font-weight: 500;
@@ -10095,7 +10069,7 @@ form ol label {
 
 .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide {
   -ms-flex-positive: 1;
   flex-grow: 1;
 }
@@ -10115,19 +10089,19 @@ form ol label {
 
 .row-padding-left, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
-  padding-left: 0.9375rem;
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide {
+  padding-left: 1.125rem;
 }
 
 .row-padding-right, .row .input-wrap-right, .footer .input-wrap-right, .form-horizontal li .input-wrap-right, .label-selector .input-wrap-right, .emojiext-list .input-wrap-right,
 .LayoutOptions .input-wrap-right,
-.HomeOptions .input-wrap-right, .media .input-wrap-right {
-  padding-right: 0.9375rem;
+.HomeOptions .input-wrap-right, .media .input-wrap-right, .Feed .input-wrap-right, .FeedItem .input-wrap-right {
+  padding-right: 1.125rem;
 }
 
 .form-group.row, .form-group.footer, .form-horizontal li, .form-group.label-selector, .form-group.emojiext-list,
 .form-group.LayoutOptions,
-.form-group.HomeOptions, .form-group.media {
+.form-group.HomeOptions, .form-group.media, .form-group.Feed, .form-group.FeedItem {
   -ms-flex-align: center;
   align-items: center;
   padding-bottom: 1rem;
@@ -10136,7 +10110,7 @@ form ol label {
 
 .form-group.row:first-child, .form-group.footer:first-child, .form-horizontal li:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
 .form-group.LayoutOptions:first-child,
-.form-group.HomeOptions:first-child, .form-group.media:first-child {
+.form-group.HomeOptions:first-child, .form-group.media:first-child, .form-group.Feed:first-child, .form-group.FeedItem:first-child {
   padding-top: 1rem;
   border-top: 1px dotted #f4f4f5;
 }
@@ -10192,7 +10166,7 @@ form ol label {
 }
 
 .toggle-box-label-wrap {
-  padding-left: 0.9375rem;
+  padding-left: 1.125rem;
 }
 
 .toggle-wrap label, .ActivateSlider label {
@@ -10819,6 +10793,7 @@ select::-ms-expand {
 .label-selector .selected svg, .emojiext-list .selected svg,
 .LayoutOptions .selected svg,
 .HomeOptions .selected svg {
+  display: block;
   width: 84px;
   fill: #60bd68;
 }
@@ -10922,6 +10897,7 @@ select::-ms-expand {
 }
 
 .mobile-wrap svg {
+  display: block;
   fill: rgba(85, 90, 98, 0.27);
 }
 
@@ -11095,17 +11071,17 @@ select::-ms-expand {
   width: 5.25rem;
 }
 
-svg.icon, svg.btn-settings-border {
-  display: block;
+svg {
+  fill: #555a62;
 }
 
-.media {
-  padding: 1rem 0.9375rem;
+.media, .Feed, .FeedItem {
+  padding: 1rem 1.125rem;
   margin-bottom: 0;
   border-bottom: 1px solid #ddd;
 }
 
-.media:first-child {
+.media:first-child, .Feed:first-child, .FeedItem:first-child {
   border-top: 1px solid #ddd;
 }
 
@@ -11131,7 +11107,7 @@ svg.icon, svg.btn-settings-border {
   padding-right: 1rem;
 }
 
-.media-heading {
+.media-heading, .FeedItem > a {
   margin-top: 0;
   margin-bottom: 0.5rem;
 }
@@ -11544,7 +11520,7 @@ div.Popup .Buttons {
 }
 
 .panel-content {
-  width: 240px;
+  width: 204px;
 }
 
 @media (max-width: 767px) {
@@ -11616,6 +11592,7 @@ div.Popup .Buttons {
 }
 
 .main {
+  padding: 0 1.125rem;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -11644,12 +11621,17 @@ div.Popup .Buttons {
   padding-bottom: 4rem;
 }
 
+.main-row {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .table-wrap {
   display: block;
   margin-top: 1rem;
-  margin-right: -0.9375rem;
+  margin-right: -1.125rem;
   margin-bottom: 1rem;
-  margin-left: -0.9375rem;
+  margin-left: -1.125rem;
 }
 
 .header-block + .table-wrap,
@@ -11824,7 +11806,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 h1, .h1,
 h2, .h2,
 h3, .h3,
-h4, .h4,
+h4, .h4, .FeedItem > a,
 h5, .h5,
 h6, .h6 {
   font-family: inherit;
@@ -11845,7 +11827,7 @@ h3, .h3 {
   font-size: 1.125rem;
 }
 
-h4, .h4 {
+h4, .h4, .FeedItem > a {
   font-size: 1.125rem;
 }
 
@@ -11864,7 +11846,7 @@ h3, .h3 {
   margin-bottom: 0.5rem;
 }
 
-h4, .h4,
+h4, .h4, .FeedItem > a,
 h5, .h5,
 h6, .h6 {
   margin-top: 0.5rem;
@@ -11882,10 +11864,10 @@ p {
 
 .full-border, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
   display: block;
-  margin-left: -0.9375rem;
-  margin-right: -0.9375rem;
-  padding-left: 0.9375rem;
-  padding-right: 0.9375rem;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
   border-bottom: 1px solid #f4f4f5;
 }
 
@@ -12029,7 +12011,7 @@ pre {
 }
 
 #UrlCode {
-  padding-left: 0.9375rem;
+  padding-left: 1.125rem;
 }
 
 .LayoutOptions > a,

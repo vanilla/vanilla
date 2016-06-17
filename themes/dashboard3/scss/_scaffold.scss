@@ -3,7 +3,9 @@
 // No styleguide reference.
 
 .main {
+  flex-grow: 1;
   padding: 0 $padding-default;
+  max-width: 1024px;
 
   // Ensure the footer is flush with the bottom of the window if the
   // page height is less than the window height.
@@ -12,8 +14,6 @@
   min-height: 100vh;
   margin-top: -$navbar-height;
   padding-top: $navbar-height;
-
-  max-width: 1024px;
   background-color: $white;
   border: 1px solid $border-color;
   border-top: 0;
@@ -35,6 +35,6 @@
 
 
 .main-row {
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  justify-content: center;
 }

@@ -6,6 +6,10 @@
 
 $enable-flex: true;
 
+@function to-rem($px) {
+  @return ($px / $rem-base * 1rem);
+}
+
 // Colors
 
 $white: #fff;
@@ -86,7 +90,7 @@ $headings-color:             inherit !default;
 // Control the default styling of most Bootstrap elements by modifying these
 // variables. Mostly focused on spacing.
 
-$spacer:                     1rem !default;
+$spacer:                     to-rem(18);
 $spacer-x:                   $spacer !default;
 $spacer-y:                   $spacer !default;
 $border-width:               1px !default;

@@ -1,20 +1,20 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
+
+Gdn_Theme::assetBegin('Help'); ?>
+<h2><?php echo sprintf(t('About %s'), t('Mobile Themes')); ?></h2>
+<p><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
+<p><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+<?php Gdn_Theme::assetEnd();
 ?>
-
-<h1>
-    <?php echo t('Manage Mobile Themes'); ?>
-</h1>
-
-<div class="Info">
-    <p class="P"><?php echo t('Mobile themes allow you to change the look and feel of your site on smaller devices.'); ?></p>
-
-    <p class="P"><?php echo t('They work just like regular themes. Once one has been added to the themes folder, you can enable it here.'); ?></p>
+<svg display="none">
+    <symbol viewBox="0 0 252 281" id="mobile-frame"><g fill-rule="evenodd"><path d="M3.15,15.7582284 C3.15,8.79489615 8.78765609,3.15 15.7571747,3.15 L236.242825,3.15 C243.205576,3.15 248.85,8.78126062 248.85,15.7582284 L248.85,280.35 L3.15,280.35 L3.15,15.7582284 L3.15,15.7582284 L3.15,15.7582284 Z M243.6,279.201172 L243.6,15.7582284 C243.6,11.6862452 240.311573,8.4 236.242825,8.4 L15.7571747,8.4 C11.6900229,8.4 8.4,11.6915185 8.4,15.7582284 L8.60057618,279.102293 L243.6,279.201172 Z M1.13686838e-13,67.7172107 C1.13686838e-13,66.8516641 0.699087095,66.15 1.575,66.15 L3.15,66.15 L3.15,151.2 L1.575,151.2 C0.705151519,151.2 1.13686838e-13,150.490284 1.13686838e-13,149.632789 L1.13686838e-13,67.7172107 L1.13686838e-13,67.7172107 Z M252,67.7263729 C252,66.8557662 251.300913,66.15 250.425,66.15 L248.85,66.15 L248.85,91.35 L250.425,91.35 C251.294848,91.35 252,90.6497064 252,89.7736271 L252,67.7263729 L252,67.7263729 Z M252,99.2263729 C252,98.3557662 251.300913,97.65 250.425,97.65 L248.85,97.65 L248.85,122.85 L250.425,122.85 C251.294848,122.85 252,122.149706 252,121.273627 L252,99.2263729 L252,99.2263729 Z M186.376373,-8.06113616e-15 C185.505766,-7.90120831e-15 184.8,0.699087095 184.8,1.575 L184.8,3.15 L210,3.15 L210,1.575 C210,0.705151519 209.299706,-1.22720842e-14 208.423627,-1.21111511e-14 L186.376373,-8.06113616e-15 L186.376373,-8.06113616e-15 Z M105,23.4015945 C105,22.2961444 105.89666,21.4 106.997492,21.4 L145.002508,21.4 C146.105692,21.4 147,22.290712 147,23.4015945 L147,23.5984055 C147,24.7038556 146.10334,25.6 145.002508,25.6 L106.997492,25.6 C105.894308,25.6 105,24.709288 105,23.5984055 L105,23.4015945 L105,23.4015945 Z"/></g></symbol>
+</svg>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>" class="active"><?php echo t('Mobile Themes'); ?></a>
 </div>
-
-<h3>Available Mobile Themes</h3>
-
 <?php echo $this->Form->errors(); ?>
 
 <div class="Messages Errors TestAddonErrors Hidden">
@@ -25,9 +25,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
 
 <?php if (count($this->data('AvailableThemes', array()))): ?>
 
-    <table class="browser-mobile-themes SelectionGrid Themes">
-        <tbody>
-
+    <ul class="browser-mobile-themes label-selector">
         <?php
         // Get currently enabled theme data.
         $EnabledThemeInfo = $this->data('EnabledThemeInfo');
@@ -65,109 +63,84 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                 ? 'current-theme'
                 : '';
 
+
+
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
-                ? anchor(Img($PreviewUrl, array('alt' => $ScreenName)), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
-                : '<div class="theme-image"></div>';
+                ? anchor(Img($PreviewUrl, array('alt' => $ScreenName, 'class' => 'label-selector-image')), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
+                : anchor(Img('/themes/mobile/mobile.png', array('alt' => $ScreenName, 'class' => 'label-selector-image')), $PreviewUrl, '', array('class' => 'theme-image mfp-image'));
 
             $DescriptionHtml = ($Description)
                 ? '<em class="theme-description">'.$Description.'</em>'
                 : '';
 
-            $Col++;
-            if ($Col == 1) {
-                $ColClass = 'FirstCol';
-                echo '<tr>';
-            } elseif ($Col == 2) {
-                $ColClass = 'MiddleCol';
-            } else {
-                $ColClass = 'LastCol';
-                $Col = 0;
-            }
 
             ?>
 
-            <td class="themeblock <?php echo $ClassCurrentTheme; ?> <?php echo $ColClass; ?>">
-                <h4>
-                    <?php echo ($ThemeUrl != '') ? anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
-                </h4>
+            <li class="label-selector-item themeblock <?php echo $ClassCurrentTheme; ?>">
 
                 <!--<div class="author-name">
                <?php echo $Author; ?>
             </div>-->
-
-                <?php echo $PreviewImageHtml; ?>
-
-                <div class="theme-right-column">
-
-                    <div class="Buttons">
-                        <div class="theme-buttons">
-                            <?php
-                            echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'SmallButton EnableAddon EnableTheme', array('target' => '_top'));
-                            //echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'SmallButton PreviewAddon', array('target' => '_top'));
-                            $this->EventArguments['ThemeInfo'] = $ThemeInfo;
-                            $this->fireEvent('AfterThemeButtons');
-                            ?>
-                        </div>
-
-                        <div class="theme-apply-progress"></div>
-
-                        <div class="theme-applied">Enabled</div>
+                <div class="mobile-wrap">
+                    <div class="mobile-frame">
+                        <svg class="icon icon-48 icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
                     </div>
-
-                    <?php echo $DescriptionHtml; ?>
-
+                    <div class="image-wrap">
+                    <?php echo $PreviewImageHtml; ?>
+                        <div class="overlay">
+                            <div class="buttons">
+                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-transparent', array('target' => '_top'));
+                                $this->EventArguments['ThemeInfo'] = $ThemeInfo;
+                                $this->fireEvent('AfterThemeButtons');
+                                ?>
+                            </div>
+                            <div class="selected">
+                                <?php echo dashboardSymbol('checkmark'); ?>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
+                <div class="title">
+                    <?php echo ($ThemeUrl != '') ? anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
+                </div>
+                <div class="description">
+                    <?php echo $DescriptionHtml; ?>
 
+                    <?php
+                    if ($this->data('EnabledTheme.Options')) {
+                        $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
+                            anchor(t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
 
-                <?php
-                if ($this->data('EnabledTheme.Options')) {
-                    $OptionsDescription = sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'),
-                        anchor(t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions'));
+                        echo '<div class="Options">',
+                        $OptionsDescription,
+                        '</div>';
+                    }
+                    ?>
 
-                    echo '<div class="Options">',
-                    $OptionsDescription,
-                    '</div>';
-                }
-                ?>
+                    <?php if (is_array($RequiredApplications)): ?>
 
-                <?php if (is_array($RequiredApplications)): ?>
+                        <dl>
+                            <dt><?php echo t('Requires'); ?></dt>
+                            <dd>
 
-                    <dl>
-                        <dt><?php echo t('Requires'); ?></dt>
-                        <dd>
-
-                            <?php
-                            $i = 0;
-                            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                                if ($i > 0) {
-                                    echo ', ';
+                                <?php
+                                $i = 0;
+                                foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
+                                    if ($i > 0) {
+                                        echo ', ';
+                                    }
+                                    printf(t('%1$s %2$s'), $RequiredApplication, $VersionInfo);
+                                    ++$i;
                                 }
-                                printf(t('%1$s %2$s'), $RequiredApplication, $VersionInfo);
-                                ++$i;
-                            }
-                            ?>
-                    </dl>
+                                ?>
+                        </dl>
 
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
 
-            </td>
-
-            <?php
-            if ($Col == 0) {
-                echo '</tr>';
-            }
-            ?>
+            </li>
 
         <?php endforeach; ?>
-
-        <?php
-        if ($Col > 0) {
-            echo '<td class="LastCol EmptyCol"'.($Col == 1 ? ' colspan="2"' : '').'>&#160;</td></tr>';
-        }
-        ?>
-
-        </tbody>
-    </table>
 
 <?php endif; ?>

@@ -10,54 +10,57 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li>
-            <?php
-            echo $this->Form->label('Page', 'Location');
-            echo $this->Form->DropDown('Location', $this->data('Locations'));
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+            <?php echo $this->Form->label('Page', 'Location'); ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->DropDown('Location', $this->data('Locations')); ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Category', 'CategoryID');
-            echo $this->Form->DropDown('CategoryID', $this->data('Categories'), array('IncludeNull' => t('All Categories')));
-            echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories');
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+            <?php echo $this->Form->label('Category', 'CategoryID'); ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->DropDown('CategoryID', $this->data('Categories'), array('IncludeNull' => t('All Categories')));
+            echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories'); ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Position', 'AssetTarget');
-            echo $this->Form->DropDown('AssetTarget', $this->AssetData);
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+            <?php echo $this->Form->label('Position', 'AssetTarget'); ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->DropDown('AssetTarget', $this->AssetData); ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Message', 'Content');
-            echo $this->Form->textBox('Content', array('MultiLine' => TRUE));
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+            <?php echo $this->Form->label('Message', 'Content'); ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->textBox('Content', array('MultiLine' => TRUE)); ?>
+            </div>
         </li>
-        <li class="MessageExamples">
+        <li class="form-group row stacked">
+            <div class="label-wrap">
+            <?php echo $this->Form->label('Appearance', 'CssClass'); ?>
+            </div>
+            <div class="input-wrap">
             <?php
-            $Style = ' style="display: inline; padding: 2px 6px 2px 6px; margin: 0 6px 0 0;"';
-            echo $this->Form->label('Appearance', 'CssClass');
-            echo $this->Form->Radio('CssClass', '', array('value' => 'CasualMessage'));
-            echo '<div class="CasualMessage"'.$Style.'>'.t('Casual').'</div>';
-            echo $this->Form->Radio('CssClass', '', array('value' => 'InfoMessage'));
-            echo '<div class="InfoMessage"'.$Style.'>'.t('Information').'</div>';
-            echo $this->Form->Radio('CssClass', '', array('value' => 'AlertMessage'));
-            echo '<div class="AlertMessage"'.$Style.'>'.t('Alert').'</div>';
-            echo $this->Form->Radio('CssClass', '', array('value' => 'WarningMessage'));
-            echo '<div class="WarningMessage"'.$Style.'>'.t('Warning').'</div>';
+            echo $this->Form->Radio('CssClass', t('Casual'), array('value' => 'CasualMessage'));
+            echo $this->Form->Radio('CssClass', t('Information'), array('value' => 'InfoMessage'));
+            echo $this->Form->Radio('CssClass', t('Alert'), array('value' => 'AlertMessage'));
+            echo $this->Form->Radio('CssClass', t('Warning'), array('value' => 'WarningMessage'));
             ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('AllowDismiss', 'Allow users to dismiss this message', array('value' => '1'));
-            ?>
+        <li class="form-group row">
+            <?php echo $this->Form->toggle('AllowDismiss', 'Allow users to dismiss this message', array('value' => '1')); ?>
         </li>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('Enabled', 'Enable this message', array('value' => '1'));
-            ?>
+        <li class="form-group row">
+            <?php echo $this->Form->toggle('Enabled', 'Enable this message', array('value' => '1')); ?>
         </li>
     </ul>
 <?php echo $this->Form->close('Save');

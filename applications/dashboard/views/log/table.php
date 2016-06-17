@@ -1,8 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 include $this->fetchViewLocation('helper_functions');
-
-PagerModule::write(array('Sender' => $this, 'Limit' => 10));
 ?>
+<div class="table-wrap">
     <table id="Log" class="AltColumns">
         <thead>
         <tr>
@@ -122,5 +121,5 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 10));
         ?>
         </tbody>
     </table>
+</div>
 <?php
-PagerModule::write();

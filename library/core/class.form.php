@@ -35,11 +35,13 @@ class Gdn_Form extends Gdn_Pluggable {
             'radio' => 'RadioLabel',
             'textarea' => 'TextBox',
             'textbox' => 'InputBox',
+            'input-wrap' => 'TextBoxWrapper',
+            'form-group' => ''
         ],
         'bootstrap' => [
             'default' => 'form-control',
             'bodybox' => 'form-control js-bodybox',
-            'button' => 'btn',
+            'button' => 'btn btn-primary',
             'button-element' => 'button',
             'checkbox' => '',
             'checkbox-container' => 'checkbox',
@@ -52,8 +54,14 @@ class Gdn_Form extends Gdn_Pluggable {
             'radio-container' => 'radio',
             'smallbutton' => 'btn btn-sm',
             'textbox' => 'form-control',
+            'dropdown' => 'form-control',
+            'input-wrap' => 'input-wrap',
+            'form-group' => 'form-group row',
         ]
     ];
+
+    /** @var boolean Whether to wrap label and input elements */
+    public $wrapElements = false;
 
     /** @var string Action with which the form should be sent. */
     public $Action = '';
@@ -187,6 +195,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return bool Returns **true** if the styles were set or **false** otherwise.
      */
     public function setStyles($name) {
+//        if (inSection('Dashboard') && isset($this->allStyles[$name])) {
         if (isset($this->allStyles[$name])) {
             $this->styles = $this->allStyles[$name];
             return true;
@@ -550,6 +559,60 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * @param $fieldName
+     * @param $attributes
+     */
+    public function toggle($fieldName, $label, $attributes) {
+
+        $value = arrayValueI('value', $attributes, true);
+        if (stringEndsWith($fieldName, '[]')) {
+            if (!isset($attributes['checked'])) {
+                $getValue = $this->getValue(substr($fieldName, 0, -2));
+                if (is_array($getValue) && in_array($value, $getValue)) {
+                    $attributes['checked'] = 'checked';
+                } elseif ($getValue == $value)
+                    $attributes['checked'] = 'checked';
+            }
+        } else {
+            if ($this->getValue($fieldName) == $value) {
+                $attributes['checked'] = 'checked';
+            }
+        }
+
+        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
+
+        $attributes['aria-labelledby'] = 'label-'.$id;
+        $input = $this->input($fieldName, 'checkbox', $attributes);
+        $toggleLabel = '<label for="'.$id.'"'.
+            attribute('class', 'toggle').
+            attribute('title', val('title', $attributes)) .'>';
+
+        $toggle = '
+            <div class="label-wrap label-wrap-wide">
+                <div class="label label-'.$fieldName.'">'.$label.'</div>
+            </div>
+            <div class="input-wrap-right">
+                <div class="toggle-wrap">'.
+                    $input.
+                    $toggleLabel.'
+                </div>
+            </div>';
+
+        return $toggle;
+    }
+
+    public function fileUpload($fieldName, $attributes = []) {
+        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
+        $upload = '
+            <label class="file-upload">
+              <input type="file" name="'.$fieldName.'" id="'.$id.'" class="js-file-upload form-control">
+              <span class="file-upload-choose">'.t('Choose').'</span>
+              <span class="file-upload-browse">'.t('Browse').'</span>
+            </label>';
+        return $upload;
+    }
+
+    /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
@@ -607,6 +670,8 @@ class Gdn_Form extends Gdn_Pluggable {
                 $Input = $LabelElement.$Input.' '.T($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.T($Label).'</label> '.$Input;
+            } elseif ($Display === 'toggle') {
+                $Input = '<div class="label-wrap"><label>'.T($Label).'</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.$Input.$LabelElement.'</label></div></div> ';
             } else {
                 $Input = $Input.' '.$LabelElement.T($Label).'</label>';
             }
@@ -1109,8 +1174,15 @@ class Gdn_Form extends Gdn_Pluggable {
             $Attributes['class'] = $this->translateClasses($Attributes['class']);
         }
 
+        $Return = '';
+
+        $Wrap = val('Wrap', $Attributes, false);
+        if ($Wrap || $this->wrapElements) {
+            $Return = '<div class="'.$this->getStyle('input-wrap').'">';
+        }
+
         // Opening select tag
-        $Return = '<select';
+        $Return .= '<select';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
         $Return .= $this->_nameAttribute($FieldName, $Attributes);
         $Return .= $this->_attributesToString($Attributes);
@@ -1173,6 +1245,10 @@ class Gdn_Form extends Gdn_Pluggable {
             }
         }
         $Return .= '</select>';
+
+        if ($Wrap) {
+            $Return .= '</div>';
+        }
 
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
@@ -1500,8 +1576,8 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
         $Strength = val('Strength', $Attributes, false, true);
-        if ($Wrap) {
-            $Return .= '<div class="TextBoxWrapper">';
+        if ($Wrap || $this->wrapElements) {
+            $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
         if (strtolower($Type) == 'checkbox') {
@@ -1576,7 +1652,11 @@ PASSWORDMETER;
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
         $For = arrayValueI('for', $Attributes, arrayValueI('id', $Attributes, $this->escapeID($DefaultFor, false)));
 
-        return '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        $return = '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        if ($this->wrapElements) {
+            $return = wrap($return, 'div', ['class' => 'label-wrap']);
+        }
+        return $return;
     }
 
     /**
@@ -1630,6 +1710,10 @@ PASSWORDMETER;
     public function open($Attributes = array()) {
         if (!is_array($Attributes)) {
             $Attributes = array();
+        }
+
+        if ($this->wrapElements) {
+            $Attributes['class'] .= 'form-horizontal';
         }
 
         $Return = '<form';
@@ -1781,11 +1865,12 @@ PASSWORDMETER;
      */
     public function radioList($FieldName, $DataSet, $Attributes = array()) {
         $List = val('list', $Attributes);
+
         $Return = '';
 
         if ($List) {
             $Return .= '<ul'.(isset($Attributes['listclass']) ? " class=\"{$Attributes['listclass']}\"" : '').'>';
-            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '')).'>';
+            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '').' '.val('list-item-class', $Attributes)).'>';
             $LiClose = '</li>';
         } elseif ($this->getStyle('radio-container', '') && stripos(val('class', $Attributes), 'inline') === false) {
             $class = $this->getStyle('radio-container');
@@ -1876,8 +1961,8 @@ PASSWORDMETER;
 
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
-        if ($Wrap) {
-            $Return .= '<div class="TextBoxWrapper">';
+        if ($Wrap || $this->wrapElements) {
+            $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
         $Return .= $MultiLine === true ? '<textarea' : '<input type="'.val('type', $Attributes, 'text').'"';
@@ -2619,8 +2704,6 @@ PASSWORDMETER;
     public function simple($Schema, $Options = array()) {
         $Result = valr('Wrap.0', $Options, '<ul>');
 
-        $ItemWrap = val('ItemWrap', $Options, array("<li class=\"form-group\">\n  ", "\n</li>\n"));
-
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {
                 $Row = array('Name' => $Index, 'Control' => $Row);
@@ -2633,6 +2716,12 @@ PASSWORDMETER;
                 $Row['Options'] = array();
             }
 
+            if (strtolower($Row['Control']) == 'callback') {
+                $ItemWrap = '';
+            } else {
+                $ItemWrap = val('ItemWrap', $Options, array('<li class="' . $this->getStyle('form-group') . "\">\n", "\n</li>\n"));
+            }
+
             $Result .= $ItemWrap[0];
 
             $LabelCode = self::labelCode($Row);
@@ -2640,6 +2729,9 @@ PASSWORDMETER;
             $Description = val('Description', $Row, '');
             if ($Description) {
                 $Description = '<div class="Info">'.$Description.'</div>';
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
+            } else {
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
             }
 
             touchValue('Control', $Row, 'TextBox');
@@ -2654,9 +2746,13 @@ PASSWORDMETER;
                     $Result .= $Description
                         .$this->checkBox($Row['Name'], $LabelCode, $Row['Options']);
                     break;
+                case 'toggle':
+                    $Result .= $Description
+                        .$this->toggle($Row['Name'], $LabelCode, $Row['Options']);
+                    break;
                 case 'dropdown':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
+                    $Row['Options']['Wrap'] = true;
+                    $Result .= $labelWrap
                         .$this->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'radiolist':
@@ -2669,8 +2765,8 @@ PASSWORDMETER;
                         .$this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                     break;
                 case 'textbox':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
+                    $Row['Options']['Wrap'] = true;
+                    $Result .= $labelWrap
                         .$this->textBox($Row['Name'], $Row['Options']);
                     break;
                 case 'callback':

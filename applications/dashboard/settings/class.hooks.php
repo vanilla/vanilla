@@ -144,6 +144,11 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+
+        // Add symbols.
+        if ($Sender->addDefinition('InDashboard')) {
+            $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
+        }
     }
 
     public function dashboardNavModule_init_handler($sender) {
@@ -161,8 +166,8 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkToSectionIf('Garden.Settings.Manage', 'DashboardHome', t('Getting Started'), '/dashboard/settings/gettingstarted', 'dashboardhome.getting-started', '', $sort)
             ->addLinkToSectionIf('Garden.Settings.View', 'DashboardHome', t('Help &amp Tutorials'), '/dashboard/settings/tutorials', 'dashboardhome.tutorials', '', $sort)
             ->addGroupToSection('Moderation', t('Moderation'), 'moderation')
-            ->addLinkToSectionIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
-            ->addLinkToSectionIf($session->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, false, array('popinRel' => '/dashboard/log/count/moderate'))
+            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
+            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
             ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Banning'), '/dashboard/settings/bans', 'moderation.bans', '', $sort)
             ->addGroup(t('Appearance'), 'appearance', '', -1)
@@ -170,16 +175,16 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Mobile Theme'), '/dashboard/settings/mobilethemes', 'appearance.mobile-themes', '', $sort)
             ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Messages'), '/dashboard/message', 'appearance.messages', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
+            ->addLinkIf('Garden.Community.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
             ->addGroup(t('Users'), 'users', '', ['after' => 'appearance'])
-            ->addLinkIf(array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), t('Users'), '/dashboard/user', 'users.users', '', $sort)
-            ->addLinkIf($session->checkPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
+            ->addLinkIf(['Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'], t('Users'), '/dashboard/user', 'users.users', '', $sort)
+            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/authentication', 'users.authentication', '', $sort)
-            ->addLinkIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), t('Applicants'), '/dashboard/user/applicants', 'users.applicants', '', $sort, false, array('popinRel' => '/dashboard/user/applicantcount'))
+            ->addLinkIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), t('Applicants'), '/dashboard/user/applicants', 'users.applicants', '', $sort, ['popinRel' => '/dashboard/user/applicantcount'], false)
             ->addGroup(t('Forum Settings'), 'forum', '', ['after' => 'users'])
             ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social', '', $sort)
             ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])

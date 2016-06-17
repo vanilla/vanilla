@@ -17,7 +17,8 @@ $PluginInfo['Tagging'] = array(
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
+    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'tagging.png'
 );
 
 /**

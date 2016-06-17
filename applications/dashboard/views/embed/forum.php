@@ -2,6 +2,7 @@
 $this->EmbedType = val('0', $this->RequestArgs, 'wordpress');
 $AllowEmbed = c('Garden.Embed.Allow');
 ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
     echo '<h2>', t('Need More Help?'), '</h2>';
@@ -10,6 +11,7 @@ $AllowEmbed = c('Garden.Embed.Allow');
     echo '</ul>';
     ?>
 </div>
+<?php Gdn_Theme::assetEnd('Help'); ?>
 <h1><?php echo t('Embed Forum'); ?></h1>
 <?php
 echo $this->Form->open();
@@ -56,43 +58,18 @@ echo $this->Form->close();
             Forum.</p>
     </div>
 <?php } else if ($this->EmbedType == 'universal') { ?>
-<style type="text/css">
-    .CopyBox {
-        font-family: 'Inconsolata', Courier, monospace;
-        font-size: 12px;
-        box-shadow: inset 0 0 3px #333;
-        white-space: pre;
-        overflow: auto;
-        padding: 8px 10px;
-        background: #fffff3;
-    }
-
-    .CopyBox strong {
-        color: #000;
-        background: #ffa;
-        padding: 2px 0;
-    }
-
-    p.WarningMessage {
-        padding: 6px;
-        margin-top: 0;
-        border-top: 0;
-    }
-</style>
 
 <h1><?php echo t('Universal Forum Embed Code'); ?></h1>
 <div class="Info">
     <p><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
 
-    <div class="CopyBox">&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', true); ?>">&lt;/script>
+    <pre>&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', true); ?>">&lt;/script>
         &lt;noscript>Please enable JavaScript to view the &lt;a
         href="http://vanillaforums.com/?ref_noscript">discussions powered by Vanilla.&lt;/a>&lt;/noscript>
         &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span
         class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
-    </div>
+    </pre>
     <p class="WarningMessage">&uarr; Copy and paste this code into the web page where you want the forum to appear.</p>
-    <?php
-    }
-    }
-    ?>
 </div>
+<?php }
+} ?>

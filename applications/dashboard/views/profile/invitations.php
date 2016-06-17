@@ -84,6 +84,7 @@ if ($this->InvitationData->numRows() > 0) {
         <?php } ?>
         </tbody>
     </table>
+</div>
 <?php
 }
 echo $this->Form->close();

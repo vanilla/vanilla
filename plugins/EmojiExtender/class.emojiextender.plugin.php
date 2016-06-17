@@ -173,8 +173,16 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
 
-            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
-            $items[$key] = '@'.$icon.
+            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'], 'class' => 'label-selector-image')) : '';
+            $items[$key] =
+                '@<div class="image-wrap">'.
+                $icon.
+                '<div class="overlay">'.
+                   '<div class="buttons">'.
+                        '<a class="btn btn-transparent">'.t('Select').'</a>'.
+                   '</div>'.
+                '</div>'.
+                '</div>'.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
                 (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(t('by %s'), $manifest['author']).'</div>').
@@ -187,13 +195,12 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 'Control' => 'radiolist',
                 'Description' => '<p>Which emoji set would you like to use?</p>',
                 'Items' => $items,
-                'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')
+                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after')
             ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
-        $sender->addCssFile('settings.css', 'plugins/EmojiExtender');
         $sender->addSideMenu();
         $sender->setData('Title', sprintf(t('%s Settings'), 'Emoji'));
         $cf->renderAll();

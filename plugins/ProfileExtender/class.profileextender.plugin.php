@@ -19,7 +19,8 @@ $PluginInfo['ProfileExtender'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'Icon' => 'profile-extender.png'
 );
 
 /**

@@ -19,6 +19,7 @@ $PluginInfo['GooglePrettify'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/dashboard/settings/googleprettify',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'google-prettify.png'
 );
 
 // Changelog

@@ -43,8 +43,8 @@ vanillaStats = (function() {
          * @type {Object}
          */
         var range = {
-            From: null,
-            To: null
+            from: null,
+            to: null
         };
 
         /**
@@ -598,9 +598,33 @@ vanillaStats = (function() {
      * Update the navigation UI based on current data.
      */
     VanillaStats.prototype.updateUI = function() {
+        var currentTimeframe = document.getElementById("StatsCurrentTimeframe");
         var navNext = document.getElementById("StatsNavNext");
         var navPrev = document.getElementById("StatsNavPrev");
         var navToday = document.getElementById("StatsNavToday");
+
+        if (currentTimeframe !== null) {
+            var dateRange = this.getRange();
+            var timeframe = "";
+
+            if (dateRange.from instanceof Date && dateRange.to instanceof Date) {
+                var from = {
+                    date: dateRange.from.getDate(),
+                    month: dateRange.from.getMonth() + 1,
+                    year: dateRange.from.getFullYear()
+                };
+                var to = {
+                    date: dateRange.to.getDate(),
+                    month: dateRange.to.getMonth() + 1,
+                    year: dateRange.to.getFullYear()
+                };
+
+                timeframe = from.month + "/" + from.date + "/" +from.year + " - ";
+                timeframe = timeframe + to.month + "/" + to.date + "/" + to.year;
+            }
+
+            currentTimeframe.innerHTML = timeframe;
+        }
 
         if (navPrev !== null) {
             navPrev.disabled = this.getLinks("Prev") === null;
@@ -610,6 +634,7 @@ vanillaStats = (function() {
             navNext.disabled = navNextDisabled;
             navToday.disabled = navNextDisabled;
         }
+
     };
 
     /**

@@ -18,7 +18,7 @@ table {
   }
 
   .options {
-    width: 5rem;
+    width: 6rem;
   }
 
   thead {
@@ -27,7 +27,7 @@ table {
     }
 
     th {
-      padding: .5rem .75rem;
+      padding: ($spacer / 2) ($spacer * .75);
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
       text-transform: uppercase;

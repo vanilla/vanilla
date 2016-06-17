@@ -42,14 +42,14 @@ $roleTitles = implode(', ', $roleTitlesArray);
                 <?php echo $roleTitles; ?>
             </div>
             <a class="btn btn-userblock" href="<?php echo url(userUrl($user)); ?>">
-                <?php echo t('My Profile'); ?> <span class="icon icon-external-link"></span>
+                <?php echo t('My Profile').' '.dashboardSymbol('external-link'); ?>
             </a>
         </div>
     </div>
     <div class="list-group list-group-flush">
-        <a class="list-group-item" href="#"><?php echo t('Take The Tour'); ?><span class="icon icon-external-link"></span></a>
-        <a class="list-group-item" href="#"><?php echo t('Help & Tutorials'); ?><span class="icon icon-external-link"></span></a>
-        <a class="list-group-item" href="#"><?php echo t('Customer Support'); ?><span class="icon icon-external-link"></span></a>
+        <a class="list-group-item" href="#"><?php echo t('Take The Tour').' '.dashboardSymbol('external-link'); ?></a>
+        <a class="list-group-item" href="#"><?php echo t('Help & Tutorials').' '.dashboardSymbol('external-link'); ?></span></a>
+        <a class="list-group-item" href="#"><?php echo t('Customer Support').' '.dashboardSymbol('external-link'); ?></span></a>
     </div>
     <div class="card-footer">
         <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary Leave'); ?>
@@ -77,7 +77,7 @@ Gdn_Theme::assetEnd();
 <!--        --><?php //} ?>
         <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
 <!--        --><?php //echo anchor($title, '/', 'title'); ?>
-        <?php echo anchor(t('Visit Site').' <span class="icon icon-external-link"></span>', '/', 'btn btn-navbar'); ?>
+        <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
     </div>
     <?php $dashboardNav = new DashboardNavModule(); ?>
     <nav class="nav nav-pills">

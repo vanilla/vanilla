@@ -3,7 +3,7 @@
 function writeCategoryTree($categories, $indent = 0) {
     $i = str_repeat('  ', $indent);
 
-    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
+    echo "$i<ol class=\"dd-list tree-list\">\n";
 
     foreach ($categories as $category) {
         writeCategoryItem($category, $indent + 1);
@@ -86,8 +86,8 @@ function writeCategoryOptions($category) {
             'displayas.'.strtolower($displayAs),
             'js-displayas '.$cssClass,
             [],
-            false,
-            ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]]
+            ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]],
+            false
         );
     }
 

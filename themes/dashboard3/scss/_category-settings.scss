@@ -1,7 +1,29 @@
+@mixin list-reset() {
+  padding-left: 0;
+  list-style-type: none;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  -webkit-margin-start: 0;
+  -webkit-margin-end: 0;
+  -webkit-padding-start: 0;
+
+  li {
+    list-style: none;
+    justify-content: space-between;
+  }
+
+  label {
+    font-weight: 500;
+    margin-bottom: 0;
+  }
+}
+
 .dd {
   color: $body-color;
   position: relative;
   fill: $body-color;
+  margin-top: $grid-gutter-width / 2;
+  font-size: 13px;
 
   * {
     box-sizing: border-box;
@@ -10,6 +32,7 @@
 
 .dd-list {
   position: relative;
+  @include list-reset();
 
   .dd-list {
     padding-left: 30px;
@@ -74,6 +97,7 @@
   top: 0;
   cursor: move;
   cursor: grab;
+  cursor: -webkit-grab;
   line-height: 1;
   fill: $tree-border;
 
@@ -89,6 +113,7 @@
   border-radius: 2px;
   padding: 6px 9px 6px 60px;
   margin: 3px 0;
+  line-height: 22px;
 }
 
 .dd-dragel {
@@ -139,7 +164,7 @@
   .crumb {
     display: inline-block;
     line-height: 24px;
-    padding: 6px (12px + 12px) 6px 12px;
+    padding: 6px (12px + 12px) 6px 16px;
     position: relative;
     fill: $body-color;
     color: $body-color;
@@ -173,8 +198,11 @@
       content: '';
     }
 
-    &:last-child {
+    &:first-child {
+      padding-left: 0;
+    }
 
+    &:last-child {
       &:before,
       &:after {
         display: none;
@@ -193,4 +221,8 @@
     float: right;
     padding: 6px 18px 0 0;
   }
+}
+
+.Trace {
+  display: none;
 }

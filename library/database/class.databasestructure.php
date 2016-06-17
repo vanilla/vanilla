@@ -373,7 +373,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
-     * @deprecated
+     * @deprecated since 2.3. Was incorrectly public. Replaced by executeQuery().
      * @param string $sql The sql to execute.
      * @param bool $checkTreshold Should not be used
      * @return Gdn_Dataset
@@ -383,6 +383,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $class = null;
         $internalCall = false;
 
+        // Detect the origin of this call.
         $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         if (count($backtrace) > 1) {
             $class = val('class', $backtrace[1]);
@@ -391,6 +392,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             }
         }
 
+        // Give appropriate message based on whether we're using it internally.
         if ($internalCall) {
             deprecated("$class::query()", "$class::executeQuery()");
             return $this->executeQuery($sql, $checkTreshold);

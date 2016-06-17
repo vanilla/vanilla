@@ -1,4 +1,4 @@
-vanillaStats = (function() {
+var vanillaStats = (function() {
     function VanillaStats() {
         /**
          * Base API URL.
@@ -90,16 +90,16 @@ vanillaStats = (function() {
 
             if (activeTypeElement.length > 0) {
                 switch (activeTypeElement.get(0).id) {
-                    case "StatsNewComments":
+                    case "StatsComments":
                         activeType = "Comments";
                         break;
-                    case "StatsNewDiscussions":
+                    case "StatsDiscussions":
                         activeType = "Discussions";
                         break;
                     case "StatsPageViews":
                         activeType = "PageViews";
                         break;
-                    case "StatsNewUsers":
+                    case "StatsUsers":
                         activeType = "Users";
                         break;
                 }
@@ -137,7 +137,7 @@ vanillaStats = (function() {
         /**
          * Get a reference to the primary chart instance.
          *
-         * @returns {object}
+         * @returns {c3}
          */
         this.getChart = function() {
             if (typeof chart !== "object") {
@@ -287,18 +287,20 @@ vanillaStats = (function() {
          */
         this.getSparkline = function(key) {
             if (typeof sparklines[key] !== "object") {
-                var container = document.getElementById(null);
+                var parentContainer = document.getElementById("Stats" + key);
+                var container = $(parentContainer).find(".Sparkline").get(0);
 
                 if (container) {
                     sparklines[key] = c3.generate({
                         axis: {
-                            x: { show:false },
+                            x: {
+                                show:false,
+                                type: "timeseries"
+                            },
                             y: { show:false }
                         },
                         bindto: container,
-                        data: {
-                            columns: []
-                        },
+                        data: { columns: [] },
                         legend: { show: false },
                         point: { show: false },
                         size: {
@@ -681,11 +683,18 @@ vanillaStats = (function() {
      * Refresh the chart by populating with timeline data of the specified type.
      *
      * @param {string} key The type of data to refresh the chart with (e.g. pageviews, comments).
+     * @param {c3} [chart] Instance of the chart to update.  Defaults to the value of this.getChart().
      * @return {boolean} False on error.
      */
-    VanillaStats.prototype.updateChart = function(key) {
+    VanillaStats.prototype.updateChart = function(key, chart) {
         // We need an explicit data type.
         if (typeof key !== "string") {
+            return false;
+        }
+
+        if (typeof chart === "undefined") {
+            chart = this.getChart();
+        } else if (typeof chart !== "object") {
             return false;
         }
 
@@ -743,7 +752,7 @@ vanillaStats = (function() {
         }
 
         // Load the newly constructed data into our chart.
-        this.getChart().load(newData);
+        chart.load(newData);
         this.updateUI();
     };
 
@@ -810,15 +819,34 @@ vanillaStats = (function() {
     };
 
     /**
-     *
+     * Update stats and chart element values with current data.
      */
     VanillaStats.prototype.writeData = function() {
-        this.writeCount("StatsNewComments", this.getCounts("Comments"));
-        this.writeCount("StatsNewDiscussions", this.getCounts("Discussions"));
-        this.writeCount("StatsNewUsers", this.getCounts("Users"));
+        var commentsSparkline = this.getSparkline("Comments");
+        if (typeof commentsSparkline === "object") {
+            this.updateChart("Comments", commentsSparkline)
+        }
+        this.writeCount("StatsComments", this.getCounts("Comments"));
+
+        var discussionsSparkline = this.getSparkline("Discussions");
+        if (typeof discussionsSparkline === "object") {
+            this.updateChart("Discussions", discussionsSparkline)
+        }
+        this.writeCount("StatsDiscussions", this.getCounts("Discussions"));
+
+        var usersSparkline = this.getSparkline("Users");
+        if (typeof usersSparkline === "object") {
+            this.updateChart("Users", usersSparkline)
+        }
+        this.writeCount("StatsUsers", this.getCounts("Users"));
+
+        var viewsSparkline = this.getSparkline("PageViews");
+        if (typeof viewsSparkline === "object") {
+            this.updateChart("PageViews", viewsSparkline)
+        }
         this.writeCount("StatsPageViews", this.getCounts("Views"));
 
-        this.updateChart(this.getActiveType());
+        this.updateChart(this.getActiveType(), this.getChart());
     };
 
     return new VanillaStats();

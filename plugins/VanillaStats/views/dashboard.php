@@ -2,14 +2,14 @@
 
 <div id="StatsToolbar">
     <ul id="StatsOverview">
-        <li class="StatsType" id="StatsNewUsers">
+        <li class="StatsType" id="StatsUsers">
             <div>
                 <?php echo t('Users'); ?>
                 <span class="StatsValue">-</span>
                 <div class="Sparkline"></div>
             </div>
         </li>
-        <li class="StatsType" id="StatsNewDiscussions">
+        <li class="StatsType" id="StatsDiscussions">
             <div>
                 <?php echo t('Discussions'); ?>
                 <span class="StatsValue">-</span>
@@ -23,7 +23,7 @@
                 <div class="Sparkline"></div>
             </div>
         </li>
-        <li class="StatsType" id="StatsNewComments">
+        <li class="StatsType" id="StatsComments">
             <div>
                 <?php echo t('Comments'); ?>
                 <span class="StatsValue">-</span>

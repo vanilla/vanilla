@@ -6,24 +6,28 @@
             <div>
                 <?php echo t('Users'); ?>
                 <span class="StatsValue">-</span>
+                <div class="Sparkline"></div>
             </div>
         </li>
         <li class="StatsType" id="StatsNewDiscussions">
             <div>
                 <?php echo t('Discussions'); ?>
                 <span class="StatsValue">-</span>
+                <div class="Sparkline"></div>
             </div>
         </li>
         <li class="StatsType" id="StatsPageViews">
             <div>
                 <?php echo t('Page Views'); ?>
                 <span class="StatsValue">-</span>
+                <div class="Sparkline"></div>
             </div>
         </li>
         <li class="StatsType" id="StatsNewComments">
             <div>
                 <?php echo t('Comments'); ?>
                 <span class="StatsValue">-</span>
+                <div class="Sparkline"></div>
             </div>
         </li>
     </ul>

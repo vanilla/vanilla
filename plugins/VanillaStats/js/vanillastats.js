@@ -54,6 +54,12 @@ vanillaStats = (function() {
         var slotType = "m";
 
         /**
+         * A collection of sparkline chart instances, indexed by data type.
+         * @type {Object}
+         */
+        var sparklines = {};
+
+        /**
          * Timeline data.
          * @type {Array}
          */
@@ -271,6 +277,40 @@ vanillaStats = (function() {
          */
         this.getSlotType = function() {
             return slotType;
+        };
+
+        /**
+         * Get a reference to a sparkline chart.
+         *
+         * @param {string} key Data type of the sparkline attempting to be retrieve.
+         * @returns {object}
+         */
+        this.getSparkline = function(key) {
+            if (typeof sparklines[key] !== "object") {
+                var container = document.getElementById(null);
+
+                if (container) {
+                    sparklines[key] = c3.generate({
+                        axis: {
+                            x: { show:false },
+                            y: { show:false }
+                        },
+                        bindto: container,
+                        data: {
+                            columns: []
+                        },
+                        legend: { show: false },
+                        point: { show: false },
+                        size: {
+                            height: 30,
+                            width: 60
+                        },
+                        tooltip: { show: false }
+                    });
+                }
+            }
+
+            return sparklines[key];
         };
 
         /**

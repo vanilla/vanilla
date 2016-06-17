@@ -121,12 +121,22 @@ $navbar-border-color: rgba(0,0,0,.125);
   }
 }
 
+
+
 .btn-navbar {
+  position: relative;
   display: inline-block;
   font-weight: 300;
   text-transform: uppercase;
   margin-left: $spacer;
   opacity: .75;
+
+  svg {
+    position: relative;
+    top: 2px;
+    fill: $white;
+    width: $font-size-xs;
+  }
 
   @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
   @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);

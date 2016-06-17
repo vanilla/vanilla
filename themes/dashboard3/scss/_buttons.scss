@@ -205,10 +205,10 @@ input[type="button"] {
 }
 
 .btn-icon {
-  $btn-icon-height: 28;
-  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
-  padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
-  margin: 0 0 0 .5rem;
+  @extend .btn-link;
+  padding: $spacer / 4;
+  margin: 0;
+  margin-left: .5rem;
 
   &:first-child {
     margin-left: 0;
@@ -216,13 +216,7 @@ input[type="button"] {
 
   svg {
     display: block;
-    height: to-rem($btn-icon-height);
-  }
-
-  &:hover {
-    svg {
-      fill: $white;
-    }
+    height: to-rem(24);
   }
 }
 
@@ -280,5 +274,23 @@ input[type="button"] {
 
 .btn-icon-border {
   @extend .btn-secondary;
-  @extend .btn-icon;
+  $btn-icon-height: 28;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
+  margin: 0 0 0 .5rem;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  svg {
+    display: block;
+    height: to-rem($btn-icon-height);
+  }
+
+  &:hover {
+    svg {
+      fill: $white;
+    }
+  }
 }

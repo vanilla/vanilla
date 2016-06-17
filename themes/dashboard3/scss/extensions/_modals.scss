@@ -5,6 +5,7 @@
 div.Popup h1 {
   @extend .modal-title;
   @extend .heading-h1-block;
+  @extend .heading-h1;
 }
 
 .Content {

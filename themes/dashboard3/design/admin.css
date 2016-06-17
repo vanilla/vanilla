@@ -9648,35 +9648,55 @@ a.current-theme,
   border-color: #fc8780;
 }
 
-.btn-link {
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
   font-weight: normal;
   color: #0291db;
   border-radius: 0;
 }
 
-.btn-link, .btn-link:active, .btn-link.active, .Tabs ul li.Active a.btn-link,
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active, .btn-link.active, .active.btn-icon, .active.btn-edit, .Tabs ul li.Active a.btn-edit,
+.Tabs ul .btn-edit.current-tab,
+.tabbed-content li.Active a.btn-edit,
+.tabbed-content .btn-edit.current-tab, .btn-edit.Current,
+.btn-edit.current-theme, .active.btn-delete, .Tabs ul li.Active a.btn-delete,
+.Tabs ul .btn-delete.current-tab,
+.tabbed-content li.Active a.btn-delete,
+.tabbed-content .btn-delete.current-tab, .btn-delete.Current,
+.btn-delete.current-theme, .active.btn-ok, .Tabs ul li.Active a.btn-ok,
+.Tabs ul .btn-ok.current-tab,
+.tabbed-content li.Active a.btn-ok,
+.tabbed-content .btn-ok.current-tab, .btn-ok.Current,
+.btn-ok.current-theme, .active.btn-settings, .Tabs ul li.Active a.btn-settings,
+.Tabs ul .btn-settings.current-tab,
+.tabbed-content li.Active a.btn-settings,
+.tabbed-content .btn-settings.current-tab, .btn-settings.Current,
+.btn-settings.current-theme, .Tabs ul li.Active a.btn-icon,
+.Tabs ul .btn-icon.current-tab,
+.tabbed-content li.Active a.btn-icon,
+.tabbed-content .btn-icon.current-tab, .btn-icon.Current,
+.btn-icon.current-theme, .Tabs ul li.Active a.btn-link,
 .Tabs ul .btn-link.current-tab,
 .tabbed-content li.Active a.btn-link,
 .tabbed-content .btn-link.current-tab, .btn-link.Current,
-.btn-link.current-theme, .btn-link:disabled {
+.btn-link.current-theme, .btn-link:disabled, .btn-icon:disabled, .btn-edit:disabled, .btn-delete:disabled, .btn-ok:disabled, .btn-settings:disabled {
   background-color: transparent;
 }
 
-.btn-link, .btn-link:focus, .btn-link:active {
+.btn-link, .btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:active, .btn-icon:active, .btn-edit:active, .btn-delete:active, .btn-ok:active, .btn-settings:active {
   border-color: transparent;
 }
 
-.btn-link:hover {
+.btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
   border-color: transparent;
 }
 
-.btn-link:focus, .btn-link:hover {
+.btn-link:focus, .btn-icon:focus, .btn-edit:focus, .btn-delete:focus, .btn-ok:focus, .btn-settings:focus, .btn-link:hover, .btn-icon:hover, .btn-edit:hover, .btn-delete:hover, .btn-ok:hover, .btn-settings:hover {
   color: #015f8f;
   text-decoration: underline;
   background-color: transparent;
 }
 
-.btn-link:disabled:focus, .btn-link:disabled:hover {
+.btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-edit:disabled:focus, .btn-delete:disabled:focus, .btn-ok:disabled:focus, .btn-settings:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .btn-edit:disabled:hover, .btn-delete:disabled:hover, .btn-ok:disabled:hover, .btn-settings:disabled:hover {
   color: #f4f4f5;
   text-decoration: none;
 }
@@ -9741,22 +9761,19 @@ input[type="button"].btn-block {
   margin-right: -0.0625rem;
 }
 
-.btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings, .btn-icon-border {
-  padding: 0.1875rem 0.375rem;
-  margin: 0 0 0 .5rem;
+.btn-icon, .btn-edit, .btn-delete, .btn-ok, .btn-settings {
+  padding: 0.28125rem;
+  margin: 0;
+  margin-left: .5rem;
 }
 
-.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-ok:first-child, .btn-settings:first-child, .btn-icon-border:first-child {
+.btn-icon:first-child, .btn-edit:first-child, .btn-delete:first-child, .btn-ok:first-child, .btn-settings:first-child {
   margin-left: 0;
 }
 
-.btn-icon svg, .btn-edit svg, .btn-delete svg, .btn-ok svg, .btn-settings svg, .btn-icon-border svg {
+.btn-icon svg, .btn-edit svg, .btn-delete svg, .btn-ok svg, .btn-settings svg {
   display: block;
-  height: 1.75rem;
-}
-
-.btn-icon:hover svg, .btn-edit:hover svg, .btn-delete:hover svg, .btn-ok:hover svg, .btn-settings:hover svg, .btn-icon-border:hover svg {
-  fill: #fff;
+  height: 1.5rem;
 }
 
 .btn-edit:before {
@@ -9779,6 +9796,24 @@ input[type="button"].btn-block {
   content: "\f13a";
 }
 
+.btn-icon-border {
+  padding: 0.1875rem 0.375rem;
+  margin: 0 0 0 .5rem;
+}
+
+.btn-icon-border:first-child {
+  margin-left: 0;
+}
+
+.btn-icon-border svg {
+  display: block;
+  height: 1.75rem;
+}
+
+.btn-icon-border:hover svg {
+  fill: #fff;
+}
+
 .card .list-group-item {
   font-weight: 500;
   background-color: #f4f6fb;
@@ -9790,6 +9825,12 @@ input[type="button"].btn-block {
 
 .card .list-group-item .icon, .card .list-group-item .btn-settings-border {
   float: right;
+}
+
+.card svg {
+  position: relative;
+  top: 3px;
+  width: 0.875rem;
 }
 
 .card .username {
@@ -9834,6 +9875,15 @@ input[type="button"].btn-block {
 
 .card .user-block .btn-userblock {
   margin-top: 1.125rem;
+}
+
+.card .user-block .btn-userblock svg {
+  width: 0.675rem;
+  top: 2px;
+}
+
+.card .user-block .btn-userblock:hover svg {
+  fill: #fff;
 }
 
 .card-user .card-footer {
@@ -11461,6 +11511,7 @@ div.Popup .Buttons {
 }
 
 .btn-navbar {
+  position: relative;
   display: inline-block;
   font-weight: 300;
   text-transform: uppercase;
@@ -11473,6 +11524,13 @@ div.Popup .Buttons {
   font-size: 0.575rem;
   line-height: 1.5;
   border-radius: 0.875rem;
+}
+
+.btn-navbar svg {
+  position: relative;
+  top: 2px;
+  fill: #fff;
+  width: 0.675rem;
 }
 
 .btn-navbar:hover {
@@ -11646,7 +11704,7 @@ table td {
 }
 
 table .options {
-  width: 5rem;
+  width: 6rem;
 }
 
 table thead tr {
@@ -11654,7 +11712,7 @@ table thead tr {
 }
 
 table thead th {
-  padding: .5rem .75rem;
+  padding: 0.5625rem 0.84375rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
   text-transform: uppercase;
@@ -11859,7 +11917,7 @@ p {
   margin-bottom: 0.5625rem;
 }
 
-.heading-h1, .content h1 {
+.heading-h1, .content h1, div.Popup h1 {
   font-size: 1.25rem;
   margin-bottom: 1.125rem;
 }

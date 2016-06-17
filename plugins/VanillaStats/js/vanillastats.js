@@ -1,21 +1,25 @@
 vanillaStats = (function() {
     function VanillaStats() {
         /**
+         * Base API URL.
          * @type {string}
          */
         var apiUrl;
 
         /**
+         * API authentication token.
          * @type {string}
          */
         var authToken;
 
         /**
+         * Primary instance of chart object.
          * @type {object}
          */
         var chart;
 
         /**
+         * Totals for each data type.
          * @type {Object}
          */
         var counts = {
@@ -26,6 +30,7 @@ vanillaStats = (function() {
         };
 
         /**
+         * Next/previous navigation link targets.
          * @type {Object}
          */
         var links = {
@@ -34,6 +39,7 @@ vanillaStats = (function() {
         };
 
         /**
+         * Date range.
          * @type {Object}
          */
         var range = {
@@ -42,21 +48,25 @@ vanillaStats = (function() {
         };
 
         /**
+         * Slot type (e.g. m for monthly, d for daily).
          * @type {string}
          */
         var slotType = "m";
 
         /**
+         * Timeline data.
          * @type {Array}
          */
         var timeline;
 
         /**
+         * Vanilla site ID.
          * @type {string}
          */
         var vanillaID;
 
         /**
+         * API endpoint paths.
          * @type {string}
          */
         var paths = {
@@ -64,7 +74,9 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the active data type.
          *
+         * @return {string}
          */
         this.getActiveType = function() {
             var activeTypeElement = $("#StatsOverview").find("li.Active");
@@ -91,6 +103,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the configured API site URL.
+         *
          * @returns {string}
          */
         this.getApiUrl = function() {
@@ -102,6 +116,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the configured API authentication token.
+         *
          * @returns {boolean|string}
          */
         this.getAuthToken = function() {
@@ -113,6 +129,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get a reference to the primary chart instance.
+         *
          * @returns {object}
          */
         this.getChart = function() {
@@ -149,6 +167,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get counts for one or all data types.
+         *
          * @param {string} [key]
          */
         this.getCounts = function(key) {
@@ -164,7 +184,9 @@ vanillaStats = (function() {
         };
 
         /**
-         * @returns {string} date
+         * Format a date value, based on the currently configured slot type, using d3.
+         *
+         * @returns {string} Formatted date.
          */
         this.formatDate = function(date) {
             var dateFormat;
@@ -182,6 +204,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get links associated with next/previous navigation.
+         *
          * @param {string} [type] Prev or Next to grab the specific link value.
          * @returns {Object}
          */
@@ -205,7 +229,9 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {string} [key]
+         * Get a specific API endpoint or paths to all endpoints.
+         *
+         * @param {string} [key] Key associated with the API endpoint.
          * @returns {Object|string|bool}
          */
         this.getPaths = function(key) {
@@ -221,7 +247,9 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {string} [key]
+         * Get the current date range.
+         *
+         * @param {string} [key] The specific date value to fetch (e.g. to, from).
          * @returns {Object|string|bool}
          */
         this.getRange = function(key) {
@@ -237,6 +265,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the current slot type.
+         *
          * @returns {string}
          */
         this.getSlotType = function() {
@@ -244,6 +274,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the current timeline data.
+         *
          * @returns {Array}
          */
         this.getTimeline = function() {
@@ -251,6 +283,8 @@ vanillaStats = (function() {
         };
 
         /**
+         * Get the Vanilla site ID.
+         *
          * @returns {boolean|string}
          */
         this.getVanillaID = function() {
@@ -262,7 +296,7 @@ vanillaStats = (function() {
         };
 
         /**
-         *
+         * Wire up navigation UI.
          */
         this.initializeUI = function() {
             $("#StatsOverview").find("li").click((function (eventObject) {
@@ -304,7 +338,10 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {Object} newCounts
+         * Set the counts for each of the specific data types.
+         *
+         * @param {Object} newCounts A plain object containing totals for each data type.
+         * @returns {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setCounts = function(newCounts) {
             if (typeof newCounts !== "object") {
@@ -333,8 +370,10 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {Object} data
-         * @returns {VanillaStats}
+         * Process the data provided in an API response and update all relevant attributes.
+         *
+         * @param {Object} data A plain object containing the full response from an API request.
+         * @returns {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setData = function(data) {
             if (typeof data === "object") {
@@ -362,8 +401,10 @@ vanillaStats = (function() {
         };
 
         /**
+         * Set the links associated with next/previous navigation.
+         *
          * @param {Object} newLinks
-         * @returns {VanillaStats}
+         * @returns {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setLinks = function(newLinks) {
             if (typeof newLinks === "object") {
@@ -375,8 +416,10 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {string} newSlotType
-         * @returns {VanillaStats}
+         * Set the current slot type (monthly or daily).
+         *
+         * @param {string} newSlotType New slot type (e.g. m for monthly, d for daily).
+         * @returns {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setSlotType = function(newSlotType) {
             if (typeof newSlotType === "string") {
@@ -387,8 +430,10 @@ vanillaStats = (function() {
         };
 
         /**
-         * @param {Array} newTimeline
-         * @returns {VanillaStats}
+         * Update timeline data.
+         *
+         * @param {Array} newTimeline A collection of properly-formatted analytics data.
+         * @returns {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setTimeline = function(newTimeline) {
             var updatedCounts = {
@@ -421,10 +466,12 @@ vanillaStats = (function() {
             return this;
         };
 
-            /**
-         * @param {Date|string} newFrom
-         * @param {Date|string} newTo
-         * @return {VanillaStats}
+        /**
+         * Set the date range.
+         *
+         * @param {Date|string} newFrom The "from" portion of the date range.
+         * @param {Date|string} newTo The "to"portion of the date range.
+         * @return {VanillaStats} Returns the current instance for fluent calls.
          */
         this.setRange = function(newFrom, newTo) {
             if (!(newFrom instanceof Date)) {
@@ -444,9 +491,11 @@ vanillaStats = (function() {
     }
 
     /**
-     * @param {string} [path]
-     * @param {Object} [data]
-     * @param {function} [successCallback]
+     * Perform an API request to the central stats site.
+     *
+     * @param {string} path Path to the endpoint.
+     * @param {Object} [data] Data to send along with the request.
+     * @param {function} [successCallback] A function to be called upon successful completion of the request.
      */
     VanillaStats.prototype.apiRequest = function(path, data, successCallback) {
         var requestConfig = {
@@ -472,6 +521,7 @@ vanillaStats = (function() {
     };
 
     /**
+     * Build a simple API URL.
      * @param {string} path
      * @returns {string}
      */
@@ -492,6 +542,8 @@ vanillaStats = (function() {
     };
 
     /**
+     * Process API responses.
+     *
      * @param {Object} data
      * @param {string} textStatus
      * @param {Object} jqXHR
@@ -504,6 +556,8 @@ vanillaStats = (function() {
     };
 
     /**
+     * Handle toggling of UI elements and trigger associated functionality.
+     *
      * @param {string} control
      * @param {string} activeElementID
      */
@@ -541,7 +595,7 @@ vanillaStats = (function() {
     };
 
     /**
-     *
+     * Update the navigation UI based on current data.
      */
     VanillaStats.prototype.updateUI = function() {
         var navNext = document.getElementById("StatsNavNext");
@@ -559,13 +613,18 @@ vanillaStats = (function() {
     };
 
     /**
-     * @param {string} key
+     * Refresh the chart by populating with timeline data of the specified type.
+     *
+     * @param {string} key The type of data to refresh the chart with (e.g. pageviews, comments).
+     * @return {boolean} False on error.
      */
     VanillaStats.prototype.updateChart = function(key) {
+        // We need an explicit data type.
         if (typeof key !== "string") {
             return false;
         }
 
+        // Based on key, configure the parameters we'll need to extract specific analytics data.
         var dataIndex, label;
         switch (key.toLowerCase()) {
             case "pageviews":
@@ -589,6 +648,7 @@ vanillaStats = (function() {
                 label = "Count";
         }
 
+        // Build the basic data structure we'll be populating and handing off to the charting library.
         var newData = {
             json: [],
             keys: {
@@ -598,6 +658,7 @@ vanillaStats = (function() {
         };
         var timeline = this.getTimeline();
 
+        // Verify we have data, then iterate through it, populating the newData object.
         if (Array.isArray(timeline)) {
             timeline.forEach(function (value, index, array) {
                 var newInterval = {
@@ -616,28 +677,37 @@ vanillaStats = (function() {
             });
         }
 
+        // Load the newly constructed data into our chart.
         this.getChart().load(newData);
         this.updateUI();
     };
 
     /**
+     * Request data from the mothership.
+     *
+     * @param {string|Date} refDate The reference date for requested analytics data.
      * @returns {boolean|string}
      */
     VanillaStats.prototype.updateStats = function(refDate) {
+        // Default to today's date.
         if (typeof refDate === "undefined") {
             refDate = new Date();
         } else {
+            // If refDate isn't already a Date object, try to make one out of it.
             if (!(refDate instanceof Date)) {
                 refDate = new Date(refDate);
             }
 
+            // Not a valid date?  Default to today.
             if (isNaN(refDate.getTime())) {
                 refDate = new Date();
             }
         }
 
+        // Build a date string the API can use (YYYY-MM-DD).
         var date = refDate.getFullYear() + "-" + (refDate.getMonth() + 1) + "-" + refDate.getDate();
 
+        // Make the formal request.
         this.apiRequest(
             this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
             {
@@ -690,5 +760,6 @@ vanillaStats = (function() {
 }());
 
 $(document).ready(function() {
+    // Here we go...
     vanillaStats.updateStats();
 });

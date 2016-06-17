@@ -36,9 +36,8 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td>
                     <div class="btn-group">
                     <?php
-                    echo Gdn_Theme::link("/dashboard/settings/bans/edit?id={$Row['BanID']}", t('Edit'), null, array('class' => 'btn btn-edit Edit'));
-                    echo ' ';
-                    echo Gdn_Theme::link("/dashboard/settings/bans/delete?id={$Row['BanID']}", t('Delete'), null, array('class' => 'btn btn-delete Delete'));
+                    echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'Edit btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'Delete btn btn-icon', ['aria-label' => t('Delete')]);
                     ?>
                     </div>
                 </td>

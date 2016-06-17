@@ -43,10 +43,10 @@ $Session = Gdn::session();
                 <td>
                     <div class="btn-group">
                     <?php
-                    echo anchor(t('Edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute btn btn-edit');
-                    if (!$Reserved)
-                        echo anchor(t('Delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute btn btn-delete');
-
+                    echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute btn btn-icon', ['aria-label' => t('Edit')]);
+                    if (!$Reserved) {
+                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute btn btn-delete', ['aria-label' => t('Delete')]);
+                    }
                     ?>
                     </div>
                 </td>

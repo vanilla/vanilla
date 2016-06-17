@@ -54,7 +54,7 @@ trait NestedCollection {
     /**
      * @var bool Whether to separate groups with a hr element. Only supported for flattened lists.
      */
-    private $forceDivider = false;
+    private $forceDivider = true;
 
     /**
      * @var array The allowed keys in the $modifiers array parameter in the 'addItem' methods.
@@ -558,7 +558,7 @@ trait NestedCollection {
                 $newItems = array_merge($newItems, $this->flattenArray($subItems));
                 if ($this->forceDivider && $index < $itemslength) {
                     // Add hr after group but not the last one
-                    $newitems[] = array('type' => 'divider');
+                    $newItems[] = array('type' => 'divider');
                 }
             }
         }

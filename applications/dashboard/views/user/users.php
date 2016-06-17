@@ -58,12 +58,12 @@ foreach ($this->UserData->result() as $User) {
             <td>
                 <div class="btn-group">
                 <?php
-                if ($EditUser)
-                    echo anchor(t('Edit'), '/user/edit/'.$User->UserID, 'Popup btn btn-edit');
-
-                if ($DeleteUser && $User->UserID != $Session->User->UserID)
-                    echo anchor(t('Delete'), '/user/delete/'.$User->UserID, 'btn btn-delete');
-
+                if ($EditUser) {
+                    echo anchor(dashboardSymbol('edit'), '/user/edit/'.$User->UserID, 'Popup btn btn-icon', ['aria-label' => t('Edit')]);
+                }
+                if ($DeleteUser && $User->UserID != $Session->User->UserID) {
+                    echo anchor(dashboardSymbol('delete'), '/user/delete/'.$User->UserID, 'btn btn-icon', ['aria-label' => t('Delete')]);
+                }
                 $this->EventArguments['User'] = $User;
                 $this->fireEvent('UserListOptions');
                 ?>

@@ -59,8 +59,8 @@ if ($NumApplicants == 0) : ?>
                     <td style="border-bottom:none;">
                         <div class="btn-group">
                         <?php
-                        echo anchor(t('Approve'), '/user/approve/'.$User->UserID, 'btn btn-ok ApproveApplicant');
-                        echo anchor(t('Decline'), '/user/decline/'.$User->UserID, 'btn btn-delete CancelButton DeclineApplicant');
+                        echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve')]);
+                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Decline')]);
                         ?>
                         </div>
                     </td>

@@ -1784,7 +1784,7 @@ a.text-danger:focus, a.text-danger:hover {
 
 .navbar {
   position: relative;
-  padding: 0.5rem 1rem;
+  padding: 0.5625rem 1.125rem;
 }
 
 .navbar::after {
@@ -1868,8 +1868,8 @@ a.text-danger:focus, a.text-danger:hover {
   width: 1px;
   padding-top: .425rem;
   padding-bottom: .425rem;
-  margin-right: 1rem;
-  margin-left: 1rem;
+  margin-right: 1.125rem;
+  margin-left: 1.125rem;
   overflow: hidden;
 }
 
@@ -4838,7 +4838,7 @@ a.current-theme,
 .table, table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .table th, table th,
@@ -5035,10 +5035,10 @@ a.current-theme,
   border: 0.0625rem solid #f4f6fb;
 }
 
-.media, .Feed, .FeedItem {
+.media {
   display: -ms-flexbox;
   display: flex;
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .media-body {
@@ -5072,7 +5072,7 @@ a.current-theme,
   padding-right: 10px;
 }
 
-.media-heading, .FeedItem > a {
+.media-heading {
   margin-top: 0;
   margin-bottom: 5px;
 }
@@ -5131,7 +5131,7 @@ a.current-theme,
 
 .dropdown-divider {
   height: 1px;
-  margin: 0.5rem 0;
+  margin: 0.5625rem 0;
   overflow: hidden;
   background-color: #e5e5e5;
 }
@@ -6474,14 +6474,14 @@ button.list-group-item-danger.current-theme:hover {
 }
 
 .form-group, .form-horizontal li {
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .radio,
 .checkbox {
   position: relative;
   display: block;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.84375rem;
 }
 
 .radio label,
@@ -6915,7 +6915,7 @@ input[type="checkbox"].disabled {
 
 .row, .footer, .form-horizontal li, .label-selector, .emojiext-list,
 .LayoutOptions,
-.HomeOptions, .media, .Feed, .FeedItem {
+.HomeOptions, .media {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -6926,17 +6926,17 @@ input[type="checkbox"].disabled {
 
 .col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
 .LayoutOptions > .label-wrap,
-.HomeOptions > .label-wrap, .media > .label-wrap, .Feed > .label-wrap, .FeedItem > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+.HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
 li.LayoutOptions > label, .form-horizontal
-li.HomeOptions > label, .form-horizontal li.media > label, .form-horizontal li.Feed > label, .form-horizontal li.FeedItem > label, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
+li.HomeOptions > label, .form-horizontal li.media > label, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
 .LayoutOptions > .input-wrap,
-.HomeOptions > .input-wrap, .media > .input-wrap, .Feed > .input-wrap, .FeedItem > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
+.HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
 li.LayoutOptions > input, .form-horizontal
-li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.Feed > input, .form-horizontal li.FeedItem > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
+li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
 li.LayoutOptions > select, .form-horizontal
-li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li.Feed > select, .form-horizontal li.FeedItem > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
+li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
 .LayoutOptions > .color-picker,
-.HomeOptions > .color-picker, .media > .color-picker, .Feed > .color-picker, .FeedItem > .color-picker, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.HomeOptions > .color-picker, .media > .color-picker, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -7394,9 +7394,9 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
   }
   .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
   .LayoutOptions > .label-wrap,
-  .HomeOptions > .label-wrap, .media > .label-wrap, .Feed > .label-wrap, .FeedItem > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+  .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
   li.LayoutOptions > label, .form-horizontal
-  li.HomeOptions > label, .form-horizontal li.media > label, .form-horizontal li.Feed > label, .form-horizontal li.FeedItem > label, .label-selector-item {
+  li.HomeOptions > label, .form-horizontal li.media > label, .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -7430,13 +7430,13 @@ li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li
   }
   .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
   .LayoutOptions > .input-wrap,
-  .HomeOptions > .input-wrap, .media > .input-wrap, .Feed > .input-wrap, .FeedItem > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
+  .HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
   li.LayoutOptions > input, .form-horizontal
-  li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.Feed > input, .form-horizontal li.FeedItem > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
+  li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
   li.LayoutOptions > select, .form-horizontal
-  li.HomeOptions > select, .form-horizontal li.media > select, .form-horizontal li.Feed > select, .form-horizontal li.FeedItem > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
+  li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
   .LayoutOptions > .color-picker,
-  .HomeOptions > .color-picker, .media > .color-picker, .Feed > .color-picker, .FeedItem > .color-picker {
+  .HomeOptions > .color-picker, .media > .color-picker {
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
@@ -9793,7 +9793,7 @@ input[type="button"].btn-block {
 }
 
 .card .username {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.28125rem;
 }
 
 .card .username a {
@@ -9811,7 +9811,7 @@ input[type="button"].btn-block {
   border-radius: 0.25rem;
   overflow: hidden;
   background-color: #f4f4f5;
-  margin-right: 1.5rem;
+  margin-right: 1.6875rem;
 }
 
 .card .user-block .user-image-wrap::after {
@@ -9833,12 +9833,12 @@ input[type="button"].btn-block {
 }
 
 .card .user-block .btn-userblock {
-  margin-top: 1rem;
+  margin-top: 1.125rem;
 }
 
 .card-user .card-footer {
   border-top: 0;
-  padding: 1.25rem;
+  padding: 1.40625rem;
 }
 
 .card-footer {
@@ -9865,7 +9865,7 @@ input[type="button"].btn-block {
   border-radius: 0.0625rem;
   overflow: hidden;
   background-color: #f4f4f5;
-  margin-right: 0.5rem;
+  margin-right: 0.5625rem;
 }
 
 .user-block .user-image-wrap::after {
@@ -9910,17 +9910,17 @@ input[type="button"].btn-block {
   display: flex;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  padding: 0.5rem 0;
+  padding: 0.5625rem 0;
 }
 
 .toolbar .toolbar-search {
   -ms-flex-positive: 1;
   flex-grow: 1;
-  padding-right: 1rem;
+  padding-right: 1.125rem;
 }
 
 .toolbar .PagerWrap {
-  padding-left: 1rem;
+  padding-left: 1.125rem;
 }
 
 .dropdown-menu {
@@ -9998,7 +9998,7 @@ input[type="button"].btn-block {
   font-size: 0.675rem;
   line-height: 1.3333333333;
   display: inline-block;
-  padding-left: 1rem;
+  padding-left: 1.125rem;
   border-left: 1px solid #ddd;
 }
 
@@ -10069,7 +10069,7 @@ form ol label {
 
 .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide {
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
   -ms-flex-positive: 1;
   flex-grow: 1;
 }
@@ -10080,7 +10080,7 @@ form ol label {
 }
 
 .input-wrap-multiple > *:last-child {
-  margin-left: 0.5rem;
+  margin-left: 0.5625rem;
 }
 
 .stacked label {
@@ -10089,19 +10089,19 @@ form ol label {
 
 .row-padding-left, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .Feed > .label-wrap-wide, .FeedItem > .label-wrap-wide {
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
   padding-left: 1.125rem;
 }
 
 .row-padding-right, .row .input-wrap-right, .footer .input-wrap-right, .form-horizontal li .input-wrap-right, .label-selector .input-wrap-right, .emojiext-list .input-wrap-right,
 .LayoutOptions .input-wrap-right,
-.HomeOptions .input-wrap-right, .media .input-wrap-right, .Feed .input-wrap-right, .FeedItem .input-wrap-right {
+.HomeOptions .input-wrap-right, .media .input-wrap-right {
   padding-right: 1.125rem;
 }
 
 .form-group.row, .form-group.footer, .form-horizontal li, .form-group.label-selector, .form-group.emojiext-list,
 .form-group.LayoutOptions,
-.form-group.HomeOptions, .form-group.media, .form-group.Feed, .form-group.FeedItem {
+.form-group.HomeOptions, .form-group.media {
   -ms-flex-align: center;
   align-items: center;
   padding-bottom: 1rem;
@@ -10110,7 +10110,7 @@ form ol label {
 
 .form-group.row:first-child, .form-group.footer:first-child, .form-horizontal li:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
 .form-group.LayoutOptions:first-child,
-.form-group.HomeOptions:first-child, .form-group.media:first-child, .form-group.Feed:first-child, .form-group.FeedItem:first-child {
+.form-group.HomeOptions:first-child, .form-group.media:first-child {
   padding-top: 1rem;
   border-top: 1px dotted #f4f4f5;
 }
@@ -10197,10 +10197,10 @@ form ol label {
 
 .color-picker-preview {
   position: absolute;
-  top: 0.25rem;
-  right: 0.3125rem;
+  top: 0.28125rem;
+  right: 0.34375rem;
   width: 2.5rem;
-  height: 1.75rem;
+  height: 1.71875rem;
   background: #000;
   border: 0.0625rem solid #ddd;
   cursor: pointer;
@@ -10225,7 +10225,7 @@ form ol label {
   top: 0;
   right: 0;
   left: 0;
-  padding: 0.40625rem 0.75rem;
+  padding: 0.40625rem 0.84375rem;
   color: #949aa2;
   border: 0.0625rem solid #ccc;
   border-radius: 0.1rem;
@@ -10761,7 +10761,7 @@ select::-ms-expand {
 .HomeOptions .image-wrap {
   position: relative;
   display: block;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .label-selector .image-wrap::after, .emojiext-list .image-wrap::after,
@@ -10825,7 +10825,7 @@ select::-ms-expand {
   flex-wrap: wrap;
   margin-left: 0;
   margin-right: 0;
-  padding: 0.5rem;
+  padding: 0.5625rem;
   -ms-flex-align: center;
   align-items: center;
   -ms-flex-pack: center;
@@ -10874,7 +10874,7 @@ select::-ms-expand {
 .HomeOptions .FilterMenu .buttons > .FilterButton, .FilterMenu
 .HomeOptions .buttons > .FilterButton {
   display: block;
-  margin: 0.1666666667rem 0.25rem;
+  margin: 0.1875rem 0.28125rem;
   max-height: 2.25rem;
   min-width: 5rem;
 }
@@ -10888,7 +10888,7 @@ select::-ms-expand {
 .mobile-wrap {
   position: relative;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .mobile-wrap .mobile-frame {
@@ -10928,7 +10928,7 @@ select::-ms-expand {
 }
 
 .label-selector-item {
-  padding: 1rem 1rem 0.5rem;
+  padding: 1.125rem 1.125rem 0.5625rem;
 }
 
 .search-wrap {
@@ -10937,13 +10937,13 @@ select::-ms-expand {
 
 .search-wrap .form-control, .search-wrap .SmallInput {
   border-radius: 1.125rem;
-  padding-left: 2.5rem;
+  padding-left: 2.8125rem;
 }
 
 .search-wrap::before {
   position: absolute;
   top: .375rem;
-  left: 1rem;
+  left: 1.125rem;
   font-size: 0.875rem;
   line-height: 1.3125rem;
   color: #949aa2;
@@ -10955,7 +10955,7 @@ select::-ms-expand {
   top: 0;
   right: 0;
   height: 2.25rem;
-  padding: 1rem 1.5rem;
+  padding: 1.125rem 1.6875rem;
   font-size: 1.25rem;
   line-height: 0;
   font-weight: 100;
@@ -10963,7 +10963,7 @@ select::-ms-expand {
 }
 
 .search-wrap .search-info {
-  margin-top: 0.25rem;
+  margin-top: 0.28125rem;
   font-style: italic;
 }
 
@@ -10991,13 +10991,13 @@ select::-ms-expand {
 .form-horizontal li > label
 .HomeOptions .Sprite,
 .HomeOptions .form-horizontal li > label .Sprite {
-  padding: 1rem 0;
+  padding: 1.125rem 0;
 }
 
 .imagewrap-table {
   display: block;
-  height: 2rem;
-  width: 2rem;
+  height: 2.25rem;
+  width: 2.25rem;
   overflow: hidden;
 }
 
@@ -11075,13 +11075,13 @@ svg {
   fill: #555a62;
 }
 
-.media, .Feed, .FeedItem {
-  padding: 1rem 1.125rem;
+.media {
+  padding: 1.125rem 1.125rem;
   margin-bottom: 0;
   border-bottom: 1px solid #ddd;
 }
 
-.media:first-child, .Feed:first-child, .FeedItem:first-child {
+.media:first-child {
   border-top: 1px solid #ddd;
 }
 
@@ -11096,25 +11096,25 @@ svg {
 .TextButton, .media-options .SmallButton, .media-options #Head h1 a span, #Head h1 a .media-options span, .media-options .Tabs ul li a, .Tabs ul li .media-options a, .media-options
 .tabbed-content li a,
 .tabbed-content li .media-options a, .media-options .FilterMenu .FilterButton, .FilterMenu .media-options .FilterButton {
-  margin-right: 2rem;
+  margin-right: 2.25rem;
 }
 
 .media-right {
-  padding-left: 1rem;
+  padding-left: 1.125rem;
 }
 
 .media-left {
-  padding-right: 1rem;
+  padding-right: 1.125rem;
 }
 
-.media-heading, .FeedItem > a {
+.media-heading {
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .media-title {
   font-weight: 500;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.28125rem;
 }
 
 .media-description {
@@ -11132,11 +11132,11 @@ svg {
 
 .media-callout .flag {
   margin-top: -.0625rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .media-callout .media-title {
-  margin-bottom: 0.6666666667rem;
+  margin-bottom: 0.75rem;
 }
 
 .media-callout .media-description {
@@ -11153,7 +11153,7 @@ svg {
 .close, .Close {
   position: absolute;
   right: 10px;
-  top: 1rem;
+  top: 1.125rem;
   font-size: 3rem;
   line-height: 1rem;
   font-weight: 100;
@@ -11181,9 +11181,9 @@ div.Popup {
 
 div.Popup .Buttons {
   display: block;
-  margin-left: -1rem;
-  margin-right: -1rem;
-  padding: 1rem 1rem 0;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding: 1.125rem 1.125rem 0;
   border-top: 1px solid #f4f4f5;
 }
 
@@ -11242,8 +11242,8 @@ div.Popup .Buttons {
 .panel-nav .badge {
   display: inline-block;
   vertical-align: middle;
-  padding: 0 0.25rem;
-  margin-left: 0.25rem;
+  padding: 0 0.28125rem;
+  margin-left: 0.28125rem;
   font-size: 0.675rem;
   background-color: #949aa2;
   background-color: rgba(0, 0, 0, 0.1875);
@@ -11311,7 +11311,7 @@ div.Popup .Buttons {
   -ms-flex-pack: distribute;
   justify-content: space-around;
   padding: 0;
-  height: 4rem;
+  height: 4.5rem;
   color: #fff;
   background-color: #0291db;
   font-weight: 100;
@@ -11331,13 +11331,13 @@ div.Popup .Buttons {
 
 .navbar .logo + .title, .navbar .LayoutOptions > .logo + a, .navbar
 .HomeOptions > .logo + a {
-  margin-left: 1rem;
+  margin-left: 1.125rem;
 }
 
 .navbar img, .navbar .LayoutOptions .Sprite, .LayoutOptions .navbar .Sprite, .navbar
 .HomeOptions .Sprite,
 .HomeOptions .navbar .Sprite {
-  height: 2.75rem;
+  height: 3.09375rem;
 }
 
 .navbar .nav-item {
@@ -11356,7 +11356,7 @@ div.Popup .Buttons {
 
 .navbar .nav-link {
   position: relative;
-  padding: 0.9666666667rem;
+  padding: 1.2166666667rem;
   color: #fff;
 }
 
@@ -11406,10 +11406,10 @@ div.Popup .Buttons {
 .nav-link.current-theme::before {
   position: absolute;
   display: block;
-  width: 1rem;
-  height: 1rem;
-  bottom: -0.5rem;
-  left: 5.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  bottom: -0.5625rem;
+  left: 5.0625rem;
   -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
   background-color: #0cb0f8;
@@ -11464,7 +11464,7 @@ div.Popup .Buttons {
   display: inline-block;
   font-weight: 300;
   text-transform: uppercase;
-  margin-left: 1rem;
+  margin-left: 1.125rem;
   opacity: .75;
   color: #fff;
   background-color: transparent;
@@ -11510,9 +11510,7 @@ div.Popup .Buttons {
 }
 
 .panel {
-  padding-top: 4rem;
-  padding-left: 4rem;
-  overflow: hidden;
+  padding-top: 4.5rem;
 }
 
 .panel code {
@@ -11536,7 +11534,7 @@ div.Popup .Buttons {
 }
 
 .panel-left {
-  padding-right: 0;
+  padding-left: 1.125rem;
 }
 
 .panel-left .panel-content {
@@ -11544,19 +11542,19 @@ div.Popup .Buttons {
 }
 
 .panel-right {
-  padding-left: 1rem;
-  padding-right: 4rem;
   color: #555a62;
   font-weight: 200;
+  padding-right: 1.125rem;
 }
 
 .panel-right .panel-content {
+  padding-left: 1.125rem;
   float: left;
 }
 
 .panel-right h2 {
-  padding-bottom: 1rem;
-  margin-bottom: 0.5rem;
+  padding-bottom: 1.125rem;
+  margin-bottom: 0.5625rem;
   letter-spacing: .0625rem;
   border-bottom: 1px dotted #949aa2;
   font-weight: 100;
@@ -11583,24 +11581,26 @@ div.Popup .Buttons {
 }
 
 .panel-right li {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .panel-right .Aside,
 .panel-right .aside {
-  margin-bottom: 3rem;
+  margin-bottom: 3.375rem;
 }
 
 .main {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
   padding: 0 1.125rem;
+  max-width: 1024px;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100vh;
-  margin-top: -4rem;
-  padding-top: 4rem;
-  max-width: 1024px;
+  margin-top: -4.5rem;
+  padding-top: 4.5rem;
   background-color: #fff;
   border: 1px solid #ddd;
   border-top: 0;
@@ -11622,15 +11622,17 @@ div.Popup .Buttons {
 }
 
 .main-row {
-  margin-left: auto;
-  margin-right: auto;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
 }
 
 .table-wrap {
   display: block;
-  margin-top: 1rem;
+  margin-top: 1.125rem;
   margin-right: -1.125rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
   margin-left: -1.125rem;
 }
 
@@ -11806,7 +11808,7 @@ position on the page to notify users of things like drafts being saved, etc. */
 h1, .h1,
 h2, .h2,
 h3, .h3,
-h4, .h4, .FeedItem > a,
+h4, .h4,
 h5, .h5,
 h6, .h6 {
   font-family: inherit;
@@ -11827,7 +11829,7 @@ h3, .h3 {
   font-size: 1.125rem;
 }
 
-h4, .h4, .FeedItem > a {
+h4, .h4 {
   font-size: 1.125rem;
 }
 
@@ -11842,24 +11844,24 @@ h6, .h6 {
 h1, .h1,
 h2, .h2,
 h3, .h3 {
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
+  margin-top: 1.125rem;
+  margin-bottom: 0.5625rem;
 }
 
-h4, .h4, .FeedItem > a,
+h4, .h4,
 h5, .h5,
 h6, .h6 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-top: 0.5625rem;
+  margin-bottom: 0.5625rem;
 }
 
 p {
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.5625rem;
 }
 
 .heading-h1, .content h1 {
   font-size: 1.25rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .full-border, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
@@ -11872,7 +11874,7 @@ p {
 }
 
 .heading-h1-block, .content > h1, div.Popup h1 {
-  padding-bottom: 1rem;
+  padding-bottom: 1.125rem;
 }
 
 .header-block {
@@ -11882,8 +11884,8 @@ p {
   justify-content: space-between;
   -ms-flex-align: center;
   align-items: center;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  padding-top: 0.5625rem;
+  padding-bottom: 0.5625rem;
 }
 
 .header-block.padded, .label-wrap img.header-block, .form-horizontal li > label img.header-block, .label-wrap .LayoutOptions .header-block.Sprite, .LayoutOptions .label-wrap .header-block.Sprite, .form-horizontal li > label .LayoutOptions .header-block.Sprite, .LayoutOptions .form-horizontal li > label .header-block.Sprite, .label-wrap
@@ -11891,12 +11893,12 @@ p {
 .HomeOptions .label-wrap .header-block.Sprite, .form-horizontal li > label
 .HomeOptions .header-block.Sprite,
 .HomeOptions .form-horizontal li > label .header-block.Sprite {
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .header-block h1 {
   margin: 0;
-  padding: 0.5rem 0;
+  padding: 0.5625rem 0;
 }
 
 .header-menu {
@@ -11913,13 +11915,13 @@ p {
 .HomeOptions .label-wrap .header-menu.Sprite, .form-horizontal li > label
 .HomeOptions .header-menu.Sprite,
 .HomeOptions .form-horizontal li > label .header-menu.Sprite {
-  margin-bottom: 1rem;
+  margin-bottom: 1.125rem;
 }
 
 .header-menu a {
   font-size: 1.125rem;
   line-height: 1;
-  margin: 0 2rem;
+  margin: 0 2.25rem;
   padding: 0.9375rem 0;
   color: #949aa2;
   text-decoration: none;
@@ -11977,7 +11979,7 @@ pre {
 }
 
 .SmallButton + .SmallButton {
-  margin-left: 0.25rem;
+  margin-left: 0.28125rem;
 }
 
 .Sortable,

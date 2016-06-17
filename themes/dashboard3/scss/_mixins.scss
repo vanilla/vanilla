@@ -110,8 +110,3 @@
     width: $width;
   }
 }
-
-
-@function to-rem($px) {
-  @return ($px / $rem-base * 1rem);
-}

@@ -106,7 +106,7 @@ Gdn_Theme::assetEnd();
         ?>
     </div>
 </div>
-<div class="row main-row">
+<div class="main-row">
     <div class="panel panel-left">
         <div class="panel-content panel-nav">
             <div class="js-scroll-to-fixed">

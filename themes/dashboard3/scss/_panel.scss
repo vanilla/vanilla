@@ -6,8 +6,6 @@
 
 .panel {
   padding-top: $spacer * 4;
-  padding-left: $spacer * 4;
-  overflow: hidden;
 
   code {
     word-wrap: break-word;
@@ -31,7 +29,7 @@
 }
 
 .panel-left {
-  padding-right: 0;
+  padding-left: $spacer;
 
   .panel-content {
     float: right;
@@ -39,12 +37,13 @@
 }
 
 .panel-right {
-  padding-left: $spacer;
-  padding-right: $spacer * 4;
   color: $grey-dark;
   font-weight: 200;
+  padding-right: $spacer;
+
 
   .panel-content {
+    padding-left: $spacer;
     float: left;
   }
 

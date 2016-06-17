@@ -35,6 +35,6 @@
   @include image-wrap();
 }
 
-svg.icon {
-  display: block;
+svg {
+  fill: $grey-dark;
 }

@@ -37,7 +37,7 @@ $brand-danger:              #f9281d;
 // Set the number of columns and specify the width of the gutters.
 
 $grid-columns:               24;
-$grid-gutter-width:          1.875rem !default; // 30px
+$grid-gutter-width:          36 / 16 * 1rem;
 
 // Typography
 //

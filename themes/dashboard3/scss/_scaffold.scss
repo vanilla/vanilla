@@ -3,6 +3,7 @@
 // No styleguide reference.
 
 .main {
+  padding: 0 $padding-default;
 
   // Ensure the footer is flush with the bottom of the window if the
   // page height is less than the window height.
@@ -30,4 +31,10 @@
   .content {
     padding-bottom: 4rem;
   }
+}
+
+
+.main-row {
+  margin-left: auto;
+  margin-right: auto;
 }

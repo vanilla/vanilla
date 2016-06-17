@@ -19,12 +19,11 @@
 }
 
 .list-reset {
+  &,
   ul,
   ol {
     @include list-reset();
   }
-
-
 }
 
 form {
@@ -545,6 +544,7 @@ select {
     display: none;
 
     svg {
+      display: block;
       width: 84px;
       fill: $brand-success;
     }
@@ -601,6 +601,7 @@ select {
   }
 
   svg {
+    display: block;
     fill: rgba(85,90,98,.27);
   }
 

@@ -105,38 +105,37 @@ Gdn_Theme::assetEnd();
         ?>
     </div>
 </div>
-<div class="container-fluid body">
-    <div class="row main-row">
-        <div class="col-sm-0 col-md-8 col-lg-6 col-xl-5 panel panel-left">
-            <div class="panel-content panel-nav">
-                <div class="js-scroll-to-fixed">
-                <?php echo anchor($title, '/', 'title'); ?>
-                <?php echo $dashboardNav; ?>
-                </div>
+<div class="row main-row">
+    <div class="panel panel-left">
+        <div class="panel-content panel-nav">
+            <div class="js-scroll-to-fixed">
+            <?php echo anchor($title, '/', 'title'); ?>
+            <?php echo $dashboardNav; ?>
             </div>
         </div>
-        <div class="col-sm-24 col-md-16 col-lg-12 col-xl-14 main">
-            <div class="content">
-                <?php $this->renderAsset('Content'); ?>
+    </div>
+    <div class="main">
+        <div class="content">
+<!--            --><?php //echo $dropdown; ?>
+            <?php $this->renderAsset('Content'); ?>
+        </div>
+        <div class="footer">
+            <?php $this->renderAsset('Foot'); ?>
+            <div class="footer-logo logo-wrap">
+                <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
+                <div class="footer-logo-powered">
+                    <div class="footer-logo-powered-text">— <?php echo t('%s Powered', 'Powered'); ?> —</div>
+                </div>
             </div>
-            <div class="footer">
-                <?php $this->renderAsset('Foot'); ?>
-                <div class="footer-logo logo-wrap">
-                    <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
-                    <div class="footer-logo-powered">
-                        <div class="footer-logo-powered-text">— <?php echo t('%s Powered', 'Powered'); ?> —</div>
-                    </div>
-                </div>
-                <div class="footer-nav nav">
-                    <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
-                </div>
+            <div class="footer-nav nav">
+                <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
             </div>
         </div>
-        <div class="col-sm-0 col-md-0 col-lg-6 col-xl-5 panel panel-help panel-right">
-            <div class="panel-content">
-                <div class="js-scroll-to-fixed">
-                    <?php $this->renderAsset('Help'); ?>
-                </div>
+    </div>
+    <div class="panel panel-help panel-right">
+        <div class="panel-content">
+            <div class="js-scroll-to-fixed">
+                <?php $this->renderAsset('Help'); ?>
             </div>
         </div>
     </div>

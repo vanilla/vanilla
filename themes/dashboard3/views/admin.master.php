@@ -16,7 +16,16 @@ $dropdown->setTrigger('A New Name')
     ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
     ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
     ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
-
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
+<head>
+    <?php $this->renderAsset('Head'); ?>
+    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
+    <meta name="robots" content="noindex,nofollow"/>
+</head>
+<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
+<?php $this->renderAsset('Symbols');
 Gdn_Theme::assetBegin('DashboardUserDropDown');
 $user = Gdn::session()->User;
 $rm = new RoleModel();
@@ -58,15 +67,6 @@ $roleTitles = implode(', ', $roleTitlesArray);
 <?php
 Gdn_Theme::assetEnd();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
-<head>
-    <?php $this->renderAsset('Head'); ?>
-    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
-    <meta name="robots" content="noindex,nofollow"/>
-</head>
-<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
-<?php $this->renderAsset('Symbols'); ?>
 <div class="navbar">
     <div class="navbar-brand">
         <?php $title = c('Garden.Title'); ?>

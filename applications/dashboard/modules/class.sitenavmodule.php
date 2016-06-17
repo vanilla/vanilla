@@ -74,7 +74,7 @@ class SiteNavModule extends NavModule {
             'modifiers' => $modifiers,
             'disabled' => $disabled
         ];
-        self::$sectionItems[strtolower($section)][self::LINKS_INDEX][$key] = $args;
+        self::$sectionItems[strtolower($section)][self::LINKS_INDEX][] = $args;
         return $this;
     }
 
@@ -193,7 +193,7 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers
      * @return $this|SiteNavModule
      */
-    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupIf($isAllowed, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {
@@ -281,8 +281,8 @@ class SiteNavModule extends NavModule {
             $currentSections = Gdn_Theme::section('', 'get');
             $currentSections = array_map('strtolower', $currentSections);
 
-            $customMenuKeys = array_intersect(array_keys(self::$sectionItems), $currentSections);
-            $hasCustomMenu = !empty($customMenuKeys);
+            $arr = array_intersect(array_keys(self::$sectionItems), $currentSections);
+            $hasCustomMenu = !empty($arr);
 
             if (!$hasCustomMenu) {
                 $currentSections = [self::SECTION_DEFAULT];
@@ -330,17 +330,6 @@ class SiteNavModule extends NavModule {
                     $link['disabled']
                 );
             }
-        }
-    }
-
-    /**
-     * Remove an item from the nested set.
-     *
-     * @param string $key The key of the item to remove, separated by dots.
-     */
-    public function removeItem($key) {
-        foreach (self::$sectionItems as &$section) {
-            unset($section['links'][$key]);
         }
     }
 }

@@ -48,7 +48,8 @@ function writeConnection($Connection, $wrap = true) {
             <div class="btn-group">
             <?php
             if ($Enabled && !empty($SettingsUrl)) {
-                echo anchor('', $SettingsUrl, 'btn btn-settings-border', ['aria-label' => sprintf(t('Settings for %s'), val('Name', $Connection, t('Unknown')))]);
+                echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border', ['aria-label' => sprintf(t('Settings for %s'), val('Name', $Connection, t('Unknown')))]), 'div', ['class' => 'btn-wrap']);
+
             } ?>
             </div>
             <div class="toggle">

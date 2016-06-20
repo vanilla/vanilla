@@ -367,6 +367,15 @@ class VanillaHooks implements Gdn_IPlugin {
         if ($sender->Menu) {
             $sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, ['Standard' => true]);
         }
+        
+        if (!inSection('Dashboard')) {
+            // Spoilers assets
+            $sender->addJsFile('spoilers.js', 'dashboard');
+            $sender->addCssFile('spoilers.css', 'dashboard');
+            $sender->addDefinition('Spoiler', t('Spoiler'));
+            $sender->addDefinition('show', t('show'));
+            $sender->addDefinition('hide', t('hide'));
+        }
     }
 
     /**

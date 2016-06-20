@@ -1749,15 +1749,13 @@ abstract class Gdn_SQLDriver {
 
             // Try and figure out an alias for the field.
             if ($Alias == '' || ($Count > 1 && $i > 0)) {
-                if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/', $Field, $Matches) > 0) {
+                if (preg_match('/^([^\s]+)\s+(?:as\s+)?`?([^`]+)`?$/i', $Field, $Matches) > 0) {
                     // This is an explicit alias in the select clause.
                     $Field = $Matches[1];
                     $Alias = $Matches[2];
-                } elseif (preg_match('/^[^\.]+\.`?([^`]+)`?$/', $Field, $Matches) > 0) {
-                    // This is an alias from the field name.
-                    $Alias = $Matches[1];
                 } else {
-                    $Alias = '';
+                    // This is an alias from the field name.
+                    $Alias = trim(strstr($Field, '.'), ' .`');
                 }
                 // Make sure we aren't selecting * as an alias.
                 if ($Alias == '*') {

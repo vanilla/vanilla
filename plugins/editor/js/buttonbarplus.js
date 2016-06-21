@@ -552,7 +552,7 @@
                         break;
 
                     case 'blockquote':
-                        $(TextArea).insertRoundTag('blockquote', htmlOpts, {'class': 'Quote'});
+                        $(TextArea).insertRoundTag('div', htmlOpts, {'class': 'Quote'});
                         break;
 
                     case 'spoiler':

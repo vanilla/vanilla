@@ -42,13 +42,6 @@ class MessagesController extends ConversationsController {
         $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
         $this->addModule('SignedInModule');
 
-        // Spoilers assets
-        $this->addJsFile('spoilers.js', 'dashboard');
-        $this->addCssFile('spoilers.css', 'dashboard');
-        $this->addDefinition('Spoiler', t('Spoiler'));
-        $this->addDefinition('show', t('show'));
-        $this->addDefinition('hide', t('hide'));
-
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
         }

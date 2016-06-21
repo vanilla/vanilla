@@ -8,7 +8,7 @@ foreach ($this->data('Comments') as $Comment) {
         <?php $this->fireEvent('BeforeItemContent'); ?>
         <div class="ItemContent">
             <div class="Message"><?php
-                echo SliceString(Gdn_Format::text(Gdn_Format::to($Comment->Body, $Comment->Format), false), 250);
+                echo SliceString(Gdn_Format::plainText($Comment->Body, $Comment->Format), 250);
                 ?></div>
             <div class="Meta">
                 <span class="MItem"><?php echo t('Comment in', 'in').' '; ?>

@@ -23,7 +23,15 @@ class Captcha {
      * @return boolean
      */
     public static function enabled() {
-        return !c('Garden.Registration.SkipCaptcha', false);
+        // Detect any available captcha validation handlers.
+        $validateHandlers = Gdn::pluginManager()->getEventHandlers(
+            '',
+            'validate',
+            'Handler',
+            ['ClassName' => 'captcha']
+        );
+
+        return c('Garden.Registration.SkipCaptcha') ? false : count($validateHandlers) > 0;
     }
 
     /**

@@ -18,6 +18,10 @@ use Vanilla\AddonManager;
  */
 class Gdn_ThemeManager extends Gdn_Pluggable {
 
+    const ACTION_ENABLE = 1;
+
+    const ACTION_DISABLE = 2;
+
     /** @var array An array of search paths for themes and their files. */
     private $themeSearchPaths = null;
 
@@ -348,6 +352,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         $newTheme = $this->enabledTheme();
 
         if ($oldTheme != $newTheme) {
+            $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
             Logger::event(
                 'theme_changed',
                 'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
@@ -357,6 +362,41 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                     'newTheme' => $newTheme
                 )
             );
+        }
+    }
+
+    /**
+     * Hooks to the various actions, i.e. enable, disable and load.
+     *
+     * @param string $themeName The name of the plugin.
+     * @param string $forAction Which action to hook it to, i.e. enable, disable or load.
+     * @param boolean $callback whether to perform the hook method.
+     * @return void
+     */
+    private function themeHook($themeName, $forAction, $callback = false) {
+        switch ($forAction) {
+            case self::ACTION_ENABLE:
+                $methodName = 'setup';
+                break;
+            case self::ACTION_DISABLE:
+                $methodName = 'onDisable';
+                break;
+            default:
+                $methodName = '';
+        }
+
+        $info = $this->getThemeInfo($themeName);
+        $pluginClass = val('ClassName', $info, '');
+        $path = val('RealHooksFile', $info , '');
+        if (!empty($path)) {
+            include_once $path;
+        }
+
+        if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
+            $plugin = new $pluginClass();
+            if (method_exists($pluginClass, $methodName)) {
+                $plugin->$methodName();
+            }
         }
     }
 
@@ -463,6 +503,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         if ($oldTheme !== $ThemeName) {
+            $this->themeHook($ThemeName, self::ACTION_ENABLE, true);
             Logger::event(
                 'theme_changed',
                 Logger::NOTICE,

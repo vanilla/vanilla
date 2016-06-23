@@ -677,7 +677,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $column = clone $column;
 
         $typeAliases = [
-            'ipaddress' => ['Type' => 'varchar', 'Length' => 15]
+            'ipaddress' => ['Type' => 'varbinary', 'Length' => 16]
         ];
 
         $validColumnTypes = array(

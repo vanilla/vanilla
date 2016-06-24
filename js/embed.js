@@ -154,7 +154,7 @@ window.vanilla.embed = function(host) {
                     currentPath = currentPath.replace('/index.php?p=', ''); // 1
                     currentPath = stripParam(currentPath, 'remote='); // 2
                     currentPath = stripParam(currentPath, 'locale='); // 3
-                    window.location.hash = currentPath;
+                    window.location.hash = encodeURI(currentPath);
                 }
             }
         } else if (message[0] == 'unload') {

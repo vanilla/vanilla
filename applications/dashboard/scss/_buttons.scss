@@ -190,7 +190,7 @@ input[type="button"] {
   @extend .btn-secondary;
   @extend .icon;
   $btn-icon-height: 28;
-  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width-rem * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
 

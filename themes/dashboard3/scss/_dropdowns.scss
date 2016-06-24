@@ -132,8 +132,8 @@ $dropdown-item-padding-y: (30 - $icon-size) / 2;
   }
 
   hr {
-    border-color: $dropdown-divider-bg;
-    border-top-style: dotted;
+    border: none; // reset
+    border-top: $border-width dotted $dropdown-divider-bg;
     margin: 6px 0;
   }
 }

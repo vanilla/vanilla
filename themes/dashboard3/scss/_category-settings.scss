@@ -32,6 +32,7 @@
 
 .dd-list {
   position: relative;
+  font-size: 13px;
   @include list-reset();
 
   .dd-list {

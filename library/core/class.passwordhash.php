@@ -153,7 +153,7 @@ class Gdn_PasswordHash {
      * Grab an instance of a valid password algorithm.
      *
      * @param string $algorithm
-     * @return PasswordInterface
+     * @return object
      * @throws Exception if a matching class cannot be found
      * @throws Exception if the found class is not an instance of PasswordInterface
      */
@@ -206,6 +206,14 @@ class Gdn_PasswordHash {
      * @return string Returns a password hash.
      */
     public function hashPasswordPhpass($password) {
-        return $this->getAlgorithm('Phpass')->setHashMethod(PhpassPassword::HASH_BLOWFISH)->hash($password);
+        $phpass = $this->getAlgorithm('Phpass');
+
+        if ($this->portable_hashes) {
+            $phpass->setHashMethod(PhpassPassword::HASH_PHPASS);
+        } else {
+            $phpass->setHashMethod(PhpassPassword::HASH_BLOWFISH);
+        }
+
+        return $phpass->hash($password);
     }
 }

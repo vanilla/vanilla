@@ -251,7 +251,15 @@ class Addon {
             }
         }
         if ($infoString != '') {
-            eval($infoString);
+            try {
+                eval($infoString);
+            } catch (\Throwable $ex) {
+                trigger_error("Error scanning info array in $path. ".$ex->getMessage(), E_USER_WARNING);
+                return null;
+            } catch (\Exception $ex) {
+                trigger_error("Error scanning info array in $path. ".$ex->getMessage(), E_USER_WARNING);
+                return null;
+            }
         } else {
             return null;
         }

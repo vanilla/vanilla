@@ -1814,8 +1814,8 @@ jQuery(document).ready(function($) {
                             flag = '(?:^|\\s)' + flag;
                         }
 
-                        // Allow matches to end with a space, a line feed or the end of the string.
-                        regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*)(?:\\s|\\n|$)|' + flag + '([^\\x00-\\xff]*)(?:\\s|\\n|$)', 'gi');
+                        // Some browsers append a linefeed to the end of subtext.  We need to allow for it.
+                        regexp = new RegExp(flag + '([A-Za-z0-9_\+\-]*|[^\\x00-\\xff]*)(?:\\n)?$', 'gi');
                         match = regexp.exec(subtext);
 
                         if (match) {

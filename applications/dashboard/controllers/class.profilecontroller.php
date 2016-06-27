@@ -119,9 +119,6 @@ class ProfileController extends Gdn_Controller {
         $this->permission('Garden.Profiles.View');
         $this->editMode(false);
 
-        $this->addJsFile('spoilers.js');
-        $this->addCssFile('spoilers.css');
-
         // Object setup
         $Session = Gdn::session();
         $this->ActivityModel = new ActivityModel();

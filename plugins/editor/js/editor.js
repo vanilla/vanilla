@@ -1659,7 +1659,7 @@
 
                                     wysihtml5.commands.blockquote = {
                                         exec: function(composer, command) {
-                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
+                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Quote", REG_EXP);
                                             if ($(composer.element.lastChild).hasClass('Quote')) {
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
@@ -1667,7 +1667,7 @@
                                         },
 
                                         state: function(composer, command) {
-                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
+                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "div", "Quote", REG_EXP);
                                         },
 
                                         value: function() {
@@ -1691,7 +1691,7 @@
                                         },
 
                                         state: function(composer, command) {
-                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
+                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
                                         },
 
                                         value: function() {

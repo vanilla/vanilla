@@ -290,7 +290,8 @@ cell-* are used for the dropdown */
 del {
 }
 
-blockquote.Quote {
+blockquote.Quote,
+div.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   margin: 1em;

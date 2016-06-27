@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "f86602f1ac9ae5205f3baca73b6a8514",
-    "content-hash": "810372b6f714bceb65afa73a6f8ac4ae",
+    "hash": "46c4615c1a79cce417e9c87fba91b05b",
+    "content-hash": "5dbbb16f260bda6ad6a3bb2ab31bb3fe",
     "packages": [
         {
             "name": "psr/log",
@@ -139,6 +139,59 @@
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
             "time": "2016-03-25 22:29:23"
+        },
+        {
+            "name": "vanilla/garden-password",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-password.git",
+                "reference": "bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-password/zipball/bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e",
+                "reference": "bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "suggest": {
+                "ircmaxell/password-compat": "~1.0",
+                "php": ">=5.5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Password\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com",
+                    "role": "developer"
+                },
+                {
+                    "name": "Tim Gunter",
+                    "email": "tim@vanillaforums.com",
+                    "role": "developer"
+                }
+            ],
+            "description": "Provides a standard password hashing interface and support for password hashing in common frameworks.",
+            "keywords": [
+                "garden",
+                "password",
+                "php",
+                "vanilla",
+                "vanilla forums"
+            ],
+            "time": "2016-04-18 01:43:52"
         },
         {
             "name": "vanilla/htmlawed",

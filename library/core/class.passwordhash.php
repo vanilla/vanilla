@@ -79,6 +79,9 @@ class Gdn_PasswordHash {
             case 'mybb':
                 $Result = $this->getAlgorithm('Mybb')->verify($Password, $StoredHash);
                 break;
+            case 'phpass':
+                $Result = $this->getAlgorithm('Phpass')->verify($Password, $StoredHash);
+                break;
             case 'phpbb':
                 $Result = $this->getAlgorithm('Phpbb')->verify($Password, $StoredHash);
                 break;

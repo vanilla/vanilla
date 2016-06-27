@@ -54,6 +54,11 @@ class Gdn_PasswordHash {
     public function checkPassword($Password, $StoredHash, $Method = false) {
         $Result = false;
 
+        if (empty($Password) || empty($StoredHash)) {
+            // We don't care if there is a strong password hash. Empty passwords are not cool
+            return false;
+        }
+
         switch (strtolower($Method)) {
             case 'crypt':
                 $Result = (crypt($Password, $StoredHash) === $StoredHash);

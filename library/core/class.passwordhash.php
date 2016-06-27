@@ -162,8 +162,6 @@ class Gdn_PasswordHash {
             $algorithm .= 'Password';
         }
 
-        $algorithm = strtolower($algorithm);
-
         if (!array_key_exists($algorithm, $this->algorithms)) {
             $class = "\\Garden\\Password\\{$algorithm}";
 

@@ -1714,7 +1714,7 @@
                                                 pre.appendChild(code);
                                                 code.appendChild(selectedNodes);
                                                 range.insertNode(pre);
-                                                composer.selection.selectNode(pre);
+                                                composer.selection.selectNode(code);
                                             }
                                         },
                                         state: function(composer) {

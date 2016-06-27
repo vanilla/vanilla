@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.7.10',
+   'Version' => '1.7.11',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),

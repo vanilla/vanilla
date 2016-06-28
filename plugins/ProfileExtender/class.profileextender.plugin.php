@@ -318,7 +318,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 // Make unique name from label for new fields
                 $Name = $TestSlug = substr(preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues)), 0, 50);
                 $i = 1;
-                while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
+                while (empty($Name) || array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }
             }
@@ -577,7 +577,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 // Make unique slug
                 $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', $Field);
                 $i = 1;
-                while (array_key_exists($Name, $NewData) || in_array($Name, $this->ReservedNames)) {
+                while (empty($Name) || array_key_exists($Name, $NewData) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }
 

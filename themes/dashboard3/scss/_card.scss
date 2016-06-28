@@ -20,6 +20,7 @@
 
   .username {
     margin-bottom: $spacer / 4;
+
     a {
       color: $grey-dark;
     }
@@ -41,10 +42,8 @@
         top: 2px;
       }
 
-      &:hover {
-        svg {
-          fill: $white;
-        }
+      &:hover svg {
+        fill: $white;
       }
     }
   }

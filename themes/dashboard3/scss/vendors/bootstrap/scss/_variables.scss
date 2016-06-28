@@ -78,7 +78,7 @@ $spacers: (
     y:   ($spacer-y * 3)
   )
 ) !default;
-$border-width:               (1 / 16 * 1rem);
+$border-width:               1px !default;
 
 
 // Body

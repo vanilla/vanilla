@@ -8,6 +8,7 @@
 // Base styles
 //
 
+
 .btn {
   display: inline-block;
   font-weight: $btn-font-weight;
@@ -19,16 +20,6 @@
   border: $border-width-rem solid transparent;
   @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, $btn-border-radius);
   @include transition(all .2s ease-in-out);
-
-  &,
-  &:active,
-  &.active {
-    &:focus,
-    &.focus {
-      outline: 0;
-      //@include tab-focus();
-    }
-  }
 
   @include hover-focus {
     text-decoration: none;
@@ -59,7 +50,6 @@ fieldset[disabled] a.btn {
   pointer-events: none;
 }
 
-
 //
 // Alternate buttons
 //
@@ -72,47 +62,10 @@ fieldset[disabled] a.btn {
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
 
-.btn-transparent {
-  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
-}
-//.btn-info {
-//  @include button-variant($btn-info-color, $btn-info-bg, $btn-info-border);
-//}
-//.btn-success {
-//  @include button-variant($btn-success-color, $btn-success-bg, $btn-success-border);
-//}
-//.btn-warning {
-//  @include button-variant($btn-warning-color, $btn-warning-bg, $btn-warning-border);
-//}
-//.btn-danger {
-//  @include button-variant($btn-danger-color, $btn-danger-bg, $btn-danger-border);
-//}
-
 // Remove all backgrounds
 .btn-primary-outline {
   @include button-outline-variant($btn-primary-bg);
 }
-
-.btn-secondary-outline {
-  @include button-outline-variant($btn-secondary-border);
-}
-
-.btn-info-outline {
-  @include button-outline-variant($btn-info-bg);
-}
-
-.btn-success-outline {
-  @include button-outline-variant($btn-success-bg);
-}
-
-.btn-warning-outline {
-  @include button-outline-variant($btn-warning-bg);
-}
-
-.btn-danger-outline {
-  @include button-outline-variant($btn-danger-bg);
-}
-
 
 //
 // Link buttons
@@ -179,11 +132,10 @@ fieldset[disabled] a.btn {
 .btn-block {
   display: block;
   width: 100%;
-}
 
-// Vertically space out multiple block buttons
-.btn-block + .btn-block {
-  margin-top: 5px;
+  + .btn-block {
+    margin-top: $spacer / 4;
+  }
 }
 
 // Specificity overrides
@@ -225,7 +177,7 @@ input[type="button"] {
 .btn-edit {
   @extend .btn-icon;
 
-  &:before {
+  &::before {
     @include char-content($icon-edit);
   }
 }
@@ -234,7 +186,7 @@ input[type="button"] {
   @extend .btn-icon;
 
 
-  &:before {
+  &::before {
     @include char-content($icon-trash);
   }
 }
@@ -244,7 +196,7 @@ input[type="button"] {
   @extend .btn-icon;
 
 
-  &:before {
+  &::before {
     @include char-content($icon-ok);
   }
 }
@@ -252,7 +204,7 @@ input[type="button"] {
 .btn-settings {
   @extend .btn-icon;
 
-  &:before {
+  &::before {
     @include char-content($icon-cog);
   }
 }
@@ -263,19 +215,15 @@ input[type="button"] {
   @extend .btn-secondary;
   @extend .icon;
 
-  &:before {
+  &::before {
     @include char-content($icon-edit);
   }
-}
-
-.btn-settings-border {
-  @extend .btn-secondary;
 }
 
 .btn-icon-border {
   @extend .btn-secondary;
   $btn-icon-height: 28;
-  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width-rem * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
 

@@ -5,7 +5,7 @@
   padding-left: $padding-default;
   padding-right: $padding-default;
   border-top: 1px solid $border-color;
-  font-color: $black;
+  color: $black;
   background-color: $body-bg;
 
   .vanilla-logo {
@@ -23,30 +23,14 @@
 
   display: inline-block;
   background: 0;
-  background-image: url('images/vanilla-black.png');
   background-image: url('images/vanilla-black.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
 
 .vanilla-logo-white {
-  background-image: url('images/vanilla-white.png');
   background-image: url('images/vanilla-white.svg');
 }
-
-@mixin rule($font-size, $line-height, $color) {
-  position: absolute;
-  display: block;
-  top: (($font-size * $line-height) / 2) - ($border-width-rem / 2);
-  width: 100%;
-  height: $border-width-rem;
-  background-color: $color;
-  z-index: -1;
-}
-
-//.footer-logo-powered-rule {
-//  @include rule(.425rem, $line-height-lg, $black);
-//}
 
 .footer-logo-powered-text {
   background-color: $body-bg;

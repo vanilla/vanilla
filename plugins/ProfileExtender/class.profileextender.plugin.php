@@ -427,7 +427,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Display all non-hidden fields
-            $ProfileFields = array_reverse($ProfileFields);
+            $ProfileFields = array_reverse($ProfileFields, true);
             foreach ($ProfileFields as $Name => $Value) {
                 // Skip empty and hidden fields.
                 if (!$Value || !val('OnProfile', $AllFields[$Name])) {

@@ -35,9 +35,9 @@ form {
 
 .form-control {
   line-height: 1.5;
-  padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-  padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-  border: $border-width solid #ccc;
+  padding-top: ($control-height-rem - ($border-width-rem * 2) - ($font-size-base * $line-height)) / 2;
+  padding-bottom: ($control-height-rem - ($border-width-rem * 2) - ($font-size-base * $line-height)) / 2;
+  border: $border-width-rem solid #ccc;
 }
 
 // Quick and dirty horizontal form
@@ -348,12 +348,12 @@ form {
   width: 100%;
   font-weight: 400;
   cursor: pointer;
-}
 
-.file-upload input {
-  margin: 0;
-  filter: alpha(opacity = 0);
-  opacity: 0;
+  input {
+    margin: 0;
+    filter: alpha(opacity = 0);
+    opacity: 0;
+  }
 }
 
 .file-upload-choose {
@@ -479,9 +479,6 @@ select {
 
   label {
     padding-left: 0;
-  }
-
-  label {
     cursor: pointer;
   }
 
@@ -580,7 +577,7 @@ select {
     > .btn {
       display: block;
       margin: ($spacer / 6) ($spacer / 4);
-      max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
+      max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width-rem * 2);
       min-width: 5rem;
     }
   }

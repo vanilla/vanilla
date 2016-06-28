@@ -1,127 +1,98 @@
-/* Do not customize these unless you enjoy pain. */
 
-/* Note: InformMessages are "growl" style messages that appear in a fixed
-position on the page to notify users of things like drafts being saved, etc. */
-.InformMessages {
-  text-align: left !important;
-  position: fixed;
-  top: auto;
-  bottom: 20px;
-  left: 20px;
-  z-index: 200;
-  margin: 0 !important;
-  padding: 0 !important;
-  list-style: none !important;
-  font-size: 12px;
-  display: block;
-  width: auto;
-}
+// Note: InformMessages are "growl" style messages that appear in a fixed position on the page to notify users of things like drafts being saved, etc.
 
 * html .InformMessages {
   position: absolute;
-  width: 100%; /*IE5.5*/
+  width: 100%;
   top: auto;
-  left: 20px;
+  left: $spacer;
   overflow: visible;
-  //  bottom: expression(eval(document.compatMode && document.compatMode=='CSS1Compat') ? documentElement.scrollBottom : document.body.scrollBottom);
 }
 
-.InformMessages .InformWrapper {
+.InformMessages {
+  text-align: left;
+  position: fixed;
+  top: auto;
+  bottom: $spacer;
+  left: $spacer;
+  z-index: 200;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: $font-size-sm;
   display: block;
-}
+  width: auto;
 
-.InformMessages .InformMessage {
-  color: #fff !important;
-  text-shadow: 0 1px 1px #000;
-  text-align: left !important;
-  border-radius: 2px;
-  background: rgb(0, 0, 0) !important;
-  background: rgba(0, 0, 0, 0.7) !important;
-  border: none !important;
-  width: auto !important;
-  max-width: 400px !important;
-  margin: 10px auto 0 !important;
-  padding: 9px 14px 8px !important;
-  display: inline-block;
-  zoom: 1;
-  position: relative;
-  line-height: 1.6;
-}
+  .InformWrapper {
+    display: block;
+  }
 
-.InformMessages .InformMessage:hover {
-  background: #111111;
-  background: rgba(0, 0, 0, 0.8) !important;
-}
+  .InformMessage {
+    color: $white;
+    text-shadow: 0 1px 1px $black;
+    text-align: left;
+    border-radius: $border-radius;
+    background: rgba(0,0,0,.7);
+    border: 0;
+    width: auto;
+    max-width: 400px;
+    margin: ($spacer / 2) auto 0;
+    padding: ($spacer / 2) $spacer;
+    display: inline-block;
+    zoom: 1;
+    position: relative;
 
-.InformMessages .InformMessage a {
-  color: #fff;
-  text-decoration: underline;
-}
+    &:hover {
+      background: rgba(0,0,0,.8);
+    }
 
-.InformMessages .InformMessage a:hover {
-  text-decoration: none;
-}
+    a {
+      color: $white;
+      text-decoration: underline;
 
-.InformMessages .InformMessage a.Close {
-  border: none;
-  background: transparent;
-  border-top-right-radius: 2px;
-  color: #ddd;
-  font-size: 14px;
-  text-align: center;
-  display: none;
-  height: 12px;
-  width: 12px;
-  line-height: 1;
-  text-decoration: none;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
+      &:hover {
+        text-decoration: none;
+      }
+    }
 
-.InformMessages .InformMessage a.Close span {
-  display: inline;
-}
+    .Close {
+      border: 0;
+      background: transparent;
+      border-top-right-radius: 2px;
+      color: #ddd;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+      height: 12px;
+      width: 12px;
+      line-height: 1;
+      text-decoration: none;
+      position: absolute;
+      top: 0;
+      right: 0;
 
-.InformMessages .InformMessage a.Close:hover {
-  background: #000;
-  color: #fff;
-}
+      span {
+        display: inline;
+      }
 
-.InformMessages .InformMessage:hover a.Close {
-  display: block;
-}
+      &:hover {
+        background: $black;
+        color: $white;
+      }
+    }
 
-/* Inform Sprites */
-.InformMessages .InformWrapper.HasIcon .InformMessage {
-  padding-left: 42px !important;
-  min-height: 20px;
-}
+    &:hover .Close {
+      display: block;
+    }
 
-.InformMessages .InformWrapper.HasSprite .InformMessage {
-  padding-left: 40px !important;
-}
+    // Inform Sprites
 
-.InformMessages .InformMessage a.Icon {
-  display: block;
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  height: 28px;
-  width: 28px;
-}
+    .Icon {
+      display: none;
+    }
 
-.InformMessages .InformMessage a.Icon img {
-  height: 28px;
-  width: 28px;
-}
-
-.InformSprite {
-  background: url('images/inform-sprites.png') -9px -9px no-repeat;
-  display: block;
-  position: absolute;
-  top: 4px;
-  left: 5px;
-  height: 30px;
-  width: 30px;
+    .InformSprite {
+      display: none;
+    }
+  }
 }

@@ -15,4 +15,3 @@ if ($this->data('StatisticsVerified')) {
 }
 
 echo $this->Form->close();
-?>

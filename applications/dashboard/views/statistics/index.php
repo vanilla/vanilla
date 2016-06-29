@@ -1,4 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
+<div class="js-form">
     <style type="text/css">
         body .NotifyMessage {
             margin: 0 20px 20px;
@@ -44,3 +45,6 @@ if ($this->data('AnalyticsEnabled')) {
 }
 
 echo $this->Form->close();
+?>
+</div>
+

@@ -64,7 +64,7 @@
         <ul>
             <li>
                 <?php echo $this->Form->label('API Status'); ?>
-                <div class="Popin" rel="/statistics/verify"></div>
+                <div class="Async js-popin" rel="statistics/verify"></div>
             </li>
             <li>
                 <?php
@@ -79,7 +79,7 @@
                 ?>
             </li>
         </ul>
-        <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
+        <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
     </div>
     <div class="ConfigurationHelp">
         <strong><?php echo t("About Vanilla Statistics"); ?></strong>

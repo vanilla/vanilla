@@ -114,7 +114,14 @@ class StatisticsController extends DashboardController {
             Gdn::set('Garden.Analytics.Notify', null);
         }
 
-        $this->render();
+        $this->setData(
+            'FormView',
+            $this->data('AnalyticsEnabled') ? 'configuration' : 'disabled'
+        );
+
+        $this->render(
+            $this->deliveryType() === DELIVERY_TYPE_VIEW ? $this->data('FormView') : ''
+        );
     }
 
     /**

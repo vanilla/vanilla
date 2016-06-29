@@ -59,6 +59,7 @@
         color: #c90000;
     }
 </style>
+<?php echo $this->Form->open(); ?>
 <div class="Configuration">
     <div class="ConfigurationForm">
         <ul>
@@ -89,3 +90,4 @@
         <p><?php echo t("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file: <code>\$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code>"); ?></p>
     </div>
 </div>
+<?php echo $this->Form->close(); ?>

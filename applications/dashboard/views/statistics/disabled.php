@@ -15,6 +15,7 @@
         margin: 20px 0 0 0;
     }
 </style>
+<?php echo $this->Form->open(); ?>
 <div class="StatsDisabled">
     <strong><?php echo t("Vanilla Statistics are currently disabled"); ?></strong>
     <?php
@@ -32,6 +33,5 @@
         echo "<p>".t("Garden.StatisticsReadonly.Resolve", "To solve this problem, assign file mode 777 to your conf/config.php file.")."</p>";
     }
     ?>
-    <p></p>
-
 </div>
+<?php echo $this->Form->close(); ?>

@@ -89,7 +89,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                     <?php echo $PreviewImageHtml; ?>
                         <div class="overlay">
                             <div class="buttons">
-                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-transparent', array('target' => '_top'));
+                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-overlay', array('target' => '_top'));
                                 $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                                 $this->fireEvent('AfterThemeButtons');
                                 ?>

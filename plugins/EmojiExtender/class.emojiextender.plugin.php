@@ -179,7 +179,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 $icon.
                 '<div class="overlay">'.
                    '<div class="buttons">'.
-                        '<a class="btn btn-transparent">'.t('Select').'</a>'.
+                        '<a class="btn btn-overlay">'.t('Select').'</a>'.
                    '</div>'.
                 '</div>'.
                 '</div>'.

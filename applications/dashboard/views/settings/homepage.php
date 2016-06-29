@@ -21,7 +21,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         .sprite($SpriteClass)
         .'<div class="overlay">'
         .'<div class="buttons">'
-        .anchor(t('Select'), $Url, 'btn btn-transparent', ['title' => $Description, 'rel' => $Url])
+        .anchor(t('Select'), $Url, 'btn btn-overlay', ['title' => $Description, 'rel' => $Url])
         .'</div>'
         .'<div class="selected">'
         .dashboardSymbol('checkmark')

@@ -148,8 +148,8 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                         }
                         echo '<div class="overlay">';
                         echo '<div class="buttons">';
-                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-transparent EnableAddon EnableTheme', array('target' => '_top'));
-                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-transparent PreviewAddon', array('target' => '_top'));
+                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
+                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
                         $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                         $this->fireEvent('AfterThemeButtons');
                         echo '</div>';

@@ -756,13 +756,13 @@ class ProfileController extends Gdn_Controller {
         $crop = null;
 
         if ($this->isUploadedAvatar($avatar)) {
-            //Get the image source so we can manipulate it in the crop module.
+            // Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
             $basename = changeBasename($avatar, "p%s");
             $source = $upload->copyLocal($basename);
 
-            //Set up cropping.
+            // Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
             $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
@@ -843,7 +843,14 @@ class ProfileController extends Gdn_Controller {
      * @return bool Whether the avatar has been uploaded from the dashboard.
      */
     private function isUploadedAvatar($avatar) {
-        return (!isUrl($avatar) && strpos($avatar, self::AVATAR_FOLDER.'/') !== false);
+        $avatarFolders = array_merge([self::AVATAR_FOLDER], c('Garden.AvatarUploadFolderNames', []));
+        $inFolder = false;
+        foreach ($avatarFolders as $folder) {
+           if (strpos($avatar, $folder.'/') !== false) {
+               $inFolder = true;
+           }
+        }
+        return (!isUrl($avatar) && $inFolder);
     }
 
 

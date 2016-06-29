@@ -476,7 +476,7 @@ class ProfileController extends Gdn_Controller {
     public function index($User = '', $Username = '', $UserID = '', $Page = false) {
         $this->addJsFile('cropimage.js');
         $this->addCssFile('cropimage.css');
-        
+
         $this->editMode(false);
         $this->getUserInfo($User, $Username, $UserID);
 
@@ -837,20 +837,13 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
-     * Test whether a path is a relative path to the proper uploads directory.
+     * Test whether a path is a full url, which gives us an indication whether it's an upload or not.
      *
      * @param string $avatar The path to the avatar image to test
-     * @return bool Whether the avatar has been uploaded from the dashboard.
+     * @return bool Whether the avatar has been uploaded.
      */
     private function isUploadedAvatar($avatar) {
-        $avatarFolders = array_merge([self::AVATAR_FOLDER], c('Garden.AvatarUploadFolderNames', []));
-        $inFolder = false;
-        foreach ($avatarFolders as $folder) {
-           if (strpos($avatar, $folder.'/') !== false) {
-               $inFolder = true;
-           }
-        }
-        return (!isUrl($avatar) && $inFolder);
+        return (!isUrl($avatar));
     }
 
 

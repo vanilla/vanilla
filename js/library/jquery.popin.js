@@ -5,7 +5,7 @@
  */
 "use strict";
 
-(function() {
+(function($) {
     $(document).on("contentLoad", function(event) {
         var $target = $(event.target);
 

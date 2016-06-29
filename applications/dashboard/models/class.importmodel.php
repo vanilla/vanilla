@@ -1274,7 +1274,7 @@ class ImportModel extends Gdn_Model {
 
         Gdn::database()->query("truncate table $Tablename;");
 
-        $Sql = "load data local infile $Path into table $Tablename
+        $sql = "load data local infile $Path into table $Tablename
          character set utf8
          columns terminated by ','
          optionally enclosed by '\"'
@@ -1282,16 +1282,15 @@ class ImportModel extends Gdn_Model {
          lines terminated by '\\n'
          ignore 1 lines";
 
-        // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-        $dblink = mysql_connect(c('Database.Host'), c('Database.User'), c('Database.Password'), false, 128);
-        mysql_select_db(c('Database.Name'), $dblink);
-        $Result = mysql_query($Sql, $dblink);
-        if ($Result === false) {
-            $Ex = new Exception(mysql_error($dblink));
-            mysql_close($dblink);
-            throw new $Ex;
+        // We've got to use the mysqli_* functions because PDO doesn't support load data local infile well.
+        $mysqli = new mysqli(c('Database.Host'), c('Database.User'), c('Database.Password'), c('Database.Name'), 128);
+        $result = $mysqli->query($sql);
+        if ($result === false) {
+            $ex = new Exception($mysqli->error);
+            $mysqli->close();
+            throw new $ex;
         }
-        mysql_close($dblink);
+        $mysqli->close();
     }
 
     /**

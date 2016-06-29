@@ -437,7 +437,7 @@ select {
 //         <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
 //         <div class="overlay">
 //           <div class="buttons">
-//             <a class="btn btn-transparent">Button</a>
+//             <a class="btn btn-overlay">Button</a>
 //           </div>
 //           <div class="selected">
 //             selected icon
@@ -456,7 +456,7 @@ select {
 //         <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
 //         <div class="overlay">
 //           <div class="buttons">
-//             <a class="btn btn-transparent">Button</a>
+//             <a class="btn btn-overlay">Button</a>
 //           </div>
 //           <div class="selected">
 //             selected icon
@@ -625,6 +625,10 @@ select {
   @extend .col-xl-6;
 
   padding: $spacer $spacer ($spacer / 2);
+}
+
+.btn-overlay {
+  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
 }
 
 // Search input

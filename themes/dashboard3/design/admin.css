@@ -10727,6 +10727,46 @@ select::-ms-expand {
   padding: 1.125rem 1.125rem 0.5625rem;
 }
 
+.btn-overlay {
+  color: #fff;
+  background-color: transparent;
+  border-color: #fff;
+}
+
+.btn-overlay:hover {
+  color: #fff;
+  background-color: #0cb0f8;
+  border-color: #fff;
+}
+
+.btn-overlay:focus, .btn-overlay.focus {
+  color: #fff;
+  background-color: #0cb0f8;
+  border-color: #fff;
+}
+
+.btn-overlay:active, .btn-overlay.active, .Tabs ul li.Active a.btn-overlay,
+.Tabs ul .btn-overlay.current-tab,
+.tabbed-content li.Active a.btn-overlay,
+.tabbed-content .btn-overlay.current-tab, .btn-overlay.Current,
+.btn-overlay.current-theme,
+.open > .btn-overlay.dropdown-toggle {
+  color: #fff;
+  background-color: #0cb0f8;
+  border-color: #fff;
+  background-image: none;
+}
+
+.btn-overlay.disabled:focus, .btn-overlay.disabled.focus, .btn-overlay:disabled:focus, .btn-overlay:disabled.focus {
+  background-color: transparent;
+  border-color: #fff;
+}
+
+.btn-overlay.disabled:hover, .btn-overlay:disabled:hover {
+  background-color: transparent;
+  border-color: #fff;
+}
+
 .search-wrap {
   position: relative;
 }

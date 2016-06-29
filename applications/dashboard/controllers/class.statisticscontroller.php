@@ -101,6 +101,9 @@ class StatisticsController extends DashboardController {
             if (!$ConfWritable) {
                 $AnalyticsEnabled = false;
             }
+
+            $this->Form->setFormValue('InstallationID', Gdn::installationID());
+            $this->Form->setFormValue('InstallationSecret', Gdn::installationSecret());
         }
 
         $this->setData('AnalyticsEnabled', $AnalyticsEnabled);

@@ -157,27 +157,40 @@
         }
     });
 
-    // Hijack form submits.
-    $(document).on('contentLoad', function (e) {
-        $('form', e.target).submit(function (e) {
+    // Hook into form submissions.  Replace element body with server response when we're in a .js-form.
+    $(document).on("contentLoad", function (e) {
+        $("form", e.target).submit(function (e) {
             var $form = $(this);
-            var $parent = $form.closest('.js-form');
 
+            // Traverse up the DOM, starting from the form that triggered the event, looking for the first .js-form.
+            var $parent = $form.closest(".js-form");
+
+            // Bail if we aren't in a .js-form.
             if ($parent.length === 0) {
                 return;
             }
+
+            // Hijack this submission.
             e.preventDefault();
 
-            $form.ajaxSubmit({
-                data: { DeliveryType: 'VIEW' },
-                success: function (html) {
-                    $parent.html($.parseHTML(html)).trigger('contentLoad');
-                },
-                error: function (xhr) {
+            // An object containing extra data that should be submitted along with the form.
+            var data = {
+                DeliveryType: "VIEW"
+            };
 
+            var submitButton = $form.find("input[type=submit]:focus").get(0);
+            if (submitButton) {
+                data[submitButton.name] = submitButton.name;
+            }
+
+            // Send the request, expect HTML and hope for the best.
+            $form.ajaxSubmit({
+                data: data,
+                dataType: "html",
+                success: function (data, textStatus, jqXHR) {
+                    $parent.html(data).trigger('contentLoad');
                 }
             });
-
         });
     });
 })(window, jQuery);

@@ -56,9 +56,9 @@ if ($this->data('Comments')->numRows() > 0)
 $this->fireEvent('AfterComments');
 if ($this->Pager->LastPage()) {
     $LastCommentID = $this->addDefinition('LastCommentID');
-    if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
+    if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID) {
         $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
-    $this->addDefinition('Vanilla_Comments_AutoRefresh', Gdn::config('Vanilla.Comments.AutoRefresh', 0));
+    }
 }
 echo '</div>';
 

@@ -1821,7 +1821,7 @@ class UserModel extends Gdn_Model {
      * @return bool|int|string
      */
     public function register($FormPostValues, $Options = []) {
-        $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
+        $FormPostValues['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
 
         // Check for banning first.
         $Valid = BanModel::checkUser($FormPostValues, null, true);
@@ -2096,6 +2096,15 @@ class UserModel extends Gdn_Model {
 
             // Check the validation results again in case something was added during the BeforeSave event.
             if (count($this->Validation->results()) == 0) {
+                // Encode any IP fields that aren't already encoded.
+                $ipCols = ['InsertIPAddress', 'LastIPAddress', 'UpdateIPAddress'];
+                foreach ($ipCols as $col) {
+                    if (isset($Fields[$col]) && filter_var($Fields[$col], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+                        $Fields[$col] = ipEncode($Fields[$col]);
+                    }
+                }
+                unset($col);
+
                 // If the primary key exists in the validated fields and it is a
                 // numeric value greater than zero, update the related database row.
                 if ($UserID > 0) {
@@ -2885,8 +2894,8 @@ class UserModel extends Gdn_Model {
         $Fields[$this->DateInserted] = $Now;
         touchValue('DateFirstVisit', $Fields, $Now);
         $Fields['DateLastActive'] = $Now;
-        $Fields['InsertIPAddress'] = Gdn::request()->ipAddress();
-        $Fields['LastIPAddress'] = Gdn::request()->ipAddress();
+        $Fields['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
+        $Fields['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
     }
 
     /**
@@ -2946,7 +2955,7 @@ class UserModel extends Gdn_Model {
         // Update session level information if necessary.
         if ($UserID == Gdn::session()->UserID) {
             $IP = Gdn::request()->ipAddress();
-            $Fields['LastIPAddress'] = $IP;
+            $Fields['LastIPAddress'] = ipEncode($IP);
             $this->saveIP($UserID, $IP);
 
             if (Gdn::session()->newVisit()) {
@@ -4044,7 +4053,7 @@ class UserModel extends Gdn_Model {
             $UserData['DateOfBirth'] = val('DateOfBirth', $Data, '');
             $UserData['CountNotifications'] = 0;
             $UserData['Attributes'] = $Attributes;
-            $UserData['InsertIPAddress'] = Gdn::request()->ipAddress();
+            $UserData['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
             if ($UserData['DateOfBirth'] == '') {
                 $UserData['DateOfBirth'] = '1975-09-16';
             }

@@ -702,7 +702,7 @@ class Gdn_Model extends Gdn_Pluggable {
         }
 
         if ($this->Schema->FieldExists($this->Name, 'UpdateIPAddress') && !isset($Fields['UpdateIPAddress'])) {
-            $Fields['UpdateIPAddress'] = Gdn::request()->ipAddress();
+            $Fields['UpdateIPAddress'] = ipEncode(Gdn::request()->ipAddress());
         }
     }
 

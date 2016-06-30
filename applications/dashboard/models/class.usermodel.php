@@ -2414,11 +2414,11 @@ class UserModel extends Gdn_Model {
             $this->SQL
                 ->orOp()
                 ->beginWhereGroup()
-                ->orWhere('u.LastIPAddress', $IPAddress);
+                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)]);
 
             // An or is expensive so only do it if the query isn't optimized.
             if (!$Optimize) {
-                $this->SQL->orWhere('u.InsertIPAddress', $IPAddress);
+                $this->SQL->orWhereIn('u.InsertIPAddress', [$IPAddress, inet_pton($IPAddress)]);
             }
 
             $this->SQL->endWhereGroup();

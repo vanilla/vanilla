@@ -2411,10 +2411,13 @@ class UserModel extends Gdn_Model {
         if (!empty($RoleID)) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } elseif (isset($IPAddress)) {
+            $this->SQL->join('UserIP uip', 'u.userID = uip.UserID');
+
             $this->SQL
                 ->orOp()
                 ->beginWhereGroup()
-                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)]);
+                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)])
+                ->orWhere('uip.IPAddress', inet_pton($IPAddress));
 
             // An or is expensive so only do it if the query isn't optimized.
             if (!$Optimize) {

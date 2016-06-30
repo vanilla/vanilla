@@ -110,7 +110,7 @@ $body-color:                 $gray-dark !default;
 $line-height-lg:         (4 / 3);
 $line-height-sm:         1.5;
 
-$border-radius:          .1rem;
+$border-radius:          to-rem(2);
 $border-radius-lg:       .25rem;
 $border-radius-sm:       .05rem;
 

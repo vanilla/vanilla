@@ -1445,7 +1445,7 @@ a.text-danger:focus, a.text-danger:hover {
   display: block;
   padding: 0.375em 1em;
   border: 1px solid transparent;
-  border-radius: 0.1rem 0.1rem 0 0;
+  border-radius: 0.125rem 0.125rem 0 0;
 }
 
 .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
@@ -1505,7 +1505,7 @@ a.text-danger:focus, a.text-danger:hover {
 .nav-pills .nav-link {
   display: block;
   padding: 0.375em 1em;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .nav-pills .nav-link.active, .nav-pills .Tabs ul li.Active a.nav-link, .Tabs ul li.Active .nav-pills a.nav-link, .nav-pills
@@ -1572,7 +1572,7 @@ a.text-danger:focus, a.text-danger:hover {
   margin-bottom: 0.75rem;
   background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .card-block {
@@ -1601,11 +1601,11 @@ a.text-danger:focus, a.text-danger:hover {
 }
 
 .card > .list-group:first-child .list-group-item:first-child {
-  border-radius: 0.1rem 0.1rem 0 0;
+  border-radius: 0.125rem 0.125rem 0 0;
 }
 
 .card > .list-group:last-child .list-group-item:last-child {
-  border-radius: 0 0 0.1rem 0.1rem;
+  border-radius: 0 0 0.125rem 0.125rem;
 }
 
 .card-header {
@@ -1615,7 +1615,7 @@ a.text-danger:focus, a.text-danger:hover {
 }
 
 .card-header:first-child {
-  border-radius: 0.1rem 0.1rem 0 0;
+  border-radius: 0.125rem 0.125rem 0 0;
 }
 
 .card-footer {
@@ -1625,7 +1625,7 @@ a.text-danger:focus, a.text-danger:hover {
 }
 
 .card-footer:last-child {
-  border-radius: 0 0 0.1rem 0.1rem;
+  border-radius: 0 0 0.125rem 0.125rem;
 }
 
 .card-primary {
@@ -1725,11 +1725,11 @@ a.text-danger:focus, a.text-danger:hover {
 }
 
 .card-img-top {
-  border-radius: 0.1rem 0.1rem 0 0;
+  border-radius: 0.125rem 0.125rem 0 0;
 }
 
 .card-img-bottom {
-  border-radius: 0 0 0.1rem 0.1rem;
+  border-radius: 0 0 0.125rem 0.125rem;
 }
 
 @media (min-width: 544px) {
@@ -1846,7 +1846,7 @@ button.close, button.Close {
 
 @media (min-width: 544px) {
   .navbar {
-    border-radius: 0.1rem;
+    border-radius: 0.125rem;
   }
 }
 
@@ -1934,7 +1934,7 @@ button.close, button.Close {
   line-height: 1;
   background: none;
   border: 1px solid transparent;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .navbar-toggler:focus, .navbar-toggler:hover {
@@ -4654,7 +4654,7 @@ a.current-theme,
 .btn-group-vertical > .btn:first-child:not(:last-child), .btn-group-vertical > .file-upload-browse:first-child:not(:last-child), .btn-group-vertical > .Button:first-child:not(:last-child), .btn-group-vertical >
 .TextButton:first-child:not(:last-child), .btn-group-vertical > .SmallButton:first-child:not(:last-child), #Head h1 a .btn-group-vertical > span:first-child:not(:last-child), .Tabs ul li .btn-group-vertical > a:first-child:not(:last-child),
 .tabbed-content li .btn-group-vertical > a:first-child:not(:last-child), .FilterMenu .btn-group-vertical > .FilterButton:first-child:not(:last-child) {
-  border-top-right-radius: 0.1rem;
+  border-top-right-radius: 0.125rem;
   border-bottom-right-radius: 0;
   border-bottom-left-radius: 0;
 }
@@ -4662,7 +4662,7 @@ a.current-theme,
 .btn-group-vertical > .btn:last-child:not(:first-child), .btn-group-vertical > .file-upload-browse:last-child:not(:first-child), .btn-group-vertical > .Button:last-child:not(:first-child), .btn-group-vertical >
 .TextButton:last-child:not(:first-child), .btn-group-vertical > .SmallButton:last-child:not(:first-child), #Head h1 a .btn-group-vertical > span:last-child:not(:first-child), .Tabs ul li .btn-group-vertical > a:last-child:not(:first-child),
 .tabbed-content li .btn-group-vertical > a:last-child:not(:first-child), .FilterMenu .btn-group-vertical > .FilterButton:last-child:not(:first-child) {
-  border-bottom-left-radius: 0.1rem;
+  border-bottom-left-radius: 0.125rem;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
 }
@@ -5863,7 +5863,7 @@ a.current-theme,
   background-color: #fff;
   background-clip: padding-box;
   border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .dropdown-divider {
@@ -5996,14 +5996,14 @@ a.current-theme,
 }
 
 .list-group-item:first-child {
-  border-top-right-radius: 0.1rem;
-  border-top-left-radius: 0.1rem;
+  border-top-right-radius: 0.125rem;
+  border-top-left-radius: 0.125rem;
 }
 
 .list-group-item:last-child {
   margin-bottom: 0;
-  border-bottom-right-radius: 0.1rem;
-  border-bottom-left-radius: 0.1rem;
+  border-bottom-right-radius: 0.125rem;
+  border-bottom-left-radius: 0.125rem;
 }
 
 .list-group-flush .list-group-item {
@@ -6374,7 +6374,7 @@ button.list-group-item-danger.current-theme:hover {
   background-color: #fff;
   background-image: none;
   border: 1px solid #ccc;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .form-control::-ms-expand, .SmallInput::-ms-expand {
@@ -9131,7 +9131,7 @@ output {
   padding: 0.40625rem 1rem;
   font-size: 0.875rem;
   line-height: 1.5;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .btn:focus, .file-upload-browse:focus, .Button:focus,
@@ -10029,7 +10029,7 @@ form ol label {
   padding: 0.40625rem 0.84375rem;
   color: #949aa2;
   border: 1px solid #ccc;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
 }
 
 .file-upload-browse {
@@ -10985,6 +10985,66 @@ svg {
   border: 1px solid #ddd;
 }
 
+.modal-dialog, .Border {
+  margin: 3vh auto;
+  width: inherit;
+  max-width: 1024px;
+}
+
+.modal-body, .Content {
+  max-height: 80vh;
+  overflow: scroll;
+}
+
+.modal-content, .Overlay .Popup .Body {
+  border-radius: 0.125rem;
+}
+
+.modal {
+  display: -ms-flexbox;
+  display: flex;
+  padding: 0 0.5625rem;
+}
+
+.modal.fade .modal-dialog, .modal.fade .Border {
+  transition: opacity .2s ease-out;
+  -webkit-transform: none;
+  transform: none;
+  opacity: 0;
+}
+
+.modal.in .modal-dialog, .modal.in .Border {
+  -webkit-transform: none;
+  transform: none;
+  -webkit-filter: none;
+  opacity: 1;
+}
+
+.modal-open .main-row,
+.modal-open .navbar {
+  -webkit-filter: blur(5px);
+}
+
+body .modal-open {
+  overflow: hidden;
+}
+
+.modal-footer,
+.modal-header {
+  padding: 0.75rem 1.125rem;
+}
+
+.modal-footer::before {
+  position: absolute;
+  left: 0;
+  bottom: 3.8125rem;
+  display: block;
+  width: 100%;
+  height: 1rem;
+  box-shadow: inset 0px -0.75rem 0.75rem 0px white;
+  content: '';
+}
+
 .nav-heading a {
   display: block;
   padding-top: 1rem;
@@ -11049,7 +11109,7 @@ svg {
 .tabbed-content .nav-link.current-tab,
 .tabbed-content .panel-nav .nav-link.current-tab, .panel-nav .nav-link.Current, .panel-nav
 .nav-link.current-theme {
-  border-radius: 0.1rem 0 0 0.1rem;
+  border-radius: 0.125rem 0 0 0.125rem;
 }
 
 .panel-nav .nav-link.active, .panel-nav .Tabs ul li.Active a.nav-link, .Tabs ul li.Active .panel-nav a.nav-link, .panel-nav
@@ -11501,7 +11561,7 @@ table tbody tr:hover {
   color: #fff;
   text-shadow: 0 1px 1px #000;
   text-align: left;
-  border-radius: 0.1rem;
+  border-radius: 0.125rem;
   background: rgba(0, 0, 0, 0.7);
   border: 0;
   width: auto;

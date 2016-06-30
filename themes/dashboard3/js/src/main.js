@@ -89,9 +89,14 @@
                         </button> \
                         <h4 class="modal-title">{title}</h4> \
                     </div> \
+                    {form.open} \
                     <div class="modal-body"> \
                         {body} \
                     </div> \
+                    <div class="modal-footer"> \
+                        {footer} \
+                    </div> \
+                    {form.close} \
                 </div> \
             </div> \
         </div>',
@@ -142,6 +147,9 @@
                     var content = modal.parseBody(body);
                     var html = $('#' + modal.id).html().replace('{body}', content.body);
                     html = html.replace('{title}', content.title);
+                    html = html.replace('{footer}', content.footer);
+                    html = html.replace('{form.open}', content.form.open);
+                    html = html.replace('{form.close}', content.form.close);
                     $('#' + modal.id).htmlTrigger(html);
                 }
             });
@@ -149,8 +157,12 @@
 
         parseBody: function(body) {
             var title = '';
+            var footer = '';
+            var formTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
+            var $footer = $elem.find('.Buttons');
+            var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title
             if ($title.length !== 0) {
@@ -159,9 +171,29 @@
                 body = $elem.html();
             }
 
+            // Pull out the buttons from the view to add to the modal footer
+            if ($footer.length !== 0) {
+                footer = $footer.html();
+                $footer.remove();
+                body = $elem.html()
+            }
+
+            // Pull out the form opening and closing tags to wrap around the modal-content and modal-footer
+            if ($form.length !== 0) {
+                var formHtml = $form.prop('outerHTML');
+                formTag = formHtml.split('>')[0] += '>';
+                body = body.replace(formTag, '');
+                body = body.replace('</form>', '');
+            }
+
             return {
                 'title': title,
-                'body': body
+                'footer': footer,
+                'body': body,
+                'form': {
+                    'open': formTag,
+                    'close': '</form>'
+                }
             };
         },
 
@@ -247,6 +279,14 @@
             });
         }
         $('.navbar', element).scrollToFixed({
+            zIndex: 1005
+        });
+
+        $('.modal-header', element).scrollToFixed({
+            zIndex: 1005
+        });
+
+        $('.modal-footer', element).scrollToFixed({
             zIndex: 1005
         });
     }

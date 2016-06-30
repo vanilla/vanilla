@@ -1,0 +1,63 @@
+// When the modal fills the screen it has an even 3% on top and bottom
+// Centers the modal
+.modal-dialog {
+  margin: 3vh auto;
+  width: inherit;
+  max-width: 1024px;
+}
+
+// Sets the maximum height of the entire modal to 80% of the screen height
+.modal-body {
+  max-height: 80vh;
+  overflow: scroll;
+}
+
+.modal-content {
+  border-radius: $border-radius;
+}
+
+.modal {
+  display: flex;
+  padding: 0 $spacer / 2;
+
+  &.fade .modal-dialog {
+    transition: opacity .2s ease-out;
+    transform: none;
+    opacity: 0;
+  }
+  &.in .modal-dialog {
+    transform: none;
+    -webkit-filter: none;
+    opacity: 1;
+  }
+}
+
+.modal-open {
+  .main-row,
+  .navbar {
+    -webkit-filter: blur(5px);
+  }
+
+  body & {
+    overflow: hidden;
+  }
+}
+
+.modal-footer,
+.modal-header {
+  padding: ((to-rem(60) - $control-height-rem) / 2) $spacer;
+}
+
+.modal-footer {
+  &::before {
+    position: absolute;
+    left: 0;
+    bottom: to-rem(61);
+    display: block;
+    width: 100%;
+    height: 1rem;
+    box-shadow: inset 0px -.75rem .75rem 0px rgba(255,255,255,1);
+    content: '';
+  }
+}
+

@@ -2897,12 +2897,20 @@ class UserModel extends Gdn_Model {
      *
      * @param int $userID Unique ID of the user.
      * @param string $IP Human-readable IP address.
+     * @param string $dateUpdated Force an update timesetamp.
      * @return bool Was the operation successful?
      */
-    public function saveIP($userID, $IP) {
+    public function saveIP($userID, $IP, $dateUpdated = false) {
+        if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+            return false;
+        }
+
         $packedIP = ipEncode($IP);
         $px = Gdn::database()->DatabasePrefix;
-        $currentDateTime = Gdn_Format::toDateTime();
+
+        if (!$dateUpdated) {
+            $dateUpdated = Gdn_Format::toDateTime();
+        }
 
         $query = "insert into {$px}UserIP (UserID, IPAddress, DateInserted, DateUpdated)
             values (:UserID, :IPAddress, :DateInserted, :DateUpdated)
@@ -2910,9 +2918,9 @@ class UserModel extends Gdn_Model {
         $values = [
             ':UserID' => $userID,
             ':IPAddress' => $packedIP,
-            ':DateInserted' => $currentDateTime,
-            ':DateUpdated' => $currentDateTime,
-            ':DateUpdated2' => $currentDateTime
+            ':DateInserted' => Gdn_Format::toDateTime(),
+            ':DateUpdated' => $dateUpdated,
+            ':DateUpdated2' => $dateUpdated
         ];
 
         try {

@@ -52,7 +52,7 @@ if (!class_exists('HeadModule', false)) {
             $this->_Strings = array();
             $this->_Title = '';
             $this->_Subtitle = '';
-            $this->_TitleDivider = ' - ';
+            $this->_TitleDivider = ' — ';
             parent::__construct($Sender);
         }
 
@@ -333,11 +333,11 @@ if (!class_exists('HeadModule', false)) {
          * Sets the title divider.
          *
          * This is the string that is used to concatenate title and subtitle.
-         * Defaults to ' - '.
+         * Defaults to ' — '.
          *
          * @param string $titleDivider The string that concats title and subtitle.
          */
-        public function setTitleDivider($titleDivider = ' - ') {
+        public function setTitleDivider($titleDivider = ' — ') {
             $this->_TitleDivider = $titleDivider;
         }
 

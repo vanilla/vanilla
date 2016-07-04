@@ -14,17 +14,19 @@
   font-weight: 500;
   text-transform: uppercase;
   text-decoration: none;
-  transition: rotate .5s;
 
   &::before {
     @extend .caret;
-    tranform: rotate(-90deg);
+    -webkit-transform: rotate(0deg);
+    tranform: rotate(0deg);
     margin-left: -1rem;
     margin-right: .5rem;
+    transition: all .1s ease-out;
   }
 
-  &[aria-expanded=true]::before {
-    transform: rotate(0deg);
+  &.collapsed::before {
+    -webkit-transform: rotate(-90deg);
+    tranform: rotate(-90deg);
   }
 }
 

@@ -90,7 +90,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
         $this->enabledApplicationFolders = null;
-        $this->Request = '';
         $this->applicationFolder = '';
         $this->controllerAssets = [];
         $this->ControllerName = '';
@@ -99,6 +98,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->controllerProperties = [];
         $this->controllerData = [];
         $this->addonManager = $addonManager;
+    }
+
+    /**
+     * Backwards compatible support for deprecated properties.
+     *
+     * @param string $name The name of the property to get.
+     * @return mixed Returns the property value.
+     */
+    public function __get($name) {
+        switch (strtolower($name)) {
+            case 'request':
+                deprecated('Gdn_Dispatcher->Request', 'Gdn::request()->path()');
+                return Gdn::request()->path();
+        }
     }
 
     /**
@@ -174,7 +187,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
             } else {
-                redirect('/entry/signin?Target='.urlencode($this->Request));
+                redirect('/entry/signin?Target='.urlencode($Request->pathAndQuery()));
             }
             exit();
         }
@@ -205,7 +218,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Controller->SyndicationMethod = $this->syndicationMethod;
 
             // Pass along the request
-            $Controller->SelfUrl = $this->Request;
+            $Controller->SelfUrl = $Request->path();
 
             // Pass along any objects
             foreach ($this->controllerProperties as $Name => $Mixed) {
@@ -307,12 +320,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * Parses the query string looking for supplied request parameters. Places
-     * anything useful into this object's Controller properties.
+     * Parses the query string looking for supplied request parameters.
      *
-     * @param int $FolderDepth
+     * Places anything useful into this object's Controller properties.
+     *
+     * @param Gdn_Request $request The request to analyze.
      */
-    protected function analyzeRequest(&$Request) {
+    private function analyzeRequest($request) {
 
         // Here is the basic format of a request:
         // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
@@ -328,58 +342,54 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->applicationFolder = '';
         $this->ControllerName = '';
         $this->ControllerMethod = 'index';
-        $this->controllerMethodArgs = array();
-        $this->Request = $Request->path(false);
+        $this->controllerMethodArgs = [];
 
-        $PathAndQuery = $Request->PathAndQuery();
-        $MatchRoute = Gdn::router()->matchRoute($PathAndQuery);
+        $pathAndQuery = $request->PathAndQuery();
+        $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
 
         // We have a route. Take action.
-        if ($MatchRoute !== false) {
-            switch ($MatchRoute['Type']) {
-                case 'Internal':
-                    $Request->pathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->path(false);
-                    break;
+        if (!empty($matchRoute)) {
+            $request->pathAndQuery($matchRoute['FinalDestination']);
 
+            switch ($matchRoute['Type']) {
+                case 'Internal':
+                    // Do nothing. The request has been rewritten.
+                    break;
                 case 'Temporary':
                     safeHeader("HTTP/1.1 302 Moved Temporarily");
-                    safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
                     exit();
                     break;
 
                 case 'Permanent':
                     safeHeader("HTTP/1.1 301 Moved Permanently");
-                    safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
                     exit();
                     break;
 
                 case 'NotAuthorized':
                     safeHeader("HTTP/1.1 401 Not Authorized");
-                    $this->Request = $MatchRoute['FinalDestination'];
+
                     break;
 
                 case 'NotFound':
                     safeHeader("HTTP/1.1 404 Not Found");
-                    $this->Request = $MatchRoute['FinalDestination'];
                     break;
 
                 case 'Drop':
                     die();
 
                 case 'Test':
-                    $Request->pathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->path(false);
-                    decho($MatchRoute, 'Route');
+                    decho($matchRoute, 'Route');
                     decho(array(
-                        'Path' => $Request->path(),
-                        'Get' => $Request->get()
+                        'Path' => $request->path(),
+                        'Get' => $request->get()
                     ), 'Request');
                     die();
             }
         }
 
-        switch ($Request->outputFormat()) {
+        switch ($request->outputFormat()) {
             case 'rss':
                 $this->syndicationMethod = SYNDICATION_RSS;
                 $this->deliveryMethod = DELIVERY_METHOD_RSS;
@@ -394,12 +404,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 break;
         }
 
-        if ($this->Request == '') {
-            $DefaultController = Gdn::router()->getRoute('DefaultController');
-            $this->Request = $DefaultController['Destination'];
+        if (in_array($request->path(), ['', '/'])) {
+            $defaultController = Gdn::router()->getRoute('DefaultController');
+            $request->pathAndQuery($defaultController['Destination']);
         }
 
-        $Parts = explode('/', str_replace('\\', '/', $this->Request));
+        $parts = explode('/', str_replace('\\', '/', $request->path()));
 
         /**
          * The application folder is either the first argument or is not provided. The controller is therefore
@@ -407,20 +417,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          */
         try {
             // if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
-            if (in_array($Parts[0], $this->getEnabledApplicationFolders())) {
-                $this->findController(1, $Parts);
+            if (in_array($parts[0], $this->getEnabledApplicationFolders())) {
+                $this->findController(1, $parts);
             }
 
             // if no match, see if the first argument is a controller
-            $this->findController(0, $Parts);
+            $this->findController(0, $parts);
 
             // 3] See if there is a plugin trying to create a root method.
-            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $Parts), true);
+            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $parts), true);
             if ($MethodName && Gdn::pluginManager()->hasNewMethod('RootController', $MethodName, true)) {
                 $this->deliveryMethod = $DeliveryMethod;
-                $Parts[0] = $MethodName;
-                $Parts = array_merge(array('root'), $Parts);
-                $this->findController(0, $Parts);
+                $parts[0] = $MethodName;
+                $parts = array_merge(array('root'), $parts);
+                $this->findController(0, $parts);
             }
 
             throw new GdnDispatcherControllerNotFoundException();
@@ -449,8 +459,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             if (!$Handled) {
                 safeHeader("HTTP/1.1 404 Not Found");
-                $Request->withRoute('Default404');
-                return $this->analyzeRequest($Request);
+                $request->withRoute('Default404');
+                return $this->analyzeRequest($request);
             }
         }
     }

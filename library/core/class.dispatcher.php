@@ -27,8 +27,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Block condition. */
     const BLOCK_ANY = 2;
 
-    /** @var string The currently requested url (defined in _AnalyzeRequest). */
-    public $Request;
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
     /** @var stringThe method of the controller to be called. */

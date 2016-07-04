@@ -267,7 +267,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     break;
             case DELIVERY_METHOD_ATOM:
                 case DELIVERY_METHOD_RSS:
-                $deliveryType = DELIVERY_TYPE_VIEW;
                 $result['syndicationMethod'] = DELIVERY_METHOD_RSS; //$deliveryMethod;
                     break;
             case DELIVERY_METHOD_TEXT:

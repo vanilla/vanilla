@@ -10641,18 +10641,19 @@ body .modal-open {
   font-weight: 500;
   text-transform: uppercase;
   text-decoration: none;
-  transition: rotate .5s;
 }
 
 .nav-heading a::before {
-  tranform: rotate(-90deg);
+  -webkit-transform: rotate(0deg);
+  tranform: rotate(0deg);
   margin-left: -1rem;
   margin-right: .5rem;
+  transition: all .1s ease-out;
 }
 
-.nav-heading a[aria-expanded=true]::before {
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
+.nav-heading a.collapsed::before {
+  -webkit-transform: rotate(-90deg);
+  tranform: rotate(-90deg);
 }
 
 .nav-inline {

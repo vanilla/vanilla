@@ -279,16 +279,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // Figure out the controller.
         list($controllerName, $pathArgs) = $this->findController($parts);
+        $result['pathArgs'] = $pathArgs;
 
         if ($controllerName) {
             // The controller was found based on the path.
             $result['controller'] = $controllerName;
-            $result['pathArgs'] = $pathArgs;
         } elseif (Gdn::pluginManager()->hasNewMethod('RootController', val(0, $parts))) {
             // There is a plugin defining a new root method.
             $result['controller'] = 'RootController';
-            $result['controllerMethod'] = array_shift($parts);
-            $result['pathArgs'] = $parts;
         } else {
             // No controller was found, fire a not found event.
             // TODO: Move this outside this method.
@@ -374,7 +372,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         } else {
             $application = '';
         }
-        $controller = ucfirst(array_shift($parts));
+        $controller = ucfirst(reset($parts));
 
         // This is a kludge until we can refactor- settings controllers better.
         if ($controller === 'Settings' && $application !== 'dashboard') {
@@ -385,6 +383,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             // If the lookup succeeded, good to go
         if (class_exists($controllerName, true)) {
+            array_shift($parts);
             return [$controllerName, $parts];
         } else {
             return ['', $parts];

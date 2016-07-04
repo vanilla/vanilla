@@ -159,51 +159,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('BeforeDispatch');
 
         // By default, all requests can be blocked by UpdateMode/PrivateCommunity
-        $CanBlock = self::BLOCK_ANY;
+        $CanBlock = $this->getCanBlock();
 
-        try {
-            $BlockExceptions = array(
-                '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
-                '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
-                '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
-                '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
-            );
-
-            $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
-            $this->fireEvent('BeforeBlockDetect');
-
-            $PathRequest = Gdn::request()->path();
-            foreach ($BlockExceptions as $BlockException => $BlockLevel) {
-                if (preg_match($BlockException, $PathRequest)) {
-                    throw new Exception("Block detected - {$BlockException}", $BlockLevel);
-                }
-            }
-
-            // Never block an admin
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                throw new Exception("Block detected", self::BLOCK_NEVER);
-            }
-
-            if (Gdn::session()->isValid()) {
-                throw new Exception("Block detected", self::BLOCK_PERMISSION);
-            }
-
-        } catch (Exception $e) {
-            // BlockLevel
-            //  TRUE = Block any time
-            //  FALSE = Absolutely no blocking
-            //  NULL = Block for permissions (e.g. PrivateCommunity)
-            $CanBlock = $e->getCode();
-        }
-
-        // If we're in updatemode and arent explicitly prevented from blocking, block
+        // If we're in update mode and aren't explicitly prevented from blocking, block.
         if (Gdn::config('Garden.UpdateMode', false) && $CanBlock > self::BLOCK_NEVER) {
             $Request->withURI(Gdn::router()->getDestination('UpdateMode'));
         }
@@ -802,6 +760,62 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 }
             }
         }
+    }
+
+    /**
+     * Figure out what kind of blocks are allowed on dispatches.
+     *
+     * @return int Returns one of the **Gdn_Disparcher::BLOCK_*** constants.
+     */
+    private function getCanBlock() {
+        $CanBlock = self::BLOCK_ANY;
+
+        $BlockExceptions = array(
+            '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
+            '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
+            '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
+            '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+        );
+
+        $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
+        $this->fireEvent('BeforeBlockDetect');
+
+        $PathRequest = Gdn::request()->path();
+        foreach ($BlockExceptions as $BlockException => $BlockLevel) {
+            if (preg_match($BlockException, $PathRequest)) {
+                Logger::debug(
+                    "Dispatcher block: {blockException}, {blockLevel}",
+                    ['blockException' => $BlockException, 'blockLevel' => $BlockLevel]
+                );
+                return $BlockLevel;
+            }
+        }
+
+        // Never block an admin.
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
+            );
+            return self::BLOCK_NEVER;
+        }
+
+        if (Gdn::session()->isValid()) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'signed_in', 'blockLevel' => self::BLOCK_PERMISSION]
+            );
+            return self::BLOCK_PERMISSION;
+        }
+
+        return $CanBlock;
     }
 }
 

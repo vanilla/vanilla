@@ -159,7 +159,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('BeforeDispatch');
 
         // By default, all requests can be blocked by UpdateMode/PrivateCommunity
-        $CanBlock = $this->getCanBlock();
+        $CanBlock = $this->getCanBlock($Request);
 
         // If we're in update mode and aren't explicitly prevented from blocking, block.
         if (Gdn::config('Garden.UpdateMode', false) && $CanBlock > self::BLOCK_NEVER) {
@@ -765,12 +765,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Figure out what kind of blocks are allowed on dispatches.
      *
-     * @return int Returns one of the **Gdn_Disparcher::BLOCK_*** constants.
+     * @param Gdn_Request $request The current request being inspected.
+     * @return int Returns one of the **Gdn_Dispatcher::BLOCK_*** constants.
      */
-    private function getCanBlock() {
-        $CanBlock = self::BLOCK_ANY;
+    private function getCanBlock($request) {
+        $canBlock = self::BLOCK_ANY;
 
-        $BlockExceptions = array(
+        $blockExceptions = array(
             '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
             '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
             '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
@@ -784,11 +785,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
         );
 
-        $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
+        $this->EventArguments['BlockExceptions'] = &$blockExceptions;
         $this->fireEvent('BeforeBlockDetect');
 
-        $PathRequest = Gdn::request()->path();
-        foreach ($BlockExceptions as $BlockException => $BlockLevel) {
+        $PathRequest = $request->path();
+        foreach ($blockExceptions as $BlockException => $BlockLevel) {
             if (preg_match($BlockException, $PathRequest)) {
                 Logger::debug(
                     "Dispatcher block: {blockException}, {blockLevel}",
@@ -815,7 +816,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return self::BLOCK_PERMISSION;
         }
 
-        return $CanBlock;
+        return $canBlock;
     }
 }
 

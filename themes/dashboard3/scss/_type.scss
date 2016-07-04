@@ -95,7 +95,7 @@ p {
   margin-right: -$padding-default;
   padding-left: $padding-default;
   padding-right: $padding-default;
-  border-bottom: 1px solid $grey-light;
+  border-bottom: $border-width solid $grey-light;
 }
 
 // Default. Use if there's only an h1 block as a heading
@@ -113,6 +113,7 @@ p {
   align-items: center;
   padding-top: $spacer / 2;
   padding-bottom: $spacer / 2;
+  min-height: $header-block-height;
   @extend .full-border;
 
   &.padded {
@@ -126,12 +127,10 @@ p {
 }
 
 .header-menu {
-  $header-menu-border-width: .1875rem;
-  $header-menu-font-size: 1.125rem;
-  $header-menu-height-px: 54;
-
-  $header-menu-height: $header-menu-height-px / $rem-base;
-  $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2)) / 2;
+  $header-menu-border-width: to-rem(3);
+  $header-menu-font-size: to-rem(18);
+  $header-menu-height: $header-block-height;
+  $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
 
   display: flex;
   justify-content: center;

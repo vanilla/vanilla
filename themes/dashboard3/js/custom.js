@@ -58,28 +58,7 @@
 
     var modal = {
 
-        fullModalHtml: ' \
-        <div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"> \
-            <div class="modal-dialog" role="document"> \
-                <div class="modal-content"> \
-                    <div class="modal-header"> \
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"> \
-                            <span aria-hidden="true">&times;</span> \
-                        </button> \
-                        <h4 class="modal-title" id="myModalLabel">Modal title</h4> \
-                    </div> \
-                    <div class="modal-body"> \
-                        {body} \
-                    </div> \
-                    <div class="modal-footer"> \
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button> \
-                        <button type="button" class="btn btn-primary">Save changes</button> \
-                    </div> \
-                </div> \
-            </div> \
-        </div>',
-
-        basicModalHtml: ' \
+        modalHtml: ' \
         <div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"> \
             <div class="modal-dialog" role="document"> \
                 <div class="modal-content"> \
@@ -104,14 +83,10 @@
         id: '',
 
         start: function($trigger) {
-            if ($trigger.attr('data-modal-id') === undefined) {
-                modal.id = Math.random().toString(36).substr(2, 9);
-                modal.setupTrigger($trigger);
-                modal.addToDom();
-                $('#' + modal.id).modal();
-            } else {
-                modal.id = $trigger.attr('data-modal-id');
-            }
+            modal.id = Math.random().toString(36).substr(2, 9);
+            modal.setupTrigger($trigger);
+            modal.addToDom();
+            $('#' + modal.id).modal('show');
             modal.addContent($trigger.attr('href'));
         },
 
@@ -121,7 +96,6 @@
 
         setupTrigger: function($trigger) {
             $trigger.attr('data-target', '#' + modal.id);
-            $trigger.attr('data-toggle', 'modal');
             $trigger.attr('data-modal-id', modal.id);
         },
 
@@ -175,7 +149,7 @@
             if ($footer.length !== 0) {
                 footer = $footer.html();
                 $footer.remove();
-                body = $elem.html()
+                body = $elem.html();
             }
 
             // Pull out the form opening and closing tags to wrap around the modal-content and modal-footer
@@ -198,13 +172,16 @@
         },
 
         addToDom: function() {
-            $('body').append(modal.basicModalHtml.replace('{id}', modal.id));
+            $('body').append(modal.modalHtml.replace('{id}', modal.id));
             modal.addEventListeners();
         },
 
         addEventListeners: function() {
             $('#' + modal.id).on('shown.bs.modal', function() {
                 modal.load(this);
+            });
+            $('#' + modal.id).on('hidden.bs.modal', function() {
+                $(this).remove();
             });
         },
 
@@ -278,7 +255,33 @@
                 });
             });
         }
-        $('.navbar', element).scrollToFixed({
+
+        var navHeight = '';
+        var navHeightShort = '';
+
+        // Duplicate our navbar and make a more condensed version for scroll-to-fixed.
+        if ($('.navbar', element).length !== 0) {
+            $('.navbar', element).css({
+                'position': 'absolute',
+                'top': '0'
+            });
+
+            navHeight = $('.navbar', element).height();
+
+            $('body').css('padding-top', navHeight);
+
+            var $elem = $($.parseHTML($('.navbar', element).prop('outerHTML') + ''));
+            $elem.addClass('navbar-short');
+            $('body').prepend($elem);
+            navHeightShort = $elem.height();
+        }
+
+        $('.navbar-short', element).css({
+            'position': 'absolute',
+            'top': navHeight - navHeightShort
+        });
+
+        $('.navbar-short', element).scrollToFixed({
             zIndex: 1005
         });
 

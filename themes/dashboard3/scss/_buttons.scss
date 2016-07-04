@@ -17,7 +17,7 @@
   vertical-align: middle;
   cursor: pointer;
   user-select: none;
-  border: $border-width-rem solid transparent;
+  border: $border-width solid transparent;
   @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, $btn-border-radius);
   @include transition(all .2s ease-in-out);
 
@@ -223,7 +223,7 @@ input[type="button"] {
 .btn-icon-border {
   @extend .btn-secondary;
   $btn-icon-height: 28;
-  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width-rem * 2)) / 2;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
 

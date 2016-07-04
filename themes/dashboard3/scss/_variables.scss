@@ -85,6 +85,8 @@ $headings-font-weight:       400;
 $headings-line-height:       1.1 !default;
 $headings-color:             inherit !default;
 
+$header-block-height:        to-rem(60);
+
 // Spacing
 //
 // Control the default styling of most Bootstrap elements by modifying these
@@ -93,8 +95,7 @@ $headings-color:             inherit !default;
 $spacer:                     to-rem(18);
 $spacer-x:                   $spacer !default;
 $spacer-y:                   $spacer !default;
-$border-width:               1px !default;
-$border-width-rem:           (1rem / $rem-base);
+$border-width:               to-rem(1);
 
 // Body
 //
@@ -126,7 +127,7 @@ $caret-width-lg:         $caret-width !default;
 
 $control-height:                 36;
 $control-height-rem:             ($control-height / $rem-base * 1rem);
-$control-padding-y:              ($control-height-rem - ($border-width-rem * 2) - ($font-size-base * $line-height)) / 2;
+$control-padding-y:              ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
 
 $btn-min-width:                  $spacer * 6.75;
 $btn-padding-x:                  1rem !default;
@@ -205,7 +206,7 @@ $navbar-height:                             $spacer * 4;
 $nav-navbar-active-link-active-bg:          #0cb0f8;
 
 // Checkbox toggles
-$toggle-border-width:                       $border-width-rem;
+$toggle-border-width:                       $border-width;
 $toggle-height:                             $control-height-rem;
 $toggle-padding:                            $toggle-height / 32;
 

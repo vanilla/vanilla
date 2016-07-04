@@ -158,11 +158,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Move this up to allow pre-routing
         $this->fireEvent('BeforeDispatch');
 
-        // By default, all requests can be blocked by UpdateMode/PrivateCommunity
-        $CanBlock = $this->getCanBlock($Request);
-
         // If we're in update mode and aren't explicitly prevented from blocking, block.
-        if (Gdn::config('Garden.UpdateMode', false) && $CanBlock > self::BLOCK_NEVER) {
+        if (Gdn::config('Garden.UpdateMode', false) && $this->getCanBlock($Request) > self::BLOCK_NEVER) {
             $Request->withURI(Gdn::router()->getDestination('UpdateMode'));
         }
 
@@ -171,7 +168,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AfterAnalyzeRequest');
 
         // If we're in update mode and can block, redirect to signin
-        if (c('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
+        if (c('Garden.PrivateCommunity') && $this->getCanBlock($Request) > self::BLOCK_PERMISSION) {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);

@@ -344,50 +344,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->ControllerMethod = 'index';
         $this->controllerMethodArgs = [];
 
-        $pathAndQuery = $request->PathAndQuery();
-        $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
-
-        // We have a route. Take action.
-        if (!empty($matchRoute)) {
-            $request->pathAndQuery($matchRoute['FinalDestination']);
-
-            switch ($matchRoute['Type']) {
-                case 'Internal':
-                    // Do nothing. The request has been rewritten.
-                    break;
-                case 'Temporary':
-                    safeHeader("HTTP/1.1 302 Moved Temporarily");
-                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
-                    exit();
-                    break;
-
-                case 'Permanent':
-                    safeHeader("HTTP/1.1 301 Moved Permanently");
-                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
-                    exit();
-                    break;
-
-                case 'NotAuthorized':
-                    safeHeader("HTTP/1.1 401 Not Authorized");
-
-                    break;
-
-                case 'NotFound':
-                    safeHeader("HTTP/1.1 404 Not Found");
-                    break;
-
-                case 'Drop':
-                    die();
-
-                case 'Test':
-                    decho($matchRoute, 'Route');
-                    decho(array(
-                        'Path' => $request->path(),
-                        'Get' => $request->get()
-                    ), 'Request');
-                    die();
-            }
-        }
+        $this->rewriteRequest($request);
 
         switch ($request->outputFormat()) {
             case 'rss':
@@ -824,6 +781,61 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         return $canBlock;
+    }
+
+    /**
+     * Rewrite the request based on rewrite rules (currently called routes in Vanilla).
+     *
+     * This method modifies the passed {@link $request} object. It can also cause a redirect if a rule matches that
+     * specifies a redirect.
+     *
+     * @param Gdn_Request $request The request to rewrite.
+     */
+    private function rewriteRequest($request) {
+        $pathAndQuery = $request->PathAndQuery();
+        $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
+
+        // We have a route. Take action.
+        if (!empty($matchRoute)) {
+            $request->pathAndQuery($matchRoute['FinalDestination']);
+
+            switch ($matchRoute['Type']) {
+                case 'Internal':
+                    // Do nothing. The request has been rewritten.
+                    break;
+                case 'Temporary':
+                    safeHeader("HTTP/1.1 302 Moved Temporarily");
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
+                    exit();
+                    break;
+
+                case 'Permanent':
+                    safeHeader("HTTP/1.1 301 Moved Permanently");
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
+                    exit();
+                    break;
+
+                case 'NotAuthorized':
+                    safeHeader("HTTP/1.1 401 Not Authorized");
+
+                    break;
+
+                case 'NotFound':
+                    safeHeader("HTTP/1.1 404 Not Found");
+                    break;
+
+                case 'Drop':
+                    die();
+
+                case 'Test':
+                    decho($matchRoute, 'Route');
+                    decho(array(
+                        'Path' => $request->path(),
+                        'Get' => $request->get()
+                    ), 'Request');
+                    die();
+            }
+        }
     }
 }
 

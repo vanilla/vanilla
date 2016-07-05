@@ -2764,7 +2764,7 @@ class UserModel extends Gdn_Model {
             if (val('CheckCaptcha', $Options, true) && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }
@@ -2834,7 +2834,7 @@ class UserModel extends Gdn_Model {
             if ($CheckCaptcha && Captcha::enabled()) {
                 $captchaIsValid = Captcha::validate();
                 if ($captchaIsValid !== true) {
-                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', 'The captcha was not completed correctly. Please try again.');
+                    $this->Validation->addValidationResult('Garden.Registration.CaptchaPublicKey', t('The captcha was not completed correctly. Please try again.'));
                     return false;
                 }
             }
@@ -3174,10 +3174,10 @@ class UserModel extends Gdn_Model {
             return $Result;
         } else {
             if (!$Result['Name']) {
-                $this->Validation->addValidationResult('Name', 'The name you entered is already in use by another member.');
+                $this->Validation->addValidationResult('Name', t('The name you entered is already in use by another member.'));
             }
             if (!$Result['Email']) {
-                $this->Validation->addValidationResult('Email', 'The email you entered is in use by another member.');
+                $this->Validation->addValidationResult('Email', t('The email you entered is in use by another member.'));
             }
             return $Valid;
         }
@@ -4152,7 +4152,7 @@ class UserModel extends Gdn_Model {
         $this->fireEvent('BeforePasswordRequest');
 
         if (count($Users) == 0) {
-            $this->Validation->addValidationResult('Name', "Couldn't find an account associated with that email/username.");
+            $this->Validation->addValidationResult('Name', t("Couldn't find an account associated with that email/username."));
             return false;
         }
 
@@ -4182,7 +4182,7 @@ class UserModel extends Gdn_Model {
         }
 
         if ($NoEmail) {
-            $this->Validation->addValidationResult('Name', 'There is no email address associated with that account.');
+            $this->Validation->addValidationResult('Name', t('There is no email address associated with that account.'));
             return false;
         }
         return true;

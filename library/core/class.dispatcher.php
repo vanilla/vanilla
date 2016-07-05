@@ -155,7 +155,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * Analyzes the supplied query string and decides how to dispatch the request.
+     * Dispatch a request to a controller method.
+     *
+     * This method analyzes a request and figures out which controller and method it maps to. It also instantiates the
+     * controller and calls the method.
+     *
+     * @param string|Gdn_Request|null $ImportRequest The request to dispatch. This can be a string URL or a Gdn_Request object,
+     * @param bool $Permanent Whether or not to set {@link Gdn::request()} with the dispatched request.
      */
     public function dispatch($ImportRequest = null, $Permanent = true) {
 
@@ -469,33 +475,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return true;
         } else {
             return false;
-        }
-    }
-
-    /**
-     * Parses methods that may be using dot-syntax to express a delivery type
-     *
-     * For example, /controller/method.json
-     * method.json should be split up and return array('method', 'JSON')
-     *
-     * @param type $Name Name of method to search for forced delivery types
-     * @param type $AllowAll Whether to allow delivery types that don't exist
-     * @return type
-     */
-    protected function _splitDeliveryMethod($Name, $AllowAll = false) {
-        $Parts = explode('.', $Name);
-        if (count($Parts) >= 2) {
-            $DeliveryPart = array_pop($Parts);
-            $MethodPart = implode('.', $Parts);
-
-            if ($AllowAll || in_array(strtoupper($DeliveryPart), array(DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS))) {
-                return array($MethodPart, strtoupper($DeliveryPart));
-            } else {
-                return array($Name, $this->deliveryMethod);
             }
-        } else {
-            return array($Name, $this->deliveryMethod);
-        }
     }
 
     /**
@@ -566,74 +546,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     public function passProperty($Name, $Mixed) {
         $this->controllerProperties[$Name] = $Mixed;
         return $this;
-    }
-
-    protected function _reflectControllerArgs($Controller) {
-        // Reflect the controller arguments based on the get.
-        if (count($Controller->Request->get()) == 0) {
-            return;
-        }
-
-        if (!method_exists($Controller, $this->ControllerMethod)) {
-            return;
-        }
-
-        $Meth = new ReflectionMethod($Controller, $this->ControllerMethod);
-        $MethArgs = $Meth->getParameters();
-        $Args = array();
-        $Get = array_change_key_case($Controller->Request->get());
-        $MissingArgs = array();
-
-        if (count($MethArgs) == 0) {
-            // The method has no arguments so just pass all of the arguments in.
-            return;
-        }
-
-        // Set all of the parameters.
-        foreach ($MethArgs as $Index => $MethParam) {
-            $ParamName = strtolower($MethParam->getName());
-
-            if (isset($this->controllerMethodArgs[$Index])) {
-                $Args[] = $this->controllerMethodArgs[$Index];
-            } elseif (isset($Get[$ParamName]))
-                $Args[] = $Get[$ParamName];
-            elseif ($MethParam->isDefaultValueAvailable())
-                $Args[] = $MethParam->getDefaultValue();
-            else {
-                $Args[] = null;
-                $MissingArgs[] = "{$Index}: {$ParamName}";
-            }
-        }
-
-        $this->controllerMethodArgs = $Args;
-
-    }
-
-    /**
-     * An internal method used to map parts of the request to various properties
-     * of this object that represent the controller, controller method, and
-     * controller method arguments.
-     *
-     * @param array $Parts An array of parts of the request.
-     * @param int $ControllerKey An integer representing the key of the controller in the $Parts array.
-     */
-    private function _mapParts($Parts, $ControllerKey) {
-        $Length = count($Parts);
-        if ($Length > $ControllerKey) {
-            $this->ControllerName = ucfirst(strtolower($Parts[$ControllerKey]));
-        }
-
-        if ($Length > $ControllerKey + 1) {
-            list($this->ControllerMethod, $this->deliveryMethod) = $this->_splitDeliveryMethod($Parts[$ControllerKey + 1]);
-        }
-
-        if ($Length > $ControllerKey + 2) {
-            for ($i = $ControllerKey + 2; $i < $Length; ++$i) {
-                if ($Parts[$i] != '') {
-                    $this->controllerMethodArgs[] = $Parts[$i];
-                }
-            }
-        }
     }
 
     /**
@@ -771,7 +683,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @return array Returns an array in the form `[$parts, $deliveryMethod]`.
      */
     private function parseDeliveryMethod($parts) {
-        $methods = [DELIVERY_METHOD_JSON, DELIVERY_METHOD_XHTML, DELIVERY_METHOD_XML, DELIVERY_METHOD_TEXT, DELIVERY_METHOD_RSS, DELIVERY_METHOD_ATOM];
+        $methods = [
+            DELIVERY_METHOD_JSON,
+            DELIVERY_METHOD_XHTML,
+            DELIVERY_METHOD_XML,
+            DELIVERY_METHOD_TEXT,
+            DELIVERY_METHOD_RSS,
+            DELIVERY_METHOD_ATOM
+        ];
 
         if ($ext = pathinfo(end($parts), PATHINFO_EXTENSION)) {
             $ext = strtoupper($ext);
@@ -898,16 +817,4 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         return $controller;
     }
-}
-
-/**
- * Class GdnDispatcherControllerNotFoundException
- */
-class GdnDispatcherControllerNotFoundException extends Exception {
-}
-
-/**
- * Class GdnDispatcherControllerFoundException
- */
-class GdnDispatcherControllerFoundException extends Exception {
 }

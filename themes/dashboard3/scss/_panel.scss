@@ -16,15 +16,41 @@
   width: 204px;
 }
 
-@include media-breakpoint-down(sm) {
-  .panel-left {
-    display: none;
-  }
+.panel-left-toggle {
+  display: none;
 }
 
 @include media-breakpoint-down(md) {
   .panel-right {
     display: none;
+  }
+  .panel-left {
+    display: none;
+  }
+  .panel-left-toggle {
+    display: block;
+    color: $white;
+    font-size: $font-size-lg;
+
+    &:hover,
+    &:active,
+    &:focus {
+      color: $white;
+      text-decoration: none;
+      outline: 0;
+    }
+
+    &:hover,
+    &:active {
+      background-color: $nav-navbar-active-link-active-bg;
+    }
+  }
+
+  .drawer-show .panel-left {
+    position: absolute;
+    display: block;
+    width: $drawer-width;
+    height: 100%;
   }
 }
 

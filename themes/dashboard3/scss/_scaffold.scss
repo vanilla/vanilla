@@ -3,6 +3,7 @@
 // No styleguide reference.
 
 .main {
+  position: relative;
   flex-grow: 1;
   padding: 0 $padding-default;
   max-width: 1024px;
@@ -16,6 +17,11 @@
   border: 1px solid $border-color;
   border-top: 0;
   border-bottom: 0;
+  transition: all 250ms;
+
+  .drawer-show & {
+    transform: translate3d($drawer-width, 0, 0);
+  }
 
   .content,
   .footer {
@@ -35,4 +41,9 @@
 .main-row {
   display: flex;
   justify-content: center;
+
+  @include media-breakpoint-down(md) {
+    display: block;
+    width: 100%;
+  }
 }

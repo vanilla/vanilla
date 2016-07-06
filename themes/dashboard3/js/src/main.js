@@ -256,32 +256,7 @@
             });
         }
 
-        var navHeight = '';
-        var navHeightShort = '';
-
-        // Duplicate our navbar and make a more condensed version for scroll-to-fixed.
-        if ($('.navbar', element).length !== 0) {
-            $('.navbar', element).css({
-                'position': 'absolute',
-                'top': '0'
-            });
-
-            navHeight = $('.navbar', element).height();
-
-            $('body').css('padding-top', navHeight);
-
-            var $elem = $($.parseHTML($('.navbar', element).prop('outerHTML') + ''));
-            $elem.addClass('navbar-short');
-            $('body').prepend($elem);
-            navHeightShort = $elem.height();
-        }
-
-        $('.navbar-short', element).css({
-            'position': 'absolute',
-            'top': navHeight - navHeightShort
-        });
-
-        $('.navbar-short', element).scrollToFixed({
+        $('.navbar', element).scrollToFixed({
             zIndex: 1005
         });
 
@@ -294,19 +269,30 @@
         });
     }
 
+    $(window).scroll(function() {
+        var offset = 46; // Height difference between short and normal navbar.
+        if ($(window).scrollTop() > offset) {
+            $('.navbar').addClass('navbar-short');
+        } else {
+            $('.navbar').removeClass('navbar-short');
+        }
+    });
+
     function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
-        new Drop({
-            target: document.querySelector('.navbar .js-card-user', element),
-            content: html,
-            constrainToWindow: true,
-            remove: true,
-            tetherOptions: {
-                attachment: 'top right',
-                targetAttachment: 'bottom right',
-                offset: '-10 0'
-            }
-        });
+        if ($('.navbar .js-card-user', element).length !== 0) {
+            new Drop({
+                target: document.querySelector('.navbar .js-card-user', element),
+                content: html,
+                constrainToWindow: true,
+                remove: true,
+                tetherOptions: {
+                    attachment: 'top right',
+                    targetAttachment: 'bottom right',
+                    offset: '-10 0'
+                }
+            });
+        }
     }
 
     function collapseInit(element) {
@@ -323,6 +309,11 @@
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
         modal.load(e.target);
+        $('.panel-left').drawer({
+              toggle    : '.js-panel-left-toggle'
+            , container : '.main-container'
+            , content   : '.main-row .main'
+        });
     });
 
     $(document).on('click', '.js-clear-search', function() {

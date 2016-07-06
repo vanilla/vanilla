@@ -1,7 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-$this->EmbedType = val('0', $this->RequestArgs, 'wordpress');
-$AllowEmbed = c('Garden.Embed.Allow');
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
@@ -11,65 +8,32 @@ $AllowEmbed = c('Garden.Embed.Allow');
     echo '</ul>';
     ?>
 </div>
-<?php Gdn_Theme::assetEnd('Help'); ?>
-<h1><?php echo t('Embed Forum'); ?></h1>
-<?php
-echo $this->Form->open();
-echo $this->Form->errors();
-?>
-<div class="Info">
-    <?php
-    echo 'Your entire vanilla forum can be embedded into another page. This is typically done so you can insert your forum into another site with minimal theming effort. The preferred method is to ';
-    echo anchor('customize your theme', 'settings/themes');
-    echo ' to match your existing website.';
-    if (!$AllowEmbed) {
-        echo wrap('<span style="background: #ff0;">'.t('Embedding is currently DISABLED.').'</span>', 'p');
-        echo anchor('Enable Embedding', 'embed/forum/enable/'.Gdn::session()->TransientKey(), 'SmallButton');
-    } else {
-    echo wrap('<span style="background: #ff0;">'.t('Embedding is currently ENABLED.').'</span>', 'p');
-    echo anchor('Disable Embedding', 'embed/forum/disable/'.Gdn::session()->TransientKey(), 'SmallButton');
-    echo wrap("Use the WordPress plugin to embed your forum into a page on your blog, or use the universal code to embed your forum into any page on the web.", 'p');
-    ?>
-</div>
-<?php
-echo $this->Form->close();
-?>
-<div class="Tabs FilterTabs">
-    <ul>
-        <li<?php echo $this->EmbedType == 'wordpress' ? ' class="Active"' : ''; ?>><?php echo anchor(t('WordPress Plugin'), 'embed/forum/wordpress'); ?></li>
-        <li<?php echo $this->EmbedType == 'universal' ? ' class="Active"' : ''; ?>><?php echo anchor(t('Universal Code'), 'embed/forum/universal'); ?></li>
-        <li<?php echo $this->EmbedType == 'advanced' ? ' class="Active"' : ''; ?>><?php echo anchor(t('Advanced Settings'), 'embed/advanced'); ?></li>
-    </ul>
-</div>
-<?php if ($this->EmbedType == 'wordpress') { ?>
-    <h1><?php echo t('Ready-made Vanilla Forum Plugin for WordPress'); ?></h1>
-    <div class="Info">
-        <h2>Using WordPress?</h2>
-
-        <p>To embed your forum in a page on your WordPress site, grab our ready-made plugin from WordPress.org for easy
-            integration.</p>
+<?php Gdn_Theme::assetEnd(); ?>
+<h1><?php echo t('Embedding'); ?></h1>
+<div class="strong"><?php echo t('Embed My Forum'); ?></div>
+<div class="row form-group">
+    <div class="label-wrap-wide">
+        <div class="description"><?php echo t('If you want to embed your forum or use Vanilla\'s comments in your blog then you need to enable embedding. If you aren\'t using embedding then we recommend leaving this setting off.'); ?></div>
     </div>
-    <?php echo anchor('Get The Vanilla Forums Plugin from WordPress.org Now', 'http://wordpress.org/extend/plugins/vanilla-forums/', 'Button'); ?>
-    <div class="Info">
-        <h2>Not Using WordPress?</h2>
-
-        <p>If you are not using WordPress, you
-            can <?php echo anchor('use the universal code', 'embed/forum/universal'); ?> for embedding your Vanilla
-            Forum.</p>
+    <div class="input-wrap-right">
+    <span id="plaintext-toggle">
+        <?php
+        if (c('Garden.Embed.Allow', false)) {
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/disable/'.Gdn::session()->TransientKey(), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+        } else {
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/enable/'.Gdn::session()->TransientKey(), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+        }
+        ?>
+    </span>
     </div>
-<?php } else if ($this->EmbedType == 'universal') { ?>
-
-<h1><?php echo t('Universal Forum Embed Code'); ?></h1>
-<div class="Info">
-    <p><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
-
-    <pre>&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', true); ?>">&lt;/script>
-        &lt;noscript>Please enable JavaScript to view the &lt;a
-        href="http://vanillaforums.com/?ref_noscript">discussions powered by Vanilla.&lt;/a>&lt;/noscript>
-        &lt;div class="vanilla-credit">&lt;a class="vanilla-anchor" href="http://vanillaforums.com">Discussions by &lt;span
-        class="vanilla-logo">Vanilla&lt;/span>&lt;/a>&lt;/div>
-    </pre>
-    <p class="WarningMessage">&uarr; Copy and paste this code into the web page where you want the forum to appear.</p>
 </div>
-<?php }
-} ?>
+<?php
+$nav = new NavModule();
+$nav->addLink(t('Vanilla Plugin for WordPress'), url('embed/wordpress'), 'embed.wordpress', '', [], ['icon' => dashboardSymbol('edit'), 'description' => t('Use Vanilla\'s Wordpress plugin if you want to embed in WordPress site.')]);
+$nav->addLink(t('Universal Forum Embed Code'), url('embed/universal'), 'embed.universal', '', [], ['icon' => dashboardSymbol('edit'), 'description' => t('Use the forum embed code to embed the entire forum in a non-WordPress site.')]);
+$nav->addLink(t('Universal Comment Embed Code'), url('embed/comments'), 'embed.comments', '', [], ['icon' => dashboardSymbol('edit'), 'description' => t('Use the comment embed code to embed Vanilla comments into a non-WordPress site.')]);
+$nav->addLink(t('Embed Settings'), url('embed/settings'), 'embed.settings', '', [], ['icon' => dashboardSymbol('settings'), 'description' => t('Use the comment embed code to embed Vanilla comments into a non-WordPress site.')]);
+$nav->setView('nav-adventure');
+
+echo $nav;
+?>

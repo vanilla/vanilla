@@ -48,7 +48,6 @@ class DashboardHooks implements Gdn_IPlugin {
                 );
             }
         }
-
         if ($Session->isValid()) {
             $Confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$Confirmed) {
@@ -136,6 +135,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->setHeader('X-Frame-Options', 'SAMEORIGIN');
         }
 
+
         // Allow return to mobile site
         $ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
         if ($ForceNoMobile === 'desktop') {
@@ -146,9 +146,9 @@ class DashboardHooks implements Gdn_IPlugin {
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
 
         // Add symbols.
-        if ($Sender->addDefinition('InDashboard')) {
+//        if ($Sender->addDefinition('InDashboard')) {
             $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
-        }
+//        }
     }
 
     public function dashboardNavModule_init_handler($sender) {

@@ -95,3 +95,99 @@
     cursor: pointer;
   }
 }
+
+//
+// <div class="nav nav-adventure">
+//   <div class="nav-item">
+//     <a class="nav-link" href="#">
+//       <div class="nav-item-icon"><svg></svg></div>
+//       <div class="nav-item-content">
+//         <div class="nav-item-title">Here's the nav title</div>
+//         <div class="nav-item-description">
+//           Here's some expanatory text about where you're headed if you select this item.
+//         </div>
+//       </div>
+//       <div class="nav-item-arrow"><svg></svg></div>
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide Section 4.1 Choose-Your-Own-Adventure Nav
+
+.nav-adventure {
+  .nav-item {
+    display: block;
+    margin-left: -$padding-default;
+    margin-right: -$padding-default;
+    border-bottom: $border-width solid $border-color;
+  }
+
+  .nav-item-title {
+    line-height: 1;
+    font-weight: 500;
+    margin-bottom: to-rem(36) - ($font-size-base * 2);
+  }
+
+  .nav-item-description {
+    line-height: 1;
+  }
+
+  .nav-link {
+    position: relative;
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+    min-height: to-rem(72);
+    padding-left: $padding-default;
+    padding-right: $padding-default;
+    color: $grey-dark;
+    transition: all .2s;
+
+    > * {
+      z-index: 1;
+    }
+
+    &::before {
+      position: absolute;
+      z-index: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background-color: $brand-primary;
+      transition: all .2s;
+      content: "";
+    }
+
+    svg {
+      display: block;
+      height: to-rem(30);
+    }
+
+    &:hover {
+      &::before {
+        width: 100%;
+      }
+
+      color: $white;
+
+      svg {
+        fill: $white;
+      }
+    }
+  }
+
+  .nav-item-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: to-rem(36);
+    height: to-rem(36);
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    margin-right: $spacer;
+  }
+
+  .nav-item-arrow {
+    margin-left: auto;
+  }
+}

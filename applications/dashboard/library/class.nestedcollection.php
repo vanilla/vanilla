@@ -69,7 +69,7 @@ trait NestedCollection {
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel'];
+    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description'];
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.

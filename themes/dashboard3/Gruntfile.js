@@ -186,6 +186,8 @@ module.exports = function (grunt) {
     concat: {
       dist: {
         src: ([]).concat([
+          'js/src/lithe.js',
+          'js/src/lithe.drawer.js',
           'js/src/main.js'
         ])
         , dest: 'js/custom.js'

@@ -118,6 +118,7 @@ form {
 
   > .label-wrap-wide {
     @extend .row-padding-left;
+    padding-right: $spacer;
     flex-grow: 1;
   }
 
@@ -147,6 +148,7 @@ form {
 }
 
 .form-group.row {
+  flex-wrap: nowrap;
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted $grey-light;

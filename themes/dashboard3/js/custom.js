@@ -1,3 +1,324 @@
+;(function ($, window, document, undefined) {
+  'use strict';
+
+  /**
+   * Lithe Core JS library
+   *
+   * The {Lithe} object contains properties and functions required by the rest
+   * of the Lithe components.
+   *
+   * @author Kasper Isager <kasper@vanillaforums.com>
+   */
+  window.Lithe = window.Lithe || {
+    /**
+     * Classes for use with toggleable components.
+     *
+     * Can be overridden anywhere at any time:
+     *     Lithe.openClass = 'foo';
+     */
+    openClass   : 'is-open',
+    closedClass : 'is-closed',
+    activeClass : 'active',
+    lastOpen    : $('is-open'),
+
+    /**
+     * Clear Lithe components
+     *
+     * @this {Lithe}
+     */
+    clear: function () {
+      // If a component was opened earlier, close it
+      if (Lithe.lastOpen !== undefined) {
+        Lithe.close(Lithe.lastOpen, Lithe.lastToggle);
+      }
+    },
+
+    /**
+     * Show ("Open") a Lithe component
+     *
+     * @this  {Lithe}
+     * @param $el
+     * @param $toggle
+     */
+    open: function ($el, $toggle, callback) {
+      var self = this;
+
+      // If a component was opened earlier, close it
+      self.clear();
+
+      self.lastOpen = $el;
+      self.lastToggle = $toggle || undefined;
+
+      $el.addClass(self.openClass).removeClass(self.closedClass);
+
+      if ($toggle !== undefined) Lithe.activate($toggle);
+
+      if (callback) {
+        callback();
+      }
+      // Was a callback specified at an earlier instance? If so, execute it
+      else if (self.lastOpen.data('openCallback')) {
+        self.lastOpen.data('openCallback')();
+      }
+
+      // Clear any callback that might be stored
+      self.lastOpen.data('openCallback', undefined);
+    },
+
+    /**
+     * Hide ("Close") a Lithe component
+     *
+     * @param $el
+     * @param $toggle
+     */
+    close: function ($el, $toggle, callback) {
+      var self = this;
+
+      $el.addClass(self.closedClass).removeClass(self.openClass);
+
+      if ($toggle !== undefined) Lithe.deactivate($toggle);
+
+      if (callback) {
+        callback();
+      }
+      // Was a callback specified at an earlier instance? If so, execute it
+      else if (self.lastOpen.data('closeCallback')) {
+        self.lastOpen.data('closeCallback')();
+      }
+
+      // Clear any callback that might be stored
+      self.lastOpen.data('closeCallback', undefined);
+    },
+
+    /**
+     * Activate a Lithe component
+     *
+     * @param $el
+     */
+    activate: function ($el) {
+      $el.addClass(this.activeClass);
+    },
+
+    /**
+     * Deactivate a Lithe component
+     *
+     * @param $el
+     */
+    deactivate: function ($el) {
+      $el.removeClass(this.activeClass);
+    },
+
+    /**
+     * Toggle a Lithe component
+     *
+     * @param {Object}   $el
+     * @param {Object}   $toggle
+     * @param {Function} open
+     * @param {Function} close
+     */
+    toggle: function ($el, $toggle, open, close) {
+      var self = this;
+
+      // If no element exists, don't go any further
+      if (!$el.length) return;
+
+      if ($el.hasClass(self.openClass)) {
+        self.close($el, $toggle, close);
+      } else {
+        self.open($el, $toggle, open);
+      }
+
+      // Store callbacks so we can use them later.
+      self.lastOpen.data('closeCallback', close);
+      self.lastOpen.data('openCallback', open);
+    }
+  };
+
+  // Clear components on document click
+  $(document).on('click', Lithe.clear);
+
+}(jQuery, window, document));
+
+/**
+ * Drawer component for the Lithe mobile theme
+ *
+ * @author  Kasper Isager <kasper@vanillaforums.com>
+ */
+;(function ($, window, document, undefined) {
+    'use strict';
+
+    /**
+     * @param   element The context in which the component was called
+     * @param   options Options passed along when initializing the plugin
+     * @constructor
+     */
+    Lithe.Drawer = function (element, options) {
+        var self = this;
+
+        self.element = element;
+
+        self.options = {
+            toggle      : undefined, // Button, link or other element to toggle the drawer
+            container   : undefined, // The container to attach the classes to
+            content     : undefined, // The content, collapses the drawer when clicked
+            classes     : {
+                show: 'drawer-show',
+                hide: 'drawer-hide'
+            }
+        };
+
+        if (options) {
+            jQuery.extend(self.options, options);
+        }
+
+        self._enable();
+    };
+
+    Lithe.Drawer.prototype = {
+        /**
+         * Tear down the component
+         *
+         * @private
+         */
+        _destroy: function () {
+            var self = this;
+
+            self._disable();
+
+            jQuery(self.element).removeData('litheDrawer');
+        },
+
+        /**
+         * Get/change options AFTER initialization.
+         *
+         * @this    {Drawer}
+         * @param   key     The option we wish to change
+         * @param   value   The value we wish to assign to it
+         * @returns {*}
+         */
+        option: function (key, value) {
+            var self, options;
+
+            self    = this;
+            options = self.options;
+
+            self._disable();
+
+            if (key && value === 'undefined') {
+                return options[key];
+            }
+
+            if (jQuery.isPlainObject(key)) {
+                options = jQuery.extend(true, options, key);
+            } else {
+                options[key] = value;
+            }
+
+            self._enable(); // Re-enable with newly set options
+
+            return self;
+        },
+
+        /**
+         * Bind events to DOM
+         *
+         * @this {Drawer}
+         * @private
+         */
+        _enable: function () {
+            var self, options;
+
+            self = this;
+            options = self.options;
+
+            jQuery(document)
+                .on('click', options.toggle, function (e) {
+                    e.preventDefault();
+                    self.toggle();
+                })
+                .on('click', '.' + options.classes.show + ' ' + options.content, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    self.hide();
+                });
+        },
+
+        /**
+         * Unbind events from DOM
+         *
+         * @this {Drawer}
+         * @private
+         */
+        _disable: function () {
+            var self, options;
+
+            self = this;
+            options = self.options;
+
+            jQuery(document)
+                .off('click', options.toggle)
+                .off('click', options.content);
+        },
+
+        /**
+         * Expand the drawer
+         *
+         * @this {Drawer}
+         */
+        show: function () {
+            var self, options;
+
+            self = this;
+            options = self.options;
+
+            jQuery(options.container).addClass(options.classes.show);
+            jQuery(options.container).removeClass(options.classes.hide);
+        },
+
+        /**
+         * Collapse the drawer
+         *
+         * @this {Drawer}
+         */
+        hide: function () {
+            var self, options;
+
+            self = this;
+            options = self.options;
+
+            jQuery(options.container).addClass(options.classes.hide);
+            jQuery(options.container).removeClass(options.classes.show);
+        },
+
+        /**
+         * Toggle between the expanded and collapsed state of the drawer
+         *
+         * @this {Drawer}
+         */
+        toggle: function () {
+            var self, options;
+
+            self = this;
+            options = self.options;
+
+            if (jQuery(options.container).hasClass(options.classes.show)) {
+                self.hide();
+            } else {
+                self.show();
+            }
+        }
+    };
+
+    $.fn.drawer = function (options) {
+        return this.each(function () {
+            if ($.data(this, 'drawer') === undefined) {
+                $.data(this, 'drawer', new Lithe.Drawer(this, options));
+            }
+        });
+    }
+
+})(jQuery, window, document);
+
 /*!
  * Dashboard 2016 - A new dashboard design for Vanilla.
  *
@@ -256,32 +577,7 @@
             });
         }
 
-        var navHeight = '';
-        var navHeightShort = '';
-
-        // Duplicate our navbar and make a more condensed version for scroll-to-fixed.
-        if ($('.navbar', element).length !== 0) {
-            $('.navbar', element).css({
-                'position': 'absolute',
-                'top': '0'
-            });
-
-            navHeight = $('.navbar', element).height();
-
-            $('body').css('padding-top', navHeight);
-
-            var $elem = $($.parseHTML($('.navbar', element).prop('outerHTML') + ''));
-            $elem.addClass('navbar-short');
-            $('body').prepend($elem);
-            navHeightShort = $elem.height();
-        }
-
-        $('.navbar-short', element).css({
-            'position': 'absolute',
-            'top': navHeight - navHeightShort
-        });
-
-        $('.navbar-short', element).scrollToFixed({
+        $('.navbar', element).scrollToFixed({
             zIndex: 1005
         });
 
@@ -294,19 +590,30 @@
         });
     }
 
+    $(window).scroll(function() {
+        var offset = 46; // Height difference between short and normal navbar.
+        if ($(window).scrollTop() > offset) {
+            $('.navbar').addClass('navbar-short');
+        } else {
+            $('.navbar').removeClass('navbar-short');
+        }
+    });
+
     function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
-        new Drop({
-            target: document.querySelector('.navbar .js-card-user', element),
-            content: html,
-            constrainToWindow: true,
-            remove: true,
-            tetherOptions: {
-                attachment: 'top right',
-                targetAttachment: 'bottom right',
-                offset: '-10 0'
-            }
-        });
+        if ($('.navbar .js-card-user', element).length !== 0) {
+            new Drop({
+                target: document.querySelector('.navbar .js-card-user', element),
+                content: html,
+                constrainToWindow: true,
+                remove: true,
+                tetherOptions: {
+                    attachment: 'top right',
+                    targetAttachment: 'bottom right',
+                    offset: '-10 0'
+                }
+            });
+        }
     }
 
     function collapseInit(element) {
@@ -323,6 +630,11 @@
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
         modal.load(e.target);
+        $('.panel-left').drawer({
+              toggle    : '.js-panel-left-toggle'
+            , container : '.main-container'
+            , content   : '.main-row .main'
+        });
     });
 
     $(document).on('click', '.js-clear-search', function() {

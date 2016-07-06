@@ -86,6 +86,9 @@ if (!function_exists('popin')) {
  */
 if (!function_exists('icon')) {
     function icon($icon) {
+        if (strpos($icon, '<svg') === 0) {
+            return $icon;
+        }
         $icon = strtolower($icon);
         return ' <span class="icon icon-'.$icon.'"></span> ';
     }

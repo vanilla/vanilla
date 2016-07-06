@@ -397,7 +397,7 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
             }
 
-            $Title = Gdn_Format::text($this->title('', true));
+            $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
             if ($Title != '') {
                 $this->addTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
             }

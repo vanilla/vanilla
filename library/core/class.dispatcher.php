@@ -29,6 +29,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
+
     /** @var stringThe method of the controller to be called. */
     public $ControllerMethod;
 
@@ -48,6 +49,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var string The name of the application folder that contains the controller that has been requested. */
     private $applicationFolder;
+
     /**
      * @var array An associative collection of AssetName => Strings that will get passed
      * into the controller once it has been instantiated.
@@ -81,6 +83,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @var AddonManager $addonManager The addon manager that manages all of the addons.
      */
     private $addonManager;
+
+    /** @var bool */
+    private $isHomepage = false;
 
     /**
      * Class constructor.
@@ -360,11 +365,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         if (in_array($request->path(), ['', '/'])) {
+            $this->isHomepage = true;
             $defaultController = Gdn::router()->getRoute('DefaultController');
             $request->pathAndQuery($defaultController['Destination']);
         }
 
         $parts = explode('/', str_replace('\\', '/', $request->path()));
+
+        // We need to save this state now because it's lost after this method.
+        $this->passData('isHomepage', $this->isHomepage);
 
         /**
          * The application folder is either the first argument or is not provided. The controller is therefore
@@ -380,7 +389,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->findController(0, $parts);
 
             // 3] See if there is a plugin trying to create a root method.
-            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $parts), true);
+            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(val(0, $parts), true);
             if ($MethodName && Gdn::pluginManager()->hasNewMethod('RootController', $MethodName, true)) {
                 $this->deliveryMethod = $DeliveryMethod;
                 $parts[0] = $MethodName;

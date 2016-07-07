@@ -20,8 +20,8 @@ class Gdn_Smarty {
     /**
      *
      *
-     * @param $Path
-     * @param $Controller
+     * @param string $Path
+     * @param Gdn_Controller $Controller
      */
     public function init($Path, $Controller) {
         $Smarty = $this->smarty();
@@ -101,9 +101,10 @@ class Gdn_Smarty {
         $Smarty->assign('Assets', (array)$Controller->Assets);
         // 2016-07-07 Linc: Request used to return blank for homepage.
         // Now it returns defaultcontroller. This restores BC behavior.
-        $Path = (Gdn::controller()->data('isHomepage')) ? "" : Gdn::request()->path();
+        $isHomepage = val('isHomepage', $Controller->Data);
+        $Path = ($isHomepage) ? "" : Gdn::request()->path();
         $Smarty->assign('Path', $Path);
-        $Smarty->assign('Homepage', Gdn::controller()->data('isHomepage')); // true/false
+        $Smarty->assign('Homepage', $isHomepage); // true/false
 
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);

@@ -372,6 +372,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $parts = explode('/', str_replace('\\', '/', $request->path()));
 
+        // We need to save this state now because it's lost after this method.
+        $this->passData('isHomepage', $this->isHomepage);
+
         /**
          * The application folder is either the first argument or is not provided. The controller is therefore
          * either the second argument or the first, depending on the result of the previous statement. Check that.
@@ -386,7 +389,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->findController(0, $parts);
 
             // 3] See if there is a plugin trying to create a root method.
-            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $parts), true);
+            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(val(0, $parts), true);
             if ($MethodName && Gdn::pluginManager()->hasNewMethod('RootController', $MethodName, true)) {
                 $this->deliveryMethod = $DeliveryMethod;
                 $parts[0] = $MethodName;
@@ -624,24 +627,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
         return false;
-    }
-
-    /**
-     * Set whether the current dispatch is to our virtual homepage.
-     *
-     * We track this because Path is always set to our DefaultController, which means there's no way to
-     * differentiate whether this is a direct call to the controller or a homepage visit.
-     *
-     * @see analyzeRequest()
-     *
-     * @param $value bool
-     * @return bool
-     */
-    public function isHomepage($value = null) {
-        if ($value !== null) {
-            $this->isHomepage = ($value) ? true : false;
-        }
-        return $this->isHomepage;
     }
 
     /**

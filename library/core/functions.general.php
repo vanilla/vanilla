@@ -312,7 +312,10 @@ if (!function_exists('attribute')) {
             if (empty($Val) || ($Exclude && StringBeginsWith($Attribute, $Exclude))) {
                 continue;
             }
+            if (is_array($Val) && strpos($Attribute, 'data-') === 0) {
+                $Val = json_encode($Val);
 
+            }
             if ($Val != '' && $Attribute != 'Standard') {
                 $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
             }

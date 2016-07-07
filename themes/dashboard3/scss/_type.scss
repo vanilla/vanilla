@@ -126,6 +126,34 @@ p {
   }
 }
 
+// <div class="header-block">
+//   <div class="title-block">
+//     <a class="btn btn-icon btn-return" aria-label="Return" href="#"><svg /></a>
+//     <h1>Title</h1>
+//   </div>
+// </div>
+
+.title-block {
+  display: flex;
+}
+
+.btn-return {
+  position: relative;
+  padding-left: 0;
+  margin-right: $spacer / 2;
+
+  svg {
+    position: relative;
+    top: 4px;
+    width: $font-size-lg;
+    transform: rotate(180deg);
+  }
+
+  &:hover svg {
+    fill: $brand-primary;
+  }
+}
+
 .header-menu {
   $header-menu-border-width: to-rem(3);
   $header-menu-font-size: to-rem(18);

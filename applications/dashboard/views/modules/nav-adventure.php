@@ -30,7 +30,7 @@ if (!function_exists('renderAdventureNav')) {
                                 <?php echo val('description', $item); ?>
                             </div>
                         </div>
-                        <div class="nav-item-arrow"><?php echo dashboardSymbol('right-chevron'); ?></div>
+                        <div class="nav-item-arrow"><?php echo dashboardSymbol('caret-right'); ?></div>
                     </a>
                 </div>
                 <?php }

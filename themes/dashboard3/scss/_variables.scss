@@ -31,10 +31,10 @@ $grey-lightest:             $gray-lightest;
 
 $brand-primary:             #0291db;
 $brand-secondary:           #f5296d;
-$brand-success:             #60bd68;
-$brand-info:                #97afbf;
-$brand-warning:             #faa43a;
-$brand-danger:              #f9281d;
+$brand-success:             #6bc573;
+$brand-info:                #a1b8c6;
+$brand-warning:             #faae42;
+$brand-danger:              #fa2e1f;
 
 // Grid columns
 //
@@ -247,6 +247,29 @@ $grid-breakpoints: (
 ) !default;
 
 
+// Form states and alerts
+//
+// Define colors for form feedback states and, by default, alerts.
+
+$state-success-text:             $white;
+$state-success-bg:               $brand-success;
+$state-success-border:           $brand-success;
+
+$state-info-text:                $white;
+$state-info-bg:                  $brand-info;
+$state-info-border:              $brand-info;
+
+$state-warning-text:             $white;
+$state-warning-bg:               $brand-warning;
+$state-warning-border:           $brand-warning;
+
+$state-danger-text:              $white;
+$state-danger-bg:                $brand-danger;
+$state-danger-border:            $brand-danger;
+
+
+$alert-border-radius:            0;
+
 //Drawer
 
-$drawer-width                           : 216px;
+$drawer-width:                   222px;

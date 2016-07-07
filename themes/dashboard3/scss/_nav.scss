@@ -141,33 +141,33 @@
     padding-left: $padding-default;
     padding-right: $padding-default;
     color: $grey-dark;
-    transition: all .2s;
+    transition: background-color .1s;
 
     > * {
       z-index: 1;
     }
 
-    &::before {
-      position: absolute;
-      z-index: 0;
-      left: 0;
-      width: 0;
-      height: 100%;
-      background-color: $brand-primary;
-      transition: all .2s;
-      content: "";
-    }
+    //&::before {
+    //  position: absolute;
+    //  z-index: 0;
+    //  left: 0;
+    //  width: 0;
+    //  height: 100%;
+    //  background-color: $brand-primary;
+    //  transition: all .4s;
+    //  content: "";
+    //}
 
     svg {
       display: block;
-      height: to-rem(30);
+      height: to-rem(24);
     }
 
     &:hover {
       &::before {
         width: 100%;
       }
-
+      background-color: $brand-primary;
       color: $white;
 
       svg {

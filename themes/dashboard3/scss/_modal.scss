@@ -4,6 +4,10 @@
   margin: 3vh auto;
   width: inherit;
   max-width: 1024px;
+
+  &.modal-sm {
+    max-width: 400px;
+  }
 }
 
 // Sets the maximum height of the entire modal to 94% of the screen height
@@ -49,6 +53,10 @@
 }
 
 .modal-footer {
+  &:empty {
+    display: none;
+  }
+
   &::before {
     position: absolute;
     left: 0;

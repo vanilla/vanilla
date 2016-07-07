@@ -29,6 +29,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
+
     /** @var stringThe method of the controller to be called. */
     public $ControllerMethod;
 
@@ -48,6 +49,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var string The name of the application folder that contains the controller that has been requested. */
     private $applicationFolder;
+
     /**
      * @var array An associative collection of AssetName => Strings that will get passed
      * into the controller once it has been instantiated.
@@ -81,6 +83,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @var AddonManager $addonManager The addon manager that manages all of the addons.
      */
     private $addonManager;
+
+    /** @var bool */
+    private $isHomepage = false;
 
     /**
      * Class constructor.
@@ -360,6 +365,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         if (in_array($request->path(), ['', '/'])) {
+            $this->isHomepage = true;
             $defaultController = Gdn::router()->getRoute('DefaultController');
             $request->pathAndQuery($defaultController['Destination']);
         }
@@ -618,6 +624,24 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             }
         }
         return false;
+    }
+
+    /**
+     * Set whether the current dispatch is to our virtual homepage.
+     *
+     * We track this because Path is always set to our DefaultController, which means there's no way to
+     * differentiate whether this is a direct call to the controller or a homepage visit.
+     *
+     * @see analyzeRequest()
+     *
+     * @param $value bool
+     * @return bool
+     */
+    public function isHomepage($value = null) {
+        if ($value !== null) {
+            $this->isHomepage = ($value) ? true : false;
+        }
+        return $this->isHomepage;
     }
 
     /**

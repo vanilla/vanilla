@@ -100,6 +100,7 @@ class Gdn_Smarty {
 
         $Smarty->assign('Assets', (array)$Controller->Assets);
         $Smarty->assign('Path', Gdn::request()->path());
+        $Smarty->assign('Homepage', Gdn::dispatcher()->isHomepage()); // true/false
 
         // Assign the controller data last so the controllers override any default data.
         $Smarty->assign($Controller->Data);

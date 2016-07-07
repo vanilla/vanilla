@@ -115,8 +115,9 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left drawer">
             <div class="panel-content panel-nav">
                 <div class="js-scroll-to-fixed">
-                <?php echo anchor($title, '/', 'title'); ?>
-                <?php echo $dashboardNav; ?>
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
+                    <?php echo $dashboardNav; ?>
+                    <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary btn-signout'); ?>
                 </div>
             </div>
         </div>

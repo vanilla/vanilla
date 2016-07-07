@@ -58,36 +58,55 @@
 
     var modal = {
 
+        settings: {
+
+        },
+
+        contentDefaults: {
+            cssClass: '',
+            title: '',
+            footer: '',
+            body: '',
+            form: {
+                open: '',
+                close: ''
+            }
+        },
+
         modalHtml: ' \
-        <div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"> \
-            <div class="modal-dialog" role="document"> \
-                <div class="modal-content"> \
-                    <div class="modal-header"> \
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"> \
-                            <span aria-hidden="true">&times;</span> \
-                        </button> \
-                        <h4 class="modal-title">{title}</h4> \
-                    </div> \
-                    {form.open} \
-                    <div class="modal-body"> \
-                        {body} \
-                    </div> \
-                    <div class="modal-footer"> \
-                        {footer} \
-                    </div> \
-                    {form.close} \
+        <div><div class="modal-dialog {cssClass}" role="document"> \
+            <div class="modal-content"> \
+                <div class="modal-header"> \
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"> \
+                        <span aria-hidden="true">&times;</span> \
+                    </button> \
+                    <h4 class="modal-title">{title}</h4> \
                 </div> \
+                {form.open} \
+                <div class="modal-body">{body}</div> \
+                <div class="modal-footer">{footer}</div> \
+                {form.close} \
             </div> \
-        </div>',
+        </div></div>',
+
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
 
         id: '',
 
-        start: function($trigger) {
+        target: '',
+
+        start: function($trigger, settings) {
+            modal.settings = $.extend(true, settings, $trigger.data());
             modal.id = Math.random().toString(36).substr(2, 9);
+            modal.target = $trigger.attr('href')
             modal.setupTrigger($trigger);
             modal.addToDom();
             $('#' + modal.id).modal('show');
-            modal.addContent($trigger.attr('href'));
+            if (modal.settings.type === 'confirm') {
+                modal.addConfirmContent();
+            } else {
+                modal.addContent();
+            }
         },
 
         load: function() {
@@ -99,7 +118,57 @@
             $trigger.attr('data-modal-id', modal.id);
         },
 
-        addContent: function(url) {
+        handleConfirm: function() {
+            // request the target via ajax
+            var ajaxData = {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'};
+            if (modal.settings.httpMethod === 'post') {
+                ajaxData.TransientKey = gdn.definition('TransientKey');
+            }
+
+            $.ajax({
+                method: (modal.settings.httpMethod === 'post') ? 'POST' : 'GET',
+                url: modal.target,
+                data: ajaxData,
+                dataType: 'json',
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                },
+                success: function(json) {
+                    gdn.inform(json);
+                    gdn.processTargets(json.Targets);
+                    if (json.RedirectUrl) {
+                        setTimeout(function() {
+                            document.location.replace(json.RedirectUrl);
+                        }, 300);
+                    }
+                    $('#' + modal.id).modal('hide');
+                }
+            });
+        },
+
+        confirmContent: function() {
+            // Replace language definitions
+            var confirmHeading = gdn.definition('ConfirmHeading', 'Confirm');
+            var confirmText = gdn.definition('ConfirmText', 'Are you sure you want to do that?');
+            var ok = gdn.definition('Okay', 'Okay');
+            var cancel = gdn.definition('Cancel', 'Cancel');
+
+            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>'
+            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>'
+
+            return {
+                title: confirmHeading,
+                footer: footer,
+                body: confirmText,
+                cssClass: 'modal-sm'
+            };
+        },
+
+        addConfirmContent: function() {
+            $('#' + modal.id).htmlTrigger(modal.replaceHtml(modal.confirmContent()));
+        },
+
+        addContent: function() {
             var ajaxData = {
                 'DeliveryType' : 'VIEW',
                 'DeliveryMethod' : 'JSON'
@@ -107,7 +176,7 @@
 
             $.ajax({
                 method: 'GET',
-                url: url,
+                url: modal.target,
                 data: ajaxData,
                 dataType: 'json',
                 error: function(request, textStatus, errorThrown) {
@@ -119,20 +188,33 @@
                 success: function(json) {
                     var body = json.Data;
                     var content = modal.parseBody(body);
-                    var html = $('#' + modal.id).html().replace('{body}', content.body);
-                    html = html.replace('{title}', content.title);
-                    html = html.replace('{footer}', content.footer);
-                    html = html.replace('{form.open}', content.form.open);
-                    html = html.replace('{form.close}', content.form.close);
-                    $('#' + modal.id).htmlTrigger(html);
+                    $('#' + modal.id).htmlTrigger(modal.replaceHtml(content));
                 }
             });
+        },
+
+        replaceHtml: function(content) {
+
+            // Data attributes override parsed content, content overrides defaults.
+            content = $.extend(true, content, modal.settings.content);
+            content = $.extend(true, modal.contentDefaults, content);
+
+            var html = modal.modalHtml;
+            html = html.replace('{body}', content.body);
+            html = html.replace('{cssClass}', content.cssClass);
+            html = html.replace('{title}', content.title);
+            html = html.replace('{footer}', content.footer);
+            html = html.replace('{form.open}', content.form.open);
+            html = html.replace('{form.close}', content.form.close);
+
+            return html;
         },
 
         parseBody: function(body) {
             var title = '';
             var footer = '';
             var formTag = '';
+            var formCloseTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
             var $footer = $elem.find('.Buttons');
@@ -154,6 +236,7 @@
 
             // Pull out the form opening and closing tags to wrap around the modal-content and modal-footer
             if ($form.length !== 0) {
+                formCloseTag = '</form>';
                 var formHtml = $form.prop('outerHTML');
                 formTag = formHtml.split('>')[0] += '>';
                 body = body.replace(formTag, '');
@@ -161,18 +244,18 @@
             }
 
             return {
-                'title': title,
-                'footer': footer,
-                'body': body,
-                'form': {
-                    'open': formTag,
-                    'close': '</form>'
+                title: title,
+                footer: footer,
+                body: body,
+                form: {
+                    open: formTag,
+                    close: formCloseTag
                 }
             };
         },
 
         addToDom: function() {
-            $('body').append(modal.modalHtml.replace('{id}', modal.id));
+            $('body').append(modal.modalShell.replace('{id}', modal.id));
             modal.addEventListeners();
         },
 
@@ -182,6 +265,12 @@
             });
             $('#' + modal.id).on('hidden.bs.modal', function() {
                 $(this).remove();
+            });
+            $('#' + modal.id).on('click', '.js-ok', function() {
+               modal.handleConfirm(this);
+            });
+            $('#' + modal.id).on('click', '.js-cancel', function() {
+                $('#' + modal.id).modal('hide');
             });
         },
 
@@ -302,6 +391,35 @@
         $('a[href=#' + collapsible.attr('id') + ']').attr('aria-expanded', 'true');
     }
 
+    function clipboardInit() {
+        var clipboard = new Clipboard('.btn-copy');
+
+        clipboard.on('success', function(e) {
+            var tooltip = $(e.trigger).tooltip({
+                show: true,
+                placement: 'bottom',
+                title: $(e.trigger).attr('data-success-text'),
+                trigger: 'manual',
+            });
+            tooltip.tooltip('show');
+            setTimeout(function() {
+                tooltip.tooltip('hide')
+            }, '2000')
+        });
+
+        clipboard.on('error', function(e) {
+            console.log(e);
+        });
+    }
+
+    function drawerInit(element) {
+        $('.panel-left', element).drawer({
+            toggle    : '.js-panel-left-toggle'
+            , container : '.main-container'
+            , content   : '.main-row .main'
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target);
         aceInit(e.target);
@@ -309,11 +427,8 @@
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
         modal.load(e.target);
-        $('.panel-left').drawer({
-              toggle    : '.js-panel-left-toggle'
-            , container : '.main-container'
-            , content   : '.main-row .main'
-        });
+        clipboardInit();
+        drawerInit(e.target);
     });
 
     $(document).on('click', '.js-clear-search', function() {
@@ -335,9 +450,21 @@
         }
     });
 
-    $(document).on('click', '.js-ajax-modal, .Popup', function(e) {
+    $(document).on('click', '.js-modal, .Popup, .Popable', function(e) {
         e.preventDefault();
-        modal.start($(this));
+        modal.start($(this), {});
+    });
+
+    $(document).on('click', '.js-modal-confirm', function(e) {
+        e.preventDefault();
+        var httpMethod = 'get';
+        if ($(this).attr('data-httpmethod') === 'post') {
+            httpMethod = 'post';
+        }
+        modal.start($(this), {
+            modalType: 'confirm',
+            httpMethod: httpMethod
+        });
     });
 
 })(jQuery);

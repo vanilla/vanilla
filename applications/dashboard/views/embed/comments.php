@@ -1,18 +1,19 @@
-<h1><?php echo t('Universal Comments Embed Code'); ?></h1>
-    <?php
-    echo t('AboutCommentEmbedding', "Vanilla can be used as a drop-in replacement for your blog's native commenting system. As a matter of fact, it can be used to add comments to any page on the web.");
-    ?>
-        <p>You can use Vanilla as a commenting system for your website, and all
-            contributed comments will also be present in your discussion forum. Vanilla
-            Comments can be used on any website using the following code.</p>
+<div class="header-block padded">
+    <div class="title-block">
+        <?php echo anchor(dashboardSymbol('caret-right'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
+        <h1><?php echo t('Universal Comments Embed Code'); ?></h1>
+    </div>
+</div>
+
+    <?php echo t('AboutCommentEmbedding', "You can use Vanilla as a commenting system for your website, and all contributed comments will also be present in your discussion forum. Vanilla Comments can be used on any website using the following code."); ?>
 
         <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
             and <code>vanilla_identifier</code> settings before pasting this script into
             your web page.</p>
 
-        <pre class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
+        <pre id="comments-code" class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
-    <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
+        <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
         var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum
         var vanilla_identifier = 'your-content-identifier'; // Your unique identifier for the content being commented on</strong>
 
@@ -34,10 +35,14 @@
     &lt;a class="vanilla-anchor" href="http://vanillaforums.com">Comments by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>
 &lt;/div>
 </pre>
-        <p class="WarningMessage">&uarr; Copy and paste this code into the web page where you want the comments to
-            appear.</p>
-
-        <p>&nbsp;</p>
+    <div class="row form-group">
+        <div class="info label-wrap-wide">&uarr; Copy and paste this code into the web page where you want the comments to appear.</div>
+        <div class="input-wrap-right">
+            <button class="btn btn-secondary btn-copy" data-clipboard-target="#comments-code" data-success-text="<?php echo t('Copied!'); ?>">
+                <?php echo t('Copy Embed Code to Clipboard'); ?>
+            </button>
+        </div>
+    </div>
 
         <h2>Comment Counts</h2>
 
@@ -46,7 +51,7 @@
         <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
             before pasting this script into your web page.</p>
 
-        <pre class="CopyBox">&lt;script type="text/javascript">
+        <pre id="comments-count-code" class="CopyBox">&lt;script type="text/javascript">
     <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
         var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum</strong>
 
@@ -65,19 +70,32 @@
     })();
 &lt;/script>
         </pre>
-        <p class="WarningMessage">&uarr; Copy &amp; paste this code at the bottom of the page right before the closing
-            &lt;/body> tag.</p>
-
+        <div class="row form-group">
+            <div class="info label-wrap-wide">&uarr; Copy &amp; paste this code at the bottom of the page right before the closing
+                &lt;/body> tag.</div>
+            <div class="input-wrap-right">
+                <button class="btn btn-secondary btn-copy" data-clipboard-target="#comments-count-code" data-success-text="<?php echo t('Copied!'); ?>">
+                    <?php echo t('Copy Embed Code to Clipboard'); ?>
+                </button>
+            </div>
+        </div>
         <p>&nbsp;</p>
 
-        <p><strong>One more thing!</strong></p>
+        <h2>One more thing!</h2>
 
         <p>You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong>
             attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when
             embedding the comments into the page.</p>
 
-        <pre class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a>
+        <pre id="anchor-code" class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a>
         </pre>
 
-        <p>Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of
-            comments on the page in question.</p>
+        <div class="row form-group">
+            <div class="info label-wrap-wide">Vanilla will then replace the content of the anchor (in this case, the word "Comments") with the number of
+                comments on the page in question.</div>
+            <div class="input-wrap-right">
+                <button class="btn btn-secondary btn-copy" data-clipboard-target="#anchor-code" data-success-text="<?php echo t('Copied!'); ?>">
+                    <?php echo t('Copy Embed Code to Clipboard'); ?>
+                </button>
+            </div>
+        </div>

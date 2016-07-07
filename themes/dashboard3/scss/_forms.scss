@@ -152,11 +152,6 @@ form {
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted $grey-light;
-
-  &:first-child {
-    padding-top: 1rem;
-    border-top: 1px dotted $grey-light;
-  }
 }
 
 
@@ -640,9 +635,10 @@ select {
 // Markup:
 // <form>
 //   <div class="search-wrap">
+//     <div class="icon-wrap icon-search-wrap"><svg /></div>
 //     <input class="form-control">
 //     <button type="submit" class="search-submit">Search</button>
-//     <div class="btn js-clear-search btn-clear"><span class="clear">x</span></div>
+//     <div class="icon-wrap icon-clear-wrap"><svg /></div>
 //   </div>
 // </form>
 //
@@ -657,27 +653,31 @@ select {
     padding-left: $spacer * 2.5;
   }
 
-  &::before {
-    position: absolute;
-    top: .375rem;
-    left: $spacer;
-    font-size: $font-size-base;
-    line-height: $font-size-base * $line-height;
-    color: $grey;
-    @extend %icon;
-    @include char-content($icon-search);
-  }
+  .icon-wrap {
+    @extend .icon;
+    $btn-icon-height: 24;
+    $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height)) / 2;
+    padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
+    margin: 0 0 0 .5rem;
 
-  .btn-clear {
+    &:first-child {
+      margin-left: 0;
+    }
+
+    svg {
+      height: to-rem($btn-icon-height);
+    }
+
     position: absolute;
     top: 0;
+  }
+
+  .icon-clear-wrap {
     right: 0;
-    height: $control-height / $rem-base * 1rem;
-    padding: $spacer ($spacer * 1.5);
-    font-size: $font-size-lg;
-    line-height: 0;
-    font-weight: 100;
-    color: $grey;
+  }
+
+  .icon-search-wrap {
+    left: 0;
   }
 
   .search-info {

@@ -1,0 +1,24 @@
+.CasualMessage {
+  @extend .alert;
+  @extend .alert-success;
+}
+
+.InfoMessage {
+  @extend .alert;
+  @extend .alert-info;
+}
+
+.WarningMessage {
+  @extend .alert;
+  @extend .alert-warning;
+}
+
+.AlertMessage {
+  @extend .alert;
+  @extend .alert-warning;
+}
+
+.Messages.Errors {
+  @extend .alert;
+  @extend .alert-danger;
+}

@@ -34,879 +34,879 @@
   content: unquote('"') + unquote(str-insert($char-no-slash, "\\", 1)) + unquote('"');
 }
 
-.icon:before {
+.icon-vanillicon:before {
   @extend %icon;
 }
 
-.icon-adjust:before {
+.icon-vanillicon-adjust:before {
   @include char-content($icon-adjust);
 }
 
-.icon-agree:before {
+.icon-vanillicon-agree:before {
   @include char-content($icon-agree);
 }
 
-.icon-align-center:before {
+.icon-vanillicon-align-center:before {
   @include char-content($icon-align-center);
 }
 
-.icon-align-justify:before {
+.icon-vanillicon-align-justify:before {
   @include char-content($icon-align-justify);
 }
 
-.icon-align-left:before {
+.icon-vanillicon-align-left:before {
   @include char-content($icon-align-left);
 }
 
-.icon-align-right:before {
+.icon-vanillicon-align-right:before {
   @include char-content($icon-align-right);
 }
 
-.icon-android:before {
+.icon-vanillicon-android:before {
   @include char-content($icon-android);
 }
 
-.icon-angry:before {
+.icon-vanillicon-angry:before {
   @include char-content($icon-angry);
 }
 
-.icon-apple:before {
+.icon-vanillicon-apple:before {
   @include char-content($icon-apple);
 }
 
-.icon-archive:before {
+.icon-vanillicon-archive:before {
   @include char-content($icon-archive);
 }
 
-.icon-arrow-down:before {
+.icon-vanillicon-arrow-down:before {
   @include char-content($icon-arrow-down);
 }
 
-.icon-arrow-left:before {
+.icon-vanillicon-arrow-left:before {
   @include char-content($icon-arrow-left);
 }
 
-.icon-arrow-right:before {
+.icon-vanillicon-arrow-right:before {
   @include char-content($icon-arrow-right);
 }
 
-.icon-arrow-up:before {
+.icon-vanillicon-arrow-up:before {
   @include char-content($icon-arrow-up);
 }
 
-.icon-ban:before {
+.icon-vanillicon-ban:before {
   @include char-content($icon-ban);
 }
 
-.icon-bar-chart:before {
+.icon-vanillicon-bar-chart:before {
   @include char-content($icon-bar-chart);
 }
 
-.icon-bell:before {
+.icon-vanillicon-bell:before {
   @include char-content($icon-bell);
 }
 
-.icon-bold:before {
+.icon-vanillicon-bold:before {
   @include char-content($icon-bold);
 }
 
-.icon-bookmark:before {
+.icon-vanillicon-bookmark:before {
   @include char-content($icon-bookmark);
 }
 
-.icon-bookmark-empty:before {
+.icon-vanillicon-bookmark-empty:before {
   @include char-content($icon-bookmark-empty);
 }
 
-.icon-bug:before {
+.icon-vanillicon-bug:before {
   @include char-content($icon-bug);
 }
 
-.icon-bullhorn:before {
+.icon-vanillicon-bullhorn:before {
   @include char-content($icon-bullhorn);
 }
 
-.icon-bullseye:before {
+.icon-vanillicon-bullseye:before {
   @include char-content($icon-bullseye);
 }
 
-.icon-calendar:before {
+.icon-vanillicon-calendar:before {
   @include char-content($icon-calendar);
 }
 
-.icon-camera:before {
+.icon-vanillicon-camera:before {
   @include char-content($icon-camera);
 }
 
-.icon-caret-down:before {
+.icon-vanillicon-caret-down:before {
   @include char-content($icon-caret-down);
 }
 
-.icon-caret-left:before {
+.icon-vanillicon-caret-left:before {
   @include char-content($icon-caret-left);
 }
 
-.icon-caret-right:before {
+.icon-vanillicon-caret-right:before {
   @include char-content($icon-caret-right);
 }
 
-.icon-caret-up:before {
+.icon-vanillicon-caret-up:before {
   @include char-content($icon-caret-up);
 }
 
-.icon-certificate:before {
+.icon-vanillicon-certificate:before {
   @include char-content($icon-certificate);
 }
 
-.icon-check:before {
+.icon-vanillicon-check:before {
   @include char-content($icon-check);
 }
 
-.icon-check-empty:before {
+.icon-vanillicon-check-empty:before {
   @include char-content($icon-check-empty);
 }
 
-.icon-check-sign:before {
+.icon-vanillicon-check-sign:before {
   @include char-content($icon-check-sign);
 }
 
-.icon-chevron-down:before {
+.icon-vanillicon-chevron-down:before {
   @include char-content($icon-chevron-down);
 }
 
-.icon-chevron-left:before {
+.icon-vanillicon-chevron-left:before {
   @include char-content($icon-chevron-left);
 }
 
-.icon-chevron-right:before {
+.icon-vanillicon-chevron-right:before {
   @include char-content($icon-chevron-right);
 }
 
-.icon-chevron-sign-down:before {
+.icon-vanillicon-chevron-sign-down:before {
   @include char-content($icon-chevron-sign-down);
 }
 
-.icon-chevron-sign-left:before {
+.icon-vanillicon-chevron-sign-left:before {
   @include char-content($icon-chevron-sign-left);
 }
 
-.icon-chevron-sign-right:before {
+.icon-vanillicon-chevron-sign-right:before {
   @include char-content($icon-chevron-sign-right);
 }
 
-.icon-chevron-sign-up:before {
+.icon-vanillicon-chevron-sign-up:before {
   @include char-content($icon-chevron-sign-up);
 }
 
-.icon-chevron-up:before {
+.icon-vanillicon-chevron-up:before {
   @include char-content($icon-chevron-up);
 }
 
-.icon-circle:before {
+.icon-vanillicon-circle:before {
   @include char-content($icon-circle);
 }
 
-.icon-circle-blank:before {
+.icon-vanillicon-circle-blank:before {
   @include char-content($icon-circle-blank);
 }
 
-.icon-cloud:before {
+.icon-vanillicon-cloud:before {
   @include char-content($icon-cloud);
 }
 
-.icon-cloud-download:before {
+.icon-vanillicon-cloud-download:before {
   @include char-content($icon-cloud-download);
 }
 
-.icon-cloud-upload:before {
+.icon-vanillicon-cloud-upload:before {
   @include char-content($icon-cloud-upload);
 }
 
-.icon-code:before {
+.icon-vanillicon-code:before {
   @include char-content($icon-code);
 }
 
-.icon-cog:before {
+.icon-vanillicon-cog:before {
   @include char-content($icon-cog);
 }
 
-.icon-cogs:before {
+.icon-vanillicon-cogs:before {
   @include char-content($icon-cogs);
 }
 
-.icon-collapse:before {
+.icon-vanillicon-collapse:before {
   @include char-content($icon-collapse);
 }
 
-.icon-collapse-top:before {
+.icon-vanillicon-collapse-top:before {
   @include char-content($icon-collapse-top);
 }
 
-.icon-comment:before {
+.icon-vanillicon-comment:before {
   @include char-content($icon-comment);
 }
 
-.icon-comments:before {
+.icon-vanillicon-comments:before {
   @include char-content($icon-comments);
 }
 
-.icon-compass:before {
+.icon-vanillicon-compass:before {
   @include char-content($icon-compass);
 }
 
-.icon-compose:before {
+.icon-vanillicon-compose:before {
   @include char-content($icon-compose);
 }
 
-.icon-crown:before {
+.icon-vanillicon-crown:before {
   @include char-content($icon-crown);
 }
 
-.icon-dashboard:before {
+.icon-vanillicon-dashboard:before {
   @include char-content($icon-dashboard);
 }
 
-.icon-discussion:before {
+.icon-vanillicon-discussion:before {
   @include char-content($icon-discussion);
 }
 
-.icon-dot-circle:before {
+.icon-vanillicon-dot-circle:before {
   @include char-content($icon-dot-circle);
 }
 
-.icon-dropbox:before {
+.icon-vanillicon-dropbox:before {
   @include char-content($icon-dropbox);
 }
 
-.icon-edit:before {
+.icon-vanillicon-edit:before {
   @include char-content($icon-edit);
 }
 
-.icon-edit-sign:before {
+.icon-vanillicon-edit-sign:before {
   @include char-content($icon-edit-sign);
 }
 
-.icon-ellipsis:before {
+.icon-vanillicon-ellipsis:before {
   @include char-content($icon-ellipsis);
 }
 
-.icon-exclamation-sign:before {
+.icon-vanillicon-exclamation-sign:before {
   @include char-content($icon-exclamation-sign);
 }
 
-.icon-expand:before {
+.icon-vanillicon-expand:before {
   @include char-content($icon-expand);
 }
 
-.icon-external-link:before {
+.icon-vanillicon-external-link:before {
   @include char-content($icon-external-link);
 }
 
-.icon-eye-close:before {
+.icon-vanillicon-eye-close:before {
   @include char-content($icon-eye-close);
 }
 
-.icon-eye-open:before {
+.icon-vanillicon-eye-open:before {
   @include char-content($icon-eye-open);
 }
 
-.icon-facebook:before {
+.icon-vanillicon-facebook:before {
   @include char-content($icon-facebook);
 }
 
-.icon-facebook-alt:before {
+.icon-vanillicon-facebook-alt:before {
   @include char-content($icon-facebook-alt);
 }
 
-.icon-facebook-alt-round:before {
+.icon-vanillicon-facebook-alt-round:before {
   @include char-content($icon-facebook-alt-round);
 }
 
-.icon-file:before {
+.icon-vanillicon-file:before {
   @include char-content($icon-file);
 }
 
-.icon-file-text:before {
+.icon-vanillicon-file-text:before {
   @include char-content($icon-file-text);
 }
 
-.icon-filter:before {
+.icon-vanillicon-filter:before {
   @include char-content($icon-filter);
 }
 
-.icon-flag:before {
+.icon-vanillicon-flag:before {
   @include char-content($icon-flag);
 }
 
-.icon-flame:before {
+.icon-vanillicon-flame:before {
   @include char-content($icon-flame);
 }
 
-.icon-flickr:before {
+.icon-vanillicon-flickr:before {
   @include char-content($icon-flickr);
 }
 
-.icon-folder-close:before {
+.icon-vanillicon-folder-close:before {
   @include char-content($icon-folder-close);
 }
 
-.icon-folder-open:before {
+.icon-vanillicon-folder-open:before {
   @include char-content($icon-folder-open);
 }
 
-.icon-font:before {
+.icon-vanillicon-font:before {
   @include char-content($icon-font);
 }
 
-.icon-frown:before {
+.icon-vanillicon-frown:before {
   @include char-content($icon-frown);
 }
 
-.icon-gift:before {
+.icon-vanillicon-gift:before {
   @include char-content($icon-gift);
 }
 
-.icon-github:before {
+.icon-vanillicon-github:before {
   @include char-content($icon-github);
 }
 
-.icon-github-alt:before {
+.icon-vanillicon-github-alt:before {
   @include char-content($icon-github-alt);
 }
 
-.icon-github-octocat:before {
+.icon-vanillicon-github-octocat:before {
   @include char-content($icon-github-octocat);
 }
 
-.icon-globe:before {
+.icon-vanillicon-globe:before {
   @include char-content($icon-globe);
 }
 
-.icon-google:before {
+.icon-vanillicon-google:before {
   @include char-content($icon-google);
 }
 
-.icon-google-plus:before {
+.icon-vanillicon-google-plus:before {
   @include char-content($icon-google-plus);
 }
 
-.icon-google-plus-alt:before {
+.icon-vanillicon-google-plus-alt:before {
   @include char-content($icon-google-plus-alt);
 }
 
-.icon-group:before {
+.icon-vanillicon-group:before {
   @include char-content($icon-group);
 }
 
-.icon-hand-down:before {
+.icon-vanillicon-hand-down:before {
   @include char-content($icon-hand-down);
 }
 
-.icon-hand-left:before {
+.icon-vanillicon-hand-left:before {
   @include char-content($icon-hand-left);
 }
 
-.icon-hand-right:before {
+.icon-vanillicon-hand-right:before {
   @include char-content($icon-hand-right);
 }
 
-.icon-hand-up:before {
+.icon-vanillicon-hand-up:before {
   @include char-content($icon-hand-up);
 }
 
-.icon-heart:before {
+.icon-vanillicon-heart:before {
   @include char-content($icon-heart);
 }
 
-.icon-home:before {
+.icon-vanillicon-home:before {
   @include char-content($icon-home);
 }
 
-.icon-inbox:before {
+.icon-vanillicon-inbox:before {
   @include char-content($icon-inbox);
 }
 
-.icon-indent-left:before {
+.icon-vanillicon-indent-left:before {
   @include char-content($icon-indent-left);
 }
 
-.icon-indent-right:before {
+.icon-vanillicon-indent-right:before {
   @include char-content($icon-indent-right);
 }
 
-.icon-info-sign:before {
+.icon-vanillicon-info-sign:before {
   @include char-content($icon-info-sign);
 }
 
-.icon-instagram:before {
+.icon-vanillicon-instagram:before {
   @include char-content($icon-instagram);
 }
 
-.icon-italic:before {
+.icon-vanillicon-italic:before {
   @include char-content($icon-italic);
 }
 
-.icon-jail:before {
+.icon-vanillicon-jail:before {
   @include char-content($icon-jail);
 }
 
-.icon-key:before {
+.icon-vanillicon-key:before {
   @include char-content($icon-key);
 }
 
-.icon-lightbulb:before {
+.icon-vanillicon-lightbulb:before {
   @include char-content($icon-lightbulb);
 }
 
-.icon-link:before {
+.icon-vanillicon-link:before {
   @include char-content($icon-link);
 }
 
-.icon-linkedin:before {
+.icon-vanillicon-linkedin:before {
   @include char-content($icon-linkedin);
 }
 
-.icon-linkedin-alt:before {
+.icon-vanillicon-linkedin-alt:before {
   @include char-content($icon-linkedin-alt);
 }
 
-.icon-linux:before {
+.icon-vanillicon-linux:before {
   @include char-content($icon-linux);
 }
 
-.icon-list-ol:before {
+.icon-vanillicon-list-ol:before {
   @include char-content($icon-list-ol);
 }
 
-.icon-list-ul:before {
+.icon-vanillicon-list-ul:before {
   @include char-content($icon-list-ul);
 }
 
-.icon-lock:before {
+.icon-vanillicon-lock:before {
   @include char-content($icon-lock);
 }
 
-.icon-lol:before {
+.icon-vanillicon-lol:before {
   @include char-content($icon-lol);
 }
 
-.icon-mail:before {
+.icon-vanillicon-mail:before {
   @include char-content($icon-mail);
 }
 
-.icon-mail-open:before {
+.icon-vanillicon-mail-open:before {
   @include char-content($icon-mail-open);
 }
 
-.icon-map-marker:before {
+.icon-vanillicon-map-marker:before {
   @include char-content($icon-map-marker);
 }
 
-.icon-medium:before {
+.icon-vanillicon-medium:before {
   @include char-content($icon-medium);
 }
 
-.icon-meh:before {
+.icon-vanillicon-meh:before {
   @include char-content($icon-meh);
 }
 
-.icon-menu:before {
+.icon-vanillicon-menu:before {
   @include char-content($icon-menu);
 }
 
-.icon-minus-sign:before {
+.icon-vanillicon-minus-sign:before {
   @include char-content($icon-minus-sign);
 }
 
-.icon-mobile-phone:before {
+.icon-vanillicon-mobile-phone:before {
   @include char-content($icon-mobile-phone);
 }
 
-.icon-mod:before {
+.icon-vanillicon-mod:before {
   @include char-content($icon-mod);
 }
 
-.icon-nib:before {
+.icon-vanillicon-nib:before {
   @include char-content($icon-nib);
 }
 
-.icon-note:before {
+.icon-vanillicon-note:before {
   @include char-content($icon-note);
 }
 
-.icon-ok:before {
+.icon-vanillicon-ok:before {
   @include char-content($icon-ok);
 }
 
-.icon-ok-circle:before {
+.icon-vanillicon-ok-circle:before {
   @include char-content($icon-ok-circle);
 }
 
-.icon-ok-sign:before {
+.icon-vanillicon-ok-sign:before {
   @include char-content($icon-ok-sign);
 }
 
-.icon-paper-clip:before {
+.icon-vanillicon-paper-clip:before {
   @include char-content($icon-paper-clip);
 }
 
-.icon-paragraph:before {
+.icon-vanillicon-paragraph:before {
   @include char-content($icon-paragraph);
 }
 
-.icon-paypal:before {
+.icon-vanillicon-paypal:before {
   @include char-content($icon-paypal);
 }
 
-.icon-pencil:before {
+.icon-vanillicon-pencil:before {
   @include char-content($icon-pencil);
 }
 
-.icon-permalink:before {
+.icon-vanillicon-permalink:before {
   @include char-content($icon-permalink);
 }
 
-.icon-picture:before {
+.icon-vanillicon-picture:before {
   @include char-content($icon-picture);
 }
 
-.icon-pinterest:before {
+.icon-vanillicon-pinterest:before {
   @include char-content($icon-pinterest);
 }
 
-.icon-pinterest-alt:before {
+.icon-vanillicon-pinterest-alt:before {
   @include char-content($icon-pinterest-alt);
 }
 
-.icon-play-circle:before {
+.icon-vanillicon-play-circle:before {
   @include char-content($icon-play-circle);
 }
 
-.icon-plus-sign:before {
+.icon-vanillicon-plus-sign:before {
   @include char-content($icon-plus-sign);
 }
 
-.icon-poll:before {
+.icon-vanillicon-poll:before {
   @include char-content($icon-poll);
 }
 
-.icon-preview:before {
+.icon-vanillicon-preview:before {
   @include char-content($icon-preview);
 }
 
-.icon-pushpin:before {
+.icon-vanillicon-pushpin:before {
   @include char-content($icon-pushpin);
 }
 
-.icon-question:before {
+.icon-vanillicon-question:before {
   @include char-content($icon-question);
 }
 
-.icon-question-sign:before {
+.icon-vanillicon-question-sign:before {
   @include char-content($icon-question-sign);
 }
 
-.icon-quote:before {
+.icon-vanillicon-quote:before {
   @include char-content($icon-quote);
 }
 
-.icon-reddit:before {
+.icon-vanillicon-reddit:before {
   @include char-content($icon-reddit);
 }
 
-.icon-reddit-alien:before {
+.icon-vanillicon-reddit-alien:before {
   @include char-content($icon-reddit-alien);
 }
 
-.icon-reddit-alt:before {
+.icon-vanillicon-reddit-alt:before {
   @include char-content($icon-reddit-alt);
 }
 
-.icon-refresh:before {
+.icon-vanillicon-refresh:before {
   @include char-content($icon-refresh);
 }
 
-.icon-remove:before {
+.icon-vanillicon-remove:before {
   @include char-content($icon-remove);
 }
 
-.icon-remove-sign:before {
+.icon-vanillicon-remove-sign:before {
   @include char-content($icon-remove-sign);
 }
 
-.icon-repeat:before {
+.icon-vanillicon-repeat:before {
   @include char-content($icon-repeat);
 }
 
-.icon-reply:before {
+.icon-vanillicon-reply:before {
   @include char-content($icon-reply);
 }
 
-.icon-reply-all:before {
+.icon-vanillicon-reply-all:before {
   @include char-content($icon-reply-all);
 }
 
-.icon-report:before {
+.icon-vanillicon-report:before {
   @include char-content($icon-report);
 }
 
-.icon-resize-full:before {
+.icon-vanillicon-resize-full:before {
   @include char-content($icon-resize-full);
 }
 
-.icon-resize-small:before {
+.icon-vanillicon-resize-small:before {
   @include char-content($icon-resize-small);
 }
 
-.icon-retweet:before {
+.icon-vanillicon-retweet:before {
   @include char-content($icon-retweet);
 }
 
-.icon-robot:before {
+.icon-vanillicon-robot:before {
   @include char-content($icon-robot);
 }
 
-.icon-rss:before {
+.icon-vanillicon-rss:before {
   @include char-content($icon-rss);
 }
 
-.icon-salesforce:before {
+.icon-vanillicon-salesforce:before {
   @include char-content($icon-salesforce);
 }
 
-.icon-search:before {
+.icon-vanillicon-search:before {
   @include char-content($icon-search);
 }
 
-.icon-select:before {
+.icon-vanillicon-select:before {
   @include char-content($icon-select);
 }
 
-.icon-share:before {
+.icon-vanillicon-share:before {
   @include char-content($icon-share);
 }
 
-.icon-share-alt:before {
+.icon-vanillicon-share-alt:before {
   @include char-content($icon-share-alt);
 }
 
-.icon-share-alt-square:before {
+.icon-vanillicon-share-alt-square:before {
   @include char-content($icon-share-alt-square);
 }
 
-.icon-shield:before {
+.icon-vanillicon-shield:before {
   @include char-content($icon-shield);
 }
 
-.icon-sign-blank:before {
+.icon-vanillicon-sign-blank:before {
   @include char-content($icon-sign-blank);
 }
 
-.icon-signin:before {
+.icon-vanillicon-signin:before {
   @include char-content($icon-signin);
 }
 
-.icon-signout:before {
+.icon-vanillicon-signout:before {
   @include char-content($icon-signout);
 }
 
-.icon-skull:before {
+.icon-vanillicon-skull:before {
   @include char-content($icon-skull);
 }
 
-.icon-skype:before {
+.icon-vanillicon-skype:before {
   @include char-content($icon-skype);
 }
 
-.icon-smile:before {
+.icon-vanillicon-smile:before {
   @include char-content($icon-smile);
 }
 
-.icon-source:before {
+.icon-vanillicon-source:before {
   @include char-content($icon-source);
 }
 
-.icon-spam:before {
+.icon-vanillicon-spam:before {
   @include char-content($icon-spam);
 }
 
-.icon-star:before {
+.icon-vanillicon-star:before {
   @include char-content($icon-star);
 }
 
-.icon-star-empty:before {
+.icon-vanillicon-star-empty:before {
   @include char-content($icon-star-empty);
 }
 
-.icon-star-half-empty:before {
+.icon-vanillicon-star-half-empty:before {
   @include char-content($icon-star-half-empty);
 }
 
-.icon-steam:before {
+.icon-vanillicon-steam:before {
   @include char-content($icon-steam);
 }
 
-.icon-steam-alt:before {
+.icon-vanillicon-steam-alt:before {
   @include char-content($icon-steam-alt);
 }
 
-.icon-strikethrough:before {
+.icon-vanillicon-strikethrough:before {
   @include char-content($icon-strikethrough);
 }
 
-.icon-subscript:before {
+.icon-vanillicon-subscript:before {
   @include char-content($icon-subscript);
 }
 
-.icon-superscript:before {
+.icon-vanillicon-superscript:before {
   @include char-content($icon-superscript);
 }
 
-.icon-table:before {
+.icon-vanillicon-table:before {
   @include char-content($icon-table);
 }
 
-.icon-tag:before {
+.icon-vanillicon-tag:before {
   @include char-content($icon-tag);
 }
 
-.icon-tags:before {
+.icon-vanillicon-tags:before {
   @include char-content($icon-tags);
 }
 
-.icon-th:before {
+.icon-vanillicon-th:before {
   @include char-content($icon-th);
 }
 
-.icon-th-large:before {
+.icon-vanillicon-th-large:before {
   @include char-content($icon-th-large);
 }
 
-.icon-th-list:before {
+.icon-vanillicon-th-list:before {
   @include char-content($icon-th-list);
 }
 
-.icon-thumbs-down:before {
+.icon-vanillicon-thumbs-down:before {
   @include char-content($icon-thumbs-down);
 }
 
-.icon-thumbs-up:before {
+.icon-vanillicon-thumbs-up:before {
   @include char-content($icon-thumbs-up);
 }
 
-.icon-ticket:before {
+.icon-vanillicon-ticket:before {
   @include char-content($icon-ticket);
 }
 
-.icon-time:before {
+.icon-vanillicon-time:before {
   @include char-content($icon-time);
 }
 
-.icon-trash:before {
+.icon-vanillicon-trash:before {
   @include char-content($icon-trash);
 }
 
-.icon-troll:before {
+.icon-vanillicon-troll:before {
   @include char-content($icon-troll);
 }
 
-.icon-trophy:before {
+.icon-vanillicon-trophy:before {
   @include char-content($icon-trophy);
 }
 
-.icon-tumblr:before {
+.icon-vanillicon-tumblr:before {
   @include char-content($icon-tumblr);
 }
 
-.icon-tumblr-alt:before {
+.icon-vanillicon-tumblr-alt:before {
   @include char-content($icon-tumblr-alt);
 }
 
-.icon-twitter:before {
+.icon-vanillicon-twitter:before {
   @include char-content($icon-twitter);
 }
 
-.icon-twitter-alt:before {
+.icon-vanillicon-twitter-alt:before {
   @include char-content($icon-twitter-alt);
 }
 
-.icon-underline:before {
+.icon-vanillicon-underline:before {
   @include char-content($icon-underline);
 }
 
-.icon-undo:before {
+.icon-vanillicon-undo:before {
   @include char-content($icon-undo);
 }
 
-.icon-unlink:before {
+.icon-vanillicon-unlink:before {
   @include char-content($icon-unlink);
 }
 
-.icon-unlock:before {
+.icon-vanillicon-unlock:before {
   @include char-content($icon-unlock);
 }
 
-.icon-user:before {
+.icon-vanillicon-user:before {
   @include char-content($icon-user);
 }
 
-.icon-vcard:before {
+.icon-vanillicon-vcard:before {
   @include char-content($icon-vcard);
 }
 
-.icon-video:before {
+.icon-vanillicon-video:before {
   @include char-content($icon-video);
 }
 
-.icon-vimeo:before {
+.icon-vanillicon-vimeo:before {
   @include char-content($icon-vimeo);
 }
 
-.icon-vimeo-alt:before {
+.icon-vanillicon-vimeo-alt:before {
   @include char-content($icon-vimeo-alt);
 }
 
-.icon-vine:before {
+.icon-vanillicon-vine:before {
   @include char-content($icon-vine);
 }
 
-.icon-warn:before {
+.icon-vanillicon-warn:before {
   @include char-content($icon-warn);
 }
 
-.icon-warning-sign:before {
+.icon-vanillicon-warning-sign:before {
   @include char-content($icon-warning-sign);
 }
 
-.icon-windows:before {
+.icon-vanillicon-windows:before {
   @include char-content($icon-windows);
 }
 
-.icon-wordpress:before {
+.icon-vanillicon-wordpress:before {
   @include char-content($icon-wordpress);
 }
 
-.icon-wtf:before {
+.icon-vanillicon-wtf:before {
   @include char-content($icon-wtf);
 }
 
-.icon-yahoo:before {
+.icon-vanillicon-yahoo:before {
   @include char-content($icon-yahoo);
 }
 
-.icon-yelp:before {
+.icon-vanillicon-yelp:before {
   @include char-content($icon-yelp);
 }
 
-.icon-youtube:before {
+.icon-vanillicon-youtube:before {
   @include char-content($icon-youtube);
 }
 
-.icon-youtube-alt:before {
+.icon-vanillicon-youtube-alt:before {
   @include char-content($icon-youtube-alt);
 }
 
-.icon-zendesk:before {
+.icon-vanillicon-zendesk:before {
   @include char-content($icon-zendesk);
 }
 

@@ -32,6 +32,21 @@ $checkerboard-foreground: #d8d8d8;
   @include image-wrap();
 }
 
-svg {
-  fill: $grey-dark;
+.icon {
+  svg {
+    display: block;
+    fill: $grey-dark;
+  }
+}
+
+.icon-text {
+  @extend .icon;
+  position: relative;
+
+  svg {
+    position: relative;
+    display: inline-block;
+    height: $font-size-base;
+    top: 2px;
+  }
 }

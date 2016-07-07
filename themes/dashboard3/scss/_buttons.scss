@@ -158,6 +158,7 @@ input[type="button"] {
 
 .btn-icon {
   @extend .btn-link;
+  @extend .icon;
   padding: $spacer / 4;
   margin: 0;
   margin-left: .5rem;
@@ -167,61 +168,15 @@ input[type="button"] {
   }
 
   svg {
-    display: block;
     height: to-rem(24);
   }
 }
 
 // Icon buttons
 
-.btn-edit {
-  @extend .btn-icon;
-
-  &::before {
-    @include char-content($icon-edit);
-  }
-}
-
-.btn-delete {
-  @extend .btn-icon;
-
-
-  &::before {
-    @include char-content($icon-trash);
-  }
-}
-
-
-.btn-ok {
-  @extend .btn-icon;
-
-
-  &::before {
-    @include char-content($icon-ok);
-  }
-}
-
-.btn-settings {
-  @extend .btn-icon;
-
-  &::before {
-    @include char-content($icon-cog);
-  }
-}
-
-// Icon buttons with border
-
-.btn-settings-border {
-  @extend .btn-secondary;
-  @extend .icon;
-
-  &::before {
-    @include char-content($icon-edit);
-  }
-}
-
 .btn-icon-border {
   @extend .btn-secondary;
+  @extend .icon;
   $btn-icon-height: 28;
   $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
@@ -232,7 +187,6 @@ input[type="button"] {
   }
 
   svg {
-    display: block;
     height: to-rem($btn-icon-height);
   }
 

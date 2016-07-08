@@ -546,9 +546,8 @@ class VanillaSettingsController extends Gdn_Controller {
      * Editing a category.
      *
      * @since 2.0.0
-     * @access public
-     *
-     * @param int $CategoryID Unique ID of the category to be updated.
+     * @param int|string $CategoryID Unique ID of the category to be updated.
+     * @throws Exception when category cannot be found.
      */
     public function editCategory($CategoryID = '') {
         // Check permission
@@ -566,7 +565,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get category data
-        $this->Category = $this->CategoryModel->getID($CategoryID);
+        $this->Category = CategoryModel::categories($CategoryID);
         if (!$this->Category) {
             throw notFoundException('Category');
         }

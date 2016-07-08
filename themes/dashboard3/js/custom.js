@@ -330,6 +330,21 @@
 'use strict';
 
 (function($) {
+
+    var dashboardSymbol =  function(name, alt, cssClass) {
+        if (alt) {
+            alt = 'alt="' + alt + '" ';
+        } else {
+            alt = '';
+        }
+
+        if (!cssClass) {
+            cssClass = '';
+        }
+
+        return '<svg ' + alt + ' class="icon ' + cssClass + 'icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href=\"#' + name + '" /></svg>';
+    }
+
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
@@ -387,6 +402,7 @@
             cssClass: '',
             title: '',
             footer: '',
+            closeIcon: '',
             body: '',
             form: {
                 open: '',
@@ -398,8 +414,8 @@
         <div><div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
                 <div class="modal-header"> \
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"> \
-                        <span aria-hidden="true">&times;</span> \
+                    <button type="button" class="btn-icon close" data-dismiss="modal" aria-label="Close"> \
+                        {closeIcon} \
                     </button> \
                     <h4 class="modal-title">{title}</h4> \
                 </div> \
@@ -418,6 +434,7 @@
 
         start: function($trigger, settings) {
             modal.settings = $.extend(true, settings, $trigger.data());
+            modal.contentDefaults.closeIcon = dashboardSymbol('close');
             modal.id = Math.random().toString(36).substr(2, 9);
             modal.target = $trigger.attr('href')
             modal.setupTrigger($trigger);
@@ -524,6 +541,7 @@
             html = html.replace('{body}', content.body);
             html = html.replace('{cssClass}', content.cssClass);
             html = html.replace('{title}', content.title);
+            html = html.replace('{closeIcon}', content.closeIcon);
             html = html.replace('{footer}', content.footer);
             html = html.replace('{form.open}', content.form.open);
             html = html.replace('{form.close}', content.form.close);

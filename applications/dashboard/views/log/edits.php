@@ -11,8 +11,8 @@ echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.
 echo $this->Form->open();
 ?>
         <?php
-        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
-        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
+        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-secondary'));
+        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-secondary'));
         ?>
 <?php
 
@@ -20,10 +20,6 @@ echo '<div id="LogTable">';
 include dirname(__FILE__).'/table.php';
 echo '</div id="LogTable">';
 ?>
-        <?php
-        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton SmallButton'));
-        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton SmallButton'));
-        ?>
 <?php
 
 $this->addDefinition('ExpandText', t('(more)'));

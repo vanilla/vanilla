@@ -1594,7 +1594,7 @@ a.text-danger:focus, a.text-danger:hover {
   padding-right: 35px;
 }
 
-.alert-dismissible .close {
+.alert-dismissible .close, .alert-dismissible .Close {
   position: relative;
   top: -2px;
   right: -21px;
@@ -1897,31 +1897,6 @@ a.text-danger:focus, a.text-danger:hover {
     display: inline-block;
     width: 100%;
   }
-}
-
-.close {
-  float: right;
-  font-size: 1.3125rem;
-  font-weight: bold;
-  line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  opacity: .2;
-}
-
-.close:focus, .close:hover {
-  color: #000;
-  text-decoration: none;
-  cursor: pointer;
-  opacity: .5;
-}
-
-button.close {
-  padding: 0;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
-  -webkit-appearance: none;
 }
 
 .btn-group, .Tabs ul,
@@ -4910,7 +4885,7 @@ a.current-theme,
   overflow: hidden;
 }
 
-.modal {
+.modal, .Overlay > .Popup {
   position: fixed;
   top: 0;
   right: 0;
@@ -4923,30 +4898,30 @@ a.current-theme,
   -webkit-overflow-scrolling: touch;
 }
 
-.modal.fade .modal-dialog {
+.modal.fade .modal-dialog, .Overlay > .fade.Popup .modal-dialog, .modal.fade .Border, .Overlay > .fade.Popup .Border {
   transition: -webkit-transform .3s ease-out;
   transition: transform .3s ease-out;
   -webkit-transform: translate(0, -25%);
   transform: translate(0, -25%);
 }
 
-.modal.in .modal-dialog {
+.modal.in .modal-dialog, .Overlay > .in.Popup .modal-dialog, .modal.in .Border, .Overlay > .in.Popup .Border {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
 
-.modal-open .modal {
+.modal-open .modal, .modal-open .Overlay > .Popup {
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.modal-dialog {
+.modal-dialog, .Border {
   position: relative;
   width: auto;
   margin: 10px;
 }
 
-.modal-content {
+.modal-content, .Overlay .Popup .Body {
   position: relative;
   background-color: #fff;
   background-clip: padding-box;
@@ -4984,16 +4959,16 @@ a.current-theme,
   clear: both;
 }
 
-.modal-header .close {
+.modal-header .close, .modal-header .Close {
   margin-top: -2px;
 }
 
-.modal-title {
+.modal-title, div.Popup h1 {
   margin: 0;
   line-height: 1.5;
 }
 
-.modal-body {
+.modal-body, .Content {
   position: relative;
   padding: 15px;
 }
@@ -5577,7 +5552,7 @@ a.current-theme,
 }
 
 @media (min-width: 544px) {
-  .modal-dialog {
+  .modal-dialog, .Border {
     width: 600px;
     margin: 30px auto;
   }
@@ -8967,6 +8942,50 @@ a.current-theme,
   opacity: .65;
 }
 
+.btn + .btn, .file-upload-browse + .btn, .Button + .btn,
+.TextButton + .btn, .SmallButton + .btn, #Head h1 a span + .btn, .Tabs ul li a + .btn,
+.tabbed-content li a + .btn, .FilterMenu .FilterButton + .btn, .btn + .file-upload-browse, .file-upload-browse + .file-upload-browse, .Button + .file-upload-browse,
+.TextButton + .file-upload-browse, .SmallButton + .file-upload-browse, #Head h1 a span + .file-upload-browse, .Tabs ul li a + .file-upload-browse,
+.tabbed-content li a + .file-upload-browse, .FilterMenu .FilterButton + .file-upload-browse, .btn + .Button, .file-upload-browse + .Button, .Button + .Button,
+.TextButton + .Button, .SmallButton + .Button, #Head h1 a span + .Button, .Tabs ul li a + .Button,
+.tabbed-content li a + .Button, .FilterMenu .FilterButton + .Button, .btn +
+.TextButton, .file-upload-browse +
+.TextButton, .Button +
+.TextButton,
+.TextButton +
+.TextButton, .SmallButton +
+.TextButton, #Head h1 a span +
+.TextButton, .Tabs ul li a +
+.TextButton,
+.tabbed-content li a +
+.TextButton, .FilterMenu .FilterButton +
+.TextButton, .btn + .SmallButton, .file-upload-browse + .SmallButton, .Button + .SmallButton,
+.TextButton + .SmallButton, .SmallButton + .SmallButton, #Head h1 a span + .SmallButton, .Tabs ul li a + .SmallButton,
+.tabbed-content li a + .SmallButton, .FilterMenu .FilterButton + .SmallButton, #Head h1 a .btn + span, #Head h1 a .file-upload-browse + span, #Head h1 a .Button + span, #Head h1 a
+.TextButton + span, #Head h1 a .SmallButton + span, #Head h1 a span + span, .Tabs ul li #Head h1 a a + span, #Head h1 a .Tabs ul li a + span,
+.tabbed-content li #Head h1 a a + span, #Head h1 a
+.tabbed-content li a + span, .FilterMenu #Head h1 a .FilterButton + span, #Head h1 a .FilterMenu .FilterButton + span, .Tabs ul li .btn + a, .Tabs ul li .file-upload-browse + a, .Tabs ul li .Button + a, .Tabs ul li
+.TextButton + a, .Tabs ul li .SmallButton + a, #Head h1 a .Tabs ul li span + a, .Tabs ul li #Head h1 a span + a, .Tabs ul li a + a, .FilterMenu .Tabs ul li .FilterButton + a, .Tabs ul li .FilterMenu .FilterButton + a,
+.tabbed-content li .btn + a,
+.tabbed-content li .file-upload-browse + a,
+.tabbed-content li .Button + a,
+.tabbed-content li
+.TextButton + a,
+.tabbed-content li .SmallButton + a, #Head h1 a
+.tabbed-content li span + a,
+.tabbed-content li #Head h1 a span + a, .tabbed-content li a + a, .FilterMenu
+.tabbed-content li .FilterButton + a,
+.tabbed-content li .FilterMenu .FilterButton + a, .FilterMenu .btn + .FilterButton, .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .Button + .FilterButton, .FilterMenu
+.TextButton + .FilterButton, .FilterMenu .SmallButton + .FilterButton, #Head h1 a .FilterMenu span + .FilterButton, .FilterMenu #Head h1 a span + .FilterButton, .Tabs ul li .FilterMenu a + .FilterButton, .FilterMenu .Tabs ul li a + .FilterButton,
+.tabbed-content li .FilterMenu a + .FilterButton, .FilterMenu
+.tabbed-content li a + .FilterButton, .FilterMenu .FilterButton + .FilterButton {
+  margin-left: 0.5625rem;
+}
+
+.btn-icon + .btn-icon {
+  margin-left: 0;
+}
+
 a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button,
 a.disabled.TextButton, a.disabled.SmallButton, .Tabs ul li a.disabled,
 .tabbed-content li a.disabled, .FilterMenu a.disabled.FilterButton,
@@ -10808,39 +10827,39 @@ select::-ms-expand {
   border: 1px solid #ddd;
 }
 
-.modal-dialog {
+.modal-dialog, .Border {
   margin: 3vh auto;
   width: inherit;
   max-width: 1024px;
 }
 
-.modal-dialog.modal-sm {
+.modal-dialog.modal-sm, .modal-sm.Border {
   max-width: 400px;
 }
 
-.modal-body {
+.modal-body, .Content {
   max-height: calc(94vh - (2 * 3.75rem));
   overflow: scroll;
 }
 
-.modal-content {
+.modal-content, .Overlay .Popup .Body {
   border-radius: 0.125rem;
 }
 
-.modal {
+.modal, .Overlay > .Popup {
   display: -ms-flexbox;
   display: flex;
   padding: 0 0.5625rem;
 }
 
-.modal.fade .modal-dialog {
+.modal.fade .modal-dialog, .Overlay > .fade.Popup .modal-dialog, .modal.fade .Border, .Overlay > .fade.Popup .Border {
   transition: opacity .2s ease-out;
   -webkit-transform: none;
   transform: none;
   opacity: 0;
 }
 
-.modal.in .modal-dialog {
+.modal.in .modal-dialog, .Overlay > .in.Popup .modal-dialog, .modal.in .Border, .Overlay > .in.Popup .Border {
   -webkit-transform: none;
   transform: none;
   -webkit-filter: none;
@@ -10874,6 +10893,28 @@ body .modal-open {
   height: 1rem;
   box-shadow: inset 0px -0.75rem 0.75rem 0px white;
   content: '';
+}
+
+.close, .Close {
+  float: right;
+  padding: 0;
+}
+
+.close:hover svg, .Close:hover svg {
+  fill: #555a62;
+}
+
+.close svg, .Close svg {
+  fill: #949aa2;
+  height: 1.75rem;
+}
+
+button.close, button.Close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
 }
 
 .nav-heading a {
@@ -11697,12 +11738,12 @@ p {
   margin-bottom: 0.5625rem;
 }
 
-.heading-h1, .content h1 {
+.heading-h1, .content h1, div.Popup h1 {
   font-size: 1.25rem;
   margin-bottom: 1.125rem;
 }
 
-.full-border, .heading-h1-block, .content > h1, .header-block, .header-menu {
+.full-border, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -11711,7 +11752,7 @@ p {
   border-bottom: 0.0625rem solid #f4f4f5;
 }
 
-.heading-h1-block, .content > h1 {
+.heading-h1-block, .content > h1, div.Popup h1 {
   padding-bottom: 1.125rem;
 }
 
@@ -11942,5 +11983,15 @@ pre {
 
 .input-wrap .SmallInput, .form-horizontal li > input .SmallInput, .form-horizontal li > select .SmallInput, .color-picker .SmallInput {
   max-width: inherit;
+}
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 /*# sourceMappingURL=admin.css.map */

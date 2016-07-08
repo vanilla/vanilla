@@ -219,7 +219,6 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_nav.scss',
             'scss/vendors/bootstrap/scss/_alert.scss',
             'scss/vendors/bootstrap/scss/_card.scss',
-            'scss/vendors/bootstrap/scss/_close.scss',
             'scss/vendors/bootstrap/scss/_button-group.scss',
             'scss/vendors/bootstrap/scss/_tables.scss',
             'scss/vendors/bootstrap/scss/_tooltip.scss',

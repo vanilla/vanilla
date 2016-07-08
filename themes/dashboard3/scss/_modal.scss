@@ -69,3 +69,26 @@
   }
 }
 
+.close {
+  float: right;
+  padding: 0;
+
+  &:hover {
+    svg {
+      fill: $grey-dark;
+    }
+  }
+
+  svg {
+    fill: $grey;
+    height: to-rem(52) - 1.5rem;
+  }
+}
+
+button.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}

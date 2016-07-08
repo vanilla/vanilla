@@ -16,7 +16,7 @@
         </div>
         <?php
         if ($this->saveButton) {
-            echo $this->form->button('Save Thumbnail', array('id' => 'save-crop', 'class' => 'Button SmallButton Primary Hidden', 'style' => 'margin-top: 20px;'));
+            echo $this->form->button('Save Thumbnail', array('id' => 'save-crop', 'class' => 'Button btn btn-secondary Primary Hidden', 'style' => 'margin-top: 20px;'));
         }
         ?>
     </div>

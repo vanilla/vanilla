@@ -57,7 +57,8 @@ jQuery(document).ready(function($) {
     var setExpander = function() {
         $Expander = $('.Expander');
         $('.Expander').expander({
-            slicePoint: 200,
+            slicePoint: 100,
+            normalizeWhitespace: true,
             expandText: gdn.definition('ExpandText'),
             userCollapseText: gdn.definition('CollapseText')
         });

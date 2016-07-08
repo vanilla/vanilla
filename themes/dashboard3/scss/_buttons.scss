@@ -44,6 +44,14 @@
   }
 }
 
+.btn + .btn {
+  margin-left: $spacer / 2;
+}
+
+.btn-icon + .btn-icon {
+  margin-left: 0;
+}
+
 // Future-proof disabling of clicks on `<a>` elements
 a.btn.disabled,
 fieldset[disabled] a.btn {

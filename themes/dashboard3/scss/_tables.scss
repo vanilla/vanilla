@@ -52,3 +52,55 @@ table {
   }
 }
 
+.CheckBoxGrid {
+
+  .checkbox {
+    margin-bottom: 0;
+  }
+
+  th {
+    font-weight: $headings-font-weight;
+  }
+
+  a {
+    color: $grey-dark;
+
+    &:hover {
+      color: $brand-primary;
+    }
+  }
+
+  thead {
+    tr {
+      background-color: $grey-light;
+    }
+
+    td {
+      text-align: center;
+      padding: ($spacer / 2) ($spacer * .75);
+      border: 1px solid #eee;
+      border-top: 1px solid #ddd;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: $font-size-sm;
+      line-height: $line-height-lg;
+      vertical-align: middle;
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+
+    th {
+      font-weight: 700;
+    }
+  }
+
+  tbody {
+    td {
+      padding: ($spacer / 2) ($spacer * .75);
+      text-align: center;
+    }
+  }
+}
+

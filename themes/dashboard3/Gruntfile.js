@@ -172,7 +172,7 @@ module.exports = function (grunt) {
         force: true
         , jshintrc: 'js/.jshintrc'
       }
-      , all: ['js/src/**/*.js']
+      , all: ['js/src/main.js']
     },
 
     csslint: {

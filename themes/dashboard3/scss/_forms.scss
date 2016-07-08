@@ -691,3 +691,66 @@ select {
   position: absolute;
   left: -9999px;
 }
+
+// iCheck
+.icheck-label {
+  padding-left: 0;
+}
+
+.iradio,
+.icheckbox {
+
+  label {
+    padding-left: 0;
+    height: $spacer;
+    vertical-align: middle;
+  }
+
+  display: inline-block;
+  width: $spacer;
+  height: $spacer;
+  margin-right: $spacer / 4;
+  vertical-align: middle;
+  border: $border-width solid $border-color;
+
+  &:hover,
+  &:focus,
+  &.checked,
+  .icheck-label:hover &,
+  .icheck-label:focus & {
+    background-color: $brand-primary;
+    border-color: $brand-primary;
+
+    &:before {
+      display: block;
+      color: $white;
+    }
+  }
+}
+
+.iradio {
+  border-radius: $spacer / 2;
+
+  &.checked:before {
+    display: block;
+    vertical-align: middle;
+    text-align: center;
+    width: $spacer / 2;
+    height: $spacer / 2;
+    margin: (($spacer / 4) - $border-width) auto;
+    border-radius: $spacer / 4;
+    background-color: $white;
+    content: '';
+  }
+}
+
+.icheckbox.checked {
+  @extend %icon;
+  font-size: $font-size-sm;
+  text-align: center;
+
+  &:before {
+    margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
+    @include char-content($icon-ok);
+  }
+}

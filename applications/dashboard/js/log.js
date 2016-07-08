@@ -69,7 +69,7 @@ jQuery(document).ready(function($) {
         $checkbox.trigger('click', true);
     });
 
-    $(document).delegate('tbody .CheckboxCell input', 'click', function(e, flip) {
+    $(document).delegate('tbody .CheckboxCell input', 'change', function(e, flip) {
         e.stopPropagation();
         var $checkbox = $(this);
 
@@ -81,9 +81,11 @@ jQuery(document).ready(function($) {
             $checkbox.closest('tr').addClass('Selected');
         else
             $checkbox.closest('tr').removeClass('Selected');
+
+        $checkbox.closest('tr').trigger('contentLoad');
     });
 
-    $(document).on('click', '#SelectAll', function(e, flip) {
+    $(document).on('change', '#SelectAll', function(e, flip) {
         e.stopPropagation();
         var selected = $(this).prop('checked');
 
@@ -96,6 +98,8 @@ jQuery(document).ready(function($) {
             $('tr', table).addClass('Selected');
         else
             $('tr', table).removeClass('Selected');
+
+        table.trigger('contentLoad');
     });
 
     $('.RestoreButton').click(function(e) {

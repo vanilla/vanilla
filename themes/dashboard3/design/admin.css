@@ -24,7 +24,7 @@
   transition-property: height;
 }
 
-.icon-vanillicon:before {
+.icon-vanillicon:before, .icheckbox.checked {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -10536,6 +10536,81 @@ select::-ms-expand {
   left: -9999px;
 }
 
+.icheck-label {
+  padding-left: 0;
+}
+
+.iradio,
+.icheckbox {
+  display: inline-block;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-right: 0.28125rem;
+  vertical-align: middle;
+  border: 0.0625rem solid #ddd;
+}
+
+.iradio label,
+.icheckbox label {
+  padding-left: 0;
+  height: 1.125rem;
+  vertical-align: middle;
+}
+
+.iradio:hover, .iradio:focus, .iradio.checked,
+.icheck-label:hover .iradio,
+.icheck-label:focus .iradio,
+.icheckbox:hover,
+.icheckbox:focus,
+.icheckbox.checked,
+.icheck-label:hover
+.icheckbox,
+.icheck-label:focus
+.icheckbox {
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.iradio:hover:before, .iradio:focus:before, .iradio.checked:before,
+.icheck-label:hover .iradio:before,
+.icheck-label:focus .iradio:before,
+.icheckbox:hover:before,
+.icheckbox:focus:before,
+.icheckbox.checked:before,
+.icheck-label:hover
+.icheckbox:before,
+.icheck-label:focus
+.icheckbox:before {
+  display: block;
+  color: #fff;
+}
+
+.iradio {
+  border-radius: 0.5625rem;
+}
+
+.iradio.checked:before {
+  display: block;
+  vertical-align: middle;
+  text-align: center;
+  width: 0.5625rem;
+  height: 0.5625rem;
+  margin: 0.21875rem auto;
+  border-radius: 0.28125rem;
+  background-color: #fff;
+  content: '';
+}
+
+.icheckbox.checked {
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+.icheckbox.checked:before {
+  margin-top: 0.125rem;
+  content: "\f171";
+}
+
 .Hidden,
 .hidden {
   display: none;
@@ -11427,6 +11502,51 @@ table tbody {
 
 table tbody tr:hover {
   background-color: #f9fdfe;
+}
+
+.CheckBoxGrid .checkbox {
+  margin-bottom: 0;
+}
+
+.CheckBoxGrid th {
+  font-weight: 400;
+}
+
+.CheckBoxGrid a {
+  color: #555a62;
+}
+
+.CheckBoxGrid a:hover {
+  color: #0291db;
+}
+
+.CheckBoxGrid thead tr {
+  background-color: #f4f4f5;
+}
+
+.CheckBoxGrid thead td {
+  text-align: center;
+  padding: 0.5625rem 0.84375rem;
+  border: 1px solid #eee;
+  border-top: 1px solid #ddd;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 0.75rem;
+  line-height: 1.3333333333;
+  vertical-align: middle;
+}
+
+.CheckBoxGrid thead td:last-child {
+  border-right: 0;
+}
+
+.CheckBoxGrid thead th {
+  font-weight: 700;
+}
+
+.CheckBoxGrid tbody td {
+  padding: 0.5625rem 0.84375rem;
+  text-align: center;
 }
 
 * html .InformMessages {

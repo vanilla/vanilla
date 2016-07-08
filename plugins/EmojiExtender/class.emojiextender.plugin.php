@@ -172,7 +172,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
-
+            $selected = '<svg class="icon icon-svg-checkmark" viewBox="0 0 17 17"><use xlink:href="#checkmark" /></svg>';
             $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'], 'class' => 'label-selector-image')) : '';
             $items[$key] =
                 '@<div class="image-wrap">'.
@@ -181,6 +181,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                    '<div class="buttons">'.
                         '<a class="btn btn-overlay">'.t('Select').'</a>'.
                    '</div>'.
+                   '<div class="selected">'.$selected.'</div>'.
                 '</div>'.
                 '</div>'.
                 '<div emojiset-body>'.
@@ -195,7 +196,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 'Control' => 'radiolist',
                 'Description' => '<p>Which emoji set would you like to use?</p>',
                 'Items' => $items,
-                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after')
+                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after', 'class' => 'label-selector-input')
             ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),

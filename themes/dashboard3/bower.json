@@ -11,6 +11,7 @@
     "tether-drop": "^1.4.2",
     "jquery-sticky": "^1.0.3",
     "ScrollToFixed": "scrolltofixed#^1.0.6",
-    "clipboard": "^1.5.12"
+    "clipboard": "^1.5.12",
+    "jquery-icheck": "2.x"
   }
 }

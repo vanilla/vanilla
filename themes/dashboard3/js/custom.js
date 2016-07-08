@@ -750,6 +750,11 @@
         modal.load(e.target);
         clipboardInit();
         drawerInit(e.target);
+        $('input:not(.label-selector-input)', e.target).iCheck({
+            aria: true
+        }).on('ifChanged', function(e) {
+            $(this).trigger("change");
+        });
     });
 
     $(document).on('click', '.js-clear-search', function() {

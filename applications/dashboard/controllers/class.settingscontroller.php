@@ -1546,7 +1546,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Mobile Themes'));
 
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/mobilethemes');
+        $this->addSideMenu('dashboard/settings/themes');
 
         // Get currently enabled theme.
         $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
@@ -1554,6 +1554,7 @@ class SettingsController extends DashboardController {
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);
+        $this->setData('EnabledThemeScreenshotUrl', val('ScreenshotUrl', $ThemeInfo));
         $this->setData('EnabledThemeName', val('Name', $ThemeInfo, val('Index', $ThemeInfo)));
 
         // Get all themes.

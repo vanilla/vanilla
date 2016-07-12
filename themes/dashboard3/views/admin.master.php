@@ -84,7 +84,7 @@ Gdn_Theme::assetEnd();
     <!--        --><?php //echo anchor($title, '/', 'title'); ?>
             <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
         </div>
-        <?php $dashboardNav = new DashboardNavModule(); ?>
+        <?php $dashboardNav = $this->Assets['Panel']['DashboardNavModule']; ?>
         <nav class="nav nav-pills">
             <?php
             foreach ($dashboardNav->getSectionsInfo() as $section) { ?>

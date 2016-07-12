@@ -43,7 +43,7 @@ include $this->fetchViewLocation('helper_functions');
                         </div>
                     </div>
                 </td>
-                <td>
+                <td class="content-cell">
                     <?php
                     $Url = FALSE;
                     if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {

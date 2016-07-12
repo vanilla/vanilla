@@ -168,11 +168,17 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      *
      */
-    public function addSideMenu() {
+    public function addSideMenu($currentUrl) {
+        if (!$currentUrl) {
+            $currentUrl = strtolower($this->SelfUrl);
+        }
+
         // Only add to the assets if this is not a view-only request
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             $nav = new DashboardNavModule();
+            $nav->setHighlightRoute($currentUrl);
             $navAdapter = new NestedCollectionAdapter($nav);
+
             $this->EventArguments['SideMenu'] = $navAdapter;
             $this->fireEvent('GetAppSettingsMenuItems');
 

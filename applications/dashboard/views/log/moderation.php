@@ -1,5 +1,4 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 Gdn_Theme::assetBegin('Help');
 echo '<h2>'.$this->data('Title').'</h2>';
@@ -8,6 +7,9 @@ Gdn_Theme::assetEnd();
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
+<div class="header-block">
+    <h1><?php echo $this->data('Title'); ?></h1>
+</div>
 <div class="toolbar">
     <div class="buttons">
         <?php

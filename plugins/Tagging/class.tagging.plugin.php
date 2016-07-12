@@ -61,6 +61,16 @@ class TaggingPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        $args['AvailableAddons']['Tagging']['HasPopupFriendlySettings'] = false;
+    }
+
+    /**
      * Add the tag admin page CSS.
      *
      * @param AssetModel $sender

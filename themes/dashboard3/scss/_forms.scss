@@ -616,10 +616,7 @@ select {
 }
 
 .label-selector-item {
-  @extend .col-xs-12;
-  @extend .col-sm-8;
-  @extend .col-lg-8;
-  @extend .col-xl-6;
+  @extend .grid-item;
 
   padding: $spacer $spacer ($spacer / 2);
 }
@@ -712,6 +709,7 @@ select {
   margin-right: $spacer / 4;
   vertical-align: middle;
   border: $border-width solid $border-color;
+  cursor: pointer;
 
   &:hover,
   &:focus,
@@ -732,13 +730,14 @@ select {
   border-radius: $spacer / 2;
 
   &.checked:before {
+    position: absolute;
     display: block;
-    vertical-align: middle;
-    text-align: center;
-    width: $spacer / 2;
-    height: $spacer / 2;
-    margin: (($spacer / 4) - $border-width) auto;
-    border-radius: $spacer / 4;
+    top: -$border-width;
+    left: -$border-width;
+    width: $spacer;
+    height: $spacer;
+    border: $border-width * 4 solid $brand-primary;
+    border-radius: $spacer / 2;
     background-color: $white;
     content: '';
   }
@@ -752,5 +751,38 @@ select {
   &:before {
     margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
     @include char-content($icon-ok);
+  }
+}
+
+label[id^=iCheck] {
+  padding-left: 0;
+}
+
+// Text input with a button
+
+.text-input-button {
+  display: flex;
+  align-items: center;
+
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  button {
+    margin-left: -$border-width;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .label-wrap {
+    flex-shrink: 0;
+    display: block;
+    margin-right: $spacer / 2;
+
+    label {
+      line-height: 1;
+      margin-bottom: 0;
+    }
   }
 }

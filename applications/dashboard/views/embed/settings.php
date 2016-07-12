@@ -48,14 +48,12 @@ $AllowEmbed = c('Garden.Embed.Allow');
             ?>
         </li>
         <li>
-            <p class="WarningMessage">
-                <?php
-                echo $this->Form->CheckBox('Garden.Embed.PageToForum', "Send users to forum after the first page of comments.");
-                ?>
+            <?php
+            echo $this->Form->CheckBox('Garden.Embed.PageToForum', "Send users to forum after the first page of comments.");
+            ?>
                 <strong>Recommended:</strong> When there is more than one page of comments on a blog post, send users to
                 the forum when they click to see another page of comments. This is a great way of driving users into
                 your community.
-            </p>
         </li>
     </ul>
 <?php

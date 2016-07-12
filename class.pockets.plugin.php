@@ -94,6 +94,16 @@ class PocketsPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        $args['AvailableAddons']['Pockets']['HasPopupFriendlySettings'] = false;
+    }
+
+    /**
      *
      *
      * @param $Sender

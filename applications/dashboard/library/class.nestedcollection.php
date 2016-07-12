@@ -458,7 +458,8 @@ trait NestedCollection {
                 return $item['sort'] * 10000 + $default_sort;
             } elseif (is_array($item['sort']) && $depth < 10) {
                 // This sort is before or after another depth.
-                list($op, $key) = $item['sort'];
+                $op = array_keys($item['sort'])[0];
+                $key = $item['sort'][$op];
 
                 if (array_key_exists($key, $items)) {
                     switch ($op) {

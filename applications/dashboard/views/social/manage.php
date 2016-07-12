@@ -1,5 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo t('Social Integration'); ?></h1>
+<div class="header-block">
+    <h1><?php echo t('Social Integration'); ?></h1>
+</div>
 <?php Gdn_Theme::assetBegin('Help')?>
 <div>
     <h2><?php echo t("What's This?"); ?></h2>

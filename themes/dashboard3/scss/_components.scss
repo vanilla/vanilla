@@ -58,10 +58,32 @@
 
 .toolbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
-  padding: ($spacer / 2) 0;
 
-  .toolbar-search {
+  &.full-border {
+    display: flex;
+    padding-bottom: $spacer;
+  }
+
+  .header-block + & {
+    margin-top: $spacer / 2;
+  }
+
+  .header-menu + & {
+    margin-top: $spacer / 2;
+  }
+
+  & + .table-wrap {
+    margin-top: $spacer / 2;
+  }
+
+  > * {
+    flex-shrink: 0;
+    margin-top: $spacer / 2;
+  }
+
+  .toolbar-main {
     flex-grow: 1;
     padding-right: $spacer;
   }

@@ -149,8 +149,8 @@ class SocialController extends DashboardController {
         WriteConnection($Connection, false);
         $Row = ob_get_clean();
 
+//        $this->informMessage(t("Plugin enabled."));
         $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
-        $this->informMessage(t("Plugin enabled."));
 
         unset($this->Data['Connections']);
         $this->render('blank', 'utility');

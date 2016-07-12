@@ -77,6 +77,16 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        $args['AvailableAddons']['ProfileExtender']['HasPopupFriendlySettings'] = false;
+    }
+
+    /**
      * Add non-checkbox fields to registration forms.
      */
     public function entryController_registerBeforePassword_handler($Sender) {

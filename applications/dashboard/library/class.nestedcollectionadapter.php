@@ -66,9 +66,7 @@ class NestedCollectionAdapter {
      * @param string $route
      */
     public function highlightRoute($route) {
-        decho(func_get_args());
-
-        $this->setHighlightRoute($route);
+        $this->siteNavModule->setHighlightRoute($route);
     }
 
     /**

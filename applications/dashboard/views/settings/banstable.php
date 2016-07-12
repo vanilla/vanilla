@@ -36,8 +36,8 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 <td>
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'Edit btn btn-icon', ['aria-label' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'Delete btn btn-icon', ['aria-label' => t('Delete')]);
+                    echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'data-httpMethod' => 'post']);
                     ?>
                     </div>
                 </td>

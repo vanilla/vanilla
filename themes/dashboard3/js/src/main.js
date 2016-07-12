@@ -74,7 +74,7 @@
     var modal = {
 
         settings: {
-
+            httpmethod: 'get'
         },
 
         contentDefaults: {
@@ -111,15 +111,19 @@
 
         target: '',
 
+        trigger: {},
+
         start: function($trigger, settings) {
+            modal.trigger = $trigger;
             modal.settings = $.extend(true, settings, $trigger.data());
+            console.log(modal.settings);
             modal.contentDefaults.closeIcon = dashboardSymbol('close');
             modal.id = Math.random().toString(36).substr(2, 9);
-            modal.target = $trigger.attr('href')
+            modal.target = $trigger.attr('href');
             modal.setupTrigger($trigger);
             modal.addToDom();
             $('#' + modal.id).modal('show');
-            if (modal.settings.type === 'confirm') {
+            if (modal.settings.modaltype === 'confirm') {
                 modal.addConfirmContent();
             } else {
                 modal.addContent();
@@ -137,13 +141,13 @@
 
         handleConfirm: function() {
             // request the target via ajax
-            var ajaxData = {'DeliveryType' : settings.deliveryType, 'DeliveryMethod' : 'JSON'};
-            if (modal.settings.httpMethod === 'post') {
+            var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+            if (modal.settings.httpmethod === 'post') {
                 ajaxData.TransientKey = gdn.definition('TransientKey');
             }
 
             $.ajax({
-                method: (modal.settings.httpMethod === 'post') ? 'POST' : 'GET',
+                method: (modal.settings.httpmethod === 'post') ? 'POST' : 'GET',
                 url: modal.target,
                 data: ajaxData,
                 dataType: 'json',
@@ -159,8 +163,22 @@
                         }, 300);
                     }
                     $('#' + modal.id).modal('hide');
+                    modal.afterConfirmSuccess();
                 }
             });
+        },
+
+        // Default is to remove the closest item with the class 'js-modal-item'
+        afterConfirmSuccess: function() {
+            var found = false;
+            if (!settings.confirmaction || settings.confirmaction === 'delete') {
+                found = modal.trigger.closest('.js-modal-item').length !== 0;
+                modal.trigger.closest('.js-modal-item').remove();
+            }
+
+            if (!found) {
+                document.location.replace(window.location.href);
+            }
         },
 
         confirmContent: function() {
@@ -210,11 +228,15 @@
             });
         },
 
-        replaceHtml: function(content) {
+        replaceHtml: function(parsedContent) {
+
+            // Copy the defaults into the content array
+            var content = {};
+            $.extend(true, content, modal.contentDefaults);
 
             // Data attributes override parsed content, content overrides defaults.
-            content = $.extend(true, content, modal.settings.content);
-            content = $.extend(true, modal.contentDefaults, content);
+            $.extend(true, parsedContent, modal.settings.content);
+            $.extend(true, content, parsedContent);
 
             var html = modal.modalHtml;
             html = html.replace('{body}', content.body);
@@ -304,11 +326,7 @@
                     gdn.processTargets(json.Targets);
 
                     if (json.FormSaved === true) {
-                        if (json.RedirectUrl) {
-                            setTimeout(function() {
-                                document.location.replace(json.RedirectUrl);
-                            }, 300);
-                        }
+                        modal.afterFormSuccess(json.RedirectUrl);
                         $('#' + modal.id).modal('hide');
                     } else {
                         var body = json.Data;
@@ -320,7 +338,18 @@
                     gdn.informError(xhr);
                 }
             });
+        },
+
+        afterFormSuccess: function(redirectUrl) {
+            if (redirectUrl) {
+                setTimeout(function() {
+                    document.location.replace(redirectUrl);
+                }, 300);
+            } else {
+                document.location.replace(window.location.href);
+            }
         }
+
     };
 
     function prettyPrintInit(element) {
@@ -409,6 +438,8 @@
         $('a[href=#' + collapsible.attr('id') + ']').attr('aria-expanded', 'true');
     }
 
+
+
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
 
@@ -447,15 +478,15 @@
         modal.load(e.target);
         clipboardInit();
         drawerInit(e.target);
-        $('input:not(.label-selector-input)', e.target).iCheck({
+        $('input:not(.label-selector-input):not(.toggle-input)', e.target).iCheck({
             aria: true
         }).on('ifChanged', function(e) {
             $(this).trigger("change");
         });
     });
 
-    $(document).on('click', '.js-clear-search', function() {
-        $(this).parent('.search-wrap').find('input').val('');
+    $(document).on('click', '.js-collapse-toggle', function() {
+
     });
 
     $(document).on('shown.bs.collapse', function() {
@@ -480,13 +511,8 @@
 
     $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        var httpMethod = 'get';
-        if ($(this).attr('data-httpmethod') === 'post') {
-            httpMethod = 'post';
-        }
         modal.start($(this), {
-            modalType: 'confirm',
-            httpMethod: httpMethod
+            modaltype: 'confirm'
         });
     });
 

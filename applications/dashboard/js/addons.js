@@ -48,32 +48,32 @@ jQuery(document).ready(function($) {
                     gdn.fillAddonErrors(data);
                 } else {
                     // If not mobile themes, traditional submit.
-                    if (url.toLowerCase().indexOf('mobilethemes') == -1) {
+                    // if (url.toLowerCase().indexOf('mobilethemes') == -1) {
                         document.location = url;
-                    } else {
-                        // Start progress
-                        var $currentThemeBlock = $(e.target).closest('.themeblock');
-                        $currentThemeBlock.addClass('theme-progressing');
-                        $currentThemeBlock.find('.theme-apply-progress').addClass('TinyProgress');
-
-                        $.ajax({
-                            type: 'GET',
-                            url: url,
-                            data: {'DeliveryType': 'VIEW'},
-                            dataType: 'html',
-                            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                                // Remove any old errors from the form
-                                gdn.fillAddonErrors(XMLHttpRequest.responseText);
-                            },
-                            success: function(data) {
-                                if (data != 'Success') {
-                                    gdn.fillAddonErrors(data);
-                                } else {
-                                    gdn.setMobileTheme(e);
-                                }
-                            }
-                        });
-                    }
+                    // } else {
+                    //     // Start progress
+                    //     var $currentThemeBlock = $(e.target).closest('.themeblock');
+                    //     $currentThemeBlock.addClass('theme-progressing');
+                    //     $currentThemeBlock.find('.theme-apply-progress').addClass('TinyProgress');
+                    //
+                    //     $.ajax({
+                    //         type: 'GET',
+                    //         url: url,
+                    //         data: {'DeliveryType': 'VIEW'},
+                    //         dataType: 'html',
+                    //         error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    //             // Remove any old errors from the form
+                    //             gdn.fillAddonErrors(XMLHttpRequest.responseText);
+                    //         },
+                    //         success: function(data) {
+                    //             if (data != 'Success') {
+                    //                 gdn.fillAddonErrors(data);
+                    //             } else {
+                    //                 gdn.setMobileTheme(e);
+                    //             }
+                    //         }
+                    //     });
+                    // }
                 }
             }
         });
@@ -86,18 +86,18 @@ jQuery(document).ready(function($) {
      *
      * @param Event e
      */
-    gdn.setMobileTheme = function(e) {
-        var $currentThemeBlock = $(e.target).closest('.themeblock');
-        var $themeblocks = $('.themeblock');
-
-        $themeblocks.each(function(i, el) {
-            $(el).removeClass('current-theme');
-            $(el).removeClass('theme-progressing');
-            $(el).find('.theme-apply-progress').removeClass('TinyProgress');
-        });
-
-        $currentThemeBlock.addClass('current-theme');
-    };
+    // gdn.setMobileTheme = function(e) {
+    //     var $currentThemeBlock = $(e.target).closest('.themeblock');
+    //     var $themeblocks = $('.themeblock');
+    //
+    //     $themeblocks.each(function(i, el) {
+    //         $(el).removeClass('current-theme');
+    //         $(el).removeClass('theme-progressing');
+    //         $(el).find('.theme-apply-progress').removeClass('TinyProgress');
+    //     });
+    //
+    //     $currentThemeBlock.addClass('current-theme');
+    // };
 
     gdn.clearAddonErrors = function() {
         $('div.TestAddonErrors:not(.Hidden)').remove();

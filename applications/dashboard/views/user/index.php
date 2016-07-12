@@ -28,7 +28,7 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
     </div>
 </div>
 <div class="toolbar">
-    <div class="toolbar-search">
+    <div class="toolbar-main">
         <?php
         echo $this->Form->open(array('action' => url('/user/browse')));
         echo $this->Form->errors();

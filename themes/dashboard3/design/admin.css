@@ -6697,7 +6697,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
 .LayoutOptions > .label-wrap,
 .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
 li.LayoutOptions > label, .form-horizontal
@@ -6771,7 +6771,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   flex: 0 0 45.8333333333%;
 }
 
-.col-xs-12, .label-selector-item {
+.col-xs-12, .grid-item, .label-selector-item {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
 }
@@ -7169,7 +7169,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   .LayoutOptions > .label-wrap,
   .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
   li.LayoutOptions > label, .form-horizontal
-  li.HomeOptions > label, .form-horizontal li.media > label, .label-selector-item {
+  li.HomeOptions > label, .form-horizontal li.media > label, .grid-item, .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -7825,7 +7825,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-lg-8, .label-selector-item {
+  .col-lg-8, .grid-item, .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -8141,7 +8141,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
-  .col-xl-6, .label-selector-item {
+  .col-xl-6, .grid-item, .label-selector-item {
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
@@ -9461,12 +9461,37 @@ input[type="button"].btn-block {
 .toolbar {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
   -ms-flex-pack: justify;
   justify-content: space-between;
-  padding: 0.5625rem 0;
 }
 
-.toolbar .toolbar-search {
+.toolbar.full-border, .toolbar.heading-h1-block, .content > h1.toolbar, div.Popup h1.toolbar, .toolbar.header-block, .toolbar.header-menu {
+  display: -ms-flexbox;
+  display: flex;
+  padding-bottom: 1.125rem;
+}
+
+.header-block + .toolbar {
+  margin-top: 0.5625rem;
+}
+
+.header-menu + .toolbar {
+  margin-top: 0.5625rem;
+}
+
+.toolbar + .table-wrap {
+  margin-top: 0.5625rem;
+}
+
+.toolbar > * {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  margin-top: 0.5625rem;
+}
+
+.toolbar .toolbar-main {
   -ms-flex-positive: 1;
   flex-grow: 1;
   padding-right: 1.125rem;
@@ -10567,6 +10592,7 @@ select::-ms-expand {
   margin-right: 0.28125rem;
   vertical-align: middle;
   border: 0.0625rem solid #ddd;
+  cursor: pointer;
 }
 
 .iradio label,
@@ -10609,13 +10635,14 @@ select::-ms-expand {
 }
 
 .iradio.checked:before {
+  position: absolute;
   display: block;
-  vertical-align: middle;
-  text-align: center;
-  width: 0.5625rem;
-  height: 0.5625rem;
-  margin: 0.21875rem auto;
-  border-radius: 0.28125rem;
+  top: -0.0625rem;
+  left: -0.0625rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 0.25rem solid #0291db;
+  border-radius: 0.5625rem;
   background-color: #fff;
   content: '';
 }
@@ -10628,6 +10655,40 @@ select::-ms-expand {
 .icheckbox.checked:before {
   margin-top: 0.125rem;
   content: "\f171";
+}
+
+label[id^=iCheck] {
+  padding-left: 0;
+}
+
+.text-input-button {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.text-input-button input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.text-input-button button {
+  margin-left: -0.0625rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.text-input-button .label-wrap, .text-input-button .form-horizontal li > label, .form-horizontal .text-input-button li > label {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: block;
+  margin-right: 0.5625rem;
+}
+
+.text-input-button .label-wrap label, .text-input-button .form-horizontal li > label label, .form-horizontal .text-input-button li > label label {
+  line-height: 1;
+  margin-bottom: 0;
 }
 
 .Hidden,
@@ -10758,10 +10819,6 @@ select::-ms-expand {
   border-bottom: 1px solid #ddd;
 }
 
-.media:first-child {
-  border-top: 1px solid #ddd;
-}
-
 .media-options {
   display: -ms-flexbox;
   display: flex;
@@ -10820,11 +10877,34 @@ select::-ms-expand {
   font-weight: 300;
 }
 
-.media-callout img, .media-callout .LayoutOptions .Sprite, .LayoutOptions .media-callout .Sprite, .media-callout
-.HomeOptions .Sprite,
-.HomeOptions .media-callout .Sprite {
+.media-callout .media-image {
   height: 10rem;
   border: 1px solid #ddd;
+}
+
+.CurrentTheme {
+  padding-left: 0;
+}
+
+.grid-image {
+  display: block;
+  width: 100%;
+}
+
+.grid-image-wrap {
+  position: relative;
+}
+
+.grid-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0;
+  content: '';
 }
 
 .modal-dialog, .Border {
@@ -10915,6 +10995,10 @@ button.close, button.Close {
   background: transparent;
   border: 0;
   -webkit-appearance: none;
+}
+
+.content-cell {
+  word-break: break-word;
 }
 
 .nav-heading a {
@@ -11505,8 +11589,7 @@ button.close, button.Close {
   margin-left: -1.125rem;
 }
 
-.header-block + .table-wrap,
-.toolbar + .table-wrap {
+.header-block + .table-wrap {
   margin-top: 0;
 }
 

@@ -3,10 +3,6 @@
   padding: $spacer $padding-default;
   margin-bottom: 0;
   border-bottom: 1px solid $border-color;
-
-  &:first-child {
-    border-top: 1px solid $border-color;
-  }
 }
 
 .media-options {
@@ -73,8 +69,34 @@
     font-weight: 300;
   }
 
-  img {
+  .media-image {
     height: 10rem;
     border: 1px solid $border-color;
   }
+}
+
+//PATCH
+
+.CurrentTheme {
+  padding-left: 0;
+}
+
+
+//GRID TODO: Move
+
+.grid-item {
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-8;
+  @extend .col-xl-6;
+}
+
+.grid-image {
+  display: block;
+  width: 100%;
+}
+
+.grid-image-wrap {
+  position: relative;
+  @include image-wrap-border(0);
 }

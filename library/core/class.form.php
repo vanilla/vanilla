@@ -582,6 +582,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
 
         $attributes['aria-labelledby'] = 'label-'.$id;
+        $attributes['class'] = 'toggle-input';
         $input = $this->input($fieldName, 'checkbox', $attributes);
         $toggleLabel = '<label for="'.$id.'"'.
             attribute('class', 'toggle').

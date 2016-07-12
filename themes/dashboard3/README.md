@@ -1,6 +1,4 @@
-# 23AndMe
-
-Forum theme for 23 And Me.
+# Dashboard v3
 
 ## Compiling assets
 
@@ -27,4 +25,3 @@ Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`de
 Watches the assets for changes and runs the appropriate Grunt tasks. Also starts a Livereload server that will push the changes to your Vanilla installation automatically.
 
 ---
-Copyright &copy; 2015 Francis Bolap.

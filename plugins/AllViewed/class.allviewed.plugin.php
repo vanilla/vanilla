@@ -125,7 +125,7 @@ class AllViewedPlugin extends Gdn_Plugin {
                 $this->markCategoryRead($CategoryModel, $CategoryID);
                 $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array($CategoryID));
 
-                $sender->informMessage(t('Your changes have been saved.'));
+                $sender->informMessage(t('Category marked as viewed.'));
                 $sender->render('blank', 'utility', 'dashboard');
             }
         }
@@ -177,7 +177,7 @@ class AllViewedPlugin extends Gdn_Plugin {
             $this->markCategoryRead($CategoryModel, -1);
             $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), [-1]);
 
-            $sender->informMessage(t('Your changes have been saved.'));
+            $sender->informMessage(t('All discussions marked as viewed.'));
             $sender->render('blank', 'utility', 'dashboard');
         }
     }

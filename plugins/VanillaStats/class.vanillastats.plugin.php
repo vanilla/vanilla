@@ -106,6 +106,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $StatsUrl = Gdn::request()->scheme()."://{$StatsUrl}";
         }
 
+        Gdn_Theme::section('DashboardHome');
+
         // Tell the page where to find the Vanilla Analytics provider
         $Sender->addDefinition('VanillaStatsUrl', $StatsUrl);
         $Sender->setData('VanillaStatsUrl', $StatsUrl);
@@ -167,7 +169,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         // Load the most active discussions during this date range
         $UserModel = new UserModel();
         $Sender->setData('DiscussionData', $UserModel->SQL
-            ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID')
+            ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
             ->from('Discussion d')
             ->where('d.DateLastComment >=', $Sender->DateStart)
             ->where('d.DateLastComment <=', $Sender->DateEnd)
@@ -179,7 +181,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
         // Load the most active users during this date range
         $Sender->setData('UserData', $UserModel->SQL
-            ->select('u.UserID, u.Name')
+            ->select('u.UserID, u.Name, u.DateLastActive')
             ->select('c.CommentID', 'count', 'CountComments')
             ->from('User u')
             ->join('Comment c', 'u.UserID = c.InsertUserID', 'inner')

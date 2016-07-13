@@ -4,20 +4,20 @@
 //
 // Styleguide 6.
 
-// User block
+// Small media item
 //
-// Small user block
+// Small media item for table or list.
 //
 // Markup:
-// <div class="user-block">
-//   <div class="user-image-wrap">
+// <div class="media-sm">
+//   <div class="media-sm-image-wrap">
 //     <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
 //   </div>
-//   <div class="user-info">
-//     <div class="username">
+//   <div class="media-sm-content">
+//     <div class="media-sm-title username">
 //       <a href="#">amelia</a>
 //     </div>
-//     <div class="info user-email">
+//     <div class="media-sm-info user-email">
 //       <a href="#">name@email.com</a>
 //     </div>
 //   </div>
@@ -25,30 +25,43 @@
 //
 // Styleguide 6.1.
 
-.user-block {
+.media-sm {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+}
 
-  .user-image-wrap {
-    display: inline-block;
-    @include image-wrap(to-rem(30), to-rem(30), .0625rem);
-    margin-right: $spacer / 2;
+.media-sm-image-wrap {
+  display: inline-block;
+  @include image-wrap(to-rem(30), to-rem(30), .0625rem);
+  margin-right: $spacer / 2;
+}
+
+.media-sm-content {
+  line-height: 1;
+}
+
+.media-sm-title {
+  font-size: $font-size-tables;
+  margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+
+  a {
+    color: $gray-dark;
+    transition: color 200ms;
+
+    &:hover {
+      text-decoration: none;
+      color: $brand-primary;
+    }
   }
 }
 
-.user-info {
-  .username {
-    line-height: 1;
-    margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
-  }
-
-  .user-email {
-    line-height: 1;
-  }
+.media-sm-info {
+  font-size: $font-size-sm;
+  @extend .info;
 }
 
-.btn-userblock {
+.btn-media-sm {
   display: inline-block;
   font-weight: 300;
   text-transform: uppercase;

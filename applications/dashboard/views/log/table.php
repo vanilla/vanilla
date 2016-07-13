@@ -29,16 +29,16 @@ include $this->fetchViewLocation('helper_functions');
                 <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
                 </td>
                 <td class="UsernameCell">
-                    <div class="user-block">
-                        <div class="user-image-wrap">
+                    <div class="media-sm">
+                        <div class="media-sm-image-wrap">
                             <?php echo userPhoto($user); ?>
                         </div>
-                        <div class="user-info">
-                            <div class="username">
+                        <div class="media-sm-content">
+                            <div class="media-sm-title username">
                                 <?php echo userAnchor($user, 'Username'); ?>
                             </div>
                             <?php if ($viewPersonalInfo) : ?>
-                                <div class="user-email info"><?php echo Gdn_Format::Email($user->Email); ?></div>
+                                <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -95,9 +95,9 @@ include $this->fetchViewLocation('helper_functions');
                 <td class="PostedByCell"><?php
                     $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
                     if ($Row['RecordName']) { ?>
-                        <div class="user-block">
-                            <div class="user-info">
-                                <div class="username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
+                        <div class="media-sm">
+                            <div class="media-sm-content">
+                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
                                     <?php
                                     if ($RecordUser['Banned']) {
                                         echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
@@ -106,7 +106,7 @@ include $this->fetchViewLocation('helper_functions');
                                     ?>
                                 </div>
                                 <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
-                                <div class="info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
+                                <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
                                 <?php } ?>
                             </div>
                         </div>

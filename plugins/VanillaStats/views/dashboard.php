@@ -40,7 +40,7 @@ function WriteRangeTab($Range, $Sender) {
 <div class="Picker"></div>
 <script type="text/javascript"
         src="<?php echo $this->data('VanillaStatsUrl'); ?>/applications/vanillastats/js/remote.js"></script>
-<div class="DashboardSummaries">
+<div class="DashboardSummaries dashboard-widgets">
     <div class="Loading"></div>
 </div>
 <script type="text/javascript">
@@ -56,13 +56,15 @@ function WriteRangeTab($Range, $Sender) {
         'RangeEnd': '<?php echo $this->DateEnd; ?>'
     });
 </script>
-<div class="Column Column1 ReleasesColumn">
-    <h1><?php echo t('Updates'); ?></h1>
+<div class="dashboard-widgets">
+    <div class="Column Column1 ReleasesColumn">
+        <h2 class="dashboard-widget-title"><?php echo t('Updates'); ?></h2>
 
-    <div class="List"></div>
-</div>
-<div class="Column Column2 NewsColumn">
-    <h1><?php echo t('Recent News'); ?></h1>
+        <div class="List"></div>
+    </div>
+    <div class="Column Column2 NewsColumn">
+        <h2 class="dashboard-widget-title"><?php echo t('Recent News'); ?></h2>
 
-    <div class="List"></div>
+        <div class="List"></div>
+    </div>
 </div>

@@ -713,9 +713,19 @@
             });
         }
 
+        $('.navbar').addClass('navbar-short');
+        var navShortHeight = $('.navbar').outerHeight(true);
+        $('.navbar').removeClass('navbar-short');
+        var navHeight = $('.navbar').outerHeight(true);
+
+        window.navOffset = navHeight - navShortHeight;
+
         $('.navbar', element).scrollToFixed({
-            zIndex: 1005
+            zIndex: 1005,
+            spacerClass: 'js-scroll-to-fixed-spacer'
         });
+
+        $('.js-scroll-to-fixed-spacer').height(navHeight);
 
         $('.modal-header', element).scrollToFixed({
             zIndex: 1005
@@ -727,7 +737,7 @@
     }
 
     $(window).scroll(function() {
-        var offset = 46; // Height difference between short and normal navbar.
+        var offset = window.navOffset; // Height difference between short and normal navbar.
         if ($(window).scrollTop() > offset) {
             $('.navbar').addClass('navbar-short');
         } else {
@@ -790,6 +800,23 @@
         });
     }
 
+    function icheckInit(element) {
+        $('input:not(.label-selector-input):not(.toggle-input)', element).iCheck({
+            aria: true
+        }).on('ifChanged', function(e) {
+            $(this).trigger("change");
+        });
+    }
+
+    function expanderInit(element) {
+        $('.FeedDescription', element).expander({
+            slicePoint: 65,
+            normalizeWhitespace: true,
+            expandText: gdn.definition('ExpandText'),
+            userCollapseText: gdn.definition('CollapseText')
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target);
         aceInit(e.target);
@@ -799,16 +826,16 @@
         modal.load(e.target);
         clipboardInit();
         drawerInit(e.target);
-        $('input:not(.label-selector-input):not(.toggle-input)', e.target).iCheck({
-            aria: true
-        }).on('ifChanged', function(e) {
-            $(this).trigger("change");
-        });
+        icheckInit(e.target);
+        expanderInit(e.target);
     });
 
-    $(document).on('click', '.js-collapse-toggle', function() {
+    // $(document).on('click', '.js-collapse-toggle', function() {
+    //
+    // });
 
-    });
+
+    // Event handlers
 
     $(document).on('shown.bs.collapse', function() {
         $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');

@@ -11,7 +11,7 @@ jQuery(document).ready(function($) {
             url: gdn.url(feedUrl),
             success: function(data) {
                 container.removeClass('Loading');
-                container.html(data);
+                container.htmlTrigger(data);
             },
             error: function() {
                 container.removeClass('Loading');
@@ -21,8 +21,8 @@ jQuery(document).ready(function($) {
     };
 
     lists.addClass('Loading');
-    var newsUrl = gdn.definition("DashboardNewsFeed", "/utility/getfeed/news/5/normal");
-    var releasesUrl = gdn.definition("DashboardReleasesFeed", "/utility/getfeed/releases/2/extended");
+    var newsUrl = gdn.definition("DashboardNewsFeed", "/utility/getfeed/news/5/extended");
+    var releasesUrl = gdn.definition("DashboardReleasesFeed", "/utility/getfeed/releases/5/extended");
     if (newsUrl) {
         loadFeed(newsColumn, newsUrl);
     }

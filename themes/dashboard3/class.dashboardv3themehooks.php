@@ -15,6 +15,8 @@ class DashboardV3ThemeHooks implements Gdn_IPlugin {
      */
     public function base_render_before($sender) {
         $sender->addJsFile('custom.js', 'themes/dashboard3');
+        $sender->addJsFile('jquery.expander.js');
+        $sender->addJsFile('settings.js', 'dashboard');
         $sender->addJsFile('vendors/tether.min.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/util.js', 'themes/dashboard3');
         $sender->addJsFile('vendors/drop.min.js', 'themes/dashboard3');

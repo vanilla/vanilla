@@ -40,7 +40,3 @@
     @extend .active;
   }
 }
-
-.SmallButton + .SmallButton {
-  margin-left: $spacer / 4;
-}

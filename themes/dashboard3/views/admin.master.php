@@ -25,7 +25,16 @@ $dropdown->setTrigger('A New Name')
     <meta name="robots" content="noindex,nofollow"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
+<?php
+$BodyClass = htmlspecialchars($this->CssClass);
+$Sections = Gdn_Theme::section(null, 'get');
+if (is_array($Sections)) {
+    foreach ($Sections as $Section) {
+        $BodyClass .= ' Section-'.$Section;
+    }
+}
+?>
+<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $BodyClass; ?>">
 <?php $this->renderAsset('Symbols');
 Gdn_Theme::assetBegin('DashboardUserDropDown');
 $user = Gdn::session()->User;
@@ -40,18 +49,18 @@ $roleTitles = implode(', ', $roleTitlesArray);
 /** var UserController $user */
 ?>
 <div class="card card-user">
-    <div class="card-block user-block">
-        <div class="user-image-wrap">
+    <div class="card-block media-sm">
+        <div class="media-sm-image-wrap">
             <?php echo userPhoto($user); ?>
         </div>
-        <div class="user-info">
-            <div class="username">
+        <div class="media-sm-content">
+            <div class="media-sm-title username">
                 <?php echo userAnchor($user); ?>
             </div>
-            <div class="info">
+            <div class="media-sm-info user-roles">
                 <?php echo $roleTitles; ?>
             </div>
-            <a class="btn btn-userblock" href="<?php echo url(userUrl($user)); ?>">
+            <a class="btn btn-media-sm" href="<?php echo url(userUrl($user)); ?>">
                 <?php echo t('My Profile').' '.dashboardSymbol('external-link'); ?>
             </a>
         </div>
@@ -81,7 +90,6 @@ Gdn_Theme::assetEnd();
     <!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
     <!--        --><?php //} ?>
             <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
-    <!--        --><?php //echo anchor($title, '/', 'title'); ?>
             <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
         </div>
         <?php $dashboardNav = $this->Assets['Panel']['DashboardNavModule']; ?>
@@ -113,13 +121,15 @@ Gdn_Theme::assetEnd();
     </div>
     <div class="main-row pusher" id="main-row">
         <div class="panel panel-left drawer">
-            <div class="panel-content panel-nav">
-                <div class="js-scroll-to-fixed">
-                    <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
-                    <?php echo $dashboardNav; ?>
-                    <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary btn-signout'); ?>
+            <?php if (!inSection('DashboardHome')) { ?>
+                <div class="panel-content panel-nav">
+                    <div class="js-scroll-to-fixed">
+                        <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
+                        <?php echo $dashboardNav; ?>
+                        <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary btn-signout'); ?>
+                    </div>
                 </div>
-            </div>
+            <?php } ?>
         </div>
         <div class="main">
             <div class="content">
@@ -141,11 +151,13 @@ Gdn_Theme::assetEnd();
             </div>
         </div>
         <div class="panel panel-help panel-right">
+            <?php if (!inSection('DashboardHome')) { ?>
             <div class="panel-content">
                 <div class="js-scroll-to-fixed">
                     <?php $this->renderAsset('Help'); ?>
                 </div>
             </div>
+            <?php } ?>
         </div>
     </div>
 </div>

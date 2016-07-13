@@ -12,9 +12,9 @@
 }
 
 table {
-  td {
-    vertical-align: middle;
-  }
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: $spacer;
 
   .options {
     width: 6rem;
@@ -25,10 +25,11 @@ table {
       background-color: $grey-light;
     }
 
-    th {
+    th, td {
       padding: ($spacer / 2) ($spacer * .75);
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
+      border-bottom: (2 * $table-border-width) solid $table-border-color;
       text-transform: uppercase;
       font-weight: 500;
       font-size: $font-size-sm;
@@ -48,6 +49,22 @@ table {
         background-color: #f9fdfe;
       }
     }
+  }
+
+  th,
+  td {
+    padding: $table-cell-padding;
+    line-height: $line-height;
+    vertical-align: middle;
+    border-top: $table-border-width solid $table-border-color;
+  }
+
+  tbody + tbody {
+    border-top: (2 * $table-border-width) solid $table-border-color;
+  }
+
+  .table {
+    background-color: $body-bg;
   }
 }
 
@@ -103,3 +120,124 @@ table {
   }
 }
 
+
+.Section-DashboardHome {
+  table {
+    thead {
+      tr {
+        background-color: transparent;
+      }
+
+      th, td {
+        border: 0;
+        border-bottom: $border-width * 2 solid #ddd;
+      }
+    }
+
+    th, td {
+      border-top-width: $border-width * 2;
+    }
+
+    tr {
+      &:last-child {
+        border-bottom: $border-width * 2 solid $table-border-color;
+      }
+    }
+
+    td {
+      text-align: center;
+    }
+
+    th {
+      padding-left: 0;
+    }
+
+    tbody {
+      th {
+        font-weight: 400;
+      }
+    }
+  }
+
+  .dashboard-widgets {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    > * {
+      flex-grow: 1;
+      max-width: 50%;
+      padding: $spacer;
+
+      @include media-breakpoint-down(md) {
+        max-width: inherit;
+        width: 100%;
+      }
+    }
+  }
+
+  .dashboard-widget-title {
+    font-size: 1rem;
+  }
+
+  .Feed {
+    padding-top: $spacer / 2;
+  }
+
+  .FeedItem {
+    position: relative;
+    padding: $spacer * .75 0;
+    border-bottom: $border-width * 2 solid #eee;
+
+    &:hover {
+      background-color: #f9fdfe;
+    }
+
+    &:first-child {
+      border-top: $border-width * 2 solid #ddd;
+    }
+
+    h2 {
+      @extend .media-sm-content;
+      @extend .media-sm-title;
+      margin-top: 0;
+      text-overflow: ellipsis;
+    }
+
+    .FeedDescription {
+      @extend .media-sm-content;
+      @extend .media-sm-info;
+
+      strong {
+        font-weight: 400;
+      }
+
+      p {
+        margin-bottom: 0;
+        display: inline-block;
+      }
+
+      .details p {
+        margin-bottom: 0;
+        display: initial;
+      }
+    }
+
+
+    .FeedDescription,
+    h2 {
+      margin-right: 102px;
+    }
+
+    .Date {
+      position: absolute;
+      right: 0;
+      width: 102px;
+      top: $spacer * .75 + (to-rem(30) / 2) - ($font-size-tables / 2);
+      text-align: right;
+
+
+      @extend .media-sm-info;
+    }
+  }
+}

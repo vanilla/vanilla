@@ -83,7 +83,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['ProfileExtender']['HasPopupFriendlySettings'] = false;
+        if (val('ProfileExtender', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['ProfileExtender']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

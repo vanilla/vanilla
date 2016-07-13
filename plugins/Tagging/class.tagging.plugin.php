@@ -67,7 +67,9 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['Tagging']['HasPopupFriendlySettings'] = false;
+        if (val('Tagging', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['Tagging']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

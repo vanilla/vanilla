@@ -54,7 +54,9 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['PrivateCommunity']['HasPopupFriendlySettings'] = false;
+        if (val('PrivateCommunity', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['PrivateCommunity']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

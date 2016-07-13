@@ -649,7 +649,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
     }
 
     /**
-     * Advances to the next row and returns the value rom a column.
+     * Advances to the next row and returns the value from a column.
      *
      * @param string $ColumnName The name of the column to get the value from.
      * @param string $DefaultValue The value to return if there is no data.

@@ -464,7 +464,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $Sender
      */
     public function profileController_CustomNotificationPreferences_Handler($Sender) {
-        if (!$Sender->data('NoEmail') && Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
+        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
         }
     }

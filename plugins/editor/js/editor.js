@@ -1682,16 +1682,54 @@
                                         REG_EXP = /CodeBlock/g;
 
                                     wysihtml5.commands.code = {
-                                        exec: function(composer, command) {
-                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
-                                            if ($(composer.element.lastChild).hasClass('CodeBlock')) {
-                                                composer.selection.setAfter(composer.element.lastChild);
-                                                composer.commands.exec("insertHTML", "<p><br></p>");
+                                        exec: function(composer) {
+                                            var inCodeBlock = this.state(composer);
+                                            if (inCodeBlock) {
+                                                // caret is already within a <pre><code>...</code></pre>
+                                                composer.selection.executeAndRestore(function() {
+                                                    var pre = wysihtml5.dom.getParentElement(
+                                                        composer.selection.getSelectedNode(),
+                                                        {
+                                                            className: "CodeBlock",
+                                                            classRegExp: /CodeBlock/g,
+                                                            nodeName: "PRE"
+                                                        },
+                                                        3
+                                                    );
+                                                    var code = pre.querySelector("code");
+
+                                                    wysihtml5.dom.replaceWithChildNodes(pre);
+                                                    if (code) {
+                                                        wysihtml5.dom.replaceWithChildNodes(code);
+                                                    }
+                                                });
+                                            } else {
+                                                // Wrap in <pre><code>...</code></pre>
+                                                var range = composer.selection.getRange();
+                                                var selectedNodes = range.extractContents();
+                                                var pre = composer.doc.createElement("pre");
+                                                var code = composer.doc.createElement("code");
+
+                                                pre.className = "CodeBlock";
+                                                pre.appendChild(code);
+                                                code.appendChild(selectedNodes);
+                                                range.insertNode(pre);
+                                                composer.selection.selectNode(code);
                                             }
                                         },
+                                        state: function(composer) {
+                                            // Determine if we're in a code block, inside a pre block.
+                                            var selectedNode = composer.selection.getSelectedNode();
+                                            var inCode = !!wysihtml5.dom.getParentElement(selectedNode, {
+                                                nodeName: "CODE"
+                                            }, 2);
+                                            var parentIsPre = !!wysihtml5.dom.getParentElement(selectedNode, {
+                                                className: "CodeBlock",
+                                                classRegExp: /CodeBlock/g,
+                                                nodeName: "PRE"
+                                            }, 3);
 
-                                        state: function(composer, command) {
-                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
+                                            return inCode && parentIsPre;
                                         },
 
                                         value: function() {

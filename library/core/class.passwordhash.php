@@ -2,7 +2,6 @@
 /**
  * Gdn_PasswordHash
  *
- * @author Damien Lebrun
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @copyright 2009-2016 Vanilla Forums Inc.
@@ -11,129 +10,83 @@
  * @since 2.0
  */
 
+use Garden\Password\DjangoPassword;
+use Garden\Password\IpbPassword;
+use Garden\Password\JoomlaPassword;
+use Garden\Password\MybbPassword;
+use Garden\Password\PhpassPassword;
+use Garden\Password\PhpbbPassword;
+use Garden\Password\PasswordInterface;
+use Garden\Password\PhpPassword;
+use Garden\Password\PunbbPassword;
+use Garden\Password\SmfPassword;
+use Garden\Password\VbulletinPassword;
+use Garden\Password\VanillaPassword;
+use Garden\Password\XenforoPassword;
+
 /**
- * Wrapper for the Portable PHP password hashing framework.
+ * Wrapper for Garden Password.
  */
-class Gdn_PasswordHash extends PasswordHash {
+class Gdn_PasswordHash {
 
-    /** @var bool  */
+    /** @var array */
+    protected $algorithms = [];
+
+    /** @var bool */
+    public $portable_hashes = false;
+
+    /** @var bool */
     public $Weak = false;
-
-    /**
-     * Constructor.
-     */
-    public function __construct() {
-        // 8 iteration to create a Portable hash
-        parent::__construct(8, false);
-    }
-
-    /**
-     * Check a Django hash.
-     *
-     * @param string $Password The plaintext password to check.
-     * @param string $StoredHash The password hash stored in the database.
-     * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
-     */
-    protected function checkDjango($Password, $StoredHash) {
-        if (strpos($StoredHash, '$') === false) {
-            return md5($Password) == $StoredHash;
-        } else {
-            list($Method, $Salt, $Hash) = explode('$', $StoredHash);
-            switch (strtolower($Method)) {
-                case 'crypt':
-                    return crypt($Password, $Salt) == $Hash;
-                case 'md5':
-                    return md5($Salt.$Password) == $Hash;
-                case 'sha256':
-                    return hash('sha256', $Salt.$Password) == $Hash;
-                case 'sha1':
-                default:
-                    return sha1($Salt.$Password) == $Hash;
-            }
-        }
-    }
-
-    /**
-     * Check an IPB hash.
-     *
-     * @param string $Password The plaintext password to check.
-     * @param string $StoredHash The password hash stored in the database.
-     * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
-     */
-    protected function checkIPB($Password, $StoredHash) {
-        $Parts = explode('$', $StoredHash, 2);
-        if (count($Parts) == 2) {
-            $Hash = $Parts[0];
-            $Salt = $Parts[1];
-
-            $CalcHash = md5(md5($Salt).md5($Password));
-            return $CalcHash == $Hash;
-        }
-        return false;
-    }
 
     /**
      * Check a password against a stored password.
      *
      * The stored password can be plain, a md5 hash or a phpass hash.
-     * If the password wasn't a phppass hash, the Weak property is set to True.
+     * If the password wasn't a phppass hash, the Weak property is set to **true**.
      *
      * @param string $Password The plaintext password to check.
      * @param string $StoredHash The password hash stored in the database.
-     * @param string $Method The password hashing method.
-     * @param string $Username The username which is required for some hash methods.
+     * @param bool|string $Method The password hashing method.
      * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
+     * @throws Gdn_UserException if the password needs to be reset.
+     * @throws Gdn_UserException if the password has a method of "random".
      */
-    public function checkPassword($Password, $StoredHash, $Method = false, $Username = null) {
+    public function checkPassword($Password, $StoredHash, $Method = false) {
         $Result = false;
+
+        if (empty($Password) || empty($StoredHash)) {
+            // We don't care if there is a strong password hash. Empty passwords are not cool
+            return false;
+        }
+
         switch (strtolower($Method)) {
             case 'crypt':
                 $Result = (crypt($Password, $StoredHash) === $StoredHash);
                 break;
             case 'django':
-                $Result = $this->checkDjango($Password, $StoredHash);
+                $Result = $this->getAlgorithm('Django')->verify($Password, $StoredHash);
                 break;
             case 'drupal':
                 require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
                 $Result = Drupal\user_check_password($Password, $StoredHash);
                 break;
             case 'ipb':
-                $Result = $this->checkIPB($Password, $StoredHash);
+                $Result = $this->getAlgorithm('Ipb')->verify($Password, $StoredHash);
                 break;
             case 'joomla':
-                $Parts = explode(':', $StoredHash, 2);
-                $Hash = val(0, $Parts);
-                $Salt = val(1, $Parts);
-                $ComputedHash = md5($Password.$Salt);
-                $Result = $ComputedHash == $Hash;
+                $Result = $this->getAlgorithm('Joomla')->verify($Password, $StoredHash);
                 break;
             case 'mybb':
-                // Hash has a fixed length of 32, and we concat the salt to it.
-                $SaltLength = strlen($StoredHash) - 32;
-                $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
-                $MyStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
-                $MyHash = md5(md5($Salt).md5($Password));
-                $Result = $MyHash == $MyStoredHash;
+                $Result = $this->getAlgorithm('Mybb')->verify($Password, $StoredHash);
+                break;
+            case 'phpass':
+                $Result = $this->getAlgorithm('Phpass')->verify($Password, $StoredHash);
                 break;
             case 'phpbb':
-                require_once(PATH_LIBRARY.'/vendors/phpbb/phpbbhash.php');
-                $Result = phpbb_check_hash($Password, $StoredHash);
+                $Result = $this->getAlgorithm('Phpbb')->verify($Password, $StoredHash);
                 break;
             case 'punbb':
-                $Parts = explode('$', $StoredHash);
-                $StoredHash = val(0, $Parts);
-                $StoredSalt = val(1, $Parts);
-
-                if (md5($Password) == $StoredHash) {
-                    $Result = true;
-                } elseif (sha1($Password) == $StoredHash)
-                    $Result = true;
-                elseif (sha1($StoredSalt.sha1($Password)) == $StoredHash)
-                    $Result = true;
-                else {
-                    $Result = false;
-                }
-
+                $Result = $this->getAlgorithm('Punbb')->verify($Password, $StoredHash);
                 break;
             case 'reset':
                 $ResetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
@@ -144,36 +97,17 @@ class Gdn_PasswordHash extends PasswordHash {
                 throw new Gdn_UserException(sprintf(T('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $ResetUrl));
                 break;
             case 'smf':
-                $Result = (sha1(strtolower($Username).$Password) == $StoredHash);
+                $Result = $this->getAlgorithm('Smf')->verify($Password, $StoredHash);
                 break;
             case 'vbulletin':
-                // assume vbulletin's password hash has a fixed length of 32, the salt length will vary between version 3 and 4
-                $SaltLength = strlen($StoredHash) - 32;
-                $Salt = trim(substr($StoredHash, -$SaltLength, $SaltLength));
-                $VbStoredHash = substr($StoredHash, 0, strlen($StoredHash) - $SaltLength);
-
-                $VbHash = md5(md5($Password).$Salt);
-                $Result = $VbHash == $VbStoredHash;
+                $Result = $this->getAlgorithm('Vbulletin')->verify($Password, $StoredHash);
                 break;
             case 'vbulletin5': // Since 5.1
                 // md5 sum the raw password before crypt. Nice work as usual vb.
                 $Result = $StoredHash === crypt(md5($Password), $StoredHash);
                 break;
             case 'xenforo':
-                $Data = @unserialize($StoredHash);
-                if (!is_array($Data)) {
-                    $Result = false;
-                } else {
-                    $Hash = val('hash', $Data);
-                    $Function = val('hashFunc', $Data);
-                    if (!$Function) {
-                        $Function = strlen($Hash) == 32 ? 'md5' : 'sha1';
-                    }
-                    $Salt = val('salt', $Data);
-                    $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
-
-                    $Result = $ComputedHash == $Hash;
-                }
+                $Result = $this->getAlgorithm('Xenforo')->verify($Password, $StoredHash);
                 break;
             case 'yaf':
                 $Result = $this->checkYAF($Password, $StoredHash);
@@ -184,57 +118,11 @@ class Gdn_PasswordHash extends PasswordHash {
                 break;
             case 'vanilla':
             default:
-                $Result = $this->checkVanilla($Password, $StoredHash);
+                $this->Weak = $this->getAlgorithm('Vanilla')->needsRehash($StoredHash);
+                $Result = $this->getAlgorithm('Vanilla')->verify($Password, $StoredHash);
         }
+
         return $Result;
-    }
-
-    /**
-     * Check a Vanilla hash.
-     *
-     * @param string $Password The plaintext password to check.
-     * @param string $StoredHash The password hash stored in the database.
-     * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
-     */
-    protected function checkVanilla($Password, $StoredHash) {
-        $this->Weak = false;
-
-        if (empty($Password) || empty($StoredHash)) {
-            // We don't care if there is a strong password hash. Empty passwords are not cool
-            return false;
-        } elseif ($StoredHash && $StoredHash !== '*'
-            && !in_array(substr($StoredHash, 0, 1), ['_', '$'], true)
-            && ($Password === $StoredHash || md5($Password) === $StoredHash)
-        ) {
-            $this->Weak = true;
-            return true;
-        } elseif (substr($StoredHash, 0, 3) !== '$P$' && function_exists('password_verify')) {
-            // This is a password that uses crypt and can be checked with PHP's built in function.
-            $this->Weak = password_needs_rehash($StoredHash, PASSWORD_DEFAULT);
-
-            return password_verify((string)$Password, $StoredHash);
-        } elseif ($StoredHash[0] === '_' || $StoredHash[0] === '$') {
-            $Result = parent::checkPassword($Password, $StoredHash);
-
-            // Check to see if this password should be rehashed to crypt-blowfish.
-            if (!$this->portable_hashes && CRYPT_BLOWFISH == 1 && substr($StoredHash, 0, 3) === '$P$') {
-                $this->Weak = true;
-            }
-
-            return $Result;
-        }
-        return false;
-    }
-
-    /**
-     * Check a password using Phpass' hash.
-     *
-     * @param string $Password The plaintext password to check.
-     * @param string $StoredHash The password hash stored in the database.
-     * @return bool Returns **true** if the password matches the hash or **false** if it doesn't.
-     */
-    public function checkPhpass($Password, $StoredHash) {
-        return parent::checkPassword($Password, $StoredHash);
     }
 
     /**
@@ -270,6 +158,37 @@ class Gdn_PasswordHash extends PasswordHash {
     }
 
     /**
+     * Grab an instance of a valid password algorithm.
+     *
+     * @param string $algorithm
+     * @return object
+     * @throws Exception if a matching class cannot be found
+     * @throws Exception if the found class is not an instance of PasswordInterface
+     */
+    protected function getAlgorithm($algorithm) {
+        if (!stringEndsWith($algorithm, 'Password')) {
+            $algorithm .= 'Password';
+        }
+
+        if (!array_key_exists($algorithm, $this->algorithms)) {
+            $class = "\\Garden\\Password\\{$algorithm}";
+
+            if (!class_exists($class)) {
+                throw new Exception(sprintf(t('Password hashing algorithm does not exist: %s'), $algorithm));
+            }
+
+            $instance = new $class();
+            if ($instance instanceof PasswordInterface) {
+                $this->algorithms[$algorithm] = $instance;
+            } else {
+                throw new Exception(sprintf(t('Invalid password hashing algorithm: %s')), $algorithm);
+            }
+        }
+
+        return $this->algorithms[$algorithm];
+    }
+
+    /**
      * Create a password hash.
      *
      * This method tries to use PHP's built in {@link password_hash()} function and falls back to the default
@@ -283,7 +202,7 @@ class Gdn_PasswordHash extends PasswordHash {
             // Use PHP's native password hashing function.
             $result = password_hash($password, PASSWORD_DEFAULT);
         } else {
-            $result = parent::HashPassword($password);
+            $result = $this->hashPasswordPhpass($password);
         }
         return $result;
     }
@@ -295,6 +214,14 @@ class Gdn_PasswordHash extends PasswordHash {
      * @return string Returns a password hash.
      */
     public function hashPasswordPhpass($password) {
-        return parent::HashPassword($password);
+        $phpass = $this->getAlgorithm('Phpass');
+
+        if ($this->portable_hashes) {
+            $phpass->setHashMethod(PhpassPassword::HASH_PHPASS);
+        } else {
+            $phpass->setHashMethod(PhpassPassword::HASH_BLOWFISH);
+        }
+
+        return $phpass->hash($password);
     }
 }

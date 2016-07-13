@@ -30,11 +30,7 @@ echo $this->Form->errors();
         ?>
     </div>
 <?php } ?>
-<?php
-if ($this->data('AnalyticsEnabled')) {
-    echo $this->fetchView('configuration', 'statistics', 'dashboard');
-} else {
-    echo $this->fetchView('disabled', 'statistics', 'dashboard');
-}
+<div class="js-form">
+    <?php echo $this->fetchView($this->data('FormView'), 'statistics', 'dashboard'); ?>
+</div>
 
-echo $this->Form->close();

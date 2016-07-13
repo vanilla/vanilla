@@ -35,6 +35,7 @@ class DashboardController extends Gdn_Controller {
         $this->Head = new HeadModule($this);
         $this->addJsFile('jquery.js');
         $this->addJsFile('jquery.form.js');
+        $this->addJsFile('jquery.popin.js');
         $this->addJsFile('jquery.popup.js');
         $this->addJsFile('jquery.gardenhandleajaxform.js');
         $this->addJsFile('magnific-popup.min.js');

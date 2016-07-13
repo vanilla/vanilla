@@ -27,10 +27,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Block condition. */
     const BLOCK_ANY = 2;
 
-    /** @var string The currently requested url (defined in _AnalyzeRequest). */
-    public $Request;
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
+
     /** @var stringThe method of the controller to be called. */
     public $ControllerMethod;
 
@@ -50,6 +49,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
     /** @var string The name of the application folder that contains the controller that has been requested. */
     private $applicationFolder;
+
     /**
      * @var array An associative collection of AssetName => Strings that will get passed
      * into the controller once it has been instantiated.
@@ -84,13 +84,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      */
     private $addonManager;
 
+    /** @var bool */
+    private $isHomepage = false;
+
     /**
      * Class constructor.
      */
     public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
         $this->enabledApplicationFolders = null;
-        $this->Request = '';
         $this->applicationFolder = '';
         $this->controllerAssets = [];
         $this->ControllerName = '';
@@ -99,6 +101,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->controllerProperties = [];
         $this->controllerData = [];
         $this->addonManager = $addonManager;
+    }
+
+    /**
+     * Backwards compatible support for deprecated properties.
+     *
+     * @param string $name The name of the property to get.
+     * @return mixed Returns the property value.
+     */
+    public function __get($name) {
+        switch (strtolower($name)) {
+            case 'request':
+                deprecated('Gdn_Dispatcher->Request', 'Gdn::request()->path()');
+                return Gdn::request()->path();
+        }
     }
 
     /**
@@ -158,53 +174,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Move this up to allow pre-routing
         $this->fireEvent('BeforeDispatch');
 
-        // By default, all requests can be blocked by UpdateMode/PrivateCommunity
-        $CanBlock = self::BLOCK_ANY;
-
-        try {
-            $BlockExceptions = array(
-                '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
-                '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
-                '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
-                '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
-                '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-                '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
-            );
-
-            $this->EventArguments['BlockExceptions'] = &$BlockExceptions;
-            $this->fireEvent('BeforeBlockDetect');
-
-            $PathRequest = Gdn::request()->path();
-            foreach ($BlockExceptions as $BlockException => $BlockLevel) {
-                if (preg_match($BlockException, $PathRequest)) {
-                    throw new Exception("Block detected - {$BlockException}", $BlockLevel);
-                }
-            }
-
-            // Never block an admin
-            if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-                throw new Exception("Block detected", self::BLOCK_NEVER);
-            }
-
-            if (Gdn::session()->isValid()) {
-                throw new Exception("Block detected", self::BLOCK_PERMISSION);
-            }
-
-        } catch (Exception $e) {
-            // BlockLevel
-            //  TRUE = Block any time
-            //  FALSE = Absolutely no blocking
-            //  NULL = Block for permissions (e.g. PrivateCommunity)
-            $CanBlock = $e->getCode();
-        }
-
-        // If we're in updatemode and arent explicitly prevented from blocking, block
-        if (Gdn::config('Garden.UpdateMode', false) && $CanBlock > self::BLOCK_NEVER) {
+        // If we're in update mode and aren't explicitly prevented from blocking, block.
+        if (Gdn::config('Garden.UpdateMode', false) && $this->getCanBlock($Request) > self::BLOCK_NEVER) {
             $Request->withURI(Gdn::router()->getDestination('UpdateMode'));
         }
 
@@ -213,13 +184,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AfterAnalyzeRequest');
 
         // If we're in update mode and can block, redirect to signin
-        if (c('Garden.PrivateCommunity') && $CanBlock > self::BLOCK_PERMISSION) {
+        if (c('Garden.PrivateCommunity') && $this->getCanBlock($Request) > self::BLOCK_PERMISSION) {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
             } else {
-                redirect('/entry/signin?Target='.urlencode($this->Request));
+                redirect('/entry/signin?Target='.urlencode($Request->pathAndQuery()));
             }
             exit();
         }
@@ -250,7 +221,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $Controller->SyndicationMethod = $this->syndicationMethod;
 
             // Pass along the request
-            $Controller->SelfUrl = $this->Request;
+            $Controller->SelfUrl = $Request->path();
 
             // Pass along any objects
             foreach ($this->controllerProperties as $Name => $Mixed) {
@@ -352,12 +323,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * Parses the query string looking for supplied request parameters. Places
-     * anything useful into this object's Controller properties.
+     * Parses the query string looking for supplied request parameters.
      *
-     * @param int $FolderDepth
+     * Places anything useful into this object's Controller properties.
+     *
+     * @param Gdn_Request $request The request to analyze.
      */
-    protected function analyzeRequest(&$Request) {
+    private function analyzeRequest($request) {
 
         // Here is the basic format of a request:
         // [/application]/controller[/method[.json|.xml]]/argn|argn=valn
@@ -373,58 +345,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->applicationFolder = '';
         $this->ControllerName = '';
         $this->ControllerMethod = 'index';
-        $this->controllerMethodArgs = array();
-        $this->Request = $Request->path(false);
+        $this->controllerMethodArgs = [];
 
-        $PathAndQuery = $Request->PathAndQuery();
-        $MatchRoute = Gdn::router()->matchRoute($PathAndQuery);
+        $this->rewriteRequest($request);
 
-        // We have a route. Take action.
-        if ($MatchRoute !== false) {
-            switch ($MatchRoute['Type']) {
-                case 'Internal':
-                    $Request->pathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->path(false);
-                    break;
-
-                case 'Temporary':
-                    safeHeader("HTTP/1.1 302 Moved Temporarily");
-                    safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
-                    exit();
-                    break;
-
-                case 'Permanent':
-                    safeHeader("HTTP/1.1 301 Moved Permanently");
-                    safeHeader("Location: ".Url($MatchRoute['FinalDestination']));
-                    exit();
-                    break;
-
-                case 'NotAuthorized':
-                    safeHeader("HTTP/1.1 401 Not Authorized");
-                    $this->Request = $MatchRoute['FinalDestination'];
-                    break;
-
-                case 'NotFound':
-                    safeHeader("HTTP/1.1 404 Not Found");
-                    $this->Request = $MatchRoute['FinalDestination'];
-                    break;
-
-                case 'Drop':
-                    die();
-
-                case 'Test':
-                    $Request->pathAndQuery($MatchRoute['FinalDestination']);
-                    $this->Request = $Request->path(false);
-                    decho($MatchRoute, 'Route');
-                    decho(array(
-                        'Path' => $Request->path(),
-                        'Get' => $Request->get()
-                    ), 'Request');
-                    die();
-            }
-        }
-
-        switch ($Request->outputFormat()) {
+        switch ($request->outputFormat()) {
             case 'rss':
                 $this->syndicationMethod = SYNDICATION_RSS;
                 $this->deliveryMethod = DELIVERY_METHOD_RSS;
@@ -439,12 +364,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 break;
         }
 
-        if ($this->Request == '') {
-            $DefaultController = Gdn::router()->getRoute('DefaultController');
-            $this->Request = $DefaultController['Destination'];
+        if (in_array($request->path(), ['', '/'])) {
+            $this->isHomepage = true;
+            $defaultController = Gdn::router()->getRoute('DefaultController');
+            $request->pathAndQuery($defaultController['Destination']);
         }
 
-        $Parts = explode('/', str_replace('\\', '/', $this->Request));
+        $parts = explode('/', str_replace('\\', '/', $request->path()));
+
+        // We need to save this state now because it's lost after this method.
+        $this->passData('isHomepage', $this->isHomepage);
 
         /**
          * The application folder is either the first argument or is not provided. The controller is therefore
@@ -452,20 +381,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
          */
         try {
             // if the 1st argument is a valid application, check if it has a controller matching the 2nd argument
-            if (in_array($Parts[0], $this->getEnabledApplicationFolders())) {
-                $this->findController(1, $Parts);
+            if (in_array($parts[0], $this->getEnabledApplicationFolders())) {
+                $this->findController(1, $parts);
             }
 
             // if no match, see if the first argument is a controller
-            $this->findController(0, $Parts);
+            $this->findController(0, $parts);
 
             // 3] See if there is a plugin trying to create a root method.
-            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(GetValue(0, $Parts), true);
+            list($MethodName, $DeliveryMethod) = $this->_splitDeliveryMethod(val(0, $parts), true);
             if ($MethodName && Gdn::pluginManager()->hasNewMethod('RootController', $MethodName, true)) {
                 $this->deliveryMethod = $DeliveryMethod;
-                $Parts[0] = $MethodName;
-                $Parts = array_merge(array('root'), $Parts);
-                $this->findController(0, $Parts);
+                $parts[0] = $MethodName;
+                $parts = array_merge(array('root'), $parts);
+                $this->findController(0, $parts);
             }
 
             throw new GdnDispatcherControllerNotFoundException();
@@ -494,8 +423,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
             if (!$Handled) {
                 safeHeader("HTTP/1.1 404 Not Found");
-                $Request->withRoute('Default404');
-                return $this->analyzeRequest($Request);
+                $request->withRoute('Default404');
+                return $this->analyzeRequest($request);
             }
         }
     }
@@ -800,6 +729,118 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 if ($Parts[$i] != '') {
                     $this->controllerMethodArgs[] = $Parts[$i];
                 }
+            }
+        }
+    }
+
+    /**
+     * Figure out what kind of blocks are allowed on dispatches.
+     *
+     * @param Gdn_Request $request The current request being inspected.
+     * @return int Returns one of the **Gdn_Dispatcher::BLOCK_*** constants.
+     */
+    private function getCanBlock($request) {
+        $canBlock = self::BLOCK_ANY;
+
+        $blockExceptions = array(
+            '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
+            '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
+            '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
+            '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+        );
+
+        $this->EventArguments['BlockExceptions'] = &$blockExceptions;
+        $this->fireEvent('BeforeBlockDetect');
+
+        $PathRequest = $request->path();
+        foreach ($blockExceptions as $BlockException => $BlockLevel) {
+            if (preg_match($BlockException, $PathRequest)) {
+                Logger::debug(
+                    "Dispatcher block: {blockException}, {blockLevel}",
+                    ['blockException' => $BlockException, 'blockLevel' => $BlockLevel]
+                );
+                return $BlockLevel;
+            }
+        }
+
+        // Never block an admin.
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
+            );
+            return self::BLOCK_NEVER;
+        }
+
+        if (Gdn::session()->isValid()) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'signed_in', 'blockLevel' => self::BLOCK_PERMISSION]
+            );
+            return self::BLOCK_PERMISSION;
+        }
+
+        return $canBlock;
+    }
+
+    /**
+     * Rewrite the request based on rewrite rules (currently called routes in Vanilla).
+     *
+     * This method modifies the passed {@link $request} object. It can also cause a redirect if a rule matches that
+     * specifies a redirect.
+     *
+     * @param Gdn_Request $request The request to rewrite.
+     */
+    private function rewriteRequest($request) {
+        $pathAndQuery = $request->PathAndQuery();
+        $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
+
+        // We have a route. Take action.
+        if (!empty($matchRoute)) {
+            $request->pathAndQuery($matchRoute['FinalDestination']);
+
+            switch ($matchRoute['Type']) {
+                case 'Internal':
+                    // Do nothing. The request has been rewritten.
+                    break;
+                case 'Temporary':
+                    safeHeader("HTTP/1.1 302 Moved Temporarily");
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
+                    exit();
+                    break;
+
+                case 'Permanent':
+                    safeHeader("HTTP/1.1 301 Moved Permanently");
+                    safeHeader("Location: ".url($matchRoute['FinalDestination']));
+                    exit();
+                    break;
+
+                case 'NotAuthorized':
+                    safeHeader("HTTP/1.1 401 Not Authorized");
+
+                    break;
+
+                case 'NotFound':
+                    safeHeader("HTTP/1.1 404 Not Found");
+                    break;
+
+                case 'Drop':
+                    die();
+
+                case 'Test':
+                    decho($matchRoute, 'Route');
+                    decho(array(
+                        'Path' => $request->path(),
+                        'Get' => $request->get()
+                    ), 'Request');
+                    die();
             }
         }
     }

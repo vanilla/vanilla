@@ -39,7 +39,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(array(
             'Vanilla.Discussions.PerPage',
-            'Vanilla.Comments.AutoRefresh',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
             'Vanilla.Archive.Date',
@@ -70,7 +69,6 @@ class VanillaSettingsController extends Gdn_Controller {
             // Define some validation rules for the fields being saved
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Comments.AutoRefresh', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');

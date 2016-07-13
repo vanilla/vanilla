@@ -5,8 +5,6 @@ echo '<div class="change-picture">';
 echo '<h2 class="H">'.$this->title().'</h2>';
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form'));
 echo $this->Form->errors();
-// Is the photo hosted remotely?
-$remotePhoto = isUrl($this->User->Photo);
 if ($this->data('crop') && $allowImages) {
     echo $this->data('crop');
 } else { ?>

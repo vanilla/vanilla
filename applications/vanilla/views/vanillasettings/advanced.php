@@ -47,16 +47,24 @@ echo $this->Form->errors();
             ?>
         </li>
         <li>
-      <?php
-        $Options2 = array('0' => t('Never - Users Must Refresh Page'),
-            '5' => t('Every 5 seconds'),
-            '10' => t('Every 10 seconds'),
-            '30' => t('Every 30 seconds'),
-            '60' => t('Every 1 minute'),
-            '300' => t('Every 5 minutes'));
-        echo $this->Form->label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
-        echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
-        ?>
+            <?php
+            echo $this->Form->label('Archive Discussions', 'Vanilla.Archive.Date');
+            echo '<div class="Info">',
+            t('Vanilla.Archive.Description', 'You can choose to archive forum discussions older than a certain date. Archived discussions are effectively closed, allowing no new posts.'),
+            '</div>';
+            echo $this->Form->Calendar('Vanilla.Archive.Date');
+            echo ' '.t('(YYYY-mm-dd)');
+            ?>
+        </li>
+        <li>
+            <?php
+            echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');
+            ?>
+        </li>
+        <li>
+            <?php
+            echo $this->Form->CheckBox('Vanilla.AdminCheckboxes.Use', 'Enable admin checkboxes on discussions and comments.');
+            ?>
         </li>
     </ul>
     <ul>

@@ -121,8 +121,8 @@ class RoleController extends DashboardController {
             return;
         }
 
-        if ($this->Head && $this->Head->title() == '') {
-            $this->Head->title(t('Edit Role'));
+        if ($this->title() == '') {
+            $this->title(t('Edit Role'));
         }
 
         $this->addSideMenu('dashboard/role');

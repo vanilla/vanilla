@@ -896,17 +896,14 @@ cell-* are used for the dropdown */
   font-family: Verdana, Geneva, sans-serif; }
 
 /* Custom classes */
-blockquote.Quote {
+blockquote.Quote,
+div.Quote {
   background: rgba(0, 0, 0, 0.05);
   border-left: 4px solid rgba(0, 0, 0, 0.1);
   margin: 1em;
   padding: 1ex 10px;
   min-width: 200px;
   overflow-y: auto; }
-
-pre.CodeBlock {
-  background-color: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.07); }
 
 .AlignLeft {
   text-align: left; }

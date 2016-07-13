@@ -582,6 +582,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
 
         $attributes['aria-labelledby'] = 'label-'.$id;
+        $attributes['class'] = 'toggle-input';
         $input = $this->input($fieldName, 'checkbox', $attributes);
         $toggleLabel = '<label for="'.$id.'"'.
             attribute('class', 'toggle').
@@ -933,7 +934,7 @@ class Gdn_Form extends Gdn_Pluggable {
             unset($Data['_Info']);
         }
 
-        $Result = '<table class="CheckBoxGrid">';
+        $Result = '<div class="table-wrap"><table class="CheckBoxGrid">';
         // Append the header.
         $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
         $Alt = true;
@@ -983,7 +984,7 @@ class Gdn_Form extends Gdn_Pluggable {
             }
             $Result .= '</tr>';
         }
-        $Result .= '</tbody></table>';
+        $Result .= '</tbody></table></div>';
         return $Result;
     }
 
@@ -1456,7 +1457,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Headings = '';
             $Cells = '';
         }
-        return $Return == '' ? '' : '<table class="CheckBoxGrid">'.$Return.'</tbody></table>';
+        return $Return == '' ? '' : '<div class="table-wrap"><table class="CheckBoxGrid">'.$Return.'</tbody></table></div>';
     }
 
     /**

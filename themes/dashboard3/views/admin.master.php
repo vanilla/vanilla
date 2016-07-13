@@ -16,7 +16,26 @@ $dropdown->setTrigger('A New Name')
     ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
     ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
     ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
-
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
+<head>
+    <?php $this->renderAsset('Head'); ?>
+    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
+    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<?php
+$BodyClass = htmlspecialchars($this->CssClass);
+$Sections = Gdn_Theme::section(null, 'get');
+if (is_array($Sections)) {
+    foreach ($Sections as $Section) {
+        $BodyClass .= ' Section-'.$Section;
+    }
+}
+?>
+<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $BodyClass; ?>">
+<?php $this->renderAsset('Symbols');
 Gdn_Theme::assetBegin('DashboardUserDropDown');
 $user = Gdn::session()->User;
 $rm = new RoleModel();
@@ -30,18 +49,18 @@ $roleTitles = implode(', ', $roleTitlesArray);
 /** var UserController $user */
 ?>
 <div class="card card-user">
-    <div class="card-block user-block">
-        <div class="user-image-wrap">
+    <div class="card-block media-sm">
+        <div class="media-sm-image-wrap">
             <?php echo userPhoto($user); ?>
         </div>
-        <div class="user-info">
-            <div class="username">
+        <div class="media-sm-content">
+            <div class="media-sm-title username">
                 <?php echo userAnchor($user); ?>
             </div>
-            <div class="info">
+            <div class="media-sm-info user-roles">
                 <?php echo $roleTitles; ?>
             </div>
-            <a class="btn btn-userblock" href="<?php echo url(userUrl($user)); ?>">
+            <a class="btn btn-media-sm" href="<?php echo url(userUrl($user)); ?>">
                 <?php echo t('My Profile').' '.dashboardSymbol('external-link'); ?>
             </a>
         </div>
@@ -58,86 +77,87 @@ $roleTitles = implode(', ', $roleTitlesArray);
 <?php
 Gdn_Theme::assetEnd();
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
-<head>
-    <?php $this->renderAsset('Head'); ?>
-    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
-    <meta name="robots" content="noindex,nofollow"/>
-</head>
-<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo htmlspecialchars($this->CssClass); ?>">
-<?php $this->renderAsset('Symbols'); ?>
-<div class="navbar">
-    <div class="navbar-brand">
-        <?php $title = c('Garden.Title'); ?>
-<!--        --><?php //if ($logo = c('Garden.Logo', false)) { ?>
-<!--        <div class="navbar-image logo">--><?php //echo img(Gdn_Upload::url($logo), array('alt' => $title));?><!--</div>-->
-<!--        --><?php //} else { ?>
-<!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
-<!--        --><?php //} ?>
-        <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
-<!--        --><?php //echo anchor($title, '/', 'title'); ?>
-        <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
-    </div>
-    <?php $dashboardNav = new DashboardNavModule(); ?>
-    <nav class="nav nav-pills">
-        <?php
-        foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
-            <div class="nav-item">
-                <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
-                    <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
-                    <div class="nav-link-description"><?php echo val('description', $section, '&nbsp;'); ?></div>
-                </a>
-            </div>
-        <?php } ?>
-    </nav>
-    <div class="navbar-memenu">
-        <?php
-        if (Gdn::session()->isValid()) {
-            $this->fireEvent('BeforeUserOptionsMenu');
-            $photo = '<img src="'.userPhotoUrl($user).'">';
-            $CountNotifications = Gdn::session()->User->CountNotifications;
-            if (is_numeric($CountNotifications) && $CountNotifications > 0) {
-                $photo .= wrap($CountNotifications);
+<div class="main-container">
+    <div class="navbar">
+        <button class="js-panel-left-toggle panel-left-toggle btn btn-link" type="button">
+            &#9776;
+        </button>
+        <div class="navbar-brand">
+            <?php $title = c('Garden.Title'); ?>
+    <!--        --><?php //if ($logo = c('Garden.Logo', false)) { ?>
+    <!--        <div class="navbar-image logo">--><?php //echo img(Gdn_Upload::url($logo), array('alt' => $title));?><!--</div>-->
+    <!--        --><?php //} else { ?>
+    <!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
+    <!--        --><?php //} ?>
+            <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
+            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
+        </div>
+        <?php $dashboardNav = $this->Assets['Panel']['DashboardNavModule']; ?>
+        <nav class="nav nav-pills">
+            <?php
+            foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
+                <div class="nav-item">
+                    <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
+                        <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
+                        <div class="nav-link-description"><?php echo val('description', $section, '&nbsp;'); ?></div>
+                    </a>
+                </div>
+            <?php } ?>
+        </nav>
+        <div class="navbar-memenu">
+            <?php
+            if (Gdn::session()->isValid()) {
+                $this->fireEvent('BeforeUserOptionsMenu');
+                $photo = '<img src="'.userPhotoUrl($user).'">';
+                $CountNotifications = Gdn::session()->User->CountNotifications;
+                if (is_numeric($CountNotifications) && $CountNotifications > 0) {
+                    $photo .= wrap($CountNotifications);
+                }
+                echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
+    //            echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-navbar Leave');
             }
-            echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
-//            echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-navbar Leave');
-        }
-        ?>
+            ?>
+        </div>
     </div>
-</div>
-<div class="main-row">
-    <div class="panel panel-left">
-        <div class="panel-content panel-nav">
-            <div class="js-scroll-to-fixed">
-            <?php echo anchor($title, '/', 'title'); ?>
-            <?php echo $dashboardNav; ?>
+    <div class="main-row pusher" id="main-row">
+        <div class="panel panel-left drawer">
+            <?php if (!inSection('DashboardHome')) { ?>
+                <div class="panel-content panel-nav">
+                    <div class="js-scroll-to-fixed">
+                        <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
+                        <?php echo $dashboardNav; ?>
+                        <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary btn-signout'); ?>
+                    </div>
+                </div>
+            <?php } ?>
+        </div>
+        <div class="main">
+            <div class="content">
+    <!--            --><?php //echo $dropdown; ?>
+    <!--            <a href="/user/edit/53" class="js-ajax-modal btn btn-icon" aria-label="Edit"><svg class="icon  icon-edit" viewBox="0 0 17 17"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#edit"></use></svg></a>-->
+                <?php $this->renderAsset('Content'); ?>
             </div>
-        </div>
-    </div>
-    <div class="main">
-        <div class="content">
-<!--            --><?php //echo $dropdown; ?>
-            <?php $this->renderAsset('Content'); ?>
-        </div>
-        <div class="footer">
-            <?php $this->renderAsset('Foot'); ?>
-            <div class="footer-logo logo-wrap">
-                <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
-                <div class="footer-logo-powered">
-                    <div class="footer-logo-powered-text">— <?php echo t('%s Powered', 'Powered'); ?> —</div>
+            <div class="footer">
+                <?php $this->renderAsset('Foot'); ?>
+                <div class="footer-logo logo-wrap">
+                    <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
+                    <div class="footer-logo-powered">
+                        <div class="footer-logo-powered-text">— <?php echo t('%s Powered', 'Powered'); ?> —</div>
+                    </div>
+                </div>
+                <div class="footer-nav nav">
+                    <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
                 </div>
             </div>
-            <div class="footer-nav nav">
-                <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
-            </div>
         </div>
-    </div>
-    <div class="panel panel-help panel-right">
-        <div class="panel-content">
-            <div class="js-scroll-to-fixed">
-                <?php $this->renderAsset('Help'); ?>
+        <div class="panel panel-help panel-right">
+            <?php if (!inSection('DashboardHome')) { ?>
+            <div class="panel-content">
+                <div class="js-scroll-to-fixed">
+                    <?php $this->renderAsset('Help'); ?>
+                </div>
             </div>
+            <?php } ?>
         </div>
     </div>
 </div>

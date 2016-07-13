@@ -373,11 +373,43 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     /**
      * Send a query to the database and return the result.
      *
+     * @deprecated since 2.3. Was incorrectly public. Replaced by executeQuery().
+     * @param string $sql The sql to execute.
+     * @param bool $checkTreshold Should not be used
+     * @return Gdn_Dataset
+     */
+    public function query($sql, $checkTreshold = false) {
+
+        $class = null;
+        $internalCall = false;
+
+        // Detect the origin of this call.
+        $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        if (count($backtrace) > 1) {
+            $class = val('class', $backtrace[1]);
+            if ($class) {
+                $internalCall = is_a($class, __CLASS__, true);
+            }
+        }
+
+        // Give appropriate message based on whether we're using it internally.
+        if ($internalCall) {
+            deprecated("$class::query()", "$class::executeQuery()");
+            return $this->executeQuery($sql, $checkTreshold);
+        } else {
+            deprecated(__CLASS__.'::query()', 'Gdn_SQLDriver::query()');
+            return $this->Database->query($sql);
+        }
+    }
+
+    /**
+     * Send a query to the database and return the result.
+     *
      * @param string $sql The sql to execute.
      * @param bool $checkThreshold Whether or not to check the alter table threshold before altering the table.
      * @return bool Whether or not the query succeeded.
      */
-    public function query($sql, $checkThreshold = false) {
+    protected function executeQuery($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
                 $this->Database->CapturedSql = array();

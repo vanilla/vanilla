@@ -34,9 +34,9 @@ if (!class_exists('HeadModule', false)) {
         protected $_Title;
 
         /** @var string A string to be concatenated with $this->_Title. */
-        protected $_SubTitle;
+        protected $_Subtitle;
 
-        /** @var A string to be concatenated with $this->_Title if there is also a $this->_SubTitle string being concatenated. */
+        /** @var A string to be concatenated with $this->_Title if there is also a $this->_Subtitle string being concatenated. */
         protected $_TitleDivider;
 
         /** @var bool  */
@@ -51,8 +51,8 @@ if (!class_exists('HeadModule', false)) {
             $this->_Tags = array();
             $this->_Strings = array();
             $this->_Title = '';
-            $this->_SubTitle = '';
-            $this->_TitleDivider = '';
+            $this->_Subtitle = '';
+            $this->_TitleDivider = ' — ';
             parent::__construct($Sender);
         }
 
@@ -288,29 +288,57 @@ if (!class_exists('HeadModule', false)) {
         }
 
         /**
-         *
+         * Gets/sets the modules title.
          *
          * @param string $Title
-         * @param bool $NoSubTitle
+         * @param bool $NoSubtitle
          * @return mixed|string
          */
-        public function title($Title = '', $NoSubTitle = false) {
+        public function title($Title = '', $NoSubtitle = false) {
             if ($Title != '') {
-                // Apply $Title to $this->_Title and return it;
+                // Apply $Title to $this->_Title and to $this->_Sender.
                 $this->_Title = $Title;
                 $this->_Sender->title($Title);
-                return $Title;
-            } elseif ($this->_Title != '') {
-                // Return $this->_Title if set;
+            } elseif ($this->_Title == '') {
+                // Get Title from $this->_Sender if not supplied.
+                $this->_Title = valr('Data.Title', $this->_Sender, '');
+            }
+            if ($NoSubtitle) {
                 return $this->_Title;
-            } elseif ($NoSubTitle) {
-                return valr('Data.Title', $this->_Sender, '');
             } else {
-                $Subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
+                if ($this->_Subtitle == '') {
+                    // Get Subtitle from controller.
+                    $this->_Subtitle = valr('Data._Subtitle', $this->_Sender, c('Garden.Title'));
+                }
 
                 // Default Return title from controller's Data.Title + banner title;
-                return ConcatSep(' - ', valr('Data.Title', $this->_Sender, ''), $Subtitle);
+                return concatSep(
+                    $this->_TitleDivider,
+                    $this->_Title,
+                    $this->_Subtitle
+                );
             }
+        }
+
+        /**
+         * Sets the subtitle.
+         *
+         * @param string $subtitle The subtitle which should be displayed in the title.
+         */
+        public function setSubtitle($subtitle = '') {
+            $this->_Subtitle = $subtitle;
+        }
+
+        /**
+         * Sets the title divider.
+         *
+         * This is the string that is used to concatenate title and subtitle.
+         * Defaults to ' — '.
+         *
+         * @param string $titleDivider The string that concats title and subtitle.
+         */
+        public function setTitleDivider($titleDivider = ' — ') {
+            $this->_TitleDivider = $titleDivider;
         }
 
         /**
@@ -369,7 +397,7 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
             }
 
-            $Title = Gdn_Format::text($this->title('', true));
+            $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
             if ($Title != '') {
                 $this->addTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
             }

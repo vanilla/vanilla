@@ -5,9 +5,10 @@
 // No styleguide reference.
 
 $navbar-border-color: rgba(0,0,0,.125);
+$navbar-short-height: 3rem;
 
 .navbar {
-  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -37,7 +38,6 @@ $navbar-border-color: rgba(0,0,0,.125);
   }
 
   .nav-item {
-    min-width: 11.25rem;
     text-align: center;
     border-right: 1px solid $navbar-border-color;
 
@@ -52,6 +52,7 @@ $navbar-border-color: rgba(0,0,0,.125);
 
   .nav-link {
     position: relative;
+    min-width: to-rem(180);
     padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
     color: $white;
 
@@ -63,20 +64,6 @@ $navbar-border-color: rgba(0,0,0,.125);
         > * {
           opacity: 1;
         }
-      }
-
-      &::before {
-        position: absolute;
-        display: block;
-        width: $spacer;
-        height: $spacer;
-        bottom: - ($spacer / 2);
-        left: (11.25 / 2) - ($spacer / 2);
-        transform: rotate(45deg);
-        background-color: $nav-navbar-active-link-active-bg;
-        border-bottom: 1px solid $navbar-border-color;
-        border-right: 1px solid $navbar-border-color;
-        content: '';
       }
     }
 
@@ -91,10 +78,63 @@ $navbar-border-color: rgba(0,0,0,.125);
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: to-rem(240);
   }
 
-  .navbar-brand {
-    float: none;
+  &.navbar-short {
+    height: $navbar-short-height;
+
+    .nav-link {
+      padding: ($navbar-short-height - ($font-size-base * $line-height-lg)) / 2;
+    }
+
+    .nav-link-description {
+      display: none;
+    }
+
+    img {
+      height: $spacer * 2;
+    }
+  }
+
+  @include media-breakpoint-down(lg) {
+    .navbar-brand,
+    .navbar-memenu {
+      min-width: inherit;
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    &,
+    &.navbar-short {
+      justify-content: flex-start;
+      height: $navbar-short-height;
+
+      .nav {
+        flex-grow: 1;
+        justify-content: space-between;
+      }
+
+      .nav-item {
+        width: 100%;
+      }
+
+      .nav-link {
+        min-width: inherit;
+        width: 100%;
+        font-size: $font-size-sm;
+        padding: (($navbar-short-height - ($font-size-sm * $line-height-lg)) / 2) 0;
+      }
+
+      .nav-link-description {
+        display: none;
+      }
+
+      .navbar-memenu,
+      .navbar-brand {
+        display: none;
+      }
+    }
   }
 
   .nav {
@@ -120,8 +160,6 @@ $navbar-border-color: rgba(0,0,0,.125);
     opacity: .75;
   }
 }
-
-
 
 .btn-navbar {
   position: relative;

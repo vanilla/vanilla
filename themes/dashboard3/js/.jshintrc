@@ -10,6 +10,7 @@
   "indent": 2,
   "laxcomma": true,
   "latedef": true,
+  "multistr": true,
   "newcap": true,
   "noarg": true,
   "quotmark": "single",
@@ -20,5 +21,5 @@
   "trailing": true,
   "smarttabs": true,
   "white": true,
-  "predef": ["prettyPrint", "jQuery", "ace"]
+  "predef": ["prettyPrint", "jQuery", "ace", "Drop", "gdn"]
 }

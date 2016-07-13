@@ -136,6 +136,16 @@ class RecaptchaPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Hook to indicate a captcha service is available.
+     *
+     * @param Gdn_PluginManager $sender
+     * @param array $args
+     */
+    public function captcha_isEnabled_handler($sender, $args) {
+        $args['Enabled'] = true;
+    }
+
+    /**
      * Hook (view) to manage captcha config.
      *
      * THIS METHOD ECHOS DATA

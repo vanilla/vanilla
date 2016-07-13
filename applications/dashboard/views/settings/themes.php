@@ -34,12 +34,12 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
     <div class="media media-callout CurrentTheme">
         <?php
         $PreviewUrl = $this->data('EnabledTheme.IconUrl', false);
-        echo '<div class="media-left">';
-        echo '<div class="image-wrap">';
+        echo '<div class="media-left grid-item">';
+        echo '<div class="image-wrap grid-image-wrap">';
         if ($PreviewUrl !== FALSE) {
-            echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName')));
+            echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'class' => 'grid-image'));
         } else {
-            echo img('themes/default/screenshot.png', array('alt' => $ScreenName));
+            echo img('themes/default/screenshot.png', array('alt' => $ScreenName, 'class' => 'grid-image'));
         }
         echo '</div>';
         echo '</div>'; ?>
@@ -148,8 +148,8 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                         }
                         echo '<div class="overlay">';
                         echo '<div class="buttons">';
-                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-transparent EnableAddon EnableTheme', array('target' => '_top'));
-                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-transparent PreviewAddon', array('target' => '_top'));
+                        echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
+                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
                         $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                         $this->fireEvent('AfterThemeButtons');
                         echo '</div>';

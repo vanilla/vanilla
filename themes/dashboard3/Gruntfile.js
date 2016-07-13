@@ -172,7 +172,7 @@ module.exports = function (grunt) {
         force: true
         , jshintrc: 'js/.jshintrc'
       }
-      , all: ['js/src/**/*.js']
+      , all: ['js/src/main.js']
     },
 
     csslint: {
@@ -186,6 +186,8 @@ module.exports = function (grunt) {
     concat: {
       dist: {
         src: ([]).concat([
+          'js/src/lithe.js',
+          'js/src/lithe.drawer.js',
           'js/src/main.js'
         ])
         , dest: 'js/custom.js'
@@ -210,22 +212,21 @@ module.exports = function (grunt) {
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
+          'scss/maps/_bootstrapAnimation': 'scss/vendors/bootstrap/scss/_animation.scss',
           'scss/maps/_bootstrapSubset.scss': [
             'scss/vendors/bootstrap/scss/_normalize.scss',
             'scss/vendors/bootstrap/scss/_utilities.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
+            'scss/vendors/bootstrap/scss/_alert.scss',
             'scss/vendors/bootstrap/scss/_card.scss',
-            'scss/vendors/bootstrap/scss/_navbar.scss',
             'scss/vendors/bootstrap/scss/_button-group.scss',
-            'scss/vendors/bootstrap/scss/_tables.scss',
+            'scss/vendors/bootstrap/scss/_tooltip.scss',
             'scss/vendors/bootstrap/scss/_media.scss',
-            'scss/vendors/bootstrap/scss/_dropdown.scss',
-            'scss/vendors/bootstrap/scss/_animation.scss',
             'scss/vendors/bootstrap/scss/_modal.scss',
+            'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_list-group.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',
             'scss/vendors/bootstrap/scss/_custom-forms.scss',
-            'scss/vendors/bootstrap/scss/_nav.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'
           ],

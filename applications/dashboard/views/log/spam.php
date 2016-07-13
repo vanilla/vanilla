@@ -8,10 +8,10 @@ Gdn_Theme::assetEnd();
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
-    <div class="Info">
+    <div class="buttons">
         <?php
-        echo anchor(t('Spam'), '#', array('class' => 'SpamButton SmallButton'));
-        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton SmallButton'));
+        echo anchor(t('Spam'), '#', array('class' => 'SpamButton btn btn-secondary'));
+        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-secondary'));
         ?>
     </div>
 <?php
@@ -20,12 +20,6 @@ echo '<div id="LogTable">';
 include dirname(__FILE__).'/table.php';
 echo '</div id="LogTable">';
 ?>
-    <div class="Info">
-        <?php
-        echo anchor(t('Spam'), '#', array('class' => 'SpamButton SmallButton'));
-        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton SmallButton'));
-        ?>
-    </div>
 <?php
 
 $this->addDefinition('ExpandText', t('(more)'));

@@ -372,7 +372,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * @return Gdn_Email
      */
     public function subject($Subject) {
-        $this->PhpMailer->Subject = $Subject;
+        $this->PhpMailer->Subject = mb_encode_mimeheader($Subject, $this->PhpMailer->CharSet);
         return $this;
     }
 

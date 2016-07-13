@@ -34,6 +34,9 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
+     * @param mixed $TransientKey
      */
     public function delete($MessageID = '', $TransientKey = false) {
         $this->permission('Garden.Community.Manage');
@@ -58,6 +61,9 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
+     * @param mixed $TransientKey
      */
     public function dismiss($MessageID = '', $TransientKey = false) {
         $Session = Gdn::session();
@@ -80,6 +86,8 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
      */
     public function edit($MessageID = '') {
         $this->addJsFile('jquery.autosize.min.js');
@@ -167,13 +175,18 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access protected
+     *
+     * @return array
      */
     protected function _getAssetData() {
-        $AssetData = array();
-        $AssetData['Content'] = t('Above Main Content');
-        $AssetData['Panel'] = t('Below Sidebar');
+        $AssetData = [
+            'Content' => t('Above Main Content'),
+            'Panel' => t('Below Sidebar')
+        ];
+
         $this->EventArguments['AssetData'] = &$AssetData;
         $this->fireEvent('AfterGetAssetData');
+
         return $AssetData;
     }
 
@@ -182,23 +195,25 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access protected
+     *
+     * @return array
      */
     protected function _getLocationData() {
-        $ControllerData = array();
-        $ControllerData['[Base]'] = t('All Pages');
-        $ControllerData['[NonAdmin]'] = t('All Forum Pages');
-        // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
-        // $ControllerData['[Admin]'] = 'All Dashboard Pages';
-        $ControllerData['Dashboard/Profile/Index'] = t('Profile Page');
-        $ControllerData['Vanilla/Discussions/Index'] = t('Discussions Page');
-        $ControllerData['Vanilla/Discussion/Index'] = t('Comments Page');
-        $ControllerData['Vanilla/Post/Discussion'] = t('New Discussion Form');
-        $ControllerData['Dashboard/Entry/SignIn'] = t('Sign In');
-        $ControllerData['Dashboard/Entry/Register'] = t('Registration');
-        // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
-        // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
+        $ControllerData = [
+            '[Base]' => t('All Pages'),
+            '[NonAdmin]' => t('All Forum Pages'),
+            'Dashboard/Profile/Index' => t('Profile Page'),
+            'Vanilla/Discussions/Index' => t('Discussions Page'),
+            'Vanilla/Categories/Index' => t('Categories Page'),
+            'Vanilla/Discussion/Index' => t('Comments Page'),
+            'Vanilla/Post/Discussion' => t('New Discussion Form'),
+            'Dashboard/Entry/SignIn' => t('Sign In'),
+            'Dashboard/Entry/Register' => t('Registration')
+        ];
+
         $this->EventArguments['ControllerData'] = &$ControllerData;
         $this->fireEvent('AfterGetLocationData');
+
         return $ControllerData;
     }
 }

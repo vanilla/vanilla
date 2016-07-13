@@ -37,6 +37,21 @@ if (!function_exists('alternate')) {
 }
 
 /**
+ * Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
+ */
+if (!function_exists('dashboardSymbol')) {
+    function dashboardSymbol($name, $alt = '', $class = '') {
+        if (!empty($alt)) {
+            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+        }
+        $r = <<<EOT
+    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
+EOT;
+        return $r;
+    }
+}
+
+/**
  * English "plural" formatting for numbers that can get really big.
  */
 if (!function_exists('bigPlural')) {
@@ -86,6 +101,9 @@ if (!function_exists('popin')) {
  */
 if (!function_exists('icon')) {
     function icon($icon) {
+        if (strpos($icon, '<svg') === 0) {
+            return $icon;
+        }
         $icon = strtolower($icon);
         return ' <span class="icon icon-'.$icon.'"></span> ';
     }

@@ -28,15 +28,15 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
     </div>
 </div>
 <div class="toolbar">
-    <div class="toolbar-search">
+    <div class="toolbar-main">
         <?php
         echo $this->Form->open(array('action' => url('/user/browse')));
         echo $this->Form->errors();
-
         echo '<div class="search-wrap input-wrap">';
+        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Keywords');
         echo ' ', $this->Form->button(t('Go'));
-        echo '<div class="btn js-clear-search btn-clear"><span class="clear">x</span></div>';
+        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/user').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">';
         $count = $this->data('RecordCount', $this->data('UserCount', null));
         if ($count !== null) {

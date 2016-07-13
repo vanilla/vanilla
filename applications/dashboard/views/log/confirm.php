@@ -1,47 +1,4 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<style>
-    .ExtraActionTitle {
-        background: #FF9;
-        margin: -10px -10px 10px;
-        padding: 10px;
-    }
-
-    .ExtraAction {
-        margin: 10px -10px;
-        padding: 10px;
-        background: #ffe;
-        float: left;
-        width: 100%;
-    }
-
-    .CheckBoxCell {
-        float: left;
-        width: 50%;
-    }
-
-    .ClearFix {
-        clear: both;
-    }
-
-    .Buttons {
-        margin: 10px 0 0;
-    }
-
-    .ConfirmNo {
-        margin-left: 14px;
-        color: #d00;
-        font-weight: bold;
-    }
-
-    .ConfirmNo:hover {
-        text-decoration: underline;
-    }
-
-    .WarningMessage {
-        padding: 6px 10px;
-        margin: 10px 0 4px;
-    }
-</style>
 <div>
     <?php
 

@@ -3,6 +3,7 @@
 // No styleguide reference.
 
 .main {
+  position: relative;
   flex-grow: 1;
   padding: 0 $padding-default;
   max-width: 1024px;
@@ -12,12 +13,15 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  margin-top: -$navbar-height;
-  padding-top: $navbar-height;
   background-color: $white;
   border: 1px solid $border-color;
   border-top: 0;
   border-bottom: 0;
+  transition: all 250ms;
+
+  .drawer-show & {
+    transform: translate3d($drawer-width, 0, 0);
+  }
 
   .content,
   .footer {
@@ -33,8 +37,17 @@
   }
 }
 
+.Section-DashboardHome .main {
+  max-width: 1296px;
+}
+
 
 .main-row {
   display: flex;
   justify-content: center;
+
+  @include media-breakpoint-down(md) {
+    display: block;
+    width: 100%;
+  }
 }

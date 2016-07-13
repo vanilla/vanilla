@@ -41,6 +41,10 @@ $addonCount = count($availableAddons);
 $enabledCount = count($enabledAddons);
 $disabledCount = $addonCount - $enabledCount;
 
+$this->EventArguments['AvailableAddons'] = &$availableAddons;
+$this->fireAs('SettingsController');
+$this->fireEvent('BeforeAddonList');
+
 Gdn_Theme::assetBegin('Help'); ?>
 <div>
     <h2><?php echo $helpTitle; ?></h2>
@@ -68,6 +72,7 @@ Gdn_Theme::assetBegin('Help'); ?>
 <ul class="media-list addon-list">
     <?php
     $Alt = false;
+
     foreach ($availableAddons as $addonName => $addonInfo) {
         // Skip Hidden & Trigger plugins
         if (isset($addonInfo['Hidden']) && $addonInfo['Hidden'] === TRUE)
@@ -81,7 +86,14 @@ Gdn_Theme::assetBegin('Help'); ?>
             $Alt = !$Alt;
             $Version = Gdn_Format::Display(val('Version', $addonInfo, ''));
             $ScreenName = Gdn_Format::Display(val('Name', $addonInfo, $addonName));
+            $Settings = val('SettingsUrl', $addonInfo, []);
+
             $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $addonInfo, '') : '';
+            $SettingsPopupClass = 'js-modal';
+            if (!val('HasPopupFriendlySettings', $addonInfo, true)) {
+                $SettingsPopupClass = '';
+            }
+
             $PluginUrl = val('PluginUrl', $addonInfo, '');
             $Author = val('Author', $addonInfo, '');
             $AuthorUrl = val('AuthorUrl', $addonInfo, '');
@@ -168,20 +180,25 @@ Gdn_Theme::assetBegin('Help'); ?>
                 </div>
                 <div class="media-right media-options">
                     <?php if ($SettingsUrl != '') {
-                        echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border', ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
+                        echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
                     }
                     ?>
                     <div id="<?php echo $addonName; ?>-toggle">
                     <?php
                     $Enabled = array_key_exists($addonName, $enabledAddons);
+                    if ($this->addonType === 'locales') {
+                        $action = $Enabled ? 'disable' : 'enable';
+                    } else {
+                        $action = $this->Filter;
+                    }
                     if ($Enabled) {
                         $SliderState = 'Active';
                         $toggleState = 'on';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$this->Filter.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
                     } else {
                         $SliderState = 'InActive';
                         $toggleState = 'off';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$this->Filter.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
                     } ?>
                     </div>
                 </div>

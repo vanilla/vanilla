@@ -62,6 +62,7 @@ $PhotoIDExists = $Construct->columnExists('PhotoID');
 $PhotoExists = $Construct->columnExists('Photo');
 $UserExists = $Construct->tableExists();
 $ConfirmedExists = $Construct->columnExists('Confirmed');
+$AllIPAddressesExists = $Construct->columnExists('AllIPAddresses');
 
 $Construct
     ->primaryKey('UserID')
@@ -420,15 +421,15 @@ $Construct
     ->set($Explicit, $Drop);
 
 if (isset($ActivityIndexes['IX_Activity_NotifyUserID'])) {
-    $Construct->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
+    $SQL->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_ActivityUserID'])) {
-    $Construct->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_RegardingUserID'])) {
-    $Construct->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
 }
 
 if (!$EmailedExists) {
@@ -482,7 +483,7 @@ if (!$ActivityCommentExists && $CommentActivityIDExists) {
       select CommentActivityID, Story, 'Text', InsertUserID, DateInserted, InsertIPAddress
       from {$Px}Activity
       where CommentActivityID > 0";
-    $Construct->query($Q);
+    $SQL->query($Q);
     $SQL->delete('Activity', array('CommentActivityID >' => 0));
 }
 
@@ -577,7 +578,7 @@ $Construct->table('Message')
 $Prefix = $SQL->Database->DatabasePrefix;
 
 if ($PhotoIDExists && !$PhotoExists) {
-    $Construct->query("update {$Prefix}User u
+    $SQL->query("update {$Prefix}User u
    join {$Prefix}Photo p
       on u.PhotoID = p.PhotoID
    set u.Photo = p.Name");
@@ -643,7 +644,7 @@ if (!$FullNameColumnExists) {
         ->put();
 
     $Construct->table('Tag')
-        ->column('FullName', 'varchar(255)', false, 'index')
+        ->column('FullName', 'varchar(100)', false, 'index')
         ->set();
 }
 
@@ -764,6 +765,69 @@ $Construct
     ->column('UpdateUserID', 'int', true)
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->set($Explicit, $Drop);
+
+// If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
+if ($AllIPAddressesExists) {
+    $limit = 10000;
+    $resetBatch = 100;
+
+    // Grab the initial batch of users.
+    $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+        ->from('User')->where('AllIPAddresses is not null')->limit($limit)
+        ->get()->resultArray();
+
+    do {
+        $processedUsers = [];
+
+        // Iterate through the records of users with data needing to be migrated.
+        foreach ($legacyIPAddresses as $currentLegacy) {
+            // Pull out and format the relevant bits, where necessary.
+            $allIPAddresses = explode(',', $currentLegacy['AllIPAddresses']);
+            $dateLastActive = val('DateLastActive', $currentLegacy);
+            $insertIPAddress = val('InsertIPAddress', $currentLegacy);
+            $lastIPAddress = val('LastIPAddress', $currentLegacy);
+            $userID = val('UserID', $currentLegacy);
+
+            // If we have a LastIPAddress record, use it.  Give it a DateUpdated of the user's DateLastActive.
+            if (!empty($lastIPAddress)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $lastIPAddress,
+                    $dateLastActive
+                );
+            }
+
+            // Only save InsertIPAddress if it differs from LastIPAddress and is in AllIPAddresses (to avoid admin IPs).
+            if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $insertIPAddress
+                );
+            }
+
+            // Record the processed user's ID.
+            $processedUsers[] = $userID;
+
+            // Every X records (determined by $resetBatch), clear out the AllIPAddresses field for processed users.
+            if (count($processedUsers) > 0 && (count($processedUsers) % $resetBatch) === 0) {
+                $this->SQL->update('User')->set('AllIPAddresses', null)->whereIn('UserID', $processedUsers)
+                    ->limit(count($processedUsers))->put();
+            }
+        }
+
+        // Any stragglers that need to be wiped out?
+        if (count($processedUsers) > 0) {
+            $this->SQL->update('User')->set('AllIPAddresses', null)->where('UserID', $processedUsers)->limit(count($processedUsers))->put();
+        }
+
+        // Query the next batch of users with IP data needing to be migrated.
+        $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+            ->from('User')->where('AllIPAddresses is not null')->limit($limit)
+            ->get()->resultArray();
+    } while (count($legacyIPAddresses) > 0);
+
+    unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $processedUsers);
+}
 
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.

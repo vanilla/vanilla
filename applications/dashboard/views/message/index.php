@@ -14,7 +14,7 @@ $Session = Gdn::session();
     <?php Gdn_Theme::assetEnd(); ?>
     <div class="header-block">
         <h1><?php echo t('Manage Messages'); ?></h1>
-        <?php echo anchor(t('Add Message'), 'dashboard/message/add', 'AddMessage btn btn-primary'); ?>
+        <?php echo anchor(t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary'); ?>
     </div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
 <div class="table-wrap">
@@ -66,8 +66,8 @@ $Session = Gdn::session();
                 <td>
                     <div class="btn-group">
                         <?php
-                        echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage btn btn-icon', ['aria-label' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage btn btn-icon', ['aria-label' => t('Delete')]);
+                        echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete')]);
                         ?>
                     </div>
                 </td>

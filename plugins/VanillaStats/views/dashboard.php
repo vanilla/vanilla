@@ -36,6 +36,8 @@
         <input disabled="disabled" id="StatsSlotDay" type="button" value="<?php echo t('Day');?>" />
         <input disabled="disabled" id="StatsSlotMonth" type="button" value="<?php echo t('Month'); ?>" />
     </div>
+    <div class="Column Column2 NewsColumn">
+        <h2 class="dashboard-widget-title"><?php echo t('Recent News'); ?></h2>
 
     <div id="StatsNavigation">
         <p id="StatsCurrentTimeframe"></p>

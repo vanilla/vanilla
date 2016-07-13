@@ -2,7 +2,7 @@
 (function(window, $) {
     $(document)
         .on('click', '.js-new-avatar', function () {
-            $(".js-new-avatar-upload", $(this.closest('form'))).trigger("click");
+            $(".js-new-avatar-upload", $(this).closest('form')).trigger("click");
         })
         .on('change', ".js-new-avatar-upload", function () {
             $(this).closest('.js-change-picture-form').submit();

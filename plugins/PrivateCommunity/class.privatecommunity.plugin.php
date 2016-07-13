@@ -48,6 +48,18 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('PrivateCommunity', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['PrivateCommunity']['HasPopupFriendlySettings'] = false;
+        }
+    }
+
+    /**
      *
      *
      * @param $Sender

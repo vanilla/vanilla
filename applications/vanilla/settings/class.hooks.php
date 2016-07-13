@@ -355,18 +355,26 @@ class VanillaHooks implements Gdn_IPlugin {
     /**
      * Adds 'Discussion' item to menu.
      *
-     * 'Base_Render_Before' will trigger before every pageload across apps.
-     * If you abuse this hook, Tim with throw a Coke can at your head.
+     * 'base_render_before' will trigger before every pageload across apps.
+     * If you abuse this hook, Tim will throw a Coke can at your head.
      *
      * @since 2.0.0
      * @package Vanilla
      *
-     * @param object $Sender DashboardController.
+     * @param Gdn_Controller $sender The sending controller object.
      */
-    public function base_render_before($Sender) {
-        $Session = Gdn::session();
-        if ($Sender->Menu) {
-            $Sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, array('Standard' => true));
+    public function base_render_before($sender) {
+        if ($sender->Menu) {
+            $sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, ['Standard' => true]);
+        }
+
+        if (!inSection('Dashboard')) {
+            // Spoilers assets
+            $sender->addJsFile('spoilers.js', 'vanilla');
+            $sender->addCssFile('spoilers.css', 'vanilla');
+            $sender->addDefinition('Spoiler', t('Spoiler'));
+            $sender->addDefinition('show', t('show'));
+            $sender->addDefinition('hide', t('hide'));
         }
     }
 
@@ -456,7 +464,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $Sender
      */
     public function profileController_CustomNotificationPreferences_Handler($Sender) {
-        if (!$Sender->data('NoEmail') && Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
+        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
         }
     }
@@ -690,8 +698,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
         $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/managecategories', 'forum.manage-categories', 'nav-manage-categories', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Blog Comments'), '/dashboard/embed/comments', 'forum.embed-comments', 'nav-embed nav-embed-comments', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Embed Forum'), '/dashboard/embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Embed'), 'embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
     }
 

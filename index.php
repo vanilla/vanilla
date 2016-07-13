@@ -13,7 +13,7 @@ if (PHP_VERSION_ID < 50400) {
 }
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.2.112.2');
+define('APPLICATION_VERSION', '2.2.112.3');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
@@ -24,7 +24,7 @@ ob_start();
 
 // Define the constants we need to get going.
 
-define('DS', '/');
+define('DS', DIRECTORY_SEPARATOR);
 define('PATH_ROOT', getcwd());
 
 // Include the bootstrap to configure the framework.

@@ -100,7 +100,9 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_beforeAddonList_handler($sender, &$args) {
-        $args['AvailableAddons']['Pockets']['HasPopupFriendlySettings'] = false;
+        if (val('Pockets', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['Pockets']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

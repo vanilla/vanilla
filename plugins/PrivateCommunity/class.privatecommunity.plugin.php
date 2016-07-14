@@ -34,17 +34,26 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
             return;
         }
 
-        $Private = c('Garden.PrivateCommunity');
-        echo '<div style="padding: 10px 0;">';
-        $Style = array('style' => 'background: #ff0; padding: 2px 4px; margin: 0 10px 2px 0; display: inline-block;');
-        if ($Private) {
-            echo wrap('Your community is currently <strong>PRIVATE</strong>.', 'span', $Style);
-            echo wrap(anchor('Switch to PUBLIC', 'settings/privatecommunity/on/'.Gdn::session()->transientKey(), 'SmallButton').'(Everyone will see inside your community)', 'div');
-        } else {
-            echo wrap('Your community is currently <strong>PUBLIC</strong>.', 'span', $Style);
-            echo wrap(anchor('Switch to PRIVATE', 'settings/privatecommunity/off/'.Gdn::session()->transientKey(), 'SmallButton').'(Only members will see inside your community)', 'div');
-        }
-        echo '</div>';
+        ?>
+        <div class="row form-group padded">
+            <div class="label-wrap-wide">
+                <div class="description"><?php echo t('Enable Private Communities'); ?></div>
+                <div class="info"><?php echo t('Once enabled, only members will see inside your community.'); ?></div>
+            </div>
+            <div class="input-wrap-right">
+                <span id="plaintext-toggle">
+                    <?php
+                    if (c('Garden.PrivateCommunity', false)) {
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/on/'.Gdn::session()->TransientKey()), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                    } else {
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/off/'.Gdn::session()->TransientKey()), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                    }
+                    ?>
+                </span>
+            </div>
+        </div>
+
+        <?php
     }
 
     /**

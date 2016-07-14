@@ -14,6 +14,10 @@
 .modal-body {
   max-height: calc(94vh - (2 * #{$header-block-height}));
   overflow: scroll;
+
+  
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .modal-content {

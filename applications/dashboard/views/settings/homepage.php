@@ -36,6 +36,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
 }
 
 ?>
+    <h1><?php echo t('Homepage'); ?></h1>
     <script type="text/javascript">
         jQuery(document).ready(function($) {
 
@@ -70,8 +71,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         ?>
     </div>
     <?php Gdn_Theme::assetEnd(); ?>
-    <h1><?php echo t('Homepage'); ?></h1>
-    <div>
+    <div class="padded-top">
         <?php printf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true)) ?>
     </div>
 
@@ -94,22 +94,22 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             ?>
         </div>
         <?php if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)): ?>
-            <p>
+            <div class="padded-top">
                 <?php echo wrap(t('Discussions Layout'), 'strong'); ?>
                 <br/><?php echo t('Choose the preferred layout for the discussions page.'); ?>
-            </p>
+            </div>
             <div class="LayoutOptions DiscussionsLayout">
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'SpDiscussions', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
                 echo WriteHomepageOption('Table Layout', 'table', 'SpDiscussionsTable', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
                 ?>
             </div>
-            <p>
+            <div class="padded-top">
                 <?php echo wrap(t('Categories Layout'), 'strong'); ?>
                 (<?php echo anchor(t("adjust layout"), '/vanilla/settings/managecategories', array('class' => 'AdjustCategories')); ?>
                 )
                 <br/><?php echo t('Choose the preferred layout for the categories page.'); ?>
-            </p>
+            </div>
             <div class="LayoutOptions CategoriesLayout">
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'SpCategories', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
@@ -120,10 +120,12 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         <?php endif; ?>
     </div>
 
+<div class="form-footer">
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
 echo $this->Form->Hidden('Target');
 echo $this->Form->Hidden('DiscussionsLayout', array('value' => $CurrentDiscussionLayout));
 echo $this->Form->Hidden('CategoriesLayout', array('value' => $CurrentCategoriesLayout));
-echo $this->Form->close('Save');
+echo $this->Form->close('Save'); ?>
+</div>

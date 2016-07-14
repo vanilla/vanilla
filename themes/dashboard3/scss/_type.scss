@@ -84,7 +84,7 @@ p {
 
 .heading-h1 {
   font-size: $font-size-lg;
-  margin-bottom: $spacer;
+  margin-bottom: 0;
 }
 
 // Make full border on content
@@ -212,4 +212,11 @@ pre {
   border-right-color: transparent;
   border-width: ($font-size-xs * $line-height-flag / 2) ($font-size-xs * $line-height-flag / 3);
   text-transform: uppercase;
+}
+
+table,
+form {
+  h2 {
+    margin-top: 0;
+  }
 }

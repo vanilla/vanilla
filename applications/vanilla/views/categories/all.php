@@ -4,6 +4,7 @@ if (!function_exists('GetOptions'))
     include $this->fetchViewLocation('helper_functions', 'categories');
 
 echo '<h1 class="H HomepageTitle">'.$this->data('Title').'</h1>';
+
 if ($Description = $this->Description()) {
     echo wrap($Description, 'div', array('class' => 'P PageDescription'));
 }
@@ -78,8 +79,10 @@ foreach ($Categories as $CategoryRow) {
             }
             // If this category is one level above the max display depth, and it
             // has children, add a replacement string for them.
-            if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
+            $displayChildren = !in_array($Category->DisplayAs, ['Categories', 'Flat']);
+            if ($displayChildren && $MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1) {
                 $CatList .= '{ChildCategories}';
+            }
 
             $CatList .= '</div>
                </div>
@@ -95,3 +98,6 @@ if ($ChildCategories != '')
 echo $CatList;
 ?>
 </ul>
+<div class="PageControls Bottom">
+<?php PagerModule::write(); ?>
+</div>

@@ -641,7 +641,27 @@ class CategoryModel extends Gdn_Model {
     public function getChildTree($id, $depth = 3, $permission = 'PermsDiscussionsView') {
         $category = $this->getOne($id);
 
-        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        $tree = $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        return self::filterChildren($tree);
+    }
+
+    /**
+     * Recursively remove children from categories configured to display as "Categories" or "Flat".
+     *
+     * @param array $categories
+     * @return array
+     */
+    public static function filterChildren($categories) {
+        foreach ($categories as &$category) {
+            $children = &$category['Children'];
+            if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
+                $children = [];
+            } elseif (!empty($category['Children'])) {
+                $children = static::filterChildren($children);
+            }
+        }
+
+        return $categories;
     }
 
     /**

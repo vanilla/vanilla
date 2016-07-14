@@ -36,9 +36,6 @@
         <input disabled="disabled" id="StatsSlotDay" type="button" value="<?php echo t('Day');?>" />
         <input disabled="disabled" id="StatsSlotMonth" type="button" value="<?php echo t('Month'); ?>" />
     </div>
-    <div class="Column Column2 NewsColumn">
-        <h2 class="dashboard-widget-title"><?php echo t('Recent News'); ?></h2>
-
     <div id="StatsNavigation">
         <p id="StatsCurrentTimeframe"></p>
         <input disabled="disabled" id="StatsNavPrev" type="button" value="<" />
@@ -49,11 +46,13 @@
 
 <div id="StatsChart"></div>
 
-<div class="Column Column1 ReleasesColumn">
-    <h1><?php echo t('Updates'); ?></h1>
-    <div class="List"></div>
-</div>
-<div class="Column Column2 NewsColumn">
-    <h1><?php echo t('Recent News'); ?></h1>
-    <div class="List"></div>
+<div class="dashboard-widgets">
+    <div class="Column Column1 ReleasesColumn">
+        <h1><?php echo t('Updates'); ?></h1>
+        <div class="List"></div>
+    </div>
+    <div class="Column Column2 NewsColumn">
+        <h1><?php echo t('Recent News'); ?></h1>
+        <div class="List"></div>
+    </div>
 </div>

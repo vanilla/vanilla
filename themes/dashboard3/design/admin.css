@@ -8666,13 +8666,18 @@ form ol label {
   margin-bottom: 0;
 }
 
+.form-group.row:first-child, .form-group.footer:first-child, .form-horizontal li:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
+.form-group.LayoutOptions:first-child,
+.form-group.HomeOptions:first-child, .form-group.media:first-child {
+  border-top: 1px dotted #f4f4f5;
+}
+
 .form-footer {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-pack: end;
   justify-content: flex-end;
-  padding-top: 0.5625rem;
-  padding-bottom: 0.5625rem;
+  padding-top: 1.125rem;
 }
 
 .toggle-wrap, .ActivateSlider {

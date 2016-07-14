@@ -153,6 +153,10 @@ form {
   padding-bottom: 1rem;
   border-bottom: 1px dotted $grey-light;
 
+  &:first-child {
+    border-top: 1px dotted $grey-light;
+  }
+
   //Reset
   padding-top: 1rem;
   margin-bottom: 0;
@@ -161,8 +165,7 @@ form {
 .form-footer {
   display: flex;
   justify-content: flex-end;
-  padding-top: $spacer / 2;
-  padding-bottom: $spacer / 2;
+  padding-top: $spacer;
 }
 
 

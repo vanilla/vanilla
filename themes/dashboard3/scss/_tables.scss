@@ -1,20 +1,15 @@
 .table-wrap {
   display: block;
-  margin-top: $spacer;
-  margin-right: (-$padding-default);
-  margin-bottom: $spacer;
-  margin-left: (-$padding-default);
-}
-
-.header-block + .table-wrap {
-  // TODO: collapse border
   margin-top: 0;
+  margin-right: (-$padding-default);
+  margin-bottom: 0;
+  margin-left: (-$padding-default);
 }
 
 table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: $spacer;
+  margin-bottom: 0;
 
   .options {
     width: 6rem;

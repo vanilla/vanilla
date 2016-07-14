@@ -8662,6 +8662,17 @@ form ol label {
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted #f4f4f5;
+  padding-top: 1rem;
+  margin-bottom: 0;
+}
+
+.form-footer {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: end;
+  justify-content: flex-end;
+  padding-top: 0.5625rem;
+  padding-bottom: 0.5625rem;
 }
 
 .toggle-wrap, .ActivateSlider {
@@ -9690,6 +9701,14 @@ label[id^=iCheck] {
   padding: 1.125rem 0;
 }
 
+.padded-top {
+  padding-top: 1.125rem;
+}
+
+.padded-bottom {
+  padding-bottom: 1.125rem;
+}
+
 .pull-left {
   float: left;
 }
@@ -9897,6 +9916,8 @@ label[id^=iCheck] {
 .modal-body, .Content {
   max-height: calc(94vh - (2 * 3.75rem));
   overflow: scroll;
+  padding-top: 0;
+  padding-bottom: 0;
 }
 
 .modal-content, .Overlay .Popup .Body {
@@ -10544,6 +10565,10 @@ button.close, button.Close {
   padding-bottom: 4rem;
 }
 
+.main .content > *:not(:first-child) {
+  margin-top: -0.0625rem;
+}
+
 .Section-DashboardHome .main {
   max-width: 1296px;
 }
@@ -10562,22 +10587,22 @@ button.close, button.Close {
   }
 }
 
-.table-wrap {
-  display: block;
-  margin-top: 1.125rem;
-  margin-right: -1.125rem;
-  margin-bottom: 1.125rem;
-  margin-left: -1.125rem;
+ul {
+  margin-bottom: 0;
 }
 
-.header-block + .table-wrap {
+.table-wrap {
+  display: block;
   margin-top: 0;
+  margin-right: -1.125rem;
+  margin-bottom: 0;
+  margin-left: -1.125rem;
 }
 
 table {
   width: 100%;
   max-width: 100%;
-  margin-bottom: 1.125rem;
+  margin-bottom: 0;
 }
 
 table .options {
@@ -10929,7 +10954,7 @@ p {
 
 .heading-h1, .content h1, div.Popup h1 {
   font-size: 1.25rem;
-  margin-bottom: 1.125rem;
+  margin-bottom: 0;
 }
 
 .full-border, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
@@ -11058,6 +11083,11 @@ pre {
   border-right-color: transparent;
   border-width: 0.590625rem 0.39375rem;
   text-transform: uppercase;
+}
+
+table h2,
+form h2 {
+  margin-top: 0;
 }
 
 .Tabs ul,

@@ -376,6 +376,13 @@ class VanillaHooks implements Gdn_IPlugin {
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));
         }
+
+        // Add user's viewable roles to gdn.meta if user is logged in.
+        if (!$sender->addDefinition('Roles')) {
+            if (Gdn::session()->isValid()) {
+                Gdn::controller()->addDefinition("Roles", RoleModel::getPublicUserRoles(Gdn::session()->UserID, "Name"));
+            }
+        }
     }
 
     /**

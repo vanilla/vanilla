@@ -1,21 +1,20 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo t('Avatars'); ?></h1>
-<?php
-echo wrap(t('Manage your avatar settings.'), 'div', array('class' => 'Info'));
-?>
-<h2><?php echo t('Default Avatar'); ?></h2>
-<div class="avatars">
-    <div class="Padded current-avatar">
-        <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
-    </div>
-    <div class="change-avatar">
-        <?php echo anchor('Change', '/dashboard/settings/defaultavatar', 'Button Primary'); ?>
+    <div class="avatar-default">
+    <h2><?php echo t('Default Avatar'); ?></h2>
+    <div class="avatars">
+        <div class="padded current-avatar">
+            <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+        </div>
+        <div class="change-avatar">
+            <?php echo anchor('Change', '/dashboard/settings/defaultavatar', 'Button Primary'); ?>
+        </div>
     </div>
 </div>
-<div>
+<div class="avatar-advanced padded">
     <?php echo $this->Form->open(array('enctype' => 'multipart/form-data')); ?>
     <h2><?php echo t('Avatar sizes'); ?></h2>
-    <?php echo wrap(t('Change the sizes that avatar images are saved at.').' '.t('Changes will apply to newly uploaded avatars only.'), 'div', array('class' => 'Info'));
+    <?php echo wrap(t('Change the sizes that avatar images are saved at.').' '.t('Changes will apply to newly uploaded avatars only.'), 'div', array('class' => 'info'));
     echo $this->Form->errors(); ?>
     <ul>
         <li>
@@ -40,7 +39,7 @@ echo wrap(t('Manage your avatar settings.'), 'div', array('class' => 'Info'));
             ?>
         </li>
     </ul>
-    <div>
+    <div class="buttons form-footer">
         <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary')); ?>
     </div>
 </div>

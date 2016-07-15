@@ -8,6 +8,14 @@
   padding: $spacer 0;
 }
 
+.padded-top {
+  padding-top: $spacer;
+}
+
+.padded-bottom {
+  padding-bottom: $spacer;
+}
+
 .pull-left {
   float: left;
 }

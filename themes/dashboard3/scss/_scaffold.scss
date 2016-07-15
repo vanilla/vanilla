@@ -34,6 +34,11 @@
 
   .content {
     padding-bottom: 4rem;
+
+    > *:not(:first-child) {
+      // collapse the border on our body elements.
+      margin-top: -$border-width;
+    }
   }
 }
 
@@ -50,4 +55,8 @@
     display: block;
     width: 100%;
   }
+}
+
+ul{
+  margin-bottom: 0;
 }

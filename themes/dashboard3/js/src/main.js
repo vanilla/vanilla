@@ -257,7 +257,7 @@
             var formCloseTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
-            var $footer = $elem.find('.Buttons');
+            var $footer = $elem.find('.Buttons, .js-modal-footer');
             var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title

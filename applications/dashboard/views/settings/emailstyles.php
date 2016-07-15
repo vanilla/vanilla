@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-<div class="header-block padded">
+<div class="header-block">
 <h1><?php echo t('Email Styles'); ?></h1>
 <?php echo wrap(anchor(t('Send a Test Email'), '/dashboard/settings/emailtest', 'Popup btn-primary btn'), 'div'); ?>
 </div>
@@ -37,7 +37,7 @@ $Session = Gdn::session();
         }
         ?>
     </div>
-    <div class="btn-group">
+    <div class="buttons padded-bottom">
         <?php
         echo anchor(t('Upload New Email Logo'), '/dashboard/settings/emailimage', 'js-upload-email-image-button Button');
         ?>
@@ -68,8 +68,8 @@ $Session = Gdn::session();
                 <div class="input-wrap"><?php echo $this->Form->color('Garden.EmailTemplate.ButtonTextColor', 'button-text-color'); ?></div>
         </li>
     </ul>
-    <div class="btn-group">
-        <?php echo wrap(t('Preview Colors'), 'span', array('class' => 'js-email-preview-button Button')); ?>
+    <div class="buttons form-footer">
+        <?php echo wrap(t('Preview Colors'), 'span', array('class' => 'js-email-preview-button btn btn-secondary')); ?>
         <?php echo $this->Form->button(t('Save Colors')); ?>
     </div>
 </div>

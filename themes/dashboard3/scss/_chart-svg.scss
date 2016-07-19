@@ -1,0 +1,195 @@
+// Colors
+
+$chart-1: #f15854;
+$chart-2: #60bd68;
+$chart-3: #faa43a;
+$chart-4: #57c1c2;
+$chart-5: #b276b2;
+$chart-6: #728379;
+$chart-7: #91234c;
+$chart-8: #f17cb0;
+$chart-9: #d96435;
+$chart-10: #415366;
+$chart-11: #a67b48;
+$chart-12: #234eba;
+$chart-13: #009ea5;
+$chart-14: #957a99;
+
+$chart-bg-opacity: 0.15;
+
+@mixin chart-variant($color) {
+
+  .c3-circle {
+    fill: $color !important;
+  }
+
+  .c3-line {
+    stroke: $color !important;
+  }
+
+  .c3-area {
+    fill: $color !important;
+    opacity: $chart-bg-opacity !important;
+  }
+
+  .c3-xgrid-focus {
+    stroke: $color !important;
+  }
+
+  .c3-event-rect:hover {
+    fill-opacity: 0.1 !important;
+    fill: $color !important;
+  }
+
+  color: $color;
+}
+
+.Section-DashboardHome {
+
+  .c3-axis-y {
+    //translate: 60px;
+
+    path {
+      display: none;
+    }
+
+    .c3-axis-y-label,
+    .tick {
+      text {
+        text-anchor: middle !important;
+      }
+      line {
+        display: none;
+      }
+    }
+
+    text{
+      font-size: $font-size-base;
+      font-weight: 500;
+      color: $grey-dark;
+    }
+
+    tspan {
+      //fill: $white;
+      //background-color: $white;
+    }
+  }
+
+  .c3-axis-x {
+    text{
+      font-size: $font-size-sm;
+    }
+  }
+
+  .c3 svg {
+    overflow: visible !important;
+  }
+
+  // Chart SVG styling
+  .c3-legend-item-tile {
+    rx: 100%;
+    ry: 100%;
+  }
+
+  .c3-circle {
+    r: 8;
+    stroke-width: 2;
+    stroke: $white;
+
+    &._expanded_ {
+      r: 8;
+      stroke-width: 2;
+    }
+  }
+
+  .c3-line {
+    stroke: rgba(25, 25, 25, 0.2) !important;
+  }
+
+  .c3-event-rect:hover {
+    fill: red;
+  }
+
+  .c3-grid line {
+
+  }
+
+  .c3-xgrid,
+  .c3-ygrid {
+    stroke-dasharray: 0;
+    stroke: rgba(85,89,97,0.12);
+    stroke-width: 1;
+  }
+
+  .c3-line {
+    stroke-width: 2;
+  }
+
+  .c3-tooltip .name span {
+    border-radius: 100%;
+  }
+
+  .c3-grid {
+    stroke-width: 2;
+  }
+
+  .c3-regions {
+    stroke-width: 8;
+  }
+
+  text {
+    font: 11px $font-family-base;
+    font-weight: 400;
+    fill: $grey;
+  }
+
+  .c3-legend-item {
+    text {
+      font-size: $font-size-base;
+    }
+  }
+
+  .c3-axis path {
+    stroke-width: 1.5;
+    stroke: $border-color;
+  }
+}
+
+.ChartStatsPageViews,
+.nav-stats-pageviews.active,
+.nav-stats-pageviews:hover {
+  @include chart-variant($chart-1);
+}
+
+.ChartStatsComments,
+.nav-stats-comments.active,
+.nav-stats-comments:hover {
+  @include chart-variant($chart-2);
+}
+
+.ChartStatsDiscussions,
+.nav-stats-discussions.active,
+.nav-stats-discussions:hover {
+  @include chart-variant($chart-3);
+}
+
+.ChartStatsUsers,
+.nav-stats-users.active,
+.nav-stats-users:hover {
+  @include chart-variant($chart-4);
+}
+
+
+#StatsChart {
+  margin-left: -$spacer;
+  margin-right: -$spacer;
+}
+
+.module-triangle-bottom {
+  background-color: $white;
+  padding: $spacer / 2;
+  font-weight: 500;
+  font-size: to-rem(18);
+  border-radius: to-rem(4);
+  box-shadow: 0 0 5px rgba(0,0,0,.15);
+}

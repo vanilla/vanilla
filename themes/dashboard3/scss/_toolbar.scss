@@ -1,0 +1,58 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding-top: $spacer / 2;
+  padding-bottom: $spacer;
+
+  > * {
+    flex-shrink: 0;
+    margin-top: $spacer / 2;
+  }
+
+  .toolbar-main {
+    flex-grow: 1;
+    padding-right: $spacer;
+  }
+}
+
+.toolbar-stats {
+  > *:not(.nav-stats) {
+    margin-top: $spacer * 2;
+  }
+}
+
+.nav-stats {
+  display: flex;
+}
+
+.nav-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding: $spacer $spacer * 2 0 0 ;
+  color: rgba(25,25,25,0.20);
+
+   > * {
+     cursor: pointer;
+   }
+
+  .nav-stats-title {
+    font-weight: 400;
+    padding: $spacer / 2 0 $spacer / 4;
+    text-transform: uppercase;
+    font-size: $font-size-sm;
+  }
+}
+
+.toolbar-stats-daterange-preview {
+  display: inline;
+  font-weight: 500;
+}
+
+.nav-stats-value {
+  font-weight: 300;
+  font-size: to-rem(40);
+}
+

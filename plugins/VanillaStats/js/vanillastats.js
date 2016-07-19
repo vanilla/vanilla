@@ -151,6 +151,17 @@ var vanillaStats = (function() {
                                     format: (function(date) { return this.formatDate(date) }).bind(this)
                                 },
                                 type: "timeseries"
+                            },
+                            y : {
+                                tick: {
+                                    format: function (d) {
+                                        // Don't return decimal labels.
+                                        if (d % 1 !== 0) {
+                                            return '';
+                                        }
+                                        return d;
+                                    }
+                                }
                             }
                         },
                         grid: {

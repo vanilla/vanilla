@@ -85,7 +85,7 @@ var vanillaStats = (function() {
          * @return {string}
          */
         this.getActiveType = function() {
-            var activeTypeElement = $("#StatsOverview").find("li.Active");
+            var activeTypeElement = $("#StatsOverview").find("li.active");
             var activeType = "NewUsers";
 
             if (activeTypeElement.length > 0) {
@@ -151,17 +151,32 @@ var vanillaStats = (function() {
                                     format: (function(date) { return this.formatDate(date) }).bind(this)
                                 },
                                 type: "timeseries"
+                            }
+                        },
+                        grid: {
+                            x: {
+                                show: true
                             },
-                            y:{
-                                padding: 0
+                            y: {
+                                show: true
                             }
                         },
                         bindto: statsChart,
                         data: {
-                            columns: []
+                            columns: [],
+                            type: 'area'
                         },
                         legend: {
                             show: false
+                        },
+                        onrendered: function() {
+                            $(document).trigger('c3Init');
+                        },
+                        tooltip: {
+                            contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
+                                d = Math.floor(d[0].value)
+                                return '<div id="tooltip" class="module-triangle-bottom">' + d + '</div>'
+                            }
                         }
                     });
                 }
@@ -304,8 +319,8 @@ var vanillaStats = (function() {
                         legend: { show: false },
                         point: { show: false },
                         size: {
-                            height: 30,
-                            width: 60
+                            height: 40,
+                            width: 80
                         },
                         tooltip: { show: false }
                     });
@@ -348,7 +363,7 @@ var vanillaStats = (function() {
             document.getElementById("StatsSlotDay").disabled = false;
             document.getElementById("StatsSlotMonth").disabled = false;
 
-            $("#StatsSlotSelector").find("input").click((function (eventObject) {
+            $("#StatsSlotSelector").find("button").click((function (eventObject) {
                 switch (eventObject.currentTarget.id) {
                     case "StatsSlotDay":
                         this.setSlotType("d");
@@ -360,7 +375,7 @@ var vanillaStats = (function() {
                 }
             }).bind(this));
 
-            $("#StatsNavigation").find("input").click((function (eventObject) {
+            $("#StatsNavigation").find("button").click((function (eventObject) {
                 switch (eventObject.currentTarget.id) {
                     case "StatsNavNext":
                         this.apiRequest(this.getLinks("Next"), null, this.timelineResponseHandler);
@@ -377,6 +392,9 @@ var vanillaStats = (function() {
                         break;
                 }
             }).bind(this));
+
+            $("#StatsSlotMonth").trigger('click');
+            $("#StatsPageViews").trigger('click');
         };
 
         /**
@@ -611,23 +629,27 @@ var vanillaStats = (function() {
                     var typeElements = typeSelector.getElementsByTagName("li");
                     for (var i = 0; i < typeElements.length; i++) {
                         if (typeElements[i].id === activeElementID) {
-                            $(typeElements[i]).addClass("Active");
+                            $(typeElements[i]).addClass("active");
                         } else {
-                            $(typeElements[i]).removeClass("Active");
+                            $(typeElements[i]).removeClass("active");
                         }
                     }
+                    $("#StatsChart").removeClass(function (index, css) {
+                        return (css.match (/(^|\s)Chart\S+/g) || []).join(' ');
+                    });
+                    $("#StatsChart").addClass('Chart' + activeElementID);
                 }
                 this.writeData();
                 break;
             case "SlotSelector":
                 var slotSelector = document.getElementById("StatsSlotSelector");
                 if (slotSelector) {
-                    var slotElements = slotSelector.getElementsByTagName("input");
+                    var slotElements = slotSelector.getElementsByTagName("button");
                     for (var x = 0; x < slotElements.length; x++) {
                         if (slotElements[x].id === activeElementID) {
-                            $(slotElements[x]).addClass("Active");
+                            $(slotElements[x]).addClass("active");
                         } else {
-                            $(slotElements[x]).removeClass("Active");
+                            $(slotElements[x]).removeClass("active");
                         }
                     }
                 }
@@ -678,6 +700,21 @@ var vanillaStats = (function() {
         }
 
     };
+
+    VanillaStats.prototype.getSummaries = function(container) {
+        var dateRange = this.getRange();
+        $.ajax({
+            url: gdn.url('/dashboard/settings/dashboardsummaries?DeliveryType=VIEW'),
+            data: {range: dateRange},
+            success: function(data) {
+                $(container).html(data);
+            },
+            error: function(xhr, status, error) {
+                $(container).html('<div class="NoStats">Remote Analytics Server request failed.</div>');
+            },
+            timeout: 15000 // 15 seconds in ms
+        });
+    },
 
     /**
      * Refresh the chart by populating with timeline data of the specified type.
@@ -847,6 +884,8 @@ var vanillaStats = (function() {
         this.writeCount("StatsPageViews", this.getCounts("Views"));
 
         this.updateChart(this.getActiveType(), this.getChart());
+
+        this.getSummaries(".js-dashboard-widgets-summaries")
     };
 
     return new VanillaStats();

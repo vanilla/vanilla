@@ -163,32 +163,37 @@ class CategoriesController extends VanillaController {
             $this->Description(val('Description', $Category), true);
 
 
-            if ($Category->DisplayAs == 'Categories') {
-                if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
-                    // Headings don't make sense if we've cascaded down one level.
-                    saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-                }
-
-                if ($this->SyndicationMethod != SYNDICATION_NONE) {
-                    // RSS can't show a category list so just tell it to expand all categories.
-                    saveToConfig('Vanilla.ExpandCategories', true, false);
-                } else {
-                    // This category is an overview style category and displays as a category list.
-                    switch ($Layout) {
-                        case 'mixed':
-                            $this->View = 'discussions';
-                            $this->Discussions($CategoryIdentifier);
-                            break;
-                        case 'table':
-                            $this->table($CategoryIdentifier);
-                            break;
-                        default:
-                            $this->View = 'all';
-                            $this->All($CategoryIdentifier);
-                            break;
-                    }
+            switch ($Category->DisplayAs) {
+                case 'Flat':
+                    $this->flat($Category, $Page);
                     return;
-                }
+                case 'Categories':
+                    if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
+                        // Headings don't make sense if we've cascaded down one level.
+                        saveToConfig('Vanilla.Categories.DoHeadings', false, false);
+                    }
+
+                    if ($this->SyndicationMethod != SYNDICATION_NONE) {
+                        // RSS can't show a category list so just tell it to expand all categories.
+                        saveToConfig('Vanilla.ExpandCategories', true, false);
+                    } else {
+                        // This category is an overview style category and displays as a category list.
+                        switch ($Layout) {
+                            case 'mixed':
+                                $this->View = 'discussions';
+                                $this->Discussions($CategoryIdentifier);
+                                break;
+                            case 'table':
+                                $this->table($CategoryIdentifier);
+                                break;
+                            default:
+                                $this->View = 'all';
+                                $this->All($CategoryIdentifier);
+                                break;
+                        }
+                        return;
+                    }
+                    break;
             }
 
             Gdn_Theme::section('DiscussionList');
@@ -385,12 +390,14 @@ class CategoriesController extends VanillaController {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
         }
+
         $categoryTree = $this->CategoryModel
             ->setJoinUserCategory(true)
             ->getChildTree(
                 $Category ?: null,
                 $this->CategoryModel->getMaxDisplayDepth() ?: 10
             );
+
         if ($this->CategoryModel->Watching) {
             $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);
         }
@@ -491,6 +498,56 @@ class CategoriesController extends VanillaController {
             include_once $Path2;
         }
         $this->render();
+    }
+
+    /**
+     * @param array $category
+     */
+    private function flat($category, $page) {
+        list($offset, $limit) = offsetLimit($page, c('Vanilla.Categories.PerPage', 5));
+        if (!is_numeric($offset) || $offset < 0) {
+            $offset = 0;
+        }
+        $pageNumber = pageNumber($offset, $limit);
+
+        $categoryTree = $this->CategoryModel->getWhereCache(['ParentCategoryID' => val('CategoryID', $category)]);
+        usort($categoryTree, function($a, $b) {
+            return val('DateInserted', $a) > val('DateInserted', $b) ? -1 : 1;
+        });
+        $this->CategoryModel->joinRecent($categoryTree);
+        $countCategories = count($categoryTree);
+
+        // Build a pager
+        $pagerFactory = new Gdn_PagerFactory();
+        $url = categoryUrl($category);
+
+        $this->setData('_PagerUrl', $url.'/{Page}');
+
+        $this->pager = $pagerFactory->getPager('Pager', $this);
+        $this->pager->ClientID = 'Pager';
+        $this->pager->configure(
+            $offset,
+            $limit,
+            $countCategories,
+            $this->data('_PagerUrl')
+        );
+
+        $this->pager->Record = CategoryModel::categories(val('CategoryID', $category));
+        PagerModule::current($this->pager);
+
+        $this->setData('_Page', $pageNumber);
+        $this->setData('_Limit', $limit);
+
+        $categoryTree = array_slice($categoryTree, $offset, $limit, true);
+
+        $this->setData('CategoryTree', $categoryTree);
+
+        $this->addModule('NewDiscussionModule');
+        $this->addModule('DiscussionFilterModule');
+        $this->addModule('CategoriesModule');
+        $this->addModule('BookmarkedModule');
+
+        $this->render('all');
     }
 
     public function __get($Name) {

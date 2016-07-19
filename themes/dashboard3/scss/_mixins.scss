@@ -31,6 +31,7 @@
     color: $active-color;
     background-color: $active-background;
     border-color: $active-border;
+    outline: 0;
   }
 
   &:active,

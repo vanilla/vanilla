@@ -21,13 +21,13 @@
   @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, $btn-border-radius);
   @include transition(all .2s ease-in-out);
 
-  @include hover-focus {
-    text-decoration: none;
-  }
-
-  &.focus {
-    text-decoration: none;
-  }
+  //@include hover-focus {
+  //  text-decoration: none;
+  //}
+  //
+  //&.focus {
+  //  text-decoration: none;
+  //}
 
   &:active,
   &.active {
@@ -39,8 +39,15 @@
   &.disabled,
   &:disabled {
     cursor: $cursor-disabled;
-    opacity: .65;
-    @include box-shadow(none);
+
+    &,
+    &:hover {
+      color: $btn-link-disabled-color;
+
+      svg {
+        fill: $btn-link-disabled-color;
+      }
+    }
   }
 }
 
@@ -155,15 +162,6 @@ input[type="button"] {
   }
 }
 
-.btn-group {
-  font-size: 0;
-
-  .btn {
-    border-radius: 0;
-    margin-right: -$input-btn-border-width;
-  }
-}
-
 .btn-icon {
   @extend .btn-link;
   @extend .icon;
@@ -202,5 +200,60 @@ input[type="button"] {
     svg {
       fill: $white;
     }
+  }
+}
+
+
+// Button group
+
+.btn-group {
+  font-size: 0;
+
+  .btn {
+    border-radius: 0;
+    margin-right: -$input-btn-border-width;
+
+    &:first-child {
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $border-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+    }
+  }
+}
+
+// Make the div behave like a button
+.btn-group,
+.btn-group-vertical {
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+
+  > .btn {
+    position: relative;
+    float: left;
+
+    // Bring the "active" button to the front
+    &:focus,
+    &:active,
+    &.active {
+      z-index: 2;
+    }
+    //@include hover {
+    //  z-index: 2;
+    //}
+  }
+}
+
+// Prevent double borders when buttons are next to each other
+.btn-group {
+  .btn + .btn,
+  .btn + .btn-group,
+  .btn-group + .btn,
+  .btn-group + .btn-group {
+    margin-left: -$input-btn-border-width;
   }
 }

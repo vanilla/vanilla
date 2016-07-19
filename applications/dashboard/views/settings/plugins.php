@@ -54,14 +54,14 @@ Gdn_Theme::assetBegin('Help'); ?>
 ?>
 <h1><?php echo $title; ?></h1>
 <?php if ($this->addonType !== 'locales') { ?>
-<div class="Tabs FilterTabs">
-    <ul>
-        <li<?php echo $this->Filter == 'all' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all'); ?></li>
-        <li<?php echo $this->Filter == 'enabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount)), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled'); ?></li>
-        <li<?php echo $this->Filter == 'disabled' ? ' class="Active"' : ''; ?>><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount)), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled'); ?></li>
+    <div class="toolbar full-border">
+<div class="btn-group">
+        <?php $active = $this->Filter == 'all' ? 'active' : ''; ?><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all btn btn-secondary '.$active); ?>
+        <?php $active = $this->Filter == 'enabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount)), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled btn btn-secondary '.$active); ?>
+        <?php $active =  $this->Filter == 'disabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount)), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled btn btn-secondary '.$active); ?>
 <!--        --><?php //if ($addonUrl != '') echo $getMore; ?>
-    </ul>
 </div>
+    </div>
 <?php } ?>
 <?php echo $this->Form->errors(); ?>
 <div class="Messages Errors TestAddonErrors Hidden">

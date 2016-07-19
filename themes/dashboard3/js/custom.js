@@ -830,6 +830,12 @@
         expanderInit(e.target);
     });
 
+
+    $(document).on('c3Init', function(e) {
+
+    });
+
+
     // $(document).on('click', '.js-collapse-toggle', function() {
     //
     // });

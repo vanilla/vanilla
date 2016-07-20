@@ -18,6 +18,16 @@
   }
 }
 
+
+.radio,
+.checkbox {
+  margin-bottom: 0;
+
+  * + & {
+    margin-top: $spacer * .75;
+  }
+}
+
 .list-reset {
   &,
   ul,

@@ -37,13 +37,10 @@
   margin-right: $spacer / 2;
 }
 
-.media-sm-content {
-  line-height: 1;
-}
-
 .media-sm-title {
-  font-size: $font-size-tables;
   margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+  font-size: $font-size-tables;
+  line-height: 1;
 
   a {
     color: $gray-dark;
@@ -58,7 +55,8 @@
 
 .media-sm-info {
   font-size: $font-size-sm;
-  @extend .info;
+  line-height: 1;
+  color: $grey;
 }
 
 .btn-media-sm {

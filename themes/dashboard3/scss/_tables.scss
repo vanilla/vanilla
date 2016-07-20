@@ -19,8 +19,23 @@ table {
   max-width: 100%;
   margin-bottom: 0;
 
-  .options {
-    width: 6rem;
+  td.options {
+    white-space: nowrap;
+
+    > * {
+      display: inline-block;
+      white-space: nowrap;
+      margin-right: $spacer / 4;
+      vertical-align: middle;
+
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+
+  .grow {
+    width: 100%;
   }
 
   thead {
@@ -69,6 +84,20 @@ table {
   .table {
     background-color: $body-bg;
   }
+
+  &.no-hover {
+    tbody tr {
+      &:hover {
+        background-color: inherit;
+      }
+    }
+  }
+}
+
+.attach-top td {
+  // Hovering bg color doesn't really work here
+  border-top: 0;
+  padding-top: 0;
 }
 
 .CheckBoxGrid {
@@ -235,14 +264,12 @@ table {
     }
 
     h2 {
-      @extend .media-sm-content;
       @extend .media-sm-title;
       margin-top: 0;
       text-overflow: ellipsis;
     }
 
     .FeedDescription {
-      @extend .media-sm-content;
       @extend .media-sm-info;
 
       strong {

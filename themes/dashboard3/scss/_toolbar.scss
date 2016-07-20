@@ -2,17 +2,22 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: flex-start;
   padding-top: $spacer / 2;
   padding-bottom: $spacer;
 
   > * {
     flex-shrink: 0;
     margin-top: $spacer / 2;
+    margin-right: $spacer;
+
+    &:last-child {
+      margin-right: 0;
+    }
   }
 
   .toolbar-main {
     flex-grow: 1;
-    padding-right: $spacer;
   }
 }
 
@@ -46,10 +51,18 @@
   }
 }
 
-.toolbar-stats-daterange-preview {
-  display: inline;
+.toolbar-stats-daterange-preview,
+.pager-count {
+  line-height: 1;
   font-weight: 500;
   padding-right: $spacer / 2;
+}
+
+.pager,
+.toolbar-stats-daterange {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 
 .nav-stats-value {

@@ -4,16 +4,17 @@ $pager = Gdn::controller()->data('Pager');
 $pageCount = ceil($pager->TotalRecords / $pager->Limit);
 $currentPage = PageNumber($pager->Offset, $pager->Limit);
 
-$pagerString = '<div class="pager btn-group">';
+$pagerString = '<div class="pager">';
 if ($currentPage >= $pageCount) {
     $disabled = 'disabled';
 } else {
     $disabled = '';
 }
-$pagerString .=  '<div class="'.$disabled.' btn btn-secondary js-pager">';
+$pagerString .=  '<div class="pager-count">';
 $pagerString .= sprintf(t('Page %s of %s'), $currentPage, $pageCount ? $pageCount : 1);
 $pagerString .=  '</div>';
 
+$pagerString .= '<div class="btn-group">';
 // Previous
 if ($currentPage == 1) {
     $disabled = 'disabled';
@@ -29,6 +30,6 @@ if ($currentPage >= $pageCount) {
     $disabled = '';
 }
 $pagerString .= anchor(dashboardSymbol("chevron-right"), $pager->PageUrl($currentPage + 1), $disabled.' Next pager-next btn btn-icon-border', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
-$pagerString .= '</div>';
+$pagerString .= '</div></div>';
 
 echo '<div class="pager-wrap">'.$pagerString.'</div>';

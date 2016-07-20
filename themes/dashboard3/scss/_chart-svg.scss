@@ -47,8 +47,6 @@ $chart-bg-opacity: 0.15;
 .Section-DashboardHome {
 
   .c3-axis-y {
-    //translate: 60px;
-
     path {
       display: none;
     }
@@ -78,6 +76,7 @@ $chart-bg-opacity: 0.15;
   .c3-axis-x {
     text{
       font-size: $font-size-sm;
+      transform: translate(0,($spacer / 2));
     }
   }
 
@@ -183,6 +182,7 @@ $chart-bg-opacity: 0.15;
 #StatsChart {
   margin-left: -$spacer;
   margin-right: -$spacer;
+  left: -$spacer * .75;
 }
 
 .module-triangle-bottom {

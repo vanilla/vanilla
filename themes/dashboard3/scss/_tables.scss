@@ -1,9 +1,17 @@
+@include media-breakpoint-down(md) {
+  $font-size-table: to-rem(11);
+}
+
 .table-wrap {
   display: block;
   margin-top: 0;
   margin-right: (-$padding-default);
   margin-bottom: 0;
   margin-left: (-$padding-default);
+
+  .header-block + & {
+    margin-top: -$border-width;
+  }
 }
 
 table {
@@ -113,7 +121,41 @@ table {
       text-align: center;
     }
   }
+
+  @media screen and (max-width: 575px) {
+    table-layout: fixed;
+
+    thead,
+    tbody {
+      td,
+      th {
+        font-size: to-rem(12);
+        padding: $spacer / 4;
+      }
+    }
+
+    tbody th {
+      font-size: to-rem(13);
+    }
+
+    thead {
+      td {
+        position: relative;
+        a {
+          position: relative;
+          display: block;
+          transform: rotate(90deg);
+          top: -$spacer;
+        }
+        width: $spacer * 2;
+        text-align: center;
+        height: to-rem(90);
+      }
+    }
+  }
 }
+
+
 
 
 .Section-DashboardHome {

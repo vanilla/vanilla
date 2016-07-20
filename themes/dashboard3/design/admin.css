@@ -5368,6 +5368,12 @@ output {
   border-radius: 0.125rem;
 }
 
+.btn, .file-upload-browse, .Button,
+.TextButton, .FilterMenu .FilterButton, .btn:hover, .file-upload-browse:hover, .Button:hover,
+.TextButton:hover, .FilterMenu .FilterButton:hover {
+  text-decoration: none;
+}
+
 .btn:active, .file-upload-browse:active, .Button:active,
 .TextButton:active, .FilterMenu .FilterButton:active, .btn.active, .active.file-upload-browse, .file-upload-browse.Current,
 .file-upload-browse.current-theme, .active.Button, .Button.Current,
@@ -5417,18 +5423,6 @@ output {
 
 .btn-icon + .btn-icon {
   margin-left: 0;
-}
-
-a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button,
-a.disabled.TextButton, .FilterMenu a.disabled.FilterButton,
-fieldset[disabled] a.btn,
-fieldset[disabled] a.file-upload-browse,
-fieldset[disabled] a.Button,
-fieldset[disabled]
-a.TextButton,
-fieldset[disabled] .FilterMenu a.FilterButton, .FilterMenu
-fieldset[disabled] a.FilterButton {
-  pointer-events: none;
 }
 
 .btn-primary, .Button,
@@ -5785,29 +5779,24 @@ input[type="button"].btn-block {
   width: 0.875rem;
 }
 
-.card .username {
+.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2 {
   margin-bottom: 0.28125rem;
 }
 
-.card .username a {
+.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a {
   color: #555a62;
 }
 
-.card .user-block {
-  -ms-flex-align: start;
-  align-items: flex-start;
-}
-
-.card .user-block .user-image-wrap {
+.card .media-sm-image-wrap {
   position: relative;
   height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
   background-color: #f4f4f5;
-  margin-right: 1.6875rem;
+  margin-right: 1.125rem;
 }
 
-.card .user-block .user-image-wrap::after {
+.card .media-sm-image-wrap::after {
   position: absolute;
   display: block;
   top: 0;
@@ -5819,22 +5808,27 @@ input[type="button"].btn-block {
   content: '';
 }
 
-.card .user-block .user-image-wrap img, .card .user-block .user-image-wrap .LayoutOptions .Sprite, .LayoutOptions .card .user-block .user-image-wrap .Sprite, .card .user-block .user-image-wrap
+.card .media-sm-image-wrap img, .card .media-sm-image-wrap .LayoutOptions .Sprite, .LayoutOptions .card .media-sm-image-wrap .Sprite, .card .media-sm-image-wrap
 .HomeOptions .Sprite,
-.HomeOptions .card .user-block .user-image-wrap .Sprite {
+.HomeOptions .card .media-sm-image-wrap .Sprite {
   width: 5.25rem;
 }
 
-.card .user-block .btn-userblock {
+.card .media-sm {
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+
+.card .btn-media-sm {
   margin-top: 1.125rem;
 }
 
-.card .user-block .btn-userblock svg {
+.card .btn-media-sm svg {
   width: 0.675rem;
   top: 2px;
 }
 
-.card .user-block .btn-userblock:hover svg {
+.card .btn-media-sm:hover svg {
   fill: #fff;
 }
 
@@ -5873,6 +5867,8 @@ input[type="button"].btn-block {
 
 .Section-DashboardHome .c3-axis-x text {
   font-size: 0.75rem;
+  -webkit-transform: translate(0, 0.5625rem);
+  transform: translate(0, 0.5625rem);
 }
 
 .Section-DashboardHome .c3 svg {
@@ -6124,6 +6120,7 @@ input[type="button"].btn-block {
 #StatsChart {
   margin-left: -1.125rem;
   margin-right: -1.125rem;
+  left: -0.84375rem;
 }
 
 .module-triangle-bottom {
@@ -6348,6 +6345,11 @@ form ol label {
   font-size: 0.75rem;
   line-height: 1.3333333333;
   color: #949aa2;
+}
+
+.label-title {
+  font-weight: 500;
+  margin-bottom: 0.28125rem;
 }
 
 .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
@@ -7518,6 +7520,10 @@ button.close, button.Close {
   border-bottom: 0.0625rem solid #ddd;
 }
 
+.nav-adventure .nav-item:first-child {
+  border-top: 0.0625rem solid #ddd;
+}
+
 .nav-adventure .nav-item-title {
   line-height: 1;
   font-weight: 500;
@@ -7981,6 +7987,10 @@ ul {
   margin-left: -1.125rem;
 }
 
+.header-block + .table-wrap {
+  margin-top: -0.0625rem;
+}
+
 table {
   width: 100%;
   max-width: 100%;
@@ -8078,6 +8088,35 @@ table .table {
 .CheckBoxGrid tbody td {
   padding: 0.5625rem 0.84375rem;
   text-align: center;
+}
+
+@media screen and (max-width: 575px) {
+  .CheckBoxGrid {
+    table-layout: fixed;
+  }
+  .CheckBoxGrid thead td,
+  .CheckBoxGrid thead th,
+  .CheckBoxGrid tbody td,
+  .CheckBoxGrid tbody th {
+    font-size: 0.75rem;
+    padding: 0.28125rem;
+  }
+  .CheckBoxGrid tbody th {
+    font-size: 0.8125rem;
+  }
+  .CheckBoxGrid thead td {
+    position: relative;
+    width: 2.25rem;
+    text-align: center;
+    height: 5.625rem;
+  }
+  .CheckBoxGrid thead td a {
+    position: relative;
+    display: block;
+    -webkit-transform: rotate(90deg);
+    transform: rotate(90deg);
+    top: -1.125rem;
+  }
 }
 
 .Section-DashboardHome table thead tr {
@@ -8338,6 +8377,7 @@ table .table {
 .toolbar-stats-daterange-preview {
   display: inline;
   font-weight: 500;
+  padding-right: 0.5625rem;
 }
 
 .nav-stats-value {
@@ -8524,6 +8564,11 @@ pre {
   border-right-color: transparent;
   border-width: 0.590625rem 0.39375rem;
   text-transform: uppercase;
+}
+
+strong,
+.strong {
+  font-weight: 500;
 }
 
 table h2,

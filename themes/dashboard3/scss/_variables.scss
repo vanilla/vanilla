@@ -214,7 +214,7 @@ $toggle-padding:                            $toggle-height / 32;
 $padding-default:                           $grid-gutter-width / 2;
 $border-color:                              #ddd;
 
-$font-size-tables:                          .8125rem; //13px
+$font-size-tables:                          to-rem(13);
 
 // Cards
 $card-spacer-x:            1.25rem !default;

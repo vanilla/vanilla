@@ -13,64 +13,10 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
 }
 
 ?>
-<style type="text/css">
-    div.Tutorials {
-        padding: 20px;
-    }
-
-    .Video {
-        margin-right: 20px;
-        float: left;
-    }
-
-    .VideoInfo {
-        min-height: 420px;
-    }
-
-    .VideoInfo strong {
-        display: block;
-        font-size: 15px;
-    }
-
-    .VideoInfo em {
-        display: block;
-        color: #555;
-        font-size: 12px;
-    }
-
-    .Videos h2 {
-        font-size: 15px;
-    }
-
-    .Videos a {
-        line-height: 1.6;
-        margin: 0 10px 10px 0;
-        display: inline-block;
-        width: 212px;
-        vertical-align: top;
-        color: #000;
-    }
-
-    .Videos a.Current,
-    .Videos a:hover {
-        background: #eee;
-    }
-
-    .Videos span {
-        display: block;
-        padding: 0 6px 6px;
-    }
-
-    .Videos img {
-        border: 6px solid #eee;
-    }
-
-    .Videos a.Current img,
-    .Videos a:hover img {
-        border: 6px solid #ddd;
-    }
-</style>
-<h1><?php echo t('Help &amp; Tutorials'); ?></h1>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/tutorials'); ?>" class="active"><?php echo t('Help &amp; Tutorials'); ?></a>
+</div>
 <div class="Tutorials">
     <div class="Video">
         <iframe wmode="transparent"

@@ -8,12 +8,14 @@ Gdn_Theme::assetEnd();
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
+<div class="toolbar">
     <div class="buttons">
         <?php
         echo anchor(t('Spam'), '#', array('class' => 'SpamButton btn btn-secondary'));
         echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-secondary'));
         ?>
     </div>
+</div>
 <?php
 
 echo '<div id="LogTable">';

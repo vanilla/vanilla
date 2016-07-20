@@ -16,9 +16,11 @@ Gdn_Theme::assetEnd();
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<h1><?php echo t('Flood Control'); ?></h1>
+<div class="header-block">
+    <h1><?php echo t('Flood Control'); ?></h1>
+</div>
 <div class="table-wrap">
-    <table class="AltColumns">
+    <table>
         <thead>
         <tr>
             <th><?php echo t('Only Allow Each User To Post'); ?></th>

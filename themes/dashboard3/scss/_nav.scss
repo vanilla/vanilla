@@ -120,6 +120,10 @@
     margin-left: -$padding-default;
     margin-right: -$padding-default;
     border-bottom: $border-width solid $border-color;
+
+    &:first-child {
+      border-top: $border-width solid $border-color;
+    }
   }
 
   .nav-item-title {

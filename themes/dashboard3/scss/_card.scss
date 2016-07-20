@@ -18,7 +18,7 @@
     width: $font-size-base;
   }
 
-  .username {
+  .media-sm-title {
     margin-bottom: $spacer / 4;
 
     a {
@@ -26,25 +26,25 @@
     }
   }
 
-  .user-block {
-    align-items: flex-start;
+  .media-sm-image-wrap {
+    @include image-wrap();
+    margin-right: $spacer;
+  }
 
-    .user-image-wrap {
-      @include image-wrap();
-      margin-right: $spacer * 1.5;
+  .media-sm {
+    align-items: flex-start;
+  }
+
+  .btn-media-sm {
+    margin-top: $spacer;
+
+    svg {
+      width: $font-size-xs;
+      top: 2px;
     }
 
-    .btn-userblock {
-      margin-top: $spacer;
-
-      svg {
-        width: $font-size-xs;
-        top: 2px;
-      }
-
-      &:hover svg {
-        fill: $white;
-      }
+    &:hover svg {
+      fill: $white;
     }
   }
 }

@@ -40,7 +40,9 @@ class CategoriesModule extends Gdn_Module {
             return;
         }
 
-        $Categories = CategoryModel::categories();
+        $Categories = CategoryModel::makeTree(CategoryModel::categories());
+        CategoryModel::filterChildren($Categories);
+        $Categories = CategoryModel::flattenTree($Categories);
         $Categories2 = $Categories;
 
         // Filter out the categories we aren't watching.

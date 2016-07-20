@@ -131,13 +131,20 @@ class TagModel extends Gdn_Model {
     public function types() {
         if (!isset($this->Types)) {
             $this->Types = array(
-                '' => array(
+                '' => [
                     'key' => '',
-                    'name' => 'Tag',
-                    'plural' => 'Tags',
+                    'name' => 'All',
+                    'plural' => 'All',
                     'default' => true,
                     'addtag' => true
-                )
+                ],
+                'tags' => [
+                    'key' => 'tags',
+                    'name' => 'Tag',
+                    'plural' => 'Tags',
+                    'default' => false,
+                    'addtag' => true
+                ]
             );
 
             $this->fireEvent('Types');
@@ -158,11 +165,18 @@ class TagModel extends Gdn_Model {
             $TagTypes = array();
         }
 
+        // Remove the defaults out of the list, and add them to the start
+        $start = array_intersect_key($TagTypes, ['' => [], 'tags' => []]);
+        unset($TagTypes['']);
+        unset($TagTypes['tags']);
+
         // Sort by keys, and because the default, "Tags," has a blank key, it
         // will be set as the first key, which is good for the tabs.
         if (count($TagTypes)) {
             ksort($TagTypes);
         }
+
+        $TagTypes = array_merge($start, $TagTypes);
 
         return $TagTypes;
     }

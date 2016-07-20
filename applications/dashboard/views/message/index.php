@@ -18,26 +18,23 @@ $Session = Gdn::session();
     </div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
 <div class="table-wrap">
-    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
+    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable no-hover">
         <thead>
         <tr id="0">
-            <th><?php echo t('Location'); ?></th>
-            <th class="Alt"><?php echo t('Message'); ?></th>
-            <th class="options"><?php echo t('Options'); ?></th>
+            <th><?php echo t('Messages'); ?></th>
+            <th><?php echo t('Type'); ?></th>
+            <th class="options"></th>
         </tr>
         </thead>
         <tbody>
         <?php
-        $Alt = false;
         foreach ($this->MessageData->result() as $Message) {
             $Message = $this->MessageModel->DefineLocation($Message);
-            $Alt = !$Alt;
             ?>
             <tr id="<?php
             echo $Message->MessageID;
-            echo $Alt ? '" class="Alt' : '';
             ?>">
-                <td class="Info nowrap"><?php
+                <td><?php
                     printf(
                         t('%1$s on %2$s'),
                         val($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
@@ -53,22 +50,60 @@ $Session = Gdn::session();
                         }
 
                         echo '</div>';
+                    } else {
+                        echo '<div>'.t('All Categories').'</div>';
+                    }
+                    if (val('AllowDismiss', $Message) == '1') {
+                        echo '<div>'.t('Dismissable').'</div>';
+                    } else {
+                        echo '<div>'.t('Not Dismissable').'</div>';
                     }
                     ?>
-                    <div>
-                        <strong><?php echo $Message->Enabled == '1' ? t('Enabled') : t('Disabled'); ?></strong>
-                    </div>
                 </td>
-                <td class="Alt">
-                    <div
-                        class="Message <?php echo $Message->CssClass; ?>"><?php echo Gdn_Format::text($Message->Content); ?></div>
+                <td class="message-type">
+                    <?php
+                    $cssClass = val('CssClass', $Message);
+                    switch ($cssClass) {
+                        case 'CasualMessage':
+                            $type =  t('Casual');
+                            break;
+                        case 'InfoMessage':
+                            $type = t('Information');
+                            break;
+                        case 'AlertMessage':
+                            $type = t('Alert');
+                            break;
+                        case 'WarningMessage':
+                            $type = t('Warning');
+                            break;
+                        default:
+                            $type = t('Casual');
+                    }
+                    echo $type;
+                    ?>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
                         echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete')]);
                         ?>
+                    </div>
+                    <span id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
+                        <?php
+                        if ($Message->Enabled == '1') {
+                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
+                        } else {
+                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
+                        }
+                        ?>
+                    </span>
+                </td>
+            </tr>
+            <tr class="attach-top">
+                <td colspan="3">
+                    <div class="Message DismissMessage <?php echo $Message->CssClass; ?>">
+                        <?php echo Gdn_Format::text($Message->Content); ?>
                     </div>
                 </td>
             </tr>

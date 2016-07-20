@@ -64,6 +64,13 @@
   margin-left: 0;
 }
 
+// Future-proof disabling of clicks on `<a>` elements
+a.btn.disabled,
+fieldset[disabled] a.btn {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 //
 // Alternate buttons
 //
@@ -228,13 +235,11 @@ input[type="button"] {
 .btn-group,
 .btn-group-vertical {
   position: relative;
-  display: inline-block;
+  display: flex;
+  flex-wrap: nowrap;
   vertical-align: middle;
 
   > .btn {
-    position: relative;
-    float: left;
-
     // Bring the "active" button to the front
     &:focus,
     &:active,

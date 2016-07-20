@@ -22,7 +22,7 @@
         }
 
         return '<svg ' + alt + ' class="icon ' + cssClass + 'icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href=\"#' + name + '" /></svg>';
-    }
+    };
 
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
@@ -171,7 +171,7 @@
         // Default is to remove the closest item with the class 'js-modal-item'
         afterConfirmSuccess: function() {
             var found = false;
-            if (!settings.confirmaction || settings.confirmaction === 'delete') {
+            if (!modal.settings.confirmaction || modal.settings.confirmaction === 'delete') {
                 found = modal.trigger.closest('.js-modal-item').length !== 0;
                 modal.trigger.closest('.js-modal-item').remove();
             }
@@ -188,8 +188,8 @@
             var ok = gdn.definition('Okay', 'Okay');
             var cancel = gdn.definition('Cancel', 'Cancel');
 
-            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>'
-            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>'
+            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
+            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>';
 
             return {
                 title: confirmHeading,
@@ -462,8 +462,8 @@
             });
             tooltip.tooltip('show');
             setTimeout(function() {
-                tooltip.tooltip('hide')
-            }, '2000')
+                tooltip.tooltip('hide');
+            }, '2000');
         });
 
         clipboard.on('error', function(e) {
@@ -482,8 +482,8 @@
     function icheckInit(element) {
         $('input:not(.label-selector-input):not(.toggle-input)', element).iCheck({
             aria: true
-        }).on('ifChanged', function(e) {
-            $(this).trigger("change");
+        }).on('ifChanged', function() {
+            $(this).trigger('change');
         });
     }
 
@@ -507,10 +507,10 @@
         drawerInit(e.target);
         icheckInit(e.target);
         expanderInit(e.target);
+
     });
 
-
-    $(document).on('c3Init', function(e) {
+    $(document).on('c3Init', function() {
 
     });
 
@@ -542,7 +542,15 @@
         modal.start($(this), {});
     });
 
-    $(document).on('click', '.js-modal-confirm', function(e) {
+    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
+        e.preventDefault();
+        modal.start($(this), {
+            httpmethod: 'post',
+            modaltype: 'confirm'
+        });
+    });
+
+    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
         e.preventDefault();
         modal.start($(this), {
             modaltype: 'confirm'

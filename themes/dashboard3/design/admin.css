@@ -1527,19 +1527,19 @@ a.text-danger:focus, a.text-danger:hover {
   border-top-left-radius: 0;
 }
 
-.alert, .CasualMessage, .InfoMessage, .WarningMessage, .AlertMessage, .Messages.Errors {
+.alert, .CasualMessage, .InfoMessage, .WarningMessage, .AlertMessage, div.Messages.Errors {
   padding: 15px;
   margin-bottom: 1.125rem;
   border: 0.0625rem solid transparent;
   border-radius: 0;
 }
 
-.alert > p, .CasualMessage > p, .InfoMessage > p, .WarningMessage > p, .AlertMessage > p, .Messages.Errors > p,
-.alert > ul, .CasualMessage > ul, .InfoMessage > ul, .WarningMessage > ul, .AlertMessage > ul, .Messages.Errors > ul {
+.alert > p, .CasualMessage > p, .InfoMessage > p, .WarningMessage > p, .AlertMessage > p, div.Messages.Errors > p,
+.alert > ul, .CasualMessage > ul, .InfoMessage > ul, .WarningMessage > ul, .AlertMessage > ul, div.Messages.Errors > ul {
   margin-bottom: 0;
 }
 
-.alert > p + p, .CasualMessage > p + p, .InfoMessage > p + p, .WarningMessage > p + p, .AlertMessage > p + p, .Messages.Errors > p + p {
+.alert > p + p, .CasualMessage > p + p, .InfoMessage > p + p, .WarningMessage > p + p, .AlertMessage > p + p, div.Messages.Errors > p + p {
   margin-top: 5px;
 }
 
@@ -1604,17 +1604,17 @@ a.text-danger:focus, a.text-danger:hover {
   color: #e6e6e6;
 }
 
-.alert-danger, .Messages.Errors {
+.alert-danger, div.Messages.Errors {
   background-color: #fa2e1f;
   border-color: #fa2e1f;
   color: #fff;
 }
 
-.alert-danger hr, .Messages.Errors hr {
+.alert-danger hr, div.Messages.Errors hr {
   border-top-color: #f91706;
 }
 
-.alert-danger .alert-link, .Messages.Errors .alert-link {
+.alert-danger .alert-link, div.Messages.Errors .alert-link {
   color: #e6e6e6;
 }
 
@@ -5425,6 +5425,19 @@ output {
   margin-left: 0;
 }
 
+a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button,
+a.disabled.TextButton, .FilterMenu a.disabled.FilterButton,
+fieldset[disabled] a.btn,
+fieldset[disabled] a.file-upload-browse,
+fieldset[disabled] a.Button,
+fieldset[disabled]
+a.TextButton,
+fieldset[disabled] .FilterMenu a.FilterButton, .FilterMenu
+fieldset[disabled] a.FilterButton {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 .btn-primary, .Button,
 .TextButton, .FilterMenu .FilterButton {
   color: #0291db;
@@ -5670,20 +5683,11 @@ input[type="button"].btn-block {
 .btn-group,
 .btn-group-vertical {
   position: relative;
-  display: inline-block;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
   vertical-align: middle;
-}
-
-.btn-group > .btn, .btn-group > .file-upload-browse, .btn-group > .Button, .btn-group >
-.TextButton, .FilterMenu .btn-group > .FilterButton,
-.btn-group-vertical > .btn,
-.btn-group-vertical > .file-upload-browse,
-.btn-group-vertical > .Button,
-.btn-group-vertical >
-.TextButton, .FilterMenu
-.btn-group-vertical > .FilterButton {
-  position: relative;
-  float: left;
 }
 
 .btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .btn-group >
@@ -6169,13 +6173,10 @@ input[type="button"].btn-block {
   width: 1.875rem;
 }
 
-.media-sm-content, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .FeedDescription {
-  line-height: 1;
-}
-
 .media-sm-title, .Section-DashboardHome .FeedItem h2 {
-  font-size: 0.8125rem;
   margin-bottom: 0.3125rem;
+  font-size: 0.8125rem;
+  line-height: 1;
 }
 
 .media-sm-title a, .Section-DashboardHome .FeedItem h2 a {
@@ -6190,6 +6191,8 @@ input[type="button"].btn-block {
 
 .media-sm-info, .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .Date {
   font-size: 0.75rem;
+  line-height: 1;
+  color: #949aa2;
 }
 
 .btn-media-sm {
@@ -6279,6 +6282,16 @@ input[type="button"].btn-block {
   border-left: 1px solid #ddd;
 }
 
+.radio,
+.checkbox {
+  margin-bottom: 0;
+}
+
+* + .radio, * +
+.checkbox {
+  margin-top: 0.84375rem;
+}
+
 .list-reset,
 .list-reset ul,
 .list-reset ol {
@@ -6337,9 +6350,6 @@ form ol label {
 .Info,
 .Info2,
 .info,
-.media-sm-info,
-.Section-DashboardHome .FeedItem .FeedDescription,
-.Section-DashboardHome .FeedItem .Date,
 .emojiset-author {
   display: block;
   font-size: 0.75rem;
@@ -7286,7 +7296,7 @@ label[id^=iCheck] {
   background-color: #f4f6fb;
 }
 
-.media-callout .info, .media-callout .media-sm-info, .media-callout .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .media-callout .FeedDescription, .media-callout .Section-DashboardHome .FeedItem .Date, .Section-DashboardHome .FeedItem .media-callout .Date, .media-callout .emojiset-author {
+.media-callout .info, .media-callout .emojiset-author {
   font-size: 0.8125rem;
   font-weight: 300;
 }
@@ -7349,6 +7359,10 @@ label[id^=iCheck] {
   overflow: scroll;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.modal-sm .modal-body, .modal-sm .Content {
+  padding: 1.125rem;
 }
 
 .modal-content, .Overlay .Popup .Body {
@@ -7997,8 +8011,23 @@ table {
   margin-bottom: 0;
 }
 
-table .options {
-  width: 6rem;
+table td.options {
+  white-space: nowrap;
+}
+
+table td.options > * {
+  display: inline-block;
+  white-space: nowrap;
+  margin-right: 0.28125rem;
+  vertical-align: middle;
+}
+
+table td.options > *:last-child {
+  margin-right: 0;
+}
+
+table .grow {
+  width: 100%;
 }
 
 table thead tr {
@@ -8043,6 +8072,15 @@ table tbody + tbody {
 
 table .table {
   background-color: #f4f4f5;
+}
+
+table.no-hover tbody tr:hover {
+  background-color: inherit;
+}
+
+.attach-top td {
+  border-top: 0;
+  padding-top: 0;
 }
 
 .CheckBoxGrid .checkbox {
@@ -8326,6 +8364,8 @@ table .table {
   flex-wrap: wrap;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -ms-flex-align: start;
+  align-items: flex-start;
   padding-top: 0.5625rem;
   padding-bottom: 1.125rem;
 }
@@ -8334,12 +8374,16 @@ table .table {
   -ms-flex-negative: 0;
   flex-shrink: 0;
   margin-top: 0.5625rem;
+  margin-right: 1.125rem;
+}
+
+.toolbar > *:last-child {
+  margin-right: 0;
 }
 
 .toolbar .toolbar-main {
   -ms-flex-positive: 1;
   flex-grow: 1;
-  padding-right: 1.125rem;
 }
 
 .toolbar-stats > *:not(.nav-stats) {
@@ -8374,10 +8418,21 @@ table .table {
   font-size: 0.75rem;
 }
 
-.toolbar-stats-daterange-preview {
-  display: inline;
+.toolbar-stats-daterange-preview,
+.pager-count {
+  line-height: 1;
   font-weight: 500;
   padding-right: 0.5625rem;
+}
+
+.pager,
+.toolbar-stats-daterange {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
 .nav-stats-value {
@@ -8574,6 +8629,162 @@ strong,
 table h2,
 form h2 {
   margin-top: 0;
+}
+
+.Section-Dashboard.Message.index {
+  /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+    that it renders in a div with this DismissMessage class. */
+  /* Messages */
+}
+
+.Section-Dashboard.Message.index .DismissMessage a.Dismiss {
+  font-family: arial;
+  position: absolute;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 1;
+  color: #777;
+  top: -1px;
+  right: -1px;
+  padding: 1px 3px;
+  text-decoration: none;
+}
+
+.Section-Dashboard.Message.index .DismissMessage a.Dismiss:hover {
+  border: none;
+  background: #333;
+  color: #fff;
+}
+
+.Section-Dashboard.Message.index .DismissMessage strong,
+.Section-Dashboard.Message.index .DismissMessage b {
+  font-weight: bold;
+}
+
+.Section-Dashboard.Message.index .DismissMessage {
+  font-size: 13px;
+  text-align: left;
+  position: relative;
+  color: #000;
+  border: none;
+  border-radius: 1px;
+  margin: 10px 0;
+  padding: 10px;
+}
+
+.Section-Dashboard.Message.index .DismissMessage.Info {
+  background: #f3f4f8;
+  border: 1px solid #ddd;
+}
+
+.Section-Dashboard.Message.index .DismissMessage.Warning {
+  background: #ffebe9;
+  border: 1px solid #ffccc9;
+}
+
+.Section-Dashboard.Message.index .DismissMessage.Box {
+  background: #fff8ce;
+  border: 1px solid #c5bea4;
+  box-shadow: none;
+  margin: 0 0 10px;
+  /* Make sure that .Box definitions don't override the base DismissMessage margin! */
+}
+
+.Section-Dashboard.Message.index .CasualMessage {
+  background: #cfecff;
+  border: 1px solid #abdafb;
+  color: #1e79a7;
+}
+
+.Section-Dashboard.Message.index .InfoMessage {
+  background: #f6f6f6;
+  border: 1px solid #ddd;
+}
+
+.Section-Dashboard.Message.index .AlertMessage {
+  background: #fff8ce;
+  border: 1px solid #deddaf;
+}
+
+.Section-Dashboard.Message.index .WarningMessage {
+  background: #ffebe9;
+  border: 1px solid #ffccc9;
+}
+
+.Section-Dashboard.Message.index div.Message {
+  line-height: 1.7;
+  font-size: 100%;
+  word-wrap: break-word;
+  margin-top: 5px;
+}
+
+.Section-Dashboard.Message.index div.Message h1, .Section-Dashboard.Message.index div.Message h2, .Section-Dashboard.Message.index div.Message h3, .Section-Dashboard.Message.index div.Message p, .Section-Dashboard.Message.index div.Message .P {
+  margin: 10px 0;
+}
+
+.Section-Dashboard.Message.index div.Message small {
+  font-size: 11px;
+  color: #777;
+}
+
+.Section-Dashboard.Message.index div.Message img.LeftAlign, .Section-Dashboard.Message.index div.Message .LayoutOptions .LeftAlign.Sprite, .LayoutOptions .Section-Dashboard.Message.index div.Message .LeftAlign.Sprite, .Section-Dashboard.Message.index div.Message
+.HomeOptions .LeftAlign.Sprite,
+.HomeOptions .Section-Dashboard.Message.index div.Message .LeftAlign.Sprite,
+.Section-Dashboard.Message.index img.LeftAlign,
+.Section-Dashboard.Message.index .LayoutOptions .LeftAlign.Sprite, .LayoutOptions
+.Section-Dashboard.Message.index .LeftAlign.Sprite,
+.Section-Dashboard.Message.index
+.HomeOptions .LeftAlign.Sprite,
+.HomeOptions
+.Section-Dashboard.Message.index .LeftAlign.Sprite {
+  float: left;
+  margin: 0 10px 5px 0;
+  max-width: 300px;
+}
+
+.Section-Dashboard.Message.index div.Message dt {
+  font-weight: bold;
+  margin: 10px 0 4px;
+}
+
+.Section-Dashboard.Message.index div.Message dd {
+  margin-left: 30px;
+}
+
+.Section-Dashboard.Message.index div.Message dd > p {
+  margin-top: 4px;
+}
+
+.Section-Dashboard.Message.index div.Message li {
+  margin: 5px 0;
+}
+
+.Section-Dashboard.Message.index div.Message strong, .Section-Dashboard.Message.index div.Message b {
+  font-weight: bold;
+}
+
+.Section-Dashboard.Message.index div.Message em,
+.Section-Dashboard.Message.index div.Message i {
+  font-style: oblique;
+}
+
+.Section-Dashboard.Message.index div.Message ul,
+.Section-Dashboard.Message.index div.Message ol {
+  margin: 1em 0 1em 3em;
+}
+
+.Section-Dashboard.Message.index div.Message ol li {
+  list-style: decimal !important;
+}
+
+.Section-Dashboard.Message.index div.Message ul li {
+  list-style: disc !important;
+}
+
+.Section-Dashboard.Message.index div.Message img, .Section-Dashboard.Message.index div.Message .LayoutOptions .Sprite, .LayoutOptions .Section-Dashboard.Message.index div.Message .Sprite, .Section-Dashboard.Message.index div.Message
+.HomeOptions .Sprite,
+.HomeOptions .Section-Dashboard.Message.index div.Message .Sprite {
+  max-width: 100%;
 }
 
 .Sortable,

@@ -1,35 +1,34 @@
 <?php
 $pager = Gdn::controller()->data('Pager');
 // Get total page count, allowing override
-$PageCount = ceil($pager->TotalRecords / $pager->Limit);
-$CurrentPage = PageNumber($pager->Offset, $pager->Limit);
+$pageCount = ceil($pager->TotalRecords / $pager->Limit);
+$currentPage = PageNumber($pager->Offset, $pager->Limit);
 
-$Pager = '<div class="pager btn-group">';
-if ($CurrentPage >= $PageCount) {
+$pagerString = '<div class="pager btn-group">';
+if ($currentPage >= $pageCount) {
     $disabled = 'disabled';
 } else {
     $disabled = '';
 }
-$Pager .=  '<div class="'.$disabled.' btn btn-secondary js-btn-page-selector js-pager">';
-$Pager .= sprintf(t('Page %s of %s'), $CurrentPage, $PageCount ? $PageCount : 1);
-$Pager .=  '</div>';
+$pagerString .=  '<div class="'.$disabled.' btn btn-secondary js-pager">';
+$pagerString .= sprintf(t('Page %s of %s'), $currentPage, $pageCount ? $pageCount : 1);
+$pagerString .=  '</div>';
 
 // Previous
-if ($CurrentPage == 1) {
+if ($currentPage == 1) {
     $disabled = 'disabled';
 } else {
     $disabled = '';
 }
-$Pager .= anchor('', $pager->PageUrl($CurrentPage - 1), $disabled.' Previous btn btn-secondary icon icon-chevron-left', array('rel' => 'prev', 'aria-label' => 'Previous page'));
+$pagerString .= anchor(dashboardSymbol("chevron-left"), $pager->PageUrl($currentPage - 1), $disabled.' Previous pager-previous btn btn-icon-border', array('rel' => 'prev', 'aria-label' => 'Previous page'));
 
 // Next
-if ($CurrentPage >= $PageCount) {
+if ($currentPage >= $pageCount) {
     $disabled = 'disabled';
 } else {
     $disabled = '';
 }
-$PageParam = 'p'.($CurrentPage + 1);
-$Pager .= anchor('', $pager->PageUrl($CurrentPage + 1), $disabled.' Next btn btn-secondary icon icon-chevron-right', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
-$Pager .= '</div>';
+$pagerString .= anchor(dashboardSymbol("chevron-right"), $pager->PageUrl($currentPage + 1), $disabled.' Next pager-next btn btn-icon-border', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
+$pagerString .= '</div>';
 
-echo '<div class="pager-wrap">'.$Pager.'</div>';
+echo '<div class="pager-wrap">'.$pagerString.'</div>';

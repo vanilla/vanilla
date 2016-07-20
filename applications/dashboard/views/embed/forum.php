@@ -9,11 +9,13 @@
     ?>
 </div>
 <?php Gdn_Theme::assetEnd(); ?>
-<h1><?php echo t('Embedding'); ?></h1>
-<div class="strong"><?php echo t('Embed My Forum'); ?></div>
+<div class="header-block">
+    <h1><?php echo t('Embedding'); ?></h1>
+</div>
 <div class="row form-group">
     <div class="label-wrap-wide">
-        <div class="description"><?php echo t('If you want to embed your forum or use Vanilla\'s comments in your blog then you need to enable embedding. If you aren\'t using embedding then we recommend leaving this setting off.'); ?></div>
+        <div class="label-title"><?php echo t('Embed My Forum'); ?></div>
+        <div class="label-description"><?php echo t('If you want to embed your forum or use Vanilla\'s comments in your blog then you need to enable embedding. If you aren\'t using embedding then we recommend leaving this setting off.'); ?></div>
     </div>
     <div class="input-wrap-right">
     <span id="plaintext-toggle">

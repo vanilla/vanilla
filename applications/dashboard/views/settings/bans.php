@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block padded">
+<div class="header-block">
     <h1><?php echo $this->data('Title'); ?></h1>
     <?php echo anchor(t('Add Item'), '/dashboard/settings/bans/add', array('class' => 'btn btn-primary js-modal')); ?>
 </div>

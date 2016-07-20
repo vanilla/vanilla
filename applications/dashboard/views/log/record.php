@@ -8,12 +8,14 @@
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
+<div class="toolbar">
     <div class="buttons">
         <?php
         echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-secondary'));
         echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-secondary'));
         ?>
     </div>
+</div>
 <?php
 
 echo '<div id="LogTable">';

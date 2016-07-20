@@ -13,9 +13,9 @@
 
         <pre id="comments-code" class="CopyBox">&lt;div id="vanilla-comments">&lt;/div>
 &lt;script type="text/javascript">
-        <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
-        var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum
-        var vanilla_identifier = 'your-content-identifier'; // Your unique identifier for the content being commented on</strong>
+    <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
+    var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum
+    var vanilla_identifier = 'your-content-identifier'; // Your unique identifier for the content being commented on</strong>
 
     /*** Optional Settings: Ignore if you like ***/
     // var vanilla_discussion_id = ''; // Attach this page of comments to a specific Vanilla DiscussionID.
@@ -30,9 +30,16 @@
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(vanilla);
     })();
 &lt;/script>
-&lt;noscript>Please enable JavaScript to view the &lt;a href="http://vanillaforums.com/?ref_noscript">comments powered by Vanilla.&lt;/a>&lt;/noscript>
+&lt;noscript>
+    Please enable JavaScript to view the
+    &lt;a href="http://vanillaforums.com/?ref_noscript">
+        comments powered by Vanilla.
+    &lt;/a>
+&lt;/noscript>
 &lt;div class="vanilla-credit">
-    &lt;a class="vanilla-anchor" href="http://vanillaforums.com">Comments by &lt;span class="vanilla-logo">Vanilla&lt;/span>&lt;/a>
+    &lt;a class="vanilla-anchor" href="http://vanillaforums.com">
+        Comments by &lt;span class="vanilla-logo">Vanilla&lt;/span>
+    &lt;/a>
 &lt;/div>
 </pre>
     <div class="row form-group">
@@ -53,7 +60,7 @@
 
         <pre id="comments-count-code" class="CopyBox">&lt;script type="text/javascript">
     <strong>/*** Required Settings: Edit BEFORE pasting into your web page ***/
-        var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum</strong>
+    var vanilla_forum_url = '<?php echo url('/', true); ?>'; // The full http url & path to your vanilla forum</strong>
 
     /*** Optional Settings: customize the format of the comment counts. Html is allowed. */
     // var vanilla_comments_none = 'No Comments';

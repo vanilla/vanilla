@@ -836,6 +836,8 @@ class SettingsController extends DashboardController {
             $upload = new Gdn_Upload();
             $upload->delete($image);
         }
+
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

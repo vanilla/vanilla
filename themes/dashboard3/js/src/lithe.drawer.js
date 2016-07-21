@@ -132,6 +132,7 @@
 
             jQuery(options.container).addClass(options.classes.show);
             jQuery(options.container).removeClass(options.classes.hide);
+            jQuery(self.element).trigger('drawer.show');
         },
 
         /**
@@ -147,6 +148,7 @@
 
             jQuery(options.container).addClass(options.classes.hide);
             jQuery(options.container).removeClass(options.classes.show);
+            jQuery(self.element).trigger('drawer.hide');
         },
 
         /**

@@ -273,6 +273,7 @@
 
             jQuery(options.container).addClass(options.classes.show);
             jQuery(options.container).removeClass(options.classes.hide);
+            jQuery(self.element).trigger('drawer.show');
         },
 
         /**
@@ -288,6 +289,7 @@
 
             jQuery(options.container).addClass(options.classes.hide);
             jQuery(options.container).removeClass(options.classes.show);
+            jQuery(self.element).trigger('drawer.hide');
         },
 
         /**
@@ -395,7 +397,10 @@
     var modal = {
 
         settings: {
-            httpmethod: 'get'
+            httpmethod: 'get',
+            afterSuccess: function(json, sender) {
+                // Called after the confirm url has been loaded via ajax
+            },
         },
 
         contentDefaults: {
@@ -437,7 +442,6 @@
         start: function($trigger, settings) {
             modal.trigger = $trigger;
             modal.settings = $.extend(true, settings, $trigger.data());
-            console.log(modal.settings);
             modal.contentDefaults.closeIcon = dashboardSymbol('close');
             modal.id = Math.random().toString(36).substr(2, 9);
             modal.target = $trigger.attr('href');
@@ -628,7 +632,7 @@
                 $(this).remove();
             });
             $('#' + modal.id).on('click', '.js-ok', function() {
-               modal.handleConfirm(this);
+                modal.handleConfirm(this);
             });
             $('#' + modal.id).on('click', '.js-cancel', function() {
                 $('#' + modal.id).modal('hide');
@@ -642,12 +646,13 @@
                     'DeliveryMethod': 'JSON'
                 },
                 dataType: 'json',
-                success: function(json) {
+                success: function(json, sender) {
                     gdn.inform(json);
                     gdn.processTargets(json.Targets);
 
                     if (json.FormSaved === true) {
-                        modal.afterFormSuccess(json.RedirectUrl);
+                        console.log('saved!');
+                        modal.afterFormSuccess(json, sender, json.RedirectUrl);
                         $('#' + modal.id).modal('hide');
                     } else {
                         var body = json.Data;
@@ -661,7 +666,8 @@
             });
         },
 
-        afterFormSuccess: function(redirectUrl) {
+        afterFormSuccess: function(json, sender, redirectUrl) {
+            modal.settings.afterSuccess(json, sender);
             if (redirectUrl) {
                 setTimeout(function() {
                     document.location.replace(redirectUrl);
@@ -793,12 +799,38 @@
     }
 
     function drawerInit(element) {
+
         $('.panel-left', element).drawer({
             toggle    : '.js-panel-left-toggle'
             , container : '.main-container'
             , content   : '.main-row .main'
         });
+
+        $('.panel-left', element).on('drawer.show', function() {
+            console.log('shown');
+            $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
+            $('.panel-nav .js-scroll-to-fixed').css('position', 'initial');
+            window.scrollTo(0, 0);
+            $('.main').height($('.panel-nav').height() + 150);
+            $('.main').css('overflow', 'hidden');
+        });
+
+        $('.panel-left', element).on('drawer.hide', function() {
+            scrollToFixedInit($('.panel-nav'));
+            $('.main').height('auto');
+            $('.main').css('overflow', 'auto');
+        });
+
+        $(window).resize(function() {
+            if ($('.js-panel-left-toggle').css('display') !== 'none') {
+                $('.main-container', element).addClass('drawer-hide');
+                $('.main-container', element).removeClass('drawer-show');
+                $('.panel-left', element).trigger('drawer.hide');
+            }
+        });
     }
+
+
 
     function icheckInit(element) {
         $('input:not(.label-selector-input):not(.toggle-input)', element).iCheck({
@@ -877,5 +909,15 @@
             modaltype: 'confirm'
         });
     });
+
+
+    // Get new banner image.
+    $(document).on('click', '.js-upload-email-image-button', function(e) {
+        e.preventDefault();
+        modal.start($(this), {
+            afterSuccess: emailStyles.reloadImage
+        });
+    });
+
 
 })(jQuery);

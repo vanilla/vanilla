@@ -5,7 +5,8 @@
 .main {
   position: relative;
   flex-grow: 1;
-  padding: 0 $padding-default;
+  padding-left: $padding-default;
+  padding-right: $padding-default;
   max-width: 1024px;
 
   // Ensure the footer is flush with the bottom of the window if the
@@ -13,6 +14,15 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  margin-top: -$navbar-height;
+  padding-top: $navbar-height;
+
+  @include media-breakpoint-down(lg) {
+    margin-top: -$navbar-short-height;
+    padding-top: $navbar-short-height;
+  }
+
+
   background-color: $white;
   border: 1px solid $border-color;
   border-top: 0;
@@ -21,6 +31,18 @@
 
   .drawer-show & {
     transform: translate3d($drawer-width, 0, 0);
+
+    &:after {
+      position: absolute;
+      display: block;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-color: rgba(0,0,0,.25);
+      z-index: 3;
+      content: '';
+    }
   }
 
   .content,
@@ -42,10 +64,21 @@
   }
 }
 
-.Section-DashboardHome .main {
-  max-width: 1296px;
-}
+.Section-DashboardHome {
+  .main {
+    max-width: 1296px;
+  }
 
+  @include media-breakpoint-up(lg) {
+    .panel-left {
+      display: none;
+    }
+  }
+
+  .panel-right {
+    display: none;
+  }
+}
 
 .main-row {
   display: flex;
@@ -59,4 +92,11 @@
 
 ul{
   margin-bottom: 0;
+}
+
+
+// For the drawer functionality
+.main-container {
+  width: 100%;
+  overflow-x: hidden;
 }

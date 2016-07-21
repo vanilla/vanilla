@@ -3184,11 +3184,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
-.LayoutOptions > .label-wrap,
-.HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
-li.LayoutOptions > label, .form-horizontal
-li.HomeOptions > label, .form-horizontal li.media > label, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item:not(.no-grid), .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
 .LayoutOptions > .input-wrap,
 .HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
 li.LayoutOptions > input, .form-horizontal
@@ -3196,7 +3192,11 @@ li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.r
 li.LayoutOptions > select, .form-horizontal
 li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
 .LayoutOptions > .color-picker,
-.HomeOptions > .color-picker, .media > .color-picker, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.HomeOptions > .color-picker, .media > .color-picker, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
+.LayoutOptions > .label-wrap,
+.HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+li.LayoutOptions > label, .form-horizontal
+li.HomeOptions > label, .form-horizontal li.media > label, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -3258,7 +3258,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   flex: 0 0 45.8333333333%;
 }
 
-.col-xs-12, .grid-item, .label-selector-item {
+.col-xs-12, .grid-item, .label-selector-item:not(.no-grid) {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
 }
@@ -3318,7 +3318,19 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   flex: 0 0 95.8333333333%;
 }
 
-.col-xs-24 {
+.col-xs-24, .row > .input-wrap, .footer > .input-wrap, .form-horizontal li > .input-wrap, .label-selector > .input-wrap, .emojiext-list > .input-wrap,
+.LayoutOptions > .input-wrap,
+.HomeOptions > .input-wrap, .media > .input-wrap, .form-horizontal li.row > input, .form-horizontal li.footer > input, .form-horizontal li > input, .form-horizontal li.label-selector > input, .form-horizontal li.emojiext-list > input, .form-horizontal
+li.LayoutOptions > input, .form-horizontal
+li.HomeOptions > input, .form-horizontal li.media > input, .form-horizontal li.row > select, .form-horizontal li.footer > select, .form-horizontal li > select, .form-horizontal li.label-selector > select, .form-horizontal li.emojiext-list > select, .form-horizontal
+li.LayoutOptions > select, .form-horizontal
+li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picker, .footer > .color-picker, .form-horizontal li > .color-picker, .label-selector > .color-picker, .emojiext-list > .color-picker,
+.LayoutOptions > .color-picker,
+.HomeOptions > .color-picker, .media > .color-picker, .row > .label-wrap, .footer > .label-wrap, .form-horizontal li > .label-wrap, .label-selector > .label-wrap, .emojiext-list > .label-wrap,
+.LayoutOptions > .label-wrap,
+.HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
+li.LayoutOptions > label, .form-horizontal
+li.HomeOptions > label, .form-horizontal li.media > label {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
 }
@@ -3656,7 +3668,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
   .LayoutOptions > .label-wrap,
   .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
   li.LayoutOptions > label, .form-horizontal
-  li.HomeOptions > label, .form-horizontal li.media > label, .grid-item, .label-selector-item {
+  li.HomeOptions > label, .form-horizontal li.media > label, .grid-item, .label-selector-item:not(.no-grid) {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -4312,7 +4324,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-lg-8, .grid-item, .label-selector-item {
+  .col-lg-8, .grid-item, .label-selector-item:not(.no-grid) {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -4628,7 +4640,7 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
-  .col-xl-6, .grid-item, .label-selector-item {
+  .col-xl-6, .grid-item, .label-selector-item:not(.no-grid) {
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
@@ -6205,6 +6217,87 @@ input[type="button"].btn-block {
   border-radius: 0.875rem;
 }
 
+.hero {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 2.25rem 1.125rem;
+}
+
+.hero > * {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
+.hero .label-selector, .hero .emojiext-list, .hero
+.LayoutOptions, .hero
+.HomeOptions {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hero .hero-content {
+  padding: 0 6.75rem 0 4.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+}
+
+.hero .tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.hero .vanilla-logo {
+  width: 6.75rem;
+  height: 4.5rem;
+}
+
+.hero .btn, .hero .file-upload-browse, .hero .Button, .hero
+.TextButton, .hero .FilterMenu .FilterButton, .FilterMenu .hero .FilterButton {
+  margin-top: 2.25rem;
+}
+
+.hero .hero-media-wrapper {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.video-section-heading {
+  padding: 1.125rem 0;
+  font-weight: 500;
+}
+
+.video.label-selector-item .video-title {
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.video.label-selector-item .overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.video.label-selector-item.current .overlay {
+  height: 100%;
+}
+
+.video.label-selector-item svg {
+  fill: #fff;
+  width: 40%;
+}
+
+.video-section .info, .video-section .emojiset-author {
+  padding-top: 1.125rem;
+}
+
+.video-section:first-child .video-section-heading {
+  border-top: 0.0625rem solid #f4f4f5;
+}
+
 .dropdown-menu {
   margin: 0;
 }
@@ -6287,9 +6380,9 @@ input[type="button"].btn-block {
   margin-bottom: 0;
 }
 
-* + .radio, * +
-.checkbox {
-  margin-top: 0.84375rem;
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: 0.28125rem;
 }
 
 .list-reset,
@@ -6398,8 +6491,8 @@ form ol label {
 .form-group.row, .form-group.footer, .form-horizontal li, .form-group.label-selector, .form-group.emojiext-list,
 .form-group.LayoutOptions,
 .form-group.HomeOptions, .form-group.media {
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
   -ms-flex-align: center;
   align-items: center;
   padding-bottom: 1rem;
@@ -6927,7 +7020,7 @@ select::-ms-expand {
   border-bottom: 0;
 }
 
-.label-selector-item {
+.label-selector-item:not(.no-grid) {
   padding: 1.125rem 1.125rem 0.5625rem;
 }
 
@@ -7497,6 +7590,17 @@ button.close, button.Close {
   border-radius: .25rem;
 }
 
+.panel-nav .nav-link-globals-sign-out {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .panel-nav .nav-link-globals-sign-out {
+    display: block;
+    margin-top: 2.25rem;
+  }
+}
+
 .panel-nav .nav-link {
   font-weight: 300;
 }
@@ -7905,10 +8009,6 @@ button.close, button.Close {
   .panel-left {
     display: none;
   }
-  .panel-left .btn-signout {
-    margin-top: 2.25rem;
-    display: inline-block;
-  }
   .panel-left-toggle {
     display: block;
     color: #fff;
@@ -7934,13 +8034,16 @@ button.close, button.Close {
   position: relative;
   -ms-flex-positive: 1;
   flex-grow: 1;
-  padding: 0 1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
   max-width: 1024px;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100vh;
+  margin-top: -4.5rem;
+  padding-top: 4.5rem;
   background-color: #fff;
   border: 1px solid #ddd;
   border-top: 0;
@@ -7948,9 +8051,28 @@ button.close, button.Close {
   transition: all 250ms;
 }
 
+@media (max-width: 1199px) {
+  .main {
+    margin-top: -3rem;
+    padding-top: 3rem;
+  }
+}
+
 .drawer-show .main {
   -webkit-transform: translate3d(222px, 0, 0);
   transform: translate3d(222px, 0, 0);
+}
+
+.drawer-show .main:after {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.25);
+  z-index: 3;
+  content: '';
 }
 
 .main .content,
@@ -7975,6 +8097,16 @@ button.close, button.Close {
   max-width: 1296px;
 }
 
+@media (min-width: 992px) {
+  .Section-DashboardHome .panel-left {
+    display: none;
+  }
+}
+
+.Section-DashboardHome .panel-right {
+  display: none;
+}
+
 .main-row {
   display: -ms-flexbox;
   display: flex;
@@ -7991,6 +8123,11 @@ button.close, button.Close {
 
 ul {
   margin-bottom: 0;
+}
+
+.main-container {
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .table-wrap {
@@ -8494,12 +8631,21 @@ p {
   margin-bottom: 0.5625rem;
 }
 
+.content h2 {
+  padding: 1.125rem 0;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 500;
+  border-top: 0.0625rem solid #f4f4f5;
+}
+
 .heading-h1, .content h1, div.Popup h1 {
   font-size: 1.25rem;
   margin-bottom: 0;
 }
 
-.full-border, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
+.full-border, .video-section-heading, .content h2, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;

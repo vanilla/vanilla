@@ -31,7 +31,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Homepage Title').'</h2>';
+                    echo '<div>'.t('Homepage Title').'</div>';
                     echo wrap(
                         t('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.'),
                         'div',
@@ -45,7 +45,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Site Description').'</h2>';
+                    echo '<div>'.t('Site Description').'</div>';
 //                    echo $this->Form->label('Site Description', 'Garden.Description');
                     echo wrap(
                         t("The site description usually appears in search engines.", 'The site description usually appears in search engines. You should try having a description that is 100–150 characters long.'),
@@ -60,7 +60,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Banner Title').'</h2>';
+                    echo '<div>'.t('Banner Title').'</div>';
 //                    echo $this->Form->label('Banner Title', 'Garden.Title');
                     echo wrap(
                         t("The banner title appears on your site's banner and in your browser's title bar.",
@@ -76,7 +76,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Banner Logo').'</h2>';
+                    echo '<div>'.t('Banner Logo').'</div>';
                     echo wrap(
                         t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
                         'div',
@@ -99,7 +99,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Mobile Banner Logo').'</h2>';
+                    echo '<div>'.t('Mobile Banner Logo').'</div>';
                     echo wrap(
                         t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
                         'div',
@@ -122,7 +122,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Favicon').'</h2>';
+                    echo '<div>'.t('Favicon').'</div>';
                     echo wrap(
                         t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
                         'div',
@@ -150,7 +150,7 @@ echo $this->Form->errors();
                 <li class="form-group row">
                     <div class="label-wrap">
                     <?php
-                    echo '<h2>'.t('Share Image').'</h2>';
+                    echo '<div>'.t('Share Image').'</div>';
                     echo wrap(
                         t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
                         'div',
@@ -174,6 +174,6 @@ echo $this->Form->errors();
     </div>
 <?php
 
-echo '<div class="Buttons">'.$this->Form->button('Save').'</div>';
+echo '<div class="form-footer js-modal-footer">'.$this->Form->button('Save').'</div>';
 
 echo $this->Form->close();

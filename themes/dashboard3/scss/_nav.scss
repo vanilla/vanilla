@@ -59,6 +59,15 @@
     border-radius: .25rem;
   }
 
+  .nav-link-globals-sign-out {
+    display: none;
+
+    @include media-breakpoint-down(md) {
+      display: block;
+      margin-top: $spacer * 2;
+    }
+  }
+
   .nav-link {
     font-weight: 300;
 

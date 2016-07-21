@@ -23,5 +23,5 @@ if (c('Vanilla.Categories.DoHeadings')) {
 }
 ?>
     <div class="PageControls Bottom">
-        <?php PagerModule::write($pagerOptions); ?>
+        <?php PagerModule::write(); ?>
     </div>

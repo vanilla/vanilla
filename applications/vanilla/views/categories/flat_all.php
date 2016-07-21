@@ -94,3 +94,6 @@ if ($ChildCategories != '')
 echo $CatList;
 ?>
 </ul>
+<div class="PageControls Bottom">
+    <?php PagerModule::write(); ?>
+</div>

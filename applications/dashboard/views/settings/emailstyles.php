@@ -28,22 +28,22 @@ $Session = Gdn::session();
     echo $this->Form->errors();
     $emailImage = c('Garden.EmailTemplate.Image');
     ?>
-    <div class="Padded email-image">
+    <div class="email-image">
         <?php
         if ($this->data('EmailImage')) {
-            echo img($this->data('EmailImage'), array('class' => 'js-email-image'));
+            echo img($this->data('EmailImage'), array('class' => 'js-email-image padded-top'));
         } else {
             echo '<img class="js-email-image Hidden"/>';
         }
         ?>
     </div>
-    <div class="buttons padded-bottom">
+    <div class="buttons padded">
         <?php
-        echo anchor(t('Upload New Email Logo'), '/dashboard/settings/emailimage', 'js-upload-email-image-button Button');
+        echo anchor(t('Upload New Email Logo'), '/dashboard/settings/emailimage', 'js-upload-email-image-button btn btn-primary');
         ?>
         <?php
         $hideCssClass = $emailImage ? '' : ' Hidden';
-        echo wrap(t('Remove Email Logo'), 'div', array('class' => 'js-remove-email-image-button RemoveButton Button'.$hideCssClass));
+        echo anchor(t('Remove Email Logo'), url('/dashboard/settings/removeemailimage'), 'js-modal-confirm js-hijack btn btn-primary '.$hideCssClass);
     ?>
     </div>
     <ul>

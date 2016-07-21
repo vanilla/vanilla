@@ -4,9 +4,11 @@ if (!function_exists('renderDashboardNav')) {
     function renderDashboardNav($items)
     {
         foreach ($items as $item) {
-            if (val('type', $item) == 'group') { ?>
-                <h4 class="nav-heading"><a data-toggle="collapse" class="" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
-                <ul class="nav nav-pills nav-stacked collapse in" id="<?php echo trim(val('headerCssClass', $item)); ?>">
+            if (val('type', $item) == 'group') {
+                if (val('text', $item)) { ?>
+                    <h4 class="nav-heading"><a data-toggle="collapse" class="" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
+                <?php } ?>
+                <ul class="nav nav-pills nav-stacked collapse in <?php echo trim(val('cssClass', $item)); ?>" id="<?php echo trim(val('headerCssClass', $item)); ?>">
                 <?php
                 if (val('items', $item)) {
                     renderDashboardNav(val('items', $item));

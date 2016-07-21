@@ -22,11 +22,13 @@
 .radio,
 .checkbox {
   margin-bottom: 0;
-
-  * + & {
-    margin-top: $spacer * .75;
-  }
 }
+
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: $spacer / 4;
+}
+
 
 .list-reset {
   &,
@@ -125,10 +127,12 @@ form {
 .row {
   > .input-wrap {
     @extend .col-sm-16;
+    @extend .col-xs-24;
   }
 
   > .label-wrap {
     @extend .col-sm-8;
+    @extend .col-xs-24;
   }
 
   > .label-wrap-wide {
@@ -163,7 +167,7 @@ form {
 }
 
 .form-group.row {
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   padding-bottom: 1rem;
   border-bottom: 1px dotted $grey-light;
@@ -643,7 +647,7 @@ select {
   }
 }
 
-.label-selector-item {
+.label-selector-item:not(.no-grid) {
   @extend .grid-item;
 
   padding: $spacer $spacer ($spacer / 2);

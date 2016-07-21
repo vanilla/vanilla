@@ -92,7 +92,12 @@ Gdn_Theme::assetEnd();
             <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
             <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
         </div>
-        <?php $dashboardNav = $this->Assets['Panel']['DashboardNavModule']; ?>
+        <?php
+        /** @var DashboardNavModule $dashboardNav */
+        $dashboardNav = $this->Assets['Panel']['DashboardNavModule'];
+        $dashboardNav->addGroupToGlobals('', 'globals', 'globals');
+        $dashboardNav->addLinkToGlobals(t('Sign Out'), SignOutUrl(), 'globals.sign-out');
+        ?>
         <nav class="nav nav-pills">
             <?php
             foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
@@ -121,15 +126,12 @@ Gdn_Theme::assetEnd();
     </div>
     <div class="main-row pusher" id="main-row">
         <div class="panel panel-left drawer">
-            <?php if (!inSection('DashboardHome')) { ?>
-                <div class="panel-content panel-nav">
-                    <div class="js-scroll-to-fixed">
-                        <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
-                        <?php echo $dashboardNav; ?>
-                        <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary btn-signout'); ?>
-                    </div>
+            <div class="panel-content panel-nav">
+                <div class="js-scroll-to-fixed">
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
+                    <?php echo $dashboardNav; ?>
                 </div>
-            <?php } ?>
+            </div>
         </div>
         <div class="main">
             <div class="content">

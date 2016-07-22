@@ -1,6 +1,6 @@
 <div class="header-block">
     <div class="title-block">
-        <?php echo anchor(dashboardSymbol('caret-right'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
+        <?php echo anchor(dashboardSymbol('chevron-left'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
         <h1><?php echo t('Vanilla Plugin for WordPress'); ?></h1>
     </div>
 </div>

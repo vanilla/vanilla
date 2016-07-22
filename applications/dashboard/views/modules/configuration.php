@@ -7,7 +7,7 @@ $Form = $Sf->Form();
 if ($Sf->RenderAll) {
     echo '<h1>', $Sf->Controller()->data('Title'), '</h1>';
     if ($Sf->Controller()->data('Description')) {
-        echo '<div class="Info">', $Sf->Controller()->data('Description'), '</div>';
+        echo '<div class="padded">', $Sf->Controller()->data('Description'), '</div>';
     }
 }
 
@@ -23,38 +23,56 @@ echo $Form->errors();
     <?php
 
     foreach ($Sf->Schema() as $Row) {
-        echo "<li class=\"form-group\">\n  ";
+
+        if (val('no-grid', $Row['Options'])) {
+            echo "<li>\n  ";
+        } else {
+            echo "<li class=\"form-group row\">\n  ";
+        }
 
         $LabelCode = $Sf->LabelCode($Row);
         $Description = val('Description', $Row, '');
-        if ($Description)
-            $Description = '<div class="Info">'.$Description.'</div>';
+        if (strtolower($Row['Control']) !== 'checkbox' && $Description) {
+            $Description = '<div class="info">'.$Description.'</div>';
+        }
 
         switch (strtolower($Row['Control'])) {
             case 'categorydropdown':
+                echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;
+                echo '</div>';
+                echo '<div class="input-wrap">';
                 echo $Form->CategoryDropDown($Row['Name'], $Row['Options']);
+                echo '</div>';
                 break;
             case 'labelcheckbox':
                 echo $Form->label($LabelCode);
                 echo $Form->CheckBox($Row['Name'], '', $Row['Options']);
                 break;
             case 'checkbox':
+                echo '<div class="label-wrap">';
                 echo $Description;
+                echo '</div>';
+                echo '<div class="input-wrap">';
                 echo $Form->CheckBox($Row['Name'], t($LabelCode), $Row['Options']);
+                echo '</div>';
                 break;
             case 'dropdown':
+                echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;
+                echo '</div>';
+                echo '<div class="input-wrap">';
                 echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
+                echo '</div>';
                 break;
             case 'imageupload':
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Form->ImageUpload($Row['Name'], $Row['Options']);
                 break;
             case 'radiolist':
-                echo $Form->label($LabelCode, $Row['Name']);
+                echo $Form->label($LabelCode, $Row['Name'], ['class' => 'radiolist-label']);
                 echo $Description;
                 echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
                 break;
@@ -64,9 +82,13 @@ echo $Form->errors();
                 echo $Form->CheckBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                 break;
             case 'textbox':
+                echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;
+                echo '</div>';
+                echo '<div class="input-wrap">';
                 echo $Form->textBox($Row['Name'], $Row['Options']);
+                echo '</div>';
                 break;
             default:
                 echo "Error a control type of {$Row['Control']} is not supported.";
@@ -77,4 +99,6 @@ echo $Form->errors();
     }
     ?>
 </ul>
+<div class="form-footer js-modal-footer">
 <?php echo $Form->close('Save'); ?>
+</div>

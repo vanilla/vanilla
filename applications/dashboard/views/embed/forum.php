@@ -21,9 +21,9 @@
     <span id="plaintext-toggle">
         <?php
         if (c('Garden.Embed.Allow', false)) {
-            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/disable/'.Gdn::session()->TransientKey(), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/disable/'.Gdn::session()->TransientKey()), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
         } else {
-            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/enable/'.Gdn::session()->TransientKey(), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'embed/forum/enable/'.Gdn::session()->TransientKey()), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
         }
         ?>
     </span>

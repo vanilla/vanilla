@@ -5,15 +5,15 @@
 
 .Padded,
 .padded {
-  padding: $spacer 0;
+  margin: $spacer 0;
 }
 
 .padded-top {
-  padding-top: $spacer;
+  margin-top: $spacer;
 }
 
 .padded-bottom {
-  padding-bottom: $spacer;
+  margin-bottom: $spacer;
 }
 
 .pull-left {

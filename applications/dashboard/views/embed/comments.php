@@ -1,12 +1,12 @@
-<div class="header-block padded">
+<div class="header-block">
     <div class="title-block">
-        <?php echo anchor(dashboardSymbol('caret-right'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
+        <?php echo anchor(dashboardSymbol('chevron-left'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
         <h1><?php echo t('Universal Comments Embed Code'); ?></h1>
     </div>
 </div>
-
+    <div class="padded">
     <?php echo t('AboutCommentEmbedding', "You can use Vanilla as a commenting system for your website, and all contributed comments will also be present in your discussion forum. Vanilla Comments can be used on any website using the following code."); ?>
-
+    </div>
         <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
             and <code>vanilla_identifier</code> settings before pasting this script into
             your web page.</p>
@@ -53,7 +53,7 @@
 
         <h2>Comment Counts</h2>
 
-        <p>To show the number of comments on each blog post on your main blog page, use the following code.</p>
+        <div class="padded">To show the number of comments on each blog post on your main blog page, use the following code.</div>
 
         <p class="AlertMessage"><strong>Note:</strong> You MUST define the <code>vanilla_forum_url</code>
             before pasting this script into your web page.</p>
@@ -86,13 +86,12 @@
                 </button>
             </div>
         </div>
-        <p>&nbsp;</p>
 
         <h2>One more thing!</h2>
 
-        <p>You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong>
+        <div class="padded">You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong>
             attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when
-            embedding the comments into the page.</p>
+            embedding the comments into the page.</div>
 
         <pre id="anchor-code" class="CopyBox">&lt;a href="http://yourdomain.com/path/to/page/with/comments/#vanilla_comments" <strong>vanilla-identifier="embed-test"</strong>>Comments&lt;/a>
         </pre>

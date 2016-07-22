@@ -3,13 +3,13 @@ $Session = Gdn::session();
 ?>
 <div class="header-block">
     <h1><?php echo t('Manage Routes'); ?></h1>
-    <div class="btn-group"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'AddRoute btn btn-primary'); ?></div>
+    <div class="btn-group"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'js-modal btn btn-primary'); ?></div>
 </div>
 <?php
     Gdn_Theme::assetBegin('Help');
     echo '<h2>'.sprintf(t('About %s'), t('Routes')).'</h2>';
     echo t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
-    echo anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
+    echo ' '.anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
     Gdn_Theme::assetEnd();
 ?>
 
@@ -35,17 +35,15 @@ $Session = Gdn::session();
             $Reserved = $RouteData['Reserved'];
             ?>
             <tr<?php echo $Alt ? ' class="Alt"' : ''; ?>>
-                <td class="Info">
-                    <strong><?php echo $Route; ?></strong>
-                </td>
+                <td class="strong"><?php echo $Route; ?></td>
                 <td class="Alt"><?php echo $Target; ?></td>
                 <td class="Alt"><?php echo $RouteType; ?></td>
                 <td>
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'EditRoute btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
                     if (!$Reserved) {
-                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'DeleteRoute btn btn-delete', ['aria-label' => t('Delete')]);
+                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete')]);
                     }
                     ?>
                     </div>

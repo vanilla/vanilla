@@ -2732,8 +2732,10 @@ PASSWORDMETER;
             $LabelCode = self::labelCode($Row);
 
             $Description = val('Description', $Row, '');
-            if ($Description) {
-                $Description = '<div class="Info">'.$Description.'</div>';
+            if (in_array(strtolower($Row['Control']), ['checkbox', 'checkboxlist', 'radiolist'])) {
+                $labelWrap = wrap($Description, 'div', ['class' => 'label-wrap']);
+            } elseif ($Description) {
+                $Description = '<div class="description">'.$Description.'</div>';
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
@@ -2748,8 +2750,8 @@ PASSWORDMETER;
                         .$this->categoryDropDown($Row['Name'], $Row['Options']);
                     break;
                 case 'checkbox':
-                    $Result .= $Description
-                        .$this->checkBox($Row['Name'], $LabelCode, $Row['Options']);
+                    $Result .= $labelWrap
+                        .wrap($this->checkBox($Row['Name'], $LabelCode, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'toggle':
                     $Result .= $Description
@@ -2762,12 +2764,11 @@ PASSWORDMETER;
                     break;
                 case 'radiolist':
                     $Result .= $Description
-                        .$this->radioList($Row['Name'], $Row['Items'], $Row['Options']);
+                        .wrap($this->radioList($Row['Name'], $Row['Items'], $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'checkboxlist':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
-                        .$this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
+                    $Result .= $Description
+                        .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'textbox':
                     $Row['Options']['Wrap'] = true;

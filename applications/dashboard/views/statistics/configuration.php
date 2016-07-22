@@ -1,31 +1,34 @@
 <div class="Configuration">
     <div class="ConfigurationForm">
         <ul>
-            <li>
-                <?php echo $this->Form->label('API Status'); ?>
-                <div class="Async js-popin" rel="statistics/verify"></div>
+            <li class="form-group row">
+                <div class="label-wrap-wide">
+                    <?php echo $this->Form->label('API Status'); ?>
+                </div>
+                <div class="input-wrap-right">
+                    <div class="Async js-popin" rel="statistics/verify"></div>
+                </div>
             </li>
-            <li>
-                <?php
-                echo $this->Form->label('Application ID', 'InstallationID');
-                echo $this->Form->textBox('InstallationID');
-                ?>
+            <li class="form-group row">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Application ID', 'InstallationID'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('InstallationID'); ?>
+                </div>
             </li>
-            <li>
-                <?php
-                echo $this->Form->label('Application Secret', 'InstallationSecret');
-                echo $this->Form->textBox('InstallationSecret');
-                ?>
+            <li class="form-group row">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Application Secret', 'InstallationSecret'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('InstallationSecret'); ?>
+                </div>
             </li>
         </ul>
-        <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
-    </div>
-    <div class="ConfigurationHelp">
-        <strong><?php echo t("About Vanilla Statistics"); ?></strong>
-
-        <p><?php echo t("About.VanillaStatistics", "It is vitally important to the life of this free, open-source software that we accurately measure the reach and effectiveness of Vanilla. We ask that you please do not disable the reporting of this data."); ?></p>
-
-        <p><?php echo t("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file: <code>\$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code>"); ?></p>
+        <div class="form-footer js-modal-footer">
+            <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
+        </div>
     </div>
 </div>
 <?php echo $this->Form->close(); ?>

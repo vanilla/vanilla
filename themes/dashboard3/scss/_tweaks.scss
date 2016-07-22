@@ -1,3 +1,19 @@
+// Moderation
+
 .content-cell {
   word-break: break-word;
+}
+
+// Cateogories add/edit
+.category-url-code {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+
+// Emoji
+
+.radiolist-label[for="Form_Garden-dot-EmojiSet"] {
+  display: none;
 }

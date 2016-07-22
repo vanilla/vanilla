@@ -24,7 +24,7 @@ jQuery(document).ready(function($) {
         $('#NewUserRoles').show();
 
     // Attach to all radio clicks on the page
-    $(':radio').click(function() {
+    $(':radio').on('change', function() {
         // Show/Hide the invitation settings depending on the selected registration method
         if ($(this).val() == 'Invitation') {
             $('#InvitationSettings').slideDown('fast');

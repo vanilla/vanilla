@@ -145,16 +145,16 @@ jQuery(document).ready(function($) {
     });
 
     // Selection for theme styles.
-    $('a.SelectThemeStyle').click(function(e) {
+    $('.js-select-theme').click(function(e) {
         e.preventDefault();
 
         var key = $(this).attr('key');
 
         // Deselect the current item.
-        $('table.ThemeStyles td').removeClass('Active');
+        $('.theme-styles li').removeClass('active');
 
         // Select the new item.
-        $(this).parents('td').addClass('Active');
+        $(this).parents('li').addClass('active');
         $('#Form_StyleKey').val(key);
         $(this).parents('form').submit();
 

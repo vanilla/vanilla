@@ -61,6 +61,11 @@
       // collapse the border on our body elements.
       margin-top: -$border-width;
     }
+
+    > .padded,
+    .padded-top {
+      margin-top: $spacer / 2;
+    }
   }
 }
 

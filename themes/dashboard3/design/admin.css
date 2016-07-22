@@ -3196,7 +3196,9 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
 .LayoutOptions > .label-wrap,
 .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
 li.LayoutOptions > label, .form-horizontal
-li.HomeOptions > label, .form-horizontal li.media > label, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+li.HomeOptions > label, .form-horizontal li.media > label, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
+.LayoutOptions > .label-wrap-wide,
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -3330,7 +3332,9 @@ li.HomeOptions > select, .form-horizontal li.media > select, .row > .color-picke
 .LayoutOptions > .label-wrap,
 .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
 li.LayoutOptions > label, .form-horizontal
-li.HomeOptions > label, .form-horizontal li.media > label {
+li.HomeOptions > label, .form-horizontal li.media > label, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
+.LayoutOptions > .label-wrap-wide,
+.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
 }
@@ -3668,7 +3672,9 @@ li.HomeOptions > label, .form-horizontal li.media > label {
   .LayoutOptions > .label-wrap,
   .HomeOptions > .label-wrap, .media > .label-wrap, .form-horizontal li.row > label, .form-horizontal li.footer > label, .form-horizontal li > label, .form-horizontal li.label-selector > label, .form-horizontal li.emojiext-list > label, .form-horizontal
   li.LayoutOptions > label, .form-horizontal
-  li.HomeOptions > label, .form-horizontal li.media > label, .grid-item, .label-selector-item:not(.no-grid) {
+  li.HomeOptions > label, .form-horizontal li.media > label, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
+  .LayoutOptions > .label-wrap-wide,
+  .HomeOptions > .label-wrap-wide, .media > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid) {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -6458,7 +6464,6 @@ form ol label {
 .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
 .LayoutOptions > .label-wrap-wide,
 .HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
-  padding-right: 1.125rem;
   -ms-flex-positive: 1;
   flex-grow: 1;
 }
@@ -6476,9 +6481,9 @@ form ol label {
   display: block;
 }
 
-.row-padding-left, .row > .label-wrap-wide, .footer > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .label-selector > .label-wrap-wide, .emojiext-list > .label-wrap-wide,
-.LayoutOptions > .label-wrap-wide,
-.HomeOptions > .label-wrap-wide, .media > .label-wrap-wide {
+.row-padding-left, .row .input-wrap-right, .footer .input-wrap-right, .form-horizontal li .input-wrap-right, .label-selector .input-wrap-right, .emojiext-list .input-wrap-right,
+.LayoutOptions .input-wrap-right,
+.HomeOptions .input-wrap-right, .media .input-wrap-right {
   padding-left: 1.125rem;
 }
 
@@ -7234,15 +7239,15 @@ label[id^=iCheck] {
 .form-horizontal li > label
 .HomeOptions .Sprite,
 .HomeOptions .form-horizontal li > label .Sprite {
-  padding: 1.125rem 0;
+  margin: 1.125rem 0;
 }
 
 .padded-top {
-  padding-top: 1.125rem;
+  margin-top: 1.125rem;
 }
 
 .padded-bottom {
-  padding-bottom: 1.125rem;
+  margin-bottom: 1.125rem;
 }
 
 .pull-left {
@@ -7531,10 +7536,6 @@ button.close, button.Close {
   background: transparent;
   border: 0;
   -webkit-appearance: none;
-}
-
-.content-cell {
-  word-break: break-word;
 }
 
 .nav-heading a {
@@ -8093,6 +8094,19 @@ button.close, button.Close {
   margin-top: -0.0625rem;
 }
 
+.main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .form-horizontal li > label .content > img, .form-horizontal li > label .main .content > img, .main .label-wrap .LayoutOptions .content > .Sprite, .label-wrap .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .label-wrap .content > .Sprite, .LayoutOptions .label-wrap .main .content > .Sprite, .main .form-horizontal li > label .LayoutOptions .content > .Sprite, .form-horizontal li > label .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .form-horizontal li > label .content > .Sprite, .LayoutOptions .form-horizontal li > label .main .content > .Sprite, .main .label-wrap
+.HomeOptions .content > .Sprite, .label-wrap
+.HomeOptions .main .content > .Sprite, .main
+.HomeOptions .label-wrap .content > .Sprite,
+.HomeOptions .label-wrap .main .content > .Sprite, .main .form-horizontal li > label
+.HomeOptions .content > .Sprite, .form-horizontal li > label
+.HomeOptions .main .content > .Sprite, .main
+.HomeOptions .form-horizontal li > label .content > .Sprite,
+.HomeOptions .form-horizontal li > label .main .content > .Sprite,
+.main .content .padded-top {
+  margin-top: 0.5625rem;
+}
+
 .Section-DashboardHome .main {
   max-width: 1296px;
 }
@@ -8197,7 +8211,7 @@ table tbody tr:hover {
 
 table th,
 table td {
-  padding: 0.75rem;
+  padding: 0.75rem 1.125rem;
   line-height: 1.5;
   vertical-align: middle;
   border-top: 0.0625rem solid #f4f6fb;
@@ -8577,6 +8591,23 @@ table.no-hover tbody tr:hover {
   font-size: 2.5rem;
 }
 
+.content-cell {
+  word-break: break-word;
+}
+
+.category-url-code {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.radiolist-label[for="Form_Garden-dot-EmojiSet"] {
+  display: none;
+}
+
 h1, .h1,
 h2, .h2,
 h3, .h3,
@@ -8629,6 +8660,10 @@ h6, .h6 {
 
 p {
   margin-bottom: 0.5625rem;
+}
+
+pre {
+  margin-bottom: 0;
 }
 
 .content h2 {
@@ -8698,8 +8733,6 @@ p {
   position: relative;
   top: 4px;
   width: 1.25rem;
-  -webkit-transform: rotate(180deg);
-  transform: rotate(180deg);
 }
 
 .btn-return:hover svg {
@@ -8775,6 +8808,30 @@ strong,
 table h2,
 form h2 {
   margin-top: 0;
+}
+
+.text-primary {
+  color: #0291db;
+}
+
+.text-secondary {
+  color: #f5296d;
+}
+
+.text-success {
+  color: #6bc573;
+}
+
+.text-info {
+  color: #a1b8c6;
+}
+
+.text-warning {
+  color: #faae42;
+}
+
+.text-danger {
+  color: #fa2e1f;
 }
 
 .Section-Dashboard.Message.index {
@@ -8961,10 +9018,6 @@ form h2 {
 
 .ActivateSlider-Active a::after {
   content: '';
-}
-
-#UrlCode {
-  padding-left: 1.125rem;
 }
 
 .LayoutOptions > a,

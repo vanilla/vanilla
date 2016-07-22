@@ -194,16 +194,15 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             'Garden.EmojiSet' => array(
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
-                'Description' => '<p>Which emoji set would you like to use?</p>',
                 'Items' => $items,
-                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after', 'class' => 'label-selector-input')
+                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true)
             ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
         $sender->addSideMenu();
-        $sender->setData('Title', sprintf(t('%s Settings'), 'Emoji'));
+        $sender->setData('Title', t('Choose Your Emoji Set'));
         $cf->renderAll();
     }
 }

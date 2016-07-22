@@ -36,6 +36,16 @@ $brand-info:                #a1b8c6;
 $brand-warning:             #faae42;
 $brand-danger:              #fa2e1f;
 
+
+$semantic-colors: (
+  primary: $brand-primary,
+  secondary: $brand-secondary,
+  success: $brand-success,
+  info: $brand-info,
+  warning: $brand-warning,
+  danger: $brand-danger
+);
+
 // Grid columns
 //
 // Set the number of columns and specify the width of the gutters.

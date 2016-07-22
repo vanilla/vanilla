@@ -441,7 +441,11 @@
 
         start: function($trigger, settings) {
             modal.trigger = $trigger;
+            console.log(modal.settings);
+            settings = $.extend(true, modal.settings, settings);
             modal.settings = $.extend(true, settings, $trigger.data());
+            console.log('settings');
+            console.log(modal.settings);
             modal.contentDefaults.closeIcon = dashboardSymbol('close');
             modal.id = Math.random().toString(36).substr(2, 9);
             modal.target = $trigger.attr('href');
@@ -723,6 +727,7 @@
         var navShortHeight = $('.navbar').outerHeight(true);
         $('.navbar').removeClass('navbar-short');
         var navHeight = $('.navbar').outerHeight(true);
+        $('.js-scroll-to-fixed-spacer').height(navHeight);
 
         window.navOffset = navHeight - navShortHeight;
 
@@ -730,8 +735,6 @@
             zIndex: 1005,
             spacerClass: 'js-scroll-to-fixed-spacer'
         });
-
-        $('.js-scroll-to-fixed-spacer').height(navHeight);
 
         $('.modal-header', element).scrollToFixed({
             zIndex: 1005
@@ -748,6 +751,7 @@
             $('.navbar').addClass('navbar-short');
         } else {
             $('.navbar').removeClass('navbar-short');
+            $('.js-scroll-to-fixed-spacer').height($('.navbar').outerHeight(true));
         }
     });
 

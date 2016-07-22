@@ -53,11 +53,6 @@
   }
 }
 
-// Temp. Kludge
-#UrlCode {
-  padding-left: $grid-gutter-width / 2;
-}
-
 .emojiset-author {
   @extend .info;
 }

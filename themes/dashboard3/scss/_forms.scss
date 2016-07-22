@@ -136,13 +136,14 @@ form {
   }
 
   > .label-wrap-wide {
-    @extend .row-padding-left;
-    padding-right: $spacer;
+    @extend .col-sm-8;
+    @extend .col-xs-24;
     flex-grow: 1;
   }
 
   .input-wrap-right {
-    @extend .row-padding-right;
+      @extend .row-padding-left;
+      @extend .row-padding-right;
   }
 }
 

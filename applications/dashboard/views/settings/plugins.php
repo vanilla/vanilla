@@ -3,7 +3,7 @@ $session = Gdn::session();
 $updateUrl = c('Garden.UpdateCheckUrl');
 $addonUrl = c('Garden.AddonUrl');
 if ($this->addonType === 'applications') {
-    $title = t('Manage Applications');
+    $title = '<h1>'.t('Manage Applications').'</h1>';
     $helpTitle = sprintf(t('About %s'), t('Applications'));
     $pathHelp = sprintf(
         t('ApplicationHelp'),
@@ -14,7 +14,7 @@ if ($this->addonType === 'applications') {
     $enabledAddons = $this->EnabledApplications;
 
 } elseif ($this->addonType === 'locales') {
-    $title = t('Manage Locales');
+    $title = '';
     $helpTitle = sprintf(t('About %s'), t('Locales'));
     $pathHelp = sprintf(
         t('LocaleHelp', 'Locales allow you to support other languages on your site. Once a locale has been added to your %s folder, you can enable or disable it here.'),
@@ -26,7 +26,7 @@ if ($this->addonType === 'applications') {
     $this->Filter = 'all';
 } else {
     $this->addonType = 'plugins';
-    $title = t('Manage Plugins');
+    $title = '<h1>'.t('Manage Plugins').'</h1>';
     $helpTitle = sprintf(t('About %s'), t('Plugins'));
     $pathHelp = sprintf(
         t('PluginHelp'),
@@ -52,7 +52,7 @@ Gdn_Theme::assetBegin('Help'); ?>
 </div>
 <?php Gdn_Theme::assetEnd();
 ?>
-<h1><?php echo $title; ?></h1>
+<?php echo $title; ?>
 <?php if ($this->addonType !== 'locales') { ?>
     <div class="toolbar full-border">
 <div class="btn-group">

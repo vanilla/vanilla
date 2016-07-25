@@ -72,6 +72,10 @@ p {
   margin-bottom: ($spacer / 2);
 }
 
+pre {
+  margin-bottom: 0;
+}
+
 .content {
   > h1 {
     @extend .heading-h1-block;
@@ -79,6 +83,16 @@ p {
 
   h1 {
     @extend .heading-h1;
+  }
+
+  h2 {
+    @extend .full-border;
+    padding: $spacer 0;
+    margin: 0;
+    font-size: $font-size-base;
+    line-height: $line-height;
+    font-weight: 500;
+    border-top: $border-width solid $grey-light;
   }
 }
 
@@ -146,7 +160,6 @@ p {
     position: relative;
     top: 4px;
     width: $font-size-lg;
-    transform: rotate(180deg);
   }
 
   &:hover svg {
@@ -225,3 +238,20 @@ form {
     margin-top: 0;
   }
 }
+
+// Generate .text-* css rules to change text color for all our semantic colors in variables.
+
+@each $semantic-color in map-keys($semantic-colors) {
+  $color: map-get($semantic-colors, $semantic-color);
+  .text-#{$semantic-color} {
+    color: $color;
+  }
+}
+
+
+//.text-control-height {
+//  height: $control-height-rem;
+//  padding: (($control-height-rem - $font-size-base) / 2) 0;
+//  line-height: 1;
+//  font-size: $font-size-base;
+//}

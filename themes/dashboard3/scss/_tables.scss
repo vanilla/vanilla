@@ -71,7 +71,7 @@ table {
 
   th,
   td {
-    padding: $table-cell-padding;
+    padding: $table-cell-padding $padding-default;
     line-height: $line-height;
     vertical-align: middle;
     border-top: $table-border-width solid $table-border-color;

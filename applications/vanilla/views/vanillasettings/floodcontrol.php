@@ -94,4 +94,4 @@ echo $this->Form->errors();
         </tbody>
     </table>
 </div>
-<p><?php echo $this->Form->close('Save'); ?> </p>
+<div class="form-footer js-modal-footer"><?php echo $this->Form->close('Save'); ?> </div>

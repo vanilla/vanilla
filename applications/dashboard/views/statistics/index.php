@@ -23,7 +23,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <?php if ($this->data('NotifyMessage') !== FALSE) { ?>
-    <div class="Info NotifyMessage">
+    <div class="padded alert alert-info">
         <?php
         echo "<strong>".t("Last time your forum communicated with the statistics server it received the following message:")."</strong>";
         echo "<p><i>".Gdn_Format::Html($this->data('NotifyMessage'))."</i></p>";

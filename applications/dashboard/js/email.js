@@ -28,11 +28,6 @@ var emailStyles = {
         // Enforce hidden css class.
         $('.Hidden.Button').hide();
 
-        // Get new banner image.
-        $('.js-upload-email-image-button').popup({
-            afterSuccess: emailStyles.reloadImage
-        });
-
         // Ajax call to remove banner
         $('.js-remove-email-image-button').click(emailStyles.removeImage);
 
@@ -72,21 +67,6 @@ var emailStyles = {
                 $('.js-email-image').attr('src', json['EmailImage']);
                 $('.js-email-image').show();
                 $('.js-remove-email-image-button').show();
-            }
-        });
-    },
-
-    /**
-     * Removes the email image and on success hides the remove button and image.
-     */
-    removeImage: function() {
-        $.ajax({
-            type: 'POST',
-            url: gdn.url('/dashboard/settings/removeemailimage'),
-            data: {TransientKey: gdn.definition('TransientKey')},
-            success: function() {
-                $('.js-email-image').hide();
-                $('.js-remove-email-image-button').hide();
             }
         });
     },

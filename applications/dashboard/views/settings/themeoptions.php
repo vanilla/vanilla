@@ -2,89 +2,86 @@
     <h1><?php echo $this->data('Title'); ?></h1>
 
 <?php if ($this->data('ThemeInfo.Options.Description')) {
-    echo '<div class="Info">',
+    echo '<div class="padded">',
     $this->data('ThemeInfo.Options.Description'),
     '</div>';
 }
-?>
 
-<?php
+$hasCustomStyles = is_array($this->data('ThemeInfo.Options.Styles'));
+$hasCustomText = is_array($this->data('ThemeInfo.Options.Text'));
+
+Gdn_Theme::assetBegin('Help');
+echo wrap(t('Theme Options'), 'h2');
+echo ($hasCustomStyles) ? t('This theme has customizable styles.', 'You can choose from one of the different styles this theme offers. ') : '';
+echo ($hasCustomText) ? t('This theme has customizable text.', 'This theme has text that you can customize.') : '';
+Gdn_Theme::assetEnd();
+
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 
-<?php if (is_array($this->data('ThemeInfo.Options.Styles'))): ?>
-    <h3><?php echo t('Styles'); ?></h3>
-    <table class="SelectionGrid ThemeStyles">
-        <tbody>
+<?php if ($hasCustomStyles): ?>
+    <h2><?php echo t('Styles'); ?></h2>
+    <ul class="label-selector theme-styles">
         <?php
-        $Cols = 3;
-        $Col = 0;
-        $Classes = array('FirstCol', 'MiddleCol', 'LastCol');
-
         foreach ($this->data('ThemeInfo.Options.Styles') as $Key => $Options) {
             $Basename = val('Basename', $Options, '%s');
-
-            if ($Col == 0)
-                echo '<tr>';
-
             $Active = '';
-            if ($this->data('ThemeOptions.Styles.Key') == $Key || (!$this->data('ThemeOptions.Styles.Key') && $Basename == '%s'))
-                $Active = ' Active';
-
             $KeyID = str_replace(' ', '_', $Key);
-            echo "<td id=\"{$KeyID}_td\" class=\"{$Classes[$Col]}$Active\">";
-            echo '<h4>', t($Key), '</h4>';
 
-            // Look for a screenshot for for the style.
-            $Screenshot = SafeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif', 'jpg', 'png'));
-            if (is_array($Screenshot) && count($Screenshot) > 0) {
-                $Screenshot = basename($Screenshot[0]);
-                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, array('alt' => t($Key), 'width' => '160'));
+            if ($this->data('ThemeOptions.Styles.Key') == $Key || (!$this->data('ThemeOptions.Styles.Key') && $Basename == '%s')) {
+                $Active = ' active';
             }
 
-            $Disabled = $Active ? ' Disabled' : '';
-            echo '<div class="Buttons">',
-            anchor(t('Select'), '?style='.urlencode($Key), 'SmallButton SelectThemeStyle'.$Disabled, array('Key' => $Key)),
-            '</div>';
-
+            $KeyID = str_replace(' ', '_', $Key);
+            echo "<li id=\"{$KeyID}\" class=\"label-selector-item $Active\">"; ?>
+            <div class="image-wrap">
+                <?php
+                // Look for a screenshot for for the style.
+                $Screenshot = SafeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), array('gif', 'jpg', 'png'));
+                if (is_array($Screenshot) && count($Screenshot) > 0) {
+                    $Screenshot = basename($Screenshot[0]);
+                } else {
+                    $Screenshot = 'images'.DS.'theme-placeholder.svg';
+                }
+                echo img('/themes/'.$this->data('ThemeFolder').'/design/'.$Screenshot, array('class' => 'label-selector-image', 'alt' => t($Key), 'width' => '160')); ?>
+                <div class="overlay">
+                    <div class="buttons">
+                        <?php echo anchor(t('Select'), '?style='.urlencode($Key), 'js-select-theme btn btn-overlay Hijack', array('Key' => $Key)) ?>
+                    </div>
+                    <div class="selected">
+                        <?php echo dashboardSymbol('checkmark'); ?>
+                    </div>
+                </div>
+            </div>
+            <div class="title"><?php echo t($Key); ?></div>
+            <?php
             if (isset($Options['Description'])) {
-                echo '<div class="Info2">',
+                echo '<div class="description">',
                 $Options['Description'],
                 '</div>';
             }
-
-            echo '</td>';
-
-            $Col = ($Col + 1) % 3;
-            if ($Col == 0)
-                echo '</tr>';
+            echo '</li>';
         }
-        if ($Col > 0)
-            echo '<td colspan="'.(3 - $Col).'">&#160;</td></tr>';
-
         ?>
-        </tbody>
-    </table>
+    </ul>
 
 <?php endif; ?>
 
-<?php if (is_array($this->data('ThemeInfo.Options.Text'))): ?>
-    <h3><?php echo t('Text'); ?></h3>
-    <div class="Info">
-        <?php echo t('This theme has customizable text.', 'This theme has text that you can customize.'); ?>
-    </div>
-
+<?php if ($hasCustomText): ?>
+    <h2><?php echo t('Text'); ?></h2>
     <ul>
         <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 
-            echo '<li>',
-            $this->Form->label('@'.$Code, 'Text_'.$Code);
+            echo '<li class="form-group row">'; ?>
+            <div class="label-wrap">
+            <?php echo $this->Form->label('@'.$Code, 'Text_'.$Code);
 
             if (isset($Options['Description']))
-                echo '<div class="Info2">', $Options['Description'], '</div>';
-
-            switch (strtolower(val('Type', $Options, 'textarea'))) {
+                echo '<div class="info">', $Options['Description'], '</div>'; ?>
+            </div>
+            <div class="input-wrap">
+            <?php switch (strtolower(val('Type', $Options, 'textarea'))) {
                 case 'textbox':
                     echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code));
                     break;
@@ -92,18 +89,15 @@ echo $this->Form->errors();
                 default:
                     echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code), array('MultiLine' => TRUE));
                     break;
-            }
-
-
-            echo
-            '</li>';
+            } ?>
+            </div>
+            <?php echo '</li>';
         }
         ?>
     </ul>
-    <?php
-    echo $this->Form->button('Save');
-endif;
-?>
+    <div class="form-footer js-modal-footer">
+    <?php echo $this->Form->button('Save'); ?>
+    </div>
+<?php endif; ?>
 
-<?php
-echo '<br />'.$this->Form->close();
+<?php echo '<br />'.$this->Form->close();

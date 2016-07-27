@@ -804,7 +804,15 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // We have a route. Take action.
         if (!empty($matchRoute)) {
-            $request->pathAndQuery($matchRoute['FinalDestination']);
+            $dest = $matchRoute['FinalDestination'];
+
+            if (strpos($dest, '/?') === false) {
+                // The rewrite rule doesn't include a query string so keep the current one intact.
+                $request->path($dest);
+            } else {
+                // The rewrite rule has a query string so rewrite that too.
+                $request->pathAndQuery($dest);
+            }
 
             switch ($matchRoute['Type']) {
                 case 'Internal':

@@ -427,21 +427,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Display all non-hidden fields
+            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender');
             $ProfileFields = array_reverse($ProfileFields);
-            foreach ($ProfileFields as $Name => $Value) {
-                // Skip empty and hidden fields.
-                if (!$Value || !val('OnProfile', $AllFields[$Name])) {
-                    continue;
-                }
-
-                // Non-magic fields must be plain text, but we'll auto-link
-                if (!in_array($Name, $this->MagicLabels)) {
-                    $Value = Gdn_Format::links(Gdn_Format::text($Value));
-                }
-
-                echo ' <dt class="ProfileExtend Profile'.Gdn_Format::alphaNumeric($Name).'">'.Gdn_Format::text($AllFields[$Name]['Label']).'</dt> ';
-                echo ' <dd class="ProfileExtend Profile'.Gdn_Format::alphaNumeric($Name).'">'.Gdn_Format::htmlFilter($Value).'</dd> ';
-            }
+            extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {
             // No errors
         }

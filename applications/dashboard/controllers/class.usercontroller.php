@@ -517,6 +517,7 @@ class UserController extends DashboardController {
             $this->Method = $Method;
             if ($Method != '') {
                 $this->View = 'deleteconfirm';
+                $this->RedirectUrl = url('/dashboard/user');
             }
 
             if ($this->Form->authenticatedPostBack(true) && $Method != '') {

@@ -100,7 +100,7 @@ class ConfigurationModule extends Gdn_Module {
         if ($Schema !== null) {
             $this->schema($Schema);
         }
-
+        
         $Form = $this->form();
 
         if ($Form->authenticatedPostBack()) {

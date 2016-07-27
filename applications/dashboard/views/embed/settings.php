@@ -22,13 +22,13 @@ $AllowEmbed = c('Garden.Embed.Allow');
         </div>
     </li>
     <li class="form-group row">
-        <div class="input-wrap"><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></div>
+        <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></div>
     </li>
     <li class="form-group row">
-        <div class="input-wrap"><?php echo $this->Form->Checkbox('Garden.Embed.ForceMobile', "Force the forum to only be accessible through this url when viewed on a mobile device."); ?></div>
+        <div class="input-wrap no-label"><?php echo $this->Form->Checkbox('Garden.Embed.ForceMobile', "Force the forum to only be accessible through this url when viewed on a mobile device."); ?></div>
     </li>
     <li class="form-group row">
-        <div class="input-wrap"><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></div>
+        <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></div>
     </li>
 </ul>
 <h2>Sign In Settings</h2>

@@ -16,7 +16,7 @@ if (is_array($Sender->RegistrationFields)) {
             echo wrap($Sender->Form->{$Field['FormType']}($Name, $Field['Label']), 'li');
         } else {
             echo wrap($Sender->Form->label($Field['Label'], $Name).
-                $Sender->Form->{$Field['FormType']}($Name, $Options), 'li');
+                $Sender->Form->{$Field['FormType']}($Name, $Options), 'li', ['class' => 'form-group row']);
         }
     }
 }

@@ -5,7 +5,7 @@ $Fields = $this->data('ExtendedFields');
 ?>
 <div class="header-block">
     <h1>Custom Profile Fields</h1>
-    <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'Popup btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
+    <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'js-modal btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
 </div>
 <div class="table-wrap">
     <table>
@@ -32,8 +32,11 @@ $Fields = $this->data('ExtendedFields');
                 <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? t('Yes') : t('No'); ?></td>-->
                 <td>
                     <div class="btn-group">
-                    <?php echo anchor('Edit', '/settings/profilefieldaddedit/'.$Name, 'Popup btn btn-edit').
-                        ' '.anchor('Delete', '/settings/profilefielddelete/'.$Name, 'Popup btn btn-delete'); ?>
+                    <?php
+                    echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Name, 'js-modal btn btn-icon',
+                        ['aria-label' => t('Delete'), 'data-content' => ['cssClass' => 'modal-sm']]);
+                    ?>
                     </div>
                 </td>
             </tr>

@@ -60,9 +60,6 @@ class Gdn_Form extends Gdn_Pluggable {
         ]
     ];
 
-    /** @var boolean Whether to wrap label and input elements */
-    public $wrapElements = false;
-
     /** @var string Action with which the form should be sent. */
     public $Action = '';
 
@@ -563,8 +560,8 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param $attributes
      */
     public function toggle($fieldName, $label, $attributes) {
-
         $value = arrayValueI('value', $attributes, true);
+        $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {
             if (!isset($attributes['checked'])) {
                 $getValue = $this->getValue(substr($fieldName, 0, -2));
@@ -588,16 +585,20 @@ class Gdn_Form extends Gdn_Pluggable {
             attribute('class', 'toggle').
             attribute('title', val('title', $attributes)) .'>';
 
-        $toggle = '
-            <div class="label-wrap label-wrap-wide">
-                <div class="label label-'.$fieldName.'">'.$label.'</div>
-            </div>
-            <div class="input-wrap-right">
-                <div class="toggle-wrap">'.
-                    $input.
-                    $toggleLabel.'
+        if ($label) {
+            $toggle = '
+                <div class="label-wrap label-wrap-wide">
+                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.$label.'</div>
                 </div>
-            </div>';
+                <div class="input-wrap-right">
+                    <div class="toggle-wrap">'.
+                        $input.
+                        $toggleLabel.'
+                    </div>
+                </div>';
+        } else {
+            $toggle = '<div class="toggle-wrap">'.$input.$toggleLabel.'</div>';
+        }
 
         return $toggle;
     }
@@ -608,16 +609,23 @@ class Gdn_Form extends Gdn_Pluggable {
         $attributes['class'] = val('class', $attributes, '');
         $attributes['class'] .=  " js-file-upload form-control";
         $attributes = $this->_attributesToString($attributes);
+
         $upload = '
             <label class="file-upload">
               <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
               <span class="file-upload-choose">'.t('Choose').'</span>
               <span class="file-upload-browse">'.t('Browse').'</span>
             </label>';
+
         return $upload;
     }
 
-    /**
+    public function fileUploadWrap($fieldName, $attributes = []) {
+        return '<div class="input-wrap">'.$this->fileUpload($fieldName, $attributes).'</div>';
+    }
+
+
+        /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
@@ -1182,7 +1190,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
 
         $Wrap = val('Wrap', $Attributes, false);
-        if ($Wrap || $this->wrapElements) {
+        if ($Wrap) {
             $Return = '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
@@ -1581,7 +1589,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
         $Strength = val('Strength', $Attributes, false, true);
-        if ($Wrap || $this->wrapElements) {
+        if ($Wrap) {
             $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
@@ -1641,7 +1649,12 @@ PASSWORDMETER;
         return $Return;
     }
 
-    /**
+
+    public function inputWrap($FieldName, $Type = 'text', $Attributes = array()) {
+        return '<div class="input-wrap">'.$this->input($FieldName, $Type, $Attributes).'</div>';
+    }
+
+        /**
      * Returns XHTML for a label element.
      *
      * @param string $TranslationCode Code to be translated and presented within the label tag.
@@ -1658,10 +1671,11 @@ PASSWORDMETER;
         $For = arrayValueI('for', $Attributes, arrayValueI('id', $Attributes, $this->escapeID($DefaultFor, false)));
 
         $return = '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
-        if ($this->wrapElements) {
-            $return = wrap($return, 'div', ['class' => 'label-wrap']);
-        }
         return $return;
+    }
+
+    public function labelWrap($TranslationCode, $FieldName = '', $Attributes = array()) {
+        return '<div class="label-wrap">'.$this->label($TranslationCode, $FieldName, $Attributes).'</div>';
     }
 
     /**
@@ -1715,10 +1729,6 @@ PASSWORDMETER;
     public function open($Attributes = array()) {
         if (!is_array($Attributes)) {
             $Attributes = array();
-        }
-
-        if ($this->wrapElements) {
-            $Attributes['class'] .= 'form-horizontal';
         }
 
         $Return = '<form';
@@ -1966,7 +1976,7 @@ PASSWORDMETER;
 
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
-        if ($Wrap || $this->wrapElements) {
+        if ($Wrap) {
             $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
@@ -1992,8 +2002,12 @@ PASSWORDMETER;
         return $Return;
     }
 
+    public function textBoxWrap($FieldName, $Attributes = array()) {
+        return '<div class="input-wrap">'.$this->textBox($FieldName, $Attributes).'</div>';
+    }
 
-    /// =========================================================================
+
+        /// =========================================================================
     /// Methods for interfacing with the model & db.
     /// =========================================================================
 
@@ -2735,7 +2749,7 @@ PASSWORDMETER;
             if (in_array(strtolower($Row['Control']), ['checkbox', 'checkboxlist', 'radiolist'])) {
                 $labelWrap = wrap($Description, 'div', ['class' => 'label-wrap']);
             } elseif ($Description) {
-                $Description = '<div class="description">'.$Description.'</div>';
+                $Description = '<div class="description info">'.$Description.'</div>';
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);

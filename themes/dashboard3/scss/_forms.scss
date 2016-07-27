@@ -5,14 +5,20 @@
 // Styleguide 3.
 
 @mixin list-reset() {
-  padding-left: 0;
+
+  &,
+  ul,
+  ol {
+    padding-left: 0;
+  }
 
   li {
     list-style: none;
     justify-content: space-between;
   }
 
-  label {
+  label,
+  .label {
     font-weight: 500;
     margin-bottom: 0;
   }
@@ -124,10 +130,15 @@ form {
 }
 
 // Form grid
-.row {
+.form-group {
   > .input-wrap {
     @extend .col-sm-16;
     @extend .col-xs-24;
+
+    &.no-label {
+      @extend .col-sm-offset-8;
+      @extend .col-xs-offset-0;
+    }
   }
 
   > .label-wrap {
@@ -145,6 +156,10 @@ form {
       @extend .row-padding-left;
       @extend .row-padding-right;
   }
+}
+
+.input-wrap > .form-group > * {
+  padding-left: 0;
 }
 
 .input-wrap-multiple {
@@ -165,6 +180,12 @@ form {
 
 .row-padding-right {
   padding-right: $padding-default;
+}
+
+.form-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
 }
 
 .form-group.row {
@@ -403,6 +424,8 @@ form {
   right: 0;
   @extend .btn;
   @extend .btn-secondary;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
 
 // Focus state
@@ -425,7 +448,7 @@ select.form-control {
 select {
   display: inline-block;
   max-width: 100%;
-  padding: .375rem .75rem;
+  padding: .375rem 2rem .375rem .75rem;
   padding-right: .75rem \9;
   color: $input-color;
   vertical-align: middle;
@@ -450,6 +473,10 @@ select {
   &::-ms-expand {
     opacity: 0;
   }
+}
+
+select + select {
+  margin-left: $spacer / 2;
 }
 
 

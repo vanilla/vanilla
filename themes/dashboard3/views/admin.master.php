@@ -135,7 +135,7 @@ Gdn_Theme::assetEnd();
         </div>
         <div class="main">
             <div class="content">
-    <!--            --><?php //echo $dropdown; ?>
+<!--                --><?php //echo $dropdown; ?>
     <!--            <a href="/user/edit/53" class="js-ajax-modal btn btn-icon" aria-label="Edit"><svg class="icon  icon-edit" viewBox="0 0 17 17"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#edit"></use></svg></a>-->
                 <?php $this->renderAsset('Content'); ?>
             </div>

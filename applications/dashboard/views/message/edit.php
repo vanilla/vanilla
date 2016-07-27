@@ -57,8 +57,7 @@ echo $this->Form->errors();
             </div>
         </li>
         <li class="form-group row">
-            <div class="label-wrap"></div>
-            <div class="input-wrap">
+            <div class="input-wrap no-label">
                 <?php echo $this->Form->checkBox('AllowDismiss', 'Allow users to dismiss this message', array('value' => '1')); ?>
             </div>
         </li>

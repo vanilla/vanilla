@@ -10,42 +10,58 @@ echo $this->Form->open(array('class' => 'User'));
 echo $this->Form->errors();
 ?>
     <ul>
-        <li>
-            <?php
-            echo $this->Form->label('Username', 'Name');
-            echo $this->Form->textBox('Name');
-            ?>
-        </li>
-        <li>
-            <?php
-            echo $this->Form->label('Password', 'Password');
-            echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password '));
-            echo ' '.$this->Form->checkbox('NoPassword', 'No password', array('class' => 'Inline CheckBoxLabel js-nopassword'));
-            ?>
-            <div class="InputButtons js-password-related">
-                <?php
-                echo anchor(t('Generate Password'), '#', 'GeneratePassword Button SmallButton');
-                echo anchor(t('Reveal Password'), '#', 'RevealPassword Button SmallButton');
-                ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Username', 'Name'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Name'); ?>
             </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Email', 'Email');
-            echo $this->Form->textBox('Email');
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Password', 'Password'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password ')); ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->checkBox('ShowEmail', t('Email visible to other users'));
-            ?>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->checkbox('NoPassword', 'No password', array('class' => 'Inline CheckBoxLabel js-nopassword')); ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="InputButtons js-password-related input-wrap no-label">
+                <?php echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary'); ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Email', 'Email'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Email'); ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users')); ?>
+            </div>
         </li>
         <?php
         $this->fireEvent('CustomUserFields')
         ?>
-        <li>
-            <strong><?php echo t('Check all roles that apply to this user:'); ?></strong>
-            <?php echo $this->Form->checkBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo t('Check all roles that apply to this user:');  ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->checkBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>
+            </div>
         </li>
     </ul>
-<?php echo $this->Form->close('Save');
+<div class="form-footer js-modal-footer">
+    <?php echo $this->Form->close('Save'); ?>
+</div>

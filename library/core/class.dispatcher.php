@@ -806,7 +806,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if (!empty($matchRoute)) {
             $dest = $matchRoute['FinalDestination'];
 
-            if (strpos($dest, '\\?') === false) {
+            if (strpos($dest, '?') === false) {
                 // The rewrite rule doesn't include a query string so keep the current one intact.
                 $request->path($dest);
             } else {

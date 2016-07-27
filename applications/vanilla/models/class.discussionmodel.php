@@ -1936,11 +1936,11 @@ class DiscussionModel extends VanillaModel {
                         Gdn::cache()->remove($CacheKey);
                     }
 
+                    // The primary key was removed from the form fields, but we need it for logging.
+                    LogModel::logChange('Edit', 'Discussion', array_merge($Fields, ['DiscussionID' => $DiscussionID]));
+
                     self::serializeRow($Fields);
                     $this->SQL->put($this->Name, $Fields, [$this->PrimaryKey => $DiscussionID]);
-
-                    setValue('DiscussionID', $Fields, $DiscussionID);
-                    LogModel::logChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
                     if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
                         $StoredCategoryID = val('CategoryID', $Stored);

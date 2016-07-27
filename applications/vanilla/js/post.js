@@ -149,7 +149,7 @@ jQuery(document).ready(function($) {
                         // Redirect to the new discussion
                         document.location = json.RedirectUrl;
                     } else {
-                        $('#Content').html(json.Data);
+                        $('#Content,.page-content,.site-content').html(json.Data);
                     }
                 }
                 gdn.inform(json);

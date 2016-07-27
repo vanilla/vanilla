@@ -850,7 +850,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $methodArgs = array_slice($pathArgs, 0, $count);
         $pathArgs = array_slice($pathArgs, $count);
         if (count($methodArgs) < $count) {
-            $methodArgs = array_merge($methodArgs, array_fill(0, $count - count($methodArgs), null))
+            $methodArgs = array_merge($methodArgs, array_fill(0, $count - count($methodArgs), null));
         }
 
         $callback = function () use ($controller, $methodArgs) {

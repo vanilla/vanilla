@@ -45,11 +45,11 @@
 
 <div class="dashboard-widgets">
     <div class="Column Column1 ReleasesColumn">
-        <h2 class="dashboard-widget-title"><?php echo t('Updates'); ?></h2>
+        <div class="dashboard-widget-title"><?php echo t('Updates'); ?></div>
         <div class="List"></div>
     </div>
     <div class="Column Column2 NewsColumn">
-        <h2 class="dashboard-widget-title"><?php echo t('Recent News'); ?></h2>
+        <div class="dashboard-widget-title"><?php echo t('Recent News'); ?></div>
         <div class="List"></div>
     </div>
 </div>

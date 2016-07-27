@@ -6,6 +6,7 @@
 
 .panel {
   padding-top: $spacer * 4;
+  padding-bottom: $spacer * 4;
 
   code {
     word-wrap: break-word;
@@ -62,6 +63,10 @@
 
   li {
     margin-bottom: $spacer / 2;
+  }
+
+  ol {
+    padding-left: $spacer;
   }
 
   .Aside,

@@ -35,9 +35,9 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         }
 
         ?>
-        <div class="row form-group padded">
+        <div class="row form-group">
             <div class="label-wrap-wide">
-                <div class="description"><?php echo t('Enable Private Communities'); ?></div>
+                <div class="label"><?php echo t('Enable Private Communities'); ?></div>
                 <div class="info"><?php echo t('Once enabled, only members will see inside your community.'); ?></div>
             </div>
             <div class="input-wrap-right">

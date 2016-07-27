@@ -71,16 +71,33 @@
         }
     };
 
-    var modal = {
+    function Modal ($trigger, settings) {
+        this.id = Math.random().toString(36).substr(2, 9);
+        this.setupTrigger($trigger);
+        this.addToDom();
 
-        settings: {
+        this.settings = {};
+        this.defaultContent.closeIcon = dashboardSymbol('close');
+        $.extend(true, this.settings, Modal.prototype.defaultSettings, settings, $trigger.data());
+
+        this.trigger = $trigger;
+        this.target = $trigger.attr('href');
+        this.addEventListeners();
+        this.start();
+    }
+
+    Modal.prototype = {
+
+        defaultSettings: {
             httpmethod: 'get',
             afterSuccess: function(json, sender) {
                 // Called after the confirm url has been loaded via ajax
             },
         },
 
-        contentDefaults: {
+        id: '',
+
+        defaultContent: {
             cssClass: '',
             title: '',
             footer: '',
@@ -91,6 +108,13 @@
                 close: ''
             }
         },
+
+        settings: {},
+
+        target: '',
+
+        trigger: {},
+
 
         modalHtml: ' \
         <div><div class="modal-dialog {cssClass}" role="document"> \
@@ -110,51 +134,57 @@
 
         modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
 
-        id: '',
-
-        target: '',
-
-        trigger: {},
-
         start: function($trigger, settings) {
-            modal.trigger = $trigger;
-            console.log(modal.settings);
-            settings = $.extend(true, modal.settings, settings);
-            modal.settings = $.extend(true, settings, $trigger.data());
-            console.log('settings');
-            console.log(modal.settings);
-            modal.contentDefaults.closeIcon = dashboardSymbol('close');
-            modal.id = Math.random().toString(36).substr(2, 9);
-            modal.target = $trigger.attr('href');
-            modal.setupTrigger($trigger);
-            modal.addToDom();
-            $('#' + modal.id).modal('show');
-            if (modal.settings.modaltype === 'confirm') {
-                modal.addConfirmContent();
+            $('#' + this.id).modal('show');
+            if (this.settings.modaltype === 'confirm') {
+                this.addConfirmContent();
             } else {
-                modal.addContent();
+                this.addContent();
             }
         },
 
         load: function() {
-            modal.handleForm($('#' + modal.id));
+            this.handleForm();
+        },
+
+        addToDom: function() {
+            $('body').append(this.modalShell.replace('{id}', this.id));
         },
 
         setupTrigger: function($trigger) {
-            $trigger.attr('data-target', '#' + modal.id);
-            $trigger.attr('data-modal-id', modal.id);
+            $trigger.attr('data-target', '#' + self.id);
+            $trigger.attr('data-modal-id', self.id);
+        },
+
+        addEventListeners: function() {
+            var self = this;
+            $('#' + self.id).on('shown.bs.modal', function() {
+                self.handleForm($('#' + self.id));
+            });
+            $('#' + self.id).on('hidden.bs.modal', function() {
+                $(this).remove();
+            });
+            $('#' + self.id).on('click', '.js-ok', function() {
+                self.handleConfirm(this);
+            });
+            $('#' + self.id).on('click', '.js-cancel', function() {
+                $('#' + self.id).modal('hide');
+            });
         },
 
         handleConfirm: function() {
+            var self = this;
+
             // request the target via ajax
             var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            if (modal.settings.httpmethod === 'post') {
+            console.log(self.settings.httpmethod);
+            if (self.settings.httpmethod === 'post') {
                 ajaxData.TransientKey = gdn.definition('TransientKey');
             }
 
             $.ajax({
-                method: (modal.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                url: modal.target,
+                method: (this.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                url: self.target,
                 data: ajaxData,
                 dataType: 'json',
                 error: function(xhr) {
@@ -168,8 +198,8 @@
                             document.location.replace(json.RedirectUrl);
                         }, 300);
                     }
-                    $('#' + modal.id).modal('hide');
-                    modal.afterConfirmSuccess();
+                    $('#' + self.id).modal('hide');
+                    self.afterConfirmSuccess();
                 }
             });
         },
@@ -177,9 +207,9 @@
         // Default is to remove the closest item with the class 'js-modal-item'
         afterConfirmSuccess: function() {
             var found = false;
-            if (!modal.settings.confirmaction || modal.settings.confirmaction === 'delete') {
-                found = modal.trigger.closest('.js-modal-item').length !== 0;
-                modal.trigger.closest('.js-modal-item').remove();
+            if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
+                found = this.trigger.closest('.js-modal-item').length !== 0;
+                this.trigger.closest('.js-modal-item').remove();
             }
 
             if (!found) {
@@ -206,10 +236,34 @@
         },
 
         addConfirmContent: function() {
-            $('#' + modal.id).htmlTrigger(modal.replaceHtml(modal.confirmContent()));
+            var self = this;
+            $('#' + self.id).htmlTrigger(self.replaceHtml(self.confirmContent()));
+        },
+
+        replaceHtml: function(parsedContent) {
+
+            // Copy the defaults into the content array
+            var content = {};
+            $.extend(true, content, this.defaultContent);
+
+            // Data attributes override parsed content, content overrides defaults.
+            $.extend(true, parsedContent, this.settings.content);
+            $.extend(true, content, parsedContent);
+
+            var html = this.modalHtml;
+            html = html.replace('{body}', content.body);
+            html = html.replace('{cssClass}', content.cssClass);
+            html = html.replace('{title}', content.title);
+            html = html.replace('{closeIcon}', content.closeIcon);
+            html = html.replace('{footer}', content.footer);
+            html = html.replace('{form.open}', content.form.open);
+            html = html.replace('{form.close}', content.form.close);
+
+            return html;
         },
 
         addContent: function() {
+            var self = this;
             var ajaxData = {
                 'DeliveryType' : 'VIEW',
                 'DeliveryMethod' : 'JSON'
@@ -217,7 +271,7 @@
 
             $.ajax({
                 method: 'GET',
-                url: modal.target,
+                url: self.target,
                 data: ajaxData,
                 dataType: 'json',
                 error: function(request, textStatus, errorThrown) {
@@ -228,32 +282,51 @@
                 },
                 success: function(json) {
                     var body = json.Data;
-                    var content = modal.parseBody(body);
-                    $('#' + modal.id).htmlTrigger(modal.replaceHtml(content));
+                    var content = self.parseBody(body);
+                    $('#' + self.id).htmlTrigger(self.replaceHtml(content));
                 }
             });
         },
 
-        replaceHtml: function(parsedContent) {
+        // Add any error messages to popup form or close modal on form save.
+        handleForm: function(element) {
+            var self = this;
 
-            // Copy the defaults into the content array
-            var content = {};
-            $.extend(true, content, modal.contentDefaults);
+            $('form', element).ajaxForm({
+                data: {
+                    'DeliveryType': 'VIEW',
+                    'DeliveryMethod': 'JSON'
+                },
+                dataType: 'json',
+                success: function(json, sender) {
+                    gdn.inform(json);
+                    gdn.processTargets(json.Targets);
 
-            // Data attributes override parsed content, content overrides defaults.
-            $.extend(true, parsedContent, modal.settings.content);
-            $.extend(true, content, parsedContent);
+                    if (json.FormSaved === true) {
+                        self.afterFormSuccess(json, sender, json.RedirectUrl);
+                        $('#' + self.id).modal('hide');
+                    } else {
+                        var body = json.Data;
+                        var content = self.parseBody(body);
+                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                    }
+                },
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                }
+            });
+        },
 
-            var html = modal.modalHtml;
-            html = html.replace('{body}', content.body);
-            html = html.replace('{cssClass}', content.cssClass);
-            html = html.replace('{title}', content.title);
-            html = html.replace('{closeIcon}', content.closeIcon);
-            html = html.replace('{footer}', content.footer);
-            html = html.replace('{form.open}', content.form.open);
-            html = html.replace('{form.close}', content.form.close);
-
-            return html;
+        // Respect redirectUrl after form saves and redirect.
+        afterFormSuccess: function(json, sender, redirectUrl) {
+            this.settings.afterSuccess(json, sender);
+            if (redirectUrl) {
+                setTimeout(function() {
+                    document.location.replace(redirectUrl);
+                }, 300);
+            } else {
+                document.location.replace(window.location.href);
+            }
         },
 
         parseBody: function(body) {
@@ -297,67 +370,8 @@
                     open: formTag,
                     close: formCloseTag
                 }
-            };
-        },
-
-        addToDom: function() {
-            $('body').append(modal.modalShell.replace('{id}', modal.id));
-            modal.addEventListeners();
-        },
-
-        addEventListeners: function() {
-            $('#' + modal.id).on('shown.bs.modal', function() {
-                modal.load(this);
-            });
-            $('#' + modal.id).on('hidden.bs.modal', function() {
-                $(this).remove();
-            });
-            $('#' + modal.id).on('click', '.js-ok', function() {
-                modal.handleConfirm(this);
-            });
-            $('#' + modal.id).on('click', '.js-cancel', function() {
-                $('#' + modal.id).modal('hide');
-            });
-        },
-
-        handleForm: function(element) {
-            $('form', element).ajaxForm({
-                data: {
-                    'DeliveryType': 'VIEW',
-                    'DeliveryMethod': 'JSON'
-                },
-                dataType: 'json',
-                success: function(json, sender) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-
-                    if (json.FormSaved === true) {
-                        console.log('saved!');
-                        modal.afterFormSuccess(json, sender, json.RedirectUrl);
-                        $('#' + modal.id).modal('hide');
-                    } else {
-                        var body = json.Data;
-                        var content = modal.parseBody(body);
-                        $('#' + modal.id + ' .modal-body').htmlTrigger(content.body);
-                    }
-                },
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                }
-            });
-        },
-
-        afterFormSuccess: function(json, sender, redirectUrl) {
-            modal.settings.afterSuccess(json, sender);
-            if (redirectUrl) {
-                setTimeout(function() {
-                    document.location.replace(redirectUrl);
-                }, 300);
-            } else {
-                document.location.replace(window.location.href);
             }
         }
-
     };
 
     function prettyPrintInit(element) {
@@ -514,10 +528,19 @@
 
 
     function icheckInit(element) {
-        $('input:not(.label-selector-input):not(.toggle-input)', element).iCheck({
+        var selector = 'input:not(.label-selector-input):not(.toggle-input)';
+
+        $(selector, element).iCheck({
             aria: true
         }).on('ifChanged', function() {
             $(this).trigger('change');
+        });
+
+        $(selector, element).on('inputChecked', function() {
+            $(this).iCheck('check');
+        });
+        $(selector, element).on('inputDisabled', function() {
+            $(this).iCheck('disable');
         });
     }
 
@@ -530,13 +553,19 @@
         });
     }
 
+    function modalInit() {
+        if (typeof(Modal.activeModal) === 'object') {
+            Modal.activeModal.load();
+        }
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target);
         aceInit(e.target);
         collapseInit(e.target);
         scrollToFixedInit(e.target);
         userDropDownInit(e.target);
-        modal.load(e.target);
+        modalInit();
         clipboardInit();
         drawerInit(e.target);
         icheckInit(e.target);
@@ -573,12 +602,12 @@
 
     $(document).on('click', '.js-modal, .Popup, .Popable', function(e) {
         e.preventDefault();
-        modal.start($(this), {});
+        Modal.activeModal = new Modal($(this), {});
     });
 
     $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
         e.preventDefault();
-        modal.start($(this), {
+        Modal.activeModal = new Modal($(this), {
             httpmethod: 'post',
             modaltype: 'confirm'
         });
@@ -586,19 +615,24 @@
 
     $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
         e.preventDefault();
-        modal.start($(this), {
+        Modal.activeModal = new Modal($(this), {
+            httpmethod: 'get',
             modaltype: 'confirm'
         });
     });
 
-
     // Get new banner image.
     $(document).on('click', '.js-upload-email-image-button', function(e) {
         e.preventDefault();
-        modal.start($(this), {
+        Modal.activeModal = new Modal($(this), {
             afterSuccess: emailStyles.reloadImage
         });
     });
 
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(Modal.activeModal) === 'object') {
+            $('#' + Modal.activeModal.id).modal('hide');
+        }
+    });
 
 })(jQuery);

@@ -312,7 +312,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(
-            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
+            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Toggle', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
         ));
 
         $Sender->addSideMenu();

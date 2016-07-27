@@ -86,14 +86,23 @@ pre {
   }
 
   h2 {
-    @extend .full-border;
-    padding: $spacer 0;
-    margin: 0;
-    font-size: $font-size-base;
-    line-height: $line-height;
-    font-weight: 500;
-    border-top: $border-width solid $grey-light;
+    @extend .border-h2;
   }
+}
+
+.border-h2 {
+  @extend .full-border;
+  padding: $spacer 0;
+  margin: 0;
+  font-size: $font-size-base;
+  line-height: $line-height;
+  font-weight: 500;
+  border-top: $border-width solid $grey-light;
+}
+
+.modal h2 {
+  @extend .border-h2;
+  border-top: 0 !important;
 }
 
 .heading-h1 {

@@ -8,51 +8,6 @@
   }
 }
 
-.ActivateSlider {
-  @extend .toggle-wrap;
-
-  a {
-    &,
-    &:focus,
-    &:hover,
-    &:active,
-    &:hover:active {
-      @extend .text-hide;
-      outline: 0;
-    }
-
-    &::before {
-      @extend .toggle-well;
-      content: '';
-    }
-
-    &::after {
-      @extend .toggle-slider;
-      content: '';
-    }
-  }
-
-  .InProgress {
-    &::after {
-      @extend .toggle-slider-active;
-    }
-  }
-}
-
-.ActivateSlider-Active {
-  a {
-    &::before {
-      @extend .toggle-well-on;
-      content: '';
-    }
-
-    &::after {
-      @extend .toggle-slider-on;
-      content: '';
-    }
-  }
-}
-
 .emojiset-author {
   @extend .info;
 }
@@ -142,11 +97,19 @@
   }
 }
 
-.SmallInput {
-  @extend .form-control;
-  max-width: 20rem;
+// Autocomplete
 
-  .input-wrap & {
-    max-width: inherit;
+.ac_input {
+  @extend .form-control;
+  height: $control-height-rem !important;
+}
+
+.ac_results {
+  @extend .dropdown-menu;
+  @include list-reset();
+  z-index: 1100;
+
+  li {
+    @extend .dropdown-item
   }
 }

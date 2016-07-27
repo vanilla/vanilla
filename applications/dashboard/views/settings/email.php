@@ -72,7 +72,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('SMTP Port', 'Garden.Email.SmtpPort'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->textBox('Garden.Email.SmtpPort', array('class' => 'SmallInput')); ?>
+                <?php echo $this->Form->textBox('Garden.Email.SmtpPort'); ?>
             </div>
         </li>
         <li class="form-group row">

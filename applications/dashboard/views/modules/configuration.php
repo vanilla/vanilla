@@ -58,6 +58,9 @@ echo $Form->errors();
                 echo $Form->CheckBox($Row['Name'], t($LabelCode), $Row['Options']);
                 echo '</div>';
                 break;
+            case 'toggle':
+                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options']);
+                break;
             case 'dropdown':
                 echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
@@ -72,9 +75,13 @@ echo $Form->errors();
                 echo $Form->ImageUpload($Row['Name'], $Row['Options']);
                 break;
             case 'radiolist':
+                echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name'], ['class' => 'radiolist-label']);
                 echo $Description;
+                echo '</div>';
+                echo '<div class="input-wrap">';
                 echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
+                echo '</div>';
                 break;
             case 'checkboxlist':
                 echo $Form->label($LabelCode, $Row['Name']);

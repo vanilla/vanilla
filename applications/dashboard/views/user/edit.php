@@ -10,92 +10,98 @@ echo $this->Form->open(array('class' => 'User'));
 echo $this->Form->errors();
 if ($this->data('AllowEditing')) { ?>
     <ul>
-        <li>
-            <?php
-            echo $this->Form->label('Username', 'Name');
-            echo $this->Form->textBox('Name');
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Username', 'Name'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Name'); ?>
+            </div>
         </li>
-        <li>
-            <?php
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Email', 'Email');
+                if (UserModel::noEmail()) {
+                    echo '<div class="input">',
+                    t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
+                    '</div>';
+                } ?>
+            </div>
+            <div class="input-wrap">
+                <?php
+                $EmailAttributes = [];
 
-            echo $this->Form->label('Email', 'Email');
-            if (UserModel::noEmail()) {
-                echo '<div class="Gloss">',
-                t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
-                '</div>';
-            }
+                // Email confirmation
+                if (!$this->data('_EmailConfirmed'))
+                    $EmailAttributes['class'] = 'Unconfirmed';
 
-            $EmailAttributes = array();
-
-            // Email confirmation
-            if (!$this->data('_EmailConfirmed'))
-                $EmailAttributes['class'] = 'InputBox Unconfirmed';
-
-            echo $this->Form->textBox('Email', $EmailAttributes);
-            ?>
+                echo $this->Form->textBox('Email', $EmailAttributes); ?>
+            </div>
         </li>
         <?php if ($this->data('_CanConfirmEmail')): ?>
-            <li class="User-ConfirmEmail">
-                <?php
-                echo $this->Form->CheckBox('ConfirmEmail', t("Email is confirmed"), array('value' => '1'));
-                ?>
+            <li class="User-ConfirmEmail form-group row">
+                <div class="input-wrap no-label">
+                    <?php echo $this->Form->CheckBox('ConfirmEmail', t("Email is confirmed"), array('value' => '1')); ?>
+                </div>
             </li>
         <?php endif ?>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('ShowEmail', t('Email visible to other users'), array('value' => '1'));
-            ?>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->CheckBox('ShowEmail', t('Email visible to other users'), array('value' => '1')); ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1'));
-            ?>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->CheckBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1')); ?>
+            </div>
         </li>
-        <li>
-            <?php echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
-            <?php if ($this->data('BannedOtherReasons')): ?>
-            <div class="WarningMessage"><?php echo t(
-                    'This user is also banned for other reasons and may stay banned.',
-                    'This user is also banned for other reasons and may stay banned or become banned again.'
-                )?></div>
-            <?php endif; ?>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
+                <?php if ($this->data('BannedOtherReasons')): ?>
+                <div class="text-danger info"><?php echo t(
+                        'This user is also banned for other reasons and may stay banned.',
+                        'This user is also banned for other reasons and may stay banned or become banned again.'
+                    )?></div>
+                <?php endif; ?>
+            </div>
         </li>
         <?php
         $this->fireEvent('CustomUserFields')
         ?>
-    </ul>
 
     <?php if (count($this->data('Roles'))) : ?>
-        <h3><?php echo t('Roles'); ?></h3>
-        <ul>
-            <li>
-                <strong><?php echo t('Check all roles that apply to this user:'); ?></strong>
-                <?php
-                //echo $this->Form->CheckBoxList("RoleID", $this->RoleData, $this->UserRoleData, array('TextField' => 'Name', 'ValueField' => 'RoleID'));
-                echo $this->Form->CheckBoxList("RoleID", array_flip($this->data('Roles')), array_flip($this->data('UserRoles')));
-                ?>
-            </li>
-        </ul>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo t('Check all roles that apply to this user:'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->CheckBoxList("RoleID", array_flip($this->data('Roles')), array_flip($this->data('UserRoles'))); ?>
+            </div>
+        </li>
     <?php endif; ?>
-
-    <h3><?php echo t('Password Options'); ?></h3>
-    <ul>
-        <li class="PasswordOptions">
-            <?php
-            echo $this->Form->RadioList('ResetPassword', $this->ResetOptions);
-            ?>
+        <li class="PasswordOptions form-group row">
+            <div class="label-wrap">
+                <?php echo t('Password Options'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->RadioList('ResetPassword', $this->ResetOptions); ?>
+            </div>
         </li>
         <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
-            <li id="NewPassword">
-                <?php
-                echo $this->Form->label('New Password', 'NewPassword');
-                echo $this->Form->Input('NewPassword', 'password');
-                ?>
-                <div class="InputButtons">
+            <li id="NewPassword" class="form-group row">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('New Password', 'NewPassword'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->Input('NewPassword', 'password'); ?>
+                </div>
+            </li>
+            <li class="form-group row">
+                <div class="buttons input-wrap no-label">
                     <?php
-                    echo anchor(t('Generate Password'), '#', 'GeneratePassword Button SmallButton');
-                    echo anchor(t('Reveal Password'), '#', 'RevealPassword Button SmallButton');
+                    echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                    echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary');
                     ?>
                 </div>
             </li>

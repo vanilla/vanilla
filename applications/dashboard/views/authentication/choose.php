@@ -1,10 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->data('Title'); ?></h1>
-<div class="Info">
-    <?php echo t('Choose and configure your forum\'s authentication scheme.'); ?><br/>
-    <span
-        class="PasswordForce"><?php echo sprintf(t('You can always use your password at<a href="%1$s">%1$s</a>.', 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'), url('entry/password', true)); ?></span>
+<?php Gdn_Theme::assetBegin('Help'); ?>
+    <h2><?php echo t('Choose and configure your forum\'s authentication scheme.'); ?></h2>
+    <span class="PasswordForce"><?php echo sprintf(t('You can always use your password at<a href="%1$s">%1$s</a>.', 'If you are ever locked out of your forum you can always log in using your original Vanilla email and password at <a href="%1$s">%1$s</a>'), url('entry/password', true)); ?></span>
 </div>
+<?php Gdn_Theme::assetEnd(); ?>
 <div class="AuthenticationChooser">
     <?php
     echo $this->Form->open(array(
@@ -13,27 +13,29 @@
     echo $this->Form->errors();
     ?>
     <ul>
-        <li>
-            <?php
-            echo $this->Form->label('Current Authenticator', 'Garden.Authentication.CurrentAuthenticator');
-            echo "<span>{$this->ChooserList[$this->CurrentAuthenticationAlias]}</span>";
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Current Authenticator', 'Garden.Authentication.CurrentAuthenticator'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->ChooserList[$this->CurrentAuthenticationAlias]; ?>
+            </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Configure an Authenticator', 'Garden.Authentication.Chooser');
-            echo $this->Form->DropDown('Garden.Authentication.Chooser', array_merge(array(NULL => NULL), $this->ChooserList), array(
-                'value' => $this->data('PreFocusAuthenticationScheme')
-            ));
-            echo $this->Form->button("Activate", array(
-                'Class' => 'SliceSubmit SmallButton'
-            ));
-            ?>
+        <li class="form-group row">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Configure an Authenticator', 'Garden.Authentication.Chooser'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->DropDown('Garden.Authentication.Chooser', array_merge(array(NULL => NULL), $this->ChooserList), array(
+                    'value' => $this->data('PreFocusAuthenticationScheme')
+                )); ?>
+            </div>
         </li>
     </ul>
-    <?php
-    echo $this->Form->close();
-    ?>
+    <div class="form-footer">
+    <?php echo $this->Form->button("Activate", array('Class' => 'SliceSubmit btn btn-primary')); ?>
+    </div>
+    <?php echo $this->Form->close(); ?>
 </div>
 <?php
 if ($this->data('PreFocusAuthenticationScheme')) {

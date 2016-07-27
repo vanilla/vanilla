@@ -1,5 +1,5 @@
 <div class="AuthenticationConfigure Slice" rel="dashboard/authentication/configure">
-    <div class="Info">
+    <div class="padded">
         <?php echo $this->data('ConfigureMessage'); ?>
     </div>
 </div>

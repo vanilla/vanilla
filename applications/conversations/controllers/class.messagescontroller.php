@@ -54,8 +54,9 @@ class MessagesController extends ConversationsController {
      * @access public
      *
      * @param string $Recipient Username of the recipient.
+     * @param string $Subject Subject of the message.
      */
-    public function add($Recipient = '') {
+    public function add($Recipient = '', $Subject = '') {
         $this->permission('Conversations.Conversations.Add');
         $this->Form->setModel($this->ConversationModel);
 
@@ -112,6 +113,9 @@ class MessagesController extends ConversationsController {
         } else {
             if ($Recipient != '') {
                 $this->Form->setValue('To', $Recipient);
+            }
+            if ($Subject != '') {
+                $this->Form->setValue('Subject', $Subject);
             }
         }
         if ($Target = Gdn::request()->get('Target')) {

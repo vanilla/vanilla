@@ -41,7 +41,7 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
                 <div class="info"><?php echo t('Once enabled, only members will see inside your community.'); ?></div>
             </div>
             <div class="input-wrap-right">
-                <span id="plaintext-toggle">
+                <span id="private-community-toggle">
                     <?php
                     if (c('Garden.PrivateCommunity', false)) {
                         echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', 'settings/privatecommunity/on/'.Gdn::session()->TransientKey()), 'span', array('class' => "toggle-wrap toggle-wrap-on"));

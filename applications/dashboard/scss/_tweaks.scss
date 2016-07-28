@@ -17,3 +17,12 @@
 .radiolist-label[for="Form_Garden-dot-EmojiSet"] {
   display: none;
 }
+
+.CheckboxCell {
+  padding-left: $spacer;
+  padding-right: $spacer;
+
+  .icheckbox {
+    margin-right: 0;
+  }
+}

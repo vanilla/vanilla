@@ -30,8 +30,11 @@ $checkerboard-foreground: #d8d8d8;
   display: flex;
   align-items: center;
   @include image-wrap();
-}
 
+  @include media-breakpoint-down(md) {
+    @include image-wrap($spacer * 3.5, $spacer * 3.5);
+  }
+}
 .icon {
   svg {
     display: block;

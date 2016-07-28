@@ -99,6 +99,10 @@
     height: $spacer * 4;
   }
 
+  .hero-title {
+    @extend .h2;
+  }
+
   .btn {
     margin-top: $spacer * 2;
   }

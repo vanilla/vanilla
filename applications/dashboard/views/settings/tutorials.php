@@ -19,7 +19,7 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
 </div>
 <div class="hero">
     <div class="hero-content">
-        <h2 class="hero-title"><?php echo $CurrentTutorial['Name']; ?></h2>
+        <div class="hero-title"><?php echo $CurrentTutorial['Name']; ?></div>
         <div class="hero-body"><?php echo $CurrentTutorial['Description']; ?></div>
     </div>
     <div class="hero-media-wrapper">
@@ -40,7 +40,7 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
         echo '<img src="'.$Tutorial['Thumbnail'].'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
             <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
                 <div class="buttons">
-                    <div class="icon-wrapper"><?php echo dashboardSymbol('checkmark')?></div>
+                    <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
                 </div>
                 <div class="selected"></div>
             </a>

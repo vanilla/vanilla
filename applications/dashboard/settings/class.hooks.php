@@ -161,8 +161,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
         $sort = -1;
 
-        $nav->addGroupToSection('DashboardHome', t('Dashboard'), 'dashboardhome')
-            ->addGroupToSection('Moderation', t('Moderation'), 'moderation')
+        $nav->addGroupToSection('Moderation', t('Moderation'), 'moderation')
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)

@@ -153,6 +153,27 @@ $navbar-short-height: 3rem;
   }
 }
 
+.nav-icons {
+  margin-right: $spacer;
+
+  svg {
+    display: block;
+    fill: $white;
+    height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg));
+  }
+
+  .navbar-short & {
+    .nav-link {
+      padding-top: (($navbar-short-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2);
+      padding-bottom: (($navbar-short-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2);
+    }
+  }
+
+  .nav-link {
+    min-width: inherit;
+  }
+}
+
 .navbar-profile {
   cursor: pointer;
 

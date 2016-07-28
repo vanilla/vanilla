@@ -851,7 +851,7 @@
 
 
     function icheckInit(element) {
-        var selector = 'input:not(.label-selector-input):not(.toggle-input)';
+        var selector = 'input:not(.label-selector-input):not(.toggle-input):not(.avatar-delete-input)';
 
         $(selector, element).iCheck({
             aria: true

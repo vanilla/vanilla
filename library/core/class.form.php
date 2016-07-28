@@ -48,6 +48,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'checkbox-inline' => 'checkbox-inline',
             'file' => 'form-control-file',
             'inputbox' => 'form-control',
+            'textbox' => 'form-control',
             'popup' => 'js-popup',
             'primary' => 'btn-primary',
             'radio' => '',
@@ -129,6 +130,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
             $style = val('ControlStyle', $themeInfo);
         }
+
         $this->setStyles($style);
 
         // Get custom error class
@@ -361,8 +363,8 @@ class Gdn_Form extends Gdn_Pluggable {
     public function color($fieldName) {
         Gdn::controller()->addJsFile('colorpicker.js');
 
-        $valueAttributes['class'] = 'js-color-picker-value color-picker-value InputBox Hidden';
-        $textAttributes['class'] = 'js-color-picker-text color-picker-text InputBox';
+        $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
+        $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
         return '<div id="'.$this->escapeString($fieldName).'" class="js-color-picker color-picker input-group">'

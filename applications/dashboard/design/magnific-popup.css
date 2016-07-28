@@ -31,7 +31,6 @@
     left: 0;
     top: 0;
     padding: 0 8px;
-    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
 }
@@ -66,7 +65,6 @@
 }
 
 .mfp-zoom-out-cur, .mfp-zoom-out-cur .mfp-image-holder .mfp-close {
-    cursor: -moz-zoom-out;
     cursor: -webkit-zoom-out;
     cursor: zoom-out;
 }
@@ -74,7 +72,6 @@
 .mfp-zoom {
     cursor: pointer;
     cursor: -webkit-zoom-in;
-    cursor: -moz-zoom-in;
     cursor: zoom-in;
 }
 
@@ -85,6 +82,7 @@
 .mfp-close, .mfp-arrow, .mfp-preloader, .mfp-counter {
     -webkit-user-select: none;
     -moz-user-select: none;
+    -ms-user-select: none;
     user-select: none;
 }
 
@@ -134,7 +132,6 @@ button.mfp-close, button.mfp-arrow {
     outline: none;
     padding: 0;
     z-index: 1046;
-    -webkit-box-shadow: none;
     box-shadow: none;
 }
 
@@ -305,7 +302,6 @@ img.mfp-img {
     height: auto;
     display: block;
     line-height: 0;
-    -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
     padding: 40px 0 40px;
@@ -398,7 +394,6 @@ img.mfp-img {
         top: auto;
         padding: 3px 5px;
         position: fixed;
-        -webkit-box-sizing: border-box;
         -moz-box-sizing: border-box;
         box-sizing: border-box;
     }

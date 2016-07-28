@@ -761,7 +761,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack:not(.Message .Hijack)', 'click', hijackClick);
+    $(document).delegate('.Hijack:not(.DismissMessage .Hijack)', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus

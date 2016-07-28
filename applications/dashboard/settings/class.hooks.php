@@ -27,6 +27,35 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+
+        if ($Sender->MasterView == 'admin') {
+            if (val('Form', $Sender)) {
+                $Sender->Form->setStyles('bootstrap');
+            }
+
+            $Sender->addJsFile('dashboard.js', 'dashboard');
+            $Sender->addJsFile('jquery.expander.js');
+            $Sender->addJsFile('settings.js', 'dashboard');
+            $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/util.js', 'dashboard');
+            $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/tooltip.js', 'dashboard');
+            $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/dropdown.js', 'dashboard');
+            $Sender->addJsFile('vendors/collapse.js', 'dashboard');
+            $Sender->addJsFile('vendors/modal.js', 'dashboard');
+            $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
+            $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
+            $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
+        }
+
+        // Check the statistics.
+        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            Gdn::statistics()->check();
+        }
+
         // Enable theme previewing
         if ($Session->isValid()) {
             $PreviewThemeName = htmlspecialchars($Session->getPreference('PreviewThemeName', ''));
@@ -114,6 +143,10 @@ class DashboardHooks implements Gdn_IPlugin {
             }
 
             $Sender->addDefinition('Path', Gdn::request()->path());
+
+            $get = Gdn::request()->get();
+            unset($get['p']); // kludge for old index.php?p=/path
+            $Sender->addDefinition('Query', http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
             $Sender->addDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
 
@@ -228,6 +261,23 @@ class DashboardHooks implements Gdn_IPlugin {
                 }
                 Gdn::userModel()->Validation->reset();
             }
+        }
+    }
+
+    /**
+     * @param Gdn_Dispatcher $sender
+     */
+    public function gdn_dispatcher_sendHeaders_handler($sender) {
+        $csrfToken = Gdn::request()->post(
+            Gdn_Session::CSRF_NAME,
+            Gdn::request()->get(
+                Gdn_Session::CSRF_NAME,
+                Gdn::request()->getValueFrom(Gdn_Request::INPUT_SERVER, 'HTTP_X_CSRF_TOKEN')
+            )
+        );
+
+        if ($csrfToken && Gdn::session()->isValid() && !Gdn::session()->validateTransientKey($csrfToken)) {
+            safeHeader('X-CSRF-Token: '.Gdn::session()->transientKey());
         }
     }
 

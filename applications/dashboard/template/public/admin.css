@@ -3771,8 +3771,8 @@ input[type="checkbox"].disabled {
   }
   .col-sm-pull-20 {
     right: 83.3333333333%;
-  }
   .col-sm-pull-21 {
+  }
     right: 87.5%;
   }
   .col-sm-pull-22 {
@@ -3816,8 +3816,8 @@ input[type="checkbox"].disabled {
   }
   .col-sm-push-10 {
     left: 41.6666666667%;
-  }
   .col-sm-push-11 {
+  }
     left: 45.8333333333%;
   }
   .col-sm-push-12 {
@@ -3944,8 +3944,8 @@ input[type="checkbox"].disabled {
   .col-md-2 {
     -ms-flex: 0 0 8.3333333333%;
     flex: 0 0 8.3333333333%;
-  }
   .col-md-3 {
+  }
     -ms-flex: 0 0 12.5%;
     flex: 0 0 12.5%;
   }
@@ -5766,9 +5766,9 @@ input[type="button"].btn-block {
 
 .card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a {
   color: #555a62;
+.card .media-sm-image-wrap {
 }
 
-.card .media-sm-image-wrap {
   position: relative;
   height: 5.25rem;
   border-radius: 0.25rem;
@@ -6389,7 +6389,7 @@ form ol ol {
   padding-left: 0;
 }
 
-form ul li,
+input:focus, input:active,
 form ol li {
   list-style: none;
   -ms-flex-pack: justify;
@@ -6573,12 +6573,12 @@ form ol .label {
   position: relative;
 }
 
-.color-picker-color {
+textarea:active {
   position: absolute;
   width: 0;
   height: 0;
   opacity: 0;
-  padding: 0;
+  outline: 0;
 }
 
 .color-picker-preview {
@@ -6977,9 +6977,9 @@ select + select {
 .LayoutOptions .description,
 .HomeOptions .description {
   display: none;
+.mobile-wrap {
 }
 
-.mobile-wrap {
   position: relative;
   overflow: hidden;
   margin-bottom: 0.5625rem;
@@ -7633,9 +7633,9 @@ button.close, button.Close {
 
 .panel-nav .nav-link-globals-sign-out {
   display: none;
+@media (max-width: 991px) {
 }
 
-@media (max-width: 991px) {
   .panel-nav .nav-link-globals-sign-out {
     display: block;
     margin-top: 2.25rem;
@@ -7677,9 +7677,9 @@ button.close, button.Close {
   margin-left: -1.125rem;
   margin-right: -1.125rem;
   border-bottom: 0.0625rem solid #ddd;
+.nav-adventure .nav-item:first-child {
 }
 
-.nav-adventure .nav-item:first-child {
   border-top: 0.0625rem solid #ddd;
 }
 
@@ -7759,7 +7759,7 @@ button.close, button.Close {
   height: 4.5rem;
   color: #fff;
   background-color: #0291db;
-  font-weight: 100;
+  font-weight: 200;
   letter-spacing: .0375rem;
   border: 1px solid rgba(0, 0, 0, 0.125);
   z-index: 1;
@@ -7787,7 +7787,7 @@ button.close, button.Close {
 
 .navbar .nav-item {
   text-align: center;
-  border-right: 1px solid rgba(0, 0, 0, 0.125);
+  border-right: 1px solid #fff;
 }
 
 .navbar .nav-item + .nav-item {
@@ -7895,7 +7895,7 @@ button.close, button.Close {
 
 .navbar .nav-link-description {
   font-size: 0.675rem;
-  line-height: 1.3333333333;
+  line-height: 1.5;
   opacity: .75;
 }
 
@@ -7924,16 +7924,20 @@ button.close, button.Close {
 }
 
 .navbar-profile {
+.navbar .Profile {
   cursor: pointer;
 }
 
 .navbar-profile .icon, .navbar-profile .btn-icon, .navbar-profile .btn-icon-border, .navbar-profile .search-wrap .icon-wrap, .search-wrap .navbar-profile .icon-wrap, .navbar-profile .icon-text {
-  opacity: .75;
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .btn-navbar {
   position: relative;
   display: inline-block;
+  float: left;
   font-weight: 300;
   text-transform: uppercase;
   margin-left: 1.125rem;
@@ -7942,7 +7946,7 @@ button.close, button.Close {
   background-color: transparent;
   border-color: #fff;
   padding: 0.125rem 0.75rem;
-  font-size: 0.575rem;
+  font-size: 0.675rem;
   line-height: 1.5;
   border-radius: 0.875rem;
 }
@@ -8701,7 +8705,7 @@ h6, .h6 {
 }
 
 h1, .h1 {
-  font-size: 2rem;
+  font-size: 2.5rem;
 }
 
 h2, .h2, .hero .hero-title {
@@ -8717,7 +8721,7 @@ h4, .h4 {
 }
 
 h5, .h5 {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
 }
 
 h6, .h6 {
@@ -9148,9 +9152,9 @@ form h2 {
 
 .ac_results {
   z-index: 1100;
+.ac_results,
 }
 
-.ac_results,
 .ac_results ul,
 .ac_results ol {
   padding-left: 0;

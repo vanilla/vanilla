@@ -4,72 +4,64 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-    <div class="Info">
-        <?php echo t('Facebook Connect allows users to sign in using their Facebook account.', 'Facebook Connect allows users to sign in using their Facebook account. <b>You must register your application with Facebook for this plugin to work.</b>'); ?>
+    <div class="padded alert alert-warning">
+        <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('Facebook')); ?>
     </div>
-    <div class="Configuration">
-        <div class="ConfigurationForm">
-            <ul>
-                <li>
-                    <?php
-                    echo $this->Form->label('Application ID', 'ApplicationID');
-                    echo $this->Form->textBox('ApplicationID');
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->label('Application Secret', 'Secret');
-                    echo $this->Form->textBox('Secret');
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->checkBox('UseFacebookNames', 'Use Facebook names for usernames.');
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->checkBox('SendConnectEmail', 'Send users a welcome email.');
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
-                    ?>
-                </li>
-                <li>
-                    <?php
-                    echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
-                    ?>
-                </li>
-            </ul>
-            <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
-        </div>
-        <div class="ConfigurationHelp">
-            <strong>How to set up Facebook Connect</strong>
-
-            <p>In order to set up Facebook Connect, you must create an "application" in Facebook at: <a
-                    href="https://developers.facebook.com/apps">https://developers.facebook.com/apps</a></p>
-
-            <p>
-                When you create the Facebook application, you can choose what to enter in most fields, but make sure you
-                enter the following value in the "Site Url" field:
-                <input type="text" class="CopyInput" value="<?php echo rtrim(Gdn::request()->domain(), '/').'/'; ?>"/>
-            </p>
-
-            <p>Once your application has been set up, you must copy the "Application ID" and "Application Secret" into
-                the form on this page and click save.</p>
-            <strong>Need help?</strong>
-
-            <p>For a complete walk-through of the steps involved, read <a
-                    href="http://blog.vanillaforums.com/facebook-application-for-vanillaforums-sso/">How to Create a
-                    Facebook Application for Vanillaforums Single Sign-On (SSO)</a>.</p>
-        </div>
+    <div class="padded">
+        <?php echo t('Facebook Connect allows users to sign in using their Facebook account.'); ?>
+        <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Facebook Connect')), 'http://docs.vanillaforums.com/addons/social/facebook/', array('target' => '_blank')); ?>
     </div>
+    <ul>
+        <li class="form-group row">
+            <?php
+            echo $this->Form->labelWrap('Application ID', 'ApplicationID');
+            echo $this->Form->textBoxWrap('ApplicationID');
+            ?>
+        </li>
+        <li class="form-group row">
+            <?php
+            echo $this->Form->labelWrap('Application Secret', 'Secret');
+            echo $this->Form->textBoxWrap('Secret');
+            ?>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php
+                echo $this->Form->checkBox('UseFacebookNames', 'Use Facebook names for usernames.');
+                ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php
+                echo $this->Form->checkBox('SendConnectEmail', 'Send users a welcome email.');
+                ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php
+                echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
+                ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php
+                echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
+                ?>
+            </div>
+        </li>
+        <li class="form-group row">
+            <div class="input-wrap no-label">
+                <?php
+                echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
+                ?>
+            </div>
+        </li>
+    </ul>
+<div class="form-footer js-modal-footer">
+<?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
+</div>
 <?php
 echo $this->Form->close();

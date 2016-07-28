@@ -150,7 +150,7 @@ $themePlaceholder = asset('applications/dashboard/design/images/theme-placeholde
                         echo '<div class="overlay">';
                         echo '<div class="buttons">';
                         echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
-                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
+//                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
                         $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                         $this->fireEvent('AfterThemeButtons');
                         echo '</div>';

@@ -1,19 +1,11 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor('Using OAuth 2.0 for Login (OpenID Connect)', 'https://developers.google.com/accounts/docs/OAuth2Login'), 'li');
-        echo wrap(Anchor('Google Developers Console', 'https://console.developers.google.com/'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
-    <div class="Info">
-        <?php echo anchor(t('How to set up Google+ Social Connect.'), 'http://docs.vanillaforums.com/addons/googleplus/', array('target' => '_blank')); ?>
-    </div>
+<div class="padded alert alert-warning">
+    <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('Google+')); ?>
+</div>
+<div class="padded">
+    <?php echo anchor(sprintf(t('How to set up %s.'), t('Google+ Social Connect')), 'http://docs.vanillaforums.com/addons/social/googleplus/', array('target' => '_blank')); ?>
+</div>
 <?php
 $Cf = $this->ConfigurationModule;
 

@@ -228,6 +228,33 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
+     * A helper function to search through the get/post for a key.
+     *
+     * The get array is expected to have lowercase keys while the post array can be unaltered.
+     *
+     * @param string $key The key to search for.
+     * @param array $get The get array.
+     * @param array $post The post array.
+     * @param mixed $default The default value to get if the key does not exist.
+     * @return mixed Returns the value in one of the collections or {@link $default}.
+     */
+    private function requestVal($key, $get, $post, $default = null) {
+        $keys = [$key, lcfirst($key), strtolower($key)];
+
+        if (isset($get[$keys[0]])) {
+            return $get[$keys[0]];
+        }
+
+        foreach ($keys as $key) {
+            if (isset($post[$key])) {
+                return $post[$key];
+            }
+        }
+
+        return $default;
+    }
+
+    /**
      * Parses the query string looking for supplied request parameters.
      *
      * Places anything useful into this object's Controller properties.
@@ -243,7 +270,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             'controller' => '',
             'controllerMethod' => '',
             'pathArgs' => [],
-            'query' => array_change_key_case($request->get())
+            'query' => array_change_key_case($request->get()),
+            'post' => $request->post()
         ];
 
         // Here is the basic format of a request:
@@ -277,8 +305,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 break;
         }
         // An explicitly passed delivery type/method overrides the default.
-        $result['deliveryMethod'] = val('deliverymethod', $result['query'], $deliveryMethod ?: DELIVERY_METHOD_XHTML);
-        $result['deliveryType'] = val('deliverytype', $result['query'], $deliveryType);
+        $result['deliveryMethod'] = self::requestVal('DeliveryMethod', $result['query'], $result['post'], $deliveryMethod ?: DELIVERY_METHOD_XHTML);
+        $result['deliveryType'] = self::requestVal('DeliveryType', $result['query'], $result['post'], $deliveryType);
 
         // Figure out the controller.
         list($controllerName, $pathArgs) = $this->findController($parts);

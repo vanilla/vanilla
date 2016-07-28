@@ -104,7 +104,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                 $RowClass .= ' Alt';
             }
 
-            $IconPath = val('IconUrl', $addonInfo, '/applications/dashboard/design/images/addon-place-holder.png');
+            $IconPath = val('IconUrl', $addonInfo, asset('applications/dashboard/design/images/addon-placeholder.png'));
 
             ?>
             <li <?php echo 'id="'.Gdn_Format::url(strtolower($addonName)).'-plugin"', ' class="media More '.$RowClass.'"'; ?>>

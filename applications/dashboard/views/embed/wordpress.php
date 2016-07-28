@@ -6,7 +6,7 @@
 </div>
 <div class="media">
     <div class="media-left">
-        <?php echo wrap(img('/applications/dashboard/design/images/addon-place-holder.png', array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
+        <?php echo wrap(img(asset('applications/dashboard/design/images/addon-placeholder.png'), array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
     </div>
     <div class="media-body">
         <div class="media-heading"><div class="media-title"><?php echo t('Vanilla Plugin for WordPress'); ?></div>

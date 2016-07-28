@@ -27,6 +27,30 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+
+        if ($Sender->MasterView == 'admin') {
+            if (val('Form', $Sender)) {
+                $Sender->Form->setStyles('bootstrap');
+            }
+
+            $Sender->addJsFile('dashboard.js', 'dashboard');
+            $Sender->addJsFile('jquery.expander.js');
+            $Sender->addJsFile('settings.js', 'dashboard');
+            $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/util.js', 'dashboard');
+            $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/tooltip.js', 'dashboard');
+            $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/dropdown.js', 'dashboard');
+            $Sender->addJsFile('vendors/collapse.js', 'dashboard');
+            $Sender->addJsFile('vendors/modal.js', 'dashboard');
+            $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
+            $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
+            $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
+        }
+
         // Check the statistics.
         if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
             Gdn::statistics()->check();
@@ -161,8 +185,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
         $sort = -1;
 
-        $nav->addGroupToSection('DashboardHome', t('Dashboard'), 'dashboardhome')
-            ->addGroupToSection('Moderation', t('Moderation'), 'moderation')
+        $nav->addGroupToSection('Moderation', t('Moderation'), 'moderation')
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Authentication'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)

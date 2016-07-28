@@ -55,6 +55,7 @@ $navbar-short-height: 3rem;
     min-width: to-rem(180);
     padding: ($navbar-height - (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg))) / 2;
     color: $white;
+    border-radius: 0;
 
     &.active {
       &,
@@ -85,7 +86,7 @@ $navbar-short-height: 3rem;
     height: $navbar-short-height;
 
     .nav-link {
-      padding: ($navbar-short-height - ($font-size-base * $line-height-lg)) / 2;
+      padding: ($navbar-short-height - ($font-size-base * $line-height-lg)) / 2 - $border-width;
     }
 
     .nav-link-description {

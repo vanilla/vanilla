@@ -7631,12 +7631,12 @@ button.close, button.Close {
   border-radius: .25rem;
 }
 
-.panel-nav .nav-link-globals-sign-out {
+.panel-nav .globals-sign-out {
   display: none;
 }
 
 @media (max-width: 991px) {
-  .panel-nav .nav-link-globals-sign-out {
+  .panel-nav .globals-sign-out {
     display: block;
     margin-top: 2.25rem;
   }
@@ -7911,7 +7911,7 @@ button.close, button.Close {
 .nav-icons svg {
   display: block;
   fill: #fff;
-  height: 2.0666666667rem;
+  height: 1.9416666667rem;
 }
 
 .navbar-short .nav-icons .nav-link {

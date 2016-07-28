@@ -7631,12 +7631,12 @@ button.close, button.Close {
   border-radius: .25rem;
 }
 
-.panel-nav .nav-link-globals-sign-out {
+.panel-nav .globals-sign-out {
   display: none;
 }
 
 @media (max-width: 991px) {
-  .panel-nav .nav-link-globals-sign-out {
+  .panel-nav .globals-sign-out {
     display: block;
     margin-top: 2.25rem;
   }
@@ -7803,6 +7803,7 @@ button.close, button.Close {
   min-width: 11.25rem;
   padding: 1.2166666667rem;
   color: #fff;
+  border-radius: 0;
 }
 
 .navbar .nav-link.active, .navbar .nav-link.Current, .navbar
@@ -7837,7 +7838,7 @@ button.close, button.Close {
 }
 
 .navbar.navbar-short .nav-link {
-  padding: 0.9166666667rem;
+  padding: 0.8541666667rem;
 }
 
 .navbar.navbar-short .nav-link-description {
@@ -8686,6 +8687,15 @@ table.no-hover tbody tr:hover {
 
 .radiolist-label[for="Form_Garden-dot-EmojiSet"] {
   display: none;
+}
+
+.CheckboxCell {
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+}
+
+.CheckboxCell .icheckbox {
+  margin-right: 0;
 }
 
 h1, .h1,

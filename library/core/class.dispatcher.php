@@ -182,6 +182,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Check for URL rewrites.
         $request = $this->rewriteRequest($request);
 
+        // We need to save this state now because it's lost after this method.
+        $this->passData('isHomepage', $this->isHomepage);
+
         // If we're in a private community and can block, redirect to signin
         if (c('Garden.PrivateCommunity') && $this->getCanBlock($request) > self::BLOCK_PERMISSION) {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
@@ -716,6 +719,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     die();
             }
         } elseif (in_array($request->path(), ['', '/'])) {
+            $this->isHomepage = true;
             $defaultController = Gdn::router()->getRoute('DefaultController');
             $request->pathAndQuery($defaultController['Destination']);
         }

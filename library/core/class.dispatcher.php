@@ -149,7 +149,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AppStartup');
 
         // Register callback allowing addons to modify response headers before PHP sends them.
-        header_register_callback(function() {
+        header_register_callback(function () {
             $this->fireEvent('SendHeaders');
         });
     }
@@ -203,7 +203,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // Now that the controller has been found, dispatch to a method on it.
         $this->dispatchController($request, $routeArgs);
-                    }
+    }
 
     /*
      * Dispatch a 404 with an event that can be handled.
@@ -214,18 +214,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private function dispatchNotFound($reason = 'notfound', $request = null) {
         if (!$request) {
             $request = Gdn::request();
-                }
-                $this->EventArguments['Handled'] = false;
+        }
+        $this->EventArguments['Handled'] = false;
         $handled =& $this->EventArguments['Handled'];
-                $this->fireEvent('NotFound');
+        $this->fireEvent('NotFound');
 
         if (!$handled) {
             $request->withRoute('Default404');
             return $this->passData('Reason', $reason)->dispatch($request, true);
-                } else {
+        } else {
             return $handled;
-                }
-            }
+        }
+    }
 
     /**
      * Parses the query string looking for supplied request parameters.
@@ -264,18 +264,18 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Set some special properties based on the deliver method.
         $deliveryType = DELIVERY_TYPE_ALL;
         switch ($deliveryMethod) {
-                case DELIVERY_METHOD_JSON:
-                case DELIVERY_METHOD_XML:
+            case DELIVERY_METHOD_JSON:
+            case DELIVERY_METHOD_XML:
                 $deliveryType = DELIVERY_TYPE_DATA;
-                    break;
+                break;
             case DELIVERY_METHOD_ATOM:
-                case DELIVERY_METHOD_RSS:
+            case DELIVERY_METHOD_RSS:
                 $result['syndicationMethod'] = DELIVERY_METHOD_RSS; //$deliveryMethod;
-                    break;
+                break;
             case DELIVERY_METHOD_TEXT:
                 $deliveryType = DELIVERY_TYPE_VIEW;
-                    break;
-            }
+                break;
+        }
         // An explicitly passed delivery type/method overrides the default.
         $result['deliveryMethod'] = val('deliverymethod', $result['query'], $deliveryMethod ?: DELIVERY_METHOD_XHTML);
         $result['deliveryType'] = val('deliverytype', $result['query'], $deliveryType);
@@ -312,7 +312,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if ($addon) {
             $result['addon'] = $addon;
             $this->applicationFolder = stringBeginsWith($addon->getSubdir(), 'applications/', true, true);
-    }
+        }
         $this->ControllerName = $result['controller'];
         $this->ControllerMethod = 'index';
         $this->controllerMethodArgs = [];
@@ -384,14 +384,14 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $controllerName = $controller.'Controller';
 
-            // If the lookup succeeded, good to go
+        // If the lookup succeeded, good to go
         if (class_exists($controllerName, true)) {
             array_shift($parts);
             return [$controllerName, $parts];
         } else {
             return ['', $parts];
-                    }
-                }
+        }
+    }
 
     /**
      * Find the method to call on a controller, based on a path.
@@ -413,8 +413,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return ['index', $pathArgs];
         } else {
             return ['', $pathArgs];
-                            }
-                    }
+        }
+    }
 
     /**
      * Check to see if a controller has a method.
@@ -432,10 +432,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return true;
         } elseif (Gdn::pluginManager()->hasNewMethod($class, $method)) {
             return true;
-                } else {
-                    return false;
-                }
-            }
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Parses methods that may be using dot-syntax to express a delivery type
@@ -769,7 +769,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if (!$controllerMethod) {
             // The controller method was not found.
             return $this->dispatchNotFound('method_notfound', $request);
-            }
+        }
 
         // The method has been found, set it on the controller.
         $controller->RequestMethod = $controllerMethod;

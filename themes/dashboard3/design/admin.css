@@ -7330,6 +7330,32 @@ label[id^=iCheck] {
   width: 5.25rem;
 }
 
+@media (max-width: 991px) {
+  .addon-image-wrap {
+    position: relative;
+    height: 3.9375rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background-color: #f4f4f5;
+  }
+  .addon-image-wrap::after {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    content: '';
+  }
+  .addon-image-wrap img, .addon-image-wrap .LayoutOptions .Sprite, .LayoutOptions .addon-image-wrap .Sprite, .addon-image-wrap
+  .HomeOptions .Sprite,
+  .HomeOptions .addon-image-wrap .Sprite {
+    width: 3.9375rem;
+  }
+}
+
 .icon svg, .btn-icon svg, .btn-icon-border svg, .search-wrap .icon-wrap svg, .icon-text svg {
   display: block;
   fill: #555a62;
@@ -7355,13 +7381,31 @@ label[id^=iCheck] {
 .media-options {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
   -ms-flex-item-align: center;
   align-self: center;
 }
 
-.media-options .btn, .media-options .file-upload-browse, .media-options .Button, .media-options
-.TextButton, .media-options .FilterMenu .FilterButton, .FilterMenu .media-options .FilterButton {
-  margin-right: 2.25rem;
+.media-options > *:not(:first-child) {
+  margin-left: 2.25rem;
+}
+
+@media (max-width: 991px) {
+  .media-options {
+    -ms-flex-direction: column-reverse;
+    flex-direction: column-reverse;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-item-align: start;
+    align-self: flex-start;
+  }
+  .media-options > *:not(:first-child) {
+    margin-left: 0;
+  }
+  .media-options > *:not(:last-child) {
+    margin-top: 0.5625rem;
+  }
 }
 
 .media-right {
@@ -7860,6 +7904,25 @@ button.close, button.Close {
   opacity: .75;
 }
 
+.nav-icons {
+  margin-right: 1.125rem;
+}
+
+.nav-icons svg {
+  display: block;
+  fill: #fff;
+  height: 2.0666666667rem;
+}
+
+.navbar-short .nav-icons .nav-link {
+  padding-top: 0.4666666667rem;
+  padding-bottom: 0.4666666667rem;
+}
+
+.nav-icons .nav-link {
+  min-width: inherit;
+}
+
 .navbar-profile {
   cursor: pointer;
 }
@@ -7925,7 +7988,7 @@ button.close, button.Close {
 
 .panel {
   padding-top: 4.5rem;
-  padding-bottom: 4rem;
+  padding-bottom: 4.5rem;
 }
 
 .panel code {
@@ -8111,17 +8174,20 @@ button.close, button.Close {
   margin-top: 0.5625rem;
 }
 
-.Section-DashboardHome .main {
+.Section-DashboardHome .main,
+.Section-Tutorials .main {
   max-width: 1296px;
 }
 
 @media (min-width: 992px) {
-  .Section-DashboardHome .panel-left {
+  .Section-DashboardHome .panel-left,
+  .Section-Tutorials .panel-left {
     display: none;
   }
 }
 
-.Section-DashboardHome .panel-right {
+.Section-DashboardHome .panel-right,
+.Section-Tutorials .panel-right {
   display: none;
 }
 
@@ -8623,7 +8689,7 @@ table.no-hover tbody tr:hover {
 }
 
 h1, .h1,
-h2, .h2,
+h2, .h2, .hero .hero-title,
 h3, .h3,
 h4, .h4,
 h5, .h5,
@@ -8638,7 +8704,7 @@ h1, .h1 {
   font-size: 2rem;
 }
 
-h2, .h2 {
+h2, .h2, .hero .hero-title {
   font-size: 1.125rem;
 }
 
@@ -8659,7 +8725,7 @@ h6, .h6 {
 }
 
 h1, .h1,
-h2, .h2,
+h2, .h2, .hero .hero-title,
 h3, .h3 {
   margin-top: 1.125rem;
   margin-bottom: 0.5625rem;

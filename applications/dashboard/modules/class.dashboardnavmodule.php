@@ -13,6 +13,8 @@
  */
 class DashboardNavModule extends SiteNavModule {
 
+    const ACTIVE_SECTION_DEFAULT = 'Settings';
+
     public $view = 'nav-dashboard';
 
     /**
@@ -40,6 +42,19 @@ class DashboardNavModule extends SiteNavModule {
         ]
     ];
 
+    protected static $altSectionsInfo = [
+        'Tutorials' => [
+            'section' => 'Tutorials',
+            'title' => 'Help',
+            'description' => '',
+            'url' => '/dashboard/settings/gettingstarted'
+        ]
+    ];
+
+    public function __construct($cssClass, $useCssPrefix) {
+        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
+        parent::__construct($cssClass, $useCssPrefix);
+    }
 
     /**
      * Check user permissions, translate our translate-ables and url-ify our urls. Returns an array of the main sections
@@ -47,40 +62,56 @@ class DashboardNavModule extends SiteNavModule {
      *
      * @return array The sections to display in the main dashboard nav.
      */
-    public function getSectionsInfo() {
+    public function getSectionsInfo($alt = false) {
 
         if (!self::$initStaticFired) {
             self::$initStaticFired = true;
             $this->fireEvent('init');
         }
 
+        $sections = $alt ? self::$altSectionsInfo : self::$sectionsInfo;
+
         $session = Gdn::session();
-        foreach (self::$sectionsInfo as $key => &$section) {
+        foreach ($sections as $key => &$section) {
             if (val('permission', $section) && !$session->checkPermission(val('permission', $section))) {
-                unset(self::$sectionsInfo[$key]);
+                unset($sections[$key]);
             } else {
                 $section['title'] = t($section['title']);
                 $section['description'] = t($section['description']);
                 $section['url'] = url($section['url']);
-                $section['active'] = '';
+                $section['active'] = $this->isActive($section['section']) ? 'active' : '';
             }
+        }
+        return $sections;
+    }
+
+    public function isActive($section) {
+
+        $allSectionsInfo = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
+        $allSections = [];
+        foreach($allSectionsInfo as $sectionInfo) {
+            $allSections[] = $sectionInfo['section'];
         }
 
         $currentSections = Gdn_Theme::section('', 'get');
+        $found = false;
 
-        $activeSet = false;
         foreach($currentSections as $currentSection) {
-            if (array_key_exists($currentSection, self::$sectionsInfo)) {
-                self::$sectionsInfo[$currentSection]['active'] = 'active';
-                $activeSet = true;
+            if ($currentSection == $section) {
+                return true;
+            }
+            if (in_array($currentSection, $allSections)) {
+                $found = true;
             }
         }
 
-        if (!$activeSet) {
-            self::$sectionsInfo['Settings']['active'] = 'active';
+        // We're active if the section is 'Settings' and the $current section doesn't exist in allsections
+
+        if (!$found && $section == self::ACTIVE_SECTION_DEFAULT) {
+            return true;
         }
 
-        return self::$sectionsInfo;
+        return false;
     }
 
     /**

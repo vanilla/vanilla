@@ -12,7 +12,7 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $
     echo '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
     <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
         <div class="buttons">
-            <div class="icon-wrapper"><?php echo dashboardSymbol('checkmark')?></div>
+            <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
         </div>
         <div class="selected"></div>
     </a>

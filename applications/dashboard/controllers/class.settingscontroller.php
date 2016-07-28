@@ -1790,7 +1790,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Getting Started'));
         $this->addSideMenu('dashboard/settings/gettingstarted');
 
-        Gdn_Theme::section('DashboardHome');
+        Gdn_Theme::section('Tutorials');
         $this->render();
     }
 
@@ -1803,7 +1803,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Help &amp; Tutorials'));
         $this->addSideMenu('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
-        Gdn_Theme::section('DashboardHome');
+        Gdn_Theme::section('Tutorials');
         $this->render();
     }
 }

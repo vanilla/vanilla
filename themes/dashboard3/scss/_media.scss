@@ -7,10 +7,25 @@
 
 .media-options {
   display: flex;
+  flex-wrap: wrap;
   align-self: center;
 
-  .btn {
-    margin-right: $spacer * 2;
+  > *:not(:first-child) {
+    margin-left: $spacer * 2;
+  }
+
+  @include media-breakpoint-down(md) {
+    flex-direction: column-reverse;
+    align-items: center;
+    align-self: flex-start;
+
+    > *:not(:first-child) {
+      margin-left: 0;
+    }
+
+    > *:not(:last-child) {
+      margin-top: $spacer / 2;
+    }
   }
 }
 
@@ -26,7 +41,6 @@
 .media-left {
   padding-right: $spacer;
 }
-
 
 
 //
@@ -46,7 +60,6 @@
 .media-description {
   line-height: $line-height-lg;
 }
-
 
 .media-callout {
   background-color: $grey-lighter;

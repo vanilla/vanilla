@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
+$themePlaceholder = asset('applications/dashboard/design/images/theme-placeholder.svg');
 ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
@@ -39,7 +40,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
         if ($PreviewUrl !== FALSE) {
             echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'class' => 'grid-image'));
         } else {
-            echo img('themes/default/screenshot.png', array('alt' => $ScreenName, 'class' => 'grid-image'));
+            echo img($themePlaceholder, array('alt' => $ScreenName, 'class' => 'grid-image'));
         }
         echo '</div>';
         echo '</div>'; ?>
@@ -144,7 +145,7 @@ $AddonUrl = Gdn::config('Garden.AddonUrl');
                         if ($PreviewUrl !== FALSE) {
                             echo Img($PreviewUrl, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
                         } else {
-                            echo img('themes/default/screenshot.png', array('alt' => $ScreenName, 'class' => 'label-selector-image'));
+                            echo img($themePlaceholder, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
                         }
                         echo '<div class="overlay">';
                         echo '<div class="buttons">';

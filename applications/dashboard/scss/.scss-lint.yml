@@ -1,8 +1,3 @@
-# We're excluding the legacy files in the linting, since admin only existed in css.
-# Good practices going forward, though.
-
-exclude: 'admin.scss'
-
 # List of gem names to load custom linters from (make sure they are already
 # installed)
 plugin_gems: []
@@ -10,7 +5,7 @@ plugin_gems: []
 linters:
   BangFormat:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     space_before_bang: true
     space_after_bang: false
 
@@ -20,7 +15,7 @@ linters:
 
   BorderZero:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     convention: zero # or `none`
 
   ChainedClasses:
@@ -28,114 +23,113 @@ linters:
 
   ColorKeyword:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   ColorVariable:
-    enabled: true
-    exclude: legacy/**
+    enabled: false
+    exclude: vendors/**
 
   Comment:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: silent
 
   DebugStatement:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   DeclarationOrder:
-    enabled: true
-    exclude: legacy/**
+    enabled: false
+    exclude: vendors/**
 
   DisableLinterReason:
     enabled: false
 
   DuplicateProperty:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   ElsePlacement:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: same_line # or 'new_line'
 
   EmptyLineBetweenBlocks:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     ignore_single_line_blocks: true
 
   EmptyRule:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   ExtendDirective:
     enabled: false
 
   FinalNewline:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     present: true
 
   HexLength:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: short # or 'long'
 
   HexNotation:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: lowercase # or 'uppercase'
 
   HexValidation:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   IdSelector:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   ImportantRule:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   ImportPath:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     leading_underscore: false
     filename_extension: false
 
   Indentation:
     enabled: true
-    exclude: legacy/**
+    exclude: [vendors/**, vanillicon/**]
     allow_non_nested_indentation: false
     character: space # or 'tab'
     width: 2
 
   LeadingZero:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: exclude_zero # or 'include_zero'
 
   MergeableSelector:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     force_nesting: true
 
   NameFormat:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     allow_leading_underscore: true
     convention: hyphenated_lowercase # or 'camel_case', or 'snake_case', or a regex pattern
 
   NestingDepth:
     enabled: true
-    exclude: legacy/**
-    max_depth: 3
+    exclude: vendors/**
+    max_depth: 4
     ignore_parent_selectors: false
 
   PlaceholderInExtend:
-    enabled: true
-    exclude: legacy/**
+    enabled: false
 
   PropertyCount:
     enabled: false
@@ -144,20 +138,20 @@ linters:
 
   PropertySortOrder:
     enabled: false
-    exclude: legacy/**
+    exclude: vendors/**
     ignore_unspecified: false
     min_properties: 2
     separate_groups: false
 
   PropertySpelling:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     extra_properties: []
     disabled_properties: []
 
   PropertyUnits:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     global: [
       'ch', 'em', 'ex', 'rem',                 # Font-relative lengths
       'cm', 'in', 'mm', 'pc', 'pt', 'px', 'q', # Absolute lengths
@@ -171,85 +165,85 @@ linters:
 
   PseudoElement:
     enabled: true
-    exclude: legacy/**
+    exclude: [vendors/**, vanillicon/**]
 
   QualifyingElement:
     enabled: true
-    exclude: legacy/**
-    allow_element_with_attribute: false
+    exclude: vendors/**
+    allow_element_with_attribute: true
     allow_element_with_class: false
     allow_element_with_id: false
 
   SelectorDepth:
     enabled: true
-    exclude: legacy/**
-    max_depth: 3
+    exclude: vendors/**
+    max_depth: 4
 
   SelectorFormat:
     enabled: false
-    exclude: legacy/**
+    exclude: vendors/**
     convention: hyphenated_lowercase # or 'strict_BEM', or 'hyphenated_BEM', or 'snake_case', or 'camel_case', or a regex pattern
 
   Shorthand:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     allowed_shorthands: [1, 2, 3]
 
   SingleLinePerProperty:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     allow_single_line_rule_sets: true
 
   SingleLinePerSelector:
     enabled: true
-    exclude: legacy/**
+    exclude: [vendors/**, _type.scss]
 
   SpaceAfterComma:
-    enabled: true
-    exclude: legacy/**
+    enabled: false
+    exclude: vendors/**
     style: one_space # or 'no_space', or 'at_least_one_space'
 
   SpaceAfterPropertyColon:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: one_space # or 'no_space', or 'at_least_one_space', or 'aligned'
 
   SpaceAfterPropertyName:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   SpaceAfterVariableName:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   SpaceAroundOperator:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: one_space # or 'at_least_one_space', or 'no_space'
 
   SpaceBeforeBrace:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     style: space # or 'new_line'
     allow_single_line_padding: false
 
   SpaceBetweenParens:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     spaces: 0
 
   StringQuotes:
     enabled: true
-    exclude: legacy/**
+    exclude: [vendors/**, vanillicon/**]
     style: single_quotes # or double_quotes
 
   TrailingSemicolon:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   TrailingWhitespace:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   TrailingZero:
     enabled: false
@@ -259,19 +253,19 @@ linters:
 
   UnnecessaryMantissa:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   UnnecessaryParentReference:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   UrlFormat:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   UrlQuotes:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   VariableForProperty:
     enabled: false
@@ -279,14 +273,14 @@ linters:
 
   VendorPrefix:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
     identifier_list: base
     additional_identifiers: []
     excluded_identifiers: []
 
   ZeroUnit:
     enabled: true
-    exclude: legacy/**
+    exclude: vendors/**
 
   Compass::*:
     enabled: false

@@ -27,6 +27,30 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+
+        if ($Sender->MasterView == 'admin') {
+            if (val('Form', $Sender)) {
+                $Sender->Form->setStyles('bootstrap');
+            }
+
+            $Sender->addJsFile('dashboard.js', 'dashboard');
+            $Sender->addJsFile('jquery.expander.js');
+            $Sender->addJsFile('settings.js', 'dashboard');
+            $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/util.js', 'dashboard');
+            $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/tooltip.js', 'dashboard');
+            $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/dropdown.js', 'dashboard');
+            $Sender->addJsFile('vendors/collapse.js', 'dashboard');
+            $Sender->addJsFile('vendors/modal.js', 'dashboard');
+            $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
+            $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
+            $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
+        }
+
         // Check the statistics.
         if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
             Gdn::statistics()->check();

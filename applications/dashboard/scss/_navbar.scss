@@ -159,7 +159,7 @@ $navbar-short-height: 3rem;
   svg {
     display: block;
     fill: $white;
-    height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg));
+    height: (($font-size-xs * $line-height-lg) + ($font-size-base * $line-height-lg)) - (2 * $border-width);
   }
 
   .navbar-short & {

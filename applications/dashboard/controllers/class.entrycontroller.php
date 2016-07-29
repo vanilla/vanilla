@@ -453,7 +453,7 @@ EOT;
         if (!$this->data('Verified')) {
             // Whatever event handler catches this must Set the data 'Verified' to true to prevent a random site from connecting without credentials.
             // This must be done EVERY postback and is VERY important.
-            $this->Form->addError('The connection data has not been verified.');
+            $this->Form->addError(t('The connection data has not been verified.'));
         }
 
         if ($this->Form->errorCount() > 0) {

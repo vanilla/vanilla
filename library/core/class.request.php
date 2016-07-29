@@ -732,7 +732,7 @@ class Gdn_Request {
      */
     public function path($path = null) {
         if (is_string($path)) {
-            $result = $this->_parsedRequestElement('Path', $path);
+            $result = $this->_parsedRequestElement('Path', ltrim($path, '/'));
         } else {
             $result = $this->_parsedRequestElement('Path');
             if ($path === true) {

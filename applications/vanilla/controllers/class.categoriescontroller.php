@@ -224,7 +224,7 @@ class CategoriesController extends VanillaController {
             $this->Menu->highlightRoute('/discussions');
             if ($this->Head) {
                 $this->addJsFile('discussions.js');
-                $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->title());
+                $this->Head->addRss(categoryUrl($Category) . '/feed.rss', $this->Head->title());
             }
 
             // Set CategoryID

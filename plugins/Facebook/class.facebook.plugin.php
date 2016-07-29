@@ -337,7 +337,7 @@ class FacebookPlugin extends Gdn_Plugin {
             'ConnectUrl' => $this->authorizeUri(false, self::profileConnecUrl()),
             'Profile' => array(
                 'Name' => val('name', $Profile),
-                'Photo' => "//graph.facebook.com/{$Profile['id']}/picture?type=large"
+                'Photo' => "//graph.facebook.com/{$Profile['id']}/picture?width=200&height=200"
             )
         );
     }
@@ -528,7 +528,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $Form->setFormValue('ProviderName', 'Facebook');
         $Form->setFormValue('FullName', val('name', $Profile));
         $Form->setFormValue('Email', val('email', $Profile));
-        $Form->setFormValue('Photo', "//graph.facebook.com/{$ID}/picture?type=large");
+        $Form->setFormValue('Photo', "//graph.facebook.com/{$ID}/picture?width=200&height=200");
         $Form->addHidden('AccessToken', $AccessToken);
 
         if (c('Plugins.Facebook.UseFacebookNames')) {
@@ -599,7 +599,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @return mixed
      */
     public function getProfile($AccessToken) {
-        $Url = "https://graph.facebook.com/me?access_token=$AccessToken";
+        $Url = "https://graph.facebook.com/me?access_token=$AccessToken&fields=name,id,email";
 //      $C = curl_init();
 //      curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
 //      curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);

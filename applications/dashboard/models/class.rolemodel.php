@@ -540,6 +540,7 @@ class RoleModel extends Gdn_Model {
         if ($this->validate($FormPostValues, $Insert)) {
             $Permissions = arrayValue('Permission', $FormPostValues);
             $Fields = $this->Validation->schemaValidationFields();
+            $Fields = $this->coerceData($Fields);
 
             if ($Insert === false) {
                 $this->update($Fields, array('RoleID' => $RoleID));

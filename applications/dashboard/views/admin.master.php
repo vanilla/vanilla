@@ -107,7 +107,7 @@ Gdn_Theme::assetEnd();
             </nav>
             <?php
             if (Gdn::session()->isValid()) {
-                $this->fireEvent('BeforeUserOptionsMenu');
+//                $this->fireEvent('BeforeUserOptionsMenu');
                 $photo = '<img src="'.userPhotoUrl($user).'">';
                 $CountNotifications = Gdn::session()->User->CountNotifications;
                 if (is_numeric($CountNotifications) && $CountNotifications > 0) {

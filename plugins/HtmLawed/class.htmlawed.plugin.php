@@ -135,17 +135,6 @@ class HtmLawedPlugin extends Gdn_Plugin {
         'ul'
     ];
 
-    /** @var bool Whether SafeStyles is enabled. Turning this off is bad mojo. */
-    protected $safeStyles = true;
-
-    /**
-     * The public constructor of the class.
-     */
-    public function __construct() {
-        $this->safeStyles = c('Garden.Html.SafeStyles');
-        parent::__construct();
-    }
-
     /**
      * Filter provided HTML through htmlLawed and return the result.
      *
@@ -186,11 +175,9 @@ class HtmLawedPlugin extends Gdn_Plugin {
             $config['anti_link_spam'] = ['', ''];
         }
 
-        if ($this->safeStyles) {
-            // Deny all class and style attributes.
-            // A lot of damage can be done by hackers with these attributes.
-            $config['deny_attribute'] .= ',style,class';
-        }
+        // Deny all class and style attributes.
+        // A lot of damage can be done by hackers with these attributes.
+        $config['deny_attribute'] .= ',style,class';
 
         // Block some IDs so you can't break Javascript
         $GLOBALS['hl_Ids'] = [

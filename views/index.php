@@ -6,7 +6,7 @@ Gdn_Theme::assetEnd();
 ?>
 <div class="header-block">
 <?php echo wrap($this->data('Title'), 'h1');
-echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary'); ?>
+echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal'); ?>
 </div>
 <div class="table-wrap">
     <table>

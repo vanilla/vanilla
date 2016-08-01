@@ -427,7 +427,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Display all non-hidden fields
-            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender');
+            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender', true, false);
             $ProfileFields = array_reverse($ProfileFields);
             extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {

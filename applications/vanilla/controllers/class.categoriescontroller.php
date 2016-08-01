@@ -385,11 +385,18 @@ class CategoriesController extends VanillaController {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
         }
+
+        // Compensate for categories displaying as headings by increasing the display depth by one.
+        $maxDisplayDepth = CategoryModel::instance()->getMaxDisplayDepth() ?: 10;
+        if (c('Vanilla.Categories.DoHeadings')) {
+            $maxDisplayDepth++;
+        }
+
         $categoryTree = $this->CategoryModel
             ->setJoinUserCategory(true)
             ->getChildTree(
                 $Category ?: null,
-                $this->CategoryModel->getMaxDisplayDepth() ?: 10
+                $maxDisplayDepth
             );
         if ($this->CategoryModel->Watching) {
             $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);

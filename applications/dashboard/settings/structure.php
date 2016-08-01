@@ -18,6 +18,8 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+$captureOnly = isset($Structure) && val('CaptureOnly', $Structure);
+
 $Database = Gdn::database();
 $SQL = $Database->sql();
 $Construct = $Database->structure();
@@ -767,7 +769,7 @@ $Construct
     ->set($Explicit, $Drop);
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
-if ($AllIPAddressesExists) {
+if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
     $resetBatch = 100;
 

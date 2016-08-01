@@ -550,6 +550,12 @@ class CategoriesController extends VanillaController {
      */
     public function apiV1List() {
         $categories = CategoryModel::categories();
+
+        // Purge the root category, if present.
+        if (val(-1, $categories)) {
+            unset($categories[-1]);
+        }
+
         $this->setData('Categories', $categories);
         $this->render('blank', 'utility', 'dashboard');
     }

@@ -225,7 +225,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->RedirectUrl = '';
         $this->RequestMethod = '';
         $this->RequestArgs = false;
-        $this->Request = false;
+        $this->Request = null;
         $this->SelfUrl = '';
         $this->SyndicationMethod = SYNDICATION_NONE;
         $this->Theme = Theme();

@@ -475,7 +475,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return true;
         } else {
             return false;
-            }
+        }
     }
 
     /**

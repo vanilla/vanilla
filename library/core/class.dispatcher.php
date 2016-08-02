@@ -284,7 +284,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // /controller/argn
         // /controller
 
-        $parts = explode('/', str_replace('\\', '/', strtolower($request->path())));
+        $parts = explode('/', str_replace('\\', '/', $request->path()));
 
         // Parse the file extension.
         list($parts, $deliveryMethod) = $this->parseDeliveryMethod($parts);

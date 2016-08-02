@@ -874,52 +874,56 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param string $AssetName
+     * @param string $assetName
      */
-    public function getAsset($AssetName) {
-        if (!array_key_exists($AssetName, $this->Assets)) {
+    public function getAsset($assetName) {
+        if (!array_key_exists($assetName, $this->Assets)) {
             return '';
         }
-        if (!is_array($this->Assets[$AssetName])) {
-            return $this->Assets[$AssetName];
+        if (!is_array($this->Assets[$assetName])) {
+            return $this->Assets[$assetName];
         }
 
         // Include the module sort
-        $Modules = Gdn::config('Modules', array());
+        $modules = array_change_key_case(c('Modules', []));
+        $sortContainer = strtolower($this->ModuleSortContainer);
+        $applicationName = strtolower($this->Application);
+
         if ($this->ModuleSortContainer === false) {
-            $ModuleSort = false; // no sort wanted
-        } elseif (array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
-            $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
-        elseif (array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
-            $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
+            $moduleSort = false; // no sort wanted
+        } elseif (isset($modules[$sortContainer][$assetName])) {
+            $moduleSort = $modules[$sortContainer][$assetName]; // explicit sort
+        } elseif (isset($modules[$applicationName][$assetName])) {
+            $moduleSort = $modules[$applicationName][$assetName]; // application default sort
+        }
 
         // Get all the assets for this AssetContainer
-        $ThisAssets = $this->Assets[$AssetName];
-        $Assets = array();
+        $thisAssets = $this->Assets[$assetName];
+        $assets = array();
 
-        if (isset($ModuleSort) && is_array($ModuleSort)) {
+        if (isset($moduleSort) && is_array($moduleSort)) {
             // There is a specified sort so sort by it.
-            foreach ($ModuleSort as $Name) {
-                if (array_key_exists($Name, $ThisAssets)) {
-                    $Assets[] = $ThisAssets[$Name];
-                    unset($ThisAssets[$Name]);
+            foreach ($moduleSort as $name) {
+                if (array_key_exists($name, $thisAssets)) {
+                    $assets[] = $thisAssets[$name];
+                    unset($thisAssets[$name]);
                 }
             }
         }
 
         // Pick up any leftover assets that werent explicitly sorted
-        foreach ($ThisAssets as $Name => $Asset) {
-            $Assets[] = $Asset;
+        foreach ($thisAssets as $name => $Asset) {
+            $assets[] = $Asset;
         }
 
-        if (count($Assets) == 0) {
+        if (count($assets) == 0) {
             return '';
-        } elseif (count($Assets) == 1) {
-            return $Assets[0];
+        } elseif (count($assets) == 1) {
+            return $assets[0];
         } else {
-            $Result = new Gdn_ModuleCollection();
-            $Result->Items = $Assets;
-            return $Result;
+            $result = new Gdn_ModuleCollection();
+            $result->Items = $assets;
+            return $result;
         }
     }
 

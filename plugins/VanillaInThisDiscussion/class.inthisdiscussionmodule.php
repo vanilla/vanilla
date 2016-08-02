@@ -68,9 +68,9 @@ class InThisDiscussionModule extends Gdn_Module {
         $String = '';
         ob_start();
         ?>
-        <div class="Box">
+        <div class="Box BoxInThisDiscussion">
             <?php echo panelHeading(t('In this Discussion')); ?>
-            <ul class="PanelInfo">
+            <ul class="PanelInfo PanelInThisDiscussion">
                 <?php foreach ($this->_UserData->Result() as $User) :
 ?>
                     <li>

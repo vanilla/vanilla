@@ -322,12 +322,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if ($controllerName) {
             // The controller was found based on the path.
             $result['controller'] = $controllerName;
-            $result['pathArgs'] = $pathArgs;
         } elseif (Gdn::pluginManager()->hasNewMethod('RootController', val(0, $parts))) {
             // There is a plugin defining a new root method.
             $result['controller'] = 'RootController';
-            $result['controllerMethod'] = array_shift($parts);
-            $result['pathArgs'] = $parts;
         } else {
             // No controller was found, fire a not found event.
             // TODO: Move this outside this method.
@@ -341,10 +338,11 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                     ->passData('Reason', 'controller_notfound')
                     ->analyzeRequest($request->withRoute('Default404'));
             }
+            return;
         }
 
         // A controller has been found. Find the addon that manages it.
-        $addon = Gdn::addonManager()->lookupByClassname($controllerName);
+        $addon = Gdn::addonManager()->lookupByClassname($result['controller']);
 
         // The result should be properly set now. Set the legacy properties though.
         if ($addon) {

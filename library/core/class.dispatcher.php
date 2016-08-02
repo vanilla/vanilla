@@ -416,6 +416,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         if (class_exists($controllerName, true)) {
             array_shift($parts);
             return [$controllerName, $parts];
+        } elseif (!empty($application) && class_exists($application.'Controller', true)) {
+            // There is a controller with the same name as the application so use it.
+            return [ucfirst($application).'Controller', $parts];
         } else {
             return ['', $parts];
         }

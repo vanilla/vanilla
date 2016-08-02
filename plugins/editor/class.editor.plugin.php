@@ -750,10 +750,10 @@ class EditorPlugin extends Gdn_Plugin {
 
             // Determine if image, and thus requires thumbnail generation, or simply saving the file.
             // Not all files will be images.
-            $thumbHeight = 0;
-            $thumbWidth = 0;
-            $imageHeight = 0;
-            $imageWidth = 0;
+            $thumbHeight = null;
+            $thumbWidth = null;
+            $imageHeight = null;
+            $imageWidth = null;
             $thumbPathParsed = array('SaveName' => '');
             $thumbUrl = '';
 

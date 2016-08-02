@@ -241,8 +241,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private function requestVal($key, $get, $post, $default = null) {
         $keys = [$key, lcfirst($key), strtolower($key)];
 
-        if (isset($get[$keys[0]])) {
-            return $get[$keys[0]];
+        if (isset($get[$keys[2]])) {
+            return $get[$keys[2]];
         }
 
         foreach ($keys as $key) {

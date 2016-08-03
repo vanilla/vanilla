@@ -1645,7 +1645,7 @@ class CategoryModel extends Gdn_Model {
         }
         return $Data;
     }
-    
+
     /**
      * A simplified version of GetWhere that polls the cache instead of the database.
      * @param array $Where
@@ -1995,10 +1995,10 @@ class CategoryModel extends Gdn_Model {
                     array('CategoryID' => $CategoryID)
                 )->put();
 
+                $this->setCache($CategoryID, $Set);
                 $Saves[] = array_merge(array('CategoryID' => $CategoryID), $Set);
             }
         }
-        $this->rebuildTree(); // Safeguard to make sure that treeleft and treeright cols are added
         return $Saves;
     }
 

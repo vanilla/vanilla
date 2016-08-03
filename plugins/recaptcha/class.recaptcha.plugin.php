@@ -219,7 +219,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
             $language = (in_array(Gdn::locale()->Locale, $whitelist)) ? Gdn::locale()->Locale : false;
         }
 
-        Gdn::controller()->Head->addScript('https://www.google.com/recaptcha/api.js?hl=' . $language);
+        $scriptSrc = 'https://www.google.com/recaptcha/api.js?hl='.$language;
 
         $attributes = array('class' => 'g-recaptcha', 'data-sitekey' => $this->getPublicKey(), 'data-theme' => c('Recaptcha.Theme', 'light'));
 
@@ -228,6 +228,7 @@ class RecaptchaPlugin extends Gdn_Plugin {
         $this->fireEvent('BeforeCaptcha');
 
         echo '<div '. attribute($attributes) . '></div>';
+        echo '<script src="'.$scriptSrc.'"></script>';
     }
 
     /**

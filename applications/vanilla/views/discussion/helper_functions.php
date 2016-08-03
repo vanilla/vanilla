@@ -193,7 +193,7 @@ if (!function_exists('discussionOptionsToDropdown')):
 
         if (!empty($options)) {
             foreach ($options as $option) {
-                $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+                $dropdown->addLink(val('Label', $option), url(val('Url', $option)), slugify(val('Label', $option)), val('Class', $option));
             }
         }
 

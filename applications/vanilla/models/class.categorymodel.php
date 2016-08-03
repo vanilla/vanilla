@@ -556,7 +556,7 @@ class CategoryModel extends Gdn_Model {
                 }
                 break;
         }
-        self::ClearCache();
+        self::clearCache();
         return $Result;
     }
 
@@ -1998,7 +1998,8 @@ class CategoryModel extends Gdn_Model {
                 $Saves[] = array_merge(array('CategoryID' => $CategoryID), $Set);
             }
         }
-        self::ClearCache();
+        $this->SetCache();
+        $this->collection->flushCache();
         return $Saves;
     }
 

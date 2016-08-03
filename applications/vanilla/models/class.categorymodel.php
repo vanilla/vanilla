@@ -1998,8 +1998,7 @@ class CategoryModel extends Gdn_Model {
                 $Saves[] = array_merge(array('CategoryID' => $CategoryID), $Set);
             }
         }
-        $this->SetCache();
-        $this->collection->flushCache();
+        $this->rebuildTree(); // Safeguard to make sure that treeleft and treeright cols are added
         return $Saves;
     }
 

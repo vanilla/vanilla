@@ -135,9 +135,7 @@ class CategoriesController extends VanillaController {
                 list($offset, $limit) = offsetLimit($page, $perPage);
                 $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit);
                 $this->setData('_Limit', $perPage);
-                $this->setData('_CurrentRecords', $this->CategoryModel->getCount([
-                    'ParentCategoryID' => val('CategoryID', $category, -1)
-                ]));
+                $this->setData('_CurrentRecords', count($categoryTree));
                 break;
             case 'Categories':
             case 'Discussions':

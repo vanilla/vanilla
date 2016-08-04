@@ -159,9 +159,6 @@ jQuery(document).ready(function($) {
 
         setInterval(setHeight, 300);
 
-        // Scroll to top :D
-        remotePostMessage('scrollto:0', '*');
-
         // Simulate a page unload when popups are opened (so they are scrolled into view).
         $('body').bind('popupReveal', function() {
             remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');

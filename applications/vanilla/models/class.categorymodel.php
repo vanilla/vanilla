@@ -654,7 +654,10 @@ class CategoryModel extends Gdn_Model {
      */
     public function getTreeAsFlat($id, $offset = null, $limit = null) {
         $categoryTree = $this->getWhere(
-            ['ParentCategoryID' => $id],
+            [
+                'DisplayAs <>' => 'Heading',
+                'ParentCategoryID' => $id
+            ],
             'DateInserted',
             'desc',
             $limit,

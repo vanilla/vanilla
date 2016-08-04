@@ -532,7 +532,7 @@ class UpdateModel extends Gdn_Model {
      * @param bool $captureOnly Run the structure or just capture the SQL changes.
      * @throws Exception Throws an exception if in debug mode and something goes wrong.
      */
-    public function runStructure($captureOnly) {
+    public function runStructure($captureOnly = false) {
         $addons = array_reverse(Gdn::addonManager()->getEnabled());
 
         // These variables are required for included structure files.

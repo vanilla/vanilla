@@ -20,10 +20,14 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeFormInputs');
 
     if ($this->ShowCategorySelector === true) {
+        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true];
+        if ($this->Context) {
+            $options['Context'] = $this->Context;
+        }
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => true));
+        echo $this->Form->categoryDropDown('CategoryID', $options);
         echo '</div>';
         echo '</div>';
     }

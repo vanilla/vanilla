@@ -124,8 +124,13 @@ class PostController extends VanillaController {
         if ($Category) {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
-            $this->ShowCategorySelector = false;
             $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
+            if (val('DisplayAs', $this->Category) == 'Discussions') {
+                $this->ShowCategorySelector = false;
+            } else {
+                // Get all our subcategories to add to the category if we are in a Header or Categories category.
+                $this->Context = CategoryModel::getSubtree($this->CategoryID);
+            }
         } else {
             $this->CategoryID = 0;
             $this->Category = null;

@@ -296,6 +296,12 @@ class Gdn_Form extends Gdn_Pluggable {
         $Value = arrayValueI('Value', $Options); // The selected category id
         $CategoryData = val('CategoryData', $Options);
 
+        if (!$CategoryData && val('Context', $Options)) {
+            $CategoryData = val('Context', $Options);
+        } elseif ($CategoryData && val('Context', $Options)) {
+            $CategoryData = array_intersect_key($CategoryData, val('Context', $Options));
+        }
+
         // Sanity check
         if (is_object($CategoryData)) {
             $CategoryData = (array)$CategoryData;
@@ -376,7 +382,7 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_array($SafeCategoryData)) {
             foreach ($SafeCategoryData as $CategoryID => $Category) {
                 $Depth = val('Depth', $Category, 0);
-                $Disabled = (($Depth == 1 && $DoHeadings) || !$Category['AllowDiscussions']);
+                $Disabled = (($Depth == 1 && $DoHeadings) || !$Category['AllowDiscussions'] || val('DisplayAs', $Category) != 'Discussions');
                 $Selected = in_array($CategoryID, $Value) && $HasValue;
                 if ($ForceCleanSelection && $Depth > 1) {
                     $Selected = true;

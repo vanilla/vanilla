@@ -559,6 +559,14 @@ class VanillaSettingsController extends Gdn_Controller {
         $PermissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
+        $displayAsOptions = [
+            'Default' => 'Default',
+            'Discussions' => 'Discussions',
+            'Categories' => 'Nested Categories',
+            'Flat' => 'Flat Categories',
+            'Heading' => 'Heading'
+        ];
+
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
                 $CategoryID = $ID;
@@ -571,6 +579,12 @@ class VanillaSettingsController extends Gdn_Controller {
             throw notFoundException('Category');
         }
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
+
+        // Restrict "Display As" types based on parent.
+        $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);
+        if (val('DisplayAs', $parentCategory) === 'Flat') {
+            unset($displayAsOptions['Heading']);
+        }
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -640,6 +654,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }
 

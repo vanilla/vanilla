@@ -743,6 +743,11 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         if ($this->Form->authenticatedPostBack()) {
+            // Verify we're only attempting to save specific values.
+            $this->Form->formValues([
+                'CategoryID' => $this->Form->getValue('CategoryID'),
+                'ParentCategoryID' => $this->Form->getValue('ParentCategoryID'),
+            ]);
             $this->Form->save();
         } else {
             $this->Form->setData($category);

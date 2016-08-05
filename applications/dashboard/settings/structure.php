@@ -844,12 +844,6 @@ if ($currentLocale !== $canonicalLocale) {
     saveToConfig('Garden.Locale', $canonicalLocale);
 }
 
-// We need to undo cleditor's bad behavior for our reformed users.
-// If you still need to manipulate this, do it in memory instead (SAVE = false).
-if (!c('Garden.Html.SafeStyles')) {
-    removeFromConfig('Garden.Html.SafeStyles');
-}
-
 // We need to ensure that recaptcha is enabled if this site is upgrading from
 // 2.2 and has never had a captcha plugin
 touchConfig('EnabledPlugins.recaptcha', true);

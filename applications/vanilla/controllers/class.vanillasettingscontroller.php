@@ -722,7 +722,10 @@ class VanillaSettingsController extends Gdn_Controller {
      * @param int $categoryID Unique ID for the category to move.
      * @throws Exception if category is not found.
      */
-    public function movecategory($categoryID) {
+    public function moveCategory($categoryID) {
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
         $category = CategoryModel::categories($categoryID);
 
         if (!$category) {

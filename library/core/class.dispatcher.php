@@ -349,7 +349,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             $this->applicationFolder = stringBeginsWith($addon->getSubdir(), 'applications/', true, true);
         }
         $this->ControllerName = $result['controller'];
-        $this->ControllerMethod = 'index';
         $this->controllerMethodArgs = [];
         $this->syndicationMethod = val('syndicationMethod', $result, SYNDICATION_NONE);
         $this->deliveryMethod = $result['deliveryMethod'];
@@ -761,10 +760,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      *
      * @param string $controllerName The name of the controller to create.
      * @param Gdn_Request $request The current request.
-     * @param array $routeArgs Arguments from a call to {@link Gdn_Dispatcher::analyzeRequest}.
+     * @param array &$routeArgs Arguments from a call to {@link Gdn_Dispatcher::analyzeRequest}.
      * @return Gdn_Controller Returns a new {@link Gdn_Controller} object.
      */
-    private function createController($controllerName, $request, $routeArgs) {
+    private function createController($controllerName, $request, &$routeArgs) {
         /* @var Gdn_Controller $controller */
         $controller = new $controllerName();
         Gdn::controller($controller);
@@ -807,8 +806,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controller->deliveryMethod($routeArgs['deliveryMethod']);
         $controller->SyndicationMethod = val('syndicationMethod', $routeArgs, SYNDICATION_NONE);
 
-        // Set special controller method options for REST APIs.
+        // Kludge: We currently have a couple of plugins that modify the path arguments on initialize.
+        $this->controllerArguments($routeArgs['pathArgs']);
+        // End kludge.
         $controller->initialize();
+
+        // Kludge for controllers that modify the dispatcher.
+        $pathArgs = $this->controllerArguments();
+        if (!empty($this->ControllerMethod)) {
+            array_unshift($pathArgs, Gdn::Dispatcher()->ControllerMethod);
+        }
+        $routeArgs['pathArgs'] = $pathArgs;
+        // End kluge.
+
         $this->EventArguments['Controller'] = $controller;
         $this->fireEvent('AfterControllerInit');
 

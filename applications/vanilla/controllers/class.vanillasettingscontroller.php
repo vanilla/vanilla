@@ -582,7 +582,8 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Restrict "Display As" types based on parent.
         $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);
-        if (val('DisplayAs', $parentCategory) === 'Flat') {
+        $parentDisplay = val('DisplayAs', $parentCategory);
+        if ($parentDisplay === 'Flat') {
             unset($displayAsOptions['Heading']);
         }
 
@@ -626,6 +627,10 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+
+            if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
+                $this->Form->addError('Cannot display as heading when parent is flat', 'DisplayAs');
+            }
 
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);

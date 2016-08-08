@@ -1028,6 +1028,11 @@ class Gdn_Controller extends Gdn_Pluggable {
      * controller to do things like loading script and CSS into the head.
      */
     public function initialize() {
+        // Add a custom js file (Mainly used by themes).
+        if (arrayHasValue($this->_CssFiles, 'style.css')) {
+            $this->addJsFile('custom.js');
+        }
+
         if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
             $this->_Headers['Content-Type'] = 'text/xml; charset=utf-8';
         }
@@ -1745,11 +1750,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                             $this->Head->addCss($Path, 'all', true, $Options);
                         }
                     }
-                }
-
-                // Add a custom js file.
-                if (arrayHasValue($this->_CssFiles, 'style.css')) {
-                    $this->addJsFile('custom.js'); // only to non-admin pages.
                 }
 
                 $Cdns = array();

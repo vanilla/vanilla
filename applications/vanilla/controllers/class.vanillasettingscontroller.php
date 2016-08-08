@@ -629,7 +629,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
             if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
-                $this->Form->addError('Cannot display as heading when parent is flat', 'DisplayAs');
+                $this->Form->addError('Cannot display as heading when parent is displayed as flat categories.', 'DisplayAs');
             }
 
             if ($this->Form->save()) {

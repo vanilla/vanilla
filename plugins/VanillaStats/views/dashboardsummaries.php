@@ -1,40 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Summary PopularDiscussionSummary">
-    <h2 class="dashboard-widget-title"><?php echo t('Popular Discussions'); ?></h2>
-    <table>
-        <thead>
-        <tr>
-            <th><?php echo t('Title'); ?></th>
-            <td><?php echo t('Comments'); ?></td>
-            <td><?php echo t('Follows'); ?></td>
-            <td><?php echo t('Views'); ?></td>
-        </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
-            <tr>
-                <th>
-                    <div class="media-sm-item">
-                        <div class="media-sm-content">
-                            <div class="media-sm-title">
-                                <?php echo anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?>
-                            </div>
-                            <div class="media-sm-info post-date">
-                                <?php echo Gdn_Format::date($Discussion->DateInserted, 'html'); ?>
-                            </div>
-                        </div>
-                    </div>
-                </th>
-                <td><?php echo number_format($Discussion->CountComments); ?></td>
-                <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
-                <td><?php echo number_format($Discussion->CountViews); ?></td>
-            </tr>
-        <?php } ?>
-        </tbody>
-    </table>
-</div>
 <div class="Summary ActiveUserSummary">
-    <h2 class="dashboard-widget-title"><?php echo t('Active Users'); ?></h2>
+    <div class="dashboard-widget-title"><?php echo t('Active Users'); ?></div>
     <table>
         <thead>
         <tr>
@@ -62,6 +28,40 @@
                 </th>
                 <td><?php echo number_format($User->CountComments); ?></td>
                 <!-- <td><?php // echo number_format($Discussion->CountViews); ?></td> -->
+            </tr>
+        <?php } ?>
+        </tbody>
+    </table>
+</div>
+<div class="Summary PopularDiscussionSummary">
+    <div class="dashboard-widget-title"><?php echo t('Popular Discussions'); ?></div>
+    <table>
+        <thead>
+        <tr>
+            <th><?php echo t('Title'); ?></th>
+            <td><?php echo t('Comments'); ?></td>
+            <td><?php echo t('Follows'); ?></td>
+            <td><?php echo t('Views'); ?></td>
+        </tr>
+        </thead>
+        <tbody>
+        <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
+            <tr>
+                <th>
+                    <div class="media-sm-item">
+                        <div class="media-sm-content">
+                            <div class="media-sm-title">
+                                <?php echo anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?>
+                            </div>
+                            <div class="media-sm-info post-date">
+                                <?php echo Gdn_Format::date($Discussion->DateInserted, 'html'); ?>
+                            </div>
+                        </div>
+                    </div>
+                </th>
+                <td><?php echo number_format($Discussion->CountComments); ?></td>
+                <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
+                <td><?php echo number_format($Discussion->CountViews); ?></td>
             </tr>
         <?php } ?>
         </tbody>

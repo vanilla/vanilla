@@ -666,8 +666,11 @@ class CategoryModel extends Gdn_Model {
         self::calculateData($categoryTree);
         self::joinUserData($categoryTree);
 
-        // We don't have children, but trees are expected to have this key.
         foreach ($categoryTree as &$category) {
+            // Fix the depth to be relative, not global.
+            $category['Depth'] = 1;
+
+            // We don't have children, but trees are expected to have this key.
             $category['Children'] = [];
         }
 

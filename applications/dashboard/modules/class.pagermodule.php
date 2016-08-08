@@ -79,7 +79,7 @@ class PagerModule extends Gdn_Module {
      * it is not retrieved and simple "next/previous" links are displayed
      * instead. Default is FALSE, meaning that the simple pager is displayed.
      */
-    public $_Totalled;
+    protected $_Totalled;
 
     /**
      *

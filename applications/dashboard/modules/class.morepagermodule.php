@@ -62,14 +62,6 @@ class MorePagerModule extends PagerModule {
     private $_PropertiesDefined;
 
     /**
-     * @var bool Indicating if the total number of records is known or
-     * not. Retrieving this number can be a costly database query, so sometimes
-     * it is not retrieved and simple "next/previous" links are displayed
-     * instead. Default is FALSE, meaning that the simple pager is displayed.
-     */
-    private $_Totalled;
-
-    /**
      *
      *
      * @param string $Sender

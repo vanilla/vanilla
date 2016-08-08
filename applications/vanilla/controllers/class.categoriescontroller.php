@@ -131,7 +131,7 @@ class CategoriesController extends VanillaController {
         switch ($displayAs) {
             case 'Flat':
                 $perPage = c('Vanilla.Categories.PerPage', 30);
-                $page = Gdn::request()->get('Page', null);
+                $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
                 list($offset, $limit) = offsetLimit($page, $perPage);
                 $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit);
                 $this->setData('_Limit', $perPage);

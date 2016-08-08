@@ -1035,10 +1035,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (is_object($this->Menu)) {
             $this->Menu->Sort = Gdn::config('Garden.Menu.Sort');
         }
-
-        $ResolvedPath = strtolower(combinePaths(array(Gdn::dispatcher()->application(), Gdn::dispatcher()->ControllerName, Gdn::dispatcher()->ControllerMethod)));
-        $this->ResolvedPath = $ResolvedPath;
-
         $this->FireEvent('Initialize');
     }
 

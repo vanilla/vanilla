@@ -724,6 +724,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // The method has been found, set it on the controller.
         $controller->RequestMethod = $controllerMethod;
         $controller->RequestArgs = $pathArgs;
+        $controller->ResolvedPath = ($routeArgs['addon'] ? $routeArgs['addon']->getKey().'/' : '').
+            strtolower(stringEndsWith($controllerName, 'Controller', true, true)).'/'.
+            strtolower($controllerMethod);
 
         $reflectionArguments = $request->get();
         $this->EventArguments['Arguments'] = &$reflectionArguments;

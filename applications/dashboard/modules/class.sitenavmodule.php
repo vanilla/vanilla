@@ -193,7 +193,7 @@ class SiteNavModule extends NavModule {
      * @param array $modifiers
      * @return $this|SiteNavModule
      */
-    public function addGroupIf($isAllowed, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
+    public function addGroupIf($isAllowed = true, $text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
         if (!$this->isAllowed($isAllowed)) {
             return $this;
         } else {

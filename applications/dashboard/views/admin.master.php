@@ -153,6 +153,9 @@ Gdn_Theme::assetEnd();
                     </div>
                 </div>
                 <div class="footer-nav nav">
+                    <?php
+                    $this->fireAs('dashboard')->fireEvent('footerNav');
+                    ?>
                     <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
                 </div>
             </div>

@@ -74,7 +74,7 @@ class SiteNavModule extends NavModule {
             'modifiers' => $modifiers,
             'disabled' => $disabled
         ];
-        self::$sectionItems[strtolower($section)][self::LINKS_INDEX][] = $args;
+        self::$sectionItems[strtolower($section)][self::LINKS_INDEX][$key] = $args;
         return $this;
     }
 
@@ -330,6 +330,17 @@ class SiteNavModule extends NavModule {
                     $link['disabled']
                 );
             }
+        }
+    }
+
+    /**
+     * Remove an item from the nested set.
+     *
+     * @param string $key The key of the item to remove, separated by dots.
+     */
+    public function removeItem($key) {
+        foreach (self::$sectionItems as &$section) {
+            unset($section['links'][$key]);
         }
     }
 }

@@ -78,7 +78,17 @@ Gdn_Theme::assetEnd();
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
-        $dashboardNav = $this->Assets['Panel']['DashboardNavModule'];
+        $dashboardNav = valr('Panel.DashboardNabModule', $this->Assets);
+        if (!($dashboardNav instanceof  DashboardNavModule)) {
+            $dashboardNav = new DashboardNavModule();
+            $navAdapter = new NestedCollectionAdapter($dashboardNav);
+
+            $this->EventArguments['SideMenu'] = $navAdapter;
+            $this->fireEvent('GetAppSettingsMenuItems');
+
+            // Add the module
+            $this->addModule($dashboardNav, 'Panel');
+        }
         $dashboardNav->addGroupToGlobals('', 'globals', 'globals');
         $dashboardNav->addLinkToGlobals(t('Sign Out'), SignOutUrl(), 'globals.sign-out');
         ?>

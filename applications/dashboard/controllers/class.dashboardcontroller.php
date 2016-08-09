@@ -71,18 +71,5 @@ class DashboardController extends Gdn_Controller {
         if (!$currentUrl) {
             $currentUrl = strtolower($this->SelfUrl);
         }
-
-        // Only add to the assets if this is not a view-only request
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $nav = new DashboardNavModule();
-            $nav->setHighlightRoute($currentUrl);
-            $navAdapter = new NestedCollectionAdapter($nav);
-
-            $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('GetAppSettingsMenuItems');
-
-            // Add the module
-            $this->addModule($nav, 'Panel');
-        }
     }
 }

@@ -921,7 +921,7 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      */
-    public function xIndex() {
+    public function index() {
         $this->addJsFile('settings.js');
         $this->title(t('Dashboard'));
 

@@ -18,6 +18,8 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+$captureOnly = isset($Structure) && val('CaptureOnly', $Structure);
+
 $Database = Gdn::database();
 $SQL = $Database->sql();
 $Construct = $Database->structure();
@@ -767,7 +769,7 @@ $Construct
     ->set($Explicit, $Drop);
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
-if ($AllIPAddressesExists) {
+if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
     $resetBatch = 100;
 
@@ -840,12 +842,6 @@ $currentLocale = c('Garden.Locale');
 $canonicalLocale = Gdn_Locale::canonicalize($currentLocale);
 if ($currentLocale !== $canonicalLocale) {
     saveToConfig('Garden.Locale', $canonicalLocale);
-}
-
-// We need to undo cleditor's bad behavior for our reformed users.
-// If you still need to manipulate this, do it in memory instead (SAVE = false).
-if (!c('Garden.Html.SafeStyles')) {
-    removeFromConfig('Garden.Html.SafeStyles');
 }
 
 // We need to ensure that recaptcha is enabled if this site is upgrading from

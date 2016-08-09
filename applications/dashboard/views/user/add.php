@@ -26,9 +26,9 @@ echo $this->Form->errors();
                 <?php echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password ')); ?>
             </div>
         </li>
-        <li class="form-group row">
-            <div class="input-wrap no-label">
-                <?php echo $this->Form->checkbox('NoPassword', 'No password', array('class' => 'Inline CheckBoxLabel js-nopassword')); ?>
+        <li>
+            <?php
+            echo $this->Form->label('Email', 'Email');
             </div>
         </li>
         <li class="form-group row">
@@ -50,6 +50,24 @@ echo $this->Form->errors();
                 <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users')); ?>
             </div>
         </li>
+
+        <?php if (c('Garden.Profile.Locations', false)): ?>
+            <li class="User-Location">
+                <?php
+                echo $this->Form->label('Location', 'Location');
+                echo $this->Form->textBox('Location');
+                ?>
+            </li>
+        <?php endif; ?>
+
+        <?php if (c('Garden.Profile.Titles', false)): ?>
+            <li class="User-Title">
+                <?php
+                echo $this->Form->label('Title', 'Title');
+                echo $this->Form->textBox('Title');
+                ?>
+            </li>
+        <?php endif; ?>
         <?php
         $this->fireEvent('CustomUserFields')
         ?>

@@ -145,14 +145,15 @@ if (!function_exists('writeComment')) :
                         if ($Source = val('Source', $Comment)) {
                             echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
                         }
-                        $Sender->fireEvent('CommentInfo');
-                        $Sender->fireEvent('InsideCommentMeta'); // DEPRECATED
-                        $Sender->fireEvent('AfterCommentMeta'); // DEPRECATED
 
                         // Include IP Address if we have permission
                         if ($Session->checkPermission('Garden.PersonalInfo.View')) {
                             echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
                         }
+
+                        $Sender->fireEvent('CommentInfo');
+                        $Sender->fireEvent('InsideCommentMeta'); // DEPRECATED
+                        $Sender->fireEvent('AfterCommentMeta'); // DEPRECATED
                         ?>
                     </div>
                 </div>
@@ -192,7 +193,7 @@ if (!function_exists('discussionOptionsToDropdown')):
 
         if (!empty($options)) {
             foreach ($options as $option) {
-                $dropdown->addLink(val('Label', $option), val('Url', $option), slugify(val('Label', $option)), val('Class', $option));
+                $dropdown->addLink(val('Label', $option), url(val('Url', $option)), slugify(val('Label', $option)), val('Class', $option));
             }
         }
 

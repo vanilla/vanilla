@@ -413,6 +413,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Get the custom fields
             $ProfileFields = Gdn::userModel()->getMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
 
+            // Get allowed GDN_User fields.
+            $Blacklist = array_combine($this->ReservedNames, $this->ReservedNames);
+            $NativeFields = array_diff_key((array)$Sender->User, $Blacklist);
+
+            // Combine custom fields (GDN_UserMeta) with GDN_User fields.
+            // This is OK because we're blacklisting our $ReservedNames AND whitelisting $AllFields below.
+            $ProfileFields = array_merge($ProfileFields, $NativeFields);
+
             // Import from CustomProfileFields if available
             if (!count($ProfileFields) && is_object($Sender->User) && c('Plugins.CustomProfileFields.SuggestedFields', false)) {
                 $ProfileFields = Gdn::userModel()->getAttribute($Sender->User->UserID, 'CustomProfileFields', false);
@@ -444,7 +452,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Display all non-hidden fields
-            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender');
+            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender', true, false);
             $ProfileFields = array_reverse($ProfileFields);
             extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {

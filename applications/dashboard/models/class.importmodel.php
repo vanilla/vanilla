@@ -2171,13 +2171,15 @@ class ImportModel extends Gdn_Model {
      * @param string $Path The path to the CSV.
      * @param bool $skipHeader Whether the CSV contains a header row.
      * @param int $chunk The number of records to chunk the imports to.
-     * @return bool
+     * @return bool Whether any records were found.
      */
     public function loadTableInsert($Tablename, $Path, $skipHeader = true, $chunk = 100) {
+        $result = false;
+
         // Get the column count of the table.
         $St = Gdn::structure();
         $St->get(self::TABLE_PREFIX.$Tablename);
-        $ColumnCount = count($St->Columns());
+        $ColumnCount = count($St->columns());
         $St->reset();
 
         ini_set('auto_detect_line_endings', true);
@@ -2205,6 +2207,7 @@ class ImportModel extends Gdn_Model {
         $Count = 0;
         while ($Row = self::FGetCSV2($fp)) {
             ++$Count;
+            $result = true;
             $Row = array_map('trim', $Row);
             // Quote the values in the row.
             $Row = array_map(array($PDO, 'quote'), $Row);
@@ -2228,7 +2231,7 @@ class ImportModel extends Gdn_Model {
                 $Inserts = '';
 
                 // Check for a timeout.
-                if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+                if ($this->Timer->elapsedTime() > $this->MaxStepTime) {
                     // The step's taken too long. Save the file position.
                     $Pos = ftell($fp);
                     $this->Data['CurrentLoadPosition'] = $Pos;
@@ -2250,6 +2253,6 @@ class ImportModel extends Gdn_Model {
             $Sql = "insert $PxTablename values $Inserts";
             $this->query($Sql);
         }
-        return $Count;
+        return $result;
     }
 }

@@ -757,12 +757,12 @@ class RoleModel extends Gdn_Model {
      * @param string $field optionally the field name from the role table to return.
      * @return array|null|void
      */
-    public static function getPublicUserRoles($userID, $field = "Name") {
+    public function getPublicUserRoles($userID, $field = "Name") {
         if (!$userID) {
             return;
         }
 
-        $unfilteredRoles = self::getByUserID($userID)->resultArray();
+        $unfilteredRoles = $this->getByUserID($userID)->resultArray();
 
         // Hide personal info roles
         $unformattedRoles = array();

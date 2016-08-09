@@ -69,20 +69,24 @@ if ($this->data('AllowEditing')) { ?>
         </li>
 
         <?php if (c('Garden.Profile.Locations', false)): ?>
-            <li class="User-Location">
-                <?php
-                echo $this->Form->label('Location', 'Location');
-                echo $this->Form->textBox('Location');
-                ?>
+            <li class="form-group row User-Location">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Location', 'Location'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('Location'); ?>
+                </div>
             </li>
         <?php endif; ?>
 
         <?php if (c('Garden.Profile.Titles', false)): ?>
-            <li class="User-Title">
-                <?php
-                echo $this->Form->label('Title', 'Title');
-                echo $this->Form->textBox('Title');
-                ?>
+            <li class="form-group row User-Title">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Title', 'Title'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('Title'); ?>
+                </div>
             </li>
         <?php endif; ?>
 

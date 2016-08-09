@@ -2092,11 +2092,11 @@ a.text-danger:focus, a.text-danger:hover {
 
 .modal-body, .Content {
   position: relative;
-  padding: 15px;
+  padding: 1.125rem;
 }
 
 .modal-footer {
-  padding: 15px;
+  padding: 1.125rem;
   text-align: right;
   border-top: 1px solid #e5e5e5;
 }

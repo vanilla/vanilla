@@ -371,6 +371,29 @@ trait NestedCollection {
     }
 
     /**
+     * Remove an item from the nested set.
+     *
+     * @param string $key The key of the item to remove, separated by dots.
+     */
+    public function removeItem($key) {
+        $parts = explode('.', $key);
+
+        $arr = &$this->items;
+        foreach ($parts as $i => $part) {
+            if (array_key_exists($part, $arr)) {
+                if ($i + 1 === count($parts)) {
+                    unset($arr[$part]);
+                } else {
+                    $arr = &$arr[$part];
+                }
+            } else {
+                // The key wasn't found so short circuit.
+                return;
+            }
+        }
+    }
+
+    /**
      * Builds a CSS class for an item, based on the 'key' property of the item.
      * Optionally prepends a prefix to generated class names.
      *

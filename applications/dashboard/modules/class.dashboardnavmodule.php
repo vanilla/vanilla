@@ -38,7 +38,7 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'Settings',
             'title' => 'Settings',
             'description' => 'Preferences & Addons',
-            'url' => '/dashboard/settings/plugins'
+            'url' => '/dashboard/settings/banner'
         ]
     ];
 
@@ -89,14 +89,14 @@ class DashboardNavModule extends SiteNavModule {
 
         $allSectionsInfo = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
         $allSections = [];
-        foreach($allSectionsInfo as $sectionInfo) {
+        foreach ($allSectionsInfo as $sectionInfo) {
             $allSections[] = $sectionInfo['section'];
         }
 
         $currentSections = Gdn_Theme::section('', 'get');
         $found = false;
 
-        foreach($currentSections as $currentSection) {
+        foreach ($currentSections as $currentSection) {
             if ($currentSection == $section) {
                 return true;
             }
@@ -123,11 +123,20 @@ class DashboardNavModule extends SiteNavModule {
         $requiredArrayKeys = ['title', 'description', 'url', 'section'];
 
         // Make sure we have what we need.
-        foreach($requiredArrayKeys as $key) {
+        foreach ($requiredArrayKeys as $key) {
             if (!array_key_exists($key, $section)) {
                 return;
             }
         }
         self::$sectionsInfo[$section['section']] = $section;
+    }
+
+    public function toString() {
+        if (!self::$initStaticFired) {
+            self::$initStaticFired = true;
+            $this->fireEvent('init');
+        }
+        $this->fireAs(get_called_class())->fireEvent('render');
+        return parent::toString();
     }
 }

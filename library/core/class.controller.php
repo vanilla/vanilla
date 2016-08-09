@@ -1028,11 +1028,6 @@ class Gdn_Controller extends Gdn_Pluggable {
      * controller to do things like loading script and CSS into the head.
      */
     public function initialize() {
-        // Add a custom js file (Mainly used by themes).
-        if (arrayHasValue($this->_CssFiles, 'style.css')) {
-            $this->addJsFile('custom.js');
-        }
-
         if (in_array($this->SyndicationMethod, array(SYNDICATION_ATOM, SYNDICATION_RSS))) {
             $this->_Headers['Content-Type'] = 'text/xml; charset=utf-8';
         }
@@ -1041,6 +1036,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->Menu->Sort = Gdn::config('Garden.Menu.Sort');
         }
         $this->FireEvent('Initialize');
+
+        /*
+         * Add custom.js file (Mainly used by themes).
+         * We will have to unset it in renderMaster() if style.css is not present.
+         */
+        $this->addJsFile('custom.js');
     }
 
     /**
@@ -1699,9 +1700,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $CombineAssets = c('Garden.CombineAssets');
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
 
+                $hasStyleCSS = false;
+
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
                     $CssFile = $CssInfo['FileName'];
+
+                    if ($CssFile === 'style.css') {
+                        $hasStyleCSS = true;
+                    }
+
                     if (!array_key_exists('Options', $CssInfo) || !is_array($CssInfo['Options'])) {
                         $CssInfo['Options'] = array();
                     }
@@ -1750,6 +1758,10 @@ class Gdn_Controller extends Gdn_Pluggable {
                             $this->Head->addCss($Path, 'all', true, $Options);
                         }
                     }
+                }
+
+                if (!$hasStyleCSS) {
+                    $this->removeJsFile('custom.js');
                 }
 
                 $Cdns = array();

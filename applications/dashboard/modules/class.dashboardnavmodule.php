@@ -51,9 +51,10 @@ class DashboardNavModule extends SiteNavModule {
         ]
     ];
 
-    public function __construct($cssClass, $useCssPrefix) {
+    public function __construct($cssClass = '', $useCssPrefix = true) {
         self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
+        $this->setHighlightRoute(url('', false));
     }
 
     /**

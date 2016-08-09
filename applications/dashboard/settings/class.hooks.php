@@ -33,6 +33,7 @@ class DashboardHooks implements Gdn_IPlugin {
                 $Sender->Form->setStyles('bootstrap');
             }
 
+            $Sender->removeJsFile('jquery.popup.js');
             $Sender->addJsFile('dashboard.js', 'dashboard');
             $Sender->addJsFile('jquery.expander.js');
             $Sender->addJsFile('settings.js', 'dashboard');

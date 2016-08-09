@@ -1017,8 +1017,8 @@ class Gdn_Request {
             $path = implode('/', $pathParts);
             // Grab the get parameters too.
             if (!$query) {
-                $query = $this->getRequestArguments(self::INPUT_GET);
-                if (count($query) > 0) {
+                $query = array_filter($this->getRequestArguments(self::INPUT_GET));
+                if (!empty($query)) {
                     $query = ($rewrite ? '?' : '&amp;').http_build_query($query);
                 } else {
                     unset($query);

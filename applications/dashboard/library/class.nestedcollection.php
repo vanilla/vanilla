@@ -14,7 +14,7 @@ trait NestedCollection {
     /**
      * @var string The css class to add to active items and groups.
      */
-    public $activeCssClass = 'Active';
+    public $activeCssClass = 'active';
 
     /**
      * @var array List of items to sort.
@@ -525,22 +525,31 @@ trait NestedCollection {
     protected function prepareData(&$items) {
         foreach($items as $key => &$item) {
             unset($item['_sort'], $item['key']);
-            $subItems = [];
+            $subItems = false;
 
             // Group item
-            if (val('type', $item) == 'group') {
+            if (val('type', $item) === 'group') {
                 // ensure groups have items
                 if (val('items', $item)) {
-                    $subItems = $item['items'];
+                    $subItems = true;
                 } else {
                     unset($items[$key]);
                 }
             }
+
+            if (val('url', $item) === $this->getHighlightRoute()) {
+                $item['isActive'] = true;
+            }
+
+            if (val('isActive', $item)) {
+                $item['cssClass'] .= ' '.$this->activeCssClass;
+            }
+
             if ($subItems) {
-                $this->prepareData($subItems);
+                $this->prepareData($item['items']);
                 // Set active state on parents if child has it
                 if (!$this->flatten) {
-                    foreach ($subItems as $subItem) {
+                    foreach ($item['items'] as $subItem) {
                         if (val('isActive', $subItem)) {
                             $item['isActive'] = true;
                             $item['cssClass'] .= ' '.$this->activeCssClass;

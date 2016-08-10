@@ -111,17 +111,18 @@ Gdn_Theme::assetEnd();
             <?php } ?>
         </nav>
         <div class="navbar-memenu">
-            <nav class="nav nav-pills nav-icons">
-            <?php
-                foreach ($dashboardNav->getSectionsInfo(true) as $section) { ?>
-                    <div class="nav-item">
-                        <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
-                            <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
-                        </a>
-                    </div>
-                <?php
-                } ?>
-            </nav>
+<!--            <nav class="nav nav-pills nav-icons">-->
+<!--            --><?php
+//                $sections = $dashboardNav->getSectionsInfo(true);
+//                foreach ($dashboardNav->getSectionsInfo(true) as $section) { ?>
+<!--                    <div class="nav-item">-->
+<!--                        <a class="nav-link --><?php //echo val('active', $section); ?><!--" href="--><?php //echo val('url', $section); ?><!--">-->
+<!--                            <div class="nav-link-heading">--><?php //echo val('title', $section); ?><!--</div>-->
+<!--                        </a>-->
+<!--                    </div>-->
+<!--                --><?php
+//                } ?>
+<!--            </nav>-->
             <?php
             if (Gdn::session()->isValid()) {
 //                $this->fireEvent('BeforeUserOptionsMenu');

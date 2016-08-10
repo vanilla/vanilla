@@ -135,13 +135,8 @@ echo $this->Form->errors();
                             'div'
                         );
                         echo wrap(Anchor(t('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div');
-                    } else {
-                        echo wrap(
-                            t('FaviconDescription', "The shortcut icon that shows up in your browser's bookmark menu (16x16 px)."),
-                            'div',
-                            array('class' => 'Info')
-                        );
-                    } ?>
+                    }
+                    ?>
                     </div>
                     <div class="input-wrap">
                     <?php echo $this->Form->fileUpload('Favicon'); ?>

@@ -89,8 +89,6 @@ Gdn_Theme::assetEnd();
             // Add the module
             $this->addModule($dashboardNav, 'Panel');
         }
-        $dashboardNav->addGroupToGlobals('', 'globals', 'globals');
-        $dashboardNav->addLinkToGlobals(t('Sign Out'), SignOutUrl(), 'globals.sign-out');
         ?>
         <nav class="nav nav-pills">
             <?php

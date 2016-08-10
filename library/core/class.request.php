@@ -1001,7 +1001,8 @@ class Gdn_Request {
             $path = substr($path, 0, -strlen($query));
         }
 
-        $parts = [];
+        // Having en empty string in here will prepend a / in front of the URL on implode.
+        $parts = [''];
         if ($withDomain !== '/') {
             $port = $this->port();
             $host = $this->host();
@@ -1010,9 +1011,9 @@ class Gdn_Request {
             }
 
             if ($withDomain === '//') {
-                $parts[] = '//'.$host;
+                $parts = ['//'.$host];
             } elseif ($withDomain) {
-                $parts[] = $scheme.'://'.$host;
+                $parts = [$scheme.'://'.$host];
             }
 
             $webRoot = $this->webRoot();

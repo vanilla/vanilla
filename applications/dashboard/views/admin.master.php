@@ -1,3 +1,7 @@
+<?php
+/* Gdn_Controller $this */
+$this->fireAs('dashboard')->fireEvent('render');
+?>
 <?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
@@ -48,14 +52,19 @@ $roleTitles = implode(', ', $roleTitlesArray);
         </div>
     </div>
     <div class="list-group list-group-flush">
-        <a class="list-group-item" href="#"><?php echo t('Take The Tour').' '.dashboardSymbol('external-link'); ?></a>
-        <a class="list-group-item" href="<?php echo url('/dashboard/settings/gettingstarted') ?>">
-            <?php echo t('Help & Tutorials').' '.dashboardSymbol('external-link'); ?>
-        </a>
-        <a class="list-group-item" href="#"><?php echo t('Customer Support').' '.dashboardSymbol('external-link'); ?></a>
+        <?php
+        foreach($this->data('meList', []) as $meItem) {
+            echo anchor(
+                t($meItem['text']).(val('isExternal', $meItem, true) ? ' '.dashboardSymbol('external-link') : ''),
+                $meItem['url'],
+                'list-group-item',
+                ['target' => '_blank']
+            );
+        }
+        ?>
     </div>
     <div class="card-footer">
-        <?php echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-secondary Leave'); ?>
+        <?php echo anchor(t('Sign Out'), signOutUrl(), 'btn btn-secondary Leave'); ?>
     </div>
 </div>
 <?php

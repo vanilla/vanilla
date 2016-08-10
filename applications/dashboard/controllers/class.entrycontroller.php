@@ -1364,6 +1364,10 @@ EOT;
                     foreach ($Data as $Row) {
                         $ActivityModel->add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
                     }
+
+                    if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
+                        $this->RedirectUrl = url('/entry/registerthanks');
+                    }
                 }
             } catch (Exception $Ex) {
                 $this->Form->addError($Ex);

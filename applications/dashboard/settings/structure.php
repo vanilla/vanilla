@@ -186,10 +186,20 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     }
 
     if (c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->update('Role')
-            ->set('Type', RoleModel::TYPE_UNCONFIRMED)
+        // Verify we have valid roles to update.
+        $totalUnconfirmedRoles = $SQL->select('RoleID')
+            ->from('Role')
             ->whereIn('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
-            ->put();
+            ->getCount();
+
+        if ($totalUnconfirmedRoles > 0) {
+            $SQL->replace(
+                'Role',
+                array('Type' => RoleModel::TYPE_UNCONFIRMED),
+                array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
+                true
+            );
+        }
 //      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
     }
 

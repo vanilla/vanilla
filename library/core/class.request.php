@@ -954,101 +954,99 @@ class Gdn_Request {
      */
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
+        if ($allowSSL === null) {
+            $allowSSL = c('Garden.AllowSSL', false);
+        }
         static $rewrite = null;
+        if ($rewrite === null) {
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+        }
+
+        if (!$allowSSL) {
+            $ssl = null;
+        } elseif ($withDomain === 'https') {
+            $ssl = true;
+            $withDomain = true;
+        }
+
+        // If we are explicitly setting ssl urls one way or another
+        if (!is_null($ssl)) {
+            // Force the full domain in the url
+            $withDomain = true;
+            // And make sure to use ssl or not
+            if ($ssl) {
+                $path = str_replace('http:', 'https:', $path);
+                $scheme = 'https';
+            } else {
+                $path = str_replace('https:', 'http:', $path);
+                $scheme = 'http';
+            }
+        } else if ($withDomain && $withDomain !== '/') {
+            $scheme = $this->scheme();
+        }
 
         if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), [4, 5])) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
-            $result = $path;
-        } else {
-            if ($rewrite === null) {
-                $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+            return $path;
+        }
+
+        // Temporary strip out the hash.
+        $hash = strchr($path, '#');
+        if (strlen($hash) > 0) {
+            $path = substr($path, 0, -strlen($hash));
+        }
+
+        // Temporary strip out the querystring.
+        $query = strrchr($path, '?');
+        if (strlen($query) > 0) {
+            $path = substr($path, 0, -strlen($query));
+        }
+
+        $parts = [];
+        if ($withDomain !== '/') {
+            $port = $this->port();
+            $host = $this->host();
+            if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
+                $host .= ':'.$port;
             }
 
-            $parts = [];
-            if ($withDomain !== '/') {
-                if ($allowSSL === null) {
-                    $allowSSL = c('Garden.AllowSSL', false);
-                }
-
-                if (!$allowSSL) {
-                    $ssl = null;
-                } elseif ($withDomain === 'https') {
-                    $ssl = true;
-                    $withDomain = true;
-                }
-
-                // If we are explicitly setting ssl urls one way or another
-                if (!is_null($ssl)) {
-                    // Force the full domain in the url
-                    $withDomain = true;
-                    // And make sure to use ssl or not
-                    if ($ssl) {
-                        $path = str_replace('http:', 'https:', $path);
-                        $scheme = 'https';
-                    } else {
-                        $path = str_replace('https:', 'http:', $path);
-                        $scheme = 'http';
-                    }
-                } else if ($withDomain) {
-                    $scheme = $this->scheme();
-                }
-
-                $port = $this->port();
-                $host = $this->host();
-                if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
-                    $host .= ':'.$port;
-                }
-
-                if ($withDomain === '//') {
-                    $parts[] = '//'.$host;
-                } elseif ($withDomain) {
-                    $parts[] = $scheme.'://'.$host;
-                }
-
-                $webRoot = $this->webRoot();
-                if ($webRoot != '') {
-                    $parts[] = $webRoot;
-                }
+            if ($withDomain === '//') {
+                $parts[] = '//'.$host;
+            } elseif ($withDomain) {
+                $parts[] = $scheme.'://'.$host;
             }
 
-            // Temporary strip out the hash.
-            $hash = strchr($path, '#');
-            if (strlen($hash) > 0) {
-                $path = substr($path, 0, -strlen($hash));
+            $webRoot = $this->webRoot();
+            if ($webRoot != '') {
+                $parts[] = $webRoot;
             }
 
-            // Temporary strip out the querystring.
-            $query = strrchr($path, '?');
-            if (strlen($query) > 0) {
-                $path = substr($path, 0, -strlen($query));
-            }
-
-            if (!$rewrite && $withDomain !== '/') {
+            if (!$rewrite) {
                 $parts[] = $this->_environmentElement('SCRIPT').'?p=';
                 $query = str_replace('?', '&', $query);
             }
+        }
 
-            if ($path == '') {
-                $path = $this->path();
-                // Grab the get parameters too.
-                if (!$query) {
-                    $getParameters = $this->getRequestArguments(self::INPUT_GET);
-                    if (count($getParameters) > 0) {
-                        $query = ($rewrite ? '?' : '&amp;').http_build_query($getParameters);
-                    }
+        if ($path == '') {
+            $path = $this->path();
+            // Grab the get parameters too.
+            if (!$query) {
+                $getParameters = $this->getRequestArguments(self::INPUT_GET);
+                if (count($getParameters) > 0) {
+                    $query = ($rewrite ? '?' : '&amp;').http_build_query($getParameters);
                 }
             }
-            $parts[] = ltrim($path, '/');
-            $result = implode('/', $parts);
+        }
+        $parts[] = ltrim($path, '/');
+        $result = implode('/', $parts);
 
-            // Put back the query
-            if ($query !== false) {
-                $result .= $query;
-            }
+        // Put back the query
+        if ($query !== false) {
+            $result .= $query;
+        }
 
-            // Put back the hash.
-            if ($hash !== false) {
-                $result .= $hash;
-            }
+        // Put back the hash.
+        if ($hash !== false) {
+            $result .= $hash;
         }
 
         return $result;

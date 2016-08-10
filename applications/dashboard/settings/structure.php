@@ -186,12 +186,10 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     }
 
     if (c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_UNCONFIRMED),
-            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
-            true
-        );
+        $SQL->update('Role')
+            ->set('Type', RoleModel::TYPE_UNCONFIRMED)
+            ->whereIn('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
+            ->put();
 //      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
     }
 

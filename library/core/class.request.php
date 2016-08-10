@@ -1028,7 +1028,7 @@ class Gdn_Request {
         }
 
         if ($path == '') {
-            $path = $this->path();
+            $path = $this->path(true);
             // Grab the get parameters too.
             if (!$query) {
                 $getParameters = $this->getRequestArguments(self::INPUT_GET);

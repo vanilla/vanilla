@@ -4,7 +4,11 @@
     </div>
     <div class="header-buttons">
         <?php
-        echo anchor(t('Add Category'), 'vanilla/settings/addcategory', 'btn btn-primary');
+        echo anchor(
+            t('Add Category'),
+            'vanilla/settings/addcategory?parent='.$this->data('Category.CategoryID'),
+            'btn btn-primary'
+        );
         ?>
     </div>
 </div>

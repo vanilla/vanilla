@@ -589,11 +589,12 @@ trait NestedCollection {
             }
             if ($subItems) {
                 $newItems = array_merge($newItems, $this->flattenArray($subItems));
-                if ($this->forceDivider && $index < $itemslength) {
+                if ($this->forceDivider && $index + 1 < $itemslength) {
                     // Add hr after group but not the last one
                     $newItems[] = array('type' => 'divider');
                 }
             }
+            $index++;
         }
         return $newItems;
     }

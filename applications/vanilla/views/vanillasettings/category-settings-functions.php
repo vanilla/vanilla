@@ -3,7 +3,7 @@
 function writeCategoryTree($categories, $indent = 0) {
     $i = str_repeat('  ', $indent);
 
-    echo "$i<ol class=\"dd-list tree-list\">\n";
+    echo "$i<ol class=\"dd-list tree-list list-unstyled\">\n";
 
     foreach ($categories as $category) {
         writeCategoryItem($category, $indent + 1);
@@ -119,6 +119,10 @@ function writeCategoryBreadcrumbs($ancestors) {
     );
 
     foreach ($ancestors as $i => $ancestor) {
+        if (!in_array($ancestor['DisplayAs'], ['Categories', 'Flat'])) {
+            continue;
+        }
+
         $last = $i === count($ancestors) - 1;
 
         writeCategoryBreadcrumb(

@@ -158,6 +158,16 @@ Gdn_Theme::assetBegin('Help'); ?>
                             $Info[] = anchor(t('Visit Site'), $PluginUrl);
                         }
 
+                        if ($meta = val('meta', $addonInfo)) {
+                            foreach ($meta as $key => $value) {
+                                if (is_numeric($key)) {
+                                    $Info[] = $value;
+                                } else {
+                                    $Info[] = t($key).': '.$value;
+                                }
+                            }
+                        }
+
                         echo implode('<span class="spacer">•</span>', $Info);
 
                         ?>

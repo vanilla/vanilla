@@ -36,6 +36,10 @@ class LocaleModel {
                     $LocaleInfo['IconUrl'] = '/applications/dashboard/design/images/flag-placeholder.svg';
                 }
 
+                if ($enName = val('EnName', $LocaleInfo)) {
+                    $LocaleInfo['meta'][] = $enName;
+                }
+
                 $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
             }
             $this->_AvailableLocalePacks = $AvailableLocales;

@@ -194,8 +194,10 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
                     true
                 );
 
-                // No need for this anymore.
-                removeFromConfig($roleConfig);
+                if (!$captureOnly) {
+                    // No need for this anymore.
+                    removeFromConfig($roleConfig);
+                }
             }
         }
     }

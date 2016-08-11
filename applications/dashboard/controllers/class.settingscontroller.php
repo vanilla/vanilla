@@ -521,6 +521,7 @@ class SettingsController extends DashboardController {
                 break;
         }
 
+        Gdn_Theme::section('Moderation');
         $this->render();
     }
 
@@ -815,9 +816,9 @@ class SettingsController extends DashboardController {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
-                    $newToggle = wrap(anchor(t('Enabled'), '/dashboard/settings/setemailformat/text', 'Hijack SmallButton', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Active"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
                 } else {
-                    $newToggle = wrap(anchor(t('Disabled'), '/dashboard/settings/setemailformat/html', 'Hijack SmallButton', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "ActivateSlider ActivateSlider-Inactive"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
                 }
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }
@@ -835,6 +836,8 @@ class SettingsController extends DashboardController {
             $upload = new Gdn_Upload();
             $upload->delete($image);
         }
+
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -944,6 +947,7 @@ class SettingsController extends DashboardController {
         // Fire an event so other applications can add some data to be displayed
         $this->fireEvent('DashboardData');
 
+        Gdn_Theme::section('DashboardHome');
         $this->render();
     }
 
@@ -1544,7 +1548,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Mobile Themes'));
 
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/mobilethemes');
+        $this->addSideMenu('dashboard/settings/themes');
 
         // Get currently enabled theme.
         $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
@@ -1552,6 +1556,7 @@ class SettingsController extends DashboardController {
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);
+        $this->setData('EnabledThemeScreenshotUrl', val('ScreenshotUrl', $ThemeInfo));
         $this->setData('EnabledThemeName', val('Name', $ThemeInfo, val('Index', $ThemeInfo)));
 
         // Get all themes.
@@ -1785,6 +1790,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Getting Started'));
         $this->addSideMenu('dashboard/settings/gettingstarted');
 
+        Gdn_Theme::section('Tutorials');
         $this->render();
     }
 
@@ -1797,6 +1803,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Help &amp; Tutorials'));
         $this->addSideMenu('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
+        Gdn_Theme::section('Tutorials');
         $this->render();
     }
 }

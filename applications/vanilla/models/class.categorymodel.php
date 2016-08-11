@@ -63,16 +63,7 @@ class CategoryModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Category');
-        $this->collection = new CategoryCollection();
-        // Inject the calculator dependency.
-        $this->collection->setConfig(Gdn::config());
-        $this->collection->setStaticCalculator(function (&$category) {
-            self::calculate($category);
-        });
-
-        $this->collection->setUserCalculator(function (&$category) {
-            $this->calculateUser($category);
-        });
+        $this->collection = $this->createCollection();
     }
 
     /**
@@ -634,14 +625,13 @@ class CategoryModel extends Gdn_Model {
      * Get a category tree based on, but not including a parent category.
      *
      * @param int|string $id The parent category ID or slug.
-     * @param int $depth The maximum depth of categories.
-     * @param string $permission The permission to check to see which categories to get.
+     * @param array $options See {@link CategoryCollection::getTree()}.
      * @return array Returns an array of categories with child categories in the **Children** key.
      */
-    public function getChildTree($id, $depth = 3, $permission = 'PermsDiscussionsView') {
+    public function getChildTree($id, $options = []) {
         $category = $this->getOne($id);
 
-        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        return $this->collection->getTree((int)val('CategoryID', $category), $options);
     }
 
     /**
@@ -1496,7 +1486,10 @@ class CategoryModel extends Gdn_Model {
         if ($parent === null) {
             return [];
         }
-        $categories = self::instance()->collection->getTree($parent['CategoryID'], 10, '');
+        $categories = self::instance()->collection->getTree(
+            $parent['CategoryID'],
+            ['depth' => 10, 'permission' => '']
+        );
         $categories = self::instance()->flattenTree($categories);
 
         if ($includeParent) {
@@ -1743,7 +1736,7 @@ class CategoryModel extends Gdn_Model {
         if ($Root) {
             $Result = self::instance()->collection->getTree(
                 (int)val('CategoryID', $Root),
-                self::instance()->getMaxDisplayDepth() ?: 10
+                ['depth' => self::instance()->getMaxDisplayDepth() ?: 10]
             );
             self::instance()->joinRecent($Result);
         } else {
@@ -1916,6 +1909,60 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Save a subtree.
+     * 
+     * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
+     */
+    public function saveSubtree($subtree) {
+        $this->saveSubtreeInternal($subtree);
+    }
+
+    /**
+     * Save a subtree.
+     *
+     * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
+     * @param int|null $parentID The parent ID of the subtree.
+     * @param bool $rebuild Whether or not to rebuild the nested set after saving.
+     */
+    private function saveSubtreeInternal($subtree, $parentID = null, $rebuild = true) {
+        $order = 1;
+        foreach ($subtree as $row) {
+            $save = [];
+            $category = $this->collection->get((int)$row['CategoryID']);
+            if (!$category) {
+                $this->Validation->addValidationResult("CategoryID", "@Category {$row['CategoryID']} does not exist.");
+                continue;
+            }
+
+            if ($category['Sort'] != $order) {
+                $save['Sort'] = $order;
+            }
+
+            if ($parentID !== null && $category['ParentCategoryID'] != $parentID) {
+                $save['ParentCategoryID'] = $parentID;
+
+                if ($category['PermissionCategoryID'] != $category['CategoryID']) {
+                    $parentCategory = $this->collection->get((int)$parentID);
+                    $save['PermissionCategoryID'] = $parentCategory['PermissionCategoryID'];
+                }
+            }
+
+            if (!empty($save)) {
+                $this->setField($category['CategoryID'], $save);
+            }
+
+            if (!empty($row['Children'])) {
+                $this->saveSubtreeInternal($row['Children'], $category['CategoryID'], false);
+            }
+
+            $order++;
+        }
+        if ($rebuild) {
+            $this->rebuildTree(true);
+        }
+    }
+
+    /**
      * Saves the category tree based on a provided tree array. We are using the
      * Nested Set tree model.
      *
@@ -2026,6 +2073,31 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Create a new category collection tied to this model.
+     *
+     * @return CategoryCollection Returns a new collection.
+     */
+    public function createCollection(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null) {
+        if ($sql === null) {
+            $sql = $this->SQL;
+    }
+        if ($cache === null) {
+            $cache = Gdn::cache();
+        }
+        $collection = new CategoryCollection($sql, $cache);
+        // Inject the calculator dependency.
+        $collection->setConfig(Gdn::config());
+        $collection->setStaticCalculator(function (&$category) {
+            self::calculate($category);
+        });
+
+        $collection->setUserCalculator(function (&$category) {
+            $this->calculateUser($category);
+        });
+        return $collection;
+    }
+
+    /**
      * Utility method for sorting via usort.
      *
      * @since 2.0.18
@@ -2101,12 +2173,23 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
+        if (isset($FormPostValues['ParentCategoryID'])) {
+            if (empty($FormPostValues['ParentCategoryID'])) {
+                $FormPostValues['ParentCategoryID'] = -1;
+            } else {
+                $parent = CategoryModel::categories($FormPostValues['ParentCategoryID']);
+                if (!$parent) {
+                    $FormPostValues['ParentCategoryID'] = -1;
+                }
+            }
+        }
+
         //	Prep and fire event.
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['CategoryID'] = $CategoryID;
         $this->fireEvent('BeforeSaveCategory');
 
-        // Validate the form posted values
+        // Validate the form posted values.
         if ($this->validate($FormPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields();
             $Fields = $this->coerceData($Fields);

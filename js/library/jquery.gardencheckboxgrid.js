@@ -16,9 +16,6 @@ specific row, column, or the entire table.
      noOptionsYet: 0
    }, opt);
 
-  // Remove the cellpadding on label cells
-  $(this).find('th, thead td').css('padding', '0px');
-
   // Handle table heading clicks
   $(this).find('thead th').each(function() {
       var text = $(this).html();
@@ -30,6 +27,7 @@ specific row, column, or the entire table.
         } else {
           checkboxes.prop('checked', true);
         }
+        $(this).parents('table').trigger('contentLoad');
         return false;
       }
       anchor.innerHTML = text;
@@ -50,6 +48,7 @@ specific row, column, or the entire table.
             checkBoxes.prop('checked', true);
           }
         }
+        $(this).parents('tr').trigger('contentLoad');
         return false;
       }
       anchor.innerHTML = text;
@@ -82,6 +81,7 @@ specific row, column, or the entire table.
             checkbox.prop('checked', true);
           }
         }
+        $(this).parents('table').trigger('contentLoad');
         return false;
       }
       anchor.innerHTML = text;

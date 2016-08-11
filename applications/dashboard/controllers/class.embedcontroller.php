@@ -38,34 +38,7 @@ class EmbedController extends DashboardController {
      * @access public
      */
     public function comments($Toggle = '', $TransientKey = '') {
-        $this->permission('Garden.Settings.Manage');
-
-        try {
-            if ($this->toggle($Toggle, $TransientKey)) {
-                redirect('embed/comments');
-            }
-        } catch (Gdn_UserException $Ex) {
-            $this->Form->addError($Ex);
-        }
-
-        $this->addSideMenu('dashboard/embed/comments');
-        $this->Form = new Gdn_Form();
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Garden.Embed.CommentsPerPage', 'Garden.Embed.SortComments', 'Garden.Embed.PageToForum'));
-
-        $this->Form->setModel($ConfigurationModel);
-        if ($this->Form->authenticatedPostBack() === false) {
-            // Apply the config settings to the form.
-            $this->Form->setData($ConfigurationModel->Data);
-        } else {
-            if ($this->Form->save() !== false) {
-                $this->informMessage(t("Your settings have been saved."));
-            }
-        }
-
-        $this->title(t('Blog Comments'));
-        $this->render();
+        $this->settings($Toggle, $TransientKey);
     }
 
     /**
@@ -85,7 +58,7 @@ class EmbedController extends DashboardController {
             $this->Form->addError($Ex);
         }
 
-        $this->addSideMenu('dashboard/embed/forum');
+        $this->addSideMenu('embed/forum');
         $this->title('Embed Forum');
         $this->render();
     }
@@ -97,19 +70,21 @@ class EmbedController extends DashboardController {
      * @param string $TransientKey
      */
     public function advanced($Toggle = '', $TransientKey = '') {
+        $this->settings($Toggle, $TransientKey);
+    }
+
+    public function settings($Toggle = '', $TransientKey = '') {
         $this->permission('Garden.Settings.Manage');
 
-        try {
-            if ($this->toggle($Toggle, $TransientKey)) {
-                redirect('embed/advanced');
-            }
-        } catch (Gdn_UserException $Ex) {
-            $this->Form->addError($Ex);
-        }
+//        try {
+//            if ($this->toggle($Toggle, $TransientKey)) {
+//                redirect('embed/advanced');
+//            }
+//        } catch (Gdn_UserException $Ex) {
+//            $this->Form->addError($Ex);
+//        }
 
-        $this->title('Advanced Embed Settings');
-
-        $this->addSideMenu('dashboard/embed/advanced');
+        $this->addSideMenu('embed/forum');
         $this->Form = new Gdn_Form();
 
         $Validation = new Gdn_Validation();
@@ -120,7 +95,10 @@ class EmbedController extends DashboardController {
                 'Garden.Embed.ForceDashboard',
                 'Garden.Embed.ForceForum',
                 'Garden.Embed.ForceMobile',
-                'Garden.SignIn.Popup'
+                'Garden.SignIn.Popup',
+                'Garden.Embed.CommentsPerPage',
+                'Garden.Embed.SortComments',
+                'Garden.Embed.PageToForum'
             )
         );
 
@@ -134,7 +112,19 @@ class EmbedController extends DashboardController {
             $this->Form->setData($ConfigurationModel->Data);
         }
 
+        $this->title(t('Embed Settings'));
+        $this->render();
+    }
+
+    public function wordpress() {
         $this->permission('Garden.Settings.Manage');
+        $this->addSideMenu('embed/forum');
+        $this->render();
+    }
+
+    public function universal() {
+        $this->permission('Garden.Settings.Manage');
+        $this->addSideMenu('embed/forum');
         $this->render();
     }
 

@@ -18,7 +18,8 @@ $PluginInfo['Quotes'] = array(
     'HasLocale' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'quotes.png'
 );
 
 /**

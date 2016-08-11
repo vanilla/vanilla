@@ -19,8 +19,8 @@ if (is_array($this->ProfileFields)) {
         if ($Field['FormType'] == 'CheckBox') {
             continue;
         } else {
-            echo wrap($Sender->Form->label($Field['Label'], $Name).
-                $Sender->Form->{$Field['FormType']}($Name, $Options), 'li');
+            echo wrap('<div class="label-wrap">'.$Sender->Form->label($Field['Label'], $Name).'</div>'.
+                '<div class="input-wrap">'.$Sender->Form->{$Field['FormType']}($Name, $Options).'</div>', 'li', ['class' => 'form-group row']);
         }
     }
 }

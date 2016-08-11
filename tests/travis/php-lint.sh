@@ -49,7 +49,7 @@ do
     fi
 
     if [ "$haveerror" = true ]; then
-        echo $out
+        echo "$file: $out"
         errored=true
         if [ "$quick" = true ]; then
             exit 1;

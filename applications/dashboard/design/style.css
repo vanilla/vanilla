@@ -58,11 +58,11 @@ blockquote, q {
 }
 
 textarea, input[type=text] {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
   transition: height 0.1s ease;
   resize: none !important;
 }
@@ -1847,6 +1847,7 @@ overflow: hidden;
 
 .SearchForm .InputBox {
   width: 100%;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
@@ -5257,6 +5258,7 @@ input + .ReactSprite {
 
 /* Token input */
 ul.token-input-list {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   border: 1px solid #aaa;
   color: #333;
@@ -5527,7 +5529,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  -webkit-transition: background-color 100ms;
   transition: background-color 100ms;
 }
 
@@ -5768,6 +5769,7 @@ Styleguide Definitions
 .item-attachment .dl-columns dd {
   float: left;
   padding: 0 10px;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
@@ -5989,7 +5991,6 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
   opacity: 1;
 }

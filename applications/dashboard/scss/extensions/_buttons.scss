@@ -1,0 +1,5 @@
+.Button,
+.TextButton {
+  @extend .btn;
+  @extend .btn-primary;
+}

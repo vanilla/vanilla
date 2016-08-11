@@ -367,7 +367,7 @@ class VanillaHooks implements Gdn_IPlugin {
         if ($sender->Menu) {
             $sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, ['Standard' => true]);
         }
-        
+
         if (!inSection('Dashboard')) {
             // Spoilers assets
             $sender->addJsFile('spoilers.js', 'vanilla');
@@ -375,6 +375,14 @@ class VanillaHooks implements Gdn_IPlugin {
             $sender->addDefinition('Spoiler', t('Spoiler'));
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));
+        }
+
+        // Add user's viewable roles to gdn.meta if user is logged in.
+        if (!$sender->addDefinition('Roles')) {
+            if (Gdn::session()->isValid()) {
+                $roleModel = new RoleModel();
+                Gdn::controller()->addDefinition("Roles", $roleModel->getPublicUserRoles(Gdn::session()->UserID, "Name"));
+            }
         }
     }
 
@@ -464,7 +472,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $Sender
      */
     public function profileController_CustomNotificationPreferences_Handler($Sender) {
-        if (!$Sender->data('NoEmail') && Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
+        if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
         }
     }

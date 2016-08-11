@@ -224,7 +224,7 @@ class CategoriesController extends VanillaController {
             $this->Menu->highlightRoute('/discussions');
             if ($this->Head) {
                 $this->addJsFile('discussions.js');
-                $this->Head->AddRss($this->SelfUrl.'/feed.rss', $this->Head->title());
+                $this->Head->addRss(categoryUrl($Category) . '/feed.rss', $this->Head->title());
             }
 
             // Set CategoryID
@@ -385,11 +385,18 @@ class CategoriesController extends VanillaController {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
         }
+
+        // Compensate for categories displaying as headings by increasing the display depth by one.
+        $maxDisplayDepth = CategoryModel::instance()->getMaxDisplayDepth() ?: 10;
+        if (c('Vanilla.Categories.DoHeadings')) {
+            $maxDisplayDepth++;
+        }
+
         $categoryTree = $this->CategoryModel
             ->setJoinUserCategory(true)
             ->getChildTree(
                 $Category ?: null,
-                $this->CategoryModel->getMaxDisplayDepth() ?: 10
+                $maxDisplayDepth
             );
         if ($this->CategoryModel->Watching) {
             $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);

@@ -283,6 +283,10 @@ class Gdn_Form extends Gdn_Pluggable {
      *   Value         The ID of the category that    FALSE
      *                 is selected.
      *   IncludeNull   Include a blank row?           TRUE
+     *   Context       A set of categories to         []
+     *                 interset with the CategoryData
+     *                 that is relative to the category
+     *                 we're in.
      *   CategoryData  Custom set of categories to    CategoryModel::Categories()
      *                 display.
      *
@@ -295,6 +299,12 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $Value = arrayValueI('Value', $Options); // The selected category id
         $CategoryData = val('CategoryData', $Options);
+
+        if (!$CategoryData && val('Context', $Options)) {
+            $CategoryData = val('Context', $Options);
+        } elseif ($CategoryData && val('Context', $Options)) {
+            $CategoryData = array_intersect_key($CategoryData, val('Context', $Options));
+        }
 
         // Sanity check
         if (is_object($CategoryData)) {
@@ -333,7 +343,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $SafeCategoryData[$CategoryID] = $Category;
         }
 
-        unset($Options['Filter'], $Options['PermFilter']);
+        unset($Options['Filter'], $Options['PermFilter'], $Options['Context'], $Options['CategoryData']);
 
         // Opening select tag
         $Return = '<select';
@@ -376,7 +386,7 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_array($SafeCategoryData)) {
             foreach ($SafeCategoryData as $CategoryID => $Category) {
                 $Depth = val('Depth', $Category, 0);
-                $Disabled = (($Depth == 1 && $DoHeadings) || !$Category['AllowDiscussions']);
+                $Disabled = (($Depth == 1 && $DoHeadings) || !$Category['AllowDiscussions'] || val('DisplayAs', $Category) != 'Discussions');
                 $Selected = in_array($CategoryID, $Value) && $HasValue;
                 if ($ForceCleanSelection && $Depth > 1) {
                     $Selected = true;

@@ -44,18 +44,6 @@ echo $this->Form->errors();
             echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields);
             ?>
         </li>
-        <!--   <li>
-      <?php
-        $Options2 = array('0' => t('Never - Users Must Refresh Page'),
-            '5' => t('Every 5 seconds'),
-            '10' => t('Every 10 seconds'),
-            '30' => t('Every 30 seconds'),
-            '60' => t('Every 1 minute'),
-            '300' => t('Every 5 minutes'));
-        echo $this->Form->label('Auto-Fetch New Comments', 'Vanilla.Comments.AutoRefresh');
-        echo $this->Form->DropDown('Vanilla.Comments.AutoRefresh', $Options2, $Fields);
-        ?>
-   </li>-->
         <li>
             <?php
             echo $this->Form->label('Archive Discussions', 'Vanilla.Archive.Date');

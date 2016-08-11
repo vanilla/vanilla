@@ -59,12 +59,13 @@
         color: #c90000;
     }
 </style>
+<?php echo $this->Form->open(); ?>
 <div class="Configuration">
     <div class="ConfigurationForm">
         <ul>
             <li>
                 <?php echo $this->Form->label('API Status'); ?>
-                <div class="Popin" rel="/statistics/verify"></div>
+                <div class="Async js-popin" rel="statistics/verify"></div>
             </li>
             <li>
                 <?php
@@ -79,7 +80,7 @@
                 ?>
             </li>
         </ul>
-        <?php echo $this->Form->button('Save', array('class' => 'Button SliceSubmit')); ?>
+        <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
     </div>
     <div class="ConfigurationHelp">
         <strong><?php echo t("About Vanilla Statistics"); ?></strong>
@@ -89,3 +90,4 @@
         <p><?php echo t("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file: <code>\$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code>"); ?></p>
     </div>
 </div>
+<?php echo $this->Form->close(); ?>

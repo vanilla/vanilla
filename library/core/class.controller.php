@@ -225,7 +225,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         $this->RedirectUrl = '';
         $this->RequestMethod = '';
         $this->RequestArgs = false;
-        $this->Request = false;
+        $this->Request = null;
         $this->SelfUrl = '';
         $this->SyndicationMethod = SYNDICATION_NONE;
         $this->Theme = Theme();
@@ -734,12 +734,16 @@ class Gdn_Controller extends Gdn_Pluggable {
      * @param string $View The name of the view to fetch. If not specified, it will use the value
      * of $this->View. If $this->View is not specified, it will use the value
      * of $this->RequestMethod (which is defined by the dispatcher class).
-     * @param string $ControllerName The name of the controller that owns the view if it is not $this.
+     * @param bool|string $ControllerName The name of the controller that owns the view if it is not $this.
      *  - If the controller name is FALSE then the name of the current controller will be used.
      *  - If the controller name is an empty string then the view will be looked for in the base views folder.
-     * @param string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
+     * @param bool|string $ApplicationFolder The name of the application folder that contains the requested controller if it is not $this->ApplicationFolder.
+     * @param bool $ThrowError Whether to throw an error.
+     * @param bool $useController Whether to attach a controller to the view location. Some plugins have views that should not be looked up in a controller's view directory.
+     * @return string The resolved location of the view.
+     * @throws Exception
      */
-    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true) {
+    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true, $useController = true) {
         // Accept an explicitly defined view, or look to the method that was called on this controller
         if ($View == '') {
             $View = $this->View;
@@ -799,12 +803,14 @@ class Gdn_Controller extends Gdn_Pluggable {
             // Define the subpath for the view.
             // The $ControllerName used to default to '' instead of FALSE.
             // This extra search is added for backwards-compatibility.
-            if (strlen($ControllerName) > 0) {
+            if (strlen($ControllerName) > 0 && $useController) {
                 $SubPaths[] = "views/$ControllerName/$View";
             } else {
                 $SubPaths[] = "views/$View";
 
-                $SubPaths[] = 'views/'.stringEndsWith($this->ControllerName, 'Controller', true, true)."/$View";
+                if ($useController) {
+                    $SubPaths[] = 'views/'.stringEndsWith($this->ControllerName, 'Controller', true, true)."/$View";
+                }
             }
 
             // Views come from one of four places:
@@ -868,52 +874,56 @@ class Gdn_Controller extends Gdn_Pluggable {
     /**
      *
      *
-     * @param string $AssetName
+     * @param string $assetName
      */
-    public function getAsset($AssetName) {
-        if (!array_key_exists($AssetName, $this->Assets)) {
+    public function getAsset($assetName) {
+        if (!array_key_exists($assetName, $this->Assets)) {
             return '';
         }
-        if (!is_array($this->Assets[$AssetName])) {
-            return $this->Assets[$AssetName];
+        if (!is_array($this->Assets[$assetName])) {
+            return $this->Assets[$assetName];
         }
 
         // Include the module sort
-        $Modules = Gdn::config('Modules', array());
+        $modules = array_change_key_case(c('Modules', []));
+        $sortContainer = strtolower($this->ModuleSortContainer);
+        $applicationName = strtolower($this->Application);
+
         if ($this->ModuleSortContainer === false) {
-            $ModuleSort = false; // no sort wanted
-        } elseif (array_key_exists($this->ModuleSortContainer, $Modules) && array_key_exists($AssetName, $Modules[$this->ModuleSortContainer]))
-            $ModuleSort = $Modules[$this->ModuleSortContainer][$AssetName]; // explicit sort
-        elseif (array_key_exists($this->Application, $Modules) && array_key_exists($AssetName, $Modules[$this->Application]))
-            $ModuleSort = $Modules[$this->Application][$AssetName]; // application default sort
+            $moduleSort = false; // no sort wanted
+        } elseif (isset($modules[$sortContainer][$assetName])) {
+            $moduleSort = $modules[$sortContainer][$assetName]; // explicit sort
+        } elseif (isset($modules[$applicationName][$assetName])) {
+            $moduleSort = $modules[$applicationName][$assetName]; // application default sort
+        }
 
         // Get all the assets for this AssetContainer
-        $ThisAssets = $this->Assets[$AssetName];
-        $Assets = array();
+        $thisAssets = $this->Assets[$assetName];
+        $assets = array();
 
-        if (isset($ModuleSort) && is_array($ModuleSort)) {
+        if (isset($moduleSort) && is_array($moduleSort)) {
             // There is a specified sort so sort by it.
-            foreach ($ModuleSort as $Name) {
-                if (array_key_exists($Name, $ThisAssets)) {
-                    $Assets[] = $ThisAssets[$Name];
-                    unset($ThisAssets[$Name]);
+            foreach ($moduleSort as $name) {
+                if (array_key_exists($name, $thisAssets)) {
+                    $assets[] = $thisAssets[$name];
+                    unset($thisAssets[$name]);
                 }
             }
         }
 
         // Pick up any leftover assets that werent explicitly sorted
-        foreach ($ThisAssets as $Name => $Asset) {
-            $Assets[] = $Asset;
+        foreach ($thisAssets as $name => $Asset) {
+            $assets[] = $Asset;
         }
 
-        if (count($Assets) == 0) {
+        if (count($assets) == 0) {
             return '';
-        } elseif (count($Assets) == 1) {
-            return $Assets[0];
+        } elseif (count($assets) == 1) {
+            return $assets[0];
         } else {
-            $Result = new Gdn_ModuleCollection();
-            $Result->Items = $Assets;
-            return $Result;
+            $result = new Gdn_ModuleCollection();
+            $result->Items = $assets;
+            return $result;
         }
     }
 
@@ -1025,10 +1035,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         if (is_object($this->Menu)) {
             $this->Menu->Sort = Gdn::config('Garden.Menu.Sort');
         }
-
-        $ResolvedPath = strtolower(combinePaths(array(Gdn::dispatcher()->application(), Gdn::dispatcher()->ControllerName, Gdn::dispatcher()->ControllerMethod)));
-        $this->ResolvedPath = $ResolvedPath;
-
         $this->FireEvent('Initialize');
     }
 

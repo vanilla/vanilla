@@ -24,7 +24,7 @@ class CategoryCollection {
     /**
      * @var int The absolute select limit of the categories.
      */
-    private $absoluteLimit = 200;
+    private $absoluteLimit = 300;
 
     /**
      * @var Gdn_Cache The cache dependency.
@@ -434,8 +434,6 @@ class CategoryCollection {
             }
         }
     }
-    
-    
 
     /**
      * Get all of the children of a parent category.

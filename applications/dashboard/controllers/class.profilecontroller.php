@@ -476,7 +476,7 @@ class ProfileController extends Gdn_Controller {
     public function index($User = '', $Username = '', $UserID = '', $Page = false) {
         $this->addJsFile('cropimage.js');
         $this->addCssFile('cropimage.css');
-        
+
         $this->editMode(false);
         $this->getUserInfo($User, $Username, $UserID);
 
@@ -756,13 +756,13 @@ class ProfileController extends Gdn_Controller {
         $crop = null;
 
         if ($this->isUploadedAvatar($avatar)) {
-            //Get the image source so we can manipulate it in the crop module.
+            // Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
             $thumbnailSize = c('Garden.Thumbnail.Size', 40);
             $basename = changeBasename($avatar, "p%s");
             $source = $upload->copyLocal($basename);
 
-            //Set up cropping.
+            // Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
             $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
@@ -837,13 +837,13 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
-     * Test whether a path is a relative path to the proper uploads directory.
+     * Test whether a path is a full url, which gives us an indication whether it's an upload or not.
      *
      * @param string $avatar The path to the avatar image to test
-     * @return bool Whether the avatar has been uploaded from the dashboard.
+     * @return bool Whether the avatar has been uploaded.
      */
     private function isUploadedAvatar($avatar) {
-        return (!isUrl($avatar) && strpos($avatar, self::AVATAR_FOLDER.'/') !== false);
+        return (!isUrl($avatar));
     }
 
 

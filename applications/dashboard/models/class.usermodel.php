@@ -1078,8 +1078,13 @@ class UserModel extends Gdn_Model {
      * @param boolean $Serialize
      * @return array
      */
-    public function definePermissions($UserID, $Serialize = true) {
+    public function definePermissions($UserID, $Serialize = false) {
+        if ($Serialize) {
+            deprecated("UserModel->definePermissions(id, true)", "UserModel->definePermissions(id)");
+        }
+
         $UserPermissionsKey = '';
+
         if (Gdn::cache()->activeEnabled()) {
             $PermissionsIncrement = $this->getPermissionsIncrement();
             $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [
@@ -2411,14 +2416,17 @@ class UserModel extends Gdn_Model {
         if (!empty($RoleID)) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } elseif (isset($IPAddress)) {
+            $this->SQL->join('UserIP uip', 'u.userID = uip.UserID');
+
             $this->SQL
                 ->orOp()
                 ->beginWhereGroup()
-                ->orWhere('u.LastIPAddress', $IPAddress);
+                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)])
+                ->orWhere('uip.IPAddress', inet_pton($IPAddress));
 
             // An or is expensive so only do it if the query isn't optimized.
             if (!$Optimize) {
-                $this->SQL->orWhere('u.InsertIPAddress', $IPAddress);
+                $this->SQL->orWhereIn('u.InsertIPAddress', [$IPAddress, inet_pton($IPAddress)]);
             }
 
             $this->SQL->endWhereGroup();
@@ -2894,12 +2902,20 @@ class UserModel extends Gdn_Model {
      *
      * @param int $userID Unique ID of the user.
      * @param string $IP Human-readable IP address.
+     * @param string $dateUpdated Force an update timesetamp.
      * @return bool Was the operation successful?
      */
-    public function saveIP($userID, $IP) {
+    public function saveIP($userID, $IP, $dateUpdated = false) {
+        if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+            return false;
+        }
+
         $packedIP = ipEncode($IP);
         $px = Gdn::database()->DatabasePrefix;
-        $currentDateTime = Gdn_Format::toDateTime();
+
+        if (!$dateUpdated) {
+            $dateUpdated = Gdn_Format::toDateTime();
+        }
 
         $query = "insert into {$px}UserIP (UserID, IPAddress, DateInserted, DateUpdated)
             values (:UserID, :IPAddress, :DateInserted, :DateUpdated)
@@ -2907,9 +2923,9 @@ class UserModel extends Gdn_Model {
         $values = [
             ':UserID' => $userID,
             ':IPAddress' => $packedIP,
-            ':DateInserted' => $currentDateTime,
-            ':DateUpdated' => $currentDateTime,
-            ':DateUpdated2' => $currentDateTime
+            ':DateInserted' => Gdn_Format::toDateTime(),
+            ':DateUpdated' => $dateUpdated,
+            ':DateUpdated2' => $dateUpdated
         ];
 
         try {

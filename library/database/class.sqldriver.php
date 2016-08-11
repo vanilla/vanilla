@@ -1991,7 +1991,7 @@ abstract class Gdn_SQLDriver {
         foreach ($Field as $SubField => $SubValue) {
             if (is_array($SubValue)) {
                 if (count($SubValue) == 1) {
-                    list($firstVal) = $SubValue;
+                    $firstVal = reset($SubValue);
                     $this->where($SubField, $firstVal);
                 } else {
                     $this->whereIn($SubField, $SubValue);

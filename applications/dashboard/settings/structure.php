@@ -165,42 +165,39 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if (c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_APPLICANT),
-            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
-    }
 
-    if (c('Garden.Registration.DefaultRoles')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_MEMBER),
-            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.DefaultRoles');
-    }
+    // Mapping of legacy config keys to new role types.
+    $legacyRoleConfig = [
+        'Garden.Registration.ApplicantRoleID' => RoleModel::TYPE_APPLICANT,
+        'Garden.Registration.ConfirmEmailRole' => RoleModel::TYPE_UNCONFIRMED,
+        'Garden.Registration.DefaultRoles' => RoleModel::TYPE_MEMBER
+    ];
 
-    if (c('Garden.Registration.ConfirmEmailRole')) {
-        // Verify we have valid roles to update.
-        $totalUnconfirmedRoles = $SQL->select('RoleID')
-            ->from('Role')
-            ->whereIn('RoleID', $types[RoleModel::TYPE_UNCONFIRMED])
-            ->getCount();
+    // Loop through our old config values and update their associated roles with the proper type.
+    foreach ($legacyRoleConfig as $roleConfig => $roleType) {
+        if (c($roleConfig) && !empty($types[$roleType])) {
+            // Verify we have valid roles to update.
+            $totalUnconfirmedRoles = $SQL->select('RoleID')
+                ->from('Role')
+                ->whereIn('RoleID', $types[$roleType])
+                ->getCount();
 
-        if ($totalUnconfirmedRoles > 0) {
-            $SQL->replace(
-                'Role',
-                array('Type' => RoleModel::TYPE_UNCONFIRMED),
-                array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
-                true
-            );
+            /**
+             * If we attempt to update rows that don't exist, Gdn_SQLDriver throws an insert error, because
+             * the row would attempt to be inserted with an array as a field value.
+             */
+            if ($totalUnconfirmedRoles > 0) {
+                $SQL->replace(
+                    'Role',
+                    array('Type' => $roleType),
+                    array('RoleID' => $types[$roleType]),
+                    true
+                );
+
+                // No need for this anymore.
+                removeFromConfig($roleConfig);
+            }
         }
-//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
     }
 
     $guestRoleIDs = Gdn::sql()->getWhere('UserRole', array('UserID' => 0))->resultArray();

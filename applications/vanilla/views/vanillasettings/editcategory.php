@@ -25,7 +25,7 @@ echo $this->Form->errors();
             echo wrap(htmlspecialchars($this->Form->getValue('UrlCode')));
             echo '</div>';
             echo $this->Form->textBox('UrlCode');
-            echo (!empty($this->Form->getValue('UrlCode'))) ? '/' : '';
+            echo ($this->Form->getValue('UrlCode')) ? '/' : '';
             echo anchor(t('edit'), '#', 'Edit btn btn-link');
             echo anchor(t('OK'), '#', 'Save btn btn-primary');
             ?>

@@ -176,28 +176,14 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     // Loop through our old config values and update their associated roles with the proper type.
     foreach ($legacyRoleConfig as $roleConfig => $roleType) {
         if (c($roleConfig) && !empty($types[$roleType])) {
-            // Verify we have valid roles to update.
-            $totalLegacyRoles = $SQL->select('RoleID')
-                ->from('Role')
+            $SQL->update('Role')
+                ->set('Type', $roleType)
                 ->whereIn('RoleID', $types[$roleType])
-                ->getCount();
+                ->put();
 
-            /**
-             * If we attempt to update rows that don't exist, Gdn_SQLDriver throws an insert error, because
-             * the row would attempt to be inserted with an array as a field value.
-             */
-            if ($totalLegacyRoles > 0) {
-                $SQL->replace(
-                    'Role',
-                    array('Type' => $roleType),
-                    array('RoleID' => $types[$roleType]),
-                    true
-                );
-
-                if (!$captureOnly) {
-                    // No need for this anymore.
-                    removeFromConfig($roleConfig);
-                }
+            if (!$captureOnly) {
+                // No need for this anymore.
+                removeFromConfig($roleConfig);
             }
         }
     }

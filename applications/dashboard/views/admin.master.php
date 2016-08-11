@@ -125,14 +125,8 @@ Gdn_Theme::assetEnd();
 <!--            </nav>-->
             <?php
             if (Gdn::session()->isValid()) {
-//                $this->fireEvent('BeforeUserOptionsMenu');
                 $photo = '<img src="'.userPhotoUrl($user).'">';
-                $CountNotifications = Gdn::session()->User->CountNotifications;
-                if (is_numeric($CountNotifications) && $CountNotifications > 0) {
-                    $photo .= wrap($CountNotifications);
-                }
                 echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
-    //            echo anchor(t('Sign Out'), SignOutUrl(), 'btn btn-navbar Leave');
             }
             ?>
         </div>

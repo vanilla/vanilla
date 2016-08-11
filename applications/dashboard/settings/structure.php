@@ -177,7 +177,7 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     foreach ($legacyRoleConfig as $roleConfig => $roleType) {
         if (c($roleConfig) && !empty($types[$roleType])) {
             // Verify we have valid roles to update.
-            $totalUnconfirmedRoles = $SQL->select('RoleID')
+            $totalLegacyRoles = $SQL->select('RoleID')
                 ->from('Role')
                 ->whereIn('RoleID', $types[$roleType])
                 ->getCount();
@@ -186,7 +186,7 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
              * If we attempt to update rows that don't exist, Gdn_SQLDriver throws an insert error, because
              * the row would attempt to be inserted with an array as a field value.
              */
-            if ($totalUnconfirmedRoles > 0) {
+            if ($totalLegacyRoles > 0) {
                 $SQL->replace(
                     'Role',
                     array('Type' => $roleType),

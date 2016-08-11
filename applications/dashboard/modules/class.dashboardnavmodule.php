@@ -24,20 +24,20 @@ class DashboardNavModule extends SiteNavModule {
         'DashboardHome' => [
             'section' => 'DashboardHome',
             'title' => 'Dashboard',
-            'description' => 'Forum Overview',
+            'description' => 'Site Overview',
             'url' => '/settings'
         ],
         'Moderation' => [
             'section' => 'Moderation',
             'title' => 'Moderation',
-            'description' => 'Gate Keeping',
+            'description' => 'Community Management',
             'url' => '/dashboard/log/moderation',
             'permission' => 'Garden.Moderation.Manage'
         ],
         'Settings' => [
             'section' => 'Settings',
             'title' => 'Settings',
-            'description' => 'Preferences & Addons',
+            'description' => 'Configuration & Addons',
             'url' => '/dashboard/settings/banner'
         ]
     ];

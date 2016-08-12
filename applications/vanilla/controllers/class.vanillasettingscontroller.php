@@ -559,6 +559,14 @@ class VanillaSettingsController extends Gdn_Controller {
         $PermissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
+        $displayAsOptions = [
+            'Default' => 'Default',
+            'Discussions' => 'Discussions',
+            'Categories' => 'Nested Categories',
+            'Flat' => 'Flat Categories',
+            'Heading' => 'Heading'
+        ];
+
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
                 $CategoryID = $ID;
@@ -571,6 +579,13 @@ class VanillaSettingsController extends Gdn_Controller {
             throw notFoundException('Category');
         }
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
+
+        // Restrict "Display As" types based on parent.
+        $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);
+        $parentDisplay = val('DisplayAs', $parentCategory);
+        if ($parentDisplay === 'Flat') {
+            unset($displayAsOptions['Heading']);
+        }
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -613,6 +628,10 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
+            if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
+                $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
+            }
+
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);
@@ -640,6 +659,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }
 

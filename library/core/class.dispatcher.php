@@ -62,13 +62,13 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $controllerData;
 
     /** @var array Any query string arguments supplied to the controller method. */
-    private $controllerMethodArgs = [];
+    private $controllerMethodArgs;
 
     /** @var string|false The delivery method to set on the controller. */
-    private $deliveryMethod = false;
+    private $deliveryMethod;
 
     /** @var string|false The delivery type to set on the controller. */
-    private $deliveryType = false;
+    private $deliveryType;
 
     /**
      * @var array An associative collection of variables that will get passed into the
@@ -85,13 +85,21 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private $addonManager;
 
     /** @var bool */
-    private $isHomepage = false;
+    private $isHomepage;
 
     /**
      * Class constructor.
      */
     public function __construct(AddonManager $addonManager = null) {
         parent::__construct();
+        $this->addonManager = $addonManager;
+        $this->reset();
+    }
+
+    /**
+     * Reset the dispatchert to its default state.
+     */
+    public function reset() {
         $this->enabledApplicationFolders = null;
         $this->applicationFolder = '';
         $this->controllerAssets = [];
@@ -100,7 +108,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->controllerMethodArgs = [];
         $this->controllerProperties = [];
         $this->controllerData = [];
-        $this->addonManager = $addonManager;
+        $this->deliveryType = DELIVERY_TYPE_ALL;
+        $this->deliveryMethod = DELIVERY_METHOD_XHTML;
+        $this->isHomepage = false;
     }
 
     /**
@@ -296,7 +306,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         list($parts, $deliveryMethod) = $this->parseDeliveryMethod($parts);
 
         // Set some special properties based on the deliver method.
-        $deliveryType = DELIVERY_TYPE_ALL;
+        $deliveryType = $this->deliveryType;
         switch ($deliveryMethod) {
             case DELIVERY_METHOD_JSON:
             case DELIVERY_METHOD_XML:
@@ -311,7 +321,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 break;
         }
         // An explicitly passed delivery type/method overrides the default.
-        $result['deliveryMethod'] = self::requestVal('DeliveryMethod', $result['query'], $result['post'], $deliveryMethod ?: DELIVERY_METHOD_XHTML);
+        $result['deliveryMethod'] = self::requestVal('DeliveryMethod', $result['query'], $result['post'], $deliveryMethod ?: $this->deliveryMethod);
         $result['deliveryType'] = self::requestVal('DeliveryType', $result['query'], $result['post'], $deliveryType);
 
         // Figure out the controller.
@@ -808,6 +818,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controller->deliveryType($routeArgs['deliveryType']);
         $controller->deliveryMethod($routeArgs['deliveryMethod']);
         $controller->SyndicationMethod = val('syndicationMethod', $routeArgs, SYNDICATION_NONE);
+
+        $this->deliveryType = $routeArgs['deliveryType'];
+        $this->deliveryMethod = $routeArgs['deliveryMethod'];
 
         // Kludge: We currently have a couple of plugins that modify the path arguments on initialize.
         $this->controllerArguments($routeArgs['pathArgs']);

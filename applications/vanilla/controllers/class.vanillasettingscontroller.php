@@ -559,7 +559,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->Form->setModel($this->CategoryModel);
 
         $displayAsOptions = [
-            'Default' => 'Default',
             'Discussions' => 'Discussions',
             'Categories' => 'Nested Categories',
             'Flat' => 'Flat Categories',

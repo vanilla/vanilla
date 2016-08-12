@@ -762,7 +762,7 @@ class RoleModel extends Gdn_Model {
             return;
         }
 
-        $unfilteredRoles = self::getByUserID($userID)->resultArray();
+        $unfilteredRoles = $this->getByUserID($userID)->resultArray();
 
         // Hide personal info roles
         $unformattedRoles = array();

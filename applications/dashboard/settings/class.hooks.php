@@ -438,19 +438,4 @@ class DashboardHooks implements Gdn_IPlugin {
             PermissionModel::resetAllRoles();
         }
     }
-
-    /**
-     * Add user's viewable roles to gdn.meta if user is logged in.
-     * @param $sender
-     * @param $args
-     */
-    public function gdn_dispatcher_afterControllerCreate_handler($sender, $args) {
-        // Function addDefinition returns the value of the definition if you pass only one argument.
-        if (!gdn::controller()->addDefinition('Roles')) {
-            if (Gdn::session()->isValid()) {
-                $roleModel = new RoleModel();
-                gdn::controller()->addDefinition("Roles", $roleModel->getPublicUserRoles(gdn::session()->UserID, "Name"));
-            }
-        }
-    }
 }

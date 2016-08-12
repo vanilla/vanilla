@@ -3981,19 +3981,19 @@ class UserModel extends Gdn_Model {
                     $welcome = formatString(t('You have successfully connected to {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        formatString(t('Connected With: {ProviderName}'), $data).'</p>';
+                        formatString(t('Connected With: {ProviderName}'), $data).'<br></p>';
                     break;
                 case 'Register' :
                     $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'</p>';
+                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br></p>';
                     break;
                 default :
                     $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Password'), $password).'</p>';
+                        sprintf(t('%s: %s'), t('Password'), $password).'<br></p>';
             }
         }
         return $welcome;

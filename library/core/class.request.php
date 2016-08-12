@@ -732,7 +732,7 @@ class Gdn_Request {
      */
     public function path($path = null) {
         if (is_string($path)) {
-            $result = $this->_parsedRequestElement('Path', $path);
+            $result = $this->_parsedRequestElement('Path', ltrim($path, '/'));
         } else {
             $result = $this->_parsedRequestElement('Path');
             if ($path === true) {
@@ -1017,11 +1017,9 @@ class Gdn_Request {
             $path = implode('/', $pathParts);
             // Grab the get parameters too.
             if (!$query) {
-                $query = $this->getRequestArguments(self::INPUT_GET);
-                if (count($query) > 0) {
-                    $query = ($rewrite ? '?' : '&amp;').http_build_query($query);
-                } else {
-                    unset($query);
+                $query = http_build_query($this->getRequestArguments(self::INPUT_GET));
+                if (!empty($query)) {
+                    $query = ($rewrite ? '?' : '&').$query;
                 }
             }
         }
@@ -1039,11 +1037,11 @@ class Gdn_Request {
             }
         }
 
-        if (isset($query)) {
+        if (!empty($query)) {
             $result .= $query;
         }
 
-        if (isset($hash)) {
+        if (!empty($hash)) {
             $result .= $hash;
         }
 

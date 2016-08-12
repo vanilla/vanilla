@@ -35,6 +35,7 @@ if ($this->data('AllowEditing')) { ?>
             echo $this->Form->textBox('Email', $EmailAttributes);
             ?>
         </li>
+
         <?php if ($this->data('_CanConfirmEmail')): ?>
             <li class="User-ConfirmEmail">
                 <?php
@@ -61,6 +62,25 @@ if ($this->data('AllowEditing')) { ?>
                 )?></div>
             <?php endif; ?>
         </li>
+
+        <?php if (c('Garden.Profile.Locations', false)): ?>
+            <li class="User-Location">
+                <?php
+                echo $this->Form->label('Location', 'Location');
+                echo $this->Form->textBox('Location');
+                ?>
+            </li>
+        <?php endif; ?>
+
+        <?php if (c('Garden.Profile.Titles', false)): ?>
+            <li class="User-Title">
+                <?php
+                echo $this->Form->label('Title', 'Title');
+                echo $this->Form->textBox('Title');
+                ?>
+            </li>
+        <?php endif; ?>
+
         <?php
         $this->fireEvent('CustomUserFields')
         ?>

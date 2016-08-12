@@ -18,6 +18,8 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+$captureOnly = isset($Structure) && val('CaptureOnly', $Structure);
+
 $Database = Gdn::database();
 $SQL = $Database->sql();
 $Construct = $Database->structure();
@@ -163,34 +165,27 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if (c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_APPLICANT),
-            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
-    }
 
-    if (c('Garden.Registration.DefaultRoles')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_MEMBER),
-            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.DefaultRoles');
-    }
+    // Mapping of legacy config keys to new role types.
+    $legacyRoleConfig = [
+        'Garden.Registration.ApplicantRoleID' => RoleModel::TYPE_APPLICANT,
+        'Garden.Registration.ConfirmEmailRole' => RoleModel::TYPE_UNCONFIRMED,
+        'Garden.Registration.DefaultRoles' => RoleModel::TYPE_MEMBER
+    ];
 
-    if (c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_UNCONFIRMED),
-            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+    // Loop through our old config values and update their associated roles with the proper type.
+    foreach ($legacyRoleConfig as $roleConfig => $roleType) {
+        if (c($roleConfig) && !empty($types[$roleType])) {
+            $SQL->update('Role')
+                ->set('Type', $roleType)
+                ->whereIn('RoleID', $types[$roleType])
+                ->put();
+
+            if (!$captureOnly) {
+                // No need for this anymore.
+                removeFromConfig($roleConfig);
+            }
+        }
     }
 
     $guestRoleIDs = Gdn::sql()->getWhere('UserRole', array('UserID' => 0))->resultArray();
@@ -767,7 +762,7 @@ $Construct
     ->set($Explicit, $Drop);
 
 // If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
-if ($AllIPAddressesExists) {
+if (!$captureOnly && $AllIPAddressesExists) {
     $limit = 10000;
     $resetBatch = 100;
 
@@ -840,12 +835,6 @@ $currentLocale = c('Garden.Locale');
 $canonicalLocale = Gdn_Locale::canonicalize($currentLocale);
 if ($currentLocale !== $canonicalLocale) {
     saveToConfig('Garden.Locale', $canonicalLocale);
-}
-
-// We need to undo cleditor's bad behavior for our reformed users.
-// If you still need to manipulate this, do it in memory instead (SAVE = false).
-if (!c('Garden.Html.SafeStyles')) {
-    removeFromConfig('Garden.Html.SafeStyles');
 }
 
 // We need to ensure that recaptcha is enabled if this site is upgrading from

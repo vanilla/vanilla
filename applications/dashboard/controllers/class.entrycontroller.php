@@ -453,7 +453,7 @@ EOT;
         if (!$this->data('Verified')) {
             // Whatever event handler catches this must Set the data 'Verified' to true to prevent a random site from connecting without credentials.
             // This must be done EVERY postback and is VERY important.
-            $this->Form->addError('The connection data has not been verified.');
+            $this->Form->addError(t('The connection data has not been verified.'));
         }
 
         if ($this->Form->errorCount() > 0) {
@@ -1363,6 +1363,10 @@ EOT;
                     $ActivityModel = new ActivityModel();
                     foreach ($Data as $Row) {
                         $ActivityModel->add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
+                    }
+
+                    if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
+                        $this->RedirectUrl = url('/entry/registerthanks');
                     }
                 }
             } catch (Exception $Ex) {

@@ -35,11 +35,30 @@ echo $this->Form->errors();
             echo $this->Form->textBox('Email');
             ?>
         </li>
+
         <li>
             <?php
             echo $this->Form->checkBox('ShowEmail', t('Email visible to other users'));
             ?>
         </li>
+
+        <?php if (c('Garden.Profile.Locations', false)): ?>
+            <li class="User-Location">
+                <?php
+                echo $this->Form->label('Location', 'Location');
+                echo $this->Form->textBox('Location');
+                ?>
+            </li>
+        <?php endif; ?>
+
+        <?php if (c('Garden.Profile.Titles', false)): ?>
+            <li class="User-Title">
+                <?php
+                echo $this->Form->label('Title', 'Title');
+                echo $this->Form->textBox('Title');
+                ?>
+            </li>
+        <?php endif; ?>
         <?php
         $this->fireEvent('CustomUserFields')
         ?>

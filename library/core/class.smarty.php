@@ -114,7 +114,6 @@ class Gdn_Smarty {
         $security->php_handling = Smarty::PHP_REMOVE;
         $security->allow_constants = false;
         $security->allow_super_globals = false;
-        $security->secure_dir = [$Path];
         $security->streams = null;
 
         $security->setPhpFunctions(array_merge($security->php_functions, [
@@ -123,10 +122,12 @@ class Gdn_Smarty {
             'checkPermission',
             'inSection',
             'inCategory',
+            'ismobile',
             'multiCheckPermission',
             'getValue',
             'setValue',
-            'url'
+            'url',
+            'useragenttype'
         ]));
 
         $security->php_modifiers = array_merge(

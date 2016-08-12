@@ -185,7 +185,7 @@ class TaggingPlugin extends Gdn_Plugin {
         }
 
         $Sender->title(htmlspecialchars($TagRow['FullName']));
-        $UrlTag = rawurlencode($Tag);
+        $UrlTag = empty($CategoryCode) ? rawurlencode($Tag) : rawurlencode($CategoryCode).'/'.rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
             $Sender->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
             $FeedUrl = url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, true, false)), '//');

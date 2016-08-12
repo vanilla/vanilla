@@ -317,7 +317,7 @@ if (!function_exists('countString')) {
             return "<span class=\"$CssClass\">$Number</span>";
         } elseif ($Number === null && $Url) {
             $CssClass = trim($CssClass.' Popin TinyProgress', ' ');
-            $Url = htmlspecialchars(url($Url));
+            $Url = htmlspecialchars($Url);
             return "<span class=\"$CssClass\" rel=\"$Url\"></span>";
         } else {
             return '';

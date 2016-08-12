@@ -716,6 +716,45 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->render();
     }
 
+    /**
+     * Move a category to a different parent.
+     *
+     * @param int $categoryID Unique ID for the category to move.
+     * @throws Exception if category is not found.
+     */
+    public function moveCategory($categoryID) {
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
+        $category = CategoryModel::categories($categoryID);
+
+        if (!$category) {
+            throw notFoundException();
+        }
+
+        $this->Form->setModel($this->CategoryModel);
+        $this->Form->addHidden('CategoryID', $categoryID);
+        $this->setData('Category', $category);
+
+        $parentCategories = CategoryModel::getAncestors($categoryID);
+        array_pop($parentCategories);
+        if (!empty($parentCategories)) {
+            $this->setData('ParentCategories', array_column($parentCategories, 'Name', 'CategoryID'));
+        }
+
+        if ($this->Form->authenticatedPostBack()) {
+            // Verify we're only attempting to save specific values.
+            $this->Form->formValues([
+                'CategoryID' => $this->Form->getValue('CategoryID'),
+                'ParentCategoryID' => $this->Form->getValue('ParentCategoryID'),
+            ]);
+            $this->Form->save();
+        } else {
+            $this->Form->setData($category);
+        }
+
+        $this->render();
+    }
 
     /**
      * Enable or disable the use of categories in Vanilla.

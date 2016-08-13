@@ -150,6 +150,7 @@ class MessageController extends DashboardController {
         $this->addJsFile('jquery.tablednd.js');
         $this->addJsFile('messages.js');
         $this->title(t('Messages'));
+        Gdn_Theme::section('Moderation');
 
         // Load all messages from the db
         $this->MessageData = $this->MessageModel->get('Sort');

@@ -80,13 +80,13 @@ class DashboardNavModule extends SiteNavModule {
                 $section['title'] = t($section['title']);
                 $section['description'] = t($section['description']);
                 $section['url'] = url($section['url']);
-                $section['active'] = $this->isActive($section['section']) ? 'active' : '';
+                $section['active'] = $this->isActiveSection($section['section']) ? 'active' : '';
             }
         }
         return $sections;
     }
 
-    public function isActive($section) {
+    public function isActiveSection($section) {
 
         $allSectionsInfo = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
         $allSections = [];
@@ -106,8 +106,7 @@ class DashboardNavModule extends SiteNavModule {
             }
         }
 
-        // We're active if the section is 'Settings' and the $current section doesn't exist in allsections
-
+        // We're active if the section is 'Settings' and the $currentSection doesn't exist in allsections
         if (!$found && $section == self::ACTIVE_SECTION_DEFAULT) {
             return true;
         }

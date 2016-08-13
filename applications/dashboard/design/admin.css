@@ -6525,12 +6525,11 @@ form ol .label {
 .toggle-slider, .toggle-wrap input[type="checkbox"] + label::after {
   display: block;
   position: absolute;
-  top: 0.1328125rem;
-  left: 0.1328125rem;
-  bottom: 0.1328125rem;
-  width: 1.984375rem;
-  height: 1.984375rem;
-  border-radius: 1.08984375rem;
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 1.0625rem;
   border: 0.0625rem solid #949aa2;
   background-color: #fff;
   outline: 0;
@@ -6543,11 +6542,11 @@ form ol .label {
 }
 
 .toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap input[type="checkbox"]:checked + label::after {
-  left: 2.3203125rem;
+  left: 2.4375rem;
 }
 
 .toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after {
-  left: 1.1953125rem;
+  left: 3.46875rem;
   transition: left .4s;
 }
 

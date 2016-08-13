@@ -82,7 +82,7 @@ Gdn_Theme::assetEnd();
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
-        $dashboardNav = valr('Panel.DashboardNabModule', $this->Assets);
+        $dashboardNav = valr('Panel.DashboardNavModule', $this->Assets);
         if (!($dashboardNav instanceof  DashboardNavModule)) {
             $dashboardNav = new DashboardNavModule();
             $navAdapter = new NestedCollectionAdapter($dashboardNav);

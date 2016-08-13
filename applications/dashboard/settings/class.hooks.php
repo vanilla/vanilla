@@ -33,6 +33,14 @@ class DashboardHooks implements Gdn_IPlugin {
                 $Sender->Form->setStyles('bootstrap');
             }
 
+            $Sender->CssClass = htmlspecialchars($Sender->CssClass);
+            $Sections = Gdn_Theme::section(null, 'get');
+            if (is_array($Sections)) {
+                foreach ($Sections as $Section) {
+                    $Sender->CssClass .= ' Section-'.$Section;
+                }
+            }
+
             $Sender->removeJsFile('jquery.popup.js');
             $Sender->addJsFile('dashboard.js', 'dashboard');
             $Sender->addJsFile('jquery.expander.js');

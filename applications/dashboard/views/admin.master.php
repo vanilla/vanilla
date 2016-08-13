@@ -11,17 +11,10 @@ $this->fireAs('dashboard')->fireEvent('render');
     <meta name="robots" content="noindex,nofollow"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<?php
-$BodyClass = htmlspecialchars($this->CssClass);
-$Sections = Gdn_Theme::section(null, 'get');
-if (is_array($Sections)) {
-    foreach ($Sections as $Section) {
-        $BodyClass .= ' Section-'.$Section;
-    }
-}
-?>
-<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $BodyClass; ?>">
+<body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $this->CssClass; ?>">
 <?php $this->renderAsset('Symbols');
+
+// TODO: Pull this asset out elsewhere
 Gdn_Theme::assetBegin('DashboardUserDropDown');
 $user = Gdn::session()->User;
 $rm = new RoleModel();
@@ -70,6 +63,8 @@ $roleTitles = implode(', ', $roleTitlesArray);
 <?php
 Gdn_Theme::assetEnd();
 ?>
+
+
 <div class="main-container">
     <div class="navbar">
         <button class="js-panel-left-toggle panel-left-toggle btn btn-link" type="button">
@@ -142,8 +137,6 @@ Gdn_Theme::assetEnd();
         </div>
         <div class="main">
             <div class="content">
-<!--                --><?php //echo $dropdown; ?>
-    <!--            <a href="/user/edit/53" class="js-ajax-modal btn btn-icon" aria-label="Edit"><svg class="icon  icon-edit" viewBox="0 0 17 17"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#edit"></use></svg></a>-->
                 <?php $this->renderAsset('Content'); ?>
             </div>
             <div class="footer">

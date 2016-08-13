@@ -537,14 +537,6 @@ trait NestedCollection {
                 }
             }
 
-            if (val('url', $item) === $this->getHighlightRoute()) {
-                $item['isActive'] = true;
-            }
-
-            if (val('isActive', $item)) {
-                $item['cssClass'] .= ' '.$this->activeCssClass;
-            }
-
             if ($subItems) {
                 $this->prepareData($item['items']);
                 // Set active state on parents if child has it

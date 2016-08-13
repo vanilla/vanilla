@@ -218,7 +218,7 @@ $nav-navbar-active-link-active-bg:          #0cb0f8;
 // Checkbox toggles
 $toggle-border-width:                       $border-width;
 $toggle-height:                             $control-height-rem;
-$toggle-padding:                            $toggle-height / 32;
+$toggle-padding:                            to-rem(2);
 
 // Padding
 $padding-default:                           $grid-gutter-width / 2;

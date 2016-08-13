@@ -59,6 +59,7 @@ class UserController extends DashboardController {
         $this->addJsFile('user.js');
         $this->title(t('Users'));
         $this->addSideMenu('dashboard/user');
+        Gdn_Theme::section('Moderation');
 
         // Form setup
         $this->Form->Method = 'get';

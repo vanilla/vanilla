@@ -773,7 +773,6 @@ select + select {
 
   &:hover,
   &:focus,
-  &.checked,
   .icheck-label:hover &,
   .icheck-label:focus & {
     background-color: $brand-primary;
@@ -807,9 +806,13 @@ select + select {
   @extend %icon;
   font-size: $font-size-sm;
   text-align: center;
+  background-color: $brand-primary;
+  border-color: $brand-primary;
 
   &:before {
+    display: block;
     margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
+    color: $white;
     @include char-content($icon-ok);
   }
 }

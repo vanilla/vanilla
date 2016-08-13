@@ -1143,7 +1143,7 @@ th {
   padding: 0;
 }
 
-.clearfix::after, .Clearfix::after {
+.clearfix::after {
   content: "";
   display: table;
   clear: both;
@@ -2173,7 +2173,7 @@ a.text-danger:focus, a.text-danger:hover {
   position: relative;
 }
 
-.dropdown-toggle::after, .caret, .nav-heading a::before {
+.dropdown-toggle::after {
   display: inline-block;
   width: 0;
   height: 0;
@@ -2190,7 +2190,7 @@ a.text-danger:focus, a.text-danger:hover {
   outline: 0;
 }
 
-.dropup .dropdown-toggle::after, .dropup .caret, .dropup .nav-heading a::before, .nav-heading .dropup a::before {
+.dropup .dropdown-toggle::after {
   border-top: 0;
   border-bottom: 0.375em solid;
 }
@@ -7127,12 +7127,11 @@ select + select {
   vertical-align: middle;
 }
 
-.iradio:hover, .iradio:focus, .iradio.checked,
+.iradio:hover, .iradio:focus,
 .icheck-label:hover .iradio,
 .icheck-label:focus .iradio,
 .icheckbox:hover,
 .icheckbox:focus,
-.icheckbox.checked,
 .icheck-label:hover
 .icheckbox,
 .icheck-label:focus
@@ -7141,12 +7140,11 @@ select + select {
   border-color: #0291db;
 }
 
-.iradio:hover:before, .iradio:focus:before, .iradio.checked:before,
+.iradio:hover:before, .iradio:focus:before,
 .icheck-label:hover .iradio:before,
 .icheck-label:focus .iradio:before,
 .icheckbox:hover:before,
 .icheckbox:focus:before,
-.icheckbox.checked:before,
 .icheck-label:hover
 .icheckbox:before,
 .icheck-label:focus
@@ -7175,10 +7173,14 @@ select + select {
 .icheckbox.checked {
   font-size: 0.75rem;
   text-align: center;
+  background-color: #0291db;
+  border-color: #0291db;
 }
 
 .icheckbox.checked:before {
+  display: block;
   margin-top: 0.125rem;
+  color: #fff;
   content: "\f171";
 }
 
@@ -7252,6 +7254,19 @@ label[id^=iCheck] {
 
 .pull-right {
   float: right;
+}
+
+.caret, .nav-heading a::before {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: .25rem;
+  margin-left: .25rem;
+  vertical-align: middle;
+  content: "";
+  border-top: 0.375em solid;
+  border-right: 0.375em solid transparent;
+  border-left: 0.375em solid transparent;
 }
 
 .imagewrap-table {
@@ -9193,142 +9208,6 @@ form h2 {
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-.ToggleFlyout {
-  position: relative;
-}
-
-.ToggleFlyout.Open {
-  z-index: 110;
-  /* above Item:hover */
-}
-
-.ToggleFlyout.Open .Button-Options {
-  color: #0291db;
-  fill: #0291db;
-}
-
-.ToggleFlyout.Open .Button-Options .SpFlyoutHandle {
-  border-top-color: #0291db;
-}
-
-.ToggleFlyout .Flyout {
-  position: absolute;
-  top: 100%;
-  /* right: -10px; This causes text overflows when flyout items are long */
-  display: none;
-}
-
-.ToggleFlyout,
-.Button-Options,
-.OptionsTitle {
-  display: inline-block;
-}
-
-.Button-Options {
-  cursor: pointer;
-  line-height: 1;
-}
-
-.Button-Options:hover {
-  color: #0291db;
-  fill: #0291db;
-}
-
-.Button-Options:hover .SpFlyoutHandle {
-  border-top-color: #0291db;
-}
-
-.OptionsMenu .Flyout {
-  right: -0;
-}
-
-.Flyout .Author .PhotoWrap {
-  margin: 0;
-}
-
-.FlyoutMenu {
-  width: 300px;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  border: solid 1px;
-}
-
-.FlyoutButton {
-  cursor: pointer;
-}
-
-.FlyoutLeft .Flyout {
-  right: inherit;
-}
-
-.SpFlyoutHandle,
-.DropHandle {
-  display: inline-block;
-  height: 0;
-  width: 0;
-  border-style: solid;
-  border-width: 4px;
-  border-color: #555a62 transparent transparent transparent;
-  position: relative;
-  bottom: -2px;
-  vertical-align: middle;
-}
-
-.MenuItems {
-  color: #555a62;
-  background: #fff;
-  font-size: 14px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  line-height: 16px;
-  min-width: 180px;
-  padding: 6px 0;
-}
-
-.MenuItems .icon, .MenuItems .btn-icon, .MenuItems .btn-icon-border, .MenuItems .search-wrap .icon-wrap, .search-wrap .MenuItems .icon-wrap, .MenuItems .icon-text {
-  fill: rgba(85, 90, 98, 0.8);
-  margin-right: 6px;
-  vertical-align: top;
-}
-
-.MenuItems .dropdown-header {
-  color: #A3A3A3;
-  font-size: 12px;
-  padding: 6px 12px;
-}
-
-.MenuItems .dropdown-menu-link {
-  display: block;
-  color: inherit;
-  padding: 7px 12px 7px 12px;
-}
-
-.MenuItems .dropdown-menu-link.danger {
-  color: #FF1010;
-}
-
-.MenuItems .dropdown-menu-link:hover {
-  background: #f2f5fa;
-}
-
-.MenuItems .selected:after {
-  content: url(data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2016%2016%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22%230291DB%22%3E%3Cpath%20d%3D%22M7.5721325%2C12.1125141%20C7.5714572%2C12.1131928%207.57078083%2C12.1138709%207.57010342%2C12.1145483%20C7.35254964%2C12.3321021%207.0688103%2C12.4422832%206.78434933%2C12.4429854%20C6.49721771%2C12.4413055%206.21268196%2C12.3329648%205.99426545%2C12.1145483%20L3.32760891%2C9.44789175%20C2.89237254%2C9.01265538%202.88927326%2C8.31009706%203.32746273%2C7.8719076%20C3.76261837%2C7.43675196%204.46257481%2C7.43118171%204.90344688%2C7.87205378%20L6.78218443%2C9.75079133%20L11.2025906%2C5.3303852%20C11.6399896%2C4.89298617%2012.3443011%2C4.88813372%2012.7824905%2C5.32632319%20C13.2176462%2C5.76147883%2013.224448%2C6.46020374%2012.7784285%2C6.90622316%20L7.57416542%2C12.1104863%20C7.57348803%2C12.1111637%207.57281%2C12.11184%207.57213133%2C12.1125153%20L7.5721325%2C12.1125141%20Z%22%3E%3C%2Fpath%3E%3C%2Fg%3E%3C%2Fsvg%3E);
-  display: block;
-  height: 16px;
-  width: 16px;
-  float: right;
-}
-
-.MenuItems .no-icon .dropdown-menu-link {
-  padding-left: 34px;
-}
-
-.MenuItems hr {
-  border: none;
-  border-top: 1px #e5e5e5 dotted;
-  margin: 6px 0;
-}
-
 .dd {
   color: #555a62;
   padding: 18px 0;
@@ -9402,6 +9281,7 @@ form h2 {
   left: 0;
   top: 0;
   cursor: move;
+  cursor: -webkit-grab;
   cursor: -moz-grab;
   cursor: grab;
   line-height: 1;
@@ -9428,6 +9308,7 @@ form h2 {
   margin-top: 0;
   margin-left: 0;
   opacity: .8;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }
@@ -9444,6 +9325,7 @@ form h2 {
   border: 1px dashed #0291db;
   min-height: 36px;
   border-radius: 2px;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }

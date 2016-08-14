@@ -37,7 +37,7 @@ class SocialController extends DashboardController {
     public function manage() {
         $this->permission('Garden.Settings.Manage');
         $this->title("Social Integration");
-        $this->addSideMenu('dashboard/social');
+        $this->setHighlightRoute('dashboard/social');
 
         $Connections = $this->GetConnections();
         $this->setData('Connections', $Connections);

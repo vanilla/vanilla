@@ -79,7 +79,7 @@ class VanilliconPlugin extends Gdn_Plugin {
          )
         ));
 
-        $sender->addSideMenu();
+        
         $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
     }

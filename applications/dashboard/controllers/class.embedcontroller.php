@@ -58,7 +58,7 @@ class EmbedController extends DashboardController {
             $this->Form->addError($Ex);
         }
 
-        $this->addSideMenu('embed/forum');
+        $this->setHighlightRoute('embed/forum');
         $this->title('Embed Forum');
         $this->render();
     }
@@ -84,7 +84,7 @@ class EmbedController extends DashboardController {
 //            $this->Form->addError($Ex);
 //        }
 
-        $this->addSideMenu('embed/forum');
+        $this->setHighlightRoute('embed/forum');
         $this->Form = new Gdn_Form();
 
         $Validation = new Gdn_Validation();
@@ -118,13 +118,13 @@ class EmbedController extends DashboardController {
 
     public function wordpress() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('embed/forum');
+        $this->setHighlightRoute('embed/forum');
         $this->render();
     }
 
     public function universal() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('embed/forum');
+        $this->setHighlightRoute('embed/forum');
         $this->render();
     }
 

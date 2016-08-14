@@ -201,7 +201,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
-        $sender->addSideMenu();
+        
         $sender->setData('Title', t('Choose Your Emoji Set'));
         $cf->renderAll();
     }

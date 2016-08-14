@@ -1336,7 +1336,7 @@ class EditorPlugin extends Gdn_Plugin {
             'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter'))
         ));
 
-        $Sender->addSideMenu();
+        
         $Sender->setData('Title', t('Advanced Editor Settings'));
         $Cf->renderAll();
     }

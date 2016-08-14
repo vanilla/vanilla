@@ -82,17 +82,7 @@ Gdn_Theme::assetEnd();
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
-        $dashboardNav = valr('Panel.DashboardNavModule', $this->Assets);
-        if (!($dashboardNav instanceof  DashboardNavModule)) {
-            $dashboardNav = new DashboardNavModule();
-            $navAdapter = new NestedCollectionAdapter($dashboardNav);
-
-            $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('GetAppSettingsMenuItems');
-
-            // Add the module
-            $this->addModule($dashboardNav, 'Panel');
-        }
+        $dashboardNav = DashboardController::$dashbordNav;
         ?>
         <nav class="nav nav-pills">
             <?php

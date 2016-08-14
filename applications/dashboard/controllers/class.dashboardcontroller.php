@@ -12,6 +12,12 @@
  * Root class for the Dashboard's controllers.
  */
 class DashboardController extends Gdn_Controller {
+
+    /**
+     * @var DashboardNavModule
+     */
+    public static $dashbordNav;
+
     /**
      * Set PageName.
      *
@@ -52,24 +58,33 @@ class DashboardController extends Gdn_Controller {
             $this->addCssFile('admin.css');
             $this->addCssFile('magnific-popup.css');
         }
+        self::$dashbordNav = new DashboardNavModule();
+        $navAdapter = new NestedCollectionAdapter(self::$dashbordNav);
+        $this->EventArguments['SideMenu'] = $navAdapter;
+        $this->fireEvent('GetAppSettingsMenuItems');
 
         $this->MasterView = 'admin';
         parent::initialize();
     }
 
+
     /**
-     * Build and add the Dashboard's side navigation menu.
-     *
-     * EXACT COPY OF VanillaController::addSideMenu(). KEEP IN SYNC.
-     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
-     *
-     * @since 2.0.0
-     * @access public
-     *
+     * @param string $currentUrl
      */
-    public function addSideMenu($currentUrl) {
+    public function setHighlightRoute($currentUrl = '') {
         if (!$currentUrl) {
             $currentUrl = strtolower($this->SelfUrl);
+        }
+        self::$dashbordNav->setHighlightRoute($currentUrl);
+    }
+
+    /**
+     * @param string $currentUrl
+     */
+    public function addSideMenu($currentUrl = '') {
+        deprecated('addSideMenu', 'setHighlightRoute');
+        if ($currentUrl) {
+            $this->setHighlightRoute($currentUrl);
         }
     }
 }

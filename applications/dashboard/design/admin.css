@@ -6550,8 +6550,11 @@ form ol .label {
   left: 2.4375rem;
 }
 
-.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after {
-  left: 3.46875rem;
+.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after,
+.toggle-wrap-active .toggle-slider,
+.toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap
+.toggle-wrap-active input[type="checkbox"] + label::after {
+  left: 1.3125rem;
   transition: left .4s;
 }
 

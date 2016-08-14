@@ -120,7 +120,7 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left drawer">
             <div class="panel-content panel-nav">
                 <div class="js-scroll-to-fixed">
-                    <?php echo anchor($title.' '.dashboardSymbol('external-link'), '/', 'title icon-text'); ?>
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link', '', 'icon-16'), '/', 'title'); ?>
                     <?php echo $dashboardNav; ?>
                 </div>
             </div>

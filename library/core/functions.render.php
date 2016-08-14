@@ -101,7 +101,7 @@ if (!function_exists('popin')) {
  */
 if (!function_exists('icon')) {
     function icon($icon) {
-        if (substr($icon, 0, 1) === '<') {
+        if (substr(trim($icon), 0, 1) === '<') {
             return $icon;
         } else {
         $icon = strtolower($icon);

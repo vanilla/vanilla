@@ -5,7 +5,7 @@
         echo val('text', $trigger);
         ?>
     </div>
-    <div class="dropdown-menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">
+    <div class="dropdown-menu <?php echo val('listCssClass', $this); ?>" aria-labelledby="<?php echo val('triggerId', $this); ?>">
         <?php foreach (val('items', $this) as $item) {
             if (val('type', $item) == 'group') { ?>
                 <div class="dropdown-header">

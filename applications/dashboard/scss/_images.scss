@@ -35,21 +35,31 @@ $checkerboard-foreground: #d8d8d8;
     @include image-wrap($spacer * 3.5, $spacer * 3.5);
   }
 }
+
+
+// icons
+
 .icon {
+  &,
   svg {
-    display: block;
-    fill: $grey-dark;
+    vertical-align: middle;
+    display: inline-block;
   }
 }
 
-.icon-text {
-  @extend .icon;
-  position: relative;
-
+.icon-block {
+  &,
   svg {
-    position: relative;
-    display: inline-block;
-    height: $font-size-base;
-    top: 2px;
+    display: block;
+  }
+}
+
+@each $icon-size in map-keys($icon-sizes) {
+  .icon-#{$icon-size} {
+    &,
+    svg {
+      height: to-rem($icon-size);
+      width: to-rem($icon-size);
+    }
   }
 }

@@ -5750,13 +5750,12 @@ input[type="button"].btn-block {
   background-color: #f8f9fc;
 }
 
-.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .btn-icon-border, .card .list-group-item .search-wrap .icon-wrap, .search-wrap .card .list-group-item .icon-wrap, .card .list-group-item .icon-text {
+.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .btn-icon-border, .card .list-group-item .search-wrap .icon-wrap, .search-wrap .card .list-group-item .icon-wrap {
   float: right;
 }
 
 .card svg {
   position: relative;
-  top: 3px;
   width: 0.875rem;
 }
 
@@ -5806,7 +5805,6 @@ input[type="button"].btn-block {
 
 .card .btn-media-sm svg {
   width: 0.675rem;
-  top: 2px;
 }
 
 .card .btn-media-sm:hover svg {
@@ -6272,7 +6270,7 @@ input[type="button"].btn-block {
   padding: 0.5625rem 0;
 }
 
-.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .btn-icon-border, .ac_results .btn-icon-border, .dropdown-menu .search-wrap .icon-wrap, .search-wrap .dropdown-menu .icon-wrap, .ac_results .search-wrap .icon-wrap, .search-wrap .ac_results .icon-wrap, .dropdown-menu .icon-text, .ac_results .icon-text {
+.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .btn-icon-border, .ac_results .btn-icon-border, .dropdown-menu .search-wrap .icon-wrap, .search-wrap .dropdown-menu .icon-wrap, .ac_results .search-wrap .icon-wrap, .search-wrap .ac_results .icon-wrap {
   margin-right: 0.28125rem;
 }
 
@@ -7378,20 +7376,51 @@ label[id^=iCheck] {
   }
 }
 
-.icon svg, .btn-icon svg, .btn-icon-border svg, .search-wrap .icon-wrap svg, .icon-text svg {
-  display: block;
-  fill: #555a62;
-}
-
-.icon-text {
-  position: relative;
-}
-
-.icon-text svg {
-  position: relative;
+.icon, .btn-icon, .btn-icon-border, .search-wrap .icon-wrap,
+.icon svg, .btn-icon svg, .btn-icon-border svg, .search-wrap .icon-wrap svg {
+  vertical-align: middle;
   display: inline-block;
-  height: 0.875rem;
-  top: 2px;
+}
+
+.icon-block,
+.icon-block svg {
+  display: block;
+}
+
+.icon-9,
+.icon-9 svg {
+  height: 0.5625rem;
+  width: 0.5625rem;
+}
+
+.icon-12,
+.icon-12 svg {
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.icon-16,
+.icon-16 svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.icon-24,
+.icon-24 svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.icon-30,
+.icon-30 svg {
+  height: 1.875rem;
+  width: 1.875rem;
+}
+
+.icon-48,
+.icon-48 svg {
+  height: 3rem;
+  width: 3rem;
 }
 
 .media {
@@ -7640,6 +7669,10 @@ button.close, button.Close {
 
 .panel-nav a {
   color: #949aa2;
+}
+
+.panel-nav svg {
+  fill: #949aa2;
 }
 
 .panel-nav .badge {
@@ -7950,7 +7983,7 @@ button.close, button.Close {
   cursor: pointer;
 }
 
-.navbar-profile .icon, .navbar-profile .btn-icon, .navbar-profile .btn-icon-border, .navbar-profile .search-wrap .icon-wrap, .search-wrap .navbar-profile .icon-wrap, .navbar-profile .icon-text {
+.navbar-profile .icon, .navbar-profile .btn-icon, .navbar-profile .btn-icon-border, .navbar-profile .search-wrap .icon-wrap, .search-wrap .navbar-profile .icon-wrap {
   opacity: .75;
 }
 
@@ -7972,7 +8005,6 @@ button.close, button.Close {
 
 .btn-navbar svg {
   position: relative;
-  top: 2px;
   fill: #fff;
   width: 0.675rem;
 }
@@ -9338,16 +9370,6 @@ form h2 {
 .SpFlyoutHandle,
 .DropHandle {
   border-top-color: rgba(85, 90, 98, 0.6);
-}
-
-.icon, .btn-icon, .btn-icon-border, .search-wrap .icon-wrap, .icon-text {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.icon-16 {
-  height: 16px;
-  width: 16px;
 }
 
 .bigcrumbs {

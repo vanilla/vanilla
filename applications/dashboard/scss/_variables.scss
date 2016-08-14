@@ -256,6 +256,16 @@ $grid-breakpoints: (
   xl: 1200px
 ) !default;
 
+
+$icon-sizes: (
+  9: 9,
+  12: 12,
+  16: 16,
+  24: 24,
+  30: 30,
+  48: 48
+);
+
 // Dropdowns
 $dropdown-font-size: 14px !default;
 $dropdown-min-width: 180px !default;
@@ -302,7 +312,6 @@ $alert-border-radius:            0;
 //Drawer
 
 $drawer-width:                   222px;
-
 
 $modal-inner-padding:            to-rem(18);
 

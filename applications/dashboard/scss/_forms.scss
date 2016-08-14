@@ -282,7 +282,7 @@ $toggle-width: $toggle-height * 2;
 }
 
 .toggle-slider-active {
-  left: $toggle-width - ($toggle-slider-width / 2) - ($toggle-slider-padding / 2);
+  left: ($toggle-width / 2) - ($toggle-slider-width / 2);
   transition: left .4s;
 }
 
@@ -296,7 +296,8 @@ $toggle-width: $toggle-height * 2;
   }
 }
 
-.InProgress {
+.InProgress,
+.toggle-wrap-active {
   .toggle-slider {
     @extend .toggle-slider-active;
   }

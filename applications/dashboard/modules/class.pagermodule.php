@@ -449,6 +449,7 @@ class PagerModule extends Gdn_Module {
         $Pager->LessCode = val('LessCode', $Options, $Pager->LessCode);
 
         $Pager->ClientID = val('ClientID', $Options, $Pager->ClientID);
+        $Pager->CssClass = val('CssClass', $Options, 'Pager');
 
         $Pager->Limit = val('Limit', $Options, $Pager->Controller()->data('_Limit', $Pager->Limit));
         $Pager->HtmlBefore = val('HtmlBefore', $Options, val('HtmlBefore', $Pager, ''));

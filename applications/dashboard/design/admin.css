@@ -6373,16 +6373,6 @@ input[type="button"].btn-block {
   justify-content: space-between;
 }
 
-.list-reset label,
-.list-reset .label,
-.list-reset ul label,
-.list-reset ul .label,
-.list-reset ol label,
-.list-reset ol .label {
-  font-weight: 500;
-  margin-bottom: 0;
-}
-
 form ul,
 form ul ul,
 form ul ol,
@@ -6399,10 +6389,8 @@ form ol li {
   justify-content: space-between;
 }
 
-form ul label,
-form ul .label,
-form ol label,
-form ol .label {
+label,
+.label {
   font-weight: 500;
   margin-bottom: 0;
 }
@@ -6632,6 +6620,7 @@ form ol .label {
 
 select.form-control, select.ac_input {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
+  padding-right: 2rem;
 }
 
 select {
@@ -6648,6 +6637,7 @@ select {
   background-image: none \9;
   background-size: 8px 10px;
   border: 0.0625rem solid #ccc;
+  border-radius: 0.125rem;
   -moz-appearance: none;
   -webkit-appearance: none;
 }
@@ -6683,16 +6673,6 @@ select + select {
   list-style: none;
   -ms-flex-pack: justify;
   justify-content: space-between;
-}
-
-.label-selector label, .emojiext-list label,
-.LayoutOptions label,
-.HomeOptions label,
-.label-selector .label, .emojiext-list .label,
-.LayoutOptions .label,
-.HomeOptions .label {
-  font-weight: 500;
-  margin-bottom: 0;
 }
 
 .label-selector label, .emojiext-list label,
@@ -7272,6 +7252,29 @@ label[id^=iCheck] {
   border-top: 0.375em solid;
   border-right: 0.375em solid transparent;
   border-left: 0.375em solid transparent;
+}
+
+.flex {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.flex.flex-wrap {
+  max-width: 100%;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.flex > * {
+  margin-right: 0.28125rem;
+}
+
+.flex > *:last-child {
+  margin-right: 0;
 }
 
 .imagewrap-table {
@@ -8104,12 +8107,6 @@ button.close, button.Close {
   list-style: none;
   -ms-flex-pack: justify;
   justify-content: space-between;
-}
-
-.panel-right ul label,
-.panel-right ul .label {
-  font-weight: 500;
-  margin-bottom: 0;
 }
 
 .panel-right li {
@@ -9229,12 +9226,6 @@ form h2 {
   list-style: none;
   -ms-flex-pack: justify;
   justify-content: space-between;
-}
-
-.ac_results label,
-.ac_results .label {
-  font-weight: 500;
-  margin-bottom: 0;
 }
 
 .Overlay {

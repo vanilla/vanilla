@@ -16,12 +16,6 @@
     list-style: none;
     justify-content: space-between;
   }
-
-  label,
-  .label {
-    font-weight: 500;
-    margin-bottom: 0;
-  }
 }
 
 
@@ -49,6 +43,12 @@ form {
   ol {
     @include list-reset();
   }
+}
+
+label,
+.label {
+  font-weight: 500;
+  margin-bottom: 0;
 }
 
 .form-control {
@@ -448,6 +448,7 @@ $toggle-width: $toggle-height * 2;
 
 select.form-control {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
+  padding-right: 2rem;
 }
 
 select {
@@ -464,6 +465,7 @@ select {
   background-image: none \9;
   background-size: 8px 10px;
   border: $input-btn-border-width solid $input-border-color;
+  border-radius: $border-radius;
   // Use vendor prefixes as `appearance` isn't part of the CSS spec.
   -moz-appearance: none;
   -webkit-appearance: none;

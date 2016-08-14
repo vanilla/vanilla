@@ -6263,12 +6263,17 @@ input[type="button"].btn-block {
   border-top: 0.0625rem solid #f4f4f5;
 }
 
-.dropdown-menu, .ac_results {
-  margin: 0;
-}
-
 .dropdown-toggle {
   border-radius: 0;
+  cursor: pointer;
+}
+
+.dropdown-menu, .ac_results {
+  padding: 0.5625rem 0;
+}
+
+.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .btn-icon-border, .ac_results .btn-icon-border, .dropdown-menu .search-wrap .icon-wrap, .search-wrap .dropdown-menu .icon-wrap, .ac_results .search-wrap .icon-wrap, .search-wrap .ac_results .icon-wrap, .dropdown-menu .icon-text, .ac_results .icon-text {
+  margin-right: 0.28125rem;
 }
 
 .footer {
@@ -9255,8 +9260,6 @@ form h2 {
 .dd-item .options {
   float: right;
   fill: rgba(85, 90, 98, 0.6);
-  margin-top: -7px;
-  margin-right: -6px;
 }
 
 .dd-item .OptionsTitle {

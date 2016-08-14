@@ -66,6 +66,7 @@ EOT;
 
 function writeCategoryOptions($category) {
     $cdd = new DropdownModule('');
+    $cdd->setView('dropdown-twbs');
 
     $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'span')
         ->setForceDivider(true);

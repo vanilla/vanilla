@@ -62,7 +62,6 @@ class DbaController extends DashboardController {
         }
 
         $this->setData('Title', t('Recalculate Counts'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -82,7 +81,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix missing permission records after import");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -100,7 +98,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix category tree from an import.");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -120,7 +117,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix url codes for $Table.$Column");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -155,7 +151,6 @@ class DbaController extends DashboardController {
         }
 
         $this->setData('Title', t('Fix Invalid InsertUserID'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -172,7 +167,6 @@ class DbaController extends DashboardController {
             }
         }
 
-        $this->addSideMenu();
         $this->render();
     }
 
@@ -189,7 +183,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', 'Reset all role permissions');
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 

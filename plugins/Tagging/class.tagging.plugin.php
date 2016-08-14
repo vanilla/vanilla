@@ -672,7 +672,7 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
         $Sender->title('Tagging');
-        $Sender->addSideMenu('settings/tagging');
+        $Sender->setHighlightRoute('settings/tagging');
         $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
         $SQL = Gdn::sql();
 

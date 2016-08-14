@@ -70,7 +70,7 @@ class SettingsController extends DashboardController {
         $this->addJsFile('addons.js');
         $this->addJsFile('applications.js');
         $this->title(t('Applications'));
-        $this->addSideMenu('dashboard/settings/applications');
+        $this->setHighlightRoute('dashboard/settings/applications');
 
         // Validate & set parameters
         $Session = Gdn::session();
@@ -148,7 +148,7 @@ class SettingsController extends DashboardController {
      */
     public function avatars() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/settings/avatars');
+        $this->setHighlightRoute('dashboard/settings/avatars');
         $this->addJsFile('avatars.js');
         $this->title(t('Avatars'));
 
@@ -195,7 +195,7 @@ class SettingsController extends DashboardController {
      */
     public function defaultAvatar() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/settings/avatars');
+        $this->setHighlightRoute('dashboard/settings/avatars');
         $this->title(t('Default Avatar'));
         $this->addJsFile('avatars.js');
 
@@ -318,7 +318,7 @@ class SettingsController extends DashboardController {
      */
     public function banner() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/settings/banner');
+        $this->setHighlightRoute('dashboard/settings/banner');
         $this->title(t('Banner'));
 
         $Validation = new Gdn_Validation();
@@ -473,7 +473,6 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->addSideMenu();
         $this->title(t('Banning Options'));
         $this->addJsFile('bans.js');
 
@@ -535,7 +534,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->addSideMenu('dashboard/settings/homepage');
+        $this->setHighlightRoute('dashboard/settings/homepage');
         $this->title(t('Homepage'));
 
         $CurrentRoute = val('Destination', Gdn::router()->getRoute('DefaultController'), '');
@@ -607,7 +606,7 @@ class SettingsController extends DashboardController {
      */
     public function email() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/email');
+        $this->setHighlightRoute('dashboard/settings/email');
         $this->addJsFile('email.js');
         $this->title(t('Outgoing Email'));
 
@@ -675,7 +674,7 @@ class SettingsController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/emailstyles');
+        $this->setHighlightRoute('dashboard/settings/emailstyles');
         $this->addJsFile('email.js');
         // Get the current logo.
         $image = c('Garden.EmailTemplate.Image');
@@ -776,7 +775,7 @@ class SettingsController extends DashboardController {
         if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
             throw permissionException();
         }
-        $this->addSideMenu('dashboard/settings/email');
+        $this->setHighlightRoute('dashboard/settings/email');
         $this->Form = new Gdn_Form();
         $validation = new Gdn_Validation();
         $configurationModel = new Gdn_ConfigurationModel($validation);
@@ -870,7 +869,7 @@ class SettingsController extends DashboardController {
             throw permissionException();
         }
         $this->addJsFile('email.js');
-        $this->addSideMenu('dashboard/settings/email');
+        $this->setHighlightRoute('dashboard/settings/email');
         $image = c('Garden.EmailTemplate.Image');
         $this->Form = new Gdn_Form();
         $validation = new Gdn_Validation();
@@ -934,7 +933,7 @@ class SettingsController extends DashboardController {
         $this->RequiredAdminPermissions[] = 'Garden.Users.Approve';
         $this->fireEvent('DefineAdminPermissions');
         $this->permission($this->RequiredAdminPermissions, false);
-        $this->addSideMenu('dashboard/settings');
+        $this->setHighlightRoute('dashboard/settings');
 
         $UserModel = Gdn::userModel();
 
@@ -1004,7 +1003,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         $this->title(t('Locales'));
-        $this->addSideMenu('dashboard/settings/locales');
+        $this->setHighlightRoute('dashboard/settings/locales');
         $this->addJsFile('addons.js');
 
         $LocaleModel = new LocaleModel();
@@ -1103,7 +1102,7 @@ class SettingsController extends DashboardController {
         // Page setup
         $this->addJsFile('addons.js');
         $this->title(t('Plugins'));
-        $this->addSideMenu('dashboard/settings/plugins');
+        $this->setHighlightRoute('dashboard/settings/plugins');
 
         // Validate and set properties
         $Session = Gdn::session();
@@ -1161,7 +1160,7 @@ class SettingsController extends DashboardController {
      */
     public function registration($RedirectUrl = '') {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/registration');
+        $this->setHighlightRoute('dashboard/settings/registration');
 
         $this->addJsFile('registration.js');
         $this->title(t('Registration'));
@@ -1350,7 +1349,7 @@ class SettingsController extends DashboardController {
 
         try {
             $this->addJsFile('addons.js');
-            $this->addSideMenu('dashboard/settings/themeoptions');
+            $this->setHighlightRoute('dashboard/settings/themeoptions');
 
             $ThemeManager = Gdn::themeManager();
             $this->setData('ThemeInfo', $ThemeManager->enabledThemeInfo());
@@ -1412,7 +1411,7 @@ class SettingsController extends DashboardController {
 
         try {
             $this->addJsFile('addons.js');
-            $this->addSideMenu('dashboard/settings/mobilethemeoptions');
+            $this->setHighlightRoute('dashboard/settings/mobilethemeoptions');
 
             $ThemeManager = Gdn::themeManager();
             $EnabledThemeName = $ThemeManager->mobileTheme();
@@ -1480,7 +1479,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Themes'));
 
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/themes');
+        $this->setHighlightRoute('dashboard/settings/themes');
 
         $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
@@ -1548,7 +1547,7 @@ class SettingsController extends DashboardController {
         $this->setData('Title', t('Mobile Themes'));
 
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/settings/themes');
+        $this->setHighlightRoute('dashboard/settings/themes');
 
         // Get currently enabled theme.
         $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
@@ -1788,7 +1787,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         $this->setData('Title', t('Getting Started'));
-        $this->addSideMenu('dashboard/settings/gettingstarted');
+        $this->setHighlightRoute('dashboard/settings/gettingstarted');
 
         Gdn_Theme::section('Tutorials');
         $this->render();
@@ -1801,7 +1800,7 @@ class SettingsController extends DashboardController {
      */
     public function tutorials($Tutorial = '') {
         $this->setData('Title', t('Help &amp; Tutorials'));
-        $this->addSideMenu('dashboard/settings/tutorials');
+        $this->setHighlightRoute('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
         Gdn_Theme::section('Tutorials');
         $this->render();

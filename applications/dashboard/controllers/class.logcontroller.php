@@ -200,7 +200,7 @@ class LogController extends DashboardController {
         }
 
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('dashboard/log/edits');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render();
     }
 
@@ -236,7 +236,7 @@ class LogController extends DashboardController {
         }
 
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('dashboard/log/edits');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render();
     }
 
@@ -275,7 +275,7 @@ class LogController extends DashboardController {
         }
 
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('dashboard/log/edits');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render('record');
     }
 
@@ -342,7 +342,7 @@ class LogController extends DashboardController {
         }
 
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('dashboard/log/moderation');
+        $this->setHighlightRoute('dashboard/log/moderation');
         $this->render();
     }
 
@@ -440,7 +440,7 @@ class LogController extends DashboardController {
         }
 
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('dashboard/log/spam');
+        $this->setHighlightRoute('dashboard/log/spam');
         $this->render();
     }
 }

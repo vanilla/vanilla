@@ -184,7 +184,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 
-        $Sender->addSideMenu();
+        
         $Sender->setData('Title', t('Syntax Prettifier Settings'));
         $Cf->renderAll();
     }

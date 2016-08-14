@@ -110,7 +110,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         }
 
-        $this->addSideMenu('vanilla/settings/advanced');
+        $this->setHighlightRoute('vanilla/settings/advanced');
         $this->addJsFile('settings.js');
         $this->title(t('Advanced Forum Settings'));
 
@@ -162,31 +162,26 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Build and add the Dashboard's side navigation menu.
-     *
-     * EXACT COPY OF DashboardController::addSideMenu(). KEEP IN SYNC.
-     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
-     *
-     * @since 2.0.0
-     * @access public
-     *
+     * @param string $currentUrl
      */
-    public function addSideMenu($currentUrl) {
+    public function setHighlightRoute($currentUrl = '') {
         if (!$currentUrl) {
             $currentUrl = strtolower($this->SelfUrl);
         }
+        if (empty(DashboardController::$dashbordNav)) {
+            $dashboardController = new DashboardController();
+            $dashboardController->initialize();
+        }
+        DashboardController::$dashbordNav->setHighlightRoute($currentUrl);
+    }
 
-        // Only add to the assets if this is not a view-only request
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $nav = new DashboardNavModule();
-            $nav->setHighlightRoute($currentUrl);
-            $navAdapter = new NestedCollectionAdapter($nav);
-
-            $this->EventArguments['SideMenu'] = $navAdapter;
-            $this->fireEvent('GetAppSettingsMenuItems');
-
-            // Add the module
-            $this->addModule($nav, 'Panel');
+    /**
+     * @param string $currentUrl
+     */
+    public function addSideMenu($currentUrl = '') {
+        deprecated('addSideMenu', 'setHighlightRoute');
+        if ($currentUrl) {
+            $this->setHighlightRoute($currentUrl);
         }
     }
 
@@ -203,7 +198,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Display options
         $this->title(t('Flood Control'));
         Gdn_Theme::section('Moderation');
-        $this->addSideMenu('vanilla/settings/floodcontrol');
+        $this->setHighlightRoute('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.
         $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
@@ -298,7 +293,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Add Category'));
-        $this->addSideMenu('vanilla/settings/categories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Prep models
         $RoleModel = new RoleModel();
@@ -411,7 +406,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Set up head
         $this->addJsFile('manage-categories.js');
         $this->title(t('Delete Category'));
-        $this->addSideMenu('vanilla/settings/categories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
@@ -577,7 +572,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Edit Category'));
 
-        $this->addSideMenu('vanilla/settings/categories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Make sure the form knows which item we are editing.
         $this->Form->addHidden('CategoryID', $CategoryID);
@@ -649,7 +644,7 @@ class VanillaSettingsController extends Gdn_Controller {
      */
     public function categories($parent = '') {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->addSideMenu('vanilla/settings/categories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Make sure we are reading the categories from the database only.
         $collection = $this->CategoryModel->createCollection(Gdn::sql(), new Gdn_Dirtycache());
@@ -667,7 +662,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         $this->setData('Categories', $categories);
-        
+
         if ($parentID > 0) {
             $ancestors = $collection->getAncestors($parentID, true);
             $this->setData('Ancestors', $ancestors);
@@ -691,7 +686,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->addSideMenu('vanilla/settings/categories');
+        $this->setHighlightRoute('vanilla/settings/categories');
         $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
 
@@ -788,7 +783,7 @@ class VanillaSettingsController extends Gdn_Controller {
      */
     public function categoryDisplayAs() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        
+
         if ($this->Request->isAuthenticatedPostBack(true)) {
             $categoryID = $this->Request->post('CategoryID');
             $displayAs = $this->Request->post('DisplayAs');

@@ -125,7 +125,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
         $sender->fireEvent('DefineAdminPermissions');
         $sender->permission($sender->RequiredAdminPermissions, '', false);
-        $sender->addSideMenu('dashboard/settings');
+        $sender->setHighlightRoute('dashboard/settings');
 
         if (!Gdn_Statistics::checkIsEnabled() && Gdn_Statistics::checkIsLocalhost()) {
             $sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');

@@ -592,8 +592,12 @@ select + select {
 
   .image-wrap {
     position: relative;
-    display: block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
     margin-bottom: $spacer / 2;
+    overflow: hidden;
     @include image-wrap-border(0);
 
     &:hover .overlay {

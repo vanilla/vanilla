@@ -559,6 +559,20 @@
         }
     }
 
+    function themeInit(element) {
+        var aspectRatio = [2, 3];
+        $('.js-themes .image-wrap', element).each(function() {
+            var width = $(this).width();
+            $(this).height(aspectRatio[0] * width / aspectRatio[1])
+        });
+        $(window).resize(function() {
+            $('.js-themes .image-wrap', element).each(function() {
+                var width = $(this).width();
+                $(this).height(aspectRatio[0] * width / aspectRatio[1])
+            });
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target);
         aceInit(e.target);
@@ -570,6 +584,7 @@
         drawerInit(e.target);
         icheckInit(e.target);
         expanderInit(e.target);
+        themeInit(e.target);
 
     });
 

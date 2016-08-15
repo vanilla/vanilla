@@ -1,52 +1,52 @@
 jQuery(document).on('contentLoad', function(e) {
-    SetProfileFormOptions();
+    SetProfileFormOptions($(e.target));
 
     $("select[name='FormType']").change(function() {
-        SetProfileFormOptions();
+        SetProfileFormOptions($('.js-profile-extender-form'));
     });
 });
 
-function SetProfileFormOptions() {
-    $("[name='Required']").prop('disabled', false);
-    $("[name='OnRegister']").prop('disabled', false);
-    $("[name='OnProfile']").prop('disabled', false);
-    switch ($("select[name='FormType']").val()) {
+function SetProfileFormOptions($element) {
+    $("[name='Required']", $element).prop('disabled', false);
+    $("[name='OnRegister']", $element).prop('disabled', false);
+    $("[name='OnProfile']", $element).prop('disabled', false);
+    switch ($("select[name='FormType']", $element).val()) {
         case 'Dropdown':
-            $('.Label').slideDown('fast');
-            $('.Options').slideDown('fast');
-            $('.ShowOnProfiles').slideDown('fast');
+            $('.js-label', $element).slideDown('fast');
+            $('.js-options', $element).slideDown('fast');
+            $('.js-show-on-profiles', $element).slideDown('fast');
             break;
         case 'DateOfBirth':
-            $('.Label').slideUp('fast');
-            $('.Options').slideUp('fast');
-            $('.ShowOnProfiles').slideDown('fast');
+            $('.js-label', $element).slideUp('fast');
+            $('.js-options', $element).slideUp('fast');
+            $('.js-show-on-profiles', $element).slideDown('fast');
             break;
         case 'CheckBox':
-            $('.Label').slideDown('fast');
-            $('.Options').slideUp('fast');
-            $('.ShowOnProfiles').slideUp('fast');
-            $("[name='OnProfile']").prop('checked', false);
-            $("[name='OnProfile']").prop('disabled', true);
+            $('.js-label', $element).slideDown('fast');
+            $('.js-options', $element).slideUp('fast');
+            $('.js-show-on-profiles', $element).slideUp('fast');
+            $("[name='OnProfile']", $element).prop('checked', false);
+            $("[name='OnProfile']", $element).prop('disabled', true);
 
-            if (!$("[name='Required']").prop('checked')) {
-                $("[name='Required']").trigger('inputChecked');
-                $("[name='Required']").prop('checked', true);
+            if (!$("[name='Required']", $element).prop('checked')) {
+                $("[name='Required']", $element).trigger('inputChecked');
+                $("[name='Required']", $element).prop('checked', true);
             }
-            $("[name='Required']").trigger('inputDisabled');
-            $("[name='Required']").prop('disabled', true);
+            $("[name='Required']", $element).trigger('inputDisabled');
+            $("[name='Required']", $element).prop('disabled', true);
 
-            if (!$("[name='OnRegister']").prop('checked')) {
-                $("[name='OnRegister']").trigger('inputChecked');
-                $("[name='OnRegister']").prop('checked', true);
+            if (!$("[name='OnRegister']", $element).prop('checked')) {
+                $("[name='OnRegister']", $element).trigger('inputChecked');
+                $("[name='OnRegister']", $element).prop('checked', true);
             }
-            $("[name='OnRegister']").trigger('inputDisabled');
-            $("[name='OnRegister']").prop('disabled', true);
+            $("[name='OnRegister']", $element).trigger('inputDisabled');
+            $("[name='OnRegister']", $element).prop('disabled', true);
 
             break;
         default:
-            $('.Label').slideDown('fast');
-            $('.Options').slideUp('fast');
-            $('.ShowOnProfiles').slideDown('fast');
+            $('.js-label', $element).slideDown('fast');
+            $('.js-options', $element).slideUp('fast');
+            $('.js-show-on-profiles', $element).slideDown('fast');
             break;
     }
 }

@@ -122,10 +122,12 @@ class Gdn_Smarty {
             'checkPermission',
             'inSection',
             'inCategory',
+            'ismobile',
             'multiCheckPermission',
             'getValue',
             'setValue',
-            'url'
+            'url',
+            'useragenttype'
         ]));
 
         $security->php_modifiers = array_merge(

@@ -165,34 +165,27 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if (c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_APPLICANT),
-            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
-    }
 
-    if (c('Garden.Registration.DefaultRoles')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_MEMBER),
-            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.DefaultRoles');
-    }
+    // Mapping of legacy config keys to new role types.
+    $legacyRoleConfig = [
+        'Garden.Registration.ApplicantRoleID' => RoleModel::TYPE_APPLICANT,
+        'Garden.Registration.ConfirmEmailRole' => RoleModel::TYPE_UNCONFIRMED,
+        'Garden.Registration.DefaultRoles' => RoleModel::TYPE_MEMBER
+    ];
 
-    if (c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_UNCONFIRMED),
-            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+    // Loop through our old config values and update their associated roles with the proper type.
+    foreach ($legacyRoleConfig as $roleConfig => $roleType) {
+        if (c($roleConfig) && !empty($types[$roleType])) {
+            $SQL->update('Role')
+                ->set('Type', $roleType)
+                ->whereIn('RoleID', $types[$roleType])
+                ->put();
+
+            if (!$captureOnly) {
+                // No need for this anymore.
+                removeFromConfig($roleConfig);
+            }
+        }
     }
 
     $guestRoleIDs = Gdn::sql()->getWhere('UserRole', array('UserID' => 0))->resultArray();

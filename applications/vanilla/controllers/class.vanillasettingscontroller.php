@@ -546,9 +546,8 @@ class VanillaSettingsController extends Gdn_Controller {
      * Editing a category.
      *
      * @since 2.0.0
-     * @access public
-     *
-     * @param int $CategoryID Unique ID of the category to be updated.
+     * @param int|string $CategoryID Unique ID of the category to be updated.
+     * @throws Exception when category cannot be found.
      */
     public function editCategory($CategoryID = '') {
         // Check permission
@@ -559,6 +558,13 @@ class VanillaSettingsController extends Gdn_Controller {
         $PermissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
+        $displayAsOptions = [
+            'Discussions' => 'Discussions',
+            'Categories' => 'Nested Categories',
+            'Flat' => 'Flat Categories',
+            'Heading' => 'Heading'
+        ];
+
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
                 $CategoryID = $ID;
@@ -566,11 +572,18 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get category data
-        $this->Category = $this->CategoryModel->getID($CategoryID);
+        $this->Category = CategoryModel::categories($CategoryID);
         if (!$this->Category) {
             throw notFoundException('Category');
         }
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
+
+        // Restrict "Display As" types based on parent.
+        $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);
+        $parentDisplay = val('DisplayAs', $parentCategory);
+        if ($parentDisplay === 'Flat') {
+            unset($displayAsOptions['Heading']);
+        }
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
@@ -613,6 +626,10 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
+            if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
+                $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
+            }
+
             if ($this->Form->save()) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);
@@ -640,6 +657,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }
 
@@ -716,6 +734,45 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->render();
     }
 
+    /**
+     * Move a category to a different parent.
+     *
+     * @param int $categoryID Unique ID for the category to move.
+     * @throws Exception if category is not found.
+     */
+    public function moveCategory($categoryID) {
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
+        $category = CategoryModel::categories($categoryID);
+
+        if (!$category) {
+            throw notFoundException();
+        }
+
+        $this->Form->setModel($this->CategoryModel);
+        $this->Form->addHidden('CategoryID', $categoryID);
+        $this->setData('Category', $category);
+
+        $parentCategories = CategoryModel::getAncestors($categoryID);
+        array_pop($parentCategories);
+        if (!empty($parentCategories)) {
+            $this->setData('ParentCategories', array_column($parentCategories, 'Name', 'CategoryID'));
+        }
+
+        if ($this->Form->authenticatedPostBack()) {
+            // Verify we're only attempting to save specific values.
+            $this->Form->formValues([
+                'CategoryID' => $this->Form->getValue('CategoryID'),
+                'ParentCategoryID' => $this->Form->getValue('ParentCategoryID'),
+            ]);
+            $this->Form->save();
+        } else {
+            $this->Form->setData($category);
+        }
+
+        $this->render();
+    }
 
     /**
      * Enable or disable the use of categories in Vanilla.

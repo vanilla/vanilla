@@ -641,8 +641,58 @@ class CategoryModel extends Gdn_Model {
     public function getChildTree($id, $depth = 3, $permission = 'PermsDiscussionsView') {
         $category = $this->getOne($id);
 
-        return $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        $tree = $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        self::filterChildren($tree);
+        return $tree;
     }
+
+    /**
+     * @param int|string $id The parent category ID or slug.
+     * @param int|bool $offset
+     * @param int|bool $limit
+     * @return array
+     */
+    public function getTreeAsFlat($id, $offset = null, $limit = null) {
+        $categoryTree = $this->getWhere(
+            [
+                'DisplayAs <>' => 'Heading',
+                'ParentCategoryID' => $id
+            ],
+            'DateInserted',
+            'desc',
+            $limit,
+            $offset
+        )->resultArray();
+        self::calculateData($categoryTree);
+        self::joinUserData($categoryTree);
+
+        foreach ($categoryTree as &$category) {
+            // Fix the depth to be relative, not global.
+            $category['Depth'] = 1;
+
+            // We don't have children, but trees are expected to have this key.
+            $category['Children'] = [];
+        }
+
+        return $categoryTree;
+    }
+
+    /**
+     * Recursively remove children from categories configured to display as "Categories" or "Flat".
+     *
+     * @param array $categories
+     * @param string $childField
+     */
+    public static function filterChildren(&$categories, $childField = 'Children') {
+        foreach ($categories as &$category) {
+            $children = &$category[$childField];
+            if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
+                    $children = [];
+                } elseif (!empty($children)) {
+                    static::filterChildren($children);
+                }
+         }
+      }
 
     /**
      * Filter a category tree to only the followed categories.
@@ -1496,8 +1546,13 @@ class CategoryModel extends Gdn_Model {
         if ($parent === null) {
             return [];
         }
-        $categories = self::instance()->collection->getTree($parent['CategoryID'], 10, '');
-        $categories = self::instance()->flattenTree($categories);
+
+        if (val('DisplayAs', $parent) === 'Flat') {
+            $categories = self::instance()->getTreeAsFlat($parent['CategoryID']);
+        } else {
+            $categories = self::instance()->collection->getTree($parent['CategoryID'], 10, '');
+            $categories = self::instance()->flattenTree($categories);
+        }
 
         if ($includeParent) {
             $parent['Depth'] = 1;

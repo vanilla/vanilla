@@ -49,7 +49,7 @@ $Construct->PrimaryKey('CategoryID')
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')
-    ->column('DisplayAs', array('Categories', 'Discussions', 'Heading', 'Default'), 'Default')
+    ->column('DisplayAs', array('Categories', 'Discussions', 'Flat', 'Heading', 'Default'), 'Discussions')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DateInserted', 'datetime')

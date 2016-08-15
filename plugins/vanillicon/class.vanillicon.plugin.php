@@ -74,7 +74,7 @@ class VanilliconPlugin extends Gdn_Plugin {
             'Control' => 'radiolist',
             'Description' => 'Which vanillicon set do you want to use?',
             'Items' => $items,
-            'Options' => array('list' => true, 'listclass' => 'icon-list', 'display' => 'after'),
+            'Options' => array('display' => 'after'),
             'Default' => 'v1'
          )
         ));

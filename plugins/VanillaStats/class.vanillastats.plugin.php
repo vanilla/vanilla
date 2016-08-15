@@ -179,7 +179,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->orderBy('d.CountViews', 'desc')
             ->orderBy('d.CountComments', 'desc')
             ->orderBy('d.CountBookmarks', 'desc')
-            ->limit(10, 0)
+            ->limit(5, 0)
             ->get());
 
         // Load the most active users during this date range
@@ -192,7 +192,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->where('c.DateInserted >=', $range['from'])
             ->where('c.DateInserted <=', $range['to'])
             ->orderBy('CountComments', 'desc')
-            ->limit(10, 0)
+            ->limit(5, 0)
             ->get());
 
         // Render the custom dashboard view

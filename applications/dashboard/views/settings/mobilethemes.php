@@ -26,9 +26,9 @@ Gdn_Theme::assetBegin('Help'); ?>
     <?php
     $PreviewUrl = $this->data('EnabledTheme.MobileScreenshotUrl', false); ?>
     <div class="media-left grid-item">
-        <div class="mobile-wrap">
+        <div class="mobile-theme-wrap">
             <div class="mobile-frame">
-                <svg class="icon icon-48 icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
+                <svg class="icon icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
             </div>
             <div class="image-wrap">
                 <?php
@@ -173,9 +173,9 @@ Gdn_Theme::assetBegin('Help'); ?>
                 <!--<div class="author-name">
                <?php echo $Author; ?>
             </div>-->
-                <div class="mobile-wrap">
+                <div class="mobile-theme-wrap">
                     <div class="mobile-frame">
-                        <svg class="icon icon-48 icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
+                        <svg class="icon icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
                     </div>
                     <div class="image-wrap">
                     <?php echo $PreviewImageHtml; ?>

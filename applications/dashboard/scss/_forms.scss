@@ -592,12 +592,8 @@ select + select {
 
   .image-wrap {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+    display: block;
     margin-bottom: $spacer / 2;
-    overflow: hidden;
     @include image-wrap-border(0);
 
     &:hover .overlay {
@@ -655,7 +651,31 @@ select + select {
   }
 }
 
-.mobile-wrap {
+.theme-wrap {
+  position: relative;
+  margin-bottom: $spacer / 2;
+
+  .image-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    @include image-wrap-border(0);
+
+    .label-selector-image {
+      flex-shrink: 0;
+      min-width: 100%;
+      min-height: 100%;
+    }
+  }
+}
+
+.mobile-theme-wrap {
   position: relative;
   overflow: hidden;
   margin-bottom: $spacer / 2;

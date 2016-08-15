@@ -120,7 +120,7 @@ $themePlaceholder = asset('applications/dashboard/design/images/theme-placeholde
     </div>
 </div>
 <?php if (count($this->data('AvailableThemes', array())) > 1) { ?>
-    <div class="BrowseThemes">
+    <div class="BrowseThemes js-themes">
         <ul class="label-selector">
             <?php
             foreach ($this->data('AvailableThemes') as $ThemeName => $ThemeInfo) {

@@ -6861,8 +6861,15 @@ select + select {
 .LayoutOptions .image-wrap,
 .HomeOptions .image-wrap {
   position: relative;
-  display: block;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-align: center;
+  align-items: center;
+  width: 100%;
   margin-bottom: 0.5625rem;
+  overflow: hidden;
 }
 
 .label-selector .image-wrap::after, .emojiext-list .image-wrap::after,

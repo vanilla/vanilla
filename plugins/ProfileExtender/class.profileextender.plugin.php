@@ -40,7 +40,9 @@ $PluginInfo['ProfileExtender'] = array(
 class ProfileExtenderPlugin extends Gdn_Plugin {
 
     public function base_render_before($sender) {
-        $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        }
     }
 
     /** @var array */

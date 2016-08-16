@@ -702,7 +702,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param DashboardNavModule $sender
      */
     public function dashboardNavModule_init_handler($sender) {
-        $sort = -1;
+        $sort = -1; // Ensure these items go before any plugin items.
 
         $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/categories', 'forum.manage-categories', 'nav-manage-categories', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)

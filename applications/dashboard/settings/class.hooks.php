@@ -192,7 +192,7 @@ class DashboardHooks implements Gdn_IPlugin {
         $themeOptionsName = c('Garden.ThemeOptions.Name');
         $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
 
-        $sort = -1;
+        $sort = -1; // Ensure these nav items come before any plugin nav items.
 
         $nav->addGroupToSection('Moderation', t('Site'), 'site')
             ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Messages'), '/dashboard/message', 'site.messages', '', $sort)

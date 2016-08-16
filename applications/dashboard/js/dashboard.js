@@ -383,6 +383,7 @@
             textarea.hide();
 
             var editor = ace.edit('editor-' + formID);
+            editor.$blockScrolling = Infinity;
             editor.getSession().setMode('ace/mode/' + mode);
             editor.setTheme('ace/theme/clouds');
 

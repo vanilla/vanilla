@@ -14,7 +14,6 @@
 
   li {
     list-style: none;
-    justify-content: space-between;
   }
 }
 
@@ -56,26 +55,6 @@ label,
   padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
   padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
   border: $border-width solid #ccc;
-}
-
-// Quick and dirty horizontal form
-.form-horizontal {
-  li {
-    @extend .form-group;
-    @extend .row;
-
-    > label {
-      @extend .label-wrap;
-    }
-
-    > input {
-      @extend .input-wrap;
-    }
-
-    > select {
-      @extend .input-wrap;
-    }
-  }
 }
 
 // Forms

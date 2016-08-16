@@ -72,10 +72,9 @@ class DashboardController extends Gdn_Controller {
      * @param string $currentUrl
      */
     public function setHighlightRoute($currentUrl = '') {
-        if (!$currentUrl) {
-            $currentUrl = strtolower($this->SelfUrl);
+        if ($currentUrl) {
+            self::$dashbordNav->setHighlightRoute($currentUrl);
         }
-        self::$dashbordNav->setHighlightRoute($currentUrl);
     }
 
     /**
@@ -83,8 +82,6 @@ class DashboardController extends Gdn_Controller {
      */
     public function addSideMenu($currentUrl = '') {
         deprecated('addSideMenu', 'setHighlightRoute');
-        if ($currentUrl) {
-            $this->setHighlightRoute($currentUrl);
-        }
+        $this->setHighlightRoute($currentUrl);
     }
 }

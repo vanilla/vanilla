@@ -165,14 +165,13 @@ class VanillaSettingsController extends Gdn_Controller {
      * @param string $currentUrl
      */
     public function setHighlightRoute($currentUrl = '') {
-        if (!$currentUrl) {
-            $currentUrl = strtolower($this->SelfUrl);
+        if ($currentUrl) {
+            if (empty(DashboardController::$dashbordNav)) {
+                $dashboardController = new DashboardController();
+                $dashboardController->initialize();
+            }
+            DashboardController::$dashbordNav->setHighlightRoute($currentUrl);
         }
-        if (empty(DashboardController::$dashbordNav)) {
-            $dashboardController = new DashboardController();
-            $dashboardController->initialize();
-        }
-        DashboardController::$dashbordNav->setHighlightRoute($currentUrl);
     }
 
     /**
@@ -180,9 +179,7 @@ class VanillaSettingsController extends Gdn_Controller {
      */
     public function addSideMenu($currentUrl = '') {
         deprecated('addSideMenu', 'setHighlightRoute');
-        if ($currentUrl) {
-            $this->setHighlightRoute($currentUrl);
-        }
+        $this->setHighlightRoute($currentUrl);
     }
 
     /**

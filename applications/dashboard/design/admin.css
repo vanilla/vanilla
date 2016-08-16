@@ -2734,7 +2734,7 @@ button.list-group-item-danger.current-theme:hover {
   border-radius: 0.25rem;
 }
 
-.form-group, .form-horizontal li {
+.form-group {
   margin-bottom: 1.125rem;
 }
 
@@ -2908,7 +2908,7 @@ input[type="checkbox"].disabled {
 }
 
 @media (min-width: 544px) {
-  .form-inline .form-group, .form-inline .form-horizontal li, .form-horizontal .form-inline li {
+  .form-inline .form-group {
     display: inline-block;
     margin-bottom: 0;
     vertical-align: middle;
@@ -3174,7 +3174,7 @@ input[type="checkbox"].disabled {
   padding-right: 1.125rem;
 }
 
-.row, .footer, .form-horizontal li, .label-selector, .emojiext-list,
+.row, .footer, .label-selector, .emojiext-list,
 .LayoutOptions,
 .HomeOptions, .media {
   display: -ms-flexbox;
@@ -3185,7 +3185,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item:not(.no-grid), .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-horizontal li > .input-wrap, .form-horizontal li.form-group > input, .form-horizontal li > input, .form-horizontal li.form-group > select, .form-horizontal li > select, .form-group > .color-picker, .form-horizontal li > .color-picker, .form-group > .label-wrap, .form-horizontal li > .label-wrap, .form-horizontal li.form-group > label, .form-horizontal li > label, .form-group > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item:not(.no-grid), .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .form-group > .label-wrap-wide, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -3307,7 +3307,7 @@ input[type="checkbox"].disabled {
   flex: 0 0 95.8333333333%;
 }
 
-.col-xs-24, .form-group > .input-wrap, .form-horizontal li > .input-wrap, .form-horizontal li.form-group > input, .form-horizontal li > input, .form-horizontal li.form-group > select, .form-horizontal li > select, .form-group > .color-picker, .form-horizontal li > .color-picker, .form-group > .label-wrap, .form-horizontal li > .label-wrap, .form-horizontal li.form-group > label, .form-horizontal li > label, .form-group > .label-wrap-wide, .form-horizontal li > .label-wrap-wide {
+.col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .form-group > .label-wrap-wide {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
 }
@@ -3512,7 +3512,7 @@ input[type="checkbox"].disabled {
   left: 100%;
 }
 
-.col-xs-offset-0, .form-group > .input-wrap.no-label, .form-horizontal li > .input-wrap.no-label, .form-horizontal li.form-group > input.no-label, .form-horizontal li > input.no-label, .form-horizontal li.form-group > select.no-label, .form-horizontal li > select.no-label, .form-group > .no-label.color-picker, .form-horizontal li > .no-label.color-picker {
+.col-xs-offset-0, .form-group > .input-wrap.no-label, .form-group > .no-label.color-picker {
   margin-left: 0%;
 }
 
@@ -3641,7 +3641,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-sm-8, .form-group > .label-wrap, .form-horizontal li > .label-wrap, .form-horizontal li.form-group > label, .form-horizontal li > label, .form-group > .label-wrap-wide, .form-horizontal li > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid) {
+  .col-sm-8, .form-group > .label-wrap, .form-group > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid) {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -3673,7 +3673,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
-  .col-sm-16, .form-group > .input-wrap, .form-horizontal li > .input-wrap, .form-horizontal li.form-group > input, .form-horizontal li > input, .form-horizontal li.form-group > select, .form-horizontal li > select, .form-group > .color-picker, .form-horizontal li > .color-picker {
+  .col-sm-16, .form-group > .input-wrap, .form-group > .color-picker {
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
@@ -3883,7 +3883,7 @@ input[type="checkbox"].disabled {
   .col-sm-offset-7 {
     margin-left: 29.1666666667%;
   }
-  .col-sm-offset-8, .form-group > .input-wrap.no-label, .form-horizontal li > .input-wrap.no-label, .form-horizontal li.form-group > input.no-label, .form-horizontal li > input.no-label, .form-horizontal li.form-group > select.no-label, .form-horizontal li > select.no-label, .form-group > .no-label.color-picker, .form-horizontal li > .no-label.color-picker {
+  .col-sm-offset-8, .form-group > .input-wrap.no-label, .form-group > .no-label.color-picker {
     margin-left: 33.3333333333%;
   }
   .col-sm-offset-9 {
@@ -6369,8 +6369,6 @@ input[type="button"].btn-block {
 .list-reset ul li,
 .list-reset ol li {
   list-style: none;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
 }
 
 form ul,
@@ -6385,8 +6383,6 @@ form ol ol {
 form ul li,
 form ol li {
   list-style: none;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
 }
 
 label,
@@ -6402,11 +6398,9 @@ label,
   border: 0.0625rem solid #ccc;
 }
 
-.label-wrap img, .form-horizontal li > label img, .label-wrap .LayoutOptions .Sprite, .LayoutOptions .label-wrap .Sprite, .form-horizontal li > label .LayoutOptions .Sprite, .LayoutOptions .form-horizontal li > label .Sprite, .label-wrap
+.label-wrap img, .label-wrap .LayoutOptions .Sprite, .LayoutOptions .label-wrap .Sprite, .label-wrap
 .HomeOptions .Sprite,
-.HomeOptions .label-wrap .Sprite, .form-horizontal li > label
-.HomeOptions .Sprite,
-.HomeOptions .form-horizontal li > label .Sprite {
+.HomeOptions .label-wrap .Sprite {
   max-width: 50%;
   max-height: 200px;
 }
@@ -6426,12 +6420,12 @@ label,
   margin-bottom: 0.28125rem;
 }
 
-.form-group > .label-wrap-wide, .form-horizontal li > .label-wrap-wide {
+.form-group > .label-wrap-wide {
   -ms-flex-positive: 1;
   flex-grow: 1;
 }
 
-.input-wrap > .form-group > *, .form-horizontal li > input > .form-group > *, .form-horizontal li > select > .form-group > *, .color-picker > .form-group > *, .form-horizontal .input-wrap > li > *, .form-horizontal li > input > li > *, .form-horizontal li > select > li > *, .form-horizontal .color-picker > li > * {
+.input-wrap > .form-group > *, .color-picker > .form-group > * {
   padding-left: 0;
 }
 
@@ -6448,15 +6442,15 @@ label,
   display: block;
 }
 
-.row-padding-left, .form-group .input-wrap-right, .form-horizontal li .input-wrap-right {
+.row-padding-left, .form-group .input-wrap-right {
   padding-left: 1.125rem;
 }
 
-.row-padding-right, .form-group .input-wrap-right, .form-horizontal li .input-wrap-right {
+.row-padding-right, .form-group .input-wrap-right {
   padding-right: 1.125rem;
 }
 
-.form-group, .form-horizontal li {
+.form-group {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -6465,7 +6459,7 @@ label,
   align-items: center;
 }
 
-.form-group.row, .form-group.footer, .form-horizontal li, .form-group.label-selector, .form-group.emojiext-list,
+.form-group.row, .form-group.footer, .form-group.label-selector, .form-group.emojiext-list,
 .form-group.LayoutOptions,
 .form-group.HomeOptions, .form-group.media {
   -ms-flex-wrap: wrap;
@@ -6478,7 +6472,7 @@ label,
   margin-bottom: 0;
 }
 
-.form-group.row:first-child, .form-group.footer:first-child, .form-horizontal li:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
+.form-group.row:first-child, .form-group.footer:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
 .form-group.LayoutOptions:first-child,
 .form-group.HomeOptions:first-child, .form-group.media:first-child {
   border-top: 1px dotted #f4f4f5;
@@ -6671,8 +6665,6 @@ select + select {
 .LayoutOptions li,
 .HomeOptions li {
   list-style: none;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
 }
 
 .label-selector label, .emojiext-list label,
@@ -7230,14 +7222,14 @@ label[id^=iCheck] {
   border-bottom-left-radius: 0;
 }
 
-.text-input-button .label-wrap, .text-input-button .form-horizontal li > label, .form-horizontal .text-input-button li > label {
+.text-input-button .label-wrap {
   -ms-flex-negative: 0;
   flex-shrink: 0;
   display: block;
   margin-right: 0.5625rem;
 }
 
-.text-input-button .label-wrap label, .text-input-button .form-horizontal li > label label, .form-horizontal .text-input-button li > label label {
+.text-input-button .label-wrap label {
   line-height: 1;
   margin-bottom: 0;
 }
@@ -7250,17 +7242,11 @@ label[id^=iCheck] {
 .Padded,
 .padded,
 .label-wrap img,
-.form-horizontal li > label img,
 .label-wrap .LayoutOptions .Sprite,
 .LayoutOptions .label-wrap .Sprite,
-.form-horizontal li > label .LayoutOptions .Sprite,
-.LayoutOptions .form-horizontal li > label .Sprite,
 .label-wrap
 .HomeOptions .Sprite,
-.HomeOptions .label-wrap .Sprite,
-.form-horizontal li > label
-.HomeOptions .Sprite,
-.HomeOptions .form-horizontal li > label .Sprite {
+.HomeOptions .label-wrap .Sprite {
   margin: 1.125rem 0;
 }
 
@@ -8144,8 +8130,6 @@ button.close, button.Close {
 
 .panel-right ul li {
   list-style: none;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
 }
 
 .panel-right li {
@@ -8252,15 +8236,11 @@ button.close, button.Close {
   margin-top: -0.0625rem;
 }
 
-.main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .form-horizontal li > label .content > img, .form-horizontal li > label .main .content > img, .main .label-wrap .LayoutOptions .content > .Sprite, .label-wrap .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .label-wrap .content > .Sprite, .LayoutOptions .label-wrap .main .content > .Sprite, .main .form-horizontal li > label .LayoutOptions .content > .Sprite, .form-horizontal li > label .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .form-horizontal li > label .content > .Sprite, .LayoutOptions .form-horizontal li > label .main .content > .Sprite, .main .label-wrap
+.main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .label-wrap .LayoutOptions .content > .Sprite, .label-wrap .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .label-wrap .content > .Sprite, .LayoutOptions .label-wrap .main .content > .Sprite, .main .label-wrap
 .HomeOptions .content > .Sprite, .label-wrap
 .HomeOptions .main .content > .Sprite, .main
 .HomeOptions .label-wrap .content > .Sprite,
-.HomeOptions .label-wrap .main .content > .Sprite, .main .form-horizontal li > label
-.HomeOptions .content > .Sprite, .form-horizontal li > label
-.HomeOptions .main .content > .Sprite, .main
-.HomeOptions .form-horizontal li > label .content > .Sprite,
-.HomeOptions .form-horizontal li > label .main .content > .Sprite,
+.HomeOptions .label-wrap .main .content > .Sprite,
 .main .content .padded-top {
   margin-top: 0.5625rem;
 }
@@ -8889,11 +8869,9 @@ pre {
   min-height: 3.75rem;
 }
 
-.header-block.padded, .label-wrap img.header-block, .form-horizontal li > label img.header-block, .label-wrap .LayoutOptions .header-block.Sprite, .LayoutOptions .label-wrap .header-block.Sprite, .form-horizontal li > label .LayoutOptions .header-block.Sprite, .LayoutOptions .form-horizontal li > label .header-block.Sprite, .label-wrap
+.header-block.padded, .label-wrap img.header-block, .label-wrap .LayoutOptions .header-block.Sprite, .LayoutOptions .label-wrap .header-block.Sprite, .label-wrap
 .HomeOptions .header-block.Sprite,
-.HomeOptions .label-wrap .header-block.Sprite, .form-horizontal li > label
-.HomeOptions .header-block.Sprite,
-.HomeOptions .form-horizontal li > label .header-block.Sprite {
+.HomeOptions .label-wrap .header-block.Sprite {
   margin-bottom: 1.125rem;
 }
 
@@ -8932,11 +8910,9 @@ pre {
   align-items: center;
 }
 
-.header-menu.padded, .label-wrap img.header-menu, .form-horizontal li > label img.header-menu, .label-wrap .LayoutOptions .header-menu.Sprite, .LayoutOptions .label-wrap .header-menu.Sprite, .form-horizontal li > label .LayoutOptions .header-menu.Sprite, .LayoutOptions .form-horizontal li > label .header-menu.Sprite, .label-wrap
+.header-menu.padded, .label-wrap img.header-menu, .label-wrap .LayoutOptions .header-menu.Sprite, .LayoutOptions .label-wrap .header-menu.Sprite, .label-wrap
 .HomeOptions .header-menu.Sprite,
-.HomeOptions .label-wrap .header-menu.Sprite, .form-horizontal li > label
-.HomeOptions .header-menu.Sprite,
-.HomeOptions .form-horizontal li > label .header-menu.Sprite {
+.HomeOptions .label-wrap .header-menu.Sprite {
   margin-bottom: 1.125rem;
 }
 
@@ -9021,6 +8997,39 @@ form h2 {
 .list-unstyled {
   padding-left: 0;
   list-style: none;
+}
+
+.modal .list-un-reset ul, .Overlay > .Popup .list-un-reset ul,
+.modal .list-un-reset ol, .Overlay > .Popup .list-un-reset ol {
+  margin-left: 15px;
+}
+
+.modal .list-un-reset ul li, .Overlay > .Popup .list-un-reset ul li {
+  list-style: disc inside;
+}
+
+.modal .list-un-reset ol li, .Overlay > .Popup .list-un-reset ol li {
+  list-style: decimal inside;
+}
+
+.modal .list-un-reset ul ul, .Overlay > .Popup .list-un-reset ul ul,
+.modal .list-un-reset ol ul, .Overlay > .Popup .list-un-reset ol ul {
+  margin-left: 30px;
+}
+
+.modal .list-un-reset ul ul li, .Overlay > .Popup .list-un-reset ul ul li,
+.modal .list-un-reset ol ul li, .Overlay > .Popup .list-un-reset ol ul li {
+  list-style: circle inside;
+}
+
+.modal .list-un-reset ol ol, .Overlay > .Popup .list-un-reset ol ol,
+.modal .list-un-reset ul ol, .Overlay > .Popup .list-un-reset ul ol {
+  margin-left: 15px;
+}
+
+.modal .list-un-reset ol ol li, .Overlay > .Popup .list-un-reset ol ol li,
+.modal .list-un-reset ul ol li, .Overlay > .Popup .list-un-reset ul ol li {
+  list-style: lower-latin inside;
 }
 
 .Section-Dashboard.Message.index {
@@ -9263,8 +9272,6 @@ form h2 {
 
 .ac_results li {
   list-style: none;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
 }
 
 .Overlay {

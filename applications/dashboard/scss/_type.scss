@@ -257,7 +257,6 @@ form {
   }
 }
 
-
 //.text-control-height {
 //  height: $control-height-rem;
 //  padding: (($control-height-rem - $font-size-base) / 2) 0;
@@ -267,4 +266,35 @@ form {
 
 .list-unstyled {
   @include list-unstyled;
+}
+
+// The modal js wraps the modal body and footer in a form element to place the form buttons in the footer.
+// The side-effect of this is that some non-form elements can be wrapped in a form. This rather inelegant
+// list-un-reset can be applied to any lists appearing in a modal that are not actually part of the form and should
+// have list styling.
+.modal .list-un-reset {
+  ul,
+  ol {
+    margin-left: 15px;
+  }
+  ul li {
+    list-style: disc inside;
+  }
+  ol li {
+    list-style: decimal inside;
+  }
+  ul ul,
+  ol ul {
+    margin-left: 30px;
+    li {
+      list-style: circle inside;
+    }
+  }
+  ol ol,
+  ul ol {
+    margin-left: 15px;
+    li {
+      list-style: lower-latin inside;
+    }
+  }
 }

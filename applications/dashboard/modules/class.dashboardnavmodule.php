@@ -18,6 +18,11 @@ class DashboardNavModule extends SiteNavModule {
     public $view = 'nav-dashboard';
 
     /**
+     * @var DashboardNavModule The dashboard nav instance.
+     */
+    protected static $dashboardNav;
+
+    /**
      * @var array The section info for the dashboard's main nav.
      */
     protected static $sectionsInfo = [
@@ -54,6 +59,16 @@ class DashboardNavModule extends SiteNavModule {
     public function __construct($cssClass = '', $useCssPrefix = true) {
         self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
+    }
+
+    /**
+     * @return DashboardNavModule
+     */
+    public static function getDashboardNav() {
+        if (!isset(self::$dashboardNav)) {
+            self::$dashboardNav = new DashboardNavModule();
+        }
+        return self::$dashboardNav;
     }
 
     /**

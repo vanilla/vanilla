@@ -14,11 +14,6 @@
 class DashboardController extends Gdn_Controller {
 
     /**
-     * @var DashboardNavModule
-     */
-    public static $dashbordNav;
-
-    /**
      * Set PageName.
      *
      * @since 2.0.0
@@ -73,7 +68,7 @@ class DashboardController extends Gdn_Controller {
      */
     public function setHighlightRoute($currentUrl = '') {
         if ($currentUrl) {
-            self::$dashbordNav->setHighlightRoute($currentUrl);
+            DashboardNavModule::getDashboardNav()->setHighlightRoute($currentUrl);
         }
     }
 

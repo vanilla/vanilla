@@ -82,7 +82,7 @@ Gdn_Theme::assetEnd();
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
-        $dashboardNav = DashboardController::$dashbordNav;
+        $dashboardNav = DashboardNavModule::getDashboardNav();
         ?>
         <nav class="nav nav-pills">
             <?php

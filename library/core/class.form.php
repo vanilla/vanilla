@@ -54,7 +54,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'radio' => '',
             'radio-container' => 'radio',
             'smallbutton' => 'btn btn-sm',
-            'textbox' => 'form-control',
+            'textarea' => 'form-control',
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
             'form-group' => 'form-group row',

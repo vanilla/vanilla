@@ -166,11 +166,7 @@ class VanillaSettingsController extends Gdn_Controller {
      */
     public function setHighlightRoute($currentUrl = '') {
         if ($currentUrl) {
-            if (empty(DashboardController::$dashbordNav)) {
-                $dashboardController = new DashboardController();
-                $dashboardController->initialize();
-            }
-            DashboardController::$dashbordNav->setHighlightRoute($currentUrl);
+            DashboardNavModule::getDashboardNav()->setHighlightRoute($currentUrl);
         }
     }
 

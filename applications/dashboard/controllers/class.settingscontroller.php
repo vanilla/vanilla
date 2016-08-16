@@ -834,6 +834,7 @@ class SettingsController extends DashboardController {
             RemoveFromConfig('Garden.EmailTemplate.Image');
             $upload = new Gdn_Upload();
             $upload->delete($image);
+            $this->informMessage(sprintf(t('%s deleted.'), t('Logo')));
         }
 
         $this->render('blank', 'utility', 'dashboard');
@@ -1753,14 +1754,14 @@ class SettingsController extends DashboardController {
      * @access public
      * @param string $transientKey Security token.
      */
-    public function removeDefaultAvatar($transientKey = '') {
-        $session = Gdn::session();
-        if ($session->validateTransientKey($transientKey) && $session->checkPermission('Garden.Community.Manage')) {
+    public function removeDefaultAvatar() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $avatar = c('Garden.DefaultAvatar', '');
             $this->deleteDefaultAvatars($avatar);
             removeFromConfig('Garden.DefaultAvatar');
+            $this->informMessage(sprintf(t('%s deleted.'), t('Avatar')));
         }
-        redirect('dashboard/settings/defaultavatar');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

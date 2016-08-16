@@ -839,6 +839,13 @@ form ul li label.Inline {
   display: inline-block;
 }
 
+.ImageUpload {
+  img {
+    max-width: 100%;
+    max-height: 250px;
+  }
+}
+
 /* FormTable */
 table {
   width: 100%;
@@ -1476,6 +1483,12 @@ body.Home #Content {
 }
 
 /* =================================================================== Popups */
+div.Popup {
+  img {
+    max-width: 100%;
+  }
+}
+
 div.Popup div.Messages {
   text-align: left;
   position: inherit;

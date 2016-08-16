@@ -185,6 +185,8 @@ class AllViewedPlugin extends Gdn_Plugin {
             }
 
             $sender->render('blank', 'utility', 'dashboard');
+        } else {
+            throw new Exception('Requires POST', 405);
         }
     }
 

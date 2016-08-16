@@ -20,7 +20,7 @@ if ($this->data('crop')) {
     <div class="js-new-avatar Button">Upload New Avatar</div>
 <?php
     if ($defaultAvatar) {
-        echo anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/'.Gdn::session()->transientKey(), 'Button');
+        echo anchor(t('Remove Default Avatar'), '/dashboard/settings/removedefaultavatar/', 'btn btn-primary js-hijack js-modal-confirm');
     } ?>
 </div>
 <?php echo $this->Form->close(); ?>

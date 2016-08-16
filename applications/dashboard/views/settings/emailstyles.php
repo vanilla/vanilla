@@ -43,7 +43,7 @@ $Session = Gdn::session();
         ?>
         <?php
         $hideCssClass = $emailImage ? '' : ' Hidden';
-        echo anchor(t('Remove Email Logo'), url('/dashboard/settings/removeemailimage'), 'js-modal-confirm js-hijack btn btn-primary '.$hideCssClass);
+        echo anchor(t('Remove Email Logo'), '/dashboard/settings/removeemailimage', 'js-modal-confirm js-hijack btn btn-primary '.$hideCssClass);
     ?>
     </div>
     <ul>

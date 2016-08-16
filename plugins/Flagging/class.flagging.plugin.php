@@ -24,21 +24,21 @@ $PluginInfo['Flagging'] = array(
 );
 
 class FlaggingPlugin extends Gdn_Plugin {
+
     /**
      * Add Flagging to Dashboard menu.
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
+    public function dashboardNavModule_init_handler($sender) {
         $flaggedItemsResult = Gdn::sql()->select('count(distinct(ForeignURL)) as NumFlaggedItems')
             ->from('Flag fl')
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $LinkText = t('Flagged Content');
         if ($flaggedItemsResult['NumFlaggedItems']) {
-            $LinkText .= ' <span class="Alert">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
+            $LinkText .= ' <span class="badge">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
         }
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddItem('Forum', t('Forum'));
-        $Menu->addLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Moderation.Manage');
+        /** @var DashboardNavModule $sender */
+        $sender->addLinkToSectionIf('Garden.Moderation.Manage', 'Moderation', $LinkText, 'plugin/flagging', 'moderation.flagging');
     }
 
     /**
@@ -136,6 +136,7 @@ class FlaggingPlugin extends Gdn_Plugin {
         }
         unset($FlaggedItems);
 
+        Gdn_Theme::section('Moderation');
         $Sender->render($this->getView('flagging.php'));
     }
 

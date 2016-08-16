@@ -53,10 +53,6 @@ class DashboardController extends Gdn_Controller {
             $this->addCssFile('admin.css');
             $this->addCssFile('magnific-popup.css');
         }
-        self::$dashbordNav = new DashboardNavModule();
-        $navAdapter = new NestedCollectionAdapter(self::$dashbordNav);
-        $this->EventArguments['SideMenu'] = $navAdapter;
-        $this->fireEvent('GetAppSettingsMenuItems');
 
         $this->MasterView = 'admin';
         parent::initialize();

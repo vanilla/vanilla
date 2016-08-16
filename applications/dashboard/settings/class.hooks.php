@@ -41,6 +41,11 @@ class DashboardHooks implements Gdn_IPlugin {
                 }
             }
 
+            // Get our plugin nav items.
+            $navAdapter = new NestedCollectionAdapter(DashboardNavModule::getDashboardNav());
+            $Sender->EventArguments['SideMenu'] = $navAdapter;
+            $Sender->fireEvent('GetAppSettingsMenuItems');
+
             $Sender->removeJsFile('jquery.popup.js');
             $Sender->addJsFile('dashboard.js', 'dashboard');
             $Sender->addJsFile('jquery.expander.js');

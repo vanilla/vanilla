@@ -24,7 +24,7 @@ Gdn_Theme::assetEnd();
         echo $this->Form->errors();
         echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Search', ['placeholder' => t('Search for a tag.', 'Search for all or part of a tag.')]);
-        echo ' '.$this->Form->close(t('Go'));
+        echo ' '.$this->Form->close(t('Go'), '', ['class' => 'search-submit']);
         echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/settings/tagging').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">'.sprintf(t('%s tag(s) found.'), $this->data('RecordCount')).'</div>';
         ?>

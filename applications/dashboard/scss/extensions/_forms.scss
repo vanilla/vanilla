@@ -81,10 +81,6 @@
   @extend .active;
 }
 
-#Form_Go {
-  @extend .search-submit;
-}
-
 .FilterMenu {
   select {
     display: inline-block;

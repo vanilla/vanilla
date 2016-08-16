@@ -346,7 +346,6 @@ textarea.TextBox {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
   transition: height 0.1s ease;
   resize: none !important;
 }
@@ -368,7 +367,6 @@ select.Year {
   margin: 0;
   border-radius: .5ex;
   background: #3fbcf3;
-  background: -webkit-linear-gradient(top, #aee7fe, #3fbcf3);
   background: linear-gradient(top, #aee7fe, #3fbcf3);
   border: 1px solid #0F7FE6;
   color: #003673;
@@ -448,7 +446,6 @@ a.Button {
 
 .CancelButton {
   border-color: #919191;
-  background: -webkit-linear-gradient(top, #F1F1F1, #D1D1D1);
   background: linear-gradient(top, #F1F1F1, #D1D1D1);
   color: #414141;
   text-shadow: 0 1px 0 #E1E1E1;
@@ -842,6 +839,11 @@ input.SmallInput {
 div.Popup ul li label.Inline,
 form ul li label.Inline {
   display: inline-block;
+}
+
+.ImageUpload img {
+  max-width: 100%;
+  max-height: 250px;
 }
 
 /* FormTable */
@@ -1481,6 +1483,10 @@ body.Home #Content {
 }
 
 /* =================================================================== Popups */
+div.Popup img {
+  max-width: 100%;
+}
+
 div.Popup div.Messages {
   text-align: left;
   position: inherit;
@@ -1958,13 +1964,13 @@ div.Summary table tbody td {
 
 /* Mobile themes */
 .themeblock {
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin: 0;
   width: 33.33%;
   min-width: 235px;
   padding: 20px;
   position: relative;
-  -webkit-transition: all 0.4s ease;
   transition: all 0.4s ease;
 }
 
@@ -2043,6 +2049,7 @@ div.Summary table tbody td {
 .browser-mobile-themes.SelectionGrid div.Buttons {
   display: block;
   width: 100%;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   margin: 10px 0 20px 0;
 }
@@ -2524,7 +2531,6 @@ div.Errors pre * {
 
 .PageInfo {
   background: #00346d;
-  background: -webkit-linear-gradient(top, #00346d, #014a8a);
   background: linear-gradient(top, #00346d, #014a8a);
   padding: 10px;
   color: #fff;

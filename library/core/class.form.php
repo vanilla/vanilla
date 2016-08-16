@@ -2496,6 +2496,11 @@ PASSWORDMETER;
                         .$Description
                         .$this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                     break;
+                case 'imageupload':
+                    $Result .= $this->label($LabelCode, $Row['Name'])
+                        .$Description
+                        .$this->imageUpload($Row['Name'], $Row['Options']);
+                    break;
                 case 'textbox':
                     $Result .= $this->label($LabelCode, $Row['Name'])
                         .$Description

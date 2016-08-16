@@ -37,7 +37,7 @@ Gdn_Theme::assetBegin('Help');
         echo '<div class="search-wrap input-wrap">';
         echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Keywords');
-        echo ' ', $this->Form->button(t('Go'));
+        echo ' ', $this->Form->button(t('Go'), ['class' => 'search-submit']);
         echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/user').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">';
         $count = $this->data('RecordCount', $this->data('UserCount', null));

@@ -7124,7 +7124,7 @@ select + select {
   font-style: italic;
 }
 
-.search-submit, #Form_Go {
+.search-submit {
   position: absolute;
   left: -9999px;
 }

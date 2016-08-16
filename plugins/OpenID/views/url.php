@@ -16,7 +16,7 @@ echo $Form->errors();
             </li>
         </ul>
         <div class="Buttons">
-            <?php echo $Form->button('Go'); ?>
+            <?php echo $Form->button('Save'); ?>
         </div>
     </div>
 <?php

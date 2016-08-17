@@ -237,7 +237,7 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
-            ->addGroupIf('Garden.Settings.Manage', t('Import'), 'import', '', ['after' => 'site-settings'])
+            ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'import', '', ['after' => 'site-settings'])
             ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'import.import', '', $sort);
     }
 

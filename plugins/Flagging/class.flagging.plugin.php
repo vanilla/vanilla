@@ -42,6 +42,18 @@ class FlaggingPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('Flagging', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['Flagging']['HasPopupFriendlySettings'] = false;
+        }
+    }
+
+    /**
      * Let users with permission choose to receive Flagging emails.
      */
     public function profileController_afterPreferencesDefined_handler($Sender) {
@@ -142,21 +154,30 @@ class FlaggingPlugin extends Gdn_Plugin {
 
     /**
      * Dismiss a flag, then view index.
+     * @param Gdn_Controller $Sender
+     * @throws Exception
+     * @throws Gdn_UserException
      */
     public function controller_dismiss($Sender) {
-        $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 2) {
-            return;
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
-        list($Controller, $EncodedURL) = $Arguments;
+        if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $Arguments = $Sender->RequestArgs;
+            if (sizeof($Arguments) != 2) {
+                return;
+            }
+            list($Controller, $EncodedURL) = $Arguments;
 
-        $URL = base64_decode(str_replace('-', '=', $EncodedURL));
+            $URL = base64_decode(str_replace('-', '=', $EncodedURL));
 
-        Gdn::sql()->delete('Flag', array(
-            'ForeignURL' => $URL
-        ));
+            Gdn::sql()->delete('Flag', array(
+                'ForeignURL' => $URL
+            ));
 
-        $this->controller_index($Sender);
+            $Sender->informMessage(sprintf(t('%s dismissed.'), t('Flag')));
+        }
+        $Sender->render('blank', 'utility', 'dashboard');
     }
 
     /**

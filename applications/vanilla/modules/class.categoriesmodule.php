@@ -40,8 +40,8 @@ class CategoriesModule extends Gdn_Module {
             return;
         }
 
-        $Categories = CategoryModel::makeTree(CategoryModel::categories());
-        CategoryModel::filterChildren($Categories);
+        $categoryModel = new CategoryModel();
+        $Categories = $categoryModel->setJoinUserCategory(true)->getChildTree(null);
         $Categories = CategoryModel::flattenTree($Categories);
         $Categories2 = $Categories;
 
@@ -53,7 +53,6 @@ class CategoriesModule extends Gdn_Module {
         }
 
         $Data = new Gdn_DataSet($Categories);
-        $Data->DatasetType(DATASET_TYPE_ARRAY);
         $Data->DatasetType(DATASET_TYPE_OBJECT);
         $this->Data = $Data;
     }

@@ -576,6 +576,8 @@ class VanillaSettingsController extends Gdn_Controller {
         if (!$this->Category) {
             throw notFoundException('Category');
         }
+        // Category data is expected to be in the form of an object.
+        $this->Category = (object)$this->Category;
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 
         // Restrict "Display As" types based on parent.

@@ -30,7 +30,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function assetModel_styleCss_handler($Sender) {
-        if (!$this->hasLayoutTables() || IsMobile()) {
+        if (c('Vanilla.Discussions.Layout') != 'table') {
             $Sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
         }
     }
@@ -39,7 +39,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * Add OP name to start of discussion meta.
      */
     public function discussionsController_afterDiscussionLabels_handler($Sender, $Args) {
-        if (!$this->hasLayoutTables() || isMobile()) {
+        if (c('Vanilla.Discussions.Layout') != 'table') {
             if (val('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
             }
@@ -53,7 +53,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * @param $Args
      */
     public function categoriesController_afterDiscussionLabels_handler($Sender, $Args) {
-        if (!$this->hasLayoutTables() || isMobile()) {
+        if (c('Vanilla.Discussions.Layout') != 'table') {
             if (val('FirstUser', $Args)) {
                 echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
             }
@@ -64,7 +64,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * Trigger on All Discussions.
      */
     public function discussionsController_beforeDiscussionContent_handler($Sender) {
-        if (!$this->hasLayoutTables() || isMobile()) {
+        if (c('Vanilla.Discussions.Layout') != 'table') {
             $this->displayPhoto($Sender);
         }
     }
@@ -73,7 +73,7 @@ class IndexPhotosPlugin extends Gdn_Plugin {
      * Trigger on Categories.
      */
     public function categoriesController_beforeDiscussionContent_handler($Sender) {
-        if (!$this->hasLayoutTables()) {
+        if (c('Vanilla.Discussions.Layout') != 'table') {
             $this->displayPhoto($Sender);
         }
     }
@@ -85,14 +85,5 @@ class IndexPhotosPlugin extends Gdn_Plugin {
         // Build user object & output photo
         $FirstUser = userBuilder($Sender->EventArguments['Discussion'], 'First');
         echo userPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
-    }
-
-    /**
-     * Determine whether layout of discussions page is "table" (vs. "modern").
-     *
-     * @return bool If forum is using table layout, returns true
-     */
-    public function hasLayoutTables() {
-        return (c('Vanilla.Discussions.Layout') == 'table');
     }
 }

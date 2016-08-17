@@ -1,96 +1,66 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 
 <h1><?php echo t($this->Data['Title']); ?></h1>
-<div class="Info">
-    <?php echo t('FlaggedContent', 'The following content has been flagged by users for moderator review.'); ?>
-</div>
-
 <?php
 // Settings
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<h3><?php echo t('Flagging Settings'); ?></h3>
+<h2><?php echo t('Flagging Settings'); ?></h2>
 <ul>
-    <li><?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', t('Create Discussions')); ?></li>
-    <li>
-        <?php
-        echo $this->Form->label('Category to Use', 'Plugins.Flagging.CategoryID');
-        echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => c('Plugins.Flagging.CategoryID')));
-        ?>
+    <li class="form-group row">
+        <?php echo $this->Form->labelWrap('Category to Use', 'Plugins.Flagging.CategoryID'); ?>
+        <div class="input-wrap">
+            <?php echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => c('Plugins.Flagging.CategoryID'))); ?>
+        </div>
+    </li>
+    <li class="form-group row">
+        <div class="input-wrap no-label">
+            <?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', t('Create Discussions')); ?>
+        </div>
     </li>
 </ul>
-<?php
-echo $this->Form->close('Save');
-
-// Flagged Items list
-echo "<h3>".t('Flagged Items')."</h3>\n";
-echo '<div class="FlaggedContent">';
-$NumFlaggedItems = count($this->FlaggedItems);
-if (!$NumFlaggedItems) {
-    echo t('FlagQueueEmpty', "There are no items awaiting moderation at this time.");
-} else {
-    echo sprintf(
-        t('Flagging queue counter', '%s in queue.'),
-        plural($NumFlaggedItems, '%s post', '%s posts')
-    );
-    foreach ($this->FlaggedItems as $URL => $FlaggedList) {
-        ?>
-        <div class="FlaggedItem">
-            <?php
-            $TitleCell = TRUE;
-            ksort($FlaggedList, SORT_STRING);
-            $NumComplaintsInThread = sizeof($FlaggedList);
-            foreach ($FlaggedList as $FlagIndex => $Flag) {
-                if ($TitleCell) {
-                    $TitleCell = FALSE;
-                    ?>
-                    <div class="FlaggedTitleCell">
-                        <div
-                            class="FlaggedItemURL"><?php echo anchor(url($Flag['ForeignURL'], true), $Flag['ForeignURL']); ?></div>
-                        <div class="FlaggedItemInfo">
-                            <?php
-                            if ($NumComplaintsInThread > 1)
-                                $OtherString = t(' and').' '.($NumComplaintsInThread - 1).' '.t(Plural($NumComplaintsInThread - 1, 'other', 'others'));
-                            else
-                                $OtherString = '';
-                            ?>
-                            <span><?php echo t('FlaggedBy', "Reported by:"); ?> </span>
-                            <span><?php printf(t('<strong>%s</strong>%s on %s'), anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $OtherString, $Flag['DateInserted']); ?></span>
-                        </div>
-                        <div class="FlaggedItemComment">"<?php echo Gdn_Format::text($Flag['Comment']); ?>"</div>
-                        <div class="FlaggedActions">
-                            <?php
-                            echo $this->Form->button('Dismiss', array(
-                                'onclick' => "window.location.href='".Url('plugin/flagging/dismiss/'.$Flag['EncodedURL'], true)."'",
-                                'class' => 'SmallButton'
-                            ));
-                            echo $this->Form->button('Take Action', array(
-                                'onclick' => "window.location.href='".Url($Flag['ForeignURL'], true)."'",
-                                'class' => 'SmallButton'
-                            ));
-                            ?>
-                        </div>
-                    </div>
-                    <?php
-                    if ($NumComplaintsInThread > 1)
-                        echo '<div class="OtherComplaints">'."\n";
-                } else {
-                    ?>
-                    <div class="FlaggedOtherCell">
-                        <div
-                            class="FlaggedItemInfo"><?php echo t('On').' '.$Flag['DateInserted'].', <strong>'.anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}").'</strong> '.t('said:'); ?></div>
-                        <div class="FlaggedItemComment">"<?php echo Gdn_Format::text($Flag['Comment']); ?>"</div>
-                    </div>
-                <?php
-                }
-            }
-            if ($NumComplaintsInThread > 1)
-                echo "</div>\n";
-            ?>
-        </div>
-    <?php
-    }
-}
-?>
+<div class="form-footer padded-bottom">
+    <?php echo $this->Form->close('Save'); ?>
 </div>
+<?php
+// Flagged Items list
+if (!count($this->FlaggedItems)) {
+    echo '<div class="padded">'.t('FlagQueueEmpty', "There are no items awaiting moderation at this time.").'</div>';
+} else { ?>
+<div class="table-wrap padded">
+    <table>
+        <thead>
+        <tr>
+            <th><?php echo t('Post Type'); ?></th>
+            <th><?php echo t('Flagged By'); ?></th>
+            <th class="options"><?php echo t('Options'); ?></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <?php
+            foreach ($this->FlaggedItems as $URL => $FlaggedList) {
+                ksort($FlaggedList, SORT_STRING);
+                $numComplaintsInThread = sizeof($FlaggedList);
+                $multipleReportsString = '<div class="info italic">'.sprintf(t('Flagged by %s users.'), $numComplaintsInThread).'</div>';
+                $flaggedBy = ($numComplaintsInThread > 1) ? $multipleReportsString : '';
+                foreach ($FlaggedList as $FlagIndex => $Flag) {
+                    $type = ucfirst($Flag['ForeignType']);
+                    $flaggedBy .= sprintf(t('<strong>%s</strong> on %s'), anchor($Flag['InsertName'], "profile/{$Flag['InsertUserID']}/{$Flag['InsertName']}"), $Flag['DateInserted']).' '.t('said:');
+                    $flaggedBy .= '<div class="FlaggedReason">'.Gdn_Format::text($Flag['Comment']).'</div>';
+                }
+                $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');
+                $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm js-hijack', ['data-content' => ['body' => t('Are you sure you want to dismiss this flag?')]]);
+                ?>
+                <td class="FlaggedType"><?php echo $type; ?></td>
+                <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>
+                <td class="options"><?php echo $options; ?></td>
+                <?php
+            }
+            ?>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<?php } ?>

@@ -224,6 +224,7 @@ class CategoriesController extends VanillaController {
 
             switch ($Category->DisplayAs) {
                 case 'Flat':
+                case 'Heading':
                 case 'Categories':
                     if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
                         // Headings don't make sense if we've cascaded down one level.

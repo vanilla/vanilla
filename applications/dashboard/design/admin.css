@@ -9032,6 +9032,10 @@ form h2 {
   list-style: lower-latin inside;
 }
 
+.italic {
+  font-style: italic;
+}
+
 .Section-Dashboard.Message.index {
   /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
     that it renders in a div with this DismissMessage class. */

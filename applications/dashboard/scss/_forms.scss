@@ -759,6 +759,31 @@ select + select {
   left: -9999px;
 }
 
+.textbox-suffix {
+  position: relative;
+
+  input {
+    padding-right: $spacer * 1.5;
+    width: $btn-min-width;
+    text-align: right;
+  }
+
+  &::after {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    height: $control-height-rem;
+    padding-top: ($control-height-rem - $font-size-sm) / 2;
+    padding-right: $spacer / 2;
+    font-size: $font-size-sm;
+    line-height: 1;
+    color: $grey;
+    content: attr(data-suffix);
+  }
+}
+
+
 // iCheck
 .icheck-label {
   padding-left: 0;

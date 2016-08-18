@@ -168,9 +168,7 @@ class SettingsController extends DashboardController {
 
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($configurationModel->Data);
-            $this->setData('lessHidden', 'Hidden'); // show advanced settings only if we're in a post-back
         } else {
-            $this->setData('moreHidden', 'Hidden');
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
             }
@@ -212,6 +210,7 @@ class SettingsController extends DashboardController {
 
             //Set up cropping.
             $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+            $crop->saveButton = false;
             $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
             $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
             $this->setData('crop', $crop);
@@ -248,6 +247,7 @@ class SettingsController extends DashboardController {
                     $basename = changeBasename($avatar, "p%s");
                     $source = $upload->copyLocal($basename);
                     $crop = new CropImageModule($this, $this->Form, $thumbnailSize, $thumbnailSize, $source);
+                    $crop->saveButton = false;
                     $crop->setSize($thumbnailSize, $thumbnailSize);
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));

@@ -16,6 +16,7 @@ $PluginInfo['OpenID'] = array(
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'SocialConnect' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',

@@ -82,7 +82,6 @@ fieldset[disabled] a.btn {
 }
 
 .btn-secondary {
-  min-width: $btn-min-width;
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
 

@@ -5472,7 +5472,6 @@ fieldset[disabled] a.FilterButton {
 }
 
 .btn-secondary, .btn-icon-border, .btn-media-sm, .file-upload-browse {
-  min-width: 6rem;
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;

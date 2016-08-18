@@ -2462,6 +2462,7 @@ class UserModel extends Gdn_Model {
             ->where('u.Deleted', 0)
             ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset)
+            ->groupBy('u.UserID')
             ->get();
 
         $Result = &$Data->result();

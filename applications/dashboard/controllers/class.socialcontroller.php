@@ -69,7 +69,9 @@ class SocialController extends DashboardController {
 
             $ConnectionName = $PluginInfo['Index'];
 
-            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON)) {
+            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON) &&
+                (method_exists('IsConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME))
+                    || method_exists('isConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)))) {
                 $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
                 $Configured = null;

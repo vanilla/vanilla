@@ -16,6 +16,14 @@
   margin-bottom: $spacer;
 }
 
+.padded-left {
+  margin-left: $spacer;
+}
+
+.padded-right {
+  margin-right: $spacer;
+}
+
 .pull-left {
   float: left;
 }

@@ -48,6 +48,7 @@
     &,
     &:hover {
       color: $btn-link-disabled-color;
+      border-color: $btn-link-disabled-color;
 
       svg {
         fill: $btn-link-disabled-color;
@@ -76,10 +77,12 @@ fieldset[disabled] a.btn {
 //
 
 .btn-primary {
+  min-width: $btn-min-width;
   @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
 
 .btn-secondary {
+  min-width: $btn-min-width;
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }
 

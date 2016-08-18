@@ -50,11 +50,9 @@
     &:focus,
     &.focus {
       background-color: $background;
-      border-color: $border;
     }
     @include hover {
       background-color: $background;
-      border-color: $border;
     }
   }
 }

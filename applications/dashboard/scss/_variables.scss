@@ -73,10 +73,10 @@ $font-size-xs:               .675rem;
 
 $font-size-h1:               2rem;
 $font-size-h2:               1.125rem;
-$font-size-h3:               1.125rem;
-$font-size-h4:               1.125rem;
-$font-size-h5:               1.125rem !default;
-$font-size-h6:               1rem !default;
+$font-size-h3:               1rem;
+$font-size-h4:               1rem;
+$font-size-h5:               .925rem;
+$font-size-h6:               .875rem;
 
 $display1-size:               6rem !default;
 $display2-size:               5.5rem !default;
@@ -144,6 +144,8 @@ $btn-padding-x:                  1rem !default;
 $btn-padding-y:                  $control-padding-y;
 $btn-font-weight:                normal !default;
 $btn-line-height:                1;
+
+$btn-min-width:                  to-rem(96);
 
 $btn-primary-color:              $brand-primary;
 $btn-primary-bg:                 $white;

@@ -176,6 +176,21 @@ pre {
   }
 }
 
+.subheading-block {
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  border-top: $border-width solid $grey-light;
+
+  @extend .full-border;
+
+  .subheading {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: to-rem(16);
+    font-weight: 500;
+  }
+}
+
 .header-menu {
   $header-menu-border-width: to-rem(3);
   $header-menu-font-size: to-rem(18);

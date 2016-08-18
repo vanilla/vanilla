@@ -8,7 +8,7 @@ echo $this->Form->errors(); ?>
     <?php echo t('TextEnterEmails', 'Type email addresses separated by commas here'); ?>
     </div>
     <div class="input-wrap">
-    <?php echo $this->Form->input('EmailTestAddresses', 'text', array('class' => 'InputBox BigInput')); ?>
+    <?php echo $this->Form->input('EmailTestAddresses', 'text'); ?>
     </div>
 </div>
 <div class="form-footer js-modal-footer">

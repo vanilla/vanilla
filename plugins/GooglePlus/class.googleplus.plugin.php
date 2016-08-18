@@ -524,8 +524,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(
-            'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID', 'Options' => array('class' => 'InputBox BigInput')),
-            'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret', 'Options' => array('class' => 'InputBox BigInput')),
+            'Plugins.GooglePlus.ClientID' => array('LabelCode' => 'Client ID'),
+            'Plugins.GooglePlus.Secret' => array('LabelCode' => 'Client secret'),
             'Plugins.GooglePlus.SocialReactions' => array('Control' => 'checkbox', 'Default' => true),
             'Plugins.GooglePlus.SocialSharing' => array('Control' => 'checkbox', 'Default' => true),
             'Plugins.GooglePlus.UseAvatars' => array('Control' => 'checkbox', 'Default' => true),

@@ -8366,6 +8366,7 @@ table thead th, table thead td {
   font-size: 0.75rem;
   line-height: 1.3333333333;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 table thead th:last-child, table thead td:last-child {
@@ -8589,6 +8590,24 @@ table.no-hover tbody tr:hover {
   width: 102px;
   top: 1.375rem;
   text-align: right;
+}
+
+.tj-meta {
+  margin-top: 0.5625rem;
+}
+
+.tj-meta .table-meta-item {
+  font-size: 0.75rem;
+}
+
+.tj-meta .table-meta-item-label {
+  font-weight: 500;
+}
+
+.tj-meta .table-meta-item-label a {
+  color: #555a62;
+  pointer-events: none;
+  cursor: default;
 }
 
 * html .InformMessages {

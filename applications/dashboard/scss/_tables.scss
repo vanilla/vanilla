@@ -57,6 +57,7 @@ table {
       font-size: $font-size-sm;
       line-height: $line-height-lg;
       vertical-align: middle;
+      white-space: nowrap;
 
       &:last-child {
         border-right: 0;
@@ -312,6 +313,29 @@ table {
 
 
       @extend .media-sm-info;
+    }
+  }
+}
+
+.tj-meta {
+  margin-top: ($spacer / 2);
+
+  .table-meta-item {
+    font-size: $font-size-sm;
+  }
+
+  .table-meta-item-data {
+
+  }
+
+  .table-meta-item-label {
+    font-weight: 500;
+
+    // Disable links in labels.
+    a {
+      color: $grey-dark;
+      pointer-events: none;
+      cursor: default;
     }
   }
 }

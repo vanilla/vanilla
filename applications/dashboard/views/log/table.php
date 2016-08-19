@@ -5,12 +5,12 @@ include $this->fetchViewLocation('helper_functions');
     <table id="Log" class="AltColumns">
         <thead>
         <tr>
-            <th class="CheckboxCell"><input id="SelectAll" type="checkbox"/></th>
-            <th class="UsernameCell"><?php echo t('Flagged By', 'Flagged By'); ?></th>
-            <th><?php echo t('Record Content', 'Content') ?></th>
-            <th class="PostTypeCell"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="CheckboxCell" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
+            <th class="UsernameCell" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
             <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
+            <th class="PostTypeCell"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="content-cell"><?php echo t('Record Content', 'Content') ?></th>
         </tr>
         </thead>
         <tbody>
@@ -42,6 +42,33 @@ include $this->fetchViewLocation('helper_functions');
                             <?php endif; ?>
                         </div>
                     </div>
+                </td>
+                <td class="PostType">
+                    <?php echo t($RecordLabel); ?>
+                </td>
+                <td class="DateCell"><?php
+                    echo Gdn_Format::date($Row['DateInserted'], 'html');
+                    ?>
+                </td>
+                <td class="PostedByCell"><?php
+                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
+                    if ($Row['RecordName']) { ?>
+                        <div class="media-sm">
+                            <div class="media-sm-content">
+                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
+                                    <?php
+                                    if ($RecordUser['Banned']) {
+                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
+                                    }
+                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                                    ?>
+                                </div>
+                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
+                                    <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </td>
                 <td class="content-cell">
                     <?php
@@ -91,33 +118,6 @@ include $this->fetchViewLocation('helper_functions');
                     echo '</div>';
                     ?>
 
-                </td>
-                <td class="PostedByCell"><?php
-                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
-                    if ($Row['RecordName']) { ?>
-                        <div class="media-sm">
-                            <div class="media-sm-content">
-                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
-                                    <?php
-                                    if ($RecordUser['Banned']) {
-                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
-                                    }
-                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
-                                    ?>
-                                </div>
-                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
-                                <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
-                                <?php } ?>
-                            </div>
-                        </div>
-                    <?php } ?>
-                </td>
-                <td class="PostType">
-                    <?php echo t($RecordLabel); ?>
-                </td>
-                <td class="DateCell"><?php
-                    echo Gdn_Format::date($Row['DateInserted'], 'html');
-                    ?>
                 </td>
             </tr>
         <?php

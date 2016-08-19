@@ -560,17 +560,22 @@
         }
     }
 
+    function responsiveTablesInit(element) {
+        $('.table-wrap table', element).tablejengo({container: '#main-row .main'});
+    }
+
     $(document).on('contentLoad', function(e) {
-        prettyPrintInit(e.target);
-        aceInit(e.target);
-        collapseInit(e.target);
-        scrollToFixedInit(e.target);
-        userDropDownInit(e.target);
-        modalInit();
-        clipboardInit();
-        drawerInit(e.target);
-        icheckInit(e.target);
-        expanderInit(e.target);
+        prettyPrintInit(e.target); // prettifies <pre> blocks
+        aceInit(e.target); // code editor
+        collapseInit(e.target); // panel nav collapsind
+        scrollToFixedInit(e.target); // panel and navbar scrolling
+        userDropDownInit(e.target); // navbar 'me' dropdown
+        modalInit(); // modals aka. popups
+        clipboardInit(); // copy elements to the clipboard
+        drawerInit(e.target); // responsive hamburger menu nav
+        icheckInit(e.target); // checkboxes and radios
+        expanderInit(e.target); // truncates text and adds link to expand
+        responsiveTablesInit(e.target); // makes tables responsive
     });
 
     $(document).on('c3Init', function() {

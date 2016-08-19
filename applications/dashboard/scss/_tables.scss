@@ -130,7 +130,7 @@ table {
 
     td {
       text-align: center;
-      padding: ($spacer / 2) ($spacer * .75);
+      padding: ($spacer / 2) ($spacer / 2);
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
       text-transform: uppercase;
@@ -138,6 +138,7 @@ table {
       font-size: $font-size-sm;
       line-height: $line-height-lg;
       vertical-align: middle;
+      width: 10%;
 
       &:last-child {
         border-right: 0;
@@ -146,6 +147,9 @@ table {
 
     th {
       font-weight: 700;
+      max-width: to-rem(180);
+      min-width: to-rem(180);
+      @extend .truncate;
     }
   }
 

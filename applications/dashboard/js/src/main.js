@@ -561,7 +561,7 @@
     }
 
     function responsiveTablesInit(element) {
-        $('.table-wrap table', element).tablejengo({container: '#main-row .main'});
+        $('.table-wrap table:not(.CheckBoxGrid)', element).tablejengo({container: '#main-row .main'});
     }
 
     $(document).on('contentLoad', function(e) {

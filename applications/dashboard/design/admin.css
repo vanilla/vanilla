@@ -8428,7 +8428,7 @@ table.no-hover tbody tr:hover {
 
 .CheckBoxGrid thead td {
   text-align: center;
-  padding: 0.5625rem 0.84375rem;
+  padding: 0.5625rem 0.5625rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
   text-transform: uppercase;
@@ -8436,6 +8436,7 @@ table.no-hover tbody tr:hover {
   font-size: 0.75rem;
   line-height: 1.3333333333;
   vertical-align: middle;
+  width: 10%;
 }
 
 .CheckBoxGrid thead td:last-child {
@@ -8444,6 +8445,8 @@ table.no-hover tbody tr:hover {
 
 .CheckBoxGrid thead th {
   font-weight: 700;
+  max-width: 11.25rem;
+  min-width: 11.25rem;
 }
 
 .CheckBoxGrid tbody td {
@@ -9096,6 +9099,12 @@ form h2 {
 
 .italic {
   font-style: italic;
+}
+
+.truncate, .CheckBoxGrid thead th {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .Section-Dashboard.Message.index {

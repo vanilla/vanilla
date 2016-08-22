@@ -59,7 +59,7 @@ foreach ($this->UserData->result() as $User) {
                 <div class="btn-group">
                 <?php
                 if ($EditUser) {
-                    echo anchor(dashboardSymbol('edit'), '/user/edit/'.$User->UserID, 'Popup btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('edit'), '/user/edit/'.$User->UserID, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
                 }
                 if ($DeleteUser && $User->UserID != $Session->User->UserID) {
                     echo anchor(dashboardSymbol('delete'), '/user/delete/'.$User->UserID, 'btn btn-icon', ['aria-label' => t('Delete')]);

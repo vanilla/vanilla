@@ -342,7 +342,7 @@ jQuery(document).ready(function($) {
         //$('a.Popup').popup();
         //$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-        $('a.Popup:not(.Message a.Popup, .Dashboard a.Popup)').popup();
+        $('a.Popup:not(.Message a.Popup):not(.dashboard a.Popup)').popup();
         $('a.PopConfirm:not(.Message a.PopConfirm)').popup({'confirm': true, 'followConfirm': true});
     }
 

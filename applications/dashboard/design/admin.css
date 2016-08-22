@@ -8045,6 +8045,12 @@ button.close, button.Close {
   border-bottom: 0.0625rem dotted #0291db;
 }
 
+.panel-right .help a, .panel-right .help a:hover,
+.panel-right .Help a,
+.panel-right .Help a:hover {
+  text-decoration: none;
+}
+
 .panel-right ul,
 .panel-right ul ul,
 .panel-right ul ol {

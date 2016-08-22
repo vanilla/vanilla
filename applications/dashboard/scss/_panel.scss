@@ -62,6 +62,11 @@
     a {
       color: $brand-primary;
       border-bottom: $border-width dotted $brand-primary;
+
+      &,
+      &:hover {
+        text-decoration: none;
+      }
     }
   }
 

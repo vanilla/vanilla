@@ -30,3 +30,13 @@
 .crop-label {
   display: none;
 }
+
+.main .content .control-panel {
+  display: none;
+}
+
+@include media-breakpoint-down(md) {
+  .main .content .control-panel {
+    display: block;
+  }
+}

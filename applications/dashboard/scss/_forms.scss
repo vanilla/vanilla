@@ -867,10 +867,11 @@ label[id^=iCheck] {
     border-bottom-right-radius: 0;
   }
 
-  button {
+  .btn {
     margin-left: -$border-width;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
+    min-width: inherit;
   }
 
   .label-wrap {

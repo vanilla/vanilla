@@ -19,6 +19,7 @@
 }
 
 div.Messages.Errors {
+  @extend .padded;
   @extend .alert;
   @extend .alert-danger;
 }

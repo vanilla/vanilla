@@ -44,17 +44,25 @@
     float: left;
   }
 
-  h2 {
-    padding-bottom: $spacer;
+  h2,
+  h3 {
+    padding-bottom: $spacer / 2;
     margin-bottom: $spacer / 2;
+    border-bottom: 1px dotted $grey-dark-border;
+  }
+
+  h2 {
     letter-spacing: .0625rem;
-    border-bottom: 1px dotted $grey;
     font-weight: 100;
     text-transform: uppercase;
   }
 
-  a {
-    color: $brand-primary;
+  .help,
+  .Help {
+    a {
+      color: $brand-primary;
+      border-bottom: $border-width dotted $brand-primary;
+    }
   }
 
   ul {
@@ -62,7 +70,8 @@
   }
 
   li {
-    margin-bottom: $spacer / 2;
+    margin-bottom: $spacer / 4;
+    font-size: to-rem(12);
   }
 
   ol {
@@ -109,4 +118,53 @@
     width: $drawer-width;
     height: 100%;
   }
+}
+
+.control-panel {
+  font-size: to-rem(12);
+  color: $grey-light-text;
+  margin-bottom: $spacer * 2;
+
+  li {
+    line-height: to-rem(18);
+    margin-bottom: 0;
+
+    > * {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  .control-panel-heading {
+    font-size: to-rem(16);
+    font-weight: 500;
+    color: $grey-dark;
+    padding-bottom: $spacer / 2;
+    margin-bottom: $spacer / 2;
+    border-bottom: 1px dotted $grey-dark-border;
+  }
+
+  .control-panel-subheading {
+    margin-top: $spacer / 2;
+    margin-bottom: $spacer / 4;
+    font-weight: 500;
+  }
+
+  .control-panel-footer {
+    margin-top: $spacer;
+  }
+
+  svg {
+    width: to-rem(18);
+    fill: $grey-light-text;
+  }
+
+  .control-panel-list-item-label {
+    max-width: to-rem(102);
+  }
+}
+
+.btn-control-panel {
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, $font-size-xs, $line-height-sm, $btn-border-radius);
+  @include button-variant($grey, $btn-secondary-bg, $grey, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
 }

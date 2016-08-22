@@ -794,8 +794,6 @@
         $('a[href=#' + collapsible.attr('id') + ']').attr('aria-expanded', 'true');
     }
 
-
-
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
 
@@ -849,8 +847,6 @@
         });
     }
 
-
-
     function icheckInit(element) {
         var selector = 'input:not(.label-selector-input):not(.toggle-input):not(.avatar-delete-input):not(.jcrop-keymgr)';
 
@@ -891,9 +887,9 @@
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsind
-        scrollToFixedInit(e.target); // panel and navbar scrolling
+        scrollToFixedInit(e.target); // panel and navbar scroll settings and modal fixed header and footer
         userDropDownInit(e.target); // navbar 'me' dropdown
-        modalInit(); // modals aka. popups
+        modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav
         icheckInit(e.target); // checkboxes and radios
@@ -901,9 +897,9 @@
         responsiveTablesInit(e.target); // makes tables responsive
     });
 
-    $(document).on('c3Init', function() {
-
-    });
+    // $(document).on('c3Init', function() {
+    //
+    // });
 
 
     // $(document).on('click', '.js-collapse-toggle', function() {

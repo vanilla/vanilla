@@ -18,7 +18,7 @@ $black: #000;
 // Override the grays
 $gray-dark:                 #555a62;
 $gray:                      lighten(#555a62, 25%);
-$gray-light:                #f4f4f5;
+$gray-light:                #f6f9fb;
 $gray-lighter:              #f4f6fb;
 $gray-lightest:             #fbfcfc;
 
@@ -28,6 +28,9 @@ $grey:                      $gray;
 $grey-light:                $gray-light;
 $grey-lighter:              $gray-lighter;
 $grey-lightest:             $gray-lightest;
+
+$grey-dark-border:          #ededed; // belongs between grey and grey-light.
+$grey-light-text:           #727d83; // belongs between grey and grey-dark.
 
 $brand-primary:             #0291db;
 $brand-secondary:           #f5296d;

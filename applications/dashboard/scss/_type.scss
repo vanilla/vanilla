@@ -201,6 +201,7 @@ pre {
   justify-content: center;
   align-items: center;
   @extend .full-border;
+  border-bottom-color: $grey-dark-border;
 
   &.padded {
     margin-bottom: $spacer;

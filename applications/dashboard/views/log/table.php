@@ -10,7 +10,7 @@ include $this->fetchViewLocation('helper_functions');
             <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
             <th class="PostTypeCell"><?php echo t('Posted By', 'Posted By'); ?></th>
-            <th class="content-cell"><?php echo t('Record Content', 'Content') ?></th>
+            <th class="content-cell" data-tj-ignore="true"><?php echo t('Record Content', 'Content') ?></th>
         </tr>
         </thead>
         <tbody>
@@ -34,11 +34,11 @@ include $this->fetchViewLocation('helper_functions');
                             <?php echo userPhoto($user); ?>
                         </div>
                         <div class="media-sm-content">
-                            <div class="media-sm-title username">
-                                <?php echo userAnchor($user, 'Username'); ?>
+                            <div class="title">
+                                <?php echo userAnchor($user, 'Username reverse-link'); ?>
                             </div>
                             <?php if ($viewPersonalInfo) : ?>
-                                <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
+<!--                                <div class="media-sm-info user-email">--><?php //echo Gdn_Format::Email($user->Email); ?><!--</div>-->
                             <?php endif; ?>
                         </div>
                     </div>
@@ -89,7 +89,7 @@ include $this->fetchViewLocation('helper_functions');
                     }
 
                     if ($Url) {
-                        echo '<div class="pull-right">'.anchor(dashboardSymbol('external-link'), $Url, 'icon-text').'</div>';
+                        echo '<div class="pull-right">'.anchor(dashboardSymbol('external-link'), $Url, 'icon icon-text').'</div>';
                     }
                     echo '<div class="post-content Expander">', $this->FormatContent($Row), '</div>';
 

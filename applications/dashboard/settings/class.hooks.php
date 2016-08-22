@@ -46,7 +46,9 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->EventArguments['SideMenu'] = $navAdapter;
             $Sender->fireEvent('GetAppSettingsMenuItems');
 
-            $Sender->removeJsFile('jquery.popup.js');
+            // Don't remove until all pages that invoke popup in their js have reconciled with the new modals.
+            // i.e., moderation pages
+//            $Sender->removeJsFile('jquery.popup.js');
             $Sender->addJsFile('dashboard.js', 'dashboard');
             $Sender->addJsFile('jquery.expander.js');
             $Sender->addJsFile('settings.js', 'dashboard');

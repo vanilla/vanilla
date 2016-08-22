@@ -7459,10 +7459,6 @@ div.Messages.Errors {
   border: 1px solid #ddd;
 }
 
-.CurrentTheme {
-  padding-left: 0;
-}
-
 .grid-image {
   display: block;
   width: 100%;
@@ -8599,6 +8595,10 @@ table.no-hover tbody tr:hover {
   cursor: default;
 }
 
+.content-cell {
+  min-width: 12.5rem;
+}
+
 * html .InformMessages {
   position: absolute;
   width: 100%;
@@ -8814,6 +8814,10 @@ table.no-hover tbody tr:hover {
   .main .content .control-panel {
     display: block;
   }
+}
+
+.CurrentTheme {
+  padding-left: 0;
 }
 
 h1, .h1,
@@ -9102,6 +9106,20 @@ form h2 {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.icon-text {
+  width: 0.875rem;
+  fill: #555a62;
+  vertical-align: middle;
+}
+
+.reverse-link {
+  color: #555a62;
+}
+
+.reverse-link:hover {
+  color: #0291db;
 }
 
 .Section-Dashboard.Message.index {

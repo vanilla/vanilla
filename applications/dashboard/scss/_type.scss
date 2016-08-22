@@ -324,3 +324,19 @@ form {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+// same color and size as default body text.
+.icon-text {
+  width: $font-size-base;
+  fill: $grey-dark;
+  vertical-align: middle;
+}
+
+
+.reverse-link {
+  color: $grey-dark;
+
+  &:hover {
+    color: $brand-primary;
+  }
+}

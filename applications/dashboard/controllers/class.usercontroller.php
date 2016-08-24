@@ -627,9 +627,7 @@ class UserController extends DashboardController {
 
         // Decide if they have ability to confirm users
         $Confirmed = (bool)valr('Confirmed', $User);
-        $CanConfirmEmail = (
-            UserModel::RequireConfirmEmail() &&
-            Gdn::session()->checkPermission('Garden.Users.Edit'));
+        $CanConfirmEmail = (UserModel::requireConfirmEmail() && Gdn::session()->checkPermission('Garden.Users.Edit'));
         $this->setData('_CanConfirmEmail', $CanConfirmEmail);
         $this->setData('_EmailConfirmed', $Confirmed);
         $User['ConfirmEmail'] = (int)$Confirmed;
@@ -661,8 +659,7 @@ class UserController extends DashboardController {
             $this->EventArguments['TargetUser'] = &$User;
 
             // These are all the 'effective' roles for this edit action. This list can
-            // be trimmed down from the real list to allow subsets of roles to be
-            // edited.
+            // be trimmed down from the real list to allow subsets of roles to be edited.
             $this->EventArguments['RoleData'] = &$RoleData;
 
             $UserRoleData = $UserModel->getRoles($UserID)->resultArray();

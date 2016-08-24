@@ -148,6 +148,11 @@ class DiscussionsController extends VanillaController {
         $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($where) : false;
         $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : array(), true);
 
+        // RSS should include announcements.
+        if ($this->SyndicationMethod !== SYNDICATION_NONE) {
+            $Where['Announce'] = 'all';
+        }
+
         // Get Discussions
         $this->DiscussionData = $DiscussionModel->getWhereRecent($where, $Limit, $Offset);
 

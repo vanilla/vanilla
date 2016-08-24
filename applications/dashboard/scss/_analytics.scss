@@ -56,11 +56,11 @@
   }
 }
 
-//Move Icon
+// TODO: Reinstate this
 .analytics-widget-move {
-  @include font-vanillicon('\f1db', $grey, 18px);
-  margin-left: 10px;
-  cursor: move;
+  //@include font-vanillicon('\f1db', $grey, 18px);
+  //margin-left: 10px;
+  //cursor: move;
 }
 
 .analytics-panel-metrics {

@@ -8738,40 +8738,40 @@ ul {
   margin-top: -0.0625rem;
 }
 
-.table-wrap table {
+table:not(.table-condensed) {
   width: 100%;
   max-width: 100%;
   margin-bottom: 0;
 }
 
-.table-wrap table ul {
+table:not(.table-condensed) ul {
   padding-left: 0;
 }
 
-.table-wrap table td.options {
+table:not(.table-condensed) td.options {
   white-space: nowrap;
 }
 
-.table-wrap table td.options > * {
+table:not(.table-condensed) td.options > * {
   display: inline-block;
   white-space: nowrap;
   margin-right: 0.28125rem;
   vertical-align: middle;
 }
 
-.table-wrap table td.options > *:last-child {
+table:not(.table-condensed) td.options > *:last-child {
   margin-right: 0;
 }
 
-.table-wrap table .grow {
+table:not(.table-condensed) .grow {
   width: 100%;
 }
 
-.table-wrap table thead tr {
+table:not(.table-condensed) thead tr {
   background-color: #f6f9fb;
 }
 
-.table-wrap table thead th, .table-wrap table thead td {
+table:not(.table-condensed) thead th, table:not(.table-condensed) thead td {
   padding: 0.5625rem 0.84375rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
@@ -8784,35 +8784,35 @@ ul {
   white-space: nowrap;
 }
 
-.table-wrap table thead th:last-child, .table-wrap table thead td:last-child {
+table:not(.table-condensed) thead th:last-child, table:not(.table-condensed) thead td:last-child {
   border-right: 0;
 }
 
-.table-wrap table tbody {
+table:not(.table-condensed) tbody {
   font-size: 0.8125rem;
 }
 
-.table-wrap table tbody tr:hover {
+table:not(.table-condensed) tbody tr:hover {
   background-color: #f9fdfe;
 }
 
-.table-wrap table th,
-.table-wrap table td {
+table:not(.table-condensed) th,
+table:not(.table-condensed) td {
   padding: 0.75rem 1.125rem;
   line-height: 1.5;
   vertical-align: middle;
   border-top: 0.0625rem solid #f4f6fb;
 }
 
-.table-wrap table tbody + tbody {
+table:not(.table-condensed) tbody + tbody {
   border-top: 0.125rem solid #f4f6fb;
 }
 
-.table-wrap table .table {
+table:not(.table-condensed) .table {
   background-color: #f6f9fb;
 }
 
-.table-wrap table.no-hover tbody tr:hover {
+table:not(.table-condensed).no-hover tbody tr:hover {
   background-color: inherit;
 }
 

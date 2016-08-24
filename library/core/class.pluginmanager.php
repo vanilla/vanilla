@@ -718,6 +718,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Register a a callback to handle an event.
+     *
+     * @param string $eventName The name of the event to register.
+     * @param callable $callback The callback to call when the event is fired.
+     */
+    public function registerCallback($eventName, callable $callback) {
+        $this->eventHandlers[strtolower($eventName)][] = $callback;
+    }
+
+    /**
      * Registers a plugin override method.
      *
      * @param string $OverrideClassName The name of the plugin class that will override the existing method.
@@ -825,7 +835,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param array $Options An array of options to modify the call.
      * @return mixed Returns whatever the event handler returns or **false** of there is not event handler.
      */
-    public function callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType, $Options = array()) {
+    public function callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler', $Options = []) {
         $this->trace("CallEventHandler $EventClassName $EventName $EventHandlerType");
         $Return = false;
 
@@ -862,25 +872,33 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         // Loop through the handlers and execute them
         foreach ($this->eventHandlers[$EventKey] as $PluginKey) {
-            $PluginKeyParts = explode('.', $PluginKey);
-            if (count($PluginKeyParts) == 2) {
-                list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
-
-
-                if (isset($Sender->Returns)) {
-                    if (array_key_exists($EventKey, $Sender->Returns) === false || is_array($Sender->Returns[$EventKey]) === false) {
-                        $Sender->Returns[$EventKey] = array();
-                    }
-
-                    $Return = $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-
-                    $Sender->Returns[$EventKey][$PluginKey] = $Return;
-                    $Return = true;
-                } elseif (isset($Sender->EventArguments)) {
-                    $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-                } else {
-                    $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, array(), $PassedEventKey);
+            $callback = null;
+            if (is_array($PluginKey) || $PluginKey instanceof \Closure) {
+                $callback = $PluginKey;
+            } else {
+                $PluginKeyParts = explode('.', $PluginKey);
+                if (count($PluginKeyParts) == 2) {
+                    list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
+                    $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
+                } elseif (is_callable($PluginKey)) {
+                    $callback = $PluginKey;
                 }
+            }
+
+            if (!$callback) {
+                continue;
+            } elseif (isset($Sender->Returns)) {
+                if (array_key_exists($EventKey, $Sender->Returns) === false || is_array($Sender->Returns[$EventKey]) === false) {
+                    $Sender->Returns[$EventKey] = array();
+                }
+
+                $Return = call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
+                $Sender->Returns[$EventKey][$PluginKey] = $Return;
+                $Return = true;
+            } elseif (isset($Sender->EventArguments)) {
+                call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
+            } else {
+                call_user_func($callback, $Sender, [], $PassedEventKey);
             }
         }
 

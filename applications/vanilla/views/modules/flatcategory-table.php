@@ -10,3 +10,9 @@
 <?php else: ?>
     <?php writeCategoryTable($this->data('Categories', []), 1); ?>
 <?php endif; ?>
+
+<?php echo wrap(
+    anchor(htmlspecialchars(t('View All')), $this->data('ParentCategory.Url')),
+    'span',
+    ['class' => 'MItem Category']
+); ?>

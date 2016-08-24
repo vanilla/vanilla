@@ -48,3 +48,10 @@
     </li>
 <?php endforeach; ?>
 </ul>
+
+<?php echo wrap(
+    anchor(htmlspecialchars(t('View All')), $this->data('ParentCategory.Url')),
+    'span',
+    ['class' => 'MItem Category']
+); ?>
+

@@ -5137,7 +5137,8 @@ body {
   outline: none !important;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, .analytics-widget-header .title, .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
+.HomeOptions > a, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: .5rem;
 }
@@ -5302,6 +5303,84 @@ output {
   display: none !important;
 }
 
+.analytics-widget {
+  position: relative;
+}
+
+.analytics-widget-options {
+  position: absolute;
+  right: 0;
+  top: 1.125rem;
+}
+
+.analytics-widget-metric .analytics-widget-options {
+  right: 0.5625rem;
+  top: 0;
+}
+
+.bookmark svg {
+  transition: -webkit-transform .1s;
+  transition: transform .1s;
+  fill: #949aa2;
+  width: 1.125rem;
+}
+
+.bookmark:hover svg, .bookmark:focus svg {
+  -webkit-transform: rotate(30deg);
+  transform: rotate(30deg);
+}
+
+.bookmarked svg {
+  -webkit-transform: rotate(30deg);
+  transform: rotate(30deg);
+}
+
+.bookmarked:hover svg, .bookmarked:focus svg {
+  -webkit-transform: rotate(0deg);
+  transform: rotate(0deg);
+}
+
+.analytics-panel-metrics {
+  overflow: hidden;
+  margin-left: -0.0625rem;
+  margin-right: -0.0625rem;
+  display: -ms-flexbox !important;
+  display: flex !important;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding: 0.5625rem 0 1.125rem;
+  border-top: 0.0625rem solid #ededed;
+  border-bottom-color: #ededed;
+}
+
+.analytics-panel-metrics .metric-value {
+  text-align: center;
+  color: #949aa2;
+}
+
+.analytics-panel-metrics .metric-title {
+  text-align: center;
+  color: #949aa2;
+}
+
+.analytics-panel-metrics .analytics-widget-metric {
+  border-right: 0.0625rem solid #ededed;
+  padding: 1.125rem 2.25rem !important;
+  margin-top: 0.5625rem;
+  min-width: 11.25rem;
+}
+
+.analytics-panel-metrics .analytics-widget-metric:last-child {
+  border-right: 0;
+}
+
+.keen-spinner > div > div {
+  width: 5px !important;
+  height: 1px !important;
+}
+
 .btn, .file-upload-browse, .Button, .FilterMenu .FilterButton {
   display: inline-block;
   font-weight: normal;
@@ -5337,12 +5416,12 @@ output {
 }
 
 .btn.disabled, .disabled.file-upload-browse, .disabled.Button, .FilterMenu .disabled.FilterButton, .btn.disabled:hover, .disabled.file-upload-browse:hover, .disabled.Button:hover, .FilterMenu .disabled.FilterButton:hover, .btn:disabled, .file-upload-browse:disabled, .Button:disabled, .FilterMenu .FilterButton:disabled, .btn:disabled:hover, .file-upload-browse:disabled:hover, .Button:disabled:hover, .FilterMenu .FilterButton:disabled:hover {
-  color: #949aa2;
-  border-color: #949aa2;
+  color: #ededed;
+  border-color: #ededed;
 }
 
 .btn.disabled svg, .disabled.file-upload-browse svg, .disabled.Button svg, .FilterMenu .disabled.FilterButton svg, .btn.disabled:hover svg, .disabled.file-upload-browse:hover svg, .disabled.Button:hover svg, .FilterMenu .disabled.FilterButton:hover svg, .btn:disabled svg, .file-upload-browse:disabled svg, .Button:disabled svg, .FilterMenu .FilterButton:disabled svg, .btn:disabled:hover svg, .file-upload-browse:disabled:hover svg, .Button:disabled:hover svg, .FilterMenu .FilterButton:disabled:hover svg {
-  fill: #949aa2;
+  fill: #ededed;
 }
 
 .btn + .btn, .file-upload-browse + .btn, .Button + .btn, .FilterMenu .FilterButton + .btn, .btn + .file-upload-browse, .file-upload-browse + .file-upload-browse, .Button + .file-upload-browse, .FilterMenu .FilterButton + .file-upload-browse, .btn + .Button, .file-upload-browse + .Button, .Button + .Button, .FilterMenu .FilterButton + .Button, .FilterMenu .btn + .FilterButton, .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .Button + .FilterButton, .FilterMenu .FilterButton + .FilterButton {
@@ -5501,7 +5580,7 @@ fieldset[disabled] a.FilterButton {
 }
 
 .btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover {
-  color: #949aa2;
+  color: #ededed;
   text-decoration: none;
 }
 
@@ -5657,11 +5736,19 @@ input[type="button"].btn-block {
   width: 0.875rem;
 }
 
-.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2 {
+.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title, .card .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .LayoutOptions > a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .LayoutOptions > a, .card .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header .card
+.HomeOptions > a, .card .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .card
+.HomeOptions > a {
   margin-bottom: 0.28125rem;
 }
 
-.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a {
+.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .LayoutOptions > a a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .LayoutOptions > a a, .card .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header .card
+.HomeOptions > a a, .card .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .card
+.HomeOptions > a a {
   color: #555a62;
 }
 
@@ -5722,39 +5809,105 @@ input[type="button"].btn-block {
   z-index: 1005;
 }
 
+.Section-Analytics .c3-axis-y path,
 .Section-DashboardHome .c3-axis-y path {
   display: none;
 }
 
+.Section-Analytics .c3-axis-y .c3-axis-y-label text,
+.Section-Analytics .c3-axis-y .tick text,
 .Section-DashboardHome .c3-axis-y .c3-axis-y-label text,
 .Section-DashboardHome .c3-axis-y .tick text {
   text-anchor: middle !important;
 }
 
+.Section-Analytics .c3-axis-y .c3-axis-y-label line,
+.Section-Analytics .c3-axis-y .tick line,
 .Section-DashboardHome .c3-axis-y .c3-axis-y-label line,
 .Section-DashboardHome .c3-axis-y .tick line {
   display: none;
 }
 
+.Section-Analytics .c3-axis-y text,
 .Section-DashboardHome .c3-axis-y text {
   font-size: 0.875rem;
   font-weight: 500;
   color: #555a62;
 }
 
+.Section-Analytics .c3-axis-x text,
 .Section-DashboardHome .c3-axis-x text {
   font-size: 0.75rem;
   -webkit-transform: translate(0, 0.5625rem);
   transform: translate(0, 0.5625rem);
 }
 
+.Section-Analytics .c3 svg,
 .Section-DashboardHome .c3 svg {
   overflow: visible !important;
 }
 
+.Section-Analytics .c3-legend-item-tile,
 .Section-DashboardHome .c3-legend-item-tile {
   rx: 100%;
   ry: 100%;
+}
+
+.Section-Analytics .c3-line,
+.Section-DashboardHome .c3-line {
+  stroke: rgba(25, 25, 25, 0.2) !important;
+}
+
+.Section-Analytics .c3-event-rect:hover,
+.Section-DashboardHome .c3-event-rect:hover {
+  fill: red;
+}
+
+.Section-Analytics .c3-xgrid,
+.Section-Analytics .c3-ygrid,
+.Section-DashboardHome .c3-xgrid,
+.Section-DashboardHome .c3-ygrid {
+  stroke-dasharray: 0;
+  stroke: rgba(85, 89, 97, 0.12);
+  stroke-width: 1;
+}
+
+.Section-Analytics .c3-line,
+.Section-DashboardHome .c3-line {
+  stroke-width: 2;
+}
+
+.Section-Analytics .c3-tooltip .name span,
+.Section-DashboardHome .c3-tooltip .name span {
+  border-radius: 100%;
+}
+
+.Section-Analytics .c3-grid,
+.Section-DashboardHome .c3-grid {
+  stroke-width: 2;
+}
+
+.Section-Analytics .c3-regions,
+.Section-DashboardHome .c3-regions {
+  stroke-width: 8;
+}
+
+.Section-Analytics text,
+.Section-DashboardHome text {
+  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  fill: #949aa2;
+}
+
+.Section-Analytics .c3-legend-item text,
+.Section-DashboardHome .c3-legend-item text {
+  font-size: 0.875rem;
+}
+
+.Section-Analytics .c3-axis path,
+.Section-DashboardHome .c3-axis path {
+  stroke-width: 1.5;
+  stroke: #ddd;
 }
 
 .Section-DashboardHome .c3-circle {
@@ -5768,50 +5921,19 @@ input[type="button"].btn-block {
   stroke-width: 2;
 }
 
-.Section-DashboardHome .c3-line {
-  stroke: rgba(25, 25, 25, 0.2) !important;
+.Section-Analytics .c3-circle {
+  r: 6;
+  stroke-width: 2;
+  stroke: #fff;
 }
 
-.Section-DashboardHome .c3-event-rect:hover {
-  fill: red;
-}
-
-.Section-DashboardHome .c3-xgrid,
-.Section-DashboardHome .c3-ygrid {
-  stroke-dasharray: 0;
-  stroke: rgba(85, 89, 97, 0.12);
-  stroke-width: 1;
-}
-
-.Section-DashboardHome .c3-line {
+.Section-Analytics .c3-circle._expanded_ {
+  r: 6;
   stroke-width: 2;
 }
 
-.Section-DashboardHome .c3-tooltip .name span {
-  border-radius: 100%;
-}
-
-.Section-DashboardHome .c3-grid {
-  stroke-width: 2;
-}
-
-.Section-DashboardHome .c3-regions {
-  stroke-width: 8;
-}
-
-.Section-DashboardHome text {
-  font: 11px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  fill: #949aa2;
-}
-
-.Section-DashboardHome .c3-legend-item text {
-  font-size: 0.875rem;
-}
-
-.Section-DashboardHome .c3-axis path {
-  stroke-width: 1.5;
-  stroke: #ddd;
+.Section-Analytics .c3-legend-item {
+  translate: 0 1.125rem;
 }
 
 .ChartStatsPageViews,
@@ -6000,6 +6122,19 @@ input[type="button"].btn-block {
   left: -0.84375rem;
 }
 
+.analytics-widget-chart {
+  margin-bottom: 3.375rem;
+}
+
+.analytics-widget-chart .c3 {
+  margin-left: -0.5625rem;
+  left: -0.703125rem;
+}
+
+.analytics-widget-chart .c3-legend-item {
+  width: 50px;
+}
+
 .module-triangle-bottom {
   background-color: #fff;
   padding: 0.5625rem;
@@ -6046,18 +6181,24 @@ input[type="button"].btn-block {
   width: 1.875rem;
 }
 
-.media-sm-title, .Section-DashboardHome .FeedItem h2 {
+.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a {
   margin-bottom: 0.3125rem;
   font-size: 0.8125rem;
   line-height: 1;
 }
 
-.media-sm-title a, .Section-DashboardHome .FeedItem h2 a {
+.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a a {
   color: #555a62;
   transition: color 200ms;
 }
 
-.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover {
+.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a a:hover {
   text-decoration: none;
   color: #0291db;
 }
@@ -6158,6 +6299,238 @@ input[type="button"].btn-block {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
+.daterangepicker {
+  position: absolute;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-align: stretch;
+  align-items: stretch;
+  width: 17.375rem;
+  color: inherit;
+  background: #fff;
+  border-radius: 0.125rem;
+  margin-top: 0.0625rem;
+  top: 100px;
+  left: 20px;
+  /* Calendars */
+}
+
+@media (min-width: 564px) {
+  .daterangepicker {
+    width: auto;
+  }
+}
+
+.daterangepicker.dropdown-menu, .daterangepicker.ac_results {
+  padding: 0.5625rem;
+}
+
+.daterangepicker.dropdown-menu, .daterangepicker.ac_results {
+  max-width: none;
+  z-index: 3001;
+}
+
+.daterangepicker.show-calendar .calendar {
+  display: block;
+}
+
+.daterangepicker .calendar {
+  display: none;
+  max-width: 16.25rem;
+  margin: 0.5625rem;
+}
+
+.daterangepicker .calendar.single .calendar-table {
+  border: none;
+}
+
+.daterangepicker .calendar th, .daterangepicker .calendar td {
+  white-space: nowrap;
+  text-align: center;
+  min-width: 32px;
+}
+
+.daterangepicker .calendar-table {
+  margin-top: 0.5625rem;
+  border: 0.0625rem solid #fff;
+  border-radius: 0.125rem;
+  background: #fff;
+}
+
+.daterangepicker table {
+  width: 100%;
+  margin: 0;
+}
+
+.daterangepicker td, .daterangepicker th {
+  text-align: center;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 0.125rem;
+  border: 0.0625rem solid transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.daterangepicker td.available:hover, .daterangepicker th.available:hover {
+  background-color: #ddd;
+  border-color: transparent;
+  color: inherit;
+}
+
+.daterangepicker td.week, .daterangepicker th.week {
+  font-size: 80%;
+  color: #ccc;
+}
+
+.daterangepicker td.off, .daterangepicker td.off.in-range, .daterangepicker td.off.start-date, .daterangepicker td.off.end-date {
+  background-color: #fff;
+  border-color: transparent;
+  color: #999;
+}
+
+.daterangepicker td.in-range {
+  background-color: #eee;
+  border-color: transparent;
+  color: #000;
+  border-radius: 0;
+}
+
+.daterangepicker td.start-date {
+  border-radius: 0.125rem 0 0 0.125rem;
+}
+
+.daterangepicker td.end-date {
+  border-radius: 0 0.125rem 0.125rem 0;
+}
+
+.daterangepicker td.start-date.end-date {
+  border-radius: 0.125rem;
+}
+
+.daterangepicker td.active, .daterangepicker td.Current, .daterangepicker
+td.current-theme, .daterangepicker td.active:hover, .daterangepicker td.Current:hover, .daterangepicker
+td.current-theme:hover {
+  background-color: #0291db;
+  border-color: transparent;
+  color: #fff;
+}
+
+.daterangepicker th.month {
+  width: auto;
+  padding-bottom: 0.28125rem;
+}
+
+.daterangepicker td.disabled, .daterangepicker option.disabled {
+  color: #999;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.daterangepicker select.monthselect, .daterangepicker select.yearselect {
+  font-size: 12px;
+  padding: 1px;
+  height: auto;
+  margin: 0;
+  cursor: default;
+}
+
+.daterangepicker select.monthselect {
+  margin-right: 2%;
+  width: 56%;
+}
+
+.daterangepicker select.yearselect {
+  width: 40%;
+}
+
+.daterangepicker select.hourselect, .daterangepicker select.minuteselect, .daterangepicker select.secondselect, .daterangepicker select.ampmselect {
+  width: 50px;
+  margin-bottom: 0;
+}
+
+.daterangepicker .input-mini.active, .daterangepicker .input-mini.Current, .daterangepicker
+.input-mini.current-theme {
+  border: 0.0625rem solid #08c;
+  border-radius: 0.125rem;
+}
+
+.daterangepicker .daterangepicker_input {
+  position: relative;
+}
+
+.daterangepicker .daterangepicker_input i {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+}
+
+.daterangepicker.rtl .daterangepicker_input i {
+  left: auto;
+  right: 8px;
+}
+
+.daterangepicker .calendar-time {
+  text-align: center;
+  margin: 5px auto;
+  line-height: 2.25rem;
+  position: relative;
+  padding-left: 28px;
+}
+
+.daterangepicker .calendar-time select.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.ranges {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: 0.5625rem;
+}
+
+@media (min-width: 564px) {
+  .ranges {
+    width: auto;
+  }
+}
+
+.ranges ul {
+  list-style: none;
+  margin: 0 auto 0.5625rem;
+  padding: 0;
+  width: 100%;
+}
+
+.ranges li {
+  padding: 0.140625rem 0;
+  cursor: pointer;
+}
+
+.ranges li:hover, .ranges li.active, .ranges li.Current, .ranges
+li.current-theme {
+  color: #0291db;
+}
+
+.ranges .range_inputs {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+
+.ranges .range_inputs > * {
+  margin-left: 0.28125rem;
+}
+
 .dropdown-toggle {
   border-radius: 0;
   cursor: pointer;
@@ -6250,21 +6623,21 @@ input[type="button"].btn-block {
   margin-top: 0.28125rem;
 }
 
-.list-reset,
-.list-reset ul,
-.list-reset ol,
-.list-reset ul,
-.list-reset ul ul,
-.list-reset ul ol,
-.list-reset ol,
-.list-reset ol ul,
-.list-reset ol ol {
+.list-reset, .analytics-panel,
+.list-reset ul, .analytics-panel ul,
+.list-reset ol, .analytics-panel ol,
+.list-reset ul, .analytics-panel ul,
+.list-reset ul ul, .analytics-panel ul ul,
+.list-reset ul ol, .analytics-panel ul ol,
+.list-reset ol, .analytics-panel ol,
+.list-reset ol ul, .analytics-panel ol ul,
+.list-reset ol ol, .analytics-panel ol ol {
   padding-left: 0;
 }
 
-.list-reset li,
-.list-reset ul li,
-.list-reset ol li {
+.list-reset li, .analytics-panel li,
+.list-reset ul li, .analytics-panel ul li,
+.list-reset ol li, .analytics-panel ol li {
   list-style: none;
 }
 
@@ -7749,6 +8122,56 @@ button.close, button.Close {
   margin-left: auto;
 }
 
+.nav-stats, .analytics-panel-metrics {
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.nav-stats-item, .analytics-panel-metrics .analytics-widget-metric {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  -ms-flex-align: center;
+  align-items: center;
+  line-height: 1;
+  padding: 1.125rem 2.25rem 0 0;
+  color: rgba(25, 25, 25, 0.2);
+}
+
+.nav-stats-link > * {
+  cursor: pointer;
+}
+
+.nav-stats-title, .analytics-panel-metrics .metric-title {
+  font-weight: 400;
+  padding: 0.5625rem 0 0.28125rem;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.toolbar-stats-daterange-preview,
+.pager-count {
+  line-height: 1;
+  font-weight: 500;
+  padding-right: 0.5625rem;
+}
+
+.pager,
+.toolbar-stats-daterange {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.nav-stats-value, .analytics-panel-metrics .metric-value {
+  font-weight: 300;
+  font-size: 2.5rem;
+}
+
 .navbar {
   width: 100%;
   display: -ms-flexbox;
@@ -8026,14 +8449,18 @@ button.close, button.Close {
   float: left;
 }
 
-.panel-right h2,
+.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title, .panel-right .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .panel-right .LayoutOptions > a, .panel-right .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .panel-right
+.HomeOptions > a,
 .panel-right h3 {
   padding-bottom: 0.5625rem;
   margin-bottom: 0.5625rem;
   border-bottom: 1px dotted #ededed;
 }
 
-.panel-right h2 {
+.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title, .panel-right .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .panel-right .LayoutOptions > a, .panel-right .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .panel-right
+.HomeOptions > a {
   letter-spacing: .0625rem;
   font-weight: 100;
   text-transform: uppercase;
@@ -8311,40 +8738,40 @@ ul {
   margin-top: -0.0625rem;
 }
 
-table {
+.table-wrap table {
   width: 100%;
   max-width: 100%;
   margin-bottom: 0;
 }
 
-table ul {
+.table-wrap table ul {
   padding-left: 0;
 }
 
-table td.options {
+.table-wrap table td.options {
   white-space: nowrap;
 }
 
-table td.options > * {
+.table-wrap table td.options > * {
   display: inline-block;
   white-space: nowrap;
   margin-right: 0.28125rem;
   vertical-align: middle;
 }
 
-table td.options > *:last-child {
+.table-wrap table td.options > *:last-child {
   margin-right: 0;
 }
 
-table .grow {
+.table-wrap table .grow {
   width: 100%;
 }
 
-table thead tr {
+.table-wrap table thead tr {
   background-color: #f6f9fb;
 }
 
-table thead th, table thead td {
+.table-wrap table thead th, .table-wrap table thead td {
   padding: 0.5625rem 0.84375rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
@@ -8357,35 +8784,35 @@ table thead th, table thead td {
   white-space: nowrap;
 }
 
-table thead th:last-child, table thead td:last-child {
+.table-wrap table thead th:last-child, .table-wrap table thead td:last-child {
   border-right: 0;
 }
 
-table tbody {
+.table-wrap table tbody {
   font-size: 0.8125rem;
 }
 
-table tbody tr:hover {
+.table-wrap table tbody tr:hover {
   background-color: #f9fdfe;
 }
 
-table th,
-table td {
+.table-wrap table th,
+.table-wrap table td {
   padding: 0.75rem 1.125rem;
   line-height: 1.5;
   vertical-align: middle;
   border-top: 0.0625rem solid #f4f6fb;
 }
 
-table tbody + tbody {
+.table-wrap table tbody + tbody {
   border-top: 0.125rem solid #f4f6fb;
 }
 
-table .table {
+.table-wrap table .table {
   background-color: #f6f9fb;
 }
 
-table.no-hover tbody tr:hover {
+.table-wrap table.no-hover tbody tr:hover {
   background-color: inherit;
 }
 
@@ -8546,7 +8973,9 @@ table.no-hover tbody tr:hover {
   border-top: 0.125rem solid #ddd;
 }
 
-.Section-DashboardHome .FeedItem h2 {
+.Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem
+.HomeOptions > a {
   padding: 0;
   margin-top: 0;
   margin-left: 0;
@@ -8571,7 +9000,15 @@ table.no-hover tbody tr:hover {
 }
 
 .Section-DashboardHome .FeedItem .FeedDescription,
-.Section-DashboardHome .FeedItem h2 {
+.Section-DashboardHome .FeedItem h2,
+.Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header
+.Section-DashboardHome .FeedItem .title,
+.Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
+.Section-DashboardHome .FeedItem .LayoutOptions > a,
+.Section-DashboardHome .FeedItem .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header
+.Section-DashboardHome .FeedItem
+.HomeOptions > a {
   margin-right: 102px;
 }
 
@@ -8732,56 +9169,6 @@ table.no-hover tbody tr:hover {
   margin-top: 2.25rem;
 }
 
-.nav-stats {
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.nav-stats-item {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
-  -ms-flex-align: center;
-  align-items: center;
-  line-height: 1;
-  padding: 1.125rem 2.25rem 0 0;
-  color: rgba(25, 25, 25, 0.2);
-}
-
-.nav-stats-item > * {
-  cursor: pointer;
-}
-
-.nav-stats-item .nav-stats-title {
-  font-weight: 400;
-  padding: 0.5625rem 0 0.28125rem;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-}
-
-.toolbar-stats-daterange-preview,
-.pager-count {
-  line-height: 1;
-  font-weight: 500;
-  padding-right: 0.5625rem;
-}
-
-.pager,
-.toolbar-stats-daterange {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.nav-stats-value {
-  font-weight: 300;
-  font-size: 2.5rem;
-}
-
 .content-cell {
   word-break: break-word;
 }
@@ -8826,8 +9213,16 @@ table.no-hover tbody tr:hover {
   padding-left: 0;
 }
 
+.filter-date {
+  min-width: 11.5rem;
+}
+
 h1, .h1,
-h2, .h2, .hero .hero-title,
+h2,
+.analytics-widget-header .title,
+.analytics-widget-header .LayoutOptions > a,
+.analytics-widget-header
+.HomeOptions > a, .h2, .hero .hero-title,
 h3, .h3,
 h4, .h4,
 h5, .h5,
@@ -8842,7 +9237,8 @@ h1, .h1 {
   font-size: 2rem;
 }
 
-h2, .h2, .hero .hero-title {
+h2, .analytics-widget-header .title, .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
+.HomeOptions > a, .h2, .hero .hero-title {
   font-size: 1.125rem;
 }
 
@@ -8863,7 +9259,11 @@ h6, .h6 {
 }
 
 h1, .h1,
-h2, .h2, .hero .hero-title,
+h2,
+.analytics-widget-header .title,
+.analytics-widget-header .LayoutOptions > a,
+.analytics-widget-header
+.HomeOptions > a, .h2, .hero .hero-title,
 h3, .h3 {
   margin-top: 1.125rem;
   margin-bottom: 0.5625rem;
@@ -8884,7 +9284,13 @@ pre {
   margin-bottom: 0;
 }
 
-.border-h2, .content h2, .modal h2, .Overlay > .Popup h2 {
+.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .content .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .content .LayoutOptions > a, .content .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .content
+.HomeOptions > a, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .modal
+.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
+.HomeOptions > a {
   padding: 1.125rem 0;
   margin: 0;
   font-size: 0.875rem;
@@ -8893,7 +9299,11 @@ pre {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
-.modal h2, .Overlay > .Popup h2 {
+.modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .modal
+.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
+.HomeOptions > a {
   border-top: 0 !important;
 }
 
@@ -8902,7 +9312,13 @@ pre {
   margin-bottom: 0;
 }
 
-.full-border, .video-section-heading, .border-h2, .content h2, .modal h2, .Overlay > .Popup h2, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
+.full-border, .analytics-panel-metrics, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .content .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .content .LayoutOptions > a, .content .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .content
+.HomeOptions > a, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .modal
+.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
+.HomeOptions > a, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -9037,8 +9453,18 @@ strong,
   font-weight: 500;
 }
 
-table h2,
-form h2 {
+table h2, table .analytics-widget-header .title, .analytics-widget-header table .title, table .analytics-widget-header .LayoutOptions > a, .analytics-widget-header table .LayoutOptions > a, table .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header table
+.HomeOptions > a,
+form h2,
+form .analytics-widget-header .title, .analytics-widget-header
+form .title,
+form .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
+form .LayoutOptions > a,
+form .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header
+form
+.HomeOptions > a {
   margin-top: 0;
 }
 
@@ -9215,7 +9641,9 @@ form h2 {
   margin-top: 5px;
 }
 
-.Section-Dashboard.Message.index div.Message h1, .Section-Dashboard.Message.index div.Message h2, .Section-Dashboard.Message.index div.Message h3, .Section-Dashboard.Message.index div.Message p, .Section-Dashboard.Message.index div.Message .P {
+.Section-Dashboard.Message.index div.Message h1, .Section-Dashboard.Message.index div.Message h2, .Section-Dashboard.Message.index div.Message .analytics-widget-header .title, .analytics-widget-header .Section-Dashboard.Message.index div.Message .title, .Section-Dashboard.Message.index div.Message .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-Dashboard.Message.index div.Message .LayoutOptions > a, .Section-Dashboard.Message.index div.Message .analytics-widget-header
+.HomeOptions > a, .analytics-widget-header .Section-Dashboard.Message.index div.Message
+.HomeOptions > a, .Section-Dashboard.Message.index div.Message h3, .Section-Dashboard.Message.index div.Message p, .Section-Dashboard.Message.index div.Message .P {
   margin: 10px 0;
 }
 

@@ -2,22 +2,22 @@
 
 <div id="StatsToolbar" class="toolbar toolbar-stats">
     <ul id="StatsOverview" class="toolbar-stats-navigation nav nav-stats">
-        <li class="nav-stats-item nav-stats-users" id="StatsUsers">
+        <li class="nav-stats-item nav-stats-link nav-stats-users" id="StatsUsers">
             <div class="nav-stats-value StatsValue">-</div>
             <div class="nav-stats-title"><?php echo t('Users'); ?></div>
             <div class="Sparkline"></div>
         </li>
-        <li class="nav-stats-item nav-stats-discussions" id="StatsDiscussions">
+        <li class="nav-stats-item nav-stats-link nav-stats-discussions" id="StatsDiscussions">
             <div class="nav-stats-value StatsValue">-</div>
             <div class="nav-stats-title"><?php echo t('Discussions'); ?></div>
             <div class="Sparkline"></div>
         </li>
-        <li class="nav-stats-item nav-stats-pageviews" id="StatsPageViews">
+        <li class="nav-stats-item nav-stats-link nav-stats-pageviews" id="StatsPageViews">
             <div class="nav-stats-value StatsValue">-</div>
             <div class="nav-stats-title"><?php echo t('Page Views'); ?></div>
             <div class="Sparkline"></div>
         </li>
-        <li class="nav-stats-item nav-stats-comments" id="StatsComments">
+        <li class="nav-stats-item nav-stats-link nav-stats-comments" id="StatsComments">
             <div class="nav-stats-value StatsValue">-</div>
             <div class="nav-stats-title"><?php echo t('Comments'); ?></div>
             <div class="Sparkline"></div>

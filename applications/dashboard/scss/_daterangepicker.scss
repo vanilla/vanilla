@@ -1,0 +1,368 @@
+// Adapted from the 'Date Range Picker for Bootstrap' project https://github.com/dangrossman/bootstrap-daterangepicker
+// by Dan Grossman http://www.dangrossman.info/
+//
+// Modified to use rems instead of pixels and to use a flex layout.
+
+// Settings
+
+// The class name to contain everything within.
+$prefix-class: daterangepicker;
+
+//
+// Colors
+$daterangepicker-color:                      inherit !default;
+$daterangepicker-bg-color:                   $white;
+
+$daterangepicker-cell-color:                 $daterangepicker-color !default;
+$daterangepicker-cell-border-color:          transparent !default;
+$daterangepicker-cell-bg-color:              $daterangepicker-bg-color !default;
+
+$daterangepicker-cell-hover-color:           $daterangepicker-color !default;
+$daterangepicker-cell-hover-border-color:    $daterangepicker-cell-border-color !default;
+$daterangepicker-cell-hover-bg-color:        #ddd;
+
+$daterangepicker-in-range-color:             #000 !default;
+$daterangepicker-in-range-border-color:      transparent !default;
+$daterangepicker-in-range-bg-color:          #eee;
+
+$daterangepicker-active-color:               #fff !default;
+$daterangepicker-active-bg-color:            $brand-primary;
+$daterangepicker-active-border-color:        transparent !default;
+
+$daterangepicker-unselected-color:           #999 !default;
+$daterangepicker-unselected-border-color:    transparent !default;
+$daterangepicker-unselected-bg-color:        #fff !default;
+
+//
+// daterangepicker
+$daterangepicker-width:          to-rem(278);
+$daterangepicker-z-index:        3000 !default;
+
+$daterangepicker-border-size:    $border-width;
+$daterangepicker-border-color:   #ccc !default;
+$daterangepicker-border-radius:  $border-radius;
+
+
+//
+// Calendar
+$daterangepicker-calendar-margin:              $spacer / 2;
+$daterangepicker-calendar-bg-color:            $daterangepicker-bg-color !default;
+
+$daterangepicker-calendar-border-size:         $border-width;
+$daterangepicker-calendar-border-color:        $daterangepicker-bg-color !default;
+$daterangepicker-calendar-border-radius:       $daterangepicker-border-radius !default;
+
+//
+// Calendar Cells
+$daterangepicker-cell-size:           to-rem(18);
+$daterangepicker-cell-width:          $daterangepicker-cell-size !default;
+$daterangepicker-cell-height:         $daterangepicker-cell-size !default;
+
+$daterangepicker-cell-border-radius:  $daterangepicker-calendar-border-radius !default;
+$daterangepicker-cell-border-size:    $border-width;
+
+//
+// Dropdowns
+$daterangepicker-dropdown-z-index: $daterangepicker-z-index + 1 !default;
+
+//
+// Controls
+$daterangepicker-control-height:               to-rem(36);
+$daterangepicker-control-line-height:          $daterangepicker-control-height !default;
+$daterangepicker-control-color:                #555 !default;
+
+$daterangepicker-control-border-size:          $border-width;
+$daterangepicker-control-border-color:         #ccc !default;
+$daterangepicker-control-border-radius:        $border-radius;
+
+$daterangepicker-control-active-border-size:   $border-width;
+$daterangepicker-control-active-border-color:  #08c !default;
+$daterangepicker-control-active-border-radius: $daterangepicker-control-border-radius !default;
+
+$daterangepicker-control-disabled-color:       #ccc !default;
+
+//
+// Ranges
+$daterangepicker-ranges-color:                #08c !default;
+$daterangepicker-ranges-bg-color:             #f5f5f5 !default;
+
+$daterangepicker-ranges-border-size:          $border-width;
+$daterangepicker-ranges-border-color:         $daterangepicker-ranges-bg-color !default;
+$daterangepicker-ranges-border-radius:        $daterangepicker-border-radius !default;
+
+$daterangepicker-ranges-hover-color:          #fff !default;
+$daterangepicker-ranges-hover-bg-color:       $daterangepicker-ranges-color !default;
+$daterangepicker-ranges-hover-border-size:    $daterangepicker-ranges-border-size !default;
+$daterangepicker-ranges-hover-border-color:   $daterangepicker-ranges-hover-bg-color !default;
+$daterangepicker-ranges-hover-border-radius:  $daterangepicker-border-radius !default;
+
+$daterangepicker-ranges-active-border-size:   $daterangepicker-ranges-border-size !default;
+$daterangepicker-ranges-active-border-color:  $daterangepicker-ranges-bg-color !default;
+$daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !default;
+
+//
+// STYLESHEETS
+//
+.#{$prefix-class} {
+  position: absolute;
+
+  // js from date range picker we're using adds the display: flex property.
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: $daterangepicker-width;
+  color: $daterangepicker-color;
+  background: $daterangepicker-bg-color;
+  border-radius: $daterangepicker-border-radius;
+  margin-top: $daterangepicker-border-size;
+
+  @media (min-width: 564px) {
+    width: auto;
+  }
+
+  &.dropdown-menu {
+    padding: ($spacer / 2);
+  }
+
+  // TODO: Should these be parameterized??
+  top: 100px;
+  left: 20px;
+
+  &.dropdown-menu {
+    max-width: none;
+    z-index: $daterangepicker-dropdown-z-index;
+  }
+
+  /* Calendars */
+  &.show-calendar {
+    .calendar {
+      display: block;
+    }
+  }
+
+  .calendar {
+    display: none;
+    max-width: $daterangepicker-width - ($spacer); // container padding
+    margin: $spacer / 2;
+
+    &.single {
+      .calendar-table {
+        border: none;
+      }
+    }
+
+    th, td {
+      white-space: nowrap;
+      text-align: center;
+
+      // TODO: Should this actually be hard-coded?
+      min-width: 32px;
+    }
+  }
+
+  .calendar-table {
+    margin-top: $spacer / 2;
+    border: $daterangepicker-calendar-border-size solid $daterangepicker-calendar-border-color;
+    border-radius: $daterangepicker-calendar-border-radius;
+    background: $daterangepicker-calendar-bg-color;
+  }
+
+  table {
+    width: 100%;
+    margin: 0;
+  }
+
+  td, th {
+    text-align: center;
+    width: $daterangepicker-cell-width;
+    height: $daterangepicker-cell-height;
+    border-radius: $daterangepicker-cell-border-radius;
+    border: $daterangepicker-cell-border-size solid $daterangepicker-cell-border-color;
+    white-space: nowrap;
+    cursor: pointer;
+
+    &.available {
+      &:hover {
+        background-color: $daterangepicker-cell-hover-bg-color;
+        border-color: $daterangepicker-cell-hover-border-color;
+        color: $daterangepicker-cell-hover-color;
+      }
+    }
+
+    &.week {
+      font-size: 80%;
+      color: #ccc;
+    }
+  }
+
+  td {
+    &.off {
+      &, &.in-range, &.start-date, &.end-date {
+        background-color: $daterangepicker-unselected-bg-color;
+        border-color: $daterangepicker-unselected-border-color;
+        color: $daterangepicker-unselected-color;
+      }
+    }
+
+    //
+    // Date Range
+    &.in-range {
+      background-color: $daterangepicker-in-range-bg-color;
+      border-color: $daterangepicker-in-range-border-color;
+      color: $daterangepicker-in-range-color;
+
+      // TODO: Should this be static or should it be parameterized?
+      border-radius: 0;
+    }
+
+    &.start-date {
+      border-radius: $daterangepicker-cell-border-radius 0 0 $daterangepicker-cell-border-radius;
+    }
+
+    &.end-date {
+      border-radius: 0 $daterangepicker-cell-border-radius $daterangepicker-cell-border-radius 0;
+    }
+
+    &.start-date.end-date {
+      border-radius: $daterangepicker-cell-border-radius;
+    }
+
+    &.active {
+      &, &:hover {
+        background-color: $daterangepicker-active-bg-color;
+        border-color: $daterangepicker-active-border-color;
+        color: $daterangepicker-active-color;
+      }
+    }
+  }
+
+  th {
+    &.month {
+      width: auto;
+      padding-bottom: $spacer / 4;
+    }
+  }
+
+  //
+  // Disabled Controls
+  //
+  td, option {
+    &.disabled {
+      color: #999;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+  }
+
+  select {
+    &.monthselect, &.yearselect {
+      font-size: 12px;
+      padding: 1px;
+      height: auto;
+      margin: 0;
+      cursor: default;
+    }
+
+    &.monthselect {
+      margin-right: 2%;
+      width: 56%;
+    }
+
+    &.yearselect {
+      width: 40%;
+    }
+
+    &.hourselect, &.minuteselect, &.secondselect, &.ampmselect {
+      width: 50px;
+      margin-bottom: 0;
+    }
+  }
+
+  //
+  // Text Input Controls (above calendar)
+  //
+  .input-mini {
+    &.active {
+      border: $daterangepicker-control-active-border-size solid $daterangepicker-control-active-border-color;
+      border-radius: $daterangepicker-control-active-border-radius;
+    }
+  }
+
+  .daterangepicker_input {
+    position: relative;
+
+    i {
+      position: absolute;
+
+      // NOTE: These appear to be eyeballed to me...
+      left: 8px;
+      top: 8px;
+    }
+  }
+  &.rtl {
+    .daterangepicker_input i {
+      left: auto;
+      right: 8px;
+    }
+  }
+
+  //
+  // Time Picker
+  //
+  .calendar-time {
+    text-align: center;
+    margin: 5px auto;
+    line-height: $daterangepicker-control-line-height;
+    position: relative;
+    padding-left: 28px;
+
+    select {
+      &.disabled {
+        color: $daterangepicker-control-disabled-color;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+//
+// Predefined Ranges
+//
+
+.ranges {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  padding: $spacer / 2;
+
+  @media (min-width: 564px) {
+    width: auto;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0 auto $spacer / 2;
+    padding: 0;
+    width: 100%;
+  }
+
+  li {
+    padding: ($spacer / 8) 0;
+    cursor: pointer;
+
+    &:hover,
+    &.active {
+      color: $brand-primary;
+    }
+  }
+
+  .range_inputs {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row-reverse;
+     > * {
+       margin-left: $spacer / 4;
+     }
+  }
+}

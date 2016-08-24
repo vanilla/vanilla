@@ -105,6 +105,7 @@ module.exports = function (grunt) {
               // , 'bootstrap/scss/_variables.scss'
               , 'bootstrap/scss/*.scss'
               , 'bootstrap/scss/mixins/*.scss'
+              , 'bootstrap-daterangepicker/daterangepicker.scss'
             ],
             dest: 'scss/vendors'
           }
@@ -213,7 +214,7 @@ module.exports = function (grunt) {
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
           'scss/maps/_bootstrapAnimation': 'scss/vendors/bootstrap/scss/_animation.scss',
-          'scss/maps/_bootstrapSubset.scss': [
+          'scss/maps/_vendorSubset.scss': [
             'scss/vendors/bootstrap/scss/_normalize.scss',
             'scss/vendors/bootstrap/scss/_utilities.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
@@ -227,7 +228,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_forms.scss',
             'scss/vendors/bootstrap/scss/_custom-forms.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
-            'scss/vendors/bootstrap/scss/_reboot.scss'
+            'scss/vendors/bootstrap/scss/_reboot.scss',
           ],
           'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },

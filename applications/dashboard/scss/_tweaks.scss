@@ -41,7 +41,10 @@
   }
 }
 
-//PATCH
 .CurrentTheme {
   padding-left: 0;
+}
+
+.filter-date {
+  min-width: to-rem(184);
 }

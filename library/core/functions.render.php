@@ -1093,6 +1093,7 @@ if (!function_exists('userUrl')) {
 
         $UserName = val($Px.'Name', $User);
         $UserName = preg_replace('/([\?&]+)/', '', $UserName);
+        $UserName = str_replace('/', '%2f', $UserName);
 
         $Result = '/profile/'.
             ($Method ? trim($Method, '/').'/' : '').

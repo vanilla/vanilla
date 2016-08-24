@@ -874,13 +874,16 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         foreach ($this->eventHandlers[$EventKey] as $PluginKey) {
             $callback = null;
             if (is_array($PluginKey) || $PluginKey instanceof \Closure) {
+                // The event handler is an array or a closure so we can call it directly.
                 $callback = $PluginKey;
             } else {
                 $PluginKeyParts = explode('.', $PluginKey);
                 if (count($PluginKeyParts) == 2) {
+                    // The event handler is a class and method name.
                     list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
                     $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
                 } elseif (is_callable($PluginKey)) {
+                    // The event handler is a global function.
                     $callback = $PluginKey;
                 }
             }

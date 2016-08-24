@@ -68,6 +68,7 @@ class FlatCategoryModule extends Gdn_Module {
                 0,
                 $this->getLimit()
             );
+            $this->categoryModel->joinRecent($this->children);
         }
 
         return $this->children;
@@ -86,6 +87,7 @@ class FlatCategoryModule extends Gdn_Module {
      */
     public function toString() {
         $this->setData('Categories', $this->getChildren());
+        $this->setData('DoHeadings', c('Vanilla.Categories.DoHeadings'));
         $this->setData('Layout', c('Vanilla.Categories.Layout', 'modern'));
         $this->setData('ParentCategory', $this->getCategory());
 
@@ -93,6 +95,16 @@ class FlatCategoryModule extends Gdn_Module {
             return '';
         }
 
+        switch ($this->data('Layout')) {
+            case 'table':
+                $this->setView('flatcategory-table');
+                break;
+            case 'modern':
+            default:
+                $this->setView('flatcategory-modern');
+        }
+
+        require_once Gdn::controller()->fetchViewLocation('helper_functions', 'categories', 'vanilla');
         return parent::toString();
     }
 }

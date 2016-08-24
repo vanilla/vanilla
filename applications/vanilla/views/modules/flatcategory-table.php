@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) return; ?>
 
-<?php if (c('Vanilla.Categories.DoHeadings')): ?>
+<?php if ($this->data('DoHeadings')): ?>
     <?php foreach ($this->data('Categories', []) as $category): ?>
     <div id="CategoryGroup-<?php echo $category['UrlCode']; ?>" class="CategoryGroup <?php echo val('CssClass', $category); ?>">
         <h2 class="H"><?php echo htmlspecialchars($category['Name']); ?></h2>

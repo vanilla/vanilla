@@ -5,12 +5,12 @@ class FlatCategoryModule extends Gdn_Module {
     const DEFAULT_LIMIT = 10;
 
     /**
-     * @var string|int Target category's slug or ID.
+     * @var string|int
      */
     public $categoryID;
 
     /**
-     * @var array The category for this module instance.
+     * @var array
      */
     private $category;
 
@@ -18,6 +18,11 @@ class FlatCategoryModule extends Gdn_Module {
      * @var CategoryModel
      */
     private $categoryModel;
+
+    /**
+     * @var array
+     */
+    private $children;
 
     /**
      * @var int Limit on the number of categories displayed.
@@ -56,22 +61,38 @@ class FlatCategoryModule extends Gdn_Module {
 
     public function getChildren() {
         $category = $this->getCategory();
-        $children = [];
 
-        if (is_array($category)) {
-            $children = $this->categoryModel->getTreeAsFlat(
+        if (!$this->children) {
+            $this->children = $this->categoryModel->getTreeAsFlat(
                 $category['CategoryID'],
                 0,
                 $this->getLimit()
             );
         }
 
-        return $children;
+        return $this->children;
     }
 
     public function getLimit() {
         $limit = $this->limit;
 
         return is_numeric($limit) && $limit > 0 ? (int)$limit : $this::DEFAULT_LIMIT;
+    }
+
+    /**
+     * Returns the component as a string to be rendered to the screen.
+     *
+     * @return string
+     */
+    public function toString() {
+        $this->setData('Categories', $this->getChildren());
+        $this->setData('Layout', c('Vanilla.Categories.Layout', 'modern'));
+        $this->setData('ParentCategory', $this->getCategory());
+
+        if (!$this->data('ParentCategory') || !$this->data('Categories')) {
+            return '';
+        }
+
+        return parent::toString();
     }
 }

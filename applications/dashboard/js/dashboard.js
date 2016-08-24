@@ -883,6 +883,41 @@
         $('.table-wrap table:not(.CheckBoxGrid)', element).tablejengo({container: '#main-row .main'});
     }
 
+    function pinToolTips() {
+        var options = {
+            title: 'Pin to your dashboard',
+            trigger: 'hover',
+            placement: 'left',
+            delay: {
+                show: 100
+            }
+        };
+
+        $('.analytics-widget-chart .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
+            $(this).tooltip('hide');
+        });
+
+        options['placement'] = 'top';
+
+        $('.analytics-widget-metric .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
+            $(this).tooltip('hide');
+        });
+
+        options['title'] = 'Unpin from your dashboard';
+
+        $('.analytics-widget-metric .bookmarked').tooltip(options).on('click', function() {
+            $(this).tooltip('hide');
+        });
+
+        options['placement'] = 'left';
+
+        $('.analytics-widget-chart .bookmarked').tooltip(options).on('click', function() {
+            $(this).tooltip('hide');
+        });
+
+
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -895,6 +930,7 @@
         icheckInit(e.target); // checkboxes and radios
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
+        pinToolTips(); // tooltips for analytics page
     });
 
     // $(document).on('c3Init', function() {
@@ -960,3 +996,11 @@
     });
 
 })(jQuery);
+
+// Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
+var dashboardSymbol = function(name, cssClass) {
+    if (!cssClass) {
+        cssClass = '';
+    }
+    return '<svg class="icon ' + cssClass + ' icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href="#' + name + '" /></svg>';
+};

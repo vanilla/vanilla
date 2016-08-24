@@ -44,6 +44,7 @@ $chart-bg-opacity: 0.15;
   color: $color;
 }
 
+.Section-Analytics,
 .Section-DashboardHome {
 
   .c3-axis-y {
@@ -88,17 +89,6 @@ $chart-bg-opacity: 0.15;
   .c3-legend-item-tile {
     rx: 100%;
     ry: 100%;
-  }
-
-  .c3-circle {
-    r: 8;
-    stroke-width: 2;
-    stroke: $white;
-
-    &._expanded_ {
-      r: 8;
-      stroke-width: 2;
-    }
   }
 
   .c3-line {
@@ -154,6 +144,37 @@ $chart-bg-opacity: 0.15;
   }
 }
 
+.Section-DashboardHome {
+  .c3-circle {
+    r: 8;
+    stroke-width: 2;
+    stroke: $white;
+
+    &._expanded_ {
+      r: 8;
+      stroke-width: 2;
+    }
+  }
+}
+
+.Section-Analytics {
+  .c3-circle {
+    r: 6;
+    stroke-width: 2;
+    stroke: $white;
+
+    &._expanded_ {
+      r: 6;
+      stroke-width: 2;
+    }
+  }
+
+  .c3-legend-item {
+    translate: 0 $spacer;
+  }
+}
+
+
 .ChartStatsPageViews,
 .nav-stats-pageviews.active,
 .nav-stats-pageviews:hover {
@@ -178,11 +199,23 @@ $chart-bg-opacity: 0.15;
   @include chart-variant($chart-4);
 }
 
-
 #StatsChart {
   margin-left: -$spacer;
   margin-right: -$spacer;
   left: -$spacer * .75;
+}
+
+.analytics-widget-chart {
+  margin-bottom: $spacer * 3;
+
+  .c3 {
+    margin-left: -$spacer / 2;
+    left: -$spacer * .625;
+  }
+
+  .c3-legend-item {
+    width: 50px;
+  }
 }
 
 .module-triangle-bottom {
@@ -193,3 +226,4 @@ $chart-bg-opacity: 0.15;
   border-radius: to-rem(4);
   box-shadow: 0 0 5px rgba(0,0,0,.15);
 }
+

@@ -208,3 +208,48 @@
     margin-left: auto;
   }
 }
+
+.nav-stats {
+  display: flex;
+}
+
+.nav-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding: $spacer $spacer * 2 0 0 ;
+  color: rgba(25,25,25,0.20);
+}
+
+.nav-stats-link {
+  > * {
+    cursor: pointer;
+  }
+}
+
+.nav-stats-title {
+  font-weight: 400;
+  padding: $spacer / 2 0 $spacer / 4;
+  text-transform: uppercase;
+  font-size: $font-size-sm;
+}
+
+.toolbar-stats-daterange-preview,
+.pager-count {
+  line-height: 1;
+  font-weight: 500;
+  padding-right: $spacer / 2;
+}
+
+.pager,
+.toolbar-stats-daterange {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.nav-stats-value {
+  font-weight: 300;
+  font-size: to-rem(40);
+}

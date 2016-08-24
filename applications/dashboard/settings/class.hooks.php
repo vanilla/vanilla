@@ -55,6 +55,8 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
             $Sender->addJsFile('vendors/util.js', 'dashboard');
             $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/moment.js', 'dashboard');
+            $Sender->addJsFile('vendors/daterangepicker.js', 'dashboard');
             $Sender->addJsFile('vendors/tooltip.js', 'dashboard');
             $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
             $Sender->addJsFile('vendors/dropdown.js', 'dashboard');

@@ -12,88 +12,88 @@
   .header-block + & {
     margin-top: -$border-width;
   }
-}
 
-table {
-  width: 100%;
-  max-width: 100%;
-  margin-bottom: 0;
-
-  ul {
-    padding-left: 0;
-  }
-
-  td.options {
-    white-space: nowrap;
-
-    > * {
-      display: inline-block;
-      white-space: nowrap;
-      margin-right: $spacer / 4;
-      vertical-align: middle;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-  .grow {
+  table {
     width: 100%;
-  }
+    max-width: 100%;
+    margin-bottom: 0;
 
-  thead {
-    tr {
-      background-color: $grey-light;
+    ul {
+      padding-left: 0;
     }
 
-    th, td {
-      padding: ($spacer / 2) ($spacer * .75);
-      border: 1px solid #eee;
-      border-top: 1px solid #ddd;
-      border-bottom: (2 * $table-border-width) solid $table-border-color;
-      text-transform: uppercase;
-      font-weight: 500;
-      font-size: $font-size-sm;
-      line-height: $line-height-lg;
-      vertical-align: middle;
+    td.options {
       white-space: nowrap;
 
-      &:last-child {
-        border-right: 0;
+      > * {
+        display: inline-block;
+        white-space: nowrap;
+        margin-right: $spacer / 4;
+        vertical-align: middle;
+
+        &:last-child {
+          margin-right: 0;
+        }
       }
     }
-  }
 
-  tbody {
-    font-size: $font-size-tables;
-    tr {
-      &:hover {
-        background-color: #f9fdfe;
+    .grow {
+      width: 100%;
+    }
+
+    thead {
+      tr {
+        background-color: $grey-light;
+      }
+
+      th, td {
+        padding: ($spacer / 2) ($spacer * .75);
+        border: 1px solid #eee;
+        border-top: 1px solid #ddd;
+        border-bottom: (2 * $table-border-width) solid $table-border-color;
+        text-transform: uppercase;
+        font-weight: 500;
+        font-size: $font-size-sm;
+        line-height: $line-height-lg;
+        vertical-align: middle;
+        white-space: nowrap;
+
+        &:last-child {
+          border-right: 0;
+        }
       }
     }
-  }
 
-  th,
-  td {
-    padding: $table-cell-padding $padding-default;
-    line-height: $line-height;
-    vertical-align: middle;
-    border-top: $table-border-width solid $table-border-color;
-  }
+    tbody {
+      font-size: $font-size-tables;
+      tr {
+        &:hover {
+          background-color: #f9fdfe;
+        }
+      }
+    }
 
-  tbody + tbody {
-    border-top: (2 * $table-border-width) solid $table-border-color;
-  }
+    th,
+    td {
+      padding: $table-cell-padding $padding-default;
+      line-height: $line-height;
+      vertical-align: middle;
+      border-top: $table-border-width solid $table-border-color;
+    }
 
-  .table {
-    background-color: $body-bg;
-  }
+    tbody + tbody {
+      border-top: (2 * $table-border-width) solid $table-border-color;
+    }
 
-  &.no-hover {
-    tbody tr {
-      &:hover {
-        background-color: inherit;
+    .table {
+      background-color: $body-bg;
+    }
+
+    &.no-hover {
+      tbody tr {
+        &:hover {
+          background-color: inherit;
+        }
       }
     }
   }

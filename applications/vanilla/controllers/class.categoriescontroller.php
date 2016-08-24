@@ -347,6 +347,11 @@ class CategoriesController extends VanillaController {
             $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
             $Wheres['d.CategoryID'] = $CategoryIDs;
 
+            // RSS should include announcements.
+            if ($this->SyndicationMethod !== SYNDICATION_NONE) {
+                $Wheres['Announce'] = 'all';
+            }
+
             $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
             // Build a pager

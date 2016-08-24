@@ -105,6 +105,8 @@ class SearchController extends Gdn_Controller {
         $this->setData('SearchResults', $ResultSet, true);
         $this->setData('SearchTerm', Gdn_Format::text($Search), true);
 
+        $this->setData('_CurrentRecords', count($ResultSet));
+
         $this->canonicalUrl(url('search', true));
         $this->render();
     }

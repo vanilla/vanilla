@@ -975,12 +975,11 @@ if (!function_exists('userBuilder')) {
         $photo = $userPrefix.'Photo';
         $gender = $userPrefix.'Gender';
 
-
-        $user->UserID = $row->$userID;
-        $user->Name = $row->$name;
-        $user->Photo = property_exists($row, $photo) ? $row->$photo : '';
+        $user->UserID = val($userID, $row);
+        $user->Name = val($name, $row);
+        $user->Photo = val($photo, $row) ?: '';
         $user->Email = val($userPrefix.'Email', $row, null);
-        $user->Gender = property_exists($row, $gender) ? $row->$gender : null;
+        $user->Gender = val($gender, $row) ?: null;
 
         return $user;
     }

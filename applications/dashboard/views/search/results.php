@@ -79,8 +79,9 @@
 echo '<div class="PageControls Bottom">';
 
 $RecordCount = $this->data('RecordCount');
-if ($RecordCount)
+if ($RecordCount) {
     echo '<span class="Gloss">'.plural($RecordCount, '%s result', '%s results').'</span>';
+}
 
 PagerModule::write(array('Wrapper' => '<div %1$s>%2$s</div>'));
 

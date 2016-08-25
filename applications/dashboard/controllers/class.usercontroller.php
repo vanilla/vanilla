@@ -829,18 +829,18 @@ class UserController extends DashboardController {
      * @since 2.0.0
      * @access private
      * @see self::Decline, self::Approve
+     *
      * @param string $Action Approve or Decline.
      * @param int $UserID Unique ID.
+     * @return bool Whether handling was successful.
      */
     private function handleApplicant($Action, $UserID) {
         $this->permission('Garden.Users.Approve');
 
-        //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
         if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
             $this->Form->addError('ErrorInput');
             $Result = false;
         } else {
-            $Session = Gdn::session();
             $UserModel = new UserModel();
             if (is_numeric($UserID)) {
                 try {
@@ -852,7 +852,7 @@ class UserController extends DashboardController {
 
                     // Re-calculate applicant count
                     $RoleModel = new RoleModel();
-                    $RoleModel->GetApplicantCount(true);
+                    $RoleModel->getApplicantCount(true);
 
                     $this->fireEvent("After{$Action}User");
                 } catch (Exception $ex) {
@@ -861,6 +861,8 @@ class UserController extends DashboardController {
                 }
             }
         }
+
+        return $Result;
     }
 
     /**

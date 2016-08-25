@@ -12,68 +12,8 @@
   @extend .info;
 }
 
-.emojiext-list,
-.LayoutOptions,
-.HomeOptions {
+.emojiext-list {
   @extend .label-selector;
-}
-
-.LayoutOptions,
-.HomeOptions {
-  > a {
-    text-decoration: none;
-    color: $grey-dark;
-    @extend .title;
-  }
-
-  .Sprite {
-    @extend img;
-  }
-
-  .image-wrap {
-    height: 124px;
-    width: 180px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-// Homepage page
-.Homepage .Sprite {
-  display: block;
-  height: 124px;
-  width: 180px;
-  background: url("./images/homepage-sprites.png") 0 0 no-repeat;
-
-  @extend .label-selector-image;
-}
-
-.Homepage .SpDiscussionsTable {
-  background-position: 0 0;
-}
-
-.Homepage .SpDiscussions {
-  background-position: -180px 0;
-}
-
-.Homepage .SpCategories {
-  background-position: -360px 0;
-}
-
-.Homepage .SpCategoriesTable {
-  background-position: 0 -124px;
-}
-
-.Homepage .SpCategoriesMixed {
-  background-position: -180px -124px;
-}
-
-.Homepage .SpActivity {
-  background-position: -360px -124px;
-}
-
-.Homepage .SpBestOf {
-  background-position: -540px 0;
 }
 
 .Current,

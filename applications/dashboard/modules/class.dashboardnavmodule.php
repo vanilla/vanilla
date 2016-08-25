@@ -48,16 +48,16 @@ class DashboardNavModule extends SiteNavModule {
     ];
 
     protected static $altSectionsInfo = [
-        'Tutorials' => [
-            'section' => 'Tutorials',
-            'title' => 'Help',
-            'description' => '',
-            'url' => '/dashboard/settings/gettingstarted'
-        ]
+//        'Tutorials' => [
+//            'section' => 'Tutorials',
+//            'title' => 'Help',
+//            'description' => '',
+//            'url' => '/dashboard/settings/gettingstarted'
+//        ]
     ];
 
     public function __construct($cssClass = '', $useCssPrefix = true) {
-        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
+//        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
     }
 
@@ -84,6 +84,8 @@ class DashboardNavModule extends SiteNavModule {
             $this->fireEvent('init');
         }
 
+        $this->handleUserPreferencesSection();
+
         $sections = $alt ? self::$altSectionsInfo : self::$sectionsInfo;
 
         $session = Gdn::session();
@@ -100,7 +102,18 @@ class DashboardNavModule extends SiteNavModule {
         return $sections;
     }
 
-    public function isActiveSection($section) {
+    private function getActiveSection() {
+        $allSections = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
+        $currentSections = Gdn_Theme::section('', 'get');
+        foreach ($currentSections as $currentSection) {
+            if (array_key_exists($currentSection, $allSections )) {
+                return $currentSection;
+            }
+        }
+        return self::ACTIVE_SECTION_DEFAULT;
+    }
+
+    private function isActiveSection($section) {
 
         $allSectionsInfo = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
         $allSections = [];
@@ -128,6 +141,42 @@ class DashboardNavModule extends SiteNavModule {
         return false;
     }
 
+    private function handleUserPreferencesNav() {
+        if ($session = Gdn::session()) {
+            $collapsed = $session->getPreference('DashboardNav.Collapsed');
+            $section = $this->getActiveSection();
+
+            foreach($this->items as &$item) {
+                if (array_key_exists(val('headerCssClass', $item), $collapsed)) {
+                    $item['collapsed'] = 'collapsed';
+                    $item['ariaExpanded'] = 'false';
+                    $item['collapsedList'] = '';
+                } else {
+                    $item['collapsed'] = '';
+                    $item['ariaExpanded'] = 'true';
+                    $item['collapsedList'] = 'in';
+                }
+                if (isset($item['items'])) {
+                    foreach($item[items] as &$subitem) {
+                        $subitem['section'] = $section;
+                    }
+                }
+            }
+        }
+    }
+
+    private function handleUserPreferencesSection() {
+        if ($session = Gdn::session()) {
+            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+
+            foreach (self::$sectionsInfo as $key => $section) {
+                if (array_key_exists($key, $landingPages)) {
+                    self::$sectionsInfo[$key]['url'] = $landingPages[$key];
+                }
+            }
+        }
+    }
+
     /**
      * Adds a section to the sections info array to output in the dashboard.
      *
@@ -143,6 +192,12 @@ class DashboardNavModule extends SiteNavModule {
             }
         }
         self::$sectionsInfo[$section['section']] = $section;
+    }
+
+    public function prepare() {
+        parent::prepare();
+        $this->handleUserPreferencesNav();
+        return true;
     }
 
     public function toString() {

@@ -2650,9 +2650,7 @@ class DiscussionModel extends VanillaModel {
         $this->EventArguments['Discussion'] = $Data;
         $this->fireEvent('DeleteDiscussion');
 
-        // Execute deletion of discussion and related bits
-        $this->SQL->delete('Draft', ['DiscussionID' => $discussionID]);
-
+        // Setup logging.
         $Log = val('Log', $options, true);
         $LogOptions = val('LogOptions', $options, []);
         if ($Log === true) {

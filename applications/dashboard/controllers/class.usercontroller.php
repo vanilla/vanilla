@@ -677,8 +677,10 @@ class UserController extends DashboardController {
 
             $this->Form->setData($User);
             if ($this->Form->authenticatedPostBack(true)) {
-                if (!$CanEditUsername) {
-                    $this->Form->setFormValue("Name", $User['Name']);
+                // Do not re-validate or change the username if disabled or exactly the same.
+                $nameUnchanged = ($User['Name'] === $this->Form->getValue('Name'));
+                if (!$CanEditUsername || $nameUnchanged) {
+                    $this->Form->removeFormValue("Name");
                 }
 
                 // Allow mods to confirm/unconfirm emails

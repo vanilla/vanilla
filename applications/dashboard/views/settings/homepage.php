@@ -9,16 +9,18 @@ $CurrentCategoriesLayout = c('Vanilla.Categories.Layout', 'modern');
 if ($CurrentCategoriesLayout == '')
     $CurrentCategoriesLayout = 'modern';
 
-function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '') {
-    $SpriteClass = $CssClass;
+function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '') {
+    $iconPath = asset('applications/dashboard/design/images/'.$iconName.'.png');
+
+    $cssClass = '';
     if ($Current == $Url) {
-        $CssClass .= ' Current';
+        $cssClass = 'active';
     }
-    $CssClass .= ' Choice';
+    $cssClass .= ' Choice';
 
     echo wrap(
         '<div class="image-wrap">'
-        .sprite($SpriteClass)
+        .img($iconPath, ['alt' => $Title, 'class' => 'label-selector-image'])
         .'<div class="overlay">'
         .'<div class="buttons">'
         .anchor(t('Select'), $Url, 'btn btn-overlay', ['title' => $Description, 'rel' => $Url])
@@ -31,7 +33,7 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         .t($Title)
         .'</div>',
         'div',
-        array('class' => $CssClass.' label-selector-item')
+        array('class' => $cssClass.' label-selector-item')
     );
 }
 
@@ -41,8 +43,8 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
         jQuery(document).ready(function($) {
 
             $('.HomeOptions a').click(function() {
-                $('.HomeOptions .Choice').removeClass('Current');
-                $(this).parents('.Choice').addClass('Current');
+                $('.HomeOptions .Choice').removeClass('active');
+                $(this).parents('.Choice').addClass('active');
                 var page = $(this).attr('rel');
                 $('#Form_Target').val(page);
                 return false;
@@ -51,8 +53,8 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
             $('.LayoutOptions a').click(function() {
                 var parent = $(this).parents('.LayoutOptions');
                 var layoutContainer = $(parent).hasClass('DiscussionsLayout') ? 'DiscussionsLayout' : 'CategoriesLayout';
-                $(parent).find('.Choice').removeClass('Current');
-                $(this).parents('.Choice').addClass('Current');
+                $(parent).find('.Choice').removeClass('active');
+                $(this).parents('.Choice').addClass('active');
                 var layout = $(this).attr('rel');
                 $('#Form_' + layoutContainer).val(layout);
                 return false;
@@ -76,20 +78,20 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
     </div>
 
     <div class="Homepage">
-        <div class="HomeOptions">
+        <div class="HomeOptions label-selector">
             <?php
             // Only show the vanilla pages if Vanilla is enabled
             $CurrentTarget = $this->data('CurrentTarget');
 
             if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)) {
-                echo WriteHomepageOption('Discussions', 'discussions', 'SpDiscussions', $CurrentTarget);
-                echo WriteHomepageOption('Categories', 'categories', 'SpCategories', $CurrentTarget);
+                echo WriteHomepageOption('Discussions', 'discussions', 'disc-modern', $CurrentTarget);
+                echo WriteHomepageOption('Categories', 'categories', 'cat-modern', $CurrentTarget);
                 // echo WriteHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
             }
             //echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
 
             if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON)) {
-                echo WriteHomepageOption('Best Of', 'bestof', 'SpBestOf', $CurrentTarget);
+                echo WriteHomepageOption('Best Of', 'bestof', 'best-of', $CurrentTarget);
             }
             ?>
         </div>
@@ -98,10 +100,10 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
                 <?php echo wrap(t('Discussions Layout'), 'strong'); ?>
                 <br/><?php echo t('Choose the preferred layout for the discussions page.'); ?>
             </div>
-            <div class="LayoutOptions DiscussionsLayout">
+            <div class="LayoutOptions DiscussionsLayout label-selector">
                 <?php
-                echo WriteHomepageOption('Modern Layout', 'modern', 'SpDiscussions', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
-                echo WriteHomepageOption('Table Layout', 'table', 'SpDiscussionsTable', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
+                echo WriteHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
+                echo WriteHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
                 ?>
             </div>
             <div class="padded-top">
@@ -110,11 +112,11 @@ function writeHomepageOption($Title, $Url, $CssClass, $Current, $Description = '
                 )
                 <br/><?php echo t('Choose the preferred layout for the categories page.'); ?>
             </div>
-            <div class="LayoutOptions CategoriesLayout">
+            <div class="LayoutOptions CategoriesLayout label-selector">
                 <?php
-                echo WriteHomepageOption('Modern Layout', 'modern', 'SpCategories', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
-                echo WriteHomepageOption('Table Layout', 'table', 'SpCategoriesTable', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
-                echo WriteHomepageOption('Mixed Layout', 'mixed', 'SpCategoriesMixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
+                echo WriteHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
+                echo WriteHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
+                echo WriteHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
                 ?>
             </div>
         <?php endif; ?>

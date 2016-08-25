@@ -106,7 +106,6 @@ class FlatCategoryModule extends Gdn_Module {
     public function toString() {
         // Setup
         $this->setData('Categories', $this->getChildren());
-        $this->setData('DoHeadings', c('Vanilla.Categories.DoHeadings'));
         $this->setData('Layout', c('Vanilla.Categories.Layout', 'modern'));
         $this->setData('ParentCategory', $this->getCategory());
 

@@ -1092,7 +1092,9 @@ if (!function_exists('userUrl')) {
         }
 
         $UserName = val($Px.'Name', $User);
-        $UserName = preg_replace('/([\?&]+)/', '', $UserName);
+        // Make sure that the name will not be split if the p parameter is set.
+        // Prevent p=/profile/a&b to be translated to $_GET['p'=>'/profile/a?', 'b'=>'']
+        $UserName = str_replace('&', '%26', $UserName);
 
         $Result = '/profile/'.
             ($Method ? trim($Method, '/').'/' : '').

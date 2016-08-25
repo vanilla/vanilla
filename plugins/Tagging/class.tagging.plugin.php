@@ -349,15 +349,13 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param array $Args
      */
     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        // Allow an addon to set disallowed tag names.
         $reservedTags = [];
         $Sender->EventArguments['ReservedTags'] = &$reservedTags;
         $Sender->fireEvent('ReservedTags');
 
-        $FormPostValues = val('FormPostValues', $Args, array());
-        $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
-        $NumTagsMax = c('Plugin.Tagging.Max', 5);
-
-        // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
+        // Set some tagging requirements.
+        $TagsString = trim(strtolower(valr('FormPostValues.Tags', $Args, '')));
         if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
@@ -365,6 +363,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $Tags = TagModel::splitTags($TagsString);
             $Tags = array_map('strtolower', $Tags);
             $reservedTags = array_map('strtolower', $reservedTags);
+            $maxTags = c('Plugin.Tagging.Max', 5);
 
             // Validate our tags.
             if ($reservedTags = array_intersect($Tags, $reservedTags)) {
@@ -374,8 +373,8 @@ class TaggingPlugin extends Gdn_Plugin {
             if (!TagModel::validateTags($Tags)) {
                 $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
             }
-            if (count($Tags) > $NumTagsMax) {
-                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $NumTagsMax));
+            if (count($Tags) > $maxTags) {
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
             }
         }
     }

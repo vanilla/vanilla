@@ -496,8 +496,9 @@ class SettingsController extends DashboardController {
                     $banValue = trim($this->Form->getFormValue('BanValue'));
                     $this->Form->setFormValue('BanValue', $banValue);
 
-                    if ($banValue === '*' || $banValue === '*@*') {
-                        // We won't let you HAL 9000 the entire crew.
+                    // We won't let you HAL 9000 the entire crew.
+                    $crazyBans = ['*', '*@*', '*.*', '*.*.*', '*.*.*.*'];
+                    if (in_array($banValue, $crazyBans)) {
                         $this->Form->addError("I'm sorry Dave, I'm afraid I can't do that.");
                     }
 

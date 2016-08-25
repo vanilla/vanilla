@@ -2,15 +2,18 @@
 
 class FlatCategoryModule extends Gdn_Module {
 
+    /**
+     * Default limit for categories.
+     */
     const DEFAULT_LIMIT = 10;
 
     /**
-     * @var string|int
+     * @var string|int Category identifier.  Can be the slug or the category's ID.
      */
     public $categoryID;
 
     /**
-     * @var array
+     * @var array An associative array representing a category record.
      */
     private $category;
 
@@ -20,7 +23,7 @@ class FlatCategoryModule extends Gdn_Module {
     private $categoryModel;
 
     /**
-     * @var array
+     * @var array An array of category records beneath the current category.
      */
     private $children;
 
@@ -51,6 +54,11 @@ class FlatCategoryModule extends Gdn_Module {
         return 'Content';
     }
 
+    /**
+     * Get data for the configured category.
+     *
+     * @return array|null Array if the configured category is valid.  Otherwise, null.
+     */
     public function getCategory() {
         if (!isset($this->category)) {
             $this->category = CategoryModel::categories($this->categoryID);
@@ -59,12 +67,17 @@ class FlatCategoryModule extends Gdn_Module {
         return $this->category;
     }
 
+    /**
+     * Get a list of immediate children for the configured category.
+     *
+     * @return array|null
+     */
     public function getChildren() {
         $category = $this->getCategory();
 
-        if (!$this->children) {
+        if ($category && !$this->children) {
             $this->children = $this->categoryModel->getTreeAsFlat(
-                $category['CategoryID'],
+                val('CategoryID', $category),
                 0,
                 $this->getLimit()
             );
@@ -74,6 +87,11 @@ class FlatCategoryModule extends Gdn_Module {
         return $this->children;
     }
 
+    /**
+     * Get the configured record limit.
+     *
+     * @return int
+     */
     public function getLimit() {
         $limit = $this->limit;
 
@@ -86,24 +104,18 @@ class FlatCategoryModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
+        // Setup
         $this->setData('Categories', $this->getChildren());
         $this->setData('DoHeadings', c('Vanilla.Categories.DoHeadings'));
         $this->setData('Layout', c('Vanilla.Categories.Layout', 'modern'));
         $this->setData('ParentCategory', $this->getCategory());
 
+        // If our category isn't valid, or we have no child categories to display, then display nothing.
         if (!$this->data('ParentCategory') || !$this->data('Categories')) {
             return '';
         }
 
-        switch ($this->data('Layout')) {
-            case 'table':
-                $this->setView('flatcategory-table');
-                break;
-            case 'modern':
-            default:
-                $this->setView('flatcategory-modern');
-        }
-
+        // Vanilla's category helper functions are beneficial in creating markdown in the views.
         require_once Gdn::controller()->fetchViewLocation('helper_functions', 'categories', 'vanilla');
         return parent::toString();
     }

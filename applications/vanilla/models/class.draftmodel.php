@@ -66,6 +66,7 @@ class DraftModel extends VanillaModel {
         $this->draftQuery();
         $this->SQL
             ->select('d.Name, di.Name', 'coalesce', 'Name')
+            ->select('di.DateInserted', '', 'DiscussionExists')
             ->join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
             ->where('d.InsertUserID', $UserID)
             ->orderBy('d.DateInserted', 'desc')

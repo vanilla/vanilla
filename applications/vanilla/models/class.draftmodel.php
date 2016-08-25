@@ -89,7 +89,7 @@ class DraftModel extends VanillaModel {
     public function getID($draftID, $dataSetType = false, $options = []) {
         $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;
 
-        $this->DraftQuery();
+        $this->draftQuery();
         return $this->SQL
             ->where('d.DraftID', $draftID)
             ->get()
@@ -141,7 +141,7 @@ class DraftModel extends VanillaModel {
         $this->Validation->applyRule('Body', 'Required');
         $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
-            $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
+            $this->Validation->setSchemaProperty('Body', 'Length', $MaxCommentLength);
             $this->Validation->applyRule('Body', 'Length');
         }
 
@@ -166,8 +166,8 @@ class DraftModel extends VanillaModel {
 
         }
         // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
-        $this->AddInsertFields($formPostValues);
-        $this->AddUpdateFields($formPostValues);
+        $this->addInsertFields($formPostValues);
+        $this->addUpdateFields($formPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
         if (val('Announce', $formPostValues, '') === false) {
@@ -239,7 +239,7 @@ class DraftModel extends VanillaModel {
 
         $this->SQL->delete('Draft', array('DraftID' => $draftID));
         if (is_object($DraftUser)) {
-            $this->UpdateUser($DraftUser->InsertUserID);
+            $this->updateUser($DraftUser->InsertUserID);
         }
 
         return true;

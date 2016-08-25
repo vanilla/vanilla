@@ -34,6 +34,7 @@ var discussionTagging = {
 
             var TagSearch = gdn.definition('PluginsTaggingSearchUrl', gdn.url('plugin/tagsearch'));
             var TagAdd = gdn.definition('PluginsTaggingAdd', false);
+            var MaxTags = gdn.definition('MaxTagsAllowed', false);
 
             $element.find("#Form_Tags").tokenInput(TagSearch, {
                 hintText: gdn.definition("TagHint", "Start to type..."),
@@ -45,6 +46,7 @@ var discussionTagging = {
                 prePopulate: tags,
                 dataFields: ["#Form_CategoryID"],
                 allowFreeTagging: TagAdd,
+                tokenLimit: MaxTags,
                 zindex: 3000
             });
 

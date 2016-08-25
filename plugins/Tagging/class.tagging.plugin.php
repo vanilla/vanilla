@@ -10,7 +10,7 @@
 $PluginInfo['Tagging'] = array(
     'Name' => 'Tagging',
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.9.0',
+    'Version' => '1.9.1',
     'SettingsUrl' => '/dashboard/settings/tagging',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
@@ -36,6 +36,7 @@ $PluginInfo['Tagging'] = array(
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
  *  1.8.12  Fix issues with CSS and js loading.
+ *  1.9.1   Add tokenLimit enforcement; cleanup.
  */
 class TaggingPlugin extends Gdn_Plugin {
 
@@ -607,6 +608,7 @@ class TaggingPlugin extends Gdn_Plugin {
     public function postController_render_before($Sender) {
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
+        $Sender->addDefinition('MaxTagsAllowed', c('Plugin.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();

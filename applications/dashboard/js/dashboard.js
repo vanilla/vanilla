@@ -501,7 +501,6 @@
 
             // request the target via ajax
             var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            console.log(self.settings.httpmethod);
             if (self.settings.httpmethod === 'post') {
                 ajaxData.TransientKey = gdn.definition('TransientKey');
             }
@@ -521,9 +520,10 @@
                         setTimeout(function() {
                             document.location.replace(json.RedirectUrl);
                         }, 300);
+                    } else {
+                        $('#' + self.id).modal('hide');
+                        self.afterConfirmSuccess();
                     }
-                    $('#' + self.id).modal('hide');
-                    self.afterConfirmSuccess();
                 }
             });
         },
@@ -536,6 +536,7 @@
                 this.trigger.closest('.js-modal-item').remove();
             }
 
+            // Refresh the page.
             if (!found) {
                 document.location.replace(window.location.href);
             }
@@ -824,7 +825,6 @@
         });
 
         $('.panel-left', element).on('drawer.show', function() {
-            console.log('shown');
             $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
             $('.panel-nav .js-scroll-to-fixed').css('position', 'initial');
             window.scrollTo(0, 0);

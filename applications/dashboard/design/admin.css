@@ -1018,8 +1018,7 @@ sub {
   bottom: -0.25em;
 }
 
-img, .LayoutOptions .Sprite,
-.HomeOptions .Sprite {
+img {
   border: 0;
 }
 
@@ -3150,9 +3149,7 @@ input[type="checkbox"].disabled {
   padding-right: 1.125rem;
 }
 
-.row, .footer, .label-selector, .emojiext-list,
-.LayoutOptions,
-.HomeOptions, .media {
+.row, .footer, .label-selector, .emojiext-list, .media {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -5137,8 +5134,7 @@ body {
   outline: none !important;
 }
 
-h1, h2, .analytics-widget-header .title, .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
-.HomeOptions > a, h3, h4, h5, h6 {
+h1, h2, .analytics-widget-header .title, h3, h4, h5, h6 {
   margin-top: 0;
   margin-bottom: .5rem;
 }
@@ -5212,8 +5208,7 @@ figure {
   margin: 0 0 1rem;
 }
 
-img, .LayoutOptions .Sprite,
-.HomeOptions .Sprite {
+img {
   vertical-align: middle;
 }
 
@@ -5614,9 +5609,11 @@ input[type="button"].btn-block {
 }
 
 .btn-icon {
-  padding: 0.28125rem;
+  padding: 0.1875rem;
   margin: 0;
   margin-left: .5rem;
+  font-size: 0.75rem;
+  line-height: 1.5rem;
 }
 
 .btn-icon:first-child {
@@ -5736,19 +5733,11 @@ input[type="button"].btn-block {
   width: 0.875rem;
 }
 
-.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title, .card .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .LayoutOptions > a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .LayoutOptions > a, .card .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header .card
-.HomeOptions > a, .card .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .card
-.HomeOptions > a {
+.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title {
   margin-bottom: 0.28125rem;
 }
 
-.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .LayoutOptions > a a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .LayoutOptions > a a, .card .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header .card
-.HomeOptions > a a, .card .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .card
-.HomeOptions > a a {
+.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title a {
   color: #555a62;
 }
 
@@ -5773,9 +5762,7 @@ input[type="button"].btn-block {
   content: '';
 }
 
-.card .media-sm-image-wrap img, .card .media-sm-image-wrap .LayoutOptions .Sprite, .LayoutOptions .card .media-sm-image-wrap .Sprite, .card .media-sm-image-wrap
-.HomeOptions .Sprite,
-.HomeOptions .card .media-sm-image-wrap .Sprite {
+.card .media-sm-image-wrap img {
   width: 5.25rem;
 }
 
@@ -6175,30 +6162,22 @@ input[type="button"].btn-block {
   content: '';
 }
 
-.media-sm-image-wrap img, .media-sm-image-wrap .LayoutOptions .Sprite, .LayoutOptions .media-sm-image-wrap .Sprite, .media-sm-image-wrap
-.HomeOptions .Sprite,
-.HomeOptions .media-sm-image-wrap .Sprite {
+.media-sm-image-wrap img {
   width: 1.875rem;
 }
 
-.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a {
+.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
   margin-bottom: 0.3125rem;
   font-size: 0.8125rem;
   line-height: 1;
 }
 
-.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a, .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a a, .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a a {
+.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a {
   color: #555a62;
   transition: color 200ms;
 }
 
-.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a a:hover {
+.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover {
   text-decoration: none;
   color: #0291db;
 }
@@ -6234,9 +6213,7 @@ input[type="button"].btn-block {
   flex-grow: 1;
 }
 
-.hero .label-selector, .hero .emojiext-list, .hero
-.LayoutOptions, .hero
-.HomeOptions {
+.hero .label-selector, .hero .emojiext-list {
   margin-left: 0;
   margin-right: 0;
 }
@@ -6668,9 +6645,7 @@ label,
   border: 0.0625rem solid #ccc;
 }
 
-.label-wrap img, .label-wrap .LayoutOptions .Sprite, .LayoutOptions .label-wrap .Sprite, .label-wrap
-.HomeOptions .Sprite,
-.HomeOptions .label-wrap .Sprite {
+.label-wrap img {
   max-width: 50%;
   max-height: 200px;
 }
@@ -6729,9 +6704,7 @@ label,
   align-items: center;
 }
 
-.form-group.row, .form-group.footer, .form-group.label-selector, .form-group.emojiext-list,
-.form-group.LayoutOptions,
-.form-group.HomeOptions, .form-group.media {
+.form-group.row, .form-group.footer, .form-group.label-selector, .form-group.emojiext-list, .form-group.media {
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   -ms-flex-align: center;
@@ -6742,9 +6715,7 @@ label,
   margin-bottom: 0;
 }
 
-.form-group.row:first-child, .form-group.footer:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child,
-.form-group.LayoutOptions:first-child,
-.form-group.HomeOptions:first-child, .form-group.media:first-child {
+.form-group.row:first-child, .form-group.footer:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child, .form-group.media:first-child {
   border-top: 1px dotted #f6f9fb;
 }
 
@@ -6920,77 +6891,39 @@ select + select {
 }
 
 .label-selector, .emojiext-list,
-.LayoutOptions,
-.HomeOptions,
 .label-selector ul, .emojiext-list ul,
-.LayoutOptions ul,
-.HomeOptions ul,
-.label-selector ol, .emojiext-list ol,
-.LayoutOptions ol,
-.HomeOptions ol {
+.label-selector ol, .emojiext-list ol {
   padding-left: 0;
 }
 
-.label-selector li, .emojiext-list li,
-.LayoutOptions li,
-.HomeOptions li {
+.label-selector li, .emojiext-list li {
   list-style: none;
 }
 
-.label-selector label, .emojiext-list label,
-.LayoutOptions label,
-.HomeOptions label {
+.label-selector label, .emojiext-list label {
   padding-left: 0;
   cursor: pointer;
 }
 
 .label-selector input[type=radio], .emojiext-list input[type=radio],
-.LayoutOptions input[type=radio],
-.HomeOptions input[type=radio],
-.label-selector input[type=checkbox], .emojiext-list input[type=checkbox],
-.LayoutOptions input[type=checkbox],
-.HomeOptions input[type=checkbox] {
+.label-selector input[type=checkbox], .emojiext-list input[type=checkbox] {
   position: absolute;
   opacity: 0;
 }
 
-.label-selector .active, .emojiext-list .active,
-.LayoutOptions .active,
-.HomeOptions .active, .label-selector .Current, .emojiext-list .Current,
-.LayoutOptions .Current,
-.HomeOptions .Current, .label-selector
+.label-selector .active, .emojiext-list .active, .label-selector .Current, .emojiext-list .Current, .label-selector
 .current-theme, .emojiext-list
 .current-theme,
-.LayoutOptions
-.current-theme,
-.HomeOptions
-.current-theme,
 .label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label,
-.LayoutOptions input[type=radio]:checked ~ label,
-.HomeOptions input[type=radio]:checked ~ label,
-.label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label,
-.LayoutOptions input[type=radio]:checked ~ label,
-.HomeOptions input[type=radio]:checked ~ label {
+.label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label {
   cursor: default;
 }
 
-.label-selector .active .overlay, .emojiext-list .active .overlay,
-.LayoutOptions .active .overlay,
-.HomeOptions .active .overlay, .label-selector .Current .overlay, .emojiext-list .Current .overlay,
-.LayoutOptions .Current .overlay,
-.HomeOptions .Current .overlay, .label-selector
+.label-selector .active .overlay, .emojiext-list .active .overlay, .label-selector .Current .overlay, .emojiext-list .Current .overlay, .label-selector
 .current-theme .overlay, .emojiext-list
 .current-theme .overlay,
-.LayoutOptions
-.current-theme .overlay,
-.HomeOptions
-.current-theme .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay,
-.LayoutOptions input[type=radio]:checked ~ label .overlay,
-.HomeOptions input[type=radio]:checked ~ label .overlay,
-.label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay,
-.LayoutOptions input[type=radio]:checked ~ label .overlay,
-.HomeOptions input[type=radio]:checked ~ label .overlay {
+.label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -7003,133 +6936,47 @@ select + select {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-.label-selector .active .overlay > .buttons, .emojiext-list .active .overlay > .buttons,
-.LayoutOptions .active .overlay > .buttons,
-.HomeOptions .active .overlay > .buttons, .label-selector .Current .overlay > .buttons, .emojiext-list .Current .overlay > .buttons,
-.LayoutOptions .Current .overlay > .buttons,
-.HomeOptions .Current .overlay > .buttons, .label-selector
+.label-selector .active .overlay > .buttons, .emojiext-list .active .overlay > .buttons, .label-selector .Current .overlay > .buttons, .emojiext-list .Current .overlay > .buttons, .label-selector
 .current-theme .overlay > .buttons, .emojiext-list
 .current-theme .overlay > .buttons,
-.LayoutOptions
-.current-theme .overlay > .buttons,
-.HomeOptions
-.current-theme .overlay > .buttons,
 .label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > .buttons,
-.HomeOptions input[type=radio]:checked ~ label .overlay > .buttons,
-.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > .buttons,
-.HomeOptions input[type=radio]:checked ~ label .overlay > .buttons {
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons {
   display: none;
 }
 
-.label-selector .active .overlay > .selected, .emojiext-list .active .overlay > .selected,
-.LayoutOptions .active .overlay > .selected,
-.HomeOptions .active .overlay > .selected, .label-selector .Current .overlay > .selected, .emojiext-list .Current .overlay > .selected,
-.LayoutOptions .Current .overlay > .selected,
-.HomeOptions .Current .overlay > .selected, .label-selector
+.label-selector .active .overlay > .selected, .emojiext-list .active .overlay > .selected, .label-selector .Current .overlay > .selected, .emojiext-list .Current .overlay > .selected, .label-selector
 .current-theme .overlay > .selected, .emojiext-list
 .current-theme .overlay > .selected,
-.LayoutOptions
-.current-theme .overlay > .selected,
-.HomeOptions
-.current-theme .overlay > .selected,
 .label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > .selected,
-.HomeOptions input[type=radio]:checked ~ label .overlay > .selected,
-.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected,
-.LayoutOptions input[type=radio]:checked ~ label .overlay > .selected,
-.HomeOptions input[type=radio]:checked ~ label .overlay > .selected {
+.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected {
   display: block;
 }
 
-.label-selector .active .label-selector-image, .emojiext-list .active .label-selector-image,
-.LayoutOptions .active .label-selector-image,
-.HomeOptions .active .label-selector-image, .label-selector .Current .label-selector-image, .emojiext-list .Current .label-selector-image,
-.LayoutOptions .Current .label-selector-image,
-.HomeOptions .Current .label-selector-image, .label-selector
+.label-selector .active .label-selector-image, .emojiext-list .active .label-selector-image, .label-selector .Current .label-selector-image, .emojiext-list .Current .label-selector-image, .label-selector
 .current-theme .label-selector-image, .emojiext-list
 .current-theme .label-selector-image,
-.LayoutOptions
-.current-theme .label-selector-image,
-.HomeOptions
-.current-theme .label-selector-image, .label-selector .active .Homepage .Sprite, .Homepage .label-selector .active .Sprite, .emojiext-list .active .Homepage .Sprite, .Homepage .emojiext-list .active .Sprite,
-.LayoutOptions .active .Homepage .Sprite, .Homepage
-.LayoutOptions .active .Sprite,
-.HomeOptions .active .Homepage .Sprite, .Homepage
-.HomeOptions .active .Sprite, .label-selector .Current .Homepage .Sprite, .Homepage .label-selector .Current .Sprite, .emojiext-list .Current .Homepage .Sprite, .Homepage .emojiext-list .Current .Sprite,
-.LayoutOptions .Current .Homepage .Sprite, .Homepage
-.LayoutOptions .Current .Sprite,
-.HomeOptions .Current .Homepage .Sprite, .Homepage
-.HomeOptions .Current .Sprite, .label-selector
-.current-theme .Homepage .Sprite, .Homepage .label-selector
-.current-theme .Sprite, .emojiext-list
-.current-theme .Homepage .Sprite, .Homepage .emojiext-list
-.current-theme .Sprite,
-.LayoutOptions
-.current-theme .Homepage .Sprite, .Homepage
-.LayoutOptions
-.current-theme .Sprite,
-.HomeOptions
-.current-theme .Homepage .Sprite, .Homepage
-.HomeOptions
-.current-theme .Sprite,
 .label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image,
-.LayoutOptions input[type=radio]:checked ~ label .label-selector-image,
-.HomeOptions input[type=radio]:checked ~ label .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.label-selector input[type=radio]:checked ~ label .Sprite, .emojiext-list input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage .emojiext-list input[type=radio]:checked ~ label .Sprite,
-.LayoutOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.LayoutOptions input[type=radio]:checked ~ label .Sprite,
-.HomeOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.HomeOptions input[type=radio]:checked ~ label .Sprite,
-.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image,
-.LayoutOptions input[type=radio]:checked ~ label .label-selector-image,
-.HomeOptions input[type=radio]:checked ~ label .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.label-selector input[type=radio]:checked ~ label .Sprite, .emojiext-list input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage .emojiext-list input[type=radio]:checked ~ label .Sprite,
-.LayoutOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.LayoutOptions input[type=radio]:checked ~ label .Sprite,
-.HomeOptions input[type=radio]:checked ~ label .Homepage .Sprite, .Homepage
-.HomeOptions input[type=radio]:checked ~ label .Sprite {
+.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image {
   opacity: .5;
 }
 
-.label-selector .label-selector-image, .emojiext-list .label-selector-image,
-.LayoutOptions .label-selector-image,
-.HomeOptions .label-selector-image, .label-selector .Homepage .Sprite, .Homepage .label-selector .Sprite, .emojiext-list .Homepage .Sprite, .Homepage .emojiext-list .Sprite,
-.LayoutOptions .Homepage .Sprite, .Homepage
-.LayoutOptions .Sprite,
-.HomeOptions .Homepage .Sprite, .Homepage
-.HomeOptions .Sprite {
+.label-selector .label-selector-image, .emojiext-list .label-selector-image {
   display: block;
   width: 100%;
 }
 
-.label-selector .title, .emojiext-list .title,
-.LayoutOptions .title,
-.HomeOptions .title, .label-selector .LayoutOptions > a, .emojiext-list .LayoutOptions > a, .LayoutOptions > a,
-.HomeOptions .LayoutOptions > a, .label-selector
-.HomeOptions > a, .emojiext-list
-.HomeOptions > a,
-.LayoutOptions
-.HomeOptions > a,
-.HomeOptions > a {
+.label-selector .title, .emojiext-list .title {
   text-align: center;
   font-weight: 500;
 }
 
-.label-selector .image-wrap, .emojiext-list .image-wrap,
-.LayoutOptions .image-wrap,
-.HomeOptions .image-wrap {
+.label-selector .image-wrap, .emojiext-list .image-wrap {
   position: relative;
   display: block;
   margin-bottom: 0.5625rem;
 }
 
-.label-selector .image-wrap::after, .emojiext-list .image-wrap::after,
-.LayoutOptions .image-wrap::after,
-.HomeOptions .image-wrap::after {
+.label-selector .image-wrap::after, .emojiext-list .image-wrap::after {
   position: absolute;
   display: block;
   top: 0;
@@ -7141,29 +6988,21 @@ select + select {
   content: '';
 }
 
-.label-selector .image-wrap:hover .overlay, .emojiext-list .image-wrap:hover .overlay,
-.LayoutOptions .image-wrap:hover .overlay,
-.HomeOptions .image-wrap:hover .overlay {
+.label-selector .image-wrap:hover .overlay, .emojiext-list .image-wrap:hover .overlay {
   height: 100%;
 }
 
-.label-selector .selected, .emojiext-list .selected,
-.LayoutOptions .selected,
-.HomeOptions .selected {
+.label-selector .selected, .emojiext-list .selected {
   display: none;
 }
 
-.label-selector .selected svg, .emojiext-list .selected svg,
-.LayoutOptions .selected svg,
-.HomeOptions .selected svg {
+.label-selector .selected svg, .emojiext-list .selected svg {
   display: block;
   width: 84px;
   fill: #6bc573;
 }
 
-.label-selector .overlay, .emojiext-list .overlay,
-.LayoutOptions .overlay,
-.HomeOptions .overlay {
+.label-selector .overlay, .emojiext-list .overlay {
   display: block;
   position: absolute;
   bottom: 0;
@@ -7179,9 +7018,7 @@ select + select {
   text-align: center;
 }
 
-.label-selector .buttons, .emojiext-list .buttons,
-.LayoutOptions .buttons,
-.HomeOptions .buttons {
+.label-selector .buttons, .emojiext-list .buttons {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -7197,26 +7034,14 @@ select + select {
   height: 100%;
 }
 
-.label-selector .buttons > .btn, .emojiext-list .buttons > .btn,
-.LayoutOptions .buttons > .btn,
-.HomeOptions .buttons > .btn, .label-selector .buttons > .file-upload-browse, .emojiext-list .buttons > .file-upload-browse,
-.LayoutOptions .buttons > .file-upload-browse,
-.HomeOptions .buttons > .file-upload-browse, .label-selector .buttons > .Button, .emojiext-list .buttons > .Button,
-.LayoutOptions .buttons > .Button,
-.HomeOptions .buttons > .Button, .label-selector .FilterMenu .buttons > .FilterButton, .FilterMenu .label-selector .buttons > .FilterButton, .emojiext-list .FilterMenu .buttons > .FilterButton, .FilterMenu .emojiext-list .buttons > .FilterButton,
-.LayoutOptions .FilterMenu .buttons > .FilterButton, .FilterMenu
-.LayoutOptions .buttons > .FilterButton,
-.HomeOptions .FilterMenu .buttons > .FilterButton, .FilterMenu
-.HomeOptions .buttons > .FilterButton {
+.label-selector .buttons > .btn, .emojiext-list .buttons > .btn, .label-selector .buttons > .file-upload-browse, .emojiext-list .buttons > .file-upload-browse, .label-selector .buttons > .Button, .emojiext-list .buttons > .Button, .label-selector .FilterMenu .buttons > .FilterButton, .FilterMenu .label-selector .buttons > .FilterButton, .emojiext-list .FilterMenu .buttons > .FilterButton, .FilterMenu .emojiext-list .buttons > .FilterButton {
   display: block;
   margin: 0.1875rem 0.28125rem;
   max-height: 2.25rem;
   min-width: 5rem;
 }
 
-.label-selector .description, .emojiext-list .description,
-.LayoutOptions .description,
-.HomeOptions .description {
+.label-selector .description, .emojiext-list .description {
   display: none;
 }
 
@@ -7252,7 +7077,7 @@ select + select {
   content: '';
 }
 
-.theme-wrap .image-wrap .label-selector-image, .theme-wrap .image-wrap .Homepage .Sprite, .Homepage .theme-wrap .image-wrap .Sprite {
+.theme-wrap .image-wrap .label-selector-image {
   -ms-flex-negative: 0;
   flex-shrink: 0;
   min-width: 100%;
@@ -7529,11 +7354,6 @@ label[id^=iCheck] {
 .Padded,
 .padded,
 .label-wrap img,
-.label-wrap .LayoutOptions .Sprite,
-.LayoutOptions .label-wrap .Sprite,
-.label-wrap
-.HomeOptions .Sprite,
-.HomeOptions .label-wrap .Sprite,
 div.Messages.Errors {
   margin: 1.125rem 0;
 }
@@ -7631,9 +7451,7 @@ div.Messages.Errors {
   content: '';
 }
 
-.DataList .IconWrap img, .DataList .IconWrap .LayoutOptions .Sprite, .LayoutOptions .DataList .IconWrap .Sprite, .DataList .IconWrap
-.HomeOptions .Sprite,
-.HomeOptions .DataList .IconWrap .Sprite {
+.DataList .IconWrap img {
   width: 5.25rem;
 }
 
@@ -7668,9 +7486,7 @@ div.Messages.Errors {
   content: '';
 }
 
-.addon-image-wrap img, .addon-image-wrap .LayoutOptions .Sprite, .LayoutOptions .addon-image-wrap .Sprite, .addon-image-wrap
-.HomeOptions .Sprite,
-.HomeOptions .addon-image-wrap .Sprite {
+.addon-image-wrap img {
   width: 5.25rem;
 }
 
@@ -7693,9 +7509,7 @@ div.Messages.Errors {
     border-radius: 0.25rem;
     content: '';
   }
-  .addon-image-wrap img, .addon-image-wrap .LayoutOptions .Sprite, .LayoutOptions .addon-image-wrap .Sprite, .addon-image-wrap
-  .HomeOptions .Sprite,
-  .HomeOptions .addon-image-wrap .Sprite {
+  .addon-image-wrap img {
     width: 3.9375rem;
   }
 }
@@ -8194,19 +8008,15 @@ button.close, button.Close {
   width: 5rem;
 }
 
-.navbar .title, .navbar .LayoutOptions > a, .navbar
-.HomeOptions > a {
+.navbar .title {
   color: #fff;
 }
 
-.navbar .logo + .title, .navbar .LayoutOptions > .logo + a, .navbar
-.HomeOptions > .logo + a {
+.navbar .logo + .title {
   margin-left: 1.125rem;
 }
 
-.navbar img, .navbar .LayoutOptions .Sprite, .LayoutOptions .navbar .Sprite, .navbar
-.HomeOptions .Sprite,
-.HomeOptions .navbar .Sprite {
+.navbar img {
   height: 3.09375rem;
 }
 
@@ -8270,9 +8080,7 @@ button.close, button.Close {
   display: none;
 }
 
-.navbar.navbar-short img, .navbar.navbar-short .LayoutOptions .Sprite, .LayoutOptions .navbar.navbar-short .Sprite, .navbar.navbar-short
-.HomeOptions .Sprite,
-.HomeOptions .navbar.navbar-short .Sprite {
+.navbar.navbar-short img {
   height: 2.25rem;
 }
 
@@ -8449,18 +8257,14 @@ button.close, button.Close {
   float: left;
 }
 
-.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title, .panel-right .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .panel-right .LayoutOptions > a, .panel-right .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .panel-right
-.HomeOptions > a,
+.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title,
 .panel-right h3 {
   padding-bottom: 0.5625rem;
   margin-bottom: 0.5625rem;
   border-bottom: 1px dotted #ededed;
 }
 
-.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title, .panel-right .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .panel-right .LayoutOptions > a, .panel-right .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .panel-right
-.HomeOptions > a {
+.panel-right h2, .panel-right .analytics-widget-header .title, .analytics-widget-header .panel-right .title {
   letter-spacing: .0625rem;
   font-weight: 100;
   text-transform: uppercase;
@@ -8677,11 +8481,7 @@ button.close, button.Close {
   margin-top: -0.0625rem;
 }
 
-.main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .label-wrap .LayoutOptions .content > .Sprite, .label-wrap .LayoutOptions .main .content > .Sprite, .main .LayoutOptions .label-wrap .content > .Sprite, .LayoutOptions .label-wrap .main .content > .Sprite, .main .label-wrap
-.HomeOptions .content > .Sprite, .label-wrap
-.HomeOptions .main .content > .Sprite, .main
-.HomeOptions .label-wrap .content > .Sprite,
-.HomeOptions .label-wrap .main .content > .Sprite, .main .content > div.Messages.Errors,
+.main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .content > div.Messages.Errors,
 .main .content .padded-top {
   margin-top: 0.5625rem;
 }
@@ -8973,9 +8773,7 @@ table:not(.table-condensed).no-hover tbody tr:hover {
   border-top: 0.125rem solid #ddd;
 }
 
-.Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title, .Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem .LayoutOptions > a, .Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Section-DashboardHome .FeedItem
-.HomeOptions > a {
+.Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
   padding: 0;
   margin-top: 0;
   margin-left: 0;
@@ -9002,13 +8800,7 @@ table:not(.table-condensed).no-hover tbody tr:hover {
 .Section-DashboardHome .FeedItem .FeedDescription,
 .Section-DashboardHome .FeedItem h2,
 .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header
-.Section-DashboardHome .FeedItem .title,
-.Section-DashboardHome .FeedItem .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
-.Section-DashboardHome .FeedItem .LayoutOptions > a,
-.Section-DashboardHome .FeedItem .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header
-.Section-DashboardHome .FeedItem
-.HomeOptions > a {
+.Section-DashboardHome .FeedItem .title {
   margin-right: 102px;
 }
 
@@ -9219,10 +9011,7 @@ table:not(.table-condensed).no-hover tbody tr:hover {
 
 h1, .h1,
 h2,
-.analytics-widget-header .title,
-.analytics-widget-header .LayoutOptions > a,
-.analytics-widget-header
-.HomeOptions > a, .h2, .hero .hero-title,
+.analytics-widget-header .title, .h2, .hero .hero-title,
 h3, .h3,
 h4, .h4,
 h5, .h5,
@@ -9237,8 +9026,7 @@ h1, .h1 {
   font-size: 2rem;
 }
 
-h2, .analytics-widget-header .title, .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
-.HomeOptions > a, .h2, .hero .hero-title {
+h2, .analytics-widget-header .title, .h2, .hero .hero-title {
   font-size: 1.125rem;
 }
 
@@ -9260,10 +9048,7 @@ h6, .h6 {
 
 h1, .h1,
 h2,
-.analytics-widget-header .title,
-.analytics-widget-header .LayoutOptions > a,
-.analytics-widget-header
-.HomeOptions > a, .h2, .hero .hero-title,
+.analytics-widget-header .title, .h2, .hero .hero-title,
 h3, .h3 {
   margin-top: 1.125rem;
   margin-bottom: 0.5625rem;
@@ -9284,13 +9069,7 @@ pre {
   margin-bottom: 0;
 }
 
-.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .content .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .content .LayoutOptions > a, .content .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .content
-.HomeOptions > a, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .modal
-.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
-.HomeOptions > a {
+.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title {
   padding: 1.125rem 0;
   margin: 0;
   font-size: 0.875rem;
@@ -9299,11 +9078,7 @@ pre {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
-.modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .modal
-.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
-.HomeOptions > a {
+.modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title {
   border-top: 0 !important;
 }
 
@@ -9312,13 +9087,7 @@ pre {
   margin-bottom: 0;
 }
 
-.full-border, .analytics-panel-metrics, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .content .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .content .LayoutOptions > a, .content .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .content
-.HomeOptions > a, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .modal .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .modal .LayoutOptions > a, .Overlay > .Popup .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Overlay > .Popup .LayoutOptions > a, .modal .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .modal
-.HomeOptions > a, .Overlay > .Popup .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Overlay > .Popup
-.HomeOptions > a, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
+.full-border, .analytics-panel-metrics, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -9343,9 +9112,7 @@ pre {
   min-height: 3.75rem;
 }
 
-.header-block.padded, .label-wrap img.header-block, .label-wrap .LayoutOptions .header-block.Sprite, .LayoutOptions .label-wrap .header-block.Sprite, .label-wrap
-.HomeOptions .header-block.Sprite,
-.HomeOptions .label-wrap .header-block.Sprite, div.header-block.Messages.Errors {
+.header-block.padded, .label-wrap img.header-block, div.header-block.Messages.Errors {
   margin-bottom: 1.125rem;
 }
 
@@ -9398,9 +9165,7 @@ pre {
   border-bottom-color: #ededed;
 }
 
-.header-menu.padded, .label-wrap img.header-menu, .label-wrap .LayoutOptions .header-menu.Sprite, .LayoutOptions .label-wrap .header-menu.Sprite, .label-wrap
-.HomeOptions .header-menu.Sprite,
-.HomeOptions .label-wrap .header-menu.Sprite, div.header-menu.Messages.Errors {
+.header-menu.padded, .label-wrap img.header-menu, div.header-menu.Messages.Errors {
   margin-bottom: 1.125rem;
 }
 
@@ -9453,18 +9218,10 @@ strong,
   font-weight: 500;
 }
 
-table h2, table .analytics-widget-header .title, .analytics-widget-header table .title, table .analytics-widget-header .LayoutOptions > a, .analytics-widget-header table .LayoutOptions > a, table .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header table
-.HomeOptions > a,
+table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,
 form h2,
 form .analytics-widget-header .title, .analytics-widget-header
-form .title,
-form .analytics-widget-header .LayoutOptions > a, .analytics-widget-header
-form .LayoutOptions > a,
-form .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header
-form
-.HomeOptions > a {
+form .title {
   margin-top: 0;
 }
 
@@ -9641,9 +9398,7 @@ form
   margin-top: 5px;
 }
 
-.Section-Dashboard.Message.index div.Message h1, .Section-Dashboard.Message.index div.Message h2, .Section-Dashboard.Message.index div.Message .analytics-widget-header .title, .analytics-widget-header .Section-Dashboard.Message.index div.Message .title, .Section-Dashboard.Message.index div.Message .analytics-widget-header .LayoutOptions > a, .analytics-widget-header .Section-Dashboard.Message.index div.Message .LayoutOptions > a, .Section-Dashboard.Message.index div.Message .analytics-widget-header
-.HomeOptions > a, .analytics-widget-header .Section-Dashboard.Message.index div.Message
-.HomeOptions > a, .Section-Dashboard.Message.index div.Message h3, .Section-Dashboard.Message.index div.Message p, .Section-Dashboard.Message.index div.Message .P {
+.Section-Dashboard.Message.index div.Message h1, .Section-Dashboard.Message.index div.Message h2, .Section-Dashboard.Message.index div.Message .analytics-widget-header .title, .analytics-widget-header .Section-Dashboard.Message.index div.Message .title, .Section-Dashboard.Message.index div.Message h3, .Section-Dashboard.Message.index div.Message p, .Section-Dashboard.Message.index div.Message .P {
   margin: 10px 0;
 }
 
@@ -9652,16 +9407,8 @@ form
   color: #777;
 }
 
-.Section-Dashboard.Message.index div.Message img.LeftAlign, .Section-Dashboard.Message.index div.Message .LayoutOptions .LeftAlign.Sprite, .LayoutOptions .Section-Dashboard.Message.index div.Message .LeftAlign.Sprite, .Section-Dashboard.Message.index div.Message
-.HomeOptions .LeftAlign.Sprite,
-.HomeOptions .Section-Dashboard.Message.index div.Message .LeftAlign.Sprite,
-.Section-Dashboard.Message.index img.LeftAlign,
-.Section-Dashboard.Message.index .LayoutOptions .LeftAlign.Sprite, .LayoutOptions
-.Section-Dashboard.Message.index .LeftAlign.Sprite,
-.Section-Dashboard.Message.index
-.HomeOptions .LeftAlign.Sprite,
-.HomeOptions
-.Section-Dashboard.Message.index .LeftAlign.Sprite {
+.Section-Dashboard.Message.index div.Message img.LeftAlign,
+.Section-Dashboard.Message.index img.LeftAlign {
   float: left;
   margin: 0 10px 5px 0;
   max-width: 300px;
@@ -9706,9 +9453,7 @@ form
   list-style: disc !important;
 }
 
-.Section-Dashboard.Message.index div.Message img, .Section-Dashboard.Message.index div.Message .LayoutOptions .Sprite, .LayoutOptions .Section-Dashboard.Message.index div.Message .Sprite, .Section-Dashboard.Message.index div.Message
-.HomeOptions .Sprite,
-.HomeOptions .Section-Dashboard.Message.index div.Message .Sprite {
+.Section-Dashboard.Message.index div.Message img {
   max-width: 100%;
 }
 
@@ -9720,55 +9465,6 @@ form
 .Sortable li,
 .DataList li {
   list-style: none;
-}
-
-.LayoutOptions > a,
-.HomeOptions > a {
-  text-decoration: none;
-  color: #555a62;
-}
-
-.LayoutOptions .image-wrap,
-.HomeOptions .image-wrap {
-  height: 124px;
-  width: 180px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.Homepage .Sprite {
-  display: block;
-  height: 124px;
-  width: 180px;
-  background: url("./images/homepage-sprites.png") 0 0 no-repeat;
-}
-
-.Homepage .SpDiscussionsTable {
-  background-position: 0 0;
-}
-
-.Homepage .SpDiscussions {
-  background-position: -180px 0;
-}
-
-.Homepage .SpCategories {
-  background-position: -360px 0;
-}
-
-.Homepage .SpCategoriesTable {
-  background-position: 0 -124px;
-}
-
-.Homepage .SpCategoriesMixed {
-  background-position: -180px -124px;
-}
-
-.Homepage .SpActivity {
-  background-position: -360px -124px;
-}
-
-.Homepage .SpBestOf {
-  background-position: -540px 0;
 }
 
 .FilterMenu select {

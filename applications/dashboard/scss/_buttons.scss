@@ -173,9 +173,11 @@ input[type="button"] {
 .btn-icon {
   @extend .btn-link;
   @extend .icon;
-  padding: $spacer / 4;
+  padding: to-rem(3);
   margin: 0;
   margin-left: .5rem;
+  font-size: $font-size-sm;
+  line-height: to-rem(24);
 
   &:first-child {
     margin-left: 0;

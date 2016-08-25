@@ -63,7 +63,7 @@ class DraftModel extends VanillaModel {
             $Limit = 100;
         }
 
-        $this->DraftQuery();
+        $this->draftQuery();
         $this->SQL
             ->select('d.Name, di.Name', 'coalesce', 'Name')
             ->join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
@@ -184,7 +184,7 @@ class DraftModel extends VanillaModel {
 
         // Validate the form posted values
         if ($this->validate($formPostValues, $Insert)) {
-            $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
+            $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             $DraftID = intval(val('DraftID', $Fields, 0));
 
             // If the post is new and it validates, make sure the user isn't spamming
@@ -216,7 +216,7 @@ class DraftModel extends VanillaModel {
             return $result;
         }
 
-        throw new \BadMethodCallException("CommentModel->delete() is not supported.", 400);
+        throw new \BadMethodCallException("DraftModel->delete() is not supported.", 400);
     }
 
     /**

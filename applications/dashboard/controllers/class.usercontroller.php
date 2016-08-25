@@ -828,7 +828,7 @@ class UserController extends DashboardController {
      *
      * @since 2.0.0
      * @access private
-     * @see self::Decline, self::Approve
+     * @see UserModel::decline, UserModel::approve
      *
      * @param string $Action Approve or Decline.
      * @param int $UserID Unique ID.

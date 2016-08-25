@@ -58,6 +58,54 @@ class DashboardController extends Gdn_Controller {
         parent::initialize();
     }
 
+    public function userPreferenceCollapse() {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
+        $key = Gdn::request()->getValue('key');
+        $collapsed = Gdn::request()->getValue('collapsed');
+
+        if ($key && $collapsed) {
+            $collapsed = ($collapsed === 'true');
+            $session = Gdn::session();
+            $collapsedGroups = $session->getPreference('DashboardNav.Collapsed');
+            if (!$collapsedGroups) {
+                $collapsedGroups = [];
+            }
+
+            if ($collapsed) {
+                $collapsedGroups[$key] = $key;
+            } elseif(isset($collapsedGroups[$key])) {
+                unset($collapsedGroups[$key]);
+            }
+
+            $session->setPreference('DashboardNav.Collapsed', $collapsedGroups);
+        }
+
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
+    public function userPreferenceSectionLandingPage($section, $landingPageUrl) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
+        $url = Gdn::request()->getValue('url');
+        $section = Gdn::request()->getValue('section');
+
+        if ($url && $section) {
+            $session = Gdn::session();
+            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+            if (!$landingPages) {
+                $landingPages = [];
+            }
+
+            $landingPages[$section] = $url;
+            $session->setPreference('DashboardNav.SectionLandingPages', $landingPages);
+        }
+        $this->render('blank', 'utility', 'dashboard');
+    }
 
     /**
      * @param string $currentUrl

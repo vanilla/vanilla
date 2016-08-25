@@ -950,6 +950,58 @@
         scrollToFixedInit($('.panel-nav'));
     });
 
+    $(document).on('click', '.js-save-pref-collapse', function() {
+        var key = $(this).data('key');
+        var collapsed = !$(this).hasClass('collapsed');
+
+        // request the target via ajax
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+
+        ajaxData.TransientKey = gdn.definition('TransientKey');
+        ajaxData.key = key;
+        ajaxData.collapsed = collapsed;
+
+        $.ajax({
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencecollapse'),
+            data: ajaxData,
+            dataType: 'json',
+            error: function(xhr) {
+                gdn.informError(xhr);
+            },
+            success: function(json) {
+                gdn.inform(json);
+                gdn.processTargets(json.Targets);
+            }
+        });
+    });
+
+    $(document).on('click', '.js-save-pref-section', function() {
+        var url = $(this).attr('href');
+        var section = $(this).data('section');
+
+        // request the target via ajax
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+
+        ajaxData.TransientKey = gdn.definition('TransientKey');
+        ajaxData.url = url;
+        ajaxData.section = section;
+
+        $.ajax({
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencesectionlandingpage'),
+            data: ajaxData,
+            dataType: 'json',
+            error: function(xhr) {
+                gdn.informError(xhr);
+            },
+            success: function(json) {
+                gdn.inform(json);
+                gdn.processTargets(json.Targets);
+            }
+        });
+    });
+
     $(document).on('change', '.js-file-upload', function() {
         var filename = $(this).val();
         if (filename.substring(3, 11) === 'fakepath') {

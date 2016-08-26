@@ -2086,3 +2086,29 @@ jQuery.fn.effect = function(name) {
             that.removeClass(name);
         });
 };
+
+$(document).on("contentLoad", function(e) {
+    $(".BoxFlatCategory", e.target).each(function(index, value){
+        var container = value;
+        var categoryID = $("input[name=CategoryID]", container).val();
+
+        if (typeof categoryID === "undefined") {
+            return;
+        }
+
+        $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
+            var url = gdn.url("module/flatcategorymodule/vanilla");
+
+            jQuery.get(
+                gdn.url("module/flatcategorymodule/vanilla"),
+                {
+                    categoryID: categoryID,
+                    filter: filterEvent.target.value
+                },
+                function(data, textStatus, jqXHR) {
+                    $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
+                }
+            )
+        });
+    });
+});

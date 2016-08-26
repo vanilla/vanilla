@@ -110,7 +110,7 @@ class FlatCategoryModule extends Gdn_Module {
 
     /**
      * Get the value to be used for filtering categories by name, if any.
-     * 
+     *
      * @return null|string
      */
     public function getFilter() {

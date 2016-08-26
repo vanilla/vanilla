@@ -8,12 +8,12 @@ echo $this->Form->errors();
 $NumApplicants = $this->UserData->numRows();
 
 if ($NumApplicants == 0) : ?>
-    <div class="Info"><?php echo t('There are currently no applicants.'); ?></div>
+    <div class="padded"><?php echo t('There are currently no applicants.'); ?></div>
 <?php else : ?>
     <?php
     $AppText = plural($NumApplicants, 'There is currently %s applicant.', 'There are currently %s applicants.');
     ?>
-    <div class="Info"><?php echo sprintf($AppText, $NumApplicants); ?></div>
+    <div class="padded italic"><?php echo sprintf($AppText, $NumApplicants); ?></div>
     <div class="table-wrap">
         <table>
             <thead>

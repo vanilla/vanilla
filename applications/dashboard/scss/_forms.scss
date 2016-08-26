@@ -685,6 +685,11 @@ select + select {
   }
 }
 
+.Homepage .label-selector-item {
+  @extend .grid-item-large;
+
+}
+
 .label-selector-item:not(.no-grid) {
   @extend .grid-item;
 

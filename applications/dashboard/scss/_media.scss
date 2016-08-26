@@ -89,7 +89,7 @@
 }
 
 //GRID TODO: Move
-
+// Starts 4 wide
 .grid-item {
   @extend .col-xs-12;
   @extend .col-sm-8;
@@ -105,4 +105,12 @@
 .grid-image-wrap {
   position: relative;
   @include image-wrap-border(0);
+}
+
+// Starts 3 wide
+.grid-item-large {
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-12;
+  @extend .col-xl-8;
 }

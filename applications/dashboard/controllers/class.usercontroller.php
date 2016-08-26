@@ -255,6 +255,7 @@ class UserController extends DashboardController {
         $this->fireEvent('BeforeApplicants');
         $UserModel = Gdn::userModel();
         $this->UserData = $UserModel->getApplicants();
+        Gdn_Theme::section('Moderation');
         $this->render();
     }
 

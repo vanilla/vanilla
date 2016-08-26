@@ -493,7 +493,14 @@ class SettingsController extends DashboardController {
                     }
 
                     // Trim the ban value to avoid obvious mismatches.
-                    $this->Form->setFormValue('BanValue', trim($this->Form->getFormValue('BanValue')));
+                    $banValue = trim($this->Form->getFormValue('BanValue'));
+                    $this->Form->setFormValue('BanValue', $banValue);
+
+                    // We won't let you HAL 9000 the entire crew.
+                    $crazyBans = ['*', '*@*', '*.*', '*.*.*', '*.*.*.*'];
+                    if (in_array($banValue, $crazyBans)) {
+                        $this->Form->addError("I'm sorry Dave, I'm afraid I can't do that.");
+                    }
 
                     try {
                         // Save the ban.

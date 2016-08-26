@@ -1699,7 +1699,7 @@ class UserModel extends Gdn_Model {
         $Result = &$Data->result();
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
-                $Row->Photo = Gdn_Upload::url($Row->Photo);
+                $Row->Photo = Gdn_Upload::url(changeBasename($Row->Photo, 'p%s'));
             }
         }
 
@@ -1708,7 +1708,7 @@ class UserModel extends Gdn_Model {
 
     /**
      * Retrieves a "system user" id that can be used to perform non-real-person tasks.
-     * 
+     *
      * @return int Returns a user ID.
      */
     public function getSystemUserID() {

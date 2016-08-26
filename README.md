@@ -49,6 +49,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 * PHP version 5.3 or newer with `--enable-mbstring`.
 * pdo_mysql module must be enabled.
 * MySQL 5 or newer.
+* If you intend to [Migrate to Vanilla](#migrating-to-vanilla) you will also need PHP with `--with-mysqli`.
 
 Vanilla 2.2 requires PHP 5.3. Running `master` branch requires PHP 5.4, as will future official releases.
 

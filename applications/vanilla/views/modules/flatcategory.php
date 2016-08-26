@@ -6,6 +6,7 @@
     <div class="FlatCategoryFilter SearchForm">
         <input class="InputBox" placeholder="<?php echo t('Search'); ?>" type="text" />
         <input name="CategoryID" type="hidden" value="<?php echo htmlspecialchars($this->data('ParentCategory.CategoryID'))?>" />
+        <input name="Limit" type="hidden" value="<?php echo $this->getLimit(); ?>" />
     </div>
 
     <div class="FlatCategoryResult">

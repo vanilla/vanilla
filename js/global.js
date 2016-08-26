@@ -2094,10 +2094,16 @@ $(document).on("contentLoad", function(e) {
         // Setup the constants we'll need to perform the lookup for this module instance.
         var container = value;
         var categoryID = $("input[name=CategoryID]", container).val();
+        var limit = parseInt($("input[name=Limit]", container).val());
 
         // If we don't even have a category, don't bother setting up filtering.
         if (typeof categoryID === "undefined") {
             return;
+        }
+
+        // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
+        if (isNaN(limit) || limit < 1) {
+            limit = 10;
         }
 
         // Anytime someone types something into the search box in this instance's container...
@@ -2109,7 +2115,8 @@ $(document).on("contentLoad", function(e) {
                 gdn.url("module/flatcategorymodule/vanilla"),
                 {
                     categoryID: categoryID,
-                    filter: filterEvent.target.value
+                    filter: filterEvent.target.value,
+                    limit: limit
                 },
                 function(data, textStatus, jqXHR) {
                     $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));

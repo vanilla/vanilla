@@ -28,6 +28,11 @@ class FlatCategoryModule extends Gdn_Module {
     private $children;
 
     /**
+     * @var string Filter output by name.
+     */
+    public $filter;
+
+    /**
      * @var int Limit on the number of categories displayed.
      */
     public $limit;
@@ -43,6 +48,21 @@ class FlatCategoryModule extends Gdn_Module {
 
         $this->categoryModel = new CategoryModel();
         $this->limit = $this::DEFAULT_LIMIT;
+
+        // If this is coming from the module controller, populate some properties by query parameters.
+        if ($sender instanceof ModuleController) {
+            $paramWhitelist = [
+                'categoryID' => Gdn::request()->get('categoryID', Gdn::request()->get('CategoryID')),
+                'filter' => Gdn::request()->get('filter', Gdn::request()->get('Filter')),
+                'limit' => Gdn::request()->get('limit', Gdn::request()->get('Limit'))
+            ];
+
+            foreach ($paramWhitelist as $property => $value) {
+                if ($value) {
+                    $this->$property = $value;
+                }
+            }
+        }
     }
 
     /**
@@ -79,12 +99,28 @@ class FlatCategoryModule extends Gdn_Module {
             $this->children = $this->categoryModel->getTreeAsFlat(
                 val('CategoryID', $category),
                 0,
-                $this->getLimit()
+                $this->getLimit(),
+                $this->getFilter()
             );
             $this->categoryModel->joinRecent($this->children);
         }
 
         return $this->children;
+    }
+
+    /**
+     * Get the value to be used for filtering categories by name, if any.
+     * 
+     * @return null|string
+     */
+    public function getFilter() {
+        $filter = null;
+
+        if ($this->filter) {
+            $filter = (string)$this->filter;
+        }
+
+        return $filter;
     }
 
     /**

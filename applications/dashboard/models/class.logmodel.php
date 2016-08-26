@@ -319,6 +319,9 @@ class LogModel extends Gdn_Pluggable {
     /**
      * Log an operation into the log table.
      *
+     * WARNING: Hooking events in this method is dangerous because plugin disabling is logged.
+     * Events registered by your plugin will still try to fire when your `plugin disable` action gets here.
+     *
      * @param string $Operation The operation being performed. This is usually one of:
      *  - Delete: The record has been deleted.
      *  - Edit: The record has been edited.

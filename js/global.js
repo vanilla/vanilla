@@ -2087,18 +2087,24 @@ jQuery.fn.effect = function(name) {
         });
 };
 
+// Setup AJAX filtering for flat category module.
 $(document).on("contentLoad", function(e) {
+    // Find each flat category module container, if any.
     $(".BoxFlatCategory", e.target).each(function(index, value){
+        // Setup the constants we'll need to perform the lookup for this module instance.
         var container = value;
         var categoryID = $("input[name=CategoryID]", container).val();
 
+        // If we don't even have a category, don't bother setting up filtering.
         if (typeof categoryID === "undefined") {
             return;
         }
 
+        // Anytime someone types something into the search box in this instance's container...
         $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
             var url = gdn.url("module/flatcategorymodule/vanilla");
 
+            // ...perform an AJAX request, replacing the current category data with the result's data.
             jQuery.get(
                 gdn.url("module/flatcategorymodule/vanilla"),
                 {

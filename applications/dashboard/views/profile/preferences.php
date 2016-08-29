@@ -66,29 +66,15 @@
                     // Loop through all means of notification.
                     foreach ($PreferenceTypes as $NotificationType) {
                         $ConfigPreference = c('Preferences.'.$NotificationType.'.'.$Event, 0);
-                        if (
-                            !in_array($NotificationType.'.'.$Event, $Settings) ||
-                            $ConfigPreference === false ||
-                            $ConfigPreference == 2
-                         ) {
-                            // If preference does not exist, or is excluded by
-                            // a config setting, show an empty cell.
-                            $ColumnsMarkup .= wrap(
-                                '&nbsp;',
-                                'td',
-                                array('class' => 'PrefCheckBox')
-                            );
+                        $preferenceDisabled = ($ConfigPreference === false || $ConfigPreference == 2);
+
+                        if (!in_array($NotificationType.'.'.$Event, $Settings) || $preferenceDisabled) {
+                            // If preference does not exist, or is excluded by a config setting, show an empty cell.
+                            $ColumnsMarkup .= wrap('&nbsp;', 'td', ['class' => 'PrefCheckBox']);
                         } else {
                             // Everything's fine, show checkbox.
-                            $ColumnsMarkup .= wrap(
-                                $this->Form->CheckBox(
-                                    $NotificationType.'.'.$Event,
-                                    '',
-                                    array('value' => '1')
-                                ),
-                                'td',
-                                array('class' => 'PrefCheckBox')
-                            );
+                            $checkbox = $this->Form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1']);
+                            $ColumnsMarkup .= wrap($checkbox, 'td', ['class' => 'PrefCheckBox']);
                             // Set flag so that line is printed.
                             $RowHasConfigValues = true;
                         }
@@ -97,17 +83,12 @@
                     if ($RowHasConfigValues) {
                         // Make sure we have complete numeric indexes.
                         $Settings = array_values($Settings);
-
                         $Description = val($Settings[0], $Descriptions);
                         if (is_array($Description)) {
                             $Description = $Description[0];
                         }
                         echo '<tr>';
-                        echo wrap(
-                            $Description,
-                            'td',
-                            array('class' => 'Description')
-                        );
+                        echo wrap($Description, 'td', ['class' => 'Description']);
                         echo $ColumnsMarkup;
                         echo '</tr>';
                     }
@@ -118,7 +99,7 @@
         <?php
         }
         $this->fireEvent('CustomNotificationPreferences');
-        echo $this->Form->close('Save Preferences', '', array('class' => 'Button Primary'));
+        echo $this->Form->close('Save Preferences', '', ['class' => 'Button Primary']);
         $this->fireEvent("AfterPreferencesRender");
         ?>
     </div>

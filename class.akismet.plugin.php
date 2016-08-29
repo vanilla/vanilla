@@ -29,18 +29,27 @@ class AkismetPlugin extends Gdn_Plugin {
     public static function akismet() {
         static $Akismet;
         if (!$Akismet) {
-            $Key = c('Plugins.Akismet.Key', c('Plugins.Akismet.MasterKey'));
-            if (!$Key) {
-               return null;
+            $key = c('Plugins.Akismet.Key', c('Plugins.Akismet.MasterKey'));
+            $server = c('Plugins.Akismet.Server');
+            if (!$key || !$server) {
+                return null;
             }
-
-            $Akismet = new Akismet(Gdn::request()->url('/', true), $Key);
-
-            $Server = C('Plugins.Akismet.Server');
-            if ($Server) {
-                $Akismet->setAkismetServer($Server);
-            }
+            $Akismet = self::buildAkismet($key, $server);
         }
+
+        return $Akismet;
+    }
+
+    /**
+     * Build an Akismet object.
+     *
+     * @param string $key Authentication key.
+     * @param string $server Remote URL.
+     * @return Akismet
+     */
+    private static function buildAkismet($key, $server) {
+        $Akismet = new Akismet(Gdn::request()->url('/', true), $key);
+        $Akismet->setAkismetServer($server);
 
         return $Akismet;
     }
@@ -54,12 +63,12 @@ class AkismetPlugin extends Gdn_Plugin {
      * @throws exception
      */
     public function checkAkismet($RecordType, $Data) {
-        $UserID = $this->UserID();
+        $UserID = $this->userID();
         if (!$UserID) {
             return false;
         }
 
-        $Akismet = self::Akismet();
+        $Akismet = self::akismet();
         if (!$Akismet) {
             return false;
         }
@@ -73,6 +82,16 @@ class AkismetPlugin extends Gdn_Plugin {
 
         $Result = $Akismet->isCommentSpam();
         return $Result;
+    }
+
+    /**
+     * Do we have a valid key?
+     *
+     * @return bool
+     */
+    protected function validateKey($key) {
+        $server = c('Plugins.Akismet.Server');
+        return self::buildAkismet($key, $server)->isKeyValid();
     }
 
     /**
@@ -159,7 +178,7 @@ class AkismetPlugin extends Gdn_Plugin {
     /**
      * Settings page.
      *
-     * @param $Sender
+     * @param SettingsController $Sender
      */
     public function settingsController_akismet_create($Sender) {
         // Allow for master hosted key
@@ -172,6 +191,16 @@ class AkismetPlugin extends Gdn_Plugin {
         $Sender->setData('Title', t('Akismet Settings'));
 
         $Cf = new ConfigurationModule($Sender);
+
+        // Do key validation so we don't break our entire site.
+        // Always allow a blank key, because the plugin turns off in that scenario.
+        if (Gdn::request()->isAuthenticatedPostBack()) {
+            $key = $Cf->form()->getFormValue('Plugins.Akismet.Key');
+            if ($key !== '' && !$this->validateKey($key)) {
+                $Cf->form()->addError('Key is invalid.');
+            }
+        }
+
         $Cf->initialize([
             'Plugins.Akismet.Key' => ['Description' => $KeyDesc],
             'Plugins.Akismet.Server' => [

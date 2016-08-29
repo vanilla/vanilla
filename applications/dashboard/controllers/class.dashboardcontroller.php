@@ -58,53 +58,61 @@ class DashboardController extends Gdn_Controller {
         parent::initialize();
     }
 
+    /**
+     * Sets a user's preference for dashboard panel nav collapsing. Collapsed groups are stored in an
+     * list, by their 'data-key' attribute on the nav-header <a> element.
+     *
+     * @throws Gdn_UserException
+     */
     public function userPreferenceCollapse() {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
+        if (Gdn::request()->isAuthenticatedPostBack(true)) {
+            $key = Gdn::request()->getValue('key');
+            $collapsed = Gdn::request()->getValue('collapsed');
 
-        $key = Gdn::request()->getValue('key');
-        $collapsed = Gdn::request()->getValue('collapsed');
+            if ($key && $collapsed) {
+                $collapsed = ($collapsed === 'true');
+                $session = Gdn::session();
+                $collapsedGroups = $session->getPreference('DashboardNav.Collapsed');
+                if (!$collapsedGroups) {
+                    $collapsedGroups = [];
+                }
 
-        if ($key && $collapsed) {
-            $collapsed = ($collapsed === 'true');
-            $session = Gdn::session();
-            $collapsedGroups = $session->getPreference('DashboardNav.Collapsed');
-            if (!$collapsedGroups) {
-                $collapsedGroups = [];
+                if ($collapsed) {
+                    $collapsedGroups[$key] = $key;
+                } elseif(isset($collapsedGroups[$key])) {
+                    unset($collapsedGroups[$key]);
+                }
+
+                $session->setPreference('DashboardNav.Collapsed', $collapsedGroups);
             }
 
-            if ($collapsed) {
-                $collapsedGroups[$key] = $key;
-            } elseif(isset($collapsedGroups[$key])) {
-                unset($collapsedGroups[$key]);
-            }
-
-            $session->setPreference('DashboardNav.Collapsed', $collapsedGroups);
+            $this->render('blank', 'utility', 'dashboard');
         }
-
-        $this->render('blank', 'utility', 'dashboard');
     }
 
+    /**
+     * Sets a user's preference for the landing page for each top-level nav item. Stored in a list as
+     * SectionName->url pairs, where SectionName is the 'data-section' attribute on the panel nav link.
+     *
+     * @throws Gdn_UserException
+     */
     public function userPreferenceSectionLandingPage($section, $landingPageUrl) {
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
+        if (Gdn::request()->isAuthenticatedPostBack(true)) {
+            $url = Gdn::request()->getValue('url');
+            $section = Gdn::request()->getValue('section');
 
-        $url = Gdn::request()->getValue('url');
-        $section = Gdn::request()->getValue('section');
+            if ($url && $section) {
+                $session = Gdn::session();
+                $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+                if (!$landingPages) {
+                    $landingPages = [];
+                }
 
-        if ($url && $section) {
-            $session = Gdn::session();
-            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
-            if (!$landingPages) {
-                $landingPages = [];
+                $landingPages[$section] = $url;
+                $session->setPreference('DashboardNav.SectionLandingPages', $landingPages);
             }
-
-            $landingPages[$section] = $url;
-            $session->setPreference('DashboardNav.SectionLandingPages', $landingPages);
+            $this->render('blank', 'utility', 'dashboard');
         }
-        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

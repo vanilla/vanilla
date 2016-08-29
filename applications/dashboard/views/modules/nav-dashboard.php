@@ -6,7 +6,7 @@ if (!function_exists('renderDashboardNav')) {
         foreach ($items as $item) {
             if (val('type', $item) == 'group') {
                 if (val('text', $item)) { ?>
-                    <h4 class="nav-heading"><a data-toggle="collapse" aria-expanded="<?php echo val('ariaExpanded', $item); ?>" class="js-save-pref-collapse <?php echo val('collapsed', $item); ?> " data-key="<?php echo val('headerCssClass', $item); ?>" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
+                    <h4 class="nav-heading"><a data-toggle="collapse" aria-expanded="<?php echo val('ariaExpanded', $item); ?>" class="js-save-pref-collapse <?php echo val('collapsed', $item); ?> <?php echo val('headerCssClass', $item); ?>" data-key="<?php echo val('headerCssClass', $item); ?>" href="#<?php echo trim(val('headerCssClass', $item))?>"><?php echo val('text', $item); ?></a></h4>
                 <?php } ?>
                 <ul class="nav nav-pills nav-stacked collapse <?php echo val('collapsedList', $item); ?> <?php echo trim(val('cssClass', $item)); ?>" id="<?php echo trim(val('headerCssClass', $item)); ?>">
                 <?php

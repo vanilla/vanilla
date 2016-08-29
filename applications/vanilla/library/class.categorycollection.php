@@ -291,44 +291,6 @@ class CategoryCollection {
     }
 
     /**
-     * Get all of the ancestor categories above this one.
-     *
-     * @param int|string $categoryID The category ID or url code.
-     * @param bool $includeHeadings Whether or not to include heading categories.
-     * @return array
-     */
-    public function getAncestors($categoryID, $includeHeadings = false) {
-        $result = [];
-
-        $category = $this->get($categoryID);
-
-        if ($category === null) {
-            return $result;
-        }
-
-        // Build up the ancestor array by tracing back through parents.
-        $result[] = $category;
-        $max = 20;
-        while ($category = $this->get($category['ParentCategoryID'])) {
-            // Check for an infinite loop.
-            if ($max <= 0) {
-                break;
-            }
-            $max--;
-
-            if ($category['CategoryID'] == -1) {
-                break;
-            }
-
-            if ($includeHeadings || $category['DisplayAs'] !== 'Heading') {
-                $result[] = $category;
-            }
-        }
-        $result = array_reverse($result);
-        return $result;
-    }
-
-    /**
      * Get several categories by ID.
      *
      * @param array $categoryIDs An array of category IDs.
@@ -393,33 +355,23 @@ class CategoryCollection {
      * Get all of the categories from a root.
      *
      * @param int $parentID The ID of the parent category.
-     * @param array $options An array of options to affect the fetching.
-     *
-     * - maxdepth: The maximum depth of the tree.
-     * - collapsed: Stop when looking at a category of a certain type.
-     * - permission: The permission to use when looking at the tree.
+     * @param int $maxDepth The maximum relative depth to grab.
+     * @param int $permission The permission column to check.
      */
-    public function getTree($parentID = -1, $options = []) {
+    public function getTree($parentID = -1, $maxDepth = 3, $permission = 'PermsDiscussionsView') {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
-        $options = array_change_key_case($options) + [
-                'maxdepth' => 3,
-                'collapsecategories' => false,
-                'permission' => 'PermsDiscussionsView'
-            ];
-
 
         $currentDepth = 1;
         $parents = [$parentID];
-        for ($i = 0; $i < $options['maxdepth']; $i++) {
-            $children = $this->getChildrenByParents($parents, $options['permission']);
+        for ($i = 0; $i < $maxDepth; $i++) {
+            $children = $this->getChildrenByParents($parents, $permission);
             if (empty($children)) {
                 break;
             }
 
             // Go through the children and wire them up.
-            $parents = [];
             foreach ($children as $child) {
                 $category = $child;
                 $category['Children'] = [];
@@ -437,13 +389,10 @@ class CategoryCollection {
                 } else {
                     $categories[$category['ParentCategoryID']]['Children'][] = &$categories[$category['CategoryID']];
                 }
-
-                if (!$options['collapsecategories'] || !in_array($child['DisplayAs'], ['Categories'])) {
-                    $parents[] = $child['CategoryID'];
-                }
             }
 
             // Get the IDs for the next depth of children.
+            $parents = array_column($children, 'CategoryID');
             $currentDepth++;
         }
         $this->calculateTreeCounts($tree);
@@ -494,7 +443,7 @@ class CategoryCollection {
      * @return array Returns an array of child categories.
      */
     private function getChildrenByParents(array $parentIDs, $permission = 'PermsDiscussionsView') {
-        if (!$this->cache instanceof Gdn_Dirtycache) {
+        if ($this->cache->activeEnabled()) {
             $select = 'CategoryID';
         } else {
             $select = '*';
@@ -510,7 +459,7 @@ class CategoryCollection {
             ->orderBy('ParentCategoryID, Sort')
             ->get()->resultArray();
 
-        if (!$this->cache instanceof Gdn_Dirtycache) {
+        if ($this->cache->activeEnabled()) {
             $ids = array_column($data, 'CategoryID');
             $data = $this->getMulti($ids);
         } else {

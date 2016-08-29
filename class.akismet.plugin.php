@@ -90,14 +90,14 @@ class AkismetPlugin extends Gdn_Plugin {
         $UserID = Gdn::sql()->getWhere('User', ['Name' => 'Akismet', 'Admin' => 2])->value('UserID');
 
         if (!$UserID) {
-            $UserID = Gdn::sql()->insert('User', array(
-            'Name' => 'Akismet',
-            'Password' => tandomString('20'),
-            'HashMethod' => 'Random',
-            'Email' => 'akismet@domain.com',
-            'DateInserted' => Gdn_Format::toDateTime(),
-            'Admin' => '2'
-            ));
+            $UserID = Gdn::sql()->insert('User', [
+                'Name' => 'Akismet',
+                'Password' => randomString('20'),
+                'HashMethod' => 'Random',
+                'Email' => 'akismet@domain.com',
+                'DateInserted' => Gdn_Format::toDateTime(),
+                'Admin' => '2'
+            ]);
         }
 
         saveToConfig('Plugins.Akismet.UserID', $UserID);
@@ -185,4 +185,3 @@ class AkismetPlugin extends Gdn_Plugin {
         $Cf->renderAll();
     }
 }
-

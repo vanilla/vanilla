@@ -2030,8 +2030,9 @@ jQuery(document).ready(function($) {
          */
         $discussionTitles.each(function() {
             var $this = $(this);
-            if (!!$this.text()) {
-                $renderer.empty().text($this.text());
+            var text = $this.text();
+            if (!!text) {
+                $renderer.empty().text(text);
                 if ($renderer.width() === 0) {
                     $this.text(gdn.definition('BlankDiscussionTopicText', 'Blank Discussion Topic'));
                 }

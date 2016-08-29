@@ -166,7 +166,7 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
-            if (ValidateRequired($this->Form->getFormValue('DefaultUserRole'))) {
+            if (validateRequired($this->Form->getFormValue('DefaultUserRole'))) {
                 $this->Model->fixUserRole($this->Form->getFormValue('DefaultUserRole'));
                 $this->setData('CompletedFix', true);
             }
@@ -193,6 +193,11 @@ class DbaController extends DashboardController {
         $this->render('Job');
     }
 
+    /**
+     * Set a job.
+     *
+     * @param string $Name
+     */
     protected function _setJob($Name) {
         $Args = array_change_key_case($this->ReflectArgs);
         $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

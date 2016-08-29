@@ -2022,7 +2022,7 @@ jQuery(document).ready(function($) {
             position: 'absolute',
             left: '-9999px',
             'font-size': '20px'
-        }).prepend('body');
+        }).prependTo('body');
 
         /*
          * Render every discussion into the a renderer (which has no styling that will interfere with the title's text)

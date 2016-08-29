@@ -2026,7 +2026,7 @@ jQuery(document).ready(function($) {
 
         /*
          * Render every discussion into the a renderer (which has no styling that will interfere with the title's text)
-          * and check its size.
+         * and check its size.
          */
         $discussionTitles.each(function() {
             var $this = $(this);

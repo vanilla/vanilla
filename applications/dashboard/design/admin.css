@@ -6122,13 +6122,16 @@ input[type="button"].btn-block {
   width: 50px;
 }
 
-.module-triangle-bottom {
+.popover-analytics {
   background-color: #fff;
   padding: 0.5625rem;
   font-weight: 500;
-  font-size: 1.125rem;
   border-radius: 0.25rem;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+}
+
+.popover-single {
+  font-size: 1.125rem;
 }
 
 .media-sm {

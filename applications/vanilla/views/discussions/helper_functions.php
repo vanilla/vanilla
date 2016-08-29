@@ -138,6 +138,10 @@ if (!function_exists('WriteDiscussion')) :
         $DiscussionName = $Discussion->Name;
         if ($DiscussionName == '') {
             $DiscussionName = t('Blank Discussion Topic');
+
+        // If there are no word character detected in the title try to fix the link on the client side.
+        } elseif (preg_match('/\w/u', $DiscussionName) == false) {
+            $CssClass .= ' FixEmptyTitle';
         }
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
 

@@ -53,6 +53,8 @@ class DiscussionController extends VanillaController {
      * @param int $Page The current page of comments
      */
     public function index($DiscussionID = '', $DiscussionStub = '', $Page = '') {
+        $this->_Definitions['BlankDiscussionTopicText'] = t('Blank Discussion Topic');
+
         // Setup head
         $Session = Gdn::session();
         $this->addJsFile('jquery.autosize.min.js');
@@ -529,7 +531,7 @@ class DiscussionController extends VanillaController {
             if ($Target) {
                 $this->RedirectUrl = url($Target);
             }
-            
+
             $this->jsonTarget('', '', 'Refresh');
         } else {
             if (!$Discussion->Announce) {

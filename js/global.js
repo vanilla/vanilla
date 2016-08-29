@@ -2016,6 +2016,31 @@ jQuery(document).ready(function($) {
         });
     }
 
+    var $discussionTitles = $('.FixEmptyTitle .Title a');
+    if ($discussionTitles.length) {
+        var $renderer = $('<div id="#TitleRender"/>').css({
+            position: 'absolute',
+            left: '-9999px',
+            'font-size': '20px'
+        }).prepend('body');
+
+        /*
+         * Render every discussion into the a renderer (which has no styling that will interfere with the title's text)
+          * and check its size.
+         */
+        $discussionTitles.each(function() {
+            var $this = $(this);
+            if (!!$this.text()) {
+                $renderer.empty().text($this.text());
+                if ($renderer.width() === 0) {
+                    $this.text(gdn.definition('BlankDiscussionTopicText', 'Blank Discussion Topic'));
+                }
+            }
+        });
+
+        $renderer.remove();
+    }
+
     $(document).trigger('contentLoad');
 });
 

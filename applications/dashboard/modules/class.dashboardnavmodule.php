@@ -30,7 +30,8 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'DashboardHome',
             'title' => 'Dashboard',
             'description' => 'Site Overview',
-            'url' => '/settings'
+            'url' => '/settings',
+            'empty' => true
         ],
         'Moderation' => [
             'section' => 'Moderation',
@@ -194,8 +195,17 @@ class DashboardNavModule extends SiteNavModule {
         self::$sectionsInfo[$section['section']] = $section;
     }
 
+    public function handleEmpty() {
+        $section = $this->getActiveSection();
+        $section = val($section, self::$sectionsInfo);
+        if (val('empty', $section) === true) {
+            $this->items = [];
+        }
+    }
+
     public function prepare() {
         parent::prepare();
+        $this->handleEmpty();
         $this->handleUserPreferencesNav();
         return true;
     }

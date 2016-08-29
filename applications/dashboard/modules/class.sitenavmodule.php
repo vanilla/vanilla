@@ -16,7 +16,8 @@
  * If a section is not specified, the item is added to the SECTION_DEFAULT. If we are in a section without a custom nav,
  * these items will display.
  *
- * We can force the module to display any section menus by setting the currentSections property.
+ * We can force the module to display any section menus by setting the currentSections property. Beware, you'll need to
+ * handle the user preference saving if you do this.
  *
  * TODO: Handle the dropdown menu case.
  */

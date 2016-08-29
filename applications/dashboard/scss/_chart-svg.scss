@@ -218,12 +218,15 @@ $chart-bg-opacity: 0.15;
   }
 }
 
-.module-triangle-bottom {
+.popover-analytics {
   background-color: $white;
   padding: $spacer / 2;
   font-weight: 500;
-  font-size: to-rem(18);
   border-radius: to-rem(4);
   box-shadow: 0 0 5px rgba(0,0,0,.15);
+}
+
+.popover-single {
+  font-size: to-rem(18);
 }
 

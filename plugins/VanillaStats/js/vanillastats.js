@@ -185,8 +185,9 @@ var vanillaStats = (function() {
                         },
                         tooltip: {
                             contents: function (d, defaultTitleFormat, defaultValueFormat, color) {
-                                d = Math.floor(d[0].value)
-                                return '<div id="tooltip" class="module-triangle-bottom">' + d + '</div>'
+                                valueFormat = defaultValueFormat;
+                                value = valueFormat(d[0].value, d[0].ratio, d[0].id, d[0].index);
+                                return '<div class="popover popover-single popover-analytics popover-name-" + d[0].id + ">' + value + '</div>';
                             }
                         }
                     });

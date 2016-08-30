@@ -193,6 +193,9 @@ class DiscussionsController extends VanillaController {
         $this->render();
     }
 
+    /**
+     * @deprecated since 2.3
+     */
     public function unread($Page = '0') {
         if (!Gdn::session()->isValid()) {
             redirect('/discussions/index', 302);

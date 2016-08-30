@@ -1473,6 +1473,8 @@ class DiscussionModel extends VanillaModel {
     /**
      * Count how many discussions match the given criteria.
      *
+     * @deprecated since 2.3
+     *
      * @param array $Wheres SQL conditions.
      * @return int Number of discussions.
      * @since 2.0.0

@@ -136,9 +136,12 @@ class ConfigurationModule extends Gdn_Module {
                 $this->controller()->setData($Name, $Value);
             }
 
-            // Save it to the config.
-            saveToConfig($Data, array('RemoveEmpty' => true));
-            $this->_Sender->informMessage(t('Saved'));
+            // Halt the save if we've had errors assigned.
+            if ($Form->errorCount() == 0) {
+                // Save it to the config.
+                saveToConfig($Data, array('RemoveEmpty' => true));
+                $this->_Sender->informMessage(t('Saved'));
+            }
         } else {
             // Load the form data from the config.
             $Data = array();
@@ -146,7 +149,7 @@ class ConfigurationModule extends Gdn_Module {
                 $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
             }
             $Form->setData($Data);
-            $this->Controller()->Data = array_merge($this->Controller()->Data, $Data);
+            $this->controller()->Data = array_merge($this->controller()->Data, $Data);
         }
     }
 

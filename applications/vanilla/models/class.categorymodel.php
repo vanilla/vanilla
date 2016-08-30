@@ -1828,14 +1828,17 @@ class CategoryModel extends Gdn_Model {
         }
 
         $Result = array();
-        foreach ($Category['ChildIDs'] as $ID) {
-            if (!isset($Categories[$ID])) {
-                continue;
+        $childIDs = val('ChildIDs', $Category);
+        if (is_array($childIDs) && count($childIDs)) {
+            foreach ($childIDs as $ID) {
+                if (!isset($Categories[$ID])) {
+                    continue;
+                }
+                $Row = (array)$Categories[$ID];
+                $Row['Depth'] += $DepthAdj;
+                $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
+                $Result[] = $Row;
             }
-            $Row = (array)$Categories[$ID];
-            $Row['Depth'] += $DepthAdj;
-            $Row['Children'] = self::_MakeTreeChildren($Row, $Categories);
-            $Result[] = $Row;
         }
         return $Result;
     }

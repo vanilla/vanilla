@@ -52,8 +52,8 @@ foreach ($this->data('_EditorToolbar') as $button) {
                '<div class="editor-insert-dialog Flyout MenuItems" data-wysihtml5-dialog="createLink">
                      <input class="InputBox editor-input-url" data-wysihtml5-dialog-field="href" value="http://" />
                       <div class="MenuButtons">
-                      <input type="button" data-wysihtml5-dialog-action="save" class="Button editor-dialog-fire-close" value="'.t('OK').'"/>
-                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Cancel editor-dialog-fire-close" value="'.t('Cancel').'"/>
+                      <input type="button" data-wysihtml5-dialog-action="save" class="Button Flyout-Button editor-dialog-fire-close" value="'.t('OK').'"/>
+                      <input type="button" data-wysihtml5-dialog-action="cancel" class="Button Flyout-Button Cancel editor-dialog-fire-close" value="'.t('Cancel').'"/>
                       </div>
                    </div>'
                , 'div', array('class' => 'editor-dropdown editor-dropdown-link'));

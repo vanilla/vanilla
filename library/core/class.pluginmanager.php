@@ -1237,6 +1237,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             return false;
         }
 
+        $pluginClassName = $addon->getPluginClass();
         $pluginName = $addon->getRawKey();
         $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
@@ -1253,6 +1254,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         saveToConfig("EnabledPlugins.{$pluginName}", false);
 
         $this->addonManager->stopAddon($addon);
+
+        // 4. Unregister the plugin properly.
+        $this->unregisterPlugin($pluginClassName);
 
         if ($enabled) {
             Logger::event(

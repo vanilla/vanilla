@@ -336,7 +336,7 @@ if (!function_exists('countString')) {
             return "<span class=\"$CssClass\">$Number</span>";
         } elseif ($Number === null && $Url) {
             $CssClass = trim($CssClass.' Popin TinyProgress', ' ');
-            $Url = htmlspecialchars(url($Url));
+            $Url = htmlspecialchars($Url);
             return "<span class=\"$CssClass\" rel=\"$Url\"></span>";
         } else {
             return '';
@@ -1111,7 +1111,9 @@ if (!function_exists('userUrl')) {
         }
 
         $UserName = val($Px.'Name', $User);
-        $UserName = preg_replace('/([\?&]+)/', '', $UserName);
+        // Make sure that the name will not be split if the p parameter is set.
+        // Prevent p=/profile/a&b to be translated to $_GET['p'=>'/profile/a?', 'b'=>'']
+        $UserName = str_replace('&', '%26', $UserName);
 
         $Result = '/profile/'.
             ($Method ? trim($Method, '/').'/' : '').

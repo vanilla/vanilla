@@ -153,7 +153,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Rename the column
         // The syntax for renaming a column is:
         // ALTER TABLE tablename CHANGE COLUMN oldname newname originaldefinition;
-        if (!$this->executeQuery('alter table `'.$OldPrefix.$this->_TableName.'` change column `'.$OldName.'` `'.$NewName.'` '.$this->_defineColumn($OldColumn))) {
+        if (!$this->executeQuery('alter table `'.$OldPrefix.$this->_TableName.'` change column '.$this->_defineColumn($OldColumn, $NewName))) {
             throw new Exception(sprintf(t('Failed to rename table `%1$s` to `%2$s`.'), $OldName, $NewName));
         }
 
@@ -672,8 +672,9 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      *
      *
      * @param stdClass $column
+     * @param string $newColumnName For rename action only.
      */
-    protected function _defineColumn($column) {
+    protected function _defineColumn($column, $newColumnName = null) {
         $column = clone $column;
 
         $typeAliases = [
@@ -719,7 +720,15 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             throw new Exception(sprintf(t('The specified data type (%1$s) is not accepted for the MySQL database.'), $column->Type));
         }
 
-        $Return = "`{$column->Name}` {$column->Type}";
+        $Return = "`{$column->Name}` ";
+
+        // The CHANGE COLUMN syntax requires this ordering.
+        // @see $this->renameColumn().
+        if (is_string($newColumnName)) {
+            $Return .= "`{$newColumnName}` ";
+        }
+
+        $Return .= "{$column->Type}";
 
         $LengthTypes = $this->types('length');
         if ($column->Length != '' && in_array($column->Type, $LengthTypes)) {

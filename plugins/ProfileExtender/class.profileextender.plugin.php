@@ -335,8 +335,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Fields = $this->getProfileFields();
             if (!$Name = val('Name', $FormPostValues)) {
                 // Make unique name from label for new fields
-                $Name = $TestSlug = substr(preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues)), 0, 50);
+                if (unicodeRegexSupport()) {
+                    $regex = '/[^\pL\pN]/u';
+                } else {
+                    $regex = '/[^a-z\d]/i';
+                }
+                // Make unique slug
+                $Name = $TestSlug = substr(preg_replace($regex, '', val('Label', $FormPostValues)), 0, 50);
                 $i = 1;
+
+                // Fallback in case the name is empty
+                if (empty($Name)) {
+                    $Name = $TestSlug = md5($Field);
+                }
                 while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }
@@ -455,7 +466,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
             // Display all non-hidden fields
             require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender', true, false);
-            $ProfileFields = array_reverse($ProfileFields);
+            $ProfileFields = array_reverse($ProfileFields, true);
             extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {
             // No errors
@@ -589,9 +600,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Assign new data structure
             $NewData = array();
             foreach ($Fields as $Field) {
+                if (unicodeRegexSupport()) {
+                    $regex = '/[^\pL\pN]/u';
+                } else {
+                    $regex = '/[^a-z\d]/i';
+                }
                 // Make unique slug
-                $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', $Field);
+                $Name = $TestSlug = preg_replace($regex, '', $Field);
                 $i = 1;
+
+                // Fallback in case the name is empty
+                if (empty($Name)) {
+                    $Name = $TestSlug = md5($Field);
+                }
                 while (array_key_exists($Name, $NewData) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }

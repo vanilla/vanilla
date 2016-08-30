@@ -1473,6 +1473,8 @@ class DiscussionModel extends VanillaModel {
     /**
      * Count how many discussions match the given criteria.
      *
+     * @deprecated since 2.3
+     *
      * @param array $Wheres SQL conditions.
      * @return int Number of discussions.
      * @since 2.0.0
@@ -2650,9 +2652,7 @@ class DiscussionModel extends VanillaModel {
         $this->EventArguments['Discussion'] = $Data;
         $this->fireEvent('DeleteDiscussion');
 
-        // Execute deletion of discussion and related bits
-        $this->SQL->delete('Draft', ['DiscussionID' => $discussionID]);
-
+        // Setup logging.
         $Log = val('Log', $options, true);
         $LogOptions = val('LogOptions', $options, []);
         if ($Log === true) {

@@ -629,9 +629,7 @@ class UserController extends DashboardController {
 
         // Decide if they have ability to confirm users
         $Confirmed = (bool)valr('Confirmed', $User);
-        $CanConfirmEmail = (
-            UserModel::RequireConfirmEmail() &&
-            Gdn::session()->checkPermission('Garden.Users.Edit'));
+        $CanConfirmEmail = (UserModel::requireConfirmEmail() && Gdn::session()->checkPermission('Garden.Users.Edit'));
         $this->setData('_CanConfirmEmail', $CanConfirmEmail);
         $this->setData('_EmailConfirmed', $Confirmed);
         $User['ConfirmEmail'] = (int)$Confirmed;
@@ -663,8 +661,7 @@ class UserController extends DashboardController {
             $this->EventArguments['TargetUser'] = &$User;
 
             // These are all the 'effective' roles for this edit action. This list can
-            // be trimmed down from the real list to allow subsets of roles to be
-            // edited.
+            // be trimmed down from the real list to allow subsets of roles to be edited.
             $this->EventArguments['RoleData'] = &$RoleData;
 
             $UserRoleData = $UserModel->getRoles($UserID)->resultArray();
@@ -682,8 +679,10 @@ class UserController extends DashboardController {
 
             $this->Form->setData($User);
             if ($this->Form->authenticatedPostBack(true)) {
-                if (!$CanEditUsername) {
-                    $this->Form->setFormValue("Name", $User['Name']);
+                // Do not re-validate or change the username if disabled or exactly the same.
+                $nameUnchanged = ($User['Name'] === $this->Form->getValue('Name'));
+                if (!$CanEditUsername || $nameUnchanged) {
+                    $this->Form->removeFormValue("Name");
                 }
 
                 // Allow mods to confirm/unconfirm emails
@@ -833,19 +832,19 @@ class UserController extends DashboardController {
      *
      * @since 2.0.0
      * @access private
-     * @see self::Decline, self::Approve
+     * @see UserModel::decline, UserModel::approve
+     *
      * @param string $Action Approve or Decline.
      * @param int $UserID Unique ID.
+     * @return bool Whether handling was successful.
      */
     private function handleApplicant($Action, $UserID) {
         $this->permission('Garden.Users.Approve');
 
-        //$this->_DeliveryType = DELIVERY_TYPE_BOOL;
         if (!in_array($Action, array('Approve', 'Decline')) || !is_numeric($UserID)) {
             $this->Form->addError('ErrorInput');
             $Result = false;
         } else {
-            $Session = Gdn::session();
             $UserModel = new UserModel();
             if (is_numeric($UserID)) {
                 try {
@@ -857,7 +856,7 @@ class UserController extends DashboardController {
 
                     // Re-calculate applicant count
                     $RoleModel = new RoleModel();
-                    $RoleModel->GetApplicantCount(true);
+                    $RoleModel->getApplicantCount(true);
 
                     $this->fireEvent("After{$Action}User");
                 } catch (Exception $ex) {
@@ -866,6 +865,8 @@ class UserController extends DashboardController {
                 }
             }
         }
+
+        return $Result;
     }
 
     /**

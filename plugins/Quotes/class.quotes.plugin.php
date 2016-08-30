@@ -472,7 +472,11 @@ BQ;
                 case 'Display':
                 case 'Text':
                     $QuoteBody = $Data->Body;
-                    $Quote = '> '.sprintf(t('%s said:'), '@'.$Data->InsertName)."\n".
+                    $insertName = $Data->InsertName;
+                    if (strpos($insertName, ' ') !== false) {
+                        $insertName = '"'.$insertName.'"';
+                    }
+                    $Quote = '> '.sprintf(t('%s said:'), '@'.$insertName)."\n".
                         '> '.str_replace("\n", "\n> ", $QuoteBody)."\n";
 
                     break;

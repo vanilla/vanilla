@@ -2652,8 +2652,6 @@ div.Popup .Border {
 div.Popup .Body {
   background: #fff;
   padding: 10px;
-  float: left;
-  /* Put this here b/c background of form was not descending to bottom of popup. */
 }
 
 div.Popup .Loading {

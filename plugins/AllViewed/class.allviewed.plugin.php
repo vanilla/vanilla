@@ -179,7 +179,15 @@ class AllViewedPlugin extends Gdn_Plugin {
             $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), [-1]);
 
             $sender->informMessage(t('All discussions marked as viewed.'));
+
+            // Didn't use the default async option and landed here directly.
+            if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+                redirect('/');
+            }
+
             $sender->render('blank', 'utility', 'dashboard');
+        } else {
+            throw new Exception('Requires POST', 405);
         }
     }
 

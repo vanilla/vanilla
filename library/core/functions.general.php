@@ -546,6 +546,36 @@ if (!function_exists('concatSep')) {
     }
 }
 
+if (!function_exists('flattenArray')) {
+
+    /**
+     * Recursively flatten a nested array into a single-dimension array.
+     *
+     * @param string $sep The string used to separate keys.
+     * @param array $array The array to flatten.
+     * @return array Returns the flattened array.
+     */
+    function flattenArray($sep, $array) {
+        $result = [];
+
+        $fn = function ($array, $px = '') use ($sep, &$fn, &$result) {
+            foreach ($array as $key => $value) {
+                $px = $px ? "{$px}{$sep}{$key}" : $key;
+
+                if (is_array($value)) {
+                    $fn($value, $px);
+                } else {
+                    $result[$px] = $value;
+                }
+            }
+        };
+
+        $fn($array);
+
+        return $result;
+    }
+}
+
 if (!function_exists('safePrint')) {
     /**
      * Return/print human-readable and non casted information about a variable.

@@ -631,7 +631,7 @@ class CategoryModel extends Gdn_Model {
     public function getChildTree($id, $options = []) {
         $category = $this->getOne($id);
 
-        $tree = $this->collection->getTree((int)val('CategoryID', $category), $depth, $permission);
+        $tree = $this->collection->getTree((int)val('CategoryID', $category), $options);
         self::filterChildren($tree);
         return $tree;
     }
@@ -1965,7 +1965,7 @@ class CategoryModel extends Gdn_Model {
 
     /**
      * Save a subtree.
-     * 
+     *
      * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
      */
     public function saveSubtree($subtree) {

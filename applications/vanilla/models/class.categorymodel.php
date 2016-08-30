@@ -1540,7 +1540,7 @@ class CategoryModel extends Gdn_Model {
         if (val('DisplayAs', $parent) === 'Flat') {
             $categories = self::instance()->getTreeAsFlat($parent['CategoryID']);
         } else {
-            $categories = self::instance()->collection->getTree($parent['CategoryID'], 10, '');
+            $categories = self::instance()->collection->getTree($parent['CategoryID'], ['depth' => 10]);
             $categories = self::instance()->flattenTree($categories);
         }
 

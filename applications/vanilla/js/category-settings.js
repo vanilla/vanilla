@@ -59,7 +59,7 @@
                 var svgMap = {categories: "nested"};
                 var svg = svgMap[displayAs] || displayAs;
                 svg = '<svg class="icon icon-16 icon-$name" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg>';
-                $('.OptionsTitle', $content).html(svg);
+                $('.dropdown-toggle', $content).html(svg);
             };
 
             // Ajax the value.

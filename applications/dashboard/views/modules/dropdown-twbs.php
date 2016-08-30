@@ -8,7 +8,7 @@
     <div class="dropdown-menu <?php echo val('listCssClass', $this); ?>" aria-labelledby="<?php echo val('triggerId', $this); ?>">
         <?php foreach (val('items', $this) as $item) {
             if (val('type', $item) == 'group') { ?>
-                <div class="dropdown-header">
+                <div class="dropdown-header" <?php echo attribute(val('attributes', $item, [])) ?>>
                     <?php if (val('icon', $item)) {
                         echo icon(val('icon', $item));
                     }
@@ -19,7 +19,7 @@
                 </div>
             <?php } ?>
             <?php  if (val('type', $item) == 'link') { ?>
-                <a role="menuitem" class="dropdown-item <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>">
+                <a role="menuitem" class="dropdown-item <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>"  <?php echo attribute(val('attributes', $item, [])) ?>>
                     <?php if (val('icon', $item)) {
                         echo icon(val('icon', $item));
                     }

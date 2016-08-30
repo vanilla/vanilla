@@ -137,7 +137,7 @@ class ConfigurationModule extends Gdn_Module {
             }
 
             // Halt the save if we've had errors assigned.
-            if (!$Form->errorCount()) {
+            if ($Form->errorCount() == 0) {
                 // Save it to the config.
                 saveToConfig($Data, array('RemoveEmpty' => true));
                 $this->_Sender->informMessage(t('Saved'));

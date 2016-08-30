@@ -22,6 +22,8 @@ var crop = {
      * @param c The source image crop.element to crop.
      */
     setPreviewAndCoords: function (c) {
+        $(document).trigger('cropStart');
+
         // Show the preview image and the 'save' button and hide the current cropped image.
         $('#preview', crop.element).show();
         $('#current-crop', crop.element).hide();
@@ -56,6 +58,7 @@ var crop = {
      * Hides the cropping preview and save button and shows the current cropped image.
      */
     removePreviewAndCoords: function() {
+        $(document).trigger('cropEnd');
         if ($('#current-crop', crop.element)) {
             $('#current-crop', crop.element).show();
             $('#preview', crop.element).hide();

@@ -19,7 +19,8 @@ $PluginInfo['ProfileExtender'] = array(
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'Icon' => 'profile-extender.png'
 );
 
 /**
@@ -37,6 +38,12 @@ $PluginInfo['ProfileExtender'] = array(
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
+
+    public function base_render_before($sender) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        }
+    }
 
     /** @var array */
     public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name');
@@ -73,6 +80,18 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Users', t('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
+    }
+
+    /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('ProfileExtender', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['ProfileExtender']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**

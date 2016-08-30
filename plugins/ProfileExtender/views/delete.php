@@ -6,11 +6,11 @@ echo $this->Form->open();
 echo $this->Form->errors();
 
 echo wrap(FormatString(t("ConfirmDeleteProfileField",
-    "You are about to delete the profile field &ldquo;{Field.Label}&rdquo; from all users."), $this->Data), 'p');
+    "You are about to delete the profile field &ldquo;{Field.Label}&rdquo; from all users."), $this->Data), 'div');
 
-echo '<div class="Buttons Buttons-Confirm">';
+echo '<div class="js-modal-footer form-footer">';
+echo $this->Form->button('Cancel', array('type' => 'button', 'class' => 'btn btn-link js-modal-close'));
 echo $this->Form->button('Delete Field');
-echo $this->Form->button('Cancel', array('type' => 'button', 'class' => 'Button Close Cancel'));
 echo '</div>';
 
 echo $this->Form->close();

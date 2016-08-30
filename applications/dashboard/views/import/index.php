@@ -1,6 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $this->addSideMenu();
 ?>
+<?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php
     echo '<h2>', t('Need More Help?'), '</h2>';
@@ -10,6 +11,7 @@ $this->addSideMenu();
     echo '</ul>';
     ?>
 </div>
+<?php Gdn_Theme::assetEnd(); ?>
 <h1><?php echo t('Import'); ?></h1>
 <?php
 echo '<div class="Info">'

@@ -94,7 +94,7 @@ class MessageController extends DashboardController {
         $this->addJsFile('messages.js');
 
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/message');
+        $this->setHighlightRoute('dashboard/message');
 
         // Generate some Controller & Asset data arrays
         $this->setData('Locations', $this->_getLocationData());
@@ -145,11 +145,12 @@ class MessageController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/message');
+        $this->setHighlightRoute('dashboard/message');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('jquery.tablednd.js');
         $this->addJsFile('messages.js');
         $this->title(t('Messages'));
+        Gdn_Theme::section('Moderation');
 
         // Load all messages from the db
         $this->MessageData = $this->MessageModel->get('Sort');
@@ -168,6 +169,44 @@ class MessageController extends DashboardController {
         if ($this->Menu) {
             $this->Menu->highlightRoute('/dashboard/settings');
         }
+    }
+
+    public function enable($messageID) {
+        $this->permission('Garden.Community.Manage');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        if ($messageID && is_numeric($messageID)) {
+            $this->setEnabled($messageID, 1);
+        }
+    }
+
+    public function disable($messageID) {
+        $this->permission('Garden.Community.Manage');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        if ($messageID && is_numeric($messageID)) {
+            $this->setEnabled($messageID, 0);
+        }
+    }
+
+    protected function setEnabled($messageID, $enabled) {
+        $messageModel = new MessageModel();
+        $enabled = forceBool($enabled, '0', '1', '0');
+        $messageModel->setProperty($messageID, 'Enabled', $enabled);
+        if ($enabled === '1') {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
+        } else {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
+        }
+        $this->jsonTarget("#toggle-".$messageID, $newToggle);
+        if ($enabled === '1') {
+            $this->informMessage(sprintf(t('%s enabled.'), t('Message')));
+        } else {
+            $this->informMessage(sprintf(t('%s disabled.'), t('Message')));
+        }
+        $this->render('Blank', 'Utility');
     }
 
     /**

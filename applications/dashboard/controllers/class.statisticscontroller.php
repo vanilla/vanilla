@@ -46,7 +46,7 @@ class StatisticsController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/statistics');
+        $this->setHighlightRoute('dashboard/statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
 

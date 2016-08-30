@@ -15,6 +15,7 @@ $PluginInfo['Debugger'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'MobileFriendly' => true,
+    'Icon' => 'debugger.png'
 );
 
 /**

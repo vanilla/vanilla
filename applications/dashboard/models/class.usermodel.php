@@ -2400,7 +2400,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->where('u.Banned >', 0);
             $Keywords = '';
         } elseif (preg_match('/^\d+$/', $Keywords)) {
-            $UserID = $Keywords;
+            $numericQuery = $Keywords;
             $Keywords = '';
         } else {
             // Check to see if the search exactly matches a role name.
@@ -2430,8 +2430,12 @@ class UserModel extends Gdn_Model {
             }
 
             $this->SQL->endWhereGroup();
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
+        } elseif (isset($numericQuery)) {
+            // We've searched for a number. Return UserID AND any exact numeric name match.
+            $this->SQL->beginWhereGroup()
+                ->where('u.UserID', $numericQuery)
+                ->orWhere('u.Name', $numericQuery)
+                ->endWhereGroup();
         } elseif ($Keywords) {
             if ($Optimize) {
                 // An optimized search should only be done against name OR email.

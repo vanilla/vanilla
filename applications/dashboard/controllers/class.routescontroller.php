@@ -52,7 +52,7 @@ class RoutesController extends DashboardController {
      */
     public function edit($RouteIndex = false) {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/routes');
+        $this->setHighlightRoute('dashboard/routes');
         $this->Route = Gdn::router()->getRoute($RouteIndex);
 
         $Validation = new Gdn_Validation();
@@ -142,7 +142,7 @@ class RoutesController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/routes');
+        $this->setHighlightRoute('dashboard/routes');
         $this->addJsFile('routes.js');
         $this->title(t('Routes'));
 

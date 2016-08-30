@@ -242,7 +242,11 @@ class PostController extends VanillaController {
                 }
 
                 // Make sure that the title will not be invisible after rendering
-                $Name = trim($this->Form->getFormValue('Name', ''));
+                if (unicodeRegexSupport()) {
+                    $Name = preg_replace('/^[\pC ]*(.*?)[\pC ]*$/u', '$1', $this->Form->getFormValue('Name', ''));
+                } else {
+                    $Name = trim($this->Form->getFormValue('Name', ''));
+                }
                 if ($Name != '' && Gdn_Format::text($Name) == '') {
                     $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
                 } else {
@@ -990,7 +994,7 @@ function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
 
         $Result = ' <b>'.t($LabelCode)."</b> <ul class=\"$CssClass\">";
         foreach ($ListOptions as $Value => $Code) {
-            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
         }
         $Result .= '</ul>';
         return $Result;

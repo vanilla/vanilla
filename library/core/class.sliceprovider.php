@@ -11,6 +11,8 @@
 
 /**
  * Allows plugns and controllers to implement small asynchronously refreshable portions of the page - slices.
+ *
+ * @deprecated since 2.3
  */
 class Gdn_SliceProvider {
 

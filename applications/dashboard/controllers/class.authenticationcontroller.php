@@ -87,7 +87,7 @@ class AuthenticationController extends DashboardController {
      */
     public function choose($AuthenticationSchemeAlias = null) {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/authentication');
+        $this->setHighlightRoute('dashboard/authentication');
         $this->title(t('Authentication'));
         $this->addCssFile('authentication.css');
 

@@ -41,10 +41,10 @@
  * ->addGroup('', 'group1') // creates group with no header
  * ->addGroup('Group 3', 'group3') // creates group with header: 'Group 3', empty so will not display
  * ->addGroup('Group 2', 'group2') // creates group with header: 'Group 2'
- * ->addLink('Link 5', '#', '', '', array('before', 'link2'), false, array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
+ * ->addLink('Link 5', '#', '', '', array('before', 'link2'), array('badge' => '4')) // automatically creates key: item5. Inserts before Link 2
  * ->addLink('Link 6', '#') // automatically creates key: item6
  * ->addLink('Link 7', '#') // automatically creates key: item7
- * ->addLink('Link 8', '#', 'group2.link8', '', array(), false, array('icon' => 'flame')) // adds to Group 2
+ * ->addLink('Link 8', '#', 'group2.link8', '', array(), array('icon' => 'flame')) // adds to Group 2
  * ->addLink('Link 9', '#', 'group1.link9') // adds to Group 1
  * ->addLink('Link 10', '#', 'group1.link10'); // adds to Group 1
  * echo $dropdown;
@@ -68,7 +68,9 @@
  *
  *
  */
-class DropdownModule extends SortableModule {
+class DropdownModule extends Gdn_Module {
+
+    use NestedCollection;
 
     /**
      * @var string The id value of the trigger.
@@ -117,7 +119,10 @@ class DropdownModule extends SortableModule {
      * @param bool $useCssPrefix Whether to use CSS prefixes on the dropmenu items.
      */
     public function __construct($triggerId = 'dropdown', $triggerText = '', $cssClass = '', $listCssClass = '', $useCssPrefix = true) {
-        parent::__construct(true, $useCssPrefix);
+        parent::__construct();
+        $this->flatten = true;
+        $this->useCssPrefix = $useCssPrefix;
+
         $this->triggerId = $triggerId;
         $this->trigger['text'] = $triggerText;
         $this->cssClass = $cssClass;

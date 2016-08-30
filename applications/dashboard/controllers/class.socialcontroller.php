@@ -37,7 +37,7 @@ class SocialController extends DashboardController {
     public function manage() {
         $this->permission('Garden.Settings.Manage');
         $this->title("Social Integration");
-        $this->addSideMenu('dashboard/social');
+        $this->setHighlightRoute('/social/manage');
 
         $Connections = $this->GetConnections();
         $this->setData('Connections', $Connections);
@@ -69,7 +69,9 @@ class SocialController extends DashboardController {
 
             $ConnectionName = $PluginInfo['Index'];
 
-            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON)) {
+            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON) &&
+                (method_exists('IsConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME))
+                    || method_exists('isConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)))) {
                 $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
                 $Configured = null;
@@ -111,7 +113,7 @@ class SocialController extends DashboardController {
 
         require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
-        WriteConnection($Connection);
+        WriteConnection($Connection, false);
         $Row = ob_get_clean();
 
         $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
@@ -146,11 +148,11 @@ class SocialController extends DashboardController {
 
         require_once($this->fetchViewLocation('connection_functions'));
         ob_start();
-        WriteConnection($Connection);
+        WriteConnection($Connection, false);
         $Row = ob_get_clean();
 
+//        $this->informMessage(t("Plugin enabled."));
         $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
-        $this->informMessage(t("Plugin enabled."));
 
         unset($this->Data['Connections']);
         $this->render('blank', 'utility');

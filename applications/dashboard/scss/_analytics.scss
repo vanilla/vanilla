@@ -1,0 +1,109 @@
+.analytics-panel {
+  @extend .list-reset;
+}
+
+.analytics-widget {
+  position: relative;
+}
+
+//Options
+.analytics-widget-options {
+  position: absolute;
+  right: 0;
+  top: $spacer;
+}
+
+.analytics-widget-header {
+  .title {
+    @extend h2;
+  }
+}
+
+.analytics-widget-metric {
+  .analytics-widget-options {
+    right: $spacer / 2;
+    top: 0;
+  }
+}
+
+// Bookmark Icons
+.bookmark {
+  svg {
+    transition: transform .1s;
+    fill: $grey;
+    width: to-rem(18);
+  }
+
+
+  &:hover,
+  &:focus {
+    svg {
+      transform: rotate(30deg);
+    }
+  }
+}
+
+.bookmarked {
+  svg {
+    transform: rotate(30deg);
+  }
+
+  &:hover,
+  &:focus {
+    svg {
+      transform: rotate(0deg);
+    }
+  }
+}
+
+// TODO: Reinstate this
+.analytics-widget-move {
+  //@include font-vanillicon('\f1db', $grey, 18px);
+  //margin-left: 10px;
+  //cursor: move;
+}
+
+.analytics-panel-metrics {
+  @extend .full-border;
+  @extend .nav-stats;
+  overflow: hidden;
+  margin-left: -$border-width;
+  margin-right: -$border-width;
+
+  display: flex !important;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  padding: ($spacer / 2) 0 $spacer;
+  border-top: $border-width solid $grey-dark-border;
+  border-bottom-color: $grey-dark-border;
+
+  .metric-value {
+    text-align: center;
+    @extend .nav-stats-value;
+    color: $grey;
+  }
+
+  .metric-title {
+    text-align: center;
+    @extend .nav-stats-title;
+    color: $grey;
+  }
+
+  .analytics-widget-metric {
+    @extend .nav-stats-item;
+    border-right: $border-width solid $grey-dark-border;
+    padding: $spacer ($spacer * 2) !important;
+    margin-top: ($spacer / 2);
+    min-width: to-rem(180);
+
+    &:last-child {
+      border-right: 0;
+    }
+  }
+}
+
+.keen-spinner > div > div {
+  width: 5px !important;
+  height: 1px !important;
+}

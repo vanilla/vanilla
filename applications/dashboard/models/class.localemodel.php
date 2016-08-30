@@ -28,6 +28,18 @@ class LocaleModel {
             foreach ($LocaleInfoPaths as $InfoPath) {
                 $LocaleInfo = Gdn::pluginManager()->scanPluginFile($InfoPath, 'LocaleInfo');
                 $this->calculateLocaleInfo($LocaleInfo);
+
+
+                if ($icon = val('Icon', $LocaleInfo)) {
+                    $LocaleInfo['IconUrl'] = "/locales/".basename(dirname($InfoPath))."/$icon";
+                } else {
+                    $LocaleInfo['IconUrl'] = '/applications/dashboard/design/images/flag-placeholder.svg';
+                }
+
+                if ($enName = val('EnName', $LocaleInfo)) {
+                    $LocaleInfo['meta'][] = $enName;
+                }
+
                 $AvailableLocales[$LocaleInfo['Index']] = $LocaleInfo;
             }
             $this->_AvailableLocalePacks = $AvailableLocales;

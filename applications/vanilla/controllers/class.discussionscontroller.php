@@ -54,6 +54,7 @@ class DiscussionsController extends VanillaController {
     public function index($Page = false) {
         $this->_Definitions['BlankDiscussionTopicText'] = t('Blank Discussion Topic');
 
+        $this->allowJSONP(true);
         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
         $Layout = c('Vanilla.Discussions.Layout');
         switch ($Layout) {
@@ -195,6 +196,9 @@ class DiscussionsController extends VanillaController {
         $this->render();
     }
 
+    /**
+     * @deprecated since 2.3
+     */
     public function unread($Page = '0') {
         if (!Gdn::session()->isValid()) {
             redirect('/discussions/index', 302);

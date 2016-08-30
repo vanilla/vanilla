@@ -229,11 +229,14 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Database update.
      */
     public function structure() {
-        if (Gdn::sql()->getWhere('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => 'Google+'))->firstRow()) {
-            Gdn::sql()->put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Google+'));
+        if (!val('CaptureOnly', Gdn::structure())) {
+            // This next check always evaluates to true during a scan.
+            if (Gdn::sql()->getWhere('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => 'Google+'))->firstRow()) {
+                Gdn::sql()->put('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => self::ProviderKey), array('AuthenticationSchemeAlias' => 'Google+'));
+            }
         }
 
         // Save the google+ provider type.

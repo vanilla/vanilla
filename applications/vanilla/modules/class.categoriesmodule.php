@@ -40,7 +40,9 @@ class CategoriesModule extends Gdn_Module {
             return;
         }
 
-        $Categories = CategoryModel::categories();
+        $categoryModel = new CategoryModel();
+        $Categories = $categoryModel->setJoinUserCategory(true)->getChildTree(null);
+        $Categories = CategoryModel::flattenTree($Categories);
         $Categories2 = $Categories;
 
         // Filter out the categories we aren't watching.

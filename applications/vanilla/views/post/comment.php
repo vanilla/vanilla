@@ -54,7 +54,7 @@ $this->fireEvent('BeforeCommentForm');
                     echo '</span>';
 
                     $ButtonOptions = array('class' => 'Button Primary CommentButton');
-                    $ButtonOptions['tabindex'] = 2;
+                    $ButtonOptions['tabindex'] = 1;
 
                     if (!$Editing && $Session->isValid()) {
                         echo ' '.anchor(t('Preview'), '#', 'Button PreviewButton')."\n";

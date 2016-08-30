@@ -78,8 +78,14 @@ foreach ($Categories as $CategoryRow) {
             }
             // If this category is one level above the max display depth, and it
             // has children, add a replacement string for them.
-            if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
+            if (
+                !in_array($Category->DisplayAs, ['Flat'])
+                && $MaxDisplayDepth > 0
+                && $Category->Depth == $MaxDisplayDepth - 1
+                && $Category->TreeRight - $Category->TreeLeft > 1
+            ) {
                 $CatList .= '{ChildCategories}';
+            }
 
             $CatList .= '</div>
                </div>
@@ -89,8 +95,9 @@ foreach ($Categories as $CategoryRow) {
 }
 // If there are any remaining child categories that have been collected, do
 // the replacement one last time.
-if ($ChildCategories != '')
+if ($ChildCategories != '') {
     $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(t('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
+}
 
 echo $CatList;
 ?>

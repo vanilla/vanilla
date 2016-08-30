@@ -76,7 +76,7 @@ Gdn_Theme::assetEnd();
         <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
         </div>
         <div class="input-wrap">
-        <?php echo $this->Form->DropDown('DisplayAs', array('Default' => 'Default', 'Categories' => 'Categories', 'Discussions' => 'Discussions', 'Heading' => 'Heading'), ['Wrap' => true]); ?>
+        <?php echo $this->Form->DropDown('DisplayAs', 'Default' => 'Default', 'Discussions' => 'Discussions', 'Categories' => 'Nested Categories', 'Flat' => 'Flat Categories', 'Heading' => 'Heading'], ['Wrap' => true]); ?>
         </div>
     </li>
     <li class="form-group row">

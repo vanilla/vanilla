@@ -644,41 +644,43 @@ class Gdn_Session {
 
     /**
      * Place a name/value pair into the user's session stash.
+     *
+     * @param string $name            The key of the stash value.
+     * @param mixed  $value           The value of the stash to set. Pass null to retrieve the key.
+     * @param bool   $unsetOnRetrieve Whether or not to unset the key from stash.
+     *
+     * @return mixed Returns the value of the stash or null on failure.
      */
-    public function stash($Name = '', $Value = '', $UnsetOnRetrieve = true) {
-        if ($Name == '') {
+    public function stash($name = '', $value = '', $unsetOnRetrieve = true) {
+        if ($name == '') {
             return;
         }
 
         // Grab the user's session
-        $Session = $this->_getStashSession($Value);
-        if (!$Session) {
+        $session = $this->_getStashSession($value);
+        if (!$session) {
             return;
         }
 
         // Stash or unstash the value depending on inputs
-        if ($Name != '' && $Value != '') {
-            $Session->Attributes[$Name] = $Value;
-        } elseif ($Name != '') {
-            $Value = val($Name, $Session->Attributes);
-            if ($UnsetOnRetrieve) {
-                unset($Session->Attributes[$Name]);
+        if ($value != '') {
+            $session->Attributes[$name] = $value;
+        } else {
+            $value = val($name, $session->Attributes);
+            if ($unsetOnRetrieve) {
+                unset($session->Attributes[$name]);
             }
         }
         // Update the attributes
-        if ($Name != '') {
-            Gdn::SQL()->put(
-                'Session',
-                array(
-                    'DateUpdated' => Gdn_Format::toDateTime(),
-                    'Attributes' => dbencode($Session->Attributes)
-                ),
-                array(
-                    'SessionID' => $Session->SessionID
-                )
-            );
-        }
-        return $Value;
+        Gdn::SQL()->put(
+            'Session',
+            [
+                'DateUpdated' => Gdn_Format::toDateTime(),
+                'Attributes' => serialize($session->Attributes)
+            ],
+            ['SessionID' => $session->SessionID]
+        );
+        return $value;
     }
 
     /**

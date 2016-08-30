@@ -149,7 +149,16 @@ jQuery(document).ready(function($) {
                         // Redirect to the new discussion
                         document.location = json.RedirectUrl;
                     } else {
-                        $('#Content').html(json.Data);
+                        var contentContainer = $("#Content");
+
+                        if (contentContainer.length === 1) {
+                            contentContainer.html(json.Data);
+                        } else {
+                            // Hack to emulate a content container.
+                            contentContainer = $(document.createElement("div"));
+                            contentContainer.html(json.Data);
+                            $(frm).replaceWith(contentContainer);
+                        }
                     }
                 }
                 gdn.inform(json);

@@ -106,15 +106,74 @@ class CategoriesController extends VanillaController {
     }
 
     /**
-     * "Table" layout for categories. Mimics more traditional forum category layout.
+     * Build a structured tree of children for the specified category.
+     *
+     * @param int|string|object|array|null $category Category or code/ID to build the tree for. Null for all.
+     * @param string|null $displayAs What display should the tree be configured for?
+     * @param bool $recent Join in recent record info?
+     * @param bool $watching Filter categories by "watching" status?
+     * @return array
      */
-    public function table($Category = '') {
-        if ($this->SyndicationMethod == SYNDICATION_NONE) {
-            $this->View = 'table';
-        } else {
-            $this->View = 'all';
+    private function getCategoryTree($category = null, $displayAs = null, $recent = false, $watching = false) {
+        $categoryIdentifier = null;
+
+        if (is_string($category) || is_numeric($category)) {
+            $category = CategoryModel::categories($category);
         }
-        $this->All($Category);
+
+        if ($category) {
+            if ($displayAs === null) {
+                $displayAs = val('DisplayAs', $category, 'Discussions');
+            }
+            $categoryIdentifier = val('CategoryID', $category, null);
+        }
+
+        switch ($displayAs) {
+            case 'Flat':
+                $perPage = c('Vanilla.Categories.PerPage', 30);
+                $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
+                list($offset, $limit) = offsetLimit($page, $perPage);
+                $categoryTree = $this->CategoryModel->getTreeAsFlat($categoryIdentifier, $offset, $limit);
+                $this->setData('_Limit', $perPage);
+                $this->setData('_CurrentRecords', count($categoryTree));
+                break;
+            case 'Categories':
+            case 'Discussions':
+            case 'Default':
+            case 'Nested':
+            default:
+            $categoryTree = $this->CategoryModel
+                    ->setJoinUserCategory(true)
+                    ->getChildTree(
+                        $categoryIdentifier ?: null,
+                        CategoryModel::instance()->getMaxDisplayDepth() ?: 10
+                    );
+        }
+
+        if ($recent) {
+            $this->CategoryModel->joinRecent($categoryTree);
+        }
+
+        if ($watching && $this->CategoryModel->Watching) {
+            $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);
+        }
+
+        return $categoryTree;
+    }
+
+    /**
+     * "Table" layout for categories. Mimics more traditional forum category layout.
+     *
+     * @param string $Category
+     * @param string $displayAs
+     */
+    public function table($Category = '', $displayAs = '') {
+        if ($this->SyndicationMethod == SYNDICATION_NONE) {
+            $this->View = $displayAs === 'Flat' ? 'flat_table' : 'table';
+        } else {
+            $this->View = $displayAs === 'Flat' ? 'flat_all' : 'all';
+        }
+        $this->All($Category, $displayAs);
     }
 
     /**
@@ -134,7 +193,7 @@ class CategoriesController extends VanillaController {
             switch ($Layout) {
                 case 'mixed':
                     $this->View = 'discussions';
-                    $this->Discussions();
+                    $this->discussions();
                     break;
                 case 'table':
                     $this->table();
@@ -160,35 +219,38 @@ class CategoriesController extends VanillaController {
             $this->setData('Category', $Category, true);
 
             $this->title(htmlspecialchars(val('Name', $Category, '')));
-            $this->Description(val('Description', $Category), true);
+            $this->description(val('Description', $Category), true);
 
-
-            if ($Category->DisplayAs == 'Categories') {
-                if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
-                    // Headings don't make sense if we've cascaded down one level.
-                    saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-                }
-
-                if ($this->SyndicationMethod != SYNDICATION_NONE) {
-                    // RSS can't show a category list so just tell it to expand all categories.
-                    saveToConfig('Vanilla.ExpandCategories', true, false);
-                } else {
-                    // This category is an overview style category and displays as a category list.
-                    switch ($Layout) {
-                        case 'mixed':
-                            $this->View = 'discussions';
-                            $this->Discussions($CategoryIdentifier);
-                            break;
-                        case 'table':
-                            $this->table($CategoryIdentifier);
-                            break;
-                        default:
-                            $this->View = 'all';
-                            $this->All($CategoryIdentifier);
-                            break;
+            switch ($Category->DisplayAs) {
+                case 'Flat':
+                case 'Heading':
+                case 'Categories':
+                    if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
+                        // Headings don't make sense if we've cascaded down one level.
+                        saveToConfig('Vanilla.Categories.DoHeadings', false, false);
                     }
-                    return;
-                }
+
+                    if ($this->SyndicationMethod != SYNDICATION_NONE) {
+                        // RSS can't show a category list so just tell it to expand all categories.
+                        saveToConfig('Vanilla.ExpandCategories', true, false);
+                    } else {
+                        // This category is an overview style category and displays as a category list.
+                        switch ($Layout) {
+                            case 'mixed':
+                                $this->View = 'discussions';
+                                $this->discussions($CategoryIdentifier);
+                                break;
+                            case 'table':
+                                $this->table($CategoryIdentifier, $Category->DisplayAs);
+                                break;
+                            default:
+                                $this->View = 'all';
+                                $this->All($CategoryIdentifier, $Category->DisplayAs);
+                                break;
+                        }
+                        return;
+                    }
+                    break;
             }
 
             Gdn_Theme::section('DiscussionList');
@@ -205,18 +267,13 @@ class CategoriesController extends VanillaController {
                     break;
             }
 
-            // Load the subtree.
-            $categoryTree = $this->CategoryModel
-                ->setJoinUserCategory(true)
-                ->getChildTree(
-                    $CategoryIdentifier,
-                    ['depth' => CategoryModel::instance()->getMaxDisplayDepth() ?: 10]
-                );
-            $this->setData('CategoryTree', $categoryTree);
+            $this->setData('CategoryTree', $this->getCategoryTree(
+                $CategoryIdentifier, val('DisplayAs', $Category
+            )));
 
             // Add a backwards-compatibility shim for the old categories.
             $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {
-                $categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
+                $categories = CategoryModel::getSubtree($CategoryIdentifier, false);
                 return $categories;
             };
 
@@ -286,9 +343,14 @@ class CategoriesController extends VanillaController {
 
             // We don't wan't child categories in announcements.
             $Wheres['d.CategoryID'] = $CategoryID;
-            $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
+            $AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($Wheres) : new Gdn_DataSet();
             $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
             $Wheres['d.CategoryID'] = $CategoryIDs;
+
+            // RSS should include announcements.
+            if ($this->SyndicationMethod !== SYNDICATION_NONE) {
+                $Wheres['Announce'] = 'all';
+            }
 
             $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
@@ -314,18 +376,18 @@ class CategoriesController extends VanillaController {
             );
 
             $this->Pager->Record = $Category;
-            PagerModule::Current($this->Pager);
+            PagerModule::current($this->Pager);
             $this->setData('_Page', $Page);
             $this->setData('_Limit', $Limit);
             $this->fireEvent('AfterBuildPager');
 
             // Set the canonical Url.
-            $this->canonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
+            $this->canonicalUrl(categoryUrl($Category, pageNumber($Offset, $Limit)));
 
             // Change the controller name so that it knows to grab the discussion views
             $this->ControllerName = 'DiscussionsController';
             // Pick up the discussions class
-            $this->CssClass = 'Discussions Category-'.GetValue('UrlCode', $Category);
+            $this->CssClass = 'Discussions Category-'.val('UrlCode', $Category);
 
             // Deliver JSON data if necessary
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -346,7 +408,7 @@ class CategoriesController extends VanillaController {
      * @since 2.0.17
      * @access public
      */
-    public function all($Category = '') {
+    public function all($Category = '', $displayAs = '') {
         // Setup head.
         $this->Menu->highlightRoute('/discussions');
         if (!$this->title()) {
@@ -402,7 +464,7 @@ class CategoriesController extends VanillaController {
             $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);
         }
         $this->CategoryModel->joinRecent($categoryTree);
-        $this->setData('CategoryTree', $categoryTree);
+        $this->setData('CategoryTree', $this->getCategoryTree($Category, null, true, true));
 
         // Add modules
         $this->addModule('NewDiscussionModule');
@@ -411,6 +473,10 @@ class CategoriesController extends VanillaController {
         $this->addModule($CategoryFollowToggleModule);
 
         $this->canonicalUrl(url('/categories', true));
+
+        if ($this->View === 'all' && $displayAs === 'Flat') {
+            $this->View = 'flat_all';
+        }
 
         $Location = $this->fetchViewLocation('helper_functions', 'categories', false, false);
         if ($Location) {
@@ -459,6 +525,7 @@ class CategoriesController extends VanillaController {
         } else {
             $Categories = $this->CategoryModel->GetFull()->resultArray();
         }
+
         $this->setData('Categories', $Categories);
 
         // Get category data and discussions
@@ -470,6 +537,7 @@ class CategoriesController extends VanillaController {
         $this->setData('Filters', $DiscussionModel->getFilters());
 
         $this->CategoryDiscussionData = array();
+
         foreach ($this->CategoryData->result() as $Category) {
             if ($Category->CategoryID > 0) {
                 $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'Announce' => 'all'));
@@ -550,6 +618,12 @@ class CategoriesController extends VanillaController {
      */
     public function apiV1List() {
         $categories = CategoryModel::categories();
+
+        // Purge the root category, if present.
+        if (val(-1, $categories)) {
+            unset($categories[-1]);
+        }
+
         $this->setData('Categories', $categories);
         $this->render('blank', 'utility', 'dashboard');
     }

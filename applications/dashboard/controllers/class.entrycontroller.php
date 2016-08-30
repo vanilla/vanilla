@@ -41,10 +41,9 @@ class EntryController extends Gdn_Controller {
         // Set error message here so it can run thru t()
         $this->UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
 
-        switch (isset($_GET['display'])) { // TODO: rm global access
-            case 'popup':
-                $this->MasterView = 'popup';
-                break;
+        // Allow use of a master popup template for easier theming.
+        if (Gdn::request()->get('display') === 'popup') {
+            $this->MasterView = 'popup';
         }
     }
 
@@ -516,8 +515,7 @@ EOT;
             // Sign the user in.
             Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
             Gdn::userModel()->fireEvent('AfterSignIn');
-//         $this->_setRedirect(TRUE);
-            $this->_setRedirect($this->Request->get('display') == 'popup');
+            $this->_setRedirect(Gdn::request()->get('display') === 'popup');
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             $NameUnique = c('Garden.Registration.NameUnique', true);
             $EmailUnique = c('Garden.Registration.EmailUnique', true);
@@ -584,8 +582,7 @@ EOT;
                         // Sign the user in.
                         Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
                         Gdn::userModel()->fireEvent('AfterSignIn');
-                        //         $this->_setRedirect(TRUE);
-                        $this->_setRedirect($this->Request->get('display') == 'popup');
+                        $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                         $this->render();
                         return;
                     }
@@ -684,7 +681,7 @@ EOT;
                         }
                     }
 
-                    $this->_setRedirect(true);
+                    $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                 }
             }
         }
@@ -772,7 +769,7 @@ EOT;
                 // Sign the appropriate user in.
                 Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', true));
                 Gdn::userModel()->fireEvent('AfterSignIn');
-                $this->_setRedirect(true);
+                $this->_setRedirect(Gdn::request()->get('display') === 'popup');
             }
         }
 
@@ -1363,6 +1360,10 @@ EOT;
                     $ActivityModel = new ActivityModel();
                     foreach ($Data as $Row) {
                         $ActivityModel->add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
+                    }
+
+                    if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
+                        $this->RedirectUrl = url('/entry/registerthanks');
                     }
                 }
             } catch (Exception $Ex) {

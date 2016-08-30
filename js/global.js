@@ -2057,7 +2057,7 @@ jQuery(window).load(function() {
         }
     }(jQuery));
 
-    jQuery('div.Message img').each(function(i, img) {
+    jQuery('div.Message img').not(jQuery('div.Message a > img')).each(function(i, img) {
         img = jQuery(img);
         var container = img.closest('div.Message');
         if (img.naturalWidth() > container.width() && container.width() > 0) {

@@ -63,9 +63,10 @@ class DraftModel extends VanillaModel {
             $Limit = 100;
         }
 
-        $this->DraftQuery();
+        $this->draftQuery();
         $this->SQL
             ->select('d.Name, di.Name', 'coalesce', 'Name')
+            ->select('di.DateInserted', '', 'DiscussionExists')
             ->join('Discussion di', 'd.discussionID = di.DiscussionID', 'left')
             ->where('d.InsertUserID', $UserID)
             ->orderBy('d.DateInserted', 'desc')
@@ -89,7 +90,7 @@ class DraftModel extends VanillaModel {
     public function getID($draftID, $dataSetType = false, $options = []) {
         $dataSetType = $dataSetType ?: DATASET_TYPE_OBJECT;
 
-        $this->DraftQuery();
+        $this->draftQuery();
         return $this->SQL
             ->where('d.DraftID', $draftID)
             ->get()
@@ -141,7 +142,7 @@ class DraftModel extends VanillaModel {
         $this->Validation->applyRule('Body', 'Required');
         $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
         if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
-            $this->Validation->SetSchemaProperty('Body', 'Length', $MaxCommentLength);
+            $this->Validation->setSchemaProperty('Body', 'Length', $MaxCommentLength);
             $this->Validation->applyRule('Body', 'Length');
         }
 
@@ -166,8 +167,8 @@ class DraftModel extends VanillaModel {
 
         }
         // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
-        $this->AddInsertFields($formPostValues);
-        $this->AddUpdateFields($formPostValues);
+        $this->addInsertFields($formPostValues);
+        $this->addUpdateFields($formPostValues);
 
         // Remove checkboxes from the fields if they were unchecked
         if (val('Announce', $formPostValues, '') === false) {
@@ -184,7 +185,7 @@ class DraftModel extends VanillaModel {
 
         // Validate the form posted values
         if ($this->validate($formPostValues, $Insert)) {
-            $Fields = $this->Validation->SchemaValidationFields(); // All fields on the form that relate to the schema
+            $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             $DraftID = intval(val('DraftID', $Fields, 0));
 
             // If the post is new and it validates, make sure the user isn't spamming
@@ -216,7 +217,7 @@ class DraftModel extends VanillaModel {
             return $result;
         }
 
-        throw new \BadMethodCallException("CommentModel->delete() is not supported.", 400);
+        throw new \BadMethodCallException("DraftModel->delete() is not supported.", 400);
     }
 
     /**
@@ -239,7 +240,7 @@ class DraftModel extends VanillaModel {
 
         $this->SQL->delete('Draft', array('DraftID' => $draftID));
         if (is_object($DraftUser)) {
-            $this->UpdateUser($DraftUser->InsertUserID);
+            $this->updateUser($DraftUser->InsertUserID);
         }
 
         return true;

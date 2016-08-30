@@ -49,7 +49,7 @@ $Construct->PrimaryKey('CategoryID')
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')
-    ->column('DisplayAs', array('Categories', 'Discussions', 'Heading', 'Default'), 'Default')
+    ->column('DisplayAs', array('Categories', 'Discussions', 'Flat', 'Heading', 'Default'), 'Discussions')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DateInserted', 'datetime')
@@ -63,7 +63,23 @@ $Construct->PrimaryKey('CategoryID')
 
 $RootCategoryInserted = false;
 if ($SQL->getWhere('Category', array('CategoryID' => -1))->numRows() == 0) {
-    $SQL->insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
+    $SQL->insert(
+        'Category',
+        [
+            'CategoryID' => -1,
+            'TreeLeft' => 1,
+            'TreeRight' => 4,
+            'InsertUserID' => 1,
+            'UpdateUserID' => 1,
+            'DateInserted' => Gdn_Format::toDateTime(),
+            'DateUpdated' => Gdn_Format::toDateTime(),
+            'Name' => 'Root',
+            'UrlCode' => '',
+            'Description' => 'Root of category tree. Users should never see this.',
+            'PermissionCategoryID' => -1,
+            'DisplayAs' => 'Categories'
+        ]
+    );
     $RootCategoryInserted = true;
 }
 

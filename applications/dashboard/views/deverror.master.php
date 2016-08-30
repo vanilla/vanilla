@@ -3,7 +3,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
     <title>Fatal Error</title>
-    <meta name="robots" content="noindex"/>
     <?php
     if ($CssPath !== FALSE)
         echo '<link rel="stylesheet" type="text/css" href="', Asset($CssPath), '" />';

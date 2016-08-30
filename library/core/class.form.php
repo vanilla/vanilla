@@ -2796,6 +2796,11 @@ PASSWORDMETER;
                     $Result .= $Description
                         .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
+                case 'imageupload':
+                    $Result .= $this->label($LabelCode, $Row['Name'])
+                        .$Description
+                        .$this->imageUpload($Row['Name'], $Row['Options']);
+                    break;
                 case 'textbox':
                     $Row['Options']['Wrap'] = true;
                     $Result .= $labelWrap

@@ -1699,7 +1699,7 @@ class UserModel extends Gdn_Model {
         $Result = &$Data->result();
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
-                $Row->Photo = Gdn_Upload::url($Row->Photo);
+                $Row->Photo = Gdn_Upload::url(changeBasename($Row->Photo, 'p%s'));
             }
         }
 
@@ -1708,7 +1708,7 @@ class UserModel extends Gdn_Model {
 
     /**
      * Retrieves a "system user" id that can be used to perform non-real-person tasks.
-     * 
+     *
      * @return int Returns a user ID.
      */
     public function getSystemUserID() {
@@ -2400,7 +2400,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->where('u.Banned >', 0);
             $Keywords = '';
         } elseif (preg_match('/^\d+$/', $Keywords)) {
-            $UserID = $Keywords;
+            $numericQuery = $Keywords;
             $Keywords = '';
         } else {
             // Check to see if the search exactly matches a role name.
@@ -2430,8 +2430,12 @@ class UserModel extends Gdn_Model {
             }
 
             $this->SQL->endWhereGroup();
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
+        } elseif (isset($numericQuery)) {
+            // We've searched for a number. Return UserID AND any exact numeric name match.
+            $this->SQL->beginWhereGroup()
+                ->where('u.UserID', $numericQuery)
+                ->orWhere('u.Name', $numericQuery)
+                ->endWhereGroup();
         } elseif ($Keywords) {
             if ($Optimize) {
                 // An optimized search should only be done against name OR email.
@@ -2462,6 +2466,7 @@ class UserModel extends Gdn_Model {
             ->where('u.Deleted', 0)
             ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset)
+            ->groupBy('u.UserID')
             ->get();
 
         $Result = &$Data->result();
@@ -3981,19 +3986,19 @@ class UserModel extends Gdn_Model {
                     $welcome = formatString(t('You have successfully connected to {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        formatString(t('Connected With: {ProviderName}'), $data).'</p>';
+                        formatString(t('Connected With: {ProviderName}'), $data).'<br></p>';
                     break;
                 case 'Register' :
                     $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'</p>';
+                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br></p>';
                     break;
                 default :
                     $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Password'), $password).'</p>';
+                        sprintf(t('%s: %s'), t('Password'), $password).'<br></p>';
             }
         }
         return $welcome;

@@ -249,6 +249,7 @@ table:not(.table-condensed) {
       @include media-breakpoint-down(md) {
         max-width: inherit;
         width: 100%;
+        padding-left: $spacer 0;
       }
     }
   }

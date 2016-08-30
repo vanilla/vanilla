@@ -7,11 +7,11 @@
     width: 40px;
 }
 
-.Discussion.ItemContent {
+body:not(#dashboard_profile_discussions) .Discussion.ItemContent {
     padding-left: 48px;
 }
 
-body.rtl .Discussion.ItemContent {
+body.rtl:not(#dashboard_profile_discussions) .Discussion.ItemContent {
     padding-right: 48px;
     padding-left: 0;
 }

@@ -29,7 +29,7 @@ $chart-bg-opacity: 0.15;
 
   .c3-area {
     fill: $color !important;
-    opacity: $chart-bg-opacity !important;
+    fill-opacity: $chart-bg-opacity !important;
   }
 
   .c3-xgrid-focus {

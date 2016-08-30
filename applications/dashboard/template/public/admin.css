@@ -5949,8 +5949,8 @@ input[type="button"].btn-block {
 .nav-stats-pageviews.active .c3-area, .nav-stats-pageviews.Current .c3-area,
 .nav-stats-pageviews.current-theme .c3-area,
 .nav-stats-pageviews:hover .c3-area {
-  fill: #f15854 !important;
-  opacity: 0.15 !important;
+  fill: white !important;
+  opacity: 1 !important;
 }
 
 .ChartStatsPageViews .c3-xgrid-focus,
@@ -5994,8 +5994,8 @@ input[type="button"].btn-block {
 .nav-stats-comments.active .c3-area, .nav-stats-comments.Current .c3-area,
 .nav-stats-comments.current-theme .c3-area,
 .nav-stats-comments:hover .c3-area {
-  fill: #60bd68 !important;
-  opacity: 0.15 !important;
+  fill: white !important;
+  opacity: 1 !important;
 }
 
 .ChartStatsComments .c3-xgrid-focus,
@@ -6039,8 +6039,8 @@ input[type="button"].btn-block {
 .nav-stats-discussions.active .c3-area, .nav-stats-discussions.Current .c3-area,
 .nav-stats-discussions.current-theme .c3-area,
 .nav-stats-discussions:hover .c3-area {
-  fill: #faa43a !important;
-  opacity: 0.15 !important;
+  fill: white !important;
+  opacity: 1 !important;
 }
 
 .ChartStatsDiscussions .c3-xgrid-focus,
@@ -6084,8 +6084,8 @@ input[type="button"].btn-block {
 .nav-stats-users.active .c3-area, .nav-stats-users.Current .c3-area,
 .nav-stats-users.current-theme .c3-area,
 .nav-stats-users:hover .c3-area {
-  fill: #57c1c2 !important;
-  opacity: 0.15 !important;
+  fill: white !important;
+  opacity: 1 !important;
 }
 
 .ChartStatsUsers .c3-xgrid-focus,

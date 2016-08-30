@@ -8750,6 +8750,7 @@ table:not(.table-condensed).no-hover tbody tr:hover {
   .Section-DashboardHome .dashboard-widgets > * {
     max-width: inherit;
     width: 100%;
+    padding-left: 1.125rem 0;
   }
 }
 

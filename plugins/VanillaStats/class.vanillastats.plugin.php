@@ -12,7 +12,7 @@ $PluginInfo['VanillaStats'] = array(
     'Name' => 'Vanilla Statistics',
     'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
     'Version' => '2.0.6',
-    'MobileFriendly' => false,
+    'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
@@ -137,7 +137,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->addJsFile('picker.js', 'plugins/VanillaStats');
             $sender->addJsFile('d3.min.js');
             $sender->addJsFile('c3.min.js');
-            
+
             $sender->addDefinition('VanillaID', Gdn::installationID());
             $sender->addDefinition('AuthToken', Gdn_Statistics::generateToken());
 

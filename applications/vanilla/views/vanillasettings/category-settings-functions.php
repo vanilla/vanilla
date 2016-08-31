@@ -70,7 +70,7 @@ function writeCategoryOptions($category) {
     $cdd->setForceDivider(true);
 
     $cdd->addGroup('', 'edit')
-        ->addLink(t('Edit'), url("/vanilla/settings/editcategory?categoryid={$category['CategoryID']}"), 'edit.edit');
+        ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit');
 
     $cdd->addGroup(t('Display as'), 'displayas');
     $displayasOptions = ['Heading', 'Categories', 'Discussions'];
@@ -93,14 +93,14 @@ function writeCategoryOptions($category) {
     $cdd->addGroup('', 'actions')
         ->addLink(
             t('Add Subcategory'),
-            url("/vanilla/settings/addcategory?parent={$category['CategoryID']}"),
+            "/vanilla/settings/addcategory?parent={$category['CategoryID']}",
             'actions.add'
         );
 
     $cdd->addGroup('', 'delete')
         ->addLink(
             t('Delete'),
-            url("/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}"),
+            "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
             'delete.delete',
             'Popup'
         );

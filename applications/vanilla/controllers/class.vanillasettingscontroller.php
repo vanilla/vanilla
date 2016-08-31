@@ -92,7 +92,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
             // Save new settings
             $Saved = $this->Form->save();
-            if ($Saved) {
+            if ($Saved !== false) {
                 $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
                 $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
 

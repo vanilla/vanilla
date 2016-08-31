@@ -110,15 +110,8 @@ pre {
   margin-bottom: 0;
 }
 
-// Make full border on content
-
 .full-border {
-  display: block;
-  margin-left: -$padding-default;
-  margin-right: -$padding-default;
-  padding-left: $padding-default;
-  padding-right: $padding-default;
-  border-bottom: $border-width solid $grey-light;
+  @include full-border(block)
 }
 
 // Default. Use if there's only an h1 block as a heading

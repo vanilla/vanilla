@@ -109,3 +109,17 @@
     width: $width;
   }
 }
+
+@mixin full-border($display: block, $has-border-bottom: true, $has-border-top: false) {
+  display: $display;
+  margin-left: -$padding-default;
+  margin-right: -$padding-default;
+  padding-left: $padding-default;
+  padding-right: $padding-default;
+  @if ($has-border-bottom) {
+    border-bottom: $border-width solid $grey-light;
+  }
+  @if ($has-border-top) {
+    border-top: $border-width solid $grey-light;
+  }
+}

@@ -5338,17 +5338,21 @@ output {
 }
 
 .analytics-panel-metrics {
+  display: -ms-flexbox;
+  display: flex;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #f6f9fb;
+  border-top: 0.0625rem solid #f6f9fb;
   overflow: hidden;
-  margin-left: -0.0625rem;
-  margin-right: -0.0625rem;
-  display: -ms-flexbox !important;
-  display: flex !important;
   -ms-flex-pack: center;
   justify-content: center;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding: 0.5625rem 0 1.125rem;
-  border-top: 0.0625rem solid #ededed;
+  border-top-color: #ededed;
   border-bottom-color: #ededed;
 }
 
@@ -5364,13 +5368,17 @@ output {
 
 .analytics-panel-metrics .analytics-widget-metric {
   border-right: 0.0625rem solid #ededed;
-  padding: 1.125rem 2.25rem !important;
+  padding: 1.125rem 2.25rem;
   margin-top: 0.5625rem;
   min-width: 11.25rem;
 }
 
 .analytics-panel-metrics .analytics-widget-metric:last-child {
   border-right: 0;
+}
+
+.analytics-panel-metrics:empty {
+  display: none;
 }
 
 .keen-spinner > div > div {
@@ -9087,7 +9095,7 @@ pre {
   margin-bottom: 0;
 }
 
-.full-border, .analytics-panel-metrics, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
+.full-border, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;

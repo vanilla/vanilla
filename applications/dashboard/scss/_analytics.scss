@@ -64,18 +64,15 @@
 }
 
 .analytics-panel-metrics {
-  @extend .full-border;
+  @include full-border(flex, true, true);
   @extend .nav-stats;
   overflow: hidden;
-  margin-left: -$border-width;
-  margin-right: -$border-width;
 
-  display: flex !important;
   justify-content: center;
   flex-wrap: wrap;
 
   padding: ($spacer / 2) 0 $spacer;
-  border-top: $border-width solid $grey-dark-border;
+  border-top-color: $grey-dark-border;
   border-bottom-color: $grey-dark-border;
 
   .metric-value {
@@ -93,7 +90,7 @@
   .analytics-widget-metric {
     @extend .nav-stats-item;
     border-right: $border-width solid $grey-dark-border;
-    padding: $spacer ($spacer * 2) !important;
+    padding: $spacer ($spacer * 2);
     margin-top: ($spacer / 2);
     min-width: to-rem(180);
 
@@ -101,7 +98,12 @@
       border-right: 0;
     }
   }
+
+  &:empty {
+    display: none;
+  }
 }
+
 
 .keen-spinner > div > div {
   width: 5px !important;

@@ -1,14 +1,14 @@
 <?php
 if ($this->data('StatisticsVerified')) {
 ?>
-    <div class="StatisticsVerification StatisticsOk"><?php echo t("Verified!"); ?></div>
+    <div class="StatisticsVerification text-success"><?php echo t("Verified!"); ?></div>
 <?php
 } else {
 ?>
     <?php echo $this->Form->open(['action' => url('/statistics')]); ?>
-    <div class="StatisticsVerification StatisticsProblem">
+    <div class="StatisticsVerification text-danger">
         <?php echo t("Problem with credentials."); ?>
-        <p><?php echo $this->Form->button('Re-Register API Key', array('class' => 'SmallButton', 'name' => 'Reregister')); ?></p>
+        <?php echo $this->Form->button('Re-Register API Key', array('class' => 'padded-left btn btn-primary', 'name' => 'Reregister')); ?>
     </div>
     <?php echo $this->Form->close(); ?>
 <?php

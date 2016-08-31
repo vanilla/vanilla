@@ -71,8 +71,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
         </div>
         <div class="input-wrap">
-        echo $this->Form->DropDown('DisplayAs', $this->data('DisplayAsOptions'));
-        ?>
+        <?php echo $this->Form->DropDown('DisplayAs', $this->data('DisplayAsOptions')); ?>
         </div>
     </li>
     <li class="form-group row">

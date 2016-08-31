@@ -143,7 +143,6 @@ class RoutesController extends DashboardController {
     public function index() {
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('dashboard/routes');
-        $this->addJsFile('routes.js');
         $this->title(t('Routes'));
 
         $this->MyRoutes = Gdn::router()->Routes;

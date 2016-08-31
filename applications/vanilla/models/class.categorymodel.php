@@ -42,7 +42,7 @@ class CategoryModel extends Gdn_Model {
     public static $Categories = null;
 
     /** @var array Valid values => labels for DisplayAs column. */
-    public static $displayAsOptions = [
+    private static $displayAsOptions = [
         'Discussions' => 'Discussions',
         'Categories' => 'Nested',
         'Flat' => 'Flat',
@@ -1389,6 +1389,13 @@ class CategoryModel extends Gdn_Model {
         $CategoryData = $this->SQL->get();
         $this->AddCategoryColumns($CategoryData);
         return $CategoryData;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDisplayAsOptions() {
+        return self::$displayAsOptions;
     }
 
     /**

@@ -76,7 +76,7 @@ function writeCategoryOptions($category) {
 
     $cdd->addGroup(t('Display as'), 'displayas');
 
-    foreach (CategoryModel::$displayAsOptions as $displayAs => $label) {
+    foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
         $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
 
         $icon = displayAsSymbol($displayAs);

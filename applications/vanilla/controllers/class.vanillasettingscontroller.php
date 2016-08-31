@@ -298,7 +298,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->fireEvent('AddEditCategory');
         $this->setupDiscussionTypes(array());
 
-        $displayAsOptions = CategoryModel::$displayAsOptions;
+        $displayAsOptions = CategoryModel::getDisplayAsOptions();
 
         if ($this->Form->authenticatedPostBack()) {
             // Form was validly submitted
@@ -565,7 +565,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->Category = (object)$this->Category;
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 
-        $displayAsOptions = categoryModel::$displayAsOptions;
+        $displayAsOptions = categoryModel::getDisplayAsOptions();
 
         // Restrict "Display As" types based on parent.
         $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);

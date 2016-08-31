@@ -568,10 +568,12 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
-     * @param $fieldName
-     * @param $attributes
+     * @param string $fieldName
+     * @param string $label
+     * @param array $attributes
+     * @return string
      */
-    public function toggle($fieldName, $label, $attributes) {
+    public function toggle($fieldName, $label, $attributes = []) {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {

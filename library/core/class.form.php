@@ -367,7 +367,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
-        return '<div id="'.$this->escapeString($fieldName).'" class="js-color-picker color-picker input-group">'
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="js-color-picker color-picker input-group">'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'

@@ -228,7 +228,6 @@ class DashboardHooks implements Gdn_IPlugin {
 
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Authentication'), '/dashboard/authentication', 'users.authentication', '', $sort)
 
             ->addGroup(t('Forum Settings'), 'forum', '', ['after' => 'users'])
             ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social', '', $sort)

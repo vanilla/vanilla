@@ -30,7 +30,7 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'DashboardHome',
             'title' => 'Dashboard',
             'description' => 'Site Overview',
-            'url' => '/settings',
+            'url' => '/dashboard/settings',
             'empty' => true
         ],
         'Moderation' => [
@@ -60,7 +60,7 @@ class DashboardNavModule extends SiteNavModule {
     public function __construct($cssClass = '', $useCssPrefix = true) {
 //        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
-        foreach(self::$sectionsInfo as $section) {
+        foreach(self::$sectionsInfo as &$section) {
             $section['url'] = url($section['url']);
         }
     }

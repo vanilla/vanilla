@@ -568,7 +568,8 @@ class AssetModel extends Gdn_Model {
 
         $extensions = ['php'];
         foreach ($handlers as $handlerTag => $handlerDef) {
-            $extensions[] = array_pop(explode('.', $handlerTag));
+            $extension = explode('.', $handlerTag);
+            $extensions[] = array_pop($extension);
         }
         return $extensions;
     }

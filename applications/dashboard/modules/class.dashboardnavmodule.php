@@ -161,7 +161,7 @@ class DashboardNavModule extends SiteNavModule {
                     $item['collapsedList'] = 'in';
                 }
                 if (isset($item['items'])) {
-                    foreach($item[items] as &$subitem) {
+                    foreach($item['items'] as &$subitem) {
                         $subitem['section'] = $section;
                     }
                 }

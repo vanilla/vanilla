@@ -436,6 +436,12 @@
         $('.modal-footer', element).scrollToFixed({
             zIndex: 1005
         });
+
+        // If we load in the middle of the page, we should have a short navbar.
+        var offset = window.navOffset; // Height difference between short and normal navbar.
+        if ($(window).scrollTop() > offset) {
+            $('.navbar').addClass('navbar-short');
+        }
     }
 
     $(window).scroll(function() {

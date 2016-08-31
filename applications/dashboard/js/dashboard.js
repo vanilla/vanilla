@@ -788,6 +788,11 @@
         }
     }
 
+    /**
+     * Un-collapses a group if one of its links is active.
+     *
+     * @param element
+     */
     function collapseInit(element) {
         var active = $('.js-nav-collapsible a.active', element);
         var collapsible = active.parents('.collapse');
@@ -883,6 +888,11 @@
         $('.table-wrap table:not(.CheckBoxGrid)', element).tablejengo({container: '#main-row .main'});
     }
 
+    /**
+     * Add tooltips to the pin icons in the analytics section.
+     *
+     * TODO: Migrate to analytics application, add translations to gdn.meta
+     */
     function pinToolTips() {
         var options = {
             title: 'Pin to your dashboard',
@@ -893,23 +903,25 @@
             }
         };
 
+        // Chart tooltip placements go to the left, metric tooltip placements go to the top.
+
         $('.analytics-widget-chart .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
             $(this).tooltip('hide');
         });
 
-        options['placement'] = 'top';
+        options.placement = 'top';
 
         $('.analytics-widget-metric .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
             $(this).tooltip('hide');
         });
 
-        options['title'] = 'Unpin from your dashboard';
+        options.title = 'Unpin from your dashboard';
 
         $('.analytics-widget-metric .bookmarked').tooltip(options).on('click', function() {
             $(this).tooltip('hide');
         });
 
-        options['placement'] = 'left';
+        options.placement = 'left';
 
         $('.analytics-widget-chart .bookmarked').tooltip(options).on('click', function() {
             $(this).tooltip('hide');

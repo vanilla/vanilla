@@ -264,15 +264,12 @@ module.exports = function (grunt) {
   ]);
 
   grunt.registerTask('default', [
-    'copy:main'
     , 'sass_globbing'
     , 'scsslint'
     , 'sass'
     , 'autoprefixer'
     , 'concat'
     , 'jshint'
-    // , 'csslint'
     , 'imagemin'
-    , 'styleguide'
   ]);
 };

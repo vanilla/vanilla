@@ -22,7 +22,7 @@ $ npm install
 
 #### Build - `npm run build`
 
-Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
+Compiles all theme assets using Grunt. SCSS stylesheets will be compiled to [`design/admin.css`](design/admin.css) and Javascript in the `js/src` directory will be concatenated and output to [`js/dashboard.js`](js/dashboard.js).
 
 #### Watch - `npm run watch`
 

@@ -19,8 +19,6 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
    Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
    Click <b>Finished</b> when you are ready.'), url('/dashboard/role')),
     '</div>';
-
-    echo Gdn::slice('/dashboard/role/defaultroleswarning');
 }
 ?>
     <div class="Info">

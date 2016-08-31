@@ -101,16 +101,6 @@ class RoleController extends DashboardController {
     }
 
     /**
-     * Show a warning if default roles are not setup yet.
-     *
-     * @since 2.0.?
-     * @access public
-     */
-    public function defaultRolesWarning() {
-        // Do nothing (for now).
-    }
-
-    /**
      * Edit a role.
      *
      * @since 2.0.0

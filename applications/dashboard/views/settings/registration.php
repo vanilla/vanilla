@@ -29,10 +29,6 @@ echo $this->Form->errors(); ?>
     </div>
 </div>
 
-<?php
-echo Gdn::slice('/dashboard/role/defaultroleswarning');
-
-?>
 <div id="RegistrationMethods">
     <div class="table-wrap">
         <table class="Label AltColumns">

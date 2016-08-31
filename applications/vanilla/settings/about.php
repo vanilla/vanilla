@@ -5,6 +5,7 @@
  * @package Vanilla
  */
 $ApplicationInfo['Vanilla'] = array(
+    'AllowDisable' => false, // Vanilla should never get disabled once it has been installed.
     'Description' => "Vanilla is the sweetest discussion forum on the web.",
     'Version' => APPLICATION_VERSION,
     'SetupController' => 'setup',

@@ -33,7 +33,7 @@
         </li>
     </ul>
     <div class="form-footer">
-    <?php echo $this->Form->button("Activate", array('Class' => 'SliceSubmit btn btn-primary')); ?>
+    <?php echo $this->Form->button("Activate", array('class' => 'SliceSubmit btn btn-primary')); ?>
     </div>
     <?php echo $this->Form->close(); ?>
 </div>

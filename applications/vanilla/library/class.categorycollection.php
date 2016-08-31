@@ -438,7 +438,7 @@ class CategoryCollection {
                     $categories[$category['ParentCategoryID']]['Children'][] = &$categories[$category['CategoryID']];
                 }
 
-                if (!$options['collapsecategories'] || !in_array($child['DisplayAs'], ['Categories'])) {
+                if (!$options['collapsecategories'] || !in_array($child['DisplayAs'], ['Categories', 'Flat'])) {
                     $parents[] = $child['CategoryID'];
                 }
             }

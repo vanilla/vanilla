@@ -298,6 +298,8 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->fireEvent('AddEditCategory');
         $this->setupDiscussionTypes(array());
 
+        $displayAsOptions = CategoryModel::getDisplayAsOptions();
+
         if ($this->Form->authenticatedPostBack()) {
             // Form was validly submitted
             $IsParent = $this->Form->getFormValue('IsParent', '0');
@@ -329,6 +331,10 @@ class VanillaSettingsController extends Gdn_Controller {
                 $category = CategoryModel::categories($parent);
                 if ($category) {
                     $this->Form->setValue('ParentCategoryID', $category['CategoryID']);
+
+                    if (val('DisplayAs', $category) === 'Flat') {
+                        unset($displayAsOptions['Heading']);
+                    }
                 }
             }
 
@@ -344,6 +350,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }
 
@@ -543,13 +550,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $PermissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
-        $displayAsOptions = [
-            'Discussions' => 'Discussions',
-            'Categories' => 'Nested Categories',
-            'Flat' => 'Flat Categories',
-            'Heading' => 'Heading'
-        ];
-
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
                 $CategoryID = $ID;
@@ -564,6 +564,8 @@ class VanillaSettingsController extends Gdn_Controller {
         // Category data is expected to be in the form of an object.
         $this->Category = (object)$this->Category;
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
+
+        $displayAsOptions = categoryModel::getDisplayAsOptions();
 
         // Restrict "Display As" types based on parent.
         $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);

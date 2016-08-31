@@ -18,7 +18,7 @@ function writeCategoryItem($category, $indent = 0) {
         "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>",
         "<div class=\"dd-content tree-content\">";
 
-    if (in_array($category['DisplayAs'], ['Categories'])) {
+    if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
         echo anchor(
             htmlspecialchars($category['Name']),
             '/vanilla/settings/categories?parent='.urlencode($category['UrlCode'])
@@ -46,6 +46,8 @@ function displayAsSymbol($displayAs) {
             return symbol('heading');
         case 'categories':
             return symbol('nested');
+        case 'flat':
+            return symbol('flat');
         case 'discussions':
         default:
             return symbol('discussions');
@@ -73,14 +75,14 @@ function writeCategoryOptions($category) {
         ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit');
 
     $cdd->addGroup(t('Display as'), 'displayas');
-    $displayasOptions = ['Heading', 'Categories', 'Discussions'];
-    foreach ($displayasOptions as $displayAs) {
+
+    foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
         $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
 
         $icon = displayAsSymbol($displayAs);
 
         $cdd->addLink(
-            t($displayAs),
+            t($label),
             '#',
             'displayas.'.strtolower($displayAs),
             'js-displayas '.$cssClass,

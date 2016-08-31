@@ -41,6 +41,14 @@ class CategoryModel extends Gdn_Model {
     /** @var array Merged Category data, including Pure + UserCategory. */
     public static $Categories = null;
 
+    /** @var array Valid values => labels for DisplayAs column. */
+    private static $displayAsOptions = [
+        'Discussions' => 'Discussions',
+        'Categories' => 'Nested',
+        'Flat' => 'Flat',
+        'Heading' => 'Heading'
+    ];
+
     /** @var bool Whether or not to explicitly shard the categories cache. */
     public static $ShardCache = false;
 
@@ -1381,6 +1389,13 @@ class CategoryModel extends Gdn_Model {
         $CategoryData = $this->SQL->get();
         $this->AddCategoryColumns($CategoryData);
         return $CategoryData;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getDisplayAsOptions() {
+        return self::$displayAsOptions;
     }
 
     /**

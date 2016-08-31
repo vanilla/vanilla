@@ -24,7 +24,6 @@ module.exports = function (grunt) {
       , sass: {
         files: ['scss/**/*.scss']
         , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
-        // , tasks: ['scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -58,8 +57,32 @@ module.exports = function (grunt) {
             flatten: true,
             cwd: 'bower_components',
             src: [
-              'bootstrap/js/dist/dropdown.js'
+              'bootstrap/js/dist/collapse.js'
+              , 'bootstrap/js/dist/collapse.js.map'
+              , 'bootstrap/js/dist/dropdown.js'
+              , 'bootstrap/js/dist/dropdown.js.map'
+              , 'bootstrap/js/dist/modal.js'
+              , 'bootstrap/js/dist/modal.js.map'
+              , 'bootstrap/js/dist/tooltip.js'
+              , 'bootstrap/js/dist/tooltip.js.map'
               , 'bootstrap/js/dist/util.js'
+              , 'bootstrap/js/dist/util.js.map'
+            ],
+            dest: 'js/vendors/bootstrap'
+          },
+          {
+            expand: true,
+            flatten: true,
+            cwd: 'bower_components',
+            src: [
+              'clipboard/dist/clipboard.min.js'
+              , 'bootstrap-daterangepicker/daterangepicker.js'
+              , 'jquery-icheck/icheck.min.js'
+              , 'ScrollToFixed/jquery-scrolltofixed-min.js'
+              , 'moment/min/moment.min.js'
+              , 'tether/dist/js/tether.min.js'
+              , 'tether/dist/js/tether.min.js'
+              , 'tether-drop/dist/js/drop.min.js'
             ],
             dest: 'js/vendors'
           },
@@ -80,8 +103,7 @@ module.exports = function (grunt) {
             flatten: true,
             cwd: 'bower_components',
             src: [
-              'google-code-prettify/src/lang-html.js'
-              , 'google-code-prettify/src/prettify.js'
+              'google-code-prettify/src/prettify.js'
             ],
             dest: 'js/vendors/prettify'
           },
@@ -91,21 +113,17 @@ module.exports = function (grunt) {
             cwd: 'bower_components',
             src: [
               'google-code-prettify/src/prettify.css'
+              , 'color-themes-for-google-code-prettify/themes/tomorrow.css'
             ],
             dest: 'design/vendors'
           },
           {
             expand: true,
-            // flatten: true,
             cwd: 'bower_components',
             src: [
               'bootstrap/LICENSE'
-              // , 'bootstrap/scss/_normalize.scss'
-              // , 'bootstrap/scss/_utilities.scss'
-              // , 'bootstrap/scss/_variables.scss'
               , 'bootstrap/scss/*.scss'
               , 'bootstrap/scss/mixins/*.scss'
-              , 'bootstrap-daterangepicker/daterangepicker.scss'
             ],
             dest: 'scss/vendors'
           }
@@ -228,7 +246,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_forms.scss',
             'scss/vendors/bootstrap/scss/_custom-forms.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
-            'scss/vendors/bootstrap/scss/_reboot.scss',
+            'scss/vendors/bootstrap/scss/_reboot.scss'
           ],
           'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss']
         },

@@ -218,7 +218,8 @@ $nav-pills-active-link-hover-color:         $component-active-color !default;
 $nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
 
 $navbar-height:                             $spacer * 4;
-$nav-navbar-active-link-active-bg:          #0cb0f8;
+$navbar-active-link-active-bg:              #0cb0f8;
+$navbar-link-color:                         lighten($navbar-active-link-active-bg, 40%);
 
 // Checkbox toggles
 $toggle-border-width:                       $border-width;

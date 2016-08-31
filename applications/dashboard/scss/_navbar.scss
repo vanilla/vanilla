@@ -60,17 +60,17 @@ $navbar-short-height: 3rem;
     &.active {
       &,
       &:hover {
-        background-color: $nav-navbar-active-link-active-bg;
+        background-color: $navbar-active-link-active-bg;
 
         > * {
-          opacity: 1;
+          color: $white;
         }
       }
     }
 
     &.hover,
     &:hover {
-      background-color: $nav-navbar-active-link-active-bg;
+      background-color: $navbar-active-link-active-bg;
     }
   }
 
@@ -145,12 +145,12 @@ $navbar-short-height: 3rem;
   .nav-link-description {
     font-size: $font-size-xs;
     line-height: $line-height-lg;
-    opacity: .75;
+    color: $navbar-link-color;
   }
 
   .nav-link-heading {
     line-height: $line-height-lg;
-    opacity: .75;
+    color: $navbar-link-color;
   }
 }
 
@@ -178,8 +178,9 @@ $navbar-short-height: 3rem;
 .navbar-profile {
   cursor: pointer;
 
-  .icon {
-    opacity: .75;
+  .icon-caret-down {
+    border-top-color: $navbar-link-color;
+    @extend .caret;
   }
 }
 
@@ -189,7 +190,6 @@ $navbar-short-height: 3rem;
   font-weight: 300;
   text-transform: uppercase;
   margin-left: $spacer;
-  opacity: .75;
 
   svg {
     position: relative;
@@ -197,6 +197,6 @@ $navbar-short-height: 3rem;
     width: $font-size-xs;
   }
 
-  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
+  @include button-variant($navbar-link-color, transparent, $navbar-link-color, $navbar-link-color, $navbar-active-link-active-bg, $navbar-link-color);
   @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);
 }

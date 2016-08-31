@@ -697,7 +697,7 @@ select + select {
 }
 
 .btn-overlay {
-  @include button-variant($white, transparent, $white, $white, $nav-navbar-active-link-active-bg, $white);
+  @include button-variant($white, transparent, $white, $white, $navbar-active-link-active-bg, $white);
 }
 
 // Search input

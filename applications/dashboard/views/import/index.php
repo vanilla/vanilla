@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-$this->addSideMenu();
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
 <div class="Help Aside">
     <?php

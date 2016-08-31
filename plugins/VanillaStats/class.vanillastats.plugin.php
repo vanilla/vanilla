@@ -131,7 +131,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {
             $sender->addCssFile('picker.css', 'plugins/VanillaStats');
-            $sender->addCssFile('vendors/c3.min.css', 'plugins/vanillaanalytics');
+            $sender->addCssFile('vendors/c3.min.css', 'plugins/VanillaStats');
 
             $sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
             $sender->addJsFile('picker.js', 'plugins/VanillaStats');

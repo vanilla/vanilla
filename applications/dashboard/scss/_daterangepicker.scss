@@ -156,6 +156,23 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
       // TODO: Should this actually be hard-coded?
       min-width: 32px;
+
+      &.prev.available {
+        text-align: left;
+        &:before {
+          display: inline-block;
+          content: $chevron-left;
+        }
+      }
+
+      &.next.available {
+        text-align: right;
+        &:before {
+          display: inline-block;
+          content: $chevron-right;
+        }
+      }
+
     }
   }
 
@@ -182,9 +199,6 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
     &.available {
       &:hover {
-        background-color: $daterangepicker-cell-hover-bg-color;
-        border-color: $daterangepicker-cell-hover-border-color;
-        color: $daterangepicker-cell-hover-color;
       }
     }
 

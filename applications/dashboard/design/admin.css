@@ -7911,16 +7911,11 @@ button.close, button.Close {
 }
 
 .nav-adventure .nav-link:hover {
-  background-color: #0291db;
-  color: #fff;
+  background-color: #f9fdfe;
 }
 
 .nav-adventure .nav-link:hover::before {
   width: 100%;
-}
-
-.nav-adventure .nav-link:hover svg {
-  fill: #fff;
 }
 
 .nav-adventure .nav-item-icon {

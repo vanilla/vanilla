@@ -4,7 +4,7 @@
     <h2><?php echo sprintf(t('About %s'), t('Vanilla Statistics')); ?></h2>
     <p><?php echo t(
         "The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool",
-        "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://vanillaforums.org/docs/vanillastatistics\">read more about Vanilla Statistics</a> in our documentation."
+        "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://docs.vanillaforums.com/help/addons/statistics\">read more about Vanilla Statistics</a> in our documentation."
     ); ?></p>
 
     <div class="Help Aside">

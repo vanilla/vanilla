@@ -238,7 +238,7 @@ pre {
 }
 
 .flag {
-  $line-height-flag: 1.75;
+  $flag-height: to-rem(18);
   display: inline-block;
   padding-left: .125rem;
   padding-right: .75rem;
@@ -248,7 +248,7 @@ pre {
   border-style: solid;
   border-color: $brand-secondary;
   border-right-color: transparent;
-  border-width: ($font-size-xs * $line-height-flag / 2) ($font-size-xs * $line-height-flag / 3);
+  border-width: ($flag-height / 2) ($flag-height / 2);
   text-transform: uppercase;
 }
 

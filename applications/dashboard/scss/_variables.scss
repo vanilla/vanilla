@@ -71,8 +71,8 @@ $font-size-root:             $rem-base * 1px;
 
 $font-size-base:             .875rem;
 $font-size-lg:               1.25rem !default;
-$font-size-sm:               .75rem;
-$font-size-xs:               .675rem;
+$font-size-sm:               to-rem(12);
+$font-size-xs:               to-rem(11);
 
 $font-size-h1:               2rem;
 $font-size-h2:               1.125rem;

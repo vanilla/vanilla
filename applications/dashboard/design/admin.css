@@ -5776,7 +5776,7 @@ input[type="button"].btn-block {
 }
 
 .card .btn-media-sm svg {
-  width: 0.675rem;
+  width: 0.6875rem;
 }
 
 .card .btn-media-sm:hover svg {
@@ -6586,7 +6586,7 @@ li.current-theme {
 }
 
 .footer-nav-item {
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   line-height: 1.3333333333;
   display: inline-block;
   padding-left: 1.125rem;
@@ -7817,7 +7817,7 @@ button.close, button.Close {
   vertical-align: middle;
   padding: 0 0.28125rem;
   margin-left: 0.28125rem;
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   background-color: rgba(0, 0, 0, 0.1875);
   color: #fff;
   border-radius: .25rem;
@@ -8039,7 +8039,7 @@ button.close, button.Close {
 .navbar .nav-link {
   position: relative;
   min-width: 11.25rem;
-  padding: 1.2166666667rem;
+  padding: 1.2083333333rem;
   color: #fff;
   border-radius: 0;
 }
@@ -8131,7 +8131,7 @@ button.close, button.Close {
 }
 
 .navbar .nav-link-description {
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   line-height: 1.3333333333;
   opacity: .75;
 }
@@ -8148,12 +8148,12 @@ button.close, button.Close {
 .nav-icons svg {
   display: block;
   fill: #fff;
-  height: 1.9416666667rem;
+  height: 1.9583333333rem;
 }
 
 .navbar-short .nav-icons .nav-link {
-  padding-top: 0.4666666667rem;
-  padding-bottom: 0.4666666667rem;
+  padding-top: 0.4583333333rem;
+  padding-bottom: 0.4583333333rem;
 }
 
 .nav-icons .nav-link {
@@ -8187,7 +8187,7 @@ button.close, button.Close {
 .btn-navbar svg {
   position: relative;
   fill: #fff;
-  width: 0.675rem;
+  width: 0.6875rem;
 }
 
 .btn-navbar:hover {
@@ -8383,7 +8383,7 @@ button.close, button.Close {
 
 .btn-control-panel {
   padding: 0.125rem 0.75rem;
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   line-height: 1.5;
   border-radius: 0.125rem;
   color: #949aa2;
@@ -9208,12 +9208,12 @@ pre {
   padding-left: .125rem;
   padding-right: .75rem;
   line-height: 0;
-  font-size: 0.675rem;
+  font-size: 0.6875rem;
   color: #fff;
   border-style: solid;
   border-color: #f5296d;
   border-right-color: transparent;
-  border-width: 0.590625rem 0.39375rem;
+  border-width: 0.5625rem 0.5625rem;
   text-transform: uppercase;
 }
 

@@ -60,6 +60,9 @@ class DashboardNavModule extends SiteNavModule {
     public function __construct($cssClass = '', $useCssPrefix = true) {
 //        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
+        foreach(self::$sectionsInfo as $section) {
+            $section['url'] = url($section['url']);
+        }
     }
 
     /**
@@ -96,7 +99,7 @@ class DashboardNavModule extends SiteNavModule {
             } else {
                 $section['title'] = t($section['title']);
                 $section['description'] = t($section['description']);
-                $section['url'] = url($section['url']);
+                $section['url'] = $section['url'];
                 $section['active'] = $this->isActiveSection($section['section']) ? 'active' : '';
             }
         }

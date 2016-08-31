@@ -15,11 +15,11 @@ if ($this->data('crop') && $allowImages) {
     </div>
 <?php } ?>
 <div class="DismissMessage WarningMessage"><?php echo t('By uploading a file you certify that you have the right to distribute this picture and that it does not violate the Terms of Service.'); ?></div>
-<div class="js-new-avatar Button" style="margin-bottom: 20px;"><?php echo t('Upload New Picture'); ?></div>
+<div class="js-new-avatar Button change-picture-new" style="margin-bottom: 20px;"><?php echo t('Upload New Picture'); ?></div>
 <?php
 echo $this->Form->input('Avatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
 if ($this->data('crop')) {
-    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm');
+    echo anchor(t('Remove Picture'), userUrl($this->User, '', 'removepicture').'?tk='.Gdn::session()->TransientKey().'&deliveryType='.$this->deliveryType(), 'Button Danger PopConfirm change-picture-remove');
 }
 ?>
 <?php

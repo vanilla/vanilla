@@ -50,6 +50,9 @@
 
                     $PreferenceTypes = $this->data("PreferenceTypes.{$PreferenceGroup}");
                     foreach ($PreferenceTypes as $PreferenceType) {
+                        if ($PreferenceType === 'Email' && c('Garden.Email.Disabled')) {
+                            continue;
+                        }
                         echo wrap(t($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
                     }
                     ?>
@@ -65,6 +68,10 @@
                     $ColumnsMarkup = '';
                     // Loop through all means of notification.
                     foreach ($PreferenceTypes as $NotificationType) {
+                        if ($NotificationType === 'Email' && c('Garden.Email.Disabled')) {
+                            continue;
+                        }
+
                         $ConfigPreference = c('Preferences.'.$NotificationType.'.'.$Event, 0);
                         $preferenceDisabled = ($ConfigPreference === false || $ConfigPreference == 2);
 

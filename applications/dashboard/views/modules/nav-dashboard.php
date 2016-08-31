@@ -1,8 +1,7 @@
 <?php
 $items = val('items', $this);
 if (!function_exists('renderDashboardNav')) {
-    function renderDashboardNav($items)
-    {
+    function renderDashboardNav($items) {
         foreach ($items as $item) {
             if (val('type', $item) == 'group') {
                 if (val('text', $item)) { ?>
@@ -28,17 +27,17 @@ if (!function_exists('renderDashboardNav')) {
                         }
                         ?>
                     </a>
-		   <?php }?>
-		</li>
-	    <?php }
-	    if (val('type', $item) == 'dropdown') {
-		echo val('dropdownmenu', $item);
-	    }
-	    if (val('type', $item) == 'divider') { ?>
-	    <li role="presentation" <?php if (val('cssClass', $item)) { ?> class="<?php echo val('cssClass', $item); ?>"<?php } ?>>
-		<hr/>
-	    </li>
-	<?php }
+                </li>
+		   <?php }
+		   if (val('type', $item) == 'dropdown') {
+                echo val('dropdownmenu', $item);
+           }
+           if (val('type', $item) == 'divider') { ?>
+               <li role="presentation" <?php if (val('cssClass', $item)) { ?> class="<?php echo val('cssClass', $item); ?>"<?php } ?>>
+                   <hr/>
+               </li>
+	       <?php }
+        }
 	}
 } ?>
 <div class="nav-collapsible js-nav-collapsible">

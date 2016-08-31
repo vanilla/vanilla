@@ -5,16 +5,16 @@ $pagerType = !($pager->TotalRecords) ? 'more' : 'numbered';
 
 $hasNext = true;
 
+// Get total page count, allowing override
+$pageCount = ceil($pager->TotalRecords / $pager->Limit);
+$currentPage = pageNumber($pager->Offset, $pager->Limit);
+
 if ($pagerType === 'numbered' && $currentPage >= $pageCount) {
     $hasNext = false;
 }
 if ($pagerType === 'more' && $pager->CurrentRecords !== false && $pager->CurrentRecords < $pager->Limit) {
     $hasNext = false;
 }
-
-// Get total page count, allowing override
-$pageCount = ceil($pager->TotalRecords / $pager->Limit);
-$currentPage = PageNumber($pager->Offset, $pager->Limit);
 
 $pagerString = '<div class="pager">';
 

@@ -91,7 +91,6 @@ class MessageController extends DashboardController {
      */
     public function edit($MessageID = '') {
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('messages.js');
 
         $this->permission('Garden.Community.Manage');
         $this->setHighlightRoute('dashboard/message');
@@ -148,7 +147,6 @@ class MessageController extends DashboardController {
         $this->setHighlightRoute('dashboard/message');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('jquery.tablednd.js');
-        $this->addJsFile('messages.js');
         $this->title(t('Messages'));
         Gdn_Theme::section('Moderation');
 

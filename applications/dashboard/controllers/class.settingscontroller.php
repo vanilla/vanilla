@@ -474,7 +474,6 @@ class SettingsController extends DashboardController {
 
         // Page setup
         $this->title(t('Banning Options'));
-        $this->addJsFile('bans.js');
 
         list($Offset, $Limit) = offsetLimit($Page, 20);
 

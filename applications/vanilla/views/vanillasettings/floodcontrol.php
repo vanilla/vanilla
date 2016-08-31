@@ -6,7 +6,7 @@ $SpamCount = ArrayCombine($Count, $Count);
 $SpamTime = ArrayCombine($Time, $Time);
 $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5, 10));
 
-$ConversationsEnabled = Gdn::ApplicationManager()->IsEnabled('Conversations');
+$ConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', ADDON_TYPE_APPLICATION);
 
 Gdn_Theme::assetBegin('Help');
 echo '<h2>'.$this->data('Title').'</h2>';

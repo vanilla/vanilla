@@ -2,7 +2,8 @@
 $session = Gdn::session();
 $updateUrl = c('Garden.UpdateCheckUrl');
 $addonUrl = c('Garden.AddonUrl');
-if ($this->addonType === 'applications') {
+$addonType = val('addonType', $this);
+if ($addonType === 'applications') {
     $title = '<h1>'.t('Manage Applications').'</h1>';
     $helpTitle = sprintf(t('About %s'), t('Applications'));
     $pathHelp = sprintf(
@@ -13,7 +14,7 @@ if ($this->addonType === 'applications') {
     $availableAddons = $this->AvailableApplications;
     $enabledAddons = $this->EnabledApplications;
 
-} elseif ($this->addonType === 'locales') {
+} elseif ($addonType === 'locales') {
     $title = '';
     $helpTitle = sprintf(t('About %s'), t('Locales'));
     $pathHelp = sprintf(
@@ -84,8 +85,8 @@ Gdn_Theme::assetBegin('Help'); ?>
         $State = strtolower($Css);
         if ($this->Filter == 'all' || $this->Filter == $State) {
             $Alt = !$Alt;
-            $Version = Gdn_Format::Display(val('Version', $addonInfo, ''));
-            $ScreenName = Gdn_Format::Display(val('Name', $addonInfo, $addonName));
+            $Version = Gdn_Format::display(val('Version', $addonInfo, ''));
+            $ScreenName = Gdn_Format::display(val('Name', $addonInfo, $addonName));
             $Settings = val('SettingsUrl', $addonInfo, []);
 
             $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $addonInfo, '') : '';
@@ -176,7 +177,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                             ?>
                             <div class="<?php echo $RowClass; ?>">
                                 <div class="Alert"><a href="<?php
-                                    echo CombinePaths(array($updateUrl, 'find', urlencode($ScreenName)), '/');
+                                    echo combinePaths(array($updateUrl, 'find', urlencode($ScreenName)), '/');
                                     ?>"><?php
                                         printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
                                         ?></a></div>
@@ -186,7 +187,7 @@ Gdn_Theme::assetBegin('Help'); ?>
                         ?>
                     </div>
                 </div>
-                <div class="media-description"><?php echo Gdn_Format::Html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, ''))); ?></div>
+                <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, ''))); ?></div>
                 </div>
                 <div class="media-right media-options">
                     <?php if ($SettingsUrl != '') {

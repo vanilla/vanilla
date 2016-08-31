@@ -1,22 +1,5 @@
-<style type="text/css">
-    .StatsDisabled {
-        margin: 0 20px 20px;
-        padding: 20px;
-        background: #f2f2f2;
-        color: #C90000;
-    }
-
-    .StatsDisabled strong {
-        font-size: 18px;
-
-    }
-
-    #Content form .StatsDisabled input.Button {
-        margin: 20px 0 0 0;
-    }
-</style>
 <div class="StatsDisabled">
-    <strong><?php echo t("Vanilla Statistics are currently disabled"); ?></strong>
+    <div class="alert alert-warning padded"><?php echo t("Vanilla Statistics are currently disabled"); ?></div>
     <?php
     if (!c('Garden.Analytics.Enabled', true)) {
         echo $this->Form->Hidden('Allow', array('value' => 1));

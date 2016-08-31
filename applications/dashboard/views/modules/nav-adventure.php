@@ -7,6 +7,7 @@ if (!function_exists('renderAdventureNav')) {
             if (val('type', $item) == 'group') {
                 $heading = val('text', $item);
                 if (!$heading) {
+                    touchValue('cssClass', $item, '');
                     $item['cssClass'] .= ' nav-group-noheading';
                 } ?>
                 <div type="group" class="nav-group <?php echo val('cssClass', $item); ?>">

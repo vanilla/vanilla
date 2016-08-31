@@ -147,7 +147,7 @@ class DashboardNavModule extends SiteNavModule {
 
     private function handleUserPreferencesNav() {
         if ($session = Gdn::session()) {
-            $collapsed = $session->getPreference('DashboardNav.Collapsed');
+            $collapsed = $session->getPreference('DashboardNav.Collapsed', []);
             $section = $this->getActiveSection();
 
             foreach($this->items as &$item) {

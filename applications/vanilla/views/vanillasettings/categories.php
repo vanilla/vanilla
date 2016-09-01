@@ -14,11 +14,15 @@
 </div>
 
 <?php
-writeCategoryBreadcrumbs($this->data('Ancestors', []));
+    writeCategoryBreadcrumbs($this->data('Ancestors', []));
 ?>
 
-<div class="dd tree tree-categories">
-<?php
-writeCategoryTree($this->data('Categories', []));
-?>
-</div>
+<?php if ($this->data('UsePagination', false) === true): ?>
+<div class="toolbar"><?php
+    PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']);
+?></div>
+<?php endif; ?>
+
+<div class="dd tree tree-categories"><?php
+    writeCategoryTree($this->data('Categories', []), 0, $this->data('AllowSorting', true));
+?></div>

@@ -571,6 +571,10 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorVersion', $this->pluginInfo['Version']);
         $c->addDefinition('editorInputFormat', $this->Format);
         $c->addDefinition('editorPluginAssets', $this->AssetPath);
+        $c->addDefinition('fileUpload-remove', t('Remove file'));
+        $c->addDefinition('fileUpload-reattach', t('Click to re-attach'));
+        $c->addDefinition('fileUpload-inserted', t('Inserted'));
+        $c->addDefinition('fileUpload-insertedTooltip', t('This image has been inserted into the body of text.'));
         $c->addDefinition('wysiwygHelpText', t('editor.WysiwygHelpText', 'You are using <a href="https://en.wikipedia.org/wiki/WYSIWYG" target="_new">WYSIWYG</a> in your post.'));
         $c->addDefinition('bbcodeHelpText', t('editor.BBCodeHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/BBCode" target="_new">BBCode</a> in your post.'));
         $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple HTML</a> in your post.'));

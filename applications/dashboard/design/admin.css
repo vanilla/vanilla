@@ -5368,7 +5368,7 @@ output {
 
 .analytics-panel-metrics .analytics-widget-metric {
   border-right: 0.0625rem solid #ededed;
-  padding: 1.125rem 2.25rem;
+  padding: 1.125rem 2.25rem !important;
   margin-top: 0.5625rem;
   min-width: 11.25rem;
 }

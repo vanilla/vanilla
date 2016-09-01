@@ -90,7 +90,7 @@
   .analytics-widget-metric {
     @extend .nav-stats-item;
     border-right: $border-width solid $grey-dark-border;
-    padding: $spacer ($spacer * 2);
+    padding: $spacer ($spacer * 2) !important;
     margin-top: ($spacer / 2);
     min-width: to-rem(180);
 

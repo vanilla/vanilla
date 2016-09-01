@@ -48,7 +48,7 @@ foreach ($Categories as $CategoryRow) {
             </li>';
         } else {
             $LastComment = UserBuilder($Category, 'Last');
-            $rssIcon = val('DisplayAs', $Category) !== 'Categories' ? '' : anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => t('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => t('RSS Feed')));
+            $rssIcon = val('DisplayAs', $Category) === 'Categories' ? '' : anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => t('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => t('RSS Feed')));
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
                 .'<div class="Options">'

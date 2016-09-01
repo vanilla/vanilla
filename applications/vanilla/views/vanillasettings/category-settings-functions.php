@@ -1,22 +1,24 @@
 <?php
 
-function writeCategoryTree($categories, $indent = 0) {
+function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
     $i = str_repeat('  ', $indent);
 
     echo "$i<ol class=\"dd-list tree-list list-unstyled\">\n";
 
     foreach ($categories as $category) {
-        writeCategoryItem($category, $indent + 1);
+        writeCategoryItem($category, $indent + 1, $allowSorting);
     }
     echo "$i</ol>\n";
 }
 
-function writeCategoryItem($category, $indent = 0) {
+function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
     $i = str_repeat('  ', $indent);
 
-    echo "$i<li class=\"dd-item tree-item\" data-id=\"{$category['CategoryID']}\">\n",
-        "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>",
-        "<div class=\"dd-content tree-content\">";
+    echo "$i<li class=\"dd-item tree-item\" data-id=\"{$category['CategoryID']}\">\n$i";
+    if ($allowSorting) {
+        echo "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>";
+    }
+    echo "<div class=\"dd-content tree-content\">";
 
     if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
         echo anchor(

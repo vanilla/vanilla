@@ -648,16 +648,18 @@ class CategoryModel extends Gdn_Model {
      * @param int|string $id The parent category ID or slug.
      * @param int|bool $offset
      * @param int|bool $limit
+     * @param string $orderFields
+     * @param string $orderDirection
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null) {
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $orderFields = 'DateInserted', $orderDirection = 'desc') {
         $categoryTree = $this->getWhere(
             [
                 'DisplayAs <>' => 'Heading',
                 'ParentCategoryID' => $id
             ],
-            'DateInserted',
-            'desc',
+            $orderFields,
+            $orderDirection,
             $limit,
             $offset
         )->resultArray();

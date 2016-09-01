@@ -9078,7 +9078,7 @@ ul {
   flex-grow: 1;
 }
 
-.toolbar-stats > *:not(.nav-stats) {
+.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
   margin-top: 2.25rem;
 }
 
@@ -9627,7 +9627,7 @@ form .title {
 
 .dd {
   color: #555a62;
-  padding: 18px 0;
+  padding: 0 0 18px;
   position: relative;
   fill: #555a62;
 }
@@ -9696,7 +9696,6 @@ form .title {
   left: 0;
   top: 0;
   cursor: move;
-  cursor: -webkit-grab;
   cursor: -moz-grab;
   cursor: grab;
   line-height: 1;
@@ -9723,7 +9722,6 @@ form .title {
   margin-top: 0;
   margin-left: 0;
   opacity: .8;
-  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }
@@ -9740,7 +9738,6 @@ form .title {
   border: 1px dashed #0291db;
   min-height: 36px;
   border-radius: 2px;
-  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }

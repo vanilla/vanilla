@@ -662,6 +662,13 @@ class VanillaSettingsController extends Gdn_Controller {
         // Make sure we are reading the categories from the database only.
         $collection = $this->CategoryModel->createCollection(Gdn::sql(), new Gdn_Dirtycache());
 
+        $allowSorting = true;
+
+        $usePagination = false;
+        $perPage = 30;
+        $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
+        list($offset, $limit) = offsetLimit($page, $perPage);
+
         if (!empty($parent)) {
             $categoryRow = $collection->get((string)$parent);
             if (empty($categoryRow)) {
@@ -669,17 +676,36 @@ class VanillaSettingsController extends Gdn_Controller {
             }
             $this->setData('Category', $categoryRow);
             $parentID = $categoryRow['CategoryID'];
+            $parentDisplayAs = val('DisplayAs', $categoryRow);
+
+            if (in_array($parentDisplayAs, ['Flat'])) {
+                $allowSorting = false;
+                $usePagination = true;
+            }
         } else {
             $parentID = -1;
+            $parentDisplayAs = false;
         }
 
-        $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+        if ($parentID > 0 && $parentDisplayAs === 'Flat') {
+            $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit, 'Name', 'asc');
+        } else {
+            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+        }
+
         $this->setData('Categories', $categories);
+        $this->setData('_Limit', $perPage);
+        $this->setData('_CurrentRecords', count($categories));
 
         if ($parentID > 0) {
             $ancestors = $collection->getAncestors($parentID, true);
             $this->setData('Ancestors', $ancestors);
         }
+
+        $this->setData('AllowSorting', $allowSorting);
+        $this->setData('UsePagination', $usePagination);
+
+        $this->addDefinition('AllowSorting', $allowSorting);
 
         $this->addJsFile('category-settings.js');
         $this->addJsFile('manage-categories.js');

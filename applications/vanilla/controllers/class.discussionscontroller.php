@@ -52,6 +52,9 @@ class DiscussionsController extends VanillaController {
      * @param int $Page Multiplied by PerPage option to determine offset.
      */
     public function index($Page = false) {
+        $this->_Definitions['BlankDiscussionTopicText'] = t('Blank Discussion Topic');
+
+        $this->allowJSONP(true);
         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
         $Layout = c('Vanilla.Discussions.Layout');
         switch ($Layout) {

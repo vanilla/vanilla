@@ -24,21 +24,33 @@ $PluginInfo['Flagging'] = array(
 );
 
 class FlaggingPlugin extends Gdn_Plugin {
+
     /**
      * Add Flagging to Dashboard menu.
      */
-    public function base_getAppSettingsMenuItems_handler($Sender) {
+    public function dashboardNavModule_init_handler($sender) {
         $flaggedItemsResult = Gdn::sql()->select('count(distinct(ForeignURL)) as NumFlaggedItems')
             ->from('Flag fl')
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         $LinkText = t('Flagged Content');
         if ($flaggedItemsResult['NumFlaggedItems']) {
-            $LinkText .= ' <span class="Alert">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
+            $LinkText .= ' <span class="badge">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
         }
-        $Menu = $Sender->EventArguments['SideMenu'];
-        $Menu->AddItem('Forum', t('Forum'));
-        $Menu->addLink('Forum', $LinkText, 'plugin/flagging', 'Garden.Moderation.Manage');
+        /** @var DashboardNavModule $sender */
+        $sender->addLinkToSectionIf('Garden.Moderation.Manage', 'Moderation', $LinkText, 'plugin/flagging', 'moderation.flagging');
+    }
+
+    /**
+     * Opt out of popup settings page on addons page
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_beforeAddonList_handler($sender, &$args) {
+        if (val('Flagging', $args['AvailableAddons'])) {
+            $args['AvailableAddons']['Flagging']['HasPopupFriendlySettings'] = false;
+        }
     }
 
     /**
@@ -136,26 +148,36 @@ class FlaggingPlugin extends Gdn_Plugin {
         }
         unset($FlaggedItems);
 
+        Gdn_Theme::section('Moderation');
         $Sender->render($this->getView('flagging.php'));
     }
 
     /**
      * Dismiss a flag, then view index.
+     * @param Gdn_Controller $Sender
+     * @throws Exception
+     * @throws Gdn_UserException
      */
     public function controller_dismiss($Sender) {
-        $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 2) {
-            return;
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
-        list($Controller, $EncodedURL) = $Arguments;
+        if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
+            $Arguments = $Sender->RequestArgs;
+            if (sizeof($Arguments) != 2) {
+                return;
+            }
+            list($Controller, $EncodedURL) = $Arguments;
 
-        $URL = base64_decode(str_replace('-', '=', $EncodedURL));
+            $URL = base64_decode(str_replace('-', '=', $EncodedURL));
 
-        Gdn::sql()->delete('Flag', array(
-            'ForeignURL' => $URL
-        ));
+            Gdn::sql()->delete('Flag', array(
+                'ForeignURL' => $URL
+            ));
 
-        $this->controller_index($Sender);
+            $Sender->informMessage(sprintf(t('%s dismissed.'), t('Flag')));
+        }
+        $Sender->render('blank', 'utility', 'dashboard');
     }
 
     /**

@@ -16,7 +16,8 @@ $PluginInfo['VanillaInThisDiscussion'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'SettingsUrl' => '/settings/inthisdiscussion'
+    'SettingsUrl' => '/settings/inthisdiscussion',
+    'Icon' => 'in-this-discussion.png'
 );
 
 /**

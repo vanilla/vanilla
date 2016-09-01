@@ -37,6 +37,21 @@ if (!function_exists('alternate')) {
 }
 
 /**
+ * Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
+ */
+if (!function_exists('dashboardSymbol')) {
+    function dashboardSymbol($name, $alt = '', $class = '') {
+        if (!empty($alt)) {
+            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+        }
+        $r = <<<EOT
+    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
+EOT;
+        return $r;
+    }
+}
+
+/**
  * English "plural" formatting for numbers that can get really big.
  */
 if (!function_exists('bigPlural')) {
@@ -86,8 +101,12 @@ if (!function_exists('popin')) {
  */
 if (!function_exists('icon')) {
     function icon($icon) {
+        if (substr(trim($icon), 0, 1) === '<') {
+            return $icon;
+        } else {
         $icon = strtolower($icon);
         return ' <span class="icon icon-'.$icon.'"></span> ';
+}
     }
 }
 
@@ -1023,10 +1042,10 @@ if (!function_exists('userPhoto')) {
 
         $LinkClass = $LinkClass == '' ? '' : ' class="'.$LinkClass.'"';
 
-        $Photo = val('Photo', $User, val('PhotoUrl', $User));
-        $Name = val('Name', $User);
+        $Photo = val('Photo', $FullUser, val('PhotoUrl', $User));
+        $Name = val('Name', $FullUser);
         $Title = htmlspecialchars(val('Title', $Options, $Name));
-        $Href = url(userUrl($User));
+        $Href = url(userUrl($FullUser));
 
         if ($FullUser && $FullUser['Banned']) {
             $Photo = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
@@ -1040,7 +1059,7 @@ if (!function_exists('userPhoto')) {
                 $PhotoUrl = $Photo;
             }
         } else {
-            $PhotoUrl = UserModel::getDefaultAvatarUrl($User, 'thumbnail');
+            $PhotoUrl = UserModel::getDefaultAvatarUrl($FullUser, 'thumbnail');
         }
 
         return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'

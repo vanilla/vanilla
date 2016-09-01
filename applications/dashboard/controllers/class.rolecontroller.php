@@ -63,7 +63,7 @@ class RoleController extends DashboardController {
         }
 
         $this->title(t('Delete Role'));
-        $this->addSideMenu('dashboard/role');
+        $this->setHighlightRoute('dashboard/role');
 
         $Role = $this->RoleModel->getByRoleID($RoleID);
         if ($Role->Deletable == '0') {
@@ -125,7 +125,7 @@ class RoleController extends DashboardController {
             $this->title(t('Edit Role'));
         }
 
-        $this->addSideMenu('dashboard/role');
+        $this->setHighlightRoute('dashboard/role');
         $PermissionModel = Gdn::permissionModel();
         $this->Role = $this->RoleModel->getByRoleID($RoleID);
         // $this->EditablePermissions = is_object($this->Role) ? $this->Role->EditablePermissions : '1';
@@ -196,7 +196,7 @@ class RoleController extends DashboardController {
     public function index($roleID = null) {
         $this->_permission();
 
-        $this->addSideMenu('dashboard/role');
+        $this->setHighlightRoute('dashboard/role');
         $this->addJsFile('jquery.tablednd.js');
         $this->title(t('Roles & Permissions'));
 

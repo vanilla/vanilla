@@ -1,0 +1,65 @@
+.imagewrap-table {
+  display: block;
+  height: $spacer * 2;
+  width: $spacer * 2;
+  overflow: hidden;
+}
+
+.img-fluid {
+  @include img-fluid();
+}
+
+.DataList {
+  .IconWrap {
+    @include image-wrap();
+  }
+}
+
+// Checkerboard background for transparent image uploads
+$checkerboard-background: #fefefe;
+$checkerboard-foreground: #d8d8d8;
+
+.checkerboard-bg {
+  background-color: $checkerboard-background;
+  background-image: linear-gradient(45deg, $checkerboard-foreground 25%, transparent 25%, transparent 75%, $checkerboard-foreground 75%, $checkerboard-foreground), linear-gradient(45deg, $checkerboard-foreground 25%, transparent 25%, transparent 75%, $checkerboard-foreground 75%, $checkerboard-foreground);
+  background-size: .5rem .5rem;
+  background-position: 0 0, .25rem .25rem;
+}
+
+.addon-image-wrap {
+  display: flex;
+  align-items: center;
+  @include image-wrap();
+
+  @include media-breakpoint-down(md) {
+    @include image-wrap($spacer * 3.5, $spacer * 3.5);
+  }
+}
+
+
+// icons
+
+.icon {
+  &,
+  svg {
+    vertical-align: middle;
+    display: inline-block;
+  }
+}
+
+.icon-block {
+  &,
+  svg {
+    display: block;
+  }
+}
+
+@each $icon-size in map-keys($icon-sizes) {
+  .icon-#{$icon-size} {
+    &,
+    svg {
+      height: to-rem($icon-size);
+      width: to-rem($icon-size);
+    }
+  }
+}

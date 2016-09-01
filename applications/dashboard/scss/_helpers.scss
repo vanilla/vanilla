@@ -1,0 +1,65 @@
+.Hidden,
+.hidden {
+  display: none;
+}
+
+.Padded,
+.padded {
+  margin: $spacer 0;
+}
+
+.padded-top {
+  margin-top: $spacer;
+}
+
+.padded-bottom {
+  margin-bottom: $spacer;
+}
+
+.padded-left {
+  margin-left: $spacer;
+}
+
+.padded-right {
+  margin-right: $spacer;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: .25rem;
+  margin-left: .25rem;
+  vertical-align: middle;
+  content: "";
+  border-top: $caret-width solid;
+  border-right: $caret-width solid transparent;
+  border-left: $caret-width solid transparent;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &.flex-wrap {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  > * {
+    margin-right: $spacer / 4;
+  }
+
+  > *:last-child {
+    margin-right: 0;
+  }
+}

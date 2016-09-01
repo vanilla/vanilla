@@ -8,7 +8,6 @@ Gdn_Theme::assetEnd();
 <?php echo wrap($this->data('Title'), 'h1');
 echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal'); ?>
 </div>
-<div class="table-wrap">
     <table>
         <tr>
             <td width="200"><?php
@@ -21,14 +20,13 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
             <td><?php echo t('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
         </tr>
     </table>
-</div>
 <div class="table-wrap">
-    <table id="Pockets" class="AltColumns">
+    <table id="Pockets" class="table-data">
         <thead>
             <tr>
-                <th><?php echo t('Pocket'); ?></th>
-                <th><?php echo t('Body'); ?></th>
-                <th class="options"><?php echo t('Options'); ?></th>
+                <th class="column-md"><?php echo t('Pocket'); ?></th>
+                <th class="column-xl"><?php echo t('Body'); ?></th>
+                <th class="column-sm"><?php echo t('Options'); ?></th>
             </tr>
         </thead>
         <tbody>

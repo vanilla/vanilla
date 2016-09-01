@@ -17,11 +17,9 @@
     writeCategoryBreadcrumbs($this->data('Ancestors', []));
 ?>
 
-<?php if ($this->data('UsePagination', false) === true): ?>
-<div class="toolbar"><?php
+<div class="toolbar"><?php if ($this->data('UsePagination', false) === true) {
     PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']);
-?></div>
-<?php endif; ?>
+} ?></div>
 
 <div class="dd tree tree-categories"><?php
     writeCategoryTree($this->data('Categories', []), 0, $this->data('AllowSorting', true));

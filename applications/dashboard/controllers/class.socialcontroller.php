@@ -53,10 +53,7 @@ class SocialController extends DashboardController {
      */
     protected function getConnections() {
         $this->fireEvent('GetConnections');
-        $Connections = $this->data('Connections', array());
-        if (!is_array($Connections)) {
-            $Connections = array();
-        }
+        $Connections = [];
 
         foreach (Gdn::pluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
             if (!array_key_exists('SocialConnect', $PluginInfo)) {
@@ -70,8 +67,7 @@ class SocialController extends DashboardController {
             $ConnectionName = $PluginInfo['Index'];
 
             if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON) &&
-                (method_exists('IsConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME))
-                    || method_exists('isConfigured', Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)))) {
+                (method_exists(Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME), 'IsConfigured'))) {
                 $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
             } else {
                 $Configured = null;

@@ -58,7 +58,7 @@
                 // Change the options SVG.
                 var svgMap = {categories: "nested"};
                 var svg = svgMap[displayAs] || displayAs;
-                svg = '<svg class="icon icon-16 icon-$name" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg>';
+                svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg> ';
                 $('.dropdown-toggle', $content).html(svg);
             };
 

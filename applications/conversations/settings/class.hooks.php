@@ -106,7 +106,7 @@ class ConversationsHooks implements Gdn_IPlugin {
         ) {
             $Sender->EventArguments['MemberOptions'][] = array(
                 'Text' => sprite('SpMessage').' '.t('Message'),
-                'Url' => '/messages/add/'.$Sender->User->Name,
+                'Url' => '/messages/add/'.rawurlencode($Sender->User->Name),
                 'CssClass' => 'MessageUser'
             );
         }

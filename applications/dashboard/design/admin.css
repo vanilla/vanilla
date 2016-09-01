@@ -5634,6 +5634,10 @@ input[type="button"].btn-block {
   height: 1.5rem;
 }
 
+.btn-icon.disabled {
+  border: none;
+}
+
 .btn-icon-border {
   padding: 0.1875rem 0.375rem;
   margin: 0 0 0 .5rem;
@@ -5753,6 +5757,7 @@ input[type="button"].btn-block {
 
 .card .media-sm-image-wrap {
   position: relative;
+  min-width: 5.25rem;
   height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
@@ -6156,6 +6161,7 @@ input[type="button"].btn-block {
 .media-sm-image-wrap {
   display: inline-block;
   position: relative;
+  min-width: 1.875rem;
   height: 1.875rem;
   border-radius: 0.0625rem;
   overflow: hidden;
@@ -6176,6 +6182,21 @@ input[type="button"].btn-block {
 }
 
 .media-sm-image-wrap img {
+  width: 1.875rem;
+}
+
+.media-sm-image-wrap-no-border {
+  display: inline-block;
+  position: relative;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: transparent;
+  margin-right: 0.5625rem;
+}
+
+.media-sm-image-wrap-no-border img {
   width: 1.875rem;
 }
 
@@ -6806,6 +6827,39 @@ label,
 
 .toggle-box-label-wrap {
   padding-left: 1.125rem;
+}
+
+table .toggle-wrap {
+  width: 3.75rem;
+  height: 1.875rem;
+}
+
+table .toggle-well, table .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap table input[type="checkbox"] + label::before {
+  width: 3.75rem;
+  height: 1.875rem;
+  border-radius: 0.9375rem;
+}
+
+table .toggle-slider, table .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap table input[type="checkbox"] + label::after {
+  top: 0.1875rem;
+  left: 0.1875rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.875rem;
+}
+
+table .toggle-slider-on, table .toggle-wrap-on .toggle-slider, .toggle-wrap-on table .toggle-slider, table .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap-on .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on table input[type="checkbox"] + label::after, table .toggle-wrap input[type="checkbox"]:checked + label::after, .toggle-wrap table input[type="checkbox"]:checked + label::after {
+  left: 2.0625rem;
+}
+
+table .toggle-slider-active, table .InProgress .toggle-slider, .InProgress table .toggle-slider, table .InProgress .toggle-wrap input[type="checkbox"] + label::after, .InProgress .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .InProgress table input[type="checkbox"] + label::after, table
+.toggle-wrap-active .toggle-slider,
+.toggle-wrap-active table .toggle-slider, table
+.toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after,
+.toggle-wrap-active .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap
+.toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap
+.toggle-wrap-active table input[type="checkbox"] + label::after {
+  left: 1.125rem;
 }
 
 .toggle-wrap label {
@@ -7458,6 +7512,7 @@ div.Messages.Errors {
 
 .DataList .IconWrap {
   position: relative;
+  min-width: 5.25rem;
   height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
@@ -7493,6 +7548,7 @@ div.Messages.Errors {
   -ms-flex-align: center;
   align-items: center;
   position: relative;
+  min-width: 5.25rem;
   height: 5.25rem;
   border-radius: 0.25rem;
   overflow: hidden;
@@ -7518,6 +7574,7 @@ div.Messages.Errors {
 @media (max-width: 991px) {
   .addon-image-wrap {
     position: relative;
+    min-width: 3.9375rem;
     height: 3.9375rem;
     border-radius: 0.25rem;
     overflow: hidden;
@@ -8439,8 +8496,7 @@ button.close, button.Close {
 
 .main {
   position: relative;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
+  overflow: auto;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
   max-width: 1024px;
@@ -8557,40 +8613,38 @@ ul {
   margin-top: -0.0625rem;
 }
 
-table:not(.table-condensed) {
+.table-data {
   width: 100%;
   max-width: 100%;
+  table-layout: fixed;
   margin-bottom: 0;
 }
 
-table:not(.table-condensed) ul {
+.table-data ul {
   padding-left: 0;
 }
 
-table:not(.table-condensed) td.options {
+.table-data td.options {
   white-space: nowrap;
 }
 
-table:not(.table-condensed) td.options > * {
+.table-data td.options > * {
   display: inline-block;
   white-space: nowrap;
   margin-right: 0.28125rem;
   vertical-align: middle;
 }
 
-table:not(.table-condensed) td.options > *:last-child {
+.table-data td.options > *:last-child {
   margin-right: 0;
 }
 
-table:not(.table-condensed) .grow {
-  width: 100%;
-}
-
-table:not(.table-condensed) thead tr {
+.table-data thead tr {
   background-color: #f6f9fb;
 }
 
-table:not(.table-condensed) thead th, table:not(.table-condensed) thead td {
+.table-data thead th,
+.table-data thead td {
   padding: 0.5625rem 0.84375rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
@@ -8600,44 +8654,87 @@ table:not(.table-condensed) thead th, table:not(.table-condensed) thead td {
   font-size: 0.75rem;
   line-height: 1.3333333333;
   vertical-align: middle;
-  white-space: nowrap;
 }
 
-table:not(.table-condensed) thead th:last-child, table:not(.table-condensed) thead td:last-child {
+.table-data thead th:last-child,
+.table-data thead td:last-child {
   border-right: 0;
 }
 
-table:not(.table-condensed) tbody {
+.table-data thead th.column-wrap,
+.table-data thead td.column-wrap {
+  white-space: wrap;
+}
+
+.table-data tbody {
   font-size: 0.8125rem;
 }
 
-table:not(.table-condensed) tbody tr:hover {
+.table-data tbody tr:hover {
   background-color: #f9fdfe;
 }
 
-table:not(.table-condensed) th,
-table:not(.table-condensed) td {
+.table-data th,
+.table-data td {
+  width: 6.25rem;
+  overflow: hidden;
   padding: 0.75rem 1.125rem;
   line-height: 1.5;
   vertical-align: middle;
   border-top: 0.0625rem solid #f4f6fb;
 }
 
-table:not(.table-condensed) tbody + tbody {
+.table-data th.column-xl,
+.table-data td.column-xl {
+  width: 18.75rem;
+}
+
+.table-data th.column-lg,
+.table-data td.column-lg {
+  width: 13.125rem;
+}
+
+.table-data th.column-md,
+.table-data td.column-md {
+  width: 8.25rem;
+}
+
+.table-data th.column-sm,
+.table-data td.column-sm {
+  width: 5.625rem;
+}
+
+.table-data th.column-xs,
+.table-data td.column-xs {
+  width: 3.375rem;
+}
+
+.table-data th.column-checkbox,
+.table-data td.column-checkbox {
+  width: 2.625rem;
+  max-width: 2.625rem;
+  padding: 0.75rem;
+}
+
+.table-data tbody + tbody {
   border-top: 0.125rem solid #f4f6fb;
 }
 
-table:not(.table-condensed) .table {
+.table-data .table {
   background-color: #f6f9fb;
 }
 
-table:not(.table-condensed).no-hover tbody tr:hover {
+.table-data.no-hover tbody tr:hover {
   background-color: inherit;
 }
 
 .attach-top td {
   border-top: 0;
   padding-top: 0;
+}
+
+.CheckBoxGrid {
+  table-layout: auto;
 }
 
 .CheckBoxGrid .checkbox {
@@ -8970,6 +9067,10 @@ table:not(.table-condensed).no-hover tbody tr:hover {
 
 .toolbar > *:last-child {
   margin-right: 0;
+}
+
+.toolbar.empty {
+  padding-top: 0;
 }
 
 .toolbar .toolbar-main {

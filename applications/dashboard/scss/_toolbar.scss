@@ -16,6 +16,10 @@
     }
   }
 
+  &.empty {
+    padding-top: 0;
+  }
+
   .toolbar-main {
     flex-grow: 1;
   }

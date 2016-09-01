@@ -14,10 +14,10 @@
   }
 }
 
-// not date picker table. kludge. should style on classname instead.
-table:not(.table-condensed) {
+.table-data {
   width: 100%;
   max-width: 100%;
+  table-layout: fixed;
   margin-bottom: 0;
 
   ul {
@@ -39,16 +39,15 @@ table:not(.table-condensed) {
     }
   }
 
-  .grow {
-    width: 100%;
-  }
+
 
   thead {
     tr {
       background-color: $grey-light;
     }
 
-    th, td {
+    th,
+    td {
       padding: ($spacer / 2) ($spacer * .75);
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
@@ -58,10 +57,13 @@ table:not(.table-condensed) {
       font-size: $font-size-sm;
       line-height: $line-height-lg;
       vertical-align: middle;
-      white-space: nowrap;
 
       &:last-child {
         border-right: 0;
+      }
+
+      &.column-wrap {
+        white-space: wrap;
       }
     }
   }
@@ -77,10 +79,38 @@ table:not(.table-condensed) {
 
   th,
   td {
+    width: to-rem(100);
+    overflow: hidden;
     padding: $table-cell-padding $padding-default;
     line-height: $line-height;
     vertical-align: middle;
     border-top: $table-border-width solid $table-border-color;
+
+    &.column-xl {
+      width: to-rem(300);
+    }
+
+    &.column-lg {
+      width: to-rem(210);
+    }
+
+    &.column-md {
+      width: to-rem(132);
+    }
+
+    &.column-sm {
+      width: to-rem(90);
+    }
+
+    &.column-xs {
+      width: to-rem(54);
+    }
+
+    &.column-checkbox {
+      width: to-rem(42);
+      max-width: to-rem(42);
+      padding: $table-cell-padding;
+    }
   }
 
   tbody + tbody {
@@ -108,6 +138,8 @@ table:not(.table-condensed) {
 }
 
 .CheckBoxGrid {
+  table-layout: auto;
+
 
   .checkbox {
     margin-bottom: 0;

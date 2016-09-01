@@ -96,14 +96,17 @@
   }
 }
 
-@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $background-color: $grey-light) {
+@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $has-border: true, $background-color: $grey-light) {
   position: relative;
+  min-width: $width;
   height: $height;
   border-radius: $radius;
   overflow: hidden;
   background-color: $background-color;
 
-  @include image-wrap-border($radius);
+  @if ($has-border) {
+    @include image-wrap-border($radius);
+  }
 
   img {
     width: $width;

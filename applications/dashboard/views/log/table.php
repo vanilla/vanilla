@@ -2,15 +2,15 @@
 include $this->fetchViewLocation('helper_functions');
 ?>
 <div class="table-wrap">
-    <table id="Log" class="AltColumns">
+    <table id="Log" class="table-data">
         <thead>
         <tr>
-            <th class="CheckboxCell" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
-            <th class="UsernameCell" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
+            <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
+            <th class="UsernameCell column-lg" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
             <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
-            <th class="PostTypeCell"><?php echo t('Posted By', 'Posted By'); ?></th>
-            <th class="content-cell" data-tj-ignore="true"><?php echo t('Record Content', 'Content') ?></th>
+            <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="content-cell column-xl" data-tj-ignore="true"><?php echo t('Record Content', 'Content') ?></th>
         </tr>
         </thead>
         <tbody>
@@ -26,7 +26,7 @@ include $this->fetchViewLocation('helper_functions');
 
             ?>
             <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
-                <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
+                <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
                 </td>
                 <td class="UsernameCell">
                     <div class="media-sm">

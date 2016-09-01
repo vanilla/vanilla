@@ -8,23 +8,23 @@ $Fields = $this->data('ExtendedFields');
     <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'js-modal btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
 </div>
 <div class="table-wrap">
-    <table>
+    <table class="table-data">
         <thead>
         <tr>
-            <th>Label</th>
+            <th class="column-lg">Label</th>
             <th>Type</th>
-            <th>Required</th>
-            <th>On Registration</th>
-            <th>In Profiles</th>
+            <th class="column-sm">Required</th>
+            <th class="column-md">On Registration</th>
+            <th class="column-md">In Profiles</th>
             <!--<th>In Discussions</th>-->
-            <th>Options</th>
+            <th class="column-sm">Options</th>
         </tr>
         </thead>
         <tbody>
 
         <?php foreach ($Fields as $Name => $Field) : ?>
             <tr>
-                <td><?php echo $Field['Label']; ?></td>
+                <td><div class="strong"><?php echo $Field['Label']; ?></div></td>
                 <td><?php echo $Field['FormType']; ?></td>
                 <td><?php echo (val('Required', $Field, 0)) ? t('Yes') : t('No'); ?></td>
                 <td><?php echo (val('OnRegister', $Field, 0)) ? t('Yes') : t('No'); ?></td>

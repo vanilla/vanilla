@@ -31,11 +31,11 @@ echo $this->Form->errors(); ?>
 
 <div id="RegistrationMethods">
     <div class="table-wrap">
-        <table class="Label AltColumns">
+        <table class="Label table-data">
             <thead>
             <tr>
                 <th><?php echo t('Method'); ?></th>
-                <th class="Alt"><?php echo t('Description'); ?></th>
+                <th class="column-xl"><?php echo t('Description'); ?></th>
             </tr>
             </thead>
             <tbody>
@@ -87,11 +87,11 @@ echo $this->Form->errors(); ?>
     echo '<div class="padded">'.t('Choose who can send out invitations to new members:').'</div>';
     ?>
     <div class="table-wrap">
-    <table class="Label AltColumns">
+    <table class="Label table-data">
         <thead>
         <tr>
             <th><?php echo t('Role'); ?></th>
-            <th class="Alt"><?php echo t('Invitations per month'); ?></th>
+            <th class="column-xl"><?php echo t('Invitations per month'); ?></th>
         </tr>
         </thead>
         <tbody>

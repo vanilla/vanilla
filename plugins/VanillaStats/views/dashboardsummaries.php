@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <div class="Summary ActiveUserSummary">
     <div class="dashboard-widget-title"><?php echo t('Active Users'); ?></div>
-    <table>
+    <table class="table-data">
         <thead>
         <tr>
             <th><?php echo t('Name'); ?></th>
@@ -35,7 +35,7 @@
 </div>
 <div class="Summary PopularDiscussionSummary">
     <div class="dashboard-widget-title"><?php echo t('Popular Discussions'); ?></div>
-    <table>
+    <table class="table-data">
         <thead>
         <tr>
             <th><?php echo t('Title'); ?></th>

@@ -4,7 +4,7 @@
 <div class="dashboard-widgets">
     <div class="Summary ActiveUserSummary">
         <div class="dashboard-widget-title"><?php echo t('Active Users'); ?></div>
-        <table>
+        <table class="table-data">
             <thead>
             <tr>
                 <th><?php echo t('Name'); ?></th>

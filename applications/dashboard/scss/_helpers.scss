@@ -63,3 +63,19 @@
     margin-right: 0;
   }
 }
+
+.no-shrink {
+  flex-shrink: 0;
+}
+
+.no-grow {
+  flex-grow: 0;
+}
+
+.shrink {
+  flex-shrink: 1;
+}
+
+.grow {
+  flex-grow: 1;
+}

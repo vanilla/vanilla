@@ -206,6 +206,13 @@
 
 .nav-stats {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toolbar > .nav-stats {
+  margin-right: 0;
+  flex-shrink: 1;
 }
 
 .nav-stats-item {

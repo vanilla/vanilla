@@ -7497,6 +7497,26 @@ div.Messages.Errors {
   margin-right: 0;
 }
 
+.no-shrink {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.no-grow {
+  -ms-flex-positive: 0;
+  flex-grow: 0;
+}
+
+.shrink {
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+}
+
+.grow {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
 .imagewrap-table {
   display: block;
   height: 2.25rem;
@@ -8016,6 +8036,16 @@ button.close, button.Close {
 .nav-stats, .analytics-panel-metrics {
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
+  margin-right: 0;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
 }
 
 .nav-stats-item, .analytics-panel-metrics .analytics-widget-metric {
@@ -8500,6 +8530,8 @@ button.close, button.Close {
   padding-left: 1.125rem;
   padding-right: 1.125rem;
   max-width: 1024px;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -8863,7 +8895,7 @@ ul {
   .Section-DashboardHome .dashboard-widgets > * {
     max-width: inherit;
     width: 100%;
-    padding-left: 1.125rem 0;
+    padding: 1.125rem 0;
   }
 }
 
@@ -9078,7 +9110,7 @@ ul {
   flex-grow: 1;
 }
 
-.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+.toolbar-stats > *:not(.nav-stats) {
   margin-top: 2.25rem;
 }
 
@@ -9696,6 +9728,7 @@ form .title {
   left: 0;
   top: 0;
   cursor: move;
+  cursor: -webkit-grab;
   cursor: -moz-grab;
   cursor: grab;
   line-height: 1;
@@ -9722,6 +9755,7 @@ form .title {
   margin-top: 0;
   margin-left: 0;
   opacity: .8;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }
@@ -9738,6 +9772,7 @@ form .title {
   border: 1px dashed #0291db;
   min-height: 36px;
   border-radius: 2px;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }

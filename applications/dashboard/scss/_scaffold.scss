@@ -8,6 +8,7 @@
   padding-left: $padding-default;
   padding-right: $padding-default;
   max-width: 1024px;
+  flex-grow: 1;
 
   // Ensure the footer is flush with the bottom of the window if the
   // page height is less than the window height.

@@ -259,12 +259,12 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('styleguide', [
-      'copy:styleguide',
-      'kss'
+    'copy:styleguide'
+    , 'kss'
   ]);
 
   grunt.registerTask('default', [
-    , 'sass_globbing'
+    'sass_globbing'
     , 'scsslint'
     , 'sass'
     , 'autoprefixer'

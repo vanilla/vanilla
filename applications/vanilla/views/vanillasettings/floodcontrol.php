@@ -20,11 +20,11 @@ echo $this->Form->errors();
     <h1><?php echo t('Flood Control'); ?></h1>
 </div>
 <div class="table-wrap">
-    <table>
+    <table class="table-data">
         <thead>
         <tr>
-            <th><?php echo t('Only Allow Each User To Post'); ?></th>
-            <th class="Alt"><?php echo t('Within'); ?></th>
+            <th class="column-wrap"><?php echo t('Only Allow Each User To Post'); ?></th>
+            <th class="column-sm"><?php echo t('Within'); ?></th>
             <th><?php echo t('Or Spamblock For'); ?></th>
         </tr>
         </thead>

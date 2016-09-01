@@ -14,13 +14,13 @@ $Session = Gdn::session();
 ?>
 
 <div class="table-wrap">
-    <table class="AltColumns" id="RouteTable">
+    <table class="table-data" id="RouteTable">
         <thead>
         <tr>
             <th><?php echo t('Route'); ?></th>
-            <th><?php echo t('Target'); ?></th>
+            <th class="column-lg"><?php echo t('Target'); ?></th>
             <th><?php echo t('Type'); ?></th>
-            <th class="options"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>

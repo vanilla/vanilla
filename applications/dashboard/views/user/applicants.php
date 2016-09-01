@@ -15,14 +15,14 @@ if ($NumApplicants == 0) : ?>
     ?>
     <div class="padded italic"><?php echo sprintf($AppText, $NumApplicants); ?></div>
     <div class="table-wrap">
-        <table>
+        <table class="table-data">
             <thead>
                 <tr>
-                    <th><?php echo t('Applicant'); ?></th>
-                    <th><?php echo t('Reason'); ?></th>
+                    <th class="column-lg"><?php echo t('Applicant'); ?></th>
+                    <th class="column-xl"><?php echo t('Reason'); ?></th>
                     <th><?php echo t('IP Address'); ?></th>
-                    <th><?php echo t('Date'); ?></th>
-                    <th class="options"><?php echo t('Options'); ?></th>
+                    <th class="column-md"><?php echo t('Date'); ?></th>
+                    <th class="options column-sm"><?php echo t('Options'); ?></th>
                 </tr>
             </thead>
             <tbody>

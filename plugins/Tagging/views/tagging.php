@@ -71,15 +71,15 @@ Gdn_Theme::assetEnd();
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
 <div class="table-wrap">
-    <table class="Tags">
+    <table class="Tags table-data">
         <thead>
             <tr>
-                <th><?php echo t('Tag') ?></th>
+                <th class="column-md"><?php echo t('Tag') ?></th>
                 <th><?php echo t('Type') ?></th>
-                <th><?php echo t('Date Added'); ?></th>
-                <th><?php echo t('Count'); ?></th>
+                <th class="column-md"><?php echo t('Date Added'); ?></th>
+                <th class="column-xs"><?php echo t('Count'); ?></th>
                 <?php if ($CanAddTags) { ?>
-                <th><?php echo t('Options'); ?></th>
+                <th class="column-sm"><?php echo t('Options'); ?></th>
                 <?php } ?>
             </tr>
         </thead>

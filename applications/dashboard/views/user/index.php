@@ -63,14 +63,14 @@ Gdn_Theme::assetBegin('Help');
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
     <div class="table-wrap">
-        <table id="Users" class="AltColumns">
+        <table id="Users" class="table-data">
             <thead>
             <tr>
                 <!--         <th class="CheckboxCell"><input id="SelectAll" type="checkbox" /></th>-->
-                <th><?php echo anchor(t('Username'), $this->_OrderUrl('Name')); ?></th>
+                <th class="column-lg"><?php echo anchor(t('Username'), $this->_OrderUrl('Name')); ?></th>
                 <th><?php echo t('Roles'); ?></th>
-                <th class="Alt"><?php echo anchor(t('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
-                <th><?php echo anchor(t('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
+                <th class="column-md"><?php echo anchor(t('First Visit'), $this->_OrderUrl('DateFirstVisit')); ?></th>
+                <th class="column-md"><?php echo anchor(t('Last Visit'), $this->_OrderUrl('DateLastActive')); ?></th>
                 <?php if ($ViewPersonalInfo) : ?>
                     <th><?php echo t('Last IP'); ?></th>
                 <?php endif; ?>
@@ -78,7 +78,7 @@ Gdn_Theme::assetBegin('Help');
                 $this->fireEvent('UserCell');
                 ?>
                 <?php if ($EditUser) { ?>
-                    <th class="options"><?php echo t('Options'); ?></th>
+                    <th class="options column-md"><?php echo t('Options'); ?></th>
                 <?php } ?>
             </tr>
             </thead>

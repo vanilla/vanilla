@@ -4,7 +4,7 @@
 
 .main {
   position: relative;
-  flex-grow: 1;
+  overflow: auto;
   padding-left: $padding-default;
   padding-right: $padding-default;
   max-width: 1024px;

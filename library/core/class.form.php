@@ -960,7 +960,7 @@ class Gdn_Form extends Gdn_Pluggable {
             unset($Data['_Info']);
         }
 
-        $Result = '<div class="table-wrap"><table class="CheckBoxGrid">';
+        $Result = '<div class="table-wrap"><table class="table-data CheckBoxGrid">';
         // Append the header.
         $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
         $Alt = true;
@@ -1483,7 +1483,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Headings = '';
             $Cells = '';
         }
-        return $Return == '' ? '' : '<div class="table-wrap"><table class="CheckBoxGrid">'.$Return.'</tbody></table></div>';
+        return $Return == '' ? '' : '<div class="table-wrap"><table class="table-data CheckBoxGrid">'.$Return.'</tbody></table></div>';
     }
 
     /**

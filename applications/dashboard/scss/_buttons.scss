@@ -186,6 +186,10 @@ input[type="button"] {
   svg {
     height: to-rem(24);
   }
+
+  &.disabled {
+    border: none;
+  }
 }
 
 // Icon buttons

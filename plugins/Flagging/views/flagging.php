@@ -29,7 +29,7 @@ if (!count($this->FlaggedItems)) {
     echo '<div class="padded">'.t('FlagQueueEmpty', "There are no items awaiting moderation at this time.").'</div>';
 } else { ?>
 <div class="table-wrap padded">
-    <table>
+    <table class="table-data">
         <thead>
         <tr>
             <th><?php echo t('Post Type'); ?></th>

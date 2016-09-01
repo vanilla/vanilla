@@ -18,12 +18,12 @@ $Session = Gdn::session();
     </div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
 <div class="table-wrap">
-    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable no-hover">
+    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="table-data Sortable no-hover">
         <thead>
         <tr id="0">
-            <th><?php echo t('Messages'); ?></th>
+            <th class="column-lg"><?php echo t('Messages'); ?></th>
             <th><?php echo t('Type'); ?></th>
-            <th class="options"></th>
+            <th class="options column-sm"></th>
         </tr>
         </thead>
         <tbody>

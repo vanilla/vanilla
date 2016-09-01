@@ -5,15 +5,15 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
 ?>
 </div>
 <div class="table-wrap">
-    <table id="Log" class="AltColumns">
+    <table id="Log" class="table-data">
         <thead>
         <tr>
-            <th><?php echo t('Ban Item', 'Item'); ?></th>
+            <th class="column-lg"><?php echo t('Ban Item', 'Item'); ?></th>
             <th><?php echo t('Ban Type', 'Type'); ?></th>
-            <th class="CenterCell"><?php echo t('User Count', 'Users'); ?></th>
-            <th class="CenterCell"><?php echo '<span title="'.t('Number of blocked registrations').'">', t('Blocked'), '</span>'; ?></th>
+            <th class="column-sm"><?php echo t('User Count', 'Users'); ?></th>
+            <th class="column-sm"><?php echo '<span title="'.t('Number of blocked registrations').'">', t('Blocked'), '</span>'; ?></th>
             <th class="UsernameCell"><?php echo t('Added By'); ?></th>
-            <th><?php echo t('Notes'); ?></th>
+            <th class="column-lg"><?php echo t('Notes'); ?></th>
             <th class="options"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
@@ -24,12 +24,12 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
             <tr id="<?php echo "BanID_{$Row['BanID']}"; ?>">
                 <td><?php echo htmlspecialchars($Row['BanValue']); ?></td>
                 <td><?php echo t($Row['BanType']); ?></td>
-                <td class="CenterCell">
+                <td>
                     <?php
                     echo anchor($Row['CountUsers'], '/dashboard/user?Filter='.urlencode($this->_BanFilter($Row)));
                     ?>
                 </td>
-                <td class="CenterCell">
+                <td>
                     <?php
                     echo $Row['CountBlockedRegistrations'];
                     ?>

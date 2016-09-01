@@ -286,6 +286,41 @@ $toggle-width: $toggle-height * 2;
   padding-left: $padding-default;
 }
 
+$toggle-height: to-rem(30);
+$toggle-padding: to-rem(2);
+$toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
+$toggle-slider-padding: $toggle-padding + $toggle-border-width;
+$toggle-width: $toggle-height * 2;
+
+table {
+  .toggle-wrap {
+    width: $toggle-width;
+    height: $toggle-height;
+  }
+
+  .toggle-well {
+    width: $toggle-height * 2;
+    height: $toggle-height;
+    border-radius: $toggle-height / 2;
+  }
+
+  .toggle-slider {
+    top: $toggle-slider-padding;
+    left: $toggle-slider-padding;
+    width: $toggle-slider-width;
+    height: $toggle-slider-width;
+    border-radius: ($toggle-height - ($toggle-padding)) / 2;
+  }
+
+  .toggle-slider-on {
+    left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
+  }
+
+  .toggle-slider-active {
+    left: ($toggle-width / 2) - ($toggle-slider-width / 2);
+  }
+}
+
 // Checkbox toggle
 //
 // Here's how to build an checkbox toggle.

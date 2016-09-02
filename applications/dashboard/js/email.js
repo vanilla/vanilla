@@ -34,7 +34,7 @@ var emailStyles = {
         // Ajax call for preview popup
         $('.js-email-preview-button').click(emailStyles.emailPreview);
 
-        if ($('.ActivateSlider-Inactive').length > 0) {
+        if ($('.toggle-wrap-off').length > 0) {
             emailStyles.hideSettings();
         }
     },

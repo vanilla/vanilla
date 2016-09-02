@@ -17,7 +17,7 @@ echo $this->Form->open();
 echo $this->Form->errors(); ?>
 
 <div class="form-group row">
-    <div class="input-wrap">
+    <div class="no-grid">
     <?php
     echo $this->Form->checkBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
     if (UserModel::noEmail()) {

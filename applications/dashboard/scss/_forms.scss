@@ -110,7 +110,12 @@ label,
 
 // Form grid
 .form-group {
-  .label-wrap + .input-wrap {
+  > .no-grid {
+    @extend .row-padding-left;
+    @extend .row-padding-right;
+  }
+
+  > .input-wrap {
     @extend .col-sm-16;
     @extend .col-xs-24;
 

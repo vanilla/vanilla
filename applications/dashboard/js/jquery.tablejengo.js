@@ -20,6 +20,7 @@
         var reset = function() {
             $('.tj-hidden').show();
             $('.tj-hidden').removeClass('tj-hidden');
+            $('.tj-main-heading').css('width', '');
             $('.tj-meta').remove();
         };
 
@@ -40,14 +41,17 @@
         var getDataLabels = function(table, vars) {
             vars['labels'] = [];
             vars['ignoreLabels'] = [];
+            var mainFound = false;
             $('thead tr th, thead tr td', table).each(function() {
-                if ($(this).data('tj-label')) {
-                    label = $(this).data('tj-label');
+                if ($(this).data('tjLabel')) {
+                    label = $(this).data('tjLabel');
                 } else {
                     label = $(this).html();
                     $(this).data('label', label);
                 }
                 if ($(this).data('tjMain')) {
+                    $(this).addClass('tj-main-heading');
+                    mainFound = true;
                     vars['mainLabel'] = label;
                     vars['mainCell'] = '[data-label="' + label + '"]';
                 }
@@ -56,6 +60,9 @@
                 }
                 vars.labels.push(label);
             });
+            if (!mainFound) {
+                $('thead tr th, thead tr td', table).first().addClass('tj-main-heading');
+            }
         };
 
         var isTooWide = function(table, vars) {
@@ -93,6 +100,13 @@
 
             $('thead tr td, thead tr th', table).each(function() {
                 if ($(this).data('label') === label) {
+
+                    // check the width of the column and main-heading assumes its width if it's wider than main
+                    var minWidth = $(this).width();
+                    if ($('.tj-main-heading').width() < minWidth) {
+                        $('.tj-main-heading').css('width', minWidth);
+                    }
+
                     $(this).addClass('tj-hidden');
                 }
             })

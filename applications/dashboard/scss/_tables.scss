@@ -286,6 +286,13 @@
     }
   }
 
+  .Summary {
+    thead .column-xs {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
   .dashboard-widget-title {
     font-size: 1rem;
     font-weight: 500;
@@ -297,7 +304,7 @@
 
   .FeedItem {
     position: relative;
-    padding: $spacer * .75 0;
+    padding: to-rem(12) 0;
     border-bottom: $border-width * 2 solid #eee;
 
     &:hover {
@@ -315,12 +322,16 @@
       margin-right: 0;
       border-top: 0;
       border-bottom: 0;
-      @extend .media-sm-title;
+      font-weight: 400;
+      font-size: 0.8125rem;
       text-overflow: ellipsis;
+      @extend .media-sm-title;
+      margin-bottom: to-rem(3);
     }
 
     .FeedDescription {
-      @extend .media-sm-info;
+      @extend .info;
+      margin-bottom: - to-rem(2);
 
       strong {
         font-weight: 400;
@@ -334,6 +345,12 @@
       .details p {
         margin-bottom: 0;
         display: initial;
+        line-height: 1.4;
+      }
+
+      .read-less {
+        display: block;
+        margin-top: to-rem(3);
       }
     }
 

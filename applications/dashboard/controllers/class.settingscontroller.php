@@ -950,6 +950,9 @@ class SettingsController extends DashboardController {
         // Check for updates
         $this->addUpdateCheck();
 
+        $this->addDefinition('ExpandText', t('(more)'));
+        $this->addDefinition('CollapseText', t('(less)'));
+
         // Fire an event so other applications can add some data to be displayed
         $this->fireEvent('DashboardData');
 

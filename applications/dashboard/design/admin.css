@@ -3160,7 +3160,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .form-group > .label-wrap-wide, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .form-group > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group .label-wrap + .input-wrap, .form-group .label-wrap + .color-picker, .form-group > .label-wrap, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -3222,7 +3222,7 @@ input[type="checkbox"].disabled {
   flex: 0 0 45.8333333333%;
 }
 
-.col-xs-12, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item {
+.col-xs-12, .form-group > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
 }
@@ -3282,7 +3282,7 @@ input[type="checkbox"].disabled {
   flex: 0 0 95.8333333333%;
 }
 
-.col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .form-group > .label-wrap-wide {
+.col-xs-24, .form-group .label-wrap + .input-wrap, .form-group .label-wrap + .color-picker, .form-group > .label-wrap {
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
 }
@@ -3487,7 +3487,7 @@ input[type="checkbox"].disabled {
   left: 100%;
 }
 
-.col-xs-offset-0, .form-group > .input-wrap.no-label, .form-group > .no-label.color-picker {
+.col-xs-offset-0, .form-group .label-wrap + .input-wrap.no-label, .form-group .label-wrap + .no-label.color-picker {
   margin-left: 0%;
 }
 
@@ -3648,7 +3648,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
-  .col-sm-16, .form-group > .input-wrap, .form-group > .color-picker {
+  .col-sm-16, .form-group .label-wrap + .input-wrap, .form-group .label-wrap + .color-picker {
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
@@ -3858,7 +3858,7 @@ input[type="checkbox"].disabled {
   .col-sm-offset-7 {
     margin-left: 29.1666666667%;
   }
-  .col-sm-offset-8, .form-group > .input-wrap.no-label, .form-group > .no-label.color-picker {
+  .col-sm-offset-8, .form-group .label-wrap + .input-wrap.no-label, .form-group .label-wrap + .no-label.color-picker {
     margin-left: 33.3333333333%;
   }
   .col-sm-offset-9 {
@@ -6216,7 +6216,7 @@ input[type="button"].btn-block {
   color: #0291db;
 }
 
-.media-sm-info, .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .Date {
+.media-sm-info, .Section-DashboardHome .FeedItem .Date {
   font-size: 0.75rem;
   line-height: 1;
   color: #949aa2;
@@ -6302,7 +6302,7 @@ input[type="button"].btn-block {
   width: 40%;
 }
 
-.video-section .info, .video-section .emojiset-author {
+.video-section .info, .video-section .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .video-section .FeedDescription, .video-section .emojiset-author {
   padding-top: 1.125rem;
 }
 
@@ -6699,6 +6699,7 @@ label,
 .Info,
 .Info2,
 .info,
+.Section-DashboardHome .FeedItem .FeedDescription,
 .emojiset-author {
   display: block;
   font-size: 0.75rem;
@@ -7725,7 +7726,7 @@ div.Messages.Errors {
   background-color: #f4f6fb;
 }
 
-.media-callout .info, .media-callout .emojiset-author {
+.media-callout .info, .media-callout .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .media-callout .FeedDescription, .media-callout .emojiset-author {
   font-size: 0.8125rem;
   font-weight: 300;
 }
@@ -8056,7 +8057,7 @@ button.close, button.Close {
   -ms-flex-align: center;
   align-items: center;
   line-height: 1;
-  padding: 1.125rem 2.25rem 0 0;
+  padding: 1.125rem 1.125rem 0 1.125rem;
   color: rgba(25, 25, 25, 0.2);
 }
 
@@ -8899,6 +8900,11 @@ ul {
   }
 }
 
+.Section-DashboardHome .Summary thead .column-xs {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .Section-DashboardHome .dashboard-widget-title {
   font-size: 1rem;
   font-weight: 500;
@@ -8910,7 +8916,7 @@ ul {
 
 .Section-DashboardHome .FeedItem {
   position: relative;
-  padding: 0.84375rem 0;
+  padding: 0.75rem 0;
   border-bottom: 0.125rem solid #eee;
 }
 
@@ -8929,7 +8935,14 @@ ul {
   margin-right: 0;
   border-top: 0;
   border-bottom: 0;
+  font-weight: 400;
+  font-size: 0.8125rem;
   text-overflow: ellipsis;
+  margin-bottom: 0.1875rem;
+}
+
+.Section-DashboardHome .FeedItem .FeedDescription {
+  margin-bottom: -0.125rem;
 }
 
 .Section-DashboardHome .FeedItem .FeedDescription strong {
@@ -8944,6 +8957,12 @@ ul {
 .Section-DashboardHome .FeedItem .FeedDescription .details p {
   margin-bottom: 0;
   display: initial;
+  line-height: 1.4;
+}
+
+.Section-DashboardHome .FeedItem .FeedDescription .read-less {
+  display: block;
+  margin-top: 0.1875rem;
 }
 
 .Section-DashboardHome .FeedItem .FeedDescription,

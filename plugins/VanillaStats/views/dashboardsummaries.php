@@ -6,7 +6,7 @@
         <tr>
             <th><?php echo t('Name'); ?></th>
             <!-- <td><?php echo t('Discussions'); ?></td> -->
-            <td><?php echo t('Comments'); ?></td>
+            <td class="column-xs"><?php echo t('Comments'); ?></td>
             <!-- <td><?php echo t('PageViews'); ?></td> -->
         </tr>
         </thead>
@@ -38,10 +38,10 @@
     <table class="table-data">
         <thead>
         <tr>
-            <th><?php echo t('Title'); ?></th>
-            <td><?php echo t('Comments'); ?></td>
-            <td><?php echo t('Follows'); ?></td>
-            <td><?php echo t('Views'); ?></td>
+            <th class="column-sm"><?php echo t('Title'); ?></th>
+            <td class="column-xs"><?php echo t('Comments'); ?></td>
+            <td class="column-xs"><?php echo t('Follows'); ?></td>
+            <td class="column-xs"><?php echo t('Views'); ?></td>
         </tr>
         </thead>
         <tbody>

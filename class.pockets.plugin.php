@@ -76,7 +76,7 @@ class PocketsPlugin extends Gdn_Plugin {
         if ($this->TestMode === null) {
             $this->TestMode = c('Plugins.Pockets.ShowLocations');
         }
-        if ($this->TestMode && checkPermission('Plugins.Pockets.Manage')) {
+        if ($this->TestMode && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
             // Add the css for the test pockets to the page.
             $Sender->addCSSFile('pockets.css', 'plugins/Pockets');
         }
@@ -468,7 +468,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $LocationOptions = val($Location, $this->Locations, array());
 
-        if ($this->TestMode && array_key_exists($Location, $this->Locations) && checkPermission('Plugins.Pockets.Manage')) {
+        if ($this->TestMode && array_key_exists($Location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
             $LocationName = val("Name", $this->Locations, $Location);
             echo
                 valr('Wrap.0', $LocationOptions, ''),

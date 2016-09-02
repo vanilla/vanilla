@@ -8,24 +8,31 @@ Gdn_Theme::assetEnd();
 <?php echo wrap($this->data('Title'), 'h1');
 echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal'); ?>
 </div>
-    <table>
-        <tr>
-            <td width="200"><?php
-            if (C('Plugins.Pockets.ShowLocations')) {
-                echo anchor(t('Hide Pocket Locations'), '/settings/pockets/hidelocations', 'SmallButton');
+<div class="form-group row">
+    <div class="label-wrap-wide">
+        <div class="label"><?php echo t('Enable Pocket Locations'); ?></div>
+        <div class="info">
+            <?php echo t('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try enabling this setting and then visit your site.'); ?>
+        </div>
+    </div>
+    <div class="input-wrap-right">
+        <span id="pocket-locations-toggle">
+            <?php
+            if (!c('Plugins.Pockets.ShowLocations')) {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/showlocations'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
             } else {
-                echo anchor(t('Show Pocket Locations'), '/settings/pockets/showlocations', 'SmallButton');
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/hidelocations'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
             }
-            ?></td>
-            <td><?php echo t('This option shows/hides the locations where pockets can go.', 'This option shows/hides the locations where pockets can go, but only for users that have permission to add/edit pockets. Try showing the locations and then visit your site.'); ?></td>
-        </tr>
-    </table>
+            ?>
+        </span>
+    </div>
+</div>
 <div class="table-wrap">
     <table id="Pockets" class="table-data">
         <thead>
             <tr>
-                <th class="column-md"><?php echo t('Pocket'); ?></th>
-                <th class="column-xl"><?php echo t('Body'); ?></th>
+                <th class="column-md"><?php echo t('Name'); ?></th>
+                <th class="column-xl"><?php echo t('Pocket'); ?></th>
                 <th class="column-sm"><?php echo t('Options'); ?></th>
             </tr>
         </thead>

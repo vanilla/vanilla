@@ -35,7 +35,7 @@ echo $this->Form->errors(); ?>
             <thead>
             <tr>
                 <th><?php echo t('Method'); ?></th>
-                <th class="column-xl"><?php echo t('Description'); ?></th>
+                <th class="column-lg"><?php echo t('Description'); ?></th>
             </tr>
             </thead>
             <tbody>

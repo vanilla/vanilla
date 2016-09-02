@@ -23,7 +23,7 @@ $Session = Gdn::session();
         <tr id="0">
             <th class="column-lg"><?php echo t('Messages'); ?></th>
             <th><?php echo t('Type'); ?></th>
-            <th class="options column-sm"></th>
+            <th class="options column-lg"><?php echo t('Options'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -101,7 +101,7 @@ $Session = Gdn::session();
                 </td>
             </tr>
             <tr class="attach-top">
-                <td colspan="3">
+                <td colspan="3"  data-tj-ignore="true">
                     <div class="Message DismissMessage <?php echo $Message->CssClass; ?>">
                         <?php echo Gdn_Format::text($Message->Content); ?>
                     </div>

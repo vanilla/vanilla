@@ -6,11 +6,11 @@ include $this->fetchViewLocation('helper_functions');
         <thead>
         <tr>
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
-            <th class="UsernameCell column-lg" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
+            <th class="UsernameCell column-md" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
             <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
             <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
-            <th class="content-cell column-xl" data-tj-ignore="true"><?php echo t('Record Content', 'Content') ?></th>
+            <th class="content-cell column-lg"><?php echo t('Record Content', 'Content') ?></th>
         </tr>
         </thead>
         <tbody>

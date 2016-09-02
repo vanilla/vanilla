@@ -17,9 +17,9 @@ $Session = Gdn::session();
     <table class="table-data" id="RouteTable">
         <thead>
         <tr>
-            <th><?php echo t('Route'); ?></th>
+            <th class="column-lg"><?php echo t('Route'); ?></th>
             <th class="column-lg"><?php echo t('Target'); ?></th>
-            <th><?php echo t('Type'); ?></th>
+            <th class="column-md"><?php echo t('Type'); ?></th>
             <th class="options column-sm"><?php echo t('Options'); ?></th>
         </tr>
         </thead>

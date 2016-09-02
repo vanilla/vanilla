@@ -32,7 +32,7 @@ if ($NumApplicants == 0) : ?>
                 $this->EventArguments['ApplicantMeta'] = array();
                 $this->fireEvent("ApplicantInfo"); ?>
                 <tr class="ApplicantMeta">
-                    <td style="border-bottom:none;">
+                    <td>
                         <div class="user-info">
                             <div class="username"><?php echo htmlspecialchars($User->Name); ?></div>
                             <div class="info user-email"><?php echo anchor($User->Email, 'mailto:'.$User->Email); ?></div>
@@ -54,9 +54,9 @@ if ($NumApplicants == 0) : ?>
                         $this->fireEvent("AppendApplicantInfo");
                         ?>
                     </td>
-                    <td style="border-bottom:none;"><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
-                    <td style="border-bottom:none;"><?php echo Gdn_Format::date($User->DateInserted); ?></td>
-                    <td style="border-bottom:none;">
+                    <td><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
+                    <td><?php echo Gdn_Format::date($User->DateInserted); ?></td>
+                    <td>
                         <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve')]);

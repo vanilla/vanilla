@@ -142,11 +142,11 @@
   .nav-item-title {
     line-height: 1;
     font-weight: 500;
-    margin-bottom: to-rem(36) - ($font-size-base * 2);
+    margin-bottom: to-rem(6);
   }
 
   .nav-item-description {
-    line-height: 1;
+    margin-bottom: - to-rem(5);
   }
 
   .nav-link {
@@ -154,9 +154,7 @@
     display: flex;
     justify-items: flex-start;
     align-items: center;
-    min-height: to-rem(72);
-    padding-left: $padding-default;
-    padding-right: $padding-default;
+    padding: $spacer $padding-default;
     color: $grey-dark;
     transition: background-color .1s;
 
@@ -189,6 +187,7 @@
   }
 
   .nav-item-icon {
+    flex-shrink: 0;
     display: flex;
     justify-content: center;
     align-items: center;

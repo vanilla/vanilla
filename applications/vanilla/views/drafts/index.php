@@ -18,6 +18,6 @@ if ($this->DraftData->numRows() > 0) {
     echo $this->Pager->toString('more');
 } else {
     ?>
-    <div class="Empty"><?php echo sprintf(t('You do not have any %s yet.'), t('drafts')); ?></div>
+    <div class="Empty"><?php echo t('You do not have any drafts yet.', sprintf(t('You do not have any %s yet.'), t('drafts'))); ?></div>
 <?php
 }

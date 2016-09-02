@@ -92,9 +92,9 @@ $Session = Gdn::session();
                     <span id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
                         <?php
                         if ($Message->Enabled == '1') {
-                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
+                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
                         } else {
-                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
+                            echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
                         }
                         ?>
                     </span>

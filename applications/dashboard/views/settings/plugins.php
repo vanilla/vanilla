@@ -203,13 +203,11 @@ Gdn_Theme::assetBegin('Help'); ?>
                         $action = $this->Filter;
                     }
                     if ($Enabled) {
-                        $SliderState = 'Active';
                         $toggleState = 'on';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
                     } else {
-                        $SliderState = 'InActive';
                         $toggleState = 'off';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState} ActivateSlider-{$SliderState}"));
+                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
                     } ?>
                     </div>
                 </div>

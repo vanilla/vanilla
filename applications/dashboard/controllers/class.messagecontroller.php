@@ -194,9 +194,9 @@ class MessageController extends DashboardController {
         $enabled = forceBool($enabled, '0', '1', '0');
         $messageModel->setProperty($messageID, 'Enabled', $enabled);
         if ($enabled === '1') {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on ActivateSlider ActivateSlider-Active"));
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
         } else {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off ActivateSlider ActivateSlider-Inactive"));
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
         }
         $this->jsonTarget("#toggle-".$messageID, $newToggle);
         if ($enabled === '1') {

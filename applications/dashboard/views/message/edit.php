@@ -52,8 +52,10 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('Category', 'CategoryID'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->DropDown('CategoryID', $this->data('Categories'), array('IncludeNull' => t('All Categories')));
-                echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories'); ?>
+                <?php echo $this->Form->DropDown('CategoryID', $this->data('Categories'), array('IncludeNull' => t('All Categories'))); ?>
+            </div>
+            <div class="input-wrap no-label padded-top">
+                <?php echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories'); ?>
             </div>
         </li>
         <li class="form-group row">

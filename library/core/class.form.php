@@ -601,7 +601,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
         if ($label) {
             $toggle = '
-                <div class="label-wrap label-wrap-wide">
+                <div class="label-wrap-wide">
                     <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.$label.'</div>
                 </div>
                 <div class="input-wrap-right">

@@ -6739,6 +6739,12 @@ label,
   flex-grow: 1;
 }
 
+@media (max-width: 543px) {
+  .form-group .input-wrap, .form-group .color-picker {
+    margin-top: 0.28125rem;
+  }
+}
+
 .input-wrap > .form-group > *, .color-picker > .form-group > * {
   padding-left: 0;
 }
@@ -9008,6 +9014,17 @@ ul {
 
 .tj-meta .table-meta-item {
   font-size: 0.75rem;
+}
+
+.tj-meta .media-sm {
+  display: inline-block;
+}
+
+.tj-meta .media-sm .media-sm-image-wrap,
+.tj-meta .media-sm .media-sm-info,
+.tj-meta .media-sm .Section-DashboardHome .FeedItem .Date, .Section-DashboardHome .FeedItem
+.tj-meta .media-sm .Date {
+  display: none;
 }
 
 .tj-meta .table-meta-item-label {

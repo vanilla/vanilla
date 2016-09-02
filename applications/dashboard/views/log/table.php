@@ -6,11 +6,11 @@ include $this->fetchViewLocation('helper_functions');
         <thead>
         <tr>
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
-            <th class="UsernameCell column-md" data-tj-main="true"><?php echo t('Flagged By', 'Flagged By'); ?></th>
+            <th class="UsernameCell column-lg"><?php echo t('Flagged By', 'Flagged By'); ?></th>
+            <th class="content-cell column-xl" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
             <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
             <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
-            <th class="content-cell column-lg"><?php echo t('Record Content', 'Content') ?></th>
         </tr>
         </thead>
         <tbody>
@@ -38,37 +38,10 @@ include $this->fetchViewLocation('helper_functions');
                                 <?php echo userAnchor($user, 'Username reverse-link'); ?>
                             </div>
                             <?php if ($viewPersonalInfo) : ?>
-<!--                                <div class="media-sm-info user-email">--><?php //echo Gdn_Format::Email($user->Email); ?><!--</div>-->
+                                <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
                             <?php endif; ?>
                         </div>
                     </div>
-                </td>
-                <td class="PostType">
-                    <?php echo t($RecordLabel); ?>
-                </td>
-                <td class="DateCell"><?php
-                    echo Gdn_Format::date($Row['DateInserted'], 'html');
-                    ?>
-                </td>
-                <td class="PostedByCell"><?php
-                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
-                    if ($Row['RecordName']) { ?>
-                        <div class="media-sm">
-                            <div class="media-sm-content">
-                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
-                                    <?php
-                                    if ($RecordUser['Banned']) {
-                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
-                                    }
-                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
-                                    ?>
-                                </div>
-                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
-                                    <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
-                                <?php } ?>
-                            </div>
-                        </div>
-                    <?php } ?>
                 </td>
                 <td class="content-cell">
                     <?php
@@ -117,7 +90,33 @@ include $this->fetchViewLocation('helper_functions');
                     }
                     echo '</div>';
                     ?>
-
+                </td>
+                <td class="PostType">
+                    <?php echo t($RecordLabel); ?>
+                </td>
+                <td class="DateCell"><?php
+                    echo Gdn_Format::date($Row['DateInserted'], 'html');
+                    ?>
+                </td>
+                <td class="PostedByCell"><?php
+                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
+                    if ($Row['RecordName']) { ?>
+                        <div class="media-sm">
+                            <div class="media-sm-content">
+                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
+                                    <?php
+                                    if ($RecordUser['Banned']) {
+                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
+                                    }
+                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                                    ?>
+                                </div>
+                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
+                                    <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    <?php } ?>
                 </td>
             </tr>
         <?php

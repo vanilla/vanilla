@@ -140,6 +140,12 @@ label,
       @extend .row-padding-left;
       @extend .row-padding-right;
   }
+
+  @include media-breakpoint-down(xs) {
+    .input-wrap {
+      margin-top: $spacer / 4;
+    }
+  }
 }
 
 .input-wrap > .form-group > * {

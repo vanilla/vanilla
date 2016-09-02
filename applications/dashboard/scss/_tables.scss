@@ -380,8 +380,15 @@
     font-size: $font-size-sm;
   }
 
-  .table-meta-item-data {
+  .media-sm {
+    display: inline-block;
+    .media-sm-image-wrap,
+    .media-sm-info {
+      display: none;
+    }
+  }
 
+  .table-meta-item-data {
   }
 
   .table-meta-item-label {

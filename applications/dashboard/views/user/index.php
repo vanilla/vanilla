@@ -24,7 +24,7 @@ Gdn_Theme::assetBegin('Help');
     <div class="header-buttons btn-group">
     <?php
     if (checkPermission('Garden.Users.Add')) {
-        echo anchor(t('Add User'), 'dashboard/user/add', 'Popup btn btn-primary');
+        echo anchor(t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
     }
     ?>
     </div>

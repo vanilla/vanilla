@@ -58,9 +58,14 @@
 
 // TODO: Reinstate this
 .analytics-widget-move {
-  //@include font-vanillicon('\f1db', $grey, 18px);
-  //margin-left: 10px;
-  //cursor: move;
+  margin-left: 10px;
+  cursor: move;
+
+  &::before {
+    color: $grey;
+    @include icon;
+    @include char-content('\f1db');
+  }
 }
 
 .analytics-panel-metrics {

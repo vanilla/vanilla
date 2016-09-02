@@ -571,48 +571,6 @@
         $('.table-data', element).tablejengo({container: '#main-row .main'});
     }
 
-    /**
-     * Add tooltips to the pin icons in the analytics section.
-     *
-     * TODO: Migrate to analytics application, add translations to gdn.meta
-     */
-    function pinToolTips() {
-        var options = {
-            title: 'Pin to your dashboard',
-            trigger: 'hover',
-            placement: 'left',
-            delay: {
-                show: 100
-            }
-        };
-
-        // Chart tooltip placements go to the left, metric tooltip placements go to the top.
-
-        $('.analytics-widget-chart .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
-            $(this).tooltip('hide');
-        });
-
-        options.placement = 'top';
-
-        $('.analytics-widget-metric .bookmark:not(.bookmarked)').tooltip(options).on('click', function() {
-            $(this).tooltip('hide');
-        });
-
-        options.title = 'Unpin from your dashboard';
-
-        $('.analytics-widget-metric .bookmarked').tooltip(options).on('click', function() {
-            $(this).tooltip('hide');
-        });
-
-        options.placement = 'left';
-
-        $('.analytics-widget-chart .bookmarked').tooltip(options).on('click', function() {
-            $(this).tooltip('hide');
-        });
-
-
-    }
-
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -625,7 +583,6 @@
         icheckInit(e.target); // checkboxes and radios
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
-        pinToolTips(); // tooltips for analytics page
     });
 
     // $(document).on('c3Init', function() {

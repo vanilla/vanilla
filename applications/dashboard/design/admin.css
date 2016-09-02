@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .fade {
   opacity: 0;
   transition: opacity .15s linear;
@@ -5335,6 +5336,27 @@ output {
 .bookmarked:hover svg, .bookmarked:focus svg {
   -webkit-transform: rotate(0deg);
   transform: rotate(0deg);
+}
+
+.analytics-widget-move {
+  margin-left: 10px;
+  cursor: move;
+}
+
+.analytics-widget-move::before {
+  color: #949aa2;
+  display: inline-block;
+  min-width: 1em;
+  font-family: "vanillicon";
+  font-variant: normal;
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  text-align: center;
+  text-decoration: inherit;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  content: "\";
 }
 
 .analytics-panel-metrics {

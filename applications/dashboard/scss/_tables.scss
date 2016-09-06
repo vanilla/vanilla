@@ -14,7 +14,8 @@
   }
 
   &.padded {
-    margin: $spacer 0;
+    margin-top: $spacer;
+    margin-bottom: $spacer;
   }
 
   &.padded-top {

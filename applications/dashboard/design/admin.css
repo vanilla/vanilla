@@ -8675,7 +8675,8 @@ ul {
 }
 
 .table-wrap.padded, .label-wrap img.table-wrap, div.table-wrap.Messages.Errors {
-  margin: 1.125rem 0;
+  margin-top: 1.125rem;
+  margin-bottom: 1.125rem;
 }
 
 .table-wrap.padded-top {

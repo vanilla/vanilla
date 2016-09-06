@@ -8674,6 +8674,18 @@ ul {
   margin-top: -0.0625rem;
 }
 
+.table-wrap.padded, .label-wrap img.table-wrap, div.table-wrap.Messages.Errors {
+  margin: 1.125rem 0;
+}
+
+.table-wrap.padded-top {
+  margin-top: 1.125rem;
+}
+
+.table-wrap.padded-bottom {
+  margin-bottom: 1.125rem;
+}
+
 .table-data {
   width: 100%;
   max-width: 100%;

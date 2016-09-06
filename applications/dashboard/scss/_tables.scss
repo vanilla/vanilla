@@ -12,6 +12,18 @@
   .header-block + & {
     margin-top: -$border-width;
   }
+
+  &.padded {
+    margin: $spacer 0;
+  }
+
+  &.padded-top {
+    margin-top: $spacer;
+  }
+
+  &.padded-bottom {
+    margin-bottom: $spacer;
+  }
 }
 
 .table-data {

@@ -49,6 +49,6 @@
             ?>
         </li>
     <?php else: ?>
-        <li class="Item Empty Center"><?php echo t('You do not have any messages yet.', sprintf(t('You do not have any %s yet.'), t('messages'))); ?></li>
+        <li class="Item Empty Center"><?php echo t('Your inbox is empty.', sprintf(t('You do not have any %s yet.'), t('messages'))); ?></li>
     <?php endif; ?>
 </ul>

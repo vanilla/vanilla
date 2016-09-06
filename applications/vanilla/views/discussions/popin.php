@@ -36,6 +36,6 @@
             ?>
         </li>
     <?php else: ?>
-        <li class="Item Empty Center"><?php echo t('You do not have any bookmarks yet.', sprintf(t('You do not have any %s yet.'), t('bookmarks'))); ?></li>
+        <li class="Item Empty Center"><?php echo t('Click the star icon beside a discussion to bookmark it.', sprintf(t('You do not have any %s yet.'), t('bookmarks'))); ?></li>
     <?php endif; ?>
 </ul>

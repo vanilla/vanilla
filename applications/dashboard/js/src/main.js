@@ -477,10 +477,11 @@
      * @param element
      */
     function collapseInit(element) {
-        var active = $('.js-nav-collapsible a.active', element);
-        var collapsible = active.parents('.collapse');
-        collapsible.addClass('in');
-        $('a[href=#' + collapsible.attr('id') + ']').attr('aria-expanded', 'true');
+        var $active = $('.js-nav-collapsible a.active', element);
+        var $collapsible = $active.parents('.collapse');
+        $collapsible.addClass('in');
+        $('a[href=#' + $collapsible.attr('id') + ']').attr('aria-expanded', 'true');
+        $('a[href=#' + $collapsible.attr('id') + ']').removeClass('collapsed');
     }
 
     function clipboardInit() {
@@ -574,7 +575,7 @@
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
-        collapseInit(e.target); // panel nav collapsind
+        collapseInit(e.target); // panel nav collapsing
         scrollToFixedInit(e.target); // panel and navbar scroll settings and modal fixed header and footer
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
@@ -586,11 +587,6 @@
     });
 
     // $(document).on('c3Init', function() {
-    //
-    // });
-
-
-    // $(document).on('click', '.js-collapse-toggle', function() {
     //
     // });
 

@@ -139,6 +139,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
     $RowClass = $isEnabled ? 'Enabled' : 'Disabled';
     $addon = Gdn::addonManager()->lookupAddon($addonName);
+    $IconPath = '';
     if ($addon) {
         $IconPath = $addon->getIcon();
     }

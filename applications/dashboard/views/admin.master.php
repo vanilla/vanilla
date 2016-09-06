@@ -2,9 +2,8 @@
 /* Gdn_Controller $this */
 $this->fireAs('dashboard')->fireEvent('render');
 ?>
-<?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
+<html lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
     <?php $this->renderAsset('Head'); ?>
     <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
@@ -72,12 +71,7 @@ Gdn_Theme::assetEnd();
         </button>
         <div class="navbar-brand">
             <?php $title = c('Garden.Title'); ?>
-    <!--        --><?php //if ($logo = c('Garden.Logo', false)) { ?>
-    <!--        <div class="navbar-image logo">--><?php //echo img(Gdn_Upload::url($logo), array('alt' => $title));?><!--</div>-->
-    <!--        --><?php //} else { ?>
-    <!--        <div class="title">--><?php //echo anchor($title, '/'); ?><!--</div>-->
-    <!--        --><?php //} ?>
-            <div class="navbar-image logo"><?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo vanilla-logo-white'); ?></div>
+            <div class="navbar-image logo"><?php echo wrap('Vanilla Forums', 'span', ['class' => 'vanilla-logo vanilla-logo-white']); ?></div>
             <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
         </div>
         <?php

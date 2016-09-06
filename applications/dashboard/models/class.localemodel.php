@@ -33,7 +33,7 @@ class LocaleModel {
                 if ($icon = val('Icon', $LocaleInfo)) {
                     $LocaleInfo['IconUrl'] = "/locales/".basename(dirname($InfoPath))."/$icon";
                 } else {
-                    $LocaleInfo['IconUrl'] = '/applications/dashboard/design/images/flag-placeholder.svg';
+                    $LocaleInfo['IconUrl'] = asset('/applications/dashboard/design/images/addon-placeholder.png');
                 }
 
                 if ($enName = val('EnName', $LocaleInfo)) {

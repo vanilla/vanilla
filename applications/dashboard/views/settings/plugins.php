@@ -72,146 +72,19 @@ Gdn_Theme::assetBegin('Help'); ?>
 </div>
 <ul class="media-list addon-list">
     <?php
-    $Alt = false;
-
+    require_once($this->fetchViewLocation('helper_functions'));
     foreach ($availableAddons as $addonName => $addonInfo) {
+        $isEnabled = array_key_exists($addonName, $enabledAddons);
         // Skip Hidden & Trigger plugins
-        if (isset($addonInfo['Hidden']) && $addonInfo['Hidden'] === TRUE)
-            continue;
-        if (isset($addonInfo['Trigger']) && $addonInfo['Trigger'] == TRUE) // Any 'true' value.
-            continue;
-
-        $Css = array_key_exists($addonName, $enabledAddons) ? 'Enabled' : 'Disabled';
-        $State = strtolower($Css);
-        if ($this->Filter == 'all' || $this->Filter == $State) {
-            $Alt = !$Alt;
-            $Version = Gdn_Format::display(val('Version', $addonInfo, ''));
-            $ScreenName = Gdn_Format::display(val('Name', $addonInfo, $addonName));
-            $Settings = val('SettingsUrl', $addonInfo, []);
-
-            $SettingsUrl = $State == 'enabled' ? val('SettingsUrl', $addonInfo, '') : '';
-            $SettingsPopupClass = 'js-modal';
-            if (!val('HasPopupFriendlySettings', $addonInfo, true)) {
-                $SettingsPopupClass = '';
-            }
-
-            $PluginUrl = val('PluginUrl', $addonInfo, '');
-            $Author = val('Author', $addonInfo, '');
-            $AuthorUrl = val('AuthorUrl', $addonInfo, '');
-            $NewVersion = val('NewVersion', $addonInfo, '');
-            $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-            $RowClass = $Css;
-            if ($Alt) {
-                $RowClass .= ' Alt';
-            }
-
-            $IconPath = val('IconUrl', $addonInfo, asset('applications/dashboard/design/images/addon-placeholder.png'));
-
-            ?>
-            <li <?php echo 'id="'.Gdn_Format::url(strtolower($addonName)).'-plugin"', ' class="media More '.$RowClass.'"'; ?>>
-                <div class="media-left">
-                <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
-                </div>
-                <div class="media-body">
-                <div class="media-heading"><div class="media-title"><?php echo $ScreenName; ?></div>
-                    <div class="info"><?php
-                        $Info = [];
-
-                        $RequiredApplications = val('RequiredApplications', $addonInfo, false);
-                        $RequiredPlugins = val('RequiredPlugins', $addonInfo, false);
-                        $requirements = '';
-                        if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
-                            $requirements = t('Requires: ');
-                        }
-                        $i = 0;
-                        if (is_array($RequiredApplications)) {
-                            if ($i > 0)
-                                $requirements .= ', ';
-
-                            foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                                $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-                                ++$i;
-                            }
-                        }
-                        if ($RequiredPlugins !== FALSE) {
-                            foreach ($RequiredPlugins as $RequiredPlugin => $VersionInfo) {
-                                if ($i > 0)
-                                    $requirements .= ', ';
-
-                                $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
-                                ++$i;
-                            }
-                        }
-
-                        if ($requirements != '') {
-                            $Info[] = $requirements;
-                        }
-
-                        if ($Author != '') {
-                            $Info[] = sprintf(t('Created by %s'), $AuthorUrl != '' ? anchor($Author, $AuthorUrl) : $Author);
-                        }
-
-                        if ($Version != '') {
-                            $Info[] = sprintf(t('Version %s'), $Version);
-                        }
-
-                        if ($PluginUrl != '') {
-                            $Info[] = anchor(t('Visit Site'), $PluginUrl);
-                        }
-
-                        if ($meta = val('meta', $addonInfo)) {
-                            foreach ($meta as $key => $value) {
-                                if (is_numeric($key)) {
-                                    $Info[] = $value;
-                                } else {
-                                    $Info[] = t($key).': '.$value;
-                                }
-                            }
-                        }
-
-                        echo implode('<span class="spacer">•</span>', $Info);
-
-                        ?>
-                        <?php
-                        if ($Upgrade) {
-                            ?>
-                            <div class="<?php echo $RowClass; ?>">
-                                <div class="Alert"><a href="<?php
-                                    echo combinePaths(array($updateUrl, 'find', urlencode($ScreenName)), '/');
-                                    ?>"><?php
-                                        printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
-                                        ?></a></div>
-                            </div>
-                            <?php
-                        }
-                        ?>
-                    </div>
-                </div>
-                <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, ''))); ?></div>
-                </div>
-                <div class="media-right media-options">
-                    <?php if ($SettingsUrl != '') {
-                        echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
-                    }
-                    ?>
-                    <div id="<?php echo $addonName; ?>-toggle">
-                    <?php
-                    $Enabled = array_key_exists($addonName, $enabledAddons);
-                    if ($this->addonType === 'locales') {
-                        $action = $Enabled ? 'disable' : 'enable';
-                    } else {
-                        $action = $this->Filter;
-                    }
-                    if ($Enabled) {
-                        $toggleState = 'on';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
-                    } else {
-                        $toggleState = 'off';
-                        echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$this->addonType.'/'.$action.'/'.$addonName.'/'.$session->TransientKey(), '', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
-                    } ?>
-                    </div>
-                </div>
-            </li>
+        if ((isset($addonInfo['Hidden']) && $addonInfo['Hidden'] === true)
+            || (isset($addonInfo['Trigger']) && $addonInfo['Trigger'] == true)
+            || ($this->Filter === 'disabled' && $isEnabled)
+            || ($this->Filter === 'enabled' && !$isEnabled)) {
+            echo '';
+        } else { ?>
+        <li <?php echo 'id="'.Gdn_Format::url($addonName).'-addon"', ' class="media"'; ?>>
+            <?php writeAddonMedia($addonName, $addonInfo, $isEnabled, $this->addonType, $this->Filter); ?>
+        </li>
     <?php }
     } ?>
 </ul>

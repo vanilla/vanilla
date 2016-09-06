@@ -104,3 +104,148 @@ function getTutorials($tutorialCode = '') {
         return $Tutorials;
     }
 }
+
+function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter) {
+
+    $Version = Gdn_Format::display(val('Version', $addonInfo, val('version', $addonInfo, '')));
+    $ScreenName = Gdn_Format::display(val('Name', $addonInfo, val('name', $addonInfo, $addonName)));
+
+    $SettingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, val('settingsUrl', $addonInfo, '')) : '';
+    $SettingsPopupClass = 'js-modal';
+
+    if (!val('HasPopupFriendlySettings', $addonInfo, true)) {
+        $SettingsPopupClass = '';
+    }
+
+    $PluginUrl = val('PluginUrl', $addonInfo, '');
+    $Author = val('Author', $addonInfo, '');
+    $AuthorUrl = val('AuthorUrl', $addonInfo, '');
+    $authors = [];
+    if ($Author) {
+        if ($AuthorUrl) {
+            $authors[] = anchor($Author, $AuthorUrl);
+        } else {
+            $authors[] = $Author;
+        }
+    }
+    foreach (val('authors', $addonInfo, []) as $author) {
+        if (val('homepage', $author)) {
+            $authors[] = anchor(val('name', $author), val('homepage', $author));
+        } else {
+            $authors[] = val('name', $author);
+        }
+    }
+    $NewVersion = val('NewVersion', $addonInfo, '');
+    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
+    $RowClass = $isEnabled ? 'Enabled' : 'Disabled';
+    $addon = Gdn::addonManager()->lookupAddon($addonName);
+    if ($addon) {
+        $IconPath = $addon->getIcon();
+    }
+    if (!$IconPath) {
+        $IconPath = val('IconUrl', $addonInfo, asset('applications/dashboard/design/images/addon-placeholder.png'));
+    }
+    ?>
+    <div class="media-left">
+        <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
+    </div>
+    <div class="media-body">
+        <div class="media-heading"><div class="media-title"><?php echo $ScreenName; ?></div>
+            <div class="info"><?php
+                $Info = [];
+
+                $RequiredApplications = val('RequiredApplications', $addonInfo, false);
+                $RequiredPlugins = val('RequiredPlugins', $addonInfo, false);
+                $requirements = '';
+                if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
+                    $requirements = t('Requires: ');
+                }
+                $i = 0;
+                if (is_array($RequiredApplications)) {
+                    if ($i > 0)
+                        $requirements .= ', ';
+
+                    foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
+                        $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
+                        ++$i;
+                    }
+                }
+                if ($RequiredPlugins !== FALSE) {
+                    foreach ($RequiredPlugins as $RequiredPlugin => $VersionInfo) {
+                        if ($i > 0)
+                            $requirements .= ', ';
+
+                        $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
+                        ++$i;
+                    }
+                }
+
+                if ($requirements != '') {
+                    $Info[] = $requirements;
+                }
+
+                if ($authors) {
+                    $authors = implode(', ', $authors);
+                    $Info[] = sprintf(t('Created by %s'), $authors);
+                }
+
+                if ($Version != '') {
+                    $Info[] = sprintf(t('Version %s'), $Version);
+                }
+
+                if ($PluginUrl != '') {
+                    $Info[] = anchor(t('Visit Site'), $PluginUrl);
+                }
+
+                if ($meta = val('meta', $addonInfo)) {
+                    foreach ($meta as $key => $value) {
+                        if (is_numeric($key)) {
+                            $Info[] = $value;
+                        } else {
+                            $Info[] = t($key).': '.$value;
+                        }
+                    }
+                }
+
+                echo implode('<span class="spacer">•</span>', $Info);
+
+                ?>
+                <?php
+                if ($Upgrade) {
+                    ?>
+                    <div class="<?php echo $RowClass; ?>">
+                        <div class="Alert"><a href="<?php
+                            echo combinePaths(array($PluginUrl, 'find', urlencode($ScreenName)), '/');
+                            ?>"><?php
+                                printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
+                                ?></a></div>
+                    </div>
+                    <?php
+                }
+                ?>
+            </div>
+        </div>
+        <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, val('description', $addonInfo, '')))); ?></div>
+    </div>
+    <div class="media-right media-options">
+        <?php if ($SettingsUrl != '') {
+            echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
+        }
+        ?>
+        <div id="<?php echo strtolower($addonName); ?>-toggle">
+            <?php
+            if ($addonType === 'locales') {
+                $action = $isEnabled ? 'disable' : 'enable';
+            } else {
+                $action = $filter;
+            }
+            if ($isEnabled) {
+                $toggleState = 'on';
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$addonType.'/'.$action.'/'.$addonName, 'Hijack', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
+            } else {
+                $toggleState = 'off';
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$addonType.'/'.$action.'/'.$addonName, 'Hijack', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
+            } ?>
+        </div>
+    </div>
+<?php }

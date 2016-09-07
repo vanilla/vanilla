@@ -6704,6 +6704,7 @@ label,
 .label {
   font-weight: 500;
   margin-bottom: 0;
+  word-break: break-all;
 }
 
 .form-control, .ac_input {
@@ -7426,6 +7427,7 @@ label[id^=iCheck] {
 .text-input-button {
   display: -ms-flexbox;
   display: flex;
+  width: 100%;
   -ms-flex-align: center;
   align-items: center;
 }

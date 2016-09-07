@@ -2,7 +2,7 @@
 // Check that we have the necessary tools to allow image uploading
 $allowImages = Gdn_UploadImage::CanUploadImages();
 echo '<div class="change-picture">';
-echo '<h2 class="H">'.$this->title().'</h2>';
+echo '<h1 class="H">'.$this->title().'</h1>';
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-change-picture-form'));
 echo $this->Form->errors();
 if ($this->data('crop') && $allowImages) {

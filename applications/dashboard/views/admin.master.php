@@ -119,6 +119,13 @@ Gdn_Theme::assetEnd();
                 </div>
             </div>
         </div>
+        <div class="panel panel-help panel-right">
+            <div class="panel-content">
+                <div class="js-scroll-to-fixed">
+                    <?php $this->renderAsset('Help'); ?>
+                </div>
+            </div>
+        </div>
         <div class="main">
             <div class="content">
                 <?php $this->renderAsset('Content'); ?>
@@ -138,15 +145,6 @@ Gdn_Theme::assetEnd();
                     <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
                 </div>
             </div>
-        </div>
-        <div class="panel panel-help panel-right">
-            <?php if (!inSection('DashboardHome')) { ?>
-            <div class="panel-content">
-                <div class="js-scroll-to-fixed">
-                    <?php $this->renderAsset('Help'); ?>
-                </div>
-            </div>
-            <?php } ?>
         </div>
     </div>
 </div>

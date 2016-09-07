@@ -8125,13 +8125,14 @@ button.close, button.Close {
 }
 
 .navbar {
-  width: 100%;
+  position: relative;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
   align-items: center;
   -ms-flex-pack: distribute;
   justify-content: space-around;
+  width: 100%;
   padding: 0;
   height: 4.5rem;
   color: #fff;
@@ -8384,6 +8385,8 @@ button.close, button.Close {
 }
 
 .panel-right {
+  -ms-flex-order: 3;
+  order: 3;
   color: #555a62;
   font-weight: 200;
   padding-right: 1.125rem;
@@ -8556,6 +8559,8 @@ button.close, button.Close {
 }
 
 .main {
+  -ms-flex-order: 2;
+  order: 2;
   position: relative;
   overflow: auto;
   padding-left: 1.125rem;

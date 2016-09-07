@@ -8,10 +8,11 @@ $navbar-border-color: rgba(0,0,0,.125);
 $navbar-short-height: 3rem;
 
 .navbar {
-  width: 100%;
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-around;
+  width: 100%;
   padding: 0;
   height: $navbar-height;
   color: $white;

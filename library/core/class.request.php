@@ -326,11 +326,7 @@ class Gdn_Request {
      * @return string | null
      */
     public function host($hostname = null) {
-        if ($hostname === null) {
-            return $this->_Environment['HOST'];
-        } else {
-            return $this->_environmentElement('HOST', $hostname);
-        }
+        return $this->_environmentElement('HOST', $hostname);
     }
 
     /**
@@ -397,11 +393,7 @@ class Gdn_Request {
      * @since 2.1
      */
     public function port($port = null) {
-        if ($port === null) {
-            return $this->_Environment['PORT'];
-        } else {
-            return $this->_environmentElement('PORT', $port);
-        }
+        return $this->_environmentElement('PORT', $port);
     }
 
     /**
@@ -412,11 +404,7 @@ class Gdn_Request {
      * @return string | null
      */
     public function scheme($scheme = null) {
-        if ($scheme === null) {
-            return $this->_Environment['SCHEME'];
-        } else {
-            return $this->_environmentElement('SCHEME', $scheme);
-        }
+        return $this->_environmentElement('SCHEME', $scheme);
     }
 
     /**

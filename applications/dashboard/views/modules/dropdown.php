@@ -1,6 +1,6 @@
 
 <span class="ToggleFlyout OptionsMenu <?php echo val('cssClass', $this); ?>">
-    <span class="OptionsTitle" title="Options"><?php echo val('text', val('trigger', $this)); ?></span>
+    <span class="OptionsTitle" title="<?php echo t('Options'); ?>"><?php echo val('text', val('trigger', $this)); ?></span>
     <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
     <ul class="Flyout MenuItems <?php echo val('listCssClass', $this); ?>" role="menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">
         <?php foreach (val('items', $this) as $item) {

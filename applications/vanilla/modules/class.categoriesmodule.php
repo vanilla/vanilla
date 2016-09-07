@@ -40,8 +40,8 @@ class CategoriesModule extends Gdn_Module {
             return;
         }
 
-        $Categories = CategoryModel::makeTree(CategoryModel::categories());
-        CategoryModel::filterChildren($Categories);
+        $categoryModel = new CategoryModel();
+        $Categories = $categoryModel->setJoinUserCategory(true)->getChildTree(null);
         $Categories = CategoryModel::flattenTree($Categories);
         $Categories2 = $Categories;
 

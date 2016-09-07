@@ -137,6 +137,7 @@ class Gdn_Request {
 
             switch ($key) {
                 case 'URI':
+                    // Simulate REQUEST_URI decoding.
                     $value = !is_null($value) ? rawurldecode($value) : $value;
                     break;
                 case 'SCRIPT':
@@ -556,7 +557,8 @@ class Gdn_Request {
                 $path = '';
             }
 
-            $this->_environmentElement('URI', $path);
+            // Set URI directly to avoid double decoding.
+            $this->_Environment['URI'] = $path;
         }
 
         $possibleScriptNames = [];

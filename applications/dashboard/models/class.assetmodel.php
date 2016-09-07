@@ -207,7 +207,7 @@ class AssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
-                $this->addCssFile('custom.css', false, ['Sort' => 10]);
+                $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
                     $filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);

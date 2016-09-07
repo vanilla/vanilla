@@ -193,7 +193,7 @@ class CategoriesController extends VanillaController {
             switch ($Layout) {
                 case 'mixed':
                     $this->View = 'discussions';
-                    $this->Discussions();
+                    $this->discussions();
                     break;
                 case 'table':
                     $this->table();
@@ -219,11 +219,11 @@ class CategoriesController extends VanillaController {
             $this->setData('Category', $Category, true);
 
             $this->title(htmlspecialchars(val('Name', $Category, '')));
-            $this->Description(val('Description', $Category), true);
-
+            $this->description(val('Description', $Category), true);
 
             switch ($Category->DisplayAs) {
                 case 'Flat':
+                case 'Heading':
                 case 'Categories':
                     if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
                         // Headings don't make sense if we've cascaded down one level.
@@ -238,7 +238,7 @@ class CategoriesController extends VanillaController {
                         switch ($Layout) {
                             case 'mixed':
                                 $this->View = 'discussions';
-                                $this->Discussions($CategoryIdentifier);
+                                $this->discussions($CategoryIdentifier);
                                 break;
                             case 'table':
                                 $this->table($CategoryIdentifier, $Category->DisplayAs);
@@ -273,7 +273,7 @@ class CategoriesController extends VanillaController {
 
             // Add a backwards-compatibility shim for the old categories.
             $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {
-                $categories = CategoryModel::GetSubtree($CategoryIdentifier, false);
+                $categories = CategoryModel::getSubtree($CategoryIdentifier, false);
                 return $categories;
             };
 
@@ -343,9 +343,14 @@ class CategoriesController extends VanillaController {
 
             // We don't wan't child categories in announcements.
             $Wheres['d.CategoryID'] = $CategoryID;
-            $AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($Wheres) : new Gdn_DataSet();
+            $AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($Wheres) : new Gdn_DataSet();
             $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
             $Wheres['d.CategoryID'] = $CategoryIDs;
+
+            // RSS should include announcements.
+            if ($this->SyndicationMethod !== SYNDICATION_NONE) {
+                $Wheres['Announce'] = 'all';
+            }
 
             $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
@@ -371,18 +376,18 @@ class CategoriesController extends VanillaController {
             );
 
             $this->Pager->Record = $Category;
-            PagerModule::Current($this->Pager);
+            PagerModule::current($this->Pager);
             $this->setData('_Page', $Page);
             $this->setData('_Limit', $Limit);
             $this->fireEvent('AfterBuildPager');
 
             // Set the canonical Url.
-            $this->canonicalUrl(CategoryUrl($Category, PageNumber($Offset, $Limit)));
+            $this->canonicalUrl(categoryUrl($Category, pageNumber($Offset, $Limit)));
 
             // Change the controller name so that it knows to grab the discussion views
             $this->ControllerName = 'DiscussionsController';
             // Pick up the discussions class
-            $this->CssClass = 'Discussions Category-'.GetValue('UrlCode', $Category);
+            $this->CssClass = 'Discussions Category-'.val('UrlCode', $Category);
 
             // Deliver JSON data if necessary
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {

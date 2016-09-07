@@ -125,7 +125,7 @@ class PostController extends VanillaController {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
             $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
-            if (val('DisplayAs', $this->Category) == 'Discussions') {
+            if (val('DisplayAs', $this->Category) == 'Discussions' && !$DraftID) {
                 $this->ShowCategorySelector = false;
             } else {
                 // Get all our subcategories to add to the category if we are in a Header or Categories category.
@@ -242,7 +242,11 @@ class PostController extends VanillaController {
                 }
 
                 // Make sure that the title will not be invisible after rendering
-                $Name = trim($this->Form->getFormValue('Name', ''));
+                if (unicodeRegexSupport()) {
+                    $Name = preg_replace('/^[\pC ]*(.*?)[\pC ]*$/u', '$1', $this->Form->getFormValue('Name', ''));
+                } else {
+                    $Name = trim($this->Form->getFormValue('Name', ''));
+                }
                 if ($Name != '' && Gdn_Format::text($Name) == '') {
                     $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
                 } else {

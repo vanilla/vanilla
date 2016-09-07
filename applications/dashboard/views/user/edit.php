@@ -6,7 +6,7 @@
             echo t('Add User');
         ?></h1>
 <?php
-echo $this->Form->open(array('class' => 'User'));
+echo $this->Form->open(array('class' => 'User', 'autocomplete' => 'off'));
 echo $this->Form->errors();
 if ($this->data('AllowEditing')) { ?>
     <ul>

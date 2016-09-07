@@ -1,8 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-$Session = Gdn::session();
-$ShowOptions = TRUE;
-$Alt = '';
-foreach ($this->DraftData->result() as $Draft) {
+
+foreach ($this->DraftData->resultArray() as $Draft) {
     $Offset = val('CountComments', $Draft, 0);
     if ($Offset > c('Vanilla.Comments.PerPage', 30)) {
         $Offset -= c('Vanilla.Comments.PerPage', 30);
@@ -10,22 +8,27 @@ foreach ($this->DraftData->result() as $Draft) {
         $Offset = 0;
     }
 
-    $EditUrl = !is_numeric($Draft->DiscussionID) || $Draft->DiscussionID <= 0 ? '/post/editdiscussion/0/'.$Draft->DraftID : '/discussion/'.$Draft->DiscussionID.'/'.$Offset.'/#Form_Comment';
-    $Alt = $Alt == ' Alt' ? '' : ' Alt';
-    $Excerpt = SliceString(Gdn_Format::text($Draft->Body), 200);
-    ?>
-    <li class="Item Draft<?php echo $Alt; ?>">
-        <div
-            class="Options"><?php echo anchor(t('Draft.Delete', 'Delete'), 'vanilla/drafts/delete/'.$Draft->DraftID.'/'.$Session->TransientKey().'?Target='.urlencode($this->SelfUrl), 'Delete'); ?></div>
-        <div class="ItemContent">
-            <?php echo anchor(Gdn_Format::text($Draft->Name, false), $EditUrl, 'Title DraftLink'); ?>
+    $draftID = val('DraftID', $Draft);
+    $discussionID = val('DiscussionID', $Draft);
+    $excerpt = sliceString(Gdn_Format::text(val('Body', $Draft)), 200);
 
-            <?php if ($Excerpt): ?>
+    $isDiscussion = (!is_numeric($discussionID) || $discussionID <= 0);
+    $orphaned = !val('DiscussionExists', $Draft);
+
+    $editUrl = ($isDiscussion || $orphaned) ? '/post/editdiscussion/0/'.$draftID : '/discussion/'.$discussionID.'/'.$Offset.'/#Form_Comment';
+    $deleteUrl = 'vanilla/drafts/delete/'.$draftID.'/'.Gdn::session()->transientKey().'?Target='.urlencode($this->SelfUrl);
+    ?>
+    <li class="Item Draft">
+        <div
+            class="Options"><?php
+                echo anchor(t('Draft.Delete', 'Delete'), $deleteUrl, 'Delete'); ?></div>
+        <div class="ItemContent">
+            <?php echo anchor(Gdn_Format::text(val('Name', $Draft), false), $editUrl, 'Title DraftLink'); ?>
+            <?php if ($excerpt) : ?>
                 <div class="Excerpt">
-                    <?php echo anchor($Excerpt, $EditUrl); ?>
+                    <?php echo anchor($excerpt, $editUrl); ?>
                 </div>
             <?php endif; ?>
-
         </div>
     </li>
 <?php

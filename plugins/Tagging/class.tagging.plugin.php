@@ -10,7 +10,7 @@
 $PluginInfo['Tagging'] = array(
     'Name' => 'Tagging',
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.9.0',
+    'Version' => '1.9.1',
     'SettingsUrl' => '/dashboard/settings/tagging',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
@@ -36,6 +36,7 @@ $PluginInfo['Tagging'] = array(
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
  *  1.8.12  Fix issues with CSS and js loading.
+ *  1.9.1   Add tokenLimit enforcement; cleanup.
  */
 class TaggingPlugin extends Gdn_Plugin {
 
@@ -243,13 +244,6 @@ class TaggingPlugin extends Gdn_Plugin {
 
         $Sender->View = c('Vanilla.Discussions.Layout');
 
-        /*
-        // If these don't equal, then there is a category that should be inserted.
-        if ($UseCategories && $Category && $TagRow['FullName'] != val('Name', $Category)) {
-           $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => TagUrl($TagRow));
-        }
-        $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
-  */
         // Render the controller.
         $this->View = c('Vanilla.Discussions.Layout') == 'table' && $Sender->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
         $Sender->render($this->View, 'discussions', 'vanilla');
@@ -350,50 +344,44 @@ class TaggingPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Should we limit the discussion query to a specific tagid?
-     * @param DiscussionModel $Sender
-     */
-//   public function DiscussionModel_BeforeGet_handler($Sender) {
-//      if (c('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToDiscussionIDs')) {
-//         $Sender->SQL->whereIn('d.DiscussionID', $Sender->FilterToDiscussionIDs)
-//            ->limit(FALSE);
-//      }
-//   }
-
-    /**
      * Validate tags when saving a discussion.
+     *
+     * @param DiscussionModel $Sender
+     * @param array $Args
      */
     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        // Allow an addon to set disallowed tag names.
         $reservedTags = [];
         $Sender->EventArguments['ReservedTags'] = &$reservedTags;
-        $Sender->FireEvent('ReservedTags');
+        $Sender->fireEvent('ReservedTags');
 
-        $FormPostValues = val('FormPostValues', $Args, array());
-        $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
-        $NumTagsMax = c('Plugin.Tagging.Max', 5);
-        // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
+        // Set some tagging requirements.
+        $TagsString = trim(strtolower(valr('FormPostValues.Tags', $Args, '')));
         if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
+            // Break apart our tags and lowercase them all for comparisons.
             $Tags = TagModel::splitTags($TagsString);
-            // Handle upper/lowercase
             $Tags = array_map('strtolower', $Tags);
             $reservedTags = array_map('strtolower', $reservedTags);
+            $maxTags = c('Plugin.Tagging.Max', 5);
+
+            // Validate our tags.
             if ($reservedTags = array_intersect($Tags, $reservedTags)) {
                 $names = implode(', ', $reservedTags);
                 $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
             }
             if (!TagModel::validateTags($Tags)) {
                 $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
-            } elseif (count($Tags) > $NumTagsMax) {
-                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $NumTagsMax));
-            } else {
+            }
+            if (count($Tags) > $maxTags) {
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
             }
         }
     }
 
     /**
-     *
+     * Handle tag association deletion when a discussion is deleted.
      *
      * @param $Sender
      * @throws Exception
@@ -620,6 +608,7 @@ class TaggingPlugin extends Gdn_Plugin {
     public function postController_render_before($Sender) {
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
+        $Sender->addDefinition('MaxTagsAllowed', c('Plugin.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();

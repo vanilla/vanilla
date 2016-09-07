@@ -104,36 +104,10 @@ class SearchController extends Gdn_Controller {
 
         $this->setData('SearchResults', $ResultSet, true);
         $this->setData('SearchTerm', Gdn_Format::text($Search), true);
-        if ($ResultSet) {
-            $NumResults = count($ResultSet);
-        } else {
-            $NumResults = 0;
-        }
-        if ($NumResults == $Offset + $Limit) {
-            $NumResults++;
-        }
 
-        // Build a pager
-        $PagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $PagerFactory->getPager('MorePager', $this);
-        $this->Pager->MoreCode = 'More Results';
-        $this->Pager->LessCode = 'Previous Results';
-        $this->Pager->ClientID = 'Pager';
-        $this->Pager->configure(
-            $Offset,
-            $Limit,
-            $NumResults,
-            'dashboard/search/%1$s/%2$s/?Search='.Gdn_Format::url($Search)
-        );
-
-//		if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-//         $this->setJson('LessRow', $this->Pager->toString('less'));
-//         $this->setJson('MoreRow', $this->Pager->toString('more'));
-//         $this->View = 'results';
-//      }
+        $this->setData('_CurrentRecords', count($ResultSet));
 
         $this->canonicalUrl(url('search', true));
-
         $this->render();
     }
 }

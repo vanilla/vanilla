@@ -14,6 +14,7 @@ $PluginInfo['Pockets'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RegisterPermissions' => array('Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'),
     'SettingsUrl' => '/settings/pockets',
+    'HasPopupFriendlySettings' => false,
     'SettingsPermission' => 'Plugins.Pockets.Manage',
     'MobileFriendly' => true,
     'HasLocale' => true,
@@ -91,18 +92,6 @@ class PocketsPlugin extends Gdn_Plugin {
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->addItem('Appearance', t('Appearance'));
         $Menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('Pockets', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['Pockets']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**

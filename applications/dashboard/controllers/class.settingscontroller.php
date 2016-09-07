@@ -102,7 +102,6 @@ class SettingsController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
         $applicationManager = Gdn::applicationManager();
 
         $action = 'none';
@@ -127,7 +126,6 @@ class SettingsController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
         $applicationManager = Gdn::applicationManager();
 
         $action = 'none';
@@ -153,7 +151,9 @@ class SettingsController extends DashboardController {
         $this->handleAddonToggle($addonName, $addon->getInfo(), 'applications', true, $filter, $action);
     }
 
-    private function handleAddonToggle($addonName, $addonInfo, $type, $isEnabled, $filter= '', $action = '') {
+    private function handleAddonToggle($addonName, $addonInfo, $type, $isEnabled, $filter = '', $action = '') {
+        require_once($this->fetchViewLocation('helper_functions'));
+
         if ($this->Form->errorCount() > 0) {
             $this->informMessage($this->Form->errors());
         } else {
@@ -1129,12 +1129,11 @@ class SettingsController extends DashboardController {
         $this->render();
     }
 
-    public function enableLocale($addonName, $addonInfo, &$enabledLocales) {
+    public function enableLocale($addonName, $addonInfo) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
 
         if (!is_array($addonInfo)) {
             $this->Form->addError('@'.sprintf(t('The %s locale pack does not exist.'), htmlspecialchars($addonName)), 'LocaleKey');
@@ -1142,7 +1141,6 @@ class SettingsController extends DashboardController {
             $this->Form->addError('ValidateRequired', 'Locale');
         } else {
             saveToConfig("EnabledLocales.$addonName", $addonInfo['Locale']);
-            $enabledLocales[$addonName] = $addonInfo['Locale'];
             $this->informMessage(sprintf(t('%s Enabled.'), val('Name', $addonInfo, t('Locale'))));
         }
 
@@ -1150,15 +1148,13 @@ class SettingsController extends DashboardController {
 
     }
 
-    public function disableLocale($addonName, $addonInfo, &$enabledLocales) {
+    public function disableLocale($addonName, $addonInfo) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
 
         RemoveFromConfig("EnabledLocales.$addonName");
-        unset($enabledLocales[$addonName]);
         $this->informMessage(sprintf(t('%s Disabled.'), val('Name', $addonInfo, t('Locale'))));
 
         $this->handleAddonToggle($addonName, $addonInfo, 'locales', false);
@@ -1209,7 +1205,6 @@ class SettingsController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
 
         $action = 'none';
         if ($filter == 'enabled') {
@@ -1237,7 +1232,6 @@ class SettingsController extends DashboardController {
         }
 
         $this->permission('Garden.Settings.Manage');
-        require_once($this->fetchViewLocation('helper_functions'));
 
         $action = 'none';
         if ($filter == 'disabled') {

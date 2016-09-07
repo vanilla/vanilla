@@ -311,6 +311,7 @@
                         var body = json.Data;
                         var content = self.parseBody(body);
                         $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                        $('#' + self.id + ' .modal-body').scrollTop(0);
                     }
                 },
                 error: function(xhr) {

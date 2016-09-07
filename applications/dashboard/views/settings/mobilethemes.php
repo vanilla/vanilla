@@ -101,7 +101,8 @@ Gdn_Theme::assetBegin('Help'); ?>
 
         }
 
-        $this->fireEvent('AfterCurrentTheme');
+        $this->EventArguments['IsMobile'] = true;
+        $this->fireEvent('AfterCurrentMobileTheme');
 
         if ($Upgrade) {
             echo '<div class="Alert alert">';

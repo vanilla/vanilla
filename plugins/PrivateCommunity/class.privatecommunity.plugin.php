@@ -16,6 +16,7 @@ $PluginInfo['PrivateCommunity'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'SettingsUrl' => '/dashboard/role',
+    'HasPopupFriendlySettings' => false,
     'Icon' => 'private-community.png'
 );
 
@@ -54,18 +55,6 @@ class PrivateCommunityPlugin extends Gdn_Plugin {
         </div>
 
         <?php
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('PrivateCommunity', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['PrivateCommunity']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**

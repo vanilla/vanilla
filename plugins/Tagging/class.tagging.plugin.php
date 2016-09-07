@@ -12,6 +12,7 @@ $PluginInfo['Tagging'] = array(
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
     'Version' => '1.9.1',
     'SettingsUrl' => '/dashboard/settings/tagging',
+    'HasPopupFriendlySettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
@@ -59,18 +60,6 @@ class TaggingPlugin extends Gdn_Plugin {
      */
     public function categoriesController_render_before($Sender) {
         $this->addTagModule($Sender);
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('Tagging', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['Tagging']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**

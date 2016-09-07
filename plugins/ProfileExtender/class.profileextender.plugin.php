@@ -16,6 +16,7 @@ $PluginInfo['ProfileExtender'] = array(
     'MobileFriendly' => true,
     //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
     'SettingsUrl' => '/dashboard/settings/profileextender',
+    'HasPopupFriendlySettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
@@ -80,18 +81,6 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     public function base_getAppSettingsMenuItems_handler($Sender) {
         $Menu = &$Sender->EventArguments['SideMenu'];
         $Menu->addLink('Users', t('Profile Fields'), 'settings/profileextender', 'Garden.Settings.Manage');
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('ProfileExtender', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['ProfileExtender']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**

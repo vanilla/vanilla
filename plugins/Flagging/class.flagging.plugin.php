@@ -14,6 +14,7 @@ $PluginInfo['Flagging'] = array(
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'SettingsUrl' => '/dashboard/plugin/flagging',
+    'HasPopupFriendlySettings' => false,
     'SettingsPermission' => 'Garden.Moderation.Manage',
     'HasLocale' => true,
     'MobileFriendly' => true,
@@ -39,18 +40,6 @@ class FlaggingPlugin extends Gdn_Plugin {
         }
         /** @var DashboardNavModule $sender */
         $sender->addLinkToSectionIf('Garden.Moderation.Manage', 'Moderation', $LinkText, 'plugin/flagging', 'moderation.flagging');
-    }
-
-    /**
-     * Opt out of popup settings page on addons page
-     *
-     * @param SettingsController $sender
-     * @param array $args
-     */
-    public function settingsController_beforeAddonList_handler($sender, &$args) {
-        if (val('Flagging', $args['AvailableAddons'])) {
-            $args['AvailableAddons']['Flagging']['HasPopupFriendlySettings'] = false;
-        }
     }
 
     /**

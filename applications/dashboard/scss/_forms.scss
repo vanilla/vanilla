@@ -48,7 +48,6 @@ label,
 .label {
   font-weight: 500;
   margin-bottom: 0;
-  word-break: break-all;
 }
 
 .form-control {
@@ -88,6 +87,9 @@ label,
 // Styleguide 3.1.1
 
 .label-wrap {
+  min-width: 0;
+  overflow: hidden;
+
   img {
     @extend .padded;
     max-width: 50%;
@@ -912,7 +914,7 @@ label[id^=iCheck] {
 
 .text-input-button {
   display: flex;
-  width: 100%;
+  flex-grow: 1;
   align-items: center;
 
   input {

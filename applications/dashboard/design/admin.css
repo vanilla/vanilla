@@ -6704,7 +6704,6 @@ label,
 .label {
   font-weight: 500;
   margin-bottom: 0;
-  word-break: break-all;
 }
 
 .form-control, .ac_input {
@@ -6712,6 +6711,11 @@ label,
   padding-top: 0.40625rem;
   padding-bottom: 0.40625rem;
   border: 0.0625rem solid #ccc;
+}
+
+.label-wrap {
+  min-width: 0;
+  overflow: hidden;
 }
 
 .label-wrap img {
@@ -7427,7 +7431,8 @@ label[id^=iCheck] {
 .text-input-button {
   display: -ms-flexbox;
   display: flex;
-  width: 100%;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -8625,7 +8630,7 @@ button.close, button.Close {
 }
 
 .main .content > .padded, .main .label-wrap .content > img, .label-wrap .main .content > img, .main .content > div.Messages.Errors,
-.main .content .padded-top {
+.main .content > .padded-top {
   margin-top: 0.5625rem;
 }
 

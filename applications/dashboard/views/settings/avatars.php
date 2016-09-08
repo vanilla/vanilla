@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo t('Avatars'); ?></h1>
 <div class="avatar-default">
-    <div class="avatars padded flex">
-        <div class="current-avatar flex">
+    <div class="avatars padded-bottom flex flex-wrap">
+        <div class="current-avatar flex padded-top">
             <div class="image-wrap">
                 <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
             </div>
@@ -17,7 +17,7 @@
             $disabled = 'disabled ';
         }
         ?>
-        <div class="options padded-left flex">
+        <div class="options padded-top flex">
             <?php echo anchor(t('Remove'), '/dashboard/settings/removedefaultavatar/', $disabled.'btn btn-primary js-hijack js-modal-confirm remove-avatar'); ?>
             <?php echo anchor(t('Change'), '/dashboard/settings/defaultavatar', 'btn btn-primary change-avatar'); ?>
         </div>

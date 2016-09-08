@@ -365,10 +365,10 @@ EOT;
     }
 
     /**
-     * Connect the user with an external source.
+     * SSO facilitator page. Plugins use event `ConnectData` to complete SSO connections.
      *
-     * This controller method is meant to be used with plugins that set its data array to work.
-     * Events: ConnectData
+     * Users only see this page for non-seamless connections that prompt them to finish connecting
+     * by entering a username and/or password (and possibly email).
      *
      * @since 2.0.0
      * @access public
@@ -376,51 +376,65 @@ EOT;
      * @param string $Method Used to register multiple providers on ConnectData event.
      */
     public function connect($Method) {
+        // Basic page setup.
         $this->addJsFile('entry.js');
         $this->View = 'connect';
+        $this->addDefinition('Username already exists.', t('Username already exists.'));
+        $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
+
+        // Determine what step in the process we're at.
         $IsPostBack = $this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null;
         $UserSelect = $this->Form->getFormValue('UserSelect');
 
         /**
-         * When a user is connecting through SSO he is prompted to choose a username. If he chooses an existing user name
-         * he is then prompted to enter the password for that username 'claiming' it as their own.
-         * By setting AllowConnect to false, we take away that workflow, forcing the user to choose a unique username.
+         * When a user is connecting through SSO she is prompted to choose a username.
+         * If she chooses an existing username, she is prompted to enter the password to claim it.
+         * Setting AllowConnect = false disables that workflow, forcing the user to choose a unique username.
          */
         $allowConnect = c('Garden.Registration.AllowConnect', true);
         $this->setData('AllowConnect', $allowConnect);
         $this->addDefinition('AllowConnect', $allowConnect);
 
         if (!$IsPostBack) {
-            // Here are the initial data array values. that can be set by a plugin.
-            $Data = array('Provider' => '', 'ProviderName' => '', 'UniqueID' => '', 'FullName' => '', 'Name' => '', 'Email' => '', 'Photo' => '', 'Target' => $this->target());
+            // Initialize data array that can be set by a plugin.
+            $Data = [
+                'Provider' => '',
+                'ProviderName' => '',
+                'UniqueID' => '',
+                'FullName' => '',
+                'Name' => '',
+                'Email' => '',
+                'Photo' => '',
+                'Target' => $this->target()
+            ];
             $this->Form->setData($Data);
             $this->Form->addHidden('Target', $this->Request->get('Target', '/'));
         }
 
-        // The different providers can check to see if they are being used and modify the data array accordingly.
-        $this->EventArguments = array($Method);
+        // SSO providers can check to see if they are being used and modify the data array accordingly.
+        $this->EventArguments = [$Method];
 
-        // Fire ConnectData event & error handling.
+        // Filter the form data for users.
+        // SSO plugins must reset validated data each postback.
         $currentData = $this->Form->formValues();
-
-        $this->addDefinition('Username already exists.', t('Username already exists.'));
-        $this->addDefinition('Choose a name to identify yourself on the site.', t('Choose a name to identify yourself on the site.'));
-
-        // Filter the form data for users here. SSO plugins must reset validated data each postback.
         $filteredData = Gdn::userModel()->filterForm($currentData, true);
         $filteredData = array_replace($filteredData, arrayTranslate($currentData, ['TransientKey', 'hpt']));
         unset($filteredData['Roles'], $filteredData['RoleID']);
         $this->Form->formValues($filteredData);
 
+        // Fire ConnectData event & error handling.
         try {
+            // Where your SSO plugin does magic.
             $this->EventArguments['Form'] = $this->Form;
             $this->fireEvent('ConnectData');
             $this->fireEvent('AfterConnectData');
         } catch (Gdn_UserException $Ex) {
+            // Your SSO magic said no.
             $this->Form->addError($Ex);
             return $this->render('ConnectError');
         } catch (Exception $Ex) {
-            if (Debug()) {
+            // Your SSO magic blew up.
+            if (debug()) {
                 $this->Form->addError($Ex);
             } else {
                 $this->Form->addError('There was an error fetching the connection data.');
@@ -428,6 +442,7 @@ EOT;
             return $this->render('ConnectError');
         }
 
+        // Allow a provider to not send an email address but require one be manually entered.
         if (!UserModel::noEmail()) {
             if (!$this->Form->getFormValue('Email') || $this->Form->getFormValue('EmailVisible')) {
                 $this->Form->setFormValue('EmailVisible', true);
@@ -441,7 +456,7 @@ EOT;
 
         $FormData = $this->Form->formValues(); // debug
 
-        // Make sure the minimum required data has been provided to the connect.
+        // Make sure the minimum required data has been provided by the connection.
         if (!$this->Form->getFormValue('Provider')) {
             $this->Form->addError('ValidateRequired', t('Provider'));
         }
@@ -450,18 +465,20 @@ EOT;
         }
 
         if (!$this->data('Verified')) {
-            // Whatever event handler catches this must Set the data 'Verified' to true to prevent a random site from connecting without credentials.
+            // Whatever event handler catches this must set the data 'Verified' = true
+            // to prevent a random site from connecting without credentials.
             // This must be done EVERY postback and is VERY important.
             $this->Form->addError(t('The connection data has not been verified.'));
         }
 
+        // If we've accrued errors, stop here and show them.
         if ($this->Form->errorCount() > 0) {
             return $this->render();
         }
 
         $UserModel = Gdn::userModel();
 
-        // Check to see if there is an existing user associated with the information above.
+        // Find an existing user associated with this provider & uniqueid.
         $Auth = $UserModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
         $UserID = val('UserID', $Auth);
 
@@ -474,11 +491,12 @@ EOT;
             $Roles = RoleModel::getByName($Roles);
             $RoleIDs = array_keys($Roles);
 
+            // Ensure user has at least one role.
             if (empty($RoleIDs)) {
-                // The user must have at least one role. This protects that.
                 $RoleIDs = $this->UserModel->newUserRoleIDs();
             }
 
+            // Allow role syncing to only happen on first connect.
             if (c('Garden.SSO.SyncRolesBehavior') === 'register') {
                 $SaveRoles = false;
             }
@@ -493,6 +511,7 @@ EOT;
             // The user is already connected.
             $this->Form->setFormValue('UserID', $UserID);
 
+            // Update their info.
             if (c('Garden.Registration.ConnectSynchronize', true)) {
                 $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
                 $Data = $this->Form->formValues();
@@ -504,7 +523,7 @@ EOT;
                 }
 
                 // Synchronize the user's data.
-                $UserModel->save($Data, array('NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles));
+                $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
             }
 
             // Always save the attributes because they may contain authorization information.
@@ -515,20 +534,26 @@ EOT;
             // Sign the user in.
             Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
             Gdn::userModel()->fireEvent('AfterSignIn');
+
+            // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
+            // Decide how to handle our first time connecting.
             $NameUnique = c('Garden.Registration.NameUnique', true);
             $EmailUnique = c('Garden.Registration.EmailUnique', true);
             $AutoConnect = c('Garden.Registration.AutoConnect');
 
+            // Decide which name to search for.
             if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
                 $searchName = $this->Form->getFormValue('ConnectName');
             } else {
                 $searchName = $this->Form->getFormValue('Name');
             }
 
-            // Get the existing users that match the name or email of the connection.
+            // Find existing users that match the name or email of the connection.
+            // First, discover if we have search criteria.
             $Search = false;
+            $ExistingUsers = [];
             if ($searchName && $NameUnique) {
                 $UserModel->SQL->orWhere('Name', $searchName);
                 $Search = true;
@@ -541,11 +566,9 @@ EOT;
                 $UserModel->SQL->orWhere('UserID', $UserSelect);
                 $Search = true;
             }
-
+            // Now do the search if we found some criteria.
             if ($Search) {
                 $ExistingUsers = $UserModel->getWhere()->resultArray();
-            } else {
-                $ExistingUsers = array();
             }
 
             // Check to automatically link the user.
@@ -566,18 +589,22 @@ EOT;
                             if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
                                 unset($Data['Photo']);
                             }
-                            $UserModel->save($Data, array('NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles));
+
+                            // Update the user.
+                            $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
                         }
 
+                        // Always save the attributes because they may contain authorization information.
                         if ($Attributes = $this->Form->getFormValue('Attributes')) {
                             $UserModel->saveAttribute($UserID, $Attributes);
                         }
 
-                        // Save the userauthentication link.
-                        $UserModel->saveAuthentication(array(
+                        // Save the user authentication association.
+                        $UserModel->saveAuthentication([
                             'UserID' => $UserID,
                             'Provider' => $this->Form->getFormValue('Provider'),
-                            'UniqueID' => $this->Form->getFormValue('UniqueID')));
+                            'UniqueID' => $this->Form->getFormValue('UniqueID')
+                        ]);
 
                         // Sign the user in.
                         Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
@@ -610,7 +637,7 @@ EOT;
 
             if (isset($EmailFound)) {
                 // The email address was found and can be the only user option.
-                $ExistingUsers = array($UserRow);
+                $ExistingUsers = [$UserRow];
                 $this->setData('NoConnectName', true);
             } elseif (isset($CurrentUserFound)) {
                 $ExistingUsers = array_merge(
@@ -635,19 +662,18 @@ EOT;
 
             $this->setData('ExistingUsers', $ExistingUsers);
 
+            // Validate our email address if we have one.
             if (UserModel::noEmail()) {
                 $EmailValid = true;
             } else {
                 $EmailValid = validateRequired($this->Form->getFormValue('Email'));
             }
 
-            if ((!$UserSelect || $UserSelect == 'other') &&
-                $this->Form->getFormValue('Name') && $EmailValid &&
-                (!is_array($ExistingUsers) || count($ExistingUsers) == 0)) {
-
+            $noExistingUsers = (!is_array($ExistingUsers) || count($ExistingUsers) == 0);
+            if ((!$UserSelect || $UserSelect == 'other') && $this->Form->getFormValue('Name') && $EmailValid && $noExistingUsers) {
                 // There is no existing user with the suggested name so we can just create the user.
                 $User = $this->Form->formValues();
-                $User['Password'] = randomString(50); // some password is required
+                $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
                 $User['Source'] = $this->Form->getFormValue('Provider');
                 $User['SourceID'] = $this->Form->getFormValue('UniqueID');
@@ -655,16 +681,22 @@ EOT;
                 $User['Email'] = $this->Form->getFormValue('ConnectEmail', $this->Form->getFormValue('Email', null));
                 $User['Name'] = $this->Form->getFormValue('ConnectName', $this->Form->getFormValue('Name', null));
 
-                $UserID = $UserModel->register($User, array('CheckCaptcha' => false, 'ValidateEmail' => false, 'NoConfirmEmail' => true, 'SaveRoles' => $SaveRolesRegister));
+                $UserID = $UserModel->register($User, [
+                    'CheckCaptcha' => false,
+                    'ValidateEmail' => false,
+                    'NoConfirmEmail' => true,
+                    'SaveRoles' => $SaveRolesRegister
+                ]);
 
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 if ($UserID) {
-                    $UserModel->saveAuthentication(array(
+                    $UserModel->saveAuthentication([
                         'UserID' => $UserID,
                         'Provider' => $this->Form->getFormValue('Provider'),
-                        'UniqueID' => $this->Form->getFormValue('UniqueID')));
+                        'UniqueID' => $this->Form->getFormValue('UniqueID')
+                    ]);
 
                     $this->Form->setFormValue('UserID', $UserID);
                     $this->Form->setFormValue('UserSelect', false);
@@ -675,7 +707,8 @@ EOT;
                     // Send the welcome email.
                     if (c('Garden.Registration.SendConnectEmail', false)) {
                         try {
-                            $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
+                            $providerName = $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'));
+                            $UserModel->sendWelcomeEmail($UserID, '', 'Connect', ['ProviderName' => $providerName]);
                         } catch (Exception $Ex) {
                             // Do nothing if emailing doesn't work.
                         }
@@ -744,25 +777,32 @@ EOT;
                 // The user doesn't exist so we need to add another user.
                 $User = $this->Form->formValues();
                 $User['Name'] = $User['ConnectName'];
-                $User['Password'] = randomString(50); // some password is required
+                $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
-                $UserID = $UserModel->register($User, array('CheckCaptcha' => false, 'NoConfirmEmail' => true, 'SaveRoles' => $SaveRolesRegister));
+
+                $UserID = $UserModel->register($User, [
+                    'CheckCaptcha' => false,
+                    'NoConfirmEmail' => true,
+                    'SaveRoles' => $SaveRolesRegister
+                ]);
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 if ($UserID && c('Garden.Registration.SendConnectEmail', false)) {
                     // Send the welcome email.
-                    $UserModel->sendWelcomeEmail($UserID, '', 'Connect', array('ProviderName' => $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'))));
+                    $providerName = $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'));
+                    $UserModel->sendWelcomeEmail($UserID, '', 'Connect', ['ProviderName' => $providerName]);
                 }
             }
 
             if ($this->Form->errorCount() == 0) {
                 // Save the authentication.
                 if (isset($User) && val('UserID', $User)) {
-                    $UserModel->saveAuthentication(array(
+                    $UserModel->saveAuthentication([
                         'UserID' => $User['UserID'],
                         'Provider' => $this->Form->getFormValue('Provider'),
-                        'UniqueID' => $this->Form->getFormValue('UniqueID')));
+                        'UniqueID' => $this->Form->getFormValue('UniqueID')
+                    ]);
                     $this->Form->setFormValue('UserID', $User['UserID']);
                 }
 

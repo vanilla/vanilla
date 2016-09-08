@@ -537,6 +537,7 @@ EOT;
 
             // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
+
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
             $NameUnique = c('Garden.Registration.NameUnique', true);
@@ -577,12 +578,15 @@ EOT;
                     $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
                 }
 
+                // Check each existing user for an exact email match.
                 foreach ($ExistingUsers as $Row) {
                     if (strcasecmp($this->Form->getFormValue('Email'), $Row['Email']) === 0) {
+                        // Add the UserID to the form, then get the unified user data set from it.
                         $UserID = $Row['UserID'];
                         $this->Form->setFormValue('UserID', $UserID);
                         $Data = $this->Form->formValues();
 
+                        // User synchronization.
                         if (c('Garden.Registration.ConnectSynchronize', true)) {
                             // Don't overwrite a photo if the user has already uploaded one.
                             $Photo = val('Photo', $Row);
@@ -614,64 +618,76 @@ EOT;
                         return;
                     }
                 }
-            }
+            } // Did not autoconnect!
+            // Explore alternatives for a first-time connection.
 
+            // This will be zero for a guest.
             $CurrentUserID = Gdn::session()->UserID;
 
-            // Massage the existing users.
+            // Evaluate the existing users for matches.
             foreach ($ExistingUsers as $Index => $UserRow) {
                 if ($EmailUnique && $UserRow['Email'] == $this->Form->getFormValue('Email')) {
+                    // An email match overrules any other options.
                     $EmailFound = $UserRow;
                     break;
                 }
 
+                // Detect a simple name match.
                 if ($UserRow['Name'] == $this->Form->getFormValue('Name')) {
                     $NameFound = $UserRow;
                 }
 
+                // Detect if we have a match on the current user session.
                 if ($CurrentUserID > 0 && $UserRow['UserID'] == $CurrentUserID) {
                     unset($ExistingUsers[$Index]);
                     $CurrentUserFound = true;
                 }
             }
 
+            // Handle special cases for what we matched on.
             if (isset($EmailFound)) {
                 // The email address was found and can be the only user option.
                 $ExistingUsers = [$UserRow];
                 $this->setData('NoConnectName', true);
             } elseif (isset($CurrentUserFound)) {
+                // If we're already logged in to Vanilla, assume that's an option we want.
                 $ExistingUsers = array_merge(
-                    array('UserID' => 'current', 'Name' => sprintf(t('%s (Current)'), Gdn::session()->User->Name)),
+                    ['UserID' => 'current', 'Name' => sprintf(t('%s (Current)'), Gdn::session()->User->Name)],
                     $ExistingUsers
                 );
             }
 
+            // Pre-populate our ConnectName field with the passed name if we couldn't match it.
             if (!isset($NameFound) && !$IsPostBack) {
                 $this->Form->setFormValue('ConnectName', $this->Form->getFormValue('Name'));
             }
 
+            // Block connecting to an existing user if it's disallowed.
             if (!$allowConnect) {
-                // Since we are not connecting a joining user to an existing user...
-
-                // make sure the photo of the existing user doesn't show up on the form.
+                // Make sure photo of existing user doesn't show on the form.
                 $this->Form->setFormValue("Photo", null);
-
-                // ignore any existing user(s) found.
-                $ExistingUsers = array();
+                // Ignore existing users found.
+                $ExistingUsers = [];
             }
 
+            // Set our final answer on matched users.
             $this->setData('ExistingUsers', $ExistingUsers);
 
             // Validate our email address if we have one.
             if (UserModel::noEmail()) {
-                $EmailValid = true;
+                $emailValid = true;
             } else {
-                $EmailValid = validateRequired($this->Form->getFormValue('Email'));
+                $emailValid = validateRequired($this->Form->getFormValue('Email'));
             }
 
-            $noExistingUsers = (!is_array($ExistingUsers) || count($ExistingUsers) == 0);
-            if ((!$UserSelect || $UserSelect == 'other') && $this->Form->getFormValue('Name') && $EmailValid && $noExistingUsers) {
-                // There is no existing user with the suggested name so we can just create the user.
+            // Set some nice variable names for logic clarity.
+            $noMatches = (!is_array($ExistingUsers) || count($ExistingUsers) == 0);
+            $didNotPickUser = (!$UserSelect || $UserSelect == 'other');
+            $haveName = $this->Form->getFormValue('Name');
+
+            // Should we create a new user?
+            if ($didNotPickUser && $haveName && $emailValid && $noMatches) {
+                // Create the user.
                 $User = $this->Form->formValues();
                 $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
@@ -680,17 +696,16 @@ EOT;
                 $User['Attributes'] = $this->Form->getFormValue('Attributes', null);
                 $User['Email'] = $this->Form->getFormValue('ConnectEmail', $this->Form->getFormValue('Email', null));
                 $User['Name'] = $this->Form->getFormValue('ConnectName', $this->Form->getFormValue('Name', null));
-
                 $UserID = $UserModel->register($User, [
                     'CheckCaptcha' => false,
                     'ValidateEmail' => false,
                     'NoConfirmEmail' => true,
                     'SaveRoles' => $SaveRolesRegister
                 ]);
-
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
+                // Save the association to the new user.
                 if ($UserID) {
                     $UserModel->saveAuthentication([
                         'UserID' => $UserID,
@@ -701,6 +716,7 @@ EOT;
                     $this->Form->setFormValue('UserID', $UserID);
                     $this->Form->setFormValue('UserSelect', false);
 
+                    // Sign in as the new user.
                     Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
                     Gdn::userModel()->fireEvent('AfterSignIn');
 
@@ -714,54 +730,57 @@ EOT;
                         }
                     }
 
+                    // Move along.
                     $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                 }
             }
-        }
+        } // Finished our connection logic.
 
         // Save the user's choice.
         if ($IsPostBack) {
-            // The user has made their decision.
             $PasswordHash = new Gdn_PasswordHash();
 
             if (!$UserSelect || $UserSelect == 'other') {
-                // The user entered a username.
+                // The user entered a username. Validate it.
                 $ConnectNameEntered = true;
-
                 if ($this->Form->validateRule('ConnectName', 'ValidateRequired')) {
                     $ConnectName = $this->Form->getFormValue('ConnectName');
-
                     $User = false;
+
                     if (c('Garden.Registration.NameUnique')) {
                         // Check to see if there is already a user with the given name.
                         $User = $UserModel->getWhere(array('Name' => $ConnectName))->firstRow(DATASET_TYPE_ARRAY);
                     }
 
                     if (!$User) {
+                        // Using a new username, so validate it.
                         $this->Form->validateRule('ConnectName', 'ValidateUsername');
                     }
                 }
             } else {
                 // The user selected an existing user.
                 $ConnectNameEntered = false;
-
                 if ($UserSelect == 'current') {
                     if (Gdn::session()->UserID == 0) {
-                        // This shouldn't happen, but a use could sign out in another browser and click submit on this form.
+                        // This should never happen, but a user could click submit on a stale form.
                         $this->Form->addError('@You were unexpectedly signed out.');
                     } else {
                         $UserSelect = Gdn::session()->UserID;
                     }
                 }
                 $User = $UserModel->getID($UserSelect, DATASET_TYPE_ARRAY);
-            }
+            } // End user selection.
 
             if (isset($User) && $User) {
                 // Make sure the user authenticates.
                 if (!$User['UserID'] == Gdn::session()->UserID && $allowConnect) {
-                    if ($this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')))) {
+                    $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
+                    if ($hasPassword) {
+                        // Validate their password.
                         try {
-                            if (!$PasswordHash->checkPassword($this->Form->getFormValue('ConnectPassword'), $User['Password'], $User['HashMethod'], $this->Form->getFormValue('ConnectName'))) {
+                            $password = $this->Form->getFormValue('ConnectPassword');
+                            $name = $this->Form->getFormValue('ConnectName');
+                            if (!$PasswordHash->checkPassword($password, $User['Password'], $User['HashMethod'], $name)) {
                                 if ($ConnectNameEntered) {
                                     $this->Form->addError('The username you entered has already been taken.');
                                 } else {
@@ -779,7 +798,6 @@ EOT;
                 $User['Name'] = $User['ConnectName'];
                 $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
-
                 $UserID = $UserModel->register($User, [
                     'CheckCaptcha' => false,
                     'NoConfirmEmail' => true,
@@ -788,15 +806,15 @@ EOT;
                 $User['UserID'] = $UserID;
                 $this->Form->setValidationResults($UserModel->validationResults());
 
+                // Send the welcome email.
                 if ($UserID && c('Garden.Registration.SendConnectEmail', false)) {
-                    // Send the welcome email.
                     $providerName = $this->Form->getFormValue('ProviderName', $this->Form->getFormValue('Provider', 'Unknown'));
                     $UserModel->sendWelcomeEmail($UserID, '', 'Connect', ['ProviderName' => $providerName]);
                 }
             }
 
+            // Save the user authentication association.
             if ($this->Form->errorCount() == 0) {
-                // Save the authentication.
                 if (isset($User) && val('UserID', $User)) {
                     $UserModel->saveAuthentication([
                         'UserID' => $User['UserID'],
@@ -806,12 +824,14 @@ EOT;
                     $this->Form->setFormValue('UserID', $User['UserID']);
                 }
 
-                // Sign the appropriate user in.
+                // Sign the user in.
                 Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', true));
                 Gdn::userModel()->fireEvent('AfterSignIn');
+
+                // Move along.
                 $this->_setRedirect(Gdn::request()->get('display') === 'popup');
             }
-        }
+        } // End of user choice processing.
 
         $this->render();
     }

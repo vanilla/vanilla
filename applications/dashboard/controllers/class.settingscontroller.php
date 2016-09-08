@@ -1591,9 +1591,9 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/themes');
 
         $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
-        $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
-        $this->setData('EnabledTheme', Gdn::themeManager()->enabledThemeInfo());
-        $this->setData('EnabledThemeName', val('Name', $ThemeInfo, val('Index', $ThemeInfo)));
+        $currentTheme = new ThemeInfoModule(val('Name', $ThemeInfo));
+        $currentTheme->setIsCurrent(true);
+        $this->setData('CurrentTheme', $currentTheme);
 
         $Themes = Gdn::themeManager()->availableThemes();
         uasort($Themes, array('SettingsController', '_NameSort'));
@@ -1637,6 +1637,13 @@ class SettingsController extends DashboardController {
             }
 
         }
+        $this->render();
+    }
+    
+    public function themeInfo($themeName) {
+        $this->permission('Garden.Settings.Manage');
+        $theme = new ThemeInfoModule($themeName);
+        $this->setData('Theme', $theme);
         $this->render();
     }
 

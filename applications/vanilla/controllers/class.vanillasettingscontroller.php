@@ -44,8 +44,6 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
-            'Vanilla.Archive.Date',
-            'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
@@ -74,14 +72,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
             $ConfigurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
-
-            // Grab old config values to check for an update.
-            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
             // Format the trusted domains as an array based on newlines & spaces
             $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
@@ -93,13 +86,6 @@ class VanillaSettingsController extends Gdn_Controller {
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved !== false) {
-                $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
-                $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
-
-                if ($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
-                    $DiscussionModel = new DiscussionModel();
-                    $DiscussionModel->UpdateDiscussionCount('All');
-                }
                 $this->informMessage(t("Your changes have been saved."));
             }
 
@@ -113,6 +99,53 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->title(t('Advanced Forum Settings'));
 
         // Render default view (settings/advanced.php)
+        $this->render();
+    }
+
+    public function archive() {
+        // Check permission
+        $this->permission('Garden.Settings.Manage');
+
+        // Load up config options we'll be setting
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Vanilla.Archive.Date',
+            'Vanilla.Archive.Exclude'
+        ));
+
+        // Set the model on the form.
+        $this->Form->setModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($this->Form->authenticatedPostBack() === false) {
+            $this->Form->setData($ConfigurationModel->Data);
+        } else {
+            // Define some validation rules for the fields being saved
+            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
+
+            // Grab old config values to check for an update.
+            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
+            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
+
+            // Save new settings
+            $Saved = $this->Form->save();
+            if ($Saved !== false) {
+                $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
+                $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
+
+                if ($ArchiveExclude != $ArchiveExcludeBak || ($ArchiveExclude && $ArchiveDate != $ArchiveDateBak)) {
+                    $DiscussionModel = new DiscussionModel();
+                    $DiscussionModel->UpdateDiscussionCount('All');
+                }
+                $this->informMessage(t("Your changes have been saved."));
+            }
+        }
+
+        $this->setHighlightRoute('vanilla/settings/archive');
+        $this->title(t('Archive Discussions'));
+
+        // Render default view (settings/archive.php)
         $this->render();
     }
 

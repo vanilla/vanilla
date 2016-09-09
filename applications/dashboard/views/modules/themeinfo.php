@@ -1,9 +1,9 @@
 <?php /** @var ThemeInfoModule $this */ ?>
 
-<div class="media media-callout CurrentTheme">
-    <div class="media-left grid-item">
+<div class="media not-padded <?php echo $this->isCurrent() ? 'media-callout' : ''; ?>">
+    <div class="media-left <?php echo $this->isCurrent() ? 'grid-item' : 'grid-item-fixed'; ?>">
         <div class="image-wrap grid-image-wrap">
-            <?php echo img($this->geticonUrl(), array('alt' => $this->getThemeName(), 'class' => 'grid-image')); ?>
+            <?php echo img($this->geticonUrl(), ['alt' => $this->getThemeName(), 'class' => 'grid-image']); ?>
         </div>
     </div>
     <div class="media-body">
@@ -24,8 +24,7 @@
             <div class="description"><?php echo $this->getDescription(); ?></div>
             <?php if ($this->hasOptions() && $this->isCurrent()) { ?>
                 <div class="options">
-                    <?php echo sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.')
-                        .anchor(t('Theme Options'), '/dashboard/settings/themeoptions')); ?>
+                    <?php echo sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/dashboard/settings/themeoptions')); ?>
                 </div>
             <?php } ?>
 

@@ -1591,7 +1591,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/themes');
 
         $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
-        $currentTheme = new ThemeInfoModule(val('Name', $ThemeInfo));
+        $currentTheme = new ThemeInfoModule(val('Index', $ThemeInfo));
         $currentTheme->setIsCurrent(true);
         $this->setData('CurrentTheme', $currentTheme);
 
@@ -1639,7 +1639,7 @@ class SettingsController extends DashboardController {
         }
         $this->render();
     }
-    
+
     public function themeInfo($themeName) {
         $this->permission('Garden.Settings.Manage');
         $theme = new ThemeInfoModule($themeName);

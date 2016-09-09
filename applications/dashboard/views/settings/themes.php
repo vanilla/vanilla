@@ -67,10 +67,12 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                                 echo img($themePlaceholder, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
                             } ?>
                             <div class="overlay">
+                                <div class="label-selector-corner-link">
+                                    <?php echo anchor(dashboardSymbol('external-link', '', 'icon-24'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-content' => ['cssClass' => 'modal-preview modal-md'], 'data-modal-type' => 'noheader']); ?>
+                                </div>
                                 <div class="buttons">
                                     <?php echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
-                                    //                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
-                                    echo anchor(dashboardSymbol('external-link'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal btn btn-icon');
+                                    // echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
                                     $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                                     $this->fireEvent('AfterThemeButtons'); ?>
                                 </div>

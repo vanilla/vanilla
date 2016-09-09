@@ -20,25 +20,24 @@ class ThemeInfoModule extends Gdn_Module {
     private $hasUpgrade;
 
 
-    public function __construct($themeName) {
-        $themeInfo = Gdn::themeManager()->getThemeInfo($themeName);
-        if ($themeInfo) {
-            $this->iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo, asset(self::THEME_PLACEHOLDER_IMAGE_URL)));
-            $this->themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeName));
-            $this->description = val('Description', $themeInfo, '');
-            $this->version = val('Version', $themeInfo, '');
-            $this->author = val('AuthorName', $themeInfo, '');
-            $this->authorEmail = val('AuthorEmail', $themeInfo, '');
-            $this->authorUrl = val('AuthorUrl', $themeInfo, '');
-            $this->newVersion = val('NewVersion', $themeInfo, '');
-            $this->hasOptions = !empty(val('Options', $themeInfo, []));
-            $this->themeUrl = val('ThemeUrl', $themeInfo, '');
-            $this->hasUpgrade = $this->newVersion != '' && version_compare($this->newVersion, $this->version, '>');
-            $this->requirements = val('RequiredApplications', $themeInfo, []);
-            $this->getInfo();
-        } else {
-            throwException(sprintf(t('%s not found.'), $themeName));
+    public function __construct($themeKey) {
+        $themeInfo = Gdn::themeManager()->getThemeInfo($themeKey);
+        if (!$themeInfo) {
+            throwException(sprintf(t('Theme with key %s not found.'), $themeKey));
         }
+        $this->iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo, asset(self::THEME_PLACEHOLDER_IMAGE_URL)));
+        $this->themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeKey));
+        $this->description = val('Description', $themeInfo, '');
+        $this->version = val('Version', $themeInfo, '');
+        $this->author = val('Author', $themeInfo, '');
+        $this->authorEmail = val('AuthorEmail', $themeInfo, '');
+        $this->authorUrl = val('AuthorUrl', $themeInfo, '');
+        $this->newVersion = val('NewVersion', $themeInfo, '');
+        $this->hasOptions = !empty(val('Options', $themeInfo, []));
+        $this->themeUrl = val('ThemeUrl', $themeInfo, '');
+        $this->hasUpgrade = $this->newVersion != '' && version_compare($this->newVersion, $this->version, '>');
+        $this->requirements = val('RequiredApplications', $themeInfo, []);
+        $this->getInfo();
     }
 
     /**
@@ -224,6 +223,7 @@ class ThemeInfoModule extends Gdn_Module {
     }
 
     public function getInfo() {
+        $info = [];
         if ($this->author != '') {
             $info[] = '<'.$this->infoTag.' class="media-meta author">'.sprintf('Created by %s', $this->authorUrl != '' ? anchor($this->author, $this->authorUrl) : $this->author).'</'.$this->infoTag.'>';
         }

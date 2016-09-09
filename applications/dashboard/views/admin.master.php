@@ -82,7 +82,7 @@ Gdn_Theme::assetEnd();
             <?php
             foreach ($dashboardNav->getSectionsInfo() as $section) { ?>
                 <div class="nav-item">
-                    <a class="nav-link <?php echo val('active', $section); ?>" href="<?php echo val('url', $section); ?>">
+                    <a class="nav-link js-save-pref-dashboard-landing-page <?php echo val('active', $section); ?>" href="<?php echo url(val('url', $section)); ?>" data-section="<?php echo val('section', $section) ?>">
                         <div class="nav-link-heading"><?php echo val('title', $section); ?></div>
                         <div class="nav-link-description"><?php echo val('description', $section, '&nbsp;'); ?></div>
                     </a>

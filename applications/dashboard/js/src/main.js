@@ -625,8 +625,8 @@
         });
     });
 
-    $(document).on('click', '.js-save-pref-section', function() {
-        var url = $(this).attr('href');
+    $(document).on('click', '.js-save-pref-section-landing-page', function() {
+        var url = $(this).data('linkPath');
         var section = $(this).data('section');
 
         // request the target via ajax
@@ -639,6 +639,30 @@
         $.ajax({
             method: 'POST',
             url: gdn.url('dashboard/userpreferencesectionlandingpage'),
+            data: ajaxData,
+            dataType: 'json',
+            error: function(xhr) {
+                gdn.informError(xhr);
+            },
+            success: function(json) {
+                gdn.inform(json);
+                gdn.processTargets(json.Targets);
+            }
+        });
+    });
+
+    $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
+        var section = $(this).data('section');
+
+        // request the target via ajax
+        var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+
+        ajaxData.TransientKey = gdn.definition('TransientKey');
+        ajaxData.section = section;
+
+        $.ajax({
+            method: 'POST',
+            url: gdn.url('dashboard/userpreferencedashboardlandingpage'),
             data: ajaxData,
             dataType: 'json',
             error: function(xhr) {

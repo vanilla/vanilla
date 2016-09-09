@@ -979,6 +979,21 @@ class SettingsController extends DashboardController {
      * @access public
      */
     public function index() {
+        $section = Gdn::session()->getPreference('DashboardNav.DashboardLandingPage', 'DashboardHome');
+        if ($section) {
+            $sections = DashboardNavModule::getDashboardNav()->getSectionsInfo();
+            $url = val('url', val($section, $sections));
+            if ($url) {
+                redirect($url);
+            }
+        }
+
+        // Fire event instead of calling directly because VanillaStats overrides the home method.
+        $this->fireAs('SettingsController');
+        $this->fireEvent('home');
+    }
+
+    public function home() {
         $this->addJsFile('settings.js');
         $this->title(t('Dashboard'));
 
@@ -1008,7 +1023,7 @@ class SettingsController extends DashboardController {
         $this->fireEvent('DashboardData');
 
         Gdn_Theme::section('DashboardHome');
-        $this->render();
+        $this->render('index');
     }
 
     /**

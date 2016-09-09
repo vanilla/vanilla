@@ -23,7 +23,7 @@ if (!function_exists('renderAdventureNav')) {
             if (val('type', $item) == 'link') { ?>
                 <div class="nav-item">
                     <a role="menuitem" class="nav-link <?php echo val('cssClass', $item); ?>" tabindex="-1"
-                        href="<?php echo val('url', $item); ?>">
+                        href="<?php echo url(val('url', $item)); ?>">
                         <div class="nav-item-icon"><?php echo icon(val('icon', $item)); ?></div>
                         <div class="nav-item-content">
                             <div class="nav-item-title"><?php echo val('text', $item); ?></div>

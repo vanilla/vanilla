@@ -16,7 +16,7 @@
             <?php } ?>
             <?php  if (val('type', $item) == 'link') { ?>
                 <li role="presentation" <?php if (val('listItemCssClass', $item) || empty($item['icon'])) { ?>class="<?php echo trim(val('listItemCssClass', $item).(empty($item['icon']) ? ' no-icon' : '')); ?>"<?php } ?>>
-                    <a role="menuitem" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>" <?php echo attribute(val('attributes', $item, [])) ?>><?php
+                    <a role="menuitem" class="dropdown-menu-link <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo url(val('url', $item)); ?>" <?php echo attribute(val('attributes', $item, [])) ?>><?php
                         if (val('icon', $item)) {
                             echo icon(val('icon', $item));
                         }

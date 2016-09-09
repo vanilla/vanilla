@@ -260,7 +260,7 @@ trait NestedCollection {
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
         $link = array(
             'text' => $text,
-            'url' => url($url),
+            'url' => $url,
             'key' => $key,
         );
 
@@ -432,7 +432,7 @@ trait NestedCollection {
         } else {
             $highlightRoute = url($this->highlightRoute);
         }
-        return (val('url', $item) && (trim(val('url', $item), '/') == trim($highlightRoute, '/')));
+        return (val('url', $item) && (trim(url(val('url', $item)), '/') == trim($highlightRoute, '/')));
     }
 
     /**

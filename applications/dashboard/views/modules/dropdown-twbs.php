@@ -19,7 +19,7 @@
                 </div>
             <?php } ?>
             <?php  if (val('type', $item) == 'link') { ?>
-                <a role="menuitem" class="dropdown-item <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo val('url', $item); ?>"  <?php echo attribute(val('attributes', $item, [])) ?>>
+                <a role="menuitem" class="dropdown-item <?php echo val('cssClass', $item); ?>" tabindex="-1" href="<?php echo url(val('url', $item)); ?>"  <?php echo attribute(val('attributes', $item, [])) ?>>
                     <?php if (val('icon', $item)) {
                         echo icon(val('icon', $item));
                     }

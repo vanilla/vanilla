@@ -21,7 +21,7 @@ if (!function_exists('renderNav')) {
 
             if (val('type', $item) == 'link') { ?>
 		<a role="menuitem" class="nav-link <?php echo val('cssClass', $item); ?>" tabindex="-1"
-		   href="<?php echo val('url', $item); ?>">
+		   href="<?php echo url(val('url', $item)); ?>">
 		    <?php if (val('badge', $item)) {
 			echo '<span class="Aside"><span class="Count">'.val('badge', $item).'</span></span>';
 		    } ?>

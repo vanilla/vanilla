@@ -16,7 +16,7 @@ if (!function_exists('renderDashboardNav')) {
             }
             if (val('type', $item) == 'link') { ?>
                 <li role="presentation" <?php if (val('listItemCssClass', $item)) { ?>class="nav-item <?php echo strtolower(val('listItemCssClass', $item)); ?>"<?php } ?>>
-                    <a role="menuitem" data-section="<?php echo val('section', $item); ?>" class="js-save-pref-section nav-link <?php echo val('cssClass', $item).' '.strtolower(val('listItemCssClass', $item));?>" tabindex="-1" href="<?php echo val('url', $item); ?>">
+                    <a role="menuitem" data-section="<?php echo val('section', $item); ?>" data-link-path="<?php echo val('url', $item); ?>" class="js-save-pref-section-landing-page nav-link <?php echo val('cssClass', $item).' '.strtolower(val('listItemCssClass', $item));?>" tabindex="-1" href="<?php echo url(val('url', $item)); ?>">
                         <?php
                         if (val('icon', $item)) {
                             echo icon(val('icon', $item)).' ';

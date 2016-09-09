@@ -96,7 +96,7 @@ class DashboardController extends Gdn_Controller {
      *
      * @throws Gdn_UserException
      */
-    public function userPreferenceSectionLandingPage($section, $landingPageUrl) {
+    public function userPreferenceSectionLandingPage() {
         if (Gdn::request()->isAuthenticatedPostBack(true)) {
             $url = Gdn::request()->getValue('url');
             $section = Gdn::request()->getValue('section');
@@ -111,6 +111,24 @@ class DashboardController extends Gdn_Controller {
                 $landingPages[$section] = $url;
                 $session->setPreference('DashboardNav.SectionLandingPages', $landingPages);
             }
+            $this->render('blank', 'utility', 'dashboard');
+        }
+    }
+
+    /**
+     * Saves the name of the section that a user has last navigated to serve as the landing page for whenever they
+     * navigate to the dashboard.
+     *
+     * @throws Gdn_UserException
+     */
+    public function userPreferenceDashboardLandingPage() {
+        if (Gdn::request()->isAuthenticatedPostBack(true)) {
+            $section = Gdn::request()->getValue('section');
+            if ($section && array_key_exists($section, DashboardNavModule::getDashboardNav()->getSectionsInfo())) {
+                $session = Gdn::session();
+                $session->setPreference('DashboardNav.DashboardLandingPage', $section);
+            }
+
             $this->render('blank', 'utility', 'dashboard');
         }
     }

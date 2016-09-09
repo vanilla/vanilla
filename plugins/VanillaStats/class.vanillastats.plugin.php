@@ -55,8 +55,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     public function gdn_dispatcher_beforeDispatch_handler($Sender) {
         $Enabled = c('Garden.Analytics.Enabled', true);
 
-        if ($Enabled && !Gdn::pluginManager()->hasNewMethod('SettingsController', 'Index')) {
-            Gdn::pluginManager()->registerNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'Index');
+        if ($Enabled) {
+            Gdn::pluginManager()->registerNewMethod('VanillaStatsPlugin', 'StatsDashboard', 'SettingsController', 'home');
         }
     }
 
@@ -101,7 +101,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      *
      * @param SettingsController $sender Instance of the dashboard's settings controller.
      */
-    public function statsDashboard($sender) {
+    public function settingsController_home_create($sender) {
         $statsUrl = $this->AnalyticsServer;
         if (!stringBeginsWith($statsUrl, 'http:') && !stringBeginsWith($statsUrl, 'https:')) {
             $statsUrl = Gdn::request()->scheme()."://{$statsUrl}";

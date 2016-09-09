@@ -30,7 +30,7 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'DashboardHome',
             'title' => 'Dashboard',
             'description' => 'Site Overview',
-            'url' => '/dashboard/settings',
+            'url' => '/dashboard/settings/home',
             'empty' => true
         ],
         'Moderation' => [
@@ -60,9 +60,6 @@ class DashboardNavModule extends SiteNavModule {
     public function __construct($cssClass = '', $useCssPrefix = true) {
 //        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
-        foreach(self::$sectionsInfo as &$section) {
-            $section['url'] = url($section['url']);
-        }
     }
 
     /**
@@ -76,7 +73,7 @@ class DashboardNavModule extends SiteNavModule {
     }
 
     /**
-     * Check user permissions, translate our translate-ables and url-ify our urls. Returns an array of the main sections
+     * Check user permissions, translate our translate-ables. Returns an array of the main sections
      * ready to be put into a view.
      *
      * @return array The sections to display in the main dashboard nav.
@@ -88,7 +85,7 @@ class DashboardNavModule extends SiteNavModule {
             $this->fireEvent('init');
         }
 
-        $this->handleUserPreferencesSection();
+        $this->handleUserPreferencesSectionLandingPage();
 
         $sections = $alt ? self::$altSectionsInfo : self::$sectionsInfo;
 
@@ -99,7 +96,6 @@ class DashboardNavModule extends SiteNavModule {
             } else {
                 $section['title'] = t($section['title']);
                 $section['description'] = t($section['description']);
-                $section['url'] = $section['url'];
                 $section['active'] = $this->isActiveSection($section['section']) ? 'active' : '';
             }
         }
@@ -169,7 +165,7 @@ class DashboardNavModule extends SiteNavModule {
         }
     }
 
-    private function handleUserPreferencesSection() {
+    private function handleUserPreferencesSectionLandingPage() {
         if ($session = Gdn::session()) {
             $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
 

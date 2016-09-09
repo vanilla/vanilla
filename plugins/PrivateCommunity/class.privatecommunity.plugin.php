@@ -16,7 +16,7 @@ $PluginInfo['PrivateCommunity'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
     'SettingsUrl' => '/dashboard/role',
-    'HasPopupFriendlySettings' => false,
+    'UsePopupSettings' => false,
     'Icon' => 'private-community.png'
 );
 

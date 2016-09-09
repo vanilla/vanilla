@@ -113,7 +113,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $SettingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, val('settingsUrl', $addonInfo, '')) : '';
     $SettingsPopupClass = 'js-modal';
 
-    if (!val('HasPopupFriendlySettings', $addonInfo, true)) {
+    if (!val('UsePopupSettings', $addonInfo, true)) {
         $SettingsPopupClass = '';
     }
 

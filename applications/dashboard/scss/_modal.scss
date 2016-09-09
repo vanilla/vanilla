@@ -8,9 +8,20 @@
   &.modal-sm {
     max-width: 400px;
   }
+
+  &.modal-md {
+    max-width: 600px;
+  }
+
+  &.modal-preview {
+    // We generally want this to appear more in the center of the screen
+    margin: 25vh auto;
+
+    .modal-body {
+      max-height: 50vh;
+    }
+  }
 }
-
-
 
 // Sets the maximum height of the entire modal to 94% of the screen height
 .modal-body {
@@ -21,7 +32,7 @@
   padding-top: 0;
   padding-bottom: 0;
 
-  .modal-sm & {
+  .modal-confirm & {
     padding: $spacer;
   }
 }
@@ -79,7 +90,7 @@
   }
 }
 
-.close {
+.modal-close {
   float: right;
   padding: 0;
 
@@ -101,4 +112,12 @@ button.close {
   background: transparent;
   border: 0;
   -webkit-appearance: none;
+}
+
+.modal-no-header {
+  .modal-close {
+    position: absolute;
+    top: $spacer / 2;
+    right: $spacer / 2;
+  }
 }

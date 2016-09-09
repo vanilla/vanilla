@@ -444,7 +444,7 @@
         <div><div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
                 <div class="modal-header"> \
-                    <button type="button" class="btn-icon close" data-dismiss="modal" aria-label="Close"> \
+                    <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
                     <h4 class="modal-title">{title}</h4> \
@@ -453,6 +453,16 @@
                 <div class="modal-body">{body}</div> \
                 <div class="modal-footer">{footer}</div> \
                 {form.close} \
+            </div> \
+        </div></div>',
+
+        modalHtmlNoHeader: ' \
+        <div><div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+            <div class="modal-content"> \
+                <div class="modal-body">{body}</div> \
+                <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
+                    {closeIcon} \
+                </button> \
             </div> \
         </div></div>',
 
@@ -556,7 +566,7 @@
                 title: confirmHeading,
                 footer: footer,
                 body: confirmText,
-                cssClass: 'modal-sm'
+                cssClass: 'modal-sm modal-confirm'
             };
         },
 
@@ -575,7 +585,12 @@
             $.extend(true, parsedContent, this.settings.content);
             $.extend(true, content, parsedContent);
 
-            var html = this.modalHtml;
+            if (this.settings.modalType == 'noheader') {
+                var html = this.modalHtmlNoHeader;
+            } else {
+                var html = this.modalHtml;
+            }
+
             html = html.replace('{body}', content.body);
             html = html.replace('{cssClass}', content.cssClass);
             html = html.replace('{title}', content.title);

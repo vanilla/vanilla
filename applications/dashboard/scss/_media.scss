@@ -3,6 +3,34 @@
   padding: $spacer $padding-default;
   margin-bottom: 0;
   border-bottom: 1px solid $border-color;
+
+
+  .info {
+    font-size: $font-size-tables;
+    font-weight: 300;
+  }
+
+  .flag {
+    margin-top: -.0625rem;
+    margin-bottom: $spacer / 2;
+  }
+
+  .media-title {
+    margin-bottom: $spacer * (2 / 3);
+  }
+
+  .media-description {
+    font-weight: 300;
+  }
+
+  .media-image {
+    height: 10rem;
+    border: 1px solid $border-color;
+  }
+
+  &.not-padded {
+    padding-left: 0;
+  }
 }
 
 .media-options {
@@ -63,29 +91,6 @@
 
 .media-callout {
   background-color: $grey-lighter;
-
-  .info {
-    font-size: $font-size-tables;
-    font-weight: 300;
-  }
-
-  .flag {
-    margin-top: -.0625rem;
-    margin-bottom: $spacer / 2;
-  }
-
-  .media-title {
-    margin-bottom: $spacer * (2 / 3);
-  }
-
-  .media-description {
-    font-weight: 300;
-  }
-
-  .media-image {
-    height: 10rem;
-    border: 1px solid $border-color;
-  }
 }
 
 //GRID TODO: Move
@@ -113,4 +118,8 @@
   @extend .col-sm-8;
   @extend .col-lg-12;
   @extend .col-xl-8;
+}
+
+.grid-item-fixed {
+  @extend .col-xs-12;
 }

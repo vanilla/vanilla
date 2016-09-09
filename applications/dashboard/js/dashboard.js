@@ -585,10 +585,12 @@
             $.extend(true, parsedContent, this.settings.content);
             $.extend(true, content, parsedContent);
 
-            if (this.settings.modalType == 'noheader') {
-                var html = this.modalHtmlNoHeader;
+            var html = '';
+
+            if (this.settings.modalType === 'noheader') {
+                html = this.modalHtmlNoHeader;
             } else {
-                var html = this.modalHtml;
+                html = this.modalHtml;
             }
 
             html = html.replace('{body}', content.body);

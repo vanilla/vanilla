@@ -64,7 +64,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         if ($DataSetType !== null) {
             $this->_DatasetType = $DataSetType;
         } elseif ($Result) {
-            if (isset($Result[0]) && is_array($Result[0])) {
+            $firstElement = reset($Result);
+            if (is_array($firstElement)) {
                 $this->_DatasetType = DATASET_TYPE_ARRAY;
             }
         }

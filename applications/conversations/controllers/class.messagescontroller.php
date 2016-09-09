@@ -110,8 +110,23 @@ class MessagesController extends ConversationsController {
                 $this->fireEvent('AfterConversationSave');
             }
         } else {
+            // Check if valid user name has been passed.
             if ($Recipient != '') {
-                $this->Form->setValue('To', $Recipient);
+                if (!Gdn::userModel()->getByUsername($Recipient)) {
+                    $this->Form->setValidationResults(
+                        [
+                            'RecipientUserID' => [
+                                sprintf(
+                                    '"%s" is an unknown username.',
+                                    $Recipient
+                                )
+                            ]
+                        ]
+                    );
+                    $Recipient = '';
+                } else {
+                    $this->Form->setValue('To', $Recipient);
+                }
             }
         }
         if ($Target = Gdn::request()->get('Target')) {

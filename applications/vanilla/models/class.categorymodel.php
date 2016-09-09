@@ -646,23 +646,24 @@ class CategoryModel extends Gdn_Model {
 
     /**
      * @param int|string $id The parent category ID or slug.
-     * @param int|bool $offset
-     * @param int|bool $limit
-     * @param string $orderFields
-     * @param string $orderDirection
+     * @param int|null $offset Offset results by given value.
+     * @param int|null $limit Total number of results should not exceed this value.
+     * @param string|null $filter Restrict results to only those with names matching this value, if provided.
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null, $orderFields = 'DateInserted', $orderDirection = 'desc') {
-        $categoryTree = $this->getWhere(
-            [
-                'DisplayAs <>' => 'Heading',
-                'ParentCategoryID' => $id
-            ],
-            $orderFields,
-            $orderDirection,
-            $limit,
-            $offset
-        )->resultArray();
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null) {
+        $query = $this->SQL
+            ->from('Category')
+            ->where('DisplayAs <>', 'Heading')
+            ->where('ParentCategoryID', $id)
+            ->limit($limit, $offset)
+            ->orderBy('DateInserted', 'desc');
+
+        if ($filter) {
+            $query->like('Name', $filter);
+        }
+
+        $categoryTree = $query->get()->resultArray();
         self::calculateData($categoryTree);
         self::joinUserData($categoryTree);
 

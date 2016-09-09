@@ -48,6 +48,7 @@ foreach ($Categories as $CategoryRow) {
             </li>';
         } else {
             $LastComment = UserBuilder($Category, 'Last');
+            $rssIcon = val('DisplayAs', $Category) === 'Categories' ? '' : anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => t('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => t('RSS Feed')));
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
                 .'<div class="Options">'
@@ -61,7 +62,7 @@ foreach ($Categories as $CategoryRow) {
                 .$Category->Description
                 .'</div>
                   <div class="Meta">
-                     <span class="MItem RSS">'.anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => T('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => T('RSS Feed'))).'</span>
+                     <span class="MItem RSS">'.$rssIcon.'</span>
                      <span class="MItem DiscussionCount">'.
                      sprintf(PluralTranslate($Category->CountDiscussions, '%s discussion html', '%s discussions html', t('%s discussion'), t('%s discussions')), BigPlural($Category->CountDiscussions, '%s discussion'))
                      .'</span>

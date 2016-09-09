@@ -52,9 +52,8 @@ class CategoriesModule extends Gdn_Module {
             }
         }
 
-        $Data = new Gdn_DataSet($Categories);
-        $Data->DatasetType(DATASET_TYPE_ARRAY);
-        $Data->DatasetType(DATASET_TYPE_OBJECT);
+        $Data = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
+        $Data->datasetType(DATASET_TYPE_OBJECT);
         $this->Data = $Data;
     }
 

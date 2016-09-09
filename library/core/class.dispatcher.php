@@ -304,6 +304,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // /controller
 
         $parts = explode('/', str_replace('\\', '/', $request->path()));
+        // Decode path parts at the dispatcher level.
+        array_walk($parts, function(&$value) {
+            $value = rawurldecode($value);
+        });
 
         // Parse the file extension.
         list($parts, $deliveryMethod) = $this->parseDeliveryMethod($parts);

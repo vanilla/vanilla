@@ -3965,7 +3965,7 @@ class UserModel extends Gdn_Model {
      * @return string The welcome email for the registration type.
      */
     protected function getEmailWelcome($registerType, $user, $data, $password = '') {
-        $appTitle = c('Garden.Title');
+        $appTitle = c('Garden.Title', c('Garden.HomepageTitle'));
 
         // Backwards compatability. See if anybody has overridden the EmailWelcome string.
         if (($emailFormat = t('EmailWelcome'.$registerType, ''))) {

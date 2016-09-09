@@ -19,7 +19,7 @@
  * @method string requestMethod($method = null) Get/Set the Request Method (REQUEST_METHOD).
  * @method string requestHost($uri = null) Get/Set the Request Host (HTTP_HOST).
  * @method string requestFolder($folder = null) Get/Set the Request script's Folder.
- * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR, 
+ * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
 class Gdn_Request {
@@ -137,6 +137,7 @@ class Gdn_Request {
 
             switch ($key) {
                 case 'URI':
+                    // Simulate REQUEST_URI decoding.
                     $value = !is_null($value) ? rawurldecode($value) : $value;
                     break;
                 case 'SCRIPT':
@@ -542,7 +543,8 @@ class Gdn_Request {
                 $path = '';
             }
 
-            $this->requestURI($path);
+            // Set URI directly to avoid double decoding.
+            $this->_Environment['URI'] = $path;
         }
 
         $possibleScriptNames = [];

@@ -182,7 +182,10 @@ module.exports = function (grunt) {
 
     autoprefixer: {
       dist: {
-        src: ['design/**/*.css']
+        src: ['design/admin.css', 'design/style.css']
+      }
+      , options: {
+        map: true
       }
     },
 
@@ -248,7 +251,7 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'
           ],
-          'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/_variables.scss', '!scss/_global.scss', '!scss/_svgs.scss']
+          'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/style.scss', '!scss/_variables.scss', '!scss/_global.scss', '!scss/_svgs.scss']
         },
         options: {
           useSingleQuotes: true,

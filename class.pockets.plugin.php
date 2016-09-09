@@ -14,7 +14,7 @@ $PluginInfo['Pockets'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RegisterPermissions' => array('Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'),
     'SettingsUrl' => '/settings/pockets',
-    'HasPopupFriendlySettings' => false,
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Plugins.Pockets.Manage',
     'MobileFriendly' => true,
     'HasLocale' => true,

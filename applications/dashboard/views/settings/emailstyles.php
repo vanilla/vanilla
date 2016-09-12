@@ -3,7 +3,7 @@ $Session = Gdn::session();
 ?>
 <div class="header-block">
 <h1><?php echo t('Email Styles'); ?></h1>
-<?php echo wrap(anchor(t('Send a Test Email'), '/dashboard/settings/emailtest', 'Popup btn-primary btn'), 'div'); ?>
+<?php echo wrap(anchor(t('Send a Test Email'), '/dashboard/settings/emailtest', 'js-modal btn-primary btn'), 'div'); ?>
 </div>
 <div class="row form-group">
     <div class="label-wrap-wide">

@@ -127,7 +127,7 @@ if (c('Vanilla.Categories.Use')) {
                   </td>
                   <td class="Buttons">'
                 .anchor(t('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                .anchor(t('Move'), "vanilla/settings/movecategory/{$Category->CategoryID}", 'Popup SmallButton')
+                .anchor(t('Move'), "vanilla/settings/movecategory/{$Category->CategoryID}", 'js-modal SmallButton')
                 .(val('CanDelete', $Category) ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                 .'</td>
                </tr>

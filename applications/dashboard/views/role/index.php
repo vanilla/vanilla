@@ -60,7 +60,7 @@ echo $this->Form->open();
                     if ($Role['CanModify']) {
                         echo anchor(dashboardSymbol('edit'), "/role/edit/{$Role['RoleID']}", 'btn btn-icon', ['aria-label' => t('Edit')]);
                         if ($Role['Deletable']) {
-                            echo anchor(dashboardSymbol('delete'), "/role/delete/{$Role['RoleID']}", 'Popup btn btn-icon', ['aria-label' => t('Delete')]);
+                            echo anchor(dashboardSymbol('delete'), "/role/delete/{$Role['RoleID']}", 'js-modal btn btn-icon', ['aria-label' => t('Delete')]);
                         }
                     }
                     ?>

@@ -106,7 +106,7 @@ function writeCategoryOptions($category) {
             t('Delete'),
             "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
             'delete.delete',
-            'Popup'
+            'js-modal'
         );
 
     echo $cdd->toString();

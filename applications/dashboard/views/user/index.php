@@ -51,15 +51,6 @@ Gdn_Theme::assetBegin('Help');
         echo $this->Form->close();
         ?>
     </div>
-<!--    <div class="Wrap">-->
-        <!--   <span class="ButtonList">
-      <?php
-        echo anchor(t('Ban'), '#', 'Popup SmallButton');
-        echo anchor(t('Unban'), '#', 'Popup SmallButton');
-        echo anchor(t('Delete'), '#', 'Popup SmallButton');
-        ?>
-   </span>-->
-<!--    </div>-->
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
     <div class="table-wrap">

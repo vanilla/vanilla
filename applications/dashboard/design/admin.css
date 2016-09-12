@@ -8610,7 +8610,6 @@ button.close, button.Close {
   -ms-flex-order: 2;
   order: 2;
   position: relative;
-  overflow: auto;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
   max-width: 1024px;

@@ -9026,7 +9026,7 @@ ul {
 
 .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
   padding: 0;
-  margin-top: 0;
+  margin-top: -0.1875rem;
   margin-left: 0;
   margin-right: 0;
   border-top: 0;
@@ -9034,7 +9034,8 @@ ul {
   font-weight: 400;
   font-size: 0.8125rem;
   text-overflow: ellipsis;
-  margin-bottom: 0.1875rem;
+  margin-bottom: 0.125rem;
+  line-height: 1.3333333333;
 }
 
 .Section-DashboardHome .FeedItem .FeedDescription {

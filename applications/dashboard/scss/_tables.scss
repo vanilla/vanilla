@@ -330,7 +330,7 @@
 
     h2 {
       padding: 0;
-      margin-top: 0;
+      margin-top: - to-rem(3);
       margin-left: 0;
       margin-right: 0;
       border-top: 0;
@@ -339,7 +339,8 @@
       font-size: 0.8125rem;
       text-overflow: ellipsis;
       @extend .media-sm-title;
-      margin-bottom: to-rem(3);
+      margin-bottom: to-rem(2);
+      line-height: $line-height-lg;
     }
 
     .FeedDescription {

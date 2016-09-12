@@ -144,7 +144,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
         $IconPath = $addon->getIcon();
     }
     if (!$IconPath) {
-        $IconPath = val('IconUrl', $addonInfo, asset('applications/dashboard/design/images/addon-placeholder.png'));
+        $IconPath = val('IconUrl', $addonInfo, 'applications/dashboard/design/images/addon-placeholder.png');
     }
     ?>
     <div class="media-left">

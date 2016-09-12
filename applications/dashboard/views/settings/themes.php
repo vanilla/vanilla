@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
-$themePlaceholder = asset('applications/dashboard/design/images/theme-placeholder.svg');
-$themeSpacer = asset('applications/dashboard/design/images/theme-spacer.png');
+$themePlaceholder = 'applications/dashboard/design/images/theme-placeholder.svg';
+$themeSpacer = 'applications/dashboard/design/images/theme-spacer.png';
 ?>
 <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">

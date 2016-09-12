@@ -30,7 +30,7 @@ function writeConnection($Connection, $wrap = true) {
         <?php } ?>
         <div class="media-left">
             <div class="image-wrap IconWrap">
-                <?php echo img(asset(val('Icon', $Connection, '/applications/dashboard/design/images/connection-64.png'), '//')); ?>
+                <?php echo img(val('Icon', $Connection, '/applications/dashboard/design/images/connection-64.png')); ?>
             </div>
         </div>
         <div class="media-body">

@@ -41,17 +41,33 @@ class DebuggerPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add Debugger info to every page.
+     * Add Debugger info to frontend.
      *
      * @param $Sender
      */
     public function base_afterBody_handler($Sender) {
         $Session = Gdn::session();
-        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View')) {
+        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View') || $Sender->MasterView == 'admin') {
             return;
         }
 
         require $Sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
+    }
+
+    /**
+     * Add Debugger info to dashboard after content asset.
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function base_afterRenderAsset_handler($sender, $args) {
+        if (val('AssetName', $args) == 'Content' && $sender->MasterView == 'admin') {
+            $session = Gdn::session();
+            if (!Debug() || !$session->checkPermission('Plugins.Debugger.View')) {
+                return;
+            }
+            require $sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
+        }
     }
 
     /**

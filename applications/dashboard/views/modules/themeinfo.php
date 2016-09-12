@@ -27,11 +27,6 @@
                     <?php echo sprintf(t('This theme has additional options.', 'This theme has additional options on the %s page.'), anchor(t('Theme Options'), '/dashboard/settings/themeoptions')); ?>
                 </div>
             <?php } ?>
-
-            <!--            --><?php //if ($eventString = $this->getEventString()) {
-            //                echo $eventString;
-            //            } ?>
-
             <?php if ($this->hasUpgrade()) { ?>
                 <div class="text-danger">
                     <?php echo sprintf(t('%1$s version %2$s is available.'), $this->getThemeName(), $this->getNewVersion()); ?>

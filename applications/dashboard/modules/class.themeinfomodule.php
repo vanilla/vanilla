@@ -16,7 +16,7 @@ class ThemeInfoModule extends Gdn_Module {
     private $themeUrl;
     private $requirements;
     private $isCurrent = false;
-    private $infoTag = 'span';
+    private $infoTag = "span";
     private $hasUpgrade;
 
 
@@ -77,7 +77,7 @@ class ThemeInfoModule extends Gdn_Module {
     }
 
     /**
-     * @param bool|mixed $themeName
+     * @param $description
      */
     public function setDescription($description) {
         $this->description = $description;
@@ -246,10 +246,5 @@ class ThemeInfoModule extends Gdn_Module {
             $info[] = $requiredString;
         }
         return $info;
-    }
-
-    public function getEventString() {
-        $this->fireAs('SettingsController');
-        $this->fireEvent('AfterCurrentTheme');
     }
 }

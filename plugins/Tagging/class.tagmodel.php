@@ -107,6 +107,10 @@ class TagModel extends Gdn_Model {
             return $ToID;
         } else {
             if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
+                // Tag-type tags (i.e., user generated tags) are saved with no type.
+                if (strtolower(val('Type', $FormPostValues)) == 'tag') {
+                    $FormPostValues['Type'] = '';
+                }
                 return parent::save($FormPostValues, $Settings);
             } else {
                 return false;
@@ -136,7 +140,7 @@ class TagModel extends Gdn_Model {
                     'name' => 'All',
                     'plural' => 'All',
                     'default' => true,
-                    'addtag' => true
+                    'addtag' => false
                 ],
                 'tags' => [
                     'key' => 'tags',

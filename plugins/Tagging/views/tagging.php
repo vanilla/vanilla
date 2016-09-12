@@ -14,7 +14,7 @@ Gdn_Theme::assetEnd();
 <div class="header-block">
     <h1><?php echo t($this->Data['Title']); ?></h1>
     <div class="buttons">
-        <?php echo ' '.anchor('Add Tag', '/settings/tags/add?type='.$TagType, 'js-modal btn btn-primary'); ?>
+        <?php echo ' '.anchor('Add Tag', '/settings/tags/add?type=Tag', 'js-modal btn btn-primary'); ?>
     </div>
 </div>
 <div class="toolbar">

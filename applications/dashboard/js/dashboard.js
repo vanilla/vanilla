@@ -910,7 +910,14 @@
     }
 
     function responsiveTablesInit(element) {
-        $('.table-data', element).tablejengo({container: '#main-row .main'});
+        var containerSelector = '#main-row .main';
+
+        // We're in a popup.
+        if (typeof(Modal.activeModal) === 'object') {
+            containerSelector = '#' + Modal.activeModal.id + ' .modal-body';
+        }
+
+        $('.table-data', element).tablejengo({container: containerSelector});
     }
 
     $(document).on('contentLoad', function(e) {

@@ -13,9 +13,13 @@ Gdn_Theme::assetEnd();
 ?>
 <div class="header-block">
     <h1><?php echo t($this->Data['Title']); ?></h1>
-    <div class="buttons">
-        <?php echo ' '.anchor('Add Tag', '/settings/tags/add?type=Tag', 'js-modal btn btn-primary'); ?>
-    </div>
+    <?php if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
+        // Only show add button if filter type supports adding new tags.
+        ?>
+        <div class="buttons">
+            <?php echo ' '.anchor('Add Tag', '/settings/tags/add?type=Tag', 'js-modal btn btn-primary'); ?>
+        </div>
+    <?php } ?>
 </div>
 <div class="toolbar">
     <div class="search-wrap input-wrap toolbar-main">

@@ -25,7 +25,7 @@ class ThemeInfoModule extends Gdn_Module {
         if (!$themeInfo) {
             throwException(sprintf(t('Theme with key %s not found.'), $themeKey));
         }
-        $this->iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo, asset(self::THEME_PLACEHOLDER_IMAGE_URL)));
+        $this->iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo, self::THEME_PLACEHOLDER_IMAGE_URL));
         $this->themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeKey));
         $this->description = val('Description', $themeInfo, '');
         $this->version = val('Version', $themeInfo, '');

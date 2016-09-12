@@ -1,24 +1,4 @@
-.Border {
-  @extend .modal-dialog;
-}
-
-div.Popup h1 {
-  @extend .modal-title;
-  @extend .heading-h1-block;
-  @extend .heading-h1;
-}
-
-.Content {
-  @extend .modal-body;
-}
-
-.Close {
-  @extend .close;
-}
-
-.Overlay .Popup .Body {
-  @extend .modal-content;
-}
+// Moderation section still uses Popup (styled like modals).
 
 .Overlay {
   position: fixed;
@@ -30,6 +10,11 @@ div.Popup h1 {
   background-color: rgba(0,0,0,.5);
 }
 
-.Overlay > .Popup {
-  @extend .modal;
+.Popup .Footer {
+  display: none !important;
+}
+
+.Popup .Body {
+  overflow-y: hidden !important;
+  max-height: inherit !important;
 }

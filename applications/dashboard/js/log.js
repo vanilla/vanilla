@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
             window.location.href,
             {'DeliveryType': 'VIEW'},
             function(data) {
-                $('#LogTable').html(data);
+                $('#LogTable').htmlTrigger(data);
                 setExpander();
 
                 // Highlight the rows that are different.
@@ -209,7 +209,6 @@ jQuery(document).ready(function($) {
 
         // Ajax us to filtered results
         $('#LogTable').load(gdn.url('/log/moderation?DeliveryType=VIEW&CategoryID=' + category));
-
         return false;
     });
 });

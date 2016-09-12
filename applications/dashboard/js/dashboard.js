@@ -1032,7 +1032,7 @@
         }
     });
 
-    $(document).on('click', '.js-modal, .Popup, .Popable', function(e) {
+    $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
         Modal.activeModal = new Modal($(this), {});
     });

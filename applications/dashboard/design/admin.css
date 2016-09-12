@@ -1555,7 +1555,7 @@ a.text-danger:focus, a.text-danger:hover {
   padding-right: 35px;
 }
 
-.alert-dismissible .close, .alert-dismissible .Close {
+.alert-dismissible .close {
   position: relative;
   top: -2px;
   right: -21px;
@@ -2007,7 +2007,7 @@ a.text-danger:focus, a.text-danger:hover {
   overflow: hidden;
 }
 
-.modal, .Overlay > .Popup {
+.modal {
   position: fixed;
   top: 0;
   right: 0;
@@ -2020,30 +2020,30 @@ a.text-danger:focus, a.text-danger:hover {
   -webkit-overflow-scrolling: touch;
 }
 
-.modal.fade .modal-dialog, .Overlay > .fade.Popup .modal-dialog, .modal.fade .Border, .Overlay > .fade.Popup .Border {
+.modal.fade .modal-dialog {
   transition: -webkit-transform .3s ease-out;
   transition: transform .3s ease-out;
   -webkit-transform: translate(0, -25%);
   transform: translate(0, -25%);
 }
 
-.modal.in .modal-dialog, .Overlay > .in.Popup .modal-dialog, .modal.in .Border, .Overlay > .in.Popup .Border {
+.modal.in .modal-dialog {
   -webkit-transform: translate(0, 0);
   transform: translate(0, 0);
 }
 
-.modal-open .modal, .modal-open .Overlay > .Popup {
+.modal-open .modal {
   overflow-x: hidden;
   overflow-y: auto;
 }
 
-.modal-dialog, .Border {
+.modal-dialog {
   position: relative;
   width: auto;
   margin: 10px;
 }
 
-.modal-content, .Overlay .Popup .Body {
+.modal-content {
   position: relative;
   background-color: #fff;
   background-clip: padding-box;
@@ -2081,16 +2081,16 @@ a.text-danger:focus, a.text-danger:hover {
   clear: both;
 }
 
-.modal-header .close, .modal-header .Close {
+.modal-header .close {
   margin-top: -2px;
 }
 
-.modal-title, div.Popup h1 {
+.modal-title {
   margin: 0;
   line-height: 1.5;
 }
 
-.modal-body, .Content {
+.modal-body {
   position: relative;
   padding: 1.125rem;
 }
@@ -2129,7 +2129,7 @@ a.text-danger:focus, a.text-danger:hover {
 }
 
 @media (min-width: 544px) {
-  .modal-dialog, .Border {
+  .modal-dialog {
     width: 600px;
     margin: 30px auto;
   }
@@ -7830,57 +7830,57 @@ div.Messages.Errors {
   content: '';
 }
 
-.modal-dialog, .Border {
+.modal-dialog {
   margin: 3vh auto;
   width: inherit;
   max-width: 1024px;
 }
 
-.modal-dialog.modal-sm, .modal-sm.Border {
+.modal-dialog.modal-sm {
   max-width: 400px;
 }
 
-.modal-dialog.modal-md, .modal-md.Border {
+.modal-dialog.modal-md {
   max-width: 600px;
 }
 
-.modal-dialog.modal-preview, .modal-preview.Border {
+.modal-dialog.modal-preview {
   margin: 25vh auto;
 }
 
-.modal-dialog.modal-preview .modal-body, .modal-preview.Border .modal-body, .modal-dialog.modal-preview .Content, .modal-preview.Border .Content {
+.modal-dialog.modal-preview .modal-body {
   max-height: 50vh;
 }
 
-.modal-body, .Content {
+.modal-body {
   max-height: calc(94vh - (2 * 3.75rem));
   overflow-y: auto;
   padding-top: 0;
   padding-bottom: 0;
 }
 
-.modal-confirm .modal-body, .modal-confirm .Content {
+.modal-confirm .modal-body {
   padding: 1.125rem;
 }
 
-.modal-content, .Overlay .Popup .Body {
+.modal-content {
   border-radius: 0.125rem;
 }
 
-.modal, .Overlay > .Popup {
+.modal {
   display: -ms-flexbox;
   display: flex;
   padding: 0 0.5625rem;
 }
 
-.modal.fade .modal-dialog, .Overlay > .fade.Popup .modal-dialog, .modal.fade .Border, .Overlay > .fade.Popup .Border {
+.modal.fade .modal-dialog {
   transition: opacity .2s ease-out;
   -webkit-transform: none;
   transform: none;
   opacity: 0;
 }
 
-.modal.in .modal-dialog, .Overlay > .in.Popup .modal-dialog, .modal.in .Border, .Overlay > .in.Popup .Border {
+.modal.in .modal-dialog {
   -webkit-transform: none;
   transform: none;
   -webkit-filter: none;
@@ -7930,7 +7930,7 @@ body .modal-open {
   height: 1.75rem;
 }
 
-button.close, button.Close {
+button.close {
   padding: 0;
   cursor: pointer;
   background: transparent;
@@ -9344,7 +9344,7 @@ pre {
   margin-bottom: 0;
 }
 
-.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title {
+.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title {
   padding: 1.125rem 0;
   margin: 0;
   font-size: 0.875rem;
@@ -9353,16 +9353,16 @@ pre {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
-.modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title {
+.modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title {
   border-top: 0 !important;
 }
 
-.heading-h1, .content h1, div.Popup h1 {
+.heading-h1, .content h1 {
   font-size: 1.25rem;
   margin-bottom: 0;
 }
 
-.full-border, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .Overlay > .Popup h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .Overlay > .Popup .analytics-widget-header .title, .analytics-widget-header .Overlay > .Popup .title, .heading-h1-block, .content > h1, div.Popup h1, .header-block, .subheading-block, .header-menu {
+.full-border, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .heading-h1-block, .content > h1, .header-block, .subheading-block, .header-menu {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -9371,7 +9371,7 @@ pre {
   border-bottom: 0.0625rem solid #f6f9fb;
 }
 
-.heading-h1-block, .content > h1, div.Popup h1 {
+.heading-h1-block, .content > h1 {
   padding-bottom: 1.125rem;
 }
 
@@ -9529,36 +9529,36 @@ form .title {
   list-style: none;
 }
 
-.modal .list-un-reset ul, .Overlay > .Popup .list-un-reset ul,
-.modal .list-un-reset ol, .Overlay > .Popup .list-un-reset ol {
+.modal .list-un-reset ul,
+.modal .list-un-reset ol {
   margin-left: 15px;
 }
 
-.modal .list-un-reset ul li, .Overlay > .Popup .list-un-reset ul li {
+.modal .list-un-reset ul li {
   list-style: disc inside;
 }
 
-.modal .list-un-reset ol li, .Overlay > .Popup .list-un-reset ol li {
+.modal .list-un-reset ol li {
   list-style: decimal inside;
 }
 
-.modal .list-un-reset ul ul, .Overlay > .Popup .list-un-reset ul ul,
-.modal .list-un-reset ol ul, .Overlay > .Popup .list-un-reset ol ul {
+.modal .list-un-reset ul ul,
+.modal .list-un-reset ol ul {
   margin-left: 30px;
 }
 
-.modal .list-un-reset ul ul li, .Overlay > .Popup .list-un-reset ul ul li,
-.modal .list-un-reset ol ul li, .Overlay > .Popup .list-un-reset ol ul li {
+.modal .list-un-reset ul ul li,
+.modal .list-un-reset ol ul li {
   list-style: circle inside;
 }
 
-.modal .list-un-reset ol ol, .Overlay > .Popup .list-un-reset ol ol,
-.modal .list-un-reset ul ol, .Overlay > .Popup .list-un-reset ul ol {
+.modal .list-un-reset ol ol,
+.modal .list-un-reset ul ol {
   margin-left: 15px;
 }
 
-.modal .list-un-reset ol ol li, .Overlay > .Popup .list-un-reset ol ol li,
-.modal .list-un-reset ul ol li, .Overlay > .Popup .list-un-reset ul ol li {
+.modal .list-un-reset ol ol li,
+.modal .list-un-reset ul ol li {
   list-style: lower-latin inside;
 }
 
@@ -9777,6 +9777,15 @@ form .title {
   left: 0;
   z-index: 1040;
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.Popup .Footer {
+  display: none !important;
+}
+
+.Popup .Body {
+  overflow-y: hidden !important;
+  max-height: inherit !important;
 }
 
 .dd {

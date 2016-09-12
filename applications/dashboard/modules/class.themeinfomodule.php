@@ -2,7 +2,7 @@
 
 class ThemeInfoModule extends Gdn_Module {
 
-    const THEME_PLACEHOLDER_IMAGE_URL = 'applications/dashboard/design/images/theme-placeholder.svg';
+    const THEME_PLACEHOLDER_IMAGE_URL = "applications/dashboard/design/images/theme-placeholder.svg";
 
     private $iconUrl;
     private $themeName;
@@ -21,6 +21,7 @@ class ThemeInfoModule extends Gdn_Module {
 
 
     public function __construct($themeKey) {
+        parent::__construct();
         $themeInfo = Gdn::themeManager()->getThemeInfo($themeKey);
         if (!$themeInfo) {
             throwException(sprintf(t('Theme with key %s not found.'), $themeKey));

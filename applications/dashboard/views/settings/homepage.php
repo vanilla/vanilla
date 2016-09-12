@@ -10,7 +10,7 @@ if ($CurrentCategoriesLayout == '')
     $CurrentCategoriesLayout = 'modern';
 
 function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '') {
-    $iconPath = asset('applications/dashboard/design/images/'.$iconName.'.png');
+    $iconPath = 'applications/dashboard/design/images/'.$iconName.'.png';
 
     $cssClass = '';
     if ($Current == $Url) {

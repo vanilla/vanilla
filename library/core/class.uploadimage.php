@@ -260,7 +260,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             } else {
                 $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
             }
-            if ($OutputType == 'png') {
+            if (in_array($OutputType, ['png', 'ico'])) {
                 imagealphablending($TargetImage, false);
                 imagesavealpha($TargetImage, true);
             }

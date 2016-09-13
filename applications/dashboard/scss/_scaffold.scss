@@ -3,13 +3,17 @@
 // No styleguide reference.
 
 .main {
+  // The panels are fixed width and the main content fills the rest of the screen.
+  // We want the content to load after the other assets to prevent janky loading, so we
+  // position it after the two panels and order it to be in the center here.
   order: 2;
+
   position: relative;
-  overflow: auto;
   padding-left: $padding-default;
   padding-right: $padding-default;
   max-width: 1024px;
   flex-grow: 1;
+  overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
 
   // Ensure the footer is flush with the bottom of the window if the
   // page height is less than the window height.

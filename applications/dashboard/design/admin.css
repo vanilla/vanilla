@@ -8610,12 +8610,12 @@ button.close {
   -ms-flex-order: 2;
   order: 2;
   position: relative;
-  overflow: auto;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
   max-width: 1024px;
   -ms-flex-positive: 1;
   flex-grow: 1;
+  overflow-y: hidden;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;

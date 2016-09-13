@@ -6590,6 +6590,8 @@ li.current-theme {
 }
 
 .footer {
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
   -ms-flex-pack: justify;
   justify-content: space-between;
   -ms-flex-align: center;

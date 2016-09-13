@@ -1,5 +1,6 @@
 .footer {
   @extend .row;
+  flex-wrap: nowrap;
   justify-content: space-between;
   align-items: center;
   padding-left: $padding-default;

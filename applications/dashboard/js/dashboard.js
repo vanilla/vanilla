@@ -951,8 +951,7 @@ var DashboardModal = (function() {
             method: 'POST',
             url: gdn.url('dashboard/userpreferencecollapse'),
             data: ajaxData,
-            dataType: 'json',
-            async: false
+            dataType: 'json'
         });
     });
 
@@ -971,8 +970,7 @@ var DashboardModal = (function() {
             method: 'POST',
             url: gdn.url('dashboard/userpreferencesectionlandingpage'),
             data: ajaxData,
-            dataType: 'json',
-            async: false
+            dataType: 'json'
         });
     });
 
@@ -989,8 +987,7 @@ var DashboardModal = (function() {
             method: 'POST',
             url: gdn.url('dashboard/userpreferencedashboardlandingpage'),
             data: ajaxData,
-            dataType: 'json',
-            async: false
+            dataType: 'json'
         });
     });
 

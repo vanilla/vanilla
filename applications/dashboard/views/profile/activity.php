@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.t('Activity').'</h2>';
+echo '<h1 class="H">'.t('Activity').'</h1>';
 
 $Session = Gdn::session();
 if ($Session->isValid() && checkPermission('Garden.Profiles.Edit')) {

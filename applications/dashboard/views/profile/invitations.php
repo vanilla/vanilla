@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h2 class="H"><?php echo t('Invitations'); ?></h2>
+    <h1 class="H"><?php echo t('Invitations'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.t('Notifications').'</h2>';
+echo '<h1 class="H">'.t('Notifications').'</h1>';
 
 if (count($this->data('Activities'))) {
     echo '<ul class="DataList Activities Notifications">';

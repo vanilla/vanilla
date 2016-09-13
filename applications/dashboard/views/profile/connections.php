@@ -39,7 +39,7 @@
     }
 </style>
 
-<h2 class="H"><?php echo $this->data('Title'); ?></h2>
+<h1 class="H"><?php echo $this->data('Title'); ?></h1>
 
 <div class="Hero">
     <h3><?php echo t("What's This?"); ?></h3>

@@ -210,6 +210,7 @@ module.exports = function (grunt) {
         src: ([]).concat([
           'js/src/lithe.js',
           'js/src/lithe.drawer.js',
+          'js/src/modal.dashboard.js',
           'js/src/main.js'
         ])
         , dest: 'js/dashboard.js'

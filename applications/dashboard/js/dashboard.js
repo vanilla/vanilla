@@ -321,96 +321,27 @@
 
 })(jQuery, window, document);
 
-/*!
- * Dashboard 2016 - A new dashboard design for Vanilla.
- *
- * @author    Becky Van Bussel <beckyvanbussel@gmail.com>
- * @copyright 2016 (c) Becky Van Bussel
- * @license   MIT
- */
 
-'use strict';
+var DashboardModal = (function() {
 
-(function($) {
-
-    var dashboardSymbol =  function(name, alt, cssClass) {
-        if (alt) {
-            alt = 'alt="' + alt + '" ';
-        } else {
-            alt = '';
-        }
-
-        if (!cssClass) {
-            cssClass = '';
-        }
-
-        return '<svg ' + alt + ' class="icon ' + cssClass + 'icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href=\"#' + name + '" /></svg>';
-    };
-
-    var codeInput = {
-        // Replaces any textarea with the 'js-code-input' class with an code editor.
-        start: function(element) {
-            $('.js-code-input', element).each(function () {
-                codeInput.makeAceTextArea($(this));
-            });
-        },
-
-        // Adds the 'js-code-input' class to a form and the mode and height data attributes.
-        init: function(textarea, mode, height) {
-            if (!textarea.length) {
-                return;
-            }
-            textarea.addClass('js-code-input');
-            textarea.data('code-input', {'mode': mode, 'height': height});
-        },
-
-        //
-        makeAceTextArea: function (textarea) {
-            var mode = textarea.data('code-input').mode;
-            var height = textarea.data('code-input').height;
-            var modes = ['html', 'css'];
-
-            if (modes.indexOf(mode) === -1) {
-                mode = 'html';
-            }
-            if (!height) {
-                height = 400;
-            }
-
-            // Add the ace input before the actual textarea and hide the textarea.
-            var formID = textarea.attr('id');
-            textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
-            textarea.hide();
-
-            var editor = ace.edit('editor-' + formID);
-            editor.$blockScrolling = Infinity;
-            editor.getSession().setMode('ace/mode/' + mode);
-            editor.setTheme('ace/theme/clouds');
-
-            // Set the textarea value on the ace input and update the textarea when the ace input is updated.
-            editor.getSession().setValue(textarea.val());
-            editor.getSession().on('change', function () {
-                textarea.val(editor.getSession().getValue());
-            });
-        }
-    };
-
-    function Modal ($trigger, settings) {
+    var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
         this.addToDom();
 
         this.settings = {};
         this.defaultContent.closeIcon = dashboardSymbol('close');
-        $.extend(true, this.settings, Modal.prototype.defaultSettings, settings, $trigger.data());
+        $.extend(true, this.settings, this.defaultSettings, settings, $trigger.data());
 
         this.trigger = $trigger;
         this.target = $trigger.attr('href');
         this.addEventListeners();
         this.start();
-    }
+    };
 
-    Modal.prototype = {
+    DashboardModal.prototype = {
+
+        activeModal: undefined,
 
         defaultSettings: {
             httpmethod: 'get',
@@ -717,6 +648,70 @@
         }
     };
 
+    return DashboardModal;
+
+})();
+
+/*!
+ * Dashboard v3 - A new dashboard design for Vanilla.
+ *
+ * @author    Becky Van Bussel <beckyvanbussel@gmail.com>
+ * @copyright 2016 (c) Becky Van Bussel
+ * @license   MIT
+ */
+
+'use strict';
+
+(function($) {
+
+    var codeInput = {
+        // Replaces any textarea with the 'js-code-input' class with an code editor.
+        start: function(element) {
+            $('.js-code-input', element).each(function () {
+                codeInput.makeAceTextArea($(this));
+            });
+        },
+
+        // Adds the 'js-code-input' class to a form and the mode and height data attributes.
+        init: function(textarea, mode, height) {
+            if (!textarea.length) {
+                return;
+            }
+            textarea.addClass('js-code-input');
+            textarea.data('code-input', {'mode': mode, 'height': height});
+        },
+
+        //
+        makeAceTextArea: function (textarea) {
+            var mode = textarea.data('code-input').mode;
+            var height = textarea.data('code-input').height;
+            var modes = ['html', 'css'];
+
+            if (modes.indexOf(mode) === -1) {
+                mode = 'html';
+            }
+            if (!height) {
+                height = 400;
+            }
+
+            // Add the ace input before the actual textarea and hide the textarea.
+            var formID = textarea.attr('id');
+            textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
+            textarea.hide();
+
+            var editor = ace.edit('editor-' + formID);
+            editor.$blockScrolling = Infinity;
+            editor.getSession().setMode('ace/mode/' + mode);
+            editor.setTheme('ace/theme/clouds');
+
+            // Set the textarea value on the ace input and update the textarea when the ace input is updated.
+            editor.getSession().setValue(textarea.val());
+            editor.getSession().on('change', function () {
+                textarea.val(editor.getSession().getValue());
+            });
+        }
+    };
+
     function prettyPrintInit(element) {
         // Pretty print
         $('#Pockets td:nth-child(4)', element).each(function () {
@@ -904,8 +899,8 @@
     }
 
     function modalInit() {
-        if (typeof(Modal.activeModal) === 'object') {
-            Modal.activeModal.load();
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            DashboardModal.activeModal.load();
         }
     }
 
@@ -913,8 +908,8 @@
         var containerSelector = '#main-row .main';
 
         // We're in a popup.
-        if (typeof(Modal.activeModal) === 'object') {
-            containerSelector = '#' + Modal.activeModal.id + ' .modal-body';
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            containerSelector = '#' + DashboardModal.activeModal.id + ' .modal-body';
         }
 
         $('.table-data', element).tablejengo({container: containerSelector});
@@ -933,11 +928,6 @@
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
     });
-
-    // $(document).on('c3Init', function() {
-    //
-    // });
-
 
     // Event handlers
 
@@ -1034,12 +1024,12 @@
 
     $(document).on('click', '.js-modal', function(e) {
         e.preventDefault();
-        Modal.activeModal = new Modal($(this), {});
+        DashboardModal.activeModal = new DashboardModal($(this), {});
     });
 
     $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
         e.preventDefault();
-        Modal.activeModal = new Modal($(this), {
+        DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'post',
             modaltype: 'confirm'
         });
@@ -1047,7 +1037,7 @@
 
     $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
         e.preventDefault();
-        Modal.activeModal = new Modal($(this), {
+        DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
             modaltype: 'confirm'
         });
@@ -1056,23 +1046,29 @@
     // Get new banner image.
     $(document).on('click', '.js-upload-email-image-button', function(e) {
         e.preventDefault();
-        Modal.activeModal = new Modal($(this), {
+        DashboardModal.activeModal = new DashboardModal($(this), {
             afterSuccess: emailStyles.reloadImage
         });
     });
 
     $(document).on('click', '.js-modal-close', function() {
-        if (typeof(Modal.activeModal) === 'object') {
-            $('#' + Modal.activeModal.id).modal('hide');
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
         }
     });
 
 })(jQuery);
 
-// Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
-var dashboardSymbol = function(name, cssClass) {
+var dashboardSymbol =  function(name, alt, cssClass) {
+    if (alt) {
+        alt = 'alt="' + alt + '" ';
+    } else {
+        alt = '';
+    }
+
     if (!cssClass) {
         cssClass = '';
     }
-    return '<svg class="icon ' + cssClass + ' icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href="#' + name + '" /></svg>';
+
+    return '<svg ' + alt + ' class="icon ' + cssClass + 'icon-svg-' + name + '" viewBox="0 0 17 17"><use xlink:href=\"#' + name + '" /></svg>';
 };

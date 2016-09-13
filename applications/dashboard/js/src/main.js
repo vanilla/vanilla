@@ -297,14 +297,7 @@
             method: 'POST',
             url: gdn.url('dashboard/userpreferencecollapse'),
             data: ajaxData,
-            dataType: 'json',
-            error: function(xhr) {
-                gdn.informError(xhr);
-            },
-            success: function(json) {
-                gdn.inform(json);
-                gdn.processTargets(json.Targets);
-            }
+            dataType: 'json'
         });
     });
 
@@ -323,14 +316,7 @@
             method: 'POST',
             url: gdn.url('dashboard/userpreferencesectionlandingpage'),
             data: ajaxData,
-            dataType: 'json',
-            error: function(xhr) {
-                gdn.informError(xhr);
-            },
-            success: function(json) {
-                gdn.inform(json);
-                gdn.processTargets(json.Targets);
-            }
+            dataType: 'json'
         });
     });
 
@@ -347,14 +333,7 @@
             method: 'POST',
             url: gdn.url('dashboard/userpreferencedashboardlandingpage'),
             data: ajaxData,
-            dataType: 'json',
-            error: function(xhr) {
-                gdn.informError(xhr);
-            },
-            success: function(json) {
-                gdn.inform(json);
-                gdn.processTargets(json.Targets);
-            }
+            dataType: 'json'
         });
     });
 

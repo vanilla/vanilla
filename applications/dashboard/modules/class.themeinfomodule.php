@@ -26,6 +26,8 @@ class ThemeInfoModule extends Gdn_Module {
         if (!$themeInfo) {
             throw new Exception(sprintf(t('Theme with key %s not found.'), $themeKey));
         }
+        $options = val('Options', $themeInfo, []);
+        
         $this->iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo, self::THEME_PLACEHOLDER_IMAGE_URL));
         $this->themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeKey));
         $this->description = val('Description', $themeInfo, '');
@@ -34,7 +36,7 @@ class ThemeInfoModule extends Gdn_Module {
         $this->authorEmail = val('AuthorEmail', $themeInfo, '');
         $this->authorUrl = val('AuthorUrl', $themeInfo, '');
         $this->newVersion = val('NewVersion', $themeInfo, '');
-        $this->hasOptions = !empty(val('Options', $themeInfo, []));
+        $this->hasOptions = !empty($options);
         $this->themeUrl = val('ThemeUrl', $themeInfo, '');
         $this->hasUpgrade = $this->newVersion != '' && version_compare($this->newVersion, $this->version, '>');
         $this->requirements = val('RequiredApplications', $themeInfo, []);

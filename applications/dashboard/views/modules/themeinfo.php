@@ -14,7 +14,7 @@
             <h3 class="media-heading theme-name">
                 <?php echo $this->getThemeUrl() != '' ? anchor($this->getThemeName(), $this->getThemeUrl()) : $this->getThemeName(); ?>
             </h3>
-            <?php if (!empty($this->getInfo())) { ?>
+            <?php if ($this->getInfo()) { ?>
                 <div class="info">
                     <?php echo implode('<span class="spacer">|</span>', $this->getInfo()); ?>
                 </div>

@@ -323,7 +323,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param $GD
      * @param $TargetPath
      */
-    public static function imageIco($GD, $TargetPath) {
+    public static function imageIco($gd, $targetPath) {
         require_once PATH_LIBRARY.'/vendors/php-ico/class-php-ico.php';
         $imagePath = tempnam(sys_get_temp_dir(), 'iconify');
         imagepng($gd, $imagePath);

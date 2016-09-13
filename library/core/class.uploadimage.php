@@ -324,11 +324,11 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param $TargetPath
      */
     public static function imageIco($GD, $TargetPath) {
-        require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
-        require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';
-        $Ico = new phpthumb_ico();
-        $Arr = array('ico' => $GD);
-        $IcoString = $Ico->GD2ICOstring($Arr);
-        file_put_contents($TargetPath, $IcoString);
+        require_once PATH_LIBRARY.'/vendors/php-ico/class-php-ico.php';
+        $imagePath = tempnam(sys_get_temp_dir(), 'iconify');
+        imagepng($gd, $imagePath);
+
+        $icoLib = new PHP_ICO($imagePath, [[16,16]]);
+        $icoLib->save_ico($targetPath);
     }
 }

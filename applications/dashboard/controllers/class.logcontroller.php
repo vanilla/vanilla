@@ -303,6 +303,7 @@ class LogController extends DashboardController {
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery.popup.js');
     }
 
     /**

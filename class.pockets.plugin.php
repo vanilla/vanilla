@@ -88,7 +88,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param $Sender
      */
-    public function base_GetAppSettingsMenuItems_Handler(&$Sender) {
+    public function base_GetAppSettingsMenuItems_Handler($Sender) {
         $Menu = $Sender->EventArguments['SideMenu'];
         $Menu->addItem('Appearance', t('Appearance'));
         $Menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');

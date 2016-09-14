@@ -121,7 +121,8 @@
     &.column-checkbox {
       width: to-rem(42);
       max-width: to-rem(42);
-      padding: $table-cell-padding;
+      padding-left: $table-cell-padding;
+      padding-right: $table-cell-padding;
     }
   }
 
@@ -261,7 +262,7 @@
 
     tr {
       &:last-child {
-        border-bottom: $border-width * 2 solid $table-border-color;
+        border-bottom: $border-width solid $table-border-color;
       }
     }
 
@@ -317,7 +318,7 @@
   .FeedItem {
     position: relative;
     padding: to-rem(12) 0;
-    border-bottom: $border-width solid #eee;
+    border-bottom: $border-width solid $table-border-color;
 
     &:hover {
       background-color: #f9fdfe;

@@ -1623,7 +1623,7 @@ a.text-danger:focus, a.text-danger:hover {
   display: block;
   margin-bottom: 0.75rem;
   background-color: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #e7e8e9;
   border-radius: 0.125rem;
 }
 
@@ -1663,7 +1663,7 @@ a.text-danger:focus, a.text-danger:hover {
 .card-header {
   padding: 0.75rem 1.25rem;
   background-color: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e7e8e9;
 }
 
 .card-header:first-child {
@@ -1673,7 +1673,7 @@ a.text-danger:focus, a.text-danger:hover {
 .card-footer {
   padding: 0.75rem 1.25rem;
   background-color: #fff;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #e7e8e9;
 }
 
 .card-footer:last-child {
@@ -5968,7 +5968,7 @@ input[type="button"].btn-block {
 .Section-Analytics .c3-axis path,
 .Section-DashboardHome .c3-axis path {
   stroke-width: 1.5;
-  stroke: #ddd;
+  stroke: #e7e8e9;
 }
 
 .Section-DashboardHome .c3-circle {
@@ -6635,7 +6635,7 @@ li.current-theme {
   align-items: center;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid #e7e8e9;
   color: #000;
   background-color: #f6f9fb;
 }
@@ -6694,7 +6694,7 @@ li.current-theme {
   line-height: 1.3333333333;
   display: inline-block;
   padding-left: 1.125rem;
-  border-left: 1px solid #ddd;
+  border-left: 1px solid #e7e8e9;
 }
 
 .radio,
@@ -6971,7 +6971,7 @@ table .toggle-slider-active, table .InProgress .toggle-slider, .InProgress table
   width: 2.5rem;
   height: 1.71875rem;
   background: #000;
-  border: 0.0625rem solid #ddd;
+  border: 0.0625rem solid #e7e8e9;
   cursor: pointer;
 }
 
@@ -7419,7 +7419,7 @@ select + select {
   height: 1.125rem;
   margin-right: 0.28125rem;
   vertical-align: middle;
-  border: 0.0625rem solid #ddd;
+  border: 0.0625rem solid #e7e8e9;
   cursor: pointer;
 }
 
@@ -7780,7 +7780,7 @@ div.Messages.Errors {
 .media {
   padding: 1.125rem 1.125rem;
   margin-bottom: 0;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #e7e8e9;
 }
 
 .media .info, .media .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .media .FeedDescription, .media .emojiset-author {
@@ -7803,7 +7803,7 @@ div.Messages.Errors {
 
 .media .media-image {
   height: 10rem;
-  border: 1px solid #ddd;
+  border: 1px solid #e7e8e9;
 }
 
 .media.not-padded {
@@ -8098,11 +8098,11 @@ button.close {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
-  border-bottom: 0.0625rem solid #ddd;
+  border-bottom: 0.0625rem solid #e7e8e9;
 }
 
 .nav-adventure .nav-item:first-child {
-  border-top: 0.0625rem solid #ddd;
+  border-top: 0.0625rem solid #e7e8e9;
 }
 
 .nav-adventure .nav-item-title {
@@ -8157,7 +8157,7 @@ button.close {
   align-items: center;
   width: 2.25rem;
   height: 2.25rem;
-  border: 0.0625rem solid #ddd;
+  border: 0.0625rem solid #e7e8e9;
   border-radius: 0.125rem;
   margin-right: 1.125rem;
 }
@@ -8678,7 +8678,7 @@ button.close {
   margin-top: -3.75rem;
   padding-top: 3.75rem;
   background-color: #fff;
-  border: 1px solid #ddd;
+  border: 1px solid #e7e8e9;
   border-top: 0;
   border-bottom: 0;
   transition: all 250ms;
@@ -8895,7 +8895,8 @@ ul {
 .table-data td.column-checkbox {
   width: 2.625rem;
   max-width: 2.625rem;
-  padding: 0.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .table-data tbody + tbody {
@@ -9010,7 +9011,7 @@ ul {
 }
 
 .Section-DashboardHome table tr:last-child {
-  border-bottom: 0.125rem solid #f4f6fb;
+  border-bottom: 0.0625rem solid #f4f6fb;
 }
 
 .Section-DashboardHome table td {
@@ -9066,7 +9067,7 @@ ul {
 .Section-DashboardHome .FeedItem {
   position: relative;
   padding: 0.75rem 0;
-  border-bottom: 0.0625rem solid #eee;
+  border-bottom: 0.0625rem solid #f4f6fb;
 }
 
 .Section-DashboardHome .FeedItem:hover {
@@ -9474,7 +9475,7 @@ pre {
 .subheading-block {
   padding-top: 1.125rem;
   padding-bottom: 1.125rem;
-  border-top: 0.0625rem solid #ddd;
+  border-top: 0.0625rem solid #e7e8e9;
 }
 
 .subheading-block .subheading {
@@ -9491,7 +9492,7 @@ pre {
   justify-content: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom-color: #ddd;
+  border-bottom-color: #e7e8e9;
 }
 
 .header-menu.padded, .label-wrap img.header-menu, div.header-menu.Messages.Errors {
@@ -9917,7 +9918,7 @@ form .title {
   cursor: -moz-grab;
   cursor: grab;
   line-height: 1;
-  fill: #ddd;
+  fill: #e7e8e9;
 }
 
 .dd-handle:hover {
@@ -9926,7 +9927,7 @@ form .title {
 
 .dd-content {
   display: block;
-  border: solid 1px #ddd;
+  border: solid 1px #e7e8e9;
   background: #fdfdff;
   border-radius: 2px;
   padding: 6px 9px 6px 60px;
@@ -9968,7 +9969,7 @@ form .title {
 }
 
 .bigcrumbs {
-  border-bottom: solid 1px #ddd;
+  border-bottom: solid 1px #e7e8e9;
   fill: #555a62;
   padding-left: 6px;
 }
@@ -9998,7 +9999,7 @@ form .title {
   border: solid 12px transparent;
   border-top-width: 19px;
   border-bottom-width: 19px;
-  border-left-color: #ddd;
+  border-left-color: #e7e8e9;
 }
 
 .bigcrumbs .crumb:after {

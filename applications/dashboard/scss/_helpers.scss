@@ -3,6 +3,21 @@
   display: none;
 }
 
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 ($spacer / 4);
+  margin-left: $spacer / 4;
+  font-size: $font-size-xs;
+  background-color: rgba(0,0,0,.1875);
+  color: $white;
+  border-radius: .25rem;
+
+  .btn-group & {
+    margin-top: - to-rem(2);
+  }
+}
+
 .Padded,
 .padded {
   margin: $spacer 0;

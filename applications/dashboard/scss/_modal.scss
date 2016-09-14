@@ -96,12 +96,13 @@
 
   &:hover {
     svg {
-      fill: $grey-dark;
+      opacity: 1;
     }
   }
 
   svg {
-    fill: $grey;
+    fill: $grey-dark;
+    opacity: 0.7;
     height: to-rem(52) - 1.5rem;
   }
 }

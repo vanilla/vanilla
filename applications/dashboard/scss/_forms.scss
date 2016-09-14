@@ -119,22 +119,22 @@ label,
   }
 
   > .input-wrap {
-    @extend .col-sm-16;
+    @extend .col-sm-14;
     @extend .col-xs-24;
 
     &.no-label {
-      @extend .col-sm-offset-8;
+      @extend .col-sm-offset-10;
       @extend .col-xs-offset-0;
     }
   }
 
   > .label-wrap {
-    @extend .col-sm-8;
+    @extend .col-sm-10;
     @extend .col-xs-24;
   }
 
   > .label-wrap-wide {
-    @extend .col-sm-8;
+    @extend .col-sm-10;
     @extend .col-xs-12;
     flex-grow: 1;
   }
@@ -308,6 +308,9 @@ $toggle-width: $toggle-height * 2;
 
 table {
   .toggle-wrap {
+    display: inline-block;
+    vertical-align: middle;
+
     width: $toggle-width;
     height: $toggle-height;
   }
@@ -348,6 +351,7 @@ table {
 // Styleguide 3.3.2.
 
 .toggle-wrap {
+
   label {
     display: inline;
   }

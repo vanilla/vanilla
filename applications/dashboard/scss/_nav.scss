@@ -49,18 +49,12 @@
   }
 
   svg {
-    fill: $grey;
+    fill: $grey-dark;
+    opacity: 0.7;
   }
 
   .badge {
-    display: inline-block;
-    vertical-align: middle;
-    padding: 0 ($spacer / 4);
-    margin-left: $spacer / 4;
     font-size: $font-size-xs;
-    background-color: rgba(0,0,0,.1875);
-    color: $white;
-    border-radius: .25rem;
   }
 
   .globals-sign-out {

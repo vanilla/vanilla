@@ -38,11 +38,10 @@
   }
 
   td.options {
-    white-space: nowrap;
+    text-align: right;
 
     > * {
       display: inline-block;
-      white-space: nowrap;
       margin-right: $spacer / 4;
       vertical-align: middle;
 
@@ -257,7 +256,7 @@
     }
 
     th, td {
-      border-top-width: $border-width * 2;
+      border-top-width: $border-width;
     }
 
     tr {
@@ -318,7 +317,7 @@
   .FeedItem {
     position: relative;
     padding: to-rem(12) 0;
-    border-bottom: $border-width * 2 solid #eee;
+    border-bottom: $border-width solid #eee;
 
     &:hover {
       background-color: #f9fdfe;

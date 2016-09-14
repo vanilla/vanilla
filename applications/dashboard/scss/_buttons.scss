@@ -82,7 +82,7 @@ fieldset[disabled] a.btn {
 }
 
 .btn-secondary {
-  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
 }
 
 // Remove all backgrounds
@@ -184,7 +184,13 @@ input[type="button"] {
   }
 
   svg {
+    fill: $grey-dark;
+    opacity: 0.7;
     height: to-rem(24);
+  }
+
+  &:hover svg {
+    opacity: 1;
   }
 
   &.disabled {
@@ -195,7 +201,7 @@ input[type="button"] {
 // Icon buttons
 
 .btn-icon-border {
-  @extend .btn-secondary;
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
   @extend .icon;
   $btn-icon-height: 28;
   $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
@@ -208,12 +214,6 @@ input[type="button"] {
 
   svg {
     height: to-rem($btn-icon-height);
-  }
-
-  &:hover {
-    svg {
-      fill: $white;
-    }
   }
 }
 
@@ -236,6 +236,10 @@ input[type="button"] {
       border-top-right-radius: $border-radius;
       border-bottom-right-radius: $border-radius;
     }
+  }
+
+  .btn-secondary {
+    min-width: to-rem(96);
   }
 }
 

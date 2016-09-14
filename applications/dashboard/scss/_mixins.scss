@@ -14,16 +14,16 @@
   }
 }
 
-@mixin button-variant($color, $background, $border, $active-color, $active-background, $active-border) {
+@mixin button-variant($color, $background, $border, $active-color, $active-background, $active-border, $hover-color: $active-color, $hover-background: $active-background, $hover-border: $active-border) {
   color: $color;
   background-color: $background;
   border-color: $border;
   @include box-shadow(inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075));
 
   @include hover {
-    color: $active-color;
-    background-color: $active-background;
-    border-color: $active-border;
+    color: $hover-color;
+    background-color: $hover-background;
+    border-color: $hover-border;
   }
 
   &:focus,

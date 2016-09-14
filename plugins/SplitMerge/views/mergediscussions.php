@@ -11,7 +11,7 @@ if (count($Discussions) < 2) {
     echo wrap(t('Choose the main discussion into which all comments will be merged:'), 'p');
 
     $DefaultDiscussionID = $Discussions[0]['DiscussionID'];
-    $RadioData = consolidateArrayValuesByKey($Discussions, 'DiscussionID', 'Name');
+    $RadioData = array_column($Discussions, 'Name', 'DiscussionID');
     array_map('htmlspecialchars', $RadioData);
     echo '<ul><li>';
     echo $this->Form->RadioList('MergeDiscussionID', $RadioData, array('ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID));

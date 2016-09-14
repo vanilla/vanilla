@@ -36,7 +36,7 @@ class BookmarkedModule extends Gdn_Module {
                 ->where('UserID', Gdn::session()->UserID)
                 ->where('Bookmarked', 1)
                 ->get()->resultArray();
-            $BookmarkIDs = consolidateArrayValuesByKey($BookmarkIDs, 'DiscussionID');
+            $BookmarkIDs = array_column($BookmarkIDs, 'DiscussionID');
 
             if (count($BookmarkIDs)) {
                 $DiscussionModel = new DiscussionModel();

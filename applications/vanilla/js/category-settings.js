@@ -32,7 +32,8 @@
                     url: gdn.url('/vanilla/settings/categoriestree.json'),
                     data: {
                         TransientKey: gdn.getMeta('TransientKey'),
-                        Subtree: JSON.stringify(postTree)
+                        Subtree: JSON.stringify(postTree),
+                        ParentID: $(source).data('parentId')
                     },
                     dataType: 'json',
                     error: function (xhr) {

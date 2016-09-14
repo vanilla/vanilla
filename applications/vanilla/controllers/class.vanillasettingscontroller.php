@@ -726,6 +726,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }
 
+        $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);
         $this->setData('_CurrentRecords', count($categories));
@@ -946,7 +947,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         if ($this->Request->isAuthenticatedPostBack(true)) {
             $tree = json_decode($this->Request->post('Subtree'), true);
-            $result = $this->CategoryModel->SaveSubtree($tree);
+            $result = $this->CategoryModel->saveSubtree($tree, $this->Request->post('ParentID', -1));
             $this->setData('Result', $result);
         } else {
             throw new Gdn_UserException($this->Request->requestMethod().' is not allowed.', 405);

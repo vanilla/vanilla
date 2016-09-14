@@ -1985,9 +1985,10 @@ class CategoryModel extends Gdn_Model {
      * Save a subtree.
      *
      * @param array $subtree A nested array where each array contains a CategoryID and optional Children element.
+     * @parem int $parentID Parent ID of the subtree
      */
-    public function saveSubtree($subtree) {
-        $this->saveSubtreeInternal($subtree);
+    public function saveSubtree($subtree, $parentID) {
+        $this->saveSubtreeInternal($subtree, $parentID);
     }
 
     /**

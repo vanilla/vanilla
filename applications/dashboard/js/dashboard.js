@@ -453,6 +453,7 @@ var DashboardModal = (function() {
                 dataType: 'json',
                 error: function(xhr) {
                     gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
                 },
                 success: function(json) {
                     gdn.inform(json);
@@ -547,11 +548,9 @@ var DashboardModal = (function() {
                 url: self.target,
                 data: ajaxData,
                 dataType: 'json',
-                error: function(request, textStatus, errorThrown) {
-                    console.log('error: ');
-                    console.log(request);
-                    console.log(textStatus);
-                    console.log(errorThrown);
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
                 },
                 success: function(json) {
                     var body = json.Data;
@@ -587,6 +586,7 @@ var DashboardModal = (function() {
                 },
                 error: function(xhr) {
                     gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
                 }
             });
         },
@@ -600,6 +600,9 @@ var DashboardModal = (function() {
                 }, 300);
             } else {
                 document.location.replace(window.location.href);
+                // Need to ensure editting/deleting/adding view updates
+                // are handled by the controller methods. Until then, we have to reload the page.
+                // $('#' + self.id).modal('hide');
             }
         },
 

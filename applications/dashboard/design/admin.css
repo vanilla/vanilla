@@ -6831,10 +6831,6 @@ label,
   margin-bottom: 0;
 }
 
-.form-group.row:first-child, .form-group.footer:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child, .form-group.media:first-child {
-  border-top: 1px dotted #e7e8e9;
-}
-
 .form-footer {
   display: -ms-flexbox;
   display: flex;

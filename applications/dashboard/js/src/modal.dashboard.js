@@ -77,7 +77,7 @@ var DashboardModal = (function() {
         modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
 
         start: function($trigger, settings) {
-            $('#' + this.id).modal('show');
+            $('#' + this.id).modal('show').focus();
             if (this.settings.modaltype === 'confirm') {
                 this.addConfirmContent();
             } else {

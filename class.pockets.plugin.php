@@ -157,7 +157,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function settingsController_pockets_create($Sender, $Args = array()) {
         $Sender->permission('Plugins.Pockets.Manage');
-        $Sender->addSideMenu('settings/pockets');
+        $Sender->setHighlightRoute('settings/pockets');
         $Sender->addJsFile('pockets.js', 'plugins/Pockets');
 
         $Page = val(0, $Args);

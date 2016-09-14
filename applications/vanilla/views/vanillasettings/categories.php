@@ -21,6 +21,6 @@
     PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']);
 } ?></div>
 
-<div class="dd tree tree-categories"><?php
+<div class="dd tree tree-categories" data-parent-id="<?php echo $this->data('ParentID', -1); ?>"><?php
     writeCategoryTree($this->data('Categories', []), 0, $this->data('AllowSorting', true));
 ?></div>

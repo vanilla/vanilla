@@ -296,7 +296,7 @@ class TagModel extends Gdn_Model {
                 $tags = $all_tags[$discussionId];
 
                 if ($this->StringTags) {
-                    $tags = consolidateArrayValuesByKey($tags, 'Name');
+                    $tags = array_column($tags, 'Name');
                     setValue('Tags', $row, implode(',', $tags));
                 } else {
                     foreach ($tags as &$trow) {
@@ -528,7 +528,7 @@ class TagModel extends Gdn_Model {
             ->whereIn('Name', $Tags)
             ->get()->resultArray();
 
-        $TagIDs = consolidateArrayValuesByKey($TagIDs, 'TagID');
+        $TagIDs = array_column($TagIDs, 'TagID');
 
         if ($Op == 'and' && count($Tags) > 1) {
             $DiscussionIDs = $TagSql
@@ -544,7 +544,7 @@ class TagModel extends Gdn_Model {
             $Limit = '';
             $Offset = 0;
 
-            $DiscussionIDs = consolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+            $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
 
             $Sql->whereIn('d.DiscussionID', $DiscussionIDs);
             $SortField = 'd.DiscussionID';

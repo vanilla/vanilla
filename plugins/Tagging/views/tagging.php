@@ -143,8 +143,8 @@ Gdn_Theme::assetEnd();
                     <td class="options">
                     <?php
                     if (!$Special) {
-                        echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]]);
+                        echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]]);
                     }
                     ?>
                     </td>

@@ -41,9 +41,9 @@ $Session = Gdn::session();
                 <td class="options">
                     <div class="btn-group">
                     <?php
-                    echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);
+                    echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                     if (!$Reserved) {
-                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete')]);
+                        echo anchor(dashboardSymbol('delete'), '/routes/delete/'.trim($RouteData['Key'].'=').'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     }
                     ?>
                     </div>

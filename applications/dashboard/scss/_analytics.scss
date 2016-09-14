@@ -69,7 +69,7 @@
 }
 
 .analytics-panel-metrics {
-  @include full-border(flex, true, true);
+  @include full-border(flex, false, true);
   @extend .nav-stats;
   overflow: hidden;
 
@@ -78,7 +78,7 @@
 
   padding: ($spacer / 2) 0 $spacer;
   border-top-color: $grey-dark-border;
-  border-bottom-color: $grey-dark-border;
+  //border-bottom-color: $grey-dark-border;
 
   .metric-value {
     text-align: center;
@@ -94,7 +94,7 @@
 
   .analytics-widget-metric {
     @extend .nav-stats-item;
-    border-right: $border-width solid $grey-dark-border;
+    //border-right: $border-width solid $grey-dark-border;
     padding: $spacer ($spacer * 2) !important;
     margin-top: ($spacer / 2);
     min-width: to-rem(180);

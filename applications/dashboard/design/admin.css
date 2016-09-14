@@ -5366,7 +5366,6 @@ output {
   margin-right: -1.125rem;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-bottom: 0.0625rem solid #e7e8e9;
   border-top: 0.0625rem solid #e7e8e9;
   overflow: hidden;
   -ms-flex-pack: center;
@@ -5375,7 +5374,6 @@ output {
   flex-wrap: wrap;
   padding: 0.5625rem 0 1.125rem;
   border-top-color: #ededed;
-  border-bottom-color: #ededed;
 }
 
 .analytics-panel-metrics .metric-value {
@@ -5389,7 +5387,6 @@ output {
 }
 
 .analytics-panel-metrics .analytics-widget-metric {
-  border-right: 0.0625rem solid #ededed;
   padding: 1.125rem 2.25rem !important;
   margin-top: 0.5625rem;
   min-width: 11.25rem;

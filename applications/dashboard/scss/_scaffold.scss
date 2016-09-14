@@ -51,13 +51,14 @@
     }
   }
 
-  .content,
-  .footer {
-    flex: 1 100%;
+  .content {
+    flex-grow: 1;
   }
 
   .footer {
-    max-height: 4rem;
+    flex-shrink: 0;
+    height: 4rem;
+    margin-top: -4rem;
   }
 
   .content {

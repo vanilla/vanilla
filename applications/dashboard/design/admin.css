@@ -8701,14 +8701,16 @@ button.close {
   content: '';
 }
 
-.main .content,
-.main .footer {
-  -ms-flex: 1 100%;
-  flex: 1 100%;
+.main .content {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
 }
 
 .main .footer {
-  max-height: 4rem;
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  height: 4rem;
+  margin-top: -4rem;
 }
 
 .main .content {

@@ -97,7 +97,7 @@ pre {
   font-size: $font-size-base;
   line-height: $line-height;
   font-weight: 500;
-  border-top: $border-width solid $grey-light;
+  border-top: $border-width solid #e7e8e9;
 }
 
 .modal h2 {
@@ -172,7 +172,7 @@ pre {
 .subheading-block {
   padding-top: $spacer;
   padding-bottom: $spacer;
-  border-top: $border-width solid $grey-light;
+  border-top: $border-width solid $border-color;
 
   @extend .full-border;
 
@@ -194,7 +194,7 @@ pre {
   justify-content: center;
   align-items: center;
   @extend .full-border;
-  border-bottom-color: $grey-dark-border;
+  border-bottom-color: $border-color;
 
   &.padded {
     margin-bottom: $spacer;

@@ -185,10 +185,10 @@ label,
   flex-wrap: wrap;
   align-items: center;
   padding-bottom: 1rem;
-  border-bottom: 1px dotted $grey-light;
+  border-bottom: 1px dotted #e7e8e9;
 
   &:first-child {
-    border-top: 1px dotted $grey-light;
+    border-top: 1px dotted #e7e8e9;
   }
 
   //Reset
@@ -308,11 +308,11 @@ $toggle-width: $toggle-height * 2;
 
 table {
   .toggle-wrap {
-    display: inline-block;
-    vertical-align: middle;
-
     width: $toggle-width;
     height: $toggle-height;
+    margin-left: $spacer / 4;
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .toggle-well {
@@ -689,7 +689,7 @@ select + select {
   .label-selector-corner-link {
     position: absolute;
     display: block;
-    width: to-rem(24);
+    width: to-rem(16);
     top: $spacer / 2;
     right: $spacer / 2;
 

@@ -120,9 +120,9 @@
   padding-left: $padding-default;
   padding-right: $padding-default;
   @if ($has-border-bottom) {
-    border-bottom: $border-width solid $grey-light;
+    border-bottom: $border-width solid #e7e8e9;
   }
   @if ($has-border-top) {
-    border-top: $border-width solid $grey-light;
+    border-top: $border-width solid #e7e8e9;
   }
 }

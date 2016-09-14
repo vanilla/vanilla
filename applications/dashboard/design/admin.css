@@ -5366,8 +5366,8 @@ output {
   margin-right: -1.125rem;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-bottom: 0.0625rem solid #f6f9fb;
-  border-top: 0.0625rem solid #f6f9fb;
+  border-bottom: 0.0625rem solid #e7e8e9;
+  border-top: 0.0625rem solid #e7e8e9;
   overflow: hidden;
   -ms-flex-pack: center;
   justify-content: center;
@@ -6829,13 +6829,13 @@ label,
   -ms-flex-align: center;
   align-items: center;
   padding-bottom: 1rem;
-  border-bottom: 1px dotted #f6f9fb;
+  border-bottom: 1px dotted #e7e8e9;
   padding-top: 1rem;
   margin-bottom: 0;
 }
 
 .form-group.row:first-child, .form-group.footer:first-child, .form-group.label-selector:first-child, .form-group.emojiext-list:first-child, .form-group.media:first-child {
-  border-top: 1px dotted #f6f9fb;
+  border-top: 1px dotted #e7e8e9;
 }
 
 .form-footer {
@@ -6903,10 +6903,11 @@ label,
 }
 
 table .toggle-wrap {
-  display: inline-block;
-  vertical-align: middle;
   width: 3.75rem;
   height: 1.875rem;
+  margin-left: 0.28125rem;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 table .toggle-well, table .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap table input[type="checkbox"] + label::before {
@@ -7206,7 +7207,7 @@ select + select {
 .label-selector .label-selector-corner-link, .emojiext-list .label-selector-corner-link {
   position: absolute;
   display: block;
-  width: 1.5rem;
+  width: 1rem;
   top: 0.5625rem;
   right: 0.5625rem;
 }
@@ -8131,6 +8132,8 @@ button.close {
 }
 
 .nav-adventure .nav-link svg {
+  fill: #555a62;
+  opacity: 0.7;
   display: block;
   height: 1.5rem;
 }
@@ -9401,7 +9404,7 @@ pre {
   font-size: 0.875rem;
   line-height: 1.5;
   font-weight: 500;
-  border-top: 0.0625rem solid #f6f9fb;
+  border-top: 0.0625rem solid #e7e8e9;
 }
 
 .modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title {
@@ -9419,7 +9422,7 @@ pre {
   margin-right: -1.125rem;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-bottom: 0.0625rem solid #f6f9fb;
+  border-bottom: 0.0625rem solid #e7e8e9;
 }
 
 .heading-h1-block, .content > h1 {
@@ -9471,7 +9474,7 @@ pre {
 .subheading-block {
   padding-top: 1.125rem;
   padding-bottom: 1.125rem;
-  border-top: 0.0625rem solid #f6f9fb;
+  border-top: 0.0625rem solid #ddd;
 }
 
 .subheading-block .subheading {
@@ -9488,7 +9491,7 @@ pre {
   justify-content: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom-color: #ededed;
+  border-bottom-color: #ddd;
 }
 
 .header-menu.padded, .label-wrap img.header-menu, div.header-menu.Messages.Errors {

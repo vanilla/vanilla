@@ -168,6 +168,8 @@
     //}
 
     svg {
+      fill: $grey-dark;
+      opacity: 0.7;
       display: block;
       height: to-rem(24);
     }

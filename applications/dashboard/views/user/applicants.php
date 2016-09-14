@@ -22,7 +22,7 @@ if ($NumApplicants == 0) : ?>
                     <th class="column-xl"><?php echo t('Reason'); ?></th>
                     <th><?php echo t('IP Address'); ?></th>
                     <th class="column-md"><?php echo t('Date'); ?></th>
-                    <th class="options column-sm"><?php echo t('Options'); ?></th>
+                    <th class="options column-sm"></th>
                 </tr>
             </thead>
             <tbody>
@@ -56,7 +56,7 @@ if ($NumApplicants == 0) : ?>
                     </td>
                     <td><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
                     <td><?php echo Gdn_Format::date($User->DateInserted); ?></td>
-                    <td>
+                    <td class="options">
                         <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve')]);

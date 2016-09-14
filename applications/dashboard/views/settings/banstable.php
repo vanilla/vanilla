@@ -14,7 +14,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
             <th class="column-sm"><?php echo '<span title="'.t('Number of blocked registrations').'">', t('Blocked'), '</span>'; ?></th>
             <th class="UsernameCell"><?php echo t('Added By'); ?></th>
             <th class="column-lg"><?php echo t('Notes'); ?></th>
-            <th class="options"><?php echo t('Options'); ?></th>
+            <th class="options"></th>
         </tr>
         </thead>
         <tbody>
@@ -36,7 +36,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                 </td>
                 <td class="UsernameCell"><?php echo htmlspecialchars($Row['InsertName']); ?></td>
                 <td><?php echo htmlspecialchars($Row['Notes']); ?></td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);

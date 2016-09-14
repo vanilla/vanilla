@@ -29,7 +29,7 @@ echo $this->Form->open();
         <tr id="0">
             <th><?php echo t('Role'); ?></th>
             <th class="column-xl"><?php echo t('Description'); ?></th>
-            <th class="options column-sm"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -54,7 +54,7 @@ echo $this->Form->open();
                     }
                     ?>
                 </td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     if ($Role['CanModify']) {

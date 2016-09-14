@@ -56,10 +56,10 @@ Gdn_Theme::assetBegin('Help'); ?>
 <?php echo $title; ?>
 <?php if ($this->addonType !== 'locales') { ?>
     <div class="toolbar full-border">
-<div class="btn-group">
-        <?php $active = $this->Filter == 'all' ? 'active' : ''; ?><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount)), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all btn btn-secondary '.$active); ?>
-        <?php $active = $this->Filter == 'enabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount)), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled btn btn-secondary '.$active); ?>
-        <?php $active =  $this->Filter == 'disabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount)), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled btn btn-secondary '.$active); ?>
+<div class="btn-group filters">
+        <?php $active = $this->Filter == 'all' ? 'active' : ''; ?><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount, 'span', ['class' => 'badge'])), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all btn btn-secondary '.$active); ?>
+        <?php $active = $this->Filter == 'enabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount, 'span', ['class' => 'badge'])), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled btn btn-secondary '.$active); ?>
+        <?php $active =  $this->Filter == 'disabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Disabled %1$s'), wrap($disabledCount, 'span', ['class' => 'badge'])), 'settings/'.$this->addonType.'/disabled', ''.$this->addonType.'-disabled btn btn-secondary '.$active); ?>
 <!--        --><?php //if ($addonUrl != '') echo $getMore; ?>
 </div>
     </div>

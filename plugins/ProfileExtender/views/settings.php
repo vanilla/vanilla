@@ -17,7 +17,7 @@ $Fields = $this->data('ExtendedFields');
             <th class="column-md">On Registration</th>
             <th class="column-md">In Profiles</th>
             <!--<th>In Discussions</th>-->
-            <th class="column-sm">Options</th>
+            <th class="column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -30,7 +30,7 @@ $Fields = $this->data('ExtendedFields');
                 <td><?php echo (val('OnRegister', $Field, 0)) ? t('Yes') : t('No'); ?></td>
                 <td><?php echo (val('OnProfile', $Field, 1)) ? t('Yes') : t('No'); ?></td>
                 <!--<td><?php echo (val('OnDiscussion', $Field, 0)) ? t('Yes') : t('No'); ?></td>-->
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);

@@ -34,7 +34,7 @@ if (!count($this->FlaggedItems)) {
         <tr>
             <th><?php echo t('Post Type'); ?></th>
             <th><?php echo t('Flagged By'); ?></th>
-            <th class="options"><?php echo t('Options'); ?></th>
+            <th class="options"></th>
         </tr>
         </thead>
         <tbody>

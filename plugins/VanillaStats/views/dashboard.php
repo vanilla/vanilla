@@ -30,8 +30,8 @@
     <div id="StatsNavigation" class="toolbar-stats-daterange">
         <div id="StatsCurrentTimeframe" class="toolbar-stats-daterange-preview"></div>
         <div class="btn-group pager-wrap">
-            <button disabled="disabled" id="StatsNavPrev" class="btn btn-secondary btn-icon-border"><?php echo dashboardSymbol('chevron-left'); ?></button>
-            <button disabled="disabled" id="StatsNavNext" class="btn btn-secondary btn-icon-border"><?php echo dashboardSymbol('chevron-right'); ?></button>
+            <button disabled="disabled" id="StatsNavPrev" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-left'); ?></button>
+            <button disabled="disabled" id="StatsNavNext" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-right'); ?></button>
             <button disabled="disabled" id="StatsNavToday" class="btn btn-secondary"><?php echo t('Today'); ?></button>
         </div>
     </div>

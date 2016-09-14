@@ -83,7 +83,7 @@ Gdn_Theme::assetEnd();
                 <th class="column-md"><?php echo t('Date Added'); ?></th>
                 <th class="column-xs"><?php echo t('Count'); ?></th>
                 <?php if ($CanAddTags) { ?>
-                <th class="column-sm"><?php echo t('Options'); ?></th>
+                <th class="column-sm"></th>
                 <?php } ?>
             </tr>
         </thead>

@@ -141,8 +141,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->addDefinition('VanillaID', Gdn::installationID());
             $sender->addDefinition('AuthToken', Gdn_Statistics::generateToken());
 
-            $sender->addDefinition('ExpandText', t('(more)'));
-            $sender->addDefinition('CollapseText', t('(less)'));
+            $sender->addDefinition('ExpandText', t('more'));
+            $sender->addDefinition('CollapseText', t('less'));
 
             // Render the custom dashboard view
             $sender->render('dashboard', '', 'plugins/VanillaStats');

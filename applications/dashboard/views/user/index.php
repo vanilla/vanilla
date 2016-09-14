@@ -69,7 +69,7 @@ Gdn_Theme::assetBegin('Help');
                 $this->fireEvent('UserCell');
                 ?>
                 <?php if ($EditUser) { ?>
-                    <th class="options column-md"><?php echo t('Options'); ?></th>
+                    <th class="options column-md"></th>
                 <?php } ?>
             </tr>
             </thead>

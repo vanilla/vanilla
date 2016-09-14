@@ -23,6 +23,6 @@ include dirname(__FILE__).'/table.php';
 echo '</div id="LogTable">';
 ?>
 <?php
-$this->addDefinition('ExpandText', t('(more)'));
-$this->addDefinition('CollapseText', t('(less)'));
+$this->addDefinition('ExpandText', t('more'));
+$this->addDefinition('CollapseText', t('less'));
 echo $this->Form->close();

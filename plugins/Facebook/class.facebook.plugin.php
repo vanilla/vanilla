@@ -802,7 +802,7 @@ class FacebookPlugin extends Gdn_Plugin {
 //      return $Provider;
 //   }
 //
-//   public function AuthenticationController_DisableAuthenticatorHandshake_handler(&$Sender) {
+//   public function AuthenticationController_DisableAuthenticatorHandshake_handler($Sender) {
 //      $this->_Disable();
 //   }
 //
@@ -815,7 +815,7 @@ class FacebookPlugin extends Gdn_Plugin {
 //      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 //   }
 //
-//   public function AuthenticationController_EnableAuthenticatorHandshake_handler(&$Sender) {
+//   public function AuthenticationController_EnableAuthenticatorHandshake_handler($Sender) {
 //      $this->_Enable();
 //   }
 //

@@ -1,5 +1,10 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->title(); ?></h1>
+<div class="header-block">
+    <div class="title-block">
+        <?php echo anchor(dashboardSymbol('chevron-left'), "/dashboard/role", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
+        <h1><?php echo $this->title(); ?></h1>
+    </div>
+</div>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();

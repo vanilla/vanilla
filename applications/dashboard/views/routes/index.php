@@ -20,7 +20,7 @@ $Session = Gdn::session();
             <th class="column-lg"><?php echo t('Route'); ?></th>
             <th class="column-lg"><?php echo t('Target'); ?></th>
             <th class="column-md"><?php echo t('Type'); ?></th>
-            <th class="options column-sm"><?php echo t('Options'); ?></th>
+            <th class="options column-sm"></th>
         </tr>
         </thead>
         <tbody>
@@ -38,7 +38,7 @@ $Session = Gdn::session();
                 <td class="strong"><?php echo $Route; ?></td>
                 <td class="Alt"><?php echo $Target; ?></td>
                 <td class="Alt"><?php echo $RouteType; ?></td>
-                <td>
+                <td class="options">
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/dashboard/routes/edit/'.trim($RouteData['Key'], '='), 'js-modal btn btn-icon', ['aria-label' => t('Edit')]);

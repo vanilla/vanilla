@@ -55,7 +55,7 @@ foreach ($this->UserData->result() as $User) {
         $this->fireEvent('UserCell');
         ?>
         <?php if ($EditUser || $DeleteUser) { ?>
-            <td>
+            <td class="options">
                 <div class="btn-group">
                 <?php
                 if ($EditUser) {

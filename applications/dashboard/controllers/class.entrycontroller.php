@@ -572,50 +572,56 @@ EOT;
                 $ExistingUsers = $UserModel->getWhere()->resultArray();
             }
 
+            // Get the email and decide if we can safely find a match.
+            $submittedEmail = $this->Form->getFormValue('Email');
+            $canMatchEmail = (strlen($submittedEmail) > 0) && !UserModel::noEmail();
+
             // Check to automatically link the user.
             if ($AutoConnect && count($ExistingUsers) > 0) {
                 if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
                     $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
                 }
 
-                // Check each existing user for an exact email match.
-                foreach ($ExistingUsers as $Row) {
-                    if (strcasecmp($this->Form->getFormValue('Email'), $Row['Email']) === 0) {
-                        // Add the UserID to the form, then get the unified user data set from it.
-                        $UserID = $Row['UserID'];
-                        $this->Form->setFormValue('UserID', $UserID);
-                        $Data = $this->Form->formValues();
+                if ($canMatchEmail) {
+                    // Check each existing user for an exact email match.
+                    foreach ($ExistingUsers as $Row) {
+                        if (strcasecmp($submittedEmail, $Row['Email']) === 0) {
+                            // Add the UserID to the form, then get the unified user data set from it.
+                            $UserID = $Row['UserID'];
+                            $this->Form->setFormValue('UserID', $UserID);
+                            $Data = $this->Form->formValues();
 
-                        // User synchronization.
-                        if (c('Garden.Registration.ConnectSynchronize', true)) {
-                            // Don't overwrite a photo if the user has already uploaded one.
-                            $Photo = val('Photo', $Row);
-                            if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
-                                unset($Data['Photo']);
+                            // User synchronization.
+                            if (c('Garden.Registration.ConnectSynchronize', true)) {
+                                // Don't overwrite a photo if the user has already uploaded one.
+                                $Photo = val('Photo', $Row);
+                                if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
+                                    unset($Data['Photo']);
+                                }
+
+                                // Update the user.
+                                $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
                             }
 
-                            // Update the user.
-                            $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
+                            // Always save the attributes because they may contain authorization information.
+                            if ($Attributes = $this->Form->getFormValue('Attributes')) {
+                                $UserModel->saveAttribute($UserID, $Attributes);
+                            }
+
+                            // Save the user authentication association.
+                            $UserModel->saveAuthentication([
+                                'UserID' => $UserID,
+                                'Provider' => $this->Form->getFormValue('Provider'),
+                                'UniqueID' => $this->Form->getFormValue('UniqueID')
+                            ]);
+
+                            // Sign the user in.
+                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                            Gdn::userModel()->fireEvent('AfterSignIn');
+                            $this->_setRedirect(Gdn::request()->get('display') === 'popup');
+                            $this->render();
+                            return;
                         }
-
-                        // Always save the attributes because they may contain authorization information.
-                        if ($Attributes = $this->Form->getFormValue('Attributes')) {
-                            $UserModel->saveAttribute($UserID, $Attributes);
-                        }
-
-                        // Save the user authentication association.
-                        $UserModel->saveAuthentication([
-                            'UserID' => $UserID,
-                            'Provider' => $this->Form->getFormValue('Provider'),
-                            'UniqueID' => $this->Form->getFormValue('UniqueID')
-                        ]);
-
-                        // Sign the user in.
-                        Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
-                        Gdn::userModel()->fireEvent('AfterSignIn');
-                        $this->_setRedirect(Gdn::request()->get('display') === 'popup');
-                        $this->render();
-                        return;
                     }
                 }
             } // Did not autoconnect!
@@ -626,7 +632,7 @@ EOT;
 
             // Evaluate the existing users for matches.
             foreach ($ExistingUsers as $Index => $UserRow) {
-                if ($EmailUnique && $UserRow['Email'] == $this->Form->getFormValue('Email')) {
+                if ($EmailUnique && $canMatchEmail && $UserRow['Email'] == $submittedEmail) {
                     // An email match overrules any other options.
                     $EmailFound = $UserRow;
                     break;

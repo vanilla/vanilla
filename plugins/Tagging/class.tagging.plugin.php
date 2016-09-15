@@ -12,12 +12,14 @@ $PluginInfo['Tagging'] = array(
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
     'Version' => '1.9.1',
     'SettingsUrl' => '/dashboard/settings/tagging',
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
+    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'tagging.png'
 );
 
 /**
@@ -647,9 +649,8 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param SettingsController $Sender
      */
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
-
         $Sender->title('Tagging');
-        $Sender->addSideMenu('settings/tagging');
+        $Sender->setHighlightRoute('settings/tagging');
         $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
         $SQL = Gdn::sql();
 
@@ -663,31 +664,24 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->setData('_Limit', $Limit);
 
         if ($Search) {
-            $SQL->like('FullName', $Search, 'right');
+            $SQL->like('Name', $Search, 'right');
+        }
+
+        $queryType = $Type;
+
+        if (strtolower($Type) == 'all' || $Search || $Type === null) {
+            $queryType = false;
+            $Type = '';
         }
 
         // This type doesn't actually exist, but it will represent the
         // blank types in the column.
         if (strtolower($Type) == 'tags') {
-            $Type = '';
+            $queryType = '';
         }
 
-        if (!$Search) {
-            if ($Type !== null) {
-                if ($Type === 'null') {
-                    $Type = null;
-                }
-                $SQL->where('Type', $Type);
-            } elseif ($Type == '') {
-                $SQL->where('Type', '');
-            }
-        } else {
-            $Type = 'Search Results';
-            // This is made up, and exists so search results can be placed in
-            // their own tab.
-            $TagTypes[$Type] = array(
-                'key' => $Type
-            );
+        if (!$Search && ($queryType !== false)) {
+            $SQL->where('Type', $queryType);
         }
 
         $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
@@ -695,7 +689,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Store type for view
         $TagType = (!empty($Type))
             ? $Type
-            : 'Tags';
+            : 'All';
         $Sender->setData('_TagType', $TagType);
 
         // Store tag types
@@ -712,7 +706,6 @@ class TaggingPlugin extends Gdn_Plugin {
         $Data = $SQL
             ->select('t.*')
             ->from('Tag t')
-            ->orderBy('t.FullName', 'asc')
             ->orderBy('t.CountDiscussions', 'desc')
             ->limit($Limit, $Offset)
             ->get()->resultArray();
@@ -729,9 +722,9 @@ class TaggingPlugin extends Gdn_Plugin {
 
         // Search results pagination will mess up a bit, so don't provide a type
         // in the count.
-        $RecordCountWhere = array('Type' => $Type);
-        if ($Type == '') {
-            $RecordCountWhere = array('Type' => '');
+        $RecordCountWhere = array('Type' => $queryType);
+        if ($queryType === false) {
+            $RecordCountWhere = [];
         }
         if ($Search) {
             $RecordCountWhere = array();
@@ -866,8 +859,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
         }
 
-        $Sender->setData('Title', t('Delete Tag'));
-        $Sender->render('delete', '', 'plugins/Tagging');
+        $Sender->render('Blank', 'Utility', 'dashboard');
     }
 
     /**

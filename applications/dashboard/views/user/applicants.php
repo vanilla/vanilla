@@ -8,61 +8,67 @@ echo $this->Form->errors();
 $NumApplicants = $this->UserData->numRows();
 
 if ($NumApplicants == 0) : ?>
-    <div class="Info"><?php echo t('There are currently no applicants.'); ?></div>
+    <div class="padded"><?php echo t('There are currently no applicants.'); ?></div>
 <?php else : ?>
     <?php
     $AppText = plural($NumApplicants, 'There is currently %s applicant.', 'There are currently %s applicants.');
     ?>
-    <div class="Info"><?php echo sprintf($AppText, $NumApplicants); ?></div>
-    <table>
-        <thead>
-            <tr>
-                <th width="130px"><?php echo t('Action'); ?></th>
-                <th><?php echo t('Applicant'); ?></th>
-                <th><?php echo t('Email'); ?></th>
-                <th><?php echo t('IP Address'); ?></th>
-                <th><?php echo t('Date'); ?></th>
-            </tr>
-        </thead>
-        <tbody>
-        <?php
-        foreach ($this->UserData->result() as $User) :
-            $this->EventArguments['User'] = $User;
-            $this->EventArguments['ApplicantMeta'] = array();
-            $this->fireEvent("ApplicantInfo"); ?>
-            <tr class="ApplicantMeta">
-                <td style="border-bottom:none;"><?php
-                    echo anchor(t('Approve'), '/user/approve/'.$User->UserID, 'SmallButton ApproveApplicant');
-                    echo anchor(t('Decline'), '/user/decline/'.$User->UserID, 'CancelButton DeclineApplicant');
-                    ?>
-                </td>
-                <td style="border-bottom:none;"><strong><?php echo htmlspecialchars($User->Name); ?></strong></td>
-                <td style="border-bottom:none;"><?php echo anchor($User->Email, 'mailto:'.$User->Email); ?></td>
-                <td style="border-bottom:none;"><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
-                <td style="border-bottom:none;"><?php echo Gdn_Format::date($User->DateInserted); ?></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td colspan="4">
-                <?php
-                    // Output a definition list if a plugin passed us ordered data.
-                    if (count($this->EventArguments['ApplicantMeta'])) {
-                        foreach ($this->EventArguments['ApplicantMeta'] as $label => $value) {
-                            echo '<dt>'.htmlspecialchars($label).'</dt><dd>'.htmlspecialchars($value).'</dd>';
+    <div class="padded italic"><?php echo sprintf($AppText, $NumApplicants); ?></div>
+    <div class="table-wrap">
+        <table class="table-data">
+            <thead>
+                <tr>
+                    <th class="column-lg"><?php echo t('Applicant'); ?></th>
+                    <th class="column-xl"><?php echo t('Reason'); ?></th>
+                    <th><?php echo t('IP Address'); ?></th>
+                    <th class="column-md"><?php echo t('Date'); ?></th>
+                    <th class="options column-sm"></th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            foreach ($this->UserData->result() as $User) :
+                $this->EventArguments['User'] = $User;
+                $this->EventArguments['ApplicantMeta'] = array();
+                $this->fireEvent("ApplicantInfo"); ?>
+                <tr class="ApplicantMeta">
+                    <td>
+                        <div class="user-info">
+                            <div class="username"><?php echo htmlspecialchars($User->Name); ?></div>
+                            <div class="info user-email"><?php echo anchor($User->Email, 'mailto:'.$User->Email); ?></div>
+                        </div>
+                    </td>
+                    <td>
+                        <?php
+                        // Output a definition list if a plugin passed us ordered data.
+                        if (count($this->EventArguments['ApplicantMeta'])) {
+                            foreach ($this->EventArguments['ApplicantMeta'] as $label => $value) {
+                                echo '<dt>'.htmlspecialchars($label).'</dt><dd>'.htmlspecialchars($value).'</dd>';
+                            }
                         }
-                    }
-                    // Only make a blockquote if we got a reason.
-                    if ($User->DiscoveryText) {
-                        echo '<blockquote>'.wrap(t('Reason for joining', 'Reason: '), 'em').Gdn_Format::text($User->DiscoveryText).'</blockquote>';
-                    }
-                    // Opportunity for plugins to do arbitrary appending.
-                    $this->fireEvent("AppendApplicantInfo");
-                    ?>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+                        // Only make a blockquote if we got a reason.
+                        if ($User->DiscoveryText) {
+                            echo Gdn_Format::text($User->DiscoveryText);
+                        }
+                        // Opportunity for plugins to do arbitrary appending.
+                        $this->fireEvent("AppendApplicantInfo");
+                        ?>
+                    </td>
+                    <td><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
+                    <td><?php echo Gdn_Format::date($User->DateInserted); ?></td>
+                    <td class="options">
+                        <div class="btn-group">
+                        <?php
+                        echo anchor(dashboardSymbol('checkmark'), '/user/approve/'.$User->UserID, 'ApproveApplicant btn btn-icon', ['aria-label' => t('Approve')]);
+                        echo anchor(dashboardSymbol('delete'), '/user/decline/'.$User->UserID.'/'.$Session->TransientKey(), 'DeclineApplicant btn btn-icon', ['aria-label' => t('Decline')]);
+                        ?>
+                        </div>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
     <?php
 endif;
 

@@ -5,16 +5,16 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li>
+        <li class="form-group row">
             <?php
-            echo $this->Form->label('Tag Name', 'FullName');
-            echo $this->Form->textBox('FullName');
+            echo '<div class="label-wrap">'.$this->Form->label('Tag Name', 'FullName').'</div>';
+            echo '<div class="input-wrap">'.$this->Form->textBox('FullName').'</div>';
             ?>
         </li>
-        <li>
+        <li class="form-group row">
             <?php
-            echo $this->Form->label('Url Slug', 'Name');
-            echo $this->Form->textBox('Name');
+            echo '<div class="label-wrap">'.$this->Form->label('Url Slug', 'Name').'</div>';
+            echo '<div class="input-wrap">'.$this->Form->textBox('Name').'</div>';
             ?>
         </li>
         <?php if ($this->data('MergeTagVisible')): ?>

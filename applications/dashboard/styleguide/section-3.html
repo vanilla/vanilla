@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Style Guide</title>
+    <meta name="description" content="" />
+    <meta name="generator" content="kss-node" />
+    <meta name="viewport" content="width=device-width, minimal-ui">
+    <!-- Latest compiled and minified CSS -->
+    <link type="text/css" rel="stylesheet" href="public/kss.css">
+    <link type="text/css" rel="stylesheet" href="public/admin.css">
+    <link type="text/css" rel="stylesheet" href="public/prettify.css">
+    
+    <script src="http://code.jquery.com/jquery.js"></script>
+  </head>
+  <body class="kss-styleguide" data-spy="scroll" data-target="#sidebar">
+    <nav class="navbar navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="./index.html">Styleguide</a>
+        </div>
+      </div>
+    </nav>
+    <aside class="nav-fixed">
+      <nav>
+        <ul>
+          <li><a href="index.html">0.0: Overview</a></li>
+          <li><a href="section-1.html">1.0: Typography</a></li>
+          <li><a href="section-3.html">3.0: Forms</a></li>
+          <li><a href="section-4.html">4.0: Buttons</a></li>
+          <li><a href="section-6.html">6.0: Components</a></li>
+          <li><a href="section-Alerts.html">Alerts.0: ## Alerts</a></li>
+          <li><a href="section-Attachments.html">Attachments.0: # Attachments</a></li>
+          <li><a href="section-Attachments.html">Attachments.0: ## Item attachments</a></li>
+          <li><a href="section-Definitions.html">Definitions.0: ## Definition lists</a></li>
+          <li><a href="section-Item.html">Item.0: ## Base item</a></li>
+          <li><a href="section-Media.html">Media.0: ## Media objects</a></li>
+          <li><a href="section-Section 4.html">Section 4.0: Section 4</a></li>
+        </ul>
+      </nav>
+    </aside>
+    <div class="container">
+      <div class="row">
+          <article class="col-xs-12 col-sm-9 main">
+
+              <section class="kss-depth-1">
+                <div class="component-description">
+                  <h1 class="kss-title" id="3">Forms</h1>
+
+
+              <div class="kss-box"><p>Find the dashboard form styling here.</p>
+</div>
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-1">
+                    <span class="kss-ref badge pull-right">3-1</span> Forms
+                  </h2>
+
+
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-3">
+                <div class="component-description">
+                  <h3 class="kss-title" id="3-1-1">
+                    <span class="kss-ref badge pull-right">3-1-1</span> Form layout
+                  </h3>
+
+
+              <div class="kss-box"><p>Here&#39;s how to build a basic form field.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;form-group row&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;label for=&quot;fieldID&quot;&gt;Field&lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;Info text for field&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID&quot; class=&quot;form-control&quot;&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+  <ul>
+    <li class="form-group row">
+      <div class="label-wrap">
+         <label for="fieldID">Field</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID" class="form-control">
+      </div>
+    </li>
+  </ul>
+</form></div>
+                <h4>Stacks radio or checkboxes. <span class="pull-right"><code>.stacked</code></span></h4>
+                <div class="kss-example"><form>
+  <ul>
+    <li class="form-group row">
+      <div class="label-wrap">
+         <label for="fieldID">Field</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID" class="form-control">
+      </div>
+    </li>
+  </ul>
+</form></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-3">
+                    <span class="kss-ref badge pull-right">3-3</span> Toggles
+                  </h2>
+
+
+              <div class="kss-box"><p>Toggles can either be a checkbox form element or an anchor.</p>
+</div>
+
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-3">
+                <div class="component-description">
+                  <h3 class="kss-title" id="3-3-1">
+                    <span class="kss-ref badge pull-right">3-3-1</span> Anchor toggle
+                  </h3>
+
+
+              <div class="kss-box"><p>Here&#39;s how to build an anchor toggle.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;div class=&quot;toggle-wrap [modifier class]&quot;&gt;
+  &lt;a&gt;
+    &lt;div class=&quot;toggle-well&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;toggle-slider&quot;&gt;&lt;/div&gt;
+  &lt;/a&gt;
+&lt;/div&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><div class="toggle-wrap [modifier class]">
+  <a>
+    <div class="toggle-well"></div>
+    <div class="toggle-slider"></div>
+  </a>
+</div></div>
+                <h4>On state <span class="pull-right"><code>.toggle-wrap-on</code></span></h4>
+                <div class="kss-example"><div class="toggle-wrap toggle-wrap-on">
+  <a>
+    <div class="toggle-well"></div>
+    <div class="toggle-slider"></div>
+  </a>
+</div></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-3">
+                <div class="component-description">
+                  <h3 class="kss-title" id="3-3-2">
+                    <span class="kss-ref badge pull-right">3-3-2</span> Checkbox toggle
+                  </h3>
+
+
+              <div class="kss-box"><p>Here&#39;s how to build an checkbox toggle.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;div class=&quot;toggle-wrap&quot;&gt;
+  &lt;input id=&quot;toggle-checkbox&quot; type=&quot;checkbox&quot; /&gt;
+  &lt;label for=&quot;toggle-checkbox&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><div class="toggle-wrap">
+  <input id="toggle-checkbox" type="checkbox" />
+  <label for="toggle-checkbox"></label>
+</div></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-4">
+                    <span class="kss-ref badge pull-right">3-4</span> Color Pickers
+                  </h2>
+
+
+
+              <pre class="prettyprint lang-html">&lt;div class=&quot;js-color-picker color-picker &quot;&gt;
+  &lt;input type=&quot;text&quot; class=&quot;js-color-picker-value color-picker-value hidden&quot; /&gt;
+  &lt;input type=&quot;text&quot; class=&quot;js-color-picker-text color-picker-text form-control&quot; /&gt;
+  &lt;span class=&quot;js-color-picker-preview color-picker-preview&quot;&gt;&lt;/span&gt;
+  &lt;input type=&quot;color&quot; class=&quot;js-color-picker-color color-picker-color&quot; /&gt;
+&lt;/div&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><div class="js-color-picker color-picker ">
+  <input type="text" class="js-color-picker-value color-picker-value hidden" />
+  <input type="text" class="js-color-picker-text color-picker-text form-control" />
+  <span class="js-color-picker-preview color-picker-preview"></span>
+  <input type="color" class="js-color-picker-color color-picker-color" />
+</div></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-5">
+                    <span class="kss-ref badge pull-right">3-5</span> Label selectors
+                  </h2>
+
+
+              <div class="kss-box"><p>Label selectors replace checkboxes and radios with a image and/or text selector.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+&lt;ul class=&quot;label-selector&quot;&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;babySeal&quot; name=&quot;babyAnimals&quot;&gt;
+    &lt;label for=&quot;babySeal&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/baby-seal.jpg&quot; alt=&quot;Baby Seal&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;a class=&quot;btn btn-overlay&quot;&gt;Button&lt;/a&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;selected&quot;&gt;
+            selected icon
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Baby Seal&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;p class=&quot;description&quot;&gt;Choose this happy baby seal. It&#x27;s so very happy.&lt;/p&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;puppy&quot; name=&quot;babyAnimals&quot;&gt;
+    &lt;label for=&quot;puppy&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/puppy.jpg&quot; alt=&quot;Puppy&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;a class=&quot;btn btn-overlay&quot;&gt;Button&lt;/a&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;selected&quot;&gt;
+            selected icon
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Puppy&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;p class=&quot;description&quot;&gt;Choose this sleepy puppy. Sooo tired, puppy.&lt;/p&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+<ul class="label-selector">
+  <li class="label-selector-item">
+    <input type="radio" id="babySeal" name="babyAnimals">
+    <label for="babySeal">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
+        <div class="overlay">
+          <div class="buttons">
+            <a class="btn btn-overlay">Button</a>
+          </div>
+          <div class="selected">
+            selected icon
+          </div>
+        </div>
+      </div>
+      <div class="title">Baby Seal</div>
+      <div class="info">by Author</div>
+      <p class="description">Choose this happy baby seal. It's so very happy.</p>
+    </label>
+  </li>
+  <li class="label-selector-item">
+    <input type="radio" id="puppy" name="babyAnimals">
+    <label for="puppy">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
+        <div class="overlay">
+          <div class="buttons">
+            <a class="btn btn-overlay">Button</a>
+          </div>
+          <div class="selected">
+            selected icon
+          </div>
+        </div>
+      </div>
+      <div class="title">Puppy</div>
+      <div class="info">by Author</div>
+      <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
+    </label>
+  </li>
+</ul>
+</form></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+              <section class="kss-depth-2">
+                <div class="component-description">
+                  <h2 class="kss-title" id="3-6">
+                    <span class="kss-ref badge pull-right">3-6</span> Search input
+                  </h2>
+
+
+              <div class="kss-box"><p>Search inputs have a hidden button and a search icon on the input.</p>
+</div>
+
+              <pre class="prettyprint lang-html">&lt;form&gt;
+  &lt;div class=&quot;search-wrap&quot;&gt;
+    &lt;div class=&quot;icon-wrap icon-search-wrap&quot;&gt;&lt;svg /&gt;&lt;/div&gt;
+    &lt;input class=&quot;form-control&quot;&gt;
+    &lt;button type=&quot;submit&quot; class=&quot;search-submit&quot;&gt;Search&lt;/button&gt;
+    &lt;div class=&quot;icon-wrap icon-clear-wrap&quot;&gt;&lt;svg /&gt;&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+
+              <h4>Default styling</h4>
+              <div class="kss-example"><form>
+  <div class="search-wrap">
+    <div class="icon-wrap icon-search-wrap"><svg /></div>
+    <input class="form-control">
+    <button type="submit" class="search-submit">Search</button>
+    <div class="icon-wrap icon-clear-wrap"><svg /></div>
+  </div>
+</form></div>
+
+              <hr />
+              </div><!-- // closes .component-description -->
+            </section>
+        </article>
+        <div class="col-xs-6 col-sm-3" id="sidebar">
+          <div class="list-group" data-spy="affix">
+                <!--<li><a href="#" class="list-group-item disabled">
+                  <h4 class="list-group-item-heading">Forms</h4>
+                </a></li>-->
+                <a class="list-group-item" href="#3-1"><!--<span class="kss-ref badge" >3-1</span> -->Forms</a>
+                <a class="list-group-item" href="#3-3"><!--<span class="kss-ref badge" >3-3</span> -->Toggles</a>
+                <a class="list-group-item" href="#3-4"><!--<span class="kss-ref badge" >3-4</span> -->Color Pickers</a>
+                <a class="list-group-item" href="#3-5"><!--<span class="kss-ref badge" >3-5</span> -->Label selectors</a>
+                <a class="list-group-item" href="#3-6"><!--<span class="kss-ref badge" >3-6</span> -->Search input</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="public/kss.js"></script>
+    <script src="public/prettify.js"></script>
+    <script>
+      jQuery(document).ready(function(){
+        // Ensure code blocks are highlighted properly...
+        jQuery('pre>code').addClass('prettyprint');
+        prettyPrint();
+
+        // Set the navigation to be the correct width.
+        jQuery('#sidebar .list-group').on('affix.bs.affix', function () {
+          jQuery('#sidebar .list-group').width(jQuery('.col-sm-3').width());
+        });
+      });
+    </script>
+    
+  </body>
+</html>

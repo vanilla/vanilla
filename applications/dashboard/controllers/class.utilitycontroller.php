@@ -174,7 +174,7 @@ class UtilityController extends DashboardController {
         }
 
         $this->setData('Step', $step);
-        $this->addSideMenu('dashboard/settings/configure');
+        $this->setHighlightRoute('dashboard/settings/configure');
         $this->addCssFile('admin.css');
         $this->setData('Title', t('Database Structure Upgrades'));
         $this->render();

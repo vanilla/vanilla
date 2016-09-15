@@ -1,0 +1,252 @@
+// Navs
+//
+// The dashboard panel nav styling.
+//
+// No styleguide reference.
+
+.nav-heading a {
+  display: block;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: .75rem;
+  border-bottom: 1px dotted rgba(0,0,0,.0875);
+  font-size: $font-size-sm;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: none;
+
+  &::before {
+    @extend .caret;
+    -webkit-transform: rotate(0deg);
+    tranform: rotate(0deg);
+    margin-left: -1rem;
+    margin-right: .5rem;
+    transition: all .1s ease-out;
+  }
+
+  &.collapsed::before {
+    -webkit-transform: rotate(-90deg);
+    tranform: rotate(-90deg);
+  }
+}
+
+.nav-inline {
+  font-size: 0;
+
+  .nav-item {
+    display: inline-block;
+  }
+
+  .nav-item + .nav-item,
+  .nav-link + .nav-link {
+    margin-left: 1rem;
+  }
+}
+
+.panel-nav {
+  a {
+    color: $grey;
+  }
+
+  svg {
+    fill: $grey-dark;
+    opacity: 0.7;
+  }
+
+  .badge {
+    font-size: $font-size-xs;
+  }
+
+  .globals-sign-out {
+    display: none;
+
+    @include media-breakpoint-down(md) {
+      display: block;
+      margin-top: $spacer * 2;
+    }
+  }
+
+  .nav-link {
+    font-weight: 300;
+
+    &.active {
+      border-radius: $nav-pills-panel-border-radius;
+
+      &,
+      &:hover {
+        color: $white;
+        background-color: $nav-pills-active-link-hover-bg;
+      }
+    }
+
+    &:hover,
+    &.hover {
+      color: $grey;
+      background-color: $nav-pills-link-hover-bg;
+    }
+  }
+
+  .nav-stacked {
+    .nav-item + .nav-item {
+      margin-top: 0;
+    }
+  }
+}
+
+.nav-link {
+  &,
+  &.active,
+  &:active,
+  &.hover,
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+//
+// <div class="nav nav-adventure">
+//   <div class="nav-item">
+//     <a class="nav-link" href="#">
+//       <div class="nav-item-icon"><svg></svg></div>
+//       <div class="nav-item-content">
+//         <div class="nav-item-title">Here's the nav title</div>
+//         <div class="nav-item-description">
+//           Here's some expanatory text about where you're headed if you select this item.
+//         </div>
+//       </div>
+//       <div class="nav-item-arrow"><svg></svg></div>
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide Section 4.1 Choose-Your-Own-Adventure Nav
+
+.nav-adventure {
+  .nav-item {
+    display: block;
+    margin-left: -$padding-default;
+    margin-right: -$padding-default;
+    border-bottom: $border-width solid $border-color;
+
+    &:first-child {
+      border-top: $border-width solid $border-color;
+    }
+  }
+
+  .nav-item-title {
+    line-height: 1;
+    font-weight: 500;
+    margin-bottom: to-rem(6);
+  }
+
+  .nav-item-description {
+    margin-bottom: - to-rem(5);
+  }
+
+  .nav-link {
+    position: relative;
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+    padding: $spacer $padding-default;
+    color: $grey-dark;
+    transition: background-color .1s;
+
+    > * {
+      z-index: 1;
+    }
+
+    //&::before {
+    //  position: absolute;
+    //  z-index: 0;
+    //  left: 0;
+    //  width: 0;
+    //  height: 100%;
+    //  background-color: $brand-primary;
+    //  transition: all .4s;
+    //  content: "";
+    //}
+
+    svg {
+      fill: $grey-dark;
+      opacity: 0.7;
+      display: block;
+      height: to-rem(24);
+    }
+
+    &:hover {
+      &::before {
+        width: 100%;
+      }
+      background-color: #f9fdfe;
+    }
+  }
+
+  .nav-item-icon {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: to-rem(36);
+    height: to-rem(36);
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    margin-right: $spacer;
+  }
+
+  .nav-item-arrow {
+    margin-left: auto;
+  }
+}
+
+.nav-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.toolbar > .nav-stats {
+  margin-right: 0;
+  flex-shrink: 1;
+}
+
+.nav-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding: $spacer $spacer 0 $spacer ;
+  color: rgba(25,25,25,0.20);
+}
+
+.nav-stats-link {
+  > * {
+    cursor: pointer;
+  }
+}
+
+.nav-stats-title {
+  font-weight: 400;
+  padding: $spacer / 2 0 $spacer / 4;
+  text-transform: uppercase;
+  font-size: $font-size-sm;
+}
+
+.toolbar-stats-daterange-preview,
+.pager-count {
+  line-height: 1;
+  font-weight: 500;
+  padding-right: $spacer / 2;
+}
+
+.pager,
+.toolbar-stats-daterange {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.nav-stats-value {
+  font-weight: 300;
+  font-size: to-rem(40);
+}

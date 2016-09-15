@@ -1,0 +1,335 @@
+// Typography
+//
+// Basic heading and paragraph styling.
+//
+// Styleguide 1.
+
+// Headings
+//
+// Base heading styles. Each header level has a css class associated with it, so
+// one can emulate the heading style. (i.e., p class='h1' would adopt the styles
+// associated with a h1 tag)
+//
+// Markup:
+// <h1>Heading level 1</h1>
+// <h2>Heading level 2</h2>
+// <h3>Heading level 3</h3>
+// <h4>Heading level 4</h4>
+// <h5>Heading level 5</h5>
+// <h6>Heading level 6</h6>
+//
+// Styleguide 1.1
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  font-family: $headings-font-family;
+  font-weight: $headings-font-weight;
+  line-height: $headings-line-height;
+  color: $headings-color;
+}
+
+h1, .h1 { font-size: $font-size-h1; }
+h2, .h2 { font-size: $font-size-h2; }
+h3, .h3 { font-size: $font-size-h3; }
+h4, .h4 { font-size: $font-size-h4; }
+h5, .h5 { font-size: $font-size-h5; }
+h6, .h6 { font-size: $font-size-h6; }
+
+h1, .h1,
+h2, .h2,
+h3, .h3 {
+  margin-top: $spacer;
+  margin-bottom: $headings-margin-bottom;
+}
+
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  margin-top: $headings-margin-bottom;
+  margin-bottom: $headings-margin-bottom;
+}
+
+// Paragraph
+//
+// Base paragraph style
+//
+// Markup:
+// <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+// mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+// purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
+// <p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+// nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+// sociis natoque penatibus et magnis dis parturient montes, nascetur
+// ridiculus mus.</p>
+//
+// Styleguide 1.2
+
+p {
+  margin-bottom: ($spacer / 2);
+}
+
+pre {
+  margin-bottom: 0;
+}
+
+.content {
+  > h1 {
+    @extend .heading-h1-block;
+  }
+
+  h1 {
+    @extend .heading-h1;
+  }
+
+  h2 {
+    @extend .border-h2;
+  }
+}
+
+.border-h2 {
+  @extend .full-border;
+  padding: $spacer 0;
+  margin: 0;
+  font-size: $font-size-base;
+  line-height: $line-height;
+  font-weight: 500;
+  border-top: $border-width solid #e7e8e9;
+}
+
+.modal h2 {
+  @extend .border-h2;
+  border-top: 0 !important;
+}
+
+.heading-h1 {
+  font-size: $font-size-lg;
+  margin-bottom: 0;
+}
+
+.full-border {
+  @include full-border(block)
+}
+
+// Default. Use if there's only an h1 block as a heading
+
+.heading-h1-block {
+  @extend .full-border;
+  padding-bottom: $spacer;
+}
+
+// Optimal. Header block.
+
+.header-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacer / 2;
+  padding-bottom: $spacer / 2;
+  min-height: $header-block-height;
+  @extend .full-border;
+
+  &.padded {
+    margin-bottom: $spacer;
+  }
+
+  h1 {
+    margin: 0;
+    padding: ($spacer / 2) 0;
+  }
+}
+
+// <div class="header-block">
+//   <div class="title-block">
+//     <a class="btn btn-icon btn-return" aria-label="Return" href="#"><svg /></a>
+//     <h1>Title</h1>
+//   </div>
+// </div>
+
+.title-block {
+  display: flex;
+}
+
+.btn-return {
+  position: relative;
+  padding-left: 0;
+  margin-right: $spacer / 2;
+
+  svg {
+    position: relative;
+    top: 4px;
+    width: $font-size-lg;
+  }
+
+  &:hover svg {
+    fill: $brand-primary;
+  }
+}
+
+.subheading-block {
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  border-top: $border-width solid $border-color;
+
+  @extend .full-border;
+
+  .subheading {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: to-rem(16);
+    font-weight: 500;
+  }
+}
+
+.header-menu {
+  $header-menu-border-width: to-rem(3);
+  $header-menu-font-size: to-rem(18);
+  $header-menu-height: $header-block-height;
+  $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @extend .full-border;
+  border-bottom-color: $border-color;
+
+  &.padded {
+    margin-bottom: $spacer;
+  }
+
+  a {
+    font-size: $header-menu-font-size;
+    line-height: 1;
+    margin: 0 $spacer * 2;
+    padding: ($header-menu-padding) 0;
+    color: $grey;
+    text-decoration: none;
+    border-top: $header-menu-border-width solid transparent;
+    border-bottom: $header-menu-border-width solid transparent;
+
+    &.active {
+      border-bottom-color: $brand-primary;
+      color: $brand-primary;
+    }
+
+    &:hover {
+      color: $brand-primary;
+    }
+  }
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
+}
+
+.flag {
+  $flag-height: to-rem(18);
+  display: inline-block;
+  padding-left: .125rem;
+  padding-right: .75rem;
+  line-height: 0;
+  font-size: $font-size-xs;
+  color: $white;
+  border-style: solid;
+  border-color: $brand-secondary;
+  border-right-color: transparent;
+  border-width: ($flag-height / 2) ($flag-height / 2);
+  text-transform: uppercase;
+}
+
+strong,
+.strong {
+  font-weight: 500;
+}
+
+table,
+form {
+  h2 {
+    margin-top: 0;
+  }
+}
+
+// Generate .text-* css rules to change text color for all our semantic colors in variables.
+
+@each $semantic-color in map-keys($semantic-colors) {
+  $color: map-get($semantic-colors, $semantic-color);
+  .text-#{$semantic-color} {
+    color: $color;
+  }
+}
+
+//.text-control-height {
+//  height: $control-height-rem;
+//  padding: (($control-height-rem - $font-size-base) / 2) 0;
+//  line-height: 1;
+//  font-size: $font-size-base;
+//}
+
+.list-unstyled {
+  @include list-unstyled;
+}
+
+// The modal js wraps the modal body and footer in a form element to place the form buttons in the footer.
+// The side-effect of this is that some non-form elements can be wrapped in a form. This rather inelegant
+// list-un-reset can be applied to any lists appearing in a modal that are not actually part of the form and should
+// have list styling.
+.modal .list-un-reset {
+  ul,
+  ol {
+    margin-left: 15px;
+  }
+  ul li {
+    list-style: disc inside;
+  }
+  ol li {
+    list-style: decimal inside;
+  }
+  ul ul,
+  ol ul {
+    margin-left: 30px;
+    li {
+      list-style: circle inside;
+    }
+  }
+  ol ol,
+  ul ol {
+    margin-left: 15px;
+    li {
+      list-style: lower-latin inside;
+    }
+  }
+}
+
+.italic {
+  font-style: italic;
+}
+
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// same color and size as default body text.
+.icon-text {
+  width: $font-size-base;
+  fill: $grey-dark;
+  vertical-align: middle;
+}
+
+
+.reverse-link {
+  color: $grey-dark;
+
+  &:hover {
+    color: $brand-primary;
+  }
+}

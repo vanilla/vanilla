@@ -1,0 +1,128 @@
+// Toggles
+//
+// Used in conjunction with global variables to enable certain theme features.
+
+@mixin box-shadow($shadow...) {
+  @if $enable-shadows {
+    box-shadow: $shadow;
+  }
+}
+
+@mixin transition($transition...) {
+  @if $enable-transitions {
+    transition: $transition;
+  }
+}
+
+@mixin button-variant($color, $background, $border, $active-color, $active-background, $active-border, $hover-color: $active-color, $hover-background: $active-background, $hover-border: $active-border) {
+  color: $color;
+  background-color: $background;
+  border-color: $border;
+  @include box-shadow(inset 0 1px 0 rgba(255,255,255,.15), 0 1px 1px rgba(0,0,0,.075));
+
+  @include hover {
+    color: $hover-color;
+    background-color: $hover-background;
+    border-color: $hover-border;
+  }
+
+  &:focus,
+  &.focus {
+    color: $active-color;
+    background-color: $active-background;
+    border-color: $active-border;
+    outline: 0;
+  }
+
+  &:active,
+  &.active,
+  .open > &.dropdown-toggle {
+    color: $active-color;
+    background-color: $active-background;
+    border-color: $active-border;
+    // Remove the gradient for the pressed/active state
+    background-image: none;
+    @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+  }
+
+  &.disabled,
+  &:disabled {
+    &:focus,
+    &.focus {
+      background-color: $background;
+    }
+    @include hover {
+      background-color: $background;
+    }
+  }
+}
+
+@mixin font-face(
+  $font-family,
+  $file-path,
+  $weight: normal,
+  $style: normal,
+  $asset-pipeline: $asset-pipeline,
+  $file-formats: eot woff2 woff ttf svg) {
+
+  $font-url-prefix: font-url-prefixer($asset-pipeline);
+
+  @font-face {
+    font-family: $font-family;
+    font-style: $style;
+    font-weight: $weight;
+
+    src: font-source-declaration(
+        $font-family,
+        $file-path,
+        $asset-pipeline,
+        $file-formats,
+        $font-url-prefix
+    );
+  }
+}
+
+@mixin image-wrap-border($radius) {
+  &::after {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: ($border-width * 1) solid rgba(0,0,0,.125);
+    border-radius: $radius;
+    content: '';
+  }
+}
+
+@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $has-border: true, $background-color: $grey-light) {
+  position: relative;
+  min-width: $width;
+  height: $height;
+  border-radius: $radius;
+  overflow: hidden;
+  background-color: $background-color;
+
+  @if ($has-border) {
+    @include image-wrap-border($radius);
+  }
+
+  img {
+    width: $width;
+  }
+}
+
+@mixin full-border($display: block, $has-border-bottom: true, $has-border-top: false) {
+  display: $display;
+  margin-left: -$padding-default;
+  margin-right: -$padding-default;
+  padding-left: $padding-default;
+  padding-right: $padding-default;
+  @if ($has-border-bottom) {
+    border-bottom: $border-width solid #e7e8e9;
+  }
+  @if ($has-border-top) {
+    border-top: $border-width solid #e7e8e9;
+  }
+}

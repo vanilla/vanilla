@@ -1,106 +1,121 @@
-<?php if (!defined('APPLICATION')) exit();
-
+<?php if (!defined('APPLICATION')) exit(); ?>
+<h1><?php echo t('Add Category'); ?></h1>
+<?php
 echo $this->Form->open();
 echo $this->Form->errors();
+echo $this->Form->hidden('ParentCategoryID');
 ?>
-<h1><?php echo t('Add Category'); ?></h1>
+<?php
+Gdn_Theme::assetBegin('Help');
+    echo wrap(sprintf(t('About %s'), t('Categories')), 'h2');
+    echo t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.');
+Gdn_Theme::assetEnd();
+?>
 <ul>
-    <li>
-        <div class="Info"><?php
-            echo wrap(t('Categories are used to organize discussions.', '<strong>Categories</strong> allow you to organize your discussions.'), 'div');
-            ?></div>
+    <li class="form-group row">
+        <div class="label-wrap">
+        <?php echo $this->Form->label('Category', 'Name'); ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->textBox('Name'); ?>
+        </div>
     </li>
-    <li>
-        <?php
-        echo $this->Form->label('Category', 'Name');
-        echo $this->Form->textBox('Name');
-        ?>
+    <li class="form-group row">
+        <div class="label-wrap">
+            <?php echo wrap(t('Category Url:'), 'strong'); ?>
+        </div>
+        <div id="UrlCode" class="input-wrap category-url-code">
+            <?php
+            echo '<div class="text-control-height">';
+            echo Gdn::request()->Url('categories', true);
+            echo '/';
+            echo wrap(htmlspecialchars($this->Form->getValue('UrlCode')));
+            echo '</div>';
+            echo $this->Form->textBox('UrlCode');
+            echo ($this->Form->getValue('UrlCode')) ? '/' : '';
+            echo anchor(t('edit'), '#', 'Edit btn btn-link');
+            echo anchor(t('OK'), '#', 'Save btn btn-primary');
+            ?>
+        </div>
     </li>
-    <li id="UrlCode">
-        <?php
-        echo wrap(t('Category Url:'), 'strong');
-        echo ' ';
-        echo Gdn::request()->Url('categories', true);
-        echo '/';
-        echo wrap(htmlspecialchars($this->Form->getValue('UrlCode')));
-        echo $this->Form->textBox('UrlCode');
-        echo '/';
-        echo anchor(t('edit'), '#', 'Edit');
-        echo anchor(t('OK'), '#', 'Save SmallButton');
-        ?>
+    <li class="form-group row">
+        <div class="label-wrap">
+        <?php echo $this->Form->label('Description', 'Description'); ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->textBox('Description', array('MultiLine' => TRUE)); ?>
+        </div>
     </li>
-    <li>
-        <?php
-        echo $this->Form->label('Description', 'Description');
-        echo $this->Form->textBox('Description', array('MultiLine' => TRUE));
-        ?>
+    <li class="form-group row">
+        <div class="label-wrap">
+        <?php echo $this->Form->label('Css Class', 'CssClass'); ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE)); ?>
+        </div>
     </li>
-    <li>
-        <?php
-        echo $this->Form->label('Css Class', 'CssClass');
-        echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE));
-        ?>
-    </li>
-    <li>
-        <?php
-        echo $this->Form->label('Photo', 'PhotoUpload');
+    <li class="form-group row">
+        <div class="label-wrap">
+        <?php echo $this->Form->label('Photo', 'PhotoUpload');
         if ($Photo = $this->Form->getValue('Photo')) {
             echo img(Gdn_Upload::url($Photo));
             echo '<br />'.anchor(t('Delete Photo'),
                     CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
                     'SmallButton Danger PopConfirm');
-        }
-        echo $this->Form->Input('PhotoUpload', 'file');
-        ?>
+        } ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->fileUpload('PhotoUpload'); ?>
+        </div>
     </li>
-    <?php
-    echo $this->Form->Simple(
-        $this->data('_ExtendedFields', array()),
-        array('Wrap' => array('', '')));
+    <?php echo $this->Form->Simple(
+        $this->data('_ExtendedFields', array()));
     ?>
+    <li class="form-group row">
+        <div class="label-wrap">
+        <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
+        </div>
+        <div class="input-wrap">
+        <?php echo $this->Form->dropDown('DisplayAs', $this->data('DisplayAsOptions'), ['Wrap' => true]); ?>
+        </div>
+    </li>
+    <li class="form-group row">
+        <?php echo $this->Form->toggle('HideAllDiscussions', 'Hide from the recent discussions page.'); ?>
+    </li>
     <?php if ($this->ShowCustomPoints): ?>
-        <li>
-            <?php
-            echo $this->Form->label('Display As', 'DisplayAs');
-            echo $this->Form->DropDown('DisplayAs', ['Default' => 'Default', 'Discussions' => 'Discussions', 'Categories' => 'Nested Categories', 'Flat' => 'Flat Categories', 'Heading' => 'Heading']);
-            ?>
-        </li>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('HideAllDiscussions', 'Hide from the recent discussions page.');
-            ?>
-        </li>
-        <li>
-            <?php
-            echo $this->Form->CheckBox('CustomPoints', 'Track points for this category separately.');
-            ?>
+        <li class="form-group row">
+            <?php echo $this->Form->toggle('CustomPoints', 'Track points for this category separately.'); ?>
         </li>
     <?php endif; ?>
     <?php if (count($this->PermissionData) > 0) { ?>
-        <li id="Permissions">
-            <?php
-            echo $this->Form->CheckBox('CustomPermissions', 'This category has custom permissions.');
-
-            echo '<div class="CategoryPermissions">';
-
-            if (count($this->data('DiscussionTypes')) > 1) {
-                echo '<div class="P DiscussionTypes">';
-                echo $this->Form->label('Discussion Types');
-                foreach ($this->data('DiscussionTypes') as $Type => $Row) {
-                    echo $this->Form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
-                }
-                echo '</div>';
-            }
-
-            echo $this->Form->Simple(
-                $this->data('_PermissionFields', array()),
-                array('Wrap' => array('', ''), 'ItemWrap' => array('<div class="P">', '</div>')));
-
-            echo t('Check all permissions that apply for each role');
-            echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
-            echo '</div>';
-            ?>
+        <li id="Permissions" class="form-group row">
+            <?php echo $this->Form->toggle('CustomPermissions', 'This category has custom permissions.'); ?>
         </li>
     <?php } ?>
 </ul>
+<?php
+echo '<div class="CategoryPermissions">';
+if (count($this->data('DiscussionTypes')) > 1) {
+    echo '<div class="P DiscussionTypes form-group row">';
+    echo '<div class="label-wrap">';
+    echo $this->Form->label('Discussion Types');
+    echo '</div>';
+    echo '<div class="checkbox-list input-wrap">';
+    foreach ($this->data('DiscussionTypes') as $Type => $Row) {
+        echo $this->Form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
+    }
+    echo '</div>';
+    echo '</div>';
+}
+
+echo $this->Form->Simple(
+    $this->data('_PermissionFields', array()),
+    array('Wrap' => array('<div class="form-group row">', '</div>'), 'ItemWrap' => array('<div class="input-wrap">', '</div>')));
+
+echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
+echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
+echo '</div>';
+?>
+<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
+</div>

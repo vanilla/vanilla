@@ -309,10 +309,13 @@ if (!function_exists('attribute')) {
             $Exclude = $ValueOrExclude;
         }
         foreach ($Name as $Attribute => $Val) {
-            if ($Exclude && StringBeginsWith($Attribute, $Exclude)) {
+            if (empty($Val) || ($Exclude && StringBeginsWith($Attribute, $Exclude))) {
                 continue;
             }
+            if (is_array($Val) && strpos($Attribute, 'data-') === 0) {
+                $Val = json_encode($Val);
 
+            }
             if ($Val != '' && $Attribute != 'Standard') {
                 $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
             }

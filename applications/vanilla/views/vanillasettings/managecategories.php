@@ -1,14 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 ?>
-    <style>
-        .CategoryPhoto {
-            float: left;
-            margin-right: 8px;
-            max-height: 64px;
-            max-width: 64px;
-        }
-    </style>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo wrap(t('Need More Help?'), 'h2');
@@ -18,6 +11,7 @@ $Session = Gdn::session();
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Manage Categories'); ?></h1>
     <div class="Info">
         <?php
@@ -42,6 +36,7 @@ $Session = Gdn::session();
 <?php
 if (c('Vanilla.Categories.Use')) {
     ?>
+    <?php Gdn_Theme::assetBegin('Help'); ?>
     <div class="Help Aside">
         <?php
         echo '<h2>', t('Did You Know?'), '</h2>';
@@ -52,6 +47,7 @@ if (c('Vanilla.Categories.Use')) {
         echo '</ul>';
         ?>
     </div>
+    <?php Gdn_Theme::assetEnd('Help'); ?>
     <h1><?php
         echo t('Category Page Layout');
         echo ' ';
@@ -131,7 +127,7 @@ if (c('Vanilla.Categories.Use')) {
                   </td>
                   <td class="Buttons">'
                 .anchor(t('Edit'), 'vanilla/settings/editcategory/'.$Category->CategoryID, 'SmallButton')
-                .anchor(t('Move'), "vanilla/settings/movecategory/{$Category->CategoryID}", 'Popup SmallButton')
+                .anchor(t('Move'), "vanilla/settings/movecategory/{$Category->CategoryID}", 'js-modal SmallButton')
                 .(val('CanDelete', $Category) ? anchor(t('Delete'), 'vanilla/settings/deletecategory/'.$Category->CategoryID, 'SmallButton') : '')
                 .'</td>
                </tr>

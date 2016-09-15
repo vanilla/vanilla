@@ -1,15 +1,16 @@
 <?php if (!defined('APPLICATION')) exit();
 include $this->fetchViewLocation('helper_functions');
-
-PagerModule::write(array('Sender' => $this, 'Limit' => 10));
 ?>
-    <table id="Log" class="AltColumns">
+<div class="table-wrap">
+    <table id="Log" class="table-data">
         <thead>
         <tr>
-            <th class="CheckboxCell"><input id="SelectAll" type="checkbox"/></th>
-            <th class="Alt UsernameCell"><?php echo t('Operation By', 'By'); ?></th>
-            <th><?php echo t('Record Content', 'Content') ?></th>
+            <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
+            <th class="UsernameCell column-lg"><?php echo t('Flagged By', 'Flagged By'); ?></th>
+            <th class="content-cell column-xl" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
+            <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
+            <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -19,20 +20,30 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 10));
             if (!$RecordLabel)
                 $RecordLabel = $Row['RecordType'];
             $RecordLabel = Gdn_Form::LabelCode($RecordLabel);
+            $user = userBuilder($Row, 'Insert');
+            $user = Gdn::userModel()->getByUsername(val('Name', $user));
+            $viewPersonalInfo = gdn::session()->checkPermission('Garden.PersonalInfo.View');
 
             ?>
             <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
-                <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
+                <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
                 </td>
-                <td class="UsernameCell"><?php
-                    echo userAnchor($Row, '', 'Insert');
-
-                    if (!empty($Row['OtherUserIDs'])) {
-                        $OtherUserIDs = explode(',', $Row['OtherUserIDs']);
-                        echo ' '.plural(count($OtherUserIDs), 'and %s other', 'and %s others').' ';
-                    };
-                    ?></td>
-                <td>
+                <td class="UsernameCell">
+                    <div class="media-sm">
+                        <div class="media-sm-image-wrap">
+                            <?php echo userPhoto($user); ?>
+                        </div>
+                        <div class="media-sm-content">
+                            <div class="title">
+                                <?php echo userAnchor($user, 'Username reverse-link'); ?>
+                            </div>
+                            <?php if ($viewPersonalInfo) : ?>
+                                <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </td>
+                <td class="content-cell">
                     <?php
                     $Url = FALSE;
                     if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
@@ -50,51 +61,21 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 10));
                         }
                     }
 
-                    echo '<div"><span class="Expander">', $this->FormatContent($Row), '</span></div>';
+                    if ($Url) {
+                        echo '<div class="pull-right">'.anchor(dashboardSymbol('external-link'), $Url, 'icon icon-text').'</div>';
+                    }
+                    echo '<div class="post-content Expander">', $this->FormatContent($Row), '</div>';
 
                     // Write the other record counts.
 
                     echo OtherRecordsMeta($Row['Data']);
 
                     echo '<div class="Meta-Container">';
-
-                    echo '<span class="Tags">';
-                    echo '<span class="Tag Tag-'.$Row['Operation'].'">'.t($Row['Operation']).'</span> ';
-                    echo '<span class="Tag Tag-'.$RecordLabel.'">'.anchor(t($RecordLabel), $Url).'</span> ';
-
-                    echo '</span>';
-
-                    if (checkPermission('Garden.PersonalInfo.View') && $Row['RecordIPAddress']) {
-                        echo ' <span class="Meta">',
-                        '<span class="Meta-Label">IP</span> ',
-                        IPAnchor($Row['RecordIPAddress'], 'Meta-Value'),
-                        '</span> ';
-                    }
-
                     if ($Row['CountGroup'] > 1) {
-                        echo ' <span class="Meta">',
+                        echo ' <span class="info">',
                             '<span class="Meta-Label">'.t('Reported').'</span> ',
                         wrap(Plural($Row['CountGroup'], '%s time', '%s times'), 'span', 'Meta-Value'),
                         '</span> ';
-
-//                  echo ' ', sprintf(t('%s times'), $Row['CountGroup']);
-                    }
-
-                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
-
-                    if ($Row['RecordName']) {
-                        echo ' <span class="Meta">',
-                            '<span class="Meta-Label">'.sprintf(t('%s by'), t($RecordLabel)).'</span> ',
-                        userAnchor($Row, 'Meta-Value', 'Record');
-
-                        if ($RecordUser['Banned']) {
-                            echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
-                        }
-
-                        echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
-
-
-                        echo '</span> ';
                     }
 
                     // Write custom meta information.
@@ -105,22 +86,43 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 10));
                                 '<span class="Meta-Label">'.t($Key).'</span> ',
                             wrap(Gdn_Format::Html($Value), 'span', array('class' => 'Meta-Value')),
                             '</span>';
-
                         }
                     }
-
                     echo '</div>';
                     ?>
-
+                </td>
+                <td class="PostType">
+                    <?php echo t($RecordLabel); ?>
                 </td>
                 <td class="DateCell"><?php
                     echo Gdn_Format::date($Row['DateInserted'], 'html');
-                    ?></td>
+                    ?>
+                </td>
+                <td class="PostedByCell"><?php
+                    $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
+                    if ($Row['RecordName']) { ?>
+                        <div class="media-sm">
+                            <div class="media-sm-content">
+                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
+                                    <?php
+                                    if ($RecordUser['Banned']) {
+                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
+                                    }
+                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
+                                    ?>
+                                </div>
+                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
+                                    <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
+                                <?php } ?>
+                            </div>
+                        </div>
+                    <?php } ?>
+                </td>
             </tr>
         <?php
         endforeach;
         ?>
         </tbody>
     </table>
+</div>
 <?php
-PagerModule::write();

@@ -19,6 +19,7 @@ $PluginInfo['GooglePrettify'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SettingsUrl' => '/dashboard/settings/googleprettify',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'google-prettify.png'
 );
 
 // Changelog
@@ -183,7 +184,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 
-        $Sender->addSideMenu();
+        
         $Sender->setData('Title', t('Syntax Prettifier Settings'));
         $Cf->renderAll();
     }

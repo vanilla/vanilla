@@ -342,7 +342,7 @@ jQuery(document).ready(function($) {
         //$('a.Popup').popup();
         //$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-        $('a.Popup:not(.Message a.Popup)').popup();
+        $('a.Popup:not(.Message a.Popup):not(.dashboard a.Popup):not(.Section-Dashboard a.Popup)').popup();
         $('a.PopConfirm:not(.Message a.PopConfirm)').popup({'confirm': true, 'followConfirm': true});
     }
 
@@ -761,7 +761,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack:not(.Message .Hijack)', 'click', hijackClick);
+    $(document).delegate('.Hijack:not(.DismissMessage .Hijack)', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus
@@ -1916,7 +1916,7 @@ jQuery(document).ready(function($) {
                 // Either @ or : for now.
                 var at = context.at;
                 var text = context.query.text;
-                var font_mirror = $('.BodyBox');
+                var font_mirror = $('.BodyBox,.js-bodybox');
                 var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
 
                 // Get font width
@@ -1965,9 +1965,9 @@ jQuery(document).ready(function($) {
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
         $(document).on('contentLoad', function() {
-            gdn.atCompleteInit('.BodyBox', '');
+            gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
         });
-        gdn.atCompleteInit('.BodyBox', '');
+        gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
     }
 
 

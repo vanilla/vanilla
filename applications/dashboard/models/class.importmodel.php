@@ -1269,6 +1269,10 @@ class ImportModel extends Gdn_Model {
      * @param $Path
      */
     protected function _LoadTableLocalInfile($Tablename, $Path) {
+        if (extension_loaded('mysqli') === false) {
+            throw new Exception('mysqli extension required for load data');
+        }
+
         $Tablename = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
         $Path = Gdn::database()->connection()->quote($Path);
 

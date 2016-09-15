@@ -1,0 +1,96 @@
+.Hidden,
+.hidden {
+  display: none;
+}
+
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 ($spacer / 4);
+  margin-left: $spacer / 4;
+  font-size: $font-size-xs;
+  background-color: rgba(0,0,0,.1875);
+  color: $white;
+  border-radius: .25rem;
+
+  .btn-group & {
+    margin-top: - to-rem(2);
+  }
+}
+
+.Padded,
+.padded {
+  margin: $spacer 0;
+}
+
+.padded-top {
+  margin-top: $spacer;
+}
+
+.padded-bottom {
+  margin-bottom: $spacer;
+}
+
+.padded-left {
+  margin-left: $spacer;
+}
+
+.padded-right {
+  margin-right: $spacer;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: .25rem;
+  margin-left: .25rem;
+  vertical-align: middle;
+  content: "";
+  border-top: $caret-width solid;
+  border-right: $caret-width solid transparent;
+  border-left: $caret-width solid transparent;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &.flex-wrap {
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  > * {
+    margin-right: $spacer / 4;
+  }
+
+  > *:last-child {
+    margin-right: 0;
+  }
+}
+
+.no-shrink {
+  flex-shrink: 0;
+}
+
+.no-grow {
+  flex-grow: 0;
+}
+
+.shrink {
+  flex-shrink: 1;
+}
+
+.grow {
+  flex-grow: 1;
+}

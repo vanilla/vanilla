@@ -199,7 +199,8 @@ class LogController extends DashboardController {
             $this->View = 'Table';
         }
 
-        $this->addSideMenu('dashboard/log/edits');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render();
     }
 
@@ -234,7 +235,8 @@ class LogController extends DashboardController {
             $this->View = 'Table';
         }
 
-        $this->addSideMenu('dashboard/log/edits');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render();
     }
 
@@ -272,7 +274,8 @@ class LogController extends DashboardController {
             $this->View = 'Table';
         }
 
-        $this->addSideMenu('dashboard/log/edits');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/edits');
         $this->render('record');
     }
 
@@ -300,6 +303,7 @@ class LogController extends DashboardController {
         $this->addJsFile('log.js');
         $this->addJsFile('jquery.expander.js');
         $this->addJsFile('jquery-ui.js');
+        $this->addJsFile('jquery.popup.js');
     }
 
     /**
@@ -338,7 +342,8 @@ class LogController extends DashboardController {
             $this->View = 'Table';
         }
 
-        $this->addSideMenu('dashboard/log/moderation');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/moderation');
         $this->render();
     }
 
@@ -435,7 +440,8 @@ class LogController extends DashboardController {
             $this->View = 'Table';
         }
 
-        $this->addSideMenu('dashboard/log/spam');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/log/spam');
         $this->render();
     }
 }

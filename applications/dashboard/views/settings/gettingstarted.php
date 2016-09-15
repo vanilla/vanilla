@@ -1,244 +1,81 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
-function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium') {
+function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $noGrid = false) {
     $Tutorial = GetTutorials($TutorialCode);
     if (!$Tutorial)
         return '';
 
     $Thumbnail = $ThumbnailSize == 'medium' ? $Tutorial['Thumbnail'] : $Tutorial['LargeThumbnail'];
-    return anchor(
-        '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" title="'.$Tutorial['Name'].'" />'
-        .($WriteTitle ? wrap($Tutorial['Name']) : ''),
-        'settings/tutorials/'.$Tutorial['Code']
-    );
+    $noGrid = ($noGrid) ? 'no-grid' : '';
+    echo '<div class="video label-selector-item '.$noGrid.'">';
+    echo '<div class="image-wrap">';
+    echo '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
+    <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
+        <div class="buttons">
+            <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
+        </div>
+        <div class="selected"></div>
+    </a>
+    <?php
+    echo '</div>';
+    echo ($WriteTitle) ? wrap($Tutorial['Name'], 'div', ['class' => 'video-title title']) : '';
+    echo '</div>';
 }
-
 ?>
-    <style type="text/css">
-        .Welcome {
-            position: relative;
-            min-height: 181px;
-            background: #00346d;
-            background: -webkit-gradient(linear, center bottom, center top, from(#014a8a), to(#00346d));
-            background: -moz-linear-gradient(top, #00346d, #014a8a);
-            -pie-background: linear-gradient(top, #00346d, #014a8a);
-            background: linear-gradient(top, #00346d, #014a8a);
-            padding: 20px 400px 20px 20px;
-            color: #fff;
-            border-radius: 4px;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-        }
 
-        .Welcome strong {
-            color: #FFF6CD;
-        }
-
-        /*
-         Put this definition in admin.css b/c of the relative path to the bg image
-        .Welcome h2 {
-            overflow: hidden;
-            text-indent: -1000px;
-            font-size: 1px;
-            height: 42px;
-            width: 341px;
-            background: url('images/welcome-message.png') top left no-repeat transparent;
-        }
-        */
-        .Welcome .Video {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            line-height: 1;
-        }
-
-        .Welcome a {
-            color: #fff;
-            text-decoration: underline;
-        }
-
-        .Welcome a:hover {
-            text-decoration: none;
-        }
-
-        .Welcome .Video a {
-            border: 10px solid #1c4c80;
-            border-color: rgba(255, 255, 255, 0.1);
-            background: #1c4c80;
-            background: rgba(255, 255, 255, 0.1);
-            line-height: 0;
-            display: block;
-        }
-
-        .Welcome .Video a:hover {
-            border: 10px solid #3c6ca0;
-            border-color: rgba(255, 255, 255, 0.3);
-        }
-
-        .Welcome .Video img {
-            width: 320px;
-        }
-
-        .Step {
-            background: #efefef;
-            border: 1px solid #dfdfdf;
-            margin: 20px 0 0;
-            padding: 16px 20px 10px;
-            border-radius: 4px;
-            -moz-border-radius: 4px;
-            -webkit-border-radius: 4px;
-            position: relative;
-        }
-
-        .NumberPoint {
-            position: absolute;
-            top: 0px;
-            left: -16px;
-            border-radius: 40px;
-            -webkit-border-radius: 40px;
-            -moz-border-radius: 40px;
-            border: 5px solid #3CB3E8;
-            font-size: 28px;
-            height: 36px;
-            width: 36px;
-            background: #aee7fe;
-            -moz-transform: rotate(-20.5deg);
-            -o-transform: rotate(-20.5deg);
-            -webkit-transform: rotate(-20.5deg);
-            text-align: center;
-            font-family: monospace, Arial, Sans-Serif;
-            font-weight: bold;
-            color: #003673;
-            text-shadow: 1px 1px 0 rgba(256, 256, 256, 0.5);
-            box-shadow: 0 1px 1px #003673;
-            -moz-box-shadow: 0 1px 1px #003673;
-            -webkit-box-shadow: 0 1px 1px #003673;
-        }
-
-        .Step textarea,
-        .Step .RecipientBox {
-            font-family: arial;
-            color: #666;
-            font-size: 14px;
-            width: 100%;
-            padding: 3px;
-            margin-bottom: 10px;
-        }
-
-        .Step textarea:focus,
-        .Step .RecipientBox:focus {
-            color: #222;
-        }
-
-        .Step textarea {
-            height: 85px;
-        }
-
-        .Step .RecipientBox {
-            padding: 3px 1px;
-        }
-
-        .Step h2 {
-            padding-left: 16px;
-            font-size: 14px;
-        }
-
-        .Step .Videos {
-            padding: 10px 0 0;
-        }
-
-        .Step .Videos a {
-            vertical-align: top;
-            display: inline-block;
-            margin: 0 10px 10px 0;
-            width: 212px;
-        }
-
-        .Step .Videos a:hover {
-            background: #ddd;
-        }
-
-        .Step .Videos a img {
-            border: 6px solid #ddd;
-        }
-
-        .Step .Videos a:hover img {
-            border: 6px solid #bbb;
-        }
-
-        .Step .Videos a span {
-            display: block;
-            font-size: 11px;
-            color: #555;
-            padding: 0 6px 6px;
-        }
-
-        .Step .Videos a:hover span {
-            color: #222;
-        }
-
-        #Content form .Step input.Button {
-            margin: 0;
-        }
-    </style>
-    <h1><?php echo t('Getting Started with Vanilla'); ?></h1>
-    <div class="Info">
-        <div class="Welcome">
-            <h2><?php echo t('Getting Started with Vanilla'); ?></h2>
-
-            <p><strong><?php echo t('Kick-start your community and increase user engagement.'); ?></strong></p>
-
-            <p><?php echo t("Check out these tutorials to get started using Vanilla", "Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?></p>
-
-            <p><?php echo anchor(t("Check out the full list of video tutorials here."), 'settings/tutorials'); ?></p>
-
-            <div class="Video"><?php echo TutLink('introduction', FALSE, 'large'); ?></div>
-        </div>
-        <div class="Step">
-            <div class="NumberPoint"><?= t('1'); ?></div>
-            <h2><?php echo t('The Basics'); ?></h2>
-
-            <p><?php echo t('Learn how to use the basic functionality of your forum.'); ?></p>
-
-            <div class="Videos">
-                <?php
-                echo TutLink('using-the-forum');
-                echo TutLink('private-conversations');
-                echo TutLink('user-profiles');
-                ?>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/gettingstarted'); ?>" class="active"><?php echo t('Getting Started'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/tutorials'); ?>"><?php echo t('Help &amp; Tutorials'); ?></a>
+</div>
+<div class="hero">
+    <div class="hero-content">
+        <div class="hero-title">
+            <div class="tagline">
+                <?php echo sprintf(t('Getting Started with %s'), ''); ?>
             </div>
         </div>
-        <div class="Step">
-            <div class="NumberPoint"><?= t('2'); ?></div>
-            <h2><?php echo t("Appearance"); ?></h2>
-
-            <p><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></p>
-
-            <div class="Videos">
-                <?php echo TutLink('appearance'); ?>
-            </div>
+        <?php echo wrap('Vanilla Forums', 'div', ['class' => 'vanilla-logo vanilla-logo-black']); ?>
+        <div class="hero-body">
+            <?php echo t('Kick-start your community and increase user engagement.');
+            echo t("Check out these tutorials to get started using Vanilla", "Vanilla is the simplest, most powerful community platform in the world. It's super-duper easy to use. Start with this introductory video and continue with the steps below. Enjoy!"); ?>
         </div>
-        <div class="Step">
-            <div class="NumberPoint"><?= t('3'); ?></div>
-            <h2><?php echo t('Organize'); ?></h2>
-
-            <p><?php echo t('Create & organize discussion categories and manage your users.'); ?></p>
-
-            <div class="Videos">
-                <?php
-                echo TutLink('user-registration');
-                echo TutLink('users');
-                echo TutLink('roles-and-permissions');
-                echo TutLink('category-management-and-advanced-settings');
-                ?>
-            </div>
-        </div>
-        <div class="Step">
-            <div class="NumberPoint"><?= t('4'); ?></div>
-            <h2><?php echo t('Encourage your friends to join your new community!'); ?></h2>
-
-            <p><?php echo t('Invite your friends to register to your new forum!'); ?></p>
-            <?php $registrationURL = url('entry/register', true); ?>
-            <p><?php echo sprintf(t('Simply tell them to go to the following URL and register: %s'), anchor($registrationURL, $registrationURL)); ?></p>
+        <?php echo anchor(t("Full list of video tutorials"), 'settings/tutorials', 'btn btn-secondary'); ?>
+    </div>
+    <div class="hero-media-wrapper">
+        <div class="label-selector">
+            <?php echo TutLink('introduction', FALSE, 'large', true); ?>
         </div>
     </div>
+</div>
+<div class="video-sections">
+    <div class="video-section">
+        <div class="video-section-heading"><?php echo t('The Basics'); ?></div>
+        <div class="info"><?php echo t('Learn how to use the basic functionality of your forum.'); ?></div>
+        <div class="videos label-selector">
+            <?php
+            echo TutLink('using-the-forum');
+            echo TutLink('private-conversations');
+            echo TutLink('user-profiles');
+            ?>
+        </div>
+    </div>
+    <div class="video-section">
+        <div class="video-section-heading"><?php echo t("Appearance"); ?></div>
+        <div class="info"><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></div>
+        <div class="videos label-selector">
+            <?php echo TutLink('appearance'); ?>
+        </div>
+    </div>
+    <div class="video-section">
+        <div class="video-section-heading"><?php echo t('Organize'); ?></div>
+        <div class="info"><?php echo t('Create & organize discussion categories and manage your users.'); ?></div>
+        <div class="videos label-selector">
+            <?php
+            echo TutLink('user-registration');
+            echo TutLink('users');
+            echo TutLink('roles-and-permissions');
+            echo TutLink('category-management-and-advanced-settings');
+            ?>
+        </div>
+    </div>
+</div>

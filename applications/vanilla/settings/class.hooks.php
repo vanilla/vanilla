@@ -491,57 +491,30 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     * @param SiteLinkMenuModule $sender
+     * @param NavModule $sender
      */
-    public function siteNavModule_default_handler($sender) {
+    public function siteNavModule_init_handler($sender) {
         // Grab the default route so that we don't add a link to it twice.
         $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
         // Add the site discussion links.
-        if ($home !== 'categories') {
-            $sender->addLink('main.categories', array('text' => t('All Categories', 'Categories'), 'url' => '/categories', 'icon' => icon('th-list'), 'sort' => 1));
-        }
-        if ($home !== 'discussions') {
-            $sender->addLink('main.discussions', array('text' => t('Recent Discussions'), 'url' => '/discussions', 'icon' => icon('discussion'), 'sort' => 1));
-        }
-
-        // Add favorites.
-        $sender->addGroup('favorites', array('text' => t('Favorites')));
+        $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, array('icon' => 'th-list'));
+        $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, array('icon' => 'discussion'));
+        $sender->addGroup(t('Favorites'), 'favorites', '', 3);
 
         if (Gdn::session()->isValid()) {
-            $sender->addLink('favorites.bookmarks', array('text' => t('My Bookmarks'),
-                'url' => '/discussions/bookmarked', 'icon' => icon('star'),
-                'badge' => countString(Gdn::session()->User->CountBookmarks, '/discussions/userbookmarkcount')));
-            $sender->addLink('favorites.discussions', array('text' => t('My Discussions'),
-                'url' => '/discussions/mine', 'icon' => icon('discussion'),
-                'badge' => countString(Gdn::session()->User->CountDiscussions)));
-            $sender->addLink('favorites.drafts', array('text' => t('Drafts'), 'url' => '/drafts',
-                'icon' => icon('compose'),
-                'badge' => countString(Gdn::session()->User->CountDrafts)));
+            $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', array(), array('icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks));
+            $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', array(), array('icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions));
+            $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', array(), array('icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts));
         }
-    }
 
-    /**
-     * Add discussion & comment links to profiles.
-     *
-     * @param SiteLinkMenuModule $sender
-     */
-    public function siteNavModule_profile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
-
         if (!$user) {
             return;
         }
-
-        $user_id = val('UserID', $user);
-
-        $sender->addGroup('posts', array('text' => t('Posts')));
-
-        $sender->addLink('posts.discussions', array('text' => t('Discussions'), 'url' => userUrl($user, '', 'discussions'),
-            'icon' => icon('discussion'), 'badge' => countString(val('CountDiscussions', $user), "/profile/count/discussions?userid=$user_id")));
-
-        $sender->addLink('posts.comments', array('text' => t('Comments'), 'url' => userUrl($user, '', 'comments'),
-            'icon' => icon('comment'), 'badge' => countString(val('CountComments', $user), "/profile/count/comments?userid=$user_id")));
+        $sender->addGroupToSection('Profile', t('Posts'), 'posts');
+        $sender->addLinkToSection('Profile', t('Discussions'), userUrl($user, '', 'discussions'), 'posts.discussions', '', array(), array('icon' => 'discussion', 'badge' => val('CountDiscussions', $user)));
+        $sender->addLinkToSection('Profile', t('Comments'), userUrl($user, '', 'comments'), 'posts.comments', '', array(), array('icon' => 'comment', 'badge' => val('CountComments', $user)));
     }
 
     /**
@@ -726,15 +699,16 @@ class VanillaHooks implements Gdn_IPlugin {
      * @since 2.0.0
      * @package Vanilla
      *
-     * @param object $Sender DashboardController.
+     * @param DashboardNavModule $sender
      */
-    public function base_earlyAppSettingsMenuItems_handler($Sender) {
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addLink('Moderation', t('Flood Control'), 'vanilla/settings/floodcontrol', 'Garden.Settings.Manage', array('class' => 'nav-flood-control'));
-        $Menu->addLink('Forum', t('Categories'), 'vanilla/settings/managecategories', 'Garden.Community.Manage', array('class' => 'nav-manage-categories'));
-        $Menu->addLink('Forum', t('Advanced'), 'vanilla/settings/advanced', 'Garden.Settings.Manage', array('class' => 'nav-forum-advanced'));
-        $Menu->addLink('Forum', t('Blog Comments'), 'dashboard/embed/comments', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-comments'));
-        $Menu->addLink('Forum', t('Embed Forum'), 'dashboard/embed/forum', 'Garden.Settings.Manage', array('class' => 'nav-embed nav-embed-site'));
+    public function dashboardNavModule_init_handler($sender) {
+        $sort = -1; // Ensure these items go before any plugin items.
+
+        $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/categories', 'forum.manage-categories', 'nav-manage-categories', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)
+            ->addLinkIf(c('Vanilla.Archive.Date', false) &&  Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Archive Discussions'), '/vanilla/settings/archive', 'forum.archive', 'nav-forum-archive', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Embed'), 'embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
     }
 
     /**

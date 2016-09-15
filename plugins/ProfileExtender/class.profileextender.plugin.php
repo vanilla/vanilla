@@ -16,10 +16,12 @@ $PluginInfo['ProfileExtender'] = array(
     'MobileFriendly' => true,
     //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
     'SettingsUrl' => '/dashboard/settings/profileextender',
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'Icon' => 'profile-extender.png'
 );
 
 /**
@@ -37,6 +39,12 @@ $PluginInfo['ProfileExtender'] = array(
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
+
+    public function base_render_before($sender) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        }
+    }
 
     /** @var array */
     public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name');

@@ -21,7 +21,6 @@ Please review the information below and click <b>Start Import</b> to begin the i
         t('Garden.Import.Complete.Description', 'You have successfully completed an import.
    Click <b>Finished</b> when you are ready.'),
         '</div>';
-        echo Gdn::slice('/dashboard/role/defaultroleswarning');
     } else {
         // The import is in process.
         echo '<div class="Info">',

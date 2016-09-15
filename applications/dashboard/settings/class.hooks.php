@@ -27,6 +27,47 @@ class DashboardHooks implements Gdn_IPlugin {
     public function base_render_before($Sender) {
         $Session = Gdn::session();
 
+
+        if ($Sender->MasterView == 'admin') {
+            if (val('Form', $Sender)) {
+                $Sender->Form->setStyles('bootstrap');
+            }
+
+            $Sender->CssClass = htmlspecialchars($Sender->CssClass);
+            $Sections = Gdn_Theme::section(null, 'get');
+            if (is_array($Sections)) {
+                foreach ($Sections as $Section) {
+                    $Sender->CssClass .= ' Section-'.$Section;
+                }
+            }
+
+            // Get our plugin nav items.
+            $navAdapter = new NestedCollectionAdapter(DashboardNavModule::getDashboardNav());
+            $Sender->EventArguments['SideMenu'] = $navAdapter;
+            $Sender->fireEvent('GetAppSettingsMenuItems');
+
+            $Sender->removeJsFile('jquery.popup.js');
+            $Sender->addJsFile('dashboard.js', 'dashboard');
+            $Sender->addJsFile('jquery.expander.js');
+            $Sender->addJsFile('settings.js', 'dashboard');
+            $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/bootstrap/util.js', 'dashboard');
+            $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/moment.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/daterangepicker.js', 'dashboard');
+            $Sender->addJsFile('vendors/bootstrap/tooltip.js', 'dashboard');
+            $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
+            $Sender->addJsFile('vendors/bootstrap/dropdown.js', 'dashboard');
+            $Sender->addJsFile('vendors/bootstrap/collapse.js', 'dashboard');
+            $Sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
+            $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
+            $Sender->addJsFile('jquery.tablejengo.js', 'dashboard');
+            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
+            $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
+            $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
+        }
+
         // Check the statistics.
         if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
             Gdn::statistics()->check();
@@ -48,7 +89,6 @@ class DashboardHooks implements Gdn_IPlugin {
                 );
             }
         }
-
         if ($Session->isValid()) {
             $Confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$Confirmed) {
@@ -136,6 +176,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->setHeader('X-Frame-Options', 'SAMEORIGIN');
         }
 
+
         // Allow return to mobile site
         $ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
         if ($ForceNoMobile === 'desktop') {
@@ -144,81 +185,62 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // Allow global translation of TagHint
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+
+        // Add symbols.
+//        if ($Sender->addDefinition('InDashboard')) {
+            $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
+//        }
     }
 
-    /**
-     * @param $Sender
-     */
-    public function base_earlyAppSettingsMenuItems_handler($Sender) {
-        // SideMenuModule menu
-        $Menu = &$Sender->EventArguments['SideMenu'];
-        $Menu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
-        $Menu->addLink('Dashboard', t('Dashboard'), '/dashboard/settings', 'Garden.Settings.View', array('class' => 'nav-dashboard'));
-        $Menu->addLink('Dashboard', t('Getting Started'), '/dashboard/settings/gettingstarted', 'Garden.Settings.Manage', array('class' => 'nav-getting-started'));
-        $Menu->addLink('Dashboard', t('Help &amp; Tutorials'), '/dashboard/settings/tutorials', 'Garden.Settings.View', array('class' => 'nav-tutorials'));
+    public function dashboardNavModule_init_handler($sender) {
+        /** @var DashboardNavModule $nav */
+        $nav = $sender;
 
-        $Menu->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
-        $Menu->addLink('Appearance', t('Banner'), '/dashboard/settings/banner', 'Garden.Community.Manage', array('class' => 'nav-banner'));
-        $Menu->addLink('Appearance', t('Homepage'), '/dashboard/settings/homepage', 'Garden.Settings.Manage', array('class' => 'nav-homepage'));
+        $session = Gdn::session();
+        $themeOptionsName = c('Garden.ThemeOptions.Name');
+        $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
 
-        $Menu->addLink('Appearance', t('Themes'), '/dashboard/settings/themes', 'Garden.Settings.Manage', array('class' => 'nav-themes'));
-        if ($ThemeOptionsName = c('Garden.ThemeOptions.Name')) {
-            $Menu->addLink('Appearance', t('Theme Options'), '/dashboard/settings/themeoptions', 'Garden.Settings.Manage', array('class' => 'nav-theme-options'));
-        }
+        $sort = -1; // Ensure these nav items come before any plugin nav items.
 
-        $Menu->addLink('Appearance', t('Mobile Themes'), '/dashboard/settings/mobilethemes', 'Garden.Settings.Manage', array('class' => 'nav-mobile-themes'));
-        if ($MobileThemeOptionsName = c('Garden.MobileThemeOptions.Name')) {
-            $Menu->addLink('Appearance', t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'Garden.Settings.Manage', array('class' => 'nav-mobile-theme-options'));
-        }
+        $nav->addGroupToSection('Moderation', t('Site'), 'site')
+            ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Messages'), '/dashboard/message', 'site.messages', '', $sort)
+            ->addLinkToSectionIf(['Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'], 'Moderation', t('Users'), '/dashboard/user', 'site.users', '', $sort)
+            ->addLinkToSectionIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), 'Moderation', t('Applicants'), '/dashboard/user/applicants', 'site.applicants', '', $sort, ['popinRel' => '/dashboard/user/applicantcount'], false)
+            ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Banning'), '/dashboard/settings/bans', 'site.bans', '', $sort)
 
-        $Menu->addLink('Appearance', t('Messages'), '/dashboard/message', 'Garden.Community.Manage', array('class' => 'nav-messages'));
-        $Menu->addLink('Appearance', t('Avatars'), '/dashboard/settings/avatars', 'Garden.Community.Manage', array('class' => 'nav-avatars'));
-        $Menu->addLink('Appearance', t('Email'), '/dashboard/settings/emailstyles', 'Garden.Community.Manage', array('class' => 'nav-email-styles'));
+            ->addGroupToSection('Moderation', t('Content'), 'moderation')
+            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
+            ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
 
-        $Menu->addItem('Users', t('Users'), false, array('class' => 'Users'));
-        $Menu->addLink('Users', t('Users'), '/dashboard/user', array('Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'), array('class' => 'nav-users'));
 
-        if (Gdn::session()->checkPermission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false)) {
-            $Menu->addLink('Users', t('Roles & Permissions'), 'dashboard/role', false, array('class' => 'nav-roles'));
-        }
+            ->addGroup(t('Appearance'), 'appearance', '', -1)
+            ->addLinkIf('Garden.Settings.Manage', t('Banner'), '/dashboard/settings/banner', 'appearance.banner', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
+            ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
+            ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
+            ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
+            ->addLinkIf('Garden.Community.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
+            ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
 
-        $Menu->addLink('Users', t('Registration'), 'dashboard/settings/registration', 'Garden.Settings.Manage', array('class' => 'nav-registration'));
-        $Menu->addLink('Users', t('Authentication'), 'dashboard/authentication', 'Garden.Settings.Manage', array('class' => 'nav-authentication'));
+            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
 
-        if (c('Garden.Registration.Method') == 'Approval') {
-            $Menu->addLink('Users', t('Applicants').' <span class="Popin" rel="/dashboard/user/applicantcount"></span>', 'dashboard/user/applicants', 'Garden.Users.Approve', array('class' => 'nav-applicants'));
-        }
+            ->addGroup(t('Forum Settings'), 'forum', '', ['after' => 'users'])
+            ->addLinkIf('Garden.Settings.Manage', t('Social'), '/social/manage', 'forum.social', '', $sort)
+            ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
+            ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales', '', $sort)
 
-        $Menu->addItem('Moderation', t('Moderation'), false, array('class' => 'Moderation'));
-
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false)) {
-            $Menu->addLink('Moderation', t('Spam Queue'), 'dashboard/log/spam', false, array('class' => 'nav-spam-queue'));
-        }
-        if (Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
-            $Menu->addLink('Moderation', t('Moderation Queue').' <span class="Popin" rel="/dashboard/log/count/moderate"></span>', 'dashboard/log/moderation', false, array('class' => 'nav-moderation-queue'));
-        }
-        $Menu->addLink('Moderation', t('Change Log'), 'dashboard/log/edits', 'Garden.Moderation.Manage', array('class' => 'nav-change-log'));
-        $Menu->addLink('Moderation', t('Banning'), 'dashboard/settings/bans', 'Garden.Community.Manage', array('class' => 'nav-bans'));
-
-        $Menu->addItem('Forum', t('Forum Settings'), false, array('class' => 'Forum'));
-        $Menu->addLink('Forum', t('Social'), 'dashboard/social', 'Garden.Settings.Manage', array('class' => 'nav-social-settings'));
-
-        $Menu->addItem('Reputation', t('Reputation'), false, array('class' => 'Reputation'));
-
-        $Menu->addItem('Add-ons', t('Addons'), false, array('class' => 'Addons'));
-        $Menu->addLink('Add-ons', t('Plugins'), 'dashboard/settings/plugins', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-plugins'));
-        $Menu->addLink('Add-ons', t('Applications'), 'dashboard/settings/applications', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-applications'));
-        $Menu->addLink('Add-ons', t('Locales'), 'dashboard/settings/locales', 'Garden.Settings.Manage', array('class' => 'nav-addons nav-locales'));
-
-        $Menu->addItem('Site Settings', t('Settings'), false, array('class' => 'SiteSettings'));
-        $Menu->addLink('Site Settings', t('Outgoing Email'), 'dashboard/settings/email', 'Garden.Settings.Manage', array('class' => 'nav-email nav-email-out'));
-        $Menu->addLink('Site Settings', t('Routes'), 'dashboard/routes', 'Garden.Settings.Manage', array('class' => 'nav-routes'));
-        $Menu->addLink('Site Settings', t('Statistics'), 'dashboard/statistics', 'Garden.Settings.Manage', array('class' => 'nav-statistics-settings'));
-
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            $Menu->addItem('Import', t('Import'), 'Garden.Settings.Manage', array('class' => 'Import'));
-            $Menu->addLink('Import', false, 'dashboard/import', 'Garden.Settings.Manage', array('class' => 'nav-import'));
-        }
+            ->addGroup(t('Site Settings'), 'site-settings', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
+            ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
+            ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'forum-data.import', '', $sort);
     }
 
     /**
@@ -318,113 +340,58 @@ class DashboardHooks implements Gdn_IPlugin {
      *
      * @param SiteNavModule $sender
      */
-    public function siteNavModule_all_handler($sender) {
+    public function siteNavModule_init_handler($sender) {
+
+        // GLOBALS
+
         // Add a link to the community home.
-        $sender->addLink('main.home', array('text' => t('Community Home'), 'url' => '/', 'icon' => icon('home'), 'sort' => -100));
+        $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
+        $sender->addGroupToGlobals('', 'etc', '', 100);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', '', 100, array('icon' => 'resize-full'));
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
+        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
 
-        $sender->addGroup('etc', array('sort' => 100));
-        if (Gdn::session()->isValid()) {
-            // Switch between the full site and mobile.
-            if (IsMobile()) {
-                $sender->addLink('etc.nomobile', array('text' => t('Full Site'), 'url' => '/profile/nomobile', 'icon' => icon('resize-full'), 'sort' => 100));
-            }
-
-            $sender->addLink('etc.signout', array('text' => t('Sign Out'), 'url' => SignOutUrl(), 'icon' => icon('signout'), 'sort' => 100));
-        } else {
-            $sender->addLink('etc.signin', array('text' => t('Sign In'), 'url' => SignInUrl(), 'icon' => icon('signin'), 'sort' => 100));
-        }
-    }
-
-    /**
-     *
-     *
-     * @param SiteNavModule $sender
-     */
-    public function siteNavModule_default_handler($sender) {
-        if (Gdn::session()->isValid()) {
-            $sender->addLink('main.profile', array('text' => t('Profile'), 'url' => '/profile', 'icon' => icon('user'), 'sort' => 10));
-        }
-        if (Gdn::session()->checkPermission('Garden.Activity.View')) {
-            $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => '/activity', 'icon' => icon('time'), 'sort' => 10));
-        }
-
-        // Add the moderation items.
-        $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
-        if (Gdn::session()->checkPermission('Garden.Users.Approve')) {
-            $RoleModel = new RoleModel();
-            $applicant_count = (int)$RoleModel->getApplicantCount();
-            if ($applicant_count > 0 || true) {
-                $sender->addLink('moderation.applicants', array('text' => t('Applicants'), 'url' => '/user/applicants', 'icon' => icon('user'), 'badge' => countString($applicant_count)));
-            }
-        }
-
-        if (Gdn::session()->checkPermission('Garden.Modertion.Manage')) {
-            $sender->addLink('moderation.spam', array('text' => 'Spam Queue', 'url' => '/log/spam', 'icon' => icon('spam')));
-//         $sender->addLink('moderation.queue', array('text' => 'Moderaton Queue', 'url' => '/log/moderation', 'icon' => icon('report')));
-        }
-
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            $sender->addLink('etc.dashboard', array('text' => t('Dashboard'), 'url' => '/settings', 'icon' => icon('dashboard')));
-        }
-    }
-
-    /**
-     *
-     *
-     * @param SiteNavModule $sender
-     */
-    public function siteNavModule_editprofile_handler($sender) {
-        $user = Gdn::controller()->data('Profile');
-        $user_id = val('UserID', $user);
-        $is_me = $user_id == Gdn::session()->UserID;
+        // DEFAULTS
 
         if (!Gdn::session()->isValid()) {
             return;
         }
 
-        // Users can edit their own profiles and moderators can edit any profile.
-        if (hasEditProfile($user_id)) {
-            $sender->addLink('main.editprofile', array('text' => t('Profile'), 'url' => userUrl($user, '', 'edit'), 'icon' => icon('edit')));
+        $sender->addLinkIf(Gdn::session()->isValid(), t('Profile'), '/profile', 'main.profile', 'profile', 10, array('icon' => 'user'))
+            ->addLinkIf('Garden.Activity.View', t('Activity'), '/activity', 'main.activity', 'activity', 10, array('icon' => 'time'));
+
+        // Add the moderation items.
+        $sender->addGroup(t('Moderation'), 'moderation', 'moderation', 90);
+        if (Gdn::session()->checkPermission('Garden.Users.Approve')) {
+            $RoleModel = new RoleModel();
+            $applicant_count = (int)$RoleModel->getApplicantCount();
+            if ($applicant_count > 0 || true) {
+                $sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', array(), array('icon' => 'user', 'badge' => $applicant_count));
+            }
         }
+        $sender->addLinkIf('Garden.Moderation.Manage', t('Spam Queue'), '/log/spam', 'moderation.spam', 'spam', array(), array('icon' => 'spam'))
+            ->addLinkIf('Garden.Settings.Manage', t('Dashboard'), '/settings', 'etc.dashboard', 'dashboard', array(), array('icon' => 'dashboard'));
 
-        if (checkPermission('Garden.Users.Edit')) {
-            $sender->addLink('main.editaccount', array('text' => t('Edit Account'), 'url' => "/user/edit/$user_id", 'icon' => icon('cog'), 'class' => 'Popup'));
-        }
-
-        $sender->addLink('main.profile', array('text' => t('Back to Profile'), 'url' => userUrl('user'), 'icon' => icon('arrow-left'), 'sort' => 100));
-    }
-
-    /**
-     *
-     *
-     * @param SiteNavModule $sender
-     */
-    public function siteNavModule_profile_handler($sender) {
         $user = Gdn::controller()->data('Profile');
         $user_id = val('UserID', $user);
 
-        // Show the activity.
-        if (c('Garden.Profile.ShowActivities', true)) {
-            $sender->addLink('main.activity', array('text' => t('Activity'), 'url' => userUrl($user, '', 'activity'), 'icon' => icon('time')));
-        }
-
-        // Display the notifications for the current user.
-        if (Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID) {
-            $sender->addLink('main.notifications', array('text' => t('Notifications'), 'url' => userUrl($user, '', 'notifications'), 'icon' => icon('globe'), 'badge' => Gdn::controller()->data('Profile.CountNotifications')));
-        }
-
-        // Show the invitations if we're using the invite registration method.
-        if (strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0) {
-            $sender->addLink('main.invitations', array('text' => t('Invitations'), 'url' => userUrl($user, '', 'invitations'), 'icon' => icon('ticket')));
-        }
+        //EDIT PROFILE SECTION
 
         // Users can edit their own profiles and moderators can edit any profile.
-        if (hasEditProfile($user_id)) {
-            $sender->addLink('main.editprofile', array('text' => t('Edit Profile'), 'url' => userUrl($user, '', 'edit'), 'icon' => icon('edit')));
-        }
+        $sender->addLinkToSectionIf(hasEditProfile($user_id), 'EditProfile', t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'))
+            ->addLinkToSectionIf('Garden.Users.Edit', 'EditProfile', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', array(), array('icon' => 'cog'))
+            ->addLinkToSection('EditProfile', t('Back to Profile'), userUrl($user), 'main.profile', '', 100, array('icon' => 'arrow-left'));
 
-        // Add a stub group for moderation.
-        $sender->addGroup('moderation', array('text' => t('Moderation'), 'sort' => 90));
+
+        //PROFILE SECTION
+
+        $sender->addLinkToSectionIf(c('Garden.Profile.ShowActivities', true), 'Profile', t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', array(), array('icon' => 'time'))
+            ->addLinkToSectionIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, 'Profile', t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', array(), array('icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')))
+            // Show the invitations if we're using the invite registration method.
+            ->addLinkToSectionIf(strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0, 'Profile', t('Invitations'), userUrl($user, '', 'invitations'), 'main.invitations', '', array(), array('icon' => 'ticket'))
+            // Users can edit their own profiles and moderators can edit any profile.
+            ->addLinkToSectionIf(hasEditProfile($user_id), 'Profile', t('Edit Profile'), userUrl($user, '', 'edit'), 'Profile', 'main.editprofile', '', array(), array('icon' => 'edit'));
+
     }
 
     /**

@@ -226,6 +226,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Check to see if Conversation is enabled.
         $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
+        $this->setData('IsConversationsEnabled', $IsConversationsEnabled);
 
         $ConfigurationFields = array(
             'Vanilla.Discussion.SpamCount',

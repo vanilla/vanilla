@@ -193,6 +193,7 @@ class MessageController extends DashboardController {
         $messageModel = new MessageModel();
         $enabled = forceBool($enabled, '0', '1', '0');
         $messageModel->setProperty($messageID, 'Enabled', $enabled);
+        $this->MessageModel->setMessageCache();
         if ($enabled === '1') {
             $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
         } else {

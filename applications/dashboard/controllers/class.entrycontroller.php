@@ -556,38 +556,43 @@ EOT;
                     $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
                 }
 
-                foreach ($ExistingUsers as $Row) {
-                    if (strcasecmp($this->Form->getFormValue('Email'), $Row['Email']) === 0) {
-                        $UserID = $Row['UserID'];
-                        $this->Form->setFormValue('UserID', $UserID);
-                        $Data = $this->Form->formValues();
+                // Get the email and decide if we can safely find a match.
+                $submittedEmail = $this->Form->getFormValue('Email');
+                if ((strlen($submittedEmail) > 0) && !UserModel::noEmail()) {
+                    foreach ($ExistingUsers as $Row) {
+                        // Look for an email match.
+                        if (strcasecmp($submittedEmail, $Row['Email']) === 0) {
+                            $UserID = $Row['UserID'];
+                            $this->Form->setFormValue('UserID', $UserID);
+                            $Data = $this->Form->formValues();
 
-                        if (c('Garden.Registration.ConnectSynchronize', true)) {
-                            // Don't overwrite a photo if the user has already uploaded one.
-                            $Photo = val('Photo', $Row);
-                            if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
-                                unset($Data['Photo']);
+                            if (c('Garden.Registration.ConnectSynchronize', true)) {
+                                // Don't overwrite a photo if the user has already uploaded one.
+                                $Photo = val('Photo', $Row);
+                                if (!val('Photo', $Data) || ($Photo && !stringBeginsWith($Photo, 'http'))) {
+                                    unset($Data['Photo']);
+                                }
+                                $UserModel->save($Data, array('NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles));
                             }
-                            $UserModel->save($Data, array('NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles));
+
+                            if ($Attributes = $this->Form->getFormValue('Attributes')) {
+                                $UserModel->saveAttribute($UserID, $Attributes);
+                            }
+
+                            // Save the userauthentication link.
+                            $UserModel->saveAuthentication(array(
+                                'UserID' => $UserID,
+                                'Provider' => $this->Form->getFormValue('Provider'),
+                                'UniqueID' => $this->Form->getFormValue('UniqueID')));
+
+                            // Sign the user in.
+                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                            Gdn::userModel()->fireEvent('AfterSignIn');
+                            //         $this->_setRedirect(TRUE);
+                            $this->_setRedirect($this->Request->get('display') == 'popup');
+                            $this->render();
+                            return;
                         }
-
-                        if ($Attributes = $this->Form->getFormValue('Attributes')) {
-                            $UserModel->saveAttribute($UserID, $Attributes);
-                        }
-
-                        // Save the userauthentication link.
-                        $UserModel->saveAuthentication(array(
-                            'UserID' => $UserID,
-                            'Provider' => $this->Form->getFormValue('Provider'),
-                            'UniqueID' => $this->Form->getFormValue('UniqueID')));
-
-                        // Sign the user in.
-                        Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
-                        Gdn::userModel()->fireEvent('AfterSignIn');
-                        //         $this->_setRedirect(TRUE);
-                        $this->_setRedirect($this->Request->get('display') == 'popup');
-                        $this->render();
-                        return;
                     }
                 }
             }

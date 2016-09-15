@@ -550,15 +550,17 @@ EOT;
                 $ExistingUsers = array();
             }
 
+            // Get the email and decide if we can safely find a match.
+            $submittedEmail = $this->Form->getFormValue('Email');
+            $canMatchEmail = (strlen($submittedEmail) > 0) && !UserModel::noEmail();
+
             // Check to automatically link the user.
             if ($AutoConnect && count($ExistingUsers) > 0) {
                 if ($IsPostBack && $this->Form->getFormValue('ConnectName')) {
                     $this->Form->setFormValue('Name', $this->Form->getFormValue('ConnectName'));
                 }
 
-                // Get the email and decide if we can safely find a match.
-                $submittedEmail = $this->Form->getFormValue('Email');
-                if ((strlen($submittedEmail) > 0) && !UserModel::noEmail()) {
+                if ($canMatchEmail) {
                     foreach ($ExistingUsers as $Row) {
                         // Look for an email match.
                         if (strcasecmp($submittedEmail, $Row['Email']) === 0) {
@@ -601,7 +603,7 @@ EOT;
 
             // Massage the existing users.
             foreach ($ExistingUsers as $Index => $UserRow) {
-                if ($EmailUnique && $UserRow['Email'] == $this->Form->getFormValue('Email')) {
+                if ($EmailUnique && $canMatchEmail && $UserRow['Email'] == $submittedEmail) {
                     $EmailFound = $UserRow;
                     break;
                 }

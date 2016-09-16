@@ -187,9 +187,9 @@ class DashboardHooks implements Gdn_IPlugin {
         $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
 
         // Add symbols.
-//        if ($Sender->addDefinition('InDashboard')) {
+        if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
             $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
-//        }
+        }
     }
 
     public function dashboardNavModule_init_handler($sender) {

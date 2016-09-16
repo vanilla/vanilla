@@ -65,6 +65,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
             $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
             $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $Sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');
             $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
         }
 

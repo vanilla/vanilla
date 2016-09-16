@@ -94,6 +94,7 @@ module.exports = function (grunt) {
               'ace-builds/src-min/ace.js'
               , 'ace-builds/src-min/mode-html.js'
               , 'ace-builds/src-min/mode-css.js'
+              , 'ace-builds/src-min/ext-searchbox.js'
               , 'ace-builds/src-min/theme-clouds.js'
             ],
             dest: 'js/vendors/ace'

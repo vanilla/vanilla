@@ -230,7 +230,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     </div>
     <div class="media-right media-options">
         <?php if ($SettingsUrl != '') {
-            echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName)]), 'div', ['class' => 'btn-wrap']);
+            echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName), 'data-reload-page-on-save' => 'false']), 'div', ['class' => 'btn-wrap']);
         }
         ?>
         <div id="<?php echo strtolower($addonName); ?>-toggle">

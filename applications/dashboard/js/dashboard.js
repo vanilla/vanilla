@@ -345,9 +345,8 @@ var DashboardModal = (function() {
 
         defaultSettings: {
             httpmethod: 'get',
-            afterSuccess: function(json, sender) {
-                // Called after the confirm url has been loaded via ajax
-            },
+            afterSuccess: function(json, sender) {},
+            reloadPageOnSave: true
         },
 
         id: '',
@@ -447,7 +446,7 @@ var DashboardModal = (function() {
             }
 
             $.ajax({
-                method: (this.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
                 url: self.target,
                 data: ajaxData,
                 dataType: 'json',
@@ -598,11 +597,8 @@ var DashboardModal = (function() {
                 setTimeout(function() {
                     document.location.replace(redirectUrl);
                 }, 300);
-            } else {
+            } else if (this.settings.reloadPageOnSave) {
                 document.location.replace(window.location.href);
-                // Need to ensure editting/deleting/adding view updates
-                // are handled by the controller methods. Until then, we have to reload the page.
-                // $('#' + self.id).modal('hide');
             }
         },
 

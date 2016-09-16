@@ -171,7 +171,6 @@ class DashboardHooks implements Gdn_IPlugin {
                 $Sender->addJsFile('vanilla.embed.local.js');
             } else {
                 $Sender->addJsFile('embed_local.js');
-
             }
         } else {
             $Sender->setHeader('X-Frame-Options', 'SAMEORIGIN');

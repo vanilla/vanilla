@@ -4524,4 +4524,55 @@ class UserModel extends Gdn_Model {
         }
         return $RoleIDs;
     }
+
+    /**
+     * Clears navigation preferences for a user.
+     *
+     * @param string $userID Optional - defaults to sessioned user
+     */
+    public function clearNavigationPreferences($userID = '') {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        $this->savePreference($userID, 'DashboardNav.Collapsed', []);
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', []);
+        $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+    }
+
+    /**
+     * Checks if a url is saved as a navigation preference and if so, deletes it.
+     * Also optionally resets the section dashboard landing page.
+     *
+     * @param string $url
+     * @param string $userID
+     * @param bool $resetSectionPreference
+     */
+    public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        if ($url == '') {
+            $url = Gdn::request()->url();
+        }
+
+        $user = $this->getID($userID);
+        $preferences = val('Preferences', $user, []);
+        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+
+        foreach ($landingPages as $section => $landingPage) {
+            $url = strtolower(trim($url, '/'));
+            $landingPage = strtolower(trim($landingPage, '/'));
+            if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                unset($landingPages[$section]);
+            }
+        }
+
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+
+        if ($resetSectionPreference) {
+            $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+        }
+    }
 }

@@ -59,23 +59,6 @@ class DashboardController extends Gdn_Controller {
     }
 
     /**
-     * An endpoint to clear all the navigation preferences for a user.
-     *
-     * @param string $userID
-     */
-    public function clearNavigationPreferences($userID = '') {
-        if ($userID && $userID !== Gdn::session()->UserID) {
-            $this->permission('Garden.Users.Edit');
-        }
-
-        $userModel = new UserModel();
-        $userModel->clearNavigationPreferences($userID);
-
-        $this->informMessage(t('Navigation preferences cleared.'));
-        redirect('/');
-    }
-
-    /**
      * Sets a user's preference for dashboard panel nav collapsing. Collapsed groups are stored in an
      * list, by their 'data-key' attribute on the nav-header <a> element.
      *

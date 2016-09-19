@@ -116,13 +116,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         // Load javascript & css, check permissions, and load side menu for this page.
         $sender->addJsFile('settings.js');
         $sender->title(t('Dashboard'));
-        $sender->RequiredAdminPermissions[] = 'Garden.Settings.View';
-        $sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-        $sender->RequiredAdminPermissions[] = 'Garden.Community.Manage';
-        $sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
-        $sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
-        $sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
-        $sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+        $sender->RequiredAdminPermissions = [
+            'Garden.Settings.View',
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+        ];
         $sender->fireEvent('DefineAdminPermissions');
         $sender->permission($sender->RequiredAdminPermissions, '', false);
         $sender->setHighlightRoute('dashboard/settings');
@@ -158,11 +156,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->addJsFile('settings.js');
         $Sender->title(t('Dashboard Summaries'));
 
-        $Sender->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Add';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Edit';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Delete';
-        $Sender->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+        $Sender->RequiredAdminPermissions = [
+            'Garden.Settings.View',
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+        ];
 
         $Sender->fireEvent('DefineAdminPermissions');
         $Sender->permission($Sender->RequiredAdminPermissions, '', false);

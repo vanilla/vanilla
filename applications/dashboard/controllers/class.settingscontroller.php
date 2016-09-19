@@ -368,7 +368,7 @@ class SettingsController extends DashboardController {
      * @access public
      */
     public function banner() {
-        $this->permission('Garden.Community.Manage');
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
         $this->setHighlightRoute('dashboard/settings/banner');
         $this->title(t('Banner'));
 
@@ -979,6 +979,21 @@ class SettingsController extends DashboardController {
      * @access public
      */
     public function index() {
+
+        // Confirm that the user has at least one of the many admin preferences.
+        $this->permission([
+            'Garden.Settings.View',
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+            'Garden.Moderation.Manage',
+            'Moderation.ModerationQueue.Manage',
+            'Garden.Users.Add',
+            'Garden.Users.Edit',
+            'Garden.Users.Delete',
+            'Garden.Users.Approve',
+        ], false);
+
+        // Send the user to the last section they navigated to in the dashboard.
         $section = Gdn::session()->getPreference('DashboardNav.DashboardLandingPage', 'DashboardHome');
         if ($section) {
             $sections = DashboardNavModule::getDashboardNav()->getSectionsInfo();
@@ -988,22 +1003,30 @@ class SettingsController extends DashboardController {
             }
         }
 
-        // Fire event instead of calling directly because VanillaStats overrides the home method.
-        $this->fireAs('SettingsController');
-        $this->fireEvent('home');
+        // Resolve our default landing page redirection based on permissions.
+        if (!Gdn::session()->checkPermission([
+                'Garden.Settings.View',
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+            ], false)) {
+            // We don't have permission to see the dashboard/home.
+            redirect(DashboardNavModule::getDashboardNav()->getUrlForSection('Moderation'));
+        }
+
+        // Still here?
+        redirect('dashboard/settings/home');
     }
 
     public function home() {
         $this->addJsFile('settings.js');
         $this->title(t('Dashboard'));
 
-        $this->RequiredAdminPermissions[] = 'Garden.Settings.View';
-        $this->RequiredAdminPermissions[] = 'Garden.Settings.Manage';
-        $this->RequiredAdminPermissions[] = 'Garden.Community.Manage';
-        $this->RequiredAdminPermissions[] = 'Garden.Users.Add';
-        $this->RequiredAdminPermissions[] = 'Garden.Users.Edit';
-        $this->RequiredAdminPermissions[] = 'Garden.Users.Delete';
-        $this->RequiredAdminPermissions[] = 'Garden.Users.Approve';
+        $this->RequiredAdminPermissions = [
+            'Garden.Settings.View',
+            'Garden.Settings.Manage',
+            'Garden.Community.Manage',
+        ];
+
         $this->fireEvent('DefineAdminPermissions');
         $this->permission($this->RequiredAdminPermissions, false);
         $this->setHighlightRoute('dashboard/settings');

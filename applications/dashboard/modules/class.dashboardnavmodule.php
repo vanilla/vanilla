@@ -27,6 +27,11 @@ class DashboardNavModule extends SiteNavModule {
      */
     protected static $sectionsInfo = [
         'DashboardHome' => [
+            'permission' => [
+                'Garden.Settings.View',
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+            ],
             'section' => 'DashboardHome',
             'title' => 'Dashboard',
             'description' => 'Site Overview',
@@ -34,13 +39,35 @@ class DashboardNavModule extends SiteNavModule {
             'empty' => true
         ],
         'Moderation' => [
+            'permission' => [
+                'Garden.Moderation.Manage',
+                'Moderation.ModerationQueue.Manage',
+                'Garden.Community.Manage',
+                'Garden.Users.Add',
+                'Garden.Users.Edit',
+                'Garden.Users.Delete',
+                'Garden.Settings.Manage',
+                'Garden.Users.Approve',
+            ],
             'section' => 'Moderation',
             'title' => 'Moderation',
             'description' => 'Community Management',
-            'url' => '/dashboard/log/moderation',
-            'permission' => 'Garden.Moderation.Manage'
+            'url' => [
+                'Garden.Moderation.Manage' => 'dashboard/log/moderation',
+                'Moderation.ModerationQueue.Manage' => 'dashboard/log/moderation',
+                'Garden.Community.Manage' => '/dashboard/message',
+                'Garden.Users.Add' => 'dashboard/user',
+                'Garden.Users.Edit' => 'dashboard/user',
+                'Garden.Users.Delete' => 'dashboard/user',
+                'Garden.Settings.Manage' => '/dashboard/settings/bans',
+                'Garden.Users.Approve' => '/dashboard/user/applicants',
+            ],
         ],
         'Settings' => [
+            'permission' => [
+                'Garden.Settings.Manage',
+                'Garden.Community.Manage',
+            ],
             'section' => 'Settings',
             'title' => 'Settings',
             'description' => 'Configuration & Addons',
@@ -80,6 +107,7 @@ class DashboardNavModule extends SiteNavModule {
      */
     public function getSectionsInfo($alt = false) {
 
+
         if (!self::$initStaticFired) {
             self::$initStaticFired = true;
             $this->fireEvent('init');
@@ -90,16 +118,40 @@ class DashboardNavModule extends SiteNavModule {
         $sections = $alt ? self::$altSectionsInfo : self::$sectionsInfo;
 
         $session = Gdn::session();
+
         foreach ($sections as $key => &$section) {
-            if (val('permission', $section) && !$session->checkPermission(val('permission', $section))) {
+            if (val('permission', $section) && !$session->checkPermission(val('permission', $section), false)) {
                 unset($sections[$key]);
             } else {
                 $section['title'] = t($section['title']);
                 $section['description'] = t($section['description']);
                 $section['active'] = $this->isActiveSection($section['section']) ? 'active' : '';
+                $section['url'] = $this->getUrlForSection($key);
             }
         }
         return $sections;
+    }
+
+    /**
+     * Retrieves or resolves the default url for a section link depending on the sessioned user's permissions.
+     *
+     * @param $sectionKey The section to get the url for
+     * @return string The url associated with the passed section key
+     */
+    public function getUrlForSection($sectionKey) {
+        $section = self::$sectionsInfo[$sectionKey];
+        if (is_array(val('url', $section))) {
+            // In array form, the url property is stored as 'Permission' => 'url'.
+            // Sometimes a section won't have a landing page common to all the permissions it houses.
+            // The url gets resolved to the first url the user has permission to see.
+            foreach($section['url'] as $permission => $url) {
+                if (Gdn::session()->checkPermission($permission)) {
+                    return $url;
+                }
+            }
+        }
+
+        return val('url', $section, '/');
     }
 
     private function getActiveSection() {

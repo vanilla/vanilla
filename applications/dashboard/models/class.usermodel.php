@@ -4542,11 +4542,12 @@ class UserModel extends Gdn_Model {
 
     /**
      * Checks if a url is saved as a navigation preference and if so, deletes it.
-     * Also optionally resets the section dashboard landing page.
+     * Also optionally resets the section dashboard landing page, which may be desirable if a user no longer has
+     * permission to access pages in that section.
      *
-     * @param string $url
-     * @param string $userID
-     * @param bool $resetSectionPreference
+     * @param string $url The url to search the user navigation preferences for, defaults to the request
+     * @param string $userID The ID of the user to clear the preferences for, defaults to the sessioned user
+     * @param bool $resetSectionPreference Whether to reset the dashboard section landing page
      */
     public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
         if (!$userID) {
@@ -4561,6 +4562,8 @@ class UserModel extends Gdn_Model {
         $preferences = val('Preferences', $user, []);
         $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
 
+        // Run through the user's saved landing page per section and if the url matches the passed url,
+        // remove that preference.
         foreach ($landingPages as $section => $landingPage) {
             $url = strtolower(trim($url, '/'));
             $landingPage = strtolower(trim($landingPage, '/'));

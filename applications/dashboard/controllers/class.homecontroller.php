@@ -99,11 +99,13 @@ class HomeController extends Gdn_Controller {
     }
 
     /**
-     * Clears the url from the user's navigation preferences.
+     * Clears the request uri from the user's navigation preferences. This stops the user from getting locked out of
+     * the dashboard if they saved a preference for a page that no longer exists or that they no longer have
+     * permission to view.
      */
     private function clearNavigationPreferences() {
-        $userModel = new UserModel();
         $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+        $userModel = new UserModel();
         $userModel->clearSectionNavigationPreference($uri);
     }
 

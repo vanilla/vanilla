@@ -4524,4 +4524,58 @@ class UserModel extends Gdn_Model {
         }
         return $RoleIDs;
     }
+
+    /**
+     * Clears navigation preferences for a user.
+     *
+     * @param string $userID Optional - defaults to sessioned user
+     */
+    public function clearNavigationPreferences($userID = '') {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        $this->savePreference($userID, 'DashboardNav.Collapsed', []);
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', []);
+        $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+    }
+
+    /**
+     * Checks if a url is saved as a navigation preference and if so, deletes it.
+     * Also optionally resets the section dashboard landing page, which may be desirable if a user no longer has
+     * permission to access pages in that section.
+     *
+     * @param string $url The url to search the user navigation preferences for, defaults to the request
+     * @param string $userID The ID of the user to clear the preferences for, defaults to the sessioned user
+     * @param bool $resetSectionPreference Whether to reset the dashboard section landing page
+     */
+    public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        if ($url == '') {
+            $url = Gdn::request()->url();
+        }
+
+        $user = $this->getID($userID);
+        $preferences = val('Preferences', $user, []);
+        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+
+        // Run through the user's saved landing page per section and if the url matches the passed url,
+        // remove that preference.
+        foreach ($landingPages as $section => $landingPage) {
+            $url = strtolower(trim($url, '/'));
+            $landingPage = strtolower(trim($landingPage, '/'));
+            if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                unset($landingPages[$section]);
+            }
+        }
+
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+
+        if ($resetSectionPreference) {
+            $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+        }
+    }
 }

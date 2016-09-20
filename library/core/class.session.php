@@ -26,6 +26,9 @@ class Gdn_Session {
     /** @var object A User object containing properties relevant to session */
     public $User;
 
+    /** @var Gdn_SQLDriver Contains the sql driver which is set in method stash. */
+    public $sql;
+    
     /** @var object Attributes of the current user. */
     protected $_Attributes;
 
@@ -656,6 +659,10 @@ class Gdn_Session {
             return;
         }
 
+        // Create a fresh copy of the Sql object to avoid pollution.
+        $this->sql = clone Gdn::sql();
+        $this->sql->reset();
+
         // Grab the user's session
         $session = $this->_getStashSession($value);
         if (!$session) {
@@ -672,7 +679,7 @@ class Gdn_Session {
             }
         }
         // Update the attributes
-        Gdn::SQL()->put(
+        $this->sql->put(
             'Session',
             [
                 'DateUpdated' => Gdn_Format::toDateTime(),
@@ -701,8 +708,7 @@ class Gdn_Session {
             return false;
         }
 
-        $Session = Gdn::SQL()
-            ->select()
+        $Session = $this->sql->select()
             ->from('Session')
             ->where('SessionID', $SessionID)
             ->get()
@@ -712,7 +718,7 @@ class Gdn_Session {
             $SessionID = betterRandomString(32);
             $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
             // Save the session information to the database.
-            Gdn::SQL()->insert(
+            $this->sql->insert(
                 'Session',
                 array(
                     'SessionID' => $SessionID,
@@ -724,8 +730,7 @@ class Gdn_Session {
             );
             Trace("Inserting session stash $SessionID");
 
-            $Session = Gdn::SQL()
-                ->select()
+            $Session = $this->sql->select()
                 ->from('Session')
                 ->where('SessionID', $SessionID)
                 ->get()

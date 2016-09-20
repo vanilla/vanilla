@@ -1,9 +1,0 @@
-1.0.0 - 2011-08-04
-	Initial version.
-1.0.1 - 2012-10-01
-	Added requirements checks.
-1.0.2 - 2013-01-07
-	Added bug fix that caused source images with transparency to have artifacts when output at the same dimensions as the source.
-1.0.3 - 2016-07-22
-	Updated class constructor to __construct() as PHP4-style constructors are now deprecated. Props @nuxodin.
-	Removed trailing whitespace from blank lines.

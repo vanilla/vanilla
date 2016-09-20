@@ -241,13 +241,11 @@ class PostController extends VanillaController {
                     }
                 }
 
-                // Make sure that the title will not be invisible after rendering
-                if (unicodeRegexSupport()) {
-                    $Name = preg_replace('/^[\pC ]*(.*?)[\pC ]*$/u', '$1', $this->Form->getFormValue('Name', ''));
-                } else {
-                    $Name = trim($this->Form->getFormValue('Name', ''));
-                }
-                if ($Name != '' && Gdn_Format::text($Name) == '') {
+                $Name = trim($this->Form->getFormValue('Name', ''));
+                // Let's be super aggressive and disallow titles with no word characters in them!
+                $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
+
+                if (!$hasWordCharacter || (!$Name != '' && Gdn_Format::text($Name) == '')) {
                     $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
                 } else {
                     // Trim the name.

@@ -25,9 +25,6 @@ class Gdn_Session {
 
     /** @var object A User object containing properties relevant to session */
     public $User;
-
-    /** @var Gdn_SQLDriver Contains the sql driver which is set in method stash. */
-    public $sql;
     
     /** @var object Attributes of the current user. */
     protected $_Attributes;
@@ -37,6 +34,9 @@ class Gdn_Session {
 
     /** @var object Preferences of the current user. */
     protected $_Preferences;
+
+    /** @var Gdn_SQLDriver Contains the sql driver which is set in method stash. */
+    protected $sql;
 
     /** @var object The current user's transient key. */
     protected $_TransientKey;
@@ -660,8 +660,10 @@ class Gdn_Session {
         }
 
         // Create a fresh copy of the Sql object to avoid pollution.
-        $this->sql = clone Gdn::sql();
-        $this->sql->reset();
+        if ($this->sql === null) {
+            $this->sql = clone Gdn::sql();
+            $this->sql->reset();
+        }
 
         // Grab the user's session
         $session = $this->_getStashSession($value);

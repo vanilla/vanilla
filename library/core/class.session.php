@@ -25,7 +25,7 @@ class Gdn_Session {
 
     /** @var object A User object containing properties relevant to session */
     public $User;
-    
+
     /** @var object Attributes of the current user. */
     protected $_Attributes;
 

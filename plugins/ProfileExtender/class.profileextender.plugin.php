@@ -527,7 +527,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points');
+        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName');
 
         // Set up our basic query.
         Gdn::sql()
@@ -538,7 +538,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->select('u.CountDiscussions')
             ->select('u.CountComments')
             ->select('u.Points')
+            ->select('u.InviteUserID')
+            ->select('u2.Name', '', 'InvitedByName')
             ->from('User u')
+            ->leftJoin('User u2', 'u.InviteUserID = u2.InviteUserID and u.InviteUserID is not null')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
 

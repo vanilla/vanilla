@@ -104,7 +104,7 @@ class HomeController extends Gdn_Controller {
      * permission to view.
      */
     private function clearNavigationPreferences() {
-        if (Gdn::session()) {
+        if (Gdn::session()->isValid()) {
             $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
             $userModel = new UserModel();
             $userModel->clearSectionNavigationPreference($uri);

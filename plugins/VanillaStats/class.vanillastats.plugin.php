@@ -11,7 +11,7 @@
 $PluginInfo['VanillaStats'] = array(
     'Name' => 'Vanilla Statistics',
     'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
-    'Version' => '2.0.6',
+    'Version' => '2.0.7',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'Author' => "Vanilla Staff",

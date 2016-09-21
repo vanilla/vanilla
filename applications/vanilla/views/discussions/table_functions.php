@@ -59,7 +59,7 @@ if (!function_exists('writeDiscussionRow')) :
 
         $DiscussionName = $Discussion->Name;
         // If there are no word character detected in the title treat it as if it is blank.
-        if (preg_match('/\w/u', $DiscussionName) !== 1) {
+        if (!preg_match('/\w/u', $DiscussionName)) {
             $DiscussionName = t('Blank Discussion Topic');
         }
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;

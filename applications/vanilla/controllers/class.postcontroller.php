@@ -934,6 +934,13 @@ class PostController extends VanillaController {
         // Mark the notification as in progress.
         $this->DiscussionModel->setField($DiscussionID, 'Notified', ActivityModel::SENT_INPROGRESS);
 
+        $discussionType = val('Type', $Discussion);
+        if ($discussionType) {
+            $Code = "HeadlineFormat.Discussion.{$discussionType}";
+        } else {
+            $Code = 'HeadlineFormat.Discussion';
+        }
+
         $HeadlineFormat = t($Code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
         $Category = CategoryModel::categories(val('CategoryID', $Discussion));
         $Activity = array(

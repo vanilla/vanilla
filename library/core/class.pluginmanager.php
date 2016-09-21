@@ -883,6 +883,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 // The event handler is an array or a closure so we can call it directly.
                 $callback = $PluginKey;
             } else {
+                // Decode how `self::register[Handler|NewMethod|Override]` store event names.
                 $PluginKeyParts = explode('.', $PluginKey);
                 if (count($PluginKeyParts) == 2) {
                     // The event handler is a class and method name.
@@ -991,6 +992,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             // The event handler is an array or a closure so we can call it directly.
             $callback = $MethodKey;
         } else {
+            // Decode how `self::register[Handler|NewMethod|Override]` store event names.
             $PluginKeyParts = explode('.', $MethodKey);
             if (count($PluginKeyParts) == 2) {
                 // The event handler is a class and method name.

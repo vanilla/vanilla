@@ -159,7 +159,7 @@ var vanillaStats = (function() {
                                         if (d % 1 !== 0) {
                                             return '';
                                         }
-                                        return d;
+                                        return d.toLocaleString();
                                     }
                                 }
                             }
@@ -852,7 +852,7 @@ var vanillaStats = (function() {
         if (typeof count !== "number") {
             countString = "-";
         } else {
-            countString = count.toString(10);
+            countString = count.toLocaleString();
         }
 
         var containerElement = document.getElementById(containerID);

@@ -49,4 +49,38 @@ class PluginManagerTest extends \PHPUnit_Framework_Testcase {
         $pm->callEventHandler($sender, 'arg', 'ref');
         $this->assertTrue($arg);
     }
+
+    /**
+     * Registering "create" callbacks behaves differently than "handler" callbacks.
+     */
+    public function testRegisterCallbackCreate() {
+        $pm = new Gdn_PluginManager();
+
+        $called = false;
+        $pm->registerCallback('Foo_Bar_Create', function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertTrue($pm->hasNewMethod('foo', 'bar'));
+
+        $pm->callNewMethod($this, 'foo', 'bar');
+        $this->assertTrue($called);
+    }
+
+    /**
+     * Registering "override" callbacks behaves differently than "handler" callbacks.
+     */
+    public function testRegisterCallbackOverride() {
+        $pm = new Gdn_PluginManager();
+
+        $called = false;
+        $pm->registerCallback('Foo_Bar_Override', function () use (&$called) {
+            $called = true;
+        });
+
+        $this->assertTrue($pm->hasMethodOverride('foo', 'bar'));
+
+        $pm->callMethodOverride($this, 'foo', 'bar');
+        $this->assertTrue($called);
+    }
 }

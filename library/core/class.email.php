@@ -16,6 +16,9 @@
  */
 class Gdn_Email extends Gdn_Pluggable {
 
+    /** Error: The email was not attempted to be sent.. */
+    const ERR_SKIPPED = 1;
+
     /** @var PHPMailer */
     public $PhpMailer;
 
@@ -322,7 +325,7 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->fireEvent('BeforeSendMail');
 
         if (c('Garden.Email.Disabled')) {
-            return;
+            throw new Exception('Email disabled', self::ERR_SKIPPED);
         }
 
         if (c('Garden.Email.UseSmtp')) {
@@ -341,8 +344,6 @@ class Gdn_Email extends Gdn_Pluggable {
             if (!empty($Username)) {
                 $this->PhpMailer->SMTPAuth = true;
             }
-
-
         } else {
             $this->PhpMailer->isMail();
         }
@@ -354,7 +355,7 @@ class Gdn_Email extends Gdn_Pluggable {
 
         if (!empty($this->Skipped) && $this->PhpMailer->countRecipients() == 0) {
             // We've skipped all recipients.
-            return true;
+            throw new Exception('No valid email recipients.', self::ERR_SKIPPED);
         }
 
         $this->PhpMailer->throwExceptions(true);

@@ -37,6 +37,9 @@ class ActivityModel extends Gdn_Model {
     /** Activity status: There was an error sending the activity, but it can be retried. */
     const SENT_ERROR = 5;
 
+    /** Activity status: The recipient was not eligible for an email notification. */
+    const SENT_SKIPPED = 6;
+
     /** Activity status: Sending is in progress. */
     const SENT_INPROGRESS = 31;
 
@@ -65,6 +68,7 @@ class ActivityModel extends Gdn_Model {
     /**
      * Build basis of common activity SQL query.
      *
+     * @param bool $Join
      * @since 2.0.0
      * @access public
      */
@@ -242,8 +246,8 @@ class ActivityModel extends Gdn_Model {
      * @param array $Where A filter suitable for passing to Gdn_SQLDriver::Where().
      * @param string $orderFields A comma delimited string to order the data.
      * @param string $orderDirection One of **asc** or **desc**.
-     * @param int|false $Limit The database limit.
-     * @param int|false $Offset The database offset.
+     * @param int|bool $Limit The database limit.
+     * @param int|bool $Offset The database offset.
      * @return Gdn_DataSet SQL results.
      */
     public function getWhere($Where = [], $orderFields = '', $orderDirection = '', $Limit = false, $Offset = false) {
@@ -345,7 +349,7 @@ class ActivityModel extends Gdn_Model {
      *
      * Events: BeforeGet, AfterGet.
      *
-     * @param int|false $NotifyUserID Unique ID of user to gather activity for or one of the NOTIFY_* constants in this class.
+     * @param int|bool $NotifyUserID Unique ID of user to gather activity for or one of the NOTIFY_* constants in this class.
      * @param int $Offset Number to skip.
      * @param int $Limit How many to return.
      * @return Gdn_DataSet SQL results.
@@ -481,7 +485,7 @@ class ActivityModel extends Gdn_Model {
      * @return Gdn_DataSet SQL results.
      * @since 2.0.18
      */
-    public function getForRole($RoleID = '', $Offset = '0', $Limit = '50') {
+    public function getForRole($RoleID = '', $Offset = 0, $Limit = 50) {
         if (!is_array($RoleID)) {
             $RoleID = [$RoleID];
         }
@@ -516,7 +520,7 @@ class ActivityModel extends Gdn_Model {
      *
      * @since 2.0.18
      * @access public
-     * @param int $RoleID Unique ID of role.
+     * @param int|string $RoleID Unique ID of role.
      * @return int Number of activity items.
      */
     public function getCountForRole($RoleID = '') {
@@ -540,7 +544,7 @@ class ActivityModel extends Gdn_Model {
      * Get a particular activity record.
      *
      * @param int $activityID Unique ID of activity item.
-     * @param string $dataSetType The format of the resulting data.
+     * @param bool|string $dataSetType The format of the resulting data.
      * @param array $options Not used.
      * @return array|object A single SQL result.
      */
@@ -567,7 +571,7 @@ class ActivityModel extends Gdn_Model {
      * @return Gdn_DataSet SQL results.
      * @since 2.0.0
      */
-    public function getNotifications($NotifyUserID, $Offset = '0', $Limit = '30') {
+    public function getNotifications($NotifyUserID, $Offset = 0, $Limit = 30) {
         $this->activityQuery(false);
         $this->fireEvent('BeforeGetNotifications');
         $Result = $this->SQL
@@ -634,12 +638,12 @@ class ActivityModel extends Gdn_Model {
      *
      * @param int $UserID Unique ID of user.
      * @param int $LastActivityID ID of activity to start at.
-     * @param array $FilterToActivityTypeIDs Limits returned activity to particular types.
+     * @param array|string $FilterToActivityTypeIDs Limits returned activity to particular types.
      * @param int $Limit Max number to return.
      * @return Gdn_DataSet SQL results.
      * @since 2.0.18
      */
-    public function getNotificationsSince($UserID, $LastActivityID, $FilterToActivityTypeIDs = '', $Limit = '5') {
+    public function getNotificationsSince($UserID, $LastActivityID, $FilterToActivityTypeIDs = '', $Limit = 5) {
         $this->activityQuery();
         $this->fireEvent('BeforeGetNotificationsSince');
         if (is_array($FilterToActivityTypeIDs)) {
@@ -827,7 +831,7 @@ class ActivityModel extends Gdn_Model {
      * @since 2.0.17
      * @access public
      * @param int $ActivityID
-     * @param array $Story
+     * @param array|string $Story
      * @param bool $Force
      */
     public function sendNotification($ActivityID, $Story = '', $Force = false) {
@@ -879,9 +883,10 @@ class ActivityModel extends Gdn_Model {
                     // Only send if the user is not banned
                     if (!val('Banned', $User)) {
                         $Email->send();
+                        $Emailed = self::SENT_OK;
+                    } else {
+                        $Emailed = self::SENT_SKIPPED;
                     }
-
-                    $Emailed = self::SENT_OK;
                 } catch (phpmailerException $pex) {
                     if ($pex->getCode() == PHPMailer::STOP_CRITICAL) {
                         $Emailed = self::SENT_FAIL;
@@ -889,7 +894,13 @@ class ActivityModel extends Gdn_Model {
                         $Emailed = self::SENT_ERROR;
                     }
                 } catch (Exception $ex) {
-                    $Emailed = self::SENT_FAIL; // similar to http 5xx
+                    switch ($ex->getCode()) {
+                        case Gdn_Email::ERR_SKIPPED:
+                            $Emailed = self::SENT_SKIPPED;
+                            break;
+                        default:
+                            $Emailed = self::SENT_FAIL; // similar to http 5xx
+                    }
                 }
                 try {
                     $this->SQL->put('Activity', ['Emailed' => $Emailed], ['ActivityID' => $ActivityID]);
@@ -905,7 +916,7 @@ class ActivityModel extends Gdn_Model {
      * Takes an array representing an activity and builds the email message based on the activity's story and
      * the contents of the global config Garden.Email.Prefix.
      *
-     * @param array $activity The activity to build the email for.
+     * @param array|object $activity The activity to build the email for.
      * @return string The email message.
      */
     private function getEmailMessage($activity) {
@@ -997,9 +1008,10 @@ class ActivityModel extends Gdn_Model {
             // Only send if the user is not banned
             if (!val('Banned', $User)) {
                 $Email->send();
+                $Emailed = self::SENT_OK;
+            } else {
+                $Emailed = self::SENT_SKIPPED;
             }
-
-            $Emailed = self::SENT_OK;
 
             // Delete the activity now that it has been emailed.
             if (!$NoDelete && !$Activity['Notified']) {
@@ -1016,7 +1028,13 @@ class ActivityModel extends Gdn_Model {
                 $Emailed = self::SENT_ERROR;
             }
         } catch (Exception $ex) {
-            $Emailed = self::SENT_FAIL; // similar to http 5xx
+            switch ($ex->getCode()) {
+                case Gdn_Email::ERR_SKIPPED:
+                    $Emailed = self::SENT_SKIPPED;
+                    break;
+                default:
+                    $Emailed = self::SENT_FAIL; // similar to http 5xx
+            }
         }
         $Activity['Emailed'] = $Emailed;
         if ($ActivityID) {
@@ -1140,9 +1158,10 @@ class ActivityModel extends Gdn_Model {
                         $User = Gdn::userModel()->getID($UserID);
                         if (!val('Banned', $User)) {
                             $Email->send();
+                            $Emailed = self::SENT_OK;
+                        } else {
+                            $Emailed = self::SENT_SKIPPED;
                         }
-
-                        $Emailed = self::SENT_OK;
                     } catch (phpmailerException $pex) {
                         if ($pex->getCode() == PHPMailer::STOP_CRITICAL) {
                             $Emailed = self::SENT_FAIL;
@@ -1150,7 +1169,13 @@ class ActivityModel extends Gdn_Model {
                             $Emailed = self::SENT_ERROR;
                         }
                     } catch (Exception $Ex) {
-                        $Emailed = self::SENT_FAIL;
+                        switch ($Ex->getCode()) {
+                            case Gdn_Email::ERR_SKIPPED:
+                                $Emailed = self::SENT_SKIPPED;
+                                break;
+                            default:
+                                $Emailed = self::SENT_FAIL;
+                        }
                     }
 
                     try {
@@ -1270,8 +1295,9 @@ class ActivityModel extends Gdn_Model {
      * Queue an activity for saving later.
      *
      * @param array $Data The data in the activity.
-     * @param string|FALSE $Preference The name of the preference governing the activity.
+     * @param string|bool $Preference The name of the preference governing the activity.
      * @param array $Options Additional options for saving.
+     * @throws Exception
      */
     public function queue($Data, $Preference = false, $Options = []) {
         $this->_touch($Data);
@@ -1610,6 +1636,7 @@ class ActivityModel extends Gdn_Model {
     /**
      * Notify the user of wall comments.
      *
+     * @param array $Comment
      * @param $WallPost
      */
     protected function notifyWallComment($Comment, $WallPost) {

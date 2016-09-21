@@ -74,6 +74,7 @@ function writeCategoryOptions($category) {
     $cdd->setForceDivider(true);
 
     $cdd->addGroup('', 'edit')
+        ->addLink(t('View'), $category['Url'], 'edit.view')
         ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit');
 
     $cdd->addGroup(t('Display as'), 'displayas');

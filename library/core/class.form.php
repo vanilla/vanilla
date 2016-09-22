@@ -324,7 +324,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return .= $this->_attributesToString($Attributes);
 
         if ($elem === 'button') {
-            $Return .= ' value="'.val('value', $Attributes).'">'.htmlspecialchars(t($ButtonCode, val('value', $Attributes))).'</button>';
+            $Return .= ' value="'.val('value', $Attributes, $ButtonCode).'">'.htmlspecialchars(t($ButtonCode, val('value', $Attributes))).'</button>';
         } else {
             $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
             $Return .= " />\n";

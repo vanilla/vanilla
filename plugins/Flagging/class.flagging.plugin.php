@@ -369,10 +369,6 @@ class FlaggingPlugin extends Gdn_Plugin {
 
                     try {
                         $Email->send();
-                    } catch (phpmailerException $e) {
-                        if (debug()) {
-                            throw $e;
-                        }
                     } catch (Exception $e) {
                         if (debug()) {
                             throw $e;

@@ -853,10 +853,6 @@ class SettingsController extends DashboardController {
                     } else {
                         $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
                     }
-                } catch (phpmailerException $e) {
-                    if (debug()) {
-                        throw $e;
-                    }
                 } catch (Exception $e) {
                     if (debug()) {
                         throw $e;

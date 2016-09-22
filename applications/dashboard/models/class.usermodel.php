@@ -3237,10 +3237,6 @@ class UserModel extends Gdn_Model {
 
                 try {
                     $Email->send();
-                } catch (phpmailerException $e) {
-                    if (debug()) {
-                        throw $e;
-                    }
                 } catch (Exception $e) {
                     if (debug()) {
                         throw $e;
@@ -3910,10 +3906,6 @@ class UserModel extends Gdn_Model {
 
         try {
             $Email->send();
-        } catch (phpmailerException $e) {
-            if (debug()) {
-                throw $e;
-            }
         } catch (Exception $e) {
             if (debug()) {
                 throw $e;
@@ -3976,10 +3968,6 @@ class UserModel extends Gdn_Model {
 
         try {
             $Email->send();
-        } catch (phpmailerException $e) {
-            if (debug()) {
-                throw $e;
-            }
         } catch (Exception $e) {
             if (debug()) {
                 throw $e;
@@ -4066,10 +4054,6 @@ class UserModel extends Gdn_Model {
 
         try {
             $Email->send();
-        } catch (phpmailerException $e) {
-            if (debug()) {
-                throw $e;
-            }
         } catch (Exception $e) {
             if (debug()) {
                 throw $e;
@@ -4228,10 +4212,6 @@ class UserModel extends Gdn_Model {
 
             try {
                 $Email->send();
-            } catch (phpmailerException $e) {
-                if (debug()) {
-                    throw $e;
-                }
             } catch (Exception $e) {
                 if (debug()) {
                     throw $e;

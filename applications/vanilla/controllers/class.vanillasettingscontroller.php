@@ -722,7 +722,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         if ($parentID > 0 && $parentDisplayAs === 'Flat') {
-            $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit, null, 'Name', 'asc');
+            $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }

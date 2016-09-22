@@ -653,7 +653,7 @@ class CategoryModel extends Gdn_Model {
      * @param string $orderDirection
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'DateInserted', $orderDirection = 'desc') {
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc') {
         $query = $this->SQL
             ->from('Category')
             ->where('DisplayAs <>', 'Heading')

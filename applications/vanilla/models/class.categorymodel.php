@@ -649,15 +649,17 @@ class CategoryModel extends Gdn_Model {
      * @param int|null $offset Offset results by given value.
      * @param int|null $limit Total number of results should not exceed this value.
      * @param string|null $filter Restrict results to only those with names matching this value, if provided.
+     * @param string $orderFields
+     * @param string $orderDirection
      * @return array
      */
-    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null) {
+    public function getTreeAsFlat($id, $offset = null, $limit = null, $filter = null, $orderFields = 'Name', $orderDirection = 'asc') {
         $query = $this->SQL
             ->from('Category')
             ->where('DisplayAs <>', 'Heading')
             ->where('ParentCategoryID', $id)
             ->limit($limit, $offset)
-            ->orderBy('DateInserted', 'desc');
+            ->orderBy($orderFields, $orderDirection);
 
         if ($filter) {
             $query->like('Name', $filter);

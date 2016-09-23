@@ -67,18 +67,41 @@
 
             if (handleScroll) {
                 var $element = $(element); // Cache element before scroll.
-                $(window).on("scroll." + vars.id, {element: $element, vars: vars}, scrollHandler);
+                killThreadIds[vars.id] = false;
+                scrollHandler($element, vars)
             } else {
                 $(element).css('margin-top', 0);
-                $(window).off("scroll." + vars.id);
+                killThreadIds[vars.id] = true;
+                $(window).off("scroll." + vars.id); // IE
             }
         };
 
-        var scrollHandler = function(e) {
-            scrollThrottler = true;
-            var vars = e.data.vars;
-            var $element = e.data.element;
-            vars.st = $(window).scrollTop();
+        // Detect request animation frame
+        var scroll = function($element, vars) {
+            return window.requestAnimationFrame ||
+            window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            // IE Fallback
+            function() { $(window).on("scroll." + vars.id, $.proxy(onScroll, null, $element, vars)); };
+        }
+
+        var scrollHandler = function($element, vars) {
+            if (killThreadIds[vars.id]) {
+                return false;
+            }
+            if (vars.lastScrollTop == window.pageYOffset) {
+                scroll($element, vars)($.proxy(scrollHandler, null, $element, vars));
+                return false;
+            } else {
+                onScroll($element, vars);
+                scroll($element, vars)($.proxy(scrollHandler, null, $element, vars));
+            }
+        };
+
+        var onScroll = function($element, vars) {
+            vars.st = window.pageYOffset;
             if (vars.st > vars.lastScrollTop){
                 // downscroll
                 handleDownScroll($element, vars);
@@ -87,15 +110,7 @@
                 handleUpScroll($element, vars);
             }
             vars.lastScrollTop = vars.st;
-        };
-
-        var scrollThrottler = false;
-
-        setInterval(function() {
-            if (scrollThrottler) {
-                scrollThrottler = false;
-            }
-        }, 25);
+        }
 
         var handleDownScroll = function($element, vars) {
             vars.upstart = 0;
@@ -149,6 +164,8 @@
             $element.css('margin-top', margin + 'px');
         }
 
+        var killThreadIds = [];
+
         this.each(function() {
             var self = this;
 
@@ -175,9 +192,9 @@
                 downstartMargin: 0,
                 upstart: 0,
                 downstart: 0,
-                lastScrollTop: $(window).scrollTop(),
                 lastMarginTop: 0,
-                st: $(window).scrollTop()
+                lastScrollTop: window.pageYOffset,
+                st: window.pageYOffset
             };
 
             $(self).on('reset.FluidFixed', function() {
@@ -193,7 +210,8 @@
             $(self).on('detach.FluidFixed', function() {
                 $(self).css('position', 'initial');
                 $(self).css('margin-top', 0);
-                $(window).off("scroll." + vars.id);
+                killThreadIds[vars.id] = true;
+                $(window).off("scroll." + vars.id); // IE
             });
 
             start(self, vars);

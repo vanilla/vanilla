@@ -78,13 +78,16 @@
 
     function scrollToFixedInit(element) {
 
-        $('.navbar').addClass('navbar-short');
-        var navShortHeight = $('.navbar').outerHeight(true);
-        $('.navbar').removeClass('navbar-short');
-        var navHeight = $('.navbar').outerHeight(true);
-        $('.js-scroll-to-fixed-spacer').height(navHeight);
+        var $navbar = $('.navbar');
+        var $spacer = $('.js-scroll-to-fixed-spacer');
 
-        window.navOffset = navHeight - navShortHeight;
+        $navbar.addClass('navbar-short');
+        var navShortHeight = $('.navbar').outerHeight(true);
+        $navbar.removeClass('navbar-short');
+        var navHeight = $navbar.outerHeight(true);
+        $spacer.height(navHeight);
+
+        var navOffset = navHeight - navShortHeight;
 
         $('.navbar', element).scrollToFixed({
             zIndex: 1005,
@@ -100,25 +103,34 @@
         });
 
         // If we load in the middle of the page, we should have a short navbar.
-        var offset = window.navOffset; // Height difference between short and normal navbar.
-        if ($(window).scrollTop() > offset) {
+        if ($(window).scrollTop() > navOffset) {
             $('.navbar').addClass('navbar-short');
         }
 
+        $(window).on('scroll', function() {
+            scrollThrottler = true;
+            if ($(window).scrollTop() > navOffset) {
+                $navbar.addClass('navbar-short');
+            } else {
+                $navbar.removeClass('navbar-short');
+                $spacer.height(navHeight);
+            }
+        });
+
+        var scrollThrottler = false;
+
+        setInterval(function() {
+            if (scrollThrottler) {
+                scrollThrottler = false;
+            }
+        }, 200);
+    }
+
+    function fluidFixedInit(element) {
         $('.js-fluid-fixed', element).fluidfixed({
             offsetBottom: 72
         });
     }
-
-    $(window).scroll(function() {
-        var offset = window.navOffset; // Height difference between short and normal navbar.
-        if ($(window).scrollTop() > offset) {
-            $('.navbar').addClass('navbar-short');
-        } else {
-            $('.navbar').removeClass('navbar-short');
-            $('.js-scroll-to-fixed-spacer').height($('.navbar').outerHeight(true));
-        }
-    });
 
     function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
@@ -249,7 +261,8 @@
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        scrollToFixedInit(e.target); // panel and navbar scroll settings and modal fixed header and footer
+        scrollToFixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard

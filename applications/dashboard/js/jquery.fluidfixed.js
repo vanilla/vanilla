@@ -14,6 +14,7 @@
             vars.downstartMargin = 0;
             vars.upstart = 0;
             vars.downstart = 0;
+            vars.lastMarginTop = 0;
         };
 
         var debug = function(vars) {
@@ -65,7 +66,8 @@
             }
 
             if (handleScroll) {
-                $(window).on("scroll." + vars.id, {element: element, vars: vars}, scrollHandler);
+                var $element = $(element); // Cache element before scroll.
+                $(window).on("scroll." + vars.id, {element: $element, vars: vars}, scrollHandler);
             } else {
                 $(element).css('margin-top', 0);
                 $(window).off("scroll." + vars.id);
@@ -73,56 +75,78 @@
         };
 
         var scrollHandler = function(e) {
+            scrollThrottler = true;
             var vars = e.data.vars;
-            var element = e.data.element;
+            var $element = e.data.element;
             vars.st = $(window).scrollTop();
             if (vars.st > vars.lastScrollTop){
                 // downscroll
-                handleDownScroll(element, vars.st, vars);
+                handleDownScroll($element, vars);
             } else if (vars.st < vars.lastScrollTop) {
                 //upscroll
-                handleUpScroll(element, vars.st, vars);
+                handleUpScroll($element, vars);
             }
             vars.lastScrollTop = vars.st;
         };
 
-        var handleDownScroll = function(element, st, vars) {
+        var scrollThrottler = false;
+
+        setInterval(function() {
+            if (scrollThrottler) {
+                scrollThrottler = false;
+            }
+        }, 25);
+
+        var handleDownScroll = function($element, vars) {
             vars.upstart = 0;
             vars.upstartMargin = 0;
 
+            if (vars.downstart != 0 && vars.lastMarginTop == vars.maxMarginDiff) {
+                // checkout early
+                return;
+            }
+
             if (vars.downstart == 0) {
-                vars.downstart = st;
+                vars.downstart = vars.st;
             }
 
             if (vars.downstartMargin == 0) {
-                var px = $(element).css('margin-top');
+                var px = $element.css('margin-top');
                 vars.downstartMargin = parseInt(px.substring(0, px.length - 2));
             }
 
-            var margin = Math.max((vars.downstartMargin + vars.downstart - st), vars.maxMarginDiff);
+            var margin = Math.max((vars.downstartMargin + vars.downstart - vars.st), vars.maxMarginDiff);
 
-            if (st > vars.offsetTop) {
-                $(element).css('margin-top', margin + 'px');
+            if (vars.st > vars.offsetTop) {
+                vars.lastMarginTop = margin;
+                $element.css('margin-top', margin + 'px');
             } else {
-                $(element).css('margin-top', - (st) + 'px');
+                vars.lastMarginTop = - (vars.st);
+                $element.css('margin-top', - (vars.st) + 'px');
             }
         };
 
-        var handleUpScroll = function(element, st, vars) {
+        var handleUpScroll = function($element, vars) {
             vars.downstart = 0;
             vars.downstartMargin = 0;
 
+            if (vars.upstart != 0 && vars.lastMarginTop == 0) {
+                // checkout early
+                return;
+            }
+
             if (vars.upstart == 0) {
-                vars.upstart = st;
+                vars.upstart = vars.st;
             }
 
             if (vars.upstartMargin == 0) {
-                var px = $(element).css('margin-top');
+                var px = $element.css('margin-top');
                 vars.upstartMargin = parseInt(px.substring(0, px.length - 2));
             }
 
-            var margin = Math.min((vars.upstartMargin - st + vars.upstart), 0);
-            $(element).css('margin-top', margin + 'px');
+            var margin = Math.min((vars.upstartMargin - vars.st + vars.upstart), 0);
+            vars.lastMarginTop = margin;
+            $element.css('margin-top', margin + 'px');
         }
 
         this.each(function() {
@@ -152,6 +176,7 @@
                 upstart: 0,
                 downstart: 0,
                 lastScrollTop: $(window).scrollTop(),
+                lastMarginTop: 0,
                 st: $(window).scrollTop()
             };
 

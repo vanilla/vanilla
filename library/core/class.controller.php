@@ -185,9 +185,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var array An array of JS file names to search for in app folders & include in the page. */
     protected $_JsFiles;
 
-    /**  @var array */
-    protected $_Staches;
-
     /**
      * @var array If JSON is going to be delivered to the client (see the render method),
      * this property will hold the values being sent.
@@ -407,27 +404,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         $this->fireEvent('AfterAddModule');
-    }
-
-
-    /**
-     * Add a Mustache template to the output
-     *
-     * @param string $Template
-     * @param string $ControllerName Optional.
-     * @param string $ApplicationFolder Optional.
-     * @return boolean
-     */
-    public function addStache($Template = '', $ControllerName = false, $ApplicationFolder = false) {
-
-        $Template = StringEndsWith($Template, '.stache', true, true);
-        $StacheTemplate = "{$Template}.stache";
-        $TemplateData = $this->fetchView($StacheTemplate, $ControllerName, $ApplicationFolder);
-
-        if ($TemplateData === false) {
-            return false;
-        }
-        $this->_Staches[$Template] = $TemplateData;
     }
 
     /**

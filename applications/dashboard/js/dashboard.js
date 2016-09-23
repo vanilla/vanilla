@@ -730,26 +730,6 @@ var DashboardModal = (function() {
     }
 
     function scrollToFixedInit(element) {
-        if ($('.js-scroll-to-fixed', element).length) {
-            var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
-            var minOffset = $('.navbar').outerHeight(true) + panelPadding;
-
-            $('.js-scroll-to-fixed > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-            $('.js-scroll-to-fixed > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-
-            $('.js-scroll-to-fixed', element).each(function () {
-                $(this).scrollToFixed({
-                    zIndex: 1000,
-                    marginTop: function () {
-                        var marginTop = $(window).height() - $(this).outerHeight(true) - minOffset;
-                        if (marginTop >= 0) {
-                            return minOffset;
-                        }
-                        return marginTop;
-                    }
-                });
-            });
-        }
 
         $('.navbar').addClass('navbar-short');
         var navShortHeight = $('.navbar').outerHeight(true);
@@ -777,6 +757,10 @@ var DashboardModal = (function() {
         if ($(window).scrollTop() > offset) {
             $('.navbar').addClass('navbar-short');
         }
+
+        $('.js-fluid-fixed', element).fluidfixed({
+            offsetBottom: 72
+        });
     }
 
     $(window).scroll(function() {
@@ -849,15 +833,15 @@ var DashboardModal = (function() {
         });
 
         $('.panel-left', element).on('drawer.show', function() {
-            $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
-            $('.panel-nav .js-scroll-to-fixed').css('position', 'initial');
             window.scrollTo(0, 0);
-            $('.main').height($('.panel-nav').height() + 150);
+            $('.panel-nav .js-fluid-fixed').trigger('detach.FluidFixed');
+            $('.main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
             $('.main').css('overflow', 'hidden');
+
         });
 
         $('.panel-left', element).on('drawer.hide', function() {
-            scrollToFixedInit($('.panel-nav'));
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
             $('.main').height('auto');
             $('.main').css('overflow', 'auto');
         });
@@ -931,8 +915,11 @@ var DashboardModal = (function() {
     // Event handlers
 
     $(document).on('shown.bs.collapse', function() {
-        $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
-        scrollToFixedInit($('.panel-nav'));
+        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+    });
+
+    $(document).on('hidden.bs.collapse', function() {
+        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
     });
 
     $(document).on('click', '.js-save-pref-collapse', function() {

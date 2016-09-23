@@ -618,15 +618,16 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     public function fileUpload($fieldName, $attributes = []) {
-        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
-        unset($attributes['id']);
         $attributes['class'] = val('class', $attributes, '');
         $attributes['class'] .=  " js-file-upload form-control";
+        $id = $this->_idAttribute($fieldName, $attributes);
         $attributes = $this->_attributesToString($attributes);
+        $value = $this->_valueAttribute($fieldName, $attributes);
+        $name = attribute('name', arrayValueI('Name', $attributes, $fieldName));
 
         $upload = '
             <label class="file-upload">
-              <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
+              <input type="file" '.$name.' '.$id.' '.$attributes.' '.$value.'>
               <span class="file-upload-choose">'.t('Choose').'</span>
               <span class="file-upload-browse">'.t('Browse').'</span>
             </label>';

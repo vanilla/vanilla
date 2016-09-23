@@ -23,7 +23,7 @@ $Session = Gdn::session();
         <tr id="0">
             <th class="column-lg"><?php echo t('Messages'); ?></th>
             <th><?php echo t('Type'); ?></th>
-            <th class="options column-lg"></th>
+            <th class="options column-md"></th>
         </tr>
         </thead>
         <tbody>

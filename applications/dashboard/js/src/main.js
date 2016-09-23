@@ -108,7 +108,6 @@
         }
 
         $(window).on('scroll', function() {
-            scrollThrottler = true;
             if ($(window).scrollTop() > navOffset) {
                 $navbar.addClass('navbar-short');
             } else {
@@ -116,14 +115,6 @@
                 $spacer.height(navHeight);
             }
         });
-
-        var scrollThrottler = false;
-
-        setInterval(function() {
-            if (scrollThrottler) {
-                scrollThrottler = false;
-            }
-        }, 200);
     }
 
     function fluidFixedInit(element) {

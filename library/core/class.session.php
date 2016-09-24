@@ -35,9 +35,6 @@ class Gdn_Session {
     /** @var object Preferences of the current user. */
     protected $_Preferences;
 
-    /** @var Gdn_SQLDriver Contains the sql driver which is set in method stash. */
-    protected $sql;
-
     /** @var object The current user's transient key. */
     protected $_TransientKey;
 
@@ -660,18 +657,16 @@ class Gdn_Session {
         }
 
         // Create a fresh copy of the Sql object to avoid pollution.
-        if ($this->sql === null) {
-            $this->sql = clone Gdn::sql();
-            $this->sql->reset();
-        }
+        $sql = clone Gdn::sql();
+        $sql->reset();
 
-        // Grab the user's session
-        $session = $this->_getStashSession($value);
+        // Grab the user's session.
+        $session = $this->getStashSession($sql, $value);
         if (!$session) {
             return;
         }
 
-        // Stash or unstash the value depending on inputs
+        // Stash or unstash the value depending on inputs.
         if ($value != '') {
             $session->Attributes[$name] = $value;
         } else {
@@ -680,12 +675,12 @@ class Gdn_Session {
                 unset($session->Attributes[$name]);
             }
         }
-        // Update the attributes
-        $this->sql->put(
+        // Update the attributes.
+        $sql->put(
             'Session',
             [
                 'DateUpdated' => Gdn_Format::toDateTime(),
-                'Attributes' => serialize($session->Attributes)
+                'Attributes' => dbencode($session->Attributes)
             ],
             ['SessionID' => $session->SessionID]
         );
@@ -693,70 +688,78 @@ class Gdn_Session {
     }
 
     /**
-     * Used by $this->Stash() to create & manage sessions for users & guests.
+     * Used by $this->stash() to create & manage sessions for users & guests.
      *
      * This is a stop-gap solution until full session management for users &
-     * guests can be imlemented.
+     * guests can be implemented.
+     *
+     * @param Gdn_SQLDriver $sql          Local clone of the sql driver.
+     * @param string        $valueToStash The value of the stash to set.
+     *
+     * @return bool|Gdn_DataSet Current session.
      */
-    private function _getStashSession($ValueToStash) {
-        $CookieName = c('Garden.Cookie.Name', 'Vanilla');
-        $Name = $CookieName.'-sid';
+    private function getStashSession($sql, $valueToStash = '') {
+        $cookieName = c('Garden.Cookie.Name', 'Vanilla');
+        $name = $cookieName.'-sid';
 
-        // Grab the entire session record
-        $SessionID = val($Name, $_COOKIE, '');
+        // Grab the entire session record.
+        $sessionID = val($name, $_COOKIE, '');
 
-        // If there is no session, and no value for saving, return;
-        if ($SessionID == '' && $ValueToStash == '') {
+        // If there is no session, and no value for saving, return.
+        if ($sessionID == '' && $valueToStash == '') {
             return false;
         }
 
-        $Session = $this->sql->select()
+        $session = $sql
+            ->select()
             ->from('Session')
-            ->where('SessionID', $SessionID)
+            ->where('SessionID', $sessionID)
             ->get()
             ->firstRow();
 
-        if (!$Session) {
-            $SessionID = betterRandomString(32);
-            $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
+        if (!$session) {
+            $sessionID = betterRandomString(32);
+            $transientKey = substr(md5(mt_rand()), 0, 11).'!';
             // Save the session information to the database.
-            $this->sql->insert(
+            $sql->insert(
                 'Session',
-                array(
-                    'SessionID' => $SessionID,
+                [
+                    'SessionID' => $sessionID,
                     'UserID' => Gdn::session()->UserID,
-                    'TransientKey' => $TransientKey,
+                    'TransientKey' => $transientKey,
                     'DateInserted' => Gdn_Format::toDateTime(),
                     'DateUpdated' => Gdn_Format::toDateTime()
-                )
+                ]
             );
-            Trace("Inserting session stash $SessionID");
+            trace("Inserting session stash $sessionID");
 
-            $Session = $this->sql->select()
+            $session = $sql
+                ->select()
                 ->from('Session')
-                ->where('SessionID', $SessionID)
+                ->where('SessionID', $sessionID)
                 ->get()
                 ->firstRow();
 
-            // Save a session cookie
-            $Path = c('Garden.Cookie.Path', '/');
-            $Domain = c('Garden.Cookie.Domain', '');
-            $Expire = 0;
+            // Save a session cookie.
+            $path = c('Garden.Cookie.Path', '/');
+            $domain = c('Garden.Cookie.Domain', '');
+            $expire = 0;
 
-            // If the domain being set is completely incompatible with the current domain then make the domain work.
-            $CurrentHost = Gdn::request()->host();
-            if (!stringEndsWith($CurrentHost, trim($Domain, '.'))) {
+            // If the domain being set is completely incompatible with the
+            // current domain then make the domain work.
+            $currentHost = Gdn::request()->host();
+            if (!stringEndsWith($currentHost, trim($domain, '.'))) {
                 $Domain = '';
             }
 
-            safeCookie($Name, $SessionID, $Expire, $Path, $Domain);
-            $_COOKIE[$Name] = $SessionID;
+            safeCookie($name, $sessionID, $expire, $path, $domain);
+            $_COOKIE[$name] = $sessionID;
         }
-        $Session->Attributes = dbdecode($Session->Attributes);
-        if (!$Session->Attributes) {
-            $Session->Attributes = array();
+        $session->Attributes = dbdecode($session->Attributes);
+        if (!$session->Attributes) {
+            $session->Attributes = [];
         }
 
-        return $Session;
+        return $session;
     }
 }

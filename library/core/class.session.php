@@ -749,7 +749,7 @@ class Gdn_Session {
             // current domain then make the domain work.
             $currentHost = Gdn::request()->host();
             if (!stringEndsWith($currentHost, trim($domain, '.'))) {
-                $Domain = '';
+                $domain = '';
             }
 
             safeCookie($name, $sessionID, $expire, $path, $domain);

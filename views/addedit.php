@@ -7,7 +7,7 @@ echo $Form->open();
 echo $Form->errors();
 ?>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
         <?php
             echo $Form->label('Name', 'Name');
@@ -15,7 +15,7 @@ echo $Form->errors();
         </div>
         <?php echo $Form->textBoxWrap('Name'); ?>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
         <?php
             echo $Form->label('Body', 'Body');
@@ -24,7 +24,7 @@ echo $Form->errors();
         <?php echo $Form->textBoxWrap('Body', array('Multiline' => true));
         ?>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
         <?php
             echo $Form->label('Page', 'Page');
@@ -34,7 +34,7 @@ echo $Form->errors();
         <?php echo $Form->dropdown('Page', $this->data('Pages')); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
         <?php
             echo $Form->label('Location', 'Location');
@@ -44,7 +44,7 @@ echo $Form->errors();
         <?php echo $Form->dropdown('Location', array_merge(array('' => '('.sprintf(T('Select a %s'), t('Location')).')'), $this->data('LocationsArray'))); ?>
         </div>
     </li>
-    <li class="js-repeat form-group row">
+    <li class="js-repeat form-group">
         <?php echo $Form->labelWrap('Repeat', 'RepeatType'); ?>
         <div class="input-wrap">
         <?php
@@ -55,11 +55,11 @@ echo $Form->errors();
 
             // Options for repeat every.
             echo '<div class="RepeatOptions RepeatEveryOptions padded-top">',
-                '<div class="form-group row">',
+                '<div class="form-group">',
                 $Form->labelWrap('Frequency', 'EveryFrequency'),
                 $Form->textBoxWrap('EveryFrequency'),
                 '</div>',
-                '<div class="form-group row">',
+                '<div class="form-group">',
                 $Form->labelWrap('Begin At', 'EveryBegin'),
                 $Form->textBoxWrap('EveryBegin'),
                 '</div>',
@@ -68,7 +68,7 @@ echo $Form->errors();
 
             // Options for repeat indexes.
             echo '<div class="RepeatOptions RepeatIndexesOptions padded-top">',
-                '<div class="form-group row">',
+                '<div class="form-group">',
                 '<div class="label-wrap">',
                 $Form->label('Indexes', 'Indexes'),
                 '<div class="info">', t('Enter a comma-delimited list of indexes, starting at 1.'), '</div>',
@@ -81,7 +81,7 @@ echo $Form->errors();
         ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <?php
             echo $Form->labelWrap('Conditions', ''); ?>
         <div class="input-wrap">
@@ -103,7 +103,7 @@ echo $Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <?php
             echo $Form->labelWrap('Enable/Disable', 'Disabled'); ?>
         <div class="input-wrap">

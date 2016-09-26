@@ -8,7 +8,7 @@ Gdn_Theme::assetEnd();
 <?php echo wrap($this->data('Title'), 'h1');
 echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal'); ?>
 </div>
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Enable Pocket Locations'); ?></div>
         <div class="info">

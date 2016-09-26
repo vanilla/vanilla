@@ -13,8 +13,8 @@ echo $this->Form->open();
     <div class="toolbar">
         <div class="buttons">
         <?php
-        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-secondary'));
-        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-secondary'));
+        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-primary'));
+        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
         ?>
         </div>
     </div>

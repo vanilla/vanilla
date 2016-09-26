@@ -1,3 +1,34 @@
+// Media Item
+//
+// Basic heading and paragraph styling.
+//
+// Styleguide 7.
+
+// Media Item
+//
+//
+// Markup:
+// <div class="media">
+//   <div class="media-left">
+//     <div class="addon-image-wrap">
+//       <img src="/plugins/AgeGate/age-gate.png" class="PluginIcon">
+//     </div>
+//   </div>
+//   <div class="media-body">
+//     <div class="media-heading">
+//       <div class="media-title">Age Gate</div>
+//       <div class="info">Created by Becky Van Bussel<span class="spacer">•</span>Version 1.2.0</div>
+//     </div>
+//     <div class="media-description">Add Date of Birth to the registration form, and require a certain age to register.</div>
+//   </div>
+//   <div class="media-right media-options">
+//     <div class="btn-wrap"><a href="/en/settings/agegate" class="btn btn-icon-border js-modal" aria-label="Settings for Age Gate" data-reload-page-on-save="false">    <svg class="icon  icon-svg-settings" viewBox="0 0 17 17"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#settings"></use></svg></a></div>        <div id="agegate-toggle">
+//     <span class="toggle-wrap toggle-wrap-on"><a href="/en/settings/plugins/all/AgeGate" class="Hijack" aria-label="Disable Age Gate"><div class="toggle-well"></div><div class="toggle-slider"></div></a></span>        </div>
+//   </div>
+// </div>
+//
+// Styleguide 7.1.
+
 .media {
   @extend .row;
   padding: $spacer $padding-default;
@@ -93,33 +124,71 @@
   background-color: $grey-lighter;
 }
 
-//GRID TODO: Move
-// Starts 4 wide
-.grid-item {
-  @extend .col-xs-12;
-  @extend .col-sm-8;
-  @extend .col-lg-8;
-  @extend .col-xl-6;
+// Small media item
+//
+// Small media item for table or list.
+//
+// Markup:
+// <div class="media-sm">
+//   <div class="media-sm-image-wrap">
+//     <a title="amelia" href="/en/profile/amelia" class="PhotoWrap  Offline"><img src="http://vanil.la/uploads/defaultavatar/nRZOCO2G7UFIN.jpg" alt="amelia" class="ProfilePhoto ProfilePhotoMedium"></a>
+//   </div>
+//   <div class="media-sm-content">
+//     <div class="media-sm-title username">
+//       <a href="#">amelia</a>
+//     </div>
+//     <div class="media-sm-info user-email">
+//       <a href="#">name@email.com</a>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 7.2.
+
+.media-sm {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.grid-image {
-  display: block;
-  width: 100%;
+.media-sm-image-wrap {
+  display: inline-block;
+  @include image-wrap(to-rem(30), to-rem(30), .0625rem);
+  margin-right: $spacer / 2;
 }
 
-.grid-image-wrap {
-  position: relative;
-  @include image-wrap-border(0);
+.media-sm-image-wrap-no-border {
+  display: inline-block;
+  @include image-wrap(to-rem(30), to-rem(30), .0625rem, false, transparent);
+  margin-right: $spacer / 2;
 }
 
-// Starts 3 wide
-.grid-item-large {
-  @extend .col-xs-12;
-  @extend .col-sm-8;
-  @extend .col-lg-12;
-  @extend .col-xl-8;
+.media-sm-title {
+  margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+  font-size: $font-size-tables;
+  line-height: 1;
+
+  a {
+    color: $gray-dark;
+    transition: color 200ms;
+
+    &:hover {
+      text-decoration: none;
+      color: $brand-primary;
+    }
+  }
 }
 
-.grid-item-fixed {
-  @extend .col-xs-12;
+.media-sm-info {
+  font-size: $font-size-sm;
+  line-height: 1;
+  color: $grey;
+}
+
+.btn-media-sm {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  @extend .btn-secondary;
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, .575rem, $line-height-sm, $btn-border-radius-navbar);
 }

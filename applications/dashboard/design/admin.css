@@ -5427,6 +5427,14 @@ output {
   text-decoration: none;
 }
 
+.btn:focus, .file-upload-browse:focus, .Button:focus, .FilterMenu .FilterButton:focus, .btn:hover, .file-upload-browse:hover, .Button:hover, .FilterMenu .FilterButton:hover {
+  text-decoration: none;
+}
+
+.btn.focus, .focus.file-upload-browse, .focus.Button, .FilterMenu .focus.FilterButton {
+  text-decoration: none;
+}
+
 .btn:active, .file-upload-browse:active, .Button:active, .FilterMenu .FilterButton:active, .btn.active, .active.file-upload-browse, .file-upload-browse.Current,
 .file-upload-browse.current-theme, .active.Button, .Button.Current,
 .Button.current-theme, .btn.Current, .FilterMenu .Current.FilterButton,
@@ -5506,73 +5514,44 @@ fieldset[disabled] a.FilterButton {
   background-color: #fff;
 }
 
-.btn-secondary, .btn-media-sm, .file-upload-browse {
+.btn-secondary, .file-upload-browse, .btn-media-sm {
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary:hover, .btn-media-sm:hover, .file-upload-browse:hover {
+.btn-secondary:hover, .file-upload-browse:hover, .btn-media-sm:hover {
   color: #555a62;
   background-color: #ddf3ff;
   border-color: #ccc;
 }
 
-.btn-secondary:focus, .btn-media-sm:focus, .file-upload-browse:focus, .btn-secondary.focus, .focus.btn-media-sm, .focus.file-upload-browse {
+.btn-secondary:focus, .file-upload-browse:focus, .btn-media-sm:focus, .btn-secondary.focus, .focus.file-upload-browse, .focus.btn-media-sm {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
   outline: 0;
 }
 
-.btn-secondary:active, .btn-media-sm:active, .file-upload-browse:active, .btn-secondary.active, .active.btn-media-sm, .btn-media-sm.Current,
-.btn-media-sm.current-theme, .active.file-upload-browse, .file-upload-browse.Current,
-.file-upload-browse.current-theme, .btn-secondary.Current,
+.btn-secondary:active, .file-upload-browse:active, .btn-media-sm:active, .btn-secondary.active, .active.file-upload-browse, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .active.btn-media-sm, .btn-media-sm.Current,
+.btn-media-sm.current-theme, .btn-secondary.Current,
 .btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
-.open > .dropdown-toggle.btn-media-sm,
-.open > .dropdown-toggle.file-upload-browse {
+.open > .dropdown-toggle.file-upload-browse,
+.open > .dropdown-toggle.btn-media-sm {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
   background-image: none;
 }
 
-.btn-secondary.disabled:focus, .disabled.btn-media-sm:focus, .disabled.file-upload-browse:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-media-sm, .disabled.focus.file-upload-browse, .btn-secondary:disabled:focus, .btn-media-sm:disabled:focus, .file-upload-browse:disabled:focus, .btn-secondary:disabled.focus, .btn-media-sm:disabled.focus, .file-upload-browse:disabled.focus {
+.btn-secondary.disabled:focus, .disabled.file-upload-browse:focus, .disabled.btn-media-sm:focus, .btn-secondary.disabled.focus, .disabled.focus.file-upload-browse, .disabled.focus.btn-media-sm, .btn-secondary:disabled:focus, .file-upload-browse:disabled:focus, .btn-media-sm:disabled:focus, .btn-secondary:disabled.focus, .file-upload-browse:disabled.focus, .btn-media-sm:disabled.focus {
   background-color: #fff;
 }
 
-.btn-secondary.disabled:hover, .disabled.btn-media-sm:hover, .disabled.file-upload-browse:hover, .btn-secondary:disabled:hover, .btn-media-sm:disabled:hover, .file-upload-browse:disabled:hover {
+.btn-secondary.disabled:hover, .disabled.file-upload-browse:hover, .disabled.btn-media-sm:hover, .btn-secondary:disabled:hover, .file-upload-browse:disabled:hover, .btn-media-sm:disabled:hover {
   background-color: #fff;
-}
-
-.btn-primary-outline {
-  color: #fff;
-  background-image: none;
-  background-color: transparent;
-  border-color: #fff;
-}
-
-.btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline.active, .btn-primary-outline.Current,
-.btn-primary-outline.current-theme,
-.open > .btn-primary-outline.dropdown-toggle {
-  color: #fff;
-  background-color: #fff;
-  border-color: #fff;
-}
-
-.btn-primary-outline:hover {
-  color: #fff;
-  background-color: #fff;
-  border-color: #fff;
-}
-
-.btn-primary-outline.disabled:focus, .btn-primary-outline.disabled.focus, .btn-primary-outline:disabled:focus, .btn-primary-outline:disabled.focus {
-  border-color: white;
-}
-
-.btn-primary-outline.disabled:hover, .btn-primary-outline:disabled:hover {
-  border-color: white;
 }
 
 .btn-link, .btn-icon {
@@ -5604,35 +5583,6 @@ fieldset[disabled] a.FilterButton {
 .btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover {
   color: #ededed;
   text-decoration: none;
-}
-
-.btn-lg {
-  padding: 0.75rem 1.25rem;
-  font-size: 1.25rem;
-  line-height: 1.3333333333;
-  border-radius: 0.25rem;
-}
-
-.btn-sm {
-  padding: 0.125rem 0.75rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  border-radius: 0.05rem;
-}
-
-.btn-block {
-  display: block;
-  width: 100%;
-}
-
-.btn-block + .btn-block {
-  margin-top: 0.28125rem;
-}
-
-input[type="submit"].btn-block,
-input[type="reset"].btn-block,
-input[type="button"].btn-block {
-  width: 100%;
 }
 
 .btn-icon {
@@ -5709,6 +5659,19 @@ input[type="button"].btn-block {
 
 .btn-group {
   font-size: 0;
+  position: relative;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  vertical-align: middle;
+}
+
+.btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .FilterMenu .btn-group > .FilterButton:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .FilterMenu .btn-group > .FilterButton:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse, .btn-group > .file-upload-browse.Current, .btn-group >
+.file-upload-browse.current-theme, .btn-group > .active.Button, .btn-group > .Button.Current, .btn-group >
+.Button.current-theme, .btn-group > .btn.Current, .FilterMenu .btn-group > .Current.FilterButton, .btn-group >
+.btn.current-theme, .FilterMenu .btn-group > .current-theme.FilterButton, .FilterMenu .btn-group > .active.FilterButton {
+  z-index: 2;
 }
 
 .btn-group .btn, .btn-group .file-upload-browse, .btn-group .Button, .btn-group .FilterMenu .FilterButton, .FilterMenu .btn-group .FilterButton {
@@ -5726,48 +5689,8 @@ input[type="button"].btn-block {
   border-bottom-right-radius: 0.125rem;
 }
 
-.btn-group .btn-secondary, .btn-group .btn-media-sm, .btn-group .file-upload-browse {
+.btn-group .btn-secondary, .btn-group .file-upload-browse, .btn-group .btn-media-sm {
   min-width: 6rem;
-}
-
-.btn-group,
-.btn-group-vertical {
-  position: relative;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  vertical-align: middle;
-}
-
-.btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .FilterMenu .btn-group > .FilterButton:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .FilterMenu .btn-group > .FilterButton:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse, .btn-group > .file-upload-browse.Current, .btn-group >
-.file-upload-browse.current-theme, .btn-group > .active.Button, .btn-group > .Button.Current, .btn-group >
-.Button.current-theme, .btn-group > .btn.Current, .FilterMenu .btn-group > .Current.FilterButton, .btn-group >
-.btn.current-theme, .FilterMenu .btn-group > .current-theme.FilterButton, .FilterMenu .btn-group > .active.FilterButton,
-.btn-group-vertical > .btn:focus,
-.btn-group-vertical > .file-upload-browse:focus,
-.btn-group-vertical > .Button:focus, .FilterMenu
-.btn-group-vertical > .FilterButton:focus,
-.btn-group-vertical > .btn:active,
-.btn-group-vertical > .file-upload-browse:active,
-.btn-group-vertical > .Button:active, .FilterMenu
-.btn-group-vertical > .FilterButton:active,
-.btn-group-vertical > .btn.active,
-.btn-group-vertical > .active.file-upload-browse,
-.btn-group-vertical > .file-upload-browse.Current,
-.btn-group-vertical >
-.file-upload-browse.current-theme,
-.btn-group-vertical > .active.Button,
-.btn-group-vertical > .Button.Current,
-.btn-group-vertical >
-.Button.current-theme,
-.btn-group-vertical > .btn.Current, .FilterMenu
-.btn-group-vertical > .Current.FilterButton,
-.btn-group-vertical >
-.btn.current-theme, .FilterMenu
-.btn-group-vertical > .current-theme.FilterButton, .FilterMenu
-.btn-group-vertical > .active.FilterButton {
-  z-index: 2;
 }
 
 .btn-group .btn + .btn, .btn-group .file-upload-browse + .btn, .btn-group .Button + .btn, .btn-group .FilterMenu .FilterButton + .btn, .FilterMenu .btn-group .FilterButton + .btn, .btn-group .btn + .file-upload-browse, .btn-group .file-upload-browse + .file-upload-browse, .btn-group .Button + .file-upload-browse, .btn-group .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .btn-group .FilterButton + .file-upload-browse, .btn-group .btn + .Button, .btn-group .file-upload-browse + .Button, .btn-group .Button + .Button, .btn-group .FilterMenu .FilterButton + .Button, .FilterMenu .btn-group .FilterButton + .Button, .btn-group .FilterMenu .btn + .FilterButton, .FilterMenu .btn-group .btn + .FilterButton, .btn-group .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .btn-group .file-upload-browse + .FilterButton, .btn-group .FilterMenu .Button + .FilterButton, .FilterMenu .btn-group .Button + .FilterButton, .btn-group .FilterMenu .FilterButton + .FilterButton, .FilterMenu .btn-group .FilterButton + .FilterButton,
@@ -6203,89 +6126,6 @@ input[type="button"].btn-block {
 
 .popover-single {
   font-size: 1.125rem;
-}
-
-.media-sm {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.media-sm-image-wrap {
-  display: inline-block;
-  position: relative;
-  min-width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 0.0625rem;
-  overflow: hidden;
-  background-color: #f6f9fb;
-  margin-right: 0.5625rem;
-}
-
-.media-sm-image-wrap::after {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.0625rem;
-  content: '';
-}
-
-.media-sm-image-wrap img {
-  width: 1.875rem;
-}
-
-.media-sm-image-wrap-no-border {
-  display: inline-block;
-  position: relative;
-  min-width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 0.0625rem;
-  overflow: hidden;
-  background-color: transparent;
-  margin-right: 0.5625rem;
-}
-
-.media-sm-image-wrap-no-border img {
-  width: 1.875rem;
-}
-
-.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
-  margin-bottom: 0.3125rem;
-  font-size: 0.8125rem;
-  line-height: 1;
-}
-
-.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a {
-  color: #555a62;
-  transition: color 200ms;
-}
-
-.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover {
-  text-decoration: none;
-  color: #0291db;
-}
-
-.media-sm-info, .Section-DashboardHome .FeedItem .Date {
-  font-size: 0.75rem;
-  line-height: 1;
-  color: #949aa2;
-}
-
-.btn-media-sm {
-  display: inline-block;
-  font-weight: 300;
-  text-transform: uppercase;
-  padding: 0.125rem 0.75rem;
-  font-size: 0.575rem;
-  line-height: 1.5;
-  border-radius: 0.875rem;
 }
 
 .hero {
@@ -6836,7 +6676,7 @@ label,
   display: flex;
   -ms-flex-pack: end;
   justify-content: flex-end;
-  padding-top: 1.125rem;
+  padding: 1.125rem 0;
 }
 
 .toggle-wrap {
@@ -7517,6 +7357,27 @@ label[id^=iCheck] {
   margin-bottom: 0;
 }
 
+.grid-image {
+  display: block;
+  width: 100%;
+}
+
+.grid-image-wrap {
+  position: relative;
+}
+
+.grid-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0;
+  content: '';
+}
+
 .Hidden,
 .hidden {
   display: none;
@@ -7859,16 +7720,27 @@ div.Messages.Errors {
   background-color: #f4f6fb;
 }
 
-.grid-image {
-  display: block;
-  width: 100%;
+.media-sm {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
-.grid-image-wrap {
+.media-sm-image-wrap {
+  display: inline-block;
   position: relative;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: #f6f9fb;
+  margin-right: 0.5625rem;
 }
 
-.grid-image-wrap::after {
+.media-sm-image-wrap::after {
   position: absolute;
   display: block;
   top: 0;
@@ -7876,8 +7748,59 @@ div.Messages.Errors {
   width: 100%;
   height: 100%;
   border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0;
+  border-radius: 0.0625rem;
   content: '';
+}
+
+.media-sm-image-wrap img {
+  width: 1.875rem;
+}
+
+.media-sm-image-wrap-no-border {
+  display: inline-block;
+  position: relative;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: transparent;
+  margin-right: 0.5625rem;
+}
+
+.media-sm-image-wrap-no-border img {
+  width: 1.875rem;
+}
+
+.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
+  margin-bottom: 0.3125rem;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a {
+  color: #555a62;
+  transition: color 200ms;
+}
+
+.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover {
+  text-decoration: none;
+  color: #0291db;
+}
+
+.media-sm-info, .Section-DashboardHome .FeedItem .Date {
+  font-size: 0.75rem;
+  line-height: 1;
+  color: #949aa2;
+}
+
+.btn-media-sm {
+  display: inline-block;
+  font-weight: 300;
+  text-transform: uppercase;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.575rem;
+  line-height: 1.5;
+  border-radius: 0.875rem;
 }
 
 .modal-dialog {
@@ -8459,7 +8382,8 @@ button.close {
   word-wrap: break-word;
 }
 
-.panel-content {
+.panel-content,
+.panel-content-wrapper {
   width: 204px;
 }
 
@@ -8675,13 +8599,6 @@ button.close {
   border-top: 0;
   border-bottom: 0;
   transition: all 250ms;
-}
-
-@media (max-width: 1199px) {
-  .main {
-    margin-top: -3rem;
-    padding-top: 3rem;
-  }
 }
 
 .drawer-show .main {

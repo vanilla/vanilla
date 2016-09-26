@@ -73,7 +73,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     public function structure() {
         // Make sure we have the OAuth2 provider.
         $provider = $this->provider();
-        if (!$provider['AuthenticationKey']) {
+        if (!val('AuthenticationKey', $provider)) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
                 'AuthenticationKey' => $this->providerKey,
@@ -363,13 +363,13 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     public function authorizeUri($state = []) {
         $provider = $this->provider();
 
-        $uri = $provider['AuthorizeUrl'];
+        $uri = val('AuthorizeUrl', $provider);
 
         $redirect_uri = '/entry/'.$this->getProviderKey();
 
         $defaultParams = [
             'response_type' => 'code',
-            'client_id' => $provider['AssociationKey'],
+            'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
             'scope' => $this->scope
         ];
@@ -610,13 +610,13 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function requestAccessToken($code) {
         $provider = $this->provider();
-        $uri = $provider['TokenUrl'];
+        $uri = val('TokenUrl', $provider);
 
         $defaultParams = [
             'code' => $code,
-            'client_id' => $provider['AssociationKey'],
+            'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
-            'client_secret' => $provider['AssociationSecret'],
+            'client_secret' => val('AssociationSecret', $provider),
             'grant_type' => 'authorization_code',
             'scope' => $this->scope
         ];
@@ -693,7 +693,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
-        if ($provider['AuthenticationSchemeAlias'] != $this->getProviderKey() || !$this->isConfigured()) {
+        if (val('AuthenticationSchemeAlias', $provider) != $this->getProviderKey() || !$this->isConfigured()) {
             return;
         }
 

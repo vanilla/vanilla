@@ -6,8 +6,8 @@
 
 $PluginInfo['Akismet'] = [
     'Name' => 'Akismet',
-    'Description' => 'Akismet spam protection for Vanilla.',
-    'Version' => '1.1',
+    'Description' => 'Adds Akismet spam filtering to all posts by unverified users and applicant registrations.',
+    'Version' => '1.2',
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'SettingsUrl' => '/settings/akismet',
     'SettingsPermission' => 'Garden.Settings.Manage',
@@ -28,6 +28,7 @@ class AkismetPlugin extends Gdn_Plugin {
      */
     public static function akismet() {
         static $Akismet;
+
         if (!$Akismet) {
             $key = c('Plugins.Akismet.Key', c('Plugins.Akismet.MasterKey'));
             $server = c('Plugins.Akismet.Server');
@@ -201,14 +202,21 @@ class AkismetPlugin extends Gdn_Plugin {
             }
         }
 
-        $Cf->initialize([
-            'Plugins.Akismet.Key' => ['Description' => $KeyDesc],
-            'Plugins.Akismet.Server' => [
+        // Settings to be shown.
+        $options = [
+            'Plugins.Akismet.Key' => ['Description' => $KeyDesc]
+        ];
+
+        // Deprecated TypePad option should go away if it's not already set.
+        if (c('Plugins.Akismet.Server')) {
+            $options['Plugins.Akismet.Server'] = [
                 'Description' => 'You can use either Akismet or TypePad antispam.',
                 'Control' => 'DropDown',
-                'Items' => ['' => 'Aksimet', 'api.antispam.typepad.com' => 'TypePad', 'DefaultValue' => '']
-            ]
-        ]);
+                'Items' => ['' => 'Akismet', 'api.antispam.typepad.com' => 'TypePad']
+            ];
+        }
+
+        $Cf->initialize($options);
 
         $Sender->addSideMenu('settings/plugins');
         $Cf->renderAll();

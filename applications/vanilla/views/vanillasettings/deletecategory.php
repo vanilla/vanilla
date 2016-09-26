@@ -19,14 +19,14 @@ if (is_object($this->OtherCategories)) {
         // Only show the delete discussions checkbox if we're deleting a non-parent category.
         if ($this->Category->AllowDiscussions == '1') {
             ?>
-            <li class="form-group row">
+            <li class="form-group">
                 <div class="input-wrap">
                 <?php echo $this->Form->CheckBox('DeleteDiscussions', "Move discussions in this category to a replacement category.", array('value' => '1')); ?>
                 </div>
             </li>
         <?php }
         ?>
-        <li id="ReplacementCategory" class="form-group row">
+        <li id="ReplacementCategory" class="form-group">
             <div class="label-wrap">
             <?php
             echo $this->Form->label('Replacement Category', 'ReplacementCategoryID');

@@ -5,7 +5,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <div class="js-profile-extender-form">
-    <div class="form-group row">
+    <div class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Type', 'FormType'); ?>
         </div>
@@ -14,7 +14,7 @@ echo $this->Form->errors();
         </div>
     </div>
     <div class="js-label<?php if ($this->Form->getValue('FormType') == 'DateOfBirth') echo ' Hidden'; ?>">
-        <div class="form-group row">
+        <div class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Label', 'Label'); ?>
             </div>
@@ -24,7 +24,7 @@ echo $this->Form->errors();
         </div>
     </div>
     <div class="js-options<?php if ($this->Form->getValue('FormType') != 'Dropdown') echo ' Hidden'; ?>">
-        <div class="form-group row">
+        <div class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Options', 'Options');
                 echo wrap(t('One option per line'), 'div', ['class' => 'info']); ?>
@@ -34,18 +34,18 @@ echo $this->Form->errors();
             </div>
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="input-wrap no-label">
             <?php echo $this->Form->checkBox('Required', 'Required for all users'); ?>
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group">
         <div class="input-wrap no-label">
             <?php echo $this->Form->checkBox('OnRegister', 'Show on registration'); ?>
         </div>
     </div>
     <div class="js-show-on-profiles">
-        <div class="form-group row">
+        <div class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->checkBox('OnProfile', 'Show on profiles'); ?>
             </div>

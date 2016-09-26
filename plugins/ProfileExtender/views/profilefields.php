@@ -20,7 +20,7 @@ if (is_array($this->ProfileFields)) {
             continue;
         } else {
             echo wrap('<div class="label-wrap">'.$Sender->Form->label($Field['Label'], $Name).'</div>'.
-                '<div class="input-wrap">'.$Sender->Form->{$Field['FormType']}($Name, $Options).'</div>', 'li', ['class' => 'form-group row']);
+                '<div class="input-wrap">'.$Sender->Form->{$Field['FormType']}($Name, $Options).'</div>', 'li', ['class' => 'form-group']);
         }
     }
 }

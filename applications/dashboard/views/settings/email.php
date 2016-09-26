@@ -8,7 +8,7 @@ echo $this->Form->open(array('autocomplete' => 'off'));
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Name', 'Garden.Email.SupportName'); ?>
                 <div class="info"><?php echo t("Email sent from the application will be addressed from the following name."); ?></div>
@@ -17,7 +17,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Garden.Email.SupportName'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Email', 'Garden.Email.SupportAddress'); ?>
                 <div class="info"><?php echo t("Email sent from the application will be addressed from the following address."); ?></div>
@@ -26,14 +26,14 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Garden.Email.SupportAddress'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             </div>
             <div class="input-wrap">
                 <?php echo $this->Form->CheckBox('Garden.Email.OmitToName', 'Do not include usernames in the "to" field of outgoing e-mails.'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             </div>
             <div class="input-wrap">
@@ -43,7 +43,7 @@ echo $this->Form->errors();
         </li>
     </ul>
     <ul id="SmtpOptions">
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('SMTP Host', 'Garden.Email.SmtpHost'); ?>
             </div>
@@ -51,7 +51,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Garden.Email.SmtpHost'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('SMTP User', 'Garden.Email.SmtpUser'); ?>
             </div>
@@ -59,7 +59,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Garden.Email.SmtpUser', array('autocomplete' => 'off')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('SMTP Password', 'Garden.Email.SmtpPassword'); ?>
             </div>
@@ -67,7 +67,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->Input('Garden.Email.SmtpPassword', 'password', array('autocomplete' => 'off')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('SMTP Port', 'Garden.Email.SmtpPort'); ?>
             </div>
@@ -75,7 +75,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Garden.Email.SmtpPort'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('SMTP Security', 'Garden.Email.SmtpSecurity'); ?>
             </div>

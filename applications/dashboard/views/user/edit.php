@@ -10,7 +10,7 @@ echo $this->Form->open(array('class' => 'User', 'autocomplete' => 'off'));
 echo $this->Form->errors();
 if ($this->data('AllowEditing')) { ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Username', 'Name'); ?>
             </div>
@@ -18,7 +18,7 @@ if ($this->data('AllowEditing')) { ?>
                 <?php echo $this->Form->textBox('Name'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Email', 'Email');
                 if (UserModel::noEmail()) {
@@ -40,23 +40,23 @@ if ($this->data('AllowEditing')) { ?>
         </li>
 
         <?php if ($this->data('_CanConfirmEmail')): ?>
-            <li class="User-ConfirmEmail form-group row">
+            <li class="User-ConfirmEmail form-group">
                 <div class="input-wrap no-label">
                     <?php echo $this->Form->CheckBox('ConfirmEmail', t("Email is confirmed"), array('value' => '1')); ?>
                 </div>
             </li>
         <?php endif ?>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->CheckBox('ShowEmail', t('Email visible to other users'), array('value' => '1')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->CheckBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
                 <?php if ($this->data('BannedOtherReasons')): ?>
@@ -69,7 +69,7 @@ if ($this->data('AllowEditing')) { ?>
         </li>
 
         <?php if (c('Garden.Profile.Locations', false)): ?>
-            <li class="form-group row User-Location">
+            <li class="form-group User-Location">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Location', 'Location'); ?>
                 </div>
@@ -80,7 +80,7 @@ if ($this->data('AllowEditing')) { ?>
         <?php endif; ?>
 
         <?php if (c('Garden.Profile.Titles', false)): ?>
-            <li class="form-group row User-Title">
+            <li class="form-group User-Title">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Title', 'Title'); ?>
                 </div>
@@ -95,7 +95,7 @@ if ($this->data('AllowEditing')) { ?>
         ?>
 
     <?php if (count($this->data('Roles'))) : ?>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo t('Check all roles that apply to this user:'); ?>
             </div>
@@ -104,7 +104,7 @@ if ($this->data('AllowEditing')) { ?>
             </div>
         </li>
     <?php endif; ?>
-        <li class="PasswordOptions form-group row">
+        <li class="PasswordOptions form-group">
             <div class="label-wrap">
                 <?php echo t('Password Options'); ?>
             </div>
@@ -113,7 +113,7 @@ if ($this->data('AllowEditing')) { ?>
             </div>
         </li>
         <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
-            <li id="NewPassword" class="form-group row">
+            <li id="NewPassword" class="form-group">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('New Password', 'NewPassword'); ?>
                 </div>
@@ -121,7 +121,7 @@ if ($this->data('AllowEditing')) { ?>
                     <?php echo $this->Form->Input('NewPassword', 'password'); ?>
                 </div>
             </li>
-            <li class="form-group row">
+            <li class="form-group">
                 <div class="buttons input-wrap no-label">
                     <?php
                     echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');

@@ -3152,7 +3152,7 @@ input[type="checkbox"].disabled {
   padding-right: 1.125rem;
 }
 
-.row, .footer, .label-selector, .emojiext-list, .media {
+.row, .footer, .form-group, .label-selector, .emojiext-list, .media {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -6820,7 +6820,7 @@ label,
   align-items: center;
 }
 
-.form-group.row, .form-group.footer, .form-group.label-selector, .form-group.emojiext-list, .form-group.media {
+.form-group.row, .form-group {
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   -ms-flex-align: center;

@@ -15,7 +15,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
             $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
@@ -27,7 +27,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->DropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Comments per Page', 'Vanilla.Comments.PerPage'); ?>
             </div>
@@ -35,7 +35,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             $Options = array('0' => t('Authors may never edit'),
                 '350' => sprintf(t('Authors may edit for %s'), t('5 minutes')),
@@ -57,10 +57,10 @@ echo $this->Form->errors();
             <?php echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Max Comment Length', 'Vanilla.Comment.MaxLength'); ?>
             <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
@@ -69,7 +69,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Min Comment Length', 'Vanilla.Comment.MinLength'); ?>
             <div class="info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
@@ -78,7 +78,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
                 <div class="info">

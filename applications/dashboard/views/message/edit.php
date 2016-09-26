@@ -10,7 +10,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Appearance', 'CssClass'); ?>
             </div>
@@ -23,7 +23,7 @@ echo $this->Form->errors();
                 ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Message', 'Content'); ?>
             </div>
@@ -31,7 +31,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Content', array('MultiLine' => TRUE)); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Page', 'Location'); ?>
             </div>
@@ -39,7 +39,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->DropDown('Location', $this->data('Locations')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Position', 'AssetTarget'); ?>
             </div>
@@ -47,7 +47,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->DropDown('AssetTarget', $this->AssetData); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Category', 'CategoryID'); ?>
             </div>
@@ -58,12 +58,12 @@ echo $this->Form->errors();
                 <?php echo $this->Form->CheckBox('IncludeSubcategories', 'Include Subcategories'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->checkBox('AllowDismiss', 'Allow users to dismiss this message', array('value' => '1')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->toggle('Enabled', 'Enable this message', array('value' => '1')); ?>
         </li>
     </ul>

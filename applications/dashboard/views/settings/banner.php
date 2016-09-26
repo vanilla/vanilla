@@ -28,7 +28,7 @@ echo $this->Form->errors();
     <div class="Row">
         <div>
             <ul>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Homepage Title').'</div>';
@@ -42,7 +42,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->textBox('Garden.HomepageTitle'); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Site Description').'</div>';
@@ -57,7 +57,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->textBox('Garden.Description', array('Multiline' => TRUE)); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Banner Title').'</div>';
@@ -73,7 +73,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->textBox('Garden.Title'); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Banner Logo').'</div>';
@@ -96,7 +96,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->fileUpload('Logo'); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Mobile Banner Logo').'</div>';
@@ -119,7 +119,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->fileUpload('MobileLogo'); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Favicon').'</div>';
@@ -142,7 +142,7 @@ echo $this->Form->errors();
                     <?php echo $this->Form->fileUpload('Favicon'); ?>
                     </div>
                 </li>
-                <li class="form-group row">
+                <li class="form-group">
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Share Image').'</div>';

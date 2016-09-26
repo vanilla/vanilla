@@ -87,7 +87,13 @@
                         label = $cell.data('label');
 
                         html = vars.metaTemplate.replace('{data}', html);
-                        html = html.replace('{label}', label);
+                        if (label) {
+                            var labelHtml = vars.metaLabel.replace('{label}', label);
+                            html = html.replace('{label}', labelHtml);
+                        } else {
+                            html = html.replace('{label}', '');
+                        }
+
                         if (!$('.tj-main-cell .tj-meta', this).length) {
                             $('.tj-main-cell', this).append('<div class="tj-meta">' + html + '</div>');
                         } else {
@@ -144,6 +150,7 @@
                 container: settings.container,
                 mainCell: settings.mainCell,
                 metaTemplate: settings.metaTemplate,
+                metaLabel: settings.metaLabel,
                 showEmptyCells: settings.showEmptyCells
             };
 
@@ -160,9 +167,10 @@
         container: 'body',
         mainCell: 'firstcell',
         metaTemplate: '<div class="table-meta-item">' +
-        '<span class="table-meta-item-label">{label}: </span>' +
+        '{label}' +
         '<span class="table-meta-item-data">{data}</span>' +
         '</div>',
+        metaLabel: '<span class="table-meta-item-label">{label}: </span>',
         showEmptyCells: false
     };
 

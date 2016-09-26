@@ -51,7 +51,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
-        $this->provider = provider();
+        $this->provider = $this->provider();
         if ($accessToken) {
             // We passed in a connection
             $this->accessToken = $accessToken;
@@ -62,7 +62,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     /**
      * Setup
      */
-    public function setUp() {
+    public function setup() {
         $this->structure();
     }
 
@@ -99,7 +99,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function isConfigured() {
         $provider = $this->provider();
-        return $provider['AssociationSecret'] && $provider['AssociationKey'];
+        return (val('AssociationSecret', $provider) && val('AssociationKey', $provider));
     }
 
 
@@ -123,7 +123,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function isDefault() {
         $provider = $this->provider();
-        return $provider['IsDefault'];
+        return val('IsDefault', $provider);
     }
 
 
@@ -144,7 +144,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         }
 
         // If there is no token passed, try to retrieve one from the user's attributes.
-        if ($this->accessToken === null) {
+        if ($this->accessToken === null && Gdn::session()->UserID) {
             $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
         }
 
@@ -328,10 +328,9 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
         ];
 
-        $formFields =$formFields + $this->getSettingsFormFields();
+        $formFields = $formFields + $this->getSettingsFormFields();
 
         $formFields['IsDefault'] = ['LabelCode' => 'Make this connection your default signin method.', 'Control' => 'checkbox'];
-
 
         $sender->setData('_Form', $formFields);
 
@@ -662,19 +661,19 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function getProfile() {
         $provider = $this->provider();
-
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-
         $defaultParams = array(
             'access_token' => $this->accessToken()
         );
-
         $requestParams = array_merge($defaultParams, $this->profileRequestParams);
 
+        // Request the profile from the Authentication Provider
         $rawProfile = $this->api($uri, 'GET', $requestParams);
 
+        // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);
 
+        // Log the results when troubleshooting.
         $this->log('getProfile API call', ['ProfileUrl' => $uri, 'Params' => $requestParams, 'RawProfile' => $rawProfile, 'Profile' => $profile]);
 
         return $profile;

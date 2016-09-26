@@ -1147,7 +1147,7 @@
                             // If it's an image, then indicate that it's been embedded
                             // in the post
                             var imageEmbeddedText = (payload.thumbnail_url)
-                                ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                                ? ' &middot; <em title="' + gdn.meta['fileUpload-insertedTooltip'] + '">' + gdn.meta['fileUpload-inserted'] + '</em>'
                                 : '';
 
                             var html = ''
@@ -1158,8 +1158,8 @@
                                 + '<a class="filename" data-type="' + payload.type + '" data-width="' + payload.original_width + '" data-height="' + payload.original_height + '" href="' + payload.original_url + '" target="_blank">' + payload.Filename + '</a>'
                                 + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
                                 + '</div>'
-                                + '<span class="editor-file-remove" title="Remove file"></span>'
-                                + '<span class="editor-file-reattach" title="Click to re-attach \'' + payload.Filename + '\'"></span>'
+                                + '<span class="editor-file-remove" title="' + window.gdn.meta['fileUpload-remove']  + '"></span>'
+                                + '<span class="editor-file-reattach" title="' + window.gdn.meta['fileUpload-reattatch']  + ' \'' + payload.Filename + '\'"></span>'
                                 + '</div>';
 
 

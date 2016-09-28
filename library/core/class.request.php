@@ -992,8 +992,12 @@ class Gdn_Request {
             $parts[] = '';
         }
 
-        if ($withDomain !== '/' && $this->webRoot() != '') {
-            $parts[] = $this->webRoot();
+        $webRoot = '';
+        if ($withDomain !== '/') {
+            $webRoot = $this->webRoot();
+            if ($webRoot) {
+                $parts[] = $webRoot;
+            }
         }
 
         // Strip out the hash.
@@ -1025,7 +1029,13 @@ class Gdn_Request {
                 }
             }
         }
-        $parts[] = ltrim($path, '/');
+
+        // Prevent the addition of webRoot a second time if the path was already encoded.
+        $path = ltrim($path, '/');
+        if ($webRoot && strpos($path, $webRoot.'/') === 0) {
+            $path = str_replace($webRoot, null, $path);
+        }
+        $parts[] = $path;
 
         $result = implode('/', $parts);
 

@@ -9,12 +9,12 @@
 
 
 /**
- * Class OAuth2PluginBase
+ * Class Gdn_OAuth2
  *
  * Base class to be extended by any plugin that wants to use Oauth2 protocol for SSO.
  * Will eventually be moved to a library that will be included by composer.
  */
-class Gdn_OAuth2 extends Gdn_Pluggable {
+class Gdn_OAuth2 extends Gdn_Plugin {
 
     /** @var string token provider by authenticator  */
     protected $accessToken;
@@ -257,6 +257,17 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     }
 
 
+    /**
+     * Register a call back function so that multiple plugins can use it as an entry point on SSO
+     * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
+     * initial request to log in to an authentication provider.
+     *
+     * @param $sender
+     */
+    public function gdn_pluginManager_afterStart_handler($sender) {
+        $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
+        $sender->registerCallback("settingsController_{$this->providerKey}_create", [$this, 'settingsEndpoint']);
+    }
 
     /** ------------------- Settings Related Methods --------------------- */
 
@@ -286,7 +297,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * @param Gdn_Controller $sender.
      * @param Gdn_Controller $args.
      */
-    public function settingsController_dashboard_create($sender, $args) {
+    public function settingsEndpoint($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
         $model = new Gdn_AuthenticationProviderModel();
 
@@ -296,7 +307,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         $sender->Form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
-            $provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->getProviderKey());
+            $provider = $this->provider();
             $form->setData($provider);
         } else {
 
@@ -371,7 +382,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             'response_type' => 'code',
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
-            'scope' => $this->scope
+            'scope' => val('AcceptedScope', $provider)
         ];
         // allow child class to overwrite or add to the authorize URI.
         $get = array_merge($defaultParams, $this->authorizeUriParams);
@@ -450,18 +461,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         }
 
         return $response;
-    }
-
-
-    /**
-     * Register a call back function so that multiple plugins can use it as an entry point on SSO
-     * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
-     * initial request to log in to an authentication provider.
-     *
-     * @param $sender
-     */
-    public function gdn_pluginManager_afterStart_handler($sender) {
-        $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
     }
 
 
@@ -593,7 +592,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         $this->log('Base Connect Data Before OAuth Event', ['profile' => $profile, 'form' => $form]);
 
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
-        $sender->fireEvent('OAuth');
+        $this->fireEvent('OAuth');
 
         SpamModel::disabled(true);
         $sender->setData('Trusted', true);
@@ -618,7 +617,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
             'client_secret' => val('AssociationSecret', $provider),
             'grant_type' => 'authorization_code',
-            'scope' => $this->scope
+            'scope' => val('AcceptedScope', $provider)
         ];
 
         $post = array_merge($defaultParams, $this->requestAccessTokenParams);
@@ -638,6 +637,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
+        $email = val('ProfileKeyEmail', $provider, 'email');
         $translatedKeys = [
             val('ProfileKeyEmail', $provider, 'email') => 'Email',
             val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
@@ -751,9 +751,23 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
         $url = $this->authorizeUri(['target' => $target]);
-        $result = socialSignInButton('OAuth2', $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => t('Sign in with OAuth2')]);
+        $providerName = val('Name', $this->provider);
+        $linkLabel = sprintf(t('Sign in with %s'), $providerName);
+        $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
         return $result;
     }
+
+
+    /**
+     * Insert css file for generic styling of signin button/icon.
+     *
+     * @param AssetModel $sender.
+     * @param AssetModel $args.
+     */
+    public function assetModel_styleCss_handler($sender, $args) {
+        $sender->addCssFile('OAuth2.css', 'plugins/OAuth2');
+    }
+
 
 
     /** ------------------- Helper functions --------------------- */

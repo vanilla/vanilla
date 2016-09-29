@@ -698,7 +698,7 @@ class Gdn_Session {
      *
      * @return bool|Gdn_DataSet Current session.
      */
-    private function getStashSession($sql, $valueToStash = '') {
+    private function getStashSession($sql, $valueToStash) {
         $cookieName = c('Garden.Cookie.Name', 'Vanilla');
         $name = $cookieName.'-sid';
 

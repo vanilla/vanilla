@@ -730,34 +730,17 @@ var DashboardModal = (function() {
     }
 
     function scrollToFixedInit(element) {
-        if ($('.js-scroll-to-fixed', element).length) {
-            var panelPadding = Number($('.panel').css('padding-top').substring(0, $('.panel').css('padding-top').length - 2));
-            var minOffset = $('.navbar').outerHeight(true) + panelPadding;
 
-            $('.js-scroll-to-fixed > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
-            $('.js-scroll-to-fixed > *:first-child > *:first-child').css('margin-top', 0); // Prevent jank on items with a margin-top.
+        var $navbar = $('.navbar');
+        var $spacer = $('.js-scroll-to-fixed-spacer');
 
-            $('.js-scroll-to-fixed', element).each(function () {
-                $(this).scrollToFixed({
-                    zIndex: 1000,
-                    marginTop: function () {
-                        var marginTop = $(window).height() - $(this).outerHeight(true) - minOffset;
-                        if (marginTop >= 0) {
-                            return minOffset;
-                        }
-                        return marginTop;
-                    }
-                });
-            });
-        }
-
-        $('.navbar').addClass('navbar-short');
+        $navbar.addClass('navbar-short');
         var navShortHeight = $('.navbar').outerHeight(true);
-        $('.navbar').removeClass('navbar-short');
-        var navHeight = $('.navbar').outerHeight(true);
-        $('.js-scroll-to-fixed-spacer').height(navHeight);
+        $navbar.removeClass('navbar-short');
+        var navHeight = $navbar.outerHeight(true);
+        $spacer.height(navHeight);
 
-        window.navOffset = navHeight - navShortHeight;
+        var navOffset = navHeight - navShortHeight;
 
         $('.navbar', element).scrollToFixed({
             zIndex: 1005,
@@ -773,21 +756,25 @@ var DashboardModal = (function() {
         });
 
         // If we load in the middle of the page, we should have a short navbar.
-        var offset = window.navOffset; // Height difference between short and normal navbar.
-        if ($(window).scrollTop() > offset) {
+        if ($(window).scrollTop() > navOffset) {
             $('.navbar').addClass('navbar-short');
         }
+
+        $(window).on('scroll', function() {
+            if ($(window).scrollTop() > navOffset) {
+                $navbar.addClass('navbar-short');
+            } else {
+                $navbar.removeClass('navbar-short');
+                $spacer.height(navHeight);
+            }
+        });
     }
 
-    $(window).scroll(function() {
-        var offset = window.navOffset; // Height difference between short and normal navbar.
-        if ($(window).scrollTop() > offset) {
-            $('.navbar').addClass('navbar-short');
-        } else {
-            $('.navbar').removeClass('navbar-short');
-            $('.js-scroll-to-fixed-spacer').height($('.navbar').outerHeight(true));
-        }
-    });
+    function fluidFixedInit(element) {
+        $('.js-fluid-fixed', element).fluidfixed({
+            offsetBottom: 72
+        });
+    }
 
     function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
@@ -849,15 +836,15 @@ var DashboardModal = (function() {
         });
 
         $('.panel-left', element).on('drawer.show', function() {
-            $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
-            $('.panel-nav .js-scroll-to-fixed').css('position', 'initial');
             window.scrollTo(0, 0);
-            $('.main').height($('.panel-nav').height() + 150);
+            $('.panel-nav .js-fluid-fixed').trigger('detach.FluidFixed');
+            $('.main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
             $('.main').css('overflow', 'hidden');
+
         });
 
         $('.panel-left', element).on('drawer.hide', function() {
-            scrollToFixedInit($('.panel-nav'));
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
             $('.main').height('auto');
             $('.main').css('overflow', 'auto');
         });
@@ -918,7 +905,8 @@ var DashboardModal = (function() {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        scrollToFixedInit(e.target); // panel and navbar scroll settings and modal fixed header and footer
+        scrollToFixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
@@ -931,8 +919,11 @@ var DashboardModal = (function() {
     // Event handlers
 
     $(document).on('shown.bs.collapse', function() {
-        $('.panel-nav .js-scroll-to-fixed').trigger('detach.ScrollToFixed');
-        scrollToFixedInit($('.panel-nav'));
+        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+    });
+
+    $(document).on('hidden.bs.collapse', function() {
+        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
     });
 
     $(document).on('click', '.js-save-pref-collapse', function() {

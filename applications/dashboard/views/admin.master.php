@@ -112,16 +112,16 @@ Gdn_Theme::assetEnd();
     </div>
     <div class="main-row pusher" id="main-row">
         <div class="panel panel-left drawer">
-            <div class="panel-content panel-nav">
-                <div class="js-scroll-to-fixed">
+            <div class="panel-nav panel-content-wrapper">
+                <div id="panel-nav" class="js-fluid-fixed panel-content">
                     <?php echo anchor($title.' '.dashboardSymbol('external-link', '', 'icon-16'), '/', 'title'); ?>
                     <?php echo $dashboardNav; ?>
                 </div>
             </div>
         </div>
         <div class="panel panel-help panel-right">
-            <div class="panel-content">
-                <div class="js-scroll-to-fixed">
+            <div class="panel-content-wrapper">
+                <div id="fixed-help" class="js-fluid-fixed panel-content">
                     <?php $this->renderAsset('Help'); ?>
                 </div>
             </div>

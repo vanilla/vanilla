@@ -12,7 +12,19 @@ echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P Pag
 
 $this->fireEvent('AfterPageTitle');
 
-include $this->fetchViewLocation('Subtree', 'Categories', 'Vanilla');
+$childCategories = $this->data('Categories', []);
+if ($childCategories) {
+    include($this->fetchViewLocation('helper_functions', 'categories', 'vanilla'));
+    if (c('Vanilla.Categories.Layout') === 'table') {
+        writeCategoryTable($childCategories, 1);
+    } else {
+        echo '<ul class="DataList ChildCategoryList">';
+        foreach ($childCategories as $childCategory) {
+            writeListItem($childCategory);
+        }
+        echo '</ul>';
+    }
+}
 
 $this->fireEvent('AfterCategorySubtree');
 

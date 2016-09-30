@@ -585,9 +585,6 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param ProfileController $Sender ProfileController.
      */
     public function profileController_discussions_create($Sender, $UserReference = '', $Username = '', $Page = '', $UserID = '') {
-        $Sender->addJsFile('cropimage.js');
-        $Sender->addCssFile('cropimage.css');
-
         $Sender->editMode(false);
 
         // Tell the ProfileController what tab to load

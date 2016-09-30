@@ -12,7 +12,21 @@ echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P Pag
 
 $this->fireEvent('AfterPageTitle');
 
-include $this->fetchViewLocation('Subtree', 'Categories', 'Vanilla');
+$subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);
+if ($subtreeView) {
+    include $subtreeView;
+} else {
+    $childCategories = $this->data('CategoryTree', []);
+    $this->CategoryModel->joinRecent($childCategories);
+    if ($childCategories) {
+        include($this->fetchViewLocation('helper_functions', 'categories', 'vanilla'));
+        if (c('Vanilla.Categories.Layout') === 'table') {
+            writeCategoryTable($childCategories);
+        } else {
+            writeCategoryList($childCategories);
+        }
+    }
+}
 
 $this->fireEvent('AfterCategorySubtree');
 

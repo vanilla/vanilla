@@ -139,7 +139,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Renew or return access token.
      *
      * @param bool|string $newValue Pass existing token if it exists.
-     *
      * @return bool|string|null String if there is an accessToken passed or found in session, false or null if not.
      */
     public function accessToken($newValue = false) {
@@ -164,7 +163,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set access token received from provider.
      *
      * @param string $accessToken Retrieved from provider to authenticate communication.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setAccessToken($accessToken) {
@@ -177,7 +175,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set provider key used to access settings stored in GDN_UserAuthenticationProvider.
      *
      * @param string $providerKey Key to retrieve provider data hardcoded into child class.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setProviderKey($providerKey) {
@@ -190,7 +187,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set scope to be passed to provider.
      *
      * @param string $scope.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setScope($scope) {
@@ -203,7 +199,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set additional params to be added to the get string in the AuthorizeUri string.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setAuthorizeUriParams($params) {
@@ -216,7 +211,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set additional params to be added to the post array in the accessToken request.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setRequestAccessTokenParams($params) {
@@ -229,12 +223,32 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Set additional params to be added to the get string in the getProfile request.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setGetProfileParams($params) {
         $this->getProfileParams = $params;
         return $this;
+    }
+
+
+    /**
+     * Allow child classes to pass different options to the Token request API call.
+     * Valid options are ConnectTimeout, Timeout, Content-Type and Authorization-Header-Message.
+     *
+     * @return array
+     */
+    public function getAccessTokenRequestOptions() {
+        return [];
+    }
+
+
+    /** Allow child classes to pass different options to the Profile request API call.
+     * Valid options are ConnectTimeout, Timeout, Content-Type and Authorization-Header-Message.
+     *
+     * @return array
+     */
+    public function getProfileRequestOptions() {
+        return [];
     }
 
 
@@ -263,7 +277,6 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProviderKey() {
         return $this->providerKey;
     }
-
 
     /**
      * Register a call back function so that multiple plugins can use it as an entry point on SSO
@@ -632,7 +645,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
 
-        return $this->api($uri, 'POST', $post);
+        return $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
     }
 
 
@@ -676,7 +689,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $requestParams = array_merge($defaultParams, $this->profileRequestParams);
 
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams);
+        $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);

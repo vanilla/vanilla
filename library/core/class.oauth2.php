@@ -371,7 +371,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
         }
 
-        $view = ($this->settingsView) ? $this->settingsView : 'plugins/OAuth2';
+        $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
 
         // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
@@ -786,7 +786,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param AssetModel $args.
      */
     public function assetModel_styleCss_handler($sender, $args) {
-        $sender->addCssFile('OAuth2.css', 'plugins/OAuth2');
+        $sender->addCssFile('oauth2.css', 'plugins/oauth2');
     }
 
 

@@ -16,7 +16,8 @@ $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', fals
 if ($subtreeView) {
     include $subtreeView;
 } else {
-    $childCategories = $this->data('Categories', []);
+    $childCategories = $this->data('CategoryTree', []);
+    $this->CategoryModel->joinRecent($childCategories);
     if ($childCategories) {
         include($this->fetchViewLocation('helper_functions', 'categories', 'vanilla'));
         if (c('Vanilla.Categories.Layout') === 'table') {

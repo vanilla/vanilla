@@ -12,7 +12,15 @@
  * Class Gdn_OAuth2
  *
  * Base class to be extended by any plugin that wants to use Oauth2 protocol for SSO.
- * Will eventually be moved to a library that will be included by composer.
+ *
+ * WARNING
+ * This is a base class for the purposes of being extended by other plugins.
+ * It is not to be instantiated on its own.
+ *
+ * For most OAuth2 SSO needs the generic plugins/OAuth2/class.Oauth2.plugin.php should
+ * be adequate. If not, create a plugin that extends this class, Gdn_OAuth2, and overwrite
+ * any of its methods of constants.
+ *
  */
 class Gdn_OAuth2 extends Gdn_Plugin {
 
@@ -350,7 +358,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
         }
 
-        $view = ($this->settingsView) ? $this->settingsView : 'plugins/'.$this->getProviderKey();
+        $view = ($this->settingsView) ? $this->settingsView : 'plugins/OAuth2';
 
         // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
@@ -524,9 +532,9 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
                 Gdn::userModel()->saveAttribute($user->UserID, $this->getProviderKey(), $attributes);
 
-                $this->EventArguments['Provider'] = $this->getProviderKey();
-                $this->EventArguments['User'] = $sender->User;
-                $this->fireEvent('AfterConnection');
+                $sender->EventArguments['Provider'] = $this->getProviderKey();
+                $sender->EventArguments['User'] = $sender->User;
+                $sender->fireEvent('AfterConnection');
 
                 redirect(userUrl($user, '', 'connections'));
                 break;
@@ -592,7 +600,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $this->log('Base Connect Data Before OAuth Event', ['profile' => $profile, 'form' => $form]);
 
         // Throw an event so that other plugins can add/remove stuff from the basic sso.
-        $this->fireEvent('OAuth');
+        $sender->fireEvent('OAuth');
 
         SpamModel::disabled(true);
         $sender->setData('Trusted', true);

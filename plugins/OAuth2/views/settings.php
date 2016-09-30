@@ -1,7 +1,7 @@
 <h1><?php echo $this->data('Title'); ?></h1>
 
 <div class="PageInfo">
-    <h2><?php echo t('Create Single Sign On integration with Auth0!'); ?></h2>
+    <h2><?php echo t('Create Single Sign On integration using the OAuth2 protocol!'); ?></h2>
 
     <p>
         <?php

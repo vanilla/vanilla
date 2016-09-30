@@ -13,7 +13,7 @@ $PluginInfo['OAuth2'] = array(
 
 class OAuth2Plugin extends Gdn_OAuth2 {
 
-    protected $settingsView = "settings/OAuth2";
+    protected $settingsView = 'settings/OAuth2';
 
     public function __construct() {
         $this

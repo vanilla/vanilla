@@ -31,13 +31,9 @@ if ($subtreeView) {
     if ($childCategories) {
         include($this->fetchViewLocation('helper_functions', 'categories', 'vanilla'));
         if (c('Vanilla.Categories.Layout') === 'table') {
-            writeCategoryTable($childCategories, 1);
+            writeCategoryTable($childCategories);
         } else {
-            echo '<ul class="DataList ChildCategoryList">';
-            foreach ($childCategories as $childCategory) {
-                writeListItem($childCategory);
-            }
-            echo '</ul>';
+            writeCategoryList($childCategories);
         }
     }
 }

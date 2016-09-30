@@ -157,13 +157,10 @@ class DiscussionController extends VanillaController {
         $PageNumber = PageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);
         $this->_SetOpenGraph();
-
-
-        include_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
         if ($PageNumber == 1) {
             $this->description(sliceParagraph(Gdn_Format::plainText($this->Discussion->Body, $this->Discussion->Format), 160));
             // Add images to head for open graph
-            $Dom = str_get_html(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
+            $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
         } else {
             $this->Data['Title'] .= sprintf(t(' - Page %s'), PageNumber($this->Offset, $Limit));
 
@@ -172,13 +169,13 @@ class DiscussionController extends VanillaController {
             $FirstFormat = val('Format', $FirstComment);
             $this->description(sliceParagraph(Gdn_Format::plainText($FirstBody, $FirstFormat), 160));
             // Add images to head for open graph
-            $Dom = str_get_html(Gdn_Format::to($FirstBody, $FirstFormat));
+            $Dom = pQuery::parseStr(Gdn_Format::to($FirstBody, $FirstFormat));
         }
 
         if ($Dom) {
-            foreach ($Dom->find('img') as $img) {
-                if (isset($img->src)) {
-                    $this->image($img->src);
+            foreach ($Dom->query('img') as $img) {
+                if ($img->attr('src')) {
+                    $this->image($img->attr('src'));
                 }
             }
         }
@@ -529,7 +526,7 @@ class DiscussionController extends VanillaController {
             if ($Target) {
                 $this->RedirectUrl = url($Target);
             }
-            
+
             $this->jsonTarget('', '', 'Refresh');
         } else {
             if (!$Discussion->Announce) {

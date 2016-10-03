@@ -1458,9 +1458,27 @@ a.text-danger:focus, a.text-danger:hover {
   border-color: transparent;
 }
 
-.nav-tabs .nav-link.active, .nav-tabs .nav-link.Current, .nav-tabs
-.nav-link.current-theme, .nav-tabs .nav-link.active:focus, .nav-tabs .nav-link.Current:focus, .nav-tabs
-.nav-link.current-theme:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .nav-link.Current:hover, .nav-tabs
+.nav-tabs .nav-link.active, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose, .nav-tabs
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-browse,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse, .nav-tabs .nav-link.Current, .nav-tabs
+.nav-link.current-theme, .nav-tabs .nav-link.active:focus, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:focus, .nav-tabs
+.file-upload input:focus ~ .nav-link.file-upload-browse:focus,
+.file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:focus, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-choose:focus,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:focus, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-browse:focus,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:focus, .nav-tabs .nav-link.Current:focus, .nav-tabs
+.nav-link.current-theme:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:hover, .nav-tabs
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:hover, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:hover, .nav-tabs
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:hover, .nav-tabs .nav-link.Current:hover, .nav-tabs
 .nav-link.current-theme:hover,
 .nav-tabs .nav-item.open .nav-link,
 .nav-tabs .nav-item.open .nav-link:focus,
@@ -1490,9 +1508,27 @@ a.text-danger:focus, a.text-danger:hover {
   border-radius: 0.125rem;
 }
 
-.nav-pills .nav-link.active, .nav-pills .nav-link.Current, .nav-pills
-.nav-link.current-theme, .nav-pills .nav-link.active:focus, .nav-pills .nav-link.Current:focus, .nav-pills
-.nav-link.current-theme:focus, .nav-pills .nav-link.active:hover, .nav-pills .nav-link.Current:hover, .nav-pills
+.nav-pills .nav-link.active, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose, .nav-pills
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-browse,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse, .nav-pills .nav-link.Current, .nav-pills
+.nav-link.current-theme, .nav-pills .nav-link.active:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:focus, .nav-pills
+.file-upload input:focus ~ .nav-link.file-upload-browse:focus,
+.file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:focus, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-choose:focus,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:focus, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-browse:focus,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:focus, .nav-pills .nav-link.Current:focus, .nav-pills
+.nav-link.current-theme:focus, .nav-pills .nav-link.active:hover, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:hover, .nav-pills
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:hover, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:hover, .nav-pills
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:hover, .nav-pills .nav-link.Current:hover, .nav-pills
 .nav-link.current-theme:hover,
 .nav-pills .nav-item.open .nav-link,
 .nav-pills .nav-item.open .nav-link:focus,
@@ -1516,7 +1552,10 @@ a.text-danger:focus, a.text-danger:hover {
   display: none;
 }
 
-.tab-content > .active, .tab-content > .Current, .tab-content >
+.tab-content > .active, .file-upload .tab-content > input:focus ~ .file-upload-choose,
+.file-upload .tab-content > input:focus ~ .file-upload-browse,
+.file-upload .tab-content > input:hover ~ .file-upload-choose,
+.file-upload .tab-content > input:hover ~ .file-upload-browse, .tab-content > .Current, .tab-content >
 .current-theme {
   display: block;
 }
@@ -2107,12 +2146,12 @@ a.text-danger:focus, a.text-danger:hover {
   clear: both;
 }
 
-.modal-footer .btn + .btn, .modal-footer .file-upload-browse + .btn, .modal-footer .Button + .btn, .modal-footer .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .FilterButton + .btn, .modal-footer .btn + .file-upload-browse, .modal-footer .file-upload-browse + .file-upload-browse, .modal-footer .Button + .file-upload-browse, .modal-footer .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .FilterButton + .file-upload-browse, .modal-footer .btn + .Button, .modal-footer .file-upload-browse + .Button, .modal-footer .Button + .Button, .modal-footer .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .FilterButton + .Button, .modal-footer .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .btn + .FilterButton, .modal-footer .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .file-upload-browse + .FilterButton, .modal-footer .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .Button + .FilterButton, .modal-footer .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .FilterButton + .FilterButton {
+.modal-footer .btn + .btn, .modal-footer .file-upload-browse + .btn, .modal-footer .Button + .btn, .modal-footer .btn + .file-upload-browse, .modal-footer .file-upload-browse + .file-upload-browse, .modal-footer .Button + .file-upload-browse, .modal-footer .btn + .Button, .modal-footer .file-upload-browse + .Button, .modal-footer .Button + .Button {
   margin-bottom: 0;
   margin-left: 5px;
 }
 
-.modal-footer .btn-group .btn + .btn, .modal-footer .btn-group .file-upload-browse + .btn, .modal-footer .btn-group .Button + .btn, .modal-footer .btn-group .FilterMenu .FilterButton + .btn, .FilterMenu .modal-footer .btn-group .FilterButton + .btn, .modal-footer .btn-group .btn + .file-upload-browse, .modal-footer .btn-group .file-upload-browse + .file-upload-browse, .modal-footer .btn-group .Button + .file-upload-browse, .modal-footer .btn-group .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .modal-footer .btn-group .FilterButton + .file-upload-browse, .modal-footer .btn-group .btn + .Button, .modal-footer .btn-group .file-upload-browse + .Button, .modal-footer .btn-group .Button + .Button, .modal-footer .btn-group .FilterMenu .FilterButton + .Button, .FilterMenu .modal-footer .btn-group .FilterButton + .Button, .modal-footer .btn-group .FilterMenu .btn + .FilterButton, .FilterMenu .modal-footer .btn-group .btn + .FilterButton, .modal-footer .btn-group .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .modal-footer .btn-group .file-upload-browse + .FilterButton, .modal-footer .btn-group .FilterMenu .Button + .FilterButton, .FilterMenu .modal-footer .btn-group .Button + .FilterButton, .modal-footer .btn-group .FilterMenu .FilterButton + .FilterButton, .FilterMenu .modal-footer .btn-group .FilterButton + .FilterButton {
+.modal-footer .btn-group .btn + .btn, .modal-footer .btn-group .file-upload-browse + .btn, .modal-footer .btn-group .Button + .btn, .modal-footer .btn-group .btn + .file-upload-browse, .modal-footer .btn-group .file-upload-browse + .file-upload-browse, .modal-footer .btn-group .Button + .file-upload-browse, .modal-footer .btn-group .btn + .Button, .modal-footer .btn-group .file-upload-browse + .Button, .modal-footer .btn-group .Button + .Button {
   margin-left: -1px;
 }
 
@@ -2218,9 +2257,36 @@ a.text-danger:focus, a.text-danger:hover {
   background-color: #f2f5fa;
 }
 
-.dropdown-item.active, .dropdown-item.Current, .ac_results li.Current,
-.dropdown-item.current-theme, .ac_results li.current-theme, .ac_results li.active, .dropdown-item.active:focus, .dropdown-item.Current:focus, .ac_results li.Current:focus,
-.dropdown-item.current-theme:focus, .ac_results li.current-theme:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .dropdown-item.Current:hover, .ac_results li.Current:hover,
+.dropdown-item.active, .file-upload input:focus ~ .dropdown-item.file-upload-choose, .file-upload .ac_results input:focus ~ li.file-upload-choose, .ac_results .file-upload input:focus ~ li.file-upload-choose,
+.file-upload input:focus ~ .dropdown-item.file-upload-browse,
+.file-upload .ac_results input:focus ~ li.file-upload-browse, .ac_results
+.file-upload input:focus ~ li.file-upload-browse,
+.file-upload input:hover ~ .dropdown-item.file-upload-choose,
+.file-upload .ac_results input:hover ~ li.file-upload-choose, .ac_results
+.file-upload input:hover ~ li.file-upload-choose,
+.file-upload input:hover ~ .dropdown-item.file-upload-browse,
+.file-upload .ac_results input:hover ~ li.file-upload-browse, .ac_results
+.file-upload input:hover ~ li.file-upload-browse, .dropdown-item.Current, .ac_results li.Current,
+.dropdown-item.current-theme, .ac_results li.current-theme, .ac_results li.active, .dropdown-item.active:focus, .file-upload input:focus ~ .dropdown-item.file-upload-choose:focus, .file-upload .ac_results input:focus ~ li.file-upload-choose:focus, .ac_results .file-upload input:focus ~ li.file-upload-choose:focus,
+.file-upload input:focus ~ .dropdown-item.file-upload-browse:focus,
+.file-upload .ac_results input:focus ~ li.file-upload-browse:focus, .ac_results
+.file-upload input:focus ~ li.file-upload-browse:focus,
+.file-upload input:hover ~ .dropdown-item.file-upload-choose:focus,
+.file-upload .ac_results input:hover ~ li.file-upload-choose:focus, .ac_results
+.file-upload input:hover ~ li.file-upload-choose:focus,
+.file-upload input:hover ~ .dropdown-item.file-upload-browse:focus,
+.file-upload .ac_results input:hover ~ li.file-upload-browse:focus, .ac_results
+.file-upload input:hover ~ li.file-upload-browse:focus, .dropdown-item.Current:focus, .ac_results li.Current:focus,
+.dropdown-item.current-theme:focus, .ac_results li.current-theme:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .file-upload input:focus ~ .dropdown-item.file-upload-choose:hover, .file-upload .ac_results input:focus ~ li.file-upload-choose:hover, .ac_results .file-upload input:focus ~ li.file-upload-choose:hover,
+.file-upload input:focus ~ .dropdown-item.file-upload-browse:hover,
+.file-upload .ac_results input:focus ~ li.file-upload-browse:hover, .ac_results
+.file-upload input:focus ~ li.file-upload-browse:hover,
+.file-upload input:hover ~ .dropdown-item.file-upload-choose:hover,
+.file-upload .ac_results input:hover ~ li.file-upload-choose:hover, .ac_results
+.file-upload input:hover ~ li.file-upload-choose:hover,
+.file-upload input:hover ~ .dropdown-item.file-upload-browse:hover,
+.file-upload .ac_results input:hover ~ li.file-upload-browse:hover, .ac_results
+.file-upload input:hover ~ li.file-upload-browse:hover, .dropdown-item.Current:hover, .ac_results li.Current:hover,
 .dropdown-item.current-theme:hover, .ac_results li.current-theme:hover, .ac_results li.active:hover {
   color: #fff;
   text-decoration: none;
@@ -2372,9 +2438,18 @@ button.list-group-item:hover {
   color: #f6f9fb;
 }
 
-.list-group-item.active, .list-group-item.Current,
-.list-group-item.current-theme, .list-group-item.active:focus, .list-group-item.Current:focus,
-.list-group-item.current-theme:focus, .list-group-item.active:hover, .list-group-item.Current:hover,
+.list-group-item.active, .file-upload input:focus ~ .list-group-item.file-upload-choose,
+.file-upload input:focus ~ .list-group-item.file-upload-browse,
+.file-upload input:hover ~ .list-group-item.file-upload-choose,
+.file-upload input:hover ~ .list-group-item.file-upload-browse, .list-group-item.Current,
+.list-group-item.current-theme, .list-group-item.active:focus, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:focus,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:focus,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus, .list-group-item.Current:focus,
+.list-group-item.current-theme:focus, .list-group-item.active:hover, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:hover,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:hover,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover, .list-group-item.Current:hover,
 .list-group-item.current-theme:hover {
   z-index: 2;
   color: #fff;
@@ -2382,28 +2457,64 @@ button.list-group-item:hover {
   border-color: #0291db;
 }
 
-.list-group-item.active .list-group-item-heading, .list-group-item.Current .list-group-item-heading,
+.list-group-item.active .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading,
+.file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading, .list-group-item.Current .list-group-item-heading,
 .list-group-item.current-theme .list-group-item-heading,
-.list-group-item.active .list-group-item-heading > small, .list-group-item.Current .list-group-item-heading > small,
+.list-group-item.active .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > small, .list-group-item.Current .list-group-item-heading > small,
 .list-group-item.current-theme .list-group-item-heading > small,
-.list-group-item.active .list-group-item-heading > .small, .list-group-item.Current .list-group-item-heading > .small,
-.list-group-item.current-theme .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .list-group-item.Current:focus .list-group-item-heading,
+.list-group-item.active .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > .small, .list-group-item.Current .list-group-item-heading > .small,
+.list-group-item.current-theme .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading, .list-group-item.Current:focus .list-group-item-heading,
 .list-group-item.current-theme:focus .list-group-item-heading,
-.list-group-item.active:focus .list-group-item-heading > small, .list-group-item.Current:focus .list-group-item-heading > small,
+.list-group-item.active:focus .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small, .list-group-item.Current:focus .list-group-item-heading > small,
 .list-group-item.current-theme:focus .list-group-item-heading > small,
-.list-group-item.active:focus .list-group-item-heading > .small, .list-group-item.Current:focus .list-group-item-heading > .small,
-.list-group-item.current-theme:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .list-group-item.Current:hover .list-group-item-heading,
+.list-group-item.active:focus .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small, .list-group-item.Current:focus .list-group-item-heading > .small,
+.list-group-item.current-theme:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading, .list-group-item.Current:hover .list-group-item-heading,
 .list-group-item.current-theme:hover .list-group-item-heading,
-.list-group-item.active:hover .list-group-item-heading > small, .list-group-item.Current:hover .list-group-item-heading > small,
+.list-group-item.active:hover .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small, .list-group-item.Current:hover .list-group-item-heading > small,
 .list-group-item.current-theme:hover .list-group-item-heading > small,
-.list-group-item.active:hover .list-group-item-heading > .small, .list-group-item.Current:hover .list-group-item-heading > .small,
+.list-group-item.active:hover .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small, .list-group-item.Current:hover .list-group-item-heading > .small,
 .list-group-item.current-theme:hover .list-group-item-heading > .small {
   color: inherit;
 }
 
-.list-group-item.active .list-group-item-text, .list-group-item.Current .list-group-item-text,
-.list-group-item.current-theme .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .list-group-item.Current:focus .list-group-item-text,
-.list-group-item.current-theme:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .list-group-item.Current:hover .list-group-item-text,
+.list-group-item.active .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-text,
+.file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-text, .list-group-item.Current .list-group-item-text,
+.list-group-item.current-theme .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-text, .list-group-item.Current:focus .list-group-item-text,
+.list-group-item.current-theme:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
+.file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-text, .list-group-item.Current:hover .list-group-item-text,
 .list-group-item.current-theme:hover .list-group-item-text {
   color: #abe2fe;
 }
@@ -2430,17 +2541,38 @@ button.list-group-item-success:hover {
   background-color: #59be62;
 }
 
-a.list-group-item-success.active, a.list-group-item-success.Current,
-a.list-group-item-success.current-theme, a.list-group-item-success.active:focus, a.list-group-item-success.Current:focus,
-a.list-group-item-success.current-theme:focus, a.list-group-item-success.active:hover, a.list-group-item-success.Current:hover,
+a.list-group-item-success.active, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose,
+.file-upload input:focus ~ a.list-group-item-success.file-upload-browse,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-choose,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse, a.list-group-item-success.Current,
+a.list-group-item-success.current-theme, a.list-group-item-success.active:focus, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:focus,
+.file-upload input:focus ~ a.list-group-item-success.file-upload-browse:focus,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:focus, a.list-group-item-success.Current:focus,
+a.list-group-item-success.current-theme:focus, a.list-group-item-success.active:hover, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:hover,
+.file-upload input:focus ~ a.list-group-item-success.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:hover, a.list-group-item-success.Current:hover,
 a.list-group-item-success.current-theme:hover,
 button.list-group-item-success.active,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-choose,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-browse,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-choose,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-browse,
 button.list-group-item-success.Current,
 button.list-group-item-success.current-theme,
 button.list-group-item-success.active:focus,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-choose:focus,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-browse:focus,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-choose:focus,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:focus,
 button.list-group-item-success.Current:focus,
 button.list-group-item-success.current-theme:focus,
 button.list-group-item-success.active:hover,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-choose:hover,
+.file-upload input:focus ~ button.list-group-item-success.file-upload-browse:hover,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-choose:hover,
+.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:hover,
 button.list-group-item-success.Current:hover,
 button.list-group-item-success.current-theme:hover {
   color: #fff;
@@ -2470,17 +2602,38 @@ button.list-group-item-info:hover {
   background-color: #91acbc;
 }
 
-a.list-group-item-info.active, a.list-group-item-info.Current,
-a.list-group-item-info.current-theme, a.list-group-item-info.active:focus, a.list-group-item-info.Current:focus,
-a.list-group-item-info.current-theme:focus, a.list-group-item-info.active:hover, a.list-group-item-info.Current:hover,
+a.list-group-item-info.active, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose,
+.file-upload input:focus ~ a.list-group-item-info.file-upload-browse,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-choose,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse, a.list-group-item-info.Current,
+a.list-group-item-info.current-theme, a.list-group-item-info.active:focus, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:focus,
+.file-upload input:focus ~ a.list-group-item-info.file-upload-browse:focus,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:focus, a.list-group-item-info.Current:focus,
+a.list-group-item-info.current-theme:focus, a.list-group-item-info.active:hover, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:hover,
+.file-upload input:focus ~ a.list-group-item-info.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:hover, a.list-group-item-info.Current:hover,
 a.list-group-item-info.current-theme:hover,
 button.list-group-item-info.active,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-choose,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-browse,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-choose,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-browse,
 button.list-group-item-info.Current,
 button.list-group-item-info.current-theme,
 button.list-group-item-info.active:focus,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-choose:focus,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-browse:focus,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-choose:focus,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:focus,
 button.list-group-item-info.Current:focus,
 button.list-group-item-info.current-theme:focus,
 button.list-group-item-info.active:hover,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-choose:hover,
+.file-upload input:focus ~ button.list-group-item-info.file-upload-browse:hover,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-choose:hover,
+.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:hover,
 button.list-group-item-info.Current:hover,
 button.list-group-item-info.current-theme:hover {
   color: #fff;
@@ -2510,17 +2663,38 @@ button.list-group-item-warning:hover {
   background-color: #f9a329;
 }
 
-a.list-group-item-warning.active, a.list-group-item-warning.Current,
-a.list-group-item-warning.current-theme, a.list-group-item-warning.active:focus, a.list-group-item-warning.Current:focus,
-a.list-group-item-warning.current-theme:focus, a.list-group-item-warning.active:hover, a.list-group-item-warning.Current:hover,
+a.list-group-item-warning.active, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose,
+.file-upload input:focus ~ a.list-group-item-warning.file-upload-browse,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-choose,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse, a.list-group-item-warning.Current,
+a.list-group-item-warning.current-theme, a.list-group-item-warning.active:focus, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:focus,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:focus, a.list-group-item-warning.Current:focus,
+a.list-group-item-warning.current-theme:focus, a.list-group-item-warning.active:hover, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:hover, a.list-group-item-warning.Current:hover,
 a.list-group-item-warning.current-theme:hover,
 button.list-group-item-warning.active,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-choose,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-browse,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-choose,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse,
 button.list-group-item-warning.Current,
 button.list-group-item-warning.current-theme,
 button.list-group-item-warning.active:focus,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:focus,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:focus,
 button.list-group-item-warning.Current:focus,
 button.list-group-item-warning.current-theme:focus,
 button.list-group-item-warning.active:hover,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:hover,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:hover,
 button.list-group-item-warning.Current:hover,
 button.list-group-item-warning.current-theme:hover {
   color: #fff;
@@ -2550,17 +2724,38 @@ button.list-group-item-danger:hover {
   background-color: #f91706;
 }
 
-a.list-group-item-danger.active, a.list-group-item-danger.Current,
-a.list-group-item-danger.current-theme, a.list-group-item-danger.active:focus, a.list-group-item-danger.Current:focus,
-a.list-group-item-danger.current-theme:focus, a.list-group-item-danger.active:hover, a.list-group-item-danger.Current:hover,
+a.list-group-item-danger.active, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose,
+.file-upload input:focus ~ a.list-group-item-danger.file-upload-browse,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-choose,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse, a.list-group-item-danger.Current,
+a.list-group-item-danger.current-theme, a.list-group-item-danger.active:focus, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:focus,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:focus, a.list-group-item-danger.Current:focus,
+a.list-group-item-danger.current-theme:focus, a.list-group-item-danger.active:hover, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:hover, a.list-group-item-danger.Current:hover,
 a.list-group-item-danger.current-theme:hover,
 button.list-group-item-danger.active,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-choose,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-browse,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-choose,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse,
 button.list-group-item-danger.Current,
 button.list-group-item-danger.current-theme,
 button.list-group-item-danger.active:focus,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:focus,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:focus,
 button.list-group-item-danger.Current:focus,
 button.list-group-item-danger.current-theme:focus,
 button.list-group-item-danger.active:hover,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:hover,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:hover,
 button.list-group-item-danger.Current:hover,
 button.list-group-item-danger.current-theme:hover {
   color: #fff;
@@ -2937,183 +3132,6 @@ input[type="checkbox"].disabled {
   }
 }
 
-.c-input {
-  position: relative;
-  display: inline;
-  padding-left: 1.5rem;
-  color: #555;
-  cursor: pointer;
-}
-
-.c-input > input {
-  position: absolute;
-  z-index: -1;
-  opacity: 0;
-}
-
-.c-input > input:checked ~ .c-indicator {
-  color: #fff;
-  background-color: #0074d9;
-}
-
-.c-input > input:focus ~ .c-indicator {
-  box-shadow: 0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9;
-}
-
-.c-input > input:active ~ .c-indicator {
-  color: #fff;
-  background-color: #84c6ff;
-}
-
-.c-input + .c-input {
-  margin-left: 1rem;
-}
-
-.c-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  width: 1rem;
-  height: 1rem;
-  font-size: 65%;
-  line-height: 1rem;
-  color: #eee;
-  text-align: center;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-color: #eee;
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 50% 50%;
-}
-
-.c-checkbox .c-indicator {
-  border-radius: .25rem;
-}
-
-.c-checkbox input:checked ~ .c-indicator {
-  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgOCA4IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA4IDgiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTYuNCwxTDUuNywxLjdMMi45LDQuNUwyLjEsMy43TDEuNCwzTDAsNC40bDAuNywwLjdsMS41LDEuNWwwLjcsMC43bDAuNy0wLjdsMy41LTMuNWwwLjctMC43TDYuNCwxTDYuNCwxeiINCgkvPg0KPC9zdmc+DQo=);
-}
-
-.c-checkbox input:indeterminate ~ .c-indicator {
-  background-color: #0074d9;
-  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB3aWR0aD0iOHB4IiBoZWlnaHQ9IjhweCIgdmlld0JveD0iMCAwIDggOCIgZW5hYmxlLWJhY2tncm91bmQ9Im5ldyAwIDAgOCA4IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik0wLDN2Mmg4VjNIMHoiLz4NCjwvc3ZnPg0K);
-}
-
-.c-radio .c-indicator {
-  border-radius: 50%;
-}
-
-.c-radio input:checked ~ .c-indicator {
-  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4NCjwhLS0gR2VuZXJhdG9yOiBBZG9iZSBJbGx1c3RyYXRvciAxNy4xLjAsIFNWRyBFeHBvcnQgUGx1Zy1JbiAuIFNWRyBWZXJzaW9uOiA2LjAwIEJ1aWxkIDApICAtLT4NCjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBoaWNzL1NWRy8xLjEvRFREL3N2ZzExLmR0ZCI+DQo8c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgOCA4IiBlbmFibGUtYmFja2dyb3VuZD0ibmV3IDAgMCA4IDgiIHhtbDpzcGFjZT0icHJlc2VydmUiPg0KPHBhdGggZmlsbD0iI0ZGRkZGRiIgZD0iTTQsMUMyLjMsMSwxLDIuMywxLDRzMS4zLDMsMywzczMtMS4zLDMtM1M1LjcsMSw0LDF6Ii8+DQo8L3N2Zz4NCg==);
-}
-
-.c-inputs-stacked .c-input {
-  display: inline;
-}
-
-.c-inputs-stacked .c-input::after {
-  display: block;
-  margin-bottom: .25rem;
-  content: "";
-}
-
-.c-inputs-stacked .c-input + .c-input {
-  margin-left: 0;
-}
-
-.c-select {
-  display: inline-block;
-  max-width: 100%;
-  padding: .375rem 1.75rem .375rem .75rem;
-  padding-right: .75rem \9;
-  color: #949aa2;
-  vertical-align: middle;
-  background: #fff url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC) no-repeat right 0.75rem center;
-  background-image: none \9;
-  background-size: 8px 10px;
-  border: 0.0625rem solid #ccc;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-}
-
-.c-select:focus {
-  border-color: #51a7e8;
-  outline: none;
-}
-
-.c-select::-ms-expand {
-  opacity: 0;
-}
-
-.c-select-sm {
-  padding-top: 3px;
-  padding-bottom: 3px;
-  font-size: 12px;
-}
-
-.c-select-sm:not([multiple]) {
-  height: 26px;
-  min-height: 26px;
-}
-
-.file {
-  position: relative;
-  display: inline-block;
-  height: 2.5rem;
-  cursor: pointer;
-}
-
-.file input {
-  min-width: 14rem;
-  margin: 0;
-  filter: alpha(opacity=0);
-  opacity: 0;
-}
-
-.file-custom {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 5;
-  height: 2.5rem;
-  padding: .5rem 1rem;
-  line-height: 1.5;
-  color: #555;
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  background-color: #fff;
-  border: 0.0625rem solid #ddd;
-  border-radius: .25rem;
-}
-
-.file-custom::after {
-  content: "Choose file...";
-}
-
-.file-custom::before {
-  position: absolute;
-  top: -.075rem;
-  right: -.075rem;
-  bottom: -.075rem;
-  z-index: 6;
-  display: block;
-  height: 2.5rem;
-  padding: .5rem 1rem;
-  line-height: 1.5;
-  color: #555;
-  content: "Browse";
-  background-color: #eee;
-  border: 0.0625rem solid #ddd;
-  border-radius: 0 .25rem .25rem 0;
-}
-
 .container {
   margin-left: auto;
   margin-right: auto;
@@ -3152,7 +3170,8 @@ input[type="checkbox"].disabled {
   padding-right: 1.125rem;
 }
 
-.row, .footer, .label-selector, .emojiext-list, .media {
+.row, .footer, .form-group, .label-selector, .media-addon,
+.media-callout {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -3161,7 +3180,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .form-group > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item, .grid-item-fixed, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -3223,7 +3242,7 @@ input[type="checkbox"].disabled {
   flex: 0 0 45.8333333333%;
 }
 
-.col-xs-12, .form-group > .label-wrap-wide, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item, .grid-item-fixed {
+.col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left {
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
 }
@@ -3617,7 +3636,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-sm-8, .grid-item, .label-selector-item:not(.no-grid), .grid-item-large, .Homepage .label-selector-item {
+  .col-sm-8, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -4265,7 +4284,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-lg-8, .grid-item, .label-selector-item:not(.no-grid) {
+  .col-lg-8, .label-selector-item, .media-callout .media-left {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -4281,7 +4300,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 45.8333333333%;
     flex: 0 0 45.8333333333%;
   }
-  .col-lg-12, .grid-item-large, .Homepage .label-selector-item {
+  .col-lg-12, .Homepage .label-selector-item {
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
@@ -4581,7 +4600,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
-  .col-xl-6, .grid-item, .label-selector-item:not(.no-grid) {
+  .col-xl-6, .label-selector-item, .media-callout .media-left {
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
@@ -4589,7 +4608,7 @@ input[type="checkbox"].disabled {
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-xl-8, .grid-item-large, .Homepage .label-selector-item {
+  .col-xl-8, .Homepage .label-selector-item {
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
@@ -5301,6 +5320,26 @@ output {
   display: none !important;
 }
 
+.toolbar-stats > *:not(.nav-stats) {
+  margin-top: 2.25rem;
+}
+
+.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
+  margin-right: 0;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+}
+
+.analytics-panel,
+.analytics-panel ul,
+.analytics-panel ol {
+  padding-left: 0;
+}
+
+.analytics-panel li {
+  list-style: none;
+}
+
 .analytics-widget {
   position: relative;
 }
@@ -5405,7 +5444,7 @@ output {
   height: 1px !important;
 }
 
-.btn, .file-upload-browse, .Button, .FilterMenu .FilterButton {
+.btn, .file-upload-browse, .Button {
   display: inline-block;
   font-weight: normal;
   text-align: center;
@@ -5423,32 +5462,44 @@ output {
   border-radius: 0.125rem;
 }
 
-.btn, .file-upload-browse, .Button, .FilterMenu .FilterButton, .btn:hover, .file-upload-browse:hover, .Button:hover, .FilterMenu .FilterButton:hover {
+.btn, .file-upload-browse, .Button, .btn:hover, .file-upload-browse:hover, .Button:hover {
   text-decoration: none;
 }
 
-.btn:active, .file-upload-browse:active, .Button:active, .FilterMenu .FilterButton:active, .btn.active, .active.file-upload-browse, .file-upload-browse.Current,
-.file-upload-browse.current-theme, .active.Button, .Button.Current,
-.Button.current-theme, .btn.Current, .FilterMenu .Current.FilterButton,
-.btn.current-theme, .FilterMenu .current-theme.FilterButton, .FilterMenu .active.FilterButton {
+.btn:focus, .file-upload-browse:focus, .Button:focus, .btn:hover, .file-upload-browse:hover, .Button:hover {
+  text-decoration: none;
+}
+
+.btn.focus, .focus.file-upload-browse, .focus.Button {
+  text-decoration: none;
+}
+
+.btn:active, .file-upload-browse:active, .Button:active, .btn.active, .active.file-upload-browse,
+.file-upload input:focus ~ .file-upload-browse,
+.file-upload input:hover ~ .file-upload-browse, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .file-upload input:focus ~ .btn.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
+.file-upload input:hover ~ .btn.file-upload-choose,
+.file-upload input:hover ~ .file-upload-choose.Button, .active.Button, .Button.Current,
+.Button.current-theme, .btn.Current,
+.btn.current-theme {
   background-image: none;
   outline: 0;
 }
 
-.btn.disabled, .disabled.file-upload-browse, .disabled.Button, .FilterMenu .disabled.FilterButton, .btn:disabled, .file-upload-browse:disabled, .Button:disabled, .FilterMenu .FilterButton:disabled {
+.btn.disabled, .disabled.file-upload-browse, .disabled.Button, .btn:disabled, .file-upload-browse:disabled, .Button:disabled {
   cursor: not-allowed;
 }
 
-.btn.disabled, .disabled.file-upload-browse, .disabled.Button, .FilterMenu .disabled.FilterButton, .btn.disabled:hover, .disabled.file-upload-browse:hover, .disabled.Button:hover, .FilterMenu .disabled.FilterButton:hover, .btn:disabled, .file-upload-browse:disabled, .Button:disabled, .FilterMenu .FilterButton:disabled, .btn:disabled:hover, .file-upload-browse:disabled:hover, .Button:disabled:hover, .FilterMenu .FilterButton:disabled:hover {
+.btn.disabled, .disabled.file-upload-browse, .disabled.Button, .btn.disabled:hover, .disabled.file-upload-browse:hover, .disabled.Button:hover, .btn:disabled, .file-upload-browse:disabled, .Button:disabled, .btn:disabled:hover, .file-upload-browse:disabled:hover, .Button:disabled:hover {
   color: #ededed;
   border-color: #ededed;
 }
 
-.btn.disabled svg, .disabled.file-upload-browse svg, .disabled.Button svg, .FilterMenu .disabled.FilterButton svg, .btn.disabled:hover svg, .disabled.file-upload-browse:hover svg, .disabled.Button:hover svg, .FilterMenu .disabled.FilterButton:hover svg, .btn:disabled svg, .file-upload-browse:disabled svg, .Button:disabled svg, .FilterMenu .FilterButton:disabled svg, .btn:disabled:hover svg, .file-upload-browse:disabled:hover svg, .Button:disabled:hover svg, .FilterMenu .FilterButton:disabled:hover svg {
+.btn.disabled svg, .disabled.file-upload-browse svg, .disabled.Button svg, .btn.disabled:hover svg, .disabled.file-upload-browse:hover svg, .disabled.Button:hover svg, .btn:disabled svg, .file-upload-browse:disabled svg, .Button:disabled svg, .btn:disabled:hover svg, .file-upload-browse:disabled:hover svg, .Button:disabled:hover svg {
   fill: #ededed;
 }
 
-.btn + .btn, .file-upload-browse + .btn, .Button + .btn, .FilterMenu .FilterButton + .btn, .btn + .file-upload-browse, .file-upload-browse + .file-upload-browse, .Button + .file-upload-browse, .FilterMenu .FilterButton + .file-upload-browse, .btn + .Button, .file-upload-browse + .Button, .Button + .Button, .FilterMenu .FilterButton + .Button, .FilterMenu .btn + .FilterButton, .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .Button + .FilterButton, .FilterMenu .FilterButton + .FilterButton {
+.btn + .btn, .file-upload-browse + .btn, .Button + .btn, .btn + .file-upload-browse, .file-upload-browse + .file-upload-browse, .Button + .file-upload-browse, .btn + .Button, .file-upload-browse + .Button, .Button + .Button {
   margin-left: 0.5625rem;
 }
 
@@ -5456,81 +5507,86 @@ output {
   margin-left: 0;
 }
 
-a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button, .FilterMenu a.disabled.FilterButton,
+a.btn.disabled, a.disabled.file-upload-browse, a.disabled.Button,
 fieldset[disabled] a.btn,
 fieldset[disabled] a.file-upload-browse,
-fieldset[disabled] a.Button,
-fieldset[disabled] .FilterMenu a.FilterButton, .FilterMenu
-fieldset[disabled] a.FilterButton {
+fieldset[disabled] a.Button {
   pointer-events: none;
   cursor: not-allowed;
 }
 
-.btn-primary, .Button, .FilterMenu .FilterButton {
+.btn-primary, .Button {
   min-width: 6rem;
   color: #0291db;
   background-color: #fff;
   border-color: #0291db;
 }
 
-.btn-primary:hover, .Button:hover, .FilterMenu .FilterButton:hover {
+.btn-primary:hover, .Button:hover {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.btn-primary:focus, .Button:focus, .FilterMenu .FilterButton:focus, .btn-primary.focus, .focus.Button, .FilterMenu .focus.FilterButton {
+.btn-primary:focus, .Button:focus, .btn-primary.focus, .focus.Button {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
   outline: 0;
 }
 
-.btn-primary:active, .Button:active, .FilterMenu .FilterButton:active, .btn-primary.active, .active.Button, .Button.Current,
-.Button.current-theme, .btn-primary.Current, .FilterMenu .Current.FilterButton,
-.btn-primary.current-theme, .FilterMenu .current-theme.FilterButton, .FilterMenu .active.FilterButton,
+.btn-primary:active, .Button:active, .btn-primary.active, .file-upload input:focus ~ .btn-primary.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
+.file-upload input:focus ~ .btn-primary.file-upload-browse,
+.file-upload input:focus ~ .file-upload-browse.Button,
+.file-upload input:hover ~ .btn-primary.file-upload-choose,
+.file-upload input:hover ~ .file-upload-choose.Button,
+.file-upload input:hover ~ .btn-primary.file-upload-browse,
+.file-upload input:hover ~ .file-upload-browse.Button, .active.Button, .Button.Current,
+.Button.current-theme, .btn-primary.Current,
+.btn-primary.current-theme,
 .open > .btn-primary.dropdown-toggle,
-.open > .dropdown-toggle.Button, .FilterMenu
-.open > .dropdown-toggle.FilterButton {
+.open > .dropdown-toggle.Button {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
   background-image: none;
 }
 
-.btn-primary.disabled:focus, .disabled.Button:focus, .FilterMenu .disabled.FilterButton:focus, .btn-primary.disabled.focus, .disabled.focus.Button, .FilterMenu .disabled.focus.FilterButton, .btn-primary:disabled:focus, .Button:disabled:focus, .FilterMenu .FilterButton:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus, .FilterMenu .FilterButton:disabled.focus {
+.btn-primary.disabled:focus, .disabled.Button:focus, .btn-primary.disabled.focus, .disabled.focus.Button, .btn-primary:disabled:focus, .Button:disabled:focus, .btn-primary:disabled.focus, .Button:disabled.focus {
   background-color: #fff;
 }
 
-.btn-primary.disabled:hover, .disabled.Button:hover, .FilterMenu .disabled.FilterButton:hover, .btn-primary:disabled:hover, .Button:disabled:hover, .FilterMenu .FilterButton:disabled:hover {
+.btn-primary.disabled:hover, .disabled.Button:hover, .btn-primary:disabled:hover, .Button:disabled:hover {
   background-color: #fff;
 }
 
-.btn-secondary, .btn-media-sm, .file-upload-browse {
+.btn-secondary, .file-upload-browse {
+  min-width: 6rem;
   color: #555a62;
   background-color: #fff;
   border-color: #ccc;
 }
 
-.btn-secondary:hover, .btn-media-sm:hover, .file-upload-browse:hover {
+.btn-secondary:hover, .file-upload-browse:hover {
   color: #555a62;
   background-color: #ddf3ff;
   border-color: #ccc;
 }
 
-.btn-secondary:focus, .btn-media-sm:focus, .file-upload-browse:focus, .btn-secondary.focus, .focus.btn-media-sm, .focus.file-upload-browse {
+.btn-secondary:focus, .file-upload-browse:focus, .btn-secondary.focus, .focus.file-upload-browse {
   color: #fff;
   background-color: #0291db;
   border-color: #0291db;
   outline: 0;
 }
 
-.btn-secondary:active, .btn-media-sm:active, .file-upload-browse:active, .btn-secondary.active, .active.btn-media-sm, .btn-media-sm.Current,
-.btn-media-sm.current-theme, .active.file-upload-browse, .file-upload-browse.Current,
-.file-upload-browse.current-theme, .btn-secondary.Current,
+.btn-secondary:active, .file-upload-browse:active, .btn-secondary.active, .active.file-upload-browse,
+.file-upload input:focus ~ .file-upload-browse,
+.file-upload input:hover ~ .file-upload-browse, .file-upload-browse.Current,
+.file-upload-browse.current-theme, .file-upload input:focus ~ .btn-secondary.file-upload-choose,
+.file-upload input:hover ~ .btn-secondary.file-upload-choose, .btn-secondary.Current,
 .btn-secondary.current-theme,
 .open > .btn-secondary.dropdown-toggle,
-.open > .dropdown-toggle.btn-media-sm,
 .open > .dropdown-toggle.file-upload-browse {
   color: #fff;
   background-color: #0291db;
@@ -5538,41 +5594,12 @@ fieldset[disabled] a.FilterButton {
   background-image: none;
 }
 
-.btn-secondary.disabled:focus, .disabled.btn-media-sm:focus, .disabled.file-upload-browse:focus, .btn-secondary.disabled.focus, .disabled.focus.btn-media-sm, .disabled.focus.file-upload-browse, .btn-secondary:disabled:focus, .btn-media-sm:disabled:focus, .file-upload-browse:disabled:focus, .btn-secondary:disabled.focus, .btn-media-sm:disabled.focus, .file-upload-browse:disabled.focus {
+.btn-secondary.disabled:focus, .disabled.file-upload-browse:focus, .btn-secondary.disabled.focus, .disabled.focus.file-upload-browse, .btn-secondary:disabled:focus, .file-upload-browse:disabled:focus, .btn-secondary:disabled.focus, .file-upload-browse:disabled.focus {
   background-color: #fff;
 }
 
-.btn-secondary.disabled:hover, .disabled.btn-media-sm:hover, .disabled.file-upload-browse:hover, .btn-secondary:disabled:hover, .btn-media-sm:disabled:hover, .file-upload-browse:disabled:hover {
+.btn-secondary.disabled:hover, .disabled.file-upload-browse:hover, .btn-secondary:disabled:hover, .file-upload-browse:disabled:hover {
   background-color: #fff;
-}
-
-.btn-primary-outline {
-  color: #fff;
-  background-image: none;
-  background-color: transparent;
-  border-color: #fff;
-}
-
-.btn-primary-outline:focus, .btn-primary-outline.focus, .btn-primary-outline:active, .btn-primary-outline.active, .btn-primary-outline.Current,
-.btn-primary-outline.current-theme,
-.open > .btn-primary-outline.dropdown-toggle {
-  color: #fff;
-  background-color: #fff;
-  border-color: #fff;
-}
-
-.btn-primary-outline:hover {
-  color: #fff;
-  background-color: #fff;
-  border-color: #fff;
-}
-
-.btn-primary-outline.disabled:focus, .btn-primary-outline.disabled.focus, .btn-primary-outline:disabled:focus, .btn-primary-outline:disabled.focus {
-  border-color: white;
-}
-
-.btn-primary-outline.disabled:hover, .btn-primary-outline:disabled:hover {
-  border-color: white;
 }
 
 .btn-link, .btn-icon {
@@ -5581,8 +5608,14 @@ fieldset[disabled] a.FilterButton {
   border-radius: 0;
 }
 
-.btn-link, .btn-icon, .btn-link:active, .btn-icon:active, .btn-link.active, .active.btn-icon, .btn-icon.Current,
-.btn-icon.current-theme, .btn-link.Current,
+.btn-link, .btn-icon, .btn-link:active, .btn-icon:active, .btn-link.active, .active.btn-icon, .file-upload input:focus ~ .btn-icon.file-upload-choose,
+.file-upload input:focus ~ .btn-icon.file-upload-browse,
+.file-upload input:hover ~ .btn-icon.file-upload-choose,
+.file-upload input:hover ~ .btn-icon.file-upload-browse, .btn-icon.Current,
+.btn-icon.current-theme, .file-upload input:focus ~ .btn-link.file-upload-choose,
+.file-upload input:focus ~ .btn-link.file-upload-browse,
+.file-upload input:hover ~ .btn-link.file-upload-choose,
+.file-upload input:hover ~ .btn-link.file-upload-browse, .btn-link.Current,
 .btn-link.current-theme, .btn-link:disabled, .btn-icon:disabled {
   background-color: transparent;
 }
@@ -5604,35 +5637,6 @@ fieldset[disabled] a.FilterButton {
 .btn-link:disabled:focus, .btn-icon:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover {
   color: #ededed;
   text-decoration: none;
-}
-
-.btn-lg {
-  padding: 0.75rem 1.25rem;
-  font-size: 1.25rem;
-  line-height: 1.3333333333;
-  border-radius: 0.25rem;
-}
-
-.btn-sm {
-  padding: 0.125rem 0.75rem;
-  font-size: 0.75rem;
-  line-height: 1.5;
-  border-radius: 0.05rem;
-}
-
-.btn-block {
-  display: block;
-  width: 100%;
-}
-
-.btn-block + .btn-block {
-  margin-top: 0.28125rem;
-}
-
-input[type="submit"].btn-block,
-input[type="reset"].btn-block,
-input[type="button"].btn-block {
-  width: 100%;
 }
 
 .btn-icon {
@@ -5682,7 +5686,10 @@ input[type="button"].btn-block {
   outline: 0;
 }
 
-.btn-icon-border:active, .btn-icon-border.active, .btn-icon-border.Current,
+.btn-icon-border:active, .btn-icon-border.active, .file-upload input:focus ~ .btn-icon-border.file-upload-choose,
+.file-upload input:focus ~ .btn-icon-border.file-upload-browse,
+.file-upload input:hover ~ .btn-icon-border.file-upload-choose,
+.file-upload input:hover ~ .btn-icon-border.file-upload-browse, .btn-icon-border.Current,
 .btn-icon-border.current-theme,
 .open > .btn-icon-border.dropdown-toggle {
   color: #555a62;
@@ -5709,80 +5716,156 @@ input[type="button"].btn-block {
 
 .btn-group {
   font-size: 0;
-}
-
-.btn-group .btn, .btn-group .file-upload-browse, .btn-group .Button, .btn-group .FilterMenu .FilterButton, .FilterMenu .btn-group .FilterButton {
-  border-radius: 0;
-  margin-right: -0.0625rem;
-}
-
-.btn-group .btn:first-child, .btn-group .file-upload-browse:first-child, .btn-group .Button:first-child, .btn-group .FilterMenu .FilterButton:first-child, .FilterMenu .btn-group .FilterButton:first-child {
-  border-top-left-radius: 0.125rem;
-  border-bottom-left-radius: 0.125rem;
-}
-
-.btn-group .btn:last-child, .btn-group .file-upload-browse:last-child, .btn-group .Button:last-child, .btn-group .FilterMenu .FilterButton:last-child, .FilterMenu .btn-group .FilterButton:last-child {
-  border-top-right-radius: 0.125rem;
-  border-bottom-right-radius: 0.125rem;
-}
-
-.btn-group .btn-secondary, .btn-group .btn-media-sm, .btn-group .file-upload-browse {
-  min-width: 6rem;
-}
-
-.btn-group,
-.btn-group-vertical {
   position: relative;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
-  vertical-align: middle;
+  -ms-flex-align: center;
+  align-items: center;
 }
 
-.btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .FilterMenu .btn-group > .FilterButton:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .FilterMenu .btn-group > .FilterButton:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse, .btn-group > .file-upload-browse.Current, .btn-group >
-.file-upload-browse.current-theme, .btn-group > .active.Button, .btn-group > .Button.Current, .btn-group >
-.Button.current-theme, .btn-group > .btn.Current, .FilterMenu .btn-group > .Current.FilterButton, .btn-group >
-.btn.current-theme, .FilterMenu .btn-group > .current-theme.FilterButton, .FilterMenu .btn-group > .active.FilterButton,
-.btn-group-vertical > .btn:focus,
-.btn-group-vertical > .file-upload-browse:focus,
-.btn-group-vertical > .Button:focus, .FilterMenu
-.btn-group-vertical > .FilterButton:focus,
-.btn-group-vertical > .btn:active,
-.btn-group-vertical > .file-upload-browse:active,
-.btn-group-vertical > .Button:active, .FilterMenu
-.btn-group-vertical > .FilterButton:active,
-.btn-group-vertical > .btn.active,
-.btn-group-vertical > .active.file-upload-browse,
-.btn-group-vertical > .file-upload-browse.Current,
-.btn-group-vertical >
-.file-upload-browse.current-theme,
-.btn-group-vertical > .active.Button,
-.btn-group-vertical > .Button.Current,
-.btn-group-vertical >
-.Button.current-theme,
-.btn-group-vertical > .btn.Current, .FilterMenu
-.btn-group-vertical > .Current.FilterButton,
-.btn-group-vertical >
-.btn.current-theme, .FilterMenu
-.btn-group-vertical > .current-theme.FilterButton, .FilterMenu
-.btn-group-vertical > .active.FilterButton {
+.btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse,
+.file-upload .btn-group > input:focus ~ .file-upload-browse,
+.file-upload .btn-group > input:hover ~ .file-upload-browse, .btn-group > .file-upload-browse.Current, .btn-group >
+.file-upload-browse.current-theme, .file-upload .btn-group > input:focus ~ .btn.file-upload-choose, .file-upload .btn-group > input:focus ~ .file-upload-choose.Button,
+.file-upload .btn-group > input:hover ~ .btn.file-upload-choose,
+.file-upload .btn-group > input:hover ~ .file-upload-choose.Button, .btn-group > .active.Button, .btn-group > .Button.Current, .btn-group >
+.Button.current-theme, .btn-group > .btn.Current, .btn-group >
+.btn.current-theme {
   z-index: 2;
 }
 
-.btn-group .btn + .btn, .btn-group .file-upload-browse + .btn, .btn-group .Button + .btn, .btn-group .FilterMenu .FilterButton + .btn, .FilterMenu .btn-group .FilterButton + .btn, .btn-group .btn + .file-upload-browse, .btn-group .file-upload-browse + .file-upload-browse, .btn-group .Button + .file-upload-browse, .btn-group .FilterMenu .FilterButton + .file-upload-browse, .FilterMenu .btn-group .FilterButton + .file-upload-browse, .btn-group .btn + .Button, .btn-group .file-upload-browse + .Button, .btn-group .Button + .Button, .btn-group .FilterMenu .FilterButton + .Button, .FilterMenu .btn-group .FilterButton + .Button, .btn-group .FilterMenu .btn + .FilterButton, .FilterMenu .btn-group .btn + .FilterButton, .btn-group .FilterMenu .file-upload-browse + .FilterButton, .FilterMenu .btn-group .file-upload-browse + .FilterButton, .btn-group .FilterMenu .Button + .FilterButton, .FilterMenu .btn-group .Button + .FilterButton, .btn-group .FilterMenu .FilterButton + .FilterButton, .FilterMenu .btn-group .FilterButton + .FilterButton,
+.btn-group .btn, .btn-group .file-upload-browse, .btn-group .Button {
+  border-radius: 0;
+  margin-right: -0.0625rem;
+}
+
+.btn-group .btn:first-child, .btn-group .file-upload-browse:first-child, .btn-group .Button:first-child {
+  border-top-left-radius: 0.125rem;
+  border-bottom-left-radius: 0.125rem;
+}
+
+.btn-group .btn:last-child, .btn-group .file-upload-browse:last-child, .btn-group .Button:last-child {
+  border-top-right-radius: 0.125rem;
+  border-bottom-right-radius: 0.125rem;
+}
+
+.btn-group .btn + .btn, .btn-group .file-upload-browse + .btn, .btn-group .Button + .btn, .btn-group .btn + .file-upload-browse, .btn-group .file-upload-browse + .file-upload-browse, .btn-group .Button + .file-upload-browse, .btn-group .btn + .Button, .btn-group .file-upload-browse + .Button, .btn-group .Button + .Button,
 .btn-group .btn + .btn-group,
 .btn-group .file-upload-browse + .btn-group,
 .btn-group .Button + .btn-group,
-.btn-group .FilterMenu .FilterButton + .btn-group, .FilterMenu
-.btn-group .FilterButton + .btn-group,
 .btn-group .btn-group + .btn,
 .btn-group .btn-group + .file-upload-browse,
 .btn-group .btn-group + .Button,
-.btn-group .FilterMenu .btn-group + .FilterButton, .FilterMenu
-.btn-group .btn-group + .FilterButton,
 .btn-group .btn-group + .btn-group {
   margin-left: -0.0625rem;
+}
+
+.btn-sm-rounded {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: 300;
+  text-transform: uppercase;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  border-radius: 0.625rem;
+  color: #555a62;
+  background-color: #fff;
+  border-color: #ccc;
+}
+
+.btn-sm-rounded svg {
+  margin-top: -0.125rem;
+}
+
+.btn-sm-rounded:hover {
+  color: #555a62;
+  background-color: #ddf3ff;
+  border-color: #ccc;
+}
+
+.btn-sm-rounded:focus, .btn-sm-rounded.focus {
+  color: #fff;
+  background-color: #0291db;
+  border-color: #0291db;
+  outline: 0;
+}
+
+.btn-sm-rounded:active, .btn-sm-rounded.active, .file-upload input:focus ~ .btn-sm-rounded.file-upload-choose,
+.file-upload input:focus ~ .btn-sm-rounded.file-upload-browse,
+.file-upload input:hover ~ .btn-sm-rounded.file-upload-choose,
+.file-upload input:hover ~ .btn-sm-rounded.file-upload-browse, .btn-sm-rounded.Current,
+.btn-sm-rounded.current-theme,
+.open > .btn-sm-rounded.dropdown-toggle {
+  color: #fff;
+  background-color: #0291db;
+  border-color: #0291db;
+  background-image: none;
+}
+
+.btn-sm-rounded.disabled:focus, .btn-sm-rounded.disabled.focus, .btn-sm-rounded:disabled:focus, .btn-sm-rounded:disabled.focus {
+  background-color: #fff;
+}
+
+.btn-sm-rounded.disabled:hover, .btn-sm-rounded:disabled:hover {
+  background-color: #fff;
+}
+
+.btn-navbar {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: 300;
+  text-transform: uppercase;
+  padding: 0.125rem 0.75rem;
+  font-size: 0.625rem;
+  line-height: 0.875rem;
+  border-radius: 0.625rem;
+  color: #d2f0fe;
+  background-color: #0291db;
+  border-color: #d2f0fe;
+}
+
+.btn-navbar svg {
+  margin-top: -0.125rem;
+}
+
+.btn-navbar svg {
+  fill: #fff;
+}
+
+.btn-navbar:hover {
+  color: #d2f0fe;
+  background-color: #0cb0f8;
+  border-color: #d2f0fe;
+}
+
+.btn-navbar:focus, .btn-navbar.focus {
+  color: #d2f0fe;
+  background-color: #0cb0f8;
+  border-color: #d2f0fe;
+  outline: 0;
+}
+
+.btn-navbar:active, .btn-navbar.active, .file-upload input:focus ~ .btn-navbar.file-upload-choose,
+.file-upload input:focus ~ .btn-navbar.file-upload-browse,
+.file-upload input:hover ~ .btn-navbar.file-upload-choose,
+.file-upload input:hover ~ .btn-navbar.file-upload-browse, .btn-navbar.Current,
+.btn-navbar.current-theme,
+.open > .btn-navbar.dropdown-toggle {
+  color: #d2f0fe;
+  background-color: #0cb0f8;
+  border-color: #d2f0fe;
+  background-image: none;
+}
+
+.btn-navbar.disabled:focus, .btn-navbar.disabled.focus, .btn-navbar:disabled:focus, .btn-navbar:disabled.focus {
+  background-color: #0291db;
+}
+
+.btn-navbar.disabled:hover, .btn-navbar:disabled:hover {
+  background-color: #0291db;
 }
 
 .card .list-group-item {
@@ -5794,7 +5877,7 @@ input[type="button"].btn-block {
   background-color: #f8f9fc;
 }
 
-.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .btn-icon-border, .card .list-group-item .search-wrap .icon-wrap, .search-wrap .card .list-group-item .icon-wrap {
+.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .btn-icon-border, .card .list-group-item .search-wrap .search-icon-wrap, .search-wrap .card .list-group-item .search-icon-wrap {
   float: right;
 }
 
@@ -5803,11 +5886,11 @@ input[type="button"].btn-block {
   width: 0.875rem;
 }
 
-.card .media-sm-title, .card .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .card h2, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title {
+.card .media-sm-title {
   margin-bottom: 0.28125rem;
 }
 
-.card .media-sm-title a, .card .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .card h2 a, .card .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .Section-DashboardHome .FeedItem .analytics-widget-header .card .title a, .card .analytics-widget-header .Section-DashboardHome .FeedItem .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .card .title a {
+.card .media-sm-title a {
   color: #555a62;
 }
 
@@ -5837,21 +5920,9 @@ input[type="button"].btn-block {
   width: 5.25rem;
 }
 
-.card .media-sm {
+.card .media-sm, .card .Section-DashboardHome .FeedItem, .Section-DashboardHome .card .FeedItem {
   -ms-flex-align: start;
   align-items: flex-start;
-}
-
-.card .btn-media-sm {
-  margin-top: 1.125rem;
-}
-
-.card .btn-media-sm svg {
-  width: 0.6875rem;
-}
-
-.card .btn-media-sm:hover svg {
-  fill: #fff;
 }
 
 .card-user .card-footer {
@@ -5996,6 +6067,10 @@ input[type="button"].btn-block {
 
 .ChartStatsPageViews,
 .nav-stats-pageviews.active,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse,
 .nav-stats-pageviews.Current,
 .nav-stats-pageviews.current-theme,
 .nav-stats-pageviews:hover {
@@ -6003,21 +6078,30 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsPageViews .c3-circle,
-.nav-stats-pageviews.active .c3-circle, .nav-stats-pageviews.Current .c3-circle,
+.nav-stats-pageviews.active .c3-circle, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-circle, .nav-stats-pageviews.Current .c3-circle,
 .nav-stats-pageviews.current-theme .c3-circle,
 .nav-stats-pageviews:hover .c3-circle {
   fill: #f15854 !important;
 }
 
 .ChartStatsPageViews .c3-line,
-.nav-stats-pageviews.active .c3-line, .nav-stats-pageviews.Current .c3-line,
+.nav-stats-pageviews.active .c3-line, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-line,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-line,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-line, .nav-stats-pageviews.Current .c3-line,
 .nav-stats-pageviews.current-theme .c3-line,
 .nav-stats-pageviews:hover .c3-line {
   stroke: #f15854 !important;
 }
 
 .ChartStatsPageViews .c3-area,
-.nav-stats-pageviews.active .c3-area, .nav-stats-pageviews.Current .c3-area,
+.nav-stats-pageviews.active .c3-area, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-area,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-area,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-area, .nav-stats-pageviews.Current .c3-area,
 .nav-stats-pageviews.current-theme .c3-area,
 .nav-stats-pageviews:hover .c3-area {
   fill: #f15854 !important;
@@ -6025,14 +6109,20 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsPageViews .c3-xgrid-focus,
-.nav-stats-pageviews.active .c3-xgrid-focus, .nav-stats-pageviews.Current .c3-xgrid-focus,
+.nav-stats-pageviews.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus, .nav-stats-pageviews.Current .c3-xgrid-focus,
 .nav-stats-pageviews.current-theme .c3-xgrid-focus,
 .nav-stats-pageviews:hover .c3-xgrid-focus {
   stroke: #f15854 !important;
 }
 
 .ChartStatsPageViews .c3-event-rect:hover,
-.nav-stats-pageviews.active .c3-event-rect:hover, .nav-stats-pageviews.Current .c3-event-rect:hover,
+.nav-stats-pageviews.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
+.file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover, .nav-stats-pageviews.Current .c3-event-rect:hover,
 .nav-stats-pageviews.current-theme .c3-event-rect:hover,
 .nav-stats-pageviews:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
@@ -6041,6 +6131,10 @@ input[type="button"].btn-block {
 
 .ChartStatsComments,
 .nav-stats-comments.active,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-choose,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse,
 .nav-stats-comments.Current,
 .nav-stats-comments.current-theme,
 .nav-stats-comments:hover {
@@ -6048,21 +6142,30 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsComments .c3-circle,
-.nav-stats-comments.active .c3-circle, .nav-stats-comments.Current .c3-circle,
+.nav-stats-comments.active .c3-circle, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-circle,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-circle,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-circle, .nav-stats-comments.Current .c3-circle,
 .nav-stats-comments.current-theme .c3-circle,
 .nav-stats-comments:hover .c3-circle {
   fill: #60bd68 !important;
 }
 
 .ChartStatsComments .c3-line,
-.nav-stats-comments.active .c3-line, .nav-stats-comments.Current .c3-line,
+.nav-stats-comments.active .c3-line, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-line,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-line,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-line, .nav-stats-comments.Current .c3-line,
 .nav-stats-comments.current-theme .c3-line,
 .nav-stats-comments:hover .c3-line {
   stroke: #60bd68 !important;
 }
 
 .ChartStatsComments .c3-area,
-.nav-stats-comments.active .c3-area, .nav-stats-comments.Current .c3-area,
+.nav-stats-comments.active .c3-area, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-area,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-area,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-area, .nav-stats-comments.Current .c3-area,
 .nav-stats-comments.current-theme .c3-area,
 .nav-stats-comments:hover .c3-area {
   fill: #60bd68 !important;
@@ -6070,14 +6173,20 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsComments .c3-xgrid-focus,
-.nav-stats-comments.active .c3-xgrid-focus, .nav-stats-comments.Current .c3-xgrid-focus,
+.nav-stats-comments.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus, .nav-stats-comments.Current .c3-xgrid-focus,
 .nav-stats-comments.current-theme .c3-xgrid-focus,
 .nav-stats-comments:hover .c3-xgrid-focus {
   stroke: #60bd68 !important;
 }
 
 .ChartStatsComments .c3-event-rect:hover,
-.nav-stats-comments.active .c3-event-rect:hover, .nav-stats-comments.Current .c3-event-rect:hover,
+.nav-stats-comments.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
+.file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover, .nav-stats-comments.Current .c3-event-rect:hover,
 .nav-stats-comments.current-theme .c3-event-rect:hover,
 .nav-stats-comments:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
@@ -6086,6 +6195,10 @@ input[type="button"].btn-block {
 
 .ChartStatsDiscussions,
 .nav-stats-discussions.active,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-choose,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse,
 .nav-stats-discussions.Current,
 .nav-stats-discussions.current-theme,
 .nav-stats-discussions:hover {
@@ -6093,21 +6206,30 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsDiscussions .c3-circle,
-.nav-stats-discussions.active .c3-circle, .nav-stats-discussions.Current .c3-circle,
+.nav-stats-discussions.active .c3-circle, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-circle,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-circle,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-circle, .nav-stats-discussions.Current .c3-circle,
 .nav-stats-discussions.current-theme .c3-circle,
 .nav-stats-discussions:hover .c3-circle {
   fill: #faa43a !important;
 }
 
 .ChartStatsDiscussions .c3-line,
-.nav-stats-discussions.active .c3-line, .nav-stats-discussions.Current .c3-line,
+.nav-stats-discussions.active .c3-line, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-line,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-line,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-line, .nav-stats-discussions.Current .c3-line,
 .nav-stats-discussions.current-theme .c3-line,
 .nav-stats-discussions:hover .c3-line {
   stroke: #faa43a !important;
 }
 
 .ChartStatsDiscussions .c3-area,
-.nav-stats-discussions.active .c3-area, .nav-stats-discussions.Current .c3-area,
+.nav-stats-discussions.active .c3-area, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-area,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-area,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-area, .nav-stats-discussions.Current .c3-area,
 .nav-stats-discussions.current-theme .c3-area,
 .nav-stats-discussions:hover .c3-area {
   fill: #faa43a !important;
@@ -6115,14 +6237,20 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsDiscussions .c3-xgrid-focus,
-.nav-stats-discussions.active .c3-xgrid-focus, .nav-stats-discussions.Current .c3-xgrid-focus,
+.nav-stats-discussions.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus, .nav-stats-discussions.Current .c3-xgrid-focus,
 .nav-stats-discussions.current-theme .c3-xgrid-focus,
 .nav-stats-discussions:hover .c3-xgrid-focus {
   stroke: #faa43a !important;
 }
 
 .ChartStatsDiscussions .c3-event-rect:hover,
-.nav-stats-discussions.active .c3-event-rect:hover, .nav-stats-discussions.Current .c3-event-rect:hover,
+.nav-stats-discussions.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
+.file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover, .nav-stats-discussions.Current .c3-event-rect:hover,
 .nav-stats-discussions.current-theme .c3-event-rect:hover,
 .nav-stats-discussions:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
@@ -6131,6 +6259,10 @@ input[type="button"].btn-block {
 
 .ChartStatsUsers,
 .nav-stats-users.active,
+.file-upload input:focus ~ .nav-stats-users.file-upload-choose,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse,
 .nav-stats-users.Current,
 .nav-stats-users.current-theme,
 .nav-stats-users:hover {
@@ -6138,21 +6270,30 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsUsers .c3-circle,
-.nav-stats-users.active .c3-circle, .nav-stats-users.Current .c3-circle,
+.nav-stats-users.active .c3-circle, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-circle,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-circle,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-circle, .nav-stats-users.Current .c3-circle,
 .nav-stats-users.current-theme .c3-circle,
 .nav-stats-users:hover .c3-circle {
   fill: #57c1c2 !important;
 }
 
 .ChartStatsUsers .c3-line,
-.nav-stats-users.active .c3-line, .nav-stats-users.Current .c3-line,
+.nav-stats-users.active .c3-line, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-line,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-line,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-line, .nav-stats-users.Current .c3-line,
 .nav-stats-users.current-theme .c3-line,
 .nav-stats-users:hover .c3-line {
   stroke: #57c1c2 !important;
 }
 
 .ChartStatsUsers .c3-area,
-.nav-stats-users.active .c3-area, .nav-stats-users.Current .c3-area,
+.nav-stats-users.active .c3-area, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-area,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-area,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-area, .nav-stats-users.Current .c3-area,
 .nav-stats-users.current-theme .c3-area,
 .nav-stats-users:hover .c3-area {
   fill: #57c1c2 !important;
@@ -6160,14 +6301,20 @@ input[type="button"].btn-block {
 }
 
 .ChartStatsUsers .c3-xgrid-focus,
-.nav-stats-users.active .c3-xgrid-focus, .nav-stats-users.Current .c3-xgrid-focus,
+.nav-stats-users.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus, .nav-stats-users.Current .c3-xgrid-focus,
 .nav-stats-users.current-theme .c3-xgrid-focus,
 .nav-stats-users:hover .c3-xgrid-focus {
   stroke: #57c1c2 !important;
 }
 
 .ChartStatsUsers .c3-event-rect:hover,
-.nav-stats-users.active .c3-event-rect:hover, .nav-stats-users.Current .c3-event-rect:hover,
+.nav-stats-users.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
+.file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover, .nav-stats-users.Current .c3-event-rect:hover,
 .nav-stats-users.current-theme .c3-event-rect:hover,
 .nav-stats-users:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
@@ -6203,167 +6350,6 @@ input[type="button"].btn-block {
 
 .popover-single {
   font-size: 1.125rem;
-}
-
-.media-sm {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-pack: start;
-  justify-content: flex-start;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.media-sm-image-wrap {
-  display: inline-block;
-  position: relative;
-  min-width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 0.0625rem;
-  overflow: hidden;
-  background-color: #f6f9fb;
-  margin-right: 0.5625rem;
-}
-
-.media-sm-image-wrap::after {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.0625rem;
-  content: '';
-}
-
-.media-sm-image-wrap img {
-  width: 1.875rem;
-}
-
-.media-sm-image-wrap-no-border {
-  display: inline-block;
-  position: relative;
-  min-width: 1.875rem;
-  height: 1.875rem;
-  border-radius: 0.0625rem;
-  overflow: hidden;
-  background-color: transparent;
-  margin-right: 0.5625rem;
-}
-
-.media-sm-image-wrap-no-border img {
-  width: 1.875rem;
-}
-
-.media-sm-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
-  margin-bottom: 0.3125rem;
-  font-size: 0.8125rem;
-  line-height: 1;
-}
-
-.media-sm-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a {
-  color: #555a62;
-  transition: color 200ms;
-}
-
-.media-sm-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover {
-  text-decoration: none;
-  color: #0291db;
-}
-
-.media-sm-info, .Section-DashboardHome .FeedItem .Date {
-  font-size: 0.75rem;
-  line-height: 1;
-  color: #949aa2;
-}
-
-.btn-media-sm {
-  display: inline-block;
-  font-weight: 300;
-  text-transform: uppercase;
-  padding: 0.125rem 0.75rem;
-  font-size: 0.575rem;
-  line-height: 1.5;
-  border-radius: 0.875rem;
-}
-
-.hero {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  padding: 2.25rem 1.125rem;
-}
-
-.hero > * {
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-}
-
-.hero .label-selector, .hero .emojiext-list {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.hero .hero-content {
-  padding: 0 6.75rem 0 4.5rem;
-  font-size: 0.8125rem;
-  text-align: center;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
-}
-
-.hero .tagline {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.hero .vanilla-logo {
-  width: 6.75rem;
-  height: 4.5rem;
-}
-
-.hero .btn, .hero .file-upload-browse, .hero .Button, .hero .FilterMenu .FilterButton, .FilterMenu .hero .FilterButton {
-  margin-top: 2.25rem;
-}
-
-.hero .hero-media-wrapper {
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-}
-
-.video-section-heading {
-  padding: 1.125rem 0;
-  font-weight: 500;
-}
-
-.video.label-selector-item .video-title {
-  font-size: 0.75rem;
-  text-align: left;
-}
-
-.video.label-selector-item .overlay {
-  background-color: rgba(0, 0, 0, 0.75);
-}
-
-.video.label-selector-item.current .overlay {
-  height: 100%;
-}
-
-.video.label-selector-item svg {
-  fill: #fff;
-  width: 40%;
-}
-
-.video-section .info, .video-section .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .video-section .FeedDescription, .video-section .emojiset-author {
-  padding-top: 1.125rem;
-}
-
-.video-section:first-child .video-section-heading {
-  border-top: 0.0625rem solid #f6f9fb;
 }
 
 .daterangepicker {
@@ -6487,8 +6473,20 @@ input[type="button"].btn-block {
   border-radius: 0.125rem;
 }
 
-.daterangepicker td.active, .daterangepicker td.Current, .daterangepicker
-td.current-theme, .daterangepicker td.active:hover, .daterangepicker td.Current:hover, .daterangepicker
+.daterangepicker td.active, .daterangepicker .file-upload input:focus ~ td.file-upload-choose, .file-upload .daterangepicker input:focus ~ td.file-upload-choose, .daterangepicker
+.file-upload input:focus ~ td.file-upload-browse,
+.file-upload .daterangepicker input:focus ~ td.file-upload-browse, .daterangepicker
+.file-upload input:hover ~ td.file-upload-choose,
+.file-upload .daterangepicker input:hover ~ td.file-upload-choose, .daterangepicker
+.file-upload input:hover ~ td.file-upload-browse,
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse, .daterangepicker td.Current, .daterangepicker
+td.current-theme, .daterangepicker td.active:hover, .daterangepicker .file-upload input:focus ~ td.file-upload-choose:hover, .file-upload .daterangepicker input:focus ~ td.file-upload-choose:hover, .daterangepicker
+.file-upload input:focus ~ td.file-upload-browse:hover,
+.file-upload .daterangepicker input:focus ~ td.file-upload-browse:hover, .daterangepicker
+.file-upload input:hover ~ td.file-upload-choose:hover,
+.file-upload .daterangepicker input:hover ~ td.file-upload-choose:hover, .daterangepicker
+.file-upload input:hover ~ td.file-upload-browse:hover,
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse:hover, .daterangepicker td.Current:hover, .daterangepicker
 td.current-theme:hover {
   background-color: #0291db;
   border-color: transparent;
@@ -6528,7 +6526,13 @@ td.current-theme:hover {
   margin-bottom: 0;
 }
 
-.daterangepicker .input-mini.active, .daterangepicker .input-mini.Current, .daterangepicker
+.daterangepicker .input-mini.active, .daterangepicker .file-upload input:focus ~ .input-mini.file-upload-choose, .file-upload .daterangepicker input:focus ~ .input-mini.file-upload-choose, .daterangepicker
+.file-upload input:focus ~ .input-mini.file-upload-browse,
+.file-upload .daterangepicker input:focus ~ .input-mini.file-upload-browse, .daterangepicker
+.file-upload input:hover ~ .input-mini.file-upload-choose,
+.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-choose, .daterangepicker
+.file-upload input:hover ~ .input-mini.file-upload-browse,
+.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse, .daterangepicker .input-mini.Current, .daterangepicker
 .input-mini.current-theme {
   border: 0.0625rem solid #08c;
   border-radius: 0.125rem;
@@ -6592,7 +6596,13 @@ td.current-theme:hover {
   cursor: pointer;
 }
 
-.ranges li:hover, .ranges li.active, .ranges li.Current, .ranges
+.ranges li:hover, .ranges li.active, .ranges .file-upload input:focus ~ li.file-upload-choose, .file-upload .ranges input:focus ~ li.file-upload-choose, .ranges
+.file-upload input:focus ~ li.file-upload-browse,
+.file-upload .ranges input:focus ~ li.file-upload-browse, .ranges
+.file-upload input:hover ~ li.file-upload-choose,
+.file-upload .ranges input:hover ~ li.file-upload-choose, .ranges
+.file-upload input:hover ~ li.file-upload-browse,
+.file-upload .ranges input:hover ~ li.file-upload-browse, .ranges li.Current, .ranges
 li.current-theme {
   color: #0291db;
 }
@@ -6619,7 +6629,7 @@ li.current-theme {
   padding: 0.5625rem 0;
 }
 
-.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .btn-icon-border, .ac_results .btn-icon-border, .dropdown-menu .search-wrap .icon-wrap, .search-wrap .dropdown-menu .icon-wrap, .ac_results .search-wrap .icon-wrap, .search-wrap .ac_results .icon-wrap {
+.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .btn-icon-border, .ac_results .btn-icon-border, .dropdown-menu .search-wrap .search-icon-wrap, .search-wrap .dropdown-menu .search-icon-wrap, .ac_results .search-wrap .search-icon-wrap, .search-wrap .ac_results .search-icon-wrap {
   margin-right: 0.28125rem;
 }
 
@@ -6694,34 +6704,6 @@ li.current-theme {
   border-left: 1px solid #e7e8e9;
 }
 
-.radio,
-.checkbox {
-  margin-bottom: 0;
-}
-
-.radio + .radio,
-.checkbox + .checkbox {
-  margin-top: 0.28125rem;
-}
-
-.list-reset, .analytics-panel,
-.list-reset ul, .analytics-panel ul,
-.list-reset ol, .analytics-panel ol,
-.list-reset ul, .analytics-panel ul,
-.list-reset ul ul, .analytics-panel ul ul,
-.list-reset ul ol, .analytics-panel ul ol,
-.list-reset ol, .analytics-panel ol,
-.list-reset ol ul, .analytics-panel ol ul,
-.list-reset ol ol, .analytics-panel ol ol {
-  padding-left: 0;
-}
-
-.list-reset li, .analytics-panel li,
-.list-reset ul li, .analytics-panel ul li,
-.list-reset ol li, .analytics-panel ol li {
-  list-style: none;
-}
-
 form ul,
 form ul ul,
 form ul ol,
@@ -6734,73 +6716,6 @@ form ol ol {
 form ul li,
 form ol li {
   list-style: none;
-}
-
-label,
-.label {
-  font-weight: 500;
-  margin-bottom: 0;
-}
-
-.form-control, .ac_input {
-  line-height: 1.5;
-  padding-top: 0.40625rem;
-  padding-bottom: 0.40625rem;
-  border: 0.0625rem solid #ccc;
-}
-
-.label-wrap {
-  min-width: 0;
-  overflow: hidden;
-}
-
-.label-wrap img {
-  max-width: 50%;
-  max-height: 200px;
-}
-
-.Info,
-.Info2,
-.info,
-.Section-DashboardHome .FeedItem .FeedDescription,
-.emojiset-author {
-  display: block;
-  font-size: 0.75rem;
-  line-height: 1.3333333333;
-  color: #949aa2;
-}
-
-.label-title {
-  font-weight: 500;
-  margin-bottom: 0.28125rem;
-}
-
-.form-group > .label-wrap-wide {
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-}
-
-@media (max-width: 543px) {
-  .form-group .input-wrap, .form-group .color-picker {
-    margin-top: 0.28125rem;
-  }
-}
-
-.input-wrap > .form-group > *, .color-picker > .form-group > * {
-  padding-left: 0;
-}
-
-.input-wrap-multiple {
-  display: -ms-flexbox;
-  display: flex;
-}
-
-.input-wrap-multiple > *:last-child {
-  margin-left: 0.5625rem;
-}
-
-.stacked label {
-  display: block;
 }
 
 .row-padding-left, .form-group > .no-grid, .form-group .input-wrap-right {
@@ -6818,17 +6733,38 @@ label,
   flex-wrap: wrap;
   -ms-flex-align: center;
   align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+  border-bottom: 1px dotted #e7e8e9;
 }
 
-.form-group.row, .form-group.footer, .form-group.label-selector, .form-group.emojiext-list, .form-group.media {
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -ms-flex-align: center;
-  align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 1px dotted #e7e8e9;
-  padding-top: 1rem;
+.form-group > .label-wrap-wide {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
+@media (max-width: 543px) {
+  .form-group .input-wrap, .form-group .color-picker {
+    margin-top: 0.28125rem;
+  }
+}
+
+label,
+.label {
+  font-weight: 500;
   margin-bottom: 0;
+}
+
+.stacked label {
+  display: block;
+}
+
+.form-control, .ac_input {
+  line-height: 1.5;
+  padding-top: 0.40625rem;
+  padding-bottom: 0.40625rem;
+  border: 0.0625rem solid #ccc;
 }
 
 .form-footer {
@@ -6839,6 +6775,39 @@ label,
   padding: 1.125rem 0;
 }
 
+.label-wrap {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.label-wrap img {
+  max-width: 50%;
+  max-height: 11.25rem;
+}
+
+.input-wrap > .form-group, .color-picker > .form-group {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: 1.125rem;
+}
+
+.input-wrap > .form-group:last-child, .color-picker > .form-group:last-child {
+  padding-bottom: 0;
+}
+
+.input-wrap > .form-group > *, .color-picker > .form-group > * {
+  padding-left: 0;
+}
+
+.input-wrap-multiple {
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.input-wrap-multiple > *:last-child {
+  margin-left: 0.5625rem;
+}
+
 .toggle-wrap {
   display: block;
   position: relative;
@@ -6846,7 +6815,7 @@ label,
   height: 2.25rem;
 }
 
-.toggle-well, .toggle-wrap input[type="checkbox"] + label::before {
+.toggle-wrap .toggle-well, .toggle-wrap input[type="checkbox"] + label::before {
   display: block;
   position: absolute;
   top: 0;
@@ -6860,7 +6829,7 @@ label,
   cursor: pointer;
 }
 
-.toggle-slider, .toggle-wrap input[type="checkbox"] + label::after {
+.toggle-wrap .toggle-slider, .toggle-wrap input[type="checkbox"] + label::after {
   display: block;
   position: absolute;
   top: 0.1875rem;
@@ -6875,18 +6844,18 @@ label,
   cursor: pointer;
 }
 
-.toggle-well-on, .toggle-wrap-on .toggle-well, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap input[type="checkbox"]:checked + label::before {
+.toggle-wrap .toggle-well-on, .toggle-wrap.toggle-wrap-on .toggle-well, .toggle-wrap.toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on .toggle-well, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap .toggle-well, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap input[type="checkbox"]:checked + label::before {
   background-color: #0291db;
 }
 
-.toggle-slider-on, .toggle-wrap-on .toggle-slider, .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap input[type="checkbox"]:checked + label::after {
+.toggle-wrap .toggle-slider-on, .toggle-wrap.toggle-wrap-on .toggle-slider, .toggle-wrap.toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on .toggle-slider, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap .toggle-slider, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap input[type="checkbox"]:checked + label::after {
   left: 2.4375rem;
 }
 
-.toggle-slider-active, .InProgress .toggle-slider, .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .InProgress input[type="checkbox"] + label::after,
-.toggle-wrap-active .toggle-slider,
-.toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap
-.toggle-wrap-active input[type="checkbox"] + label::after {
+.toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-slider, .toggle-wrap .InProgress input[type="checkbox"] + label::after,
+.toggle-wrap .toggle-wrap-active .toggle-slider, .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-wrap .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after,
+.toggle-wrap-sm .toggle-wrap-active .toggle-wrap .toggle-slider,
+.toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after {
   left: 1.3125rem;
   transition: left .4s;
 }
@@ -6895,40 +6864,57 @@ label,
   padding-left: 1.125rem;
 }
 
-table .toggle-wrap {
-  width: 3.75rem;
-  height: 1.875rem;
-  margin-left: 0.28125rem;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-table .toggle-well, table .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap table input[type="checkbox"] + label::before {
-  width: 3.75rem;
-  height: 1.875rem;
-  border-radius: 0.9375rem;
-}
-
-table .toggle-slider, table .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap table input[type="checkbox"] + label::after {
-  top: 0.1875rem;
-  left: 0.1875rem;
-  width: 1.5rem;
+.toggle-wrap-sm, .table-data .toggle-wrap {
+  display: block;
+  position: relative;
+  width: 3rem;
   height: 1.5rem;
-  border-radius: 0.875rem;
 }
 
-table .toggle-slider-on, table .toggle-wrap-on .toggle-slider, .toggle-wrap-on table .toggle-slider, table .toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap-on .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap .toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-on table input[type="checkbox"] + label::after, table .toggle-wrap input[type="checkbox"]:checked + label::after, .toggle-wrap table input[type="checkbox"]:checked + label::after {
-  left: 2.0625rem;
+.toggle-wrap-sm .toggle-well, .table-data .toggle-wrap .toggle-well, .toggle-wrap-sm .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-sm input[type="checkbox"] + label::before, .table-data .toggle-wrap input[type="checkbox"] + label::before {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3rem;
+  height: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.75rem;
+  border: 0.0625rem solid #949aa2;
+  transition: background .4s;
+  cursor: pointer;
 }
 
-table .toggle-slider-active, table .InProgress .toggle-slider, .InProgress table .toggle-slider, table .InProgress .toggle-wrap input[type="checkbox"] + label::after, .InProgress .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .InProgress table input[type="checkbox"] + label::after, table
-.toggle-wrap-active .toggle-slider,
-.toggle-wrap-active table .toggle-slider, table
-.toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after,
-.toggle-wrap-active .toggle-wrap table input[type="checkbox"] + label::after, table .toggle-wrap
-.toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap
-.toggle-wrap-active table input[type="checkbox"] + label::after {
-  left: 1.125rem;
+.toggle-wrap-sm .toggle-slider, .table-data .toggle-wrap .toggle-slider, .toggle-wrap-sm .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm input[type="checkbox"] + label::after, .table-data .toggle-wrap input[type="checkbox"] + label::after {
+  display: block;
+  position: absolute;
+  top: 0.125rem;
+  left: 0.125rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.71875rem;
+  border: 0.0625rem solid #949aa2;
+  background-color: #fff;
+  outline: 0;
+  transition: left .4s;
+  cursor: pointer;
+}
+
+.toggle-wrap-sm .toggle-well-on, .table-data .toggle-wrap .toggle-well-on, .toggle-wrap-sm .toggle-wrap.toggle-wrap-on .toggle-well, .toggle-wrap.toggle-wrap-on .toggle-wrap-sm .toggle-well, .toggle-wrap-sm .toggle-wrap.toggle-wrap-on input[type="checkbox"] + label::before, .toggle-wrap.toggle-wrap-on .toggle-wrap-sm input[type="checkbox"] + label::before, .toggle-wrap-sm.toggle-wrap-on .toggle-well, .table-data .toggle-wrap-on.toggle-wrap .toggle-well, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on input[type="checkbox"] + label::before, .table-data .toggle-wrap-on.toggle-wrap input[type="checkbox"] + label::before, .toggle-wrap-sm .toggle-wrap input[type="checkbox"]:checked + label::before, .toggle-wrap .toggle-wrap-sm input[type="checkbox"]:checked + label::before, .table-data .toggle-wrap input[type="checkbox"]:checked + label::before {
+  background-color: #0291db;
+}
+
+.toggle-wrap-sm .toggle-slider-on, .table-data .toggle-wrap .toggle-slider-on, .toggle-wrap-sm .toggle-wrap.toggle-wrap-on .toggle-slider, .toggle-wrap.toggle-wrap-on .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap.toggle-wrap-on input[type="checkbox"] + label::after, .toggle-wrap.toggle-wrap-on .toggle-wrap-sm input[type="checkbox"] + label::after, .toggle-wrap-sm.toggle-wrap-on .toggle-slider, .table-data .toggle-wrap-on.toggle-wrap .toggle-slider, .toggle-wrap-sm.toggle-wrap-on .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm.toggle-wrap-on input[type="checkbox"] + label::after, .table-data .toggle-wrap-on.toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap-sm .toggle-wrap input[type="checkbox"]:checked + label::after, .toggle-wrap .toggle-wrap-sm input[type="checkbox"]:checked + label::after, .table-data .toggle-wrap input[type="checkbox"]:checked + label::after {
+  left: 1.625rem;
+}
+
+.toggle-wrap-sm .toggle-slider-active, .table-data .toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .InProgress .toggle-wrap-sm input[type="checkbox"] + label::after,
+.toggle-wrap .toggle-wrap-active .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-active .toggle-wrap-sm input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-slider, .table-data .toggle-wrap .InProgress .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .InProgress input[type="checkbox"] + label::after, .table-data .toggle-wrap .InProgress input[type="checkbox"] + label::after,
+.toggle-wrap-sm .toggle-wrap-active .toggle-slider, .table-data .toggle-wrap .toggle-wrap-active .toggle-slider,
+.toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap
+.toggle-wrap-sm .toggle-wrap-active input[type="checkbox"] + label::after, .table-data .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after {
+  left: 0.875rem;
+  transition: left .4s;
 }
 
 .toggle-wrap label {
@@ -7001,16 +6987,23 @@ table .toggle-slider-active, table .InProgress .toggle-slider, .InProgress table
   border-bottom-left-radius: 0;
 }
 
+.file-upload input:focus ~ .file-upload-choose,
+.file-upload input:focus ~ .file-upload-browse,
+.file-upload input:hover ~ .file-upload-choose,
+.file-upload input:hover ~ .file-upload-browse {
+  border-color: #66afe9;
+  outline: none;
+}
+
 select.form-control, select.ac_input {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
-  padding-right: 2rem;
 }
 
 select {
   display: inline-block;
+  height: 2.25rem;
   max-width: 100%;
-  padding: .375rem 2rem .375rem .75rem;
-  padding-right: .75rem \9;
+  padding-right: 2rem;
   color: #949aa2;
   vertical-align: middle;
   background-color: #fff;
@@ -7025,11 +7018,6 @@ select {
   -webkit-appearance: none;
 }
 
-select:focus {
-  border-color: #51a7e8;
-  outline: none;
-}
-
 select::-ms-expand {
   opacity: 0;
 }
@@ -7038,40 +7026,50 @@ select + select {
   margin-left: 0.5625rem;
 }
 
-.label-selector, .emojiext-list,
-.label-selector ul, .emojiext-list ul,
-.label-selector ol, .emojiext-list ol {
+.label-selector,
+.label-selector ul,
+.label-selector ol {
   padding-left: 0;
 }
 
-.label-selector li, .emojiext-list li {
+.label-selector li {
   list-style: none;
 }
 
-.label-selector label, .emojiext-list label {
+.label-selector label {
   padding-left: 0;
   cursor: pointer;
 }
 
-.label-selector input[type=radio], .emojiext-list input[type=radio],
-.label-selector input[type=checkbox], .emojiext-list input[type=checkbox] {
+.label-selector input[type=radio],
+.label-selector input[type=checkbox] {
   position: absolute;
   opacity: 0;
 }
 
-.label-selector .active, .emojiext-list .active, .label-selector .Current, .emojiext-list .Current, .label-selector
-.current-theme, .emojiext-list
+.label-selector .active, .label-selector .file-upload input:focus ~ .file-upload-choose, .file-upload .label-selector input:focus ~ .file-upload-choose, .label-selector
+.file-upload input:focus ~ .file-upload-browse,
+.file-upload .label-selector input:focus ~ .file-upload-browse, .label-selector
+.file-upload input:hover ~ .file-upload-choose,
+.file-upload .label-selector input:hover ~ .file-upload-choose, .label-selector
+.file-upload input:hover ~ .file-upload-browse,
+.file-upload .label-selector input:hover ~ .file-upload-browse, .label-selector .Current, .label-selector
 .current-theme,
-.label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label,
-.label-selector input[type=radio]:checked ~ label, .emojiext-list input[type=radio]:checked ~ label {
+.label-selector input[type=radio]:checked ~ label,
+.label-selector input[type=radio]:checked ~ label {
   cursor: default;
 }
 
-.label-selector .active .overlay, .emojiext-list .active .overlay, .label-selector .Current .overlay, .emojiext-list .Current .overlay, .label-selector
-.current-theme .overlay, .emojiext-list
+.label-selector .active .overlay, .label-selector .file-upload input:focus ~ .file-upload-choose .overlay, .file-upload .label-selector input:focus ~ .file-upload-choose .overlay, .label-selector
+.file-upload input:focus ~ .file-upload-browse .overlay,
+.file-upload .label-selector input:focus ~ .file-upload-browse .overlay, .label-selector
+.file-upload input:hover ~ .file-upload-choose .overlay,
+.file-upload .label-selector input:hover ~ .file-upload-choose .overlay, .label-selector
+.file-upload input:hover ~ .file-upload-browse .overlay,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay, .label-selector .Current .overlay, .label-selector
 .current-theme .overlay,
-.label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay,
-.label-selector input[type=radio]:checked ~ label .overlay, .emojiext-list input[type=radio]:checked ~ label .overlay {
+.label-selector input[type=radio]:checked ~ label .overlay,
+.label-selector input[type=radio]:checked ~ label .overlay {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -7084,47 +7082,62 @@ select + select {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-.label-selector .active .overlay > .buttons, .emojiext-list .active .overlay > .buttons, .label-selector .Current .overlay > .buttons, .emojiext-list .Current .overlay > .buttons, .label-selector
-.current-theme .overlay > .buttons, .emojiext-list
+.label-selector .active .overlay > .buttons, .label-selector .file-upload input:focus ~ .file-upload-choose .overlay > .buttons, .file-upload .label-selector input:focus ~ .file-upload-choose .overlay > .buttons, .label-selector
+.file-upload input:focus ~ .file-upload-browse .overlay > .buttons,
+.file-upload .label-selector input:focus ~ .file-upload-browse .overlay > .buttons, .label-selector
+.file-upload input:hover ~ .file-upload-choose .overlay > .buttons,
+.file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .buttons, .label-selector
+.file-upload input:hover ~ .file-upload-browse .overlay > .buttons,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons, .label-selector .Current .overlay > .buttons, .label-selector
 .current-theme .overlay > .buttons,
-.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons,
-.label-selector input[type=radio]:checked ~ label .overlay > .buttons, .emojiext-list input[type=radio]:checked ~ label .overlay > .buttons {
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons,
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons {
   display: none;
 }
 
-.label-selector .active .overlay > .selected, .emojiext-list .active .overlay > .selected, .label-selector .Current .overlay > .selected, .emojiext-list .Current .overlay > .selected, .label-selector
-.current-theme .overlay > .selected, .emojiext-list
+.label-selector .active .overlay > .selected, .label-selector .file-upload input:focus ~ .file-upload-choose .overlay > .selected, .file-upload .label-selector input:focus ~ .file-upload-choose .overlay > .selected, .label-selector
+.file-upload input:focus ~ .file-upload-browse .overlay > .selected,
+.file-upload .label-selector input:focus ~ .file-upload-browse .overlay > .selected, .label-selector
+.file-upload input:hover ~ .file-upload-choose .overlay > .selected,
+.file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .selected, .label-selector
+.file-upload input:hover ~ .file-upload-browse .overlay > .selected,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected, .label-selector .Current .overlay > .selected, .label-selector
 .current-theme .overlay > .selected,
-.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected,
-.label-selector input[type=radio]:checked ~ label .overlay > .selected, .emojiext-list input[type=radio]:checked ~ label .overlay > .selected {
+.label-selector input[type=radio]:checked ~ label .overlay > .selected,
+.label-selector input[type=radio]:checked ~ label .overlay > .selected {
   display: block;
 }
 
-.label-selector .active .label-selector-image, .emojiext-list .active .label-selector-image, .label-selector .Current .label-selector-image, .emojiext-list .Current .label-selector-image, .label-selector
-.current-theme .label-selector-image, .emojiext-list
+.label-selector .active .label-selector-image, .label-selector .file-upload input:focus ~ .file-upload-choose .label-selector-image, .file-upload .label-selector input:focus ~ .file-upload-choose .label-selector-image, .label-selector
+.file-upload input:focus ~ .file-upload-browse .label-selector-image,
+.file-upload .label-selector input:focus ~ .file-upload-browse .label-selector-image, .label-selector
+.file-upload input:hover ~ .file-upload-choose .label-selector-image,
+.file-upload .label-selector input:hover ~ .file-upload-choose .label-selector-image, .label-selector
+.file-upload input:hover ~ .file-upload-browse .label-selector-image,
+.file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image, .label-selector .Current .label-selector-image, .label-selector
 .current-theme .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .label-selector-image, .emojiext-list input[type=radio]:checked ~ label .label-selector-image {
+.label-selector input[type=radio]:checked ~ label .label-selector-image,
+.label-selector input[type=radio]:checked ~ label .label-selector-image {
   opacity: .5;
 }
 
-.label-selector .label-selector-image, .emojiext-list .label-selector-image {
+.label-selector .label-selector-image {
   display: block;
   width: 100%;
 }
 
-.label-selector .title, .emojiext-list .title {
+.label-selector .title {
   text-align: center;
   font-weight: 500;
 }
 
-.label-selector .image-wrap, .emojiext-list .image-wrap {
+.label-selector .image-wrap {
   position: relative;
   display: block;
   margin-bottom: 0.5625rem;
 }
 
-.label-selector .image-wrap::after, .emojiext-list .image-wrap::after {
+.label-selector .image-wrap::after {
   position: absolute;
   display: block;
   top: 0;
@@ -7136,37 +7149,38 @@ select + select {
   content: '';
 }
 
-.label-selector .image-wrap:hover .overlay, .emojiext-list .image-wrap:hover .overlay {
+.label-selector .image-wrap:hover .overlay {
   height: 100%;
+  opacity: .9;
 }
 
-.label-selector .selected, .emojiext-list .selected {
+.label-selector .selected {
   display: none;
 }
 
-.label-selector .selected svg, .emojiext-list .selected svg {
+.label-selector .selected svg {
   display: block;
   width: 84px;
   fill: #6bc573;
 }
 
-.label-selector .overlay, .emojiext-list .overlay {
+.label-selector .overlay {
   display: block;
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
   width: 100%;
-  height: 0;
+  height: 100%;
   z-index: 20;
   background-color: #0291db;
-  opacity: .9;
+  opacity: 0;
   overflow: hidden;
   transition: all .1s;
   text-align: center;
 }
 
-.label-selector .buttons, .emojiext-list .buttons {
+.label-selector .buttons {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -7182,22 +7196,18 @@ select + select {
   height: 100%;
 }
 
-.label-selector .buttons > .btn, .emojiext-list .buttons > .btn, .label-selector .buttons > .file-upload-browse, .emojiext-list .buttons > .file-upload-browse, .label-selector .buttons > .Button, .emojiext-list .buttons > .Button, .label-selector .FilterMenu .buttons > .FilterButton, .FilterMenu .label-selector .buttons > .FilterButton, .emojiext-list .FilterMenu .buttons > .FilterButton, .FilterMenu .emojiext-list .buttons > .FilterButton {
+.label-selector .buttons > .btn, .label-selector .buttons > .file-upload-browse, .label-selector .buttons > .Button {
   display: block;
   margin: 0.1875rem 0.28125rem;
   max-height: 2.25rem;
   min-width: 5rem;
 }
 
-.label-selector .description, .emojiext-list .description {
-  display: none;
-}
-
-.label-selector .label-selector-item, .emojiext-list .label-selector-item {
+.label-selector .label-selector-item {
   position: relative;
 }
 
-.label-selector .label-selector-corner-link, .emojiext-list .label-selector-corner-link {
+.label-selector .label-selector-corner-link {
   position: absolute;
   display: block;
   width: 1rem;
@@ -7205,12 +7215,12 @@ select + select {
   right: 0.5625rem;
 }
 
-.label-selector .label-selector-corner-link svg, .emojiext-list .label-selector-corner-link svg {
+.label-selector .label-selector-corner-link svg {
   display: block;
   fill: #fff;
 }
 
-.label-selector .label-selector-corner-link a:hover svg, .emojiext-list .label-selector-corner-link a:hover svg {
+.label-selector .label-selector-corner-link a:hover svg {
   fill: #0cb0f8;
 }
 
@@ -7295,7 +7305,7 @@ select + select {
   border-bottom: 0;
 }
 
-.label-selector-item:not(.no-grid) {
+.label-selector-item {
   padding: 1.125rem 1.125rem 0.5625rem;
 }
 
@@ -7318,7 +7328,10 @@ select + select {
   outline: 0;
 }
 
-.btn-overlay:active, .btn-overlay.active, .btn-overlay.Current,
+.btn-overlay:active, .btn-overlay.active, .file-upload input:focus ~ .btn-overlay.file-upload-choose,
+.file-upload input:focus ~ .btn-overlay.file-upload-browse,
+.file-upload input:hover ~ .btn-overlay.file-upload-choose,
+.file-upload input:hover ~ .btn-overlay.file-upload-browse, .btn-overlay.Current,
 .btn-overlay.current-theme,
 .open > .btn-overlay.dropdown-toggle {
   color: #fff;
@@ -7344,26 +7357,26 @@ select + select {
   padding-left: 2.8125rem;
 }
 
-.search-wrap .icon-wrap {
+.search-wrap .search-icon-wrap {
   padding: 0.375rem 0.75rem;
   margin: 0 0 0 .5rem;
   position: absolute;
   top: 0;
 }
 
-.search-wrap .icon-wrap:first-child {
+.search-wrap .search-icon-wrap:first-child {
   margin-left: 0;
 }
 
-.search-wrap .icon-wrap svg {
+.search-wrap .search-icon-wrap svg {
   height: 1.5rem;
 }
 
-.search-wrap .icon-clear-wrap {
+.search-wrap .search-icon-clear-wrap {
   right: 0;
 }
 
-.search-wrap .icon-search-wrap {
+.search-wrap .search-icon-search-wrap {
   left: 0;
 }
 
@@ -7399,6 +7412,48 @@ select + select {
   line-height: 1;
   color: #949aa2;
   content: attr(data-suffix);
+}
+
+.text-input-button {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.text-input-button input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.text-input-button .btn, .text-input-button .file-upload-browse, .text-input-button .Button {
+  margin-left: -0.0625rem;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.text-input-button .label-wrap {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+  display: block;
+  margin-right: 0.5625rem;
+}
+
+.text-input-button .label-wrap label {
+  line-height: 1;
+  margin-bottom: 0;
+}
+
+.radio,
+.checkbox {
+  margin-bottom: 0;
+}
+
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: 0.28125rem;
 }
 
 .icheck-label {
@@ -7484,63 +7539,7 @@ label[id^=iCheck] {
   padding-left: 0;
 }
 
-.text-input-button {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
-.text-input-button input {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-.text-input-button .btn, .text-input-button .file-upload-browse, .text-input-button .Button, .text-input-button .FilterMenu .FilterButton, .FilterMenu .text-input-button .FilterButton {
-  margin-left: -0.0625rem;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  min-width: inherit;
-}
-
-.text-input-button .label-wrap {
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-  display: block;
-  margin-right: 0.5625rem;
-}
-
-.text-input-button .label-wrap label {
-  line-height: 1;
-  margin-bottom: 0;
-}
-
-.Hidden,
-.hidden {
-  display: none;
-}
-
-.badge {
-  display: inline-block;
-  vertical-align: middle;
-  padding: 0 0.28125rem;
-  margin-left: 0.28125rem;
-  font-size: 0.6875rem;
-  background-color: rgba(0, 0, 0, 0.1875);
-  color: #fff;
-  border-radius: .25rem;
-}
-
-.btn-group .badge {
-  margin-top: -0.125rem;
-}
-
-.Padded,
-.padded,
-.label-wrap img,
-div.Messages.Errors {
+.padded, .label-wrap img, div.Messages.Errors {
   margin: 1.125rem 0;
 }
 
@@ -7558,27 +7557,6 @@ div.Messages.Errors {
 
 .padded-right {
   margin-right: 1.125rem;
-}
-
-.pull-left {
-  float: left;
-}
-
-.pull-right {
-  float: right;
-}
-
-.caret, .nav-heading a::before, .navbar-profile .icon-caret-down {
-  display: inline-block;
-  width: 0;
-  height: 0;
-  margin-right: .25rem;
-  margin-left: .25rem;
-  vertical-align: middle;
-  content: "";
-  border-top: 0.375em solid;
-  border-right: 0.375em solid transparent;
-  border-left: 0.375em solid transparent;
 }
 
 .flex {
@@ -7604,16 +7582,6 @@ div.Messages.Errors {
   margin-right: 0;
 }
 
-.no-shrink {
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
-}
-
-.no-grow {
-  -ms-flex-positive: 0;
-  flex-grow: 0;
-}
-
 .shrink {
   -ms-flex-negative: 1;
   flex-shrink: 1;
@@ -7624,120 +7592,51 @@ div.Messages.Errors {
   flex-grow: 1;
 }
 
-.imagewrap-table {
-  display: block;
-  height: 2.25rem;
-  width: 2.25rem;
-  overflow: hidden;
+.no-shrink {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
 }
 
-.img-fluid {
-  display: block;
-  max-width: 100%;
-  height: auto;
+.no-grow {
+  -ms-flex-positive: 0;
+  flex-grow: 0;
 }
 
-.DataList .IconWrap {
-  position: relative;
-  min-width: 5.25rem;
-  height: 5.25rem;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  background-color: #f6f9fb;
+.pull-left {
+  float: left;
 }
 
-.DataList .IconWrap::after {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-  content: '';
+.pull-right {
+  float: right;
 }
 
-.DataList .IconWrap img {
-  width: 5.25rem;
+.Hidden,
+.hidden {
+  display: none;
 }
 
-.checkerboard-bg {
-  background-color: #fefefe;
-  background-image: linear-gradient(45deg, #d8d8d8 25%, transparent 25%, transparent 75%, #d8d8d8 75%, #d8d8d8), linear-gradient(45deg, #d8d8d8 25%, transparent 25%, transparent 75%, #d8d8d8 75%, #d8d8d8);
-  background-size: .5rem .5rem;
-  background-position: 0 0, .25rem .25rem;
-}
-
-.addon-image-wrap {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  position: relative;
-  min-width: 5.25rem;
-  height: 5.25rem;
-  border-radius: 0.25rem;
-  overflow: hidden;
-  background-color: #f6f9fb;
-}
-
-.addon-image-wrap::after {
-  position: absolute;
-  display: block;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.25rem;
-  content: '';
-}
-
-.addon-image-wrap img {
-  width: 5.25rem;
-}
-
-@media (max-width: 991px) {
-  .addon-image-wrap {
-    position: relative;
-    min-width: 3.9375rem;
-    height: 3.9375rem;
-    border-radius: 0.25rem;
-    overflow: hidden;
-    background-color: #f6f9fb;
-  }
-  .addon-image-wrap::after {
-    position: absolute;
-    display: block;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0.0625rem solid rgba(0, 0, 0, 0.125);
-    border-radius: 0.25rem;
-    content: '';
-  }
-  .addon-image-wrap img {
-    width: 3.9375rem;
-  }
-}
-
-.icon, .btn-icon, .btn-icon-border, .search-wrap .icon-wrap,
-.icon svg, .btn-icon svg, .btn-icon-border svg, .search-wrap .icon-wrap svg {
+.icon, .btn-icon, .btn-icon-border, .search-wrap .search-icon-wrap,
+.icon svg, .btn-icon svg, .btn-icon-border svg, .search-wrap .search-icon-wrap svg {
   vertical-align: middle;
   display: inline-block;
-}
-
-.icon-block,
-.icon-block svg {
-  display: block;
 }
 
 .icon-9,
 .icon-9 svg {
   height: 0.5625rem;
   width: 0.5625rem;
+}
+
+.icon-10,
+.icon-10 svg {
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.icon-11,
+.icon-11 svg {
+  height: 0.6875rem;
+  width: 0.6875rem;
 }
 
 .icon-12,
@@ -7770,13 +7669,17 @@ div.Messages.Errors {
   width: 3rem;
 }
 
-.media {
-  padding: 1.125rem 1.125rem;
-  margin-bottom: 0;
-  border-bottom: 1px solid #e7e8e9;
+.icon-text {
+  width: 0.875rem;
+  fill: #555a62;
+  vertical-align: middle;
 }
 
-.media .info, .media .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .media .FeedDescription, .media .emojiset-author {
+.media {
+  margin-bottom: 0;
+}
+
+.media .info, .media .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .media .FeedDescription, .media .Section-DashboardHome .FeedItem .Date, .Section-DashboardHome .FeedItem .media .Date {
   font-size: 0.8125rem;
   font-weight: 300;
 }
@@ -7786,7 +7689,7 @@ div.Messages.Errors {
   margin-bottom: 0.5625rem;
 }
 
-.media .media-title {
+.media .media-title, .media .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .media h2, .media .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .media .title, .media .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .media .title {
   margin-bottom: 0.75rem;
 }
 
@@ -7799,8 +7702,76 @@ div.Messages.Errors {
   border: 1px solid #e7e8e9;
 }
 
-.media.not-padded {
-  padding-left: 0;
+.media-addon .media-image-wrap {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  position: relative;
+  min-width: 5.25rem;
+  height: 5.25rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  background-color: #f6f9fb;
+}
+
+.media-addon .media-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.25rem;
+  content: '';
+}
+
+.media-addon .media-image-wrap img {
+  width: 5.25rem;
+}
+
+@media (max-width: 991px) {
+  .media-addon .media-image-wrap {
+    position: relative;
+    min-width: 3.9375rem;
+    height: 3.9375rem;
+    border-radius: 0.25rem;
+    overflow: hidden;
+    background-color: #f6f9fb;
+  }
+  .media-addon .media-image-wrap::after {
+    position: absolute;
+    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+    border-radius: 0.25rem;
+    content: '';
+  }
+  .media-addon .media-image-wrap img {
+    width: 3.9375rem;
+  }
+}
+
+.media-addon,
+.media-callout {
+  border-bottom: 1px solid #e7e8e9;
+  padding: 1.125rem 1.125rem;
+}
+
+.media-addon .media-title, .media-addon .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .media-addon h2, .media-addon .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header .media-addon .title, .media-addon .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem .media-addon .title,
+.media-callout .media-title,
+.media-callout .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem
+.media-callout h2,
+.media-callout .Section-DashboardHome .FeedItem .analytics-widget-header .title, .Section-DashboardHome .FeedItem .analytics-widget-header
+.media-callout .title,
+.media-callout .analytics-widget-header .Section-DashboardHome .FeedItem .title, .analytics-widget-header .Section-DashboardHome .FeedItem
+.media-callout .title {
+  font-weight: 500;
+  margin-bottom: 0.28125rem;
 }
 
 .media-options {
@@ -7846,29 +7817,28 @@ div.Messages.Errors {
   margin-bottom: 0.5625rem;
 }
 
-.media-title {
-  font-weight: 500;
-  margin-bottom: 0.28125rem;
-}
-
 .media-description {
   line-height: 1.3333333333;
 }
 
 .media-callout {
+  padding-left: 0;
+}
+
+.media-callout.media-callout-grey-bg {
   background-color: #f4f6fb;
 }
 
-.grid-image {
+.media-callout .media-left img {
   display: block;
   width: 100%;
 }
 
-.grid-image-wrap {
+.media-callout .media-image-wrap {
   position: relative;
 }
 
-.grid-image-wrap::after {
+.media-callout .media-image-wrap::after {
   position: absolute;
   display: block;
   top: 0;
@@ -7878,6 +7848,83 @@ div.Messages.Errors {
   border: 0.0625rem solid rgba(0, 0, 0, 0.125);
   border-radius: 0;
   content: '';
+}
+
+.media-sm, .Section-DashboardHome .FeedItem {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: start;
+  justify-content: flex-start;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.media-sm .media-left, .Section-DashboardHome .FeedItem .media-left {
+  padding-right: 0.5625rem;
+  height: 1.875rem;
+}
+
+.media-sm .media-image-wrap, .Section-DashboardHome .FeedItem .media-image-wrap {
+  display: inline-block;
+  position: relative;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: #f6f9fb;
+}
+
+.media-sm .media-image-wrap::after, .Section-DashboardHome .FeedItem .media-image-wrap::after {
+  position: absolute;
+  display: block;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0.0625rem solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.0625rem;
+  content: '';
+}
+
+.media-sm .media-image-wrap img, .Section-DashboardHome .FeedItem .media-image-wrap img {
+  width: 1.875rem;
+}
+
+.media-sm .media-image-wrap-no-border, .Section-DashboardHome .FeedItem .media-image-wrap-no-border {
+  display: inline-block;
+  position: relative;
+  min-width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 0.0625rem;
+  overflow: hidden;
+  background-color: transparent;
+  margin-right: 0.5625rem;
+}
+
+.media-sm .media-image-wrap-no-border img, .Section-DashboardHome .FeedItem .media-image-wrap-no-border img {
+  width: 1.875rem;
+}
+
+.media-sm .media-title, .Section-DashboardHome .FeedItem .media-title, .Section-DashboardHome .FeedItem h2, .Section-DashboardHome .FeedItem .analytics-widget-header .title, .analytics-widget-header .Section-DashboardHome .FeedItem .title {
+  margin-bottom: 0.3125rem;
+  font-size: 0.8125rem;
+  line-height: 1;
+}
+
+.media-sm .media-title a, .Section-DashboardHome .FeedItem .media-title a, .Section-DashboardHome .FeedItem h2 a, .Section-DashboardHome .FeedItem .analytics-widget-header .title a, .analytics-widget-header .Section-DashboardHome .FeedItem .title a {
+  color: #555a62;
+  transition: color 200ms;
+}
+
+.media-sm .media-title a:hover, .Section-DashboardHome .FeedItem .media-title a:hover, .Section-DashboardHome .FeedItem h2 a:hover, .Section-DashboardHome .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .Section-DashboardHome .FeedItem .title a:hover {
+  text-decoration: none;
+  color: #0291db;
+}
+
+.media-sm .info, .Section-DashboardHome .FeedItem .info, .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .Date {
+  font-size: 0.75rem;
+  line-height: 1;
+  color: #949aa2;
 }
 
 .modal-dialog {
@@ -7894,11 +7941,11 @@ div.Messages.Errors {
   max-width: 600px;
 }
 
-.modal-dialog.modal-preview {
+.modal-dialog.modal-center {
   margin: 25vh auto;
 }
 
-.modal-dialog.modal-preview .modal-body {
+.modal-dialog.modal-center .modal-body {
   max-height: 50vh;
 }
 
@@ -7951,6 +7998,10 @@ body .modal-open {
   padding: 0.75rem 1.125rem;
 }
 
+.modal-footer {
+  margin-top: 0.0625rem;
+}
+
 .modal-footer:empty {
   display: none;
 }
@@ -7995,96 +8046,37 @@ button.close {
   right: 0.5625rem;
 }
 
-.nav-heading a {
-  display: block;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  padding-left: .75rem;
-  border-bottom: 1px dotted rgba(0, 0, 0, 0.0875);
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  text-decoration: none;
+.modal .list-un-reset ul,
+.modal .list-un-reset ol {
+  margin-left: 15px;
 }
 
-.nav-heading a::before {
-  -webkit-transform: rotate(0deg);
-  tranform: rotate(0deg);
-  margin-left: -1rem;
-  margin-right: .5rem;
-  transition: all .1s ease-out;
+.modal .list-un-reset ul li {
+  list-style: disc inside;
 }
 
-.nav-heading a.collapsed::before {
-  -webkit-transform: rotate(-90deg);
-  tranform: rotate(-90deg);
+.modal .list-un-reset ol li {
+  list-style: decimal inside;
 }
 
-.nav-inline {
-  font-size: 0;
+.modal .list-un-reset ul ul,
+.modal .list-un-reset ol ul {
+  margin-left: 30px;
 }
 
-.nav-inline .nav-item {
-  display: inline-block;
+.modal .list-un-reset ul ul li,
+.modal .list-un-reset ol ul li {
+  list-style: circle inside;
 }
 
-.nav-inline .nav-item + .nav-item,
-.nav-inline .nav-link + .nav-link {
-  margin-left: 1rem;
+.modal .list-un-reset ol ol,
+.modal .list-un-reset ul ol {
+  margin-left: 15px;
 }
 
-.panel-nav a {
-  color: #949aa2;
-}
-
-.panel-nav svg {
-  fill: #555a62;
-  opacity: 0.7;
-}
-
-.panel-nav .badge {
-  font-size: 0.6875rem;
-}
-
-.panel-nav .globals-sign-out {
-  display: none;
-}
-
-@media (max-width: 991px) {
-  .panel-nav .globals-sign-out {
-    display: block;
-    margin-top: 2.25rem;
-  }
-}
-
-.panel-nav .nav-link {
-  font-weight: 300;
-}
-
-.panel-nav .nav-link.active, .panel-nav .nav-link.Current, .panel-nav
-.nav-link.current-theme {
-  border-radius: 0.125rem 0 0 0.125rem;
-}
-
-.panel-nav .nav-link.active, .panel-nav .nav-link.Current, .panel-nav
-.nav-link.current-theme, .panel-nav .nav-link.active:hover, .panel-nav .nav-link.Current:hover, .panel-nav
-.nav-link.current-theme:hover {
-  color: #fff;
-  background-color: #0291db;
-}
-
-.panel-nav .nav-link:hover, .panel-nav .nav-link.hover {
-  color: #949aa2;
-  background-color: #e8ecf2;
-}
-
-.panel-nav .nav-stacked .nav-item + .nav-item {
-  margin-top: 0;
-}
-
-.nav-link, .nav-link.active, .nav-link.Current,
-.nav-link.current-theme, .nav-link:active, .nav-link.hover, .nav-link:hover {
-  cursor: pointer;
+.modal .list-un-reset ol ol li,
+.modal .list-un-reset ul ol li {
+  list-style: lower-latin inside;
 }
 
 .nav-adventure .nav-item {
@@ -8168,12 +8160,6 @@ button.close {
   justify-content: center;
 }
 
-.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
-  margin-right: 0;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
-}
-
 .nav-stats-item, .analytics-panel-metrics .analytics-widget-metric {
   display: -ms-flexbox;
   display: flex;
@@ -8197,26 +8183,121 @@ button.close {
   font-size: 0.75rem;
 }
 
-.toolbar-stats-daterange-preview,
-.pager-count {
-  line-height: 1;
-  font-weight: 500;
-  padding-right: 0.5625rem;
-}
-
-.pager,
-.toolbar-stats-daterange {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-wrap: nowrap;
-  flex-wrap: nowrap;
-  -ms-flex-align: center;
-  align-items: center;
-}
-
 .nav-stats-value, .analytics-panel-metrics .metric-value {
   font-weight: 300;
   font-size: 2.5rem;
+}
+
+.nav-heading a {
+  display: block;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  padding-left: .75rem;
+  border-bottom: 1px dotted rgba(0, 0, 0, 0.0875);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.nav-heading a::before {
+  -webkit-transform: rotate(0deg);
+  tranform: rotate(0deg);
+  margin-left: -1rem;
+  margin-right: .5rem;
+  transition: all .1s ease-out;
+}
+
+.nav-heading a.collapsed::before {
+  -webkit-transform: rotate(-90deg);
+  tranform: rotate(-90deg);
+}
+
+.nav-inline {
+  font-size: 0;
+}
+
+.nav-inline .nav-item {
+  display: inline-block;
+}
+
+.nav-inline .nav-item + .nav-item,
+.nav-inline .nav-link + .nav-link {
+  margin-left: 1rem;
+}
+
+.panel-nav a {
+  color: #949aa2;
+}
+
+.panel-nav svg {
+  fill: #949aa2;
+}
+
+.panel-nav .badge {
+  font-size: 0.6875rem;
+}
+
+.panel-nav .globals-sign-out {
+  display: none;
+}
+
+@media (max-width: 991px) {
+  .panel-nav .globals-sign-out {
+    display: block;
+    margin-top: 2.25rem;
+  }
+}
+
+.panel-nav .nav-link {
+  font-weight: 300;
+}
+
+.panel-nav .nav-link.active, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose, .panel-nav
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-browse,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav .nav-link.Current, .panel-nav
+.nav-link.current-theme {
+  border-radius: 0.125rem 0 0 0.125rem;
+}
+
+.panel-nav .nav-link.active, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose, .panel-nav
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-browse,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav .nav-link.Current, .panel-nav
+.nav-link.current-theme, .panel-nav .nav-link.active:hover, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover, .panel-nav
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover,
+.file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse:hover, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose:hover, .panel-nav
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover, .panel-nav .nav-link.Current:hover, .panel-nav
+.nav-link.current-theme:hover {
+  color: #fff;
+  background-color: #0291db;
+}
+
+.panel-nav .nav-link:hover, .panel-nav .nav-link.hover {
+  color: #949aa2;
+  background-color: #e8ecf2;
+}
+
+.panel-nav .nav-stacked .nav-item + .nav-item {
+  margin-top: 0;
+}
+
+.nav-link, .nav-link.active, .file-upload input:focus ~ .nav-link.file-upload-choose,
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload input:hover ~ .nav-link.file-upload-browse, .nav-link.Current,
+.nav-link.current-theme, .nav-link:active, .nav-link.hover, .nav-link:hover {
+  cursor: pointer;
 }
 
 .navbar {
@@ -8275,14 +8356,38 @@ button.close {
   border-radius: 0;
 }
 
-.navbar .nav-link.active, .navbar .nav-link.Current, .navbar
-.nav-link.current-theme, .navbar .nav-link.active:hover, .navbar .nav-link.Current:hover, .navbar
+.navbar .nav-link.active, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose, .navbar
+.file-upload input:focus ~ .nav-link.file-upload-browse,
+.file-upload .navbar input:focus ~ .nav-link.file-upload-browse, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-choose,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-choose, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-browse,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar .nav-link.Current, .navbar
+.nav-link.current-theme, .navbar .nav-link.active:hover, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover, .navbar
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover,
+.file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover, .navbar .nav-link.Current:hover, .navbar
 .nav-link.current-theme:hover {
   background-color: #0cb0f8;
 }
 
-.navbar .nav-link.active > *, .navbar .nav-link.Current > *, .navbar
-.nav-link.current-theme > *, .navbar .nav-link.active:hover > *, .navbar .nav-link.Current:hover > *, .navbar
+.navbar .nav-link.active > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose > *, .navbar
+.file-upload input:focus ~ .nav-link.file-upload-browse > *,
+.file-upload .navbar input:focus ~ .nav-link.file-upload-browse > *, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-choose > *,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-choose > *, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-browse > *,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse > *, .navbar .nav-link.Current > *, .navbar
+.nav-link.current-theme > *, .navbar .nav-link.active:hover > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover > *, .navbar
+.file-upload input:focus ~ .nav-link.file-upload-browse:hover > *,
+.file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover > *, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-choose:hover > *,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover > *, .navbar
+.file-upload input:hover ~ .nav-link.file-upload-browse:hover > *,
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover > *, .navbar .nav-link.Current:hover > *, .navbar
 .nav-link.current-theme:hover > * {
   color: #fff;
 }
@@ -8397,57 +8502,6 @@ button.close {
 
 .navbar-profile .icon-caret-down {
   border-top-color: #d2f0fe;
-}
-
-.btn-navbar {
-  position: relative;
-  display: inline-block;
-  font-weight: 300;
-  text-transform: uppercase;
-  margin-left: 1.125rem;
-  color: #d2f0fe;
-  background-color: transparent;
-  border-color: #d2f0fe;
-  padding: 0.125rem 0.75rem;
-  font-size: 0.575rem;
-  line-height: 1.5;
-  border-radius: 0.875rem;
-}
-
-.btn-navbar svg {
-  position: relative;
-  fill: #fff;
-  width: 0.6875rem;
-}
-
-.btn-navbar:hover {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
-}
-
-.btn-navbar:focus, .btn-navbar.focus {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
-  outline: 0;
-}
-
-.btn-navbar:active, .btn-navbar.active, .btn-navbar.Current,
-.btn-navbar.current-theme,
-.open > .btn-navbar.dropdown-toggle {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
-  background-image: none;
-}
-
-.btn-navbar.disabled:focus, .btn-navbar.disabled.focus, .btn-navbar:disabled:focus, .btn-navbar:disabled.focus {
-  background-color: transparent;
-}
-
-.btn-navbar.disabled:hover, .btn-navbar:disabled:hover {
-  background-color: transparent;
 }
 
 .panel {
@@ -8605,11 +8659,6 @@ button.close {
   margin-top: 1.125rem;
 }
 
-.control-panel svg {
-  width: 1.125rem;
-  fill: #727d83;
-}
-
 .control-panel .control-panel-list-item-label {
   max-width: 6.375rem;
 }
@@ -8637,7 +8686,10 @@ button.close {
   outline: 0;
 }
 
-.btn-control-panel:active, .btn-control-panel.active, .btn-control-panel.Current,
+.btn-control-panel:active, .btn-control-panel.active, .file-upload input:focus ~ .btn-control-panel.file-upload-choose,
+.file-upload input:focus ~ .btn-control-panel.file-upload-browse,
+.file-upload input:hover ~ .btn-control-panel.file-upload-choose,
+.file-upload input:hover ~ .btn-control-panel.file-upload-browse, .btn-control-panel.Current,
 .btn-control-panel.current-theme,
 .open > .btn-control-panel.dropdown-toggle {
   color: #fff;
@@ -8664,6 +8716,9 @@ button.close {
   -ms-flex-positive: 1;
   flex-grow: 1;
   overflow-y: hidden;
+}
+
+.main-row .main {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-direction: column;
@@ -8678,12 +8733,12 @@ button.close {
   transition: all 250ms;
 }
 
-.drawer-show .main {
+.drawer-show .main-row .main {
   -webkit-transform: translate3d(222px, 0, 0);
   transform: translate3d(222px, 0, 0);
 }
 
-.drawer-show .main:after {
+.drawer-show .main-row .main:after {
   position: absolute;
   display: block;
   width: 100%;
@@ -8768,46 +8823,11 @@ ul {
   margin-left: -1.125rem;
 }
 
-.header-block + .table-wrap {
-  margin-top: -0.0625rem;
-}
-
-.table-wrap.padded, .label-wrap img.table-wrap, div.table-wrap.Messages.Errors {
-  margin-top: 1.125rem;
-  margin-bottom: 1.125rem;
-}
-
-.table-wrap.padded-top {
-  margin-top: 1.125rem;
-}
-
-.table-wrap.padded-bottom {
-  margin-bottom: 1.125rem;
-}
-
 .table-data {
   width: 100%;
   max-width: 100%;
   table-layout: fixed;
   margin-bottom: 0;
-}
-
-.table-data ul {
-  padding-left: 0;
-}
-
-.table-data td.options {
-  text-align: right;
-}
-
-.table-data td.options > * {
-  display: inline-block;
-  margin-right: 0.28125rem;
-  vertical-align: middle;
-}
-
-.table-data td.options > *:last-child {
-  margin-right: 0;
 }
 
 .table-data thead tr {
@@ -8816,6 +8836,7 @@ ul {
 
 .table-data thead th,
 .table-data thead td {
+  width: 6.25rem;
   padding: 0.5625rem 0.84375rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
@@ -8824,17 +8845,44 @@ ul {
   font-weight: 500;
   font-size: 0.75rem;
   line-height: 1.3333333333;
-  vertical-align: middle;
+}
+
+.table-data thead th.column-xl,
+.table-data thead td.column-xl {
+  width: 18.75rem;
+}
+
+.table-data thead th.column-lg,
+.table-data thead td.column-lg {
+  width: 13.125rem;
+}
+
+.table-data thead th.column-md,
+.table-data thead td.column-md {
+  width: 8.25rem;
+}
+
+.table-data thead th.column-sm,
+.table-data thead td.column-sm {
+  width: 5.625rem;
+}
+
+.table-data thead th.column-xs,
+.table-data thead td.column-xs {
+  width: 3.375rem;
+}
+
+.table-data thead th.column-checkbox,
+.table-data thead td.column-checkbox {
+  width: 2.625rem;
+  max-width: 2.625rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 .table-data thead th:last-child,
 .table-data thead td:last-child {
   border-right: 0;
-}
-
-.table-data thead th.column-wrap,
-.table-data thead td.column-wrap {
-  white-space: wrap;
 }
 
 .table-data tbody {
@@ -8847,7 +8895,6 @@ ul {
 
 .table-data th,
 .table-data td {
-  width: 6.25rem;
   overflow: hidden;
   padding: 0.75rem 1.125rem;
   line-height: 1.5;
@@ -8855,54 +8902,50 @@ ul {
   border-top: 0.0625rem solid #f4f6fb;
 }
 
-.table-data th.column-xl,
-.table-data td.column-xl {
-  width: 18.75rem;
+.table-data td.options .btn-group {
+  -ms-flex-pack: end;
+  justify-content: flex-end;
 }
 
-.table-data th.column-lg,
-.table-data td.column-lg {
-  width: 13.125rem;
-}
-
-.table-data th.column-md,
-.table-data td.column-md {
-  width: 8.25rem;
-}
-
-.table-data th.column-sm,
-.table-data td.column-sm {
-  width: 5.625rem;
-}
-
-.table-data th.column-xs,
-.table-data td.column-xs {
-  width: 3.375rem;
-}
-
-.table-data th.column-checkbox,
-.table-data td.column-checkbox {
-  width: 2.625rem;
-  max-width: 2.625rem;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+.table-data .toggle-wrap {
+  margin-left: 0.28125rem;
 }
 
 .table-data tbody + tbody {
   border-top: 0.125rem solid #f4f6fb;
 }
 
-.table-data .table {
-  background-color: #f6f9fb;
-}
-
 .table-data.no-hover tbody tr:hover {
   background-color: inherit;
 }
 
-.attach-top td {
-  border-top: 0;
-  padding-top: 0;
+.tj-meta {
+  margin-top: 0.5625rem;
+}
+
+.tj-meta .table-meta-item {
+  font-size: 0.75rem;
+}
+
+.tj-meta .media-sm, .tj-meta .Section-DashboardHome .FeedItem, .Section-DashboardHome .tj-meta .FeedItem {
+  display: inline-block;
+}
+
+.tj-meta .media-sm .media-sm-image-wrap, .tj-meta .Section-DashboardHome .FeedItem .media-sm-image-wrap, .Section-DashboardHome .tj-meta .FeedItem .media-sm-image-wrap,
+.tj-meta .media-sm .media-sm-info,
+.tj-meta .Section-DashboardHome .FeedItem .media-sm-info, .Section-DashboardHome
+.tj-meta .FeedItem .media-sm-info {
+  display: none;
+}
+
+.tj-meta .table-meta-item-label {
+  font-weight: 500;
+}
+
+.tj-meta .table-meta-item-label a {
+  color: #555a62;
+  pointer-events: none;
+  cursor: default;
 }
 
 .CheckBoxGrid {
@@ -9120,39 +9163,6 @@ ul {
   text-align: right;
 }
 
-.tj-meta {
-  margin-top: 0.5625rem;
-}
-
-.tj-meta .table-meta-item {
-  font-size: 0.75rem;
-}
-
-.tj-meta .media-sm {
-  display: inline-block;
-}
-
-.tj-meta .media-sm .media-sm-image-wrap,
-.tj-meta .media-sm .media-sm-info,
-.tj-meta .media-sm .Section-DashboardHome .FeedItem .Date, .Section-DashboardHome .FeedItem
-.tj-meta .media-sm .Date {
-  display: none;
-}
-
-.tj-meta .table-meta-item-label {
-  font-weight: 500;
-}
-
-.tj-meta .table-meta-item-label a {
-  color: #555a62;
-  pointer-events: none;
-  cursor: default;
-}
-
-.content-cell {
-  min-width: 12.5rem;
-}
-
 * html .InformMessages {
   position: absolute;
   width: 100%;
@@ -9250,19 +9260,20 @@ ul {
 .toolbar {
   display: -ms-flexbox;
   display: flex;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
   -ms-flex-align: start;
   align-items: flex-start;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
   padding-top: 0.5625rem;
   padding-bottom: 1.125rem;
 }
 
 .toolbar > * {
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
   margin-top: 0.5625rem;
   margin-right: 1.125rem;
 }
@@ -9273,6 +9284,7 @@ ul {
 
 .toolbar.empty {
   padding-top: 0;
+  padding-bottom: 0;
 }
 
 .toolbar .toolbar-main {
@@ -9280,8 +9292,97 @@ ul {
   flex-grow: 1;
 }
 
-.toolbar-stats > *:not(.nav-stats) {
+.pager-count {
+  line-height: 1;
+  font-weight: 500;
+  padding-right: 0.5625rem;
+}
+
+.pager {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
+  -ms-flex-align: center;
+  align-items: center;
+}
+
+.hero {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-align: center;
+  align-items: center;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  padding: 2.25rem 1.125rem;
+}
+
+.hero > * {
+  -ms-flex-positive: 1;
+  flex-grow: 1;
+}
+
+.hero .label-selector {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.hero .hero-content {
+  padding: 0 6.75rem 0 4.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  -ms-flex-negative: 1;
+  flex-shrink: 1;
+}
+
+.hero .tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.hero .vanilla-logo {
+  width: 6.75rem;
+  height: 4.5rem;
+}
+
+.hero .btn, .hero .file-upload-browse, .hero .Button {
   margin-top: 2.25rem;
+}
+
+.hero .hero-media-wrapper {
+  -ms-flex-negative: 0;
+  flex-shrink: 0;
+}
+
+.video-section-heading {
+  padding: 1.125rem 0;
+  font-weight: 500;
+}
+
+.video.label-selector-item .video-title {
+  font-size: 0.75rem;
+  text-align: left;
+}
+
+.video.label-selector-item .overlay {
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.video.label-selector-item.current .overlay {
+  height: 100%;
+}
+
+.video.label-selector-item svg {
+  fill: #fff;
+  width: 40%;
+}
+
+.video-section .info, .video-section .Section-DashboardHome .FeedItem .FeedDescription, .Section-DashboardHome .FeedItem .video-section .FeedDescription, .video-section .Section-DashboardHome .FeedItem .Date, .Section-DashboardHome .FeedItem .video-section .Date {
+  padding-top: 1.125rem;
+}
+
+.video-section:first-child .video-section-heading {
+  border-top: 0.0625rem solid #f6f9fb;
 }
 
 .content-cell {
@@ -9328,6 +9429,17 @@ ul {
   min-width: 11.5rem;
 }
 
+table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,
+form h2,
+form .analytics-widget-header .title, .analytics-widget-header
+form .title {
+  margin-top: 0;
+}
+
+.label-selector .theme-description {
+  display: none;
+}
+
 h1, .h1,
 h2,
 .analytics-widget-header .title, .h2, .hero .hero-title,
@@ -9368,15 +9480,11 @@ h6, .h6 {
 h1, .h1,
 h2,
 .analytics-widget-header .title, .h2, .hero .hero-title,
-h3, .h3 {
-  margin-top: 1.125rem;
-  margin-bottom: 0.5625rem;
-}
-
+h3, .h3,
 h4, .h4,
 h5, .h5,
 h6, .h6 {
-  margin-top: 0.5625rem;
+  margin-top: 1.125rem;
   margin-bottom: 0.5625rem;
 }
 
@@ -9386,27 +9494,10 @@ p {
 
 pre {
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
-.border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title {
-  padding: 1.125rem 0;
-  margin: 0;
-  font-size: 0.875rem;
-  line-height: 1.5;
-  font-weight: 500;
-  border-top: 0.0625rem solid #e7e8e9;
-}
-
-.modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title {
-  border-top: 0 !important;
-}
-
-.heading-h1, .content h1 {
-  font-size: 1.25rem;
-  margin-bottom: 0;
-}
-
-.full-border, .video-section-heading, .border-h2, .content h2, .content .analytics-widget-header .title, .analytics-widget-header .content .title, .modal h2, .modal .analytics-widget-header .title, .analytics-widget-header .modal .title, .heading-h1-block, .content > h1, .header-block, .subheading-block, .header-menu {
+.full-border, .video-section-heading, .heading-h1-block, .content > h1, .header-block, .header-menu, .subheading-border, .subheading-block {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -9419,6 +9510,11 @@ pre {
   padding-bottom: 1.125rem;
 }
 
+.heading-h1, .heading-h1-block, .content > h1, .header-block h1 {
+  font-size: 1.25rem;
+  margin-bottom: 0;
+}
+
 .header-block {
   display: -ms-flexbox;
   display: flex;
@@ -9429,10 +9525,6 @@ pre {
   padding-top: 0.5625rem;
   padding-bottom: 0.5625rem;
   min-height: 3.75rem;
-}
-
-.header-block.padded, .label-wrap img.header-block, div.header-block.Messages.Errors {
-  margin-bottom: 1.125rem;
 }
 
 .header-block h1 {
@@ -9461,19 +9553,6 @@ pre {
   fill: #0291db;
 }
 
-.subheading-block {
-  padding-top: 1.125rem;
-  padding-bottom: 1.125rem;
-  border-top: 0.0625rem solid #e7e8e9;
-}
-
-.subheading-block .subheading {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 1rem;
-  font-weight: 500;
-}
-
 .header-menu {
   display: -ms-flexbox;
   display: flex;
@@ -9481,11 +9560,6 @@ pre {
   justify-content: center;
   -ms-flex-align: center;
   align-items: center;
-  border-bottom-color: #e7e8e9;
-}
-
-.header-menu.padded, .label-wrap img.header-menu, div.header-menu.Messages.Errors {
-  margin-bottom: 1.125rem;
 }
 
 .header-menu a {
@@ -9499,7 +9573,13 @@ pre {
   border-bottom: 0.1875rem solid transparent;
 }
 
-.header-menu a.active, .header-menu a.Current, .header-menu
+.header-menu a.active, .header-menu .file-upload input:focus ~ a.file-upload-choose, .file-upload .header-menu input:focus ~ a.file-upload-choose, .header-menu
+.file-upload input:focus ~ a.file-upload-browse,
+.file-upload .header-menu input:focus ~ a.file-upload-browse, .header-menu
+.file-upload input:hover ~ a.file-upload-choose,
+.file-upload .header-menu input:hover ~ a.file-upload-choose, .header-menu
+.file-upload input:hover ~ a.file-upload-browse,
+.file-upload .header-menu input:hover ~ a.file-upload-browse, .header-menu a.Current, .header-menu
 a.current-theme {
   border-bottom-color: #0291db;
   color: #0291db;
@@ -9509,13 +9589,26 @@ a.current-theme {
   color: #0291db;
 }
 
-pre {
-  white-space: pre-wrap;
+.subheading-border {
+  padding-top: 1.125rem;
+  padding-bottom: 1.125rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 500;
+  border-top: 0.0625rem solid #e7e8e9;
 }
 
-.spacer {
-  display: inline-block;
-  padding: 0 .25rem;
+.subheading-block {
+  padding-top: 1.125rem;
+  padding-bottom: 1.125rem;
+  border-top: 0.0625rem solid #e7e8e9;
+}
+
+.subheading-block .subheading-title {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .flag {
@@ -9532,16 +9625,19 @@ pre {
   text-transform: uppercase;
 }
 
-strong,
-.strong {
-  font-weight: 500;
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 0.28125rem;
+  margin-left: 0.28125rem;
+  font-size: 0.6875rem;
+  background-color: rgba(0, 0, 0, 0.1875);
+  color: #fff;
+  border-radius: .25rem;
 }
 
-table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,
-form h2,
-form .analytics-widget-header .title, .analytics-widget-header
-form .title {
-  margin-top: 0;
+.btn-group .badge {
+  margin-top: -0.125rem;
 }
 
 .text-primary {
@@ -9568,58 +9664,9 @@ form .title {
   color: #fa2e1f;
 }
 
-.list-unstyled {
-  padding-left: 0;
-  list-style: none;
-}
-
-.modal .list-un-reset ul,
-.modal .list-un-reset ol {
-  margin-left: 15px;
-}
-
-.modal .list-un-reset ul li {
-  list-style: disc inside;
-}
-
-.modal .list-un-reset ol li {
-  list-style: decimal inside;
-}
-
-.modal .list-un-reset ul ul,
-.modal .list-un-reset ol ul {
-  margin-left: 30px;
-}
-
-.modal .list-un-reset ul ul li,
-.modal .list-un-reset ol ul li {
-  list-style: circle inside;
-}
-
-.modal .list-un-reset ol ol,
-.modal .list-un-reset ul ol {
-  margin-left: 15px;
-}
-
-.modal .list-un-reset ol ol li,
-.modal .list-un-reset ul ol li {
-  list-style: lower-latin inside;
-}
-
-.italic {
-  font-style: italic;
-}
-
-.truncate, .CheckBoxGrid thead th {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.icon-text {
-  width: 0.875rem;
-  fill: #555a62;
-  vertical-align: middle;
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
 }
 
 .reverse-link {
@@ -9628,6 +9675,50 @@ form .title {
 
 .reverse-link:hover {
   color: #0291db;
+}
+
+.italic {
+  font-style: italic;
+}
+
+strong,
+.strong {
+  font-weight: 500;
+}
+
+.Info,
+.Info2,
+.info,
+.Section-DashboardHome .FeedItem .FeedDescription,
+.Section-DashboardHome .FeedItem .Date {
+  display: block;
+  font-size: 0.75rem;
+  line-height: 1.3333333333;
+  color: #949aa2;
+}
+
+.list-reset,
+.list-reset ul,
+.list-reset ol,
+.list-reset ul,
+.list-reset ul ul,
+.list-reset ul ol,
+.list-reset ol,
+.list-reset ol ul,
+.list-reset ol ol {
+  padding-left: 0;
+}
+
+.list-reset li,
+.list-reset ul li,
+.list-reset ol li {
+  list-style: none;
+}
+
+.truncate, .CheckBoxGrid thead th {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .Section-Dashboard.Message.index {
@@ -9784,15 +9875,6 @@ form .title {
 .Sortable li,
 .DataList li {
   list-style: none;
-}
-
-.FilterMenu select {
-  display: inline-block;
-  width: inherit;
-}
-
-.FilterMenu .FilterButton {
-  display: inline-block;
 }
 
 .ac_input {

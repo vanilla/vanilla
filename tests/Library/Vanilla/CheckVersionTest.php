@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-namespace Library\Vanilla;
+namespace VanillaTests\Library\Vanilla;
 
 use Vanilla\Addon;
 

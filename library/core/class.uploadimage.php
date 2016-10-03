@@ -329,5 +329,6 @@ class Gdn_UploadImage extends Gdn_Upload {
 
         $icoLib = new PHP_ICO($imagePath, [[16,16]]);
         $icoLib->save_ico($targetPath);
+        unlink($imagePath);
     }
 }

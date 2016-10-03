@@ -44,3 +44,14 @@
 .filter-date {
   min-width: to-rem(184);
 }
+
+table,
+form {
+  h2 {
+    margin-top: 0;
+  }
+}
+
+.label-selector .theme-description {
+  display: none;
+}

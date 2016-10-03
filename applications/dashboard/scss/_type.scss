@@ -1,6 +1,6 @@
 // Typography
 //
-// Basic heading and paragraph styling.
+// Type and typography styles.
 //
 // Styleguide 1.
 
@@ -41,15 +41,11 @@ h6, .h6 { font-size: $font-size-h6; }
 
 h1, .h1,
 h2, .h2,
-h3, .h3 {
-  margin-top: $spacer;
-  margin-bottom: $headings-margin-bottom;
-}
-
+h3, .h3,
 h4, .h4,
 h5, .h5,
 h6, .h6 {
-  margin-top: $headings-margin-bottom;
+  margin-top: $spacer;
   margin-bottom: $headings-margin-bottom;
 }
 
@@ -74,35 +70,33 @@ p {
 
 pre {
   margin-bottom: 0;
+  white-space: pre-wrap;
 }
 
-.content {
-  > h1 {
-    @extend .heading-h1-block;
-  }
+// Full Border
+//
+// Adds a bottom border property to an element that spans the entire content container. Has negative margins
+// and then adds padding to the element.
+//
+// Markup:
+// <div class="full-border">Here's some text with a full border underneath.</div>
+//
+// Styleguide 1.3.
 
-  h1 {
-    @extend .heading-h1;
-  }
-
-  h2 {
-    @extend .border-h2;
-  }
+.full-border {
+  @include full-border(block)
 }
 
-.border-h2 {
+// Heading Block
+//
+// Maintains backwards compatibility for any view that just has an h1 heading.
+//
+// No styleguide reference
+
+.heading-h1-block {
   @extend .full-border;
-  padding: $spacer 0;
-  margin: 0;
-  font-size: $font-size-base;
-  line-height: $line-height;
-  font-weight: 500;
-  border-top: $border-width solid #e7e8e9;
-}
-
-.modal h2 {
-  @extend .border-h2;
-  border-top: 0 !important;
+  @extend .heading-h1;
+  padding-bottom: $spacer;
 }
 
 .heading-h1 {
@@ -110,18 +104,30 @@ pre {
   margin-bottom: 0;
 }
 
-.full-border {
-  @include full-border(block)
+.content > h1 {
+  @extend .heading-h1-block;
 }
 
-// Default. Use if there's only an h1 block as a heading
+// Header Block
+//
+// This is the area at the top of a settings page. It contains the page title
+// and optionally a button. This button should be of the 'Add *' variety. It can
+// also contain a 'return' link to its parent settings page.
+//
+// Styleguide 1.4.
 
-.heading-h1-block {
-  @extend .full-border;
-  padding-bottom: $spacer;
-}
-
-// Optimal. Header block.
+// Header Block with Button
+//
+// Here'a an example of a header block with an 'add'-type button. This button
+// should only be facilitate an 'Add *' action.
+//
+// Markup:
+// <div class="header-block">
+//   <h1>Title</h1>
+//   <div class="btn btn-primary">Add Something</div>
+// </div>
+//
+// Styleguide 1.4.1.
 
 .header-block {
   display: flex;
@@ -132,26 +138,35 @@ pre {
   min-height: $header-block-height;
   @extend .full-border;
 
-  &.padded {
-    margin-bottom: $spacer;
-  }
-
   h1 {
+    @extend .heading-h1;
     margin: 0;
     padding: ($spacer / 2) 0;
   }
 }
 
-// <div class="header-block">
-//   <div class="title-block">
-//     <a class="btn btn-icon btn-return" aria-label="Return" href="#"><svg /></a>
-//     <h1>Title</h1>
-//   </div>
-// </div>
-
 .title-block {
   display: flex;
 }
+
+// Header Block with Return Button
+//
+// Here's a header with a return button. This should always be in place when a a user navigates to a settings
+// page that is not part of the panel nav.
+//
+// Markup:
+// <div class="header-block">
+//   <div class="title-block">
+//     <a class="btn btn-icon btn-return" aria-label="Return" href="#">
+//       <svg class="icon icon-svg icon-svg-chevron-left" viewBox="0 0 17 17">
+//         <use xlink:href="#chevron-left"></use>
+//       </svg>
+//     </a>
+//     <h1>Title</h1>
+//   </div>
+// </div>
+//
+// Styleguide 1.4.2.
 
 .btn-return {
   position: relative;
@@ -169,20 +184,17 @@ pre {
   }
 }
 
-.subheading-block {
-  padding-top: $spacer;
-  padding-bottom: $spacer;
-  border-top: $border-width solid $border-color;
-
-  @extend .full-border;
-
-  .subheading {
-    margin-top: 0;
-    margin-bottom: 0;
-    font-size: to-rem(16);
-    font-weight: 500;
-  }
-}
+// Header Menu
+//
+// This is a header that's also a menu.
+//
+// Markup:
+// <div class="header-menu">
+//   <a href="#" class="active">Option One</a>
+//   <a href="#">Option Two</a>
+// </div>
+//
+// Styleguide 1.5.
 
 .header-menu {
   $header-menu-border-width: to-rem(3);
@@ -194,11 +206,6 @@ pre {
   justify-content: center;
   align-items: center;
   @extend .full-border;
-  border-bottom-color: $border-color;
-
-  &.padded {
-    margin-bottom: $spacer;
-  }
 
   a {
     font-size: $header-menu-font-size;
@@ -221,14 +228,62 @@ pre {
   }
 }
 
-pre {
-  white-space: pre-wrap;
+// Subheading
+//
+// Most subheadings should be of this variety.
+//
+// Markup:
+// <h2 class="subheading-border">This is a Subheading</h2>
+//
+// Styleguide 1.6.
+
+.subheading-border {
+  @extend .full-border;
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  font-size: $font-size-base;
+  line-height: $line-height;
+  font-weight: 500;
+  border-top: $border-width solid #e7e8e9;
 }
 
-.spacer {
-  display: inline-block;
-  padding: 0 .25rem;
+// Subheading Block
+//
+// This element is for a subheading that requires a bit of explanation.
+//
+// Markup:
+// <div class="subheading-block">
+//   <div class="subheading-title">Subtitle Title</div>
+//   <div class="subheading-description">
+//     This is a description of this section. It makes this section easier to understand.
+//   </div>
+// </div>
+//
+// Styleguide 1.7.
+
+.subheading-block {
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  border-top: $border-width solid $border-color;
+
+  @extend .full-border;
+
+  .subheading-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: to-rem(16);
+    font-weight: 500;
+  }
 }
+
+// Flags
+//
+// Makes a flag-style element.
+//
+// Markup:
+// <div class="flag">The best!</div>
+//
+// Styleguide 1.8.
 
 .flag {
   $flag-height: to-rem(18);
@@ -245,20 +300,50 @@ pre {
   text-transform: uppercase;
 }
 
-strong,
-.strong {
-  font-weight: 500;
-}
+// Badges
+//
+// Makes a badge element, usually used to display a count on a navigation item.
+//
+// Markup:
+// <div class="btn btn-primary">
+//   Tags
+//   <span class="badge">42</span>
+// </div>
+//
+// Styleguide 1.9.
 
-table,
-form {
-  h2 {
-    margin-top: 0;
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 ($spacer / 4);
+  margin-left: $spacer / 4;
+  font-size: $font-size-xs;
+  background-color: rgba(0,0,0,.1875);
+  color: $white;
+  border-radius: .25rem;
+
+  .btn-group & {
+    margin-top: - to-rem(2);
   }
 }
 
-// Generate .text-* css rules to change text color for all our semantic colors in variables.
+// Semantic Text Colors
+//
+// Applies a semantic color to some text.
+//
+// .text-danger - Danger color
+// .text-warning - Warning color
+// .text-info - Info color
+// .text-success - Success color
+//
+// Markup:
+// <div class="{{modifier_class}}">
+//   Here is some text.
+// </div>
+//
+// Styleguide 1.10.
 
+// Generates .text-* css rules to change text color for all our semantic colors in variables.
 @each $semantic-color in map-keys($semantic-colors) {
   $color: map-get($semantic-colors, $semantic-color);
   .text-#{$semantic-color} {
@@ -266,65 +351,29 @@ form {
   }
 }
 
-//.text-control-height {
-//  height: $control-height-rem;
-//  padding: (($control-height-rem - $font-size-base) / 2) 0;
-//  line-height: 1;
-//  font-size: $font-size-base;
-//}
+// Spacer
+//
+// Spacer to put around bullets or pipes in meta descriptions.
+//
+// Markup:
+// <div>Written by Jane<div class="spacer">|</div>July 5, 2000</div>
+//
+//Styleguide 1.11.
 
-.list-unstyled {
-  @include list-unstyled;
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
 }
 
-// The modal js wraps the modal body and footer in a form element to place the form buttons in the footer.
-// The side-effect of this is that some non-form elements can be wrapped in a form. This rather inelegant
-// list-un-reset can be applied to any lists appearing in a modal that are not actually part of the form and should
-// have list styling.
-.modal .list-un-reset {
-  ul,
-  ol {
-    margin-left: 15px;
-  }
-  ul li {
-    list-style: disc inside;
-  }
-  ol li {
-    list-style: decimal inside;
-  }
-  ul ul,
-  ol ul {
-    margin-left: 30px;
-    li {
-      list-style: circle inside;
-    }
-  }
-  ol ol,
-  ul ol {
-    margin-left: 15px;
-    li {
-      list-style: lower-latin inside;
-    }
-  }
-}
 
-.italic {
-  font-style: italic;
-}
-
-.truncate {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-// same color and size as default body text.
-.icon-text {
-  width: $font-size-base;
-  fill: $grey-dark;
-  vertical-align: middle;
-}
-
+// Anchors
+//
+// .reverse-link - makes the hover-color the link color and vice-versa
+//
+// Markup:
+// <a class="{{modifier_class}}" href="#">I am some text.</a>
+//
+// Styleguide 1.12.
 
 .reverse-link {
   color: $grey-dark;
@@ -332,4 +381,72 @@ form {
   &:hover {
     color: $brand-primary;
   }
+}
+
+// Font Helpers
+//
+// Add some font styling to a block of text.
+//
+// .italic - sets the text font-style to italic
+// .strong - adds a font-weight of 500 to the text
+// .info - makes the text smaller and muted, good for adding meta info to an item
+//
+// Markup:
+// <div class="{{modifier_class}}">Here is some text.</div>
+//
+// Styleguide 1.13.
+
+.italic {
+  font-style: italic;
+}
+
+strong,
+.strong {
+  font-weight: 500;
+}
+
+.Info,
+.Info2,
+.info {
+  display: block;
+  font-size: $font-size-sm;
+  line-height: $line-height-lg;
+  color: $grey;
+}
+
+// List Reset
+//
+// .list-reset - removes list styling
+//
+// Markup:
+// <ul class="{{modifier_class}}">
+//   <li>List item one</li>
+//   <li>List item two</li>
+//   <li>List item three</li>
+// </ul>
+//
+// Styleguide 1.14.
+
+.list-reset {
+  &,
+  ul,
+  ol {
+    @include list-reset;
+  }
+}
+
+// Truncate
+//
+// Trucates text that flows longer than the width of its container.
+// Note that the `ex-block` class here is for examples in the styleguide only.
+//
+// Markup:
+// <div class="ex-block truncate">I am some really really long text. Nobody can put me in a box!</div>
+//
+// Styleguide 1.15.
+
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

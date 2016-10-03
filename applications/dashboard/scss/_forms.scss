@@ -2,117 +2,123 @@
 //
 // Find the dashboard form styling here.
 //
-// Styleguide 3.
-
-@mixin list-reset() {
-
-  &,
-  ul,
-  ol {
-    padding-left: 0;
-  }
-
-  li {
-    list-style: none;
-  }
-}
-
-
-.radio,
-.checkbox {
-  margin-bottom: 0;
-}
-
-.radio + .radio,
-.checkbox + .checkbox {
-  margin-top: $spacer / 4;
-}
-
-
-.list-reset {
-  &,
-  ul,
-  ol {
-    @include list-reset();
-  }
-}
+// Styleguide 5.
 
 form {
   ul,
   ol {
-    @include list-reset();
+    @include list-reset;
   }
 }
 
-label,
-.label {
-  font-weight: 500;
-  margin-bottom: 0;
+.row-padding-left {
+  padding-left: $padding-row;
 }
 
-.form-control {
-  line-height: 1.5;
-  padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-  padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
-  border: $border-width solid #ccc;
+.row-padding-right {
+  padding-right: $padding-row;
 }
 
-// Forms
+// Form Layout
 //
+// Here's how to build a basic form group. The three important classes are the `form-group` class on the wrapper
+// around the entire form field, the `label-wrap` class on the wrapper around the label, and the `input-wrap` class
+// on the wrapper around the from input.
 //
+// PHP rendering: If you use Gdn_Form `simple()` to render your forms, the markup will render like this.
+// Otherwise, you'll have to add the wrapper classes manually and/or by using the help of the `*Wrap()`
+// functions in Gdn_Form that will add the `label-wrap` div or `input-wrap` div to a field.
 //
-// Styleguide 3.1.
+// Styleguide 5.1.
 
-// Form layout
+// Basic Form Layout
 //
-// Here's how to build a basic form field.
+// Here's an example of a basic form layout. If you have other plans for your label element, you can mimic a label by
+// adding the `label` class to a div around your fake label. Accessibility matters, though. Don't forget to add
+// appropriate aria-label or aria-labelledby attributes in these cases.
 //
-// .stacked - Stacks radio or checkboxes.
 //
 // Markup:
 // <form>
 //   <ul>
-//     <li class="form-group row">
+//     <li class="form-group">
 //       <div class="label-wrap">
-//          <label for="fieldID">Field</label>
-//          <div class="info">Info text for field</div>
+//          <label for="fieldID1">Label</label>
+//          <div class="info">
+//            Here's some info text for this field.
+//          </div>
 //       </div>
 //       <div class="input-wrap">
-//         <input type="text" id="fieldID" class="form-control">
+//         <input type="text" id="fieldID1" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <div class="label" id="fieldID2-label">Another (fake) Label</div>
+//       </div>
+//       <div class="input-wrap">
+//         <input type="text" id="fieldID2" aria-labelledby="fieldID2-label" class="form-control" />
 //       </div>
 //     </li>
 //   </ul>
 // </form>
 //
-// Styleguide 3.1.1
+// Styleguide 5.1.1.
 
-.label-wrap {
-  min-width: 0;
-  overflow: hidden;
+// Form Layout Variants
+//
+// This example showcases a few examples that illustrate how you can play with some variants on the default.
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label for="fieldID1">Normal label and form input</label>
+//          <div class="info">
+//            Here's some info text for this field. I'm giving a little description of what this field
+//            does and how it affects the user.
+//          </div>
+//       </div>
+//       <div class="input-wrap">
+//         <input type="text" id="fieldID1" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="label-wrap-wide">
+//          <label for="fieldID2">
+//            Wide label and narrow form input, useful for small text inputs or toggles
+//          </label>
+//          <div class="info">
+//            Here's some info text for this field. I'm giving a little description of what this field
+//            does and how it affects the user.
+//          </div>
+//       </div>
+//       <div class="input-wrap-right">
+//         <input type="text" id="fieldID2" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="input-wrap no-label">
+//         <input type="text" id="fieldID3" class="form-control" placeholder="No Label"/>
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.2.
 
-  img {
-    @extend .padded;
-    max-width: 50%;
-    max-height: 200px;
-  }
-}
-
-.Info,
-.Info2,
-.info {
-  display: block;
-  font-size: $font-size-sm;
-  line-height: $line-height-lg;
-  color: $grey;
-}
-
-.label-title {
-  font-weight: 500;
-  margin-bottom: $spacer / 4;
-}
-
-// Form grid
 .form-group {
+  @extend .row;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+  border-bottom: 1px dotted #e7e8e9;
+
   > .no-grid {
     @extend .row-padding-left;
     @extend .row-padding-right;
@@ -140,8 +146,8 @@ label,
   }
 
   .input-wrap-right {
-      @extend .row-padding-left;
-      @extend .row-padding-right;
+    @extend .row-padding-left;
+    @extend .row-padding-right;
   }
 
   @include media-breakpoint-down(xs) {
@@ -151,10 +157,81 @@ label,
   }
 }
 
-.input-wrap > .form-group > * {
-  padding-left: 0;
+// Radio and Checkbox Groups
+//
+// If you have a form field with multiple options, you can display them inline, or stacked.
+//
+// .stacked - Stacks radio or checkboxes.
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label>Checkbox field with multiple options</label>
+//          <div class="info">Info text for field</div>
+//       </div>
+//       <div class="input-wrap {{modifier_class}}">
+//         <label><input type="checkbox" id="fieldID1" class="form-control">Option One</label>
+//         <label><input type="checkbox" id="fieldID2" class="form-control">Option Two</label>
+//         <label><input type="checkbox" id="fieldID3" class="form-control">Option Three</label>
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.3.
+
+label,
+.label {
+  font-weight: 500;
+  margin-bottom: 0;
 }
 
+.stacked label {
+  display: block;
+}
+
+.form-control {
+  line-height: 1.5;
+  padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  border: $border-width solid #ccc;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: $spacer 0;
+}
+.label-wrap {
+
+  min-width: 0;
+  overflow: hidden;
+
+  img {
+    @extend .padded;
+    max-width: 50%;
+    max-height: to-rem(180); // Something sane.
+  }
+}
+
+// For cases where there are form groups in input-wraps (see Ranks add/edit form)
+.input-wrap > .form-group {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: $spacer;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  > * {
+    padding-left: 0;
+  }
+}
+
+// Handles case where there are more than one inputs in the input-wrap. i.e., a select and a button.
 .input-wrap-multiple {
   display: flex;
 
@@ -163,49 +240,13 @@ label,
   }
 }
 
-.stacked label {
-  display: block;
-}
-
-.row-padding-left {
-  padding-left: $padding-default;
-}
-
-.row-padding-right {
-  padding-right: $padding-default;
-}
-
-.form-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.form-group.row {
-  flex-wrap: wrap;
-  align-items: center;
-  padding-bottom: 1rem;
-  border-bottom: 1px dotted #e7e8e9;
-
-  //Reset
-  padding-top: 1rem;
-  margin-bottom: 0;
-}
-
-.form-footer {
-  display: flex;
-  justify-content: flex-end;
-  padding: $spacer 0;
-}
-
-
 // Toggles
 //
 // Toggles can either be a checkbox form element or an anchor.
 //
-// Styleguide 3.3.
+// Styleguide 5.2.
 
-// Anchor toggle
+// Anchor Toggle
 //
 // Here's how to build an anchor toggle.
 //
@@ -219,135 +260,35 @@ label,
 //   </a>
 // </div>
 //
-// Styleguide 3.3.1.
-
-// Calculated variables
-$toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
-$toggle-slider-padding: $toggle-padding + $toggle-border-width;
-$toggle-width: $toggle-height * 2;
+// Styleguide 5.2.1.
 
 .toggle-wrap {
-  display: block;
-  position: relative;
-  width: $toggle-width;
-  height: $toggle-height;
-}
-
-.toggle-well {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: $toggle-height * 2;
-  height: $toggle-height;
-  background-color: $white;
-  border-radius: $toggle-height / 2;
-  border: $toggle-border-width solid $grey;
-  transition: background .4s;
-  cursor: pointer;
-}
-
-.toggle-slider {
-  display: block;
-  position: absolute;
-  top: $toggle-slider-padding;
-  left: $toggle-slider-padding;
-  width: $toggle-slider-width;
-  height: $toggle-slider-width;
-  border-radius: ($toggle-height - ($toggle-padding)) / 2;
-  border: $toggle-border-width solid $grey;
-  background-color: $white;
-  outline: 0;
-  transition: left .4s;
-  cursor: pointer;
-}
-
-.toggle-well-on {
-  background-color: $brand-primary;
-}
-
-.toggle-slider-on {
-  left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
-}
-
-.toggle-slider-active {
-  left: ($toggle-width / 2) - ($toggle-slider-width / 2);
-  transition: left .4s;
-}
-
-.toggle-wrap-on {
-  .toggle-well {
-    @extend .toggle-well-on;
-  }
-
-  .toggle-slider {
-    @extend .toggle-slider-on;
-  }
-}
-
-.InProgress,
-.toggle-wrap-active {
-  .toggle-slider {
-    @extend .toggle-slider-active;
-  }
+  @include toggle($toggle-height, $toggle-padding);
 }
 
 .toggle-box-label-wrap {
-  padding-left: $padding-default;
+  padding-left: $padding-row;
 }
 
-$toggle-height: to-rem(30);
-$toggle-padding: to-rem(2);
-$toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
-$toggle-slider-padding: $toggle-padding + $toggle-border-width;
-$toggle-width: $toggle-height * 2;
-
-table {
-  .toggle-wrap {
-    width: $toggle-width;
-    height: $toggle-height;
-    margin-left: $spacer / 4;
-    display: inline-block;
-    vertical-align: middle;
-  }
-
-  .toggle-well {
-    width: $toggle-height * 2;
-    height: $toggle-height;
-    border-radius: $toggle-height / 2;
-  }
-
-  .toggle-slider {
-    top: $toggle-slider-padding;
-    left: $toggle-slider-padding;
-    width: $toggle-slider-width;
-    height: $toggle-slider-width;
-    border-radius: ($toggle-height - ($toggle-padding)) / 2;
-  }
-
-  .toggle-slider-on {
-    left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
-  }
-
-  .toggle-slider-active {
-    left: ($toggle-width / 2) - ($toggle-slider-width / 2);
-  }
+.toggle-wrap-sm {
+  @include toggle($toggle-height-sm, $toggle-padding-sm);
 }
 
-// Checkbox toggle
+// Checkbox Toggle
 //
 // Here's how to build an checkbox toggle.
 //
+// PHP rendering: The toggle() function in Gdn_Form. Also supported in simple().
+//
 // Markup:
 // <div class="toggle-wrap">
-//   <input id="toggle-checkbox" type="checkbox" />
+//   <input id="toggle-checkbox" type="checkbox" class="toggle-input" />
 //   <label for="toggle-checkbox"></label>
 // </div>
 //
-// Styleguide 3.3.2.
+// Styleguide 5.2.2.
 
 .toggle-wrap {
-
   label {
     display: inline;
   }
@@ -385,7 +326,7 @@ table {
 
 // Color Pickers
 //
-//
+// Color pickers provide an interface for the user to choose a color.
 //
 // Markup:
 // <div class="js-color-picker color-picker ">
@@ -395,7 +336,7 @@ table {
 //   <input type="color" class="js-color-picker-color color-picker-color" />
 // </div>
 //
-// Styleguide 3.4
+// Styleguide 5.4
 
 .color-picker {
   position: relative;
@@ -422,9 +363,18 @@ table {
   cursor: pointer;
 }
 
-// File
+// File Upload
 //
-// Custom file input.
+// Input for a file upload.
+//
+// Markup:
+// <label class="file-upload">
+//   <input type="file" name="Logo" id="Form_Logo" class=" js-file-upload form-control">
+//   <span class="file-upload-choose">Choose</span>
+//   <span class="file-upload-browse">Browse</span>
+// </label>
+//
+// Styleguide 5.5.
 
 .file-upload {
   position: relative;
@@ -462,47 +412,46 @@ table {
 }
 
 // Focus state
-.file input:focus ~ .file-custom {
-  @include box-shadow(0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9);
+.file-upload input:focus,
+.file-upload input:hover {
+  ~ .file-upload-choose,
+  ~ .file-upload-browse {
+    border-color: #66afe9;
+    outline: none;
+    @extend .active;
+  }
 }
 
 
 // Select
 //
-// Replaces the browser default select with a custom one, mostly pulled from
-// http://primercss.io.
-//
 // Includes IE9-specific hacks (noted by ` \9`).
 
 select.form-control {
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
-  padding-right: 2rem;
 }
 
 select {
   display: inline-block;
+  height: $control-height-rem;
   max-width: 100%;
-  padding: .375rem 2rem .375rem .75rem;
-  padding-right: .75rem \9;
+  padding-right: 2rem;
   color: $input-color;
   vertical-align: middle;
+
   background-color: #fff;
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
   background-repeat: no-repeat;
   background-position: right .75rem center;
   background-image: none \9;
   background-size: 8px 10px;
+
   border: $input-btn-border-width solid $input-border-color;
   border-radius: $border-radius;
+
   // Use vendor prefixes as `appearance` isn't part of the CSS spec.
   -moz-appearance: none;
   -webkit-appearance: none;
-
-  &:focus {
-    border-color: #51a7e8;
-    outline: none;
-    @include box-shadow(inset 0 1px 2px rgba(0, 0, 0, .075), 0 0 5px rgba(81, 167, 232, .5));
-  }
 
   // Hides the default caret in IE11
   &::-ms-expand {
@@ -515,7 +464,7 @@ select + select {
 }
 
 
-// Label selectors
+// Label Selectors
 //
 // Label selectors replace checkboxes and radios with a image and/or text selector.
 //
@@ -523,51 +472,55 @@ select + select {
 // <form>
 // <ul class="label-selector">
 //   <li class="label-selector-item">
-//     <input type="radio" id="babySeal" name="babyAnimals">
+//     <input type="radio" id="babySeal" name="babyAnimals" class="label-selector-input">
 //     <label for="babySeal">
 //       <div class="image-wrap">
 //         <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
 //         <div class="overlay">
 //           <div class="buttons">
-//             <a class="btn btn-overlay">Button</a>
+//             <div class="btn btn-overlay">Button</div>
 //           </div>
 //           <div class="selected">
-//             selected icon
+//             <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+//               <use xlink:href="#checkmark" />
+//             </svg>
 //           </div>
 //         </div>
 //       </div>
 //       <div class="title">Baby Seal</div>
 //       <div class="info">by Author</div>
-//       <p class="description">Choose this happy baby seal. It's so very happy.</p>
+//       <div class="description">Choose this happy baby seal. It's so very happy.</div>
 //     </label>
 //   </li>
 //   <li class="label-selector-item">
-//     <input type="radio" id="puppy" name="babyAnimals">
+//     <input type="radio" id="puppy" name="babyAnimals" class="label-selector-input">
 //     <label for="puppy">
 //       <div class="image-wrap">
 //         <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
 //         <div class="overlay">
 //           <div class="buttons">
-//             <a class="btn btn-overlay">Button</a>
+//             <div class="btn btn-overlay">Button</div>
 //           </div>
 //           <div class="selected">
-//             selected icon
+//             <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+//               <use xlink:href="#checkmark" />
+//             </svg>
 //           </div>
 //         </div>
 //       </div>
 //       <div class="title">Puppy</div>
 //       <div class="info">by Author</div>
-//       <p class="description">Choose this sleepy puppy. Sooo tired, puppy.</p>
+//       <div class="description">Choose this sleepy puppy. Sooo tired, puppy.</div>
 //     </label>
 //   </li>
 // </ul>
 // </form>
 //
-// Styleguide 3.5.
+// Styleguide 5.6.
 
 .label-selector {
   @extend .row;
-  @include list-reset();
+  @include list-reset;
 
   label {
     padding-left: 0;
@@ -626,6 +579,7 @@ select + select {
 
     &:hover .overlay {
       height: 100%;
+      opacity: .9;
     }
   }
 
@@ -646,10 +600,10 @@ select + select {
     left: 0;
     right: 0;
     width: 100%;
-    height: 0;
+    height: 100%;
     z-index: 20;
     background-color: $brand-primary;
-    opacity: .9;
+    opacity: 0;
     overflow: hidden;
     transition: all .1s;
     text-align: center;
@@ -672,10 +626,6 @@ select + select {
       max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
       min-width: 5rem;
     }
-  }
-
-  .description {
-    display: none;
   }
 
   .label-selector-item {
@@ -702,6 +652,9 @@ select + select {
   }
 }
 
+// TODO: these are kinda tweaks, aren't they? Think about it.
+// Theme-specific variants
+
 .theme-wrap {
   position: relative;
   margin-bottom: $spacer / 2;
@@ -725,6 +678,8 @@ select + select {
     }
   }
 }
+
+// Mobile-theme-specific variants
 
 .mobile-theme-wrap {
   position: relative;
@@ -758,13 +713,11 @@ select + select {
 }
 
 .Homepage .label-selector-item {
-  @extend .grid-item-large;
-
+  @include grid-item-large();
 }
 
-.label-selector-item:not(.no-grid) {
-  @extend .grid-item;
-
+.label-selector-item {
+  @include grid-item();
   padding: $spacer $spacer ($spacer / 2);
 }
 
@@ -772,21 +725,25 @@ select + select {
   @include button-variant($white, transparent, $white, $white, $navbar-active-link-active-bg, $white);
 }
 
-// Search input
+// Search Input
 //
 // Search inputs have a hidden button and a search icon on the input.
 //
 // Markup:
 // <form>
 //   <div class="search-wrap">
-//     <div class="icon-wrap icon-search-wrap"><svg /></div>
+//     <div class="search-icon-wrap search-icon-search-wrap">
+//       <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17"><use xlink:href="#search" /></svg>
+//     </div>
 //     <input class="form-control">
 //     <button type="submit" class="search-submit">Search</button>
-//     <div class="icon-wrap icon-clear-wrap"><svg /></div>
+//     <div class="search-icon-wrap search-icon-clear-wrap">
+//       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17"><use xlink:href="#close" /></svg>
+//     </div>
 //   </div>
 // </form>
 //
-// Styleguide 3.6.
+// Styleguide 5.7.
 
 
 .search-wrap {
@@ -797,7 +754,7 @@ select + select {
     padding-left: $spacer * 2.5;
   }
 
-  .icon-wrap {
+  .search-icon-wrap {
     @extend .icon;
     $btn-icon-height: 24;
     $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height)) / 2;
@@ -816,11 +773,11 @@ select + select {
     top: 0;
   }
 
-  .icon-clear-wrap {
+  .search-icon-clear-wrap {
     right: 0;
   }
 
-  .icon-search-wrap {
+  .search-icon-search-wrap {
     left: 0;
   }
 
@@ -835,6 +792,25 @@ select + select {
   position: absolute;
   left: -9999px;
 }
+
+// Suffix Textbox
+//
+// Text box with a suffix value (useful for units). The suffix pulls from the data-suffix value of a input wrapper div.
+//
+// Markup:
+// <div class="form-group">
+//   <div class="label-wrap-wide">
+//     <label for="Form_ThumbnailSize">Thumbnail Size</label>
+//     <div class="info">Avatars will have their thumbnails saved at this size.</div>
+//   </div>
+//   <div class="input-wrap-right">
+//     <div class="textbox-suffix" data-suffix="px">
+//       <input type="text" class="form-control">
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 5.8.
 
 .textbox-suffix {
   position: relative;
@@ -860,6 +836,75 @@ select + select {
   }
 }
 
+// Text Input With Button
+//
+// Text input with an attached button and optional label.
+//
+// Markup:
+// <div class="text-input-button">
+//   <div class="label-wrap">
+//     <label for="Form_Label">Label:</label>
+//   </div>
+//   <input type="text" id="Form_Label" name="Label" value="preview" class="form-control">
+//   <button type="submit" id="Form_Apply" name="Apply" class="btn btn-primary btn-apply" value="Apply">
+//     Apply
+//   </button>
+// </div>
+//
+// Styleguide 5.9.
+
+.text-input-button {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .btn {
+    margin-left: -$border-width;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .label-wrap {
+    flex-shrink: 0;
+    display: block;
+    margin-right: $spacer / 2;
+
+    label {
+      line-height: 1;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.radio,
+.checkbox {
+  margin-bottom: 0;
+}
+
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: $spacer / 4;
+}
+
+// Checkboxes and Radios
+//
+// We use iCheck to make our checkboxes and radios look nice. It does some magic wrap the input in a style-able div.
+// The most important thing to note is that you cannot listen for the click event, since the click happens on the
+// wrapper. Listen for the change event instead.
+//
+// Markup:
+// <script>
+//   $(document).on('click', '#checkbox-1', function() {console.log('clicked!')}); // doesn't work
+//   $(document).on('change', '#checkbox-1', function() {console.log('changed!')});
+// </script>
+// <label><input id="checkbox-1" type="checkbox" />A label for checkbox 1</label>
+//
+// Styleguide 5.10.
 
 // iCheck
 .icheck-label {
@@ -933,33 +978,3 @@ label[id^=iCheck] {
   padding-left: 0;
 }
 
-// Text input with a button
-
-.text-input-button {
-  display: flex;
-  flex-grow: 1;
-  align-items: center;
-
-  input {
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-  }
-
-  .btn {
-    margin-left: -$border-width;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    min-width: inherit;
-  }
-
-  .label-wrap {
-    flex-shrink: 0;
-    display: block;
-    margin-right: $spacer / 2;
-
-    label {
-      line-height: 1;
-      margin-bottom: 0;
-    }
-  }
-}

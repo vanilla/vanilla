@@ -14,7 +14,17 @@
   }
 }
 
-@mixin button-variant($color, $background, $border, $active-color, $active-background, $active-border, $hover-color: $active-color, $hover-background: $active-background, $hover-border: $active-border) {
+@mixin button-variant(
+  $color,
+  $background,
+  $border,
+  $active-color,
+  $active-background,
+  $active-border,
+  $hover-color: $active-color,
+  $hover-background: $active-background,
+  $hover-border: $active-border) {
+
   color: $color;
   background-color: $background;
   border-color: $border;
@@ -96,7 +106,13 @@
   }
 }
 
-@mixin image-wrap($width: 5.25rem, $height: 5.25rem, $radius: .25rem, $has-border: true, $background-color: $grey-light) {
+@mixin image-wrap(
+  $width: 5.25rem,
+  $height: 5.25rem,
+  $radius: .25rem,
+  $has-border: true,
+  $background-color: $grey-light) {
+
   position: relative;
   min-width: $width;
   height: $height;
@@ -113,16 +129,129 @@
   }
 }
 
-@mixin full-border($display: block, $has-border-bottom: true, $has-border-top: false) {
+@mixin full-border(
+  $display: block,
+  $has-border-bottom: true,
+  $has-border-top: false) {
+
   display: $display;
-  margin-left: -$padding-default;
-  margin-right: -$padding-default;
-  padding-left: $padding-default;
-  padding-right: $padding-default;
+  margin-left: -$padding-row;
+  margin-right: -$padding-row;
+  padding-left: $padding-row;
+  padding-right: $padding-row;
   @if ($has-border-bottom) {
     border-bottom: $border-width solid #e7e8e9;
   }
   @if ($has-border-top) {
     border-top: $border-width solid #e7e8e9;
+  }
+}
+
+// Grid
+//
+// Grid layout.
+//
+// No styleguide reference.
+
+// Grid Items
+
+// Starts 4 wide
+@mixin grid-item() {
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-8;
+  @extend .col-xl-6;
+}
+
+// Starts 3 wide
+@mixin grid-item-large() {
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-12;
+  @extend .col-xl-8;
+}
+
+@mixin list-reset() {
+
+  &,
+  ul,
+  ol {
+    padding-left: 0;
+  }
+
+  li {
+    list-style: none;
+  }
+}
+
+
+@mixin toggle($toggle-height, $toggle-padding) {
+
+  $toggle-slider-width: $toggle-height - ($toggle-padding * 2) - ($toggle-border-width * 2);
+  $toggle-slider-padding: $toggle-padding + $toggle-border-width;
+  $toggle-width: $toggle-height * 2;
+
+  display: block;
+  position: relative;
+  width: $toggle-width;
+  height: $toggle-height;
+
+  .toggle-well {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: $toggle-height * 2;
+    height: $toggle-height;
+    background-color: $white;
+    border-radius: $toggle-height / 2;
+    border: $toggle-border-width solid $grey;
+    transition: background .4s;
+    cursor: pointer;
+  }
+
+  .toggle-slider {
+    display: block;
+    position: absolute;
+    top: $toggle-slider-padding;
+    left: $toggle-slider-padding;
+    width: $toggle-slider-width;
+    height: $toggle-slider-width;
+    border-radius: ($toggle-height - ($toggle-padding)) / 2;
+    border: $toggle-border-width solid $grey;
+    background-color: $white;
+    outline: 0;
+    transition: left .4s;
+    cursor: pointer;
+  }
+
+  .toggle-well-on {
+    background-color: $brand-primary;
+  }
+
+  .toggle-slider-on {
+    left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
+  }
+
+  .toggle-slider-active {
+    left: ($toggle-width / 2) - ($toggle-slider-width / 2);
+    transition: left .4s;
+  }
+
+  &.toggle-wrap-on {
+    .toggle-well {
+      @extend .toggle-well-on;
+    }
+
+    .toggle-slider {
+      @extend .toggle-slider-on;
+    }
+  }
+
+  .InProgress,
+  .toggle-wrap-active {
+    .toggle-slider {
+      @extend .toggle-slider-active;
+    }
   }
 }

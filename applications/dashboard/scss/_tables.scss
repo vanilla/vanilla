@@ -1,30 +1,134 @@
-@include media-breakpoint-down(md) {
-  $font-size-table: to-rem(11);
-}
+// Tables
+//
+// Table layouts.
+//
+// Styleguide 7.
+
+// Data Table
+//
+// The only two classes you need to add to get this styling is "table-wrap" to a container that wraps around
+// the table element and also the "table-data" class to the table element itself.
+//
+// Take note of the options cell. This cell generally contains icons and maybe a toggle to perform actions on the row.
+// Most of the time, these options should be wrapped in a btn-group div to make sure they don't wrap and align
+// themselves to eachother properly. Also, any icon that performs an action should have the title attribute set, so
+// the user can hover over it to get a description of what it does.
+//
+// The default min-width for any column (not including the checkbox column) is 100px. You can specify other min-widths
+// using the following classes on th elements in the thead container:
+//
+// .column-xl       : 300px <br>
+// .column-lg       : 210px <br>
+// .column-md       : 132px <br>
+// .column-sm       : 90px  <br>
+// .column-xs       : 54px  <br>
+// .column-checkbox : 42px  <br>
+//
+// The table is made responsive by the jquery plugin Table Jengo, which adds column headings and cell data to meta
+// items under the main column. There are data attributes you can add to columns to make Table Jengo work as you intend:
+//
+// Set 'data-tj-ignore="true"' on a thead td or thead th element to never collapse that column
+// Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column
+//
+// Markup:
+// <div class="table-wrap">
+//   <table class="table-data">
+//     <thead>
+//       <tr>
+//         <th class="column-checkbox" data-tj-ignore="true"></th>
+//         <th class="column-lg" data-tj-main="true">Username</th>
+//         <th>Roles</th>
+//         <th class="column-md">First Visit</th>
+//         <th class="column-md">Last Visit</th>
+//         <th>Last IP</th>
+//         <th class="options column-sm"></th>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       <tr>
+//         <td><input type="checkbox"></td>
+//         <td>
+//           <div class="media-sm">
+//             <div class="media-left">
+//               <div class="media-image-wrap">
+//                 <a href="#"><img src="./public/resources/images/smart-puppy.jpg"></a>
+//               </div>
+//             </div>
+//             <div class="media-body">
+//               <div class="media-title">
+//                 <a href="#">Smart Puppy</a>
+//               </div>
+//               <div class="info user-email">puppy@email.com</div>
+//             </div>
+//           </div>
+//         </td>
+//         <td>Member, Moderator</td>
+//         <td>April 2</td>
+//         <td>April 26</td>
+//         <td>10.0.10.1</td>
+//         <td class="options">
+//           <div class="btn-group">
+//             <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+//               <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+//                 <use xlink:href="#edit"></use>
+//               </svg>
+//             </a>
+//             <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+//               <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+//                 <use xlink:href="#delete"></use>
+//               </svg>
+//             </a>
+//           </div>
+//         </td>
+//       </tr>
+//       <tr>
+//         <td><input type="checkbox"></td>
+//         <td>
+//           <div class="media-sm">
+//             <div class="media-left">
+//               <div class="media-image-wrap">
+//                 <a href="#"><img src="./public/resources/images/little-chick.jpg"></a>
+//               </div>
+//             </div>
+//             <div class="media-body">
+//               <div class="media-title">
+//                 <a href="#">Chick</a>
+//               </div>
+//               <div class="info user-email">chick@email.com</div>
+//             </div>
+//           </div>
+//         </td>
+//         <td>Member</td>
+//         <td>April 2</td>
+//         <td>April 26</td>
+//         <td>10.0.10.1</td>
+//         <td class="options">
+//           <div class="btn-group">
+//             <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+//               <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+//                 <use xlink:href="#edit"></use>
+//               </svg>
+//             </a>
+//             <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+//               <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+//                 <use xlink:href="#delete"></use>
+//               </svg>
+//             </a>
+//           </div>
+//         </td>
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+//
+// Styleguide 7.1.
 
 .table-wrap {
   display: block;
   margin-top: 0;
-  margin-right: (-$padding-default);
+  margin-right: (-$padding-row);
   margin-bottom: 0;
-  margin-left: (-$padding-default);
-
-  .header-block + & {
-    margin-top: -$border-width;
-  }
-
-  &.padded {
-    margin-top: $spacer;
-    margin-bottom: $spacer;
-  }
-
-  &.padded-top {
-    margin-top: $spacer;
-  }
-
-  &.padded-bottom {
-    margin-bottom: $spacer;
-  }
+  margin-left: (-$padding-row);
 }
 
 .table-data {
@@ -33,26 +137,7 @@
   table-layout: fixed;
   margin-bottom: 0;
 
-  ul {
-    padding-left: 0;
-  }
-
-  td.options {
-    text-align: right;
-
-    > * {
-      display: inline-block;
-      margin-right: $spacer / 4;
-      vertical-align: middle;
-
-      &:last-child {
-        margin-right: 0;
-      }
-    }
-  }
-
-
-
+  // thead
   thead {
     tr {
       background-color: $grey-light;
@@ -60,6 +145,7 @@
 
     th,
     td {
+      width: to-rem(100);
       padding: ($spacer / 2) ($spacer * .75);
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
@@ -68,18 +154,41 @@
       font-weight: 500;
       font-size: $font-size-sm;
       line-height: $line-height-lg;
-      vertical-align: middle;
+
+      &.column-xl {
+        width: to-rem(300);
+      }
+
+      &.column-lg {
+        width: to-rem(210);
+      }
+
+      &.column-md {
+        width: to-rem(132);
+      }
+
+      &.column-sm {
+        width: to-rem(90);
+      }
+
+      &.column-xs {
+        width: to-rem(54);
+      }
+
+      &.column-checkbox {
+        width: to-rem(42);
+        max-width: to-rem(42);
+        padding-left: $table-cell-padding;
+        padding-right: $table-cell-padding;
+      }
 
       &:last-child {
         border-right: 0;
       }
-
-      &.column-wrap {
-        white-space: wrap;
-      }
     }
   }
 
+  // tbody
   tbody {
     font-size: $font-size-tables;
     tr {
@@ -91,47 +200,26 @@
 
   th,
   td {
-    width: to-rem(100);
     overflow: hidden;
-    padding: $table-cell-padding $padding-default;
+    padding: $table-cell-padding $padding-row;
     line-height: $line-height;
     vertical-align: middle;
     border-top: $table-border-width solid $table-border-color;
+  }
 
-    &.column-xl {
-      width: to-rem(300);
+  td.options {
+    .btn-group {
+      justify-content: flex-end;
     }
+  }
 
-    &.column-lg {
-      width: to-rem(210);
-    }
-
-    &.column-md {
-      width: to-rem(132);
-    }
-
-    &.column-sm {
-      width: to-rem(90);
-    }
-
-    &.column-xs {
-      width: to-rem(54);
-    }
-
-    &.column-checkbox {
-      width: to-rem(42);
-      max-width: to-rem(42);
-      padding-left: $table-cell-padding;
-      padding-right: $table-cell-padding;
-    }
+  .toggle-wrap {
+    margin-left: $spacer / 4;
+    @extend .toggle-wrap-sm;
   }
 
   tbody + tbody {
     border-top: (2 * $table-border-width) solid $table-border-color;
-  }
-
-  .table {
-    background-color: $body-bg;
   }
 
   &.no-hover {
@@ -143,16 +231,40 @@
   }
 }
 
+// Table jengo
 
-.attach-top td {
-  // Hovering bg color doesn't really work here
-  border-top: 0;
-  padding-top: 0;
+.tj-meta {
+  margin-top: ($spacer / 2);
+
+  .table-meta-item {
+    font-size: $font-size-sm;
+  }
+
+  .media-sm {
+    display: inline-block;
+    .media-sm-image-wrap,
+    .media-sm-info {
+      display: none;
+    }
+  }
+
+  .table-meta-item-label {
+    font-weight: 500;
+
+    // Disable any links in labels.
+    a {
+      color: $grey-dark;
+      pointer-events: none;
+      cursor: default;
+    }
+  }
 }
+
+// TODO: styleguide
+// Checkbox grid
 
 .CheckBoxGrid {
   table-layout: auto;
-
 
   .checkbox {
     margin-bottom: 0;
@@ -240,8 +352,8 @@
   }
 }
 
-
-
+// TODO: refactor and styleguide
+// Feed tables
 
 .Section-DashboardHome {
   table {
@@ -328,6 +440,8 @@
       border-top: $border-width * 2 solid #ddd;
     }
 
+    @extend .media-sm;
+
     h2 {
       padding: 0;
       margin-top: - to-rem(3);
@@ -338,7 +452,7 @@
       font-weight: 400;
       font-size: 0.8125rem;
       text-overflow: ellipsis;
-      @extend .media-sm-title;
+      @extend .media-title;
       margin-bottom: to-rem(2);
       line-height: $line-height-lg;
     }
@@ -381,43 +495,7 @@
       top: $spacer * .75 + (to-rem(30) / 2) - ($font-size-tables / 2);
       text-align: right;
 
-
-      @extend .media-sm-info;
+      @extend .info;
     }
   }
-}
-
-.tj-meta {
-  margin-top: ($spacer / 2);
-
-  .table-meta-item {
-    font-size: $font-size-sm;
-  }
-
-  .media-sm {
-    display: inline-block;
-    .media-sm-image-wrap,
-    .media-sm-info {
-      display: none;
-    }
-  }
-
-  .table-meta-item-data {
-  }
-
-  .table-meta-item-label {
-    font-weight: 500;
-
-    // Disable links in labels.
-    a {
-      color: $grey-dark;
-      pointer-events: none;
-      cursor: default;
-    }
-  }
-}
-
-
-.content-cell {
-  min-width: to-rem(200);
 }

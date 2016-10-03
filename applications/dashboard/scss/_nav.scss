@@ -1,6 +1,163 @@
 // Navs
 //
-// The dashboard panel nav styling.
+// Styleguide 9.
+
+// Choose-Your-Own-Adventure Nav
+//
+// Navigation for a landing page of parent settings page. Displays a bunch of different navigation options that
+// will likely lead to other settings pages.
+//
+// PHP rendering: Render using the `nav-adventure` of the nav module.
+//
+// Markup:
+// <div class="nav nav-adventure">
+//   <div class="nav-item">
+//     <a class="nav-link" href="#">
+//       <div class="nav-item-icon">
+//         <svg class="icon icon-svg-plugin" viewBox="0 0 17 17">
+//           <use xlink:href="#plugin"></use>
+//         </svg>
+//       </div>
+//       <div class="nav-item-content">
+//         <div class="nav-item-title">Here's the nav title</div>
+//         <div class="nav-item-description">
+//           Here's some expanatory text about where you're headed if you select this item.
+//         </div>
+//       </div>
+//       <div class="nav-item-arrow">
+//         <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+//           <use xlink:href="#chevron-right"></use>
+//         </svg>
+//       </div>
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide 9.1.
+
+.nav-adventure {
+  .nav-item {
+    display: block;
+    margin-left: -$padding-row;
+    margin-right: -$padding-row;
+    border-bottom: $border-width solid $border-color;
+
+    &:first-child {
+      border-top: $border-width solid $border-color;
+    }
+  }
+
+  .nav-item-title {
+    line-height: 1;
+    font-weight: 500;
+    margin-bottom: to-rem(6);
+  }
+
+  .nav-item-description {
+    margin-bottom: - to-rem(5);
+  }
+
+  .nav-link {
+    position: relative;
+    display: flex;
+    justify-items: flex-start;
+    align-items: center;
+    padding: $spacer $padding-row;
+    color: $grey-dark;
+    transition: background-color .1s;
+
+    > * {
+      z-index: 1;
+    }
+
+    svg {
+      fill: $grey-dark;
+      opacity: 0.7;
+      display: block;
+      height: to-rem(24);
+    }
+
+    &:hover {
+      &::before {
+        width: 100%;
+      }
+      background-color: #f9fdfe;
+    }
+  }
+
+  .nav-item-icon {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: to-rem(36);
+    height: to-rem(36);
+    border: $border-width solid $border-color;
+    border-radius: $border-radius;
+    margin-right: $spacer;
+  }
+
+  .nav-item-arrow {
+    margin-left: auto;
+  }
+}
+
+// Stats Nav
+//
+// Navigation for a landing page of parent settings page. Displays a bunch of different navigation options that
+// will likely leading to other settings pages.
+//
+// Markup:
+// <ul class="nav nav-stats">
+//   <li class="nav-stats-item nav-stats-link nav-stats-pageviews active">
+//     <div class="nav-stats-value">33,250</div>
+//     <div class="nav-stats-title">Page Views</div>
+//   </li>
+//   <li class="nav-stats-item nav-stats-link nav-stats-discussions">
+//     <div class="nav-stats-value">360</div>
+//     <div class="nav-stats-title">Discussions</div>
+//   </li>
+// </ul>
+//
+// Styleguide 9.2.
+
+.nav-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-stats-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  padding: $spacer $spacer 0 $spacer ;
+  color: rgba(25,25,25,0.20);
+}
+
+.nav-stats-link {
+  > * {
+    cursor: pointer;
+  }
+}
+
+.nav-stats-title {
+  font-weight: 400;
+  padding: $spacer / 2 0 $spacer / 4;
+  text-transform: uppercase;
+  font-size: $font-size-sm;
+}
+
+.nav-stats-value {
+  font-weight: 300;
+  font-size: to-rem(40);
+}
+
+
+// Panel navigation
+//
+// The dashboard panel navigation.
 //
 // No styleguide reference.
 
@@ -48,9 +205,9 @@
     color: $grey;
   }
 
+  // External link on forum title.
   svg {
-    fill: $grey-dark;
-    opacity: 0.7;
+    fill: $grey;
   }
 
   .badge {
@@ -101,152 +258,4 @@
   &:hover {
     cursor: pointer;
   }
-}
-
-//
-// <div class="nav nav-adventure">
-//   <div class="nav-item">
-//     <a class="nav-link" href="#">
-//       <div class="nav-item-icon"><svg></svg></div>
-//       <div class="nav-item-content">
-//         <div class="nav-item-title">Here's the nav title</div>
-//         <div class="nav-item-description">
-//           Here's some expanatory text about where you're headed if you select this item.
-//         </div>
-//       </div>
-//       <div class="nav-item-arrow"><svg></svg></div>
-//     </a>
-//   </div>
-// </div>
-//
-// Styleguide Section 4.1 Choose-Your-Own-Adventure Nav
-
-.nav-adventure {
-  .nav-item {
-    display: block;
-    margin-left: -$padding-default;
-    margin-right: -$padding-default;
-    border-bottom: $border-width solid $border-color;
-
-    &:first-child {
-      border-top: $border-width solid $border-color;
-    }
-  }
-
-  .nav-item-title {
-    line-height: 1;
-    font-weight: 500;
-    margin-bottom: to-rem(6);
-  }
-
-  .nav-item-description {
-    margin-bottom: - to-rem(5);
-  }
-
-  .nav-link {
-    position: relative;
-    display: flex;
-    justify-items: flex-start;
-    align-items: center;
-    padding: $spacer $padding-default;
-    color: $grey-dark;
-    transition: background-color .1s;
-
-    > * {
-      z-index: 1;
-    }
-
-    //&::before {
-    //  position: absolute;
-    //  z-index: 0;
-    //  left: 0;
-    //  width: 0;
-    //  height: 100%;
-    //  background-color: $brand-primary;
-    //  transition: all .4s;
-    //  content: "";
-    //}
-
-    svg {
-      fill: $grey-dark;
-      opacity: 0.7;
-      display: block;
-      height: to-rem(24);
-    }
-
-    &:hover {
-      &::before {
-        width: 100%;
-      }
-      background-color: #f9fdfe;
-    }
-  }
-
-  .nav-item-icon {
-    flex-shrink: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: to-rem(36);
-    height: to-rem(36);
-    border: $border-width solid $border-color;
-    border-radius: $border-radius;
-    margin-right: $spacer;
-  }
-
-  .nav-item-arrow {
-    margin-left: auto;
-  }
-}
-
-.nav-stats {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.toolbar > .nav-stats {
-  margin-right: 0;
-  flex-shrink: 1;
-}
-
-.nav-stats-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  line-height: 1;
-  padding: $spacer $spacer 0 $spacer ;
-  color: rgba(25,25,25,0.20);
-}
-
-.nav-stats-link {
-  > * {
-    cursor: pointer;
-  }
-}
-
-.nav-stats-title {
-  font-weight: 400;
-  padding: $spacer / 2 0 $spacer / 4;
-  text-transform: uppercase;
-  font-size: $font-size-sm;
-}
-
-.toolbar-stats-daterange-preview,
-.pager-count {
-  line-height: 1;
-  font-weight: 500;
-  padding-right: $spacer / 2;
-}
-
-.pager,
-.toolbar-stats-daterange {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-}
-
-.nav-stats-value {
-  font-weight: 300;
-  font-size: to-rem(40);
 }

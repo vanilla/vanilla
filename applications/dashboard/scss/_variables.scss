@@ -187,7 +187,7 @@ $btn-border-radius:              $border-radius !default;
 $btn-border-radius-lg:           $border-radius-lg !default;
 $btn-border-radius-sm:           $border-radius-sm !default;
 
-$btn-border-radius-navbar:       $btn-padding-y-sm + ($line-height-sm / 2);
+$btn-border-radius-navbar:       to-rem(10);
 
 // Navs
 
@@ -226,8 +226,11 @@ $toggle-border-width:                       $border-width;
 $toggle-height:                             $control-height-rem;
 $toggle-padding:                            to-rem(2);
 
+$toggle-height-sm: to-rem(24);
+$toggle-padding-sm: to-rem(1);
+
 // Padding
-$padding-default:                           $grid-gutter-width / 2;
+$padding-row:                               $grid-gutter-width / 2;
 $border-color:                              #e7e8e9;
 
 $font-size-tables:                          to-rem(13);
@@ -265,6 +268,8 @@ $grid-breakpoints: (
 
 $icon-sizes: (
   9: 9,
+  10: 10,
+  11: 11,
   12: 12,
   16: 16,
   24: 24,

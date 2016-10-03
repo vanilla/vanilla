@@ -73,7 +73,7 @@
   }
 
   ul {
-    @include list-reset();
+    @include list-reset;
   }
 
   li {
@@ -159,11 +159,6 @@
 
   .control-panel-footer {
     margin-top: $spacer;
-  }
-
-  svg {
-    width: to-rem(18);
-    fill: $grey-light-text;
   }
 
   .control-panel-list-item-label {

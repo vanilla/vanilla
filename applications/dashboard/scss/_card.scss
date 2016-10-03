@@ -1,3 +1,9 @@
+// Cards
+//
+// Find the card styling here.
+//
+// Styleguide 12.
+
 .card {
   .list-group-item {
     font-weight: 500;
@@ -32,18 +38,6 @@
 
   .media-sm {
     align-items: flex-start;
-  }
-
-  .btn-media-sm {
-    margin-top: $spacer;
-
-    svg {
-      width: $font-size-xs;
-    }
-
-    &:hover svg {
-      fill: $white;
-    }
   }
 }
 

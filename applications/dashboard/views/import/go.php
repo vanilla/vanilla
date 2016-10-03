@@ -29,7 +29,7 @@ if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
 
                 if ($Number == $CurrentStep) {
                     $Message = val('CurrentStepMessage', $this->Data);
-                    echo '<div><span class="Progress">&#160;</span>';
+                    echo '<div><span class="progress">&#160;</span>';
                     if ($Message)
                         echo ' ', wrap($Message, 'span');
                     echo '</div>';

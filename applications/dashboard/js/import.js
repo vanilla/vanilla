@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
             dataType: 'json',
             success: function(json) {
                 // Refresh the view.
-                $('#Content').html(json.Data);
+                $('#main-row .content').html(json.Data);
                 bindAjaxForm();
 
                 // Go to the next step.
@@ -19,12 +19,10 @@ jQuery(document).ready(function($) {
                 }
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                if (textStatus == "timeout")
+                if (textStatus == "timeout") {
                     return;
-                // Remove any old popups
-                $('div.Popup').remove();
-                // Add new popup with error
-                $.popup({}, XMLHttpRequest.responseText);
+                }
+                gdn.informError(XMLHttpRequest.responseText);
             }
         });
     }
@@ -33,7 +31,7 @@ jQuery(document).ready(function($) {
         $('form').ajaxForm({
             dataType: 'json',
             success: function(json) {
-                $('#Content').html(json.Data);
+                $('#main-row .content').html(json.Data);
                 bindAjaxForm();
 
                 // Go to the next step.

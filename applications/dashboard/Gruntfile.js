@@ -41,10 +41,11 @@ module.exports = function (grunt) {
     kss: {
       options: {
         verbose: true,
-        template: 'template'
+        template: 'template',
+        homepage: 'styleguide.html'
       },
       dist: {
-        src: ['scss'],
+        src: ['scss/src'],
         dest: 'styleguide'
       }
     },
@@ -138,6 +139,13 @@ module.exports = function (grunt) {
               'design/admin.css'
             ],
             dest: 'template/public/admin.css'
+          },
+          {
+            flatten: true,
+            src: [
+              'js/jquery.tablejenga.js'
+            ],
+            dest: 'template/public/jquery.tablejenga.js'
           }
         ]
       },
@@ -162,7 +170,7 @@ module.exports = function (grunt) {
       dist: {
         files: [{
           expand: true
-          , cwd: 'scss/'
+          , cwd: 'scss'
           , src: [
             '*.scss'
             , '!_*.scss'
@@ -215,6 +223,22 @@ module.exports = function (grunt) {
           'js/src/main.js'
         ])
         , dest: 'js/dashboard.js'
+      },
+      styleguide: {
+        src: ([]).concat([
+          'js/vendors/tether.js',
+          'js/vendors/jquery-scrolltofixed-min.js',
+          'js/vendors/icheck.min.js',
+          'js/vendors/clipboard.min.js',
+          'js/vendors/drop.min.js',
+          'js/vendors/bootstrap/*.js',
+          'js/vendors/prettify/*.js',
+          'js/vendors/ace/*.js',
+          'js/colorpicker.js',
+          'js/cropimage.js',
+          'js/dashboard.js'
+        ])
+        , dest: 'template/public/dashboard.js'
       }
     },
 
@@ -249,11 +273,10 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_list-group.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',
-            'scss/vendors/bootstrap/scss/_custom-forms.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'
           ],
-          'scss/maps/_dashboard.scss': ['scss/*.scss', '!scss/admin.scss', '!scss/style.scss', '!scss/_variables.scss', '!scss/_global.scss', '!scss/_svgs.scss']
+          'scss/maps/_dashboard.scss': ['scss/src/*.scss', '!scss/src/_variables.scss', '!scss/src/_svgs.scss']
         },
         options: {
           useSingleQuotes: true,
@@ -264,7 +287,8 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('styleguide', [
-    'copy:styleguide'
+    'concat:styleguide'
+    , 'copy:styleguide'
     , 'kss'
   ]);
 
@@ -276,5 +300,6 @@ module.exports = function (grunt) {
     , 'concat'
     , 'jshint'
     , 'imagemin'
+    , 'styleguide'
   ]);
 };

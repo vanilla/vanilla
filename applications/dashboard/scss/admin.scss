@@ -5,12 +5,12 @@
 // @author    Becky Van Bussel <beckyvanbussel@gmail.com>
 //
 
-@import 'variables';
-@import 'svgs';
+@import 'src/variables';
+@import 'src/svgs';
 @import 'maps/bootstrapVariables';
 @import 'maps/bootstrapMixins';
 @import 'maps/bootstrapAnimation';
-@import 'mixins';
+@import 'src/mixins';
 
 @import 'maps/vanillicon';
 @import 'maps/vendorSubset';

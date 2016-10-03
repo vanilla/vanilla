@@ -8,29 +8,9 @@
   }
 }
 
-.emojiset-author {
-  @extend .info;
-}
-
-.emojiext-list {
-  @extend .label-selector;
-}
-
 .Current,
 .current-theme {
   @extend .active;
-}
-
-.FilterMenu {
-  select {
-    display: inline-block;
-    width: inherit;
-  }
-  .FilterButton {
-    display: inline-block;
-    @extend .btn;
-    @extend .btn-primary;
-  }
 }
 
 // Autocomplete
@@ -42,7 +22,7 @@
 
 .ac_results {
   @extend .dropdown-menu;
-  @include list-reset();
+  @include list-reset;
   z-index: 1100;
 
   li {

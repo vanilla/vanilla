@@ -9,12 +9,20 @@
 
 
 /**
- * Class OAuth2PluginBase
+ * Class Gdn_OAuth2
  *
  * Base class to be extended by any plugin that wants to use Oauth2 protocol for SSO.
- * Will eventually be moved to a library that will be included by composer.
+ *
+ * WARNING
+ * This is a base class for the purposes of being extended by other plugins.
+ * It is not to be instantiated on its own.
+ *
+ * For most OAuth2 SSO needs the generic plugins/OAuth2/class.Oauth2.plugin.php should
+ * be adequate. If not, create a plugin that extends this class, Gdn_OAuth2, and overwrite
+ * any of its methods of constants.
+ *
  */
-class Gdn_OAuth2 extends Gdn_Pluggable {
+class Gdn_OAuth2 extends Gdn_Plugin {
 
     /** @var string token provider by authenticator  */
     protected $accessToken;
@@ -131,7 +139,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Renew or return access token.
      *
      * @param bool|string $newValue Pass existing token if it exists.
-     *
      * @return bool|string|null String if there is an accessToken passed or found in session, false or null if not.
      */
     public function accessToken($newValue = false) {
@@ -156,7 +163,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set access token received from provider.
      *
      * @param string $accessToken Retrieved from provider to authenticate communication.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setAccessToken($accessToken) {
@@ -169,7 +175,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set provider key used to access settings stored in GDN_UserAuthenticationProvider.
      *
      * @param string $providerKey Key to retrieve provider data hardcoded into child class.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setProviderKey($providerKey) {
@@ -182,7 +187,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set scope to be passed to provider.
      *
      * @param string $scope.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setScope($scope) {
@@ -195,7 +199,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set additional params to be added to the get string in the AuthorizeUri string.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setAuthorizeUriParams($params) {
@@ -208,7 +211,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set additional params to be added to the post array in the accessToken request.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setRequestAccessTokenParams($params) {
@@ -221,12 +223,33 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * Set additional params to be added to the get string in the getProfile request.
      *
      * @param string $params.
-     *
      * @return $this Return this object for chaining purposes.
      */
     public function setGetProfileParams($params) {
         $this->getProfileParams = $params;
         return $this;
+    }
+
+
+    /**
+     * Allow child classes to pass different options to the Token request API call.
+     * Valid options are ConnectTimeout, Timeout, Content-Type and Authorization-Header-Message.
+     *
+     * @return array
+     */
+    public function getAccessTokenRequestOptions() {
+        return [];
+    }
+
+
+    /**
+     * Allow child classes to pass different options to the Profile request API call.
+     * Valid options are ConnectTimeout, Timeout, Content-Type and Authorization-Header-Message.
+     *
+     * @return array
+     */
+    public function getProfileRequestOptions() {
+        return [];
     }
 
 
@@ -256,7 +279,18 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         return $this->providerKey;
     }
 
-
+    /**
+     * Register a call back function so that multiple plugins can use it as an entry point on SSO.
+     *
+     * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
+     * initial request to log in to an authentication provider.
+     *
+     * @param $sender
+     */
+    public function gdn_pluginManager_afterStart_handler($sender) {
+        $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
+        $sender->registerCallback("settingsController_{$this->providerKey}_create", [$this, 'settingsEndpoint']);
+    }
 
     /** ------------------- Settings Related Methods --------------------- */
 
@@ -267,14 +301,14 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     protected function getSettingsFormFields() {
         $formFields = [
-            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the scope to be sent with Token Requests.'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate UserID.']
+            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.'],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails'],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
+            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
         ];
         return $formFields;
     }
@@ -286,7 +320,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      * @param Gdn_Controller $sender.
      * @param Gdn_Controller $args.
      */
-    public function settingsController_dashboard_create($sender, $args) {
+    public function settingsEndpoint($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
         $model = new Gdn_AuthenticationProviderModel();
 
@@ -296,7 +330,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         $sender->Form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
-            $provider = Gdn_AuthenticationProviderModel::GetProviderByKey($this->getProviderKey());
+            $provider = $this->provider();
             $form->setData($provider);
         } else {
 
@@ -321,11 +355,11 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
 
         // Set up the form.
         $formFields = [
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the unique ID of the authentication application.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the secret provided by the authentication provider.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'TokenUrl' => ['LabelCode' => 'Token Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
+            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Enter the unique ID of the authentication application.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
+            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
+            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -339,7 +373,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
         }
 
-        $view = ($this->settingsView) ? $this->settingsView : 'plugins/'.$this->getProviderKey();
+        $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
 
         // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
@@ -371,7 +405,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             'response_type' => 'code',
             'client_id' => val('AssociationKey', $provider),
             'redirect_uri' => url($redirect_uri, true),
-            'scope' => $this->scope
+            'scope' => val('AcceptedScope', $provider)
         ];
         // allow child class to overwrite or add to the authorize URI.
         $get = array_merge($defaultParams, $this->authorizeUriParams);
@@ -454,18 +488,6 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
 
 
     /**
-     * Register a call back function so that multiple plugins can use it as an entry point on SSO
-     * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
-     * initial request to log in to an authentication provider.
-     *
-     * @param $sender
-     */
-    public function gdn_pluginManager_afterStart_handler($sender) {
-        $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
-    }
-
-
-    /**
      * Create a controller to handle entry request.
      *
      * @param Gdn_Controller $sender.
@@ -525,9 +547,9 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
 
                 Gdn::userModel()->saveAttribute($user->UserID, $this->getProviderKey(), $attributes);
 
-                $this->EventArguments['Provider'] = $this->getProviderKey();
-                $this->EventArguments['User'] = $sender->User;
-                $this->fireEvent('AfterConnection');
+                $sender->EventArguments['Provider'] = $this->getProviderKey();
+                $sender->EventArguments['User'] = $sender->User;
+                $sender->fireEvent('AfterConnection');
 
                 redirect(userUrl($user, '', 'connections'));
                 break;
@@ -618,14 +640,14 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
             'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
             'client_secret' => val('AssociationSecret', $provider),
             'grant_type' => 'authorization_code',
-            'scope' => $this->scope
+            'scope' => val('AcceptedScope', $provider)
         ];
 
         $post = array_merge($defaultParams, $this->requestAccessTokenParams);
 
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
 
-        return $this->api($uri, 'POST', $post);
+        return $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
     }
 
 
@@ -638,6 +660,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
      */
     public function translateProfileResults($rawProfile = []) {
         $provider = $this->provider();
+        $email = val('ProfileKeyEmail', $provider, 'email');
         $translatedKeys = [
             val('ProfileKeyEmail', $provider, 'email') => 'Email',
             val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
@@ -668,7 +691,7 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
         $requestParams = array_merge($defaultParams, $this->profileRequestParams);
 
         // Request the profile from the Authentication Provider
-        $rawProfile = $this->api($uri, 'GET', $requestParams);
+        $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());
 
         // Translate the keys of the profile sent to match the keys we are looking for.
         $profile = $this->translateProfileResults($rawProfile);
@@ -751,9 +774,23 @@ class Gdn_OAuth2 extends Gdn_Pluggable {
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
         $url = $this->authorizeUri(['target' => $target]);
-        $result = socialSignInButton('OAuth2', $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => t('Sign in with OAuth2')]);
+        $providerName = val('Name', $this->provider);
+        $linkLabel = sprintf(t('Sign in with %s'), $providerName);
+        $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
         return $result;
     }
+
+
+    /**
+     * Insert css file for generic styling of signin button/icon.
+     *
+     * @param AssetModel $sender.
+     * @param AssetModel $args.
+     */
+    public function assetModel_styleCss_handler($sender, $args) {
+        $sender->addCssFile('oauth2.css', 'plugins/oauth2');
+    }
+
 
 
     /** ------------------- Helper functions --------------------- */

@@ -242,7 +242,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 
 
-    /** Allow child classes to pass different options to the Profile request API call.
+    /**
+     * Allow child classes to pass different options to the Profile request API call.
      * Valid options are ConnectTimeout, Timeout, Content-Type and Authorization-Header-Message.
      *
      * @return array
@@ -279,7 +280,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 
     /**
-     * Register a call back function so that multiple plugins can use it as an entry point on SSO
+     * Register a call back function so that multiple plugins can use it as an entry point on SSO.
+     *
      * This endpoint is executed on /entry/[provider] and is used as the redirect after making an
      * initial request to log in to an authentication provider.
      *
@@ -299,14 +301,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     protected function getSettingsFormFields() {
         $formFields = [
-            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
-            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the scope to be sent with Token Requests.'],
-            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Emails'],
-            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Photo.'],
-            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Display Name.'],
-            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate Full Name.'],
-            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Options' => ['Class' => 'InputBox'], 'Description' => 'The Key in the JSON array to designate UserID.']
+            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.'],
+            'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails'],
+            'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
+            'ProfileKeyName' => ['LabelCode' => 'Display Name', 'Description' => 'The Key in the JSON array to designate Display Name.'],
+            'ProfileKeyFullName' => ['LabelCode' => 'Full Name', 'Description' => 'The Key in the JSON array to designate Full Name.'],
+            'ProfileKeyUniqueID' => ['LabelCode' => 'User ID', 'Description' => 'The Key in the JSON array to designate UserID.']
         ];
         return $formFields;
     }
@@ -353,11 +355,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // Set up the form.
         $formFields = [
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the unique ID of the authentication application.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the secret provided by the authentication provider.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'TokenUrl' => ['LabelCode' => 'Token Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Options' => ['Class' => 'InputBox BigInput'], 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
+            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Enter the unique ID of the authentication application.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
+            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
+            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();

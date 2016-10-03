@@ -1,10 +1,9 @@
-<?php if (!defined('APPLICATION')) exit();
-$this->addSideMenu();
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
+    <h1><?php echo t('Import'); ?></h1>
+
     <style> .Complete {
             text-decoration: line-through;
         }</style>
-    <h1><?php echo t('Import'); ?></h1>
 <?php
 echo $this->Form->errors();
 
@@ -14,14 +13,14 @@ $Complete = FALSE;
 
 if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {
     $Complete = TRUE;
-    echo '<div class="Info">',
+    echo '<div class="alert alert-success padded">',
     sprintf(t('Garden.Import.Complete.Description', 'You have successfully completed an import.
    Remember to visit <a href="%s">Dashboard &gt; Roles & Permissions</a> to set up your role permissions.
    Click <b>Finished</b> when you are ready.'), url('/dashboard/role')),
     '</div>';
 }
 ?>
-    <div class="Info">
+    <div class="js-import-steps padded">
         <ol>
             <?php
             foreach ($Steps as $Number => $Name) {

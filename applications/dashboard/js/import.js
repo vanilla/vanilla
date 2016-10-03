@@ -44,6 +44,12 @@ jQuery(document).ready(function($) {
         });
     };
 
-    refreshSteps();
-    bindAjaxForm();
+    if ($('.js-import-steps').length) {
+        refreshSteps();
+        bindAjaxForm();
+    }
+});
+
+$(document).on('click', '#Form_ImportFile', function() {
+    $('.js-new-path').trigger('inputChecked');
 });

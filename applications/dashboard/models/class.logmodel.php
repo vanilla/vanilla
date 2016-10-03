@@ -346,7 +346,7 @@ class LogModel extends Gdn_Pluggable {
             $InsertUserID = Gdn::session()->UserID;
         }
         if (($InsertIPAddress = self::logValue($Data, 'Log_InsertIPAddress')) == null) {
-            $InsertIPAddress = Gdn::request()->ipAddress();
+            $InsertIPAddress = ipEncode(Gdn::request()->ipAddress());
         }
         // Do some known translations for the parent record ID.
         if (($ParentRecordID = self::logValue($Data, 'ParentRecordID')) === null) {

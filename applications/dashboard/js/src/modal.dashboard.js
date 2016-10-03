@@ -77,7 +77,7 @@ var DashboardModal = (function() {
 
         start: function($trigger, settings) {
             $('#' + this.id).modal('show').focus();
-            if (this.settings.modaltype === 'confirm') {
+            if (this.settings.modalType === 'confirm') {
                 this.addConfirmContent();
             } else {
                 this.addContent();
@@ -290,7 +290,7 @@ var DashboardModal = (function() {
             var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title
-            if ($title.length !== 0) {
+            if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
                 $title.remove();
                 body = $elem.html();

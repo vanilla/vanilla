@@ -5,7 +5,7 @@
  * Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column.
  */
 (function($) {
-    $.fn.tablejengo = function(options) {
+    $.fn.tablejenga = function(options) {
 
         var start = function(table, vars) {
             reset();
@@ -87,13 +87,7 @@
                         label = $cell.data('label');
 
                         html = vars.metaTemplate.replace('{data}', html);
-                        if (label) {
-                            var labelHtml = vars.metaLabel.replace('{label}', label);
-                            html = html.replace('{label}', labelHtml);
-                        } else {
-                            html = html.replace('{label}', '');
-                        }
-
+                        html = html.replace('{label}', label);
                         if (!$('.tj-main-cell .tj-meta', this).length) {
                             $('.tj-main-cell', this).append('<div class="tj-meta">' + html + '</div>');
                         } else {
@@ -144,13 +138,12 @@
             var table = $(this);
 
             // Extend Settings.
-            var settings = $.extend({}, $.fn.tablejengo.defaults, options);
+            var settings = $.extend({}, $.fn.tablejenga.defaults, options);
 
             var vars = {
                 container: settings.container,
                 mainCell: settings.mainCell,
                 metaTemplate: settings.metaTemplate,
-                metaLabel: settings.metaLabel,
                 showEmptyCells: settings.showEmptyCells
             };
 
@@ -163,14 +156,13 @@
         });
     };
 
-    $.fn.tablejengo.defaults = {
+    $.fn.tablejenga.defaults = {
         container: 'body',
         mainCell: 'firstcell',
         metaTemplate: '<div class="table-meta-item">' +
-        '{label}' +
+        '<span class="table-meta-item-label">{label}: </span>' +
         '<span class="table-meta-item-data">{data}</span>' +
         '</div>',
-        metaLabel: '<span class="table-meta-item-label">{label}: </span>',
         showEmptyCells: false
     };
 

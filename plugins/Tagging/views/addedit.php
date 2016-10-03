@@ -5,13 +5,13 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             echo '<div class="label-wrap">'.$this->Form->label('Tag Name', 'FullName').'</div>';
             echo '<div class="input-wrap">'.$this->Form->textBox('FullName').'</div>';
             ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             echo '<div class="label-wrap">'.$this->Form->label('Url Slug', 'Name').'</div>';
             echo '<div class="input-wrap">'.$this->Form->textBox('Name').'</div>';

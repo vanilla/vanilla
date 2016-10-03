@@ -6,7 +6,7 @@ echo $this->Form->errors();
 ?>
     <ul>
         <?php $this->fireEvent("BeforeAddBanForm"); ?>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Type', 'BanType'); ?>
             </div>
@@ -14,7 +14,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->DropDown('BanType', $this->data('_BanTypes')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Value or Pattern', 'BanValue'); ?>
             <div class="info"><?php echo t('Use asterisks for wildcards', 'Use asterisks for wildcards, e.g. &lsquo;*@hotmail.com&rsquo;'); ?></div>
@@ -23,7 +23,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('BanValue'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Notes', 'Notes'); ?>
             <div class="info"><?php echo t('Optional'); ?></div>

@@ -8,7 +8,7 @@ if ($this->data('DefaultLocaleWarning')) {
 }
 echo $this->Form->open();
 echo $this->Form->errors(); ?>
-<div class="form-group row">
+<div class="form-group">
     <?php echo
     '<div class="label-wrap">', t('Default Locale'), '</div> ',
     '<div class="input-wrap input-wrap-multiple">',

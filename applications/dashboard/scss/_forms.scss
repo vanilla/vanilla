@@ -113,6 +113,8 @@ label,
 
 // Form grid
 .form-group {
+  @extend .row;
+
   > .no-grid {
     @extend .row-padding-left;
     @extend .row-padding-right;

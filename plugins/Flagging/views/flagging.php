@@ -8,13 +8,13 @@ echo $this->Form->errors();
 ?>
 <h2><?php echo t('Flagging Settings'); ?></h2>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <?php echo $this->Form->labelWrap('Category to Use', 'Plugins.Flagging.CategoryID'); ?>
         <div class="input-wrap">
             <?php echo $this->Form->CategoryDropDown('Plugins.Flagging.CategoryID', array('Value' => c('Plugins.Flagging.CategoryID'))); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="input-wrap no-label">
             <?php echo $this->Form->checkBox('Plugins.Flagging.UseDiscussions', t('Create Discussions')); ?>
         </div>

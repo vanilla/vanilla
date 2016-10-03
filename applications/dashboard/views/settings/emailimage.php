@@ -3,7 +3,7 @@
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data', 'class' => 'js-email-image-form'));
 echo $this->Form->errors(); ?>
-<div class="form-group row">
+<div class="form-group">
     <div class="label-wrap">
     <?php
     echo t('Choose a new email logo'); ?>

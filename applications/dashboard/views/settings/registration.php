@@ -16,7 +16,7 @@
 echo $this->Form->open();
 echo $this->Form->errors(); ?>
 
-<div class="form-group row">
+<div class="form-group">
     <div class="no-grid">
     <?php
     echo $this->Form->checkBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
@@ -74,7 +74,7 @@ echo $this->Form->errors(); ?>
 
 <?php $this->fireEvent('RegistrationView'); ?>
 
-<div id="InvitationExpiration" class="form-group row">
+<div id="InvitationExpiration" class="form-group">
     <div class="label-wrap">
     <?php echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration'); ?>
     </div>

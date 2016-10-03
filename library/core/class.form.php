@@ -57,7 +57,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'textarea' => 'form-control',
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
-            'form-group' => 'form-group row',
+            'form-group' => 'form-group',
         ]
     ];
 

@@ -1953,6 +1953,7 @@ class SettingsController extends DashboardController {
      * @param string $Tutorial
      */
     public function tutorials($Tutorial = '') {
+        $this->permission('Garden.Settings.Manage');
         $this->setData('Title', t('Help &amp; Tutorials'));
         $this->setHighlightRoute('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);

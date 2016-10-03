@@ -147,8 +147,10 @@ class Gdn_Request {
                     $hostParts = explode(':', $value);
                     $value = array_shift($hostParts);
                     break;
-                case 'SCHEME':
                 case 'METHOD':
+                    $value = strtoupper($value);
+                    break;
+                case 'SCHEME':
                 case 'FOLDER':
                 case 'ADDRESS':
                 default:
@@ -324,7 +326,7 @@ class Gdn_Request {
      * @return string | null
      */
     public function host($hostname = null) {
-        return $this->requestHost($hostname);
+        return $this->_environmentElement('HOST', $hostname);
     }
 
     /**
@@ -348,7 +350,7 @@ class Gdn_Request {
      * @return type
      */
     public function ipAddress() {
-        return $this->requestAddress();
+        return $this->_Environment['ADDRESS'];
     }
 
     /**
@@ -380,7 +382,7 @@ class Gdn_Request {
      * @return bool
      */
     public function isPostBack() {
-        return strcasecmp($this->requestMethod(), 'post') == 0;
+        return $this->_environmentElement('METHOD') === 'POST';
     }
 
     /**
@@ -390,19 +392,19 @@ class Gdn_Request {
      * @return int
      * @since 2.1
      */
-    public function port($Port = null) {
-        return $this->_environmentElement('PORT', $Port);
+    public function port($port = null) {
+        return $this->_environmentElement('PORT', $port);
     }
 
     /**
      * Gets/Sets the scheme from the current url. e.g. "http" in
      * "http://foo.com/this/that/garden/index.php?/controller/action/"
      *
-     * @param $Scheme optional value to set.
+     * @param $scheme optional value to set.
      * @return string | null
      */
-    public function scheme($Scheme = null) {
-        return $this->requestScheme($Scheme);
+    public function scheme($scheme = null) {
+        return $this->_environmentElement('SCHEME', $scheme);
     }
 
     /**
@@ -435,8 +437,8 @@ class Gdn_Request {
             $rawPort = $hostParts[1];
         }
 
-        $this->requestHost($host);
-        $this->requestMethod(isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD', $_SERVER) : 'CONSOLE');
+        $this->_environmentElement('HOST', $host);
+        $this->_environmentElement('METHOD', isset($_SERVER['REQUEST_METHOD']) ? val('REQUEST_METHOD', $_SERVER) : 'CONSOLE');
 
         // Request IP
 
@@ -472,7 +474,7 @@ class Gdn_Request {
         }
 
         $ip = forceIPv4($ip);
-        $this->requestAddress($ip);
+        $this->_environmentElement('ADDRESS', $ip);
 
         // Request Scheme
 
@@ -494,7 +496,7 @@ class Gdn_Request {
             $scheme = $originalProto;
         }
 
-        $this->requestScheme($scheme);
+        $this->_environmentElement('SCHEME', $scheme);
 
         if (isset($_SERVER['SERVER_PORT'])) {
             $port = $_SERVER['SERVER_PORT'];
@@ -568,10 +570,10 @@ class Gdn_Request {
             $possibleScriptNames[] = $_SERVER['ORIG_SCRIPT_NAME'];
         }
 
-        $this->requestFolder('');
+        $this->_environmentElement('FOLDER', '');
         foreach ($possibleScriptNames as $scriptName) {
             $script = basename($scriptName);
-            $this->requestScript($script);
+            $this->_environmentElement('SCRIPT', $script);
 
             $folder = substr($scriptName, 0, 0 - strlen($script));
             if (isset($_SERVER['DOCUMENT_ROOT'])) {
@@ -588,7 +590,7 @@ class Gdn_Request {
             $realFolder = str_replace($trimRoot, '', $folder);
 
             if (!empty($realFolder)) {
-                $this->requestFolder(ltrim($realFolder, '/'));
+                $this->_environmentElement('FOLDER', ltrim($realFolder, '/'));
                 break;
             }
         }
@@ -969,54 +971,54 @@ class Gdn_Request {
                 $path = str_replace('https:', 'http:', $path);
                 $scheme = 'http';
             }
-        } else {
+        } else if ($withDomain && $withDomain !== '/') {
             $scheme = $this->scheme();
         }
+
         if (substr($path, 0, 2) == '//' || in_array(strpos($path, '://'), [4, 5])) { // Accounts for http:// and https:// - some querystring params may have "://", and this would cause things to break.
             return $path;
         }
 
-        $parts = [];
-
-        $port = $this->port();
-        $host = $this->host();
-        if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
-            $host .= ':'.$port;
-        }
-
-        if ($withDomain === '//') {
-            $parts[] = '//'.$host;
-        } elseif ($withDomain && $withDomain !== '/') {
-            $parts[] = $scheme.'://'.$host;
-        } else {
-            $parts[] = '';
-        }
-
-        if ($withDomain !== '/' && $this->webRoot() != '') {
-            $parts[] = $this->webRoot();
-        }
-
-        // Strip out the hash.
+        // Temporary strip out the hash.
         $hash = strchr($path, '#');
         if (strlen($hash) > 0) {
             $path = substr($path, 0, -strlen($hash));
         }
 
-        // Strip out the querystring.
+        // Temporary strip out the querystring.
         $query = strrchr($path, '?');
         if (strlen($query) > 0) {
             $path = substr($path, 0, -strlen($query));
         }
 
-        if (!$rewrite && $withDomain !== '/') {
-            $parts[] = $this->_environmentElement('Script').'?p=';
-            $query = str_replace('?', '&', $query);
+        // Having en empty string in here will prepend a / in front of the URL on implode.
+        $parts = [''];
+        if ($withDomain !== '/') {
+            $port = $this->port();
+            $host = $this->host();
+            if (!in_array($port, [80, 443]) && (strpos($host, ':'.$port) === false)) {
+                $host .= ':'.$port;
+            }
+
+            if ($withDomain === '//') {
+                $parts = ['//'.$host];
+            } elseif ($withDomain) {
+                $parts = [$scheme.'://'.$host];
+            }
+
+            $webRoot = $this->webRoot();
+            if ($webRoot != '') {
+                $parts[] = $webRoot;
+            }
+
+            if (!$rewrite) {
+                $parts[] = $this->_environmentElement('SCRIPT').'?p=';
+                $query = str_replace('?', '&', $query);
+            }
         }
 
         if ($path == '') {
-            $pathParts = explode('/', $this->path());
-            $pathParts = array_map('rawurlencode', $pathParts);
-            $path = implode('/', $pathParts);
+            $path = $this->path(true);
             // Grab the get parameters too.
             if (!$query) {
                 $query = http_build_query($this->getRequestArguments(self::INPUT_GET));
@@ -1026,24 +1028,15 @@ class Gdn_Request {
             }
         }
         $parts[] = ltrim($path, '/');
-
         $result = implode('/', $parts);
 
-        // If we are explicitly setting ssl urls one way or another
-        if (!is_null($ssl)) {
-            // And make sure to use ssl or not
-            if ($ssl) {
-                $result = str_replace('http:', 'https:', $result);
-            } else {
-                $result = str_replace('https:', 'http:', $result);
-            }
-        }
-
-        if (!empty($query)) {
+        // Put back the query
+        if ($query !== false) {
             $result .= $query;
         }
 
-        if (!empty($hash)) {
+        // Put back the hash.
+        if ($hash !== false) {
             $result .= $hash;
         }
 
@@ -1126,13 +1119,18 @@ class Gdn_Request {
      * @return string
      */
     public function webRoot($webRoot = null) {
-        $path = (string)$this->_parsedRequestElement('WebRoot', $webRoot);
-        $webRootFromConfig = $this->_environmentElement('ConfigWebRoot');
+        static $path = null;
 
-        $removeWebRootConfig = $this->_environmentElement('ConfigStripUrls');
-        if ($webRootFromConfig && $removeWebRootConfig) {
-            $path = str_replace($webRootFromConfig, '', $path);
+        if ($webRoot !== null || $path === null || !$this->_HaveParsedRequest) {
+            $path = (string)$this->_parsedRequestElement('WebRoot', $webRoot);
+            $webRootFromConfig = $this->_environmentElement('ConfigWebRoot');
+
+            $removeWebRootConfig = $this->_environmentElement('ConfigStripUrls');
+            if ($webRootFromConfig && $removeWebRootConfig) {
+                $path = str_replace($webRootFromConfig, '', $webRoot);
+            }
         }
+
         return $path;
     }
 

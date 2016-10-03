@@ -27,8 +27,8 @@
         <button disabled="disabled" id="StatsSlotDay" class="btn btn-secondary"><?php echo t('Day');?></button>
         <button disabled="disabled" id="StatsSlotMonth" class="btn btn-secondary"><?php echo t('Month'); ?></button>
     </div>
-    <div id="StatsNavigation" class="toolbar-stats-daterange">
-        <div id="StatsCurrentTimeframe" class="toolbar-stats-daterange-preview"></div>
+    <div id="StatsNavigation" class="pager">
+        <div id="StatsCurrentTimeframe" class="pager-count"></div>
         <div class="btn-group pager-wrap">
             <button disabled="disabled" id="StatsNavPrev" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-left'); ?></button>
             <button disabled="disabled" id="StatsNavNext" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-right'); ?></button>

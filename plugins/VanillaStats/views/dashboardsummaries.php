@@ -14,15 +14,17 @@
         <?php foreach ($this->Data['UserData'] as $User) { ?>
             <tr>
                 <th>
-                    <div class="media-sm">
-                        <div class="media-sm-image-wrap">
-                            <?php echo userPhoto($User); ?>
+                    <div class="media media-sm">
+                        <div class="media-left">
+                            <div class="media-image-wrap">
+                                <?php echo userPhoto($User); ?>
+                            </div>
                         </div>
-                        <div class="media-sm-content">
-                            <div class="media-sm-title username">
+                        <div class="media-body">
+                            <div class="media-title username">
                                 <?php echo userAnchor($User, 'Username'); ?>
                             </div>
-                            <div class="media-sm-info user-date"><?php echo Gdn_Format::date(val('DateLastActive', $User), 'html'); ?></div>
+                            <div class="info user-date"><?php echo Gdn_Format::date(val('DateLastActive', $User), 'html'); ?></div>
                         </div>
                     </div>
                 </th>
@@ -48,12 +50,12 @@
         <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
             <tr>
                 <th>
-                    <div class="media-sm-item">
-                        <div class="media-sm-content">
-                            <div class="media-sm-title">
+                    <div class="media media-sm">
+                        <div class="media-body">
+                            <div class="media-title">
                                 <?php echo anchor(htmlspecialchars($Discussion->Name), DiscussionUrl($Discussion)); ?>
                             </div>
-                            <div class="media-sm-info post-date">
+                            <div class="info post-date">
                                 <?php echo Gdn_Format::date($Discussion->DateInserted, 'html'); ?>
                             </div>
                         </div>

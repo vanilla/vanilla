@@ -1,9 +1,9 @@
 <?php /** @var ThemeInfoModule $this */ ?>
 
-<div class="media not-padded <?php echo $this->isCurrent() ? 'media-callout' : ''; ?>">
-    <div class="media-left <?php echo $this->isCurrent() ? 'grid-item' : 'grid-item-fixed'; ?>">
-        <div class="image-wrap grid-image-wrap">
-            <?php echo img($this->geticonUrl(), ['alt' => $this->getThemeName(), 'class' => 'grid-image']); ?>
+<div class="media media-callout <?php echo $this->isCurrent() ? 'media-callout-grey-bg' : ''; ?>">
+    <div class="media-left">
+        <div class="image-wrap">
+            <?php echo img($this->geticonUrl(), ['alt' => $this->getThemeName()]); ?>
         </div>
     </div>
     <div class="media-body">

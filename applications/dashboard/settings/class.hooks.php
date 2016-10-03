@@ -62,7 +62,7 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->addJsFile('vendors/bootstrap/collapse.js', 'dashboard');
             $Sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
             $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
-            $Sender->addJsFile('jquery.tablejengo.js', 'dashboard');
+            $Sender->addJsFile('jquery.tablejenga.js', 'dashboard');
             $Sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
             $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
             $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');

@@ -188,7 +188,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 '</div>'.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
-                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(t('by %s'), $manifest['author']).'</div>').
+                (empty($manifest['author']) ? '' : '<div class="emojiset-author info">'.sprintf(t('by %s'), $manifest['author']).'</div>').
                 (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::wysiwyg($manifest['description']).'</p>').
                 '</div>';
         }
@@ -197,7 +197,7 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
                 'Items' => $items,
-                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true)
+                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list label-selector', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true)
             ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),

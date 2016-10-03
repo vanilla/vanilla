@@ -51,7 +51,7 @@
         </div>
     </div>
 
-        <h2>Comment Counts</h2>
+        <h2 class="subheading-border">Comment Counts</h2>
 
         <div class="padded">To show the number of comments on each blog post on your main blog page, use the following code.</div>
 
@@ -87,7 +87,7 @@
             </div>
         </div>
 
-        <h2>One more thing!</h2>
+        <h2 class="subheading-border">One more thing!</h2>
 
         <div class="padded">You need to tell Vanilla where the comment counts are located in your page. To achieve this, add a <strong>vanilla-identifier</strong>
             attribute to the anchor linking to the comments. The vanilla-identifier is the same value used above when

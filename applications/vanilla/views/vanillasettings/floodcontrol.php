@@ -23,7 +23,7 @@ echo $this->Form->errors();
     <table class="table-data">
         <thead>
         <tr>
-            <th class="column-wrap"><?php echo t('Only Allow Each User To Post'); ?></th>
+            <th><?php echo t('Only Allow Each User To Post'); ?></th>
             <th class="column-sm"><?php echo t('Within'); ?></th>
             <th><?php echo t('Or Spamblock For'); ?></th>
         </tr>

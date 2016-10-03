@@ -25,8 +25,8 @@
 </div>
 <div class="avatar-advanced">
     <div class="subheading-block">
-        <div class="subheading"><?php echo t('Avatar Settings'); ?></div>
-        <div><?php echo t('Change the sizes that avatar images are saved at.').' '.t('Changes will apply to newly uploaded avatars only.'); ?></div>
+        <div class="subheading-title"><?php echo t('Avatar Settings'); ?></div>
+        <div class="subheading-description"><?php echo t('Change the sizes that avatar images are saved at.').' '.t('Changes will apply to newly uploaded avatars only.'); ?></div>
     </div>
     <?php echo $this->Form->open(array('enctype' => 'multipart/form-data')); ?>
     <?php echo $this->Form->errors(); ?>

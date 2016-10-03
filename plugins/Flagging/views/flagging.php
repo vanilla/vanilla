@@ -55,7 +55,11 @@ if (!count($this->FlaggedItems)) {
                 ?>
                 <td class="FlaggedType"><?php echo $type; ?></td>
                 <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>
-                <td class="options"><?php echo $options; ?></td>
+                <td class="options">
+                    <div class="btn-group">
+                    <?php echo $options; ?>
+                    </div>
+                </td>
                 <?php
             }
             ?>

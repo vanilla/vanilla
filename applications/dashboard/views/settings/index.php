@@ -15,17 +15,19 @@
             <?php foreach ($this->ActiveUserData as $User) { ?>
                 <tr>
                     <th>
-                        <div class="media-sm">
-                            <div class="media-sm-image-wrap">
-                                <?php
-                                $PhotoUser = UserBuilder($User);
-                                echo userPhoto($PhotoUser); ?>
+                        <div class="media media-sm">
+                            <div class="media-left">
+                                <div class="media-image-wrap">
+                                    <?php
+                                    $PhotoUser = UserBuilder($User);
+                                    echo userPhoto($PhotoUser); ?>
+                                </div>
                             </div>
-                            <div class="media-sm-content">
-                                <div class="media-sm-title username">
+                            <div class="media-body">
+                                <div class="media-title username">
                                     <?php echo userAnchor($User, 'Username'); ?>
                                 </div>
-                                <div class="media-sm-info user-date"><?php echo Gdn_Format::date(val('DateLastActive', $User), 'html'); ?></div>
+                                <div class="info user-date"><?php echo Gdn_Format::date(val('DateLastActive', $User), 'html'); ?></div>
                             </div>
                         </div>
                     </th>

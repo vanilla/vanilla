@@ -11,8 +11,8 @@ echo $this->Form->open();
 <div class="toolbar">
     <div class="buttons">
         <?php
-        echo anchor(t('Spam'), '#', array('class' => 'SpamButton btn btn-secondary'));
-        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-secondary'));
+        echo anchor(t('Spam'), '#', array('class' => 'SpamButton btn btn-primary'));
+        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-primary'));
         ?>
     </div>
 </div>

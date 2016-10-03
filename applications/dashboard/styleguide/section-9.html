@@ -99,89 +99,117 @@
   <div class="panel panel-help panel-right">
     <div class="panel-content-wrapper">
       <div id="fixed-help" class="js-fluid-fixed panel-content">
+        <ul class="nav nav-pills" data-spy="affix">
+          <!--<li><a href="#" class="list-group-item disabled">
+            <h4 class="list-group-item-heading">Navs</h4>
+          </a></li>-->
+          <li><a href="#9-1" class="nav-link"><!--<span class="kss-ref badge" >9-1</span> -->Choose-Your-Own-Adventure Nav</a></li>
+          <li><a href="#9-2" class="nav-link"><!--<span class="kss-ref badge" >9-2</span> -->Stats Nav</a></li>
+        </ul>
       </div>
     </div>
   </div>
   <div class="main">
     <div class="content">
-      <h1>Vanilla Dashboard Styleguide</h1>
-      <div class="padded"> <p>Welcome to the Vanilla Dashboard Styleguide!</p>
-<p>This styleguide covers the Vanilla dashboard styling.</p>
-<p>The goals of this styleguide are</p>
-<ul>
-    <li>to showcase the components we use in the dashboard, so you can easily mix-and-match to build your own settings page;</li>
-    <li>to ensure a streamlined appearance;</li>
-    <li>to ensure a reliable and expected UX;</li>
-    <li>to cross-reference PHP rendering helpers.</li>
-</ul>
 
-<h2 class="subheading-border">Workflow</h2>
 
-<p><h3>Grunt Tasks</h3></p>
-<div>
-    More to come...
+          <h1 class="kss-title" id="9">Navs</h1>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="9-1">
+                <span class="kss-ref badge pull-right">9-1</span> Choose-Your-Own-Adventure Nav
+                </h2>
+
+
+                <div class="kss-box padded"><p>Navigation for a landing page of parent settings page. Displays a bunch of different navigation options that
+will likely lead to other settings pages.</p>
+<p>PHP rendering: Render using the <code>nav-adventure</code> of the nav module.</p>
 </div>
 
-<h2 class="subheading-border">Vendor Dependencies</h2>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;nav nav-adventure&quot;&gt;
+  &lt;div class=&quot;nav-item&quot;&gt;
+    &lt;a class=&quot;nav-link&quot; href=&quot;#&quot;&gt;
+      &lt;div class=&quot;nav-item-icon&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg-plugin&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#plugin&quot;&gt;&lt;/use&gt;
+        &lt;/svg&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;nav-item-content&quot;&gt;
+        &lt;div class=&quot;nav-item-title&quot;&gt;Here&#x27;s the nav title&lt;/div&gt;
+        &lt;div class=&quot;nav-item-description&quot;&gt;
+          Here&#x27;s some expanatory text about where you&#x27;re headed if you select this item.
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;nav-item-arrow&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg-chevron-right&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#chevron-right&quot;&gt;&lt;/use&gt;
+        &lt;/svg&gt;
+      &lt;/div&gt;
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="nav nav-adventure">
+  <div class="nav-item">
+    <a class="nav-link" href="#">
+      <div class="nav-item-icon">
+        <svg class="icon icon-svg-plugin" viewBox="0 0 17 17">
+          <use xlink:href="#plugin"></use>
+        </svg>
+      </div>
+      <div class="nav-item-content">
+        <div class="nav-item-title">Here's the nav title</div>
+        <div class="nav-item-description">
+          Here's some expanatory text about where you're headed if you select this item.
+        </div>
+      </div>
+      <div class="nav-item-arrow">
+        <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+          <use xlink:href="#chevron-right"></use>
+        </svg>
+      </div>
+    </a>
+  </div>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="9-2">
+                <span class="kss-ref badge pull-right">9-2</span> Stats Nav
+                </h2>
 
-<p><h3>Twitter Bootstrap (twbs)</h3></p>
-<p><h4>twbs SASS</h4></p>
-<div>
-   More to come...
+
+                <div class="kss-box padded"><p>Navigation for a landing page of parent settings page. Displays a bunch of different navigation options that
+will likely leading to other settings pages.</p>
 </div>
-<h4>twbs Javascript</h4>
-<div>
-    More to come...
-</div>
 
-<p><h3>Ace</h3></p>
-<div>
-    We use ace for our code editor in the Pockets and Customize Theme plugins.
-</div>
-
-<p><h3>Google Prettify</h3></p>
-<div>
-    We use google prettify to add syntax highlighting to our code and pre blocks.
-</div>
-
-<p><h3>iCheck</h3></p>
-<div>
-    We use iCheck for our radio and checkboxes.
-</div>
-
-<p><h3>Drop</h3></p>
-<div>
-    We use drop for our user card dropdown...
-</div>
-
-<p><h3>ScrollToFixed</h3></p>
-<div>
-    ScrollToFixed manages our navbar...
-</div>
-
-<h2 class="subheading-border">Other Dependencies</h2>
-
-<p><h3>FluidFixed</h3></p>
-<div>
-    Panel Scrolling
-</div>
-
-<p><h3>TableJenga</h3></p>
-<div>
-    Table Responsiveness
-</div>
-
-
-<h2 class="subheading-border">Tips and Tricks</h2>
-
-<p><h3>Avoid going rogue when building your own settings page</h3></p>
-<div>
-    Try not to add css, whether it&#39;s inline, or contained in an internal or external stylesheet.
-    Optimally, we want to have all of the dashboard&#39;s css in the admin.css file.
-    This encourages developers to use existing patterns. If a necessary pattern doesn&#39;t exist,
-    we can build it with the help of our design team (aka Dan).
-</div>
-</div>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;ul class=&quot;nav nav-stats&quot;&gt;
+  &lt;li class=&quot;nav-stats-item nav-stats-link nav-stats-pageviews active&quot;&gt;
+    &lt;div class=&quot;nav-stats-value&quot;&gt;33,250&lt;/div&gt;
+    &lt;div class=&quot;nav-stats-title&quot;&gt;Page Views&lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;nav-stats-item nav-stats-link nav-stats-discussions&quot;&gt;
+    &lt;div class=&quot;nav-stats-value&quot;&gt;360&lt;/div&gt;
+    &lt;div class=&quot;nav-stats-title&quot;&gt;Discussions&lt;/div&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><ul class="nav nav-stats">
+  <li class="nav-stats-item nav-stats-link nav-stats-pageviews active">
+    <div class="nav-stats-value">33,250</div>
+    <div class="nav-stats-title">Page Views</div>
+  </li>
+  <li class="nav-stats-item nav-stats-link nav-stats-discussions">
+    <div class="nav-stats-value">360</div>
+    <div class="nav-stats-title">Discussions</div>
+  </li>
+</ul></div>
+          </section>
     </div>
     <div class="footer">
       <div class="footer-logo logo-wrap">

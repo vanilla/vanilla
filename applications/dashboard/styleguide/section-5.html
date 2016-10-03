@@ -99,89 +99,612 @@
   <div class="panel panel-help panel-right">
     <div class="panel-content-wrapper">
       <div id="fixed-help" class="js-fluid-fixed panel-content">
+        <ul class="nav nav-pills" data-spy="affix">
+          <!--<li><a href="#" class="list-group-item disabled">
+            <h4 class="list-group-item-heading">Forms</h4>
+          </a></li>-->
+          <li><a href="#5-1" class="nav-link"><!--<span class="kss-ref badge" >5-1</span> -->Form Layout</a></li>
+          <li><a href="#5-2" class="nav-link"><!--<span class="kss-ref badge" >5-2</span> -->Toggles</a></li>
+          <li><a href="#5-4" class="nav-link"><!--<span class="kss-ref badge" >5-4</span> -->Color Pickers</a></li>
+          <li><a href="#5-5" class="nav-link"><!--<span class="kss-ref badge" >5-5</span> -->File Upload</a></li>
+          <li><a href="#5-6" class="nav-link"><!--<span class="kss-ref badge" >5-6</span> -->Label Selectors</a></li>
+          <li><a href="#5-7" class="nav-link"><!--<span class="kss-ref badge" >5-7</span> -->Search Input</a></li>
+          <li><a href="#5-8" class="nav-link"><!--<span class="kss-ref badge" >5-8</span> -->Suffix Textbox</a></li>
+          <li><a href="#5-9" class="nav-link"><!--<span class="kss-ref badge" >5-9</span> -->Text Input With Button</a></li>
+          <li><a href="#5-10" class="nav-link"><!--<span class="kss-ref badge" >5-10</span> -->Checkboxes and Radios</a></li>
+        </ul>
       </div>
     </div>
   </div>
   <div class="main">
     <div class="content">
-      <h1>Vanilla Dashboard Styleguide</h1>
-      <div class="padded"> <p>Welcome to the Vanilla Dashboard Styleguide!</p>
-<p>This styleguide covers the Vanilla dashboard styling.</p>
-<p>The goals of this styleguide are</p>
-<ul>
-    <li>to showcase the components we use in the dashboard, so you can easily mix-and-match to build your own settings page;</li>
-    <li>to ensure a streamlined appearance;</li>
-    <li>to ensure a reliable and expected UX;</li>
-    <li>to cross-reference PHP rendering helpers.</li>
+
+
+          <h1 class="kss-title" id="5">Forms</h1>
+            <div class="kss-box">
+              <div class="padded"><p>Find the dashboard form styling here.</p>
+</div>
+            </div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-1">
+                <span class="kss-ref badge pull-right">5-1</span> Form Layout
+                </h2>
+
+
+                <div class="kss-box padded"><p>Here&#39;s how to build a basic form group. The three important classes are the <code>form-group</code> class on the wrapper
+around the entire form field, the <code>label-wrap</code> class on the wrapper around the label, and the <code>input-wrap</code> class
+on the wrapper around the from input.</p>
+<p>PHP rendering: If you use Gdn_Form <code>simple()</code> to render your forms, the markup will render like this.
+Otherwise, you&#39;ll have to add the wrapper classes manually and/or by using the help of the <code>*Wrap()</code>
+functions in Gdn_Form that will add the <code>label-wrap</code> div or <code>input-wrap</code> div to a field.</p>
+</div>
+
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="5-1-1">
+                <span class="kss-ref badge pull-right">5-1-1</span> Basic Form Layout
+                </h3>
+
+
+                <div class="kss-box padded"><p>Here&#39;s an example of a basic form layout. If you have other plans for your label element, you can mimic a label by
+adding the <code>label</code> class to a div around your fake label. Accessibility matters, though. Don&#39;t forget to add
+appropriate aria-label or aria-labelledby attributes in these cases.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;form&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;label for=&quot;fieldID1&quot;&gt;Label&lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;
+           Here&#x27;s some info text for this field.
+         &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID1&quot; class=&quot;form-control&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;div class=&quot;label&quot; id=&quot;fieldID2-label&quot;&gt;Another (fake) Label&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID2&quot; aria-labelledby=&quot;fieldID2-label&quot; class=&quot;form-control&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><form>
+  <ul>
+    <li class="form-group">
+      <div class="label-wrap">
+         <label for="fieldID1">Label</label>
+         <div class="info">
+           Here's some info text for this field.
+         </div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID1" class="form-control" />
+      </div>
+    </li>
+    <li class="form-group">
+      <div class="label-wrap">
+         <div class="label" id="fieldID2-label">Another (fake) Label</div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID2" aria-labelledby="fieldID2-label" class="form-control" />
+      </div>
+    </li>
+  </ul>
+</form></div>
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="5-1-2">
+                <span class="kss-ref badge pull-right">5-1-2</span> Form Layout Variants
+                </h3>
+
+
+                <div class="kss-box padded"><p>This example showcases a few examples that illustrate how you can play with some variants on the default.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;form&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;label for=&quot;fieldID1&quot;&gt;Normal label and form input&lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;
+           Here&#x27;s some info text for this field. I&#x27;m giving a little description of what this field
+           does and how it affects the user.
+         &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID1&quot; class=&quot;form-control&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;label-wrap-wide&quot;&gt;
+         &lt;label for=&quot;fieldID2&quot;&gt;
+           Wide label and narrow form input, useful for small text inputs or toggles
+         &lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;
+           Here&#x27;s some info text for this field. I&#x27;m giving a little description of what this field
+           does and how it affects the user.
+         &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap-right&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID2&quot; class=&quot;form-control&quot; /&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;input-wrap no-label&quot;&gt;
+        &lt;input type=&quot;text&quot; id=&quot;fieldID3&quot; class=&quot;form-control&quot; placeholder=&quot;No Label&quot;/&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><form>
+  <ul>
+    <li class="form-group">
+      <div class="label-wrap">
+         <label for="fieldID1">Normal label and form input</label>
+         <div class="info">
+           Here's some info text for this field. I'm giving a little description of what this field
+           does and how it affects the user.
+         </div>
+      </div>
+      <div class="input-wrap">
+        <input type="text" id="fieldID1" class="form-control" />
+      </div>
+    </li>
+    <li class="form-group">
+      <div class="label-wrap-wide">
+         <label for="fieldID2">
+           Wide label and narrow form input, useful for small text inputs or toggles
+         </label>
+         <div class="info">
+           Here's some info text for this field. I'm giving a little description of what this field
+           does and how it affects the user.
+         </div>
+      </div>
+      <div class="input-wrap-right">
+        <input type="text" id="fieldID2" class="form-control" />
+      </div>
+    </li>
+    <li class="form-group">
+      <div class="input-wrap no-label">
+        <input type="text" id="fieldID3" class="form-control" placeholder="No Label"/>
+      </div>
+    </li>
+  </ul>
+</form></div>
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="5-1-3">
+                <span class="kss-ref badge pull-right">5-1-3</span> Radio and Checkbox Groups
+                </h3>
+
+
+                <div class="kss-box padded"><p>If you have a form field with multiple options, you can display them inline, or stacked.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;form&gt;
+  &lt;ul&gt;
+    &lt;li class=&quot;form-group&quot;&gt;
+      &lt;div class=&quot;label-wrap&quot;&gt;
+         &lt;label&gt;Checkbox field with multiple options&lt;/label&gt;
+         &lt;div class=&quot;info&quot;&gt;Info text for field&lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;input-wrap [modifier class]&quot;&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;fieldID1&quot; class=&quot;form-control&quot;&gt;Option One&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;fieldID2&quot; class=&quot;form-control&quot;&gt;Option Two&lt;/label&gt;
+        &lt;label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;fieldID3&quot; class=&quot;form-control&quot;&gt;Option Three&lt;/label&gt;
+      &lt;/div&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/form&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><form>
+  <ul>
+    <li class="form-group">
+      <div class="label-wrap">
+         <label>Checkbox field with multiple options</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap [modifier class]">
+        <label><input type="checkbox" id="fieldID1" class="form-control">Option One</label>
+        <label><input type="checkbox" id="fieldID2" class="form-control">Option Two</label>
+        <label><input type="checkbox" id="fieldID3" class="form-control">Option Three</label>
+      </div>
+    </li>
+  </ul>
+</form></div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Stacks radio or checkboxes.</span> <span class="pull-right"><code>.stacked</code></span></div>
+              <div class="kss-example padded-bottom"><form>
+  <ul>
+    <li class="form-group">
+      <div class="label-wrap">
+         <label>Checkbox field with multiple options</label>
+         <div class="info">Info text for field</div>
+      </div>
+      <div class="input-wrap stacked">
+        <label><input type="checkbox" id="fieldID1" class="form-control">Option One</label>
+        <label><input type="checkbox" id="fieldID2" class="form-control">Option Two</label>
+        <label><input type="checkbox" id="fieldID3" class="form-control">Option Three</label>
+      </div>
+    </li>
+  </ul>
+</form></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-2">
+                <span class="kss-ref badge pull-right">5-2</span> Toggles
+                </h2>
+
+
+                <div class="kss-box padded"><p>Toggles can either be a checkbox form element or an anchor.</p>
+</div>
+
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="5-2-1">
+                <span class="kss-ref badge pull-right">5-2-1</span> Anchor Toggle
+                </h3>
+
+
+                <div class="kss-box padded"><p>Here&#39;s how to build an anchor toggle.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;toggle-wrap [modifier class]&quot;&gt;
+  &lt;a&gt;
+    &lt;div class=&quot;toggle-well&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;toggle-slider&quot;&gt;&lt;/div&gt;
+  &lt;/a&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="toggle-wrap [modifier class]">
+  <a>
+    <div class="toggle-well"></div>
+    <div class="toggle-slider"></div>
+  </a>
+</div></div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">On state</span> <span class="pull-right"><code>.toggle-wrap-on</code></span></div>
+              <div class="kss-example padded-bottom"><div class="toggle-wrap toggle-wrap-on">
+  <a>
+    <div class="toggle-well"></div>
+    <div class="toggle-slider"></div>
+  </a>
+</div></div>
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="5-2-2">
+                <span class="kss-ref badge pull-right">5-2-2</span> Checkbox Toggle
+                </h3>
+
+
+                <div class="kss-box padded"><p>Here&#39;s how to build an checkbox toggle.</p>
+<p>PHP rendering: The toggle() function in Gdn_Form. Also supported in simple().</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;toggle-wrap&quot;&gt;
+  &lt;input id=&quot;toggle-checkbox&quot; type=&quot;checkbox&quot; class=&quot;toggle-input&quot; /&gt;
+  &lt;label for=&quot;toggle-checkbox&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="toggle-wrap">
+  <input id="toggle-checkbox" type="checkbox" class="toggle-input" />
+  <label for="toggle-checkbox"></label>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-4">
+                <span class="kss-ref badge pull-right">5-4</span> Color Pickers
+                </h2>
+
+
+                <div class="kss-box padded"><p>Color pickers provide an interface for the user to choose a color.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;js-color-picker color-picker &quot;&gt;
+  &lt;input type=&quot;text&quot; class=&quot;js-color-picker-value color-picker-value hidden&quot; /&gt;
+  &lt;input type=&quot;text&quot; class=&quot;js-color-picker-text color-picker-text form-control&quot; /&gt;
+  &lt;span class=&quot;js-color-picker-preview color-picker-preview&quot;&gt;&lt;/span&gt;
+  &lt;input type=&quot;color&quot; class=&quot;js-color-picker-color color-picker-color&quot; /&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="js-color-picker color-picker ">
+  <input type="text" class="js-color-picker-value color-picker-value hidden" />
+  <input type="text" class="js-color-picker-text color-picker-text form-control" />
+  <span class="js-color-picker-preview color-picker-preview"></span>
+  <input type="color" class="js-color-picker-color color-picker-color" />
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-5">
+                <span class="kss-ref badge pull-right">5-5</span> File Upload
+                </h2>
+
+
+                <div class="kss-box padded"><p>Input for a file upload.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;label class=&quot;file-upload&quot;&gt;
+  &lt;input type=&quot;file&quot; name=&quot;Logo&quot; id=&quot;Form_Logo&quot; class=&quot; js-file-upload form-control&quot;&gt;
+  &lt;span class=&quot;file-upload-choose&quot;&gt;Choose&lt;/span&gt;
+  &lt;span class=&quot;file-upload-browse&quot;&gt;Browse&lt;/span&gt;
+&lt;/label&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><label class="file-upload">
+  <input type="file" name="Logo" id="Form_Logo" class=" js-file-upload form-control">
+  <span class="file-upload-choose">Choose</span>
+  <span class="file-upload-browse">Browse</span>
+</label></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-6">
+                <span class="kss-ref badge pull-right">5-6</span> Label Selectors
+                </h2>
+
+
+                <div class="kss-box padded"><p>Label selectors replace checkboxes and radios with a image and/or text selector.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;form&gt;
+&lt;ul class=&quot;label-selector&quot;&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;babySeal&quot; name=&quot;babyAnimals&quot; class=&quot;label-selector-input&quot;&gt;
+    &lt;label for=&quot;babySeal&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/baby-seal.jpg&quot; alt=&quot;Baby Seal&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;div class=&quot;btn btn-overlay&quot;&gt;Button&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;selected&quot;&gt;
+            &lt;svg class=&quot;icon icon-svg icon-svg-checkmark&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+              &lt;use xlink:href=&quot;#checkmark&quot; /&gt;
+            &lt;/svg&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Baby Seal&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;div class=&quot;description&quot;&gt;Choose this happy baby seal. It&#x27;s so very happy.&lt;/div&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+  &lt;li class=&quot;label-selector-item&quot;&gt;
+    &lt;input type=&quot;radio&quot; id=&quot;puppy&quot; name=&quot;babyAnimals&quot; class=&quot;label-selector-input&quot;&gt;
+    &lt;label for=&quot;puppy&quot;&gt;
+      &lt;div class=&quot;image-wrap&quot;&gt;
+        &lt;img class=&quot;label-selector-image&quot; src=&quot;./public/resources/images/puppy.jpg&quot; alt=&quot;Puppy&quot;&gt;
+        &lt;div class=&quot;overlay&quot;&gt;
+          &lt;div class=&quot;buttons&quot;&gt;
+            &lt;div class=&quot;btn btn-overlay&quot;&gt;Button&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;div class=&quot;selected&quot;&gt;
+            &lt;svg class=&quot;icon icon-svg icon-svg-checkmark&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+              &lt;use xlink:href=&quot;#checkmark&quot; /&gt;
+            &lt;/svg&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;title&quot;&gt;Puppy&lt;/div&gt;
+      &lt;div class=&quot;info&quot;&gt;by Author&lt;/div&gt;
+      &lt;div class=&quot;description&quot;&gt;Choose this sleepy puppy. Sooo tired, puppy.&lt;/div&gt;
+    &lt;/label&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+&lt;/form&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><form>
+<ul class="label-selector">
+  <li class="label-selector-item">
+    <input type="radio" id="babySeal" name="babyAnimals" class="label-selector-input">
+    <label for="babySeal">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
+        <div class="overlay">
+          <div class="buttons">
+            <div class="btn btn-overlay">Button</div>
+          </div>
+          <div class="selected">
+            <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+              <use xlink:href="#checkmark" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="title">Baby Seal</div>
+      <div class="info">by Author</div>
+      <div class="description">Choose this happy baby seal. It's so very happy.</div>
+    </label>
+  </li>
+  <li class="label-selector-item">
+    <input type="radio" id="puppy" name="babyAnimals" class="label-selector-input">
+    <label for="puppy">
+      <div class="image-wrap">
+        <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
+        <div class="overlay">
+          <div class="buttons">
+            <div class="btn btn-overlay">Button</div>
+          </div>
+          <div class="selected">
+            <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+              <use xlink:href="#checkmark" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div class="title">Puppy</div>
+      <div class="info">by Author</div>
+      <div class="description">Choose this sleepy puppy. Sooo tired, puppy.</div>
+    </label>
+  </li>
 </ul>
+</form></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-7">
+                <span class="kss-ref badge pull-right">5-7</span> Search Input
+                </h2>
 
-<h2 class="subheading-border">Workflow</h2>
 
-<p><h3>Grunt Tasks</h3></p>
-<div>
-    More to come...
+                <div class="kss-box padded"><p>Search inputs have a hidden button and a search icon on the input.</p>
 </div>
 
-<h2 class="subheading-border">Vendor Dependencies</h2>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;form&gt;
+  &lt;div class=&quot;search-wrap&quot;&gt;
+    &lt;div class=&quot;search-icon-wrap search-icon-search-wrap&quot;&gt;
+      &lt;svg class=&quot;icon icon-svg icon-svg-search&quot; viewBox=&quot;0 0 17 17&quot;&gt;&lt;use xlink:href=&quot;#search&quot; /&gt;&lt;/svg&gt;
+    &lt;/div&gt;
+    &lt;input class=&quot;form-control&quot;&gt;
+    &lt;button type=&quot;submit&quot; class=&quot;search-submit&quot;&gt;Search&lt;/button&gt;
+    &lt;div class=&quot;search-icon-wrap search-icon-clear-wrap&quot;&gt;
+      &lt;svg class=&quot;icon icon-svg icon-svg-close&quot; viewBox=&quot;0 0 17 17&quot;&gt;&lt;use xlink:href=&quot;#close&quot; /&gt;&lt;/svg&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/form&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><form>
+  <div class="search-wrap">
+    <div class="search-icon-wrap search-icon-search-wrap">
+      <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17"><use xlink:href="#search" /></svg>
+    </div>
+    <input class="form-control">
+    <button type="submit" class="search-submit">Search</button>
+    <div class="search-icon-wrap search-icon-clear-wrap">
+      <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17"><use xlink:href="#close" /></svg>
+    </div>
+  </div>
+</form></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-8">
+                <span class="kss-ref badge pull-right">5-8</span> Suffix Textbox
+                </h2>
 
-<p><h3>Twitter Bootstrap (twbs)</h3></p>
-<p><h4>twbs SASS</h4></p>
-<div>
-   More to come...
-</div>
-<h4>twbs Javascript</h4>
-<div>
-    More to come...
-</div>
 
-<p><h3>Ace</h3></p>
-<div>
-    We use ace for our code editor in the Pockets and Customize Theme plugins.
-</div>
-
-<p><h3>Google Prettify</h3></p>
-<div>
-    We use google prettify to add syntax highlighting to our code and pre blocks.
-</div>
-
-<p><h3>iCheck</h3></p>
-<div>
-    We use iCheck for our radio and checkboxes.
-</div>
-
-<p><h3>Drop</h3></p>
-<div>
-    We use drop for our user card dropdown...
-</div>
-
-<p><h3>ScrollToFixed</h3></p>
-<div>
-    ScrollToFixed manages our navbar...
-</div>
-
-<h2 class="subheading-border">Other Dependencies</h2>
-
-<p><h3>FluidFixed</h3></p>
-<div>
-    Panel Scrolling
+                <div class="kss-box padded"><p>Text box with a suffix value (useful for units). The suffix pulls from the data-suffix value of a input wrapper div.</p>
 </div>
 
-<p><h3>TableJenga</h3></p>
-<div>
-    Table Responsiveness
-</div>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;form-group&quot;&gt;
+  &lt;div class=&quot;label-wrap-wide&quot;&gt;
+    &lt;label for=&quot;Form_ThumbnailSize&quot;&gt;Thumbnail Size&lt;/label&gt;
+    &lt;div class=&quot;info&quot;&gt;Avatars will have their thumbnails saved at this size.&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;input-wrap-right&quot;&gt;
+    &lt;div class=&quot;textbox-suffix&quot; data-suffix=&quot;px&quot;&gt;
+      &lt;input type=&quot;text&quot; class=&quot;form-control&quot;&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="form-group">
+  <div class="label-wrap-wide">
+    <label for="Form_ThumbnailSize">Thumbnail Size</label>
+    <div class="info">Avatars will have their thumbnails saved at this size.</div>
+  </div>
+  <div class="input-wrap-right">
+    <div class="textbox-suffix" data-suffix="px">
+      <input type="text" class="form-control">
+    </div>
+  </div>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-9">
+                <span class="kss-ref badge pull-right">5-9</span> Text Input With Button
+                </h2>
 
 
-<h2 class="subheading-border">Tips and Tricks</h2>
+                <div class="kss-box padded"><p>Text input with an attached button and optional label.</p>
+</div>
 
-<p><h3>Avoid going rogue when building your own settings page</h3></p>
-<div>
-    Try not to add css, whether it&#39;s inline, or contained in an internal or external stylesheet.
-    Optimally, we want to have all of the dashboard&#39;s css in the admin.css file.
-    This encourages developers to use existing patterns. If a necessary pattern doesn&#39;t exist,
-    we can build it with the help of our design team (aka Dan).
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;text-input-button&quot;&gt;
+  &lt;div class=&quot;label-wrap&quot;&gt;
+    &lt;label for=&quot;Form_Label&quot;&gt;Label:&lt;/label&gt;
+  &lt;/div&gt;
+  &lt;input type=&quot;text&quot; id=&quot;Form_Label&quot; name=&quot;Label&quot; value=&quot;preview&quot; class=&quot;form-control&quot;&gt;
+  &lt;button type=&quot;submit&quot; id=&quot;Form_Apply&quot; name=&quot;Apply&quot; class=&quot;btn btn-primary btn-apply&quot; value=&quot;Apply&quot;&gt;
+    Apply
+  &lt;/button&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="text-input-button">
+  <div class="label-wrap">
+    <label for="Form_Label">Label:</label>
+  </div>
+  <input type="text" id="Form_Label" name="Label" value="preview" class="form-control">
+  <button type="submit" id="Form_Apply" name="Apply" class="btn btn-primary btn-apply" value="Apply">
+    Apply
+  </button>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="5-10">
+                <span class="kss-ref badge pull-right">5-10</span> Checkboxes and Radios
+                </h2>
+
+
+                <div class="kss-box padded"><p>We use iCheck to make our checkboxes and radios look nice. It does some magic wrap the input in a style-able div.
+The most important thing to note is that you cannot listen for the click event, since the click happens on the
+wrapper. Listen for the change event instead.</p>
 </div>
-</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;script&gt;
+  $(document).on(&#x27;click&#x27;, &#x27;#checkbox-1&#x27;, function() {console.log(&#x27;clicked!&#x27;)}); // doesn&#x27;t work
+  $(document).on(&#x27;change&#x27;, &#x27;#checkbox-1&#x27;, function() {console.log(&#x27;changed!&#x27;)});
+&lt;/script&gt;
+&lt;label&gt;&lt;input id=&quot;checkbox-1&quot; type=&quot;checkbox&quot; /&gt;A label for checkbox 1&lt;/label&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><script>
+  $(document).on('click', '#checkbox-1', function() {console.log('clicked!')}); // doesn't work
+  $(document).on('change', '#checkbox-1', function() {console.log('changed!')});
+</script>
+<label><input id="checkbox-1" type="checkbox" />A label for checkbox 1</label></div>
+          </section>
     </div>
     <div class="footer">
       <div class="footer-logo logo-wrap">

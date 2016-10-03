@@ -99,89 +99,207 @@
   <div class="panel panel-help panel-right">
     <div class="panel-content-wrapper">
       <div id="fixed-help" class="js-fluid-fixed panel-content">
+        <ul class="nav nav-pills" data-spy="affix">
+          <!--<li><a href="#" class="list-group-item disabled">
+            <h4 class="list-group-item-heading">Toolbar</h4>
+          </a></li>-->
+          <li><a href="#8-1" class="nav-link"><!--<span class="kss-ref badge" >8-1</span> -->Toolbar Layout</a></li>
+          <li><a href="#8-2" class="nav-link"><!--<span class="kss-ref badge" >8-2</span> -->Pager</a></li>
+        </ul>
       </div>
     </div>
   </div>
   <div class="main">
     <div class="content">
-      <h1>Vanilla Dashboard Styleguide</h1>
-      <div class="padded"> <p>Welcome to the Vanilla Dashboard Styleguide!</p>
-<p>This styleguide covers the Vanilla dashboard styling.</p>
-<p>The goals of this styleguide are</p>
-<ul>
-    <li>to showcase the components we use in the dashboard, so you can easily mix-and-match to build your own settings page;</li>
-    <li>to ensure a streamlined appearance;</li>
-    <li>to ensure a reliable and expected UX;</li>
-    <li>to cross-reference PHP rendering helpers.</li>
-</ul>
 
-<h2 class="subheading-border">Workflow</h2>
 
-<p><h3>Grunt Tasks</h3></p>
-<div>
-    More to come...
+          <h1 class="kss-title" id="8">Toolbar</h1>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="8-1">
+                <span class="kss-ref badge pull-right">8-1</span> Toolbar Layout
+                </h2>
+
+
+                <div class="kss-box padded"><p>The toolbar is a tray that is at the top of a settings page that provides tools for filtering or managing
+the page data.</p>
 </div>
 
-<h2 class="subheading-border">Vendor Dependencies</h2>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;toolbar&quot;&gt;
+  &lt;form class=[modifier class]&gt;
+    &lt;div class=&quot;search-wrap&quot;&gt;
+      &lt;div class=&quot;search-icon-wrap search-icon-search-wrap&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg icon-svg-search&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#search&quot; /&gt;
+        &lt;/svg&gt;
+      &lt;/div&gt;
+      &lt;input class=&quot;form-control&quot;&gt;
+      &lt;button type=&quot;submit&quot; class=&quot;search-submit&quot;&gt;Search&lt;/button&gt;
+      &lt;div class=&quot;search-icon-wrap search-icon-clear-wrap&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg icon-svg-close&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#close&quot; /&gt;
+        &lt;/svg&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+  &lt;div class=&quot;btn-group&quot;&gt;
+    &lt;a href=&quot;#&quot; class=&quot;active btn btn-secondary&quot;&gt;All&lt;/a&gt;
+    &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;&gt;A Filter&lt;/a&gt;
+    &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;&gt;Another Filter&lt;/a&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;pager-wrap Pager&quot;&gt;
+    &lt;div class=&quot;pager&quot;&gt;
+      &lt;div class=&quot;pager-count&quot;&gt;Page 1 of 2&lt;/div&gt;
+      &lt;div class=&quot;btn-group&quot;&gt;
+        &lt;a href=&quot;#&quot; class=&quot;disabled btn btn-icon-border&quot; rel=&quot;prev&quot; aria-label=&quot;Previous page&quot;&gt;
+          &lt;svg class=&quot;icon icon-svg-chevron-left&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+            &lt;use xlink:href=&quot;#chevron-left&quot; /&gt;
+          &lt;/svg&gt;
+        &lt;/a&gt;
+        &lt;a href=&quot;#&quot; class=&quot; btn btn-icon-border&quot; rel=&quot;next&quot; aria-label=&quot;Next page&quot;&gt;
+          &lt;svg class=&quot;icon icon-svg-chevron-right&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+            &lt;use xlink:href=&quot;#chevron-right&quot; /&gt;
+          &lt;/svg&gt;
+        &lt;/a&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="toolbar">
+  <form class=[modifier class]>
+    <div class="search-wrap">
+      <div class="search-icon-wrap search-icon-search-wrap">
+        <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17">
+          <use xlink:href="#search" />
+        </svg>
+      </div>
+      <input class="form-control">
+      <button type="submit" class="search-submit">Search</button>
+      <div class="search-icon-wrap search-icon-clear-wrap">
+        <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+          <use xlink:href="#close" />
+        </svg>
+      </div>
+    </div>
+  </form>
+  <div class="btn-group">
+    <a href="#" class="active btn btn-secondary">All</a>
+    <a href="#" class="btn btn-secondary">A Filter</a>
+    <a href="#" class="btn btn-secondary">Another Filter</a>
+  </div>
+  <div class="pager-wrap Pager">
+    <div class="pager">
+      <div class="pager-count">Page 1 of 2</div>
+      <div class="btn-group">
+        <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
+          <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
+            <use xlink:href="#chevron-left" />
+          </svg>
+        </a>
+        <a href="#" class=" btn btn-icon-border" rel="next" aria-label="Next page">
+          <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+            <use xlink:href="#chevron-right" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div></div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">element with <code>toolbar-main</code> class fills up available space</span> <span class="pull-right"><code>.toolbar-main</code></span></div>
+              <div class="kss-example padded-bottom"><div class="toolbar">
+  <form class=toolbar-main>
+    <div class="search-wrap">
+      <div class="search-icon-wrap search-icon-search-wrap">
+        <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17">
+          <use xlink:href="#search" />
+        </svg>
+      </div>
+      <input class="form-control">
+      <button type="submit" class="search-submit">Search</button>
+      <div class="search-icon-wrap search-icon-clear-wrap">
+        <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+          <use xlink:href="#close" />
+        </svg>
+      </div>
+    </div>
+  </form>
+  <div class="btn-group">
+    <a href="#" class="active btn btn-secondary">All</a>
+    <a href="#" class="btn btn-secondary">A Filter</a>
+    <a href="#" class="btn btn-secondary">Another Filter</a>
+  </div>
+  <div class="pager-wrap Pager">
+    <div class="pager">
+      <div class="pager-count">Page 1 of 2</div>
+      <div class="btn-group">
+        <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
+          <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
+            <use xlink:href="#chevron-left" />
+          </svg>
+        </a>
+        <a href="#" class=" btn btn-icon-border" rel="next" aria-label="Next page">
+          <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+            <use xlink:href="#chevron-right" />
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="8-2">
+                <span class="kss-ref badge pull-right">8-2</span> Pager
+                </h2>
 
-<p><h3>Twitter Bootstrap (twbs)</h3></p>
-<p><h4>twbs SASS</h4></p>
-<div>
-   More to come...
+
+                <div class="kss-box padded"><p>The pager element is used for pagination and for the date selector in the VanillaStats <code>dashboard/home</code></p>
+<p>PHP rendering view is <code>pager-dashboard.php</code>, to use: <code>&lt;?php PagerModule::write([&#39;View&#39; =&gt; &#39;pager-dashboard&#39;]); ?&gt;</code></p>
 </div>
-<h4>twbs Javascript</h4>
-<div>
-    More to come...
-</div>
 
-<p><h3>Ace</h3></p>
-<div>
-    We use ace for our code editor in the Pockets and Customize Theme plugins.
-</div>
-
-<p><h3>Google Prettify</h3></p>
-<div>
-    We use google prettify to add syntax highlighting to our code and pre blocks.
-</div>
-
-<p><h3>iCheck</h3></p>
-<div>
-    We use iCheck for our radio and checkboxes.
-</div>
-
-<p><h3>Drop</h3></p>
-<div>
-    We use drop for our user card dropdown...
-</div>
-
-<p><h3>ScrollToFixed</h3></p>
-<div>
-    ScrollToFixed manages our navbar...
-</div>
-
-<h2 class="subheading-border">Other Dependencies</h2>
-
-<p><h3>FluidFixed</h3></p>
-<div>
-    Panel Scrolling
-</div>
-
-<p><h3>TableJenga</h3></p>
-<div>
-    Table Responsiveness
-</div>
-
-
-<h2 class="subheading-border">Tips and Tricks</h2>
-
-<p><h3>Avoid going rogue when building your own settings page</h3></p>
-<div>
-    Try not to add css, whether it&#39;s inline, or contained in an internal or external stylesheet.
-    Optimally, we want to have all of the dashboard&#39;s css in the admin.css file.
-    This encourages developers to use existing patterns. If a necessary pattern doesn&#39;t exist,
-    we can build it with the help of our design team (aka Dan).
-</div>
-</div>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;pager-wrap&quot;&gt;
+  &lt;div class=&quot;pager&quot;&gt;
+    &lt;div class=&quot;pager-count&quot;&gt;Page 1 of 2&lt;/div&gt;
+    &lt;div class=&quot;btn-group&quot;&gt;
+      &lt;a href=&quot;#&quot; class=&quot;disabled btn btn-icon-border&quot; rel=&quot;prev&quot; aria-label=&quot;Previous page&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg-chevron-left&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#chevron-left&quot; /&gt;
+        &lt;/svg&gt;
+      &lt;/a&gt;
+      &lt;a href=&quot;#&quot; class=&quot;btn btn-icon-border&quot; rel=&quot;next&quot; aria-label=&quot;Next page&quot;&gt;
+        &lt;svg class=&quot;icon icon-svg-chevron-right&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#chevron-right&quot; /&gt;
+        &lt;/svg&gt;
+      &lt;/a&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="pager-wrap">
+  <div class="pager">
+    <div class="pager-count">Page 1 of 2</div>
+    <div class="btn-group">
+      <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
+        <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
+          <use xlink:href="#chevron-left" />
+        </svg>
+      </a>
+      <a href="#" class="btn btn-icon-border" rel="next" aria-label="Next page">
+        <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+          <use xlink:href="#chevron-right" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</div></div>
+          </section>
     </div>
     <div class="footer">
       <div class="footer-logo logo-wrap">

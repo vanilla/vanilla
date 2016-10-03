@@ -99,89 +99,234 @@
   <div class="panel panel-help panel-right">
     <div class="panel-content-wrapper">
       <div id="fixed-help" class="js-fluid-fixed panel-content">
+        <ul class="nav nav-pills" data-spy="affix">
+          <!--<li><a href="#" class="list-group-item disabled">
+            <h4 class="list-group-item-heading">Tables</h4>
+          </a></li>-->
+          <li><a href="#7-1" class="nav-link"><!--<span class="kss-ref badge" >7-1</span> -->Data Table</a></li>
+        </ul>
       </div>
     </div>
   </div>
   <div class="main">
     <div class="content">
-      <h1>Vanilla Dashboard Styleguide</h1>
-      <div class="padded"> <p>Welcome to the Vanilla Dashboard Styleguide!</p>
-<p>This styleguide covers the Vanilla dashboard styling.</p>
-<p>The goals of this styleguide are</p>
-<ul>
-    <li>to showcase the components we use in the dashboard, so you can easily mix-and-match to build your own settings page;</li>
-    <li>to ensure a streamlined appearance;</li>
-    <li>to ensure a reliable and expected UX;</li>
-    <li>to cross-reference PHP rendering helpers.</li>
-</ul>
 
-<h2 class="subheading-border">Workflow</h2>
 
-<p><h3>Grunt Tasks</h3></p>
-<div>
-    More to come...
+          <h1 class="kss-title" id="7">Tables</h1>
+            <div class="kss-box">
+              <div class="padded"><p>Table layouts.</p>
+</div>
+            </div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="7-1">
+                <span class="kss-ref badge pull-right">7-1</span> Data Table
+                </h2>
+
+
+                <div class="kss-box padded"><p>The only two classes you need to add to get this styling is &quot;table-wrap&quot; to a container that wraps around
+the table element and also the &quot;table-data&quot; class to the table element itself.</p>
+<p>Take note of the options cell. This cell generally contains icons and maybe a toggle to perform actions on the row.
+Most of the time, these options should be wrapped in a btn-group div to make sure they don&#39;t wrap and align
+themselves to eachother properly. Also, any icon that performs an action should have the title attribute set, so
+the user can hover over it to get a description of what it does.</p>
+<p>The default min-width for any column (not including the checkbox column) is 100px. You can specify other min-widths
+using the following classes on th elements in the thead container:</p>
+<p>.column-xl       : 300px <br>
+.column-lg       : 210px <br>
+.column-md       : 132px <br>
+.column-sm       : 90px  <br>
+.column-xs       : 54px  <br>
+.column-checkbox : 42px  <br></p>
+<p>The table is made responsive by the jquery plugin Table Jengo, which adds column headings and cell data to meta
+items under the main column. There are data attributes you can add to columns to make Table Jengo work as you intend:</p>
+<p>Set &#39;data-tj-ignore=&quot;true&quot;&#39; on a thead td or thead th element to never collapse that column
+Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to make that the main column instead of the first column</p>
 </div>
 
-<h2 class="subheading-border">Vendor Dependencies</h2>
-
-<p><h3>Twitter Bootstrap (twbs)</h3></p>
-<p><h4>twbs SASS</h4></p>
-<div>
-   More to come...
-</div>
-<h4>twbs Javascript</h4>
-<div>
-    More to come...
-</div>
-
-<p><h3>Ace</h3></p>
-<div>
-    We use ace for our code editor in the Pockets and Customize Theme plugins.
-</div>
-
-<p><h3>Google Prettify</h3></p>
-<div>
-    We use google prettify to add syntax highlighting to our code and pre blocks.
-</div>
-
-<p><h3>iCheck</h3></p>
-<div>
-    We use iCheck for our radio and checkboxes.
-</div>
-
-<p><h3>Drop</h3></p>
-<div>
-    We use drop for our user card dropdown...
-</div>
-
-<p><h3>ScrollToFixed</h3></p>
-<div>
-    ScrollToFixed manages our navbar...
-</div>
-
-<h2 class="subheading-border">Other Dependencies</h2>
-
-<p><h3>FluidFixed</h3></p>
-<div>
-    Panel Scrolling
-</div>
-
-<p><h3>TableJenga</h3></p>
-<div>
-    Table Responsiveness
-</div>
-
-
-<h2 class="subheading-border">Tips and Tricks</h2>
-
-<p><h3>Avoid going rogue when building your own settings page</h3></p>
-<div>
-    Try not to add css, whether it&#39;s inline, or contained in an internal or external stylesheet.
-    Optimally, we want to have all of the dashboard&#39;s css in the admin.css file.
-    This encourages developers to use existing patterns. If a necessary pattern doesn&#39;t exist,
-    we can build it with the help of our design team (aka Dan).
-</div>
-</div>
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;table-wrap&quot;&gt;
+  &lt;table class=&quot;table-data&quot;&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th class=&quot;column-checkbox&quot; data-tj-ignore=&quot;true&quot;&gt;&lt;/th&gt;
+        &lt;th class=&quot;column-lg&quot; data-tj-main=&quot;true&quot;&gt;Username&lt;/th&gt;
+        &lt;th&gt;Roles&lt;/th&gt;
+        &lt;th class=&quot;column-md&quot;&gt;First Visit&lt;/th&gt;
+        &lt;th class=&quot;column-md&quot;&gt;Last Visit&lt;/th&gt;
+        &lt;th&gt;Last IP&lt;/th&gt;
+        &lt;th class=&quot;options column-sm&quot;&gt;&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;div class=&quot;media-sm&quot;&gt;
+            &lt;div class=&quot;media-left&quot;&gt;
+              &lt;div class=&quot;media-image-wrap&quot;&gt;
+                &lt;a href=&quot;#&quot;&gt;&lt;img src=&quot;./public/resources/images/smart-puppy.jpg&quot;&gt;&lt;/a&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;media-body&quot;&gt;
+              &lt;div class=&quot;media-title&quot;&gt;
+                &lt;a href=&quot;#&quot;&gt;Smart Puppy&lt;/a&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;info user-email&quot;&gt;puppy@email.com&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/td&gt;
+        &lt;td&gt;Member, Moderator&lt;/td&gt;
+        &lt;td&gt;April 2&lt;/td&gt;
+        &lt;td&gt;April 26&lt;/td&gt;
+        &lt;td&gt;10.0.10.1&lt;/td&gt;
+        &lt;td class=&quot;options&quot;&gt;
+          &lt;div class=&quot;btn-group&quot;&gt;
+            &lt;a href=&quot;#&quot; class=&quot;btn btn-icon&quot; aria-label=&quot;Edit&quot; title=&quot;Edit&quot;&gt;
+              &lt;svg class=&quot;icon icon-svg-edit&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+                &lt;use xlink:href=&quot;#edit&quot;&gt;&lt;/use&gt;
+              &lt;/svg&gt;
+            &lt;/a&gt;
+            &lt;a href=&quot;#&quot; class=&quot;btn btn-icon&quot; aria-label=&quot;Delete&quot; title=&quot;Delete&quot;&gt;
+              &lt;svg class=&quot;icon icon-svg-delete&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+                &lt;use xlink:href=&quot;#delete&quot;&gt;&lt;/use&gt;
+              &lt;/svg&gt;
+            &lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;
+          &lt;div class=&quot;media-sm&quot;&gt;
+            &lt;div class=&quot;media-left&quot;&gt;
+              &lt;div class=&quot;media-image-wrap&quot;&gt;
+                &lt;a href=&quot;#&quot;&gt;&lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;&lt;/a&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;media-body&quot;&gt;
+              &lt;div class=&quot;media-title&quot;&gt;
+                &lt;a href=&quot;#&quot;&gt;Chick&lt;/a&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;info user-email&quot;&gt;chick@email.com&lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/td&gt;
+        &lt;td&gt;Member&lt;/td&gt;
+        &lt;td&gt;April 2&lt;/td&gt;
+        &lt;td&gt;April 26&lt;/td&gt;
+        &lt;td&gt;10.0.10.1&lt;/td&gt;
+        &lt;td class=&quot;options&quot;&gt;
+          &lt;div class=&quot;btn-group&quot;&gt;
+            &lt;a href=&quot;#&quot; class=&quot;btn btn-icon&quot; aria-label=&quot;Edit&quot; title=&quot;Edit&quot;&gt;
+              &lt;svg class=&quot;icon icon-svg-edit&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+                &lt;use xlink:href=&quot;#edit&quot;&gt;&lt;/use&gt;
+              &lt;/svg&gt;
+            &lt;/a&gt;
+            &lt;a href=&quot;#&quot; class=&quot;btn btn-icon&quot; aria-label=&quot;Delete&quot; title=&quot;Delete&quot;&gt;
+              &lt;svg class=&quot;icon icon-svg-delete&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+                &lt;use xlink:href=&quot;#delete&quot;&gt;&lt;/use&gt;
+              &lt;/svg&gt;
+            &lt;/a&gt;
+          &lt;/div&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="table-wrap">
+  <table class="table-data">
+    <thead>
+      <tr>
+        <th class="column-checkbox" data-tj-ignore="true"></th>
+        <th class="column-lg" data-tj-main="true">Username</th>
+        <th>Roles</th>
+        <th class="column-md">First Visit</th>
+        <th class="column-md">Last Visit</th>
+        <th>Last IP</th>
+        <th class="options column-sm"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td>
+          <div class="media-sm">
+            <div class="media-left">
+              <div class="media-image-wrap">
+                <a href="#"><img src="./public/resources/images/smart-puppy.jpg"></a>
+              </div>
+            </div>
+            <div class="media-body">
+              <div class="media-title">
+                <a href="#">Smart Puppy</a>
+              </div>
+              <div class="info user-email">puppy@email.com</div>
+            </div>
+          </div>
+        </td>
+        <td>Member, Moderator</td>
+        <td>April 2</td>
+        <td>April 26</td>
+        <td>10.0.10.1</td>
+        <td class="options">
+          <div class="btn-group">
+            <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+              <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+                <use xlink:href="#edit"></use>
+              </svg>
+            </a>
+            <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+              <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+                <use xlink:href="#delete"></use>
+              </svg>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td>
+          <div class="media-sm">
+            <div class="media-left">
+              <div class="media-image-wrap">
+                <a href="#"><img src="./public/resources/images/little-chick.jpg"></a>
+              </div>
+            </div>
+            <div class="media-body">
+              <div class="media-title">
+                <a href="#">Chick</a>
+              </div>
+              <div class="info user-email">chick@email.com</div>
+            </div>
+          </div>
+        </td>
+        <td>Member</td>
+        <td>April 2</td>
+        <td>April 26</td>
+        <td>10.0.10.1</td>
+        <td class="options">
+          <div class="btn-group">
+            <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+              <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+                <use xlink:href="#edit"></use>
+              </svg>
+            </a>
+            <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+              <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+                <use xlink:href="#delete"></use>
+              </svg>
+            </a>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div></div>
+          </section>
     </div>
     <div class="footer">
       <div class="footer-logo logo-wrap">

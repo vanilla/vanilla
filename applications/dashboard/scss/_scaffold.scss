@@ -23,12 +23,6 @@
   margin-top: -$navbar-height;
   padding-top: $navbar-height;
 
-  @include media-breakpoint-down(lg) {
-    margin-top: -$navbar-short-height;
-    padding-top: $navbar-short-height;
-  }
-
-
   background-color: $white;
   border: 1px solid $border-color;
   border-top: 0;

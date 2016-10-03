@@ -6836,7 +6836,7 @@ label,
   display: flex;
   -ms-flex-pack: end;
   justify-content: flex-end;
-  padding-top: 1.125rem;
+  padding: 1.125rem 0;
 }
 
 .toggle-wrap {
@@ -8459,7 +8459,8 @@ button.close {
   word-wrap: break-word;
 }
 
-.panel-content {
+.panel-content,
+.panel-content-wrapper {
   width: 204px;
 }
 
@@ -8675,13 +8676,6 @@ button.close {
   border-top: 0;
   border-bottom: 0;
   transition: all 250ms;
-}
-
-@media (max-width: 1199px) {
-  .main {
-    margin-top: -3rem;
-    padding-top: 3rem;
-  }
 }
 
 .drawer-show .main {

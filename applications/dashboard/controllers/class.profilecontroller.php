@@ -80,9 +80,11 @@ class ProfileController extends Gdn_Controller {
         $this->addJsFile('jquery.gardenhandleajaxform.js');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
+        $this->addJsFile('cropimage.js');
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
+        $this->addCssFile('cropimage.css');
         $this->addModule('GuestModule');
         parent::initialize();
 
@@ -474,9 +476,6 @@ class ProfileController extends Gdn_Controller {
      * @param int $UserID Unique ID.
      */
     public function index($User = '', $Username = '', $UserID = '', $Page = false) {
-        $this->addJsFile('cropimage.js');
-        $this->addCssFile('cropimage.css');
-
         $this->editMode(false);
         $this->getUserInfo($User, $Username, $UserID);
 

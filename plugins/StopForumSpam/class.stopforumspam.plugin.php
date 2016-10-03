@@ -162,7 +162,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             if (substr($Reason, 0, 1) === '{') {
                 $Sender->EventArguments['IsSpam'] = true;
                 $Data['Log_InsertUserID'] = $this->userID();
-                $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
+                $Data['RecordIPAddress'] = ipEncode(Gdn::request()->ipAddress());
                 return;
             }
         }
@@ -173,7 +173,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
                 $Result = self::check($Data, $Options);
                 if ($Result) {
                     $Data['Log_InsertUserID'] = $this->userID();
-                    $Data['RecordIPAddress'] = Gdn::request()->ipAddress();
+                    $Data['RecordIPAddress'] = ipEncode(Gdn::request()->ipAddress());
                 }
                 break;
             case 'Comment':

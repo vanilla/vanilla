@@ -268,8 +268,8 @@ class CategoriesController extends VanillaController {
             }
 
             $this->setData('CategoryTree', $this->getCategoryTree(
-                $CategoryIdentifier, val('DisplayAs', $Category
-            )));
+                $CategoryIdentifier, val('DisplayAs', $Category)
+            ));
 
             // Add a backwards-compatibility shim for the old categories.
             $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {

@@ -26,7 +26,7 @@ $this->fireEvent('AfterDescription');
 $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);
 if ($subtreeView) {
     include $subtreeView;
-} else {
+} elseif (isset($this->CategoryModel) && $this->CategoryModel instanceof CategoryModel) {
     $childCategories = $this->data('CategoryTree', []);
     $this->CategoryModel->joinRecent($childCategories);
     if ($childCategories) {

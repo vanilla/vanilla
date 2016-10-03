@@ -974,14 +974,10 @@ class Gdn_Format {
      */
     protected static function replaceSpoilers($html, $replaceWith = '(Spoiler)') {
         if (preg_match('/class="(User)?Spoiler"/i', $html)) {
-            // Transform $html into a dom object and replace the spoiler block.
-            if (!function_exists('str_get_html')) {
-                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
-            }
-            $htmlDom = str_get_html($html);
+            $htmlDom = pQuery::parseStr($html);
 
-            foreach($htmlDom->find('.Spoiler') as $spoilerBlock) {
-                $spoilerBlock->outertext = t($replaceWith);
+            foreach($htmlDom->query('.Spoiler') as $spoilerBlock) {
+                $spoilerBlock->html(t($replaceWith));
             }
             $html = (string)$htmlDom;
         }

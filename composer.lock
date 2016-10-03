@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2da1306a23d00f915f024f90b2dec4f5",
-    "content-hash": "25f0bbdfc45bddcedc53d9c902d2cfc7",
+    "hash": "ea702ae5d6cd817c07c806b41e052693",
+    "content-hash": "39a75ddd7fbfedd933c31af627441f78",
     "packages": [
         {
             "name": "psr/log",
@@ -328,6 +328,34 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "time": "2016-04-26 18:19:47"
+        },
+        {
+            "name": "vanilla/php-ico",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/php-ico.git",
+                "reference": "8bd36d560152e84ad5f9e42a5df1fa9fc0649940"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": {
+                    "Vanilla\\": [
+                        "class-php-ico.php"
+                    ]
+                }
+            },
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Jean",
+                    "homepage": "https://github.com/chrisbliss18"
+                }
+            ],
+            "description": "An easy-to-use library to generate valid ICO files.",
+            "time": "2016-09-20 21:59:42"
         }
     ],
     "packages-dev": [],

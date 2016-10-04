@@ -1074,6 +1074,28 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Encode a value as JSON or throw an exception on error.
+     *
+     * @param mixed $value
+     * @param int|null $options
+     * @return string
+     * @throws Gdn_UserException
+     */
+    private function jsonEncode($value, $options = null) {
+        if ($options === null) {
+            $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+        }
+
+        $encoded = json_encode($value, $options);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Gdn_UserException('A JSON encoding error has occurred');
+        }
+
+        return $encoded;
+    }
+
+    /**
      *
      *
      * @param $Target
@@ -1499,31 +1521,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
-                $jsonData = @json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-
-                switch (json_last_error()) {
-                    case JSON_ERROR_NONE:
-                        $jsonError = false; // No error has occurred
-                        break;
-                    case JSON_ERROR_DEPTH:
-                        $jsonError = 'The maximum stack depth has been exceeded.';
-                        break;
-                    case JSON_ERROR_STATE_MISMATCH:
-                        $jsonError = 'Invalid or malformed JSON.';
-                        break;
-                    case JSON_ERROR_CTRL_CHAR:
-                        $jsonError = 'Control character error, possibly incorrectly encoded.';
-                        break;
-                    case JSON_ERROR_SYNTAX:
-                        $jsonError = 'Syntax error.';
-                        break;
-                    default:
-                        $jsonError = 'Unknown error.';
-                }
-
-                if ($jsonError !== false) {
-                    throw new Gdn_UserException("JSON encoding error: {$jsonError}");
-                }
+                $jsonData = $this->jsonEncode($Data);
 
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);

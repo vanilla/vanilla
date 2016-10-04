@@ -2095,7 +2095,7 @@ if (!function_exists('jsonEncodeChecked')) {
         $encoded = json_encode($value, $options);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            if ($advanced) {
+            if ($advanced && $encoded === false) {
                 switch (json_last_error()) {
                     case JSON_ERROR_RECURSION:
                         $errorMessage = 'One or more recursive references in the value to be encoded.';

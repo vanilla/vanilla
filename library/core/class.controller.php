@@ -1499,15 +1499,41 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
+                $jsonData = @json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+                switch (json_last_error()) {
+                    case JSON_ERROR_NONE:
+                        $jsonError = false; // No error has occurred
+                        break;
+                    case JSON_ERROR_DEPTH:
+                        $jsonError = 'The maximum stack depth has been exceeded.';
+                        break;
+                    case JSON_ERROR_STATE_MISMATCH:
+                        $jsonError = 'Invalid or malformed JSON.';
+                        break;
+                    case JSON_ERROR_CTRL_CHAR:
+                        $jsonError = 'Control character error, possibly incorrectly encoded.';
+                        break;
+                    case JSON_ERROR_SYNTAX:
+                        $jsonError = 'Syntax error.';
+                        break;
+                    default:
+                        $jsonError = 'Unknown error.';
+                }
+
+                if ($jsonError !== false) {
+                    throw new Gdn_UserException("JSON encoding error: {$jsonError}");
+                }
+
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
+                    echo "{$Callback}({$jsonData});";
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    echo $jsonData;
                     return true;
                 }
                 break;

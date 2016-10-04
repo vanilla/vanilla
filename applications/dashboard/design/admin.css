@@ -7567,17 +7567,21 @@ label[id^=iCheck] {
   align-items: center;
 }
 
-.flex.flex-wrap {
-  max-width: 100%;
-  -ms-flex-wrap: wrap;
-  flex-wrap: wrap;
-}
-
 .flex > * {
   margin-right: 0.28125rem;
 }
 
 .flex > *:last-child {
+  margin-right: 0;
+}
+
+.flex-wrap {
+  max-width: 100%;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+}
+
+.flex-wrap > *, .flex-wrap.flex > * {
   margin-right: 0;
 }
 
@@ -9208,11 +9212,6 @@ ul {
 .toolbar {
   display: -ms-flexbox;
   display: flex;
-  margin-left: -1.125rem;
-  margin-right: -1.125rem;
-  padding-left: 1.125rem;
-  padding-right: 1.125rem;
-  border-bottom: 0.0625rem solid #e7e8e9;
   -ms-flex-align: start;
   align-items: flex-start;
   -ms-flex-pack: justify;
@@ -9227,6 +9226,10 @@ ul {
 }
 
 .toolbar > *:last-child {
+  margin-right: 0;
+}
+
+.toolbar.flex-wrap {
   margin-right: 0;
 }
 

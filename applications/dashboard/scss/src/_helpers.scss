@@ -90,17 +90,24 @@
   justify-content: space-between;
   align-items: center;
 
-  &.flex-wrap {
-    max-width: 100%;
-    flex-wrap: wrap;
-  }
-
   > * {
     margin-right: $spacer / 4;
   }
 
   > *:last-child {
     margin-right: 0;
+  }
+}
+
+.flex-wrap {
+  max-width: 100%;
+  flex-wrap: wrap;
+
+  &,
+  &.flex {
+    > * {
+      margin-right: 0;
+    }
   }
 }
 

@@ -54,8 +54,7 @@
 // Styleguide 8.1.
 
 .toolbar {
-  @include full-border(flex);
-
+  display: flex;
   align-items: flex-start;
   justify-content: space-between;
   padding-top: $spacer / 2;
@@ -68,6 +67,10 @@
     &:last-child {
       margin-right: 0;
     }
+  }
+
+  &.flex-wrap {
+    margin-right: 0;
   }
 
   &.empty {

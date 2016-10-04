@@ -3905,15 +3905,18 @@ if (!function_exists('walkAll')) {
      *
      * @param array|object $input
      * @param callable $callback
-     * @param string $parent Array key or object property to indicate parent node.
      */
-    function walkAllRecursive(&$input, $callback, $parent = null) {
-        foreach ($input as $key => &$val) {
-            if (is_array($val) || is_object($val)) {
-                walkAllRecursive($val, $callback, $key);
-            } else {
-                call_user_func_array($callback, [&$val, $key, $parent]);
+    function walkAllRecursive(&$input, $callback) {
+        $walker = function(&$input, $callback, $parent = null) use (&$walker) {
+            foreach ($input as $key => &$val) {
+                if (is_array($val) || is_object($val)) {
+                    call_user_func_array($walker, [&$val, $callback, $key]);
+                } else {
+                    call_user_func_array($callback, [&$val, $key, $parent]);
+                }
             }
-        }
+        };
+
+        call_user_func_array($walker, [&$input, $callback]);
     }
 }

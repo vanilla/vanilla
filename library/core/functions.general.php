@@ -3903,7 +3903,7 @@ if (!function_exists('urlMatch')) {
     }
 }
 
-if (!function_exists('walkAll')) {
+if (!function_exists('walkAllRecursive')) {
     /**
      * Recursively walk through all array elements or object properties.
      *
@@ -3911,7 +3911,16 @@ if (!function_exists('walkAll')) {
      * @param callable $callback
      */
     function walkAllRecursive(&$input, $callback) {
-        $walker = function(&$input, $callback, $parent = null) use (&$walker) {
+        $currentDepth = 0;
+        $maxDepth = 128;
+
+        $walker = function(&$input, $callback, $parent = null) use (&$walker, &$currentDepth, $maxDepth) {
+            $currentDepth++;
+
+            if ($currentDepth > $maxDepth) {
+                throw new Exception('Maximum recursion depth exceeded.', 500);
+            }
+
             foreach ($input as $key => &$val) {
                 if (is_array($val) || is_object($val)) {
                     call_user_func_array($walker, [&$val, $callback, $key]);
@@ -3919,6 +3928,8 @@ if (!function_exists('walkAll')) {
                     call_user_func_array($callback, [&$val, $key, $parent]);
                 }
             }
+
+            $currentDepth--;
         };
 
         call_user_func_array($walker, [&$input, $callback]);

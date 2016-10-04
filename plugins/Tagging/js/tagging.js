@@ -47,7 +47,8 @@ var discussionTagging = {
                 dataFields: ["#Form_CategoryID"],
                 allowFreeTagging: TagAdd,
                 tokenLimit: MaxTags,
-                zindex: 3000
+                zindex: 3000,
+                allowTabOut: true
             });
 
             // Show available link

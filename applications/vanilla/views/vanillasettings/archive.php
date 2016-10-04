@@ -4,7 +4,7 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php
             echo $this->Form->label('Archive Discussions', 'Vanilla.Archive.Date');
@@ -18,7 +18,7 @@ echo $this->Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="input-wrap no-label">
             <?php
             echo $this->Form->CheckBox('Vanilla.Archive.Exclude', 'Exclude archived discussions from the discussions list');

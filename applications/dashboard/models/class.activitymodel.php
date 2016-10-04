@@ -1060,7 +1060,7 @@ class ActivityModel extends Gdn_Model {
     public function comment($Comment) {
         $Comment['InsertUserID'] = Gdn::session()->UserID;
         $Comment['DateInserted'] = Gdn_Format::toDateTime();
-        $Comment['InsertIPAddress'] = Gdn::request()->ipAddress();
+        $Comment['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
 
         $this->Validation->applyRule('ActivityID', 'Required');
         $this->Validation->applyRule('Body', 'Required');

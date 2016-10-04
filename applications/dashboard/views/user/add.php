@@ -10,7 +10,7 @@ echo $this->Form->open(array('class' => 'User'));
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Username', 'Name'); ?>
             </div>
@@ -18,7 +18,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Name'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Email', 'Email'); ?>
             </div>
@@ -26,12 +26,12 @@ echo $this->Form->errors();
                 <?php echo $this->Form->textBox('Email'); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Password', 'Password'); ?>
             </div>
@@ -39,7 +39,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password ')); ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="InputButtons js-password-related input-wrap no-label">
                 <?php echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
                 echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary'); ?>
@@ -47,7 +47,7 @@ echo $this->Form->errors();
         </li>
 
         <?php if (c('Garden.Profile.Locations', false)): ?>
-            <li class="form-group row User-Location">
+            <li class="form-group User-Location">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Location', 'Location'); ?>
                 </div>
@@ -58,7 +58,7 @@ echo $this->Form->errors();
         <?php endif; ?>
 
         <?php if (c('Garden.Profile.Titles', false)): ?>
-            <li class="form-group row User-Title">
+            <li class="form-group User-Title">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Title', 'Title'); ?>
                 </div>
@@ -70,7 +70,7 @@ echo $this->Form->errors();
         <?php
         $this->fireEvent('CustomUserFields')
         ?>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo t('Check all roles that apply to this user:');  ?>
             </div>

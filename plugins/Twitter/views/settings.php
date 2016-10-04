@@ -14,33 +14,33 @@ echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             echo $this->Form->labelWrap('Consumer Key', 'ConsumerKey');
             echo $this->Form->textBoxWrap('ConsumerKey');
             ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <?php
             echo $this->Form->labelWrap('Consumer Secret', 'Secret');
             echo $this->Form->textBoxWrap('Secret');
             ?>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php
                 echo $this->Form->checkBox('SocialSignIn', 'Enable Social Sign In');
                 ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php
                 echo $this->Form->checkBox('SocialReactions', "Enable Social Reactions.");
                 ?>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="input-wrap no-label">
                 <?php
                 echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');

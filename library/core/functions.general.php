@@ -860,10 +860,6 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Invalid URL.', 400);
             }
 
-            if (!defined('HDOM_TYPE_ELEMENT')) {
-                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
-            }
-
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
@@ -876,39 +872,39 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Couldn\'t connect to host.', 400);
             }
 
-            $Dom = str_get_html($PageHtml);
+            $Dom = pQuery::parseStr($PageHtml);
             if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');
             }
 
             // FIRST PASS: Look for open graph title, desc, images
-            $PageInfo['Title'] = domGetContent($Dom, 'meta[property=og:title]');
+            $PageInfo['Title'] = domGetContent($Dom, 'meta[property="og:title"]');
 
             Trace('Getting og:description');
-            $PageInfo['Description'] = domGetContent($Dom, 'meta[property=og:description]');
-            foreach ($Dom->find('meta[property=og:image]') as $Image) {
-                if (isset($Image->content)) {
-                    $PageInfo['Images'][] = $Image->content;
+            $PageInfo['Description'] = domGetContent($Dom, 'meta[property="og:description"]');
+            foreach ($Dom->query('meta[property="og:image"]') as $Image) {
+                if ($Image->attr('content')) {
+                    $PageInfo['Images'][] = $Image->attr('content');
                 }
             }
 
             // SECOND PASS: Look in the page for title, desc, images
             if ($PageInfo['Title'] == '') {
-                $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
+                $PageInfo['Title'] = $Dom->query('title')->text();
             }
 
             if ($PageInfo['Description'] == '') {
                 Trace('Getting meta description');
-                $PageInfo['Description'] = domGetContent($Dom, 'meta[name=description]');
+                $PageInfo['Description'] = domGetContent($Dom, 'meta[name="description"]');
             }
 
             // THIRD PASS: Look in the page contents
             if ($PageInfo['Description'] == '') {
-                foreach ($Dom->find('p') as $element) {
+                foreach ($Dom->query('p') as $element) {
                     Trace('Looking at p for description.');
 
                     if (strlen($element->plaintext) > 150) {
-                        $PageInfo['Description'] = $element->plaintext;
+                        $PageInfo['Description'] = $element->text();
                         break;
                     }
                 }
@@ -919,10 +915,10 @@ if (!function_exists('fetchPageInfo')) {
 
             // Final: Still nothing? remove limitations
             if ($PageInfo['Description'] == '') {
-                foreach ($Dom->find('p') as $element) {
+                foreach ($Dom->query('p') as $element) {
                     Trace('Looking at p for description (no restrictions)');
-                    if (trim($element->plaintext) != '') {
-                        $PageInfo['Description'] = $element->plaintext;
+                    if (trim($element->text()) != '') {
+                        $PageInfo['Description'] = $element->text();
                         break;
                     }
                 }
@@ -948,14 +944,15 @@ if (!function_exists('domGetContent')) {
     /**
      * Search a DOM for a selector and return the contents.
      *
-     * @param simple_html_dom $dom The DOM to search.
+     * @param pQuery $dom The DOM to search.
      * @param string $selector The CSS style selector for the content to find.
      * @param string $default The default content to return if the node isn't found.
      * @return string Returns the content of the found node or {@link $default} otherwise.
      */
     function domGetContent($dom, $selector, $default = '') {
-        $Element = $dom->getElementsByTagName($selector);
-        return isset($Element->content) ? $Element->content : $default;
+        $Element = $dom->query($selector);
+        $content = $Element->attr('content');
+        return $content ? $content : $default;
     }
 }
 
@@ -963,18 +960,18 @@ if (!function_exists('domGetImages')) {
     /**
      * Get the images from a DOM.
      *
-     * @param simple_html_dom $dom The DOM to search.
+     * @param pQuery $dom The DOM to search.
      * @param string $url The URL of the document to add to relative URLs.
      * @param int $maxImages The maximum number of images to return.
      * @return array Returns an array in the form: `[['Src' => '', 'Width' => '', 'Height' => ''], ...]`.
      */
     function domGetImages($dom, $url, $maxImages = 4) {
         $Images = array();
-        foreach ($dom->find('img') as $element) {
+        foreach ($dom->query('img') as $element) {
             $Images[] = array(
-                'Src' => absoluteSource($element->src, $url),
-                'Width' => $element->width,
-                'Height' => $element->height
+                'Src' => absoluteSource($element->attr('src'), $url),
+                'Width' => $element->attr('width'),
+                'Height' => $element->attr('height'),
             );
         }
 

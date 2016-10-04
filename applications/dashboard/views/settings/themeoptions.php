@@ -73,7 +73,7 @@ echo $this->Form->errors();
     <ul>
         <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 
-            echo '<li class="form-group row">'; ?>
+            echo '<li class="form-group">'; ?>
             <div class="label-wrap">
             <?php echo $this->Form->label('@'.$Code, 'Text_'.$Code);
 

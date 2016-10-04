@@ -31,7 +31,7 @@
     <?php echo $this->Form->open(array('enctype' => 'multipart/form-data')); ?>
     <?php echo $this->Form->errors(); ?>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap-wide">
                 <?php
                 echo $this->Form->label('Thumbnail Size', 'Garden.Thumbnail.Size');
@@ -43,7 +43,7 @@
                 </div>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap-wide">
                 <?php
                 echo $this->Form->label('Max Avatar Width', 'Garden.Profile.MaxWidth');
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </li>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap-wide">
                 <?php
                 echo $this->Form->label('Max Avatar Height', 'Garden.Profile.MaxHeight');

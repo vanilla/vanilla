@@ -15,7 +15,7 @@ echo $this->Form->errors();
     ?>
     </div>
     <ul>
-        <li class="form-group row">
+        <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Replacement Role', 'ReplacementRoleID'); ?>
                 <div class="info"><?php echo t('Choose a role that orphaned users will be assigned to.'); ?></div>

@@ -260,7 +260,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             } else {
                 $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
             }
-            if ($OutputType == 'png') {
+            if (in_array($OutputType, ['png', 'ico'])) {
                 imagealphablending($TargetImage, false);
                 imagesavealpha($TargetImage, true);
             }
@@ -323,12 +323,12 @@ class Gdn_UploadImage extends Gdn_Upload {
      * @param $GD
      * @param $TargetPath
      */
-    public static function imageIco($GD, $TargetPath) {
-        require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.ico.php';
-        require_once PATH_LIBRARY.'/vendors/phpThumb/phpthumb.functions.php';
-        $Ico = new phpthumb_ico();
-        $Arr = array('ico' => $GD);
-        $IcoString = $Ico->GD2ICOstring($Arr);
-        file_put_contents($TargetPath, $IcoString);
+    public static function imageIco($gd, $targetPath) {
+        $imagePath = tempnam(sys_get_temp_dir(), 'iconify');
+        imagepng($gd, $imagePath);
+
+        $icoLib = new PHP_ICO($imagePath, [[16,16]]);
+        $icoLib->save_ico($targetPath);
+        unlink($imagePath);
     }
 }

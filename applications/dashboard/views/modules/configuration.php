@@ -27,7 +27,7 @@ echo $Form->errors();
         if (val('no-grid', $Row['Options'])) {
             echo "<li>\n  ";
         } else {
-            echo "<li class=\"form-group row\">\n  ";
+            echo "<li class=\"form-group\">\n  ";
         }
 
         $LabelCode = $Sf->LabelCode($Row);

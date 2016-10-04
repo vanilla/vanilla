@@ -5,7 +5,7 @@ echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
 ?>
 <ul>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Category', 'Name'); ?>
         </div>
@@ -13,7 +13,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Name'); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
         <?php echo wrap(t('Category Url:'), 'strong'); ?>
         </div>
@@ -31,7 +31,7 @@ echo $this->Form->errors();
             ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Description', 'Description'); ?>
         </div>
@@ -39,7 +39,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('Description', array('MultiLine' => TRUE)); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Css Class', 'CssClass'); ?>
         </div>
@@ -47,7 +47,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE)); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Photo', 'PhotoUpload');
             if ($Photo = $this->Form->getValue('Photo')) {
@@ -66,7 +66,7 @@ echo $this->Form->errors();
         $this->data('_ExtendedFields', array()),
         array('Wrap' => array('', '')));
     ?>
-    <li class="form-group row">
+    <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
         </div>
@@ -74,22 +74,22 @@ echo $this->Form->errors();
         <?php echo $this->Form->DropDown('DisplayAs', $this->data('DisplayAsOptions')); ?>
         </div>
     </li>
-    <li class="form-group row">
+    <li class="form-group">
         <?php echo $this->Form->toggle('HideAllDiscussions', 'Hide from the recent discussions page.'); ?>
     </li>
     <?php if ($this->ShowCustomPoints): ?>
-        <li class="form-group row">
+        <li class="form-group">
             <?php echo $this->Form->toggle('CustomPoints', 'Track points for this category separately.'); ?>
         </li>
     <?php endif; ?>
-    <li class="form-group row">
+    <li class="form-group">
         <?php
         echo $this->Form->toggle('Archived', 'This category is archived.');
         ?>
     </li>
     <?php $this->fireEvent('AfterCategorySettings'); ?>
     <?php if (count($this->PermissionData) > 0) { ?>
-        <li id="Permissions" class="form-group row">
+        <li id="Permissions" class="form-group">
             <?php echo $this->Form->toggle('CustomPermissions', 'This category has custom permissions.'); ?>
         </li>
     <?php } ?>
@@ -97,7 +97,7 @@ echo $this->Form->errors();
 <?php
 echo '<div class="CategoryPermissions">';
 if (count($this->data('DiscussionTypes')) > 1) {
-    echo '<div class="P DiscussionTypes form-group row">';
+    echo '<div class="P DiscussionTypes form-group">';
     echo '<div class="label-wrap">';
     echo $this->Form->label('Discussion Types');
     echo '</div>';
@@ -111,7 +111,7 @@ if (count($this->data('DiscussionTypes')) > 1) {
 
 echo $this->Form->Simple(
     $this->data('_PermissionFields', array()),
-    array('Wrap' => array('<div class="form-group row">', '</div>'), 'ItemWrap' => array('<div class="input-wrap">', '</div>')));
+    array('Wrap' => array('<div class="form-group">', '</div>'), 'ItemWrap' => array('<div class="input-wrap">', '</div>')));
 
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
 echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');

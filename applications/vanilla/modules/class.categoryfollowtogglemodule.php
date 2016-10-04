@@ -10,6 +10,8 @@
 
 /**
  * Allows the user to show all unfollowed categories so they can re-follow them.
+ *
+ * @deprecated 2.2.113 Dropped in favor of muting categories
  */
 class CategoryFollowToggleModule extends Gdn_Module {
 
@@ -39,10 +41,6 @@ class CategoryFollowToggleModule extends Gdn_Module {
     }
 
     public function toString() {
-        if (Gdn::session()->isValid()) {
-            return parent::ToString();
-        }
-
         return '';
     }
 }

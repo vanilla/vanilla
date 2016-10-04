@@ -9229,7 +9229,7 @@ ul {
   margin-right: 0;
 }
 
-.toolbar.flex-wrap {
+.toolbar.flex-wrap > * {
   margin-right: 0;
 }
 

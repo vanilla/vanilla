@@ -32,8 +32,9 @@
         "vanilla/htmlawed": "~2.0",
         "vanilla/nbbc": "~2.1",
         "vanilla/garden-password": "~1.0",
-        "vanilla/php-ico": "~1.0",
-        "tburry/pquery": "~1.1"
+		"tburry/pquery": "~1.1",
+		"container-interop/container-interop": "^1.1",
+        "vanilla/php-ico": "~1.0"
     },
     "autoload": {
         "classmap": [
@@ -49,7 +50,8 @@
             "library/core/functions.deprecated.php"
         ],
         "psr-4": {
-            "Vanilla\\": "library/Vanilla"
+			"Vanilla\\": "library/Vanilla",
+			"Garden\\": "library/Garden"
         }
     },
     "scripts": {

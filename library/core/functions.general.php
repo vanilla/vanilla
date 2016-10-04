@@ -2072,6 +2072,58 @@ if (!function_exists('joinRecords')) {
 
 }
 
+if (!function_exists('jsonEncodeChecked')) {
+    /**
+     * Encode a value as JSON or throw an exception on error.
+     *
+     * @param mixed $value
+     * @param int|null $options
+     * @return string
+     * @throws Exception
+     */
+    function jsonEncodeChecked($value, $options = null) {
+        $advanced = (PHP_VERSION_ID >= 50500);
+
+        if ($options === null) {
+            if ($advanced) {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+            } else {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+            }
+        }
+
+        $encoded = json_encode($value, $options);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if ($advanced) {
+                switch (json_last_error()) {
+                    case JSON_ERROR_RECURSION:
+                        $errorMessage = 'One or more recursive references in the value to be encoded.';
+                        break;
+                    case JSON_ERROR_INF_OR_NAN:
+                        $errorMessage = 'One or more NAN or INF values in the value to be encoded';
+                        break;
+                    case JSON_ERROR_UNSUPPORTED_TYPE:
+                        $errorMessage = 'A value of a type that cannot be encoded was given.';
+                        break;
+                    default:
+                        $errorMessage = 'An unknown error has occurred.';
+                }
+            } else {
+                $errorMessage = 'An unknown error has occurred.';
+            }
+        } else {
+            $errorMessage = null;
+        }
+
+        if ($errorMessage !== null) {
+            throw new Exception("JSON encoding error: {$errorMessage}", 500);
+        }
+
+        return $encoded;
+    }
+}
+
 if (!function_exists('now')) {
     /**
      * Get the current time in seconds with a millisecond fraction.

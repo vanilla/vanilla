@@ -1089,56 +1089,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Encode a value as JSON or throw an exception on error.
-     *
-     * @param mixed $value
-     * @param int|null $options
-     * @return string
-     * @throws Exception
-     */
-    private function jsonEncode($value, $options = null) {
-        $advanced = (PHP_VERSION_ID >= 50500);
-
-        if ($options === null) {
-            if ($advanced) {
-                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
-            } else {
-                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
-            }
-        }
-
-        $encoded = json_encode($value, $options);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            if ($advanced) {
-                switch (json_last_error()) {
-                    case JSON_ERROR_RECURSION:
-                        $errorMessage = 'One or more recursive references in the value to be encoded.';
-                        break;
-                    case JSON_ERROR_INF_OR_NAN:
-                        $errorMessage = 'One or more NAN or INF values in the value to be encoded';
-                        break;
-                    case JSON_ERROR_UNSUPPORTED_TYPE:
-                        $errorMessage = 'A value of a type that cannot be encoded was given.';
-                        break;
-                    default:
-                        $errorMessage = 'An unknown error has occurred.';
-                }
-            } else {
-                $errorMessage = 'An unknown error has occurred.';
-            }
-        } else {
-            $errorMessage = null;
-        }
-
-        if ($errorMessage !== null) {
-            throw new Exception("JSON encoding error: {$errorMessage}", 500);
-        }
-
-        return $encoded;
-    }
-
-    /**
      *
      *
      * @param $Target
@@ -1564,7 +1514,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
-                $jsonData = $this->jsonEncode($Data);
+                $jsonData = jsonEncodeChecked($Data);
 
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);

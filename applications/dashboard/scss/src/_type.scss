@@ -239,8 +239,10 @@ pre {
 
 .subheading-border {
   @extend .full-border;
+  @include has-top-border;
   padding-top: $spacer;
   padding-bottom: $spacer;
+  margin-bottom: 0;
   font-size: $font-size-base;
   line-height: $line-height;
   font-weight: 500;
@@ -262,6 +264,7 @@ pre {
 // Styleguide 1.7.
 
 .subheading-block {
+  @include has-top-border;
   padding-top: $spacer;
   padding-bottom: $spacer;
   border-top: $border-width solid $border-color;

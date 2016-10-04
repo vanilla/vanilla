@@ -1,19 +1,17 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="Summary ActiveUserSummary">
-    <div class="dashboard-widget-title"><?php echo t('Active Users'); ?></div>
-    <table class="table-data">
+<div class="table-summary-wrap ActiveUserSummary">
+    <div class="table-summary-title"><?php echo t('Active Users'); ?></div>
+    <table class="table-summary">
         <thead>
         <tr>
             <th><?php echo t('Name'); ?></th>
-            <!-- <td><?php echo t('Discussions'); ?></td> -->
-            <td class="column-xs"><?php echo t('Comments'); ?></td>
-            <!-- <td><?php echo t('PageViews'); ?></td> -->
+            <th class="column-xs"><?php echo t('Comments'); ?></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($this->Data['UserData'] as $User) { ?>
             <tr>
-                <th>
+                <td>
                     <div class="media media-sm">
                         <div class="media-left">
                             <div class="media-image-wrap">
@@ -27,29 +25,28 @@
                             <div class="info user-date"><?php echo Gdn_Format::date(val('DateLastActive', $User), 'html'); ?></div>
                         </div>
                     </div>
-                </th>
+                </td>
                 <td><?php echo number_format($User->CountComments); ?></td>
-                <!-- <td><?php // echo number_format($Discussion->CountViews); ?></td> -->
             </tr>
         <?php } ?>
         </tbody>
     </table>
 </div>
-<div class="Summary PopularDiscussionSummary">
-    <div class="dashboard-widget-title"><?php echo t('Popular Discussions'); ?></div>
-    <table class="table-data">
+<div class="table-summary-wrap PopularDiscussionSummary">
+    <div class="table-summary-title"><?php echo t('Popular Discussions'); ?></div>
+    <table class="table-summary">
         <thead>
         <tr>
             <th class="column-sm"><?php echo t('Title'); ?></th>
-            <td class="column-xs"><?php echo t('Comments'); ?></td>
-            <td class="column-xs"><?php echo t('Follows'); ?></td>
-            <td class="column-xs"><?php echo t('Views'); ?></td>
+            <th class="column-xs"><?php echo t('Comments'); ?></th>
+            <th class="column-xs"><?php echo t('Follows'); ?></th>
+            <th class="column-xs"><?php echo t('Views'); ?></th>
         </tr>
         </thead>
         <tbody>
         <?php foreach ($this->Data['DiscussionData'] as $Discussion) { ?>
             <tr>
-                <th>
+                <td>
                     <div class="media media-sm">
                         <div class="media-body">
                             <div class="media-title">
@@ -60,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                </th>
+                </td>
                 <td><?php echo number_format($Discussion->CountComments); ?></td>
                 <td><?php echo number_format($Discussion->CountBookmarks); ?></td>
                 <td><?php echo number_format($Discussion->CountViews); ?></td>

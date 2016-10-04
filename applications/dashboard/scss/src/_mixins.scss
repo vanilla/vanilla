@@ -14,6 +14,30 @@
   }
 }
 
+@mixin has-top-border() {
+  margin-top: - to-rem(1);
+}
+
+@mixin fixed-table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
+}
+
+@mixin caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-right: .25rem;
+  margin-left: .25rem;
+  vertical-align: middle;
+  content: "";
+  border-top: $caret-width solid;
+  border-right: $caret-width solid transparent;
+  border-left: $caret-width solid transparent;
+}
+
+
 @mixin button-variant(
   $color,
   $background,

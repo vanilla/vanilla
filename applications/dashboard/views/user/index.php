@@ -54,7 +54,7 @@ Gdn_Theme::assetBegin('Help');
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
     <div class="table-wrap">
-        <table id="Users" class="table-data">
+        <table id="Users" class="table-data js-tj">
             <thead>
             <tr>
                 <!--         <th class="CheckboxCell"><input id="SelectAll" type="checkbox" /></th>-->

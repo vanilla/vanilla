@@ -54,7 +54,7 @@
   .footer {
     flex-shrink: 0;
     height: 4rem;
-    margin-top: -4rem;
+    margin-top: -4rem - to-rem(1);
   }
 
   .content {

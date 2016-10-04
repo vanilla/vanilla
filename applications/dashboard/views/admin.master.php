@@ -37,7 +37,7 @@ $roleTitles = implode(', ', $roleTitlesArray);
             <div class="media-title username">
                 <?php echo userAnchor($user); ?>
             </div>
-            <div class="media-info user-roles">
+            <div class="info user-roles">
                 <?php echo $roleTitles; ?>
             </div>
             <a class="btn btn-sm-rounded btn-secondary padded-top" href="<?php echo url(userUrl($user)); ?>">

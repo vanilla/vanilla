@@ -77,3 +77,10 @@ The goals of this styleguide are
     This encourages developers to use existing patterns. If a necessary pattern doesn't exist,
     we can build it with the help of our design team (aka Dan).
 </div>
+<h3>Borders</h3>
+<div>
+    Many of the dashboard components have borders. This can make it tricky to ensure that there are no double-borders
+    when elements are flush against eachother. To fix this, if possible only add border-bottom. If a top border is
+    necessary, add a margin of -(border-width) to the element. There's a helpful mixin (`hasBorderTop`) that does just
+    that and makes it clear what you're doing.
+</div>

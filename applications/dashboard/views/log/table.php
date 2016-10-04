@@ -2,7 +2,7 @@
 include $this->fetchViewLocation('helper_functions');
 ?>
 <div class="table-wrap">
-    <table id="Log" class="table-data">
+    <table id="Log" class="table-data js-tj">
         <thead>
         <tr>
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>

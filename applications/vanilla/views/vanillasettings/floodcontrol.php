@@ -20,7 +20,7 @@ echo $this->Form->errors();
     <h1><?php echo t('Flood Control'); ?></h1>
 </div>
 <div class="table-wrap">
-    <table class="table-data">
+    <table class="table-data js-tj">
         <thead>
         <tr>
             <th><?php echo t('Only Allow Each User To Post'); ?></th>

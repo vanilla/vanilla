@@ -23,7 +23,7 @@
     width: $font-size-base;
   }
 
-  .media-sm-title {
+  .media-title {
     margin-bottom: $spacer / 4;
 
     a {
@@ -31,12 +31,17 @@
     }
   }
 
-  .media-sm-image-wrap {
-    @include image-wrap();
-    margin-right: $spacer;
+  .media-sm {
+    .media-image-wrap {
+      @include image-wrap();
+    }
+
+    .media-left {
+      padding-right: $spacer;
+    }
   }
 
-  .media-sm {
+  .media {
     align-items: flex-start;
   }
 }

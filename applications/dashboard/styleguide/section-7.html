@@ -16,6 +16,7 @@
   <script src="public/jquery.tablejenga.js"></script>
   <script src="public/jquery.fluidfixed.js"></script>
   <script src="public/jquery.expander.js"></script>
+  <script src="public/jquery.gardencheckboxgrid.js"></script>
   <script>
     gdn = function() {
 
@@ -104,6 +105,8 @@
             <h4 class="list-group-item-heading">Tables</h4>
           </a></li>-->
           <li><a href="#7-1" class="nav-link"><!--<span class="kss-ref badge" >7-1</span> -->Data Table</a></li>
+          <li><a href="#7-2" class="nav-link"><!--<span class="kss-ref badge" >7-2</span> -->Checkbox Grid</a></li>
+          <li><a href="#7-3" class="nav-link"><!--<span class="kss-ref badge" >7-3</span> -->Summary Table</a></li>
         </ul>
       </div>
     </div>
@@ -138,16 +141,17 @@ using the following classes on th elements in the thead container:</p>
 .column-lg       : 210px <br>
 .column-md       : 132px <br>
 .column-sm       : 90px  <br>
-.column-xs       : 54px  <br>
-.column-checkbox : 42px  <br></p>
-<p>The table is made responsive by the jquery plugin Table Jengo, which adds column headings and cell data to meta
-items under the main column. There are data attributes you can add to columns to make Table Jengo work as you intend:</p>
+.column-xs       : 54px  <br></p>
+<p>A checkbox column should have the .column-checkbox class on its column header.</p>
+<p>The table is made responsive by the jquery plugin Table Jenga, which adds column headings and cell data to meta
+items under the main column. To add Table Jenga functionality to a table, you must add the js-tj class to the table
+element. There are data attributes you can add to columns to make Table Jengo work as you intend:</p>
 <p>Set &#39;data-tj-ignore=&quot;true&quot;&#39; on a thead td or thead th element to never collapse that column
 Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to make that the main column instead of the first column</p>
 </div>
 
                 <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;table-wrap&quot;&gt;
-  &lt;table class=&quot;table-data&quot;&gt;
+  &lt;table class=&quot;table-data js-tj&quot;&gt;
     &lt;thead&gt;
       &lt;tr&gt;
         &lt;th class=&quot;column-checkbox&quot; data-tj-ignore=&quot;true&quot;&gt;&lt;/th&gt;
@@ -166,12 +170,12 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
           &lt;div class=&quot;media-sm&quot;&gt;
             &lt;div class=&quot;media-left&quot;&gt;
               &lt;div class=&quot;media-image-wrap&quot;&gt;
-                &lt;a href=&quot;#&quot;&gt;&lt;img src=&quot;./public/resources/images/smart-puppy.jpg&quot;&gt;&lt;/a&gt;
+                &lt;img src=&quot;./public/resources/images/smart-puppy.jpg&quot;&gt;&lt;/a&gt;
               &lt;/div&gt;
             &lt;/div&gt;
             &lt;div class=&quot;media-body&quot;&gt;
               &lt;div class=&quot;media-title&quot;&gt;
-                &lt;a href=&quot;#&quot;&gt;Smart Puppy&lt;/a&gt;
+                Smart Puppy&lt;/a&gt;
               &lt;/div&gt;
               &lt;div class=&quot;info user-email&quot;&gt;puppy@email.com&lt;/div&gt;
             &lt;/div&gt;
@@ -202,12 +206,12 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
           &lt;div class=&quot;media-sm&quot;&gt;
             &lt;div class=&quot;media-left&quot;&gt;
               &lt;div class=&quot;media-image-wrap&quot;&gt;
-                &lt;a href=&quot;#&quot;&gt;&lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;&lt;/a&gt;
+                &lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;&lt;/a&gt;
               &lt;/div&gt;
             &lt;/div&gt;
             &lt;div class=&quot;media-body&quot;&gt;
               &lt;div class=&quot;media-title&quot;&gt;
-                &lt;a href=&quot;#&quot;&gt;Chick&lt;/a&gt;
+                Chick&lt;/a&gt;
               &lt;/div&gt;
               &lt;div class=&quot;info user-email&quot;&gt;chick@email.com&lt;/div&gt;
             &lt;/div&gt;
@@ -238,7 +242,7 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
               </div>
               <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
               <div class="kss-example padded-bottom"><div class="table-wrap">
-  <table class="table-data">
+  <table class="table-data js-tj">
     <thead>
       <tr>
         <th class="column-checkbox" data-tj-ignore="true"></th>
@@ -257,12 +261,12 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
           <div class="media-sm">
             <div class="media-left">
               <div class="media-image-wrap">
-                <a href="#"><img src="./public/resources/images/smart-puppy.jpg"></a>
+                <img src="./public/resources/images/smart-puppy.jpg"></a>
               </div>
             </div>
             <div class="media-body">
               <div class="media-title">
-                <a href="#">Smart Puppy</a>
+                Smart Puppy</a>
               </div>
               <div class="info user-email">puppy@email.com</div>
             </div>
@@ -293,12 +297,12 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
           <div class="media-sm">
             <div class="media-left">
               <div class="media-image-wrap">
-                <a href="#"><img src="./public/resources/images/little-chick.jpg"></a>
+                <img src="./public/resources/images/little-chick.jpg"></a>
               </div>
             </div>
             <div class="media-body">
               <div class="media-title">
-                <a href="#">Chick</a>
+                Chick</a>
               </div>
               <div class="info user-email">chick@email.com</div>
             </div>
@@ -325,6 +329,338 @@ Set &#39;data-tj-main=&quot;true&quot;&#39; on a thead td or thead th element to
       </tr>
     </tbody>
   </table>
+</div></div>
+          </section>
+          <section class="kss-depth-3">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h3 class="kss-title padded" id="7-1-1">
+                <span class="kss-ref badge pull-right">7-1-1</span> Table Jenga Meta
+                </h3>
+
+
+                <div class="kss-box padded"><p>Styling for Table Jenga meta (when a table is collapsed on small screen sizes).</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;tj-meta&quot;&gt;
+  &lt;div class=&quot;table-meta-item&quot;&gt;
+    &lt;span class=&quot;table-meta-item-label&quot;&gt;Roles: &lt;/span&gt;
+    &lt;span class=&quot;table-meta-item-data&quot;&gt;Member, Moderator&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;table-meta-item&quot;&gt;
+    &lt;span class=&quot;table-meta-item-label&quot;&gt;First Visit: &lt;/span&gt;
+    &lt;span class=&quot;table-meta-item-data&quot;&gt;April 26&lt;/span&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="tj-meta">
+  <div class="table-meta-item">
+    <span class="table-meta-item-label">Roles: </span>
+    <span class="table-meta-item-data">Member, Moderator</span>
+  </div>
+  <div class="table-meta-item">
+    <span class="table-meta-item-label">First Visit: </span>
+    <span class="table-meta-item-data">April 26</span>
+  </div>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="7-2">
+                <span class="kss-ref badge pull-right">7-2</span> Checkbox Grid
+                </h2>
+
+
+                <div class="kss-box padded"><p>Styling for a checkbox grid, used for permission tables.</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;table-wrap&quot;&gt;
+  &lt;table class=&quot;table-data js-checkbox-grid table-checkbox-grid&quot;&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Reported Posts&lt;/th&gt;
+        &lt;td&gt;Add&lt;/td&gt;
+        &lt;td&gt;Announce&lt;/td&gt;
+        &lt;td&gt;Close&lt;/td&gt;
+        &lt;td&gt;Delete&lt;/td&gt;
+        &lt;td&gt;Edit&lt;/td&gt;
+        &lt;td&gt;Sink&lt;/td&gt;
+        &lt;td&gt;View&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Comments&lt;/th&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P1&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P2&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P3&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P4&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P5&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P6&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P7&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;th&gt;Discussions&lt;/th&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P8&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P9&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P10&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P11&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P12&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P13&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+        &lt;td&gt;&lt;input type=&quot;checkbox&quot; id=&quot;P14&quot; name=&quot;Permission[]&quot;&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="table-wrap">
+  <table class="table-data js-checkbox-grid table-checkbox-grid">
+    <thead>
+      <tr>
+        <th>Reported Posts</th>
+        <td>Add</td>
+        <td>Announce</td>
+        <td>Close</td>
+        <td>Delete</td>
+        <td>Edit</td>
+        <td>Sink</td>
+        <td>View</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>Comments</th>
+        <td><input type="checkbox" id="P1" name="Permission[]"></td>
+        <td><input type="checkbox" id="P2" name="Permission[]"></td>
+        <td><input type="checkbox" id="P3" name="Permission[]"></td>
+        <td><input type="checkbox" id="P4" name="Permission[]"></td>
+        <td><input type="checkbox" id="P5" name="Permission[]"></td>
+        <td><input type="checkbox" id="P6" name="Permission[]"></td>
+        <td><input type="checkbox" id="P7" name="Permission[]"></td>
+      </tr>
+      <tr>
+        <th>Discussions</th>
+        <td><input type="checkbox" id="P8" name="Permission[]"></td>
+        <td><input type="checkbox" id="P9" name="Permission[]"></td>
+        <td><input type="checkbox" id="P10" name="Permission[]"></td>
+        <td><input type="checkbox" id="P11" name="Permission[]"></td>
+        <td><input type="checkbox" id="P12" name="Permission[]"></td>
+        <td><input type="checkbox" id="P13" name="Permission[]"></td>
+        <td><input type="checkbox" id="P14" name="Permission[]"></td>
+      </tr>
+    </tbody>
+  </table>
+</div></div>
+          </section>
+          <section class="kss-depth-2">
+            <div class="kss-component">
+              <div class="kss-component-description row full-border">
+                <h2 class="kss-title padded" id="7-3">
+                <span class="kss-ref badge pull-right">7-3</span> Summary Table
+                </h2>
+
+
+                <div class="kss-box padded"><p>Summary Table</p>
+</div>
+
+                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;summaries js-dashboard-widgets-summaries&quot;&gt;
+  &lt;div class=&quot;table-summary-wrap ActiveUserSummary&quot;&gt;
+    &lt;div class=&quot;table-summary-title&quot;&gt;Active Users&lt;/div&gt;
+    &lt;table class=&quot;table-summary&quot;&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;Name&lt;/th&gt;
+          &lt;th&gt;Comments&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;div class=&quot;media media-sm&quot;&gt;
+              &lt;div class=&quot;media-left&quot;&gt;
+                &lt;div class=&quot;media-image-wrap&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;
+                    &lt;img src=&quot;./public/resources/images/smart-puppy.jpg&quot; /&gt;
+                  &lt;/a&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;media-body&quot;&gt;
+                &lt;div class=&quot;media-title&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;jane_austen&lt;/a&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;info&quot;&gt;2:02PM&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;336&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;div class=&quot;media media-sm&quot;&gt;
+              &lt;div class=&quot;media-left&quot;&gt;
+                &lt;div class=&quot;media-image-wrap&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;
+                    &lt;img src=&quot;./public/resources/images/snow-dog.jpg&quot; /&gt;
+                  &lt;/a&gt;
+                &lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;media-body&quot;&gt;
+                &lt;div class=&quot;media-title&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;jackieO&lt;/a&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;info&quot;&gt;2:45PM&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;312&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;table-summary-wrap ActiveUserSummary&quot;&gt;
+    &lt;div class=&quot;table-summary-title&quot;&gt;Popular Discussions&lt;/div&gt;
+    &lt;table class=&quot;table-summary&quot;&gt;
+      &lt;thead&gt;
+        &lt;tr&gt;
+          &lt;th&gt;Discussion&lt;/th&gt;
+          &lt;th&gt;Comments&lt;/th&gt;
+          &lt;th&gt;Views&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;div class=&quot;media media-sm&quot;&gt;
+              &lt;div class=&quot;media-body&quot;&gt;
+                &lt;div class=&quot;media-title&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;Discussion Title&lt;/a&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;info&quot;&gt;May 26&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;42&lt;/td&gt;
+          &lt;td&gt;145&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+          &lt;td&gt;
+            &lt;div class=&quot;media media-sm&quot;&gt;
+              &lt;div class=&quot;media-body&quot;&gt;
+                &lt;div class=&quot;media-title&quot;&gt;
+                  &lt;a href=&quot;#&quot;&gt;Another Discussion&lt;/a&gt;
+                &lt;/div&gt;
+                &lt;div class=&quot;info&quot;&gt;June 8&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/td&gt;
+          &lt;td&gt;67&lt;/td&gt;
+          &lt;td&gt;312&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+              </div>
+              <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+              <div class="kss-example padded-bottom"><div class="summaries js-dashboard-widgets-summaries">
+  <div class="table-summary-wrap ActiveUserSummary">
+    <div class="table-summary-title">Active Users</div>
+    <table class="table-summary">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Comments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="media media-sm">
+              <div class="media-left">
+                <div class="media-image-wrap">
+                  <a href="#">
+                    <img src="./public/resources/images/smart-puppy.jpg" />
+                  </a>
+                </div>
+              </div>
+              <div class="media-body">
+                <div class="media-title">
+                  <a href="#">jane_austen</a>
+                </div>
+                <div class="info">2:02PM</div>
+              </div>
+            </div>
+          </td>
+          <td>336</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="media media-sm">
+              <div class="media-left">
+                <div class="media-image-wrap">
+                  <a href="#">
+                    <img src="./public/resources/images/snow-dog.jpg" />
+                  </a>
+                </div>
+              </div>
+              <div class="media-body">
+                <div class="media-title">
+                  <a href="#">jackieO</a>
+                </div>
+                <div class="info">2:45PM</div>
+              </div>
+            </div>
+          </td>
+          <td>312</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="table-summary-wrap ActiveUserSummary">
+    <div class="table-summary-title">Popular Discussions</div>
+    <table class="table-summary">
+      <thead>
+        <tr>
+          <th>Discussion</th>
+          <th>Comments</th>
+          <th>Views</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="media media-sm">
+              <div class="media-body">
+                <div class="media-title">
+                  <a href="#">Discussion Title</a>
+                </div>
+                <div class="info">May 26</div>
+              </div>
+            </div>
+          </td>
+          <td>42</td>
+          <td>145</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="media media-sm">
+              <div class="media-body">
+                <div class="media-title">
+                  <a href="#">Another Discussion</a>
+                </div>
+                <div class="info">June 8</div>
+              </div>
+            </div>
+          </td>
+          <td>67</td>
+          <td>312</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div></div>
           </section>
     </div>

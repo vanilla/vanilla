@@ -39,17 +39,17 @@
 
 <div id="StatsChart"></div>
 
-<div class="dashboard-widgets-summaries dashboard-widgets js-dashboard-widgets-summaries">
+<div class="summaries js-dashboard-widgets-summaries">
     <div class="Loading"></div>
 </div>
 
-<div class="dashboard-widgets">
-    <div class="Column Column1 ReleasesColumn">
-        <div class="dashboard-widget-title"><?php echo t('Updates'); ?></div>
+<div class="summaries">
+    <div class="ReleasesColumn">
+        <div class="table-summary-title"><?php echo t('Updates'); ?></div>
         <div class="List"></div>
     </div>
-    <div class="Column Column2 NewsColumn">
-        <div class="dashboard-widget-title"><?php echo t('Recent News'); ?></div>
+    <div class="NewsColumn">
+        <div class="table-summary-title"><?php echo t('Recent News'); ?></div>
         <div class="List"></div>
     </div>
 </div>

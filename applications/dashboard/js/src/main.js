@@ -245,7 +245,7 @@
             containerSelector = '#' + DashboardModal.activeModal.id + ' .modal-body';
         }
 
-        $('.table-data', element).tablejenga({container: containerSelector});
+        $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
     $(document).on('contentLoad', function(e) {

@@ -181,6 +181,6 @@ $navbar-short-height: 3rem;
 
   .icon-caret-down {
     border-top-color: $navbar-link-color;
-    @extend .caret;
+    @include caret;
   }
 }

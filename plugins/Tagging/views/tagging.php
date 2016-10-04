@@ -75,7 +75,7 @@ Gdn_Theme::assetEnd();
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
 <div class="table-wrap">
-    <table class="Tags table-data">
+    <table class="Tags table-data js-tj">
         <thead>
             <tr>
                 <th class="column-md"><?php echo t('Tag') ?></th>

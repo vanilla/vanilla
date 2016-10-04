@@ -22,17 +22,19 @@
 // .column-md       : 132px <br>
 // .column-sm       : 90px  <br>
 // .column-xs       : 54px  <br>
-// .column-checkbox : 42px  <br>
 //
-// The table is made responsive by the jquery plugin Table Jengo, which adds column headings and cell data to meta
-// items under the main column. There are data attributes you can add to columns to make Table Jengo work as you intend:
+// A checkbox column should have the .column-checkbox class on its column header.
+//
+// The table is made responsive by the jquery plugin Table Jenga, which adds column headings and cell data to meta
+// items under the main column. To add Table Jenga functionality to a table, you must add the js-tj class to the table
+// element. There are data attributes you can add to columns to make Table Jengo work as you intend:
 //
 // Set 'data-tj-ignore="true"' on a thead td or thead th element to never collapse that column
 // Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column
 //
 // Markup:
 // <div class="table-wrap">
-//   <table class="table-data">
+//   <table class="table-data js-tj">
 //     <thead>
 //       <tr>
 //         <th class="column-checkbox" data-tj-ignore="true"></th>
@@ -51,12 +53,12 @@
 //           <div class="media-sm">
 //             <div class="media-left">
 //               <div class="media-image-wrap">
-//                 <a href="#"><img src="./public/resources/images/smart-puppy.jpg"></a>
+//                 <img src="./public/resources/images/smart-puppy.jpg"></a>
 //               </div>
 //             </div>
 //             <div class="media-body">
 //               <div class="media-title">
-//                 <a href="#">Smart Puppy</a>
+//                 Smart Puppy</a>
 //               </div>
 //               <div class="info user-email">puppy@email.com</div>
 //             </div>
@@ -87,12 +89,12 @@
 //           <div class="media-sm">
 //             <div class="media-left">
 //               <div class="media-image-wrap">
-//                 <a href="#"><img src="./public/resources/images/little-chick.jpg"></a>
+//                 <img src="./public/resources/images/little-chick.jpg"></a>
 //               </div>
 //             </div>
 //             <div class="media-body">
 //               <div class="media-title">
-//                 <a href="#">Chick</a>
+//                 Chick</a>
 //               </div>
 //               <div class="info user-email">chick@email.com</div>
 //             </div>
@@ -132,79 +134,21 @@
 }
 
 .table-data {
-  width: 100%;
-  max-width: 100%;
-  table-layout: fixed;
   margin-bottom: 0;
+  @include fixed-table;
+  @include has-top-border;
 
-  // thead
   thead {
-    tr {
-      background-color: $grey-light;
-    }
-
-    th,
-    td {
-      width: to-rem(100);
-      padding: ($spacer / 2) ($spacer * .75);
-      border: 1px solid #eee;
-      border-top: 1px solid #ddd;
-      border-bottom: (2 * $table-border-width) solid $table-border-color;
-      text-transform: uppercase;
-      font-weight: 500;
-      font-size: $font-size-sm;
-      line-height: $line-height-lg;
-
-      &.column-xl {
-        width: to-rem(300);
-      }
-
-      &.column-lg {
-        width: to-rem(210);
-      }
-
-      &.column-md {
-        width: to-rem(132);
-      }
-
-      &.column-sm {
-        width: to-rem(90);
-      }
-
-      &.column-xs {
-        width: to-rem(54);
-      }
-
-      &.column-checkbox {
-        width: to-rem(42);
-        max-width: to-rem(42);
-        padding-left: $table-cell-padding;
-        padding-right: $table-cell-padding;
-      }
-
-      &:last-child {
-        border-right: 0;
-      }
-    }
+    @extend .table-data-head;
   }
 
-  // tbody
   tbody {
-    font-size: $font-size-tables;
-    tr {
-      &:hover {
-        background-color: #f9fdfe;
-      }
-    }
+    @extend .table-data-body;
   }
 
   th,
   td {
-    overflow: hidden;
-    padding: $table-cell-padding $padding-row;
-    line-height: $line-height;
-    vertical-align: middle;
-    border-top: $table-border-width solid $table-border-color;
+    @extend .table-data-cell;
   }
 
   td.options {
@@ -219,19 +163,97 @@
   }
 
   tbody + tbody {
-    border-top: (2 * $table-border-width) solid $table-border-color;
+    border-top: ($table-border-width) solid $table-border-color;
   }
+}
 
-  &.no-hover {
-    tbody tr {
-      &:hover {
-        background-color: inherit;
-      }
+.table-data-cell {
+  overflow: hidden;
+  padding: $table-cell-padding $padding-row;
+  line-height: $line-height;
+  vertical-align: middle;
+  border-bottom: $table-border-width solid $table-border-color;
+}
+
+.table-data-body {
+  font-size: $font-size-tables;
+  tr {
+    &:hover {
+      background-color: #f9fdfe;
     }
   }
 }
 
-// Table jengo
+.table-data-head {
+  // thead
+  tr {
+    background-color: $grey-light;
+  }
+
+  th,
+  td {
+    width: to-rem(100);
+    padding: ($spacer / 2) ($spacer * .75);
+
+    border-right: $table-border-width solid #eee;
+    border-top: $table-border-width solid #ddd;
+    border-bottom: $table-border-width solid $table-border-color;
+
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: $font-size-sm;
+    line-height: $line-height-lg;
+
+    &:last-child {
+      border-right: 0;
+    }
+
+    &.column-xl {
+      width: to-rem(300);
+    }
+
+    &.column-lg {
+      width: to-rem(210);
+    }
+
+    &.column-md {
+      width: to-rem(132);
+    }
+
+    &.column-sm {
+      width: to-rem(90);
+    }
+
+    &.column-xs {
+      width: to-rem(54);
+    }
+
+    &.column-checkbox {
+      width: to-rem(54);
+      max-width: to-rem(54);
+      padding-left: $spacer;
+      padding-right: $spacer;
+    }
+  }
+}
+
+// Table Jenga Meta
+//
+// Styling for Table Jenga meta (when a table is collapsed on small screen sizes).
+//
+// Markup:
+// <div class="tj-meta">
+//   <div class="table-meta-item">
+//     <span class="table-meta-item-label">Roles: </span>
+//     <span class="table-meta-item-data">Member, Moderator</span>
+//   </div>
+//   <div class="table-meta-item">
+//     <span class="table-meta-item-label">First Visit: </span>
+//     <span class="table-meta-item-data">April 26</span>
+//   </div>
+// </div>
+//
+// Styleguide 7.1.1.
 
 .tj-meta {
   margin-top: ($spacer / 2);
@@ -240,30 +262,73 @@
     font-size: $font-size-sm;
   }
 
-  .media-sm {
-    display: inline-block;
-    .media-sm-image-wrap,
-    .media-sm-info {
-      display: none;
-    }
-  }
-
   .table-meta-item-label {
     font-weight: 500;
 
-    // Disable any links in labels.
+    // "Disable" any links in labels.
     a {
       color: $grey-dark;
       pointer-events: none;
       cursor: default;
     }
   }
+
+  .media-sm {
+    display: inline-block;
+    .media-left,
+    .info {
+      display: none;
+    }
+  }
 }
 
-// TODO: styleguide
-// Checkbox grid
+// Checkbox Grid
+//
+// Styling for a checkbox grid, used for permission tables.
+//
+// Markup:
+// <div class="table-wrap">
+//   <table class="table-data js-checkbox-grid table-checkbox-grid">
+//     <thead>
+//       <tr>
+//         <th>Reported Posts</th>
+//         <td>Add</td>
+//         <td>Announce</td>
+//         <td>Close</td>
+//         <td>Delete</td>
+//         <td>Edit</td>
+//         <td>Sink</td>
+//         <td>View</td>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       <tr>
+//         <th>Comments</th>
+//         <td><input type="checkbox" id="P1" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P2" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P3" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P4" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P5" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P6" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P7" name="Permission[]"></td>
+//       </tr>
+//       <tr>
+//         <th>Discussions</th>
+//         <td><input type="checkbox" id="P8" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P9" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P10" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P11" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P12" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P13" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P14" name="Permission[]"></td>
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+//
+// Styleguide 7.2.
 
-.CheckBoxGrid {
+.table-checkbox-grid {
   table-layout: auto;
 
   .checkbox {
@@ -283,10 +348,7 @@
   }
 
   thead {
-    tr {
-      background-color: $grey-light;
-    }
-
+    // Permission column headings
     td {
       text-align: center;
       padding: ($spacer / 2) ($spacer / 2);
@@ -304,10 +366,11 @@
       }
     }
 
+    // Title cell
     th {
       font-weight: 700;
-      max-width: to-rem(180);
-      min-width: to-rem(180);
+      max-width: to-rem(120);
+      min-width: to-rem(120);
       @extend .truncate;
     }
   }
@@ -327,7 +390,7 @@
       td,
       th {
         font-size: to-rem(12);
-        padding: $spacer / 4;
+        padding: to-rem(6);
       }
     }
 
@@ -336,166 +399,188 @@
     }
 
     thead {
+      th {
+        width: 100%;
+      }
+
+      // We gotta fit the column headings in somehow, so rotate them.
       td {
         position: relative;
+        width: to-rem(36);
+        height: to-rem(90);
+
         a {
           position: relative;
           display: block;
           transform: rotate(90deg);
-          top: -$spacer;
+          top: - to-rem(24);
         }
-        width: $spacer * 2;
-        text-align: center;
-        height: to-rem(90);
       }
     }
   }
 }
 
-// TODO: refactor and styleguide
-// Feed tables
+// Summary Table
+//
+// Summary Table
+//
+// Markup:
+// <div class="summaries js-dashboard-widgets-summaries">
+//   <div class="table-summary-wrap ActiveUserSummary">
+//     <div class="table-summary-title">Active Users</div>
+//     <table class="table-summary">
+//       <thead>
+//         <tr>
+//           <th>Name</th>
+//           <th>Comments</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-left">
+//                 <div class="media-image-wrap">
+//                   <a href="#">
+//                     <img src="./public/resources/images/smart-puppy.jpg" />
+//                   </a>
+//                 </div>
+//               </div>
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">jane_austen</a>
+//                 </div>
+//                 <div class="info">2:02PM</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>336</td>
+//         </tr>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-left">
+//                 <div class="media-image-wrap">
+//                   <a href="#">
+//                     <img src="./public/resources/images/snow-dog.jpg" />
+//                   </a>
+//                 </div>
+//               </div>
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">jackieO</a>
+//                 </div>
+//                 <div class="info">2:45PM</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>312</td>
+//         </tr>
+//       </tbody>
+//     </table>
+//   </div>
+//   <div class="table-summary-wrap ActiveUserSummary">
+//     <div class="table-summary-title">Popular Discussions</div>
+//     <table class="table-summary">
+//       <thead>
+//         <tr>
+//           <th>Discussion</th>
+//           <th>Comments</th>
+//           <th>Views</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">Discussion Title</a>
+//                 </div>
+//                 <div class="info">May 26</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>42</td>
+//           <td>145</td>
+//         </tr>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">Another Discussion</a>
+//                 </div>
+//                 <div class="info">June 8</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>67</td>
+//           <td>312</td>
+//         </tr>
+//       </tbody>
+//     </table>
+//   </div>
+// </div>
+//
+// Styleguide 7.3.
 
-.Section-DashboardHome {
-  table {
-    thead {
-      tr {
-        background-color: transparent;
-      }
+.summaries {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 
-      th, td {
-        border: 0;
-        border-bottom: $border-width * 2 solid #ddd;
-      }
-    }
+  > * {
+    flex-grow: 1;
+    max-width: 50%;
+    padding: $spacer;
 
-    th, td {
-      border-top-width: $border-width;
-    }
-
-    tr {
-      &:last-child {
-        border-bottom: $border-width solid $table-border-color;
-      }
-    }
-
-    td {
-      text-align: center;
-    }
-
-    th {
-      padding-left: 0;
-    }
-
-    tbody {
-      th {
-        font-weight: 400;
-      }
+    @include media-breakpoint-down(md) {
+      max-width: inherit;
+      width: 100%;
+      padding: $spacer 0;
     }
   }
+}
 
-  .dashboard-widgets {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
+.table-summary {
+  @include fixed-table;
 
-    > * {
-      flex-grow: 1;
-      max-width: 50%;
-      padding: $spacer;
-
-      @include media-breakpoint-down(md) {
-        max-width: inherit;
-        width: 100%;
-        padding: $spacer 0;
-      }
-    }
-  }
-
-  .Summary {
-    thead .column-xs {
-      padding-left: 0;
-      padding-right: 0;
-    }
-  }
-
-  .dashboard-widget-title {
-    font-size: 1rem;
-    font-weight: 500;
-  }
-
-  .Feed {
-    padding-top: $spacer / 2;
-  }
-
-  .FeedItem {
-    position: relative;
-    padding: to-rem(12) 0;
-    border-bottom: $border-width solid $table-border-color;
-
-    &:hover {
-      background-color: #f9fdfe;
-    }
+  th,
+  td {
+    @extend .table-data-cell;
+    text-align: center;
+    padding: $table-cell-padding to-rem(12);
 
     &:first-child {
-      border-top: $border-width * 2 solid #ddd;
-    }
-
-    @extend .media-sm;
-
-    h2 {
-      padding: 0;
-      margin-top: - to-rem(3);
-      margin-left: 0;
-      margin-right: 0;
-      border-top: 0;
-      border-bottom: 0;
-      font-weight: 400;
-      font-size: 0.8125rem;
-      text-overflow: ellipsis;
-      @extend .media-title;
-      margin-bottom: to-rem(2);
-      line-height: $line-height-lg;
-    }
-
-    .FeedDescription {
-      @extend .info;
-      margin-bottom: - to-rem(2);
-
-      strong {
-        font-weight: 400;
-      }
-
-      p {
-        margin-bottom: 0;
-        display: inline-block;
-      }
-
-      .details p {
-        margin-bottom: 0;
-        display: initial;
-        line-height: 1.4;
-      }
-
-      .read-less {
-        display: block;
-        margin-top: to-rem(3);
-      }
-    }
-
-
-    .FeedDescription,
-    h2 {
-      margin-right: 102px;
-    }
-
-    .Date {
-      position: absolute;
-      right: 0;
-      width: 102px;
-      top: $spacer * .75 + (to-rem(30) / 2) - ($font-size-tables / 2);
-      text-align: right;
-
-      @extend .info;
+      text-align: left;
     }
   }
+
+  tbody {
+    @extend .table-data-body;
+  }
+
+  thead {
+    th,
+    td {
+      width: 60%;
+      padding: ($spacer / 2) to-rem(12);
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: $font-size-sm;
+      line-height: $line-height-lg;
+      border-bottom: $table-border-width solid #ddd;
+
+      &:first-child {
+        width: 100%;
+        min-width: to-rem(120);
+      }
+    }
+  }
+}
+
+.table-summary-title {
+  font-size: 1rem;
+  font-weight: 500;
 }

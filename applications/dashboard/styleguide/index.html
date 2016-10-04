@@ -16,6 +16,7 @@
   <script src="public/jquery.tablejenga.js"></script>
   <script src="public/jquery.fluidfixed.js"></script>
   <script src="public/jquery.expander.js"></script>
+  <script src="public/jquery.gardencheckboxgrid.js"></script>
   <script>
     gdn = function() {
 
@@ -180,6 +181,13 @@
     Optimally, we want to have all of the dashboard&#39;s css in the admin.css file.
     This encourages developers to use existing patterns. If a necessary pattern doesn&#39;t exist,
     we can build it with the help of our design team (aka Dan).
+</div>
+<h3>Borders</h3>
+<div>
+    Many of the dashboard components have borders. This can make it tricky to ensure that there are no double-borders
+    when elements are flush against eachother. To fix this, if possible only add border-bottom. If a top border is
+    necessary, add a margin of -(border-width) to the element. There&#39;s a helpful mixin (<code>hasBorderTop</code>) that does just
+    that and makes it clear what you&#39;re doing.
 </div>
 </div>
     </div>

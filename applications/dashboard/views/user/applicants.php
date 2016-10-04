@@ -15,7 +15,7 @@ if ($NumApplicants == 0) : ?>
     ?>
     <div class="padded italic"><?php echo sprintf($AppText, $NumApplicants); ?></div>
     <div class="table-wrap">
-        <table class="table-data">
+        <table class="table-data js-tj">
             <thead>
                 <tr>
                     <th class="column-lg"><?php echo t('Applicant'); ?></th>

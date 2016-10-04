@@ -36,6 +36,8 @@
 // Styleguide 9.1.
 
 .nav-adventure {
+  @include has-top-border;
+
   .nav-item {
     display: block;
     margin-left: -$padding-row;
@@ -173,7 +175,7 @@
   text-decoration: none;
 
   &::before {
-    @extend .caret;
+    @include caret;
     -webkit-transform: rotate(0deg);
     tranform: rotate(0deg);
     margin-left: -1rem;

@@ -960,17 +960,14 @@ class Gdn_Form extends Gdn_Pluggable {
             unset($Data['_Info']);
         }
 
-        $Result = '<div class="table-wrap"><table class="table-data CheckBoxGrid">';
+        $Result = '<div class="table-wrap"><table class="table-data js-checkbox-grid table-checkbox-grid">';
         // Append the header.
         $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
-        $Alt = true;
         foreach ($Columns as $ColumnName => $X) {
             $Result .=
-                '<td'.($Alt ? ' class="Alt"' : '').'>'
+                '<td>'
                 .T($ColumnName)
                 .'</td>';
-
-            $Alt = !$Alt;
         }
         $Result.'</tr></thead>';
 
@@ -987,9 +984,8 @@ class Gdn_Form extends Gdn_Pluggable {
             }
             $Result .= T(self::labelCode($RowNames[count($RowNames) - 1])).'</th>';
             // Append the columns within the rows.
-            $Alt = true;
             foreach ($Columns as $ColumnName => $Y) {
-                $Result .= '<td'.($Alt ? ' class="Alt"' : '').'>';
+                $Result .= '<td>';
                 // Check to see if there is a row corresponding to this area.
                 if (array_key_exists($RowName.'.'.$ColumnName, $Data)) {
                     $CheckBox = $Data[$RowName.'.'.$ColumnName];
@@ -1005,8 +1001,6 @@ class Gdn_Form extends Gdn_Pluggable {
                     $Result .= ' ';
                 }
                 $Result .= '</td>';
-
-                $Alt = !$Alt;
             }
             $Result .= '</tr>';
         }
@@ -1483,7 +1477,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Headings = '';
             $Cells = '';
         }
-        return $Return == '' ? '' : '<div class="table-wrap"><table class="table-data CheckBoxGrid">'.$Return.'</tbody></table></div>';
+        return $Return == '' ? '' : '<div class="table-wrap"><table class="table-data js-tj js-checkbox-grid table-checkbox-grid">'.$Return.'</tbody></table></div>';
     }
 
     /**

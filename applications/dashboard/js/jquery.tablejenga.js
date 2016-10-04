@@ -8,7 +8,7 @@
     $.fn.tablejenga = function(options) {
 
         var start = function(table, vars) {
-            reset();
+            reset(table);
             var maxIterations = 10; //safety first
             var i = 0;
             while(isTooWide(table, vars) && i < maxIterations) {
@@ -17,11 +17,11 @@
             }
         };
 
-        var reset = function() {
-            $('.tj-hidden').show();
-            $('.tj-hidden').removeClass('tj-hidden');
-            $('.tj-main-heading').css('width', '');
-            $('.tj-meta').remove();
+        var reset = function(table) {
+            $('.tj-hidden', table).show();
+            $('.tj-hidden', table).removeClass('tj-hidden');
+            $('.tj-main-heading', table).css('width', '');
+            $('.tj-meta', table).remove();
         };
 
         var addDataLabels = function(table, vars) {
@@ -103,16 +103,16 @@
 
                     // check the width of the column and main-heading assumes its width if it's wider than main
                     var minWidth = $(this).width();
-                    if ($('.tj-main-heading').width() < minWidth) {
-                        $('.tj-main-heading').css('width', minWidth);
+                    if ($('.tj-main-heading', table).width() < minWidth) {
+                        $('.tj-main-heading', table).css('width', minWidth);
                     }
 
                     $(this).addClass('tj-hidden');
                 }
             })
 
-            $('.tj-hidden').hide();
-            $('.tj-meta').show();
+            $('.tj-hidden', table).hide();
+            $('.tj-meta', table).show();
         };
 
         var getNext = function($row, vars) {

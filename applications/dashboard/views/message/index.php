@@ -18,7 +18,7 @@ $Session = Gdn::session();
     </div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
 <div class="table-wrap">
-    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="table-data Sortable no-hover">
+    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="table-data js-tj Sortable">
         <thead>
         <tr id="0">
             <th class="column-lg"><?php echo t('Messages'); ?></th>

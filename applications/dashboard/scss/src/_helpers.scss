@@ -188,3 +188,16 @@
 .hidden {
   display: none;
 }
+
+// Progress Spinner
+//
+// Indicates some kind of progess is occuring.
+//
+// Markup:
+// <div class="progress"></div>
+//
+// Styleguide 2.6.
+
+.progress {
+  background: url("images/progress.gif") center center no-repeat;
+}

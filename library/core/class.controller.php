@@ -1470,6 +1470,24 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         $this->sendHeaders();
 
+        // Recursively walk the data, decoding any IP address fields.
+        $ipWalk = function(&$inputValues) use (&$ipWalk) {
+            if (is_array($inputValues) || is_object($inputValues)) {
+                foreach ($inputValues as $key => &$val) {
+                    if (is_string($val) && stringEndsWith($key, 'IPAddress', true)) {
+                        $val = ipDecode($val);
+                    } elseif (is_array($val) && stringEndsWith($key, 'IPAddresses', true)) {
+                        array_walk($val, function(&$ip, $i) {
+                            $ip = ipDecode($ip);
+                        });
+                    } elseif (is_array($val) || is_object($val)) {
+                        $ipWalk($val);
+                    }
+                }
+            }
+        };
+        $ipWalk($Data);
+
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
         if (file_exists($ViewLocation)) {

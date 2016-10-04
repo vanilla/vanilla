@@ -2093,9 +2093,9 @@ if (!function_exists('jsonEncodeChecked')) {
         }
 
         $encoded = json_encode($value, $options);
+        $errorMessage = null;
 
         if (json_last_error() !== JSON_ERROR_NONE && $encoded === false) {
-            fwrite(STDERR, 'Test: '.json_last_error());
             if ($advanced) {
                 switch (json_last_error()) {
                     case JSON_ERROR_UTF8:
@@ -2116,8 +2116,6 @@ if (!function_exists('jsonEncodeChecked')) {
             } else {
                 $errorMessage = 'An unknown error has occurred.';
             }
-        } else {
-            $errorMessage = null;
         }
 
         if ($errorMessage !== null) {

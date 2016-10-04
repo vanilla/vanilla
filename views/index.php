@@ -28,7 +28,7 @@ echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-
     </div>
 </div>
 <div class="table-wrap">
-    <table id="Pockets" class="table-data">
+    <table id="Pockets" class="table-data js-tj">
         <thead>
             <tr>
                 <th class="column-md"><?php echo t('Name'); ?></th>

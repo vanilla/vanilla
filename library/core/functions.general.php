@@ -1767,6 +1767,23 @@ if (!function_exists('ipDecode')) {
     }
 }
 
+if (!function_exists('ipDecodeWalk')) {
+    /**
+     * Recursively walk through the data, decoding any IP address fields.
+     *
+     * @param array|object $data
+     */
+    function ipDecodeWalk(&$data) {
+        walkAll($data, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipDecode($val);
+                }
+            }
+        });
+    }
+}
+
 if (!function_exists('ipEncode')) {
     /**
      * Encode a human-readable IP address as a packed string.
@@ -3844,5 +3861,24 @@ if (!function_exists('urlMatch')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('walkAll')) {
+    /**
+     * Recursively walk through all array elements or object properties.
+     *
+     * @param array|object $input
+     * @param callable $callback
+     * @param string $parent Array key or object property to indicate parent node.
+     */
+    function walkAll(&$input, $callback, $parent = null) {
+        foreach ($input as $key => &$val) {
+            if (is_array($val) || is_object($val)) {
+                walkAll($val, $callback, $key);
+            } else {
+                call_user_func_array($callback, [&$val, $key, $parent]);
+            }
+        }
     }
 }

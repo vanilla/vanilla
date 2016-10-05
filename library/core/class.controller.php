@@ -1048,21 +1048,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
-     * Recursively walk through the data, decoding any IP address fields.
-     *
-     * @param array|object $data
-     */
-    private function ipDecodeRecursive(&$data) {
-        walkAllRecursive($data, function(&$val, $key = null, $parent = null) {
-            if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
-                    $val = ipDecode($val);
-                }
-            }
-        });
-    }
-
-    /**
      * Determines whether a method on this controller is internal and can't be dispatched.
      *
      * @param string $methodName The name of the method.
@@ -1485,7 +1470,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         $this->sendHeaders();
 
-        $this->ipDecodeRecursive($Data);
+        $Data = ipDecodeRecursive($Data);
 
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);

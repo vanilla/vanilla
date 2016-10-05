@@ -771,7 +771,7 @@ if (!function_exists('ipAnchor')) {
      */
     function ipAnchor($IP, $CssClass = '') {
         if ($IP) {
-            return anchor(formatIP($IP), '/user/browse?keywords='.urlencode($IP), $CssClass);
+            return anchor(formatIP($IP), '/user/browse?keywords='.urlencode(ipDecode($IP)), $CssClass);
         } else {
             return $IP;
         }

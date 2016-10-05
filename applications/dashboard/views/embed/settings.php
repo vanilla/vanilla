@@ -14,7 +14,7 @@ $AllowEmbed = c('Garden.Embed.Allow');
 <ul>
     <li class="form-group">
         <div class="label-wrap">
-            <div class="label-title">The url where the forum is embedded:</div>
+            <div class="label">The url where the forum is embedded:</div>
             <div class="info">Example: http://yourdomain.com/forum/</div>
         </div>
         <div class="input-wrap">
@@ -31,11 +31,11 @@ $AllowEmbed = c('Garden.Embed.Allow');
         <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></div>
     </li>
 </ul>
-<h2>Sign In Settings</h2>
+<h2 class="subheading-border">Sign In Settings</h2>
     <div class="form-group">
     <?php echo $this->Form->toggle('Garden.SignIn.Popup', "<div class=\"label-title\">Enable popups for sign in pages.</div><div class=\"info\">If you are using SSO you probably need to disable sign in popups.</div>"); ?>
     </div>
-    <h2><?php echo t('Comment Embed Settings'); ?></h2>
+    <h2 class="subheading-border"><?php echo t('Comment Embed Settings'); ?></h2>
     <ul>
         <li class="form-group">
             <?php
@@ -61,7 +61,7 @@ $AllowEmbed = c('Garden.Embed.Allow');
         </li>
         <li class="form-group">
             <div class="label-wrap">
-                <div class="label-title">Redirect Users</div>
+                <div class="label">Redirect Users</div>
                 <div class="info">
                     <strong>Recommended:</strong> When there is more than one page of comments on a blog post, send users to
                     the forum when they click to see another page of comments. This is a great way of driving users into

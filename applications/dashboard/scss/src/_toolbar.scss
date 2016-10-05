@@ -1,0 +1,126 @@
+// Toolbar
+//
+// Styleguide 8.
+
+// Toolbar Layout
+//
+// The toolbar is a tray that is at the top of a settings page that provides tools for filtering or managing
+// the page data.
+//
+// .toolbar-main - element with `toolbar-main` class fills up available space
+//
+// Markup:
+// <div class="toolbar">
+//   <form class={{modifier_class}}>
+//     <div class="search-wrap">
+//       <div class="search-icon-wrap search-icon-search-wrap">
+//         <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17">
+//           <use xlink:href="#search" />
+//         </svg>
+//       </div>
+//       <input class="form-control">
+//       <button type="submit" class="search-submit">Search</button>
+//       <div class="search-icon-wrap search-icon-clear-wrap">
+//         <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+//           <use xlink:href="#close" />
+//         </svg>
+//       </div>
+//     </div>
+//   </form>
+//   <div class="btn-group">
+//     <a href="#" class="active btn btn-secondary">All</a>
+//     <a href="#" class="btn btn-secondary">A Filter</a>
+//     <a href="#" class="btn btn-secondary">Another Filter</a>
+//   </div>
+//   <div class="pager-wrap Pager">
+//     <div class="pager">
+//       <div class="pager-count">Page 1 of 2</div>
+//       <div class="btn-group">
+//         <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
+//           <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
+//             <use xlink:href="#chevron-left" />
+//           </svg>
+//         </a>
+//         <a href="#" class=" btn btn-icon-border" rel="next" aria-label="Next page">
+//           <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+//             <use xlink:href="#chevron-right" />
+//           </svg>
+//         </a>
+//       </div>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 8.1.
+
+.toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-top: $spacer / 2;
+  padding-bottom: $spacer;
+
+  > * {
+    margin-top: $spacer / 2;
+    margin-right: $spacer;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  &.flex-wrap {
+    > * {
+      margin-right: 0;
+    }
+  }
+
+  &.empty {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  .toolbar-main {
+    flex-grow: 1;
+  }
+}
+
+// Pager
+//
+// The pager element is used for pagination and for the date selector in the VanillaStats `dashboard/home`
+//
+// PHP rendering view is `pager-dashboard.php`, to use: `<?php PagerModule::write(['View' => 'pager-dashboard']); ?>`
+//
+// Markup:
+// <div class="pager-wrap">
+//   <div class="pager">
+//     <div class="pager-count">Page 1 of 2</div>
+//     <div class="btn-group">
+//       <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
+//         <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
+//           <use xlink:href="#chevron-left" />
+//         </svg>
+//       </a>
+//       <a href="#" class="btn btn-icon-border" rel="next" aria-label="Next page">
+//         <svg class="icon icon-svg-chevron-right" viewBox="0 0 17 17">
+//           <use xlink:href="#chevron-right" />
+//         </svg>
+//       </a>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 8.2.
+
+.pager-count {
+  line-height: 1;
+  font-weight: 500;
+  padding-right: $spacer / 2;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+

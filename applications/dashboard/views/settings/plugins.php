@@ -82,7 +82,7 @@ Gdn_Theme::assetBegin('Help'); ?>
             || ($this->Filter === 'enabled' && !$isEnabled)) {
             echo '';
         } else { ?>
-        <li <?php echo 'id="'.Gdn_Format::url($addonName).'-addon"', ' class="media"'; ?>>
+        <li <?php echo 'id="'.Gdn_Format::url($addonName).'-addon"', ' class="media media-addon"'; ?>>
             <?php writeAddonMedia($addonName, $addonInfo, $isEnabled, $this->addonType, $this->Filter); ?>
         </li>
     <?php }

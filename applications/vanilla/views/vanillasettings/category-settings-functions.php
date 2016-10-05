@@ -3,7 +3,7 @@
 function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
     $i = str_repeat('  ', $indent);
 
-    echo "$i<ol class=\"dd-list tree-list list-unstyled\">\n";
+    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
 
     foreach ($categories as $category) {
         writeCategoryItem($category, $indent + 1, $allowSorting);

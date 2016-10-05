@@ -5,7 +5,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
 ?>
 </div>
 <div class="table-wrap">
-    <table id="Log" class="table-data">
+    <table id="Log" class="table-data js-tj">
         <thead>
         <tr>
             <th class="column-lg"><?php echo t('Ban Item', 'Item'); ?></th>

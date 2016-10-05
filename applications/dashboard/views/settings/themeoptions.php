@@ -21,7 +21,7 @@ echo $this->Form->errors();
 ?>
 
 <?php if ($hasCustomStyles): ?>
-    <h2><?php echo t('Styles'); ?></h2>
+    <h2 class="subheading-border"><?php echo t('Styles'); ?></h2>
     <ul class="label-selector theme-styles">
         <?php
         foreach ($this->data('ThemeInfo.Options.Styles') as $Key => $Options) {
@@ -69,7 +69,7 @@ echo $this->Form->errors();
 <?php endif; ?>
 
 <?php if ($hasCustomText): ?>
-    <h2><?php echo t('Text'); ?></h2>
+    <h2 class="subheading-border"><?php echo t('Text'); ?></h2>
     <ul>
         <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 

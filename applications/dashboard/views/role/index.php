@@ -24,7 +24,7 @@ $this->fireEvent('AfterRolesInfo');
 echo $this->Form->open();
 ?>
 <div class="table-wrap">
-    <table border="0" cellpadding="0" cellspacing="0" class="table-data Sortable" id="RoleTable">
+    <table border="0" cellpadding="0" cellspacing="0" class="table-data js-tj Sortable" id="RoleTable">
         <thead>
         <tr id="0">
             <th><?php echo t('Role'); ?></th>

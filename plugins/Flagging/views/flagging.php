@@ -29,7 +29,7 @@ if (!count($this->FlaggedItems)) {
     echo '<div class="padded">'.t('FlagQueueEmpty', "There are no items awaiting moderation at this time.").'</div>';
 } else { ?>
 <div class="table-wrap padded">
-    <table class="table-data">
+    <table class="table-data js-tj">
         <thead>
         <tr>
             <th><?php echo t('Post Type'); ?></th>
@@ -55,7 +55,11 @@ if (!count($this->FlaggedItems)) {
                 ?>
                 <td class="FlaggedType"><?php echo $type; ?></td>
                 <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>
-                <td class="options"><?php echo $options; ?></td>
+                <td class="options">
+                    <div class="btn-group">
+                    <?php echo $options; ?>
+                    </div>
+                </td>
                 <?php
             }
             ?>

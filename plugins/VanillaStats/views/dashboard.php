@@ -27,8 +27,8 @@
         <button disabled="disabled" id="StatsSlotDay" class="btn btn-secondary"><?php echo t('Day');?></button>
         <button disabled="disabled" id="StatsSlotMonth" class="btn btn-secondary"><?php echo t('Month'); ?></button>
     </div>
-    <div id="StatsNavigation" class="toolbar-stats-daterange">
-        <div id="StatsCurrentTimeframe" class="toolbar-stats-daterange-preview"></div>
+    <div id="StatsNavigation" class="pager">
+        <div id="StatsCurrentTimeframe" class="pager-count"></div>
         <div class="btn-group pager-wrap">
             <button disabled="disabled" id="StatsNavPrev" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-left'); ?></button>
             <button disabled="disabled" id="StatsNavNext" class="btn btn-icon-border"><?php echo dashboardSymbol('chevron-right'); ?></button>
@@ -39,17 +39,17 @@
 
 <div id="StatsChart"></div>
 
-<div class="dashboard-widgets-summaries dashboard-widgets js-dashboard-widgets-summaries">
+<div class="summaries js-dashboard-widgets-summaries">
     <div class="Loading"></div>
 </div>
 
-<div class="dashboard-widgets">
-    <div class="Column Column1 ReleasesColumn">
-        <div class="dashboard-widget-title"><?php echo t('Updates'); ?></div>
+<div class="summaries">
+    <div class="ReleasesColumn">
+        <div class="table-summary-title"><?php echo t('Updates'); ?></div>
         <div class="List"></div>
     </div>
-    <div class="Column Column2 NewsColumn">
-        <div class="dashboard-widget-title"><?php echo t('Recent News'); ?></div>
+    <div class="NewsColumn">
+        <div class="table-summary-title"><?php echo t('Recent News'); ?></div>
         <div class="List"></div>
     </div>
 </div>

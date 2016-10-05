@@ -31,7 +31,7 @@ echo $this->Form->errors(); ?>
 
 <div id="RegistrationMethods">
     <div class="table-wrap">
-        <table class="Label table-data">
+        <table class="Label table-data js-tj">
             <thead>
             <tr>
                 <th><?php echo t('Method'); ?></th>
@@ -87,7 +87,7 @@ echo $this->Form->errors(); ?>
     echo '<div class="padded">'.t('Choose who can send out invitations to new members:').'</div>';
     ?>
     <div class="table-wrap">
-    <table class="Label table-data">
+    <table class="Label table-data js-tj">
         <thead>
         <tr>
             <th><?php echo t('Role'); ?></th>

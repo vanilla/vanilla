@@ -78,18 +78,18 @@
 
     function scrollToFixedInit(element) {
 
-        var $navbar = $('.navbar');
+        var $navbar = $('.js-navbar', element);
         var $spacer = $('.js-scroll-to-fixed-spacer');
 
         $navbar.addClass('navbar-short');
-        var navShortHeight = $('.navbar').outerHeight(true);
+        var navShortHeight = $navbar.outerHeight(true);
         $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
         $spacer.height(navHeight);
 
         var navOffset = navHeight - navShortHeight;
 
-        $('.navbar', element).scrollToFixed({
+        $navbar.scrollToFixed({
             zIndex: 1005,
             spacerClass: 'js-scroll-to-fixed-spacer'
         });
@@ -104,7 +104,7 @@
 
         // If we load in the middle of the page, we should have a short navbar.
         if ($(window).scrollTop() > navOffset) {
-            $('.navbar').addClass('navbar-short');
+            $navbar.addClass('navbar-short');
         }
 
         $(window).on('scroll', function() {
@@ -125,9 +125,9 @@
 
     function userDropDownInit(element) {
         var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.navbar .js-card-user', element).length !== 0) {
+        if ($('.js-navbar .js-card-user', element).length !== 0) {
             new Drop({
-                target: document.querySelector('.navbar .js-card-user', element),
+                target: document.querySelector('.js-navbar .js-card-user', element),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -185,15 +185,15 @@
         $('.panel-left', element).on('drawer.show', function() {
             window.scrollTo(0, 0);
             $('.panel-nav .js-fluid-fixed').trigger('detach.FluidFixed');
-            $('.main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
-            $('.main').css('overflow', 'hidden');
+            $('.main-row .main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
+            $('.main-row .main').css('overflow', 'hidden');
 
         });
 
         $('.panel-left', element).on('drawer.hide', function() {
             $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
-            $('.main').height('auto');
-            $('.main').css('overflow', 'auto');
+            $('.main-row .main').height('auto');
+            $('.main-row .main').css('overflow', 'auto');
         });
 
         $(window).resize(function() {
@@ -245,7 +245,7 @@
             containerSelector = '#' + DashboardModal.activeModal.id + ' .modal-body';
         }
 
-        $('.table-data', element).tablejengo({container: containerSelector});
+        $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
     $(document).on('contentLoad', function(e) {
@@ -347,7 +347,7 @@
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'post',
-            modaltype: 'confirm'
+            modalType: 'confirm'
         });
     });
 
@@ -355,7 +355,7 @@
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
-            modaltype: 'confirm'
+            modalType: 'confirm'
         });
     });
 

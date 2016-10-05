@@ -14,7 +14,7 @@ $Session = Gdn::session();
 ?>
 
 <div class="table-wrap">
-    <table class="table-data" id="RouteTable">
+    <table class="table-data js-tj" id="RouteTable">
         <thead>
         <tr>
             <th class="column-lg"><?php echo t('Route'); ?></th>

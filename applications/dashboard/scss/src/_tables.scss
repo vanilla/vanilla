@@ -1,0 +1,586 @@
+// Tables
+//
+// Table layouts.
+//
+// Styleguide 7.
+
+// Data Table
+//
+// The only two classes you need to add to get this styling is "table-wrap" to a container that wraps around
+// the table element and also the "table-data" class to the table element itself.
+//
+// Take note of the options cell. This cell generally contains icons and maybe a toggle to perform actions on the row.
+// Most of the time, these options should be wrapped in a btn-group div to make sure they don't wrap and align
+// themselves to eachother properly. Also, any icon that performs an action should have the title attribute set, so
+// the user can hover over it to get a description of what it does.
+//
+// The default min-width for any column (not including the checkbox column) is 100px. You can specify other min-widths
+// using the following classes on th elements in the thead container:
+//
+// .column-xl       : 300px <br>
+// .column-lg       : 210px <br>
+// .column-md       : 132px <br>
+// .column-sm       : 90px  <br>
+// .column-xs       : 54px  <br>
+//
+// A checkbox column should have the .column-checkbox class on its column header.
+//
+// The table is made responsive by the jquery plugin Table Jenga, which adds column headings and cell data to meta
+// items under the main column. To add Table Jenga functionality to a table, you must add the js-tj class to the table
+// element. There are data attributes you can add to columns to make Table Jengo work as you intend:
+//
+// Set 'data-tj-ignore="true"' on a thead td or thead th element to never collapse that column
+// Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column
+//
+// Markup:
+// <div class="table-wrap">
+//   <table class="table-data js-tj">
+//     <thead>
+//       <tr>
+//         <th class="column-checkbox" data-tj-ignore="true"></th>
+//         <th class="column-lg" data-tj-main="true">Username</th>
+//         <th>Roles</th>
+//         <th class="column-md">First Visit</th>
+//         <th class="column-md">Last Visit</th>
+//         <th>Last IP</th>
+//         <th class="options column-sm"></th>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       <tr>
+//         <td><input type="checkbox"></td>
+//         <td>
+//           <div class="media-sm">
+//             <div class="media-left">
+//               <div class="media-image-wrap">
+//                 <img src="./public/resources/images/smart-puppy.jpg"></a>
+//               </div>
+//             </div>
+//             <div class="media-body">
+//               <div class="media-title">
+//                 Smart Puppy</a>
+//               </div>
+//               <div class="info user-email">puppy@email.com</div>
+//             </div>
+//           </div>
+//         </td>
+//         <td>Member, Moderator</td>
+//         <td>April 2</td>
+//         <td>April 26</td>
+//         <td>10.0.10.1</td>
+//         <td class="options">
+//           <div class="btn-group">
+//             <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+//               <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+//                 <use xlink:href="#edit"></use>
+//               </svg>
+//             </a>
+//             <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+//               <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+//                 <use xlink:href="#delete"></use>
+//               </svg>
+//             </a>
+//           </div>
+//         </td>
+//       </tr>
+//       <tr>
+//         <td><input type="checkbox"></td>
+//         <td>
+//           <div class="media-sm">
+//             <div class="media-left">
+//               <div class="media-image-wrap">
+//                 <img src="./public/resources/images/little-chick.jpg"></a>
+//               </div>
+//             </div>
+//             <div class="media-body">
+//               <div class="media-title">
+//                 Chick</a>
+//               </div>
+//               <div class="info user-email">chick@email.com</div>
+//             </div>
+//           </div>
+//         </td>
+//         <td>Member</td>
+//         <td>April 2</td>
+//         <td>April 26</td>
+//         <td>10.0.10.1</td>
+//         <td class="options">
+//           <div class="btn-group">
+//             <a href="#" class="btn btn-icon" aria-label="Edit" title="Edit">
+//               <svg class="icon icon-svg-edit" viewBox="0 0 17 17">
+//                 <use xlink:href="#edit"></use>
+//               </svg>
+//             </a>
+//             <a href="#" class="btn btn-icon" aria-label="Delete" title="Delete">
+//               <svg class="icon icon-svg-delete" viewBox="0 0 17 17">
+//                 <use xlink:href="#delete"></use>
+//               </svg>
+//             </a>
+//           </div>
+//         </td>
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+//
+// Styleguide 7.1.
+
+.table-wrap {
+  display: block;
+  margin-top: 0;
+  margin-right: (-$padding-row);
+  margin-bottom: 0;
+  margin-left: (-$padding-row);
+}
+
+.table-data {
+  margin-bottom: 0;
+  @include fixed-table;
+  @include has-top-border;
+
+  thead {
+    @extend .table-data-head;
+  }
+
+  tbody {
+    @extend .table-data-body;
+  }
+
+  th,
+  td {
+    @extend .table-data-cell;
+  }
+
+  td.options {
+    .btn-group {
+      justify-content: flex-end;
+    }
+  }
+
+  .toggle-wrap {
+    margin-left: $spacer / 4;
+    @extend .toggle-wrap-sm;
+  }
+
+  tbody + tbody {
+    border-top: ($table-border-width) solid $table-border-color;
+  }
+}
+
+.table-data-cell {
+  overflow: hidden;
+  padding: $table-cell-padding $padding-row;
+  line-height: $line-height;
+  vertical-align: middle;
+  border-bottom: $table-border-width solid $table-border-color;
+}
+
+.table-data-body {
+  font-size: $font-size-tables;
+  tr {
+    &:hover {
+      background-color: #f9fdfe;
+    }
+  }
+}
+
+.table-data-head {
+  // thead
+  tr {
+    background-color: $grey-light;
+  }
+
+  th,
+  td {
+    width: to-rem(100);
+    padding: ($spacer / 2) ($spacer * .75);
+
+    border-right: $table-border-width solid #eee;
+    border-top: $table-border-width solid #ddd;
+    border-bottom: $table-border-width solid $table-border-color;
+
+    text-transform: uppercase;
+    font-weight: 500;
+    font-size: $font-size-sm;
+    line-height: $line-height-lg;
+
+    &:last-child {
+      border-right: 0;
+    }
+
+    &.column-xl {
+      width: to-rem(300);
+    }
+
+    &.column-lg {
+      width: to-rem(210);
+    }
+
+    &.column-md {
+      width: to-rem(132);
+    }
+
+    &.column-sm {
+      width: to-rem(90);
+    }
+
+    &.column-xs {
+      width: to-rem(54);
+    }
+
+    &.column-checkbox {
+      width: to-rem(54);
+      max-width: to-rem(54);
+      padding-left: $spacer;
+      padding-right: $spacer;
+    }
+  }
+}
+
+// Table Jenga Meta
+//
+// Styling for Table Jenga meta (when a table is collapsed on small screen sizes).
+//
+// Markup:
+// <div class="tj-meta">
+//   <div class="table-meta-item">
+//     <span class="table-meta-item-label">Roles: </span>
+//     <span class="table-meta-item-data">Member, Moderator</span>
+//   </div>
+//   <div class="table-meta-item">
+//     <span class="table-meta-item-label">First Visit: </span>
+//     <span class="table-meta-item-data">April 26</span>
+//   </div>
+// </div>
+//
+// Styleguide 7.1.1.
+
+.tj-meta {
+  margin-top: ($spacer / 2);
+
+  .table-meta-item {
+    font-size: $font-size-sm;
+  }
+
+  .table-meta-item-label {
+    font-weight: 500;
+
+    // "Disable" any links in labels.
+    a {
+      color: $grey-dark;
+      pointer-events: none;
+      cursor: default;
+    }
+  }
+
+  .media-sm {
+    display: inline-block;
+    .media-left,
+    .info {
+      display: none;
+    }
+  }
+}
+
+// Checkbox Grid
+//
+// Styling for a checkbox grid, used for permission tables.
+//
+// Markup:
+// <div class="table-wrap">
+//   <table class="table-data js-checkbox-grid table-checkbox-grid">
+//     <thead>
+//       <tr>
+//         <th>Reported Posts</th>
+//         <td>Add</td>
+//         <td>Announce</td>
+//         <td>Close</td>
+//         <td>Delete</td>
+//         <td>Edit</td>
+//         <td>Sink</td>
+//         <td>View</td>
+//       </tr>
+//     </thead>
+//     <tbody>
+//       <tr>
+//         <th>Comments</th>
+//         <td><input type="checkbox" id="P1" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P2" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P3" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P4" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P5" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P6" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P7" name="Permission[]"></td>
+//       </tr>
+//       <tr>
+//         <th>Discussions</th>
+//         <td><input type="checkbox" id="P8" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P9" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P10" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P11" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P12" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P13" name="Permission[]"></td>
+//         <td><input type="checkbox" id="P14" name="Permission[]"></td>
+//       </tr>
+//     </tbody>
+//   </table>
+// </div>
+//
+// Styleguide 7.2.
+
+.table-checkbox-grid {
+  table-layout: auto;
+
+  .checkbox {
+    margin-bottom: 0;
+  }
+
+  th {
+    font-weight: $headings-font-weight;
+  }
+
+  a {
+    color: $grey-dark;
+
+    &:hover {
+      color: $brand-primary;
+    }
+  }
+
+  thead {
+    // Permission column headings
+    td {
+      text-align: center;
+      padding: ($spacer / 2) ($spacer / 2);
+      border: 1px solid #eee;
+      border-top: 1px solid #ddd;
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: $font-size-sm;
+      line-height: $line-height-lg;
+      vertical-align: middle;
+      width: 10%;
+
+      &:last-child {
+        border-right: 0;
+      }
+    }
+
+    // Title cell
+    th {
+      font-weight: 700;
+      max-width: to-rem(120);
+      min-width: to-rem(120);
+      @extend .truncate;
+    }
+  }
+
+  tbody {
+    td {
+      padding: ($spacer / 2) ($spacer * .75);
+      text-align: center;
+    }
+  }
+
+  @media screen and (max-width: 575px) {
+    table-layout: fixed;
+
+    thead,
+    tbody {
+      td,
+      th {
+        font-size: to-rem(12);
+        padding: to-rem(6);
+      }
+    }
+
+    tbody th {
+      font-size: to-rem(13);
+    }
+
+    thead {
+      th {
+        width: 100%;
+      }
+
+      // We gotta fit the column headings in somehow, so rotate them.
+      td {
+        position: relative;
+        width: to-rem(36);
+        height: to-rem(90);
+
+        a {
+          position: relative;
+          display: block;
+          transform: rotate(90deg);
+          top: - to-rem(24);
+        }
+      }
+    }
+  }
+}
+
+// Summary Table
+//
+// Summary Table
+//
+// Markup:
+// <div class="summaries js-dashboard-widgets-summaries">
+//   <div class="table-summary-wrap ActiveUserSummary">
+//     <div class="table-summary-title">Active Users</div>
+//     <table class="table-summary">
+//       <thead>
+//         <tr>
+//           <th>Name</th>
+//           <th>Comments</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-left">
+//                 <div class="media-image-wrap">
+//                   <a href="#">
+//                     <img src="./public/resources/images/smart-puppy.jpg" />
+//                   </a>
+//                 </div>
+//               </div>
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">jane_austen</a>
+//                 </div>
+//                 <div class="info">2:02PM</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>336</td>
+//         </tr>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-left">
+//                 <div class="media-image-wrap">
+//                   <a href="#">
+//                     <img src="./public/resources/images/snow-dog.jpg" />
+//                   </a>
+//                 </div>
+//               </div>
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">jackieO</a>
+//                 </div>
+//                 <div class="info">2:45PM</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>312</td>
+//         </tr>
+//       </tbody>
+//     </table>
+//   </div>
+//   <div class="table-summary-wrap ActiveUserSummary">
+//     <div class="table-summary-title">Popular Discussions</div>
+//     <table class="table-summary">
+//       <thead>
+//         <tr>
+//           <th>Discussion</th>
+//           <th>Comments</th>
+//           <th>Views</th>
+//         </tr>
+//       </thead>
+//       <tbody>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">Discussion Title</a>
+//                 </div>
+//                 <div class="info">May 26</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>42</td>
+//           <td>145</td>
+//         </tr>
+//         <tr>
+//           <td>
+//             <div class="media media-sm">
+//               <div class="media-body">
+//                 <div class="media-title">
+//                   <a href="#">Another Discussion</a>
+//                 </div>
+//                 <div class="info">June 8</div>
+//               </div>
+//             </div>
+//           </td>
+//           <td>67</td>
+//           <td>312</td>
+//         </tr>
+//       </tbody>
+//     </table>
+//   </div>
+// </div>
+//
+// Styleguide 7.3.
+
+.summaries {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  > * {
+    flex-grow: 1;
+    max-width: 50%;
+    padding: $spacer;
+
+    @include media-breakpoint-down(md) {
+      max-width: inherit;
+      width: 100%;
+      padding: $spacer 0;
+    }
+  }
+}
+
+.table-summary {
+  @include fixed-table;
+
+  th,
+  td {
+    @extend .table-data-cell;
+    text-align: center;
+    padding: $table-cell-padding to-rem(12);
+
+    &:first-child {
+      text-align: left;
+    }
+  }
+
+  tbody {
+    @extend .table-data-body;
+  }
+
+  thead {
+    th,
+    td {
+      width: 60%;
+      padding: ($spacer / 2) to-rem(12);
+      text-transform: uppercase;
+      font-weight: 500;
+      font-size: $font-size-sm;
+      line-height: $line-height-lg;
+      border-bottom: $table-border-width solid #ddd;
+
+      &:first-child {
+        width: 100%;
+        min-width: to-rem(120);
+      }
+    }
+  }
+}
+
+.table-summary-title {
+  font-size: 1rem;
+  font-weight: 500;
+}

@@ -1,0 +1,303 @@
+// Buttons
+//
+// Find the dashboard button styling here.
+//
+// Styleguide 4.
+
+// Buttons
+//
+// Here are the main button styles.
+//
+// .btn-primary - A button that causes a state change or performs a action
+// .btn-secondary - A button for secondary operations, like filtering, clearing or cancelling
+// .btn-link - A button that looks like a link but has the same margins as a button
+//
+// Markup:
+// <div class="btn {{modifier_class}}">Button</div>
+//
+// Styleguide 4.1.
+
+.btn {
+  display: inline-block;
+  font-weight: $btn-font-weight;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: $border-width solid transparent;
+  @include button-size($btn-padding-y, $btn-padding-x, $font-size-base, $line-height, $btn-border-radius);
+  @include transition(all .2s ease-in-out);
+
+  &,
+  &:hover {
+    text-decoration: none;
+  }
+
+  @include hover-focus {
+    text-decoration: none;
+  }
+
+  &.focus {
+    text-decoration: none;
+  }
+
+  &:active,
+  &.active {
+    background-image: none;
+    outline: 0;
+    @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125));
+  }
+
+  &.disabled,
+  &:disabled {
+    cursor: $cursor-disabled;
+
+    &,
+    &:hover {
+      color: $btn-link-disabled-color;
+      border-color: $btn-link-disabled-color;
+
+      svg {
+        fill: $btn-link-disabled-color;
+      }
+    }
+  }
+}
+
+.btn + .btn {
+  margin-left: $spacer / 2;
+}
+
+.btn-icon + .btn-icon {
+  margin-left: 0;
+}
+
+// Future-proof disabling of clicks on `<a>` elements
+a.btn.disabled,
+fieldset[disabled] a.btn {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  min-width: $btn-min-width;
+  @include button-variant($btn-primary-color, $btn-primary-bg, $btn-primary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color);
+}
+
+.btn-secondary {
+  min-width: $btn-min-width;
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
+}
+
+// Make a button look and behave like a link
+.btn-link {
+  font-weight: normal;
+  color: $link-color;
+  border-radius: 0;
+
+  &,
+  &:active,
+  &.active,
+  &:disabled {
+    background-color: transparent;
+    @include box-shadow(none);
+  }
+
+  &,
+  &:focus,
+  &:active {
+    border-color: transparent;
+  }
+
+  @include hover {
+    border-color: transparent;
+  }
+
+  @include hover-focus {
+    color: $link-hover-color;
+    text-decoration: $link-hover-decoration;
+    background-color: transparent;
+  }
+
+  &:disabled {
+    @include hover-focus {
+      color: $btn-link-disabled-color;
+      text-decoration: none;
+    }
+  }
+}
+
+// Icon buttons
+//
+// Icons buttons.
+//
+// .btn-icon - An icon button
+// .btn-icon-border - An icon button with a border
+//
+// Markup:
+// <div class="btn {{modifier_class}}">
+//   <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+//     <use xlink:href="#checkmark" />
+//   </svg>
+// </div>
+//
+// Styleguide 4.2.
+
+.btn-icon {
+  @extend .btn-link;
+  @extend .icon;
+  padding: to-rem(3);
+  margin: 0;
+  margin-left: .5rem;
+  font-size: $font-size-sm;
+  line-height: to-rem(24);
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  svg {
+    fill: $grey-dark;
+    opacity: 0.7;
+    height: to-rem(24);
+  }
+
+  &:hover svg {
+    opacity: 1;
+  }
+
+  &.disabled {
+    border: none;
+  }
+}
+
+
+.btn-icon-border {
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
+  @extend .icon;
+
+  $btn-icon-height: 28;
+  $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
+  padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
+  margin: 0 0 0 .5rem;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  svg {
+    height: to-rem($btn-icon-height);
+  }
+}
+
+
+// Button Group
+//
+// A button group.
+//
+// Markup:
+// <div class="btn-group">
+//   <div class="btn btn-secondary active">Button 1</div>
+//   <div class="btn btn-secondary">Button 2</div>
+//   <div class="btn btn-secondary">Button 3</div>
+// </div>
+//
+// Styleguide 4.3.
+
+.btn-group {
+  font-size: 0;
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+
+  > .btn {
+    // Bring the "active" button to the front
+    &:focus,
+    &:active,
+    &.active {
+      z-index: 2;
+    }
+  }
+
+  .btn {
+    border-radius: 0;
+    margin-right: -$input-btn-border-width;
+
+    &:first-child {
+      border-top-left-radius: $border-radius;
+      border-bottom-left-radius: $border-radius;
+    }
+
+    &:last-child {
+      border-top-right-radius: $border-radius;
+      border-bottom-right-radius: $border-radius;
+    }
+  }
+
+
+  // Prevent double borders when buttons are next to each other
+  .btn + .btn,
+  .btn + .btn-group,
+  .btn-group + .btn,
+  .btn-group + .btn-group {
+    margin-left: -$input-btn-border-width;
+  }
+}
+
+// Small Rounded Buttons
+//
+// Navbar and card buttons.
+//
+// Styleguide 4.4.
+
+@mixin button-sm-rounded {
+  display: inline-block;
+  vertical-align: middle;
+  font-weight: 300;
+  text-transform: uppercase;
+
+  svg {
+    margin-top: - to-rem(2);
+  }
+
+  @include button-size($btn-padding-y-sm, $btn-padding-x-sm, to-rem(10), to-rem(14), $btn-border-radius-navbar);
+}
+
+// Small Rounded Button
+//
+// Markup:
+// <div class="btn btn-sm-rounded">
+//   Check it out
+//   <svg class="icon icon-svg icon-svg-external-link icon-12 icon-text" viewBox="0 0 17 17">
+//     <use xlink:href="#external-link" />
+//   </svg>
+// </div>
+//
+// Styleguide 4.4.1.
+
+.btn-sm-rounded {
+  @include button-sm-rounded();
+  @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-primary-bg, $btn-primary-color, $btn-primary-color, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
+}
+
+// Navbar button
+//
+// Markup:
+// <div class="btn btn-navbar">
+//   Check it out
+//   <svg class="icon icon-svg icon-svg-external-link icon-12" viewBox="0 0 17 17">
+//     <use xlink:href="#external-link" />
+//   </svg>
+// </div>
+//
+// Styleguide 4.4.2.
+
+.btn-navbar {
+  @include button-sm-rounded();
+  svg {
+    fill: $white;
+  }
+  @include button-variant($navbar-link-color, $brand-primary, $navbar-link-color, $navbar-link-color, $navbar-active-link-active-bg, $navbar-link-color);
+}

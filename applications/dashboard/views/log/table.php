@@ -2,7 +2,7 @@
 include $this->fetchViewLocation('helper_functions');
 ?>
 <div class="table-wrap">
-    <table id="Log" class="table-data">
+    <table id="Log" class="table-data js-tj">
         <thead>
         <tr>
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
@@ -29,16 +29,18 @@ include $this->fetchViewLocation('helper_functions');
                 <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
                 </td>
                 <td class="UsernameCell">
-                    <div class="media-sm">
-                        <div class="media-sm-image-wrap">
-                            <?php echo userPhoto($user); ?>
+                    <div class="media media-sm">
+                        <div class="media-left">
+                            <div class="media-image-wrap">
+                                <?php echo userPhoto($user); ?>
+                            </div>
                         </div>
-                        <div class="media-sm-content">
-                            <div class="title">
+                        <div class="media-body">
+                            <div class="media-title">
                                 <?php echo userAnchor($user, 'Username reverse-link'); ?>
                             </div>
                             <?php if ($viewPersonalInfo) : ?>
-                                <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
+                                <div class="info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -101,9 +103,9 @@ include $this->fetchViewLocation('helper_functions');
                 <td class="PostedByCell"><?php
                     $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
                     if ($Row['RecordName']) { ?>
-                        <div class="media-sm">
-                            <div class="media-sm-content">
-                                <div class="media-sm-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
+                        <div class="media media-sm">
+                            <div class="media-body">
+                                <div class="media-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
                                     <?php
                                     if ($RecordUser['Banned']) {
                                         echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
@@ -112,7 +114,7 @@ include $this->fetchViewLocation('helper_functions');
                                     ?>
                                 </div>
                                 <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
-                                    <div class="media-sm-info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
+                                    <div class="info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
                                 <?php } ?>
                             </div>
                         </div>

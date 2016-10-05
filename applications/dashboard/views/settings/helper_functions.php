@@ -148,7 +148,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     }
     ?>
     <div class="media-left">
-        <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'addon-image-wrap']); ?>
+        <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'media-image-wrap']); ?>
     </div>
     <div class="media-body">
         <div class="media-heading"><div class="media-title"><?php echo $ScreenName; ?></div>

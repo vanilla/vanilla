@@ -53,7 +53,7 @@ echo $this->Form->errors();
         if ($this->Role && $this->Role->CanSession != '1') { ?>
             <div class="alert alert-warning padded"><?php echo t('Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'); ?></div>
         <?php } ?>
-        <h2><?php echo t('Check all permissions that apply to this role:') ?></h2>
+        <h2 class="subheading-border"><?php echo t('Check all permissions that apply to this role:') ?></h2>
         <div class="RolePermissions">
             <?php
             echo $this->Form->checkBoxGridGroups($this->PermissionData, 'Permission');

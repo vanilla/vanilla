@@ -26,10 +26,10 @@ Gdn_Theme::assetEnd();
         <?php
         echo $this->Form->open();
         echo $this->Form->errors();
-        echo '<div class="icon-wrap icon-search-wrap">'.dashboardSymbol('search').'</div>';
+        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Search', ['placeholder' => t('Search for a tag.', 'Search for all or part of a tag.')]);
         echo ' '.$this->Form->close(t('Go'), '', ['class' => 'search-submit']);
-        echo '<a class="icon-wrap icon-clear-wrap" href="'.url('/settings/tagging').'">'.dashboardSymbol('close').'</a>';
+        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/settings/tagging').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">'.sprintf(t('%s tag(s) found.'), $this->data('RecordCount')).'</div>';
         ?>
     </div>
@@ -75,7 +75,7 @@ Gdn_Theme::assetEnd();
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
 </div>
 <div class="table-wrap">
-    <table class="Tags table-data">
+    <table class="Tags table-data js-tj">
         <thead>
             <tr>
                 <th class="column-md"><?php echo t('Tag') ?></th>
@@ -121,11 +121,11 @@ Gdn_Theme::assetEnd();
                     <td>
                     <?php
                     $DisplayName = TagFullName($Tag); ?>
-                    <div class="media-sm">
-                        <div class="media-sm-content">
+                    <div class="media media-sm">
+                        <div class="media-body">
                         <?php
-                        echo '<div class="media-sm-title"><a href="'.url('/discussions/tagged/'.val('Name', $Tag)).'">'.htmlspecialchars($DisplayName).'</a></div>';
-                        echo '<div class="media-sm-info">'.sprintf(t('Created by %s'), userAnchor($createdBy)).'</div>';
+                        echo '<div class="media-title"><a href="'.url('/discussions/tagged/'.val('Name', $Tag)).'">'.htmlspecialchars($DisplayName).'</a></div>';
+                        echo '<div class="info">'.sprintf(t('Created by %s'), userAnchor($createdBy)).'</div>';
                         ?>
                         </div>
                     </div>
@@ -141,12 +141,14 @@ Gdn_Theme::assetEnd();
                     </td>
                     <?php if ($CanAddTags) { ?>
                     <td class="options">
-                    <?php
-                    if (!$Special) {
-                        echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]]);
-                    }
-                    ?>
+                        <div class="btn-group">
+                        <?php
+                        if (!$Special) {
+                            echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                            echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]]);
+                        }
+                        ?>
+                        </div>
                     </td>
                     <?php } ?>
                 </tr>

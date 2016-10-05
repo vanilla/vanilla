@@ -27,19 +27,21 @@ $roleTitles = implode(', ', $roleTitlesArray);
 /** var UserController $user */
 ?>
 <div class="card card-user">
-    <div class="card-block media-sm">
-        <div class="media-sm-image-wrap">
-            <?php echo userPhoto($user); ?>
+    <div class="card-block media media-sm">
+        <div class="media-left">
+            <div class="media-image-wrap">
+                <?php echo userPhoto($user); ?>
+            </div>
         </div>
-        <div class="media-sm-content">
-            <div class="media-sm-title username">
+        <div class="media-content">
+            <div class="media-title username">
                 <?php echo userAnchor($user); ?>
             </div>
-            <div class="media-sm-info user-roles">
+            <div class="info user-roles">
                 <?php echo $roleTitles; ?>
             </div>
-            <a class="btn btn-media-sm" href="<?php echo url(userUrl($user)); ?>">
-                <?php echo t('My Profile').' '.dashboardSymbol('external-link'); ?>
+            <a class="btn btn-sm-rounded btn-secondary padded-top" href="<?php echo url(userUrl($user)); ?>">
+                <?php echo t('My Profile').' '.dashboardSymbol('external-link', '', 'icon-11 icon-text'); ?>
             </a>
         </div>
     </div>
@@ -65,14 +67,14 @@ Gdn_Theme::assetEnd();
 
 
 <div class="main-container">
-    <div class="navbar">
+    <div class="navbar js-navbar">
         <button class="js-panel-left-toggle panel-left-toggle btn btn-link" type="button">
             &#9776;
         </button>
         <div class="navbar-brand">
             <?php $title = c('Garden.Title'); ?>
             <div class="navbar-image logo"><?php echo wrap('Vanilla Forums', 'span', ['class' => 'vanilla-logo vanilla-logo-white']); ?></div>
-            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link'), '/', 'btn btn-navbar'); ?>
+            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', '', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
@@ -90,18 +92,6 @@ Gdn_Theme::assetEnd();
             <?php } ?>
         </nav>
         <div class="navbar-memenu">
-<!--            <nav class="nav nav-pills nav-icons">-->
-<!--            --><?php
-//                $sections = $dashboardNav->getSectionsInfo(true);
-//                foreach ($dashboardNav->getSectionsInfo(true) as $section) { ?>
-<!--                    <div class="nav-item">-->
-<!--                        <a class="nav-link --><?php //echo val('active', $section); ?><!--" href="--><?php //echo val('url', $section); ?><!--">-->
-<!--                            <div class="nav-link-heading">--><?php //echo val('title', $section); ?><!--</div>-->
-<!--                        </a>-->
-<!--                    </div>-->
-<!--                --><?php
-//                } ?>
-<!--            </nav>-->
             <?php
             if (Gdn::session()->isValid()) {
                 $photo = '<img src="'.userPhotoUrl($user).'">';

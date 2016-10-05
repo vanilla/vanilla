@@ -22,10 +22,10 @@ Gdn_Theme::assetBegin('Help'); ?>
         <li><?php echo t('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
     </ul>
 </div>
-<div class="media media-callout current-theme-mobile CurrentTheme">
+<div class="media media-callout media-callout-grey-bg current-theme-mobile CurrentTheme">
     <?php
     $PreviewUrl = $this->data('EnabledTheme.MobileScreenshotUrl', false); ?>
-    <div class="media-left grid-item">
+    <div class="media-left">
         <div class="mobile-theme-wrap">
             <div class="mobile-frame">
                 <svg class="icon icon-mobile-frame" viewBox="0 0 252 281"><use xlink:href="#mobile-frame" /></svg>
@@ -33,9 +33,9 @@ Gdn_Theme::assetBegin('Help'); ?>
             <div class="image-wrap">
                 <?php
                 if ($PreviewUrl !== FALSE) {
-                    echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName'), 'class' => 'grid-image'));
+                    echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName')));
                 } else {
-                    echo img('/themes/mobile/mobile.png', array('alt' => $ScreenName, 'class' => 'grid-image'));
+                    echo img('/themes/mobile/mobile.png', array('alt' => $ScreenName));
                 } ?>
             </div>
         </div>

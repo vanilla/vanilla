@@ -8,7 +8,7 @@ $Fields = $this->data('ExtendedFields');
     <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'js-modal btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
 </div>
 <div class="table-wrap">
-    <table class="table-data">
+    <table class="table-data js-tj">
         <thead>
         <tr>
             <th class="column-lg">Label</th>

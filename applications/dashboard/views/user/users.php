@@ -11,16 +11,18 @@ foreach ($this->UserData->result() as $User) {
         data-userid="<?php echo $User->UserID ?>">
         <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
         <td>
-            <div class="media-sm">
-                <div class="media-sm-image-wrap">
-                    <?php echo userPhoto($User); ?>
+            <div class="media media-sm">
+                <div class="media-left">
+                    <div class="media-image-wrap">
+                        <?php echo userPhoto($User); ?>
+                    </div>
                 </div>
-                <div class="media-sm-content">
-                    <div class="media-sm-title username">
+                <div class="media-body">
+                    <div class="media-title username">
                         <?php echo userAnchor($User, 'Username'); ?>
                     </div>
                     <?php if ($ViewPersonalInfo) : ?>
-                    <div class="media-sm-info user-email"><?php echo Gdn_Format::Email($User->Email); ?></div>
+                    <div class="info user-email"><?php echo Gdn_Format::Email($User->Email); ?></div>
                     <?php endif; ?>
                 </div>
             </div>

@@ -26,10 +26,10 @@ function writeConnection($Connection, $wrap = true) {
 
     ?>
     <?php if($wrap) { ?>
-    <li id="<?php echo "Provider_$Index"; ?>" class="media <?php echo $CssClasses; ?>">
+    <li id="<?php echo "Provider_$Index"; ?>" class="media media-addon <?php echo $CssClasses; ?>">
         <?php } ?>
         <div class="media-left">
-            <div class="image-wrap IconWrap">
+            <div class="image-wrap media-image-wrap">
                 <?php echo img(val('Icon', $Connection, '/applications/dashboard/design/images/connection-64.png')); ?>
             </div>
         </div>

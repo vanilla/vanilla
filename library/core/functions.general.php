@@ -638,10 +638,10 @@ if (!function_exists('dbdecode')) {
             return $value;
         }
 
-        // IP addresses are binary packed now. Let's convert them from text to binary
-        $value = ipEncodeRecursive($value);
-
         $decodedValue = @unserialize($value);
+
+        // IP addresses are binary packed now. Let's convert them from text to binary
+        $decodedValue = ipEncodeRecursive($decodedValue);
 
         return $decodedValue;
     }

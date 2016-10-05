@@ -71,8 +71,12 @@ echo $Form->errors();
                 echo '</div>';
                 break;
             case 'imageupload':
+                echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
-                echo $Form->ImageUpload($Row['Name'], $Row['Options']);
+                echo $Description;
+                echo wrap($Form->currentImage($Row['Name'], $Row['Options']), 'div', ['class' => 'image-wrap-label']);
+                echo '</div>';
+                echo $Form->ImageUploadWrap($Row['Name'], $Row['Options']);
                 break;
             case 'radiolist':
                 echo '<div class="label-wrap">';

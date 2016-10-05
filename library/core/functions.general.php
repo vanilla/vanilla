@@ -2072,6 +2072,62 @@ if (!function_exists('joinRecords')) {
 
 }
 
+if (!function_exists('jsonEncodeChecked')) {
+    /**
+     * Encode a value as JSON or throw an exception on error.
+     *
+     * @param mixed $value
+     * @param int|null $options
+     * @return string
+     * @throws Exception
+     */
+    function jsonEncodeChecked($value, $options = null) {
+        $advanced = (PHP_VERSION_ID >= 50500);
+
+        if ($options === null) {
+            if ($advanced) {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+            } else {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+            }
+        }
+
+        $encoded = json_encode($value, $options);
+        $errorMessage = null;
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if ($advanced) {
+                if ($encoded === false) {
+                    switch (json_last_error()) {
+                        case JSON_ERROR_UTF8:
+                            $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                            break;
+                        case JSON_ERROR_RECURSION:
+                            $errorMessage = 'One or more recursive references in the value to be encoded.';
+                            break;
+                        case JSON_ERROR_INF_OR_NAN:
+                            $errorMessage = 'One or more NAN or INF values in the value to be encoded';
+                            break;
+                        case JSON_ERROR_UNSUPPORTED_TYPE:
+                            $errorMessage = 'A value of a type that cannot be encoded was given.';
+                            break;
+                        default:
+                            $errorMessage = 'An unknown error has occurred.';
+                    }
+                }
+            } else {
+                $errorMessage = 'An unknown error has occurred.';
+            }
+        }
+
+        if ($errorMessage !== null) {
+            throw new Exception("JSON encoding error: {$errorMessage}", 500);
+        }
+
+        return $encoded;
+    }
+}
+
 if (!function_exists('now')) {
     /**
      * Get the current time in seconds with a millisecond fraction.
@@ -3844,5 +3900,38 @@ if (!function_exists('urlMatch')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('walkAllRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties.
+     *
+     * @param array|object $input
+     * @param callable $callback
+     */
+    function walkAllRecursive(&$input, $callback) {
+        $currentDepth = 0;
+        $maxDepth = 128;
+
+        $walker = function(&$input, $callback, $parent = null) use (&$walker, &$currentDepth, $maxDepth) {
+            $currentDepth++;
+
+            if ($currentDepth > $maxDepth) {
+                throw new Exception('Maximum recursion depth exceeded.', 500);
+            }
+
+            foreach ($input as $key => &$val) {
+                if (is_array($val) || is_object($val)) {
+                    call_user_func_array($walker, [&$val, $callback, $key]);
+                } else {
+                    call_user_func_array($callback, [&$val, $key, $parent]);
+                }
+            }
+
+            $currentDepth--;
+        };
+
+        call_user_func_array($walker, [&$input, $callback]);
     }
 }

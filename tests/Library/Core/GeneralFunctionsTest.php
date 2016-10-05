@@ -23,6 +23,37 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test {@link jsonEncodeChecked()}.
+     *
+     * @param mixed $data
+     * @param bool $expectException
+     * @dataProvider provideJsonEncodeCheckedTests
+     */
+    public function testJsonEncodeChecked($data, $expectException) {
+        if ($expectException && PHP_VERSION_ID < 50500) {
+            if (version_compare(\PHPUnit_Runner_Version::id(), '5.0', '<')) {
+                $this->setExpectedException('Exception');
+            } else {
+                $this->expectException('Exception');
+            }
+        }
+
+        jsonEncodeChecked($data);
+    }
+
+    /**
+     * Provide test data for {@link testJsonEncodeChecked}
+     */
+    public function provideJsonEncodeCheckedTests() {
+        $exampleIPv6Packed = inet_pton('2001:0db8:85a3:0000:0000:8a2e:0370:7334');
+        return [
+            [$exampleIPv6Packed, true],
+            [['IPAddress' => $exampleIPv6Packed], true],
+            [['Alpha' => 'One', 'Beta' => 'Two', 'Charlie' => 'Three'], false]
+        ];
+    }
+
+    /**
      * Provide test data for {@link testUrlMatch()}.
      */
     public function provideUrlMatchTests() {

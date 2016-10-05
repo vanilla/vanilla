@@ -1024,6 +1024,21 @@ class Gdn_Controller extends Gdn_Pluggable {
     }
 
     /**
+     * Recursively walk through the data, decoding any IP address fields.
+     *
+     * @param array|object $data
+     */
+    private function ipDecodeRecursive(&$data) {
+        walkAllRecursive($data, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipDecode($val);
+                }
+            }
+        });
+    }
+
+    /**
      * Determines whether a method on this controller is internal and can't be dispatched.
      *
      * @param string $methodName The name of the method.
@@ -1446,6 +1461,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         $this->sendHeaders();
 
+        $this->ipDecodeRecursive($Data);
+
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
         if (file_exists($ViewLocation)) {
@@ -1473,15 +1490,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
+                $jsonData = jsonEncodeChecked($Data);
+
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
+                    echo "{$Callback}({$jsonData});";
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    echo $jsonData;
                     return true;
                 }
                 break;

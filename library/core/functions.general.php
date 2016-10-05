@@ -639,13 +639,7 @@ if (!function_exists('dbdecode')) {
         }
 
         // IP addresses are binary packed now. Let's convert them from text to binary
-        walkAllRecursive($value, function(&$val, $key = null, $parent = null) {
-            if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
-                    $val = ipEncode($val);
-                }
-            }
-        });
+        $value = ipEncodeRecursive($value);
 
         $decodedValue = @unserialize($value);
 
@@ -667,13 +661,7 @@ if (!function_exists('dbencode')) {
 
         // IP addresses are binary packed now.
         // Let's convert them to text so that they can be safely inserted into the text column
-        walkAllRecursive($value, function(&$val, $key = null, $parent = null) {
-            if (is_string($val)) {
-                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
-                    $val = ipDecode($val);
-                }
-            }
-        });
+        $value = ipDecodeRecursive($value);
 
         $encodedValue = serialize($value);
 
@@ -3952,5 +3940,43 @@ if (!function_exists('walkAllRecursive')) {
         };
 
         call_user_func_array($walker, [&$input, $callback]);
+    }
+}
+
+if (!function_exists('ipEncodeRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties and encode IP fields.
+     *
+     * @param array|object $input
+     * @return array|object
+     */
+    function ipEncodeRecursive(&$input) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipEncode($val);
+                }
+            }
+        });
+        return $input;
+    }
+}
+
+if (!function_exists('ipDecodeRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties and decode IP fields.
+     *
+     * @param array|object $input
+     * @return array|object
+     */
+    function ipDecodeRecursive($input) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipDecode($val);
+                }
+            }
+        });
+        return $input;
     }
 }

@@ -365,8 +365,15 @@ class FlaggingPlugin extends Gdn_Plugin {
                     $Email = new Gdn_Email();
                     $Email->to($User->Email)
                         ->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $Subject))
-                        ->message($EmailBody)
-                        ->send();
+                        ->message($EmailBody);
+
+                    try {
+                        $Email->send();
+                    } catch (Exception $e) {
+                        if (debug()) {
+                            throw $e;
+                        }
+                    }
                 }
             }
 

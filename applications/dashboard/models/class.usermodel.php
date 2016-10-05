@@ -3243,7 +3243,14 @@ class UserModel extends Gdn_Model {
                     ->setTitle(t('Membership Approved'));
 
                 $Email->setEmailTemplate($emailTemplate);
-                $Email->send();
+
+                try {
+                    $Email->send();
+                } catch (Exception $e) {
+                    if (debug()) {
+                        throw $e;
+                    }
+                }
 
                 // Report that the user was approved.
                 $ActivityModel = new ActivityModel();
@@ -3905,7 +3912,14 @@ class UserModel extends Gdn_Model {
             ->setButton($url, t('Confirm My Email Address'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -3960,7 +3974,14 @@ class UserModel extends Gdn_Model {
         $emailTemplate->setTitle(t('Welcome Aboard!'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -4039,7 +4060,14 @@ class UserModel extends Gdn_Model {
             ->setButton(externalUrl('/'), t('Access the Site'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -4191,7 +4219,14 @@ class UserModel extends Gdn_Model {
                 ->setButton(externalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
             $Email->setEmailTemplate($emailTemplate);
 
-            $Email->send();
+            try {
+                $Email->send();
+            } catch (Exception $e) {
+                if (debug()) {
+                    throw $e;
+                }
+            }
+
             $NoEmail = false;
         }
 

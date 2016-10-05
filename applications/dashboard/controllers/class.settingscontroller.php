@@ -846,10 +846,17 @@ class SettingsController extends DashboardController {
                 $emailer = $this->getTestEmail();
                 $emailer->to($addresses);
                 $emailer->subject(sprintf(t('Test email from %s'), c('Garden.Title')));
-                if ($emailer->send()) {
-                    $this->informMessage(t("The email has been sent."));
-                } else {
-                    $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
+
+                try {
+                    if ($emailer->send()) {
+                        $this->informMessage(t("The email has been sent."));
+                    } else {
+                        $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
+                    }
+                } catch (Exception $e) {
+                    if (debug()) {
+                        throw $e;
+                    }
                 }
             }
         }

@@ -638,6 +638,15 @@ if (!function_exists('dbdecode')) {
             return $value;
         }
 
+        // IP addresses are binary packed now. Let's convert them from text to binary
+        walkAllRecursive($value, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipEncode($val);
+                }
+            }
+        });
+
         $decodedValue = @unserialize($value);
 
         return $decodedValue;
@@ -655,6 +664,16 @@ if (!function_exists('dbencode')) {
         if ($value === null || $value === '') {
             return null;
         }
+
+        // IP addresses are binary packed now.
+        // Let's convert them to text so that they can be safely inserted into the text column
+        walkAllRecursive($value, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipDecode($val);
+                }
+            }
+        });
 
         $encodedValue = serialize($value);
 

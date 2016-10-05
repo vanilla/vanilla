@@ -3953,7 +3953,7 @@ if (!function_exists('ipEncodeRecursive')) {
      * @param array|object $input
      * @return array|object
      */
-    function ipEncodeRecursive(&$input) {
+    function ipEncodeRecursive($input) {
         walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
             if (is_string($val)) {
                 if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {

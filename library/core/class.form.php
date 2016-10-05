@@ -568,6 +568,8 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Outputs a checkbox painted as a toggle. Includes label wrap id a label is given.
+     *
      * @param string $fieldName
      * @param string $label
      * @param array $attributes
@@ -617,6 +619,13 @@ class Gdn_Form extends Gdn_Pluggable {
         return $toggle;
     }
 
+    /**
+     * Outputs a stylized file upload input. Requires dashboard.js and dashboard.css to look and work as intended.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
     public function fileUpload($fieldName, $attributes = []) {
         $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
         unset($attributes['id']);
@@ -634,6 +643,14 @@ class Gdn_Form extends Gdn_Pluggable {
         return $upload;
     }
 
+    /**
+     * Outputs a stylized file upload input with a input wrapper div. Requires dashboard.js and dashboard.css to look
+     * and work as intended.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
     public function fileUploadWrap($fieldName, $attributes = []) {
         return '<div class="input-wrap">'.$this->fileUpload($fieldName, $attributes).'</div>';
     }
@@ -1535,6 +1552,17 @@ class Gdn_Form extends Gdn_Pluggable {
             '</div>';
 
         return $Result;
+    }
+
+    /**
+     * Return a control for uploading images with a wrapper div. The existing image should be displayed by the label.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
+    public function imageUploadWrap($fieldName, $attributes = []) {
+        return $this->fileUploadWrap($fieldName.'_New', $attributes);
     }
 
     /**
@@ -2753,11 +2781,24 @@ PASSWORDMETER;
 
             $LabelCode = self::labelCode($Row);
 
+            $image = '';
+
+            if (strtolower($Row['Control']) == 'imageupload') {
+                $image = $this->currentImage($Row['Name'], $Row['Options']);
+                $image = wrap($image, 'div', ['class' => 'image-wrap-label']);
+            }
+
             $Description = val('Description', $Row, '');
+
+            if ($Description) {
+                $Description = wrap($Description, 'div', ['class' => 'description info']);
+            }
+
+            $Description .= $image;
+
             if (in_array(strtolower($Row['Control']), ['checkbox', 'checkboxlist', 'radiolist'])) {
                 $labelWrap = wrap($Description, 'div', ['class' => 'label-wrap']);
             } elseif ($Description) {
-                $Description = '<div class="description info">'.$Description.'</div>';
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
@@ -2793,9 +2834,8 @@ PASSWORDMETER;
                         .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'imageupload':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
-                        .$this->imageUpload($Row['Name'], $Row['Options']);
+                    $Result .= $labelWrap
+                        .$this->imageUploadWrap($Row['Name'], $Row['Options']);
                     break;
                 case 'textbox':
                     $Row['Options']['Wrap'] = true;

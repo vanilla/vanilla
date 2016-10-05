@@ -121,8 +121,8 @@ class EventManager {
                     $eventName = $basename;
                     break;
                 case '_create':
-                case '_endpoint':
-                    $eventName = $basename.'_endpoint';
+                case '_method':
+                    $eventName = $basename.'_method';
                     break;
                 case '_before':
                 case '_after':

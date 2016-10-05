@@ -16,11 +16,11 @@ class BasicEventHandlers {
     }
 
     public function someController_someMethod_create($val = '') {
-        return $val.'someController_someMethod';
+        return $val.'someController_someCreate';
     }
 
-    public function someController_someEndpoint_endpoint($val = '') {
-        return $val.'someController_someEndpoint';
+    public function someController_someEndpoint_method($val = '') {
+        return $val.'someController_someMethod';
     }
 
     public function setFoo($value) {

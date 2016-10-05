@@ -207,11 +207,11 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $val = $em->fireFilter('filter', '');
         $this->assertSame('filter', $val);
 
-        $val2 = $em->fireFilter('somecontroller_somemethod_endpoint', '');
-        $this->assertSame('someController_someMethod', $val2);
+        $val2 = $em->fireFilter('somecontroller_somemethod_method', '');
+        $this->assertSame('someController_someCreate', $val2);
 
-        $val3 = $em->fireFilter('somecontroller_someendpoint_endpoint', '');
-        $this->assertSame('someController_someEndpoint', $val3);
+        $val3 = $em->fireFilter('somecontroller_someendpoint_method', '');
+        $this->assertSame('someController_someMethod', $val3);
 
         $val4 = $em->fire('setFoo');
         $this->assertSame([], $val4);

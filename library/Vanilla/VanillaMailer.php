@@ -59,4 +59,26 @@ class VanillaMailer extends \PHPMailer {
         deprecated('countRecipients', 'count($phpMailer->getAllRecipientAddresses())');
         return count($this->getAllRecipientAddresses());
     }
+
+    /**
+     * Check the phpmailerException message and tell us if the exception should be treated as
+     * a server error instead of a "critical" error.
+     * Server error means that we can try to resend the email.
+     */
+    public function isServerError(phpmailerException $e) {
+        $serverErrorMessages = [
+            'connect_host',
+            'data_not_accepted',
+            'smtp_connect_failed',
+            'execute',
+        ];
+
+        foreach($errorMessages as $errorMessage) {
+           if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
+               return true;
+           }
+        }
+
+        return false;
+    }
 }

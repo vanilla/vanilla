@@ -41,7 +41,7 @@ class Gdn_Email extends Gdn_Pluggable {
      * Constructor.
      */
     function __construct() {
-        $this->PhpMailer = new PHPMailer();
+        $this->PhpMailer = new \Vanilla\VanillaMailer();
         $this->PhpMailer->CharSet = 'utf-8';
         $this->PhpMailer->SingleTo = c('Garden.Email.SingleTo', false);
         $this->PhpMailer->Hostname = c('Garden.Email.Hostname', '');
@@ -352,12 +352,12 @@ class Gdn_Email extends Gdn_Pluggable {
             $this->fireEvent('SendMail');
         }
 
-        if (!empty($this->Skipped) && $this->PhpMailer->countRecipients() == 0) {
+        if (!empty($this->Skipped) && count($this->PhpMailer->getAllRecipientAddresses()) == 0) {
             // We've skipped all recipients.
             throw new Exception('No valid email recipients.', self::ERR_SKIPPED);
         }
 
-        $this->PhpMailer->throwExceptions(true);
+        $this->PhpMailer->setThrowExceptions(true);
         if (!$this->PhpMailer->send()) {
             throw new Exception($this->PhpMailer->ErrorInfo);
         }

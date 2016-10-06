@@ -1949,7 +1949,7 @@ class CategoryModel extends Gdn_Model {
                 );
             }
         }
-        $this->SetCache();
+        self::setCache();
         $this->collection->flushCache();
     }
 
@@ -2118,7 +2118,7 @@ class CategoryModel extends Gdn_Model {
                     array('CategoryID' => $CategoryID)
                 )->put();
 
-                $this->setCache($CategoryID, $Set);
+                self::setCache($CategoryID, $Set);
                 $Saves[] = array_merge(array('CategoryID' => $CategoryID), $Set);
             }
         }
@@ -2295,7 +2295,7 @@ class CategoryModel extends Gdn_Model {
                 if (isset($Fields['ParentCategoryID']) && $OldCategory['ParentCategoryID'] != $Fields['ParentCategoryID']) {
                     $this->rebuildTree();
                 } else {
-                    $this->setCache($CategoryID, $Fields);
+                    self::setCache($CategoryID, $Fields);
                 }
             } else {
                 $CategoryID = $this->insert($Fields);
@@ -2413,8 +2413,8 @@ class CategoryModel extends Gdn_Model {
      *
      * @since 2.0.18
      * @access public
-     * @param int $ID
-     * @param array $Data
+     * @param int|bool $ID
+     * @param array|bool $Data
      */
     public static function setCache($ID = false, $Data = false) {
         self::instance()->collection->refreshCache((int)$ID);
@@ -2512,7 +2512,7 @@ class CategoryModel extends Gdn_Model {
             $Fields['LastDiscussionID'] = $Row['DiscussionID'];
         }
         $this->setField($CategoryID, $Fields);
-        $this->setCache($CategoryID, array('LastTitle' => null, 'LastUserID' => null, 'LastDateInserted' => null, 'LastUrl' => null));
+        self::setCache($CategoryID, array('LastTitle' => null, 'LastUserID' => null, 'LastDateInserted' => null, 'LastUrl' => null));
     }
 
     /**

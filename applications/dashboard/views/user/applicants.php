@@ -54,7 +54,7 @@ if ($NumApplicants == 0) : ?>
                         $this->fireEvent("AppendApplicantInfo");
                         ?>
                     </td>
-                    <td><?php echo anchor(Gdn_Format::text($User->InsertIPAddress), '/user/browse?Keywords='.Gdn_Format::text($User->InsertIPAddress)); ?></td>
+                    <td><?php echo ipAnchor($User->InsertIPAddress); ?></td>
                     <td><?php echo Gdn_Format::date($User->DateInserted); ?></td>
                     <td class="options">
                         <div class="btn-group">

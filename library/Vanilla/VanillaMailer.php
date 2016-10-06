@@ -74,7 +74,7 @@ class VanillaMailer extends \PHPMailer {
         ];
 
         foreach($errorMessages as $errorMessage) {
-           if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
+           if (strpos($e->getMessage(), $this->lang($serverErrorMessages)) !== false) {
                return true;
            }
         }

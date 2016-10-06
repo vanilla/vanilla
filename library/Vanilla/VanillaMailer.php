@@ -73,8 +73,8 @@ class VanillaMailer extends \PHPMailer {
             'execute',
         ];
 
-        foreach($errorMessages as $errorMessage) {
-           if (strpos($e->getMessage(), $this->lang($serverErrorMessages)) !== false) {
+        foreach($serverErrorMessages as $errorMessage) {
+           if (strpos($e->getMessage(), $this->lang($errorMessage)) !== false) {
                return true;
            }
         }

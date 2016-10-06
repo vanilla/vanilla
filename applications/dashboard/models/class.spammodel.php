@@ -83,6 +83,9 @@ class SpamModel extends Gdn_Pluggable {
             $Data['Body'] = $Data['Story'];
         }
 
+        // Make sure all IP addresses are unpacked.
+        $Data = ipDecodeRecursive($Data);
+
         touchValue('IPAddress', $Data, Gdn::request()->ipAddress());
 
         $Sp = self::_Instance();

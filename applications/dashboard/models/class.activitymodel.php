@@ -888,7 +888,7 @@ class ActivityModel extends Gdn_Model {
                         $Emailed = self::SENT_SKIPPED;
                     }
                 } catch (phpmailerException $pex) {
-                    if ($pex->getCode() == PHPMailer::STOP_CRITICAL) {
+                    if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$Email->PhpMailer->isServerError($pex)) {
                         $Emailed = self::SENT_FAIL;
                     } else {
                         $Emailed = self::SENT_ERROR;
@@ -1022,7 +1022,7 @@ class ActivityModel extends Gdn_Model {
                 }
             }
         } catch (phpmailerException $pex) {
-            if ($pex->getCode() == PHPMailer::STOP_CRITICAL) {
+            if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$Email->PhpMailer->isServerError($pex)) {
                 $Emailed = self::SENT_FAIL;
             } else {
                 $Emailed = self::SENT_ERROR;
@@ -1163,7 +1163,7 @@ class ActivityModel extends Gdn_Model {
                             $Emailed = self::SENT_SKIPPED;
                         }
                     } catch (phpmailerException $pex) {
-                        if ($pex->getCode() == PHPMailer::STOP_CRITICAL) {
+                        if ($pex->getCode() == PHPMailer::STOP_CRITICAL && !$Email->PhpMailer->isServerError($pex)) {
                             $Emailed = self::SENT_FAIL;
                         } else {
                             $Emailed = self::SENT_ERROR;

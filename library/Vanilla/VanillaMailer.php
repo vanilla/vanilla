@@ -65,7 +65,7 @@ class VanillaMailer extends \PHPMailer {
      * a server error instead of a "critical" error.
      * Server error means that we can try to resend the email.
      */
-    public function isServerError(phpmailerException $e) {
+    public function isServerError(\phpmailerException $e) {
         $serverErrorMessages = [
             'connect_host',
             'data_not_accepted',

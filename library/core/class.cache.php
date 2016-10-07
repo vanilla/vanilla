@@ -692,7 +692,7 @@ abstract class Gdn_Cache {
             $ActiveOptions = c($OptionKey, array());
         }
 
-        if (is_null($Option) || !array_key_exists($Option, $ActiveOptions)) {
+        if (is_null($Option)) {
             return $ActiveOptions;
         }
 

@@ -4,7 +4,7 @@
     <?php echo sprintf(t('You must register your application with %s for this plugin to work.'), t('Google+')); ?>
 </div>
 <div class="padded">
-    <?php echo anchor(sprintf(t('How to set up %s.'), t('Google+ Social Connect')), 'http://docs.vanillaforums.com/addons/social/googleplus/', array('target' => '_blank')); ?>
+    <?php echo anchor(sprintf(t('How to set up %s.'), t('Google+ Social Connect')), 'http://docs.vanillaforums.com/help/addons/social/googleplus/', array('target' => '_blank')); ?>
 </div>
 <?php
 $Cf = $this->ConfigurationModule;

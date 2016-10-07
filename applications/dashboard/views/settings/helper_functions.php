@@ -106,11 +106,13 @@ function getTutorials($tutorialCode = '') {
 }
 
 function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter) {
+    $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
+    $addonInfo = $capitalCaseSheme->convertArrayKeys($addonInfo, ['RegisterPermissions']);
 
-    $Version = Gdn_Format::display(val('Version', $addonInfo, val('version', $addonInfo, '')));
-    $ScreenName = Gdn_Format::display(val('Name', $addonInfo, val('name', $addonInfo, $addonName)));
+    $Version = Gdn_Format::display(val('Version', $addonInfo, ''));
+    $ScreenName = Gdn_Format::display(val('Name', $addonInfo, $addonName));
 
-    $SettingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, val('settingsUrl', $addonInfo, '')) : '';
+    $SettingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, '') : '';
     $SettingsPopupClass = 'js-modal';
 
     if (!val('UsePopupSettings', $addonInfo, true)) {
@@ -128,11 +130,11 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
             $authors[] = $Author;
         }
     }
-    foreach (val('authors', $addonInfo, []) as $author) {
-        if (val('homepage', $author)) {
-            $authors[] = anchor(val('name', $author), val('homepage', $author));
+    foreach (val('Authors', $addonInfo, []) as $author) {
+        if (val('Homepage', $author)) {
+            $authors[] = anchor(val('Name', $author), val('Homepage', $author));
         } else {
-            $authors[] = val('name', $author);
+            $authors[] = val('Name', $author);
         }
     }
     $NewVersion = val('NewVersion', $addonInfo, '');
@@ -198,7 +200,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
                     $Info[] = anchor(t('Visit Site'), $PluginUrl);
                 }
 
-                if ($meta = val('meta', $addonInfo)) {
+                if ($meta = val('Meta', $addonInfo)) {
                     foreach ($meta as $key => $value) {
                         if (is_numeric($key)) {
                             $Info[] = $value;
@@ -226,7 +228,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
                 ?>
             </div>
         </div>
-        <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, val('description', $addonInfo, '')))); ?></div>
+        <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, ''))); ?></div>
     </div>
     <div class="media-right media-options">
         <?php if ($SettingsUrl != '') {

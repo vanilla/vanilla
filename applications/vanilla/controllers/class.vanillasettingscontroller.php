@@ -948,8 +948,10 @@ class VanillaSettingsController extends Gdn_Controller {
 
         if ($this->Request->isAuthenticatedPostBack(true)) {
             $tree = json_decode($this->Request->post('Subtree'), true);
-            $result = $this->CategoryModel->saveSubtree($tree, $this->Request->post('ParentID', -1));
-            $this->setData('Result', $result);
+            $this->CategoryModel->saveSubtree($tree, $this->Request->post('ParentID', -1));
+
+            $this->setData('Result', (count($this->CategoryModel->Validation->results()) === 0));
+            $this->setData('Validation', $this->CategoryModel->Validation->resultsArray());
         } else {
             throw new Gdn_UserException($this->Request->requestMethod().' is not allowed.', 405);
         }

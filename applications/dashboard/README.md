@@ -18,7 +18,11 @@ Once you have Homebrew, this will get everything else you need globally:
 $ brew install node
 
 $ brew install ruby
+```
 
+**Restart Terminal.**
+
+```sh
 $ gem install sass
 
 $ gem install scss-lint

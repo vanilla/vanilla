@@ -165,14 +165,17 @@ jQuery(document).ready(function($) {
                     resetCommentForm(btn);
                     clearCommentForm(btn);
 
-                    // If editing an existing comment, replace the appropriate row
-                    var existingCommentRow = $('#Comment_' + commentID);
+                    // If editing an existing comment, replace the appropriate row(s).
+                    // There is a small possibility that there are multiple time the same comment on the page
+                    var existingCommentRows = $('.ItemComment[id="Comment_' + commentID +'"]');
                     if (processedTargets) {
                         // Don't do anything with the data b/c it's already been handled by processTargets
-                    } else if (existingCommentRow.length > 0) {
-                        existingCommentRow.afterTrigger(json.Data);
-                        existingCommentRow.remove();
-                        $('#Comment_' + commentID).effect("highlight", {}, "slow");
+                    } else if (existingCommentRows.length > 0) {
+                        existingCommentRows.each(function(i, element) {
+                            $(element).afterTrigger(json.Data);
+                            $(element).remove();
+                            $(element).effect("highlight", {}, "slow");
+                        });
                     } else {
                         gdn.definition('LastCommentID', commentID, true);
                         // If adding a new comment, show all new comments since the page last loaded, including the new one.

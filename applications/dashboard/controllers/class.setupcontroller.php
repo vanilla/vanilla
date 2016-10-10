@@ -51,7 +51,7 @@ class SetupController extends DashboardController {
             throw new Gdn_UserException('Vanilla is installed!', 409);
         }
 
-        if (!$this->_CheckPrerequisites()) {
+        if (!$this->_checkPrerequisites()) {
             $this->View = 'prerequisites';
         } else {
             $this->View = 'configure';
@@ -347,12 +347,5 @@ class SetupController extends DashboardController {
         }
 
         return $this->Form->errorCount() == 0 ? true : false;
-    }
-
-    /**
-     *
-     */
-    public function testUrlRewrites() {
-        die('ok');
     }
 }

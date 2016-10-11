@@ -69,7 +69,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
 
         $this->databasePrefix($this->Database->DatabasePrefix);
-        $this->setAlterTableThreshold(c('Database.AlterTableThreshold', 0));
+        $this->setAlterTableThreshold(5000000);
 
         $this->reset();
     }

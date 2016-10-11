@@ -124,8 +124,13 @@ class PostController extends VanillaController {
         if ($Category) {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
-            $this->ShowCategorySelector = false;
             $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
+            if (val('DisplayAs', $this->Category) == 'Discussions' && !$DraftID) {
+                $this->ShowCategorySelector = false;
+        } else {
+                // Get all our subcategories to add to the category if we are in a Header or Categories category.
+                $this->Context = CategoryModel::getSubtree($this->CategoryID);
+            }
         } else {
             $this->CategoryID = 0;
             $this->Category = null;
@@ -236,9 +241,11 @@ class PostController extends VanillaController {
                     }
                 }
 
-               // Make sure that the title will not be invisible after rendering
                 $Name = trim($this->Form->getFormValue('Name', ''));
-                if ($Name != '' && Gdn_Format::text($Name) == '') {
+                // Let's be super aggressive and disallow titles with no word characters in them!
+                $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
+
+                if (!$hasWordCharacter || ($Name != '' && Gdn_Format::text($Name) == '')) {
                     $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
                 } else {
                    // Trim the name.
@@ -251,7 +258,7 @@ class PostController extends VanillaController {
                         $DraftID = $this->DraftModel->save($FormValues);
                         $this->Form->setValidationResults($this->DraftModel->validationResults());
                     } else {
-                        $DiscussionID = $this->DiscussionModel->save($FormValues, $this->CommentModel);
+                        $DiscussionID = $this->DiscussionModel->save($FormValues);
                         $this->Form->setValidationResults($this->DiscussionModel->validationResults());
 
                         if ($DiscussionID > 0) {
@@ -776,7 +783,7 @@ class PostController extends VanillaController {
 //                        $this->RedirectUrl = Gdn::request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", true);
       //                     } else {
       //                        // Make sure to load all new comments since the page was last loaded by this user
-      //                              if ($DisplayNewCommentOnly)
+//								if ($DisplayNewCommentOnly)
                             $this->Offset = $this->CommentModel->GetOffset($CommentID);
                             $Comments = $this->CommentModel->GetIDData($CommentID, array('Slave' => false));
                             $this->setData('Comments', $Comments);
@@ -899,7 +906,6 @@ class PostController extends VanillaController {
     */
     public function initialize() {
         parent::initialize();
-        $this->addModule('NewDiscussionModule');
         
         $this->CssClass = 'NoPanel';
     }
@@ -925,6 +931,13 @@ class PostController extends VanillaController {
 
        // Mark the notification as in progress.
         $this->DiscussionModel->setField($DiscussionID, 'Notified', ActivityModel::SENT_INPROGRESS);
+
+        $discussionType = val('Type', $Discussion);
+        if ($discussionType) {
+            $Code = "HeadlineFormat.Discussion.{$discussionType}";
+        } else {
+            $Code = 'HeadlineFormat.Discussion';
+        }
 
         $HeadlineFormat = t($Code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
         $Category = CategoryModel::categories(val('CategoryID', $Discussion));
@@ -986,7 +999,7 @@ function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
 
         $Result = ' <b>'.t($LabelCode)."</b> <ul class=\"$CssClass\">";
         foreach ($ListOptions as $Value => $Code) {
-            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
         }
         $Result .= '</ul>';
         return $Result;

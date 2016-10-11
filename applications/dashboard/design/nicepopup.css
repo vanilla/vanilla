@@ -200,8 +200,6 @@ div.Popup .Footer input.Button {
     -moz-border-radius: .5ex;
     -webkit-border-radius: .5ex;
     background: #3fbcf3;
-    background: -webkit-gradient(linear, center bottom, center top, from(#3fbcf3), to(#aee7fe));
-    background: -moz-linear-gradient(top, #aee7fe, #3fbcf3);
     -pie-background: linear-gradient(top, #aee7fe, #3fbcf3);
     background: linear-gradient(top, #aee7fe, #3fbcf3);
     border: 1px solid #0F7FE6;
@@ -216,8 +214,6 @@ div.Popup .Footer input.Button {
 
 .CancelButton {
     border-color: #919191;
-    background: -webkit-gradient(linear, center bottom, center top, from(#D1D1D1), to(#F1F1F1));
-    background: -moz-linear-gradient(top, #F1F1F1, #D1D1D1);
     -pie-background: linear-gradient(top, #F1F1F1, #D1D1D1);
     background: linear-gradient(top, #F1F1F1, #D1D1D1);
     color: #414141;

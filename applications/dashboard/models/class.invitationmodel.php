@@ -52,7 +52,7 @@ class InvitationModel extends Gdn_Model {
      * @return Gdn_DataSet
      * @throws Exception
      */
-    public function getByUserID($UserID, $InvitationID = '', $Limit = 30, $Offset = 0) {
+    public function getByUserID($UserID, $InvitationID = '', $Limit = 50, $Offset = 0) {
         $this->SQL->select('i.*')
             ->select('u.Name', '', 'AcceptedName')
             ->from('Invitation i')
@@ -193,7 +193,14 @@ class InvitationModel extends Gdn_Model {
                 ->setTitle(sprintf(t('Join %s'), $AppTitle));
 
             $Email->setEmailTemplate($emailTemplate);
-            $Email->send();
+
+            try {
+                $Email->send();
+            } catch (Exception $e) {
+                if (debug()) {
+                    throw $e;
+                }
+            }
         }
     }
 

@@ -23,7 +23,7 @@
                                 '</span>';
 
                             echo Bullet(' ');
-                            echo ' <span clsss="MItem-DateInserted">'.
+                            echo ' <span class="MItem-DateInserted">'.
                                 Gdn_Format::date($Row['DateInserted'], 'html').
                                 '</span> ';
 
@@ -79,8 +79,9 @@
 echo '<div class="PageControls Bottom">';
 
 $RecordCount = $this->data('RecordCount');
-if ($RecordCount)
+if ($RecordCount) {
     echo '<span class="Gloss">'.plural($RecordCount, '%s result', '%s results').'</span>';
+}
 
 PagerModule::write(array('Wrapper' => '<div %1$s>%2$s</div>'));
 

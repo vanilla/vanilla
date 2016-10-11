@@ -5,7 +5,10 @@
  * @license GPLv2
  */
 
-namespace Vanilla;
+namespace VanillaTests\Library\Vanilla;
+
+use Vanilla\AddonManager;
+use Vanilla\Addon;
 
 
 class AddonManagerTest extends \PHPUnit_Framework_TestCase {

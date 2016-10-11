@@ -16,14 +16,18 @@ if (!$CancelUrl) {
     echo '<div class="FormWrapper">';
     echo $this->Form->open();
     echo $this->Form->errors();
-    
+
     $this->fireEvent('BeforeFormInputs');
 
     if ($this->ShowCategorySelector === true) {
+        $options = ['Value' => val('CategoryID', $this->Category), 'IncludeNull' => true];
+        if ($this->Context) {
+            $options['Context'] = $this->Context;
+        }
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';
-        echo $this->Form->categoryDropDown('CategoryID', array('Value' => val('CategoryID', $this->Category), 'IncludeNull' => true));
+        echo $this->Form->categoryDropDown('CategoryID', $options);
         echo '</div>';
         echo '</div>';
     }
@@ -36,7 +40,7 @@ if (!$CancelUrl) {
     $this->fireEvent('BeforeBodyInput');
 
     echo '<div class="P">';
-    echo $this->Form->bodyBox('Body', array('Table' => 'Discussion', 'FileUpload' => true));
+    echo $this->Form->bodyBox('Body', array('Table' => 'Discussion', 'FileUpload' => true, 'tabindex' => 1));
     echo '</div>';
 
     $Options = '';
@@ -58,7 +62,7 @@ if (!$CancelUrl) {
 
     echo '<div class="Buttons">';
     $this->fireEvent('BeforeFormButtons');
-    echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button Primary DiscussionButton'));
+    echo $this->Form->button((property_exists($this, 'Discussion')) ? 'Save' : 'Post Discussion', array('class' => 'Button Primary DiscussionButton', 'tabindex' => 1));
     if (!property_exists($this, 'Discussion') || !is_object($this->Discussion) || (property_exists($this, 'Draft') && is_object($this->Draft))) {
         echo $this->Form->button('Save Draft', array('class' => 'Button DraftButton'));
     }

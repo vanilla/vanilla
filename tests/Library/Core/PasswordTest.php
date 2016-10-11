@@ -116,8 +116,8 @@ class PasswordTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($pw->checkPassword($password, $hash, 'Vanilla'));
 
         // Make sure the Phpass can verify the passwords.
-        $this->assertTrue($pw->checkPhpass($password, $hashPortable));
-        $this->assertTrue($pw->checkPhpass($password, $hashPhpass));
-        $this->assertTrue($pw->checkPhpass($password, $hash)); // mimics back port
+        $this->assertTrue($pw->checkPassword($password, $hashPortable, 'Phpass'));
+        $this->assertTrue($pw->checkPassword($password, $hashPhpass, 'Phpass'));
+        $this->assertTrue($pw->checkPassword($password, $hash, 'Phpass')); // mimics back port
     }
 }

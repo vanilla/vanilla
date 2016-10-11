@@ -1,0 +1,285 @@
+// Media Item
+//
+// Our media items are used for both addons and theme info. They use the same markup, with the
+// addition of `.media-callout` to the wrapper for callouts and `.media-addon` for addons. Like the `.btn` class, the
+// base `.media` class is extensible and shouldn't be used alone.
+//
+// Styleguide 6.
+
+// Media Item
+//
+// The media item.
+//
+// .media-callout - used for callouts
+// .media-addon - used for addons
+// .media-sm - used for user cells in tables
+//
+// Markup:
+// <div class="media {{modifier_class}}">
+//   <div class="media-left">
+//     <div class="media-image-wrap">
+//       <img src="./public/resources/images/snow-dog.jpg">
+//     </div>
+//   </div>
+//   <div class="media-body">
+//     <div class="media-heading">
+//       <div class="media-title">Media Title</div>
+//       <div class="info">
+//         Created by Becky Van Bussel<span class="spacer">•</span>Version 1.0.0
+//       </div>
+//     </div>
+//     <div class="media-description">This is a description of the media item we're displaying here.</div>
+//   </div>
+//   <div class="media-right media-options">
+//     <div class="btn-wrap">
+//       <a href="#" class="btn btn-icon-border" aria-label="Settings for Media Title">
+//         <svg class="icon  icon-svg-settings" viewBox="0 0 17 17">
+//           <use xlink:href="#settings"></use>
+//         </svg>
+//       </a>
+//     </div>
+//     <div id="media-item-toggle">
+//       <span class="toggle-wrap toggle-wrap-on">
+//         <a href="#" aria-label="Disable Media Title">
+//           <div class="toggle-well"></div>
+//           <div class="toggle-slider"></div>
+//         </a>
+//       </span>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 6.1.
+
+.media {
+  margin-bottom: 0;
+
+  .info {
+    font-size: $font-size-tables;
+    font-weight: 300;
+  }
+
+  .flag {
+    margin-top: -.0625rem;
+    margin-bottom: $spacer / 2;
+  }
+
+  .media-title {
+    margin-bottom: $spacer * (2 / 3);
+  }
+
+  .media-description {
+    font-weight: 300;
+  }
+
+  .media-image {
+    height: 10rem;
+    border: 1px solid $border-color;
+  }
+}
+
+.media-addon {
+  .media-image-wrap {
+    display: flex;
+    align-items: center;
+    @include image-wrap();
+
+    @include media-breakpoint-down(md) {
+      @include image-wrap($spacer * 3.5, $spacer * 3.5);
+    }
+  }
+}
+
+.media-addon,
+.media-callout {
+  @extend .row;
+  border-bottom: 1px solid $border-color;
+  padding: $spacer $padding-row;
+
+  .media-title {
+    font-weight: 500;
+    margin-bottom: $spacer / 4;
+  }
+
+}
+
+.media-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-self: center;
+
+  > *:not(:first-child) {
+    margin-left: $spacer * 2;
+  }
+
+  @include media-breakpoint-down(md) {
+    flex-direction: column-reverse;
+    align-items: center;
+    align-self: flex-start;
+
+    > *:not(:first-child) {
+      margin-left: 0;
+    }
+
+    > *:not(:last-child) {
+      margin-top: $spacer / 2;
+    }
+  }
+}
+
+//
+// Alignment
+//
+
+.media-right {
+  padding-left: $spacer;
+}
+
+.media-left {
+  padding-right: $spacer;
+}
+
+
+//
+// Media item
+//
+
+// Wrapper for title if our title has some info related to it.
+.media-heading {
+  margin-top: 0;
+  margin-bottom: $spacer / 2;
+}
+
+.media-description {
+  line-height: $line-height-lg;
+}
+
+// Media Callout
+//
+// A media callout is a media item of certain prominence. Usually appears at the top of the page as a kind of
+// "current selection" marker. See the theme settings pages for this.
+//
+// PHP rendering helper: ThemeInfoModule
+//
+// .media-callout-grey-bg - Makes the background grey.
+//
+// Markup:
+// <div class="media media-callout {{modifier_class}}">
+//   <div class="media-left">
+//     <div class="media-image-wrap">
+//       <img src="./public/resources/images/dirty-rodent.jpg" alt="+Baseline">
+//     </div>
+//   </div>
+//   <div class="media-body">
+//     <div class="flag">Current Theme</div>
+//     <div class="media-title">
+//       <h3 class="media-heading theme-name">+Baseline</h3>
+//       <div class="info">
+//         <span class="media-meta author">Created by <a href="#">Mark O'Sullivan</a></span>
+//         <span class="spacer">|</span><span class="media-meta version">Version 2.2.112.3</span>
+//       </div>
+//     </div>
+//     <div class="media-description">
+//       <div class="description">The default theme for Vanilla.</div>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 6.2.
+
+.media-callout {
+
+  // Counteracts the padding placed on the grid-item in the media-left
+  padding-left: 0;
+
+
+  .media-left {
+    @include grid-item();
+  }
+
+  &.media-callout-grey-bg {
+    background-color: $grey-lighter;
+  }
+
+  .media-left img {
+    display: block;
+    width: 100%;
+  }
+
+  .media-image-wrap {
+    position: relative;
+    @include image-wrap-border(0);
+  }
+
+  // For the theme info popups, make the image half the width of the container.
+  .modal & .media-left {
+    @extend .col-xs-12;
+  }
+}
+
+// Small Media Item
+//
+// Small media item for table or list. It works best when both the title and info in the content are one line.
+//
+// Markup:
+// <div class="media media-sm">
+//   <div class="media-left">
+//     <div class="media-image-wrap">
+//       <a href="#">
+//         <img src="./public/resources/images/snow-dog.jpg">
+//       </a>
+//   </div>
+//   </div>
+//   <div class="media-body">
+//     <div class="media-title">
+//       <a href="#">Small Media Title</a>
+//     </div>
+//     <div class="info">Small Media Info</div>
+//   </div>
+// </div>
+//
+// Styleguide 6.3.
+
+.media-sm {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  .media-left {
+    padding-right: $spacer / 2;
+    height: to-rem(30);
+  }
+
+  .media-image-wrap {
+    display: inline-block;
+    @include image-wrap(to-rem(30), to-rem(30), .0625rem);
+  }
+
+  .media-image-wrap-no-border {
+    display: inline-block;
+    @include image-wrap(to-rem(30), to-rem(30), .0625rem, false, transparent);
+    margin-right: $spacer / 2;
+  }
+
+  .media-title {
+    margin-bottom: to-rem(30) - $font-size-tables - $font-size-sm;
+    font-size: $font-size-tables;
+    line-height: 1;
+
+    a {
+      color: $gray-dark;
+      transition: color 200ms;
+
+      &:hover {
+        text-decoration: none;
+        color: $brand-primary;
+      }
+    }
+  }
+
+  .info {
+    font-size: $font-size-sm;
+    line-height: 1;
+    color: $grey;
+  }
+}

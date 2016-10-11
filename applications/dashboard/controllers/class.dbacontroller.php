@@ -62,7 +62,6 @@ class DbaController extends DashboardController {
         }
 
         $this->setData('Title', t('Recalculate Counts'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -82,7 +81,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix missing permission records after import");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -100,7 +98,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix category tree from an import.");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -120,7 +117,6 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', "Fix url codes for $Table.$Column");
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -155,7 +151,6 @@ class DbaController extends DashboardController {
         }
 
         $this->setData('Title', t('Fix Invalid InsertUserID'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
@@ -166,13 +161,12 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
-            if (ValidateRequired($this->Form->getFormValue('DefaultUserRole'))) {
+            if (validateRequired($this->Form->getFormValue('DefaultUserRole'))) {
                 $this->Model->fixUserRole($this->Form->getFormValue('DefaultUserRole'));
                 $this->setData('CompletedFix', true);
             }
         }
 
-        $this->addSideMenu();
         $this->render();
     }
 
@@ -189,10 +183,14 @@ class DbaController extends DashboardController {
 
         $this->setData('Title', 'Reset all role permissions');
         $this->_setJob($this->data('Title'));
-        $this->addSideMenu();
         $this->render('Job');
     }
 
+    /**
+     * Set a job.
+     *
+     * @param string $Name
+     */
     protected function _setJob($Name) {
         $Args = array_change_key_case($this->ReflectArgs);
         $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);

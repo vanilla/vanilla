@@ -1,0 +1,103 @@
+// Toasters
+//
+// Toasters.
+//
+// Styleguide 13.
+
+// Note: InformMessages are "growl" style messages that appear in a fixed position on the page to notify users of things like drafts being saved, etc.
+
+* html .InformMessages {
+  position: absolute;
+  width: 100%;
+  top: auto;
+  left: $spacer;
+  overflow: visible;
+}
+
+.InformMessages {
+  text-align: left;
+  position: fixed;
+  top: auto;
+  bottom: $spacer;
+  left: $spacer;
+  z-index: 200;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: $font-size-sm;
+  display: block;
+  width: auto;
+
+  .InformWrapper {
+    display: block;
+  }
+
+  .InformMessage {
+    color: $white;
+    text-shadow: 0 1px 1px $black;
+    text-align: left;
+    border-radius: $border-radius;
+    background: rgba(0,0,0,.7);
+    border: 0;
+    width: auto;
+    max-width: 400px;
+    margin: ($spacer / 2) auto 0;
+    padding: ($spacer / 2) $spacer;
+    display: inline-block;
+    zoom: 1;
+    position: relative;
+
+    &:hover {
+      background: rgba(0,0,0,.8);
+    }
+
+    a {
+      color: $white;
+      text-decoration: underline;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .Close {
+      border: 0;
+      background: transparent;
+      border-top-right-radius: 2px;
+      color: #ddd;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+      height: 12px;
+      width: 12px;
+      line-height: 1;
+      text-decoration: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      span {
+        display: inline;
+      }
+
+      &:hover {
+        background: $black;
+        color: $white;
+      }
+    }
+
+    &:hover .Close {
+      display: block;
+    }
+
+    // Inform Sprites
+
+    .Icon {
+      display: none;
+    }
+
+    .InformSprite {
+      display: none;
+    }
+  }
+}

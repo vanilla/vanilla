@@ -1,61 +1,16 @@
-<?php
+<?php if (!defined('APPLICATION')) exit();
+// This view is deprecated as of 2016-09-30.
+deprecated('vanilla/categories/subtree view');
 
-$CategoryID = $this->data('Category.CategoryID');
-if (!$CategoryID) {
-    return;
+if (isset($this->CategoryModel) && $this->CategoryModel instanceof CategoryModel) {
+    $childCategories = $this->data('CategoryTree', []);
+    $this->CategoryModel->joinRecent($childCategories);
+    if ($childCategories) {
+        include($this->fetchViewLocation('helper_functions', 'categories', 'vanilla'));
+        if (c('Vanilla.Categories.Layout') === 'table') {
+            writeCategoryTable($childCategories);
+        } else {
+            writeCategoryList($childCategories);
+        }
+    }
 }
-
-$SubCategories = CategoryModel::getChildren($CategoryID);
-if (empty($SubCategories)) {
-    return;
-}
-
-require_once $this->fetchViewLocation('helper_functions', 'categories', 'vanilla');
-
-?>
-<h2 class="ChildCategories-Title Hidden"><?php echo t('Child Categories'); ?></h2>
-<ul class="DataList ChildCategoryList">
-    <?php
-    foreach ($SubCategories as $Row):
-        if (!$Row['PermsDiscussionsView'] || $Row['Archived'])
-            continue;
-
-        $Row['Depth'] = 1;
-        ?>
-        <li id="Category_<?php echo $Row['CategoryID']; ?>" class="Item Category">
-            <div class="ItemContent Category">
-                <h3 class="CategoryName TitleWrap"><?php
-                    echo anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
-                    Gdn::controller()->EventArguments['Category'] = $Row;
-                    Gdn::controller()->fireEvent('AfterCategoryTitle');
-                    ?></h3>
-
-                <?php if ($Row['Description']): ?>
-                    <div class="CategoryDescription">
-                        <?php echo $Row['Description']; ?>
-                    </div>
-                <?php endif; ?>
-
-                <div class="Meta Hidden">
-               <span class="MItem MItem-Count DiscussionCount"><?php
-                   echo plural(
-                       $Row['CountDiscussions'],
-                       '%s discussion',
-                       '%s discussions',
-                       Gdn_Format::BigNumber($Row['CountDiscussions'], 'html'));
-                   ?></span>
-
-               <span class="MItem MItem-Count CommentCount"><?php
-                   echo plural(
-                       $Row['CountComments'],
-                       '%s comment',
-                       '%s comments',
-                       Gdn_Format::BigNumber($Row['CountComments'], 'html'));
-                   ?></span>
-                </div>
-            </div>
-        </li>
-    <?php
-    endforeach;
-    ?>
-</ul>

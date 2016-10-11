@@ -18,6 +18,8 @@ if (!isset($Explicit)) {
     $Explicit = false;
 }
 
+$captureOnly = isset($Structure) && val('CaptureOnly', $Structure);
+
 $Database = Gdn::database();
 $SQL = $Database->sql();
 $Construct = $Database->structure();
@@ -62,6 +64,7 @@ $PhotoIDExists = $Construct->columnExists('PhotoID');
 $PhotoExists = $Construct->columnExists('Photo');
 $UserExists = $Construct->tableExists();
 $ConfirmedExists = $Construct->columnExists('Confirmed');
+$AllIPAddressesExists = $Construct->columnExists('AllIPAddresses');
 
 $Construct
     ->primaryKey('UserID')
@@ -88,7 +91,6 @@ $Construct
     ->column('DateFirstVisit', 'datetime', true)
     ->column('DateLastActive', 'datetime', true, 'index')
     ->column('LastIPAddress', 'ipaddress', true)
-    ->column('AllIPAddresses', 'varchar(100)', true)
     ->column('DateInserted', 'datetime', false, 'index')
     ->column('InsertIPAddress', 'ipaddress', true)
     ->column('DateUpdated', 'datetime', true)
@@ -142,6 +144,14 @@ if (!$SystemUserID) {
     }
 }
 
+// UserIP Table
+$Construct->table('UserIP')
+    ->column('UserID', 'int', false, 'primary')
+    ->column('IPAddress', 'varbinary(16)', false, 'primary')
+    ->column('DateInserted', 'datetime', false)
+    ->column('DateUpdated', 'datetime', false)
+    ->set($Explicit, $Drop);
+
 // UserRole Table
 $Construct->table('UserRole');
 
@@ -155,34 +165,27 @@ $Construct
 // Fix old default roles that were stored in the config and user-role table.
 if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
     $types = $RoleModel->getAllDefaultRoles();
-    if (c('Garden.Registration.ApplicantRoleID')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_APPLICANT),
-            array('RoleID' => $types[RoleModel::TYPE_APPLICANT]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ApplicantRoleID');
-    }
 
-    if (c('Garden.Registration.DefaultRoles')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_MEMBER),
-            array('RoleID' => $types[RoleModel::TYPE_MEMBER]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.DefaultRoles');
-    }
+    // Mapping of legacy config keys to new role types.
+    $legacyRoleConfig = [
+        'Garden.Registration.ApplicantRoleID' => RoleModel::TYPE_APPLICANT,
+        'Garden.Registration.ConfirmEmailRole' => RoleModel::TYPE_UNCONFIRMED,
+        'Garden.Registration.DefaultRoles' => RoleModel::TYPE_MEMBER
+    ];
 
-    if (c('Garden.Registration.ConfirmEmailRole')) {
-        $SQL->replace(
-            'Role',
-            array('Type' => RoleModel::TYPE_UNCONFIRMED),
-            array('RoleID' => $types[RoleModel::TYPE_UNCONFIRMED]),
-            true
-        );
-//      RemoveFromConfig('Garden.Registration.ConfirmEmailRole');
+    // Loop through our old config values and update their associated roles with the proper type.
+    foreach ($legacyRoleConfig as $roleConfig => $roleType) {
+        if (c($roleConfig) && !empty($types[$roleType])) {
+            $SQL->update('Role')
+                ->set('Type', $roleType)
+                ->whereIn('RoleID', $types[$roleType])
+                ->put();
+
+            if (!$captureOnly) {
+                // No need for this anymore.
+                removeFromConfig($roleConfig);
+            }
+        }
     }
 
     $guestRoleIDs = Gdn::sql()->getWhere('UserRole', array('UserID' => 0))->resultArray();
@@ -413,15 +416,15 @@ $Construct
     ->set($Explicit, $Drop);
 
 if (isset($ActivityIndexes['IX_Activity_NotifyUserID'])) {
-    $Construct->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
+    $SQL->query("drop index IX_Activity_NotifyUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_ActivityUserID'])) {
-    $Construct->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_ActivityUserID on {$Px}Activity");
 }
 
 if (isset($ActivityIndexes['FK_Activity_RegardingUserID'])) {
-    $Construct->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
+    $SQL->query("drop index FK_Activity_RegardingUserID on {$Px}Activity");
 }
 
 if (!$EmailedExists) {
@@ -475,7 +478,7 @@ if (!$ActivityCommentExists && $CommentActivityIDExists) {
       select CommentActivityID, Story, 'Text', InsertUserID, DateInserted, InsertIPAddress
       from {$Px}Activity
       where CommentActivityID > 0";
-    $Construct->query($Q);
+    $SQL->query($Q);
     $SQL->delete('Activity', array('CommentActivityID >' => 0));
 }
 
@@ -570,7 +573,7 @@ $Construct->table('Message')
 $Prefix = $SQL->Database->DatabasePrefix;
 
 if ($PhotoIDExists && !$PhotoExists) {
-    $Construct->query("update {$Prefix}User u
+    $SQL->query("update {$Prefix}User u
    join {$Prefix}Photo p
       on u.PhotoID = p.PhotoID
    set u.Photo = p.Name");
@@ -636,7 +639,7 @@ if (!$FullNameColumnExists) {
         ->put();
 
     $Construct->table('Tag')
-        ->column('FullName', 'varchar(255)', false, 'index')
+        ->column('FullName', 'varchar(100)', false, 'index')
         ->set();
 }
 
@@ -777,6 +780,69 @@ $Construct
     ->column('UpdateIPAddress', 'ipaddress', true)
     ->set($Explicit, $Drop);
 
+// If the AllIPAddresses column exists, attempt to migrate legacy IP data to the UserIP table.
+if (!$captureOnly && $AllIPAddressesExists) {
+    $limit = 10000;
+    $resetBatch = 100;
+
+    // Grab the initial batch of users.
+    $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+        ->from('User')->where('AllIPAddresses is not null')->limit($limit)
+        ->get()->resultArray();
+
+    do {
+        $processedUsers = [];
+
+        // Iterate through the records of users with data needing to be migrated.
+        foreach ($legacyIPAddresses as $currentLegacy) {
+            // Pull out and format the relevant bits, where necessary.
+            $allIPAddresses = explode(',', $currentLegacy['AllIPAddresses']);
+            $dateLastActive = val('DateLastActive', $currentLegacy);
+            $insertIPAddress = val('InsertIPAddress', $currentLegacy);
+            $lastIPAddress = val('LastIPAddress', $currentLegacy);
+            $userID = val('UserID', $currentLegacy);
+
+            // If we have a LastIPAddress record, use it.  Give it a DateUpdated of the user's DateLastActive.
+            if (!empty($lastIPAddress)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $lastIPAddress,
+                    $dateLastActive
+                );
+            }
+
+            // Only save InsertIPAddress if it differs from LastIPAddress and is in AllIPAddresses (to avoid admin IPs).
+            if ($insertIPAddress !== $lastIPAddress && in_array($insertIPAddress, $allIPAddresses)) {
+                Gdn::userModel()->saveIP(
+                    $userID,
+                    $insertIPAddress
+                );
+            }
+
+            // Record the processed user's ID.
+            $processedUsers[] = $userID;
+
+            // Every X records (determined by $resetBatch), clear out the AllIPAddresses field for processed users.
+            if (count($processedUsers) > 0 && (count($processedUsers) % $resetBatch) === 0) {
+                $this->SQL->update('User')->set('AllIPAddresses', null)->whereIn('UserID', $processedUsers)
+                    ->limit(count($processedUsers))->put();
+            }
+        }
+
+        // Any stragglers that need to be wiped out?
+        if (count($processedUsers) > 0) {
+            $this->SQL->update('User')->set('AllIPAddresses', null)->where('UserID', $processedUsers)->limit(count($processedUsers))->put();
+        }
+
+        // Query the next batch of users with IP data needing to be migrated.
+        $legacyIPAddresses = $SQL->select(['UserID', 'AllIPAddresses', 'InsertIPAddress', 'LastIPAddress', 'DateLastActive'])
+            ->from('User')->where('AllIPAddresses is not null')->limit($limit)
+            ->get()->resultArray();
+    } while (count($legacyIPAddresses) > 0);
+
+    unset($allIPAddresses, $dateLastActive, $insertIPAddress, $lastIPAddress, $userID, $processedUsers);
+}
+
 // Save the current input formatter to the user's config.
 // This will allow us to change the default later and grandfather existing forums in.
 saveToConfig('Garden.InputFormatter', c('Garden.InputFormatter'));
@@ -788,12 +854,6 @@ $currentLocale = c('Garden.Locale');
 $canonicalLocale = Gdn_Locale::canonicalize($currentLocale);
 if ($currentLocale !== $canonicalLocale) {
     saveToConfig('Garden.Locale', $canonicalLocale);
-}
-
-// We need to undo cleditor's bad behavior for our reformed users.
-// If you still need to manipulate this, do it in memory instead (SAVE = false).
-if (!c('Garden.Html.SafeStyles')) {
-    removeFromConfig('Garden.Html.SafeStyles');
 }
 
 // We need to ensure that recaptcha is enabled if this site is upgrading from

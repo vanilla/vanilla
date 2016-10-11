@@ -164,6 +164,8 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
      * @deprecated Use {@link array_column()} instead.
      */
     function consolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
+        deprecated(__FUNCTION__, 'array_column');
+
         $Return = array();
         foreach ($Array as $Index => $AssociativeArray) {
             if (is_object($AssociativeArray)) {

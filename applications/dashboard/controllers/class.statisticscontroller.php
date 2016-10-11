@@ -46,7 +46,7 @@ class StatisticsController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Settings.Manage');
-        $this->addSideMenu('dashboard/statistics');
+        $this->setHighlightRoute('dashboard/statistics');
         //$this->addJsFile('statistics.js');
         $this->title(t('Vanilla Statistics'));
 
@@ -101,6 +101,9 @@ class StatisticsController extends DashboardController {
             if (!$ConfWritable) {
                 $AnalyticsEnabled = false;
             }
+
+            $this->Form->setFormValue('InstallationID', Gdn::installationID());
+            $this->Form->setFormValue('InstallationSecret', Gdn::installationSecret());
         }
 
         $this->setData('AnalyticsEnabled', $AnalyticsEnabled);
@@ -111,7 +114,14 @@ class StatisticsController extends DashboardController {
             Gdn::set('Garden.Analytics.Notify', null);
         }
 
-        $this->render();
+        $this->setData(
+            'FormView',
+            $this->data('AnalyticsEnabled') ? 'configuration' : 'disabled'
+        );
+
+        $this->render(
+            $this->deliveryType() === DELIVERY_TYPE_VIEW ? $this->data('FormView') : ''
+        );
     }
 
     /**

@@ -1269,12 +1269,16 @@ class ImportModel extends Gdn_Model {
      * @param $Path
      */
     protected function _LoadTableLocalInfile($Tablename, $Path) {
+        if (extension_loaded('mysqli') === false) {
+            throw new Exception('mysqli extension required for load data');
+        }
+
         $Tablename = Gdn::database()->DatabasePrefix.self::TABLE_PREFIX.$Tablename;
         $Path = Gdn::database()->connection()->quote($Path);
 
         Gdn::database()->query("truncate table $Tablename;");
 
-        $Sql = "load data local infile $Path into table $Tablename
+        $sql = "load data local infile $Path into table $Tablename
          character set utf8
          columns terminated by ','
          optionally enclosed by '\"'
@@ -1282,16 +1286,15 @@ class ImportModel extends Gdn_Model {
          lines terminated by '\\n'
          ignore 1 lines";
 
-        // We've got to use the mysql_* functions because PDO doesn't support load data local infile well.
-        $dblink = mysql_connect(c('Database.Host'), c('Database.User'), c('Database.Password'), false, 128);
-        mysql_select_db(c('Database.Name'), $dblink);
-        $Result = mysql_query($Sql, $dblink);
-        if ($Result === false) {
-            $Ex = new Exception(mysql_error($dblink));
-            mysql_close($dblink);
-            throw new $Ex;
+        // We've got to use the mysqli_* functions because PDO doesn't support load data local infile well.
+        $mysqli = new mysqli(c('Database.Host'), c('Database.User'), c('Database.Password'), c('Database.Name'), 128);
+        $result = $mysqli->query($sql);
+        if ($result === false) {
+            $ex = new Exception($mysqli->error);
+            $mysqli->close();
+            throw new $ex;
         }
-        mysql_close($dblink);
+        $mysqli->close();
     }
 
     /**
@@ -2171,13 +2174,15 @@ class ImportModel extends Gdn_Model {
      * @param string $Path The path to the CSV.
      * @param bool $skipHeader Whether the CSV contains a header row.
      * @param int $chunk The number of records to chunk the imports to.
-     * @return bool
+     * @return bool Whether any records were found.
      */
     public function loadTableInsert($Tablename, $Path, $skipHeader = true, $chunk = 100) {
+        $result = false;
+
         // Get the column count of the table.
         $St = Gdn::structure();
         $St->get(self::TABLE_PREFIX.$Tablename);
-        $ColumnCount = count($St->Columns());
+        $ColumnCount = count($St->columns());
         $St->reset();
 
         ini_set('auto_detect_line_endings', true);
@@ -2205,6 +2210,7 @@ class ImportModel extends Gdn_Model {
         $Count = 0;
         while ($Row = self::FGetCSV2($fp)) {
             ++$Count;
+            $result = true;
             $Row = array_map('trim', $Row);
             // Quote the values in the row.
             $Row = array_map(array($PDO, 'quote'), $Row);
@@ -2228,7 +2234,7 @@ class ImportModel extends Gdn_Model {
                 $Inserts = '';
 
                 // Check for a timeout.
-                if ($this->Timer->ElapsedTime() > $this->MaxStepTime) {
+                if ($this->Timer->elapsedTime() > $this->MaxStepTime) {
                     // The step's taken too long. Save the file position.
                     $Pos = ftell($fp);
                     $this->Data['CurrentLoadPosition'] = $Pos;
@@ -2250,6 +2256,6 @@ class ImportModel extends Gdn_Model {
             $Sql = "insert $PxTablename values $Inserts";
             $this->query($Sql);
         }
-        return $Count;
+        return $result;
     }
 }

@@ -13,17 +13,13 @@ $CatList = '';
 $DoHeadings = c('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Category.Depth', 0);
 $ChildCategories = '';
-$this->EventArguments['NumRows'] = count($this->data('Categories'));
 
-//if (c('Vanilla.Categories.ShowTabs')) {
-////   $ViewLocation = Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'vanilla');
-////   include_once $ViewLocation;
-////   WriteFilterTabs($this);
-//   echo Gdn_Theme::Module('DiscussionFilterModule');
-//}
+$CategoryTree = $this->data('CategoryTree');
+$Categories = CategoryModel::flattenTree($CategoryTree);
+$this->EventArguments['NumRows'] = $Categories;
 
 echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
-foreach ($this->data('Categories') as $CategoryRow) {
+foreach ($Categories as $CategoryRow) {
     $Category = (object)$CategoryRow;
 
     $this->EventArguments['CatList'] = &$CatList;
@@ -52,6 +48,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
             </li>';
         } else {
             $LastComment = UserBuilder($Category, 'Last');
+            $rssIcon = val('DisplayAs', $Category) === 'Categories' ? '' : anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => t('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => t('RSS Feed')));
             $CatList .= '<li id="Category_'.$CategoryID.'" class="'.$CssClass.'">
                <div class="ItemContent Category">'
                 .'<div class="Options">'
@@ -65,7 +62,7 @@ foreach ($this->data('Categories') as $CategoryRow) {
                 .$Category->Description
                 .'</div>
                   <div class="Meta">
-                     <span class="MItem RSS">'.anchor(img('applications/dashboard/design/images/rss.gif', array('alt' => T('RSS Feed'))), '/categories/'.$Category->UrlCode.'/feed.rss', '', array('title' => T('RSS Feed'))).'</span>
+                     <span class="MItem RSS">'.$rssIcon.'</span>
                      <span class="MItem DiscussionCount">'.
                      sprintf(PluralTranslate($Category->CountDiscussions, '%s discussion html', '%s discussions html', t('%s discussion'), t('%s discussions')), BigPlural($Category->CountDiscussions, '%s discussion'))
                      .'</span>
@@ -82,8 +79,14 @@ foreach ($this->data('Categories') as $CategoryRow) {
             }
             // If this category is one level above the max display depth, and it
             // has children, add a replacement string for them.
-            if ($MaxDisplayDepth > 0 && $Category->Depth == $MaxDisplayDepth - 1 && $Category->TreeRight - $Category->TreeLeft > 1)
+            if (
+                !in_array($Category->DisplayAs, ['Flat'])
+                && $MaxDisplayDepth > 0
+                && $Category->Depth == $MaxDisplayDepth - 1
+                && $Category->TreeRight - $Category->TreeLeft > 1
+            ) {
                 $CatList .= '{ChildCategories}';
+            }
 
             $CatList .= '</div>
                </div>
@@ -93,8 +96,9 @@ foreach ($this->data('Categories') as $CategoryRow) {
 }
 // If there are any remaining child categories that have been collected, do
 // the replacement one last time.
-if ($ChildCategories != '')
+if ($ChildCategories != '') {
     $CatList = str_replace('{ChildCategories}', '<span class="ChildCategories">'.Wrap(t('Child Categories:'), 'b').' '.$ChildCategories.'</span>', $CatList);
+}
 
 echo $CatList;
 ?>

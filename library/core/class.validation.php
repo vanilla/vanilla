@@ -129,7 +129,7 @@ class Gdn_Validation {
         $this->_SchemaRules = array();
 
         foreach ($this->_Schema as $Field => $Properties) {
-            if (is_scalar($Properties)) {
+            if (is_scalar($Properties) || $Properties === null) {
                 // Some code passes a record as a schema so account for that here.
                 $Properties = array(
                     'AutoIncrement' => false,

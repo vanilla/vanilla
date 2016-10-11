@@ -1,0 +1,62 @@
+// Cards
+//
+// Find the card styling here.
+//
+// Styleguide 12.
+
+.card {
+  .list-group-item {
+    font-weight: 500;
+    background-color: $grey-lighter;
+
+    &:hover {
+      background-color: lighten($grey-lighter, 1%);
+    }
+
+    .icon {
+      float: right;
+    }
+  }
+
+  svg {
+    position: relative;
+    width: $font-size-base;
+  }
+
+  .media-title {
+    margin-bottom: $spacer / 4;
+
+    a {
+      color: $grey-dark;
+    }
+  }
+
+  .media-sm {
+    .media-image-wrap {
+      @include image-wrap();
+    }
+
+    .media-left {
+      padding-right: $spacer;
+    }
+  }
+
+  .media {
+    align-items: flex-start;
+  }
+}
+
+.card-user {
+  .card-footer {
+    border-top: 0;
+    padding: $spacer * 1.25;
+  }
+}
+
+.card-footer {
+  text-align: center;
+}
+
+.drop {
+  z-index: 1005;
+}

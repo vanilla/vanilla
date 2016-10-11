@@ -15,7 +15,7 @@ $this->fireEvent('BeforeCommentForm');
                 echo "<div class=\"Buttons\">\n";
                 $this->fireEvent('BeforeFormButtons');
                 echo anchor(t('Cancel'), '/', 'Button Cancel').' ';
-                echo $this->Form->button('Save Comment', array('class' => 'Button Primary CommentButton', 'tabindex' => 2));
+                echo $this->Form->button('Save Comment', array('class' => 'Button Primary CommentButton', 'tabindex' => 1));
                 $this->fireEvent('AfterFormButtons');
                 echo "</div>\n";
                 echo $this->Form->close();

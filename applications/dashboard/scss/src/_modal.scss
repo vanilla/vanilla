@@ -1,0 +1,267 @@
+// Modals
+//
+// Styleguide 10.
+
+// Modal Parsing
+//
+// We parse the body for an h1 element and put it in the header, and if there's a `.js-modal-footer` element, we add it
+// to the modal footer.
+//
+// Markup:
+// <a href="./public/resources/pages/example-modal.json" class="js-modal">
+//   I'll render the data from the example modal json file in a popup
+// </a>
+//
+// Styleguide 10.1.
+
+// Modal Form Parsing
+//
+// We check the body for a form and add the form buttons into the footer and the h1 into the header.
+//
+// Markup:
+// <a href="./public/resources/pages/example-modal-form.json" class="js-modal">
+//   I'll render the data from the example modal form json file in a popup
+// </a>
+//
+// Styleguide 10.1.1.
+
+// Modal Sizes and Placement
+//
+// You can choose different sizes and placements for you modals. The default leaves 3% of the viewport height at the
+// top and bottom of the page. `.modal-center` leaves 25% at the top and bottom of the page. Smaller modals are good
+// for confirm-type messages and can make short settings pages look less awkward.
+//
+// .modal-sm - Small modal
+// .modal-md - Medium modal
+// .modal-center - A modal more vertically centered.
+//
+// Markup:
+// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-content='{"cssClass":"{{modifier_class}}"}'>
+//   Click me!
+// </a>
+//
+// Styleguide 10.2.
+
+// Modal Types
+//
+// There are two modal types over the default modal:
+//
+// `noheader`: A modal without a header <br>
+// `confirm`: A modal that navigates to the url if the user confirms and cancels the navigation if the user declines
+//
+// Styleguide 10.4.
+
+// Modal Without a Header
+//
+// This modal won't parse the content for an h1 and add it to the top. The close icon will appear over the modal
+// content.
+//
+// Markup:
+// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-modal-type="noheader">
+//   Headless
+// </a>
+//
+// Styleguide 10.4.1.
+
+// Modal Confirm
+//
+// This modal navigates to the url if the user confirms and cancels the navigation if the user declines. It's often
+// paired with `.js-hijack` to delete content at the given endpoint. By default, the confirm modal has the `.modal-sm`
+// class attached to it, but this can be overridden.
+//
+// Markup:
+// <a href="#" class="js-modal" data-modal-type="confirm">
+//   I'm a confirm modal
+// </a>
+// <br>
+// <a href="#" class="js-modal-confirm">
+//   I'm also a confirm modal
+// </a>
+//
+// Styleguide 10.4.2.
+
+
+// Overriding Content
+//
+// As we saw in section 10.2., you can override the css class of a modal by setting the data content attribute.
+// You can also override the following settings: `title`, `body`, `footer` and `closeIcon`
+//
+// Styleguide 10.5.
+
+// Overriding Regular Modal Text
+//
+// Markup:
+// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-content='{"title":"A New Title","body":"<div class=\"padded\">A New Body</div>"}'>
+//   I've overriden the modal text
+// </a>
+//
+// Styleguide 10.5.1.
+
+// Overriding Modal Confirm Text
+//
+// Like regular modals, the text for a confirm modal can be overridden.
+//
+// Markup:
+// <a href="#" class="js-modal-confirm" data-content='{"title":"HEY YOU!", "body":"Do you really wanna do this?"}'>
+//   I've overridden the confirm modal text
+// </a>
+//
+// Styleguide 10.5.2.
+
+// When the modal fills the screen it has an even 3% on top and bottom
+// Centers the modal
+.modal-dialog {
+  margin: 3vh auto;
+  width: inherit;
+  max-width: 1024px;
+
+  &.modal-sm {
+    max-width: 400px;
+  }
+
+  &.modal-md {
+    max-width: 600px;
+  }
+
+  &.modal-center {
+    // We generally want this to appear more in the center of the screen
+    margin: 25vh auto;
+
+    .modal-body {
+      max-height: 50vh;
+    }
+  }
+}
+
+// Sets the maximum height of the entire modal to 94% of the screen height
+.modal-body {
+  max-height: calc(94vh - (2 * #{$header-block-height}));
+  overflow-y: auto;
+
+
+  padding-top: 0;
+  padding-bottom: 0;
+
+  .modal-confirm & {
+    padding: $spacer;
+  }
+}
+
+.modal-content {
+  border-radius: $border-radius;
+}
+
+.modal {
+  display: flex;
+  padding: 0 $spacer / 2;
+
+  &.fade .modal-dialog {
+    transition: opacity .2s ease-out;
+    transform: none;
+    opacity: 0;
+  }
+  &.in .modal-dialog {
+    transform: none;
+    -webkit-filter: none;
+    opacity: 1;
+  }
+}
+
+.modal-open {
+  .main-row,
+  .navbar {
+    -webkit-filter: blur(5px);
+  }
+
+  body & {
+    overflow: hidden;
+  }
+}
+
+.modal-footer,
+.modal-header {
+  padding: ((to-rem(60) - $control-height-rem) / 2) $spacer;
+}
+
+.modal-footer {
+  margin-top: to-rem(1);
+
+  &:empty {
+    display: none;
+  }
+
+  &::before {
+    position: absolute;
+    left: 0;
+    bottom: to-rem(61);
+    display: block;
+    width: 100%;
+    height: 1rem;
+    box-shadow: inset 0px -.75rem .75rem 0px rgba(255,255,255,1);
+    content: '';
+  }
+}
+
+.modal-close {
+  float: right;
+  padding: 0;
+
+  &:hover {
+    svg {
+      opacity: 1;
+    }
+  }
+
+  svg {
+    fill: $grey-dark;
+    opacity: 0.7;
+    height: to-rem(52) - 1.5rem;
+  }
+}
+
+button.close {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+.modal-no-header {
+  .modal-close {
+    position: absolute;
+    top: $spacer / 2;
+    right: $spacer / 2;
+  }
+}
+
+// The modal js wraps the modal body and footer in a form element to place the form buttons in the footer.
+// The side-effect of this is that some non-form elements can be wrapped in a form. This rather inelegant
+// list-un-reset can be applied to any lists appearing in a modal that are not actually part of the form and should
+// have list styling.
+.modal .list-un-reset {
+  ul,
+  ol {
+    margin-left: 15px;
+  }
+  ul li {
+    list-style: disc inside;
+  }
+  ol li {
+    list-style: decimal inside;
+  }
+  ul ul,
+  ol ul {
+    margin-left: 30px;
+    li {
+      list-style: circle inside;
+    }
+  }
+  ol ol,
+  ul ol {
+    margin-left: 15px;
+    li {
+      list-style: lower-latin inside;
+    }
+  }
+}

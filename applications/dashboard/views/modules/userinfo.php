@@ -41,7 +41,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
                 if (empty($this->Roles))
                     echo t('No Roles');
                 else
-                    echo htmlspecialchars(implode(', ', consolidateArrayValuesByKey($this->Roles, 'Name')));
+                    echo htmlspecialchars(implode(', ', array_column($this->Roles, 'Name')));
 
                 ?></dd>
             <?php if ($Points = valr('User.Points', $this, 0)) : // Only show positive point totals ?>

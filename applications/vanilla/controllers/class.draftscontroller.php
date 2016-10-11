@@ -87,7 +87,7 @@ class DraftsController extends VanillaController {
      * @param string $TransientKey Single-use hash to prove intent.
      */
     public function delete($DraftID = '', $TransientKey = '') {
-        $Form = Gdn::Factory('Form');
+        $Form = Gdn::factory('Form');
         $Session = Gdn::session();
         if (is_numeric($DraftID) && $DraftID > 0) {
             $Draft = $this->DraftModel->getID($DraftID);

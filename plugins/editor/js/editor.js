@@ -1,6 +1,6 @@
 (function($) {
     $.fn.setAsEditor = function(selector) {
-        selector = selector || '.BodyBox';
+        selector = selector || '.BodyBox,.js-bodybox';
 
         // If editor can be loaded, add class to body
         $('body').addClass('editor-active');
@@ -133,7 +133,7 @@
                     // TODO move into own function
                     var ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                     if (ifr.length) {
-                        var iframeBodyBox = ifr.contents().find('.BodyBox');
+                        var iframeBodyBox = ifr.contents().find('.BodyBox,.js-bodybox');
                         //$(iframeBodyBox).addClass('iframe-bodybox-lightsoff');
                         iframeBodyBox.off('focus blur');
                         $(fullPageCandidate).removeClass('editor-lights-candidate');
@@ -163,7 +163,7 @@
                 if (typeof wysiwygInstance != 'undefined') {
                     wysiwygInstance.focus();
                 } else {
-                    editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+                    editorSetCaretFocusEnd($(formWrapper).find('.BodyBox,.js-bodybox')[0]);
                 }
             };
 
@@ -236,7 +236,7 @@
                     // the external stylesheet and override the iframe inlines.
                     ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                     if (ifr.length) {
-                        var iframeBodyBox = ifr.contents().find('.BodyBox');
+                        var iframeBodyBox = ifr.contents().find('.BodyBox,.js-bodybox');
                         iframeBodyBox.css({
                             "transition": "background-color 0.4s ease, color 0.4s ease"
                         });
@@ -1147,7 +1147,7 @@
                             // If it's an image, then indicate that it's been embedded
                             // in the post
                             var imageEmbeddedText = (payload.thumbnail_url)
-                                ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                                ? ' &middot; <em title="' + gdn.meta['fileUpload-insertedTooltip'] + '">' + gdn.meta['fileUpload-inserted'] + '</em>'
                                 : '';
 
                             var html = ''
@@ -1158,8 +1158,8 @@
                                 + '<a class="filename" data-type="' + payload.type + '" data-width="' + payload.original_width + '" data-height="' + payload.original_height + '" href="' + payload.original_url + '" target="_blank">' + payload.Filename + '</a>'
                                 + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
                                 + '</div>'
-                                + '<span class="editor-file-remove" title="Remove file"></span>'
-                                + '<span class="editor-file-reattach" title="Click to re-attach \'' + payload.Filename + '\'"></span>'
+                                + '<span class="editor-file-remove" title="' + window.gdn.meta['fileUpload-remove']  + '"></span>'
+                                + '<span class="editor-file-reattach" title="' + window.gdn.meta['fileUpload-reattatch']  + ' \'' + payload.Filename + '\'"></span>'
                                 + '</div>';
 
 
@@ -1183,7 +1183,7 @@
 
                                 var payloadHeight = payload.original_height;
                                 var payloadWidth = payload.original_width;
-                                var editorWidth = $(this).find('.BodyBox').width();
+                                var editorWidth = $(this).find('.BodyBox,.js-bodybox').width();
 
                                 // Image max-width is 100%. Change the height to refect scaling down the width.
                                 if (editorWidth < payloadWidth) {
@@ -1456,7 +1456,7 @@
                 format = currentEditorFormat + '';
                 $currentEditorToolbar = $t.find('.editor-format-' + format);
                 //currentEditableTextarea = t.find('#Form_Body');
-                $currentEditableTextarea = $t.find('.BodyBox');
+                $currentEditableTextarea = $t.find('.BodyBox,.js-bodybox');
 
                 if (textareaObj) {
                     $currentEditableTextarea = textareaObj;
@@ -1659,7 +1659,7 @@
 
                                     wysihtml5.commands.blockquote = {
                                         exec: function(composer, command) {
-                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
+                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Quote", REG_EXP);
                                             if ($(composer.element.lastChild).hasClass('Quote')) {
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
@@ -1667,7 +1667,7 @@
                                         },
 
                                         state: function(composer, command) {
-                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "blockquote", "Quote", REG_EXP);
+                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "div", "Quote", REG_EXP);
                                         },
 
                                         value: function() {
@@ -1682,16 +1682,54 @@
                                         REG_EXP = /CodeBlock/g;
 
                                     wysihtml5.commands.code = {
-                                        exec: function(composer, command) {
-                                            wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "pre", "CodeBlock", REG_EXP);
-                                            if ($(composer.element.lastChild).hasClass('CodeBlock')) {
-                                                composer.selection.setAfter(composer.element.lastChild);
-                                                composer.commands.exec("insertHTML", "<p><br></p>");
+                                        exec: function(composer) {
+                                            var inCodeBlock = this.state(composer);
+                                            if (inCodeBlock) {
+                                                // caret is already within a <pre><code>...</code></pre>
+                                                composer.selection.executeAndRestore(function() {
+                                                    var pre = wysihtml5.dom.getParentElement(
+                                                        composer.selection.getSelectedNode(),
+                                                        {
+                                                            className: "CodeBlock",
+                                                            classRegExp: /CodeBlock/g,
+                                                            nodeName: "PRE"
+                                                        },
+                                                        3
+                                                    );
+                                                    var code = pre.querySelector("code");
+
+                                                    wysihtml5.dom.replaceWithChildNodes(pre);
+                                                    if (code) {
+                                                        wysihtml5.dom.replaceWithChildNodes(code);
+                                                    }
+                                                });
+                                            } else {
+                                                // Wrap in <pre><code>...</code></pre>
+                                                var range = composer.selection.getRange();
+                                                var selectedNodes = range.extractContents();
+                                                var pre = composer.doc.createElement("pre");
+                                                var code = composer.doc.createElement("code");
+
+                                                pre.className = "CodeBlock";
+                                                pre.appendChild(code);
+                                                code.appendChild(selectedNodes);
+                                                range.insertNode(pre);
+                                                composer.selection.selectNode(code);
                                             }
                                         },
+                                        state: function(composer) {
+                                            // Determine if we're in a code block, inside a pre block.
+                                            var selectedNode = composer.selection.getSelectedNode();
+                                            var inCode = !!wysihtml5.dom.getParentElement(selectedNode, {
+                                                nodeName: "CODE"
+                                            }, 2);
+                                            var parentIsPre = !!wysihtml5.dom.getParentElement(selectedNode, {
+                                                className: "CodeBlock",
+                                                classRegExp: /CodeBlock/g,
+                                                nodeName: "PRE"
+                                            }, 3);
 
-                                        state: function(composer, command) {
-                                            return wysihtml5.commands.formatBlock.state(composer, "formatBlock", "blockquote", "CodeBlock", REG_EXP);
+                                            return inCode && parentIsPre;
                                         },
 
                                         value: function() {
@@ -1785,7 +1823,7 @@
 }(jQuery));
 
 $(document).on('contentLoad', function(e) {
-    $('.BodyBox', e.target).setAsEditor();
+    $('.BodyBox,.js-bodybox', e.target).setAsEditor();
 });
 
 /*

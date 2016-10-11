@@ -145,14 +145,15 @@ if (!function_exists('writeComment')) :
                         if ($Source = val('Source', $Comment)) {
                             echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
                         }
-                        $Sender->fireEvent('CommentInfo');
-                        $Sender->fireEvent('InsideCommentMeta'); // DEPRECATED
-                        $Sender->fireEvent('AfterCommentMeta'); // DEPRECATED
 
                         // Include IP Address if we have permission
                         if ($Session->checkPermission('Garden.PersonalInfo.View')) {
                             echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
                         }
+
+                        $Sender->fireEvent('CommentInfo');
+                        $Sender->fireEvent('InsideCommentMeta'); // DEPRECATED
+                        $Sender->fireEvent('AfterCommentMeta'); // DEPRECATED
                         ?>
                     </div>
                 </div>
@@ -339,21 +340,20 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
-        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1';
-
+        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1' && $session->isValid();
 
         if ($canEdit && $timeLeft) {
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
         }
 
-        $dropdown->addLinkIf($canDismiss, t('Dismiss'), url("vanilla/discussion/dismissannouncement?discussionid={$discussionID}"), 'dismiss', 'DismissAnnouncement Hijack')
-            ->addLinkIf($canEdit, t('Edit').$timeLeft, url('/post/editdiscussion/'.$discussionID), 'edit')
-            ->addLinkIf($canAnnounce, t('Announce'), url('/discussion/announce?discussionid='.$discussionID.'&Target='.urlencode($sender->SelfUrl.'#Head')), 'announce', 'AnnounceDiscussion Popup')
-            ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), url('/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink), 'sink', 'SinkDiscussion Hijack')
-            ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), url('/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed), 'close', 'CloseDiscussion Hijack')
-            ->addLinkIf($canRefetch, t('Refetch Page'), url('/discussion/refetchpageinfo.json?discussionid='.$discussionID), 'refetch', 'RefetchPage Hijack')
-            ->addLinkIf($canMove, t('Move'), url('/moderation/confirmdiscussionmoves?discussionid='.$discussionID), 'move', 'MoveDiscussion Popup')
-            ->addLinkIf($canDelete, t('Delete Discussion'), url('/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl), 'delete', 'DeleteDiscussion Popup');
+        $dropdown->addLinkIf($canDismiss, t('Dismiss'), "vanilla/discussion/dismissannouncement?discussionid={$discussionID}", 'dismiss', 'DismissAnnouncement Hijack')
+            ->addLinkIf($canEdit, t('Edit').$timeLeft, '/post/editdiscussion/'.$discussionID, 'edit')
+            ->addLinkIf($canAnnounce, t('Announce'), '/discussion/announce?discussionid='.$discussionID, 'announce', 'AnnounceDiscussion Popup')
+            ->addLinkIf($canSink, t($discussion->Sink ? 'Unsink' : 'Sink'), '/discussion/sink?discussionid='.$discussionID.'&sink='.(int)!$discussion->Sink, 'sink', 'SinkDiscussion Hijack')
+            ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
+            ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
+            ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED
         $options = [];

@@ -136,7 +136,8 @@ if (!function_exists('WriteDiscussion')) :
         $Sender->fireEvent('BeforeDiscussionName');
 
         $DiscussionName = $Discussion->Name;
-        if ($DiscussionName == '') {
+        // If there are no word character detected in the title treat it as if it is blank.
+        if (!preg_match('/\w/u', $DiscussionName)) {
             $DiscussionName = t('Blank Discussion Topic');
         }
         $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
@@ -405,7 +406,7 @@ if (!function_exists('writeFilterTabs')) :
         }
 
         if (c('Vanilla.Discussions.ShowCounts', true)) {
-            $Bookmarked .= countString($CountBookmarks, url('/discussions/UserBookmarkCount'));
+            $Bookmarked .= countString($CountBookmarks, '/discussions/UserBookmarkCount');
             $MyDiscussions .= countString($CountDiscussions);
             $MyDrafts .= countString($CountDrafts);
         }

@@ -1,0 +1,12 @@
+.dropdown-toggle {
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  padding: ($spacer-y / 2) 0;
+
+  .icon {
+    margin-right: $spacer / 4;
+  }
+}

@@ -17,13 +17,26 @@
  */
 class Captcha {
 
+    private static $enabled;
+
     /**
      * Should we expect captcha submissions?
      *
      * @return boolean
      */
     public static function enabled() {
-        return !c('Garden.Registration.SkipCaptcha', false);
+        if (!isset(static::$enabled)) {
+            $enabled = !c('Garden.Registration.SkipCaptcha', false);
+            $handlersAvailable = false;
+
+            Gdn::pluginManager()->fireAs('captcha')->fireEvent('IsEnabled', [
+                'Enabled' => &$handlersAvailable
+            ]);
+
+            static::$enabled = $enabled && $handlersAvailable;
+        }
+
+        return static::$enabled;
     }
 
     /**

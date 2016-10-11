@@ -1,1 +1,5 @@
 plugins/Debugger/**
+applications/dashboard/styleguide/**
+applications/dashboard/template/**
+applications/dashboard/scss/**
+applications/dashboard/js/src/**

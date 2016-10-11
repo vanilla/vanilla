@@ -1475,6 +1475,8 @@ class DiscussionModel extends VanillaModel {
 
    /**
     * Count how many discussions match the given criteria.
+     *
+     * @deprecated since 2.3
     *
      * @param array $Wheres SQL conditions.
      * @return int Number of discussions.
@@ -1639,8 +1641,8 @@ class DiscussionModel extends VanillaModel {
 
    /**
     * Get discussions that have IDs in the provided array.
+     *
      * @param array $DiscussionIDs Array of DiscussionIDs to get.
-    *
      * @return Gdn_DataSet SQL result.
     * @since 2.0.18
      */
@@ -1939,11 +1941,11 @@ class DiscussionModel extends VanillaModel {
                         Gdn::cache()->remove($CacheKey);
                     }
 
+                    // The primary key was removed from the form fields, but we need it for logging.
+                    LogModel::logChange('Edit', 'Discussion', array_merge($Fields, ['DiscussionID' => $DiscussionID]));
+
                     self::serializeRow($Fields);
                     $this->SQL->put($this->Name, $Fields, [$this->PrimaryKey => $DiscussionID]);
-
-                    setValue('DiscussionID', $Fields, $DiscussionID);
-                    LogModel::logChange('Edit', 'Discussion', (array)$Fields, $Stored);
 
                     if (val('CategoryID', $Stored) != val('CategoryID', $Fields)) {
                         $StoredCategoryID = val('CategoryID', $Stored);
@@ -2656,9 +2658,7 @@ class DiscussionModel extends VanillaModel {
         $this->EventArguments['Discussion'] = $Data;
         $this->fireEvent('DeleteDiscussion');
 
-       // Execute deletion of discussion and related bits
-        $this->SQL->delete('Draft', ['DiscussionID' => $discussionID]);
-
+        // Setup logging.
         $Log = val('Log', $options, true);
         $LogOptions = val('LogOptions', $options, []);
         if ($Log === true) {

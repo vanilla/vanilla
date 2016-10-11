@@ -16,10 +16,12 @@ $PluginInfo['ProfileExtender'] = array(
     'MobileFriendly' => true,
     //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
     'SettingsUrl' => '/dashboard/settings/profileextender',
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
+    'AuthorUrl' => 'http://lincolnwebs.com',
+    'Icon' => 'profile-extender.png'
 );
 
 /**
@@ -37,6 +39,12 @@ $PluginInfo['ProfileExtender'] = array(
  * @todo Dynamic validation rule
  */
 class ProfileExtenderPlugin extends Gdn_Plugin {
+
+    public function base_render_before($sender) {
+        if ($sender->MasterView == 'admin') {
+            $sender->addJsFile('profileextender.js', 'plugins/ProfileExtender');
+        }
+    }
 
     /** @var array */
     public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name');
@@ -316,8 +324,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $Fields = $this->getProfileFields();
             if (!$Name = val('Name', $FormPostValues)) {
                 // Make unique name from label for new fields
-                $Name = $TestSlug = substr(preg_replace('`[^0-9a-zA-Z]`', '', val('Label', $FormPostValues)), 0, 50);
+                if (unicodeRegexSupport()) {
+                    $regex = '/[^\pL\pN]/u';
+                } else {
+                    $regex = '/[^a-z\d]/i';
+                }
+                // Make unique slug
+                $Name = $TestSlug = substr(preg_replace($regex, '', val('Label', $FormPostValues)), 0, 50);
                 $i = 1;
+
+                // Fallback in case the name is empty
+                if (empty($Name)) {
+                    $Name = $TestSlug = md5($Field);
+                }
                 while (array_key_exists($Name, $Fields) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }
@@ -396,6 +415,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Get the custom fields
             $ProfileFields = Gdn::userModel()->getMeta($Sender->User->UserID, 'Profile.%', 'Profile.');
 
+            // Get allowed GDN_User fields.
+            $Blacklist = array_combine($this->ReservedNames, $this->ReservedNames);
+            $NativeFields = array_diff_key((array)$Sender->User, $Blacklist);
+
+            // Combine custom fields (GDN_UserMeta) with GDN_User fields.
+            // This is OK because we're blacklisting our $ReservedNames AND whitelisting $AllFields below.
+            $ProfileFields = array_merge($ProfileFields, $NativeFields);
+
             // Import from CustomProfileFields if available
             if (!count($ProfileFields) && is_object($Sender->User) && c('Plugins.CustomProfileFields.SuggestedFields', false)) {
                 $ProfileFields = Gdn::userModel()->getAttribute($Sender->User->UserID, 'CustomProfileFields', false);
@@ -427,21 +454,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             }
 
             // Display all non-hidden fields
-            $ProfileFields = array_reverse($ProfileFields);
-            foreach ($ProfileFields as $Name => $Value) {
-                // Skip empty and hidden fields.
-                if (!$Value || !val('OnProfile', $AllFields[$Name])) {
-                    continue;
-                }
-
-                // Non-magic fields must be plain text, but we'll auto-link
-                if (!in_array($Name, $this->MagicLabels)) {
-                    $Value = Gdn_Format::links(Gdn_Format::text($Value));
-                }
-
-                echo ' <dt class="ProfileExtend Profile'.Gdn_Format::alphaNumeric($Name).'">'.Gdn_Format::text($AllFields[$Name]['Label']).'</dt> ';
-                echo ' <dd class="ProfileExtend Profile'.Gdn_Format::alphaNumeric($Name).'">'.Gdn_Format::htmlFilter($Value).'</dd> ';
-            }
+            require_once Gdn::controller()->fetchViewLocation('helper_functions', '', 'plugins/ProfileExtender', true, false);
+            $ProfileFields = array_reverse($ProfileFields, true);
+            extendedProfileFields($ProfileFields, $AllFields, $this->MagicLabels);
         } catch (Exception $ex) {
             // No errors
         }
@@ -512,7 +527,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points');
+        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName');
 
         // Set up our basic query.
         Gdn::sql()
@@ -523,7 +538,10 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->select('u.CountDiscussions')
             ->select('u.CountComments')
             ->select('u.Points')
+            ->select('u.InviteUserID')
+            ->select('u2.Name', '', 'InvitedByName')
             ->from('User u')
+            ->leftJoin('User u2', 'u.InviteUserID = u2.InviteUserID and u.InviteUserID is not null')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
 
@@ -574,9 +592,19 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             // Assign new data structure
             $NewData = array();
             foreach ($Fields as $Field) {
+                if (unicodeRegexSupport()) {
+                    $regex = '/[^\pL\pN]/u';
+                } else {
+                    $regex = '/[^a-z\d]/i';
+                }
                 // Make unique slug
-                $Name = $TestSlug = preg_replace('`[^0-9a-zA-Z]`', '', $Field);
+                $Name = $TestSlug = preg_replace($regex, '', $Field);
                 $i = 1;
+
+                // Fallback in case the name is empty
+                if (empty($Name)) {
+                    $Name = $TestSlug = md5($Field);
+                }
                 while (array_key_exists($Name, $NewData) || in_array($Name, $this->ReservedNames)) {
                     $Name = $TestSlug.$i++;
                 }

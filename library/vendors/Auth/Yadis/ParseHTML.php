@@ -82,8 +82,20 @@ class Auth_Yadis_ParseHTML {
 
         // Replace numeric entities because html_entity_decode doesn't
         // do it for us.
-        $str = preg_replace('~&#x([0-9a-f]+);~ei', 'chr(hexdec("\\1"))', $str);
-        $str = preg_replace('~&#([0-9]+);~e', 'chr(\\1)', $str);
+        $str = preg_replace_callback(
+                '/&#x([0-9a-f]+);/i',
+                function($matches) {
+                    return chr(hexdec($matches[1]));
+                },
+                $str
+        );
+        $str = preg_replace_callback(
+                '/&#([0-9]+);/',
+                function($matches) {
+                    return chr($matches[1]);
+                },
+                $str
+        );
 
         return $str;
     }
@@ -113,7 +125,7 @@ class Auth_Yadis_ParseHTML {
     }
 
     /**
-     * Create a regular expression that will match an opening 
+     * Create a regular expression that will match an opening
      * or closing tag from a set of names.
      *
      * @access private
@@ -204,7 +216,7 @@ class Auth_Yadis_ParseHTML {
 
         $link_data = array();
         $link_matches = array();
-        
+
         if (!preg_match_all($this->tagPattern('meta', false, 'maybe'),
                             $html_string, $link_matches)) {
             return array();

@@ -207,12 +207,12 @@ class AssetModel extends Gdn_Model {
         // Include theme customizations last so that they override everything else.
         switch ($basename) {
             case 'style':
-                $this->addCssFile('custom.css', false, ['Sort' => 10]);
+                $this->addCssFile('custom.css', false, ['Sort' => 1000]);
 
                 if (Gdn::controller()->Theme && Gdn::controller()->ThemeOptions) {
                     $filenames = valr('Styles.Value', Gdn::controller()->ThemeOptions);
                     if (is_string($filenames) && $filenames != '%s') {
-                        $this->addCssFile(changeBasename('custom.css', $filenames), false, ['Sort' => 11]);
+                        $this->addCssFile(changeBasename('custom.css', $filenames), false, ['Sort' => 1001]);
                     }
                 }
 
@@ -568,7 +568,8 @@ class AssetModel extends Gdn_Model {
 
         $extensions = ['php'];
         foreach ($handlers as $handlerTag => $handlerDef) {
-            $extensions[] = array_pop(explode('.', $handlerTag));
+            $extension = explode('.', $handlerTag);
+            $extensions[] = array_pop($extension);
         }
         return $extensions;
     }

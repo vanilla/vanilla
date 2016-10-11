@@ -60,10 +60,10 @@ class BanModel extends Gdn_Model {
      * @since 2.0.18
      * @access public
      */
-    public static function &AllBans() {
+    public static function &allBans() {
         if (!self::$_AllBans) {
             self::$_AllBans = Gdn::sql()->get('Ban')->resultArray();
-            self::$_AllBans = Gdn_DataSet::Index(self::$_AllBans, array('BanID'));
+            self::$_AllBans = Gdn_DataSet::index(self::$_AllBans, array('BanID'));
         }
 //      $AllBans =& self::$_AllBans;
         return self::$_AllBans;
@@ -84,12 +84,10 @@ class BanModel extends Gdn_Model {
         }
 
         $OldUsers = array();
-        $OldUserIDs = array();
-
         $NewUsers = array();
         $NewUserIDs = array();
 
-        $AllBans = $this->AllBans();
+        $AllBans = $this->allBans();
 
         if ($NewBan) {
             // Get a list of users affected by the new ban.
@@ -100,7 +98,8 @@ class BanModel extends Gdn_Model {
             $NewUsers = $this->SQL
                 ->select('u.UserID, u.Banned')
                 ->from('User u')
-                ->where($this->BanWhere($NewBan))
+                ->where($this->banWhere($NewBan))
+                ->where('Admin', 0) // No banning superadmins, pls.
                 ->get()->resultArray();
             $NewUserIDs = array_column($NewUsers, 'UserID');
         } elseif (isset($OldBan['BanID'])) {
@@ -112,9 +111,8 @@ class BanModel extends Gdn_Model {
             $OldUsers = $this->SQL
                 ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
                 ->from('User u')
-                ->where($this->BanWhere($OldBan))
+                ->where($this->banWhere($OldBan))
                 ->get()->resultArray();
-            $OldUserIDs = array_column($OldUsers, 'UserID');
         }
 
         // Check users that need to be unbanned.
@@ -123,7 +121,7 @@ class BanModel extends Gdn_Model {
                 continue;
             }
             // TODO check the user against the other bans.
-            $this->SaveUser($User, false);
+            $this->saveUser($User, false);
         }
 
         // Check users that need to be banned.
@@ -131,7 +129,7 @@ class BanModel extends Gdn_Model {
             if (self::isBanned($User['Banned'], BanModel::BAN_AUTOMATIC)) {
                 continue;
             }
-            $this->SaveUser($User, true, $NewBan);
+            $this->saveUser($User, true, $NewBan);
         }
     }
 

@@ -34,6 +34,9 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
+     * @param mixed $TransientKey
      */
     public function delete($MessageID = '', $TransientKey = false) {
         $this->permission('Garden.Community.Manage');
@@ -58,6 +61,9 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
+     * @param mixed $TransientKey
      */
     public function dismiss($MessageID = '', $TransientKey = false) {
         $Session = Gdn::session();
@@ -80,13 +86,14 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param int|string $MessageID
      */
     public function edit($MessageID = '') {
         $this->addJsFile('jquery.autosize.min.js');
-        $this->addJsFile('messages.js');
 
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/message');
+        $this->setHighlightRoute('dashboard/message');
 
         // Generate some Controller & Asset data arrays
         $this->setData('Locations', $this->_getLocationData());
@@ -137,11 +144,11 @@ class MessageController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Community.Manage');
-        $this->addSideMenu('dashboard/message');
+        $this->setHighlightRoute('dashboard/message');
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('jquery.tablednd.js');
-        $this->addJsFile('messages.js');
         $this->title(t('Messages'));
+        Gdn_Theme::section('Moderation');
 
         // Load all messages from the db
         $this->MessageData = $this->MessageModel->get('Sort');
@@ -162,18 +169,62 @@ class MessageController extends DashboardController {
         }
     }
 
+    public function enable($messageID) {
+        $this->permission('Garden.Community.Manage');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        if ($messageID && is_numeric($messageID)) {
+            $this->setEnabled($messageID, 1);
+        }
+    }
+
+    public function disable($messageID) {
+        $this->permission('Garden.Community.Manage');
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        if ($messageID && is_numeric($messageID)) {
+            $this->setEnabled($messageID, 0);
+        }
+    }
+
+    protected function setEnabled($messageID, $enabled) {
+        $messageModel = new MessageModel();
+        $enabled = forceBool($enabled, '0', '1', '0');
+        $messageModel->setProperty($messageID, 'Enabled', $enabled);
+        $this->MessageModel->setMessageCache();
+        if ($enabled === '1') {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+        } else {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+        }
+        $this->jsonTarget("#toggle-".$messageID, $newToggle);
+        if ($enabled === '1') {
+            $this->informMessage(sprintf(t('%s enabled.'), t('Message')));
+        } else {
+            $this->informMessage(sprintf(t('%s disabled.'), t('Message')));
+        }
+        $this->render('Blank', 'Utility');
+    }
+
     /**
      * Get descriptions of asset locations on page.
      *
      * @since 2.0.0
      * @access protected
+     *
+     * @return array
      */
     protected function _getAssetData() {
-        $AssetData = array();
-        $AssetData['Content'] = t('Above Main Content');
-        $AssetData['Panel'] = t('Below Sidebar');
+        $AssetData = [
+            'Content' => t('Above Main Content'),
+            'Panel' => t('Below Sidebar')
+        ];
+
         $this->EventArguments['AssetData'] = &$AssetData;
         $this->fireEvent('AfterGetAssetData');
+
         return $AssetData;
     }
 
@@ -182,23 +233,25 @@ class MessageController extends DashboardController {
      *
      * @since 2.0.0
      * @access protected
+     *
+     * @return array
      */
     protected function _getLocationData() {
-        $ControllerData = array();
-        $ControllerData['[Base]'] = t('All Pages');
-        $ControllerData['[NonAdmin]'] = t('All Forum Pages');
-        // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
-        // $ControllerData['[Admin]'] = 'All Dashboard Pages';
-        $ControllerData['Dashboard/Profile/Index'] = t('Profile Page');
-        $ControllerData['Vanilla/Discussions/Index'] = t('Discussions Page');
-        $ControllerData['Vanilla/Discussion/Index'] = t('Comments Page');
-        $ControllerData['Vanilla/Post/Discussion'] = t('New Discussion Form');
-        $ControllerData['Dashboard/Entry/SignIn'] = t('Sign In');
-        $ControllerData['Dashboard/Entry/Register'] = t('Registration');
-        // 2011-09-09 - mosullivan - No longer allowing messages in dashboard
-        // $ControllerData['Dashboard/Settings/Index'] = 'Dashboard Home';
+        $ControllerData = [
+            '[Base]' => t('All Pages'),
+            '[NonAdmin]' => t('All Forum Pages'),
+            'Dashboard/Profile/Index' => t('Profile Page'),
+            'Vanilla/Discussions/Index' => t('Discussions Page'),
+            'Vanilla/Categories/Index' => t('Categories Page'),
+            'Vanilla/Discussion/Index' => t('Comments Page'),
+            'Vanilla/Post/Discussion' => t('New Discussion Form'),
+            'Dashboard/Entry/SignIn' => t('Sign In'),
+            'Dashboard/Entry/Register' => t('Registration')
+        ];
+
         $this->EventArguments['ControllerData'] = &$ControllerData;
         $this->fireEvent('AfterGetLocationData');
+
         return $ControllerData;
     }
 }

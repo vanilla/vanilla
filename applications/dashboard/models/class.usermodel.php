@@ -1078,8 +1078,13 @@ class UserModel extends Gdn_Model {
      * @param boolean $Serialize
      * @return array
      */
-    public function definePermissions($UserID, $Serialize = true) {
+    public function definePermissions($UserID, $Serialize = false) {
+        if ($Serialize) {
+            deprecated("UserModel->definePermissions(id, true)", "UserModel->definePermissions(id)");
+        }
+
         $UserPermissionsKey = '';
+
         if (Gdn::cache()->activeEnabled()) {
             $PermissionsIncrement = $this->getPermissionsIncrement();
             $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [
@@ -1487,6 +1492,30 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Retrieve IP addresses associated with a user.
+     *
+     * @param int $userID Unique ID for a user.
+     * @return array IP addresses for the user.
+     */
+    public function getIPs($userID) {
+        $IPs = [];
+
+        try {
+            $packedIPs = Gdn::sql()->getWhere('UserIP', ['UserID' => $userID])->resultArray();
+        } catch (\Exception $e) {
+            return $IPs;
+        }
+
+        foreach ($packedIPs as $UserIP) {
+            if ($unpackedIP = ipDecode($UserIP['IPAddress'])) {
+                $IPs[] = $unpackedIP;
+            }
+        }
+
+        return $IPs;
+    }
+
+    /**
      *
      *
      * @param bool $Like
@@ -1670,7 +1699,7 @@ class UserModel extends Gdn_Model {
         $Result = &$Data->result();
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
-                $Row->Photo = Gdn_Upload::url($Row->Photo);
+                $Row->Photo = Gdn_Upload::url(changeBasename($Row->Photo, 'p%s'));
             }
         }
 
@@ -1679,7 +1708,7 @@ class UserModel extends Gdn_Model {
 
     /**
      * Retrieves a "system user" id that can be used to perform non-real-person tasks.
-     * 
+     *
      * @return int Returns a user ID.
      */
     public function getSystemUserID() {
@@ -1797,7 +1826,7 @@ class UserModel extends Gdn_Model {
      * @return bool|int|string
      */
     public function register($FormPostValues, $Options = []) {
-        $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
+        $FormPostValues['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
 
         // Check for banning first.
         $Valid = BanModel::checkUser($FormPostValues, null, true);
@@ -2015,11 +2044,6 @@ class UserModel extends Gdn_Model {
             $this->Validation->applyRule('Email', 'Email');
         }
 
-        // AllIPAdresses is stored as a CSV, so handle the case where an array is submitted.
-        if (array_key_exists('AllIPAddresses', $FormPostValues) && is_array($FormPostValues['AllIPAddresses'])) {
-            $FormPostValues['AllIPAddresses'] = implode(',', $FormPostValues['AllIPAddresses']);
-        }
-
         if ($this->validate($FormPostValues, $Insert) && $UniqueValid) {
             // All fields on the form that need to be validated (including non-schema field rules defined above)
             $Fields = $this->Validation->validationFields();
@@ -2077,6 +2101,15 @@ class UserModel extends Gdn_Model {
 
             // Check the validation results again in case something was added during the BeforeSave event.
             if (count($this->Validation->results()) == 0) {
+                // Encode any IP fields that aren't already encoded.
+                $ipCols = ['InsertIPAddress', 'LastIPAddress', 'UpdateIPAddress'];
+                foreach ($ipCols as $col) {
+                    if (isset($Fields[$col]) && filter_var($Fields[$col], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+                        $Fields[$col] = ipEncode($Fields[$col]);
+                    }
+                }
+                unset($col);
+
                 // If the primary key exists in the validated fields and it is a
                 // numeric value greater than zero, update the related database row.
                 if ($UserID > 0) {
@@ -2376,7 +2409,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->where('u.Banned >', 0);
             $Keywords = '';
         } elseif (preg_match('/^\d+$/', $Keywords)) {
-            $UserID = $Keywords;
+            $numericQuery = $Keywords;
             $Keywords = '';
         } else {
             // Check to see if the search exactly matches a role name.
@@ -2392,19 +2425,26 @@ class UserModel extends Gdn_Model {
         if (!empty($RoleID)) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } elseif (isset($IPAddress)) {
+            $this->SQL->join('UserIP uip', 'u.userID = uip.UserID');
+
             $this->SQL
                 ->orOp()
                 ->beginWhereGroup()
-                ->orWhere('u.LastIPAddress', $IPAddress);
+                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)])
+                ->orWhere('uip.IPAddress', inet_pton($IPAddress));
 
             // An or is expensive so only do it if the query isn't optimized.
             if (!$Optimize) {
-                $this->SQL->orWhere('u.InsertIPAddress', $IPAddress);
+                $this->SQL->orWhereIn('u.InsertIPAddress', [$IPAddress, inet_pton($IPAddress)]);
             }
 
             $this->SQL->endWhereGroup();
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
+        } elseif (isset($numericQuery)) {
+            // We've searched for a number. Return UserID AND any exact numeric name match.
+            $this->SQL->beginWhereGroup()
+                ->where('u.UserID', $numericQuery)
+                ->orWhere('u.Name', $numericQuery)
+                ->endWhereGroup();
         } elseif ($Keywords) {
             if ($Optimize) {
                 // An optimized search should only be done against name OR email.
@@ -2435,6 +2475,7 @@ class UserModel extends Gdn_Model {
             ->where('u.Deleted', 0)
             ->orderBy($OrderFields, $OrderDirection)
             ->limit($Limit, $Offset)
+            ->groupBy('u.UserID')
             ->get();
 
         $Result = &$Data->result();
@@ -2866,8 +2907,49 @@ class UserModel extends Gdn_Model {
         $Fields[$this->DateInserted] = $Now;
         touchValue('DateFirstVisit', $Fields, $Now);
         $Fields['DateLastActive'] = $Now;
-        $Fields['InsertIPAddress'] = Gdn::request()->ipAddress();
-        $Fields['LastIPAddress'] = Gdn::request()->ipAddress();
+        $Fields['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
+        $Fields['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
+    }
+
+    /**
+     * Record an IP address for a user.
+     *
+     * @param int $userID Unique ID of the user.
+     * @param string $IP Human-readable IP address.
+     * @param string $dateUpdated Force an update timesetamp.
+     * @return bool Was the operation successful?
+     */
+    public function saveIP($userID, $IP, $dateUpdated = false) {
+        if (!filter_var($IP, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+            return false;
+        }
+
+        $packedIP = ipEncode($IP);
+        $px = Gdn::database()->DatabasePrefix;
+
+        if (!$dateUpdated) {
+            $dateUpdated = Gdn_Format::toDateTime();
+        }
+
+        $query = "insert into {$px}UserIP (UserID, IPAddress, DateInserted, DateUpdated)
+            values (:UserID, :IPAddress, :DateInserted, :DateUpdated)
+            on duplicate key update DateUpdated = :DateUpdated2";
+        $values = [
+            ':UserID' => $userID,
+            ':IPAddress' => $packedIP,
+            ':DateInserted' => Gdn_Format::toDateTime(),
+            ':DateUpdated' => $dateUpdated,
+            ':DateUpdated2' => $dateUpdated
+        ];
+
+        try {
+            Gdn::database()->query($query, $values);
+            $result = true;
+        } catch (\Exception $e) {
+            $result = false;
+        }
+
+        return $result;
     }
 
     /**
@@ -2894,32 +2976,14 @@ class UserModel extends Gdn_Model {
         // Update session level information if necessary.
         if ($UserID == Gdn::session()->UserID) {
             $IP = Gdn::request()->ipAddress();
-            $Fields['LastIPAddress'] = $IP;
+            $Fields['LastIPAddress'] = ipEncode($IP);
+            $this->saveIP($UserID, $IP);
 
             if (Gdn::session()->newVisit()) {
                 $Fields['CountVisits'] = val('CountVisits', $User, 0) + 1;
                 $this->fireEvent('Visit');
             }
         }
-
-        // Generate the AllIPs field.
-        $AllIPs = val('AllIPAddresses', $User, []);
-        if (is_string($AllIPs)) {
-            $AllIPs = explode(',', $AllIPs);
-            setValue('AllIPAddresses', $User, $AllIPs);
-        }
-        if (!is_array($AllIPs)) {
-            $AllIPs = [];
-        }
-        if ($IP = val('InsertIPAddress', $User)) {
-            array_unshift($AllIPs, forceIPv4($IP));
-        }
-        if ($IP = val('LastIPAddress', $User)) {
-            array_unshift($AllIPs, $IP);
-        }
-        // This will be a unique list of IPs, most recently used first. array_unique keeps the first key found.
-        $AllIPs = array_unique($AllIPs);
-        $Fields['AllIPAddresses'] = $AllIPs;
 
         // Set the hour offset based on the client's clock.
         if (is_numeric($ClientHour) && $ClientHour >= 0 && $ClientHour < 24) {
@@ -3179,7 +3243,14 @@ class UserModel extends Gdn_Model {
                     ->setTitle(t('Membership Approved'));
 
                 $Email->setEmailTemplate($emailTemplate);
-                $Email->send();
+
+                try {
+                    $Email->send();
+                } catch (Exception $e) {
+                    if (debug()) {
+                        throw $e;
+                    }
+                }
 
                 // Report that the user was approved.
                 $ActivityModel = new ActivityModel();
@@ -3699,15 +3770,12 @@ class UserModel extends Gdn_Model {
 
             setValue('PhotoUrl', $User, $PhotoUrl);
         }
-        if ($v = val('AllIPAddresses', $User)) {
-            if (is_string($v)) {
-                $IPAddresses = explode(',', $v);
-                foreach ($IPAddresses as $i => $IPAddress) {
-                    $IPAddresses[$i] = forceIPv4($IPAddress);
-                }
-                setValue('AllIPAddresses', $User, $IPAddresses);
-            }
-        }
+
+        // We store IPs in the UserIP table. To avoid unnecessary queries, the full list is not built here. Shim for BC.
+        setValue('AllIPAddresses', $User, [
+            val('InsertIPAddress', $User),
+            val('LastIPAddress', $User)
+        ]);
 
         setValue('_CssClass', $User, '');
         if (val('Banned', $User)) {
@@ -3844,7 +3912,14 @@ class UserModel extends Gdn_Model {
             ->setButton($url, t('Confirm My Email Address'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -3899,7 +3974,14 @@ class UserModel extends Gdn_Model {
         $emailTemplate->setTitle(t('Welcome Aboard!'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -3913,7 +3995,7 @@ class UserModel extends Gdn_Model {
      * @return string The welcome email for the registration type.
      */
     protected function getEmailWelcome($registerType, $user, $data, $password = '') {
-        $appTitle = c('Garden.Title');
+        $appTitle = c('Garden.Title', c('Garden.HomepageTitle'));
 
         // Backwards compatability. See if anybody has overridden the EmailWelcome string.
         if (($emailFormat = t('EmailWelcome'.$registerType, ''))) {
@@ -3934,19 +4016,19 @@ class UserModel extends Gdn_Model {
                     $welcome = formatString(t('You have successfully connected to {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        formatString(t('Connected With: {ProviderName}'), $data).'</p>';
+                        formatString(t('Connected With: {ProviderName}'), $data).'<br></p>';
                     break;
                 case 'Register' :
                     $welcome = formatString(t('You have successfully registered for an account at {Title}.'), $data).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Username'), val('Name', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'</p>';
+                        sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br></p>';
                     break;
                 default :
                     $welcome = sprintf(t('%s has created an account for you at %s.'), val('Name', val('Sender', $data)), $appTitle).' '.
                         t('Find your account information below.').'<br></p>'.
                         '<p>'.sprintf(t('%s: %s'), t('Email'), val('Email', $user)).'<br>'.
-                        sprintf(t('%s: %s'), t('Password'), $password).'</p>';
+                        sprintf(t('%s: %s'), t('Password'), $password).'<br></p>';
             }
         }
         return $welcome;
@@ -3978,7 +4060,14 @@ class UserModel extends Gdn_Model {
             ->setButton(externalUrl('/'), t('Access the Site'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -4013,7 +4102,7 @@ class UserModel extends Gdn_Model {
             $UserData['DateOfBirth'] = val('DateOfBirth', $Data, '');
             $UserData['CountNotifications'] = 0;
             $UserData['Attributes'] = $Attributes;
-            $UserData['InsertIPAddress'] = Gdn::request()->ipAddress();
+            $UserData['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
             if ($UserData['DateOfBirth'] == '') {
                 $UserData['DateOfBirth'] = '1975-09-16';
             }
@@ -4130,7 +4219,14 @@ class UserModel extends Gdn_Model {
                 ->setButton(externalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
             $Email->setEmailTemplate($emailTemplate);
 
-            $Email->send();
+            try {
+                $Email->send();
+            } catch (Exception $e) {
+                if (debug()) {
+                    throw $e;
+                }
+            }
+
             $NoEmail = false;
         }
 
@@ -4247,19 +4343,6 @@ class UserModel extends Gdn_Model {
 
         $this->defineSchema();
         $Fields = $this->Schema->fields();
-
-        if (isset($Property['AllIPAddresses'])) {
-            if (is_array($Property['AllIPAddresses'])) {
-                $IPs = array_map('ForceIPv4', $Property['AllIPAddresses']);
-                $IPs = array_unique($IPs);
-                $Property['AllIPAddresses'] = implode(',', $IPs);
-                // Ensure this isn't too big for our column
-                while (strlen($Property['AllIPAddresses']) > $Fields['AllIPAddresses']->Length) {
-                    array_pop($IPs);
-                    $Property['AllIPAddresses'] = implode(',', $IPs);
-                }
-            }
-        }
 
         $Set = array_intersect_key($Property, $Fields);
         self::serializeRow($Set);
@@ -4484,5 +4567,59 @@ class UserModel extends Gdn_Model {
             }
         }
         return $RoleIDs;
+    }
+
+    /**
+     * Clears navigation preferences for a user.
+     *
+     * @param string $userID Optional - defaults to sessioned user
+     */
+    public function clearNavigationPreferences($userID = '') {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        $this->savePreference($userID, 'DashboardNav.Collapsed', []);
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', []);
+        $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+    }
+
+    /**
+     * Checks if a url is saved as a navigation preference and if so, deletes it.
+     * Also optionally resets the section dashboard landing page, which may be desirable if a user no longer has
+     * permission to access pages in that section.
+     *
+     * @param string $url The url to search the user navigation preferences for, defaults to the request
+     * @param string $userID The ID of the user to clear the preferences for, defaults to the sessioned user
+     * @param bool $resetSectionPreference Whether to reset the dashboard section landing page
+     */
+    public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        if ($url == '') {
+            $url = Gdn::request()->url();
+        }
+
+        $user = $this->getID($userID);
+        $preferences = val('Preferences', $user, []);
+        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+
+        // Run through the user's saved landing page per section and if the url matches the passed url,
+        // remove that preference.
+        foreach ($landingPages as $section => $landingPage) {
+            $url = strtolower(trim($url, '/'));
+            $landingPage = strtolower(trim($landingPage, '/'));
+            if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                unset($landingPages[$section]);
+            }
+        }
+
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+
+        if ($resetSectionPreference) {
+            $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+        }
     }
 }

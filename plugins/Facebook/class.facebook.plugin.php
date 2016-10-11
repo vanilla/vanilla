@@ -32,6 +32,8 @@ $PluginInfo['Facebook'] = array(
  */
 class FacebookPlugin extends Gdn_Plugin {
 
+    const API_VERSION = '2.7';
+
     /** Authentication table key. */
     const ProviderKey = 'Facebook';
 
@@ -82,7 +84,7 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function api($Path, $Post = false) {
         // Build the url.
-        $Url = 'https://graph.facebook.com/'.ltrim($Path, '/');
+        $Url = 'https://graph.facebook.com/v'.self::API_VERSION.'/'.ltrim($Path, '/');
         $AccessToken = $this->accessToken();
         if (!$AccessToken) {
             throw new Gdn_UserException("You don't have a valid Facebook connection.");
@@ -800,7 +802,7 @@ class FacebookPlugin extends Gdn_Plugin {
 //      return $Provider;
 //   }
 //
-//   public function AuthenticationController_DisableAuthenticatorHandshake_handler(&$Sender) {
+//   public function AuthenticationController_DisableAuthenticatorHandshake_handler($Sender) {
 //      $this->_Disable();
 //   }
 //
@@ -813,7 +815,7 @@ class FacebookPlugin extends Gdn_Plugin {
 //      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
 //   }
 //
-//   public function AuthenticationController_EnableAuthenticatorHandshake_handler(&$Sender) {
+//   public function AuthenticationController_EnableAuthenticatorHandshake_handler($Sender) {
 //      $this->_Enable();
 //   }
 //

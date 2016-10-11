@@ -30,7 +30,7 @@ $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 
 $Construct->PrimaryKey('CategoryID')
-    ->column('ParentCategoryID', 'int', true)
+    ->column('ParentCategoryID', 'int', true, 'key')
     ->column('TreeLeft', 'int', true)
     ->column('TreeRight', 'int', true)
     ->column('Depth', 'int', '0')
@@ -49,7 +49,7 @@ $Construct->PrimaryKey('CategoryID')
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')
-    ->column('DisplayAs', array('Categories', 'Discussions', 'Heading', 'Default'), 'Default')
+    ->column('DisplayAs', array('Categories', 'Discussions', 'Flat', 'Heading', 'Default'), 'Discussions')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DateInserted', 'datetime')
@@ -63,7 +63,23 @@ $Construct->PrimaryKey('CategoryID')
 
 $RootCategoryInserted = false;
 if ($SQL->getWhere('Category', array('CategoryID' => -1))->numRows() == 0) {
-    $SQL->insert('Category', array('CategoryID' => -1, 'TreeLeft' => 1, 'TreeRight' => 4, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'Root', 'UrlCode' => '', 'Description' => 'Root of category tree. Users should never see this.', 'PermissionCategoryID' => -1));
+    $SQL->insert(
+        'Category',
+        [
+            'CategoryID' => -1,
+            'TreeLeft' => 1,
+            'TreeRight' => 4,
+            'InsertUserID' => 1,
+            'UpdateUserID' => 1,
+            'DateInserted' => Gdn_Format::toDateTime(),
+            'DateUpdated' => Gdn_Format::toDateTime(),
+            'Name' => 'Root',
+            'UrlCode' => '',
+            'Description' => 'Root of category tree. Users should never see this.',
+            'PermissionCategoryID' => -1,
+            'DisplayAs' => 'Categories'
+        ]
+    );
     $RootCategoryInserted = true;
 }
 
@@ -189,10 +205,10 @@ $Construct
     ->set($Explicit, $Drop);
 
 if (isset($CommentIndexes['FK_Comment_DiscussionID'])) {
-    $Construct->query("drop index FK_Comment_DiscussionID on {$Px}Comment");
+    $SQL->query("drop index FK_Comment_DiscussionID on {$Px}Comment");
 }
 if (isset($CommentIndexes['FK_Comment_DateInserted'])) {
-    $Construct->query("drop index FK_Comment_DateInserted on {$Px}Comment");
+    $SQL->query("drop index FK_Comment_DateInserted on {$Px}Comment");
 }
 
 // Update the participated flag.
@@ -324,18 +340,18 @@ Removed FirstComment from :_Discussion and moved it into the discussion table.
 $Prefix = $SQL->Database->DatabasePrefix;
 
 if ($FirstCommentIDExists && !$BodyExists) {
-    $Construct->query("update {$Prefix}Discussion, {$Prefix}Comment
+    $SQL->query("update {$Prefix}Discussion, {$Prefix}Comment
    set {$Prefix}Discussion.Body = {$Prefix}Comment.Body,
       {$Prefix}Discussion.Format = {$Prefix}Comment.Format
    where {$Prefix}Discussion.FirstCommentID = {$Prefix}Comment.CommentID");
 
-    $Construct->query("delete {$Prefix}Comment
+    $SQL->query("delete {$Prefix}Comment
    from {$Prefix}Comment inner join {$Prefix}Discussion
    where {$Prefix}Comment.CommentID = {$Prefix}Discussion.FirstCommentID");
 }
 
 if (!$LastCommentIDExists || !$LastCommentUserIDExists) {
-    $Construct->query("update {$Prefix}Discussion d
+    $SQL->query("update {$Prefix}Discussion d
    inner join {$Prefix}Comment c
       on c.DiscussionID = d.DiscussionID
    inner join (
@@ -350,7 +366,7 @@ where d.LastCommentUserID is null");
 }
 
 if (!$CountBookmarksExists) {
-    $Construct->query("update {$Prefix}Discussion d
+    $SQL->query("update {$Prefix}Discussion d
    set CountBookmarks = (
       select count(ud.DiscussionID)
       from {$Prefix}UserDiscussion ud

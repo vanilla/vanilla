@@ -64,7 +64,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
         if ($DataSetType !== null) {
             $this->_DatasetType = $DataSetType;
         } elseif ($Result) {
-            if (isset($Result[0]) && is_array($Result[0])) {
+            $firstElement = reset($Result);
+            if (is_array($firstElement)) {
                 $this->_DatasetType = DATASET_TYPE_ARRAY;
             }
         }
@@ -649,7 +650,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
     }
 
     /**
-     * Advances to the next row and returns the value rom a column.
+     * Advances to the next row and returns the value from a column.
      *
      * @param string $ColumnName The name of the column to get the value from.
      * @param string $DefaultValue The value to return if there is no data.

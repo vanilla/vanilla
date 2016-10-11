@@ -189,7 +189,7 @@ class PromotedContentModule extends Gdn_Module {
                 ->where('ur.RoleID', $RoleID)
                 ->groupBy('UserID')
                 ->get()->result(DATASET_TYPE_ARRAY);
-            $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
+            $UserIDs = array_column($UserIDs, 'UserID');
 
             // Get matching Discussions
             $Discussions = array();
@@ -274,7 +274,7 @@ class PromotedContentModule extends Gdn_Module {
                 ->where('u.RankID', $RankID)
                 ->groupBy('UserID')
                 ->get()->result(DATASET_TYPE_ARRAY);
-            $UserIDs = consolidateArrayValuesByKey($UserIDs, 'UserID');
+            $UserIDs = array_column($UserIDs, 'UserID');
 
             // Get matching Discussions
             $Discussions = array();

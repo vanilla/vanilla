@@ -42,13 +42,6 @@ class MessagesController extends ConversationsController {
         $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
         $this->addModule('SignedInModule');
 
-        // Spoilers assets
-        $this->addJsFile('spoilers.js', 'dashboard');
-        $this->addCssFile('spoilers.css', 'dashboard');
-        $this->addDefinition('Spoiler', t('Spoiler'));
-        $this->addDefinition('show', t('show'));
-        $this->addDefinition('hide', t('hide'));
-
         if (checkPermission('Conversations.Conversations.Add')) {
             $this->addModule('NewConversationModule');
         }
@@ -61,8 +54,9 @@ class MessagesController extends ConversationsController {
      * @access public
      *
      * @param string $Recipient Username of the recipient.
+     * @param string $Subject Subject of the message.
      */
-    public function add($Recipient = '') {
+    public function add($Recipient = '', $Subject = '') {
         $this->permission('Conversations.Conversations.Add');
         $this->Form->setModel($this->ConversationModel);
 
@@ -117,8 +111,26 @@ class MessagesController extends ConversationsController {
                 $this->fireEvent('AfterConversationSave');
             }
         } else {
+            // Check if valid user name has been passed.
             if ($Recipient != '') {
-                $this->Form->setValue('To', $Recipient);
+                if (!Gdn::userModel()->getByUsername($Recipient)) {
+                    $this->Form->setValidationResults(
+                        [
+                            'RecipientUserID' => [
+                                sprintf(
+                                    '"%s" is an unknown username.',
+                                    $Recipient
+                                )
+                            ]
+                        ]
+                    );
+                    $Recipient = '';
+                } else {
+                    $this->Form->setValue('To', $Recipient);
+                }
+            }
+            if ($Subject != '') {
+                $this->Form->setValue('Subject', $Subject);
             }
         }
         if ($Target = Gdn::request()->get('Target')) {

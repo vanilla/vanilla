@@ -5,19 +5,15 @@ jQuery(document).ready(function($) {
             $('form').submit();
         });
     });
-
-    $(".js-less-link").click(function(e) {
-        handleMore(e);
+    
+    $(".js-save-avatar-crop").addClass('disabled');
+    
+    $(document).on('cropStart', function() {
+        $(".js-save-avatar-crop").removeClass('disabled');
     });
 
-    $(".js-more-link").click(function(e) {
-        handleMore(e);
+    $(document).on('cropEnd', function() {
+        $(".js-save-avatar-crop").addClass('disabled');
     });
-
-    function handleMore(e) {
-        e.preventDefault();
-        $(".js-avatars-advanced-settings").toggle();
-        $(".js-more-link").toggle();
-        $(".js-less-link").toggle();
-    }
 });
+

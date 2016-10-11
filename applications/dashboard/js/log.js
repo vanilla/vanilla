@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
             window.location.href,
             {'DeliveryType': 'VIEW'},
             function(data) {
-                $('#LogTable').html(data);
+                $('#LogTable').htmlTrigger(data);
                 setExpander();
 
                 // Highlight the rows that are different.
@@ -57,7 +57,8 @@ jQuery(document).ready(function($) {
     var setExpander = function() {
         $Expander = $('.Expander');
         $('.Expander').expander({
-            slicePoint: 200,
+            slicePoint: 100,
+            normalizeWhitespace: true,
             expandText: gdn.definition('ExpandText'),
             userCollapseText: gdn.definition('CollapseText')
         });
@@ -69,7 +70,7 @@ jQuery(document).ready(function($) {
         $checkbox.trigger('click', true);
     });
 
-    $(document).delegate('tbody .CheckboxCell input', 'click', function(e, flip) {
+    $(document).delegate('tbody .CheckboxCell input', 'change', function(e, flip) {
         e.stopPropagation();
         var $checkbox = $(this);
 
@@ -81,9 +82,11 @@ jQuery(document).ready(function($) {
             $checkbox.closest('tr').addClass('Selected');
         else
             $checkbox.closest('tr').removeClass('Selected');
+
+        $checkbox.closest('tr').trigger('contentLoad');
     });
 
-    $(document).on('click', '#SelectAll', function(e, flip) {
+    $(document).on('change', '#SelectAll', function(e, flip) {
         e.stopPropagation();
         var selected = $(this).prop('checked');
 
@@ -96,6 +99,8 @@ jQuery(document).ready(function($) {
             $('tr', table).addClass('Selected');
         else
             $('tr', table).removeClass('Selected');
+
+        table.trigger('contentLoad');
     });
 
     $('.RestoreButton').click(function(e) {
@@ -204,7 +209,6 @@ jQuery(document).ready(function($) {
 
         // Ajax us to filtered results
         $('#LogTable').load(gdn.url('/log/moderation?DeliveryType=VIEW&CategoryID=' + category));
-
         return false;
     });
 });

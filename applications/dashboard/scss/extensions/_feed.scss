@@ -1,0 +1,81 @@
+// This should in the end have the same markup as the summary table.
+.Feed {
+  padding-top: $spacer / 2;
+}
+
+.FeedItem {
+  position: relative;
+  padding: to-rem(12) 0;
+  border-bottom: $table-border-width solid $table-border-color;
+
+  &:hover {
+    background-color: #f9fdfe;
+  }
+
+  &:first-child {
+    border-top: $table-border-width solid #ddd;
+  }
+
+  h2 {
+    padding: 0;
+    margin-top: - to-rem(3);
+    margin-left: 0;
+    margin-right: 0;
+    border-top: 0;
+    border-bottom: 0;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    text-overflow: ellipsis;
+    margin-bottom: to-rem(2);
+    line-height: $line-height-lg;
+
+    a {
+      @extend .reverse-link;
+    }
+  }
+
+  .FeedDescription {
+    @extend .info;
+    margin-bottom: - to-rem(2);
+    font-weight: 300;
+
+    strong {
+      font-weight: 400;
+    }
+
+    p {
+      margin-bottom: 0;
+      display: inline-block;
+    }
+
+    .details p {
+      margin-bottom: 0;
+      display: initial;
+      line-height: 1.4;
+    }
+
+    .read-less {
+      display: block;
+      margin-top: to-rem(3);
+    }
+  }
+
+
+  .FeedDescription,
+  h2 {
+    margin-right: 102px;
+    margin-left: to-rem(12);
+  }
+
+  .Date {
+    @extend .info;
+
+    position: absolute;
+    right: to-rem(12);
+    width: 102px;
+    line-height: 1;
+    top: $spacer * .75 + (to-rem(30) / 2) - ($font-size-tables / 2);
+    text-align: right;
+    font-weight: 300;
+  }
+}

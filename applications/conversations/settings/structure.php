@@ -104,7 +104,7 @@ set CountMessages = (
    select count(MessageID)
    from {$Px}ConversationMessage m
    where c.ConversationID = m.ConversationID)";
-    $Construct->query($UpSql);
+    $SQL->query($UpSql);
 }
 if ($UpdateLastMessageID) {
     // Calculate the count column.
@@ -113,7 +113,7 @@ set LastMessageID = (
    select max(MessageID)
    from {$Px}ConversationMessage m
    where c.ConversationID = m.ConversationID)";
-    $Construct->query($UpSql);
+    $SQL->query($UpSql);
 }
 
 if ($UpdateCountReadMessages) {
@@ -124,7 +124,7 @@ set CountReadMessages = (
   where cm.ConversationID = uc.ConversationID
     and cm.MessageID <= uc.LastMessageID)";
 
-    $Construct->query($UpSql);
+    $SQL->query($UpSql);
 }
 
 // Add extra columns to user table for tracking discussions, comments & replies

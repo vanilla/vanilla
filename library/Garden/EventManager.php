@@ -141,6 +141,26 @@ class EventManager {
     }
 
     /**
+     * Remove all of the events associated with a class.
+     *
+     * Note that this walks all event handlers so should not be called very often.
+     *
+     * @param string $className The name of the class to unbind.
+     */
+    public function unbindClass($className) {
+        foreach ($this->handlers as $event => $handlers) {
+            foreach ($handlers as $key => $handler) {
+                if (($handler instanceof LazyEventHandler && strcasecmp($handler->class, $className) === 0)
+                    || (is_array($handler) && (
+                        (is_string($handler[0] && strcasecmp($handler, $className) === 0))
+                        || (is_object($handler[0] && is_a($handler[0], $className)))))) {
+                    unset($this->handlers[$event][$key]);
+                }
+            }
+        }
+    }
+
+    /**
      * Bind a lazy event handler to an event.
      *
      * A lazy event handler will fetch the instance from the container when the event is fired.

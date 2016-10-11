@@ -233,7 +233,7 @@ class EventManager {
 
         // See if the handlers need to be sorted.
         if (isset($this->toSort[$name])) {
-            uksort($this->handlers[$name], 'strnatcasecmp');
+            $this->sortHandlers($this->handlers[$name]);
 
             // Convert lazy event handlers to callbacks.
             foreach ($this->handlers[$name] as &$handler) {
@@ -246,6 +246,17 @@ class EventManager {
         }
 
         return $this->handlers[$name];
+    }
+
+    /**
+     * Sort an event handler array.
+     *
+     * This method is useful in combination with {@link EventManager::getHandlers()}.
+     *
+     * @param array &$handlers The event handler array.
+     */
+    public function sortHandlers(array &$handlers) {
+        uksort($handlers, 'strnatcasecmp');
     }
 
     /**

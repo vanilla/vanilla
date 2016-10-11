@@ -201,9 +201,9 @@ class EventManager {
         $args = array_slice(func_get_args(), 1);
 
         // Do some backwards compatible kludges here.
-        if (count($args) === 1 && is_object($args[0]) && property_exists($args[0], 'EventArguments')) {
-            $args[] = $args[0]->EventArguments;
-        }
+//        if (count($args) === 1 && is_object($args[0]) && property_exists($args[0], 'EventArguments')) {
+//            $args[] = $args[0]->EventArguments;
+//        }
 
         $result = [];
         foreach ($handlers as $callback) {

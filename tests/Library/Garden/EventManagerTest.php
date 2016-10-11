@@ -354,30 +354,30 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Test the old EventArguments kludge.
      */
-    public function testEventArgumentsKludge() {
-        $em = new EventManager();
-
-        $events = [];
-        $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
-
-        $sender = new \stdClass();
-        $sender->EventArguments = ['foo' => 1];
-
-        // fire() has the kludge.
-        $em->fire('foo', $sender);
-        // fireArray() doesn't have the kludge.
-        $em->fireArray('foo', [$sender]);
-        // fireFilter() doesn't have the kludge.
-        $r = $em->fireFilter('foo', $sender);
-
-        $expected = [
-            ['foo', [$sender, $sender->EventArguments], []],
-            ['foo', [$sender], []],
-            ['foo', [$sender], $sender]
-        ];
-
-        $this->assertSame($expected, $events);
-    }
+//    public function testEventArgumentsKludge() {
+//        $em = new EventManager();
+//
+//        $events = [];
+//        $em->bind(EventManager::EVENT_META, $this->makeMetaHandler($events));
+//
+//        $sender = new \stdClass();
+//        $sender->EventArguments = ['foo' => 1];
+//
+//        // fire() has the kludge.
+//        $em->fire('foo', $sender);
+//        // fireArray() doesn't have the kludge.
+//        $em->fireArray('foo', [$sender]);
+//        // fireFilter() doesn't have the kludge.
+//        $r = $em->fireFilter('foo', $sender);
+//
+//        $expected = [
+//            ['foo', [$sender, $sender->EventArguments], []],
+//            ['foo', [$sender], []],
+//            ['foo', [$sender], $sender]
+//        ];
+//
+//        $this->assertSame($expected, $events);
+//    }
 
     /**
      * Get a list of plugin classes suitable for tests.

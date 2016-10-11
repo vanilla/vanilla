@@ -113,6 +113,7 @@ class EventManager {
                 continue;
             }
 
+            $method = strtolower($method);
             $suffix = strrchr($method, '_');
             $basename = substr($method, 0, -strlen($suffix));
             switch ($suffix) {

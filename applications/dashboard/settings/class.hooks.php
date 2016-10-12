@@ -11,14 +11,7 @@
 /**
  * Event handlers for the Dashboard application.
  */
-class DashboardHooks implements Gdn_IPlugin {
-
-    /**
-     * Do nothing.
-     */
-    public function setup() {
-    }
-
+class DashboardHooks extends Gdn_Plugin {
 
     /**
      * Fire before every page render.
@@ -195,6 +188,11 @@ class DashboardHooks implements Gdn_IPlugin {
         }
     }
 
+    /**
+     * Setup dashboard navigation.
+     *
+     * @param $sender
+     */
     public function dashboardNavModule_init_handler($sender) {
         /** @var DashboardNavModule $nav */
         $nav = $sender;
@@ -321,8 +319,6 @@ class DashboardHooks implements Gdn_IPlugin {
             }
         }
 
-        // TODO: Make sure the target is a safe redirect.
-
         // Get the default authentication provider.
         $DefaultProvider = Gdn_AuthenticationProviderModel::getDefault();
         $Sender->EventArguments['Target'] = $Target;
@@ -334,7 +330,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
         // If an event handler didn't handle the signin then just redirect to the target.
         if (!$Handled) {
-            redirect($Target, 302);
+            safeRedirect($Target, 302);
         }
     }
 
@@ -400,6 +396,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
     /**
      * After executing /settings/utility/update check if any role permissions have been changed, if not reset all the permissions on the roles.
+     *
      * @param $sender
      */
     public function updateModel_afterStructure_handler($sender) {

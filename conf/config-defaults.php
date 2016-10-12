@@ -36,7 +36,6 @@ $Configuration['Garden']['Domain']                              = '';
 $Configuration['Garden']['WebRoot']                             = FALSE; // You can set this value if you are using htaccess to direct into the application, but the correct webroot isn't being recognized.
 $Configuration['Garden']['StripWebRoot']                        = FALSE;
 $Configuration['Garden']['Debug']                               = FALSE;
-$Configuration['Garden']['RewriteUrls']                         = FALSE;
 $Configuration['Garden']['Session']['Length']                   = '15 minutes';
 $Configuration['Garden']['Cookie']['Salt']                      = '';
 $Configuration['Garden']['Cookie']['Name']                      = 'Vanilla';

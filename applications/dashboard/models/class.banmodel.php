@@ -95,7 +95,7 @@ class BanModel extends Gdn_Model {
                 $AllBans[$NewBan['BanID']] = $NewBan;
             }
 
-            // Protect against lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3
+            // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
             try {
                 $NewUsers = $this->SQL
                     ->select('u.UserID, u.Banned')
@@ -118,7 +118,7 @@ class BanModel extends Gdn_Model {
 
         if ($OldBan) {
             // Get a list of users affected by the old ban.
-            // Protect against lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3
+            // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
             try {
                 $OldUsers = $this->SQL
                     ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
@@ -422,7 +422,7 @@ class BanModel extends Gdn_Model {
      * @param array $Data
      */
     public function setCounts(&$Data) {
-        // Protect against lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3
+        // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
         try {
             $CountUsers = $this->SQL
                 ->select('UserID', 'count', 'CountUsers')

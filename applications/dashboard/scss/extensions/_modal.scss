@@ -1,4 +1,5 @@
-// Moderation section still uses Popup (styled like modals).
+// The moderation section still uses jquery.popup.js. We can get rid of these styles when we migrate the
+// moderation section over to modal.js
 
 .Overlay {
   position: fixed;

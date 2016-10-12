@@ -1,5 +1,7 @@
 // Helpers
 //
+// This is a special scss file in that it is included after all the other css files.
+//
 // These css classes are designed to help a developer add tweaks to a settings page without resorting to inline styles
 // or adding css to the page. Of particular interest are the `padded*` classes. The dashboard design has many elements
 // flush to one another, so margins are never assumed. The `padded*` classes add margins to elements if they need one.
@@ -30,7 +32,8 @@
 // Styleguide 2.1.1.
 
 .padded {
-  margin: $spacer 0;
+  margin-top: $spacer;
+  margin-bottom: $spacer;
 }
 
 .padded-top {
@@ -100,7 +103,6 @@
 }
 
 .flex-wrap {
-  max-width: 100%;
   flex-wrap: wrap;
 
   &,
@@ -184,7 +186,7 @@
 //
 // Hide something.
 //
-// .hidden - hides an element
+// .hidden - Hides an element.
 //
 // Markup:
 // <div class="{{modifier_class}}">I am some text.</div>
@@ -206,5 +208,5 @@
 // Styleguide 2.6.
 
 .progress {
-  background: url("images/progress.gif") center center no-repeat;
+  background: url('images/progress.gif') center center no-repeat;
 }

@@ -81,91 +81,125 @@
         <div class="panel-content-wrapper">
           <div id="fixed-help" class="js-fluid-fixed panel-content">
             <ul class="nav nav-pills" data-spy="affix">
-                <li><a href="#12-1" class="nav-link">Card</a></li>
+                <li><a href="#15-1" class="nav-link">Help Asset</a></li>
+                <li><a href="#15-2" class="nav-link">Control Panel</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="main">
         <div class="content">
-                <h1 class="kss-title" id="12">Cards</h1>
+                <h1 class="kss-title" id="15">Panel Components</h1>
+                  <div class="kss-box">
+                    <div class="padded"><p>The right panel in the dashboard generally contains explanatory text for the settings page it appears on.
+Customize theme also adds a control panel component.</p>
+<p>PHP rendering: Add help content the <code>Help</code> asset. To do this, wrap the help div in
+<code>Gdn_Theme::assetBegin(&#39;Help&#39;);</code> and <code>Gdn_Theme::assetEnd();</code></p>
+</div>
+                  </div>
                 <section class="kss-depth-2">
                   <div class="kss-component">
                     <div class="kss-component-description row full-border">
-                      <h2 class="kss-title" id="12-1">
-                      <span class="kss-ref badge pull-right">12-1</span> Card
+                      <h2 class="kss-title" id="15-1">
+                      <span class="kss-ref badge pull-right">15-1</span> Help Asset
                       </h2>
-                        <div class="kss-box padded"><p>A card is a collection of info that appears in a vertical card-looking container. We currently use a card for the
-user dropdown in the navbar. A card&#39;s width will expand or contract based on the size of the container it&#39;s in.</p>
+                        <div class="kss-box padded"><p>Styles extra helper text for the panel.</p>
+<p>PHP rendering: The <code>helpAsset(title, body)</code> function adds properly formatted help text to the Help asset.
+To render the following example, you would call:
+<code>helpAsset(&quot;Need More Help?&quot;, &quot;Here&#39;s some help text. There are things you should know.&quot;);</code></p>
 </div>
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;card card-user &quot;&gt;
-  &lt;div class=&quot;card-block media media-sm&quot;&gt;
-    &lt;div class=&quot;media-left&quot;&gt;
-      &lt;div class=&quot;media-image-wrap&quot;&gt;
-        &lt;a title=&quot;LittleChick&quot; href=&quot;#&quot;&gt;
-          &lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;
-        &lt;/a&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;media-content&quot;&gt;
-      &lt;div class=&quot;media-title&quot;&gt;
-        &lt;a href=&quot;#&quot;&gt;LittleChick&lt;/a&gt;
-      &lt;/div&gt;
-      &lt;div class=&quot;info&quot;&gt;Administrator&lt;/div&gt;
-      &lt;a class=&quot;btn btn-sm-rounded btn-secondary padded-top&quot; href=&quot;#&quot;&gt;
-        My Profile
-        &lt;svg class=&quot;icon icon-11 icon-text icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-          &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;help&quot;&gt;
+  &lt;div class=&quot;help-title&quot;&gt;Need More Help?&lt;/div&gt;
+  &lt;div class=&quot;help-description&quot;&gt;Here&#x27;s some help text. There are things you should know.&lt;/div&gt;
+&lt;/div&gt;</pre>
+                        </div> <!-- end kss-component-description -->
+                        <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                        <div class="kss-example padded-bottom"><div class="help">
+  <div class="help-title">Need More Help?</div>
+  <div class="help-description">Here's some help text. There are things you should know.</div>
+</div></div>
+                  </div>
+                </section>
+                <section class="kss-depth-2">
+                  <div class="kss-component">
+                    <div class="kss-component-description row full-border">
+                      <h2 class="kss-title" id="15-2">
+                      <span class="kss-ref badge pull-right">15-2</span> Control Panel
+                      </h2>
+                        <div class="kss-box padded"><p>The control panel helps a user manage a list of modifications.</p>
+</div>
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;control-panel&quot;&gt;
+  &lt;div class=&quot;control-panel-heading&quot;&gt;Recent Revisions&lt;/div&gt;
+  &lt;div class=&quot;control-panel-body&quot;&gt;
+    &lt;div class=&quot;control-panel-subheading&quot;&gt;Oct 7th, 2016&lt;/div&gt;
+    &lt;ul class=&quot;control-panel-list&quot;&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:07pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;This is it&lt;/span&gt;
+        &lt;svg alt=&quot;Previewing&quot; class=&quot;icon icon-text icon-svg-star-empty&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#eye&quot;&gt;&lt;/use&gt;
         &lt;/svg&gt;
-      &lt;/a&gt;
-    &lt;/div&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:04pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;Almost there&lt;/span&gt;
+        &lt;svg alt=&quot;Live&quot; class=&quot;icon icon-text icon-svg-star-empty&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#star-empty&quot;&gt;&lt;/use&gt;
+        &lt;/svg&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;div class=&quot;control-panel-subheading&quot;&gt;Oct 6th, 2016&lt;/div&gt;
+    &lt;ul class=&quot;control-panel-list&quot;&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:07pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;This is a better attempt at success&lt;/span&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:04pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;First attempt&lt;/span&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
   &lt;/div&gt;
-  &lt;div class=&quot;list-group list-group-flush&quot;&gt; &lt;!-- Uses twbs css --&gt;
-    &lt;a href=&quot;#&quot; class=&quot;list-group-item&quot; target=&quot;_blank&quot;&gt;
-      Customer Support
-      &lt;svg class=&quot;icon icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-        &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
-      &lt;/svg&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;card-footer&quot;&gt;
-    &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;&gt;Sign Out&lt;/a&gt;
+  &lt;div class=&quot;control-panel-footer&quot;&gt;
+    &lt;a href=&quot;#&quot; class=&quot;btn btn-control-panel&quot;&gt;Revert to the Original&lt;/a&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom"><div class="card card-user ">
-  <div class="card-block media media-sm">
-    <div class="media-left">
-      <div class="media-image-wrap">
-        <a title="LittleChick" href="#">
-          <img src="./public/resources/images/little-chick.jpg">
-        </a>
-      </div>
-    </div>
-    <div class="media-content">
-      <div class="media-title">
-        <a href="#">LittleChick</a>
-      </div>
-      <div class="info">Administrator</div>
-      <a class="btn btn-sm-rounded btn-secondary padded-top" href="#">
-        My Profile
-        <svg class="icon icon-11 icon-text icon-svg-external-link" viewBox="0 0 17 17">
-          <use xlink:href="#external-link"></use>
+                        <div class="kss-example padded-bottom"><div class="control-panel">
+  <div class="control-panel-heading">Recent Revisions</div>
+  <div class="control-panel-body">
+    <div class="control-panel-subheading">Oct 7th, 2016</div>
+    <ul class="control-panel-list">
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:07pm</a>
+        <span class="control-panel-list-item-label">This is it</span>
+        <svg alt="Previewing" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+          <use xlink:href="#eye"></use>
         </svg>
-      </a>
-    </div>
+      </li>
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:04pm</a>
+        <span class="control-panel-list-item-label">Almost there</span>
+        <svg alt="Live" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+          <use xlink:href="#star-empty"></use>
+        </svg>
+      </li>
+    </ul>
+    <div class="control-panel-subheading">Oct 6th, 2016</div>
+    <ul class="control-panel-list">
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:07pm</a>
+        <span class="control-panel-list-item-label">This is a better attempt at success</span>
+      </li>
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:04pm</a>
+        <span class="control-panel-list-item-label">First attempt</span>
+      </li>
+    </ul>
   </div>
-  <div class="list-group list-group-flush"> <!-- Uses twbs css -->
-    <a href="#" class="list-group-item" target="_blank">
-      Customer Support
-      <svg class="icon icon-svg-external-link" viewBox="0 0 17 17">
-        <use xlink:href="#external-link"></use>
-      </svg>
-    </a>
-  </div>
-  <div class="card-footer">
-    <a href="#" class="btn btn-secondary">Sign Out</a>
+  <div class="control-panel-footer">
+    <a href="#" class="btn btn-control-panel">Revert to the Original</a>
   </div>
 </div></div>
                   </div>

@@ -71,8 +71,9 @@
     function aceInit(element) {
         // Editor classes
         codeInput.init($('.pockets #Form_Body', element), 'html', 200);
-        codeInput.init($('#Form_CustomHtml', element), 'html', 800);
-        codeInput.init($('#Form_CustomCSS', element), 'css', 800);
+        // Don't let our code editor go taller than the window length. Makes for weird scrolling.
+        codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
+        codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
         codeInput.start(element);
     }
 
@@ -94,11 +95,7 @@
             spacerClass: 'js-scroll-to-fixed-spacer'
         });
 
-        $('.modal-header', element).scrollToFixed({
-            zIndex: 1005
-        });
-
-        $('.modal-footer', element).scrollToFixed({
+        $('.js-modal-fixed', element).scrollToFixed({
             zIndex: 1005
         });
 
@@ -118,8 +115,9 @@
     }
 
     function fluidFixedInit(element) {
+        // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
-            offsetBottom: 72
+            offsetBottom: 72 + 9
         });
     }
 
@@ -176,31 +174,41 @@
 
     function drawerInit(element) {
 
-        $('.panel-left', element).drawer({
-            toggle    : '.js-panel-left-toggle'
-            , container : '.main-container'
-            , content   : '.main-row .main'
+        // Selectors
+        var drawer = '.js-drawer';
+        var drawerToggle = '.js-drawer-toggle';
+        var content = '.main-row .main';
+        var container = '.main-container';
+
+        $(drawer, element).drawer({
+            toggle: drawerToggle,
+            container: container,
+            content: content
         });
 
-        $('.panel-left', element).on('drawer.show', function() {
+        $(drawerToggle).on('click', function() {
             window.scrollTo(0, 0);
-            $('.panel-nav .js-fluid-fixed').trigger('detach.FluidFixed');
-            $('.main-row .main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
-            $('.main-row .main').css('overflow', 'hidden');
+        });
+
+        $(drawer, element).on('drawer.show', function() {
+            $('.panel-nav .js-fluid-fixed', element).trigger('detach.FluidFixed');
+            $(content, element).height($('.panel-nav .js-fluid-fixed', element).outerHeight(true) + 132);
+            $(content, element).css('overflow', 'hidden');
 
         });
 
-        $('.panel-left', element).on('drawer.hide', function() {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
-            $('.main-row .main').height('auto');
-            $('.main-row .main').css('overflow', 'auto');
+        $(drawer, element).on('drawer.hide', function() {
+            // TODO: We should only reset if the panel is actually displayed.
+            $('.panel-nav .js-fluid-fixed', element).trigger('reset.FluidFixed');
+            $(content, element).height('auto');
+            $(content, element).css('overflow', 'inherit');
         });
 
         $(window).resize(function() {
-            if ($('.js-panel-left-toggle').css('display') !== 'none') {
-                $('.main-container', element).addClass('drawer-hide');
-                $('.main-container', element).removeClass('drawer-show');
-                $('.panel-left', element).trigger('drawer.hide');
+            if ($(drawerToggle, element).css('display') !== 'none') {
+                $(container, element).addClass('drawer-hide');
+                $(container, element).removeClass('drawer-show');
+                $(drawer, element).trigger('drawer.hide');
             }
         });
     }
@@ -226,8 +234,15 @@
         $('.FeedDescription', element).expander({
             slicePoint: 65,
             normalizeWhitespace: true,
-            expandText: gdn.definition('ExpandText'),
-            userCollapseText: gdn.definition('CollapseText')
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('CollapseText', 'less')
+        });
+
+        $('.InformMessageBody, .toaster-body', element).expander({
+            slicePoint: 60,
+            normalizeWhitespace: true,
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('', '')
         });
     }
 
@@ -266,11 +281,19 @@
     // Event handlers
 
     $(document).on('shown.bs.collapse', function() {
-        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
+        } else {
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        }
     });
 
     $(document).on('hidden.bs.collapse', function() {
-        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
+        } else {
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        }
     });
 
     $(document).on('click', '.js-save-pref-collapse', function() {

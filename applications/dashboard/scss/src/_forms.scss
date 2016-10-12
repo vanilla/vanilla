@@ -37,7 +37,6 @@ form {
 // adding the `label` class to a div around your fake label. Accessibility matters, though. Don't forget to add
 // appropriate aria-label or aria-labelledby attributes in these cases.
 //
-//
 // Markup:
 // <form>
 //   <ul>
@@ -117,7 +116,12 @@ form {
   padding-top: 1rem;
   padding-bottom: 1rem;
   margin-bottom: 0;
-  border-bottom: 1px dotted #e7e8e9;
+  border-bottom: $border-width dotted #e7e8e9;
+
+  &:first-child {
+    border-top: $border-width solid $border-color;
+    @include has-top-border;
+  }
 
   > .no-grid {
     @extend .row-padding-left;
@@ -161,7 +165,7 @@ form {
 //
 // If you have a form field with multiple options, you can display them inline, or stacked.
 //
-// .stacked - Stacks radio or checkboxes.
+// .inline - Displays input inline.
 //
 // Markup:
 // <form>
@@ -188,8 +192,14 @@ label,
   margin-bottom: 0;
 }
 
-.stacked label {
+.input-wrap:not(.inline) label {
   display: block;
+}
+
+.input-wrap.inline {
+  label {
+    margin-right: $spacer / 4;
+  }
 }
 
 .form-control {
@@ -222,6 +232,8 @@ label,
   border: 0;
   padding-top: 0;
   padding-bottom: $spacer;
+  margin-left: 0;
+  margin-right: 0;
 
   &:last-child {
     padding-bottom: 0;
@@ -251,7 +263,7 @@ label,
 //
 // Here's how to build an anchor toggle.
 //
-// .toggle-wrap-on - On state
+// .toggle-wrap-on - On state.
 //
 // Markup:
 // <div class="toggle-wrap {{modifier_class}}">
@@ -427,16 +439,14 @@ label,
 // Select
 //
 // Includes IE9-specific hacks (noted by ` \9`).
-
+select,
 select.form-control {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
-}
-
-select {
   display: inline-block;
   height: $control-height-rem;
   max-width: 100%;
   padding-right: 2rem;
+  padding-left: .75rem;
+
   color: $input-color;
   vertical-align: middle;
 
@@ -540,12 +550,7 @@ select + select {
     cursor: default;
 
     .overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
       opacity: 1;
-      background-color: $white;
       background-color: rgba(255,255,255,.7);
 
       > .buttons {
@@ -595,8 +600,11 @@ select + select {
   }
 
   .overlay {
-    display: block;
+    display: flex;
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     bottom: 0;
     left: 0;
     right: 0;
@@ -889,7 +897,7 @@ select + select {
 
 .radio + .radio,
 .checkbox + .checkbox {
-  margin-top: $spacer / 4;
+  margin-top: 0; // Override twbs
 }
 
 // Checkboxes and Radios
@@ -936,7 +944,7 @@ select + select {
     background-color: $brand-primary;
     border-color: $brand-primary;
 
-    &:before {
+    &::before {
       display: block;
       color: $white;
     }
@@ -946,7 +954,7 @@ select + select {
 .iradio {
   border-radius: $spacer / 2;
 
-  &.checked:before {
+  &.checked::before {
     position: absolute;
     display: block;
     top: -$border-width;
@@ -967,7 +975,7 @@ select + select {
   background-color: $brand-primary;
   border-color: $brand-primary;
 
-  &:before {
+  &::before {
     display: block;
     margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
     color: $white;

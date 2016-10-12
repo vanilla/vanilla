@@ -81,92 +81,49 @@
         <div class="panel-content-wrapper">
           <div id="fixed-help" class="js-fluid-fixed panel-content">
             <ul class="nav nav-pills" data-spy="affix">
-                <li><a href="#12-1" class="nav-link">Card</a></li>
+                <li><a href="#16-1" class="nav-link">Alerts</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="main">
         <div class="content">
-                <h1 class="kss-title" id="12">Cards</h1>
+                <h1 class="kss-title" id="16">Alerts</h1>
+                  <div class="kss-box">
+                    <div class="padded"><p>Alerts are warning/info/danger/success messages that generally appear at the top of a page. Alerts use twbs&#39;s scss.</p>
+</div>
+                  </div>
                 <section class="kss-depth-2">
                   <div class="kss-component">
                     <div class="kss-component-description row full-border">
-                      <h2 class="kss-title" id="12-1">
-                      <span class="kss-ref badge pull-right">12-1</span> Card
+                      <h2 class="kss-title" id="16-1">
+                      <span class="kss-ref badge pull-right">16-1</span> Alerts
                       </h2>
-                        <div class="kss-box padded"><p>A card is a collection of info that appears in a vertical card-looking container. We currently use a card for the
-user dropdown in the navbar. A card&#39;s width will expand or contract based on the size of the container it&#39;s in.</p>
+                        <div class="kss-box padded"><p>Alerts come in four different flavours.</p>
 </div>
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;card card-user &quot;&gt;
-  &lt;div class=&quot;card-block media media-sm&quot;&gt;
-    &lt;div class=&quot;media-left&quot;&gt;
-      &lt;div class=&quot;media-image-wrap&quot;&gt;
-        &lt;a title=&quot;LittleChick&quot; href=&quot;#&quot;&gt;
-          &lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;
-        &lt;/a&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;media-content&quot;&gt;
-      &lt;div class=&quot;media-title&quot;&gt;
-        &lt;a href=&quot;#&quot;&gt;LittleChick&lt;/a&gt;
-      &lt;/div&gt;
-      &lt;div class=&quot;info&quot;&gt;Administrator&lt;/div&gt;
-      &lt;a class=&quot;btn btn-sm-rounded btn-secondary padded-top&quot; href=&quot;#&quot;&gt;
-        My Profile
-        &lt;svg class=&quot;icon icon-11 icon-text icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-          &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
-        &lt;/svg&gt;
-      &lt;/a&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;list-group list-group-flush&quot;&gt; &lt;!-- Uses twbs css --&gt;
-    &lt;a href=&quot;#&quot; class=&quot;list-group-item&quot; target=&quot;_blank&quot;&gt;
-      Customer Support
-      &lt;svg class=&quot;icon icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-        &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
-      &lt;/svg&gt;
-    &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;card-footer&quot;&gt;
-    &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;&gt;Sign Out&lt;/a&gt;
-  &lt;/div&gt;
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;alert [modifier class] padded&quot;&gt;
+  This is an alert message. Take note ye all.
 &lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom"><div class="card card-user ">
-  <div class="card-block media media-sm">
-    <div class="media-left">
-      <div class="media-image-wrap">
-        <a title="LittleChick" href="#">
-          <img src="./public/resources/images/little-chick.jpg">
-        </a>
-      </div>
-    </div>
-    <div class="media-content">
-      <div class="media-title">
-        <a href="#">LittleChick</a>
-      </div>
-      <div class="info">Administrator</div>
-      <a class="btn btn-sm-rounded btn-secondary padded-top" href="#">
-        My Profile
-        <svg class="icon icon-11 icon-text icon-svg-external-link" viewBox="0 0 17 17">
-          <use xlink:href="#external-link"></use>
-        </svg>
-      </a>
-    </div>
-  </div>
-  <div class="list-group list-group-flush"> <!-- Uses twbs css -->
-    <a href="#" class="list-group-item" target="_blank">
-      Customer Support
-      <svg class="icon icon-svg-external-link" viewBox="0 0 17 17">
-        <use xlink:href="#external-link"></use>
-      </svg>
-    </a>
-  </div>
-  <div class="card-footer">
-    <a href="#" class="btn btn-secondary">Sign Out</a>
-  </div>
+                        <div class="kss-example padded-bottom"><div class="alert [modifier class] padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Inform the user about something. It&#39;s not going to break anything if they don&#39;t see this, but it&#39;s good to know.</span> <span class="pull-right"><code>.alert-info</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-info padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Warn the user about something. It&#39;s best that they heed this advice if they want everything to run smoothly.</span> <span class="pull-right"><code>.alert-warning</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-warning padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Alert the user of a failure or if they&#39;re about to do something that has serious consequences.</span> <span class="pull-right"><code>.alert-danger</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-danger padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Let the user know that what they&#39;ve tried to do has been successful.</span> <span class="pull-right"><code>.alert-success</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-success padded">
+  This is an alert message. Take note ye all.
 </div></div>
                   </div>
                 </section>

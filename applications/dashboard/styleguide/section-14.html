@@ -81,91 +81,151 @@
         <div class="panel-content-wrapper">
           <div id="fixed-help" class="js-fluid-fixed panel-content">
             <ul class="nav nav-pills" data-spy="affix">
-                <li><a href="#12-1" class="nav-link">Card</a></li>
+                <li><a href="#14-1" class="nav-link">Dropdown Menu alignment</a></li>
+                <li><a href="#14-2" class="nav-link">Dropup Variation</a></li>
             </ul>
           </div>
         </div>
       </div>
       <div class="main">
         <div class="content">
-                <h1 class="kss-title" id="12">Cards</h1>
+                <h1 class="kss-title" id="14">Dropdowns</h1>
+                  <div class="kss-box">
+                    <div class="padded"><p>The dropdown uses twbs&#39;s scss.</p>
+<p>PHP rendering: Use the <code>dropdown-twbs</code> view using the Dropdown Module.</p>
+</div>
+                  </div>
                 <section class="kss-depth-2">
                   <div class="kss-component">
                     <div class="kss-component-description row full-border">
-                      <h2 class="kss-title" id="12-1">
-                      <span class="kss-ref badge pull-right">12-1</span> Card
+                      <h2 class="kss-title" id="14-1">
+                      <span class="kss-ref badge pull-right">14-1</span> Dropdown Menu alignment
                       </h2>
-                        <div class="kss-box padded"><p>A card is a collection of info that appears in a vertical card-looking container. We currently use a card for the
-user dropdown in the navbar. A card&#39;s width will expand or contract based on the size of the container it&#39;s in.</p>
+                        <div class="kss-box padded"><p>PHP rendering: If you want the dropdown menu to open right, set the Dropdown Module&#39;s <code>listCssClass</code> to
+<code>dropdown-menu-right</code>.</p>
 </div>
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;card card-user &quot;&gt;
-  &lt;div class=&quot;card-block media media-sm&quot;&gt;
-    &lt;div class=&quot;media-left&quot;&gt;
-      &lt;div class=&quot;media-image-wrap&quot;&gt;
-        &lt;a title=&quot;LittleChick&quot; href=&quot;#&quot;&gt;
-          &lt;img src=&quot;./public/resources/images/little-chick.jpg&quot;&gt;
-        &lt;/a&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;media-content&quot;&gt;
-      &lt;div class=&quot;media-title&quot;&gt;
-        &lt;a href=&quot;#&quot;&gt;LittleChick&lt;/a&gt;
-      &lt;/div&gt;
-      &lt;div class=&quot;info&quot;&gt;Administrator&lt;/div&gt;
-      &lt;a class=&quot;btn btn-sm-rounded btn-secondary padded-top&quot; href=&quot;#&quot;&gt;
-        My Profile
-        &lt;svg class=&quot;icon icon-11 icon-text icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-          &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
-        &lt;/svg&gt;
-      &lt;/a&gt;
-    &lt;/div&gt;
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;dropdown&quot;&gt;
+  &lt;div class=&quot;dropdown-toggle btn btn-icon-border&quot; data-toggle=&quot;dropdown&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;false&quot;&gt;
+    &lt;svg class=&quot;icon icon-16&quot; viewBox=&quot;0 0 16 16&quot;&gt;
+      &lt;use xlink:href=&quot;#code-bubble&quot;&gt;&lt;/use&gt;
+    &lt;/svg&gt;
   &lt;/div&gt;
-  &lt;div class=&quot;list-group list-group-flush&quot;&gt; &lt;!-- Uses twbs css --&gt;
-    &lt;a href=&quot;#&quot; class=&quot;list-group-item&quot; target=&quot;_blank&quot;&gt;
-      Customer Support
-      &lt;svg class=&quot;icon icon-svg-external-link&quot; viewBox=&quot;0 0 17 17&quot;&gt;
-        &lt;use xlink:href=&quot;#external-link&quot;&gt;&lt;/use&gt;
+  &lt;div class=&quot;dropdown-menu [modifier class]&quot;&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;Option&lt;/a&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item disabled&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;Disabled Option&lt;/a&gt;
+    &lt;div class=&quot;dropdown-divider&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;dropdown-header&quot;&gt;Display as&lt;/div&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;
+      &lt;svg class=&quot;icon icon-16 icon-discussions&quot; viewBox=&quot;0 0 16 16&quot;&gt;
+        &lt;use xlink:href=&quot;#question-mark&quot;&gt;&lt;/use&gt;
       &lt;/svg&gt;
+      Help
     &lt;/a&gt;
-  &lt;/div&gt;
-  &lt;div class=&quot;card-footer&quot;&gt;
-    &lt;a href=&quot;#&quot; class=&quot;btn btn-secondary&quot;&gt;Sign Out&lt;/a&gt;
   &lt;/div&gt;
 &lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom"><div class="card card-user ">
-  <div class="card-block media media-sm">
-    <div class="media-left">
-      <div class="media-image-wrap">
-        <a title="LittleChick" href="#">
-          <img src="./public/resources/images/little-chick.jpg">
-        </a>
-      </div>
-    </div>
-    <div class="media-content">
-      <div class="media-title">
-        <a href="#">LittleChick</a>
-      </div>
-      <div class="info">Administrator</div>
-      <a class="btn btn-sm-rounded btn-secondary padded-top" href="#">
-        My Profile
-        <svg class="icon icon-11 icon-text icon-svg-external-link" viewBox="0 0 17 17">
-          <use xlink:href="#external-link"></use>
-        </svg>
-      </a>
-    </div>
+                        <div class="kss-example padded-bottom"><div class="dropdown">
+  <div class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <svg class="icon icon-16" viewBox="0 0 16 16">
+      <use xlink:href="#code-bubble"></use>
+    </svg>
   </div>
-  <div class="list-group list-group-flush"> <!-- Uses twbs css -->
-    <a href="#" class="list-group-item" target="_blank">
-      Customer Support
-      <svg class="icon icon-svg-external-link" viewBox="0 0 17 17">
-        <use xlink:href="#external-link"></use>
+  <div class="dropdown-menu [modifier class]">
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+    <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Display as</div>
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+      <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
+        <use xlink:href="#question-mark"></use>
       </svg>
+      Help
     </a>
   </div>
-  <div class="card-footer">
-    <a href="#" class="btn btn-secondary">Sign Out</a>
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Opens with the right side of the dropdown menu aligned the right of the root dropdown div.</span> <span class="pull-right"><code>.dropdown-menu-right</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="dropdown">
+  <div class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <svg class="icon icon-16" viewBox="0 0 16 16">
+      <use xlink:href="#code-bubble"></use>
+    </svg>
+  </div>
+  <div class="dropdown-menu dropdown-menu-right">
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+    <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Display as</div>
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+      <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
+        <use xlink:href="#question-mark"></use>
+      </svg>
+      Help
+    </a>
+  </div>
+</div></div>
+                  </div>
+                </section>
+                <section class="kss-depth-2">
+                  <div class="kss-component">
+                    <div class="kss-component-description row full-border">
+                      <h2 class="kss-title" id="14-2">
+                      <span class="kss-ref badge pull-right">14-2</span> Dropup Variation
+                      </h2>
+                        <div class="kss-box padded"><p>PHP rendering: If you want the dropdown menu to open up, set the Dropdown Module&#39;s <code>cssClass</code> property to <code>dropup</code>.</p>
+</div>
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;dropdown [modifier class]&quot;&gt;
+  &lt;div class=&quot;dropdown-toggle btn btn-secondary&quot; data-toggle=&quot;dropdown&quot; aria-haspopup=&quot;true&quot; aria-expanded=&quot;false&quot;&gt;
+    Trigger
+  &lt;/div&gt;
+  &lt;div class=&quot;dropdown-menu&quot;&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;Option&lt;/a&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item disabled&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;Disabled Option&lt;/a&gt;
+    &lt;div class=&quot;dropdown-divider&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;dropdown-header&quot;&gt;Display as&lt;/div&gt;
+    &lt;a role=&quot;menuitem&quot; class=&quot;dropdown-item&quot; tabindex=&quot;-1&quot; href=&quot;#&quot;&gt;
+      &lt;svg class=&quot;icon icon-16&quot; viewBox=&quot;0 0 16 16&quot;&gt;
+        &lt;use xlink:href=&quot;#question-mark&quot;&gt;&lt;/use&gt;
+      &lt;/svg&gt;
+      Help
+    &lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                        </div> <!-- end kss-component-description -->
+                        <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                        <div class="kss-example padded-bottom"><div class="dropdown [modifier class]">
+  <div class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Trigger
+  </div>
+  <div class="dropdown-menu">
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+    <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Display as</div>
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+      <svg class="icon icon-16" viewBox="0 0 16 16">
+        <use xlink:href="#question-mark"></use>
+      </svg>
+      Help
+    </a>
+  </div>
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Opens up instead of down.</span> <span class="pull-right"><code>.dropup</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="dropdown dropup">
+  <div class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Trigger
+  </div>
+  <div class="dropdown-menu">
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+    <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+    <div class="dropdown-divider"></div>
+    <div class="dropdown-header">Display as</div>
+    <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+      <svg class="icon icon-16" viewBox="0 0 16 16">
+        <use xlink:href="#question-mark"></use>
+      </svg>
+      Help
+    </a>
   </div>
 </div></div>
                   </div>

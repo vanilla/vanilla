@@ -20,6 +20,7 @@
         var debug = function(vars) {
             console.log('windowHeight    : ' + vars.windowHeight);
             console.log('documentHeight  : ' + vars.documentHeight);
+            console.log('containerHeight : ' + vars.containerHeight);
             console.log('maxMarginDiff   : ' + vars.maxMarginDiff);
             console.log('upstartMargin   : ' + vars.upstartMargin);
             console.log('downstartMargin : ' + vars.downstartMargin);
@@ -63,6 +64,8 @@
                     // We're going to extend past the page bottom.
                     $(element).css('margin-top', vars.maxMarginDiff);
                 }
+            } else {
+                $(element).css('position', vars.position);
             }
 
             if (handleScroll) {
@@ -180,6 +183,12 @@
                 settings.offsetBottom = 0;
             }
 
+            var position = 'static';
+
+            if ($(this).css('position') !== null) {
+                position = $(this).css('position');
+            }
+
             var vars = {
                 id: Math.random().toString(36).substr(2, 9),
                 offsetTop: settings.offsetTop,
@@ -194,7 +203,8 @@
                 downstart: 0,
                 lastMarginTop: 0,
                 lastScrollTop: window.pageYOffset,
-                st: window.pageYOffset
+                st: window.pageYOffset,
+                position: position
             };
 
             $(self).on('reset.FluidFixed', function() {

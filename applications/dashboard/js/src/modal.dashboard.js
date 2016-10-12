@@ -32,33 +32,30 @@ var DashboardModal = (function() {
             cssClass: '',
             title: '',
             footer: '',
-            closeIcon: '',
             body: '',
+            closeIcon: '',
             form: {
                 open: '',
                 close: ''
             }
         },
 
-        settings: {},
-
         target: '',
 
         trigger: {},
 
-
         modalHtml: ' \
         <div><div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
-                <div class="modal-header"> \
+                <div class="modal-header js-modal-fixed"> \
+                    <h4 class="modal-title">{title}</h4> \
                     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
-                    <h4 class="modal-title">{title}</h4> \
                 </div> \
                 {form.open} \
                 <div class="modal-body">{body}</div> \
-                <div class="modal-footer">{footer}</div> \
+                <div class="modal-footer js-modal-fixed">{footer}</div> \
                 {form.close} \
             </div> \
         </div></div>',
@@ -167,8 +164,8 @@ var DashboardModal = (function() {
             var ok = gdn.definition('Okay', 'Okay');
             var cancel = gdn.definition('Cancel', 'Cancel');
 
-            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
-            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>';
+            var footer = '<button class="btn btn-secondary btn-cancel js-cancel">' + cancel + '</button>';
+            footer += '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
 
             return {
                 title: confirmHeading,
@@ -190,7 +187,7 @@ var DashboardModal = (function() {
             $.extend(true, content, this.defaultContent);
 
             // Data attributes override parsed content, content overrides defaults.
-            $.extend(true, parsedContent, this.settings.content);
+            $.extend(true, parsedContent, this.settings);
             $.extend(true, content, parsedContent);
 
             var html = '';
@@ -286,7 +283,7 @@ var DashboardModal = (function() {
             var formCloseTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
-            var $footer = $elem.find('.Buttons, .js-modal-footer');
+            var $footer = $elem.find('.Buttons, .form-footer, .js-modal-footer');
             var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title

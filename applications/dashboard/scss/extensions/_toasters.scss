@@ -1,0 +1,33 @@
+// We can get rid of this section when we change the InformMessage class to .toaster in global.js. Inform messages
+// are used in the frontend, too. So we'll need to decouple the css class with the js implementation. Also, we need
+// to ensure the error messages that are ajax-ed in don't add additional styling. For instance, we shouldn't have an
+// alert-type message in a toaster.
+
+.InformMessages {
+  @extend .toasters;
+
+  .InformMessage {
+    @extend .toaster;
+
+    .Close {
+      @extend .toaster-close;
+
+      span {
+        display: none;
+      }
+    }
+
+    .InformSprite {
+      display: none;
+    }
+  }
+
+  .Messages.Errors {
+    @include list-reset;
+
+    background: 0;
+    padding: 0;
+    border: 0;
+    margin: 0;
+  }
+}

@@ -8,9 +8,9 @@
 //
 // Here are the main button styles.
 //
-// .btn-primary - A button that causes a state change or performs a action
-// .btn-secondary - A button for secondary operations, like filtering, clearing or cancelling
-// .btn-link - A button that looks like a link but has the same margins as a button
+// .btn-primary - A button that causes a state change or performs a action.
+// .btn-secondary - A button for secondary operations, like filtering, clearing or cancelling.
+// .btn-link - A button that looks like a link but has the same margins as a button.
 //
 // Markup:
 // <div class="btn {{modifier_class}}">Button</div>
@@ -175,19 +175,20 @@ fieldset[disabled] a.btn {
 
 .btn-icon-border {
   @include button-variant($btn-secondary-color, $btn-secondary-bg, $btn-secondary-border, $btn-secondary-color, lighten($brand-primary, 50%), $btn-secondary-border);
-  @extend .icon;
 
   $btn-icon-height: 28;
   $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
 
-  &:first-child {
-    margin-left: 0;
+  svg {
+    fill: $grey-dark;
+    opacity: 0.7;
+    height: to-rem($btn-icon-height);
   }
 
-  svg {
-    height: to-rem($btn-icon-height);
+  &:first-child {
+    margin-left: 0;
   }
 }
 

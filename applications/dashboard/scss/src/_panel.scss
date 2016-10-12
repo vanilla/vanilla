@@ -1,79 +1,57 @@
-// Panel
+// Panel Components
 //
-// Find the panel styling here.
+// The right panel in the dashboard generally contains explanatory text for the settings page it appears on.
+// Customize theme also adds a control panel component.
 //
-// No styleguide reference.
+// PHP rendering: Add help content the `Help` asset. To do this, wrap the help div in
+// `Gdn_Theme::assetBegin('Help');` and `Gdn_Theme::assetEnd();`
+//
+// Styleguide 15.
 
-.panel {
-  padding-top: $spacer * 4;
-  padding-bottom: $spacer * 4;
+// Help Asset
+//
+// Styles extra helper text for the panel.
+//
+// PHP rendering: The `helpAsset(title, body)` function adds properly formatted help text to the Help asset.
+// To render the following example, you would call:
+// `helpAsset("Need More Help?", "Here's some help text. There are things you should know.");`
+//
+// Markup:
+// <div class="help">
+//   <div class="help-title">Need More Help?</div>
+//   <div class="help-description">Here's some help text. There are things you should know.</div>
+// </div>
+//
+// Styleguide 15.1.
 
-  code {
-    word-wrap: break-word;
-  }
-}
-
-.panel-content,
-.panel-content-wrapper {
-  width: 204px;
-}
-
-.panel-left-toggle {
-  display: none;
-}
-
-.panel-left {
-  padding-left: $spacer;
-
-  .panel-content {
-    float: right;
-  }
-
-  .btn-signout {
-    display: none;
-  }
-}
-
-.panel-right {
-  order: 3;
-  color: $grey-dark;
+.help {
+  margin-bottom: $spacer * 2;
   font-weight: 200;
-  padding-right: $spacer;
+  color: $grey-dark;
 
-
-  .panel-content {
-    padding-left: $spacer;
-    float: left;
-  }
-
-  h2,
-  h3 {
+  .help-title {
     padding-bottom: $spacer / 2;
+    margin-top: 0;
     margin-bottom: $spacer / 2;
-    border-bottom: 1px dotted $grey-dark-border;
-  }
-
-  h2 {
-    letter-spacing: .0625rem;
+    border-bottom: $border-width dotted $grey-dark-border;
+    letter-spacing: to-rem(1);
+    font-size: $font-size-h2;
     font-weight: 100;
     text-transform: uppercase;
   }
 
-  .help,
-  .Help {
-    a {
-      color: $brand-primary;
-      border-bottom: $border-width dotted $brand-primary;
+  a {
+    color: $brand-primary;
+    border-bottom: $border-width dotted $brand-primary;
 
-      &,
-      &:hover {
-        text-decoration: none;
-      }
+    &,
+    &:hover {
+      text-decoration: none;
     }
   }
 
-  ul {
-    @include list-reset;
+  code {
+    word-wrap: break-word;
   }
 
   li {
@@ -81,58 +59,62 @@
     font-size: to-rem(12);
   }
 
-  ol {
+  ol,
+  ul {
     padding-left: $spacer;
   }
-
-  .Aside,
-  .aside {
-    margin-bottom: $spacer * 3;
-  }
 }
 
-@include media-breakpoint-down(md) {
-  .panel-right {
-    display: none;
-  }
-
-  .panel-left {
-    display: none;
-  }
-
-  .panel-left-toggle {
-    display: block;
-    color: $white;
-    font-size: $font-size-lg;
-
-    &:hover,
-    &:active,
-    &:focus {
-      color: $white;
-      text-decoration: none;
-      outline: 0;
-    }
-
-    &:hover,
-    &:active {
-      background-color: $navbar-active-link-active-bg;
-    }
-  }
-
-  .drawer-show .panel-left {
-    position: absolute;
-    display: block;
-    width: $drawer-width;
-    height: 100%;
-  }
-}
+// Control Panel
+//
+// The control panel helps a user manage a list of modifications.
+//
+// Markup:
+// <div class="control-panel">
+//   <div class="control-panel-heading">Recent Revisions</div>
+//   <div class="control-panel-body">
+//     <div class="control-panel-subheading">Oct 7th, 2016</div>
+//     <ul class="control-panel-list">
+//       <li class="control-panel-list-item">
+//         <a href="#">→ 2:07pm</a>
+//         <span class="control-panel-list-item-label">This is it</span>
+//         <svg alt="Previewing" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+//           <use xlink:href="#eye"></use>
+//         </svg>
+//       </li>
+//       <li class="control-panel-list-item">
+//         <a href="#">→ 2:04pm</a>
+//         <span class="control-panel-list-item-label">Almost there</span>
+//         <svg alt="Live" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+//           <use xlink:href="#star-empty"></use>
+//         </svg>
+//       </li>
+//     </ul>
+//     <div class="control-panel-subheading">Oct 6th, 2016</div>
+//     <ul class="control-panel-list">
+//       <li class="control-panel-list-item">
+//         <a href="#">→ 2:07pm</a>
+//         <span class="control-panel-list-item-label">This is a better attempt at success</span>
+//       </li>
+//       <li class="control-panel-list-item">
+//         <a href="#">→ 2:04pm</a>
+//         <span class="control-panel-list-item-label">First attempt</span>
+//       </li>
+//     </ul>
+//   </div>
+//   <div class="control-panel-footer">
+//     <a href="#" class="btn btn-control-panel">Revert to the Original</a>
+//   </div>
+// </div>
+//
+// Styleguide 15.2.
 
 .control-panel {
   font-size: to-rem(12);
   color: $grey-light-text;
   margin-bottom: $spacer * 2;
 
-  li {
+  .control-panel-list-item {
     line-height: to-rem(18);
     margin-bottom: 0;
 
@@ -140,6 +122,11 @@
       display: inline-block;
       vertical-align: middle;
     }
+  }
+
+  ul,
+  ol {
+    @include list-reset;
   }
 
   .control-panel-heading {
@@ -163,6 +150,8 @@
 
   .control-panel-list-item-label {
     max-width: to-rem(102);
+    font-style: italic;
+    @extend .truncate;
   }
 }
 

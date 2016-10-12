@@ -55,3 +55,18 @@ form {
 .label-selector .theme-description {
   display: none;
 }
+
+body {
+  transition: all 250ms;
+}
+
+ul {
+  margin-bottom: 0;
+}
+
+// TODO: I don't know where to put this yet.
+.main {
+  background-color: $white;
+  border-left: $border-width solid $border-color;
+  border-right: $border-width solid $border-color;
+}

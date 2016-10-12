@@ -126,3 +126,10 @@
     border-top: $border-width solid #e7e8e9;
   }
 }
+
+@mixin grid-item() {
+  @extend .col-xs-12;
+  @extend .col-sm-8;
+  @extend .col-lg-8;
+  @extend .col-xl-6;
+}

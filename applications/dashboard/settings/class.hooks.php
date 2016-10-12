@@ -247,6 +247,31 @@ class DashboardHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Aggressively prompt users to upgrade PHP version.
+     *
+     * @param $sender
+     */
+    public function settingsController_render_before($sender) {
+        // Set this in your config to dismiss our upgrade warnings. Not recommended.
+        if (c('Vanilla.WarnedMeToUpgrade') === 'PHP 5.6') {
+            return;
+        }
+
+        if (version_compare(phpversion(), '5.6') < 0) {
+            $UpgradeMessage = ['Content' => 'Upgrade to <b>PHP 5.6</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+            $MessageModule = new MessageModule($sender, $UpgradeMessage);
+            $sender->addModule($MessageModule);
+        }
+
+        $mysqlVersion = gdn::sql()->version();
+        if (version_compare($mysqlVersion, '5.6') < 0) {
+            $UpgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
+            $MessageModule = new MessageModule($sender, $UpgradeMessage);
+            $sender->addModule($MessageModule);
+        }
+    }
+
+    /**
      * Set P3P header because IE won't allow cookies thru the iFrame without it.
      *
      * This must be done in the Dispatcher because of PrivateCommunity.

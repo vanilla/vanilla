@@ -46,12 +46,7 @@ $this->EventArguments['AvailableAddons'] = &$availableAddons;
 $this->fireAs('SettingsController');
 $this->fireEvent('BeforeAddonList');
 
-Gdn_Theme::assetBegin('Help'); ?>
-<div>
-    <h2><?php echo $helpTitle; ?></h2>
-    <?php echo $pathHelp; ?>
-</div>
-<?php Gdn_Theme::assetEnd();
+helpAsset($helpTitle, $pathHelp);
 ?>
 <?php echo $title; ?>
 <?php if ($this->addonType !== 'locales') { ?>

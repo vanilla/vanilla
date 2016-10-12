@@ -110,6 +110,4 @@ echo $Form->errors();
     }
     ?>
 </ul>
-<div class="form-footer js-modal-footer">
 <?php echo $Form->close('Save'); ?>
-</div>

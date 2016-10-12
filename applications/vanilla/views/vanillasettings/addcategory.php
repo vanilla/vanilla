@@ -4,12 +4,8 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 echo $this->Form->hidden('ParentCategoryID');
-?>
-<?php
-Gdn_Theme::assetBegin('Help');
-    echo wrap(sprintf(t('About %s'), t('Categories')), 'h2');
-    echo t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.');
-Gdn_Theme::assetEnd();
+
+helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.'));
 ?>
 <ul>
     <li class="form-group">
@@ -115,7 +111,4 @@ echo $this->Form->Simple(
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
 echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
 echo '</div>';
-?>
-<div class="form-footer js-modal-footer">
-<?php echo $this->Form->close('Save'); ?>
-</div>
+echo $this->Form->close('Save');

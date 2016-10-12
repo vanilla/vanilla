@@ -8,10 +8,8 @@ $SpamLock = ArrayCombine(array(60, 120, 180, 240, 300, 600), array(1, 2, 3, 4, 5
 
 $ConversationsEnabled = $this->data('IsConversationsEnabled');
 
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.$this->data('Title').'</h2>';
-echo '<p>'.t('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.').'</p>';
-Gdn_Theme::assetEnd();
+$desc = t('Prevent spam on your forum by limiting the number of discussions &amp; comments that users can post within a given period of time.');
+helpAsset($this->data('Title'), $desc);
 
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -94,4 +92,4 @@ echo $this->Form->errors();
         </tbody>
     </table>
 </div>
-<div class="form-footer js-modal-footer"><?php echo $this->Form->close('Save'); ?> </div>
+<?php echo $this->Form->close('Save'); ?>

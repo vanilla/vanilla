@@ -34,6 +34,4 @@ echo $this->Form->errors();
         </li>
         <?php $this->fireEvent("AfterAddBanForm"); ?>
     </ul>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

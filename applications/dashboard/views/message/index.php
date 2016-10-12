@@ -1,21 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+$desc = t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.');
+helpAsset(sprintf(t('About %s'), t('Messages')), $desc);
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
 ?>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php echo '<h2>'.sprintf(t('About %s'), t('Messages')).'</h2>';
-        echo t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.');
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd(); ?>
-    <div class="header-block">
-        <h1><?php echo t('Manage Messages'); ?></h1>
-        <?php echo anchor(t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary'); ?>
-    </div>
+<div class="header-block">
+    <h1><?php echo t('Manage Messages'); ?></h1>
+    <?php echo anchor(t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary'); ?>
+</div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
 <div class="table-wrap">
     <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="table-data js-tj Sortable">

@@ -66,6 +66,20 @@ if (!function_exists('bigPlural')) {
 }
 
 /**
+ * Formats a help element and adds it to the help asset.
+ */
+if (!function_exists('helpAsset')) {
+    function helpAsset($title, $description) {
+        Gdn_Theme::assetBegin('Help');
+        echo '<div class="help">';
+        echo wrap($title, 'h2', ['class' => 'help-title']);
+        echo wrap($description, 'div', ['class' => 'help-description']);
+        echo '</div>';
+        Gdn_Theme::assetEnd();
+    }
+}
+
+/**
  * Outputs standardized HTML for a badge.
  * A badge generally designates a count, and displays with a contrasting background.
  *

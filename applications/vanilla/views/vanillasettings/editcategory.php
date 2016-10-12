@@ -116,7 +116,4 @@ echo $this->Form->Simple(
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
 echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
 echo '</div>';
-?>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+echo $this->Form->close('Save');

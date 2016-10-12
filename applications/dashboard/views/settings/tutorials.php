@@ -34,15 +34,12 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
         <div class="videos label-selector">
         <?php
         foreach ($Tutorials as $Tutorial) {
-        $current = ($CurrentTutorialCode == $Tutorial['Code']) ? 'current' : '';
+        $current = ($CurrentTutorialCode == $Tutorial['Code']) ? 'active' : '';
         echo '<div class="video label-selector-item '.$current.'">';
         echo '<div class="image-wrap">';
         echo '<img src="'.$Tutorial['Thumbnail'].'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
             <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
-                <div class="buttons">
-                    <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
-                </div>
-                <div class="selected"></div>
+                <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
             </a>
             <?php
             echo '</div>';

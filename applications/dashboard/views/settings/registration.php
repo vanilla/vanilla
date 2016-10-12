@@ -1,17 +1,9 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(sprintf(t('About %s'), t('Registration')), 'h2');
-        echo '<div>'.t('Change the way that new users register with the site.').'</div>';
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
-    <h1><?php echo t('User Registration Settings'); ?></h1>
+<?php if (!defined('APPLICATION')) exit();
+
+helpAsset(sprintf(t('About %s'), t('Registration')), t('Change the way that new users register with the site.'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'))
+?>
+<h1><?php echo t('User Registration Settings'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors(); ?>
@@ -129,6 +121,4 @@ echo $this->Form->errors(); ?>
     </table>
     </div>
 </div>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
-</div>

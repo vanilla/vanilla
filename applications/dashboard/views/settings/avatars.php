@@ -68,7 +68,5 @@
             </div>
         </li>
     </ul>
-    <div class="form-footer">
-        <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary')); ?>
-    </div>
+    <?php echo $this->Form->close('Save'); ?>
 </div>

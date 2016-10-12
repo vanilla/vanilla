@@ -36,7 +36,8 @@ class Gdn_Form extends Gdn_Pluggable {
             'textarea' => 'TextBox',
             'textbox' => 'InputBox',
             'input-wrap' => 'TextBoxWrapper',
-            'form-group' => ''
+            'form-group' => '',
+            'form-footer' => 'Buttons'
         ],
         'bootstrap' => [
             'default' => 'form-control',
@@ -58,6 +59,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
             'form-group' => 'form-group',
+            'form-footer' => 'js-modal-footer form-footer'
         ]
     ];
 
@@ -194,7 +196,6 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return bool Returns **true** if the styles were set or **false** otherwise.
      */
     public function setStyles($name) {
-//        if (inSection('Dashboard') && isset($this->allStyles[$name])) {
         if (isset($this->allStyles[$name])) {
             $this->styles = $this->allStyles[$name];
             return true;
@@ -1039,7 +1040,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if ($ButtonCode != '') {
-            $Return = '<div class="Buttons">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
         }
 
         return $Return;
@@ -2796,9 +2797,7 @@ PASSWORDMETER;
 
             $Description .= $image;
 
-            if (in_array(strtolower($Row['Control']), ['checkbox', 'checkboxlist', 'radiolist'])) {
-                $labelWrap = wrap($Description, 'div', ['class' => 'label-wrap']);
-            } elseif ($Description) {
+            if ($Description) {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
@@ -2826,11 +2825,11 @@ PASSWORDMETER;
                         .$this->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'radiolist':
-                    $Result .= $Description
+                    $Result .= $labelWrap
                         .wrap($this->radioList($Row['Name'], $Row['Items'], $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'checkboxlist':
-                    $Result .= $Description
+                    $Result .= $labelWrap
                         .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'imageupload':

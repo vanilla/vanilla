@@ -1,15 +1,14 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<div class="Help Aside">
-    <?php
-    echo '<h2>', t('Need More Help?'), '</h2>';
-    echo '<ul>';
-    echo '<li>', anchor(t('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/'), '</li>';
-    echo '<li>', anchor(t('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core'), '</li>';
-    echo '</ul>';
-    ?>
-</div>
-<?php Gdn_Theme::assetEnd(); ?>
+<?php
+
+$links = '<ul>';
+$links .= '<li>'.anchor(t('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/').'</li>';
+$links .= '<li>'.anchor(t('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core').'</li>';
+$links .= '</ul>';
+
+helpAsset(t('Need More Help?'), $links)
+?>
+
 <h1><?php echo t('Import'); ?></h1>
 <?php
 echo '<div class="padded">'
@@ -37,7 +36,7 @@ echo $this->Form->errors();
 <ul>
     <li class="form-group">
         <?php echo $this->Form->labelWrap('Select the import source', 'PathSelect'); ?>
-        <div class="input-wrap stacked">
+        <div class="input-wrap">
             <?php
             foreach ($this->data('ImportPaths') as $Path => $Text) {
                 echo '<div>',
@@ -82,6 +81,4 @@ echo $this->Form->errors();
         </div>
     </li>
 </ul>
-<div class="form-footer">
-    <?php echo $this->Form->close('Start'); ?>
-</div>
+<?php echo $this->Form->close('Start'); ?>

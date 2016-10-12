@@ -62,17 +62,13 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
 
         });
     </script>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor(t("Configuring Vanilla's Homepage"), 'http://docs.vanillaforums.com/developers/configuration/homepage/'), 'li');
-        echo wrap(Anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd(); ?>
+    <?php
+    $links = '<ul>';
+    $links .= wrap(anchor(t("Configuring Vanilla's Homepage"), 'http://docs.vanillaforums.com/developers/configuration/homepage/'), 'li');
+    $links .= wrap(anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
+    $links .= '</ul>';
+    helpAsset(t('Need More Help?'), $links);
+    ?>
     <div class="padded-top">
         <?php printf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true)) ?>
     </div>
@@ -122,7 +118,6 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
         <?php endif; ?>
     </div>
 
-<div class="form-footer">
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -130,4 +125,3 @@ echo $this->Form->Hidden('Target');
 echo $this->Form->Hidden('DiscussionsLayout', array('value' => $CurrentDiscussionLayout));
 echo $this->Form->Hidden('CategoriesLayout', array('value' => $CurrentCategoriesLayout));
 echo $this->Form->close('Save'); ?>
-</div>

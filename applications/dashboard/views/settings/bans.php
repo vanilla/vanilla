@@ -4,10 +4,8 @@
     <?php echo anchor(t('Add Item'), '/dashboard/settings/bans/add', array('class' => 'btn btn-primary js-modal')); ?>
 </div>
 <?php
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.sprintf(t('About %s'), t('Banning')).'</h2>';
-echo '<p>'.t('You can ban IP addresses, email domains, and words from usernames using this tool.').'</p>';
-Gdn_Theme::assetEnd();
+helpAsset(sprintf(t('About %s'), t('Banning')), t('You can ban IP addresses, email domains, and words from usernames using this tool.'));
+
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 echo '<div id="BansTable">';

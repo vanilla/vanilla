@@ -23,15 +23,5 @@ echo $this->Form->close();
 <?php echo $this->Form->errors();
 $this->addonType = 'locales';
 include_once PATH_APPLICATIONS.'/dashboard/views/settings/plugins.php';
+helpAsset(t('Need More Help?'), anchor(t('Internationalization & Localization'), 'http://docs.vanillaforums.com/developers/locales/'));
 ?>
-
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<div class="Help Aside">
-    <?php
-    echo '<h2>', t('Need More Help?'), '</h2>';
-    echo '<ul>';
-    echo '<li>', anchor(t('Internationalization & Localization'), 'http://docs.vanillaforums.com/developers/locales/'), '</li>';
-    echo '</ul>';
-    ?>
-</div>
-<?php Gdn_Theme::assetEnd(); ?>

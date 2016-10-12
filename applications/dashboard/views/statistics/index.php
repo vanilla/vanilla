@@ -1,21 +1,21 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo $this->data('Title'); ?></h1>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <h2><?php echo sprintf(t('About %s'), t('Vanilla Statistics')); ?></h2>
-    <p><?php echo t(
-        "The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool",
-        "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://docs.vanillaforums.com/help/addons/statistics\">read more about Vanilla Statistics</a> in our documentation."
-    ); ?></p>
+<?php
 
-    <div class="Help Aside">
-        <h2><?php echo t('Need More Help?'); ?></h2>
-        <ul>
-            <li><?php echo anchor(t('Vanilla Statistics Plugin'), '/settings/plugins#vanillastats-plugin'); ?></li>
-            <li><?php echo anchor(t('Statistics Documentation'), 'http://docs.vanillaforums.com/addons/statistics/'); ?></li>
-        </ul>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
+$desc = t(
+    "The Vanilla Statistics plugin turns your forum's dashboard into an analytics reporting tool",
+    "Vanilla Statistics turns your forum's dashboard into an analytics reporting tool, allowing you to review activity on your forum over specific time periods. You can <a href=\"http://docs.vanillaforums.com/help/addons/statistics\">read more about Vanilla Statistics</a> in our documentation."
+);
 
+$links = '<ul>';
+$links .= '<li>'.anchor(t('Vanilla Statistics Plugin'), '/settings/plugins#vanillastats-plugin').'</li>';
+$links .= '<li>'.anchor(t('Statistics Documentation'), 'http://docs.vanillaforums.com/addons/statistics/').'</li>';
+$links .= '</ul>';
+
+helpAsset(sprintf(t('About %s'), t('Vanilla Statistics')), $desc);
+helpAsset(t('Need More Help?'), $links);
+
+?>
 
 <?php if ($this->data('NotifyMessage') !== FALSE) : ?>
     <div class="padded alert alert-info">

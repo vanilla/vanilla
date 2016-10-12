@@ -963,3 +963,52 @@ label[id^=iCheck] {
     }
   }
 }
+
+.form-group {
+  @extend .row;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+  border-bottom: 1px dotted #e7e8e9;
+
+  > .no-grid {
+    @extend .row-padding-left;
+    @extend .row-padding-right;
+  }
+
+  > .input-wrap {
+    @extend .col-sm-14;
+    @extend .col-xs-24;
+
+    &.no-label {
+      @extend .col-sm-offset-10;
+      @extend .col-xs-offset-0;
+    }
+  }
+
+  > .label-wrap {
+    @extend .col-sm-10;
+    @extend .col-xs-24;
+  }
+
+  > .label-wrap-wide {
+    @extend .col-sm-10;
+    @extend .col-xs-12;
+    flex-grow: 1;
+  }
+
+  .input-wrap-right {
+    @extend .row-padding-left;
+    @extend .row-padding-right;
+  }
+
+  @include media-breakpoint-down(xs) {
+    .input-wrap {
+      margin-top: $spacer / 4;
+    }
+  }
+}

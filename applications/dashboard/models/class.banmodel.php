@@ -152,7 +152,7 @@ class BanModel extends Gdn_Model {
                 $Result['u.Email like'] = $Ban['BanValue'];
                 break;
             case 'ipaddress':
-                $Result['u.LastIPAddress like'] = $Ban['BanValue'];
+                $Result['inet6_ntoa(u.LastIPAddress) like'] = $Ban['BanValue'];
                 break;
             case 'name':
                 $Result['u.Name like'] = $Ban['BanValue'];
@@ -202,7 +202,12 @@ class BanModel extends Gdn_Model {
             $Parts = array_map('preg_quote', $Parts);
             $Regex = '`^'.implode('.*', $Parts).'$`i';
 
-            if (preg_match($Regex, val($Fields[$Ban['BanType']], $User))) {
+            $value = val($Fields[$Ban['BanType']], $User);
+            if ($Ban['BanType'] === 'IPAddress') {
+                $value = ipDecode($value);
+            }
+
+            if (preg_match($Regex, $value)) {
                 $Banned[$Ban['BanType']] = true;
                 $BansFound[] = $Ban;
 

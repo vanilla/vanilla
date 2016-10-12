@@ -87,19 +87,10 @@ echo $Form->errors();
         <div class="input-wrap">
             <?php
             echo $Form->checkbox("MobileOnly", t("Only display on mobile browsers."));
-            echo '<div class="info">', t('Limit the display of this pocket to "mobile only".'), '</div>';
-
             echo $Form->checkbox("MobileNever", t("Never display on mobile browsers."));
-            echo '<div class="info">', t('Limit the display of this pocket for mobile devices.'), '</div>';
-
             echo $Form->checkbox("EmbeddedNever", t("Don't display for embedded comments."));
-            echo '<div class="info">', t('Limit the display of this pocket for embedded comments.'), '</div>';
-
             echo $Form->checkbox("ShowInDashboard", t("Display in dashboard. (not recommended)"));
-            echo '<div class="info">', t("Most pockets shouldn't be displayed in the dashboard."), '</div>';
-
-            echo $Form->checkbox("Ad", t("This pocket is an ad."));
-            echo '<div class="info">', t("Users with the no ads permission will not see this pocket."), '</div>';
+            echo $Form->checkbox("Ad", t("This pocket is an ad.").' '.t("Users with the no ads permission will not see this pocket."));
             ?>
         </div>
     </li>
@@ -117,8 +108,5 @@ echo $Form->errors();
         </div>
     </li>
 </ul>
-<div class="js-modal-footer form-footer">
-<?php echo $Form->button('Save'); ?>
-</div>
-<?php $Form->close();
+<?php $Form->close('Save');
 

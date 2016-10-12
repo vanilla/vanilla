@@ -1,8 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.sprintf(t('About %s'), t('Pockets')).'</h2>';
-echo '<div>'.t('Pockets allow you to add free-form HTML to various places around the application.').'</div>';
-Gdn_Theme::assetEnd();
+helpAsset(sprintf(t('About %s'), t('Pockets')), t('Pockets allow you to add free-form HTML to various places around the application.'));
 ?>
 <div class="header-block">
 <?php echo wrap($this->data('Title'), 'h1');

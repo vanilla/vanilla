@@ -49,7 +49,7 @@ If you professionally run a large community or enterprise forum, our cloud solut
 We strongly recommend:
 
 *  **PHP 5.6** or **7.0**.
-*  MySQL 5.5 or higher (or Percona/MariaDB equivalent).
+*  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
 
 If your server is not running PHP 5.6 or higher, **you must address this immediately**. All lower versions of PHP are no longer updated and are potentially unsafe. We will remove support for them soon.
 

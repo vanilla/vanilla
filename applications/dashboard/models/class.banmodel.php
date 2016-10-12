@@ -95,12 +95,22 @@ class BanModel extends Gdn_Model {
                 $AllBans[$NewBan['BanID']] = $NewBan;
             }
 
-            $NewUsers = $this->SQL
-                ->select('u.UserID, u.Banned')
-                ->from('User u')
-                ->where($this->banWhere($NewBan))
-                ->where('Admin', 0) // No banning superadmins, pls.
-                ->get()->resultArray();
+            // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
+            try {
+                $NewUsers = $this->SQL
+                    ->select('u.UserID, u.Banned')
+                    ->from('User u')
+                    ->where($this->banWhere($NewBan))
+                    ->where('Admin', 0)// No banning superadmins, pls.
+                    ->get()->resultArray();
+            } catch (Exception $e) {
+                Logger::log(
+                    Logger::ERROR,
+                    $e->getMessage()
+                );
+                $NewUsers = [];
+            }
+
             $NewUserIDs = array_column($NewUsers, 'UserID');
         } elseif (isset($OldBan['BanID'])) {
             unset($AllBans[$OldBan['BanID']]);
@@ -108,11 +118,20 @@ class BanModel extends Gdn_Model {
 
         if ($OldBan) {
             // Get a list of users affected by the old ban.
-            $OldUsers = $this->SQL
-                ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
-                ->from('User u')
-                ->where($this->banWhere($OldBan))
-                ->get()->resultArray();
+            // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
+            try {
+                $OldUsers = $this->SQL
+                    ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
+                    ->from('User u')
+                    ->where($this->banWhere($OldBan))
+                    ->get()->resultArray();
+            } catch (Exception $e) {
+                Logger::log(
+                    Logger::ERROR,
+                    $e->getMessage()
+                );
+                $OldUsers = [];
+            }
         }
 
         // Check users that need to be unbanned.
@@ -152,7 +171,7 @@ class BanModel extends Gdn_Model {
                 $Result['u.Email like'] = $Ban['BanValue'];
                 break;
             case 'ipaddress':
-                $Result['u.LastIPAddress like'] = $Ban['BanValue'];
+                $Result['inet6_ntoa(u.LastIPAddress) like'] = $Ban['BanValue'];
                 break;
             case 'name':
                 $Result['u.Name like'] = $Ban['BanValue'];
@@ -202,7 +221,12 @@ class BanModel extends Gdn_Model {
             $Parts = array_map('preg_quote', $Parts);
             $Regex = '`^'.implode('.*', $Parts).'$`i';
 
-            if (preg_match($Regex, val($Fields[$Ban['BanType']], $User))) {
+            $value = val($Fields[$Ban['BanType']], $User);
+            if ($Ban['BanType'] === 'IPAddress') {
+                $value = ipDecode($value);
+            }
+
+            if (preg_match($Regex, $value)) {
                 $Banned[$Ban['BanType']] = true;
                 $BansFound[] = $Ban;
 
@@ -398,11 +422,20 @@ class BanModel extends Gdn_Model {
      * @param array $Data
      */
     public function setCounts(&$Data) {
-        $CountUsers = $this->SQL
-            ->select('UserID', 'count', 'CountUsers')
-            ->from('User u')
-            ->where($this->BanWhere($Data))
-            ->get()->value('CountUsers', 0);
+        // Protect against a lack of inet6_ntoa, which wasn't introduced until MySQL 5.6.3.
+        try {
+            $CountUsers = $this->SQL
+                ->select('UserID', 'count', 'CountUsers')
+                ->from('User u')
+                ->where($this->BanWhere($Data))
+                ->get()->value('CountUsers', 0);
+        } catch (Exception $e) {
+            Logger::log(
+                Logger::ERROR,
+                $e->getMessage()
+            );
+            $CountUsers = 0;
+        }
 
         $Data['CountUsers'] = $CountUsers;
     }

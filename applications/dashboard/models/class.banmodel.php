@@ -95,12 +95,21 @@ class BanModel extends Gdn_Model {
                 $AllBans[$NewBan['BanID']] = $NewBan;
             }
 
-            $NewUsers = $this->SQL
-                ->select('u.UserID, u.Banned')
-                ->from('User u')
-                ->where($this->banWhere($NewBan))
-                ->where('Admin', 0) // No banning superadmins, pls.
-                ->get()->resultArray();
+            try {
+                $NewUsers = $this->SQL
+                    ->select('u.UserID, u.Banned')
+                    ->from('User u')
+                    ->where($this->banWhere($NewBan))
+                    ->where('Admin', 0)// No banning superadmins, pls.
+                    ->get()->resultArray();
+            } catch (Exception $e) {
+                Logger::log(
+                    Logger::ERROR,
+                    $e->getMessage()
+                );
+                $NewUsers = [];
+            }
+
             $NewUserIDs = array_column($NewUsers, 'UserID');
         } elseif (isset($OldBan['BanID'])) {
             unset($AllBans[$OldBan['BanID']]);
@@ -108,11 +117,19 @@ class BanModel extends Gdn_Model {
 
         if ($OldBan) {
             // Get a list of users affected by the old ban.
-            $OldUsers = $this->SQL
-                ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
-                ->from('User u')
-                ->where($this->banWhere($OldBan))
-                ->get()->resultArray();
+            try {
+                $OldUsers = $this->SQL
+                    ->select('u.UserID, u.LastIPAddress, u.Name, u.Email, u.Banned')
+                    ->from('User u')
+                    ->where($this->banWhere($OldBan))
+                    ->get()->resultArray();
+            } catch (Exception $e) {
+                Logger::log(
+                    Logger::ERROR,
+                    $e->getMessage()
+                );
+                $OldUsers = [];
+            }
         }
 
         // Check users that need to be unbanned.
@@ -403,11 +420,19 @@ class BanModel extends Gdn_Model {
      * @param array $Data
      */
     public function setCounts(&$Data) {
-        $CountUsers = $this->SQL
-            ->select('UserID', 'count', 'CountUsers')
-            ->from('User u')
-            ->where($this->BanWhere($Data))
-            ->get()->value('CountUsers', 0);
+        try {
+            $CountUsers = $this->SQL
+                ->select('UserID', 'count', 'CountUsers')
+                ->from('User u')
+                ->where($this->BanWhere($Data))
+                ->get()->value('CountUsers', 0);
+        } catch (Exception $e) {
+            Logger::log(
+                Logger::ERROR,
+                $e->getMessage()
+            );
+            $CountUsers = 0;
+        }
 
         $Data['CountUsers'] = $CountUsers;
     }

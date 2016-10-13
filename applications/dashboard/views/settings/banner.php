@@ -1,23 +1,10 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+$desc = t('Spend a little time thinking about how you describe your site here.',
+    'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
+helpAsset(t('Heads up!'), $desc);
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
 ?>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <h2><?php echo t('Heads up!'); ?></h2>
-    <div>
-        <?php
-        echo t('Spend a little time thinking about how you describe your site here.',
-            'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
-        ?>
-    </div>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd(); ?>
 <div class="header-block">
     <h1><?php echo t('Banner'); ?></h1>
 </div>
@@ -167,8 +154,4 @@ echo $this->Form->errors();
             </ul>
         </div>
     </div>
-<?php
-
-echo '<div class="form-footer js-modal-footer">'.$this->Form->button('Save').'</div>';
-
-echo $this->Form->close();
+<?php echo $this->Form->close('Save');

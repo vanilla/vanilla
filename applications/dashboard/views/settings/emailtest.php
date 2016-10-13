@@ -11,6 +11,4 @@ echo $this->Form->errors(); ?>
     <?php echo $this->Form->input('EmailTestAddresses', 'text'); ?>
     </div>
 </div>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close(t('Send')); ?>
-</div>

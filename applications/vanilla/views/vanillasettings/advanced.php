@@ -1,15 +1,7 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
-    <h1><?php echo t('Advanced'); ?></h1>
+<?php if (!defined('APPLICATION')) exit();
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'));
+?>
+<h1><?php echo t('Advanced'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
@@ -98,6 +90,4 @@ echo $this->Form->errors();
             </div>
         </li>
     </ul>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
-</div>

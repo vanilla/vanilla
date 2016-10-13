@@ -1,20 +1,16 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div><?php
-        echo wrap(sprintf(t('About %s'), t('Roles & Permissions')), 'h2');
-        echo t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
-        ?>
-    </div>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
-        echo wrap(Anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
+<?php if (!defined('APPLICATION')) exit();
+
+$desc = t('Roles determine user\'s permissions.', 'Every user in your site is assigned to at least one role. Roles are used to determine what the users are allowed to do.');
+
+$links = '<ul>';
+$links .= wrap(anchor(t("Video tutorial on managing roles &amp; permissions"), 'settings/tutorials/roles-and-permissions'), 'li');
+$links .= wrap(anchor('Default Role Types', 'http://docs.vanillaforums.com/features/roles-permissions/default-role-types/'), 'li');
+$links .= '</ul>';
+
+helpAsset(sprintf(t('About %s'), t('Roles & Permissions')), $desc);
+helpAsset(t('Need More Help?'), $links)
+
+?>
 <div class="header-block">
     <h1><?php echo t('Manage Roles & Permissions'); ?></h1>
     <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'btn btn-primary'); ?></div>

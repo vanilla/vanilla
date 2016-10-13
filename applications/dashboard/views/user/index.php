@@ -3,20 +3,10 @@ $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 
-Gdn_Theme::assetBegin('Help');
+helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'));
+
 ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Heads up!'), 'h2');
-        echo '<div>', t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd('Help'); ?>
 <div class="header-block">
     <div class="header-title">
     <h1><?php echo t('Manage Users'); ?></h1>

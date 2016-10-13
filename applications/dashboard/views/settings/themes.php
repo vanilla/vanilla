@@ -3,25 +3,21 @@ $Session = Gdn::session();
 $AddonUrl = Gdn::config('Garden.AddonUrl');
 $themePlaceholder = 'applications/dashboard/design/images/theme-placeholder.svg';
 $themeSpacer = 'applications/dashboard/design/images/theme-spacer.png';
+
+$links = '<ul>';
+$links .= wrap(anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
+$links .= wrap(anchor(t('Theming Overview'), 'http://docs.vanillaforums.com/theming/'), 'li');
+$links .= wrap(anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'http://docs.vanillaforums.com/theming/quickstart/'), 'li');
+$links .= '</ul>';
+
+helpAsset(sprintf(t('About %s'), t('Themes')), sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>'));
+helpAsset(t('Need More Help?'), $links);
+
 ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php echo '<h2>', t('About Themes'), '</h2>'; ?>
-        <?php echo sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>'); ?>
-        <?php
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-        echo wrap(Anchor(t('Theming Overview'), 'http://docs.vanillaforums.com/theming/'), 'li');
-        echo wrap(Anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'http://docs.vanillaforums.com/theming/quickstart/'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
-    <div class="header-menu">
-        <a href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
-        <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
-    </div>
+<div class="header-menu">
+    <a href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
+    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
+</div>
 <?php
 if ($currentTheme = $this->Data('CurrentTheme')) {
     echo $currentTheme;
@@ -68,7 +64,7 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                             } ?>
                             <div class="overlay">
                                 <div class="label-selector-corner-link">
-                                    <?php echo anchor(dashboardSymbol('expand', '', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-content' => ['cssClass' => 'modal-center modal-md'], 'data-modal-type' => 'noheader']); ?>
+                                    <?php echo anchor(dashboardSymbol('expand', '', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-modal-type' => 'noheader']); ?>
                                 </div>
                                 <div class="buttons">
                                     <?php echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));

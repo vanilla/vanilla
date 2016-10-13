@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.$this->data('Title').'</h2>';
-echo t('To prevent abuse, some tools automatically hide content and list it here until it is manually approved by a moderator.');
-Gdn_Theme::assetEnd();
+
+$desc = t('To prevent abuse, some tools automatically hide content and list it here until it is manually approved by a moderator.');
+helpAsset($this->data('Title'), $desc);
+
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>

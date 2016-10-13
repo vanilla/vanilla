@@ -1,10 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php echo $this->data('Title'); ?></h1>
 <?php
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.$this->data('Title').'</h2>';
-echo '<p>'.t('Content flagged as spam is stored here for moderator review.').'</p>';
-Gdn_Theme::assetEnd();
+
+helpAsset($this->data('Title'), t('Content flagged as spam is stored here for moderator review.'));
+
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>

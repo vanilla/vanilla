@@ -35,7 +35,7 @@ $Fields = $this->data('ExtendedFields');
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                     echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Name, 'js-modal btn btn-icon',
-                        ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['cssClass' => 'modal-sm modal-confirm']]);
+                        ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-css-class' => 'modal-sm modal-confirm']);
                     ?>
                     </div>
                 </td>

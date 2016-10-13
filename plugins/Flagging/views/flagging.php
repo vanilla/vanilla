@@ -20,9 +20,7 @@ echo $this->Form->errors();
         </div>
     </li>
 </ul>
-<div class="form-footer padded-bottom">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>
 <?php
 // Flagged Items list
 if (!count($this->FlaggedItems)) {
@@ -51,7 +49,7 @@ if (!count($this->FlaggedItems)) {
                     $flaggedBy .= '<div class="FlaggedReason">'.Gdn_Format::text($Flag['Comment']).'</div>';
                 }
                 $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');
-                $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm js-hijack', ['data-content' => ['body' => t('Are you sure you want to dismiss this flag?')]]);
+                $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm js-hijack', ['data-body' => t('Are you sure you want to dismiss this flag?')]);
                 ?>
                 <td class="FlaggedType"><?php echo $type; ?></td>
                 <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>

@@ -6,10 +6,8 @@ $TagType = $this->data('_TagType');
 $TagTypes = $this->data('_TagTypes');
 $CanAddTags = $this->data('_CanAddTags');
 
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.sprintf(t('About %s'), t('Tagging')).'</h2>';
-echo t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
-Gdn_Theme::assetEnd();
+$desc = t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
+helpAsset(sprintf(t('About %s'), t('Tagging')), $desc);
 ?>
 <div class="header-block">
     <h1><?php echo t($this->Data['Title']); ?></h1>
@@ -145,7 +143,7 @@ Gdn_Theme::assetEnd();
                         <?php
                         if (!$Special) {
                             echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                            echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]]);
+                            echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]);
                         }
                         ?>
                         </div>

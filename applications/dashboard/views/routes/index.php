@@ -1,18 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+$desc = t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
+$desc .= ' '.anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
+helpAsset(sprintf(t('About %s'), t('Routes')), $desc);
 ?>
 <div class="header-block">
     <h1><?php echo t('Manage Routes'); ?></h1>
     <div class="btn-group"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'js-modal btn btn-primary'); ?></div>
 </div>
-<?php
-    Gdn_Theme::assetBegin('Help');
-    echo '<h2>'.sprintf(t('About %s'), t('Routes')).'</h2>';
-    echo t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
-    echo ' '.anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
-    Gdn_Theme::assetEnd();
-?>
-
 <div class="table-wrap">
     <table class="table-data js-tj" id="RouteTable">
         <thead>

@@ -188,11 +188,10 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                 if (empty($pathAndQuery)) {
                     $pathAndQuery = '/';
                 }
-                $url = url($pathAndQuery);
 
                 $dropdown->addLink(
                     val('name', $filter),
-                    $url,
+                    $pathAndQuery,
                     $key,
                     '', array(), false,
                     array('rel' => 'nofollow')

@@ -39,17 +39,3 @@ $.fn.extend({
         return funcTrigger.call(this, 'replaceWith', html);
     }
 });
-
-gdn = function() {};
-
-gdn.definition = function(text, defaultText) {
-    return defaultText;
-};
-
-gdn.informError = function(text) {
-    return text;
-};
-
-$(document).ready(function() {
-    $(this).trigger('contentLoad');
-});

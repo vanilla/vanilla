@@ -205,7 +205,7 @@ module.exports = function (grunt) {
           'js/src/lithe.js',
           'js/src/lithe.drawer.js',
           'js/src/modal.dashboard.js',
-          'js/src/main.js',
+          'js/src/main.js'
         ])
         , dest: 'js/dashboard.js'
       },

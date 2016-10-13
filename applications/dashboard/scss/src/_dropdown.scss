@@ -6,12 +6,9 @@
 //
 // Styleguide 14.
 
-// Dropdown Menu alignment
+// Dropdown Menu
 //
-// PHP rendering: If you want the dropdown menu to open right, set the Dropdown Module's `listCssClass` to
-// `dropdown-menu-right`.
-//
-// .dropdown-menu-right - Opens with the right side of the dropdown menu aligned the right of the root dropdown div.
+// Here's the default dropdown menu markup.
 //
 // Markup:
 // <div class="dropdown">
@@ -35,6 +32,36 @@
 // </div>
 //
 // Styleguide 14.1.
+
+// Dropdown Menu Right-aligned
+//
+// Opens with the right side of the dropdown menu aligned the right of the root dropdown div.
+//
+// PHP rendering: If you want the dropdown menu to open right, set the Dropdown Module's `listCssClass` to
+// `dropdown-menu-right`.
+//
+// Markup:
+// <div class="dropdown clearfix">
+//   <div class="dropdown-toggle pull-right btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//     <svg class="icon icon-16" viewBox="0 0 16 16">
+//       <use xlink:href="#code-bubble"></use>
+//     </svg>
+//   </div>
+//   <div class="dropdown-menu dropdown-menu-right">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+//       <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
+//         <use xlink:href="#question-mark"></use>
+//       </svg>
+//       Help
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide 14.2.
 
 // Dropup Variation
 //
@@ -61,7 +88,7 @@
 //   </div>
 // </div>
 //
-// Styleguide 14.2.
+// Styleguide 14.3.
 
 .dropdown-toggle {
   cursor: pointer;

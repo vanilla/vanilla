@@ -94,6 +94,14 @@ hr {
 
 /* Example styles */
 
+.main code {
+  border: 1px solid #e7e8e9;
+  background-color: #f6f9fb;
+  border-radius: 2px;
+  padding: 2px 3px;
+  font-size: 0.9em;
+}
+
 .ex-block {
   width: 200px;
   padding: 1rem;

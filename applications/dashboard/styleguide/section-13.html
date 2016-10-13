@@ -13,7 +13,7 @@
   <script src="public/global-stub.js"></script>
   <script src="public/dashboard.js"></script>
   <script>
-    $(document).on('click', '.main .content a', function(e) {
+    $(document).on('click', '.kss-example a', function(e) {
       e.preventDefault();
     });
   </script>
@@ -99,7 +99,7 @@
 global.js extend the <code>toaster*</code> css classes used below. The fixed toaster positioning for the toaster messages gets
 applied when the toaster is nested in a element with the <code>toasters</code> css class applied to it.</p>
 </div>
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;dix class=&quot;toaster&quot;&gt;
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;toaster&quot;&gt;
   &lt;span class=&quot;toaster-close&quot;&gt;&lt;/span&gt;
   &lt;div class=&quot;toaster-body&quot;&gt;
     This is a toaster message. The additional text will be hidden if it goes longer than 60 characters.
@@ -107,7 +107,7 @@ applied when the toaster is nested in a element with the <code>toasters</code> c
 &lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom"><dix class="toaster">
+                        <div class="kss-example padded-bottom"><div class="toaster">
   <span class="toaster-close"></span>
   <div class="toaster-body">
     This is a toaster message. The additional text will be hidden if it goes longer than 60 characters.

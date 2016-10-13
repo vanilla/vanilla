@@ -16,14 +16,14 @@ module.exports = function (grunt) {
     watch: {
       js: {
         files: ['js/src/**/*.js']
-        , tasks: ['jshint', 'concat']
+        , tasks: ['jshint', 'concat:dist']
       }
       , gruntfile: {
         files: ['Gruntfile.js']
       }
       , sass: {
         files: ['scss/**/*.scss']
-        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer', 'kss']
+        , tasks: ['sass_globbing', 'scsslint', 'sass', 'autoprefixer']
       }
       , livereload: {
         options: {
@@ -42,7 +42,7 @@ module.exports = function (grunt) {
       options: {
         verbose: true,
         template: 'template',
-        homepage: 'styleguide.html'
+        homepage: 'styleguide.md'
       },
       dist: {
         src: ['scss/src'],
@@ -139,13 +139,6 @@ module.exports = function (grunt) {
               'design/admin.css'
             ],
             dest: 'template/public/admin.css'
-          },
-          {
-            flatten: true,
-            src: [
-              'js/jquery.tablejenga.js'
-            ],
-            dest: 'template/public/jquery.tablejenga.js'
           }
         ]
       },
@@ -186,7 +179,7 @@ module.exports = function (grunt) {
         force: true
         , config: 'scss/.scss-lint.yml'
       }
-      , all: ['scss/**/*.scss']
+      , all: ['scss/src/**/*.scss']
     },
 
     autoprefixer: {
@@ -204,14 +197,6 @@ module.exports = function (grunt) {
         , jshintrc: 'js/.jshintrc'
       }
       , all: ['js/src/main.js']
-    },
-
-    csslint: {
-      options: {
-        quiet: true
-        , csslintrc: 'design/.csslintrc'
-      }
-      , all: ['design/admin.css']
     },
 
     concat: {
@@ -236,6 +221,11 @@ module.exports = function (grunt) {
           'js/vendors/ace/*.js',
           'js/colorpicker.js',
           'js/cropimage.js',
+          'js/jquery.tablejenga.js',
+          'js/jquery.fluidfixed.js',
+          '../../js/library/jquery.expander.js',
+          '../../js/library/jquery.gardencheckboxgrid.js',
+          '../../js/library/jquery.form.js',
           'js/dashboard.js'
         ])
         , dest: 'template/public/dashboard.js'
@@ -260,23 +250,20 @@ module.exports = function (grunt) {
           'scss/maps/_extensions.scss': 'scss/extensions/*.scss',
           'scss/maps/_bootstrapVariables.scss': 'scss/vendors/bootstrap/scss/_variables.scss',
           'scss/maps/_bootstrapMixins.scss': 'scss/vendors/bootstrap/scss/mixins/*.scss',
-          'scss/maps/_bootstrapAnimation': 'scss/vendors/bootstrap/scss/_animation.scss',
+          'scss/maps/_bootstrapAnimation.scss': 'scss/vendors/bootstrap/scss/_animation.scss',
           'scss/maps/_vendorSubset.scss': [
             'scss/vendors/bootstrap/scss/_normalize.scss',
             'scss/vendors/bootstrap/scss/_utilities.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
             'scss/vendors/bootstrap/scss/_alert.scss',
-            'scss/vendors/bootstrap/scss/_card.scss',
             'scss/vendors/bootstrap/scss/_tooltip.scss',
-            'scss/vendors/bootstrap/scss/_media.scss',
-            'scss/vendors/bootstrap/scss/_modal.scss',
             'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_list-group.scss',
             'scss/vendors/bootstrap/scss/_forms.scss',
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'
           ],
-          'scss/maps/_dashboard.scss': ['scss/src/*.scss', '!scss/src/_variables.scss', '!scss/src/_svgs.scss']
+          'scss/maps/_dashboard.scss': ['scss/src/*.scss', '!scss/src/_variables.scss', '!scss/src/_svgs.scss', '!scss/src/_helpers.scss']
         },
         options: {
           useSingleQuotes: true,
@@ -292,14 +279,17 @@ module.exports = function (grunt) {
     , 'kss'
   ]);
 
+  grunt.registerTask('wiredep', [
+    'copy:main'
+  ]);
+
   grunt.registerTask('default', [
     'sass_globbing'
     , 'scsslint'
     , 'sass'
     , 'autoprefixer'
-    , 'concat'
+    , 'concat:dist'
     , 'jshint'
     , 'imagemin'
-    , 'styleguide'
   ]);
 };

@@ -74,7 +74,7 @@
 
     svg {
       fill: $grey-dark;
-      opacity: 0.7;
+      opacity: .7;
       display: block;
       height: to-rem(24);
     }
@@ -83,6 +83,7 @@
       &::before {
         width: 100%;
       }
+
       background-color: #f9fdfe;
     }
   }
@@ -134,8 +135,8 @@
   flex-direction: column;
   align-items: center;
   line-height: 1;
-  padding: $spacer $spacer 0 $spacer ;
-  color: rgba(25,25,25,0.20);
+  padding: $spacer $spacer 0;
+  color: rgba(25,25,25,.20);
 }
 
 .nav-stats-link {
@@ -156,36 +157,42 @@
   font-size: to-rem(40);
 }
 
-
 // Panel navigation
 //
 // The dashboard panel navigation.
 //
 // No styleguide reference.
 
-.nav-heading a {
-  display: block;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  padding-left: .75rem;
-  border-bottom: 1px dotted rgba(0,0,0,.0875);
-  font-size: $font-size-sm;
-  font-weight: 500;
-  text-transform: uppercase;
-  text-decoration: none;
+.nav-heading {
+  margin-top: $spacer / 2;
+  margin-bottom: $spacer / 2;
 
-  &::before {
-    @include caret;
-    -webkit-transform: rotate(0deg);
-    tranform: rotate(0deg);
-    margin-left: -1rem;
-    margin-right: .5rem;
-    transition: all .1s ease-out;
-  }
+  a {
+    display: block;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    padding-left: .75rem;
+    border-bottom: 1px dotted rgba(0,0,0,.0875);
+    font-size: $font-size-sm;
+    font-weight: 500;
+    text-transform: uppercase;
+    text-decoration: none;
 
-  &.collapsed::before {
-    -webkit-transform: rotate(-90deg);
-    tranform: rotate(-90deg);
+    &::before {
+      @include caret;
+      position: relative;
+      top: -1px;
+      -webkit-transform: rotate(0deg);
+      tranform: rotate(0deg);
+      margin-left: -1rem;
+      margin-right: .5rem;
+      transition: all .1s ease-out;
+    }
+
+    &.collapsed::before {
+      -webkit-transform: rotate(-90deg);
+      tranform: rotate(-90deg);
+    }
   }
 }
 
@@ -205,6 +212,11 @@
 .panel-nav {
   a {
     color: $grey;
+  }
+
+  .title {
+    display: block;
+    margin-bottom: $spacer;
   }
 
   // External link on forum title.

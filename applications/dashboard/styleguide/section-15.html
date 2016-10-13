@@ -58,9 +58,21 @@
           <div id="panel-nav" class="js-fluid-fixed panel-content">
             <ul class="nav nav-pills">
               <li><a href="index.html" class="nav-link">0.0: Overview</a></li>
-              {{#eachRoot}}
-              <li><a href="section-{{reference}}.html" class="nav-link">{{reference}}.0: {{header}}</a></li>
-              {{/eachRoot}}
+              <li><a href="section-1.html" class="nav-link">1.0: Typography</a></li>
+              <li><a href="section-2.html" class="nav-link">2.0: Helpers</a></li>
+              <li><a href="section-3.html" class="nav-link">3.0: Icons</a></li>
+              <li><a href="section-4.html" class="nav-link">4.0: Buttons</a></li>
+              <li><a href="section-5.html" class="nav-link">5.0: Forms</a></li>
+              <li><a href="section-6.html" class="nav-link">6.0: Media Item</a></li>
+              <li><a href="section-7.html" class="nav-link">7.0: Tables</a></li>
+              <li><a href="section-8.html" class="nav-link">8.0: Toolbar</a></li>
+              <li><a href="section-9.html" class="nav-link">9.0: Navs</a></li>
+              <li><a href="section-10.html" class="nav-link">10.0: Modals</a></li>
+              <li><a href="section-12.html" class="nav-link">12.0: Cards</a></li>
+              <li><a href="section-13.html" class="nav-link">13.0: Toasters</a></li>
+              <li><a href="section-14.html" class="nav-link">14.0: Dropdowns</a></li>
+              <li><a href="section-15.html" class="nav-link">15.0: Panel Components</a></li>
+              <li><a href="section-16.html" class="nav-link">16.0: Alerts</a></li>
             </ul>
           </div>
         </div>
@@ -68,63 +80,130 @@
       <div class="panel panel-help panel-right">
         <div class="panel-content-wrapper">
           <div id="fixed-help" class="js-fluid-fixed panel-content">
-            {{#if homepage}}
-            {{else}}
             <ul class="nav nav-pills" data-spy="affix">
-              {{#eachSection rootName}}
-                {{#ifDepth 2}}
-                <li><a href="#{{referenceURI}}" class="nav-link">{{ header }}</a></li>
-                {{/ifDepth}}
-              {{/eachSection}}
+                <li><a href="#15-1" class="nav-link">Help Asset</a></li>
+                <li><a href="#15-2" class="nav-link">Control Panel</a></li>
             </ul>
-            {{/if}}
           </div>
         </div>
       </div>
       <div class="main">
         <div class="content">
-          {{#if homepage}}
-            <h1>Vanilla Dashboard Styleguide</h1>
-            <div class="padded">{{{homepage}}}</div>
-          {{else}}
-            {{#eachSection rootName}}
-              {{#ifDepth 1}}
-                <h1 class="kss-title" id="{{ referenceURI }}">{{ header }}</h1>
-                {{#if description}}
+                <h1 class="kss-title" id="15">Panel Components</h1>
                   <div class="kss-box">
-                    <div class="padded">{{{description}}}</div>
+                    <div class="padded"><p>The right panel in the dashboard generally contains explanatory text for the settings page it appears on.
+Customize theme also adds a control panel component.</p>
+<p>PHP rendering: Add help content the <code>Help</code> asset. To do this, wrap the help div in
+<code>Gdn_Theme::assetBegin(&#39;Help&#39;);</code> and <code>Gdn_Theme::assetEnd();</code></p>
+</div>
                   </div>
-                {{/if}}
-              {{else}}
-                <section class="kss-depth-{{ depth }}">
+                <section class="kss-depth-2">
                   <div class="kss-component">
                     <div class="kss-component-description row full-border">
-                      <h{{ depth }} class="kss-title" id="{{ referenceURI }}">
-                      <span class="kss-ref badge pull-right">{{ referenceURI }}</span> {{ header }}
-                      </h{{ depth }}>
-                      {{#eachParameter}}
-                        <h4><span class="pull-right"><code>{{name}}</code></span> {{{description}}}</h4>
-                      {{/eachParameter}}
-                      {{#if description}}
-                        <div class="kss-box padded">{{{description}}}</div>
-                      {{/if}}
-                      {{#if markup}}
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">{{markup}}</pre>
+                      <h2 class="kss-title" id="15-1">
+                      <span class="kss-ref badge pull-right">15-1</span> Help Asset
+                      </h2>
+                        <div class="kss-box padded"><p>Styles extra helper text for the panel.</p>
+<p>PHP rendering: The <code>helpAsset(title, body)</code> function adds properly formatted help text to the Help asset.
+To render the following example, you would call:
+<code>helpAsset(&quot;Need More Help?&quot;, &quot;Here&#39;s some help text. There are things you should know.&quot;);</code></p>
+</div>
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;help&quot;&gt;
+  &lt;div class=&quot;help-title&quot;&gt;Need More Help?&lt;/div&gt;
+  &lt;div class=&quot;help-description&quot;&gt;Here&#x27;s some help text. There are things you should know.&lt;/div&gt;
+&lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom">{{{markup}}}</div>
-                        {{#eachModifier}}
-                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">{{{description}}}</span> <span class="pull-right"><code>{{name}}</code></span></div>
-                          <div class="kss-example padded-bottom">{{{markup}}}</div>
-                        {{/eachModifier}}
-                      {{else}}
-                        </div> <!-- end kss-component-description -->
-                      {{/if}}
+                        <div class="kss-example padded-bottom"><div class="help">
+  <div class="help-title">Need More Help?</div>
+  <div class="help-description">Here's some help text. There are things you should know.</div>
+</div></div>
                   </div>
                 </section>
-              {{/ifDepth}}
-            {{/eachSection}}
-          {{/if}}
+                <section class="kss-depth-2">
+                  <div class="kss-component">
+                    <div class="kss-component-description row full-border">
+                      <h2 class="kss-title" id="15-2">
+                      <span class="kss-ref badge pull-right">15-2</span> Control Panel
+                      </h2>
+                        <div class="kss-box padded"><p>The control panel helps a user manage a list of modifications.</p>
+</div>
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;control-panel&quot;&gt;
+  &lt;div class=&quot;control-panel-heading&quot;&gt;Recent Revisions&lt;/div&gt;
+  &lt;div class=&quot;control-panel-body&quot;&gt;
+    &lt;div class=&quot;control-panel-subheading&quot;&gt;Oct 7th, 2016&lt;/div&gt;
+    &lt;ul class=&quot;control-panel-list&quot;&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:07pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;This is it&lt;/span&gt;
+        &lt;svg alt=&quot;Previewing&quot; class=&quot;icon icon-text icon-svg-star-empty&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#eye&quot;&gt;&lt;/use&gt;
+        &lt;/svg&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:04pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;Almost there&lt;/span&gt;
+        &lt;svg alt=&quot;Live&quot; class=&quot;icon icon-text icon-svg-star-empty&quot; viewBox=&quot;0 0 17 17&quot;&gt;
+          &lt;use xlink:href=&quot;#star-empty&quot;&gt;&lt;/use&gt;
+        &lt;/svg&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;div class=&quot;control-panel-subheading&quot;&gt;Oct 6th, 2016&lt;/div&gt;
+    &lt;ul class=&quot;control-panel-list&quot;&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:07pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;This is a better attempt at success&lt;/span&gt;
+      &lt;/li&gt;
+      &lt;li class=&quot;control-panel-list-item&quot;&gt;
+        &lt;a href=&quot;#&quot;&gt;→ 2:04pm&lt;/a&gt;
+        &lt;span class=&quot;control-panel-list-item-label&quot;&gt;First attempt&lt;/span&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;control-panel-footer&quot;&gt;
+    &lt;a href=&quot;#&quot; class=&quot;btn btn-control-panel&quot;&gt;Revert to the Original&lt;/a&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                        </div> <!-- end kss-component-description -->
+                        <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                        <div class="kss-example padded-bottom"><div class="control-panel">
+  <div class="control-panel-heading">Recent Revisions</div>
+  <div class="control-panel-body">
+    <div class="control-panel-subheading">Oct 7th, 2016</div>
+    <ul class="control-panel-list">
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:07pm</a>
+        <span class="control-panel-list-item-label">This is it</span>
+        <svg alt="Previewing" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+          <use xlink:href="#eye"></use>
+        </svg>
+      </li>
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:04pm</a>
+        <span class="control-panel-list-item-label">Almost there</span>
+        <svg alt="Live" class="icon icon-text icon-svg-star-empty" viewBox="0 0 17 17">
+          <use xlink:href="#star-empty"></use>
+        </svg>
+      </li>
+    </ul>
+    <div class="control-panel-subheading">Oct 6th, 2016</div>
+    <ul class="control-panel-list">
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:07pm</a>
+        <span class="control-panel-list-item-label">This is a better attempt at success</span>
+      </li>
+      <li class="control-panel-list-item">
+        <a href="#">→ 2:04pm</a>
+        <span class="control-panel-list-item-label">First attempt</span>
+      </li>
+    </ul>
+  </div>
+  <div class="control-panel-footer">
+    <a href="#" class="btn btn-control-panel">Revert to the Original</a>
+  </div>
+</div></div>
+                  </div>
+                </section>
         </div>
         <div class="footer">
           <div class="footer-logo logo-wrap">

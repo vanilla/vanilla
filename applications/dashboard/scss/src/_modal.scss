@@ -31,12 +31,12 @@
 // top and bottom of the page. `.modal-center` leaves 25% at the top and bottom of the page. Smaller modals are good
 // for confirm-type messages and can make short settings pages look less awkward.
 //
-// .modal-sm - Small modal
-// .modal-md - Medium modal
+// .modal-sm - Small modal.
+// .modal-md - Medium modal.
 // .modal-center - A modal more vertically centered.
 //
 // Markup:
-// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-content='{"cssClass":"{{modifier_class}}"}'>
+// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-css-class="{{modifier_class}}">
 //   Click me!
 // </a>
 //
@@ -91,8 +91,8 @@
 // Overriding Regular Modal Text
 //
 // Markup:
-// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-content='{"title":"A New Title","body":"<div class=\"padded\">A New Body</div>"}'>
-//   I've overriden the modal text
+// <a href="./public/resources/pages/example-modal.json" class="js-modal" data-title="A New Title">
+//   I've overriden the modal title
 // </a>
 //
 // Styleguide 10.5.1.
@@ -102,17 +102,89 @@
 // Like regular modals, the text for a confirm modal can be overridden.
 //
 // Markup:
-// <a href="#" class="js-modal-confirm" data-content='{"title":"HEY YOU!", "body":"Do you really wanna do this?"}'>
+// <a href="#" class="js-modal-confirm" data-title="HEY YOU!" data-body="Do you really wanna do this?">
 //   I've overridden the confirm modal text
 // </a>
 //
 // Styleguide 10.5.2.
 
+// Modal Markup
+//
+// This is the basic markup for a modal and an idea of how they looks at their varous sizes.
+// Note that the header and footer should also have the `js-modal-fixed` class applied to them to make them stick
+// to the top and bottom of the modal on scroll.
+//
+// .modal-sm - Small modal.
+// .modal-md - Medium modal.
+//
+// Markup:
+// <div class="modal-dialog {{modifier_class}}" role="document">
+//   <div class="modal-content">
+//     <div class="modal-header">
+//       <h4 class="modal-title">Modal Title</h4>
+//       <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
+//         <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+//           <use xlink:href="#close" />
+//         </svg>
+//       </button>
+//     </div>
+//     <div class="modal-body">
+//       <div class="padded">Modal Body</div>
+//     </div>
+//     <div class="modal-footer">
+//       <button class="btn btn-secondary">Cancel</button>
+//       <button class="btn btn-primary">OK</button>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 10.6.
+
+// Modal Markup - No Header
+//
+// Markup for a modal without a header.
+//
+// Markup:
+// <div class="modal-dialog modal-no-header" role="document">
+//   <div class="modal-content">
+//     <div class="modal-body">
+//       <!-- Media Item -->
+//       <div class="media media-callout {{modifier_class}}">
+//         <div class="media-left">
+//           <div class="media-image-wrap">
+//             <img src="./public/resources/images/dirty-rodent.jpg" alt="+Baseline">
+//           </div>
+//         </div>
+//         <div class="media-body">
+//           <div class="flag">Current Theme</div>
+//           <div class="media-title">
+//             <h3 class="media-heading theme-name">+Baseline</h3>
+//             <div class="info">
+//               <span class="media-meta author">Created by <a href="#">Mark O'Sullivan</a></span>
+//               <span class="spacer">|</span><span class="media-meta version">Version 2.2.112.3</span>
+//             </div>
+//           </div>
+//           <div class="media-description">
+//             <div class="description">The default theme for Vanilla.</div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
+//       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+//         <use xlink:href="#close" />
+//       </svg>
+//     </button>
+//   </div>
+//</div>
+//
+// Styleguide 10.6.1.
+
 // When the modal fills the screen it has an even 3% on top and bottom
 // Centers the modal
 .modal-dialog {
+  position: relative;
   margin: 3vh auto;
-  width: inherit;
   max-width: 1024px;
 
   &.modal-sm {
@@ -124,7 +196,7 @@
   }
 
   &.modal-center {
-    // We generally want this to appear more in the center of the screen
+    // Appears more centered, vertically
     margin: 25vh auto;
 
     .modal-body {
@@ -135,25 +207,53 @@
 
 // Sets the maximum height of the entire modal to 94% of the screen height
 .modal-body {
+  position: relative;
   max-height: calc(94vh - (2 * #{$header-block-height}));
   overflow-y: auto;
 
-
-  padding-top: 0;
-  padding-bottom: 0;
+  padding: 0 $modal-inner-padding;
 
   .modal-confirm & {
     padding: $spacer;
   }
 }
 
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: $zindex-modal-bg;
+  background-color: $modal-backdrop-bg;
+
+  // Fade for backdrop
+  &.fade { opacity: 0; }
+  &.in { opacity: $modal-backdrop-opacity; }
+}
+
 .modal-content {
+  position: relative;
+  background-color: $modal-content-bg;
+  background-clip: padding-box;
+  border: $border-width solid $modal-content-border-color;
   border-radius: $border-radius;
+  @include box-shadow(0 3px 9px rgba(0,0,0,.5));
+  outline: 0; // Remove focus outline from opened modal
 }
 
 .modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
   padding: 0 $spacer / 2;
+  z-index: $zindex-modal;
+  overflow: hidden;
+  outline: 0; // Prevent Chrome on Windows from adding a focus outline.
+  -webkit-overflow-scrolling: touch;
 
   &.fade .modal-dialog {
     transition: opacity .2s ease-out;
@@ -173,9 +273,12 @@
     -webkit-filter: blur(5px);
   }
 
-  body & {
-    overflow: hidden;
-  }
+  overflow: hidden;
+}
+
+.modal-open .modal {
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .modal-footer,
@@ -184,12 +287,15 @@
 }
 
 .modal-footer {
-  margin-top: to-rem(1);
+  text-align: right; // right align buttons
+  border-top: $border-width solid $modal-footer-border-color;
+  margin-top: $border-width;
 
   &:empty {
     display: none;
   }
 
+  // Fade appearance
   &::before {
     position: absolute;
     left: 0;
@@ -202,8 +308,19 @@
   }
 }
 
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: $border-width solid $modal-header-border-color;
+}
+
+.modal-title {
+  line-height: $line-height-sm;
+  margin: 0;
+}
+
 .modal-close {
-  float: right;
   padding: 0;
 
   &:hover {

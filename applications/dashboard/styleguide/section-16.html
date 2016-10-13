@@ -58,9 +58,21 @@
           <div id="panel-nav" class="js-fluid-fixed panel-content">
             <ul class="nav nav-pills">
               <li><a href="index.html" class="nav-link">0.0: Overview</a></li>
-              {{#eachRoot}}
-              <li><a href="section-{{reference}}.html" class="nav-link">{{reference}}.0: {{header}}</a></li>
-              {{/eachRoot}}
+              <li><a href="section-1.html" class="nav-link">1.0: Typography</a></li>
+              <li><a href="section-2.html" class="nav-link">2.0: Helpers</a></li>
+              <li><a href="section-3.html" class="nav-link">3.0: Icons</a></li>
+              <li><a href="section-4.html" class="nav-link">4.0: Buttons</a></li>
+              <li><a href="section-5.html" class="nav-link">5.0: Forms</a></li>
+              <li><a href="section-6.html" class="nav-link">6.0: Media Item</a></li>
+              <li><a href="section-7.html" class="nav-link">7.0: Tables</a></li>
+              <li><a href="section-8.html" class="nav-link">8.0: Toolbar</a></li>
+              <li><a href="section-9.html" class="nav-link">9.0: Navs</a></li>
+              <li><a href="section-10.html" class="nav-link">10.0: Modals</a></li>
+              <li><a href="section-12.html" class="nav-link">12.0: Cards</a></li>
+              <li><a href="section-13.html" class="nav-link">13.0: Toasters</a></li>
+              <li><a href="section-14.html" class="nav-link">14.0: Dropdowns</a></li>
+              <li><a href="section-15.html" class="nav-link">15.0: Panel Components</a></li>
+              <li><a href="section-16.html" class="nav-link">16.0: Alerts</a></li>
             </ul>
           </div>
         </div>
@@ -68,63 +80,53 @@
       <div class="panel panel-help panel-right">
         <div class="panel-content-wrapper">
           <div id="fixed-help" class="js-fluid-fixed panel-content">
-            {{#if homepage}}
-            {{else}}
             <ul class="nav nav-pills" data-spy="affix">
-              {{#eachSection rootName}}
-                {{#ifDepth 2}}
-                <li><a href="#{{referenceURI}}" class="nav-link">{{ header }}</a></li>
-                {{/ifDepth}}
-              {{/eachSection}}
+                <li><a href="#16-1" class="nav-link">Alerts</a></li>
             </ul>
-            {{/if}}
           </div>
         </div>
       </div>
       <div class="main">
         <div class="content">
-          {{#if homepage}}
-            <h1>Vanilla Dashboard Styleguide</h1>
-            <div class="padded">{{{homepage}}}</div>
-          {{else}}
-            {{#eachSection rootName}}
-              {{#ifDepth 1}}
-                <h1 class="kss-title" id="{{ referenceURI }}">{{ header }}</h1>
-                {{#if description}}
+                <h1 class="kss-title" id="16">Alerts</h1>
                   <div class="kss-box">
-                    <div class="padded">{{{description}}}</div>
+                    <div class="padded"><p>Alerts are warning/info/danger/success messages that generally appear at the top of a page. Alerts use twbs&#39;s scss.</p>
+</div>
                   </div>
-                {{/if}}
-              {{else}}
-                <section class="kss-depth-{{ depth }}">
+                <section class="kss-depth-2">
                   <div class="kss-component">
                     <div class="kss-component-description row full-border">
-                      <h{{ depth }} class="kss-title" id="{{ referenceURI }}">
-                      <span class="kss-ref badge pull-right">{{ referenceURI }}</span> {{ header }}
-                      </h{{ depth }}>
-                      {{#eachParameter}}
-                        <h4><span class="pull-right"><code>{{name}}</code></span> {{{description}}}</h4>
-                      {{/eachParameter}}
-                      {{#if description}}
-                        <div class="kss-box padded">{{{description}}}</div>
-                      {{/if}}
-                      {{#if markup}}
-                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">{{markup}}</pre>
+                      <h2 class="kss-title" id="16-1">
+                      <span class="kss-ref badge pull-right">16-1</span> Alerts
+                      </h2>
+                        <div class="kss-box padded"><p>Alerts come in four different flavours.</p>
+</div>
+                        <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;alert [modifier class] padded&quot;&gt;
+  This is an alert message. Take note ye all.
+&lt;/div&gt;</pre>
                         </div> <!-- end kss-component-description -->
                         <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                        <div class="kss-example padded-bottom">{{{markup}}}</div>
-                        {{#eachModifier}}
-                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">{{{description}}}</span> <span class="pull-right"><code>{{name}}</code></span></div>
-                          <div class="kss-example padded-bottom">{{{markup}}}</div>
-                        {{/eachModifier}}
-                      {{else}}
-                        </div> <!-- end kss-component-description -->
-                      {{/if}}
+                        <div class="kss-example padded-bottom"><div class="alert [modifier class] padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Inform the user about something. It&#39;s not going to break anything if they don&#39;t see this, but it&#39;s good to know.</span> <span class="pull-right"><code>.alert-info</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-info padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Warn the user about something. It&#39;s best that they heed this advice if they want everything to run smoothly.</span> <span class="pull-right"><code>.alert-warning</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-warning padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Alert the user of a failure or if they&#39;re about to do something that has serious consequences.</span> <span class="pull-right"><code>.alert-danger</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-danger padded">
+  This is an alert message. Take note ye all.
+</div></div>
+                          <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Let the user know that what they&#39;ve tried to do has been successful.</span> <span class="pull-right"><code>.alert-success</code></span></div>
+                          <div class="kss-example padded-bottom"><div class="alert alert-success padded">
+  This is an alert message. Take note ye all.
+</div></div>
                   </div>
                 </section>
-              {{/ifDepth}}
-            {{/eachSection}}
-          {{/if}}
         </div>
         <div class="footer">
           <div class="footer-logo logo-wrap">

@@ -993,9 +993,11 @@ jQuery(document).ready(function($) {
                 var message = response.InformMessages[i].Message;
                 var emptyMessage = message === '';
 
+                message = '<span class="InformMessageBody">' + message + '</span>';
+
                 // Is there a sprite?
                 if (sprite !== '')
-                    message = '<span class="InformSprite ' + sprite + '"></span>' + message;
+                    message = '<span class="InformSprite ' + sprite + '"></span>';
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
@@ -1023,7 +1025,7 @@ jQuery(document).ready(function($) {
                         elementId = ' id="' + elementId + '"';
                     }
                     if (!emptyMessage) {
-                        informMessages.prepend('<div class="' + css + '"' + elementId + '>' + message + '</div>');
+                        informMessages.prependTrigger('<div class="' + css + '"' + elementId + '>' + message + '</div>');
                         // Is there a callback or callback url to request on dismiss of the inform message?
                         if (dismissCallback) {
                             $('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));

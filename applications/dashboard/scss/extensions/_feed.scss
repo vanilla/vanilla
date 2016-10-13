@@ -1,4 +1,7 @@
-// This should in the end have the same markup as the summary table.
+// FeedItems are found in the dashboard home page. They are populated via an ajax call. They should in the end have
+// the same markup as the summary table component. In the meantime, this stylesheet makes a FeedItem look like a
+// summary table component.
+
 .Feed {
   padding-top: $spacer / 2;
 }

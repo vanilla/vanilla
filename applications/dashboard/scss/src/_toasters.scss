@@ -1,103 +1,64 @@
 // Toasters
 //
-// Toasters.
-//
 // Styleguide 13.
 
-// Note: InformMessages are "growl" style messages that appear in a fixed position on the page to notify users of things like drafts being saved, etc.
+// Toasters
+//
+// Toasters are "growl" style messages that appear in a fixed position on the page. The `InformMessages` rendered in
+// global.js extend the `toaster*` css classes used below. The fixed toaster positioning for the toaster messages gets
+// applied when the toaster is nested in a element with the `toasters` css class applied to it.
+//
+// Markup:
+// <dix class="toaster">
+//   <span class="toaster-close"></span>
+//   <div class="toaster-body">
+//     This is a toaster message. The additional text will be hidden if it goes longer than 60 characters.
+//   </div>
+// </div>
+//
+// Styleguide 13.1.
 
-* html .InformMessages {
-  position: absolute;
-  width: 100%;
-  top: auto;
-  left: $spacer;
-  overflow: visible;
+.toaster {
+  position: relative;
+  display: block;
+  width: 448px;
+  padding: $spacer $spacer * 3 $spacer $spacer;
+  margin-top: $spacer / 8;
+  font-weight: 400;
+  font-size: $font-size-md;
+  line-height: to-rem(18);
+  color: $white;
+  background: #333;
+  border: $border-width solid $black;
+  opacity: .9;
+  box-shadow: inset 0px 0px 1px 0px rgba(255,255,255,0.72);
+  border-radius: $border-radius;
+
+  a {
+    color: $white;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    background-color: rgba(0,0,0,.8);
+  }
 }
 
-.InformMessages {
-  text-align: left;
-  position: fixed;
-  top: auto;
-  bottom: $spacer;
-  left: $spacer;
-  z-index: 200;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: $font-size-sm;
-  display: block;
-  width: auto;
+.toaster-close {
+  position: absolute;
+  top: $spacer - to-rem(2);
+  right: $spacer;
+  cursor: pointer;
 
-  .InformWrapper {
-    display: block;
-  }
-
-  .InformMessage {
-    color: $white;
-    text-shadow: 0 1px 1px $black;
-    text-align: left;
-    border-radius: $border-radius;
-    background: rgba(0,0,0,.7);
-    border: 0;
-    width: auto;
-    max-width: 400px;
-    margin: ($spacer / 2) auto 0;
-    padding: ($spacer / 2) $spacer;
+  &::before {
     display: inline-block;
-    zoom: 1;
-    position: relative;
-
-    &:hover {
-      background: rgba(0,0,0,.8);
-    }
-
-    a {
-      color: $white;
-      text-decoration: underline;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
-
-    .Close {
-      border: 0;
-      background: transparent;
-      border-top-right-radius: 2px;
-      color: #ddd;
-      font-size: 14px;
-      text-align: center;
-      display: none;
-      height: 12px;
-      width: 12px;
-      line-height: 1;
-      text-decoration: none;
-      position: absolute;
-      top: 0;
-      right: 0;
-
-      span {
-        display: inline;
-      }
-
-      &:hover {
-        background: $black;
-        color: $white;
-      }
-    }
-
-    &:hover .Close {
-      display: block;
-    }
-
-    // Inform Sprites
-
-    .Icon {
-      display: none;
-    }
-
-    .InformSprite {
-      display: none;
-    }
+    content: $close-white;
   }
+}
+
+.toasters {
+  position: fixed;
+  bottom: to-rem(24);
+  left: to-rem(24);
+  z-index: 1050;
 }

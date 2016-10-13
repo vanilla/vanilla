@@ -71,6 +71,7 @@ $font-size-root:             $rem-base * 1px;
 
 $font-size-base:             .875rem;
 $font-size-lg:               1.25rem !default;
+$font-size-md:               to-rem(13);
 $font-size-sm:               to-rem(12);
 $font-size-xs:               to-rem(11);
 
@@ -218,8 +219,13 @@ $nav-pills-active-link-hover-color:         $component-active-color !default;
 $nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
 
 $navbar-height:                             to-rem(60);
+$navbar-short-height:                       3rem;
 $navbar-active-link-active-bg:              #0cb0f8;
 $navbar-link-color:                         lighten($navbar-active-link-active-bg, 40%);
+$navbar-border-color:                       rgba(0,0,0,.125);
+
+// Footer
+$footer-height:                             to-rem(60);
 
 // Checkbox toggles
 $toggle-border-width:                       $border-width;

@@ -108,6 +108,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         }
 
         Gdn_Theme::section('DashboardHome');
+        $sender->setData('IsWidePage', true);
 
         // Tell the page where to find the Vanilla Analytics provider
         $sender->addDefinition('VanillaStatsUrl', $statsUrl);

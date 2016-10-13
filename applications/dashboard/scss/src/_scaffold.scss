@@ -1,91 +1,42 @@
 // Scaffold
 //
+// Contains the building blocks of the dashboard template. Try to avoid adding any painting-type styles to this file.
+// We're all about position in here. Painting styles for the navbar and panel can be found in their respective scss files.
+// The basic structure of the dashboard is as follows:
+//
+// main-container
+// --------------------------------------------------------------------------------------
+//   navbar
+//   ------------------------------------------------------------------------------------
+//   main-row
+//
+//     panel-left               | main                          | panel-right
+//       panel-content-wrapper  |  content                      |   panel-content-wrapper
+//         panel-content        |  ---------------------------- |     panel-content
+//                              |  footer                       |
+// --------------------------------------------------------------------------------------
+//
+// This file also contains the CSS support for the drawer (i.e., the hamburger menu) functionality.
+//
 // No styleguide reference.
 
-.main {
-  // The panels are fixed width and the main content fills the rest of the screen.
-  // We want the content to load after the other assets to prevent janky loading, so we
-  // position it after the two panels and order it to be in the center here.
-  order: 2;
-
-  position: relative;
-  padding-left: $padding-row;
-  padding-right: $padding-row;
-  max-width: 1024px;
-  flex-grow: 1;
-  overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
-
-  .main-row & {
-    // Ensure the footer is flush with the bottom of the window if the
-    // page height is less than the window height.
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    margin-top: -$navbar-height;
-    padding-top: $navbar-height;
-
-    background-color: $white;
-    border: 1px solid $border-color;
-    border-top: 0;
-    border-bottom: 0;
-    transition: all 250ms;
-
-    .drawer-show & {
-      transform: translate3d($drawer-width, 0, 0);
-
-      &:after {
-        position: absolute;
-        display: block;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        background-color: rgba(0,0,0,.25);
-        z-index: 3;
-        content: '';
-      }
-    }
-  }
-
-  .content {
-    flex-grow: 1;
-  }
-
-  .footer {
-    flex-shrink: 0;
-    height: 4rem;
-    margin-top: -4rem - to-rem(1);
-  }
-
-  .content {
-    padding-bottom: 4rem;
-
-    > *:not(:first-child) {
-      // collapse the border on our body elements.
-      margin-top: -$border-width;
-    }
-
-    > .padded,
-    > .padded-top {
-      margin-top: $spacer / 2;
-    }
-  }
+.main-container {
+  width: 100%;
+  overflow-x: hidden; // For the drawer functionality
 }
 
-.Section-DashboardHome,
-.Section-Tutorials {
-  .main {
-    max-width: 1296px;
+.navbar {
+  position: relative;
+  width: 100%;
+  height: $navbar-height;
+  z-index: 1;
+
+  &.navbar-short {
+    height: $navbar-short-height;
   }
 
-  @include media-breakpoint-up(lg) {
-    .panel-left {
-      display: none;
-    }
-  }
-
-  .panel-right {
-    display: none;
+  @include media-breakpoint-down(md) {
+    height: $navbar-short-height;
   }
 }
 
@@ -99,13 +50,117 @@
   }
 }
 
-ul{
-  margin-bottom: 0;
+.main {
+  position: relative;
+  flex-grow: 1;
+  // The panels are fixed width and the main content fills the rest of the screen.
+  // We want the content to load after the other assets to prevent janky loading, so we
+  // position it after the two panels and order it to be in the center here.
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  // Ensure the footer is flush with the bottom of the window if the page height is less than the window height.
+  min-height: 100vh;
+  margin-top: -$navbar-height;
+  padding-top: $navbar-height;
+  padding-left: $padding-row;
+  padding-right: $padding-row;
+  max-width: 1024px;
+  overflow-y: hidden; // Setting overflow property stops content from widening into the panels.
+
+  .content {
+    flex-grow: 1;
+    padding-bottom: $footer-height + to-rem(60);
+  }
+
+  .footer {
+    flex-shrink: 0;
+    height: $footer-height;
+    margin-top: -$footer-height - to-rem(1);
+  }
 }
 
+// Panels
 
-// For the drawer functionality
-.main-container {
-  width: 100%;
-  overflow-x: hidden;
+.panel {
+  padding-top: $spacer * 4;
+  padding-bottom: $spacer * 4;
+}
+
+.panel-content,
+.panel-content-wrapper {
+  width: 204px;
+}
+
+.panel-left {
+  padding-left: $spacer;
+}
+
+.panel-right {
+  padding-right: $spacer;
+  order: 3;
+
+  .panel-content {
+    padding-left: $spacer;
+  }
+}
+
+// For wide panel-less pages, like the Dashboard Home page
+
+.main-row-wide {
+  .main {
+    max-width: 1296px;
+  }
+
+  .panel-right {
+    display: none;
+  }
+
+  .panel-left {
+    display: none;
+  }
+}
+
+// Drawer functionality, and responsive show/hide
+
+.drawer-show .main {
+  transform: translate3d($drawer-width, 0, 0);
+
+  &:after {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0,0,0,.25);
+    z-index: 3;
+    content: '';
+  }
+}
+
+.drawer-toggle {
+  display: none;
+}
+
+@include media-breakpoint-down(md) {
+  .panel-right {
+    display: none;
+  }
+
+  .panel-left {
+    display: none;
+  }
+
+  .drawer-toggle {
+    display: block;
+  }
+
+  .drawer-show .panel-left {
+    position: absolute;
+    display: block;
+    width: $drawer-width;
+    height: 100%;
+    padding-top: $spacer * 4 + $navbar-short-height;
+  }
 }

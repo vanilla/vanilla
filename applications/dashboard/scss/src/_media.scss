@@ -10,9 +10,9 @@
 //
 // The media item.
 //
-// .media-callout - used for callouts
-// .media-addon - used for addons
-// .media-sm - used for user cells in tables
+// .media-callout - Used for callouts.
+// .media-addon - Used for addons.
+// .media-sm - Used for user cells in tables.
 //
 // Markup:
 // <div class="media {{modifier_class}}">
@@ -52,7 +52,7 @@
 // Styleguide 6.1.
 
 .media {
-  margin-bottom: 0;
+  display: flex;
 
   .info {
     font-size: $font-size-tables;
@@ -74,8 +74,17 @@
 
   .media-image {
     height: 10rem;
-    border: 1px solid $border-color;
+    border: $border-width solid $border-color;
   }
+
+  .media-body {
+    flex: 1;
+  }
+}
+
+.media-list {
+  padding-left: 0;
+  list-style: none;
 }
 
 .media-addon {
@@ -138,7 +147,6 @@
 .media-left {
   padding-right: $spacer;
 }
-
 
 //
 // Media item

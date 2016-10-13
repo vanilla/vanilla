@@ -1,8 +1,5 @@
-// Alerts
-//
-// Find the dashboard alert styling here.
-//
-// Styleguide 14.
+// We can get rid of part one of this when we replace *Message classes with alert alert-* css classes.
+// The message preview part of this file requires a reworking of site messages before we can get rid of it.
 
 .CasualMessage {
   @extend .alert;
@@ -30,7 +27,9 @@ div.Messages.Errors {
   @extend .alert-danger;
 }
 
-
+// For message previews. We pull these styles from style.scss so the previews will presumably look the
+// Way the alerts will look on the front-end. However, if the user overrides style.css, or styles the alerts
+// differently in custom.css, then the preview will not be the sam.
 .Section-Dashboard.Message.index {
   /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
     that it renders in a div with this DismissMessage class. */

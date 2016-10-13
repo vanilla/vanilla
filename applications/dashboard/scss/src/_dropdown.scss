@@ -1,5 +1,69 @@
+// Dropdowns
+//
+// The dropdown uses twbs's scss.
+//
+// PHP rendering: Use the `dropdown-twbs` view using the Dropdown Module.
+//
+// Styleguide 14.
+
+// Dropdown Menu alignment
+//
+// PHP rendering: If you want the dropdown menu to open right, set the Dropdown Module's `listCssClass` to
+// `dropdown-menu-right`.
+//
+// .dropdown-menu-right - Opens with the right side of the dropdown menu aligned the right of the root dropdown div.
+//
+// Markup:
+// <div class="dropdown">
+//   <div class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//     <svg class="icon icon-16" viewBox="0 0 16 16">
+//       <use xlink:href="#code-bubble"></use>
+//     </svg>
+//   </div>
+//   <div class="dropdown-menu {{modifier_class}}">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+//       <svg class="icon icon-16 icon-discussions" viewBox="0 0 16 16">
+//         <use xlink:href="#question-mark"></use>
+//       </svg>
+//       Help
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide 14.1.
+
+// Dropup Variation
+//
+// PHP rendering: If you want the dropdown menu to open up, set the Dropdown Module's `cssClass` property to `dropup`.
+//
+// .dropup - Opens up instead of down.
+//
+// Markup:
+// <div class="dropdown {{modifier_class}}">
+//   <div class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//     Trigger
+//   </div>
+//   <div class="dropdown-menu">
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
+//     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
+//     <div class="dropdown-divider"></div>
+//     <div class="dropdown-header">Display as</div>
+//     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">
+//       <svg class="icon icon-16" viewBox="0 0 16 16">
+//         <use xlink:href="#question-mark"></use>
+//       </svg>
+//       Help
+//     </a>
+//   </div>
+// </div>
+//
+// Styleguide 14.2.
+
 .dropdown-toggle {
-  border-radius: 0;
   cursor: pointer;
 }
 
@@ -8,5 +72,13 @@
 
   .icon {
     margin-right: $spacer / 4;
+  }
+
+  svg.icon {
+    margin-top: - to-rem(2);
+  }
+
+  .dropdown-item.disabled {
+    color: lighten($grey, 20%);
   }
 }

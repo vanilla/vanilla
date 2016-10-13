@@ -68,7 +68,7 @@ Gdn_Theme::assetEnd();
 
 <div class="main-container">
     <div class="navbar js-navbar">
-        <button class="js-panel-left-toggle panel-left-toggle btn btn-link" type="button">
+        <button class="js-drawer-toggle drawer-toggle btn btn-link" type="button">
             &#9776;
         </button>
         <div class="navbar-brand">
@@ -100,8 +100,8 @@ Gdn_Theme::assetEnd();
             ?>
         </div>
     </div>
-    <div class="main-row pusher" id="main-row">
-        <div class="panel panel-left drawer">
+    <div class="main-row pusher<?php echo $this->data('IsWidePage') ? ' main-row-wide' : ''; ?>" id="main-row">
+        <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
                 <div id="panel-nav" class="js-fluid-fixed panel-content">
                     <?php echo anchor($title.' '.dashboardSymbol('external-link', '', 'icon-16'), '/', 'title'); ?>

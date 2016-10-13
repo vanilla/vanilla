@@ -1053,6 +1053,8 @@ class SettingsController extends DashboardController {
         $this->fireEvent('DashboardData');
 
         Gdn_Theme::section('DashboardHome');
+        $this->setData('IsWidePage', true);
+
         $this->render('index');
     }
 
@@ -1951,6 +1953,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/gettingstarted');
 
         Gdn_Theme::section('Tutorials');
+        $this->setData('IsWidePage', true);
         $this->render();
     }
 
@@ -1965,6 +1968,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
         Gdn_Theme::section('Tutorials');
+        $this->setData('IsWidePage', true);
         $this->render();
     }
 }

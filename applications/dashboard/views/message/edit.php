@@ -16,10 +16,10 @@ echo $this->Form->errors();
             </div>
             <div class="input-wrap">
                 <?php
-                echo $this->Form->Radio('CssClass', t('Casual'), array('value' => 'CasualMessage', 'class' => 'radio-inline'));
-                echo $this->Form->Radio('CssClass', t('Information'), array('value' => 'InfoMessage', 'class' => 'radio-inline'));
-                echo $this->Form->Radio('CssClass', t('Alert'), array('value' => 'AlertMessage', 'class' => 'radio-inline'));
-                echo $this->Form->Radio('CssClass', t('Warning'), array('value' => 'WarningMessage', 'class' => 'radio-inline'));
+                echo $this->Form->Radio('CssClass', t('Casual'), array('value' => 'CasualMessage'));
+                echo $this->Form->Radio('CssClass', t('Information'), array('value' => 'InfoMessage'));
+                echo $this->Form->Radio('CssClass', t('Alert'), array('value' => 'AlertMessage'));
+                echo $this->Form->Radio('CssClass', t('Warning'), array('value' => 'WarningMessage'));
                 ?>
             </div>
         </li>

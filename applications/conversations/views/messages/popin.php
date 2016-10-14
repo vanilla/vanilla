@@ -22,7 +22,7 @@
             $PhotoUser = userBuilder($Row, 'LastInsert');
             ?>
             <li class="Item" rel="<?php echo url("/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?>">
-                <div class="Author Photo"><?php echo userPhoto($PhotoUser); ?></div>
+                <div class="Author Photo"><?php echo userPhoto($PhotoUser, ['NoLink' => true]); ?></div>
                 <div class="ItemContent">
                     <b class="Subject"><?php echo anchor(htmlspecialchars($Subject), "/messages/{$Row['ConversationID']}#Message_{$Row['LastMessageID']}"); ?></b>
                     <?php

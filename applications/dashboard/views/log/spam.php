@@ -14,6 +14,7 @@ echo $this->Form->open();
         echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-primary'));
         ?>
     </div>
+    <?php PagerModule::write(['Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard']); ?>
 </div>
 <?php
 

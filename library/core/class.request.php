@@ -949,7 +949,7 @@ class Gdn_Request {
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
         }
 
         if (!$allowSSL) {

@@ -761,6 +761,11 @@ select + select {
   .form-control {
     border-radius: $control-height / $rem-base / 2 * 1rem;
     padding-left: $spacer * 2.5;
+    padding-right: $spacer * 2.5;
+
+    &[placeholder] {
+      text-overflow: ellipsis;
+    }
   }
 
   .search-icon-wrap {

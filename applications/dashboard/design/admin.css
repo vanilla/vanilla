@@ -6840,6 +6840,11 @@ select + select {
 .search-wrap .form-control, .search-wrap .ac_input {
   border-radius: 1.125rem;
   padding-left: 2.8125rem;
+  padding-right: 2.8125rem;
+}
+
+.search-wrap .form-control[placeholder], .search-wrap [placeholder].ac_input {
+  text-overflow: ellipsis;
 }
 
 .search-wrap .search-icon-wrap {
@@ -8628,6 +8633,7 @@ button.close {
   justify-content: space-between;
   padding-top: 0.5625rem;
   padding-bottom: 1.125rem;
+  padding-right: 0;
 }
 
 .toolbar > * {
@@ -8635,12 +8641,11 @@ button.close {
   margin-right: 1.125rem;
 }
 
-.toolbar > *:last-child {
-  margin-right: 0;
-}
-
-.toolbar.flex-wrap > * {
-  margin-right: 0;
+.toolbar .toolbar-buttons {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap;
 }
 
 .toolbar:empty {
@@ -8657,6 +8662,11 @@ button.close {
   line-height: 1;
   font-weight: 500;
   padding-right: 0.5625rem;
+  white-space: nowrap;
+}
+
+.pager-wrap {
+  margin-left: auto;
 }
 
 .pager {
@@ -9780,10 +9790,6 @@ img.jcrop-preview {
 .flex-wrap {
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
-}
-
-.flex-wrap > *, .flex-wrap.flex > * {
-  margin-right: 0;
 }
 
 .shrink {

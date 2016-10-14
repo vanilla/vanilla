@@ -10,14 +10,14 @@ echo $this->Form->open();
 <div class="header-block">
     <h1><?php echo $this->data('Title'); ?></h1>
 </div>
-<div class="toolbar">
-    <div class="buttons">
+<div class="toolbar flex-wrap">
+    <div class="toolbar-buttons">
         <?php
         echo anchor(t('Approve'), '#', array('class' => 'RestoreButton btn btn-primary'));
         echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
         ?>
     </div>
-    <div class="search"><?php
+    <div class="search toolbar-main"><?php
         if (c('Vanilla.Categories.Use')) {
             echo '<div class="input-wrap input-wrap-multiple">';
             echo $this->Form->CategoryDropDown('CategoryID', [

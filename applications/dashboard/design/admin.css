@@ -5151,6 +5151,7 @@ fieldset[disabled] a.Button {
   fill: #555a62;
   opacity: 0.7;
   height: 1.5rem;
+  width: 1.5rem;
 }
 
 .btn-icon:hover svg {
@@ -5205,6 +5206,7 @@ fieldset[disabled] a.Button {
   fill: #555a62;
   opacity: 0.7;
   height: 1.75rem;
+  width: 1.75rem;
 }
 
 .btn-icon-border:first-child {
@@ -7078,6 +7080,7 @@ label[id^=iCheck] {
 
 .icon-text {
   width: 0.875rem;
+  height: 0.875rem;
   fill: #555a62;
   vertical-align: middle;
 }

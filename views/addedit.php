@@ -108,5 +108,5 @@ echo $Form->errors();
         </div>
     </li>
 </ul>
-<?php $Form->close('Save');
+<?php echo $Form->close('Save');
 

@@ -79,7 +79,6 @@ module.exports = function (grunt) {
               'clipboard/dist/clipboard.min.js'
               , 'bootstrap-daterangepicker/daterangepicker.js'
               , 'jquery-icheck/icheck.min.js'
-              , 'ScrollToFixed/jquery-scrolltofixed-min.js'
               , 'moment/min/moment.min.js'
               , 'tether/dist/js/tether.min.js'
               , 'tether/dist/js/tether.min.js'
@@ -212,7 +211,6 @@ module.exports = function (grunt) {
       styleguide: {
         src: ([]).concat([
           'js/vendors/tether.js',
-          'js/vendors/jquery-scrolltofixed-min.js',
           'js/vendors/icheck.min.js',
           'js/vendors/clipboard.min.js',
           'js/vendors/drop.min.js',

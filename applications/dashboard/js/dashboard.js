@@ -727,27 +727,29 @@ var DashboardModal = (function() {
         codeInput.start(element);
     }
 
-    function scrollToFixedInit(element) {
+    function fixItem(selector, element) {
+        $(selector, element).each(function() {
+            var $item = $(this);
+            $item.after('<div class="js-fixed-spacer"></div>');
+            var $spacer = $('.js-fixed-spacer');
+            $spacer.height($item.height());
+            $item.css('position', 'fixed');
+            $item.css('z-index', '1050');
+        });
+    }
+
+    function fixedInit(element) {
+        fixItem('.js-navbar', element);
+        fixItem('.js-modal-fixed', element);
 
         var $navbar = $('.js-navbar', element);
-        var $spacer = $('.js-scroll-to-fixed-spacer');
 
         $navbar.addClass('navbar-short');
         var navShortHeight = $navbar.outerHeight(true);
         $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
-        $spacer.height(navHeight);
 
         var navOffset = navHeight - navShortHeight;
-
-        $navbar.scrollToFixed({
-            zIndex: 1005,
-            spacerClass: 'js-scroll-to-fixed-spacer'
-        });
-
-        $('.js-modal-fixed', element).scrollToFixed({
-            zIndex: 1005
-        });
 
         // If we load in the middle of the page, we should have a short navbar.
         if ($(window).scrollTop() > navOffset) {
@@ -759,7 +761,6 @@ var DashboardModal = (function() {
                 $navbar.addClass('navbar-short');
             } else {
                 $navbar.removeClass('navbar-short');
-                $spacer.height(navHeight);
             }
         });
     }
@@ -917,7 +918,7 @@ var DashboardModal = (function() {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        scrollToFixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        fixedInit(e.target); // navbar scroll settings and modal fixed header and footer
         fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)

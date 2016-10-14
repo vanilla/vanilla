@@ -129,7 +129,6 @@ The specific javascript files we use are listed here.
 * Google Prettify - For syntax highlighting to our code and pre blocks.
 * iCheck - For our radio and checkbox styling.
 * Drop - For our user card dropdown.
-* ScrollToFixed - For fixing the navbar and the modal header and footer.
 * Clipboard - For copying text. (Used in the embed section.)
 
 ---

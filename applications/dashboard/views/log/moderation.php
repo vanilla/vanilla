@@ -28,7 +28,7 @@ echo $this->Form->open();
             echo '</div>';
         }
         ?></div>
-    <?php PagerModule::write(array('Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard')); ?>
+    <?php PagerModule::write(['Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard']); ?>
 </div>
 <?php
 echo '<div id="LogTable">';

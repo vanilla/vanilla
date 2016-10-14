@@ -455,22 +455,26 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @return string A plaintext email.
      */
     protected function plainTextEmail() {
-        $email = array(
+        $email = [
             'banner' => val('alt', $this->image).' '.val('link', $this->image),
             'title' => $this->getTitle(),
             'lead' => $this->getLead(),
             'message' => $this->getMessage(),
             'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
             'footer' => $this->getFooter()
-        );
+        ];
 
         foreach ($email as $key => $val) {
             if (!$val) {
                 unset($email[$key]);
+            } else {
+                if ($key == 'message') {
+                    $email[$key] = "<br>$val<br>";
+                }
             }
         }
 
-        return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
+        return Gdn_Format::plainText(Gdn_Format::text(implode('<br>', $email)));
     }
 
     /**

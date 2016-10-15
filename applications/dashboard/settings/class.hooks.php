@@ -57,7 +57,6 @@ class DashboardHooks extends Gdn_Plugin {
             $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
             $Sender->addJsFile('jquery.tablejenga.js', 'dashboard');
             $Sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
-            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
             $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
             $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
             $Sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');

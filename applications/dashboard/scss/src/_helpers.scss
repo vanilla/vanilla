@@ -104,13 +104,6 @@
 
 .flex-wrap {
   flex-wrap: wrap;
-
-  &,
-  &.flex {
-    > * {
-      margin-right: 0;
-    }
-  }
 }
 
 // Filling Extra Space

@@ -1,14 +1,23 @@
 /**
- * Makes tables collapsible.
+ * Makes tables collapsible by setting meta data on a main column. The meta label is based on the column heading and
+ * the meta body is the cell content.
  *
  * Set 'data-tj-ignore="true"' on a thead td or thead th element to never collapse that column
  * Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column.
+ * Set 'data-tj-label="New label"' to override the column heading as the meta label.
  */
 (function($) {
     $.fn.tablejenga = function(options) {
 
+        var lastWindowWidth;
+
+        /**
+         * Initiates table jengo.
+         *
+         * @param table
+         * @param vars
+         */
         var start = function(table, vars) {
-            reset(table);
             var maxIterations = 10; //safety first
             var i = 0;
             while(isTooWide(table, vars) && i < maxIterations) {
@@ -17,13 +26,46 @@
             }
         };
 
+        /**
+         * If we're making the window less wide, we don't have to reassess any already hidden columns.
+         * If we're getting wider, recalculate everything.
+         *
+         * @param table
+         * @param vars
+         */
+        var windowResize = function(table, vars) {
+            if ($(window).width() < lastWindowWidth) {
+                start(table, vars);
+            } else {
+                reset(table);
+                start(table, vars);
+            }
+
+            lastWindowWidth = $(window).width();
+        };
+
+        /**
+         * Resets a table to its state before it collapsed.
+         *
+         * @param table
+         */
         var reset = function(table) {
             $('.tj-hidden', table).show();
             $('.tj-hidden', table).removeClass('tj-hidden');
             $('.tj-main-heading', table).css('width', '');
             $('.tj-meta', table).remove();
+
+            $('td[colspan]', table).each(function() {
+               $(this).attr('colspan', $(this).data('originalColspan'));
+            });
         };
 
+        /**
+         * Adds each cell's column heading as a data attribute.
+         *
+         * @param table
+         * @param vars
+         */
         var addDataLabels = function(table, vars) {
             $('tbody tr', table).each(function() {
                 $('td', this).each(function() {
@@ -38,6 +80,12 @@
             });
         };
 
+        /**
+         * Saves the column headings into an array and determines which cell is the main cell.
+         *
+         * @param table
+         * @param vars
+         */
         var getDataLabels = function(table, vars) {
             vars['labels'] = [];
             vars['ignoreLabels'] = [];
@@ -65,17 +113,30 @@
             }
         };
 
+        /**
+         * Checks if a table is too wide for its container.
+         *
+         * @param table
+         * @param vars
+         * @returns {boolean} Whether a table is wider than its container.
+         */
         var isTooWide = function(table, vars) {
             var tableWidth = table.width();
-            var windowWidth = $(vars.container).outerWidth();
+            var containerWidth = $(vars.container).outerWidth();
 
-            if (tableWidth > windowWidth) {
+            if (tableWidth > containerWidth) {
                 return true;
             }
 
             return false;
         };
 
+        /**
+         * Does what we came here to do. Moves data from a cell to a meta item under the data in the main cell.
+         *
+         * @param table
+         * @param vars
+         */
         var moveCell = function(table, vars) {
             var label = '';
 
@@ -105,22 +166,41 @@
             });
 
             $('thead tr td, thead tr th', table).each(function() {
-                if ($(this).data('label') === label) {
-
+                if (!$(this).hasClass('tj-hidden') && $(this).data('label') === label) {
                     // check the width of the column and main-heading assumes its width if it's wider than main
                     var minWidth = $(this).width();
                     if ($('.tj-main-heading', table).width() < minWidth) {
                         $('.tj-main-heading', table).css('width', minWidth);
                     }
 
+                    decrementColspan(table);
                     $(this).addClass('tj-hidden');
                 }
-            })
+            });
 
             $('.tj-hidden', table).hide();
             $('.tj-meta', table).show();
         };
 
+
+        /**
+         * Decrements the colspan of a cell.
+         *
+         * @param table
+         */
+        var decrementColspan = function(table) {
+            $('td[colspan]', table).each(function() {
+                $(this).attr('colspan', ($(this).attr('colspan') - 1));
+            });
+        };
+
+        /**
+         * Returns the next cell to collapse.
+         *
+         * @param $row
+         * @param vars
+         * @returns {boolean}
+         */
         var getNext = function($row, vars) {
             var found = false;
             var $next = false;
@@ -139,9 +219,14 @@
             return $next;
         };
 
-        // Get table.
         this.each(function() {
-            var table = $(this);
+            var $table = $(this);
+
+            $('td[colspan]', $table).each(function() {
+                $(this).data('originalColspan', $(this).attr('colspan'));
+            });
+
+            $table.css('table-layout', 'fixed');
 
             // Extend Settings.
             var settings = $.extend({}, $.fn.tablejenga.defaults, options);
@@ -154,11 +239,13 @@
                 showEmptyCells: settings.showEmptyCells
             };
 
-            getDataLabels(table, vars);
-            addDataLabels(table, vars);
-            start(table, vars);
+            getDataLabels($table, vars);
+            addDataLabels($table, vars);
+            start($table, vars);
+
+            lastWindowWidth = $(window).width();
             $(window).resize(function() {
-                start(table, vars);
+                windowResize($table, vars);
             });
         });
     };

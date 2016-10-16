@@ -585,16 +585,20 @@ if (!function_exists('safeCookie')) {
      * @param integer $expire
      * @param string $path
      * @param string $domain
-     * @param boolean $secure
+     * @param boolean|null $secure
      * @param boolean $httponly
      */
-    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = false, $httponly = false) {
+    function safeCookie($name, $value = null, $expire = 0, $path = null, $domain = null, $secure = null, $httponly = false) {
         static $context = null;
         if (is_null($context)) {
             $context = requestContext();
         }
 
         if ($context == 'http') {
+            if ($secure === null && c('Garden.ForceSSL') && Gdn::request()->scheme() === 'https') {
+                $secure = true;
+            }
+
             setcookie($name, $value, $expire, $path, $domain, $secure, $httponly);
         }
     }

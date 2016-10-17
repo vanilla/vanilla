@@ -1,8 +1,12 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->data('Title'); ?></h1>
+    <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
+if ($this->data('Operation') == 'Edit') {
+    echo $this->Form->hidden('ParentCategoryID');
+}
+helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.'));
 ?>
 <ul>
     <li class="form-group">
@@ -15,7 +19,7 @@ echo $this->Form->errors();
     </li>
     <li class="form-group">
         <div class="label-wrap">
-        <?php echo wrap(t('Category Url:'), 'strong'); ?>
+            <?php echo wrap(t('Category Url:'), 'strong'); ?>
         </div>
         <div id="UrlCode" class="input-wrap category-url-code">
             <?php
@@ -51,27 +55,25 @@ echo $this->Form->errors();
         <div class="label-wrap">
             <?php echo $this->Form->label('Photo', 'PhotoUpload');
             if ($Photo = $this->Form->getValue('Photo')) {
-                echo img(Gdn_Upload::url($Photo));
-                echo '<br />'.anchor(t('Delete Photo'),
-                        CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
-                        'SmallButton Danger PopConfirm');
+                echo wrap(img(Gdn_Upload::url($Photo)), 'div');
+                echo anchor(t('Delete Photo'),
+                    CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
+                    'js-modal-confirm');
             } ?>
         </div>
         <div class="input-wrap">
             <?php echo $this->Form->fileUpload('PhotoUpload'); ?>
         </div>
     </li>
-    <?php
-    echo $this->Form->Simple(
-        $this->data('_ExtendedFields', array()),
-        array('Wrap' => array('', '')));
+    <?php echo $this->Form->Simple(
+        $this->data('_ExtendedFields', array()));
     ?>
     <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
         </div>
         <div class="input-wrap">
-        <?php echo $this->Form->DropDown('DisplayAs', $this->data('DisplayAsOptions')); ?>
+            <?php echo $this->Form->dropDown('DisplayAs', $this->data('DisplayAsOptions'), ['Wrap' => true]); ?>
         </div>
     </li>
     <li class="form-group">
@@ -82,12 +84,14 @@ echo $this->Form->errors();
             <?php echo $this->Form->toggle('CustomPoints', 'Track points for this category separately.'); ?>
         </li>
     <?php endif; ?>
-    <li class="form-group">
-        <?php
-        echo $this->Form->toggle('Archived', 'This category is archived.');
-        ?>
-    </li>
-    <?php $this->fireEvent('AfterCategorySettings'); ?>
+    <?php if ($this->data('Operation') == 'Edit'): ?>
+        <li class="form-group">
+            <?php
+            echo $this->Form->toggle('Archived', 'This category is archived.');
+            ?>
+        </li>
+        <?php $this->fireEvent('AfterCategorySettings'); ?>
+    <?php endif; ?>
     <?php if (count($this->PermissionData) > 0) { ?>
         <li id="Permissions" class="form-group">
             <?php echo $this->Form->toggle('CustomPermissions', 'This category has custom permissions.'); ?>

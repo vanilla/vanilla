@@ -345,6 +345,21 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
+            $Upload = new Gdn_Upload();
+            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
+            if ($TmpImage) {
+                // Generate the target image name
+                $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
+                $ImageBaseName = pathinfo($TargetImage, PATHINFO_BASENAME);
+
+                // Save the uploaded image
+                $Parts = $Upload->saveAs(
+                    $TmpImage,
+                    $ImageBaseName
+                );
+                $this->Form->setFormValue('Photo', $Parts['SaveName']);
+            }
+
             $CategoryID = $this->Form->save();
             if ($CategoryID) {
                 $Category = CategoryModel::categories($CategoryID);

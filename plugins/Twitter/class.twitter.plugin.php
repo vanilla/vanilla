@@ -22,7 +22,7 @@ $PluginInfo['Twitter'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
-    'Icon' => 'twitter.svg'
+    'Icon' => 'twitter_social_connect.png'
 );
 
 require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';

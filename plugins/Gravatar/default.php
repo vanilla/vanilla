@@ -15,6 +15,7 @@ $PluginInfo['Gravatar'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
+    'Icon' => 'gravatar.png',
     'MobileFriendly' => true
 );
 

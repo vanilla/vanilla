@@ -2,7 +2,7 @@
     $(document)
         // Categories->Delete().
         // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
-        .on('click', '[name$=DeleteDiscussions]', function () {
+        .on('change', '[name$=DeleteDiscussions]', function () {
             if ($(this).prop('checked')) {
                 $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
                 $('#DeleteDiscussions').slideUp('fast');

@@ -31,7 +31,7 @@ class AkismetPlugin extends Gdn_Plugin {
 
         if (!$Akismet) {
             $key = c('Plugins.Akismet.Key', c('Plugins.Akismet.MasterKey'));
-            $server = c('Plugins.Akismet.Server');
+            $server = c('Plugins.Akismet.Server', 'rest.akismet.com');
             if (!$key || !$server) {
                 return null;
             }
@@ -48,9 +48,12 @@ class AkismetPlugin extends Gdn_Plugin {
      * @param string $server Remote URL.
      * @return Akismet
      */
-    private static function buildAkismet($key, $server) {
+    private static function buildAkismet($key, $server = false) {
         $Akismet = new Akismet(Gdn::request()->url('/', true), $key);
-        $Akismet->setAkismetServer($server);
+
+        if ($server) {
+            $Akismet->setAkismetServer($server);
+        }
 
         return $Akismet;
     }

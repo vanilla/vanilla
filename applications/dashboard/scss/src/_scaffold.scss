@@ -26,7 +26,7 @@
 }
 
 .navbar {
-  position: relative;
+  position: fixed;
   width: 100%;
   height: $navbar-height;
   z-index: 1;
@@ -43,10 +43,12 @@
 .main-row {
   display: flex;
   justify-content: center;
+  margin-top: $navbar-height;
 
   @include media-breakpoint-down(md) {
     display: block;
     width: 100%;
+    margin-top: $navbar-short-height;
   }
 }
 

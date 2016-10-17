@@ -283,6 +283,7 @@
 
 .modal-footer,
 .modal-header {
+  z-index: 1005;
   padding: ((to-rem(60) - $control-height-rem) / 2) $spacer;
 }
 

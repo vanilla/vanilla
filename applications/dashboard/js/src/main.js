@@ -77,28 +77,14 @@
         codeInput.start(element);
     }
 
-    function fixItem(selector, element) {
-        $(selector, element).each(function() {
-            var $item = $(this);
-            $item.after('<div class="js-fixed-spacer"></div>');
-            var $spacer = $('.js-fixed-spacer');
-            $spacer.height($item.height());
-            $item.css('position', 'fixed');
-            $item.css('z-index', '1050');
-        });
-    }
 
-    function fixedInit(element) {
-        fixItem('.js-navbar', element);
-        fixItem('.js-modal-fixed', element);
-
+    function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
 
         $navbar.addClass('navbar-short');
         var navShortHeight = $navbar.outerHeight(true);
         $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
-
         var navOffset = navHeight - navShortHeight;
 
         // If we load in the middle of the page, we should have a short navbar.
@@ -268,7 +254,7 @@
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        fixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)

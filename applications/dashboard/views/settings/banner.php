@@ -142,8 +142,7 @@ echo $this->Form->errors();
                     if ($ShareImage) {
                         echo wrap(
                             img(Gdn_Upload::url($ShareImage)),
-                            'div',
-                            ['class' => 'js-modal-item']
+                            'div'
                         );
                         echo wrap(Anchor(t('Remove Image'), '/dashboard/settings/removeshareimage', 'js-modal-confirm js-hijack', ['data-body' => sprintf(t('Are you sure you want to delete your share image?'))]), 'div');
                     } ?>

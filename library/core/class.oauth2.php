@@ -411,10 +411,9 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $get = array_merge($defaultParams, $this->authorizeUriParams);
 
         if (is_array($state)) {
-            if (is_array($state)) {
-                $get['state'] = http_build_query($state);
-            }
+            $get['state'] = http_build_query($state);
         }
+
         return $uri.'?'.http_build_query($get);
     }
 

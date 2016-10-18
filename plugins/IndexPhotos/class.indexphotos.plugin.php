@@ -14,6 +14,7 @@ $PluginInfo['IndexPhotos'] = array(
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
     'RegisterPermissions' => false,
     'MobileFriendly' => true,
+    'Icon' => 'discussion_photos.png',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'

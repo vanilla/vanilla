@@ -13,6 +13,7 @@ $PluginInfo['EmojiExtender'] = array(
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'License' => 'GNU GPL2',
+    'Icon' => 'emoji_set.png',
     'SettingsUrl' => '/settings/EmojiExtender',
     'MobileFriendly' => true
 );

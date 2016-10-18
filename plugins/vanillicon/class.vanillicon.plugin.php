@@ -20,7 +20,7 @@ $PluginInfo['vanillicon'] = array(
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
    'SettingsPermission' => 'Garden.Settings.Manage',
-   'Icon' => 'vanillicon.svg'
+   'Icon' => 'vanillicon.png'
 );
 
 /**

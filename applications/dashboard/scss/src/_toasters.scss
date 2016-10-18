@@ -34,6 +34,10 @@
   box-shadow: inset 0px 0px 1px 0px rgba(255,255,255,0.72);
   border-radius: $border-radius;
 
+  @include media-breakpoint-down(sm) {
+    width: 100%;
+  }
+
   a {
     color: $white;
     text-decoration: underline;
@@ -61,4 +65,10 @@
   bottom: to-rem(24);
   left: to-rem(24);
   z-index: 1050;
+
+  @include media-breakpoint-down(sm) {
+    left: to-rem(12);
+    right: to-rem(12);
+    bottom: to-rem(12);
+  }
 }

@@ -6678,15 +6678,13 @@ select + select {
   align-items: center;
   -ms-flex-pack: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
 }
 
 .label-selector .buttons > .btn, .label-selector .buttons > .file-upload-browse, .label-selector .buttons > .Button {
   display: block;
   margin: 0.1875rem 0.28125rem;
   max-height: 2.25rem;
-  min-width: 5rem;
+  min-width: 6rem;
 }
 
 .label-selector .label-selector-item {
@@ -7268,6 +7266,11 @@ label[id^=iCheck] {
   border: 0.0625rem solid rgba(0, 0, 0, 0.125);
   border-radius: 0;
   content: '';
+}
+
+.modal .media-callout .media-left {
+  max-height: 11.25rem;
+  overflow: hidden;
 }
 
 .media-sm {
@@ -8165,7 +8168,7 @@ button.close {
   position: fixed;
   width: 100%;
   height: 3.75rem;
-  z-index: 1;
+  z-index: 1005;
 }
 
 .navbar.navbar-short {
@@ -8594,6 +8597,12 @@ button.close {
   border-radius: 0.125rem;
 }
 
+@media (max-width: 767px) {
+  .toaster, .InformMessages .InformMessage {
+    width: 100%;
+  }
+}
+
 .toaster a, .InformMessages .InformMessage a {
   color: #fff;
   text-decoration: underline;
@@ -8620,6 +8629,14 @@ button.close {
   bottom: 1.5rem;
   left: 1.5rem;
   z-index: 1050;
+}
+
+@media (max-width: 767px) {
+  .toasters, .InformMessages {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+  }
 }
 
 .toolbar {

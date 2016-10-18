@@ -339,8 +339,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
-        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1';
-
+        $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1' && $session->isValid();
 
         if ($canEdit && $timeLeft) {
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';

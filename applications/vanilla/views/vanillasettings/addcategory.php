@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <h1><?php echo t('Add Category'); ?></h1>
 <?php
-echo $this->Form->open();
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 echo $this->Form->hidden('ParentCategoryID');
 

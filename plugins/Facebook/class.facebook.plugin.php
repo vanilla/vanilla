@@ -24,7 +24,7 @@ $PluginInfo['Facebook'] = array(
     'Hidden' => true,
     'SocialConnect' => true,
     'RequiresRegistration' => true,
-    'Icon' => 'facebook.svg'
+    'Icon' => 'facebook_social_connect.png'
 );
 
 /**

@@ -365,7 +365,8 @@
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
-            modalType: 'confirm'
+            modalType: 'confirm',
+            followLink: true // no ajax
         });
     });
 

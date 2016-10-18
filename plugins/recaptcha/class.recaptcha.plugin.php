@@ -10,6 +10,7 @@ $PluginInfo['recaptcha'] = array(
     'Description' => "Add recaptcha validation to signups.",
     'Version' => '0.1',
     'MobileFriendly' => true,
+    'Icon' => 'recaptcha_support.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

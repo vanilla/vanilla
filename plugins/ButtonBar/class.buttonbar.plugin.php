@@ -16,6 +16,7 @@ $PluginInfo['ButtonBar'] = array(
     'RequiredApplications' => array('Vanilla' => '2.1'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
+    'Icon' => 'button_bar.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

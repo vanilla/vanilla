@@ -19,6 +19,7 @@ $PluginInfo['Flagging'] = array(
     'HasLocale' => true,
     'MobileFriendly' => true,
     'RegisterPermissions' => array('Plugins.Flagging.Notify'),
+    'Icon' => 'flagging.png',
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

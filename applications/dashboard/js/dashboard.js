@@ -436,34 +436,39 @@ var DashboardModal = (function() {
         handleConfirm: function() {
             var self = this;
 
-            // request the target via ajax
-            var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            if (self.settings.httpmethod === 'post') {
-                ajaxData.TransientKey = gdn.definition('TransientKey');
-            }
-
-            $.ajax({
-                method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-                    if (json.RedirectUrl) {
-                        setTimeout(function() {
-                            document.location.replace(json.RedirectUrl);
-                        }, 300);
-                    } else {
-                        $('#' + self.id).modal('hide');
-                        self.afterConfirmSuccess();
-                    }
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
-            });
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json) {
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        if (json.RedirectUrl) {
+                            setTimeout(function() {
+                                document.location.replace(json.RedirectUrl);
+                            }, 300);
+                        } else {
+                            $('#' + self.id).modal('hide');
+                            self.afterConfirmSuccess();
+                        }
+                    }
+                });
+            }
         },
 
         // Default is to remove the closest item with the class 'js-modal-item'
@@ -1015,7 +1020,8 @@ var DashboardModal = (function() {
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
-            modalType: 'confirm'
+            modalType: 'confirm',
+            followLink: true // no ajax
         });
     });
 

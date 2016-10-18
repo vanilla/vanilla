@@ -76,7 +76,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($Logo)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'SmallButton'), 'div');
+                        echo wrap(Anchor(t('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your banner logo?'))]), 'div');
                     } ?>
                     </div>
                     <div class="input-wrap">
@@ -99,7 +99,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($MobileLogo)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Mobile Banner Logo'), '/dashboard/settings/removemobilelogo/'.$Session->TransientKey(), 'SmallButton'), 'div');
+                        echo wrap(Anchor(t('Remove Mobile Banner Logo'), '/dashboard/settings/removemobilelogo/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your mobile banner logo?'))]), 'div');
                     } ?>
                     </div>
                     <div class="input-wrap">
@@ -121,7 +121,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($Favicon)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'SmallButton'), 'div');
+                        echo wrap(Anchor(t('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your favicon?'))]), 'div');
                     }
                     ?>
                     </div>
@@ -144,7 +144,7 @@ echo $this->Form->errors();
                             img(Gdn_Upload::url($ShareImage)),
                             'div'
                         );
-                        echo wrap(Anchor(t('Remove Image'), '/dashboard/settings/removeshareimage', 'SmallButton Hijack'), 'div');
+                        echo wrap(Anchor(t('Remove Image'), '/dashboard/settings/removeshareimage', 'js-modal-confirm js-hijack', ['data-body' => sprintf(t('Are you sure you want to delete your share image?'))]), 'div');
                     } ?>
                     </div>
                     <div class="input-wrap">

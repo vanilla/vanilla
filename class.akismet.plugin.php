@@ -11,6 +11,7 @@ $PluginInfo['Akismet'] = [
     'RequiredApplications' => ['Vanilla' => '2.1'],
     'SettingsUrl' => '/settings/akismet',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'Icon' => 'akismet.png',
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'

@@ -885,7 +885,6 @@ class PostController extends VanillaController {
      */
     public function initialize() {
         parent::initialize();
-        $this->addModule('NewDiscussionModule');
 
         $this->CssClass = 'NoPanel';
     }

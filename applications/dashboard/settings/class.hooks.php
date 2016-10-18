@@ -68,22 +68,43 @@ class DashboardHooks extends Gdn_Plugin {
             Gdn::statistics()->check();
         }
 
-        // Enable theme previewing
+        // Inform user of theme previewing
         if ($Session->isValid()) {
-            $PreviewThemeName = htmlspecialchars($Session->getPreference('PreviewThemeName', ''));
             $PreviewThemeFolder = htmlspecialchars($Session->getPreference('PreviewThemeFolder', ''));
-            if ($PreviewThemeName != '') {
-                $Sender->Theme = $PreviewThemeName;
+            $PreviewMobileThemeFolder = htmlspecialchars($Session->getPreference('PreviewMobileThemeFolder', ''));
+            $PreviewThemeName = htmlspecialchars($Session->getPreference(
+                'PreviewThemeName',
+                $PreviewThemeFolder
+            ));
+            $PreviewMobileThemeName = htmlspecialchars($Session->getPreference(
+                'PreviewMobileThemeName',
+                $PreviewMobileThemeFolder
+            ));
+
+            if ($PreviewThemeFolder != '') {
                 $Sender->informMessage(
-                    sprintf(t('You are previewing the %s theme.'), wrap($PreviewThemeName, 'em'))
+                    sprintf(t('You are previewing the %s desktop theme.'), wrap($PreviewThemeName, 'em'))
                     .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/', 'PreviewThemeButton')
+                    .anchor(t('Apply'), 'settings/themes/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .'</div>',
+                    'DoNotDismiss'
+                );
+            }
+
+            if ($PreviewMobileThemeFolder != '') {
+                $Sender->informMessage(
+                    sprintf(t('You are previewing the %s mobile theme.'), wrap($PreviewMobileThemeName, 'em'))
+                    .'<div class="PreviewThemeButtons">'
+                    .anchor(t('Apply'), 'settings/mobilethemes/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
                     .'</div>',
                     'DoNotDismiss'
                 );
             }
         }
+
+
         if ($Session->isValid()) {
             $Confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$Confirmed) {
@@ -184,6 +205,33 @@ class DashboardHooks extends Gdn_Plugin {
         // Add symbols.
         if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
             $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
+        }
+    }
+
+    /**
+     * Checks if the user is previewing a theme and, if so, updates the default master view.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_beforeFetchMaster_handler($sender) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
+            return;
+        }
+        if (isMobile()) {
+            $theme = htmlspecialchars($session->getPreference('PreviewMobileThemeFolder', ''));
+        } else {
+            $theme = htmlspecialchars($session->getPreference('PreviewThemeFolder', ''));
+        }
+        $isDefaultMaster = $sender->MasterView == 'default' || $sender->MasterView == '';
+        if ($theme != '' && $isDefaultMaster) {
+            $htmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
+            if (file_exists($htmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $htmlFile;
+            } else {
+                // for default theme
+                $sender->EventArguments['MasterViewPath'] = $sender->fetchViewLocation('default.master', '', 'dashboard');
+            }
         }
     }
 

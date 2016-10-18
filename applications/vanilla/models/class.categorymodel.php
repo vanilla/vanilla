@@ -71,7 +71,7 @@ class CategoryModel extends Gdn_Model {
         Gdn::pluginManager()->EventArguments['AllowedDiscussionTypes'] = &$allowedTypes;
         Gdn::pluginManager()->EventArguments['Category'] = $category;
         Gdn::pluginManager()->EventArguments['PermissionCategory'] = $PermissionCategory;
-        Gdn::pluginManager()->fireEvent('AllowedDiscussionTypes');
+        Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('AllowedDiscussionTypes');
 
         return $allowedTypes;
     }
@@ -100,7 +100,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         Gdn::pluginManager()->EventArguments['CategoryIDs'] = & $Watch;
-        Gdn::pluginManager()->fireEvent('CategoryWatch');
+        Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('CategoryWatch');
 
         if ($AllCount == count($Watch)) {
             return true;

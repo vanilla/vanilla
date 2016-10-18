@@ -606,14 +606,24 @@ class Gdn_Session {
 
     /**
      * Place a name/value pair into the user's session stash.
+     *
+     * @param string $Name            The key of the stash value.
+     * @param mixed  $Value           The value of the stash to set. Pass null to retrieve the key.
+     * @param bool   $UnsetOnRetrieve Whether or not to unset the key from stash.
+     *
+     * @return mixed Returns the value of the stash or null on failure.
      */
     public function stash($Name = '', $Value = '', $UnsetOnRetrieve = true) {
         if ($Name == '') {
             return;
         }
 
-        // Grab the user's session
-        $Session = $this->_getStashSession($Value);
+        // Create a fresh copy of the Sql object to avoid pollution.
+        $Sql = clone Gdn::sql();
+        $Sql->reset();
+
+        // Grab the user's session.
+        $Session = $this->getStashSession($Sql, $Value);
         if (!$Session) {
             return;
         }
@@ -629,7 +639,7 @@ class Gdn_Session {
         }
         // Update the attributes
         if ($Name != '') {
-            Gdn::SQL()->put(
+            $Sql->put(
                 'Session',
                 array(
                     'DateUpdated' => Gdn_Format::toDateTime(),
@@ -644,12 +654,17 @@ class Gdn_Session {
     }
 
     /**
-     * Used by $this->Stash() to create & manage sessions for users & guests.
+     * Used by $this->stash() to create & manage sessions for users & guests.
      *
      * This is a stop-gap solution until full session management for users &
-     * guests can be imlemented.
+     * guests can be implemented.
+     *
+     * @param Gdn_SQLDriver $Sql          Local clone of the sql driver.
+     * @param string        $ValueToStash The value of the stash to set.
+     *
+     * @return bool|Gdn_DataSet Current session.
      */
-    private function _getStashSession($ValueToStash) {
+    private function getStashSession($Sql, $ValueToStash) {
         $CookieName = c('Garden.Cookie.Name', 'Vanilla');
         $Name = $CookieName.'-sid';
 
@@ -661,7 +676,7 @@ class Gdn_Session {
             return false;
         }
 
-        $Session = Gdn::SQL()
+        $Session = $Sql
             ->select()
             ->from('Session')
             ->where('SessionID', $SessionID)
@@ -672,7 +687,7 @@ class Gdn_Session {
             $SessionID = betterRandomString(32);
             $TransientKey = substr(md5(mt_rand()), 0, 11).'!';
             // Save the session information to the database.
-            Gdn::SQL()->insert(
+            $Sql->insert(
                 'Session',
                 array(
                     'SessionID' => $SessionID,
@@ -684,7 +699,7 @@ class Gdn_Session {
             );
             Trace("Inserting session stash $SessionID");
 
-            $Session = Gdn::SQL()
+            $Session = $Sql
                 ->select()
                 ->from('Session')
                 ->where('SessionID', $SessionID)

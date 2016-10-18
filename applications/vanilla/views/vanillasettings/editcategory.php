@@ -3,9 +3,7 @@
 <?php
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
-if ($this->data('Operation') == 'Edit') {
-    echo $this->Form->hidden('ParentCategoryID');
-}
+echo $this->Form->hidden('ParentCategoryID');
 helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.'));
 ?>
 <ul>

@@ -398,9 +398,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('PermissionData', $Permissions, true);
         }
 
-        // Render default view
+        $this->setData('Operation', 'Add');
         $this->setData('DisplayAsOptions', $displayAsOptions);
-        $this->render();
+        $this->render('editcategory', 'vanillasettings', 'vanilla');
     }
 
     /**
@@ -695,6 +695,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('Operation', 'Edit');
         $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }

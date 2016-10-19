@@ -6,7 +6,7 @@
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
-<h2><?php echo t('Flagging Settings'); ?></h2>
+<h2 class="subheading-border"><?php echo t('Flagging Settings'); ?></h2>
 <ul>
     <li class="form-group">
         <?php echo $this->Form->labelWrap('Category to Use', 'Plugins.Flagging.CategoryID'); ?>
@@ -26,7 +26,7 @@ echo $this->Form->errors();
 if (!count($this->FlaggedItems)) {
     echo '<div class="padded">'.t('FlagQueueEmpty', "There are no items awaiting moderation at this time.").'</div>';
 } else { ?>
-<div class="table-wrap padded">
+<div class="table-wrap">
     <table class="table-data js-tj">
         <thead>
         <tr>

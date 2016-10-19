@@ -637,7 +637,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $upload = '
             <label class="file-upload">
               <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
-              <span class="file-upload-choose">'.t('Choose').'</span>
+              <span class="file-upload-choose" data-placeholder="'.t('Choose').'">'.t('Choose').'</span>
               <span class="file-upload-browse">'.t('Browse').'</span>
             </label>';
 
@@ -657,7 +657,77 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
 
-        /**
+    /**
+     * Outputs the entire form group with both the label and input. Adds an image preview and a link to delete the
+     * current image. Handles the ajax clearing of the image preview on removal.
+     * Requires dashboard.js and dashboard.css to look and work as intended.
+     *
+     * @param string $fieldName The form field name for the input.
+     * @param string $label The label.
+     * @param string $labelDescription The label description.
+     * @param string $currentImageUrl The url to the current image.
+     * @param string $removeUrl The endpoint to remove the image.
+     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
+     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The attributes to pass to the file upload function.
+     * @return string
+     */
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
+                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
+                                       $attributes = []) {
+
+        $imageWrapperId = slugify($fieldName).'-preview-wrapper';
+
+        // Compile the data for our current image and current image removal.
+        $removeAttributes = [];
+        $removeCurrentImage = '';
+        $currentImage = '';
+
+        if ($currentImageUrl) {
+            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
+            if ($removeUrl) {
+                if (!$removeText) {
+                    $removeText = t('Remove');
+                }
+                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
+                if ($removeConfirmText) {
+                    $removeAttributes['data-body'] = $removeConfirmText;
+                }
+                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+            }
+        }
+
+        if ($label) {
+            $label = wrap($label, 'div', ['class' => 'label']);
+        }
+
+        if ($labelDescription) {
+            $labelDescription = wrap($labelDescription, 'div', ['class' => 'info']);
+        }
+
+        $label = '
+            <div class="label-wrap">'
+                .$label
+                .$labelDescription.'
+                <div id="'.$imageWrapperId.'" class="js-image-preview-old">'
+                    .$currentImage
+                    .$removeCurrentImage.'
+                </div>
+                <div class="js-image-preview-new hidden">
+                    <div><img class="js-image-preview"></div>
+                    <div><a class="js-remove-image-preview" href="#">'.t('Undo').'</a></div>
+                </div>
+            </div>';
+
+        $attributes['class'] .= 'js-image-upload';
+        $input = $this->fileUploadWrap($fieldName, $attributes);
+
+        return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
+    }
+
+
+    /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)

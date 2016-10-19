@@ -475,8 +475,14 @@ var DashboardModal = (function() {
         afterConfirmSuccess: function() {
             var found = false;
             if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                found = this.trigger.closest('.js-modal-item').length !== 0;
-                this.trigger.closest('.js-modal-item').remove();
+                var $remove;
+                if (this.settings.removeSelector) {
+                    $remove = $(this.settings.removeSelector)
+                } else {
+                    $remove = this.trigger.closest('.js-modal-item');
+                }
+                found = $remove.length !== 0;
+                $remove.remove();
             }
 
             // Refresh the page.
@@ -920,7 +926,45 @@ var DashboardModal = (function() {
         responsiveTablesInit(e.target); // makes tables responsive
     });
 
+    /**
+     * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
+     * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     */
+    function readUrl(input) {
+        if (input.files && input.files[0]) {
+            var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $preview.attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     // Event handlers
+
+    /**
+     * Adds a preview of the uploaded, not-yet-saved image.
+     */
+    $(document).on('change', '.js-image-upload', function() {
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-old').addClass('hidden');
+        readUrl(this);
+    });
+
+    /**
+     * Removes the preview image and clears the file name from the input.
+     */
+    $(document).on('click', '.js-remove-image-preview', function(e) {
+        e.preventDefault();
+        var $parent = $(this).parents('.js-image-preview-form-group');
+        $parent.find('.js-image-preview-old').removeClass('hidden');
+        $parent.find('.js-image-preview-new').addClass('hidden').find('.js-image-preview').attr('src', '');
+        var $input = $parent.find('.js-image-upload');
+        var $inputFileName = $parent.find('.file-upload-choose');
+        $input.val('');
+        $inputFileName.html($inputFileName.data('placeholder'));
+    });
 
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {

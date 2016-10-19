@@ -152,8 +152,14 @@ var DashboardModal = (function() {
         afterConfirmSuccess: function() {
             var found = false;
             if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                found = this.trigger.closest('.js-modal-item').length !== 0;
-                this.trigger.closest('.js-modal-item').remove();
+                var $remove;
+                if (this.settings.removeSelector) {
+                    $remove = $(this.settings.removeSelector)
+                } else {
+                    $remove = this.trigger.closest('.js-modal-item');
+                }
+                found = $remove.length !== 0;
+                $remove.remove();
             }
 
             // Refresh the page.

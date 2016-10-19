@@ -36,7 +36,6 @@ if (!count($this->FlaggedItems)) {
         </tr>
         </thead>
         <tbody>
-        <tr>
             <?php
             foreach ($this->FlaggedItems as $URL => $FlaggedList) {
                 ksort($FlaggedList, SORT_STRING);
@@ -51,17 +50,18 @@ if (!count($this->FlaggedItems)) {
                 $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');
                 $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm js-hijack', ['data-body' => t('Are you sure you want to dismiss this flag?')]);
                 ?>
-                <td class="FlaggedType"><?php echo $type; ?></td>
-                <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>
-                <td class="options">
-                    <div class="btn-group">
-                    <?php echo $options; ?>
-                    </div>
-                </td>
+                <tr>
+                    <td class="FlaggedType"><?php echo $type; ?></td>
+                    <td class="FlaggedBy"><?php echo $flaggedBy; ?></td>
+                    <td class="options">
+                        <div class="btn-group">
+                        <?php echo $options; ?>
+                        </div>
+                    </td>
+                </tr>
                 <?php
             }
             ?>
-        </tr>
         </tbody>
     </table>
 </div>

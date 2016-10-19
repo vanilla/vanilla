@@ -45,11 +45,6 @@ var emailStyles = {
      * Opens a popup with a email preview showing the current color values in the color pickers.
      */
     emailPreview: function() {
-        // var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
-        // var reader = new FileReader();
-        // reader.onload = function (e) {
-        //     $preview.attr('src', e.target.result);
-        // }
         var image = $('.js-image-preview').attr('src');
         var textColor = $('#Form_Garden-dot-EmailTemplate-dot-TextColor').val();
         var backgroundColor = $('#Form_Garden-dot-EmailTemplate-dot-BackgroundColor').val();

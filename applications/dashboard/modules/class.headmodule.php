@@ -67,7 +67,6 @@ if (!class_exists('HeadModule', false)) {
         public function addCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
             $Properties = array(
                 'rel' => 'stylesheet',
-                'type' => 'text/css',
                 'href' => Asset($HRef, false, $AddVersion),
                 'media' => $Media);
 
@@ -152,7 +151,10 @@ if (!class_exists('HeadModule', false)) {
             if ($Src) {
                 $Attributes['src'] = asset($Src, false, $AddVersion);
             }
-            $Attributes['type'] = $Type;
+            if ($Type !== 'text/javascript') {
+                // Not needed in HTML5
+                $Attributes['type'] = $Type;
+            }
             if (isset($Options['defer'])) {
                 $Attributes['defer'] = $Options['defer'];
             }

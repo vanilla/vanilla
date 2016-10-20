@@ -1,5 +1,5 @@
 <?php
-echo '<nav class="nav nav-adventure" role="navigation">';
+echo '<div class="nav nav-adventure" role="navigation">';
 $items = val('items', $this);
 if (!function_exists('renderAdventureNav')) {
     function renderAdventureNav($items) {
@@ -42,4 +42,4 @@ if (!function_exists('renderAdventureNav')) {
     }
 }
 renderAdventureNav($items);
-echo '</nav>';
+echo '</div>';

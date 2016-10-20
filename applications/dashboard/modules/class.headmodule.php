@@ -152,7 +152,7 @@ if (!class_exists('HeadModule', false)) {
                 $Attributes['src'] = asset($Src, false, $AddVersion);
             }
             if ($Type !== 'text/javascript') {
-                // Don't need this in HTML5
+                // Not needed in HTML5
                 $Attributes['type'] = $Type;
             }
             if (isset($Options['defer'])) {

@@ -9,7 +9,7 @@ $PluginInfo['oauth2'] = array(
     'ClassName' => "OAuth2Plugin",
     'Description' => 'Connect to an authentication provider to allow users to log on using SSO.',
     'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.0'),
+    'RequiredApplications' => array('Vanilla' => '2.2'),
     'SettingsUrl' => '/settings/oauth2',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,

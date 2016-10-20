@@ -1,9 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(sprintf(t('About %s'), t('Pockets')), t('Pockets allow you to add free-form HTML to various places around the application.'));
+echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal')
 ?>
-<div class="header-block">
-<?php echo wrap($this->data('Title'), 'h1');
-echo anchor(sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal'); ?>
 </div>
 <div class="form-group">
     <div class="label-wrap-wide">

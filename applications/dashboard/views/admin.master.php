@@ -7,7 +7,7 @@ $this->fireAs('dashboard')->fireEvent('render');
 <head>
     <?php $this->renderAsset('Head'); ?>
     <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
-    <meta name="robots" content="noindex,nofollow"/>
+    <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body id="<?php echo htmlspecialchars($BodyIdentifier); ?>" class="<?php echo $this->CssClass; ?>">
@@ -67,7 +67,7 @@ Gdn_Theme::assetEnd();
 
 
 <div class="main-container">
-    <div class="navbar js-navbar">
+    <header class="navbar js-navbar">
         <button class="js-drawer-toggle drawer-toggle btn btn-link" type="button">
             &#9776;
         </button>
@@ -99,7 +99,7 @@ Gdn_Theme::assetEnd();
             }
             ?>
         </div>
-    </div>
+    </header>
     <div class="main-row pusher<?php echo $this->data('IsWidePage') ? ' main-row-wide' : ''; ?>" id="main-row">
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
@@ -111,16 +111,16 @@ Gdn_Theme::assetEnd();
         </div>
         <div class="panel panel-help panel-right">
             <div class="panel-content-wrapper">
-                <div id="fixed-help" class="js-fluid-fixed panel-content">
+                <aside role="note" id="fixed-help" class="js-fluid-fixed panel-content">
                     <?php $this->renderAsset('Help'); ?>
-                </div>
+                </aside>
             </div>
         </div>
         <div class="main">
-            <div class="content">
+            <section role="main" class="content">
                 <?php $this->renderAsset('Content'); ?>
-            </div>
-            <div class="footer">
+            </section>
+            <footer class="footer">
                 <?php $this->renderAsset('Foot'); ?>
                 <div class="footer-logo logo-wrap">
                     <?php echo anchor('Vanilla Forums', c('Garden.VanillaUrl'), 'vanilla-logo'); ?>
@@ -134,13 +134,13 @@ Gdn_Theme::assetEnd();
                     ?>
                     <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
                 </div>
-            </div>
+            </footer>
         </div>
     </div>
 </div>
-<div class="hidden js-dashboard-user-dropdown">
+<aside class="hidden js-dashboard-user-dropdown">
     <?php $this->renderAsset('DashboardUserDropDown'); ?>
-</div>
+</aside>
 <?php $this->fireEvent('AfterBody'); ?>
 </body>
 </html>

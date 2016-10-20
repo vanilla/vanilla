@@ -40,6 +40,6 @@ if (!function_exists('renderDashboardNav')) {
         }
 	}
 } ?>
-<div class="nav-collapsible js-nav-collapsible">
+<nav class="nav-collapsible js-nav-collapsible">
     <?php renderDashboardNav($items); ?>
-</div>
+</nav>

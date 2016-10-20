@@ -738,11 +738,11 @@ select + select {
 //
 // Markup:
 // <form>
-//   <div class="search-wrap">
+//   <div role="search" class="search-wrap">
 //     <div class="search-icon-wrap search-icon-search-wrap">
 //       <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17"><use xlink:href="#search" /></svg>
 //     </div>
-//     <input class="form-control">
+//     <input class="form-control" />
 //     <button type="submit" class="search-submit">Search</button>
 //     <div class="search-icon-wrap search-icon-clear-wrap">
 //       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17"><use xlink:href="#close" /></svg>

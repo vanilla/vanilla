@@ -45,10 +45,10 @@ var DashboardModal = (function() {
         trigger: {},
 
         modalHtml: ' \
-        <div><div class="modal-dialog {cssClass}" role="document"> \
+        <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
                 <div class="modal-header js-modal-fixed"> \
-                    <h4 class="modal-title">{title}</h4> \
+                    <h4 id="modalTitle" class="modal-title">{title}</h4> \
                     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
@@ -58,19 +58,20 @@ var DashboardModal = (function() {
                 <div class="modal-footer js-modal-fixed">{footer}</div> \
                 {form.close} \
             </div> \
-        </div></div>',
+        </div>',
 
         modalHtmlNoHeader: ' \
-        <div><div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+        <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+            <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
             <div class="modal-content"> \
                 <div class="modal-body">{body}</div> \
                 <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                     {closeIcon} \
                 </button> \
             </div> \
-        </div></div>',
+        </div>',
 
-        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
         start: function($trigger, settings) {
             $('#' + this.id).modal('show').focus();

@@ -9,7 +9,7 @@
 // applied when the toaster is nested in a element with the `toasters` css class applied to it.
 //
 // Markup:
-// <div class="toaster">
+// <div role="alert" class="toaster">
 //   <span class="toaster-close"></span>
 //   <div class="toaster-body">
 //     This is a toaster message. The additional text will be hidden if it goes longer than 60 characters.

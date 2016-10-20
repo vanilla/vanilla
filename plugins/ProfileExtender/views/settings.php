@@ -1,12 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-
 $Fields = $this->data('ExtendedFields');
-
+echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefieldaddedit/', 'js-modal btn btn-primary')
 ?>
-<div class="header-block">
-    <h1>Custom Profile Fields</h1>
-    <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'js-modal btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
-</div>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>

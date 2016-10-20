@@ -6,19 +6,12 @@ $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'));
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'));
 
+if (checkPermission('Garden.Users.Add')) {
+    echo heading(t('Manage Users'), t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
+} else {
+    echo heading(t('Manage Users'));
+}
 ?>
-<div class="header-block">
-    <div class="header-title">
-    <h1><?php echo t('Manage Users'); ?></h1>
-    </div>
-    <div class="header-buttons btn-group">
-    <?php
-    if (checkPermission('Garden.Users.Add')) {
-        echo anchor(t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
-    }
-    ?>
-    </div>
-</div>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php

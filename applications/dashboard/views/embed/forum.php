@@ -1,10 +1,8 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
 helpAsset(t('Need More Help?'), anchor(t("Embedding Documentation"), 'http://docs.vanillaforums.com/features/embedding/'));
+echo heading(t('Embedding'));
 ?>
-<div class="header-block">
-    <h1><?php echo t('Embedding'); ?></h1>
-</div>
 <div class="row form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Embed My Forum'); ?></div>

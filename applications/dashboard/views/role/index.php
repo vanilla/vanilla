@@ -11,11 +11,8 @@ helpAsset(sprintf(t('About %s'), t('Roles & Permissions')), $desc);
 helpAsset(t('Need More Help?'), $links)
 
 ?>
-<div class="header-block">
-    <h1><?php echo t('Manage Roles & Permissions'); ?></h1>
-    <div class="FilterMenu"><?php echo anchor(t('Add Role'), 'dashboard/role/add', 'btn btn-primary'); ?></div>
-</div>
 <?php
+echo heading(t('Manage Roles & Permissions'), t('Add Role'), 'dashboard/role/add');
 $this->fireEvent('AfterRolesInfo');
 echo $this->Form->open();
 ?>

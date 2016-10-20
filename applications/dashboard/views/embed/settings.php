@@ -1,16 +1,9 @@
 <?php if (!defined('APPLICATION')) exit();
 $AllowEmbed = c('Garden.Embed.Allow');
+echo heading($this->title(), '', '', [], '/embed/forum');
+echo $this->Form->open();
+echo $this->Form->errors();
 ?>
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo $this->title(); ?></h1>
-    </div>
-</div>
-    <?php
-    echo $this->Form->open();
-    echo $this->Form->errors();
-    ?>
 <ul>
     <li class="form-group">
         <div class="label-wrap">
@@ -31,11 +24,14 @@ $AllowEmbed = c('Garden.Embed.Allow');
         <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></div>
     </li>
 </ul>
-<h2 class="subheading-border">Sign In Settings</h2>
+<section>
+    <?php echo subheading(t('Sign In Settings')); ?>
     <div class="form-group">
     <?php echo $this->Form->toggle('Garden.SignIn.Popup', "<div class=\"label-title\">Enable popups for sign in pages.</div><div class=\"info\">If you are using SSO you probably need to disable sign in popups.</div>"); ?>
     </div>
-    <h2 class="subheading-border"><?php echo t('Comment Embed Settings'); ?></h2>
+</section>
+<section>
+    <?php echo subheading(t('Comment Embed Settings')); ?>
     <ul>
         <li class="form-group">
             <?php
@@ -73,4 +69,5 @@ $AllowEmbed = c('Garden.Embed.Allow');
             </div>
         </li>
     </ul>
+</section>
 <?php echo $this->Form->close('Save'); ?>

@@ -1,10 +1,7 @@
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo t('Universal Forum Embed Code'); ?></h1>
-    </div>
-</div>
-<p class="padded"><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></p>
+<?php if (!defined('APPLICATION')) exit();
+echo heading(t('Universal Forum Embed Code'), '', '', [], '/embed/forum');
+?>
+<div class="padded"><?php echo t('To embed your Vanilla forum into your web site, use the following code.'); ?></div>
 
 <pre id="universal-code">&lt;script type="text/javascript" src="<?php echo Asset('js/embed.js', true); ?>">&lt;/script>
 &lt;noscript>

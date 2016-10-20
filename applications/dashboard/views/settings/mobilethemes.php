@@ -12,7 +12,7 @@ helpAsset(sprintf(t('About %s'), t('Mobile Themes')), $desc);
 </svg>
 <div class="header-menu">
     <a href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
-    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>" class="active"><?php echo t('Mobile Themes'); ?></a>
+    <a role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/mobilethemes'); ?>" class="active"><?php echo t('Mobile Themes'); ?></a>
 </div>
 <?php echo $this->Form->errors(); ?>
 

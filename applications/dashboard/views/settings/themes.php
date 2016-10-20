@@ -15,7 +15,7 @@ helpAsset(t('Need More Help?'), $links);
 
 ?>
 <div class="header-menu">
-    <a href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
+    <a role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
     <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
 </div>
 <?php

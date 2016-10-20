@@ -15,7 +15,7 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
 ?>
 <div class="header-menu">
     <a href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
-    <a href="<?php echo url('/dashboard/settings/tutorials'); ?>" class="active"><?php echo t('Help &amp; Tutorials'); ?></a>
+    <a role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/tutorials'); ?>" class="active"><?php echo t('Help &amp; Tutorials'); ?></a>
 </div>
 <div class="hero">
     <div class="hero-content">

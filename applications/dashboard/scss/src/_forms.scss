@@ -626,14 +626,12 @@ select + select {
     padding: $spacer / 2;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
 
     > .btn {
       display: block;
       margin: ($spacer / 6) ($spacer / 4);
       max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
-      min-width: 5rem;
+      min-width: to-rem(96);
     }
   }
 

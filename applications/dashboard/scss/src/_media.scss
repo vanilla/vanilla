@@ -219,9 +219,11 @@
     @include image-wrap-border(0);
   }
 
-  // For the theme info popups, make the image half the width of the container.
+  // For the theme info popups, make the image half the width of the container, and make sure it doesn't get too tall.
   .modal & .media-left {
     @extend .col-xs-12;
+    max-height: to-rem(180);
+    overflow: hidden;
   }
 }
 

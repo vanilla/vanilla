@@ -59,7 +59,7 @@ class SetupController extends DashboardController {
             // Make sure the user has copied the htaccess file over.
             if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->getFormValue('SkipHtaccess')) {
                 $this->setData('NoHtaccess', true);
-                $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
+                $this->Form->addError('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.');
             }
 
             $ApplicationManager = Gdn::applicationManager();
@@ -152,19 +152,19 @@ class SetupController extends DashboardController {
             } catch (PDOException $Exception) {
                 switch ($Exception->getCode()) {
                     case 1044:
-                        $this->Form->addError(t('The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                        $this->Form->addError('The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: <code>%s</code>', strip_tags($Exception->getMessage()));
                         break;
                     case 1045:
-                        $this->Form->addError(t('Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                        $this->Form->addError('Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: <code>%s</code>', strip_tags($Exception->getMessage()));
                         break;
                     case 1049:
-                        $this->Form->addError(t('It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>'), strip_tags($Exception->getMessage()));
+                        $this->Form->addError('It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: <code>%s</code>', strip_tags($Exception->getMessage()));
                         break;
                     case 2005:
-                        $this->Form->addError(t("Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>"), strip_tags($Exception->getMessage()));
+                        $this->Form->addError("Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: <code>%s</code>", strip_tags($Exception->getMessage()));
                         break;
                     default:
-                        $this->Form->addError(sprintf(t('ValidateConnection'), strip_tags($Exception->getMessage())));
+                        $this->Form->addError('@'.sprintf(t('ValidateConnection'), strip_tags($Exception->getMessage())));
                         break;
                 }
             }
@@ -214,10 +214,9 @@ class SetupController extends DashboardController {
                 // Create the administrative user
                 $UserModel = Gdn::userModel();
                 $UserModel->defineSchema();
-                $UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
-                $UserModel->Validation->applyRule('Name', 'Username', $UsernameError);
-                $UserModel->Validation->applyRule('Name', 'Required', t('You must specify an admin username.'));
-                $UserModel->Validation->applyRule('Password', 'Required', t('You must specify an admin password.'));
+                $UserModel->Validation->applyRule('Name', 'Username', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
+                $UserModel->Validation->applyRule('Name', 'Required', 'You must specify an admin username.');
+                $UserModel->Validation->applyRule('Password', 'Required', 'You must specify an admin password.');
                 $UserModel->Validation->applyRule('Password', 'Match');
                 $UserModel->Validation->applyRule('Email', 'Email');
 
@@ -263,16 +262,16 @@ class SetupController extends DashboardController {
     private function _checkPrerequisites() {
         // Make sure we are running at least PHP 5.1
         if (version_compare(phpversion(), ENVIRONMENT_PHP_VERSION) < 0) {
-            $this->Form->addError(sprintf(t('You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'), phpversion(), ENVIRONMENT_PHP_VERSION));
+            $this->Form->addError('@'.sprintf(t('You are running PHP version %1$s. Vanilla requires PHP %2$s or greater. You must upgrade PHP before you can continue.'), phpversion(), ENVIRONMENT_PHP_VERSION));
         }
 
         // Make sure PDO is available
         if (!class_exists('PDO')) {
-            $this->Form->addError(t('You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.'));
+            $this->Form->addError('You must have the PDO module enabled in PHP in order for Vanilla to connect to your database.');
         }
 
         if (!defined('PDO::MYSQL_ATTR_USE_BUFFERED_QUERY')) {
-            $this->Form->addError(t('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.'));
+            $this->Form->addError('You must have the MySQL driver for PDO enabled in order for Vanilla to connect to your database.');
         }
 
         // Make sure that the correct filesystem permissions are in place.
@@ -315,13 +314,13 @@ class SetupController extends DashboardController {
             if (file_exists($ConfigFile)) {
                 // Make sure the config file is writable.
                 if (!is_readable($ConfigFile) || !isWritable($ConfigFile)) {
-                    $this->Form->addError(sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
+                    $this->Form->addError('@'.sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
                     $PermissionProblem = true;
                 }
             } else {
                 // Make sure the config file can be created.
                 if (!is_writeable(dirname($ConfigFile))) {
-                    $this->Form->addError(sprintf(t('Your configuration file cannot be created. PHP needs to be able to create this file: <code>%s</code>'), $ConfigFile));
+                    $this->Form->addError('@'.sprintf(t('Your configuration file cannot be created. PHP needs to be able to create this file: <code>%s</code>'), $ConfigFile));
                     $PermissionProblem = true;
                 }
             }

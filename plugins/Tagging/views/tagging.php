@@ -26,7 +26,7 @@ helpAsset(sprintf(t('About %s'), t('Tagging')), $desc);
         echo $this->Form->errors();
         echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Search', ['placeholder' => t('Search for a tag.', 'Search for all or part of a tag.')]);
-        echo ' '.$this->Form->button(t('Go'), ['class' => 'search-submit']);
+        echo ' '.$this->Form->button('Go', ['class' => 'search-submit']);
         echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/settings/tagging').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">'.sprintf(t('%s tag(s) found.'), $this->data('RecordCount')).'</div>';
         echo $this->Form->close();

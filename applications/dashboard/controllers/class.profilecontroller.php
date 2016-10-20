@@ -388,7 +388,7 @@ class ProfileController extends Gdn_Controller {
                 $this->Form->setFormValue("Name", $User['Name']);
             } else {
                 $UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
-                Gdn::userModel()->Validation->applyRule('Name', 'Username', $UsernameError);
+                Gdn::userModel()->Validation->applyRule('Name', 'Username', 'ValidateUsername');
             }
 
             // API

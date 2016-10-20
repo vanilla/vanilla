@@ -80,21 +80,21 @@ $allowConnect = $this->data('AllowConnect');
 			                        echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
                               wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
                               $this->addDefinition('NoConnectName', true);
-                              echo $this->Form->Hidden('UserSelect', array('Value' => $Row['UserID']));
+                              echo $this->Form->hidden('UserSelect', array('Value' => $Row['UserID']));
                           } else {
                               echo $this->Form->label('Username', 'ConnectName');
                               echo '<div class="FinePrint">', t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), '</div>';
       
                               if (count($ExistingUsers) > 0) {
                                   foreach ($ExistingUsers as $Row) {
-                                      echo wrap($this->Form->Radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
+                                      echo wrap($this->Form->radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
                                   }
-                                  echo wrap($this->Form->Radio('UserSelect', t('Other'), array('value' => 'other')), 'div');
+                                  echo wrap($this->Form->radio('UserSelect', 'Other', array('value' => 'other')), 'div');
                               }
                           }
       
                           if (!$NoConnectName)
-                              echo $this->Form->Textbox('ConnectName');
+                              echo $this->Form->textbox('ConnectName');
                        }
                     ?>
                 </li>
@@ -103,7 +103,7 @@ $allowConnect = $this->data('AllowConnect');
                     <?php
                     echo $this->Form->label('Password', 'ConnectPassword');
                     echo wrap($PasswordMessage, 'div', array('class' => 'FinePrint'));
-                    echo $this->Form->Input('ConnectPassword', 'password');
+                    echo $this->Form->input('ConnectPassword', 'password');
                     ?>
                 </li>
             </ul>

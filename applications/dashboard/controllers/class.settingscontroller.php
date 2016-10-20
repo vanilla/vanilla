@@ -204,9 +204,9 @@ class SettingsController extends DashboardController {
         $this->title(t('Avatars'));
 
         $validation = new Gdn_Validation();
-        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', t('Thumbnail size must be an integer.'));
-        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', t('Max avatar width must be an integer.'));
-        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', t('Max avatar height must be an integer.'));
+        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', 'Thumbnail size must be an integer.');
+        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', 'Max avatar width must be an integer.');
+        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', 'Max avatar height must be an integer.');
 
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
@@ -966,7 +966,7 @@ class SettingsController extends DashboardController {
                     saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
                     $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
                 } else {
-                    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
+                    $this->Form->addError('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png');
                 }
             } catch (Exception $ex) {
                 $this->Form->addError($ex);

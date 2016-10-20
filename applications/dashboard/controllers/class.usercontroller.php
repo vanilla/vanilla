@@ -542,7 +542,7 @@ class UserController extends DashboardController {
         $this->Form->validateRule('UserID', 'ValidateRequired');
         $DeleteType = $this->Form->getFormValue('DeleteMethod');
         if (!in_array($DeleteType, array('delete', 'keep', 'wipe'))) {
-            $this->Form->addError(t('DeleteMethod must be one of: delete, keep, wipe.'));
+            $this->Form->addError('DeleteMethod must be one of: delete, keep, wipe.');
         }
 
         $UserID = $this->Form->getFormValue('UserID');
@@ -553,9 +553,9 @@ class UserController extends DashboardController {
         }
 
         if ($User['Admin'] == 2) {
-            $this->Form->addError(t('You cannot delete a system-created user.'));
+            $this->Form->addError('You cannot delete a system-created user.');
         } elseif ($User['Admin'])
-            $this->Form->addError(t('You cannot delete a super-admin.'));
+            $this->Form->addError('You cannot delete a super-admin.');
 
         if ($this->Form->errorCount() == 0) {
             Gdn::userModel()->delete($UserID, array(
@@ -782,7 +782,7 @@ class UserController extends DashboardController {
             }
         }
         if (!$Available) {
-            $this->Form->addError(sprintf(t('%s unavailable'), t('Email')));
+            $this->Form->addError('@'.sprintf(t('%s unavailable'), t('Email')));
         }
 
         $this->render();
@@ -1039,7 +1039,7 @@ class UserController extends DashboardController {
 
             $Provider = $ProviderModel->getProviderByKey($Form->getFormValue('ClientID'));
             if (!$Provider) {
-                $Form->addError(sprintf('%1$s "%2$s" not found.', t('Provider'), $Form->getFormValue('ClientID')));
+                $Form->addError('@'.sprintf(t('%1$s "%2$s" not found.'), t('Provider'), $Form->getFormValue('ClientID')));
             }
 
             if ($Form->errorCount() > 0) {
@@ -1138,7 +1138,7 @@ class UserController extends DashboardController {
             }
         }
         if (!$Available) {
-            $this->Form->addError(sprintf(t('%s unavailable'), t('Name')));
+            $this->Form->addError('@'.sprintf(t('%s unavailable'), t('Name')));
         }
 
         $this->render();

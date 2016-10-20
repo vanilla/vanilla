@@ -127,7 +127,7 @@ class ImportController extends DashboardController {
                 $Upload = new Gdn_Upload();
                 $Validation = new Gdn_Validation();
                 if (count($ImportPaths) > 0) {
-                    $Validation->applyRule('PathSelect', 'Required', t('You must select a file to import.'));
+                    $Validation->applyRule('PathSelect', 'Required', 'You must select a file to import.');
                 }
 
                 if (count($ImportPaths) == 0 || $this->Form->getFormValue('PathSelect') == 'NEW') {

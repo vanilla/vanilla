@@ -100,6 +100,7 @@ $Definition['PasswordRequest'] = 'Someone has requested to reset your password a
   %3$s
 
 If you did not make this request, disregard this email.';
+$Definition['Your password reset token has expired.'] = 'Your password reset token has expired. Try using the reset request form again.';
 $Definition['EmailNotification'] = '%1$s
 
 Follow the link below to check it out:

@@ -29,7 +29,7 @@ echo '<div class="MainForm">';
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', array('class' => 'InputBox Password'));
+            echo $this->Form->input('Password', 'password', array('class' => 'InputBox Password'));
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
@@ -61,7 +61,7 @@ echo '</div>';
     <div class="Buttons">
         <?php
         echo $this->Form->button('Sign In', array('class' => 'Button Primary'));
-        echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
+        echo $this->Form->checkBox('RememberMe', 'Keep me signed in', array('value' => '1', 'id' => 'SignInRememberMe'));
         ?>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>
             <div class="CreateAccount">

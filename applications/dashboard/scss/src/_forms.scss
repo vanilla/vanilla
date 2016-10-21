@@ -734,7 +734,11 @@ select + select {
 
 // Search Input
 //
-// Search inputs have a hidden button and a search icon on the input.
+// Search inputs have a hidden submit button, a search icon on the input, and a clear button if a search has been
+// performed.
+//
+// PHP rendering: In Gdn_Form, use either searchForm(field, url, [textboxAttributes, info]) to render the entire
+// search form or search(field, url, [textboxAttributes, info]) to render the search field.
 //
 // Markup:
 // <form>

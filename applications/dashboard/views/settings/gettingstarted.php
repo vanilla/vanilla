@@ -24,8 +24,8 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $
 ?>
 
 <div class="header-menu">
-    <a role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/gettingstarted'); ?>" class="active"><?php echo t('Getting Started'); ?></a>
-    <a href="<?php echo url('/dashboard/settings/tutorials'); ?>"><?php echo t('Help &amp; Tutorials'); ?></a>
+    <a class="header-menu-item active" role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
+    <a class="header-menu-item" href="<?php echo url('/dashboard/settings/tutorials'); ?>"><?php echo t('Help &amp; Tutorials'); ?></a>
 </div>
 <div class="hero">
     <div class="hero-content">

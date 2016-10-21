@@ -190,15 +190,34 @@ pre {
 
 // Header Menu
 //
-// This is a header that's also a menu.
+// A header that's also a menu.
+//
+// Styleguide 1.5.
+
+// Header Menu Navigation
+//
+// Handles navigating to other pages.
 //
 // Markup:
 // <header class="header-menu">
-//   <a href="#" class="active" role="heading" aria-level="1">Option One</a>
-//   <a href="#">Option Two</a>
+//   <a class="header-menu-item active" href="#" class="active" role="heading" aria-level="1">Option One</a>
+//   <a class="header-menu-item" href="#">Option Two</a>
 // </header>
 //
-// Styleguide 1.5.
+// Styleguide 1.5.1.
+
+// Header Menu Tabs
+//
+// Handles hiding and showing content that exists on a single page. This doesn't have any javascript rigged up
+// for it yet. Custom Theme is the only place it's used and the javascript functionality only exists in that plugin's js.
+//
+// Markup:
+// <div class="header-menu" role="tablist">
+//   <div class="header-menu-item active" role="tab" aria-selected="true" aria-controls="optionOneID">Option One</div>
+//   <div class="header-menu-item" role="tab" aria-selected="false" aria-controls="optionTwoID">Option Two</div>
+// </div>
+//
+// Styleguide 1.5.2.
 
 .header-menu {
   $header-menu-border-width: to-rem(3);
@@ -211,15 +230,16 @@ pre {
   align-items: center;
   @extend .full-border;
 
-  a {
+  .header-menu-item {
+    padding: ($header-menu-padding) 0;
+    margin: 0 $spacer * 2;
     font-size: $header-menu-font-size;
     line-height: 1;
-    margin: 0 $spacer * 2;
-    padding: ($header-menu-padding) 0;
     color: $grey;
     text-decoration: none;
     border-top: $header-menu-border-width solid transparent;
     border-bottom: $header-menu-border-width solid transparent;
+    cursor: pointer;
 
     &.active {
       border-bottom-color: $brand-primary;

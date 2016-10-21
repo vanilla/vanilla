@@ -71,7 +71,7 @@
 //
 // Markup:
 // <div class="control-panel">
-//   <div class="control-panel-heading">Recent Revisions</div>
+//   <h2 class="control-panel-heading">Recent Revisions</h2>
 //   <div class="control-panel-body">
 //     <div class="control-panel-subheading">Oct 7th, 2016</div>
 //     <ul class="control-panel-list">
@@ -130,11 +130,13 @@
   }
 
   .control-panel-heading {
+    padding-bottom: $spacer / 2;
+    margin-top: 0;
+    margin-bottom: $spacer / 2;
     font-size: to-rem(16);
+    line-height: 1.5;
     font-weight: 500;
     color: $grey-dark;
-    padding-bottom: $spacer / 2;
-    margin-bottom: $spacer / 2;
     border-bottom: 1px dotted $grey-dark-border;
   }
 

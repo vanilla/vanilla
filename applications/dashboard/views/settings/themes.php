@@ -76,7 +76,11 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                         </div>
                     </div>
                     <div class="title">
-                        <?php echo $ThemeUrl != '' ? anchor($ScreenName, $ThemeUrl) : $ScreenName; ?>
+                        <?php if ($ThemeUrl != '') {
+                            echo $ScreenName.' '.anchor(dashboardSymbol('external-link', '', 'icon-text'), $ThemeUrl, '', ['title' => t('Theme website')]);
+                        } else {
+                            echo $ScreenName;
+                        } ?>
                     </div>
 
 

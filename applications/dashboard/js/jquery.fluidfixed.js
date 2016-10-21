@@ -71,7 +71,7 @@
             if (handleScroll) {
                 var $element = $(element); // Cache element before scroll.
                 killThreadIds[vars.id] = false;
-                scrollHandler($element, vars)
+                scrollHandler($element, vars);
             } else {
                 $(element).css('margin-top', 0);
                 killThreadIds[vars.id] = true;
@@ -105,7 +105,7 @@
 
         var onScroll = function($element, vars) {
             vars.st = window.pageYOffset;
-            if (vars.st > vars.lastScrollTop){
+            if (vars.st > vars.lastScrollTop) {
                 // downscroll
                 handleDownScroll($element, vars);
             } else if (vars.st < vars.lastScrollTop) {

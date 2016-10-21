@@ -4,7 +4,11 @@
 //
 // No styleguide reference.
 
-$enable-flex: true;
+$enable-flex:                true;
+
+// Pixel value used to responsively scale all typography. Applied to the `<html>` element.
+$rem-base:                   16;
+
 
 @function to-rem($px) {
   @return ($px / $rem-base * 1rem);
@@ -12,8 +16,8 @@ $enable-flex: true;
 
 // Colors
 
-$white: #fff;
-$black: #000;
+$white:                     #fff;
+$black:                     #000;
 
 // Override the grays
 $gray-dark:                 #555a62;
@@ -41,12 +45,12 @@ $brand-danger:              #fa2e1f;
 
 
 $semantic-colors: (
-  primary: $brand-primary,
-  secondary: $brand-secondary,
-  success: $brand-success,
-  info: $brand-info,
-  warning: $brand-warning,
-  danger: $brand-danger
+  primary:                  $brand-primary,
+  secondary:                $brand-secondary,
+  success:                  $brand-success,
+  info:                     $brand-info,
+  warning:                  $brand-warning,
+  danger:                   $brand-danger
 );
 
 // Grid columns
@@ -65,39 +69,24 @@ $font-family-serif:          Georgia, "Times New Roman", Times, serif !default;
 $font-family-monospace:      Menlo, Monaco, Consolas, "Courier New", monospace !default;
 $font-family-base:           $font-family-sans-serif !default;
 
-// Pixel value used to responsively scale all typography. Applied to the `<html>` element.
-$rem-base:                   16;
 $font-size-root:             $rem-base * 1px;
 
-$font-size-base:             .875rem;
-$font-size-lg:               1.25rem !default;
+$font-size-base:             to-rem(14);
+$font-size-lg:               to-rem(18);
 $font-size-md:               to-rem(13);
 $font-size-sm:               to-rem(12);
 $font-size-xs:               to-rem(11);
 
-$font-size-h1:               2rem;
-$font-size-h2:               1.125rem;
+$font-size-h1:               to-rem(32);
+$font-size-h2:               to-rem(18);
 $font-size-h3:               1rem;
 $font-size-h4:               1rem;
-$font-size-h5:               .925rem;
-$font-size-h6:               .875rem;
+$font-size-h5:               to-rem(14);
+$font-size-h6:               to-rem(14);
 
-$display1-size:               6rem !default;
-$display2-size:               5.5rem !default;
-$display3-size:               4.5rem !default;
-$display4-size:               3.5rem !default;
+$line-height:                1.5;
 
-$display1-weight:             300 !default;
-$display2-weight:             300 !default;
-$display3-weight:             300 !default;
-$display4-weight:             300 !default;
-
-$line-height:                1.5 !default;
-
-$headings-font-family:       inherit !default;
 $headings-font-weight:       400;
-$headings-line-height:       1.1 !default;
-$headings-color:             inherit !default;
 
 $header-block-height:        to-rem(60);
 
@@ -107,8 +96,9 @@ $header-block-height:        to-rem(60);
 // variables. Mostly focused on spacing.
 
 $spacer:                     to-rem(18);
-$spacer-x:                   $spacer !default;
-$spacer-y:                   $spacer !default;
+$spacer-x:                   $spacer;
+$spacer-y:                   to-rem(12);
+
 $border-width:               to-rem(1);
 
 // Body
@@ -126,11 +116,8 @@ $line-height-lg:         (4 / 3);
 $line-height-sm:         1.5;
 
 $border-radius:          to-rem(2);
-$border-radius-lg:       .25rem;
-$border-radius-sm:       .05rem;
-
-$component-active-color: #fff !default;
-$component-active-bg:    $brand-primary !default;
+$border-radius-lg:       to-rem(4);
+$border-radius-sm:       to-rem(1);
 
 $caret-width:            .375em !default;
 $caret-width-lg:         $caret-width !default;
@@ -159,22 +146,6 @@ $btn-secondary-color:            $gray-dark !default;
 $btn-secondary-bg:               #fff !default;
 $btn-secondary-border:           #ccc !default;
 
-$btn-info-color:                 #fff !default;
-$btn-info-bg:                    $brand-info !default;
-$btn-info-border:                $btn-info-bg !default;
-
-$btn-success-color:              #fff !default;
-$btn-success-bg:                 $brand-success !default;
-$btn-success-border:             $btn-success-bg !default;
-
-$btn-warning-color:              #fff !default;
-$btn-warning-bg:                 $brand-warning !default;
-$btn-warning-border:             $btn-warning-bg !default;
-
-$btn-danger-color:               #fff !default;
-$btn-danger-bg:                  $brand-danger !default;
-$btn-danger-border:              $btn-danger-bg !default;
-
 $btn-link-disabled-color:        $grey-dark-border;
 
 $btn-padding-x-sm:               .75rem;
@@ -183,39 +154,12 @@ $btn-padding-y-sm:               .125rem;
 $btn-padding-x-lg:               1.25rem !default;
 $btn-padding-y-lg:               .75rem !default;
 
-// Allows for customizing button radius independently from global border radius
-$btn-border-radius:              $border-radius !default;
-$btn-border-radius-lg:           $border-radius-lg !default;
-$btn-border-radius-sm:           $border-radius-sm !default;
-
 $btn-border-radius-navbar:       to-rem(10);
 
 // Navs
 
 $nav-link-padding:                          .375em 1em;
-$nav-link-hover-bg:                         $gray-lighter !default;
-
-$nav-disabled-link-color:                   $gray-light !default;
-$nav-disabled-link-hover-color:             $gray-light !default;
-
-$nav-tabs-border-color:                     #ddd !default;
-
-$nav-tabs-link-border-width:                $border-width !default;
-$nav-tabs-link-hover-border-color:          $gray-lighter !default;
-
-$nav-tabs-active-link-hover-bg:             $body-bg !default;
-$nav-tabs-active-link-hover-color:          $gray !default;
-$nav-tabs-active-link-hover-border-color:   #ddd !default;
-
-$nav-tabs-justified-link-border-color:            #ddd !default;
-$nav-tabs-justified-active-link-border-color:     $body-bg !default;
-
 $nav-pills-link-hover-bg:                   #e8ecf2;
-
-$nav-pills-border-radius:                   $border-radius !default;
-$nav-pills-active-link-hover-bg:            $component-active-bg !default;
-$nav-pills-active-link-hover-color:         $component-active-color !default;
-
 $nav-pills-panel-border-radius:             $border-radius 0 0 $border-radius;
 
 $navbar-height:                             to-rem(60);
@@ -284,24 +228,19 @@ $icon-sizes: (
 );
 
 // Dropdowns
-$dropdown-font-size: 14px !default;
-$dropdown-min-width: 180px !default;
-$dropdown-padding-y: 5px !default;
-$dropdown-margin-top: 2px !default;
-$dropdown-color: $body-color !default;
-$dropdown-bg: #fff !default;
-//$dropdown-border-color: rgba(0, 0, 0, .15) !default;
-//$dropdown-border-width: 0 !default;
-$dropdown-divider-bg: #e5e5e5 !default;
-$dropdown-box-shadow: 0 1px 3px rgba(0, 0, 0, .3) !default;
-
-$dropdown-link-color: $body-color !default;
-$dropdown-link-hover-bg: #f2f5fa !default;
-
-$dropdown-item-padding-x: 12px !default;
-
-$dropdown-header-font-size: 12px;
-$dropdown-header-color: #a3a3a3 !default;
+$dropdown-font-size:             1rem;
+$dropdown-min-width:             to-rem(180);
+$dropdown-padding-y:             to-rem(6);
+$dropdown-margin-top:            to-rem(2);
+$dropdown-color:                 $body-color;
+$dropdown-bg:                    $white;
+$dropdown-divider-bg:            $border-color;
+$dropdown-box-shadow:            0 to-rem(1) to-rem(3) rgba(0,0,0,.3);
+$dropdown-link-color:            $body-color;
+$dropdown-link-hover-bg:         $grey-light;
+$dropdown-item-padding-x:        12px;
+$dropdown-header-font-size:      12px;
+$dropdown-header-color:          #a3a3a3;
 
 // Form states and alerts
 //
@@ -323,24 +262,23 @@ $state-danger-text:              $white;
 $state-danger-bg:                $brand-danger;
 $state-danger-border:            $brand-danger;
 
-
 $alert-border-radius:            0;
 
-//Drawer
+// Drawer
 
 $drawer-width:                   222px;
-
 $modal-inner-padding:            to-rem(18);
 
-// Category settings stuff.
-$icon-color: transparentize($body-color, .4);
-$icon-size: 16px;
+// Category settings
 
-$tree-background: #fdfdff;
-$tree-border: $border-color;
-$tree-item-height: 36px;
-$tree-padding: 6px;
-$tree-icon-padding: (($tree-item-height - $icon-size - 1px) / 2);
+$icon-color:                     transparentize($body-color, .4);
+$icon-size:                      to-rem(16);
 
-$placeholder-background: #f1faff;
-$placeholder-border: #0291db;
+$tree-background:                #fdfdff;
+$tree-border:                    $border-color;
+$tree-item-height:               to-rem(36);
+$tree-padding:                   to-rem(6);
+$tree-icon-padding:              ($tree-item-height - $icon-size) / 2;
+
+$placeholder-background:         #f1faff;
+$placeholder-border:             #0291db;

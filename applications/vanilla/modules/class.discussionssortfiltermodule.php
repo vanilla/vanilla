@@ -193,8 +193,9 @@ class DiscussionsSortFilterModule extends Gdn_Module {
                     val('name', $filter),
                     $pathAndQuery,
                     $key,
-                    '', array(), false,
-                    array('rel' => 'nofollow')
+                    '',
+                    [],
+                    ['rel' => 'nofollow']
                 );
             }
             $dropdowns[] = $dropdown;

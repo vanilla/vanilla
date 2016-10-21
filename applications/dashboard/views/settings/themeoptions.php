@@ -20,7 +20,8 @@ echo $this->Form->errors();
 ?>
 
 <?php if ($hasCustomStyles): ?>
-    <h2 class="subheading-border"><?php echo t('Styles'); ?></h2>
+<section>
+    <?php echo subheading(t('Styles')); ?>
     <ul class="label-selector theme-styles">
         <?php
         foreach ($this->data('ThemeInfo.Options.Styles') as $Key => $Options) {
@@ -64,11 +65,12 @@ echo $this->Form->errors();
         }
         ?>
     </ul>
-
+</section>
 <?php endif; ?>
 
 <?php if ($hasCustomText): ?>
-    <h2 class="subheading-border"><?php echo t('Text'); ?></h2>
+<section>
+    <?php echo subheading(t('Text')); ?>
     <ul>
         <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 
@@ -97,6 +99,7 @@ echo $this->Form->errors();
     <div class="form-footer js-modal-footer">
     <?php echo $this->Form->button('Save'); ?>
     </div>
+</section>
 <?php endif; ?>
 
 <?php echo '<br />'.$this->Form->close();

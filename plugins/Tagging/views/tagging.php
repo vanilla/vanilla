@@ -8,17 +8,14 @@ $CanAddTags = $this->data('_CanAddTags');
 
 $desc = t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
 helpAsset(sprintf(t('About %s'), t('Tagging')), $desc);
+
+if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
+    // Only show add button if filter type supports adding new tags.
+    echo heading(t($this->data('Title')), t('Add Tag'), '/settings/tags/add?type=Tag', 'js-modal btn btn-primary');
+} else {
+    echo heading(t($this->data('Title')));
+}
 ?>
-<div class="header-block">
-    <h1><?php echo t($this->Data['Title']); ?></h1>
-    <?php if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
-        // Only show add button if filter type supports adding new tags.
-        ?>
-        <div class="buttons">
-            <?php echo ' '.anchor('Add Tag', '/settings/tags/add?type=Tag', 'js-modal btn btn-primary'); ?>
-        </div>
-    <?php } ?>
-</div>
 <div class="toolbar flex-wrap">
     <div class="search-wrap input-wrap toolbar-main">
         <?php

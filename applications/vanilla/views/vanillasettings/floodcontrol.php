@@ -13,10 +13,8 @@ helpAsset($this->data('Title'), $desc);
 
 echo $this->Form->open();
 echo $this->Form->errors();
+echo heading(t('Flood Control'));
 ?>
-<div class="header-block">
-    <h1><?php echo t('Flood Control'); ?></h1>
-</div>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>

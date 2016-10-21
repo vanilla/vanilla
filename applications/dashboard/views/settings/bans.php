@@ -1,9 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-    <?php echo anchor(t('Add Item'), '/dashboard/settings/bans/add', array('class' => 'btn btn-primary js-modal')); ?>
-</div>
 <?php
+echo heading($this->data('Title'), t('Add Item'), '/dashboard/settings/bans/add', 'btn btn-primary js-modal');
 helpAsset(sprintf(t('About %s'), t('Banning')), t('You can ban IP addresses, email domains, and words from usernames using this tool.'));
 
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';

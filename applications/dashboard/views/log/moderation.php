@@ -6,10 +6,8 @@ helpAsset($this->data('Title'), $desc);
 
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
+echo heading($this->data('Title'));
 ?>
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-</div>
 <div class="toolbar flex-wrap">
     <div class="toolbar-buttons">
         <?php

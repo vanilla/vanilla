@@ -1,11 +1,6 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/dashboard/role", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo $this->title(); ?></h1>
-    </div>
-</div>
 <?php
+echo heading($this->title(), '', '', [], '/dashboard/role');
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
@@ -49,18 +44,18 @@ echo $this->Form->errors();
     ); ?>
 </ul>
 
-    <?php if (count($this->PermissionData) > 0) {
+<?php if (count($this->PermissionData) > 0) { ?>
+    <section>
+        <?php
+        echo subheading(t('Check all permissions that apply to this role:'));
         if ($this->Role && $this->Role->CanSession != '1') { ?>
             <div class="alert alert-warning padded"><?php echo t('Heads Up! This is a special role that does not allow active sessions. For this reason, the permission options have been limited to "view" permissions.'); ?></div>
         <?php } ?>
-        <h2 class="subheading-border"><?php echo t('Check all permissions that apply to this role:') ?></h2>
         <div class="RolePermissions">
             <?php
             echo $this->Form->checkBoxGridGroups($this->PermissionData, 'Permission');
             ?>
         </div>
-    <?php
-    }
-    ?>
-</ul>
+    </section>
+<?php } ?>
 <?php echo $this->Form->close('Save'); ?>

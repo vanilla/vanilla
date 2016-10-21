@@ -4,11 +4,7 @@ $desc = t('Spend a little time thinking about how you describe your site here.',
     'Spend a little time thinking about how you describe your site here. Giving your site a meaningful title and concise description could help your position in search engines.');
 helpAsset(t('Heads up!'), $desc);
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
-?>
-<div class="header-block">
-    <h1><?php echo t('Banner'); ?></h1>
-</div>
-<?php
+echo heading(t('Banner'));
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
 ?>

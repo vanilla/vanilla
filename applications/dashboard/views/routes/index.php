@@ -3,11 +3,8 @@ $Session = Gdn::session();
 $desc = t('Routes are used to redirect users.', 'Routes are used to redirect users depending on the URL requested.');
 $desc .= ' '.anchor(t('Learn about custom routing.', 'Learn about custom routing.'), 'http://docs.vanillaforums.com/developers/routes');
 helpAsset(sprintf(t('About %s'), t('Routes')), $desc);
+echo heading(t('Manage Routes'), t('Add Route'), 'dashboard/routes/add', 'js-modal btn btn-primary');
 ?>
-<div class="header-block">
-    <h1><?php echo t('Manage Routes'); ?></h1>
-    <div class="btn-group"><?php echo anchor(t('Add Route'), 'dashboard/routes/add', 'js-modal btn btn-primary'); ?></div>
-</div>
 <div class="table-wrap">
     <table class="table-data js-tj" id="RouteTable">
         <thead>

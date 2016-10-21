@@ -1,16 +1,12 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php
+<?php if (!defined('APPLICATION')) exit();
 
 $links = '<ul>';
 $links .= '<li>'.anchor(t('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/').'</li>';
 $links .= '<li>'.anchor(t('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core').'</li>';
 $links .= '</ul>';
 
-helpAsset(t('Need More Help?'), $links)
-?>
-
-<h1><?php echo t('Import'); ?></h1>
-<?php
+helpAsset(t('Need More Help?'), $links);
+echo heading(t('Import'));
 echo '<div class="padded">'
     .sprintf(t('Garden.Import.Description', 'Use this page to import data from another forum that was exported using Vanilla Porter. For more information <a href="%s">see our importing documentation</a>.'), 'http://docs.vanillaforums.com/developers/importing/')
     .Wrap(t('You can place files in your /uploads folder.', 'If your file is too
@@ -72,13 +68,15 @@ echo $this->Form->errors();
         <?php echo $this->Form->textBoxWrap('Email'); ?>
     </li>
 </ul>
-<h2 class="subheading-border"><?php echo t('Advanced Options'); ?></h2>
-<ul>
-    <li class="form-group">
-        <?php echo $this->Form->labelWrap('Generate import SQL only', 'GenerateSQL'); ?>
-        <div class="input-wrap">
-            <?php echo $this->Form->CheckBox('GenerateSQL'); ?>
-        </div>
-    </li>
-</ul>
+<section>
+    <?php echo subheading(t('Advanced Options')); ?>
+    <ul>
+        <li class="form-group">
+            <?php echo $this->Form->labelWrap('Generate import SQL only', 'GenerateSQL'); ?>
+            <div class="input-wrap">
+                <?php echo $this->Form->CheckBox('GenerateSQL'); ?>
+            </div>
+        </li>
+    </ul>
+</section>
 <?php echo $this->Form->close('Start'); ?>

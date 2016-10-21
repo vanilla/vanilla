@@ -6,9 +6,9 @@
 
 // Headings
 //
-// Base heading styles. Each header level has a css class associated with it, so
-// one can emulate the heading style. (i.e., p class='h1' would adopt the styles
-// associated with a h1 tag)
+// Base heading styles. Each header level has a css class associated with it, so one can emulate the heading style.
+// (i.e., p class='h1' would adopt the styles associated with a h1 tag.) Most headings on settings pages will need
+// to have an additional CSS class associated with them.
 //
 // Markup:
 // <h1>Heading level 1</h1>
@@ -18,7 +18,7 @@
 // <h5>Heading level 5</h5>
 // <h6>Heading level 6</h6>
 //
-// Styleguide 1.1
+// Styleguide 1.1.
 
 h1, .h1,
 h2, .h2,
@@ -62,7 +62,7 @@ h6, .h6 {
 // sociis natoque penatibus et magnis dis parturient montes, nascetur
 // ridiculus mus.</p>
 //
-// Styleguide 1.2
+// Styleguide 1.2.
 
 p {
   margin-bottom: ($spacer / 2);
@@ -91,7 +91,7 @@ pre {
 //
 // Maintains backwards compatibility for any view that just has an h1 heading.
 //
-// No styleguide reference
+// No styleguide reference.
 
 .heading-h1-block {
   @extend .full-border;
@@ -121,11 +121,13 @@ pre {
 // Here'a an example of a header block with an 'add'-type button. This button
 // should only be facilitate an 'Add *' action.
 //
+// PHP rendering: `heading(title, [buttonText, buttonUrl, buttonAttributes, returnUrl]);`
+//
 // Markup:
-// <div class="header-block">
+// <header class="header-block">
 //   <h1>Title</h1>
-//   <div class="btn btn-primary">Add Something</div>
-// </div>
+//   <a class="btn btn-primary" href="#">Add Something</a>
+// </header>
 //
 // Styleguide 1.4.1.
 
@@ -154,8 +156,10 @@ pre {
 // Here's a header with a return button. This should always be in place when a a user navigates to a settings
 // page that is not part of the panel nav.
 //
+// PHP rendering: `heading(title, [buttonText, buttonUrl, buttonAttributes, returnUrl]);`
+//
 // Markup:
-// <div class="header-block">
+// <header class="header-block">
 //   <div class="title-block">
 //     <a class="btn btn-icon btn-return" aria-label="Return" href="#">
 //       <svg class="icon icon-svg icon-svg-chevron-left" viewBox="0 0 17 17">
@@ -164,7 +168,7 @@ pre {
 //     </a>
 //     <h1>Title</h1>
 //   </div>
-// </div>
+// </header>
 //
 // Styleguide 1.4.2.
 
@@ -189,10 +193,10 @@ pre {
 // This is a header that's also a menu.
 //
 // Markup:
-// <div class="header-menu">
-//   <a href="#" class="active">Option One</a>
+// <header class="header-menu">
+//   <a href="#" class="active" role="heading" aria-level="1">Option One</a>
 //   <a href="#">Option Two</a>
-// </div>
+// </header>
 //
 // Styleguide 1.5.
 
@@ -230,7 +234,10 @@ pre {
 
 // Subheading
 //
-// Most subheadings should be of this variety.
+// Most subheadings should be of this variety. Optimally, the section for which this is a heading should be
+// wrapped in an `<section>` tag.
+//
+// PHP rendering: `subheading(title [description])`
 //
 // Markup:
 // <h2 class="subheading-border">This is a Subheading</h2>
@@ -251,15 +258,18 @@ pre {
 
 // Subheading Block
 //
-// This element is for a subheading that requires a bit of explanation.
+// This element is for a subheading that requires a bit of explanation. Optimally, the section for which this is a
+// heading should be wrapped in an `<section>` tag.
+//
+// PHP rendering: `subheading(title [description])`
 //
 // Markup:
-// <div class="subheading-block">
-//   <div class="subheading-title">Subtitle Title</div>
+// <header class="subheading-block">
+//   <h2 class="subheading-title">Subtitle Title</h2>
 //   <div class="subheading-description">
 //     This is a description of this section. It makes this section easier to understand.
 //   </div>
-// </div>
+// </header>
 //
 // Styleguide 1.7.
 
@@ -309,10 +319,10 @@ pre {
 // Makes a badge element, usually used to display a count on a navigation item.
 //
 // Markup:
-// <div class="btn btn-primary">
+// <button class="btn btn-primary">
 //   Tags
 //   <span class="badge">42</span>
-// </div>
+// </button>
 //
 // Styleguide 1.9.
 
@@ -341,9 +351,9 @@ pre {
 // .text-success - Success color.
 //
 // Markup:
-// <div class="{{modifier_class}}">
+// <p class="{{modifier_class}}">
 //   Here is some text.
-// </div>
+// </p>
 //
 // Styleguide 1.10.
 
@@ -360,7 +370,7 @@ pre {
 // Spacer to put around bullets or pipes in meta descriptions.
 //
 // Markup:
-// <div>Written by Jane<div class="spacer">|</div>July 5, 2000</div>
+// <div>Written by Jane<span class="spacer">|</span>July 5, 2000</div>
 //
 //Styleguide 1.11.
 
@@ -396,7 +406,7 @@ pre {
 // .info - Makes the text smaller and muted, good for adding meta info to an item.
 //
 // Markup:
-// <div class="{{modifier_class}}">Here is some text.</div>
+// <span class="{{modifier_class}}">Here is some text.</span>
 //
 // Styleguide 1.13.
 

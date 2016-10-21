@@ -1,17 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
+echo heading(t('Default Avatar'), t('Upload New Avatar'), '', 'js-new-avatar btn btn-primary', '/dashboard/settings/avatars');
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
-?>
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/dashboard/settings/avatars", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo t('Default Avatar'); ?></h1>
-    </div>
-    <?php echo $this->Form->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload Hidden')); ?>
-    <div class="js-new-avatar btn btn-primary"><?php echo t('Upload New Avatar'); ?></div>
-</div>
-<?php
+echo $this->Form->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload hidden'));
 if ($this->data('crop')) {
     echo $this->data('crop');
 } else { ?>

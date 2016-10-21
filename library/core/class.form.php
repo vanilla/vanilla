@@ -632,7 +632,7 @@ class Gdn_Form extends Gdn_Pluggable {
     public function searchForm($field, $url, $textBoxAttributes = [], $searchInfo = '') {
         return $this->open(['action' => url($url)]).
             $this->errors().
-            $this->search($field, $url, $textBoxAttributes, $searchInfo).
+            $this->searchInput($field, $url, $textBoxAttributes, $searchInfo).
             $this->close();
     }
 
@@ -647,7 +647,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $searchInfo The info to add under the search box, usually a result count.
      * @return string The rendered search field.
      */
-    public function search($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
         $clear = '';
         $searchKeys = ['search', 'Keywords'];
 
@@ -665,7 +665,7 @@ class Gdn_Form extends Gdn_Pluggable {
             <div class="search-wrap input-wrap" role="search">
                 <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
                 $this->textBox($field, $textBoxAttributes).
-                $this->button(t('Go'), ['class' => 'search-submit']).
+                $this->button('Go', ['class' => 'search-submit']).
                 $clear.
                 $searchInfo.'
             </div>';

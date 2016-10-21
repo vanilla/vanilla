@@ -1075,17 +1075,11 @@ if (!function_exists('userPhoto')) {
             $PhotoUrl = UserModel::getDefaultAvatarUrl($FullUser, 'thumbnail');
         }
 
-        if (val('NoLink', $Options)) {
-            return '<div title="'.$Title.'" '.$LinkClass.'>'
-            .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
-            .'</div>';
-        } else {
-            $Href = url(userUrl($FullUser));
+        $href = (val('NoLink', $Options)) ? '' : ' href="'.url(userUrl($FullUser)).'"';
 
-            return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-            .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
+        return '<a title="'.$Title.'"'.$href.$LinkClass.'>'
+                .img($PhotoUrl, ['alt' => $Name, 'class' => $ImgClass])
             .'</a>';
-        }
     }
 }
 

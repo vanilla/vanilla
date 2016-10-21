@@ -12,12 +12,12 @@
 //
 // Markup:
 // <div class="dropdown">
-//   <div class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//   <button id="dropdownMenu" class="dropdown-toggle btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     <svg class="icon icon-16" viewBox="0 0 16 16">
 //       <use xlink:href="#code-bubble"></use>
 //     </svg>
-//   </div>
-//   <div class="dropdown-menu {{modifier_class}}">
+//   </button>
+//   <div class="dropdown-menu role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
 //     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
 //     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
 //     <div class="dropdown-divider"></div>
@@ -42,12 +42,12 @@
 //
 // Markup:
 // <div class="dropdown clearfix">
-//   <div class="dropdown-toggle pull-right btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//   <button id="dropdownMenu" class="dropdown-toggle pull-right btn btn-icon-border" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     <svg class="icon icon-16" viewBox="0 0 16 16">
 //       <use xlink:href="#code-bubble"></use>
 //     </svg>
-//   </div>
-//   <div class="dropdown-menu dropdown-menu-right">
+//   </button>
+//   <div class="dropdown-menu dropdown-menu-right role="menu" aria-labelledby="dropdownMenu" {{modifier_class}}">
 //     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
 //     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
 //     <div class="dropdown-divider"></div>
@@ -71,10 +71,10 @@
 //
 // Markup:
 // <div class="dropdown {{modifier_class}}">
-//   <div class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+//   <button id="dropdownMenu" class="dropdown-toggle btn btn-secondary" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 //     Trigger
-//   </div>
-//   <div class="dropdown-menu">
+//   </button>
+//   <div class="dropdown-menu role="menu" aria-labelledby="dropdownMenu">
 //     <a role="menuitem" class="dropdown-item" tabindex="-1" href="#">Option</a>
 //     <a role="menuitem" class="dropdown-item disabled" tabindex="-1" href="#">Disabled Option</a>
 //     <div class="dropdown-divider"></div>

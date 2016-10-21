@@ -71,10 +71,10 @@ if (!function_exists('bigPlural')) {
 if (!function_exists('helpAsset')) {
     function helpAsset($title, $description) {
         Gdn_Theme::assetBegin('Help');
-        echo '<div class="help">';
+        echo '<aside role="note" class="help">';
         echo wrap($title, 'h2', ['class' => 'help-title']);
         echo wrap($description, 'div', ['class' => 'help-description']);
-        echo '</div>';
+        echo '</aside>';
         Gdn_Theme::assetEnd();
     }
 }

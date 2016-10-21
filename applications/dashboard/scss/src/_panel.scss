@@ -17,10 +17,10 @@
 // `helpAsset("Need More Help?", "Here's some help text. There are things you should know.");`
 //
 // Markup:
-// <div class="help">
-//   <div class="help-title">Need More Help?</div>
+// <aside role="note" class="help">
+//   <h2 class="help-title">Need More Help?</h2>
 //   <div class="help-description">Here's some help text. There are things you should know.</div>
-// </div>
+// </aside>
 //
 // Styleguide 15.1.
 

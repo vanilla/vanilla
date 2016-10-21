@@ -114,26 +114,31 @@
 // Note that the header and footer should also have the `js-modal-fixed` class applied to them to make them stick
 // to the top and bottom of the modal on scroll.
 //
+// Note that the `ex-modal` class used below is actually `modal`, but `modal` add positioning which would make it
+// difficult to preview here.
+//
 // .modal-sm - Small modal.
 // .modal-md - Medium modal.
 //
 // Markup:
-// <div class="modal-dialog {{modifier_class}}" role="document">
-//   <div class="modal-content">
-//     <div class="modal-header">
-//       <h4 class="modal-title">Modal Title</h4>
-//       <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
-//         <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
-//           <use xlink:href="#close" />
-//         </svg>
-//       </button>
-//     </div>
-//     <div class="modal-body">
-//       <div class="padded">Modal Body</div>
-//     </div>
-//     <div class="modal-footer">
-//       <button class="btn btn-secondary">Cancel</button>
-//       <button class="btn btn-primary">OK</button>
+// <div class="ex-modal" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle">
+//   <div class="modal-dialog {{modifier_class}}" role="document">
+//     <div class="modal-content">
+//       <div class="modal-header">
+//         <h4 id="modalTitle" class="modal-title">Modal Title</h4>
+//         <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
+//           <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+//             <use xlink:href="#close" />
+//           </svg>
+//         </button>
+//       </div>
+//       <div class="modal-body">
+//         <div class="padded">Modal Body</div>
+//       </div>
+//       <div class="modal-footer">
+//         <button class="btn btn-secondary">Cancel</button>
+//         <button class="btn btn-primary">OK</button>
+//       </div>
 //     </div>
 //   </div>
 // </div>
@@ -142,40 +147,43 @@
 
 // Modal Markup - No Header
 //
-// Markup for a modal without a header.
+// Markup for a modal without a header. There is still a title for accessibility, but it is hidden.
 //
 // Markup:
-// <div class="modal-dialog modal-no-header" role="document">
-//   <div class="modal-content">
-//     <div class="modal-body">
-//       <!-- Media Item -->
-//       <div class="media media-callout {{modifier_class}}">
-//         <div class="media-left">
-//           <div class="media-image-wrap">
-//             <img src="./public/resources/images/dirty-rodent.jpg" alt="+Baseline">
-//           </div>
-//         </div>
-//         <div class="media-body">
-//           <div class="flag">Current Theme</div>
-//           <div class="media-title">
-//             <h3 class="media-heading theme-name">+Baseline</h3>
-//             <div class="info">
-//               <span class="media-meta author">Created by <a href="#">Mark O'Sullivan</a></span>
-//               <span class="spacer">|</span><span class="media-meta version">Version 2.2.112.3</span>
+// <div class="ex-modal" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle">
+//   <div class="modal-dialog modal-no-header" role="document">
+//     <h4 id="modalTitle" class="modal-title hidden">Modal Title</h4>
+//     <div class="modal-content">
+//       <div class="modal-body">
+//         <!-- Media Item -->
+//         <div class="media media-callout {{modifier_class}}">
+//           <div class="media-left">
+//             <div class="media-image-wrap">
+//               <img src="./public/resources/images/dirty-rodent.jpg" alt="+Baseline">
 //             </div>
 //           </div>
-//           <div class="media-description">
-//             <div class="description">The default theme for Vanilla.</div>
+//           <div class="media-body">
+//             <div class="flag">Current Theme</div>
+//             <div class="media-title">
+//               <h3 class="media-heading theme-name">+Baseline</h3>
+//               <div class="info">
+//                 <span class="media-meta author">Created by <a href="#">Mark O'Sullivan</a></span>
+//                 <span class="spacer">|</span><span class="media-meta version">Version 2.2.112.3</span>
+//               </div>
+//             </div>
+//             <div class="media-description">
+//               <div class="description">The default theme for Vanilla.</div>
+//             </div>
 //           </div>
 //         </div>
 //       </div>
+//       <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
+//         <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
+//           <use xlink:href="#close" />
+//         </svg>
+//       </button>
 //     </div>
-//     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close">
-//       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17">
-//         <use xlink:href="#close" />
-//       </svg>
-//     </button>
-//   </div>
+//  </div>
 //</div>
 //
 // Styleguide 10.6.1.

@@ -111,9 +111,9 @@ Gdn_Theme::assetEnd();
         </div>
         <div class="panel panel-help panel-right">
             <div class="panel-content-wrapper">
-                <aside role="note" id="fixed-help" class="js-fluid-fixed panel-content">
+                <div id="fixed-help" class="js-fluid-fixed panel-content">
                     <?php $this->renderAsset('Help'); ?>
-                </aside>
+                </div>
             </div>
         </div>
         <div class="main">
@@ -138,7 +138,7 @@ Gdn_Theme::assetEnd();
         </div>
     </div>
 </div>
-<aside class="hidden js-dashboard-user-dropdown">
+<aside aria-hidden="true" class="hidden js-dashboard-user-dropdown">
     <?php $this->renderAsset('DashboardUserDropDown'); ?>
 </aside>
 <?php $this->fireEvent('AfterBody'); ?>

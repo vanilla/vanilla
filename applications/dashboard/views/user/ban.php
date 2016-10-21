@@ -24,23 +24,23 @@
 
     <?php
 
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
+    echo '<div class="P">', $this->Form->radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
+    echo '<div class="P">', $this->Form->radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
     echo '<div class="P">',
-    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
+    $this->Form->radio('Reason', 'Other', array('Value' => 'Other')),
     '<div class="TextBoxWrapper">',
     $this->Form->textBox('ReasonText', array('MultiLine' => TRUE)),
     '</div>',
     '</div>';
 
     if ($this->data('_MayDeleteContent'))
-        echo '<div class="P">', $this->Form->CheckBox('DeleteContent', t("Also delete this user's content.")), '</div>';
+        echo '<div class="P">', $this->Form->checkBox('DeleteContent', "Also delete this user's content."), '</div>';
 
     ?>
 
 
     <?php
-    echo '<div class="Buttons P">', $this->Form->button(t('Ban.Action', 'Ban')), '</div>';
+    echo '<div class="Buttons P">', $this->Form->button('@'.t('Ban.Action', 'Ban')), '</div>';
     echo $this->Form->close();
     ?>
 </div>

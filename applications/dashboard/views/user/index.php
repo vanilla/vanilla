@@ -27,7 +27,7 @@ helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managi
         echo '<div class="search-wrap input-wrap">';
         echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
         echo $this->Form->textBox('Keywords');
-        echo ' ', $this->Form->button(t('Go'), ['class' => 'search-submit']);
+        echo ' ', $this->Form->button('Go', ['class' => 'search-submit']);
         echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/user').'">'.dashboardSymbol('close').'</a>';
         echo '<div class="info search-info">';
         $count = $this->data('RecordCount', $this->data('UserCount', null));

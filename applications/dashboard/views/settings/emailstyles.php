@@ -70,7 +70,7 @@ $Session = Gdn::session();
     </ul>
     <div class="buttons form-footer">
         <?php echo wrap(t('Preview Colors'), 'span', array('class' => 'js-email-preview-button btn btn-secondary')); ?>
-        <?php echo $this->Form->button(t('Save Colors')); ?>
+        <?php echo $this->Form->button('Save Colors'); ?>
     </div>
 </div>
 <?php echo $this->Form->close(); ?>

@@ -17,14 +17,14 @@
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', array('class' => 'InputBox Password'));
+            echo $this->Form->input('Password', 'password', array('class' => 'InputBox Password'));
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
         <li class="Buttons">
             <?php
             echo $this->Form->button('Sign In');
-            echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
+            echo $this->Form->checkBox('RememberMe', 'Keep me signed in', array('value' => '1', 'id' => 'SignInRememberMe'));
             ?>
         </li>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>

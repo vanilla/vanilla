@@ -28,7 +28,7 @@ echo $this->Form->errors();
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users')); ?>
+                <?php echo $this->Form->checkBox('ShowEmail', 'Email visible to other users'); ?>
             </div>
         </li>
         <li class="form-group">

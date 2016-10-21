@@ -246,7 +246,7 @@ class PostController extends VanillaController {
                 $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
 
                 if (!$hasWordCharacter || ($Name != '' && Gdn_Format::text($Name) == '')) {
-                    $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
+                    $this->Form->addError('You have entered an invalid discussion title', 'Name');
                 } else {
                     // Trim the name.
                     $FormValues['Name'] = $Name;
@@ -552,7 +552,7 @@ class PostController extends VanillaController {
 
         // If no discussion was found, error out
         if (!$Discussion) {
-            $this->Form->addError(t('Failed to find discussion for commenting.'));
+            $this->Form->addError('Failed to find discussion for commenting.');
         }
 
         /**

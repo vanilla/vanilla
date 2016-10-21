@@ -22,9 +22,6 @@ class EntryController extends Gdn_Controller {
     /** @var UserModel */
     public $UserModel;
 
-    /** @var string Reusable username requirement error message. */
-    public $UsernameError = '';
-
     /** @var string Place to store DeliveryType. */
     protected $_RealDeliveryType;
 
@@ -37,9 +34,6 @@ class EntryController extends Gdn_Controller {
     public function __construct() {
         parent::__construct();
         $this->internalMethods[] = 'target';
-
-        // Set error message here so it can run thru t()
-        $this->UsernameError = t('UsernameError', 'Username can only contain letters, numbers, underscores, and must be between 3 and 20 characters long.');
 
         // Allow use of a master popup template for easier theming.
         if (Gdn::request()->get('display') === 'popup') {
@@ -458,17 +452,17 @@ EOT;
 
         // Make sure the minimum required data has been provided by the connection.
         if (!$this->Form->getFormValue('Provider')) {
-            $this->Form->addError('ValidateRequired', t('Provider'));
+            $this->Form->addError('ValidateRequired', 'Provider');
         }
         if (!$this->Form->getFormValue('UniqueID')) {
-            $this->Form->addError('ValidateRequired', t('UniqueID'));
+            $this->Form->addError('ValidateRequired', 'UniqueID');
         }
 
         if (!$this->data('Verified')) {
             // Whatever event handler catches this must set the data 'Verified' = true
             // to prevent a random site from connecting without credentials.
             // This must be done EVERY postback and is VERY important.
-            $this->Form->addError(t('The connection data has not been verified.'));
+            $this->Form->addError('The connection data has not been verified.');
         }
 
         // If we've accrued errors, stop here and show them.
@@ -769,7 +763,7 @@ EOT;
                 if ($UserSelect == 'current') {
                     if (Gdn::session()->UserID == 0) {
                         // This should never happen, but a user could click submit on a stale form.
-                        $this->Form->addError('@You were unexpectedly signed out.');
+                        $this->Form->addError('You were unexpectedly signed out.');
                     } else {
                         $UserSelect = Gdn::session()->UserID;
                     }
@@ -780,7 +774,7 @@ EOT;
             if (isset($User) && $User) {
                 // Make sure the user authenticates.
                 if (!$User['UserID'] == Gdn::session()->UserID && $allowConnect) {
-                    $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', sprintf(t('ValidateRequired'), t('Password')));
+                    $hasPassword = $this->Form->validateRule('ConnectPassword', 'ValidateRequired', .'@'.sprintf(t('ValidateRequired'), t('Password')));
                     if ($hasPassword) {
                         // Validate their password.
                         try {
@@ -969,7 +963,7 @@ EOT;
         $this->fireEvent('SignIn');
 
         if ($this->Form->isPostBack()) {
-            $this->Form->validateRule('Email', 'ValidateRequired', sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
+            $this->Form->validateRule('Email', 'ValidateRequired', '@'.sprintf(t('%s is required.'), t(UserModel::signinLabelCode())));
             $this->Form->validateRule('Password', 'ValidateRequired');
 
             if (!$this->Request->isAuthenticatedPostBack() && !c('Garden.Embed.Allow')) {
@@ -979,9 +973,9 @@ EOT;
             // Check the user.
             if ($this->Form->errorCount() == 0) {
                 $Email = $this->Form->getFormValue('Email');
-                $User = Gdn::userModel()->GetByEmail($Email);
+                $User = Gdn::userModel()->getByEmail($Email);
                 if (!$User) {
-                    $User = Gdn::userModel()->GetByUsername($Email);
+                    $User = Gdn::userModel()->getByUsername($Email);
                 }
 
                 if (!$User) {
@@ -1386,8 +1380,8 @@ EOT;
         if ($this->Form->isPostBack()) {
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
-            $this->UserModel->Validation->applyRule('Name', 'Username', $this->UsernameError);
-            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
+            $this->UserModel->Validation->applyRule('Name', 'Username', 'ValidateUsername');
+            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');
             $this->UserModel->Validation->applyRule('Password', 'Match');
@@ -1459,8 +1453,8 @@ EOT;
         if ($this->Form->isPostBack() === true) {
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
-            $this->UserModel->Validation->applyRule('Name', 'Username', $this->UsernameError);
-            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
+            $this->UserModel->Validation->applyRule('Name', 'Username', 'ValidateUsername');
+            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');
             $this->UserModel->Validation->applyRule('Password', 'Match');
@@ -1596,8 +1590,8 @@ EOT;
             $this->InvitationCode = $this->Form->getValue('InvitationCode');
             // Add validation rules that are not enforced by the model
             $this->UserModel->defineSchema();
-            $this->UserModel->Validation->applyRule('Name', 'Username', $this->UsernameError);
-            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', t('You must agree to the terms of service.'));
+            $this->UserModel->Validation->applyRule('Name', 'Username', 'ValidateUsername');
+            $this->UserModel->Validation->applyRule('TermsOfService', 'Required', 'You must agree to the terms of service.');
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');
             $this->UserModel->Validation->applyRule('Password', 'Match');
@@ -1738,7 +1732,7 @@ EOT;
 
         $Expires = $this->UserModel->getAttribute($UserID, 'PasswordResetExpires');
         if ($this->Form->errorCount() === 0 && $Expires < time()) {
-            $this->Form->addError('@'.t('Your password reset token has expired.', 'Your password reset token has expired. Try using the reset request form again.'));
+            $this->Form->addError('Your password reset token has expired.');
             Logger::event(
                 'password_reset_failure',
                 Logger::NOTICE,

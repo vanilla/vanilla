@@ -120,7 +120,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         foreach ($ProfileFields as $Name => $Field) {
             // Check both so you can't break register form by requiring omitted field
             if (val('Required', $Field) && val('OnRegister', $Field)) {
-                $Sender->UserModel->Validation->applyRule($Name, 'Required', T('%s is required.', $Field['Label']));
+                $Sender->UserModel->Validation->applyRule($Name, 'Required', '@'.t('%s is required.', $Field['Label']));
             }
         }
 

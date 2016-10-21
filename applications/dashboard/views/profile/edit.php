@@ -50,7 +50,7 @@
         <?php if ($this->data('_CanEditEmail')): ?>
             <li class="User-ShowEmail">
                 <?php
-                echo $this->Form->CheckBox('ShowEmail', t('Allow other members to see your email?'), array('value' => '1'));
+                echo $this->Form->checkBox('ShowEmail', 'Allow other members to see your email?', array('value' => '1'));
                 ?>
             </li>
         <?php endif ?>
@@ -58,7 +58,7 @@
         <?php if ($this->data('_CanConfirmEmail')): ?>
             <li class="User-ConfirmEmail">
                 <?php
-                echo $this->Form->CheckBox('ConfirmEmail', t("Confirmed email address"), array('value' => '1'));
+                echo $this->Form->checkBox('ConfirmEmail', "Confirmed email address", array('value' => '1'));
                 ?>
             </li>
         <?php endif ?>

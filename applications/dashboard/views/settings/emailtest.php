@@ -11,4 +11,4 @@ echo $this->Form->errors(); ?>
     <?php echo $this->Form->input('EmailTestAddresses', 'text'); ?>
     </div>
 </div>
-<?php echo $this->Form->close(t('Send')); ?>
+<?php echo $this->Form->close('Send'); ?>

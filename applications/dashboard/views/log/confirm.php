@@ -24,7 +24,7 @@
             <div class="modal-body">
                 <?php
                 // Give a description of what is done.'
-                $ShowUsers = FALSE;
+                $ShowUsers = false;
                 switch (strtolower($this->data('Action'))) {
                     case 'delete':
                         echo '<div class="alert alert-danger">'.t('Warning: deleting is permanent', 'WARNING: deleted items are removed from this list and cannot be brought back.').'</div>';
@@ -39,14 +39,14 @@
                         echo '<div class="alert alert-danger">'.t('Warning: deleting is permanent', 'WARNING: deleted items are removed from this list and cannot be brought back.').'</div>';
                         echo wrap(t('Marking as spam cannot be undone.', 'Marking something as SPAM will cause it to be deleted forever. Deleting is a good way to keep your forum clean.'), 'p');
                         $AfterHtml = t('Are you ABSOLUTELY sure you want to take this action?');
-                        $ShowUsers = TRUE;
+                        $ShowUsers = true;
                         $UsersHtml = t('You can also ban the users that posted the spam and delete all of their posts.',
                             'Check the box next to the user that posted the spam to also ban them and delete all of their posts. <b>Only do this if you are sure these are spammers.</b>');
                         break;
                     case 'notspam':
                         echo wrap(t('Marking things as NOT spam will put them back in your forum.'), 'p');
                         $AfterHtml = plural($ItemCount, t('Are you sure this isn\'t spam?'), t('Are you sure these %s items aren\'t spam?'));
-                        $ShowUsers = TRUE;
+                        $ShowUsers = true;
                         $UsersHtml = t("Check the box next to the user to mark them as <b>Verified</b> so their posts don't get marked as spam again.");
                         break;
                 }
@@ -57,14 +57,14 @@
                     <?php
                     if (count($this->data('Users')) > 1) {
                         echo '<div class="CheckBoxCell">';
-                        echo $this->Form->CheckBox('SelectAll', t('All'));
+                        echo $this->Form->checkBox('SelectAll', 'All');
                         echo '</div>';
                     }
 
                     foreach ($this->data('Users') as $User) {
                         $RecordUser = Gdn::userModel()->getID($User['UserID'], DATASET_TYPE_ARRAY);
                         echo '<div class="CheckBoxCell">';
-                        echo $this->Form->CheckBox('UserID[]', htmlspecialchars($User['Name']), array('value' => $User['UserID'], 'class' => 'checkbox checkbox-inline'));
+                        echo $this->Form->checkBox('UserID[]', htmlspecialchars($User['Name']), array('value' => $User['UserID'], 'class' => 'checkbox checkbox-inline'));
                         echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
 
                         echo '</div>';

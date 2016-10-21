@@ -49,20 +49,15 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
             <?php echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE)); ?>
         </div>
     </li>
-    <li class="form-group">
-        <div class="label-wrap">
-            <?php echo $this->Form->label('Photo', 'PhotoUpload');
-            if ($Photo = $this->Form->getValue('Photo')) {
-                echo wrap(img(Gdn_Upload::url($Photo)), 'div');
-                echo anchor(t('Delete Photo'),
-                    CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
-                    'js-modal-confirm');
-            } ?>
-        </div>
-        <div class="input-wrap">
-            <?php echo $this->Form->fileUpload('PhotoUpload'); ?>
-        </div>
-    </li>
+    <?php echo $this->Form->imageUploadPreview(
+        'PhotoUpload',
+        t('Photo'),
+        '',
+        $this->Form->getValue('Photo'),
+        'vanilla/settings/deletecategoryphoto/'.$this->Category->CategoryID,
+        t('Delete Photo'),
+        t('Are you sure you want to delete this category photo?')
+    ); ?>
     <?php echo $this->Form->Simple(
         $this->data('_ExtendedFields', array()));
     ?>

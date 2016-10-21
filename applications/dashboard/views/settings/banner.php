@@ -44,7 +44,6 @@ echo $this->Form->errors();
                     <div class="label-wrap">
                     <?php
                     echo '<div>'.t('Banner Title').'</div>';
-//                    echo $this->Form->label('Banner Title', 'Garden.Title');
                     echo wrap(
                         t("The banner title appears on your site's banner and in your browser's title bar.",
                             "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title."),
@@ -56,97 +55,42 @@ echo $this->Form->errors();
                     <?php echo $this->Form->textBox('Garden.Title'); ?>
                     </div>
                 </li>
-                <li class="form-group">
-                    <div class="label-wrap">
-                    <?php
-                    echo '<div>'.t('Banner Logo').'</div>';
-                    echo wrap(
-                        t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
-                        'div',
-                        array('class' => 'Info')
-                    );
-
-                    $Logo = $this->data('Logo');
-                    if ($Logo) {
-                        echo wrap(
-                            img(Gdn_Upload::url($Logo)),
-                            'div'
-                        );
-                        echo wrap(Anchor(t('Remove Banner Logo'), '/dashboard/settings/removelogo/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your banner logo?'))]), 'div');
-                    } ?>
-                    </div>
-                    <div class="input-wrap">
-                    <?php echo $this->Form->fileUpload('Logo'); ?>
-                    </div>
-                </li>
-                <li class="form-group">
-                    <div class="label-wrap">
-                    <?php
-                    echo '<div>'.t('Mobile Banner Logo').'</div>';
-                    echo wrap(
-                        t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
-                        'div',
-                        array('class' => 'Info')
-                    );
-
-                    $MobileLogo = $this->data('MobileLogo');
-                    if ($MobileLogo) {
-                        echo wrap(
-                            img(Gdn_Upload::url($MobileLogo)),
-                            'div'
-                        );
-                        echo wrap(Anchor(t('Remove Mobile Banner Logo'), '/dashboard/settings/removemobilelogo/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your mobile banner logo?'))]), 'div');
-                    } ?>
-                    </div>
-                    <div class="input-wrap">
-                    <?php echo $this->Form->fileUpload('MobileLogo'); ?>
-                    </div>
-                </li>
-                <li class="form-group">
-                    <div class="label-wrap">
-                    <?php
-                    echo '<div>'.t('Favicon').'</div>';
-                    echo wrap(
-                        t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
-                        'div',
-                        array('class' => 'Info')
-                    );
-                    $Favicon = $this->data('Favicon');
-                    if ($Favicon) {
-                        echo wrap(
-                            img(Gdn_Upload::url($Favicon)),
-                            'div'
-                        );
-                        echo wrap(Anchor(t('Remove Favicon'), '/dashboard/settings/removefavicon/'.$Session->TransientKey(), 'js-modal-confirm', ['data-body' => sprintf(t('Are you sure you want to delete your favicon?'))]), 'div');
-                    }
-                    ?>
-                    </div>
-                    <div class="input-wrap">
-                    <?php echo $this->Form->fileUpload('Favicon'); ?>
-                    </div>
-                </li>
-                <li class="form-group">
-                    <div class="label-wrap">
-                    <?php
-                    echo '<div>'.t('Share Image').'</div>';
-                    echo wrap(
-                        t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
-                        'div',
-                        array('class' => 'Info')
-                    );
-                    $ShareImage = $this->data('ShareImage');
-                    if ($ShareImage) {
-                        echo wrap(
-                            img(Gdn_Upload::url($ShareImage)),
-                            'div'
-                        );
-                        echo wrap(Anchor(t('Remove Image'), '/dashboard/settings/removeshareimage', 'js-modal-confirm js-hijack', ['data-body' => sprintf(t('Are you sure you want to delete your share image?'))]), 'div');
-                    } ?>
-                    </div>
-                    <div class="input-wrap">
-                    <?php echo $this->Form->fileUpload('ShareImage');?>
-                    </div>
-                </li>
+                <?php echo $this->Form->imageUploadPreview(
+                    'Logo',
+                    t('Banner Logo'),
+                    t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
+                    $this->data('Logo'),
+                    '/dashboard/settings/removelogo',
+                    t('Remove Banner Logo'),
+                    t('Are you sure you want to delete your banner logo?')
+                ); ?>
+                <?php echo $this->Form->imageUploadPreview(
+                    'MobileLogo',
+                    t('Mobile Banner Logo'),
+                    t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
+                    $this->data('MobileLogo'),
+                    '/dashboard/settings/removemobilelogo',
+                    t('Remove Mobile Banner Logo'),
+                    t('Are you sure you want to delete your mobile banner logo?')
+                ); ?>
+                <?php echo $this->Form->imageUploadPreview(
+                    'Favicon',
+                    t('Favicon'),
+                    t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
+                    $this->data('Favicon'),
+                    '/dashboard/settings/removefavicon',
+                    t('Remove Favicon'),
+                    t('Are you sure you want to delete your favicon?')
+                ); ?>
+                <?php echo $this->Form->imageUploadPreview(
+                    'ShareImage',
+                    t('Share Image'),
+                    t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
+                    $this->data('ShareImage'),
+                    '/dashboard/settings/removeshareimage',
+                    t('Remove Share Image'),
+                    t('Are you sure you want to delete your share image?')
+                ); ?>
             </ul>
         </div>
     </div>

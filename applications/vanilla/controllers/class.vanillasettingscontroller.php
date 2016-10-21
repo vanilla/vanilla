@@ -531,31 +531,24 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Deleting a category photo.
+     * Delete a category photo.
      *
      * @since 2.1
      * @access public
      *
-     * @param int $CategoryID Unique ID of the category to have its photo deleted.
+     * @param String $CategoryID Unique ID of the category to have its photo deleted.
      */
-    public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
+    public function deleteCategoryPhoto($CategoryID = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
-        $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
-
-        if (Gdn::session()->validateTransientKey($TransientKey)) {
-            // Do removal, set message, redirect
+        if ($CategoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
+            // Do removal, set message
             $CategoryModel = new CategoryModel();
             $CategoryModel->setField($CategoryID, 'Photo', null);
-            $this->informMessage(t('Category photo has been deleted.'));
+            $this->informMessage(t('Category photo was successfully deleted.'));
         }
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($RedirectUrl);
-        } else {
-            $this->RedirectUrl = url($RedirectUrl);
-            $this->render();
-        }
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

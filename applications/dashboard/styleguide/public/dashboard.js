@@ -1792,7 +1792,6 @@ return Tether;
 
 }));
 
-(function(a){a.isScrollToFixed=function(b){return !!a(b).data("ScrollToFixed")};a.ScrollToFixed=function(d,i){var m=this;m.$el=a(d);m.el=d;m.$el.data("ScrollToFixed",m);var c=false;var H=m.$el;var I;var F;var k;var e;var z;var E=0;var r=0;var j=-1;var f=-1;var u=null;var A;var g;function v(){H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed");f=-1;E=H.offset().top;r=H.offset().left;if(m.options.offsets){r+=(H.offset().left-H.position().left)}if(j==-1){j=r}I=H.css("position");c=true;if(m.options.bottom!=-1){H.trigger("preFixed.ScrollToFixed");x();H.trigger("fixed.ScrollToFixed")}}function o(){var J=m.options.limit;if(!J){return 0}if(typeof(J)==="function"){return J.apply(H)}return J}function q(){return I==="fixed"}function y(){return I==="absolute"}function h(){return !(q()||y())}function x(){if(!q()){var J=H[0].getBoundingClientRect();u.css({display:H.css("display"),width:J.width,height:J.height,"float":H.css("float")});cssOptions={"z-index":m.options.zIndex,position:"fixed",top:m.options.bottom==-1?t():"",bottom:m.options.bottom==-1?"":m.options.bottom,"margin-left":"0px"};if(!m.options.dontSetWidth){cssOptions.width=H.css("width")}H.css(cssOptions);H.addClass(m.options.baseClassName);if(m.options.className){H.addClass(m.options.className)}I="fixed"}}function b(){var K=o();var J=r;if(m.options.removeOffsets){J="";K=K-E}cssOptions={position:"absolute",top:K,left:J,"margin-left":"0px",bottom:""};if(!m.options.dontSetWidth){cssOptions.width=H.css("width")}H.css(cssOptions);I="absolute"}function l(){if(!h()){f=-1;u.css("display","none");H.css({"z-index":z,width:"",position:F,left:"",top:e,"margin-left":""});H.removeClass("scroll-to-fixed-fixed");if(m.options.className){H.removeClass(m.options.className)}I=null}}function w(J){if(J!=f){H.css("left",r-J);f=J}}function t(){var J=m.options.marginTop;if(!J){return 0}if(typeof(J)==="function"){return J.apply(H)}return J}function B(){if(!a.isScrollToFixed(H)||H.is(":hidden")){return}var M=c;var L=h();if(!c){v()}else{if(h()){E=H.offset().top;r=H.offset().left}}var J=a(window).scrollLeft();var N=a(window).scrollTop();var K=o();if(m.options.minWidth&&a(window).width()<m.options.minWidth){if(!h()||!M){p();H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed")}}else{if(m.options.maxWidth&&a(window).width()>m.options.maxWidth){if(!h()||!M){p();H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed")}}else{if(m.options.bottom==-1){if(K>0&&N>=K-t()){if(!L&&(!y()||!M)){p();H.trigger("preAbsolute.ScrollToFixed");b();H.trigger("unfixed.ScrollToFixed")}}else{if(N>=E-t()){if(!q()||!M){p();H.trigger("preFixed.ScrollToFixed");x();f=-1;H.trigger("fixed.ScrollToFixed")}w(J)}else{if(!h()||!M){p();H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed")}}}}else{if(K>0){if(N+a(window).height()-H.outerHeight(true)>=K-(t()||-n())){if(q()){p();H.trigger("preUnfixed.ScrollToFixed");if(F==="absolute"){b()}else{l()}H.trigger("unfixed.ScrollToFixed")}}else{if(!q()){p();H.trigger("preFixed.ScrollToFixed");x()}w(J);H.trigger("fixed.ScrollToFixed")}}else{w(J)}}}}}function n(){if(!m.options.bottom){return 0}return m.options.bottom}function p(){var J=H.css("position");if(J=="absolute"){H.trigger("postAbsolute.ScrollToFixed")}else{if(J=="fixed"){H.trigger("postFixed.ScrollToFixed")}else{H.trigger("postUnfixed.ScrollToFixed")}}}var D=function(J){if(H.is(":visible")){c=false;B()}else{l()}};var G=function(J){(!!window.requestAnimationFrame)?requestAnimationFrame(B):B()};var C=function(){var K=document.body;if(document.createElement&&K&&K.appendChild&&K.removeChild){var M=document.createElement("div");if(!M.getBoundingClientRect){return null}M.innerHTML="x";M.style.cssText="position:fixed;top:100px;";K.appendChild(M);var N=K.style.height,O=K.scrollTop;K.style.height="3000px";K.scrollTop=500;var J=M.getBoundingClientRect().top;K.style.height=N;var L=(J===100);K.removeChild(M);K.scrollTop=O;return L}return null};var s=function(J){J=J||window.event;if(J.preventDefault){J.preventDefault()}J.returnValue=false};m.init=function(){m.options=a.extend({},a.ScrollToFixed.defaultOptions,i);z=H.css("z-index");m.$el.css("z-index",m.options.zIndex);u=a("<div />");I=H.css("position");F=H.css("position");k=H.css("float");e=H.css("top");if(h()){m.$el.after(u)}a(window).bind("resize.ScrollToFixed",D);a(window).bind("scroll.ScrollToFixed",G);if("ontouchmove" in window){a(window).bind("touchmove.ScrollToFixed",B)}if(m.options.preFixed){H.bind("preFixed.ScrollToFixed",m.options.preFixed)}if(m.options.postFixed){H.bind("postFixed.ScrollToFixed",m.options.postFixed)}if(m.options.preUnfixed){H.bind("preUnfixed.ScrollToFixed",m.options.preUnfixed)}if(m.options.postUnfixed){H.bind("postUnfixed.ScrollToFixed",m.options.postUnfixed)}if(m.options.preAbsolute){H.bind("preAbsolute.ScrollToFixed",m.options.preAbsolute)}if(m.options.postAbsolute){H.bind("postAbsolute.ScrollToFixed",m.options.postAbsolute)}if(m.options.fixed){H.bind("fixed.ScrollToFixed",m.options.fixed)}if(m.options.unfixed){H.bind("unfixed.ScrollToFixed",m.options.unfixed)}if(m.options.spacerClass){u.addClass(m.options.spacerClass)}H.bind("resize.ScrollToFixed",function(){u.height(H.height())});H.bind("scroll.ScrollToFixed",function(){H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed");B()});H.bind("detach.ScrollToFixed",function(J){s(J);H.trigger("preUnfixed.ScrollToFixed");l();H.trigger("unfixed.ScrollToFixed");a(window).unbind("resize.ScrollToFixed",D);a(window).unbind("scroll.ScrollToFixed",G);H.unbind(".ScrollToFixed");u.remove();m.$el.removeData("ScrollToFixed")});D()};m.init()};a.ScrollToFixed.defaultOptions={marginTop:0,limit:0,bottom:-1,zIndex:1000,baseClassName:"scroll-to-fixed-fixed"};a.fn.scrollToFixed=function(b){return this.each(function(){(new a.ScrollToFixed(this,b))})}})(jQuery);
 /*! iCheck v1.0.2 by Damir Sultanov, http://git.io/arlzeA, MIT Licensed */
 (function(f){function A(a,b,d){var c=a[0],g=/er/.test(d)?_indeterminate:/bl/.test(d)?n:k,e=d==_update?{checked:c[k],disabled:c[n],indeterminate:"true"==a.attr(_indeterminate)||"false"==a.attr(_determinate)}:c[g];if(/^(ch|di|in)/.test(d)&&!e)x(a,g);else if(/^(un|en|de)/.test(d)&&e)q(a,g);else if(d==_update)for(var f in e)e[f]?x(a,f,!0):q(a,f,!0);else if(!b||"toggle"==d){if(!b)a[_callback]("ifClicked");e?c[_type]!==r&&q(a,g):x(a,g)}}function x(a,b,d){var c=a[0],g=a.parent(),e=b==k,u=b==_indeterminate,
 v=b==n,s=u?_determinate:e?y:"enabled",F=l(a,s+t(c[_type])),B=l(a,b+t(c[_type]));if(!0!==c[b]){if(!d&&b==k&&c[_type]==r&&c.name){var w=a.closest("form"),p='input[name="'+c.name+'"]',p=w.length?w.find(p):f(p);p.each(function(){this!==c&&f(this).data(m)&&q(f(this),b)})}u?(c[b]=!0,c[k]&&q(a,k,"force")):(d||(c[b]=!0),e&&c[_indeterminate]&&q(a,_indeterminate,!1));D(a,e,b,d)}c[n]&&l(a,_cursor,!0)&&g.find("."+C).css(_cursor,"default");g[_add](B||l(a,b)||"");g.attr("role")&&!u&&g.attr("aria-"+(v?n:k),"true");
@@ -5641,16 +5640,25 @@ $(document).on('contentLoad', function(e) {
 });
 
 /**
- * Makes tables collapsible.
+ * Makes tables collapsible by setting meta data on a main column. The meta label is based on the column heading and
+ * the meta body is the cell content.
  *
  * Set 'data-tj-ignore="true"' on a thead td or thead th element to never collapse that column
  * Set 'data-tj-main="true"' on a thead td or thead th element to make that the main column instead of the first column.
+ * Set 'data-tj-label="New label"' to override the column heading as the meta label.
  */
 (function($) {
     $.fn.tablejenga = function(options) {
 
+        var lastWindowWidth;
+
+        /**
+         * Initiates table jengo.
+         *
+         * @param table
+         * @param vars
+         */
         var start = function(table, vars) {
-            reset(table);
             var maxIterations = 10; //safety first
             var i = 0;
             while(isTooWide(table, vars) && i < maxIterations) {
@@ -5659,13 +5667,46 @@ $(document).on('contentLoad', function(e) {
             }
         };
 
+        /**
+         * If we're making the window less wide, we don't have to reassess any already hidden columns.
+         * If we're getting wider, recalculate everything.
+         *
+         * @param table
+         * @param vars
+         */
+        var windowResize = function(table, vars) {
+            if ($(window).width() < lastWindowWidth) {
+                start(table, vars);
+            } else {
+                reset(table);
+                start(table, vars);
+            }
+
+            lastWindowWidth = $(window).width();
+        };
+
+        /**
+         * Resets a table to its state before it collapsed.
+         *
+         * @param table
+         */
         var reset = function(table) {
             $('.tj-hidden', table).show();
             $('.tj-hidden', table).removeClass('tj-hidden');
             $('.tj-main-heading', table).css('width', '');
             $('.tj-meta', table).remove();
+
+            $('td[colspan]', table).each(function() {
+               $(this).attr('colspan', $(this).data('originalColspan'));
+            });
         };
 
+        /**
+         * Adds each cell's column heading as a data attribute.
+         *
+         * @param table
+         * @param vars
+         */
         var addDataLabels = function(table, vars) {
             $('tbody tr', table).each(function() {
                 $('td', this).each(function() {
@@ -5680,6 +5721,12 @@ $(document).on('contentLoad', function(e) {
             });
         };
 
+        /**
+         * Saves the column headings into an array and determines which cell is the main cell.
+         *
+         * @param table
+         * @param vars
+         */
         var getDataLabels = function(table, vars) {
             vars['labels'] = [];
             vars['ignoreLabels'] = [];
@@ -5707,17 +5754,30 @@ $(document).on('contentLoad', function(e) {
             }
         };
 
+        /**
+         * Checks if a table is too wide for its container.
+         *
+         * @param table
+         * @param vars
+         * @returns {boolean} Whether a table is wider than its container.
+         */
         var isTooWide = function(table, vars) {
             var tableWidth = table.width();
-            var windowWidth = $(vars.container).outerWidth();
+            var containerWidth = $(vars.container).outerWidth();
 
-            if (tableWidth > windowWidth) {
+            if (tableWidth > containerWidth) {
                 return true;
             }
 
             return false;
         };
 
+        /**
+         * Does what we came here to do. Moves data from a cell to a meta item under the data in the main cell.
+         *
+         * @param table
+         * @param vars
+         */
         var moveCell = function(table, vars) {
             var label = '';
 
@@ -5729,7 +5789,13 @@ $(document).on('contentLoad', function(e) {
                         label = $cell.data('label');
 
                         html = vars.metaTemplate.replace('{data}', html);
-                        html = html.replace('{label}', label);
+                        if (label) {
+                            var labelHtml = vars.metaLabel.replace('{label}', label);
+                            html = html.replace('{label}', labelHtml);
+                        } else {
+                            html = html.replace('{label}', '');
+                        }
+
                         if (!$('.tj-main-cell .tj-meta', this).length) {
                             $('.tj-main-cell', this).append('<div class="tj-meta">' + html + '</div>');
                         } else {
@@ -5741,22 +5807,41 @@ $(document).on('contentLoad', function(e) {
             });
 
             $('thead tr td, thead tr th', table).each(function() {
-                if ($(this).data('label') === label) {
-
+                if (!$(this).hasClass('tj-hidden') && $(this).data('label') === label) {
                     // check the width of the column and main-heading assumes its width if it's wider than main
                     var minWidth = $(this).width();
                     if ($('.tj-main-heading', table).width() < minWidth) {
                         $('.tj-main-heading', table).css('width', minWidth);
                     }
 
+                    decrementColspan(table);
                     $(this).addClass('tj-hidden');
                 }
-            })
+            });
 
             $('.tj-hidden', table).hide();
             $('.tj-meta', table).show();
         };
 
+
+        /**
+         * Decrements the colspan of a cell.
+         *
+         * @param table
+         */
+        var decrementColspan = function(table) {
+            $('td[colspan]', table).each(function() {
+                $(this).attr('colspan', ($(this).attr('colspan') - 1));
+            });
+        };
+
+        /**
+         * Returns the next cell to collapse.
+         *
+         * @param $row
+         * @param vars
+         * @returns {boolean}
+         */
         var getNext = function($row, vars) {
             var found = false;
             var $next = false;
@@ -5775,9 +5860,14 @@ $(document).on('contentLoad', function(e) {
             return $next;
         };
 
-        // Get table.
         this.each(function() {
-            var table = $(this);
+            var $table = $(this);
+
+            $('td[colspan]', $table).each(function() {
+                $(this).data('originalColspan', $(this).attr('colspan'));
+            });
+
+            $table.css('table-layout', 'fixed');
 
             // Extend Settings.
             var settings = $.extend({}, $.fn.tablejenga.defaults, options);
@@ -5786,14 +5876,17 @@ $(document).on('contentLoad', function(e) {
                 container: settings.container,
                 mainCell: settings.mainCell,
                 metaTemplate: settings.metaTemplate,
+                metaLabel: settings.metaLabel,
                 showEmptyCells: settings.showEmptyCells
             };
 
-            getDataLabels(table, vars);
-            addDataLabels(table, vars);
-            start(table, vars);
+            getDataLabels($table, vars);
+            addDataLabels($table, vars);
+            start($table, vars);
+
+            lastWindowWidth = $(window).width();
             $(window).resize(function() {
-                start(table, vars);
+                windowResize($table, vars);
             });
         });
     };
@@ -5802,9 +5895,10 @@ $(document).on('contentLoad', function(e) {
         container: 'body',
         mainCell: 'firstcell',
         metaTemplate: '<div class="table-meta-item">' +
-        '<span class="table-meta-item-label">{label}: </span>' +
+        '{label}' +
         '<span class="table-meta-item-data">{data}</span>' +
         '</div>',
+        metaLabel: '<span class="table-meta-item-label">{label}: </span>',
         showEmptyCells: false
     };
 
@@ -5883,7 +5977,7 @@ $(document).on('contentLoad', function(e) {
             if (handleScroll) {
                 var $element = $(element); // Cache element before scroll.
                 killThreadIds[vars.id] = false;
-                scrollHandler($element, vars)
+                scrollHandler($element, vars);
             } else {
                 $(element).css('margin-top', 0);
                 killThreadIds[vars.id] = true;
@@ -5917,7 +6011,7 @@ $(document).on('contentLoad', function(e) {
 
         var onScroll = function($element, vars) {
             vars.st = window.pageYOffset;
-            if (vars.st > vars.lastScrollTop){
+            if (vars.st > vars.lastScrollTop) {
                 // downscroll
                 handleDownScroll($element, vars);
             } else if (vars.st < vars.lastScrollTop) {
@@ -8322,10 +8416,10 @@ var DashboardModal = (function() {
         trigger: {},
 
         modalHtml: ' \
-        <div><div class="modal-dialog {cssClass}" role="document"> \
+        <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
                 <div class="modal-header js-modal-fixed"> \
-                    <h4 class="modal-title">{title}</h4> \
+                    <h4 id="modalTitle" class="modal-title">{title}</h4> \
                     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
@@ -8335,19 +8429,20 @@ var DashboardModal = (function() {
                 <div class="modal-footer js-modal-fixed">{footer}</div> \
                 {form.close} \
             </div> \
-        </div></div>',
+        </div>',
 
         modalHtmlNoHeader: ' \
-        <div><div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+        <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+            <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
             <div class="modal-content"> \
                 <div class="modal-body">{body}</div> \
                 <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                     {closeIcon} \
                 </button> \
             </div> \
-        </div></div>',
+        </div>',
 
-        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
         start: function($trigger, settings) {
             $('#' + this.id).modal('show').focus();
@@ -8390,42 +8485,53 @@ var DashboardModal = (function() {
         handleConfirm: function() {
             var self = this;
 
-            // request the target via ajax
-            var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            if (self.settings.httpmethod === 'post') {
-                ajaxData.TransientKey = gdn.definition('TransientKey');
-            }
-
-            $.ajax({
-                method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-                    if (json.RedirectUrl) {
-                        setTimeout(function() {
-                            document.location.replace(json.RedirectUrl);
-                        }, 300);
-                    } else {
-                        $('#' + self.id).modal('hide');
-                        self.afterConfirmSuccess();
-                    }
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
-            });
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json) {
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        if (json.RedirectUrl) {
+                            setTimeout(function() {
+                                document.location.replace(json.RedirectUrl);
+                            }, 300);
+                        } else {
+                            $('#' + self.id).modal('hide');
+                            self.afterConfirmSuccess();
+                        }
+                    }
+                });
+            }
         },
 
         // Default is to remove the closest item with the class 'js-modal-item'
         afterConfirmSuccess: function() {
             var found = false;
             if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                found = this.trigger.closest('.js-modal-item').length !== 0;
-                this.trigger.closest('.js-modal-item').remove();
+                var $remove;
+                if (this.settings.removeSelector) {
+                    $remove = $(this.settings.removeSelector)
+                } else {
+                    $remove = this.trigger.closest('.js-modal-item');
+                }
+                found = $remove.length !== 0;
+                $remove.remove();
             }
 
             // Refresh the page.
@@ -8681,27 +8787,15 @@ var DashboardModal = (function() {
         codeInput.start(element);
     }
 
-    function scrollToFixedInit(element) {
 
+    function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
-        var $spacer = $('.js-scroll-to-fixed-spacer');
 
         $navbar.addClass('navbar-short');
         var navShortHeight = $navbar.outerHeight(true);
         $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
-        $spacer.height(navHeight);
-
         var navOffset = navHeight - navShortHeight;
-
-        $navbar.scrollToFixed({
-            zIndex: 1005,
-            spacerClass: 'js-scroll-to-fixed-spacer'
-        });
-
-        $('.js-modal-fixed', element).scrollToFixed({
-            zIndex: 1005
-        });
 
         // If we load in the middle of the page, we should have a short navbar.
         if ($(window).scrollTop() > navOffset) {
@@ -8713,7 +8807,6 @@ var DashboardModal = (function() {
                 $navbar.addClass('navbar-short');
             } else {
                 $navbar.removeClass('navbar-short');
-                $spacer.height(navHeight);
             }
         });
     }
@@ -8871,7 +8964,7 @@ var DashboardModal = (function() {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        scrollToFixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
@@ -8882,7 +8975,45 @@ var DashboardModal = (function() {
         responsiveTablesInit(e.target); // makes tables responsive
     });
 
+    /**
+     * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
+     * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     */
+    function readUrl(input) {
+        if (input.files && input.files[0]) {
+            var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $preview.attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     // Event handlers
+
+    /**
+     * Adds a preview of the uploaded, not-yet-saved image.
+     */
+    $(document).on('change', '.js-image-upload', function() {
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-old').addClass('hidden');
+        readUrl(this);
+    });
+
+    /**
+     * Removes the preview image and clears the file name from the input.
+     */
+    $(document).on('click', '.js-remove-image-preview', function(e) {
+        e.preventDefault();
+        var $parent = $(this).parents('.js-image-preview-form-group');
+        $parent.find('.js-image-preview-old').removeClass('hidden');
+        $parent.find('.js-image-preview-new').addClass('hidden').find('.js-image-preview').attr('src', '');
+        var $input = $parent.find('.js-image-upload');
+        var $inputFileName = $parent.find('.file-upload-choose');
+        $input.val('');
+        $inputFileName.html($inputFileName.data('placeholder'));
+    });
 
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
@@ -8982,7 +9113,8 @@ var DashboardModal = (function() {
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
-            modalType: 'confirm'
+            modalType: 'confirm',
+            followLink: true // no ajax
         });
     });
 

@@ -621,6 +621,58 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Renders a search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered form.
+     */
+    public function searchForm($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        return $this->open(['action' => url($url)]).
+            $this->errors().
+            $this->search($field, $url, $textBoxAttributes, $searchInfo).
+            $this->close();
+    }
+
+
+    /**
+     * Renders a stylized search field. Requires dashboard.css to look as intended. Use with searchForm() to output an
+     * entire search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered search field.
+     */
+    public function search($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        $clear = '';
+        $searchKeys = ['search', 'Keywords'];
+
+        // Check to see if any values in the above array exist in the get request and if so, add a clear button.
+        if (!empty(array_intersect_key(array_fill_keys($searchKeys, ''), Gdn::request()->get()))) {
+            $closeIcon = dashboardSymbol('close');
+            $clear = '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url($url).'">'.$closeIcon.'</a>';
+        }
+
+        if ($searchInfo) {
+            $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
+        }
+
+        return '
+            <div class="search-wrap input-wrap" role="search">
+                <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
+                $this->textBox($field, $textBoxAttributes).
+                $this->button(t('Go'), ['class' => 'search-submit']).
+                $clear.
+                $searchInfo.'
+            </div>';
+    }
+
+
+    /**
      * Outputs a stylized file upload input. Requires dashboard.js and dashboard.css to look and work as intended.
      *
      * @param string $fieldName

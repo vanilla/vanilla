@@ -19,14 +19,9 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
 <div class="toolbar flex-wrap">
     <div class="search-wrap input-wrap toolbar-main">
         <?php
-        echo $this->Form->open();
-        echo $this->Form->errors();
-        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
-        echo $this->Form->textBox('Search', ['placeholder' => t('Search for a tag.', 'Search for all or part of a tag.')]);
-        echo ' '.$this->Form->button(t('Go'), ['class' => 'search-submit']);
-        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/settings/tagging').'">'.dashboardSymbol('close').'</a>';
-        echo '<div class="info search-info">'.sprintf(t('%s tag(s) found.'), $this->data('RecordCount')).'</div>';
-        echo $this->Form->close();
+        $info = sprintf(t('%s tag(s) found.'), $this->data('RecordCount'));
+        $placeholder = t('Search for a tag.', 'Search for all or part of a tag.');
+        echo $this->Form->searchForm('search', '/settings/tagging', ['placeholder' => $placeholder], $info);
         ?>
     </div>
 
@@ -86,9 +81,6 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
         <?php
         $Session = Gdn::session();
         $TagCount = $this->data('RecordCount');
-        if ($TagCount == 0) {
-            echo t("There are no tags in the system yet.");
-        } else {
             $Tags = $this->data('Tags'); ?>
             <tbody>
             <?php
@@ -149,7 +141,6 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
                     <?php } ?>
                 </tr>
             <?php
-            }
         }
 
         ?>

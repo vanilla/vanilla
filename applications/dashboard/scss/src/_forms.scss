@@ -767,18 +767,11 @@ select + select {
   }
 
   .search-icon-wrap {
-    @extend .icon;
-    $btn-icon-height: 24;
-    $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height)) / 2;
-    padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
-    margin: 0 0 0 .5rem;
+    @extend .btn-icon;
+    padding: to-rem(6) to-rem(12);
 
     &:first-child {
       margin-left: 0;
-    }
-
-    svg {
-      height: to-rem($btn-icon-height);
     }
 
     position: absolute;
@@ -791,6 +784,10 @@ select + select {
 
   .search-icon-search-wrap {
     left: 0;
+
+    svg {
+      opacity: 1;
+    }
   }
 
   .search-info {

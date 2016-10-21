@@ -15,23 +15,14 @@ if (checkPermission('Garden.Users.Add')) {
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
-        echo $this->Form->open(array('action' => url('/user/browse')));
-        echo $this->Form->errors();
-        echo '<div class="search-wrap input-wrap">';
-        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
-        echo $this->Form->textBox('Keywords');
-        echo ' ', $this->Form->button(t('Go'), ['class' => 'search-submit']);
-        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/user').'">'.dashboardSymbol('close').'</a>';
-        echo '<div class="info search-info">';
+        $info = '';
         $count = $this->data('RecordCount', $this->data('UserCount', null));
         if ($count !== null) {
-            echo ' ', sprintf(plural($count, '%s user found.', '%s users found.'), $count);
+            $info = sprintf(plural($count, '%s user found.', '%s users found.'), $count);
         } elseif ($this->data('UserEstimate', null) !== null) {
-            echo ' ', sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
+            $info = sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
         }
-        echo '</div>';
-        echo '</div>';
-        echo $this->Form->close();
+        echo $this->Form->searchForm('Keywords', '/user/browse', [], $info);
         ?>
     </div>
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>

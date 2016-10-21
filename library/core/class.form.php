@@ -649,10 +649,19 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
         $clear = '';
-        $searchKeys = ['search', 'Keywords'];
+        $searchTermFound = false;
+        $searchKeys = ['search', 'keywords'];
+
+        $getValues = Gdn::request()->get();
 
         // Check to see if any values in the above array exist in the get request and if so, add a clear button.
-        if (!empty(array_intersect_key(array_fill_keys($searchKeys, ''), Gdn::request()->get()))) {
+        foreach ($getValues as $key => $value) {
+            if (in_array(strtolower($key), $searchKeys)) {
+                $searchTermFound = true;
+            }
+        }
+
+        if ($searchTermFound) {
             $closeIcon = dashboardSymbol('close');
             $clear = '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url($url).'">'.$closeIcon.'</a>';
         }

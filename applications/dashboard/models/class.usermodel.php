@@ -1989,9 +1989,12 @@ class UserModel extends Gdn_Model {
             $FormPostValues['Verified'] = forceBool($FormPostValues['Verified'], '0', '1', '0');
         }
 
+        // Do not allowing setting this via general save.
         unset($FormPostValues['Admin']);
 
-        // Validate the form posted values
+        // This field is deprecated but included on user objects for backwards compatibility.
+        // It will absolutely break if you try to save it back to the database.
+        unset($FormPostValues['AllIPAddresses']);
 
         if (array_key_exists('Gender', $FormPostValues)) {
             $FormPostValues['Gender'] = self::fixGender($FormPostValues['Gender']);

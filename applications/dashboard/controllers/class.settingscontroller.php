@@ -1730,7 +1730,7 @@ class SettingsController extends DashboardController {
                     throw new Exception(sprintf(t("Could not find a theme identified by '%s'"), $ThemeName));
                 }
 
-                Gdn::session()->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+                Gdn::session()->setPreference(array('PreviewMobileThemeName' => '', 'PreviewMobileThemeFolder' => '')); // Clear out the preview
                 Gdn::themeManager()->enableTheme($ThemeName, $IsMobile);
                 $this->EventArguments['ThemeName'] = $ThemeName;
                 $this->EventArguments['ThemeInfo'] = $ThemeInfo;
@@ -1773,42 +1773,73 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param string $ThemeName Unique ID.
+     * @param string $transientKey
      */
-    public function previewTheme($ThemeName = '') {
+    public function previewTheme($ThemeName = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
 
-        $PreviewThemeName = $ThemeName;
-        $PreviewThemeFolder = val('Folder', $ThemeInfo);
-        $IsMobile = val('IsMobile', $ThemeInfo);
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
+            $PreviewThemeName = $ThemeName;
+            $displayName = val('Name', $ThemeInfo);
+            $IsMobile = val('IsMobile', $ThemeInfo);
 
-        // If we failed to get the requested theme, cancel preview
-        if ($ThemeInfo === false) {
-            $PreviewThemeName = '';
-            $PreviewThemeFolder = '';
+            // If we failed to get the requested theme, cancel preview
+            if ($ThemeInfo === false) {
+                $PreviewThemeName = '';
+            }
+
+            if ($IsMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => $PreviewThemeName,
+                    'PreviewMobileThemeName' => $displayName]
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => $PreviewThemeName,
+                    'PreviewThemeName' => $displayName]
+                );
+            }
+
+            $this->fireEvent('PreviewTheme', ['ThemeInfo' => $ThemeInfo]);
+
+            redirect('/');
+        } else {
+            redirect('settings/themes');
         }
-
-        Gdn::session()->setPreference(array(
-            'PreviewThemeName' => $PreviewThemeName,
-            'PreviewThemeFolder' => $PreviewThemeFolder,
-            'PreviewIsMobile' => $IsMobile
-        ));
-
-        redirect('/');
     }
 
     /**
-     * Closes current theme preview.
+     * Closes theme preview.
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param string $previewThemeFolder
+     * @param string $transientKey
      */
-    public function cancelPreview() {
-        $Session = Gdn::session();
-        $IsMobile = $Session->User->Preferences['PreviewIsMobile'];
-        $Session->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '', 'PreviewIsMobile' => ''));
+    public function cancelPreview($previewThemeFolder = '', $transientKey = '') {
+        $this->permission('Garden.Settings.Manage');
+        $isMobile = false;
 
-        if ($IsMobile) {
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $themeInfo = Gdn::themeManager()->getThemeInfo($previewThemeFolder);
+            $isMobile = val('IsMobile', $themeInfo);
+
+            if ($isMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => '',
+                    'PreviewMobileThemeName' => '']
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => '',
+                    'PreviewThemeName' => '']
+                );
+            }
+        }
+
+        if ($isMobile) {
             redirect('settings/mobilethemes');
         } else {
             redirect('settings/themes');

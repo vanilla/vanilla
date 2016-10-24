@@ -11,6 +11,9 @@ $links .= wrap(anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'ht
 $links .= '</ul>';
 
 helpAsset(sprintf(t('About %s'), t('Themes')), sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>'));
+helpAsset(t('About Theme Preview'), t('Not getting what you expect when you preview your theme?').' '
+    .t('Theme preview is limited to displaying the theme\'s template and css.').' '
+    .t('Overridden views or themehooks can have unintended side effects and are not previewed.'));
 helpAsset(t('Need More Help?'), $links);
 
 ?>
@@ -45,11 +48,10 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                 $Author = val('Author', $ThemeInfo, '');
                 $AuthorUrl = val('AuthorUrl', $ThemeInfo, '');
                 $NewVersion = val('NewVersion', $ThemeInfo, '');
+                $allowPreview = val('AllowPreview', $ThemeInfo, true);
                 $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
                 $PreviewUrl = val('IconUrl', $ThemeInfo, false);
-
                 $class = $Active ? ' Enabled' : '';
-                $class .= $PreviewUrl ? ' HasPreview' : '';
                 ?>
                 <li class="<?php echo $class; ?> label-selector-item">
                     <div class="theme-wrap">
@@ -68,7 +70,9 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                                 </div>
                                 <div class="buttons">
                                     <?php echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
-                                    // echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay PreviewAddon', array('target' => '_top'));
+                                    if ($allowPreview) {
+                                        echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay js-preview-addon');
+                                    }
                                     $this->EventArguments['ThemeInfo'] = $ThemeInfo;
                                     $this->fireEvent('AfterThemeButtons'); ?>
                                 </div>

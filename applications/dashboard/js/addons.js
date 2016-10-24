@@ -116,13 +116,14 @@ jQuery(document).ready(function($) {
     };
 
     // Ajax-test addons before enabling
-    $('a.PreviewAddon').click(function() {
+    $('.js-preview-addon').click(function() {
         gdn.clearAddonErrors();
 
         var url = $(this).attr('href');
         var urlParts = url.split('/');
         var addonName = urlParts[urlParts.length - 1];
         var testUrl = gdn.url('/dashboard/settings/testaddon/Theme/' + addonName + '/' + gdn.definition('TransientKey'));
+        var url = url + '/' + gdn.definition('TransientKey');
 
         $.ajax({
             type: "GET",

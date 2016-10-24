@@ -412,6 +412,8 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
             }
 
+            $hasImage = false;
+
             // Default to the site logo if there were no images provided by the controller.
             if (count($this->_Sender->Image()) == 0) {
                 $Logo = c('Garden.ShareImage', c('Garden.Logo', ''));
@@ -423,12 +425,22 @@ if (!class_exists('HeadModule', false)) {
 
                     $Logo = Gdn_Upload::url($Logo);
                     $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
+                    $hasImage = true;
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
                     $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
+                    $hasImage = true;
                 }
             }
+
+            if ($hasImage) {
+                $twitterCardType = 'summary_large_image';
+            } else {
+                $twitterCardType = 'summary';
+            }
+
+            $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
 
             $this->fireEvent('BeforeToString');
 

@@ -253,7 +253,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public static function calcOldInfoArray(Addon $addon) {
         $info = $addon->getInfo();
-        $info = self::convertArrayKeys($info);
+
+        $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
+        $info = $capitalCaseSheme->convertArrayKeys($info, ['RegisterPermissions']);
 
         // This is the basic information from scanPluginFile().
         $name = $addon->getInfoValue('keyRaw', $addon->getKey());
@@ -326,24 +328,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
 
         return $info;
-    }
-
-    /**
-     * Uppercase the first letters of an info array recursively.
-     *
-     * @param array $array The array to change.
-     * @return array Returns a new changed array.
-     */
-    private static function convertArrayKeys(array $array) {
-        $result = [];
-        foreach ($array as $key => $value) {
-            $key = ucfirst($key);
-            if (is_array($value) && !in_array($key, ['RegisterPermissions'])) {
-                $value = self::convertArrayKeys($value);
-            }
-            $result[$key] = $value;
-        }
-        return $result;
     }
 
     /**

@@ -18,8 +18,8 @@ helpAsset(t('Need More Help?'), $links);
 
 ?>
 <div class="header-menu">
-    <a role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/themes'); ?>" class="active"><?php echo t('Desktop Themes'); ?></a>
-    <a href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
+    <a class="header-menu-item active" role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
+    <a class="header-menu-item" href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
 </div>
 <?php
 if ($currentTheme = $this->Data('CurrentTheme')) {

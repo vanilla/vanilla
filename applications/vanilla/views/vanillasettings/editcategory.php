@@ -1,6 +1,6 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php echo $this->data('Title'); ?></h1>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
+echo heading($this->data('Title'), '', '', [], '/vanilla/settings/categories');
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
 echo $this->Form->hidden('ParentCategoryID');

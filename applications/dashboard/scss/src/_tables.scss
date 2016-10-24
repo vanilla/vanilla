@@ -158,7 +158,7 @@
   }
 
   .toggle-wrap {
-    margin-left: $spacer / 4;
+    margin-left: to-rem(12);
     @extend .toggle-wrap-sm;
   }
 

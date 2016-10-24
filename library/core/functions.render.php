@@ -1128,7 +1128,6 @@ if (!function_exists('userPhoto')) {
         $Photo = val('Photo', $FullUser, val('PhotoUrl', $User));
         $Name = val('Name', $FullUser);
         $Title = htmlspecialchars(val('Title', $Options, $Name));
-        $Href = url(userUrl($FullUser));
 
         if ($FullUser && $FullUser['Banned']) {
             $Photo = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
@@ -1145,9 +1144,11 @@ if (!function_exists('userPhoto')) {
             $PhotoUrl = UserModel::getDefaultAvatarUrl($FullUser, 'thumbnail');
         }
 
-        return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-        .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
-        .'</a>';
+        $href = (val('NoLink', $Options)) ? '' : ' href="'.url(userUrl($FullUser)).'"';
+
+        return '<a title="'.$Title.'"'.$href.$LinkClass.'>'
+                .img($PhotoUrl, ['alt' => $Name, 'class' => $ImgClass])
+            .'</a>';
     }
 }
 

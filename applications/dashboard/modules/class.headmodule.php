@@ -410,6 +410,10 @@ if (!class_exists('HeadModule', false)) {
 
             if ($Description = Gdn_Format::reduceWhiteSpaces($this->_Sender->Description())) {
                 $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
+                $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
+            } else {
+                // Required by twitter.
+                $this->addTag('meta', array('name' => 'twitter:description', 'content' => '...'));
             }
 
             $hasImage = false;

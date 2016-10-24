@@ -795,7 +795,7 @@ class RoleModel extends Gdn_Model {
                 left join {$px}Role as r on r.RoleID = ur.RoleID
                 left join {$px}User as u on u.UserID = ur.UserID
             where r.RoleID is null
-                or u.UserId is null
+                or u.UserID is null
         ");
     }
 }

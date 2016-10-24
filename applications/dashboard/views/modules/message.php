@@ -5,7 +5,7 @@ $Message = $this->_Message;
 if (is_array($Message)) {
     echo '<div class="DismissMessage'.($Message['CssClass'] == '' ? '' : ' '.$Message['CssClass']).'">';
     $Session = Gdn::session();
-    if ($Message['AllowDismiss'] == '1' && $Session->isValid()) {
+    if (val('AllowDismiss', $Message) == '1' && $Session->isValid()) {
         echo anchor('&times;', "/dashboard/message/dismiss/{$Message['MessageID']}/".$Session->TransientKey().'?Target='.$this->_Sender->SelfUrl, 'Dismiss');
     }
 

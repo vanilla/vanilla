@@ -408,7 +408,7 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
             }
 
-            if ($Description = Gdn_Format::reduceWhiteSpaces($this->_Sender->Description())) {
+            if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
                 $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
                 $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
             } else {

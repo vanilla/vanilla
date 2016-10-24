@@ -98,6 +98,7 @@ fieldset[disabled] a.btn {
   font-weight: normal;
   color: $link-color;
   border-radius: 0;
+  border-width: 0;
 
   &,
   &:active,
@@ -154,7 +155,8 @@ fieldset[disabled] a.btn {
   margin: 0;
   margin-left: .5rem;
   font-size: $font-size-sm;
-  line-height: to-rem(24);
+  line-height: 1;
+  border-width: 0;
 
   &:first-child {
     margin-left: 0;

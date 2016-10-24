@@ -69,7 +69,8 @@ EOT;
 }
 
 function writeCategoryOptions($category) {
-    $cdd = new DropdownModule('', displayAsSymbol($category['DisplayAs']), 'dropdown-category-options', 'dropdown-menu-right');
+    $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
+    $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'button', 'btn');
     $cdd->setView('dropdown-twbs');
     $cdd->setForceDivider(true);
 

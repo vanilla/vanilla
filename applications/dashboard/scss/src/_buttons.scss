@@ -20,6 +20,29 @@
 //
 // Styleguide 4.1.
 
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+button {
+  background: none;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  line-height: normal;
+  overflow: visible;
+  padding: 0;
+  -webkit-appearance: button; /* for input */
+  -webkit-user-select: none; /* for button */
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+input::-moz-focus-inner,
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
 .btn {
   display: inline-block;
   font-weight: $btn-font-weight;
@@ -153,7 +176,7 @@ fieldset[disabled] a.btn {
   @extend .icon;
   padding: to-rem(3);
   margin: 0;
-  margin-left: .5rem;
+  margin-left: 1rem;
   font-size: $font-size-sm;
   line-height: 1;
   border-width: 0;
@@ -251,6 +274,10 @@ fieldset[disabled] a.btn {
   .btn-group + .btn,
   .btn-group + .btn-group {
     margin-left: -$input-btn-border-width;
+  }
+
+  .btn-icon + .btn-icon {
+    margin-left: to-rem(6);
   }
 }
 

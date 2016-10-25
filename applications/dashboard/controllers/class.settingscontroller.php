@@ -204,9 +204,9 @@ class SettingsController extends DashboardController {
         $this->title(t('Avatars'));
 
         $validation = new Gdn_Validation();
-        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', 'Thumbnail size must be an integer.');
-        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', 'Max avatar width must be an integer.');
-        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', 'Max avatar height must be an integer.');
+        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', t('Thumbnail size must be an integer.'));
+        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', t('Max avatar width must be an integer.'));
+        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', t('Max avatar height must be an integer.'));
 
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(
@@ -709,6 +709,11 @@ class SettingsController extends DashboardController {
      * Garden.EmailTemplate.BackgroundColor
      * Garden.EmailTemplate.ButtonBackgroundColor
      * Garden.EmailTemplate.ButtonTextColor
+     * Garden.EmailTemplate.Image
+     *
+     * Saves the image based on 2 config settings:
+     * Garden.EmailTemplate.ImageMaxWidth (default 400px) and
+     * Garden.EmailTemplate.ImageMaxHeight (default 300px)
      *
      * @throws Gdn_UserException
      */
@@ -756,16 +761,49 @@ class SettingsController extends DashboardController {
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
+            $image = c('Garden.EmailTemplate.Image');
+            try {
+                $upload = new Gdn_UploadImage();
+                // Validate the upload
+                $tmpImage = $upload->validateUpload('EmailImage', false);
+                if ($tmpImage) {
+                    // Generate the target image name
+                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+                    // Delete any previously uploaded images.
+                    if ($image) {
+                        $upload->delete($image);
+                    }
+                    // Save the uploaded image
+                    $parts = $upload->saveImageAs(
+                        $tmpImage,
+                        $imageBaseName,
+                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
+                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
+                    );
+
+                    $imageBaseName = $parts['SaveName'];
+                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
+                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                } else {
+                    $this->Form->addError('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png');
+                }
+            } catch (Exception $ex) {
+                $this->Form->addError($ex);
+            }
+
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
             }
         }
+
         $this->render();
     }
 
     /**
      * Sets up a new Gdn_Email object with a test email.
      *
+     * @param string $image The img src of the previewed image
      * @param string $textColor The hex color code of the text.
      * @param string $backGroundColor The hex color code of the background color.
      * @param string $containerBackgroundColor The hex color code of the container background color.
@@ -773,9 +811,13 @@ class SettingsController extends DashboardController {
      * @param string $buttonBackgroundColor The hex color code of the button background.
      * @return Gdn_Email The email object with the test colors set.
      */
-    public function getTestEmail($textColor = '', $backGroundColor = '', $containerBackgroundColor = '', $buttonTextColor = '', $buttonBackgroundColor = '') {
+    public function getTestEmail($image = '', $textColor = '', $backGroundColor = '', $containerBackgroundColor = '', $buttonTextColor = '', $buttonBackgroundColor = '') {
         $emailer = new Gdn_Email();
         $email = $emailer->getEmailTemplate();
+
+        if ($image) {
+            $email->setImage($image);
+        }
         if ($textColor) {
             $email->setTextColor($textColor);
         }
@@ -801,24 +843,21 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Echoes out a test email with the colors in the post request.
+     * Echoes out a test email with the colors and image in the post request.
      *
      * @throws Exception
      * @throws Gdn_UserException
      */
     public function emailPreview() {
         $request = Gdn::request();
-//        if (!$request->isAuthenticatedPostBack(true)) {
-//            throw new Exception('Requires POST', 405);
-//        }
-
+        $image = $request->post('image', '');
         $textColor = $request->post('textColor', '');
         $backGroundColor = $request->post('backgroundColor', '');
         $containerBackGroundColor = $request->post('containerBackgroundColor', '');
         $buttonTextColor = $request->post('buttonTextColor', '');
         $buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
 
-        echo $this->getTestEmail($textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
+        echo $this->getTestEmail($image, $textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
     }
 
     /**
@@ -841,7 +880,7 @@ class SettingsController extends DashboardController {
             $addressList = $this->Form->getFormValue('EmailTestAddresses');
             $addresses = explode(',', $addressList);
             if (sizeof($addresses) > 10) {
-                $this->Form->addError(sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), '10'));
+                $this->Form->addError('@'.sprintf(t('Too many addresses! We\'ll send up to %s addresses at once.'), '10'));
             } else {
                 $emailer = $this->getTestEmail();
                 $emailer->to($addresses);
@@ -851,7 +890,7 @@ class SettingsController extends DashboardController {
                     if ($emailer->send()) {
                         $this->informMessage(t("The email has been sent."));
                     } else {
-                        $this->Form->addError(t('Error sending email. Please review the addresses and try again.'));
+                        $this->Form->addError('Error sending email. Please review the addresses and try again.');
                     }
                 } catch (Exception $e) {
                     if (debug()) {
@@ -905,7 +944,7 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Endpoint for retrieving email image url.
+     * Endpoint for retrieving current email image url.
      */
     public function emailImageUrl() {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -915,63 +954,6 @@ class SettingsController extends DashboardController {
             $image = Gdn_UploadImage::url($image);
         }
         $this->setData('EmailImage', $image);
-        $this->render();
-    }
-
-    /**
-     * Form for adding an email image.
-     * Exposes the Garden.EmailTemplate.Image setting.
-     * Garden.EmailTemplate.Image must be an upload.
-     *
-     * Saves the image based on 2 config settings:
-     * Garden.EmailTemplate.ImageMaxWidth (default 400px) and
-     * Garden.EmailTemplate.ImageMaxHeight (default 300px)
-     *
-     * @throws Gdn_UserException
-     */
-    public function emailImage() {
-        if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
-            throw permissionException();
-        }
-        $this->addJsFile('email.js');
-        $this->setHighlightRoute('dashboard/settings/email');
-        $image = c('Garden.EmailTemplate.Image');
-        $this->Form = new Gdn_Form();
-        $validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($validation);
-        // Set the model on the form.
-        $this->Form->setModel($configurationModel);
-        if ($this->Form->authenticatedPostBack() !== false) {
-            try {
-                $upload = new Gdn_UploadImage();
-                // Validate the upload
-                $tmpImage = $upload->validateUpload('EmailImage', false);
-                if ($tmpImage) {
-                    // Generate the target image name
-                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
-                    // Delete any previously uploaded images.
-                    if ($image) {
-                        $upload->delete($image);
-                    }
-                    // Save the uploaded image
-                    $parts = $upload->saveImageAs(
-                        $tmpImage,
-                        $imageBaseName,
-                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
-                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
-                    );
-
-                    $imageBaseName = $parts['SaveName'];
-                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
-                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
-                } else {
-                    $this->Form->addError('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png');
-                }
-            } catch (Exception $ex) {
-                $this->Form->addError($ex);
-            }
-        }
         $this->render();
     }
 
@@ -1748,7 +1730,7 @@ class SettingsController extends DashboardController {
                     throw new Exception(sprintf(t("Could not find a theme identified by '%s'"), $ThemeName));
                 }
 
-                Gdn::session()->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+                Gdn::session()->setPreference(array('PreviewMobileThemeName' => '', 'PreviewMobileThemeFolder' => '')); // Clear out the preview
                 Gdn::themeManager()->enableTheme($ThemeName, $IsMobile);
                 $this->EventArguments['ThemeName'] = $ThemeName;
                 $this->EventArguments['ThemeInfo'] = $ThemeInfo;
@@ -1791,42 +1773,73 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param string $ThemeName Unique ID.
+     * @param string $transientKey
      */
-    public function previewTheme($ThemeName = '') {
+    public function previewTheme($ThemeName = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
 
-        $PreviewThemeName = $ThemeName;
-        $PreviewThemeFolder = val('Folder', $ThemeInfo);
-        $IsMobile = val('IsMobile', $ThemeInfo);
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
+            $PreviewThemeName = $ThemeName;
+            $displayName = val('Name', $ThemeInfo);
+            $IsMobile = val('IsMobile', $ThemeInfo);
 
-        // If we failed to get the requested theme, cancel preview
-        if ($ThemeInfo === false) {
-            $PreviewThemeName = '';
-            $PreviewThemeFolder = '';
+            // If we failed to get the requested theme, cancel preview
+            if ($ThemeInfo === false) {
+                $PreviewThemeName = '';
+            }
+
+            if ($IsMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => $PreviewThemeName,
+                    'PreviewMobileThemeName' => $displayName]
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => $PreviewThemeName,
+                    'PreviewThemeName' => $displayName]
+                );
+            }
+
+            $this->fireEvent('PreviewTheme', ['ThemeInfo' => $ThemeInfo]);
+
+            redirect('/');
+        } else {
+            redirect('settings/themes');
         }
-
-        Gdn::session()->setPreference(array(
-            'PreviewThemeName' => $PreviewThemeName,
-            'PreviewThemeFolder' => $PreviewThemeFolder,
-            'PreviewIsMobile' => $IsMobile
-        ));
-
-        redirect('/');
     }
 
     /**
-     * Closes current theme preview.
+     * Closes theme preview.
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param string $previewThemeFolder
+     * @param string $transientKey
      */
-    public function cancelPreview() {
-        $Session = Gdn::session();
-        $IsMobile = $Session->User->Preferences['PreviewIsMobile'];
-        $Session->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '', 'PreviewIsMobile' => ''));
+    public function cancelPreview($previewThemeFolder = '', $transientKey = '') {
+        $this->permission('Garden.Settings.Manage');
+        $isMobile = false;
 
-        if ($IsMobile) {
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $themeInfo = Gdn::themeManager()->getThemeInfo($previewThemeFolder);
+            $isMobile = val('IsMobile', $themeInfo);
+
+            if ($isMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => '',
+                    'PreviewMobileThemeName' => '']
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => '',
+                    'PreviewThemeName' => '']
+                );
+            }
+        }
+
+        if ($isMobile) {
             redirect('settings/mobilethemes');
         } else {
             redirect('settings/themes');
@@ -1837,38 +1850,32 @@ class SettingsController extends DashboardController {
      * Remove the logo from config & delete it.
      *
      * @since 2.1
-     * @param string $TransientKey Security token.
      */
-    public function removeFavicon($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeFavicon() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $Favicon = c('Garden.FavIcon', '');
             RemoveFromConfig('Garden.FavIcon');
             $Upload = new Gdn_Upload();
             $Upload->delete($Favicon);
+            $this->informMessage(sprintf(t('%s deleted.'), t('Favicon')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
      * Remove the share image from config & delete it.
      *
      * @since 2.1
-     * @param string $TransientKey Security token.
      */
-    public function removeShareImage($TransientKey = '') {
-        $this->permission('Garden.Community.Manage');
-
-        if (Gdn::request()->isAuthenticatedPostBack()) {
+    public function removeShareImage() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $ShareImage = c('Garden.ShareImage', '');
             removeFromConfig('Garden.ShareImage');
             $Upload = new Gdn_Upload();
             $Upload->delete($ShareImage);
+            $this->informMessage(sprintf(t('%s deleted.'), t('Share image')));
         }
-
-        $this->RedirectUrl = '/settings/banner';
-        $this->render('Blank', 'Utility');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
 
@@ -1877,17 +1884,15 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $TransientKey Security token.
      */
-    public function removeLogo($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeLogo() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $Logo = c('Garden.Logo', '');
             RemoveFromConfig('Garden.Logo');
             safeUnlink(PATH_ROOT."/$Logo");
+            $this->informMessage(sprintf(t('%s deleted.'), t('Logo')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -1895,17 +1900,15 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $TransientKey Security token.
      */
-    public function removeMobileLogo($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeMobileLogo() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $MobileLogo = c('Garden.MobileLogo', '');
             RemoveFromConfig('Garden.MobileLogo');
             safeUnlink(PATH_ROOT."/$MobileLogo");
+            $this->informMessage(sprintf(t('%s deleted.'), t('Mobile logo')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
 
@@ -1914,7 +1917,6 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $transientKey Security token.
      */
     public function removeDefaultAvatar() {
         if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {

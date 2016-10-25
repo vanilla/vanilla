@@ -204,9 +204,9 @@ class SettingsController extends DashboardController {
         $this->title(t('Avatars'));
 
         $validation = new Gdn_Validation();
-        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', t('Thumbnail size must be an integer.'));
-        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', t('Max avatar width must be an integer.'));
-        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', t('Max avatar height must be an integer.'));
+        $validation->applyRule('Garden.Thumbnail.Size', 'Integer', 'Thumbnail size must be an integer.');
+        $validation->applyRule('Garden.Profile.MaxWidth', 'Integer', 'Max avatar width must be an integer.');
+        $validation->applyRule('Garden.Profile.MaxHeight', 'Integer', 'Max avatar height must be an integer.');
 
         $configurationModel = new Gdn_ConfigurationModel($validation);
         $configurationModel->setField(array(

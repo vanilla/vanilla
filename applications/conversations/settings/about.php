@@ -10,5 +10,6 @@ $ApplicationInfo['Conversations'] = array(
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
-    'License' => 'GNU GPL v2'
+    'License' => 'GNU GPL v2',
+    'Icon' => 'conversations.png'
 );

@@ -20,7 +20,7 @@ $PluginInfo['vanillicon'] = array(
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
    'SettingsPermission' => 'Garden.Settings.Manage',
-   'Icon' => 'vanillicon.svg'
+   'Icon' => 'vanillicon.png'
 );
 
 /**
@@ -74,12 +74,12 @@ class VanilliconPlugin extends Gdn_Plugin {
             'Control' => 'radiolist',
             'Description' => 'Which vanillicon set do you want to use?',
             'Items' => $items,
-            'Options' => array('list' => true, 'listclass' => 'icon-list', 'display' => 'after'),
+            'Options' => array('display' => 'after'),
             'Default' => 'v1'
          )
         ));
 
-        $sender->addSideMenu();
+        
         $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
     }

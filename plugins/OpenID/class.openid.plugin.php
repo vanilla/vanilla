@@ -16,9 +16,11 @@ $PluginInfo['OpenID'] = array(
     'MobileFriendly' => true,
     'SettingsUrl' => '/settings/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',
+    'SocialConnect' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
+    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'Icon' => 'open-id.png'
 );
 
 // 0.2 - Remove redundant enable toggle (2012-03-08 Lincoln)
@@ -311,10 +313,10 @@ class OpenIDPlugin extends Gdn_Plugin {
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(
-            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Checkbox', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
+            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Toggle', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
         ));
 
-        $Sender->addSideMenu();
+        
         $Sender->setData('Title', sprintf(t('%s Settings'), t('OpenID')));
         $Sender->ConfigurationModule = $Conf;
         $Conf->renderAll();

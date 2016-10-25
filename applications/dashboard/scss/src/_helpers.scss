@@ -1,0 +1,205 @@
+// Helpers
+//
+// This is a special scss file in that it is included after all the other css files.
+//
+// These css classes are designed to help a developer add tweaks to a settings page without resorting to inline styles
+// or adding css to the page. Of particular interest are the `padded*` classes. The dashboard design has many elements
+// flush to one another, so margins are never assumed. The `padded*` classes add margins to elements if they need one.
+//
+// Please note that in the following examples, any css class prefixed with `ex-` is not is the admin.css. They are
+// for illustrative purposes only.
+//
+// Styleguide 2.
+
+// Padded Helpers
+//
+// There's a bit of a misnomer here. When we say 'padded', we really mean 'margined'.
+// 'margined' sounds weird, hence 'padded'.
+//
+// Styleguide 2.1.
+
+// Vertical Padding Helpers
+//
+// .padded - Adds a margin to the top and bottom of an element.
+// .padded-top - Adds a margin to the top of an element.
+// .padded-bottom - Adds a margin to the bottom of an element.
+//
+// Markup:
+// <div class="ex-block ex-red">Control Block One</div>
+// <div class="ex-block ex-green {{modifier_class}}">Modified Block Two</div>
+// <div class="ex-block ex-blue">Control Block Three</div>
+//
+// Styleguide 2.1.1.
+
+.padded {
+  margin-top: $spacer;
+  margin-bottom: $spacer;
+}
+
+.padded-top {
+  margin-top: $spacer;
+}
+
+.padded-bottom {
+  margin-bottom: $spacer;
+}
+
+// Horizontal Paddong Helpers
+//
+// .padded-left - Adds a margin to the left of an element.
+// .padded-right - Adds a margin to the right of an element.
+//
+// Markup:
+// <div class="ex-inline">
+//   <div class="ex-block ex-red">Control Block One</div>
+//   <div class="ex-block ex-green {{modifier_class}}">Modified Block Two</div>
+//   <div class="ex-block ex-blue">Control Block Three</div>
+// </div>
+//
+// Styleguide 2.1.2.
+
+.padded-left {
+  margin-left: $spacer;
+}
+
+.padded-right {
+  margin-right: $spacer;
+}
+
+// Flex Helpers
+//
+// These helper classes may be useful for a developer trying to add a component to the toolbar.
+//
+// Styleguide 2.2.
+
+// Flex
+//
+// The flex css class aligns its items in the center vertically, and justifies them with the space-between property.
+// It also add a small margin to its items. Most of the flex elements in the dashboard elements use these properties.
+//
+// .flex-wrap - Adds a flex-wrap property of wrap to wrap items.
+//
+// Markup:
+// <div class="flex {{modifier_class}}">
+//   <div class="ex-block-flex ex-block-wide ex-red">Control Block One</div>
+//   <div class="ex-block-flex ex-block-wide ex-green {{modifier_class}}">Modified Block Two</div>
+//   <div class="ex-block-flex ex-block-wide ex-blue">Control Block Three</div>
+// </div>
+//
+// Styleguide 2.2.1.
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  > * {
+    margin-right: $spacer / 4;
+  }
+
+  > *:last-child {
+    margin-right: 0;
+  }
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+// Filling Extra Space
+//
+// Blocks in this example have a flex-basis of 25%. Applying grow to an element will have it fill the extra space.
+//
+// .shrink - Adds a flex-shrink property of 1 (default).
+// .grow - Adds a flex-grow property of 1.
+//
+// Markup:
+// <div class="ex-flex">
+//   <div class="ex-block-flex ex-red">Control Block One</div>
+//   <div class="ex-block-flex ex-green {{modifier_class}}">Modified Block Two</div>
+//   <div class="ex-block-flex ex-blue">Control Block Three</div>
+// </div>
+//
+// Styleguide 2.2.2.
+
+.shrink {
+  flex-shrink: 1;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+// Ensuring Space
+//
+// Blocks in this example have a flex-basis of 50%. Applying no-shrink to an element will ensure it has this width.
+//
+// .no-shrink - Add a flex-shrink property of 0.
+// .no-grow - Add a flex-grow property of 0 (default).
+//
+// Markup:
+// <div class="ex-flex">
+//   <div class="ex-block-flex ex-block-wide ex-red">Control Block One</div>
+//   <div class="ex-block-flex ex-block-wide ex-green {{modifier_class}}">Modified Block Two</div>
+//   <div class="ex-block-flex ex-block-wide ex-blue">Control Block Three</div>
+// </div>
+//
+// Styleguide 2.2.3.
+
+.no-shrink {
+  flex-shrink: 0;
+}
+
+.no-grow {
+  flex-grow: 0;
+}
+
+// Float Helpers
+//
+// .pull-left - Floats an element to the left.
+// .pull-right - Floats an element to the right.
+//
+// Markup:
+// <div class="clearfix">
+//   <div class="ex-block ex-green {{modifier_class}}">Modified Block One</div>
+//   <div class="ex-block ex-blue">Control Block Two</div>
+// </div>
+//
+// Styleguide 2.3.
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+// Hidden Helper
+//
+// Hide something.
+//
+// .hidden - Hides an element.
+//
+// Markup:
+// <div class="{{modifier_class}}">I am some text.</div>
+//
+// Styleguide 2.5.
+
+.Hidden,
+.hidden {
+  display: none;
+}
+
+// Progress Spinner
+//
+// Indicates some kind of progess is occuring.
+//
+// Markup:
+// <div class="progress"></div>
+//
+// Styleguide 2.6.
+
+.progress {
+  background: url('images/progress.gif') center center no-repeat;
+}

@@ -309,10 +309,13 @@ if (!function_exists('attribute')) {
             $Exclude = $ValueOrExclude;
         }
         foreach ($Name as $Attribute => $Val) {
-            if ($Exclude && StringBeginsWith($Attribute, $Exclude)) {
+            if (empty($Val) || ($Exclude && StringBeginsWith($Attribute, $Exclude))) {
                 continue;
             }
+            if (is_array($Val) && strpos($Attribute, 'data-') === 0) {
+                $Val = json_encode($Val);
 
+            }
             if ($Val != '' && $Attribute != 'Standard') {
                 $Return .= ' '.$Attribute.'="'.htmlspecialchars($Val, ENT_COMPAT, 'UTF-8').'"';
             }
@@ -637,6 +640,11 @@ if (!function_exists('dbdecode')) {
 
         $decodedValue = @unserialize($value);
 
+        if (is_array($value) || is_object($value)) {
+            // IP addresses are binary packed now. Let's convert them from text to binary
+            $decodedValue = ipEncodeRecursive($decodedValue);
+        }
+
         return $decodedValue;
     }
 }
@@ -651,6 +659,12 @@ if (!function_exists('dbencode')) {
     function dbencode($value) {
         if ($value === null || $value === '') {
             return null;
+        }
+
+        if (is_array($value) || is_object($value)) {
+            // IP addresses are binary packed now.
+            // Let's convert them to text so that they can be safely inserted into the text column
+            $value = ipDecodeRecursive($value);
         }
 
         $encodedValue = serialize($value);
@@ -857,10 +871,6 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Invalid URL.', 400);
             }
 
-            if (!defined('HDOM_TYPE_ELEMENT')) {
-                require_once(PATH_LIBRARY.'/vendors/simplehtmldom/simple_html_dom.php');
-            }
-
             $Request = new ProxyRequest();
             $PageHtml = $Request->Request(array(
                 'URL' => $url,
@@ -873,39 +883,39 @@ if (!function_exists('fetchPageInfo')) {
                 throw new Exception('Couldn\'t connect to host.', 400);
             }
 
-            $Dom = str_get_html($PageHtml);
+            $Dom = pQuery::parseStr($PageHtml);
             if (!$Dom) {
                 throw new Exception('Failed to load page for parsing.');
             }
 
             // FIRST PASS: Look for open graph title, desc, images
-            $PageInfo['Title'] = domGetContent($Dom, 'meta[property=og:title]');
+            $PageInfo['Title'] = domGetContent($Dom, 'meta[property="og:title"]');
 
             Trace('Getting og:description');
-            $PageInfo['Description'] = domGetContent($Dom, 'meta[property=og:description]');
-            foreach ($Dom->find('meta[property=og:image]') as $Image) {
-                if (isset($Image->content)) {
-                    $PageInfo['Images'][] = $Image->content;
+            $PageInfo['Description'] = domGetContent($Dom, 'meta[property="og:description"]');
+            foreach ($Dom->query('meta[property="og:image"]') as $Image) {
+                if ($Image->attr('content')) {
+                    $PageInfo['Images'][] = $Image->attr('content');
                 }
             }
 
             // SECOND PASS: Look in the page for title, desc, images
             if ($PageInfo['Title'] == '') {
-                $PageInfo['Title'] = $Dom->find('title', 0)->plaintext;
+                $PageInfo['Title'] = $Dom->query('title')->text();
             }
 
             if ($PageInfo['Description'] == '') {
                 Trace('Getting meta description');
-                $PageInfo['Description'] = domGetContent($Dom, 'meta[name=description]');
+                $PageInfo['Description'] = domGetContent($Dom, 'meta[name="description"]');
             }
 
             // THIRD PASS: Look in the page contents
             if ($PageInfo['Description'] == '') {
-                foreach ($Dom->find('p') as $element) {
+                foreach ($Dom->query('p') as $element) {
                     Trace('Looking at p for description.');
 
                     if (strlen($element->plaintext) > 150) {
-                        $PageInfo['Description'] = $element->plaintext;
+                        $PageInfo['Description'] = $element->text();
                         break;
                     }
                 }
@@ -916,10 +926,10 @@ if (!function_exists('fetchPageInfo')) {
 
             // Final: Still nothing? remove limitations
             if ($PageInfo['Description'] == '') {
-                foreach ($Dom->find('p') as $element) {
+                foreach ($Dom->query('p') as $element) {
                     Trace('Looking at p for description (no restrictions)');
-                    if (trim($element->plaintext) != '') {
-                        $PageInfo['Description'] = $element->plaintext;
+                    if (trim($element->text()) != '') {
+                        $PageInfo['Description'] = $element->text();
                         break;
                     }
                 }
@@ -945,14 +955,15 @@ if (!function_exists('domGetContent')) {
     /**
      * Search a DOM for a selector and return the contents.
      *
-     * @param simple_html_dom $dom The DOM to search.
+     * @param pQuery $dom The DOM to search.
      * @param string $selector The CSS style selector for the content to find.
      * @param string $default The default content to return if the node isn't found.
      * @return string Returns the content of the found node or {@link $default} otherwise.
      */
     function domGetContent($dom, $selector, $default = '') {
-        $Element = $dom->getElementsByTagName($selector);
-        return isset($Element->content) ? $Element->content : $default;
+        $Element = $dom->query($selector);
+        $content = $Element->attr('content');
+        return $content ? $content : $default;
     }
 }
 
@@ -960,18 +971,18 @@ if (!function_exists('domGetImages')) {
     /**
      * Get the images from a DOM.
      *
-     * @param simple_html_dom $dom The DOM to search.
+     * @param pQuery $dom The DOM to search.
      * @param string $url The URL of the document to add to relative URLs.
      * @param int $maxImages The maximum number of images to return.
      * @return array Returns an array in the form: `[['Src' => '', 'Width' => '', 'Height' => ''], ...]`.
      */
     function domGetImages($dom, $url, $maxImages = 4) {
         $Images = array();
-        foreach ($dom->find('img') as $element) {
+        foreach ($dom->query('img') as $element) {
             $Images[] = array(
-                'Src' => absoluteSource($element->src, $url),
-                'Width' => $element->width,
-                'Height' => $element->height
+                'Src' => absoluteSource($element->attr('src'), $url),
+                'Width' => $element->attr('width'),
+                'Height' => $element->attr('height'),
             );
         }
 
@@ -2070,6 +2081,62 @@ if (!function_exists('joinRecords')) {
         }
     }
 
+}
+
+if (!function_exists('jsonEncodeChecked')) {
+    /**
+     * Encode a value as JSON or throw an exception on error.
+     *
+     * @param mixed $value
+     * @param int|null $options
+     * @return string
+     * @throws Exception
+     */
+    function jsonEncodeChecked($value, $options = null) {
+        $advanced = (PHP_VERSION_ID >= 50500);
+
+        if ($options === null) {
+            if ($advanced) {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
+            } else {
+                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
+            }
+        }
+
+        $encoded = json_encode($value, $options);
+        $errorMessage = null;
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            if ($advanced) {
+                if ($encoded === false) {
+                    switch (json_last_error()) {
+                        case JSON_ERROR_UTF8:
+                            $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                            break;
+                        case JSON_ERROR_RECURSION:
+                            $errorMessage = 'One or more recursive references in the value to be encoded.';
+                            break;
+                        case JSON_ERROR_INF_OR_NAN:
+                            $errorMessage = 'One or more NAN or INF values in the value to be encoded';
+                            break;
+                        case JSON_ERROR_UNSUPPORTED_TYPE:
+                            $errorMessage = 'A value of a type that cannot be encoded was given.';
+                            break;
+                        default:
+                            $errorMessage = 'An unknown error has occurred.';
+                    }
+                }
+            } else {
+                $errorMessage = 'An unknown error has occurred.';
+            }
+        }
+
+        if ($errorMessage !== null) {
+            throw new Exception("JSON encoding error: {$errorMessage}", 500);
+        }
+
+        return $encoded;
+    }
 }
 
 if (!function_exists('now')) {
@@ -3844,5 +3911,75 @@ if (!function_exists('urlMatch')) {
         }
 
         return true;
+    }
+}
+
+if (!function_exists('walkAllRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties.
+     *
+     * @param array|object $input
+     * @param callable $callback
+     */
+    function walkAllRecursive(&$input, $callback) {
+        $currentDepth = 0;
+        $maxDepth = 128;
+
+        $walker = function(&$input, $callback, $parent = null) use (&$walker, &$currentDepth, $maxDepth) {
+            $currentDepth++;
+
+            if ($currentDepth > $maxDepth) {
+                throw new Exception('Maximum recursion depth exceeded.', 500);
+            }
+            foreach ($input as $key => &$val) {
+                if (is_array($val) || is_object($val)) {
+                    call_user_func_array($walker, [&$val, $callback, $key]);
+                } else {
+                    call_user_func_array($callback, [&$val, $key, $parent]);
+                }
+            }
+
+            $currentDepth--;
+        };
+
+        call_user_func_array($walker, [&$input, $callback]);
+    }
+}
+
+if (!function_exists('ipEncodeRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties and encode IP fields.
+     *
+     * @param array|object $input
+     * @return array|object
+     */
+    function ipEncodeRecursive($input) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipEncode($val);
+                }
+            }
+        });
+        return $input;
+    }
+}
+
+if (!function_exists('ipDecodeRecursive')) {
+    /**
+     * Recursively walk through all array elements or object properties and decode IP fields.
+     *
+     * @param array|object $input
+     * @return array|object
+     */
+    function ipDecodeRecursive($input) {
+        walkAllRecursive($input, function(&$val, $key = null, $parent = null) {
+            if (is_string($val)) {
+                if (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parent, 'IPAddresses', true)) {
+                    $val = ipDecode($val);
+                }
+            }
+        });
+        return $input;
     }
 }

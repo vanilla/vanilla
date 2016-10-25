@@ -58,7 +58,8 @@ class UserController extends DashboardController {
         $this->addJsFile('jquery.gardenmorepager.js');
         $this->addJsFile('user.js');
         $this->title(t('Users'));
-        $this->addSideMenu('dashboard/user');
+        $this->setHighlightRoute('dashboard/user');
+        Gdn_Theme::section('Moderation');
 
         // Form setup
         $this->Form->Method = 'get';
@@ -154,7 +155,7 @@ class UserController extends DashboardController {
         // Page setup
         $this->addJsFile('user.js');
         $this->title(t('Add User'));
-        $this->addSideMenu('dashboard/user');
+        $this->setHighlightRoute('dashboard/user');
 
         $RoleModel = new RoleModel();
         $AllRoles = $RoleModel->getArray();
@@ -248,12 +249,13 @@ class UserController extends DashboardController {
      */
     public function applicants() {
         $this->permission('Garden.Users.Approve');
-        $this->addSideMenu('dashboard/user/applicants');
+        $this->setHighlightRoute('dashboard/user/applicants');
         $this->addJsFile('applicants.js');
         $this->title(t('Applicants'));
         $this->fireEvent('BeforeApplicants');
         $UserModel = Gdn::userModel();
         $this->UserData = $UserModel->getApplicants();
+        Gdn_Theme::section('Moderation');
         $this->render();
     }
 
@@ -422,7 +424,6 @@ class UserController extends DashboardController {
         $this->setData('_MayDeleteContent', checkPermission('Garden.Moderation.Manage'));
 
         $this->setData('User', $User);
-        $this->addSideMenu();
         $this->title($Unban ? t('Unban User') : t('Ban User'));
         if ($Unban) {
             $this->View = 'Unban';
@@ -482,7 +483,7 @@ class UserController extends DashboardController {
         if ($Session->User->UserID == $UserID) {
             trigger_error(errorMessage("You cannot delete the user you are logged in as.", $this->ClassName, 'FetchViewLocation'), E_USER_ERROR);
         }
-        $this->addSideMenu('dashboard/user');
+        $this->setHighlightRoute('dashboard/user');
         $this->title(t('Delete User'));
 
         $RoleModel = new RoleModel();
@@ -517,6 +518,7 @@ class UserController extends DashboardController {
             $this->Method = $Method;
             if ($Method != '') {
                 $this->View = 'deleteconfirm';
+                $this->RedirectUrl = url('/dashboard/user');
             }
 
             if ($this->Form->authenticatedPostBack(true) && $Method != '') {
@@ -607,7 +609,7 @@ class UserController extends DashboardController {
         // Page setup
         $this->addJsFile('user.js');
         $this->title(t('Edit User'));
-        $this->addSideMenu('dashboard/user');
+        $this->setHighlightRoute('dashboard/user');
 
         // Only admins can reassign roles
         $RoleModel = new RoleModel();
@@ -677,8 +679,10 @@ class UserController extends DashboardController {
 
             $this->Form->setData($User);
             if ($this->Form->authenticatedPostBack(true)) {
-                if (!$CanEditUsername) {
-                    $this->Form->setFormValue("Name", $User['Name']);
+                // Do not re-validate or change the username if disabled or exactly the same.
+                $nameUnchanged = ($User['Name'] === $this->Form->getValue('Name'));
+                if (!$CanEditUsername || $nameUnchanged) {
+                    $this->Form->removeFormValue("Name");
                 }
 
                 // Allow mods to confirm/unconfirm emails

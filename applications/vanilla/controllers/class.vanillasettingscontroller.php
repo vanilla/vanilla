@@ -16,6 +16,9 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array Models to include. */
     public $Uses = array('Database', 'Form', 'CategoryModel');
 
+    /** @var CategoryModel */
+    public $CategoryModel;
+
     /** @var Gdn_Form */
     public $Form;
 
@@ -41,8 +44,6 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
-            'Vanilla.Archive.Date',
-            'Vanilla.Archive.Exclude',
             'Garden.EditContentTimeout',
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
@@ -71,14 +72,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Integer');
-            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
             $ConfigurationModel->Validation->applyRule('Garden.EditContentTimeout', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
-
-            // Grab old config values to check for an update.
-            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
-            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
             // Format the trusted domains as an array based on newlines & spaces
             $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
@@ -89,7 +85,52 @@ class VanillaSettingsController extends Gdn_Controller {
 
             // Save new settings
             $Saved = $this->Form->save();
-            if ($Saved) {
+            if ($Saved !== false) {
+                $this->informMessage(t("Your changes have been saved."));
+            }
+
+            // Reformat array as string so it displays properly in the form
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+
+        }
+
+        $this->setHighlightRoute('vanilla/settings/advanced');
+        $this->addJsFile('settings.js');
+        $this->title(t('Advanced Forum Settings'));
+
+        // Render default view (settings/advanced.php)
+        $this->render();
+    }
+
+    public function archive() {
+        // Check permission
+        $this->permission('Garden.Settings.Manage');
+
+        // Load up config options we'll be setting
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Vanilla.Archive.Date',
+            'Vanilla.Archive.Exclude'
+        ));
+
+        // Set the model on the form.
+        $this->Form->setModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($this->Form->authenticatedPostBack() === false) {
+            $this->Form->setData($ConfigurationModel->Data);
+        } else {
+            // Define some validation rules for the fields being saved
+            $ConfigurationModel->Validation->applyRule('Vanilla.Archive.Date', 'Date');
+
+            // Grab old config values to check for an update.
+            $ArchiveDateBak = Gdn::config('Vanilla.Archive.Date');
+            $ArchiveExcludeBak = (bool)Gdn::config('Vanilla.Archive.Exclude');
+
+            // Save new settings
+            $Saved = $this->Form->save();
+            if ($Saved !== false) {
                 $ArchiveDate = Gdn::config('Vanilla.Archive.Date');
                 $ArchiveExclude = (bool)Gdn::config('Vanilla.Archive.Exclude');
 
@@ -99,17 +140,12 @@ class VanillaSettingsController extends Gdn_Controller {
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
-
-            // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
-
         }
 
-        $this->addSideMenu('vanilla/settings/advanced');
-        $this->addJsFile('settings.js');
-        $this->title(t('Advanced Forum Settings'));
+        $this->setHighlightRoute('vanilla/settings/archive');
+        $this->title(t('Archive Discussions'));
 
-        // Render default view (settings/advanced.php)
+        // Render default view (settings/archive.php)
         $this->render();
     }
 
@@ -157,46 +193,20 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Build and add the Dashboard's side navigation menu.
-     *
-     * EXACT COPY OF DashboardController::addSideMenu(). KEEP IN SYNC.
-     * Dashboard is getting rebuilt. No wisecracks about DRY in the meantime.
-     *
-     * @since 2.0.0
-     * @access public
-     *
-     * @param string|bool $CurrentUrl Path to current location; used to highlight correct item in menu.
+     * @param string $currentUrl
      */
-    public function addSideMenu($CurrentUrl = false) {
-        if (!$CurrentUrl) {
-            $CurrentUrl = strtolower($this->SelfUrl);
+    public function setHighlightRoute($currentUrl = '') {
+        if ($currentUrl) {
+            DashboardNavModule::getDashboardNav()->setHighlightRoute($currentUrl);
         }
+    }
 
-        // Only add to the assets if this is not a view-only request
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $SideMenu = new SideMenuModule($this);
-
-            // Add the heading here so that they sort properly.
-            $SideMenu->addItem('Dashboard', t('Dashboard'), false, array('class' => 'Dashboard'));
-            $SideMenu->addItem('Appearance', t('Appearance'), false, array('class' => 'Appearance'));
-            $SideMenu->addItem('Users', t('Users'), false, array('class' => 'Users'));
-            $SideMenu->addItem('Moderation', t('Moderation'), false, array('class' => 'Moderation'));
-
-            // Hook for initial setup. Do NOT use this for addons.
-            $this->EventArguments['SideMenu'] = $SideMenu;
-            $this->fireEvent('earlyAppSettingsMenuItems');
-
-            // Module setup.
-            $SideMenu->HtmlId = '';
-            $SideMenu->highlightRoute($CurrentUrl);
-            $SideMenu->Sort = c('Garden.DashboardMenu.Sort');
-
-            // Hook for adding to menu. USE THIS FOR YOUR ADDON.
-            $this->fireAs('SettingsController');
-            $this->fireEvent('GetAppSettingsMenuItems');
-
-            $this->addModule($SideMenu, 'Panel');
-        }
+    /**
+     * @param string $currentUrl
+     */
+    public function addSideMenu($currentUrl = '') {
+        deprecated('addSideMenu', 'setHighlightRoute');
+        $this->setHighlightRoute($currentUrl);
     }
 
     /**
@@ -211,10 +221,12 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Display options
         $this->title(t('Flood Control'));
-        $this->addSideMenu('vanilla/settings/floodcontrol');
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('vanilla/settings/floodcontrol');
 
         // Check to see if Conversation is enabled.
         $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
+        $this->setData('IsConversationsEnabled', $IsConversationsEnabled);
 
         $ConfigurationFields = array(
             'Vanilla.Discussion.SpamCount',
@@ -297,16 +309,16 @@ class VanillaSettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      */
-    public function addCategory() {
+    public function addCategory($parent = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
-        $this->addJsFile('categories.js');
+        $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Add Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Prep models
         $RoleModel = new RoleModel();
@@ -320,6 +332,8 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->fireEvent('AddEditCategory');
         $this->setupDiscussionTypes(array());
 
+        $displayAsOptions = CategoryModel::getDisplayAsOptions();
+
         if ($this->Form->authenticatedPostBack()) {
             // Form was validly submitted
             $IsParent = $this->Form->getFormValue('IsParent', '0');
@@ -331,13 +345,28 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
+            $upload = new Gdn_Upload();
+            $tmpImage = $upload->validateUpload('PhotoUpload', false);
+            if ($tmpImage) {
+                // Generate the target image name
+                $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+
+                // Save the uploaded image
+                $parts = $upload->saveAs(
+                    $tmpImage,
+                    $imageBaseName
+                );
+                $this->Form->setFormValue('Photo', $parts['SaveName']);
+            }
+
             $CategoryID = $this->Form->save();
             if ($CategoryID) {
                 $Category = CategoryModel::categories($CategoryID);
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('vanilla/settings/categories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -347,6 +376,17 @@ class VanillaSettingsController extends Gdn_Controller {
                 unset($CategoryID);
             }
         } else {
+            if ($parent) {
+                $category = CategoryModel::categories($parent);
+                if ($category) {
+                    $this->Form->setValue('ParentCategoryID', $category['CategoryID']);
+
+                    if (val('DisplayAs', $category) === 'Flat') {
+                        unset($displayAsOptions['Heading']);
+                    }
+                }
+            }
+
             $this->Form->addHidden('CodeIsDefined', '0');
         }
 
@@ -358,8 +398,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('PermissionData', $Permissions, true);
         }
 
-        // Render default view
-        $this->render();
+        $this->setData('Operation', 'Add');
+        $this->setData('DisplayAsOptions', $displayAsOptions);
+        $this->render('editcategory', 'vanillasettings', 'vanilla');
     }
 
     /**
@@ -410,9 +451,9 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
         // Set up head
-        $this->addJsFile('categories.js');
+        $this->addJsFile('manage-categories.js');
         $this->title(t('Delete Category'));
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
@@ -478,7 +519,7 @@ class VanillaSettingsController extends Gdn_Controller {
                         $this->Form->addError($ex);
                     }
                     if ($this->Form->errorCount() == 0) {
-                        $this->RedirectUrl = url('vanilla/settings/managecategories');
+                        $this->RedirectUrl = url('vanilla/settings/categories');
                         $this->informMessage(t('Deleting category...'));
                     }
                 }
@@ -490,31 +531,24 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Deleting a category photo.
+     * Delete a category photo.
      *
      * @since 2.1
      * @access public
      *
-     * @param int $CategoryID Unique ID of the category to have its photo deleted.
+     * @param String $CategoryID Unique ID of the category to have its photo deleted.
      */
-    public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
+    public function deleteCategoryPhoto($CategoryID = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
-        $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
-
-        if (Gdn::session()->validateTransientKey($TransientKey)) {
-            // Do removal, set message, redirect
+        if ($CategoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
+            // Do removal, set message
             $CategoryModel = new CategoryModel();
             $CategoryModel->setField($CategoryID, 'Photo', null);
-            $this->informMessage(t('Category photo has been deleted.'));
+            $this->informMessage(t('Category photo was successfully deleted.'));
         }
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($RedirectUrl);
-        } else {
-            $this->RedirectUrl = url($RedirectUrl);
-            $this->render();
-        }
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -558,13 +592,6 @@ class VanillaSettingsController extends Gdn_Controller {
         $PermissionModel = Gdn::permissionModel();
         $this->Form->setModel($this->CategoryModel);
 
-        $displayAsOptions = [
-            'Discussions' => 'Discussions',
-            'Categories' => 'Nested Categories',
-            'Flat' => 'Flat Categories',
-            'Heading' => 'Heading'
-        ];
-
         if (!$CategoryID && $this->Form->authenticatedPostBack()) {
             if ($ID = $this->Form->getFormValue('CategoryID')) {
                 $CategoryID = $ID;
@@ -580,6 +607,8 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->Category = (object)$this->Category;
         $this->Category->CustomPermissions = $this->Category->CategoryID == $this->Category->PermissionCategoryID;
 
+        $displayAsOptions = categoryModel::getDisplayAsOptions();
+
         // Restrict "Display As" types based on parent.
         $parentCategory = $this->CategoryModel->getID($this->Category->ParentCategoryID);
         $parentDisplay = val('DisplayAs', $parentCategory);
@@ -589,11 +618,11 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Set up head
         $this->addJsFile('jquery.alphanumeric.js');
-        $this->addJsFile('categories.js');
+        $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.gardencheckboxgrid.js');
         $this->title(t('Edit Category'));
 
-        $this->addSideMenu('vanilla/settings/managecategories');
+        $this->setHighlightRoute('vanilla/settings/categories');
 
         // Make sure the form knows which item we are editing.
         $this->Form->addHidden('CategoryID', $CategoryID);
@@ -637,7 +666,7 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/managecategories');
+                    redirect('vanilla/settings/categories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -659,7 +688,74 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('Operation', 'Edit');
         $this->setData('DisplayAsOptions', $displayAsOptions);
+        $this->render();
+    }
+
+    /**
+     * Manage the category hierarchy.
+     *
+     * @param string $parent The URL slug of a parent category if looking at a sub tree.
+     */
+    public function categories($parent = '') {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+        $this->setHighlightRoute('vanilla/settings/categories');
+
+        // Make sure we are reading the categories from the database only.
+        $collection = $this->CategoryModel->createCollection(Gdn::sql(), new Gdn_Dirtycache());
+
+        $allowSorting = true;
+
+        $usePagination = false;
+        $perPage = 30;
+        $page = Gdn::request()->get('Page', Gdn::request()->get('page', null));
+        list($offset, $limit) = offsetLimit($page, $perPage);
+
+        if (!empty($parent)) {
+            $categoryRow = $collection->get((string)$parent);
+            if (empty($categoryRow)) {
+                throw notFoundException('Category');
+            }
+            $this->setData('Category', $categoryRow);
+            $parentID = $categoryRow['CategoryID'];
+            $parentDisplayAs = val('DisplayAs', $categoryRow);
+
+            if (in_array($parentDisplayAs, ['Flat'])) {
+                $allowSorting = false;
+                $usePagination = true;
+            }
+        } else {
+            $parentID = -1;
+            $parentDisplayAs = false;
+        }
+
+        if ($parentID > 0 && $parentDisplayAs === 'Flat') {
+            $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
+        } else {
+            $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
+        }
+
+        $this->setData('ParentID', $parentID);
+        $this->setData('Categories', $categories);
+        $this->setData('_Limit', $perPage);
+        $this->setData('_CurrentRecords', count($categories));
+
+        if ($parentID > 0) {
+            $ancestors = $collection->getAncestors($parentID, true);
+            $this->setData('Ancestors', $ancestors);
+        }
+
+        $this->setData('AllowSorting', $allowSorting);
+        $this->setData('UsePagination', $usePagination);
+
+        $this->addDefinition('AllowSorting', $allowSorting);
+
+        $this->addJsFile('category-settings.js');
+        $this->addJsFile('manage-categories.js');
+        $this->addJsFile('jquery.nestable.js');
+        require_once $this->fetchViewLocation('category-settings-functions');
+        $this->addAsset('Content', $this->fetchView('symbols'));
         $this->render();
     }
 
@@ -670,12 +766,14 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function manageCategories() {
+
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->addSideMenu('vanilla/settings/managecategories');
-
-        $this->addJsFile('categories.js');
+        $this->setHighlightRoute('vanilla/settings/categories');
+        $this->addJsFile('manage-categories.js');
         $this->addJsFile('jquery.alphanumeric.js');
+
+
 
 
         // This now works on latest jQuery version 1.10.2
@@ -791,13 +889,39 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Enabled', $enabled);
 
             if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->RedirectUrl = url('/vanilla/settings/managecategories');
+                $this->RedirectUrl = url('/vanilla/settings/categories');
             }
         } else {
             throw forbiddenException('GET');
         }
 
         return $this->render('Blank', 'Utility', 'Dashboard');
+    }
+
+    /**
+     * Set the display as property of a category.
+     *
+     * @throws Gdn_UserException Throws an exception of the posted data is incorrect.
+     */
+    public function categoryDisplayAs() {
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
+        if ($this->Request->isAuthenticatedPostBack(true)) {
+            $categoryID = $this->Request->post('CategoryID');
+            $displayAs = $this->Request->post('DisplayAs');
+
+            if (!$categoryID || !$displayAs) {
+                throw new Gdn_UserException("CategoryID and DisplayAs are required", 400);
+            }
+
+            $this->CategoryModel->setField($categoryID, 'DisplayAs', $displayAs);
+            $category = CategoryModel::categories($categoryID);
+            $this->setData('CategoryID', $category['CategoryID']);
+            $this->setData('DisplayAs', $category['DisplayAs']);
+        } else {
+            throw new Gdn_UserException(Gdn::request()->requestMethod().' not allowed.', 405);
+        }
+        $this->render();
     }
 
     /**
@@ -818,6 +942,27 @@ class VanillaSettingsController extends Gdn_Controller {
             $Saves = $this->CategoryModel->SaveTree($TreeArray);
             $this->setData('Result', true);
             $this->setData('Saves', $Saves);
+        }
+
+        // Renders true/false rather than template
+        $this->render();
+    }
+
+    /**
+     * Sorting display order of categories.
+     */
+    public function categoriesTree() {
+        // Check permission
+        $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
+
+        if ($this->Request->isAuthenticatedPostBack(true)) {
+            $tree = json_decode($this->Request->post('Subtree'), true);
+            $this->CategoryModel->saveSubtree($tree, $this->Request->post('ParentID', -1));
+
+            $this->setData('Result', (count($this->CategoryModel->Validation->results()) === 0));
+            $this->setData('Validation', $this->CategoryModel->Validation->resultsArray());
+        } else {
+            throw new Gdn_UserException($this->Request->requestMethod().' is not allowed.', 405);
         }
 
         // Renders true/false rather than template

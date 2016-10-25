@@ -1,93 +1,25 @@
-<style type="text/css">
-    .Configuration {
-        margin: 0 20px 20px;
-        background: #f5f5f5;
-        float: left;
-    }
-
-    .ConfigurationForm {
-        border-right: 1px solid #aaa;
-        padding: 20px;
-        float: left;
-    }
-
-    .ConfigurationForm .InputBox {
-        width: 350px;
-    }
-
-    #Content form .ConfigurationForm ul {
-        padding: 0;
-    }
-
-    #Content form .ConfigurationForm input.Button {
-        margin: 0;
-    }
-
-    .ConfigurationHelp {
-        margin-left: 400px;
-        padding: 20px;
-    }
-
-    .ConfigurationHelp strong {
-        display: block;
-    }
-
-    .ConfigurationHelp img {
-        width: 99%;
-    }
-
-    .ConfigurationHelp a img {
-        border: 1px solid #aaa;
-    }
-
-    .ConfigurationHelp a:hover img {
-        border: 1px solid #777;
-    }
-
-    .StatisticsVerification {
-        padding: 10px;
-        margin: 10px 0px;
-    }
-
-    .StatisticsOk {
-        background: #d6ffcf;
-        color: #06a800;
-    }
-
-    .StatisticsProblem {
-        background: #ffd1d1;
-        color: #c90000;
-    }
-</style>
-<?php echo $this->Form->open(); ?>
 <div class="Configuration">
     <div class="ConfigurationForm">
         <ul>
-            <li>
-                <?php echo $this->Form->label('API Status'); ?>
-                <div class="Async js-popin" rel="statistics/verify"></div>
+            <li class="form-group">
+                <div class="label-wrap-wide">
+                    <?php echo $this->Form->label('API Status'); ?>
+                </div>
+                <div class="input-wrap-right">
+                    <div class="Async js-popin" rel="statistics/verify"></div>
+                </div>
             </li>
-            <li>
-                <?php
-                echo $this->Form->label('Application ID', 'InstallationID');
-                echo $this->Form->textBox('InstallationID');
-                ?>
+            <li class="form-group">
+                <?php echo $this->Form->labelWrap('Application ID', 'InstallationID'); ?>
+                <?php echo $this->Form->textBoxWrap('InstallationID'); ?>
             </li>
-            <li>
-                <?php
-                echo $this->Form->label('Application Secret', 'InstallationSecret');
-                echo $this->Form->textBox('InstallationSecret');
-                ?>
+            <li class="form-group">
+                <?php echo $this->Form->labelWrap('Application Secret', 'InstallationSecret'); ?>
+                <?php echo $this->Form->textBoxWrap('InstallationSecret'); ?>
             </li>
         </ul>
-        <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
-    </div>
-    <div class="ConfigurationHelp">
-        <strong><?php echo t("About Vanilla Statistics"); ?></strong>
-
-        <p><?php echo t("About.VanillaStatistics", "It is vitally important to the life of this free, open-source software that we accurately measure the reach and effectiveness of Vanilla. We ask that you please do not disable the reporting of this data."); ?></p>
-
-        <p><?php echo t("About.DisableStatistics", "If you must disable this data reporting for some business reason, you can do so by adding the following line to your installation's configuration file: <code>\$Configuration['Garden']['Analytics']['Enabled'] = FALSE;</code>"); ?></p>
+        <div class="form-footer js-modal-footer">
+            <?php echo $this->Form->button('Save'); ?>
+        </div>
     </div>
 </div>
-<?php echo $this->Form->close(); ?>

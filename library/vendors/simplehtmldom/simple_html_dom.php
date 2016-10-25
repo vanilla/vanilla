@@ -1,4 +1,8 @@
 <?php
+if (function_exists('deprecated')) {
+    deprecated('Simple HTML DOM', 'pQuery');
+}
+
 /**
  * Website: http://sourceforge.net/projects/simplehtmldom/
  * Acknowledge: Jose Solorzano (https://sourceforge.net/projects/php-html/)
@@ -1389,5 +1393,3 @@ class simple_html_dom {
     function getElementsByTagName($name, $idx=-1) {return $this->find($name, $idx);}
     function loadFile() {$args = func_get_args();$this->load_file($args);}
 }
-
-?>

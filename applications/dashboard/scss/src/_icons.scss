@@ -1,0 +1,54 @@
+// Icons
+//
+// Styleguide 3.
+
+// Icon Rendering
+//
+// The icons in the Vanilla dashboard are in a svg map that's loaded on every page. In order to use one of these
+// icons, we make use of svg's use element, which clones the map svg into the shadow DOM.
+// Learn more: http://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
+//
+// PHP rendering function: `dashboardSymbol(iconSlug, alt, cssClass);`
+//
+// .icon-text - Same color and size as default body text.
+// .icon-9 - 9 pixel icon.
+// .icon-10 - 10 pixel icon.
+// .icon-11 - 11 pixel icon.
+// .icon-12 - 12 pixel icon.
+// .icon-16 - 16 pixel icon.
+// .icon-24 - 24 pixel icon.
+// .icon-30 - 10 pixel icon.
+// .icon-48 - 48 pixel icon.
+//
+// Markup:
+// Here's some text and an icon:
+// <svg class="icon icon-svg icon-svg-spoof {{modifier_class}}" viewBox="0 0 17 17">
+//   <use xlink:href="#spoof" />
+// </svg>
+//
+// Styleguide 3.1.
+
+.icon {
+  &,
+  svg {
+    vertical-align: middle;
+    display: inline-block;
+  }
+}
+
+@each $icon-size in map-keys($icon-sizes) {
+  .icon-#{$icon-size} {
+    &,
+    svg {
+      height: to-rem($icon-size);
+      width: to-rem($icon-size);
+    }
+  }
+}
+
+.icon-text {
+  width: $font-size-base;
+  height: $font-size-base;
+  fill: $grey-dark;
+  vertical-align: middle;
+}

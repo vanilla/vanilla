@@ -135,7 +135,7 @@ Copyright 2007 Chris Wanstrath [ chris@ozmm.org ]
 
       $('#'+settings.popupId+' .Body').css({
          'max-height': pagesize[3] * .8,
-         'overflow-y': 'scroll'
+         'overflow-y': 'auto'
       });
 
       $(document).bind('keydown.popup', function(e) {

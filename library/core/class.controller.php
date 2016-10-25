@@ -185,9 +185,6 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var array An array of JS file names to search for in app folders & include in the page. */
     protected $_JsFiles;
 
-    /**  @var array */
-    protected $_Staches;
-
     /**
      * @var array If JSON is going to be delivered to the client (see the render method),
      * this property will hold the values being sent.
@@ -407,27 +404,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         $this->fireEvent('AfterAddModule');
-    }
-
-
-    /**
-     * Add a Mustache template to the output
-     *
-     * @param string $Template
-     * @param string $ControllerName Optional.
-     * @param string $ApplicationFolder Optional.
-     * @return boolean
-     */
-    public function addStache($Template = '', $ControllerName = false, $ApplicationFolder = false) {
-
-        $Template = StringEndsWith($Template, '.stache', true, true);
-        $StacheTemplate = "{$Template}.stache";
-        $TemplateData = $this->fetchView($StacheTemplate, $ControllerName, $ApplicationFolder);
-
-        if ($TemplateData === false) {
-            return false;
-        }
-        $this->_Staches[$Template] = $TemplateData;
     }
 
     /**
@@ -1303,8 +1279,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
             }
 
-            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-            $this->_Json['Data'] = $Json;
+            $json = ipDecodeRecursive($this->_Json);
+            $json = json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+            $this->_Json['Data'] = $json;
             exit($this->_Json['Data']);
         } else {
             if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
@@ -1470,6 +1447,8 @@ class Gdn_Controller extends Gdn_Pluggable {
 
         $this->sendHeaders();
 
+        $Data = ipDecodeRecursive($Data);
+
         // Check for a special view.
         $ViewLocation = $this->fetchViewLocation(($this->View ? $this->View : $this->RequestMethod).'_'.strtolower($this->deliveryMethod()), false, false, false);
         if (file_exists($ViewLocation)) {
@@ -1497,15 +1476,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                 break;
             case DELIVERY_METHOD_JSON:
             default:
+                $jsonData = jsonEncodeChecked($Data);
+
                 if (($Callback = $this->Request->get('callback', false)) && $this->allowJSONP()) {
                     safeHeader('Content-Type: application/javascript; charset=utf-8', true);
                     // This is a jsonp request.
-                    echo $Callback.'('.json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).');';
+                    echo "{$Callback}({$jsonData});";
                     return true;
                 } else {
                     safeHeader('Content-Type: application/json; charset=utf-8', true);
                     // This is a regular json request.
-                    echo json_encode($Data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+                    echo $jsonData;
                     return true;
                 }
                 break;

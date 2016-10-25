@@ -1,0 +1,1005 @@
+// Forms
+//
+// Find the dashboard form styling here.
+//
+// Styleguide 5.
+
+form {
+  ul,
+  ol {
+    @include list-reset;
+  }
+}
+
+.row-padding-left {
+  padding-left: $padding-row;
+}
+
+.row-padding-right {
+  padding-right: $padding-row;
+}
+
+// Form Layout
+//
+// Here's how to build a basic form group. The three important classes are the `form-group` class on the wrapper
+// around the entire form field, the `label-wrap` class on the wrapper around the label, and the `input-wrap` class
+// on the wrapper around the from input.
+//
+// PHP rendering: If you use Gdn_Form `simple()` to render your forms, the markup will render like this.
+// Otherwise, you'll have to add the wrapper classes manually and/or by using the help of the `*Wrap()`
+// functions in Gdn_Form that will add the `label-wrap` div or `input-wrap` div to a field.
+//
+// Styleguide 5.1.
+
+// Basic Form Layout
+//
+// Here's an example of a basic form layout. If you have other plans for your label element, you can mimic a label by
+// adding the `label` class to a div around your fake label. Accessibility matters, though. Don't forget to add
+// appropriate aria-label or aria-labelledby attributes in these cases.
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label for="fieldID1">Label</label>
+//          <div class="info">
+//            Here's some info text for this field.
+//          </div>
+//       </div>
+//       <div class="input-wrap">
+//         <input type="text" id="fieldID1" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <div class="label" id="fieldID2-label">Another (fake) Label</div>
+//       </div>
+//       <div class="input-wrap">
+//         <input type="text" id="fieldID2" aria-labelledby="fieldID2-label" class="form-control" />
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.1.
+
+// Form Layout Variants
+//
+// This example showcases a few examples that illustrate how you can play with some variants on the default.
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label for="fieldID1">Normal label and form input</label>
+//          <div class="info">
+//            Here's some info text for this field. I'm giving a little description of what this field
+//            does and how it affects the user.
+//          </div>
+//       </div>
+//       <div class="input-wrap">
+//         <input type="text" id="fieldID1" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="label-wrap-wide">
+//          <label for="fieldID2">
+//            Wide label and narrow form input, useful for small text inputs or toggles
+//          </label>
+//          <div class="info">
+//            Here's some info text for this field. I'm giving a little description of what this field
+//            does and how it affects the user.
+//          </div>
+//       </div>
+//       <div class="input-wrap-right">
+//         <input type="text" id="fieldID2" class="form-control" />
+//       </div>
+//     </li>
+//     <li class="form-group">
+//       <div class="input-wrap no-label">
+//         <input type="text" id="fieldID3" class="form-control" placeholder="No Label"/>
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.2.
+
+.form-group {
+  @extend .row;
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+  border-bottom: $border-width dotted #e7e8e9;
+
+  &:first-child {
+    border-top: $border-width solid $border-color;
+    @include has-top-border;
+  }
+
+  > .no-grid {
+    @extend .row-padding-left;
+    @extend .row-padding-right;
+  }
+
+  > .input-wrap {
+    @extend .col-sm-14;
+    @extend .col-xs-24;
+
+    &.no-label {
+      @extend .col-sm-offset-10;
+      @extend .col-xs-offset-0;
+    }
+  }
+
+  > .label-wrap {
+    @extend .col-sm-10;
+    @extend .col-xs-24;
+  }
+
+  > .label-wrap-wide {
+    @extend .col-sm-10;
+    @extend .col-xs-12;
+    flex-grow: 1;
+  }
+
+  .input-wrap-right {
+    @extend .row-padding-left;
+    @extend .row-padding-right;
+  }
+
+  @include media-breakpoint-down(xs) {
+    .input-wrap {
+      margin-top: $spacer / 4;
+    }
+  }
+}
+
+// Radio and Checkbox Groups
+//
+// If you have a form field with multiple options, you can display them inline, or stacked.
+//
+// .inline - Displays input inline.
+//
+// Markup:
+// <form>
+//   <ul>
+//     <li class="form-group">
+//       <div class="label-wrap">
+//          <label>Checkbox field with multiple options</label>
+//          <div class="info">Info text for field</div>
+//       </div>
+//       <div class="input-wrap {{modifier_class}}">
+//         <label><input type="checkbox" id="fieldID1" class="form-control">Option One</label>
+//         <label><input type="checkbox" id="fieldID2" class="form-control">Option Two</label>
+//         <label><input type="checkbox" id="fieldID3" class="form-control">Option Three</label>
+//       </div>
+//     </li>
+//   </ul>
+// </form>
+//
+// Styleguide 5.1.3.
+
+label,
+.label {
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.input-wrap:not(.inline) label {
+  display: block;
+}
+
+.input-wrap.inline {
+  label {
+    margin-right: $spacer / 4;
+  }
+}
+
+.form-control {
+  line-height: 1.5;
+  padding-top: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  padding-bottom: ($control-height-rem - ($border-width * 2) - ($font-size-base * $line-height)) / 2;
+  border: $border-width solid #ccc;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: $spacer 0;
+}
+
+.label-wrap {
+
+  min-width: 0;
+  overflow: hidden;
+
+  img {
+    @extend .padded;
+    max-width: 50%;
+    max-height: to-rem(180); // Something sane.
+  }
+}
+
+// For cases where there are form groups in input-wraps (see Ranks add/edit form)
+.input-wrap > .form-group {
+  border: 0;
+  padding-top: 0;
+  padding-bottom: $spacer;
+  margin-left: 0;
+  margin-right: 0;
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+
+  > * {
+    padding-left: 0;
+  }
+}
+
+// Handles case where there are more than one inputs in the input-wrap. i.e., a select and a button.
+.input-wrap-multiple {
+  display: flex;
+
+  > *:last-child {
+    margin-left: $spacer / 2;
+  }
+}
+
+// Toggles
+//
+// Toggles can either be a checkbox form element or an anchor.
+//
+// Styleguide 5.2.
+
+// Anchor Toggle
+//
+// Here's how to build an anchor toggle.
+//
+// .toggle-wrap-on - On state.
+//
+// Markup:
+// <div class="toggle-wrap {{modifier_class}}">
+//   <a>
+//     <div class="toggle-well"></div>
+//     <div class="toggle-slider"></div>
+//   </a>
+// </div>
+//
+// Styleguide 5.2.1.
+
+.toggle-wrap {
+  @include toggle($toggle-height, $toggle-padding);
+}
+
+.toggle-box-label-wrap {
+  padding-left: $padding-row;
+}
+
+.toggle-wrap-sm {
+  @include toggle($toggle-height-sm, $toggle-padding-sm);
+}
+
+// Checkbox Toggle
+//
+// Here's how to build an checkbox toggle.
+//
+// PHP rendering: The toggle() function in Gdn_Form. Also supported in simple().
+//
+// Markup:
+// <div class="toggle-wrap">
+//   <input id="toggle-checkbox" type="checkbox" class="toggle-input" />
+//   <label for="toggle-checkbox"></label>
+// </div>
+//
+// Styleguide 5.2.2.
+
+.toggle-wrap {
+  label {
+    display: inline;
+  }
+
+  input[type="checkbox"] {
+    position: absolute;
+    margin-left: -9999px;
+    visibility: hidden;
+
+    + label {
+      &::before,
+      &::after {
+        content: '';
+      }
+
+      &::before {
+        @extend .toggle-well;
+      }
+
+      &::after {
+        @extend .toggle-slider;
+      }
+    }
+  }
+
+  // When checked, move and change background color
+  input[type="checkbox"]:checked + label::before {
+    @extend .toggle-well-on;
+  }
+
+  input[type="checkbox"]:checked + label::after {
+    @extend .toggle-slider-on;
+  }
+}
+
+// Color Pickers
+//
+// Color pickers provide an interface for the user to choose a color.
+//
+// Markup:
+// <div class="js-color-picker color-picker ">
+//   <input type="text" class="js-color-picker-value color-picker-value hidden" />
+//   <input type="text" class="js-color-picker-text color-picker-text form-control" />
+//   <span class="js-color-picker-preview color-picker-preview"></span>
+//   <input type="color" class="js-color-picker-color color-picker-color" />
+// </div>
+//
+// Styleguide 5.4
+
+.color-picker {
+  position: relative;
+  @extend .input-wrap;
+}
+
+// Hide the html color input
+.color-picker-color {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  padding: 0;
+}
+
+.color-picker-preview {
+  position: absolute;
+  top: $spacer / 4;
+  right: ($spacer / 4) + $border-width;
+  width: 2.5rem;
+  height: 2rem - ($spacer / 4);
+  background: $black;
+  border: $border-width solid $border-color;
+  cursor: pointer;
+}
+
+// File Upload
+//
+// Input for a file upload.
+//
+// Markup:
+// <label class="file-upload">
+//   <input type="file" name="Logo" id="Form_Logo" class=" js-file-upload form-control">
+//   <span class="file-upload-choose">Choose</span>
+//   <span class="file-upload-browse">Browse</span>
+// </label>
+//
+// Styleguide 5.5.
+
+.file-upload {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+  font-weight: 400;
+  cursor: pointer;
+
+  input {
+    margin: 0;
+    filter: alpha(opacity = 0);
+    opacity: 0;
+  }
+}
+
+.file-upload-choose {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  padding: $control-padding-y $spacer * 3 / 4;
+  color: $grey;
+  border: $input-btn-border-width solid $input-border-color;
+  border-radius: $border-radius;
+}
+
+.file-upload-browse {
+  position: absolute;
+  top: 0;
+  right: 0;
+  @extend .btn;
+  @extend .btn-secondary;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+// Focus state
+.file-upload input:focus,
+.file-upload input:hover {
+  ~ .file-upload-choose,
+  ~ .file-upload-browse {
+    border-color: #66afe9;
+    outline: none;
+    @extend .active;
+  }
+}
+
+
+// Select
+//
+// Includes IE9-specific hacks (noted by ` \9`).
+select,
+select.form-control {
+  display: inline-block;
+  height: $control-height-rem;
+  max-width: 100%;
+  padding-right: 2rem;
+  padding-left: .75rem;
+
+  color: $input-color;
+  vertical-align: middle;
+
+  background-color: #fff;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
+  background-repeat: no-repeat;
+  background-position: right .75rem center;
+  background-image: none \9;
+  background-size: 8px 10px;
+
+  border: $input-btn-border-width solid $input-border-color;
+  border-radius: $border-radius;
+
+  // Use vendor prefixes as `appearance` isn't part of the CSS spec.
+  -moz-appearance: none;
+  -webkit-appearance: none;
+
+  // Hides the default caret in IE11
+  &::-ms-expand {
+    opacity: 0;
+  }
+}
+
+select + select {
+  margin-left: $spacer / 2;
+}
+
+
+// Label Selectors
+//
+// Label selectors replace checkboxes and radios with a image and/or text selector.
+//
+// Markup:
+// <form>
+// <ul class="label-selector">
+//   <li class="label-selector-item">
+//     <input type="radio" id="babySeal" name="babyAnimals" class="label-selector-input">
+//     <label for="babySeal">
+//       <div class="image-wrap">
+//         <img class="label-selector-image" src="./public/resources/images/baby-seal.jpg" alt="Baby Seal">
+//         <div class="overlay">
+//           <div class="buttons">
+//             <div class="btn btn-overlay">Button</div>
+//           </div>
+//           <div class="selected">
+//             <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+//               <use xlink:href="#checkmark" />
+//             </svg>
+//           </div>
+//         </div>
+//       </div>
+//       <div class="title">Baby Seal</div>
+//       <div class="info">by Author</div>
+//       <div class="description">Choose this happy baby seal. It's so very happy.</div>
+//     </label>
+//   </li>
+//   <li class="label-selector-item">
+//     <input type="radio" id="puppy" name="babyAnimals" class="label-selector-input">
+//     <label for="puppy">
+//       <div class="image-wrap">
+//         <img class="label-selector-image" src="./public/resources/images/puppy.jpg" alt="Puppy">
+//         <div class="overlay">
+//           <div class="buttons">
+//             <div class="btn btn-overlay">Button</div>
+//           </div>
+//           <div class="selected">
+//             <svg class="icon icon-svg icon-svg-checkmark" viewBox="0 0 17 17">
+//               <use xlink:href="#checkmark" />
+//             </svg>
+//           </div>
+//         </div>
+//       </div>
+//       <div class="title">Puppy</div>
+//       <div class="info">by Author</div>
+//       <div class="description">Choose this sleepy puppy. Sooo tired, puppy.</div>
+//     </label>
+//   </li>
+// </ul>
+// </form>
+//
+// Styleguide 5.6.
+
+.label-selector {
+  @extend .row;
+  @include list-reset;
+
+  label {
+    padding-left: 0;
+    cursor: pointer;
+  }
+
+  input[type=radio],
+  input[type=checkbox] {
+    position: absolute;
+    opacity: 0;
+  }
+
+  .active,
+  input[type=radio]:checked ~ label,
+  input[type=radio]:checked ~ label {
+    cursor: default;
+
+    .overlay {
+      opacity: 1;
+      background-color: rgba(255,255,255,.7);
+
+      > .buttons {
+        display: none;
+      }
+
+      > .selected {
+        display: block;
+      }
+    }
+
+    .label-selector-image {
+      opacity: .5;
+    }
+  }
+
+  .label-selector-image {
+    display: block;
+    width: 100%;
+  }
+
+  .title {
+    text-align: center;
+    font-weight: 500;
+
+    a {
+      @extend .reverse-link;
+
+      &:hover {
+        text-decoration: none;
+
+        svg {
+          fill: $brand-primary;
+        }
+      }
+    }
+  }
+
+  .image-wrap {
+    position: relative;
+    display: block;
+    margin-bottom: $spacer / 2;
+    @include image-wrap-border(0);
+
+    &:hover .overlay {
+      height: 100%;
+      opacity: .9;
+    }
+  }
+
+  .selected {
+    display: none;
+
+    svg {
+      display: block;
+      width: 84px;
+      fill: $brand-success;
+    }
+  }
+
+  .overlay {
+    display: flex;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20;
+    background-color: $brand-primary;
+    opacity: 0;
+    overflow: hidden;
+    transition: all .1s;
+    text-align: center;
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    margin-left: 0;
+    margin-right: 0;
+    padding: $spacer / 2;
+    align-items: center;
+    justify-content: center;
+
+    > .btn {
+      display: block;
+      margin: ($spacer / 6) ($spacer / 4);
+      max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
+      min-width: to-rem(96);
+    }
+  }
+
+  .label-selector-item {
+    position: relative;
+  }
+
+  .label-selector-corner-link {
+    position: absolute;
+    display: block;
+    width: to-rem(16);
+    top: $spacer / 2;
+    right: $spacer / 2;
+
+    svg {
+      display: block;
+      fill: $white;
+    }
+
+    a {
+      &:hover svg {
+        fill: $navbar-active-link-active-bg;
+      }
+    }
+  }
+}
+
+// TODO: these are kinda tweaks, aren't they? Think about it.
+// Theme-specific variants
+
+.theme-wrap {
+  position: relative;
+  margin-bottom: $spacer / 2;
+
+  .image-wrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    @include image-wrap-border(0);
+
+    .label-selector-image {
+      flex-shrink: 0;
+      min-width: 100%;
+      min-height: 100%;
+    }
+  }
+}
+
+// Mobile-theme-specific variants
+
+.mobile-theme-wrap {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $spacer / 2;
+
+  .mobile-frame {
+    position: relative;
+    bottom: 0;
+  }
+
+  svg {
+    display: block;
+    fill: rgba(85,90,98,.27);
+  }
+
+  .image-wrap {
+    position: absolute;
+    bottom: .7%;
+    left: 8%;
+    width: 84%;
+    height: 86%;
+    margin-bottom: 0;
+    overflow: hidden;
+    @include image-wrap-border(0);
+
+    &::after {
+      border-bottom: 0;
+    }
+  }
+}
+
+.Homepage .label-selector-item {
+  @include grid-item-large();
+}
+
+.label-selector-item {
+  @include grid-item();
+  padding: $spacer $spacer ($spacer / 2);
+}
+
+.btn-overlay {
+  @include button-variant($white, transparent, $white, $white, $navbar-active-link-active-bg, $white);
+}
+
+// Search Input
+//
+// Search inputs have a hidden submit button, a search icon on the input, and a clear button if a search has been
+// performed.
+//
+// PHP rendering: In Gdn_Form, use either searchForm(field, url, [textboxAttributes, info]) to render the entire
+// search form or search(field, url, [textboxAttributes, info]) to render the search field.
+//
+// Markup:
+// <form>
+//   <div role="search" class="search-wrap">
+//     <div class="search-icon-wrap search-icon-search-wrap">
+//       <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17"><use xlink:href="#search" /></svg>
+//     </div>
+//     <input class="form-control" />
+//     <button type="submit" class="search-submit">Search</button>
+//     <div class="search-icon-wrap search-icon-clear-wrap">
+//       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17"><use xlink:href="#close" /></svg>
+//     </div>
+//   </div>
+// </form>
+//
+// Styleguide 5.7.
+
+
+.search-wrap {
+  position: relative;
+
+  .form-control {
+    border-radius: $control-height / $rem-base / 2 * 1rem;
+    padding-left: $spacer * 2.5;
+    padding-right: $spacer * 2.5;
+
+    &[placeholder] {
+      text-overflow: ellipsis;
+    }
+  }
+
+  .search-icon-wrap {
+    @extend .btn-icon;
+    padding: to-rem(6) to-rem(12);
+
+    &:first-child {
+      margin-left: 0;
+    }
+
+    position: absolute;
+    top: 0;
+  }
+
+  .search-icon-clear-wrap {
+    right: 0;
+  }
+
+  .search-icon-search-wrap {
+    left: 0;
+
+    svg {
+      opacity: 1;
+    }
+  }
+
+  .search-info {
+    margin-top: $spacer / 4;
+    font-style: italic;
+  }
+}
+
+// Hide the button
+.search-submit {
+  position: absolute;
+  left: -9999px;
+}
+
+// Suffix Textbox
+//
+// Text box with a suffix value (useful for units). The suffix pulls from the data-suffix value of a input wrapper div.
+//
+// Markup:
+// <div class="form-group">
+//   <div class="label-wrap-wide">
+//     <label for="Form_ThumbnailSize">Thumbnail Size</label>
+//     <div class="info">Avatars will have their thumbnails saved at this size.</div>
+//   </div>
+//   <div class="input-wrap-right">
+//     <div class="textbox-suffix" data-suffix="px">
+//       <input type="text" class="form-control">
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 5.8.
+
+.textbox-suffix {
+  position: relative;
+
+  input {
+    padding-right: $spacer * 1.5;
+    width: $btn-min-width;
+    text-align: right;
+  }
+
+  &::after {
+    position: absolute;
+    display: block;
+    top: 0;
+    right: 0;
+    height: $control-height-rem;
+    padding-top: ($control-height-rem - $font-size-sm) / 2;
+    padding-right: $spacer / 2;
+    font-size: $font-size-sm;
+    line-height: 1;
+    color: $grey;
+    content: attr(data-suffix);
+  }
+}
+
+// Text Input With Button
+//
+// Text input with an attached button and optional label.
+//
+// Markup:
+// <div class="text-input-button">
+//   <div class="label-wrap">
+//     <label for="Form_Label">Label:</label>
+//   </div>
+//   <input type="text" id="Form_Label" name="Label" value="preview" class="form-control">
+//   <button type="submit" id="Form_Apply" name="Apply" class="btn btn-primary btn-apply" value="Apply">
+//     Apply
+//   </button>
+// </div>
+//
+// Styleguide 5.9.
+
+.text-input-button {
+  display: flex;
+  flex-grow: 1;
+  align-items: center;
+
+  input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .btn {
+    margin-left: -$border-width;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .label-wrap {
+    flex-shrink: 0;
+    display: block;
+    margin-right: $spacer / 2;
+
+    label {
+      line-height: 1;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.radio,
+.checkbox {
+  margin-bottom: 0;
+}
+
+.radio + .radio,
+.checkbox + .checkbox {
+  margin-top: 0; // Override twbs
+}
+
+// Checkboxes and Radios
+//
+// We use iCheck to make our checkboxes and radios look nice. It does some magic wrap the input in a style-able div.
+// The most important thing to note is that you cannot listen for the click event, since the click happens on the
+// wrapper. Listen for the change event instead.
+//
+// Markup:
+// <script>
+//   $(document).on('click', '#checkbox-1', function() {console.log('clicked!')}); // doesn't work
+//   $(document).on('change', '#checkbox-1', function() {console.log('changed!')});
+// </script>
+// <label><input id="checkbox-1" type="checkbox" />A label for checkbox 1</label>
+//
+// Styleguide 5.10.
+
+// iCheck
+.icheck-label {
+  padding-left: 0;
+}
+
+.iradio,
+.icheckbox {
+
+  label {
+    padding-left: 0;
+    height: $spacer;
+    vertical-align: middle;
+  }
+
+  display: inline-block;
+  width: $spacer;
+  height: $spacer;
+  margin-right: $spacer / 4;
+  vertical-align: middle;
+  border: $border-width solid $border-color;
+  cursor: pointer;
+
+  &:hover,
+  &:focus,
+  .icheck-label:hover &,
+  .icheck-label:focus & {
+    background-color: $brand-primary;
+    border-color: $brand-primary;
+
+    &::before {
+      display: block;
+      color: $white;
+    }
+  }
+}
+
+.iradio {
+  border-radius: $spacer / 2;
+
+  &.checked::before {
+    position: absolute;
+    display: block;
+    top: -$border-width;
+    left: -$border-width;
+    width: $spacer;
+    height: $spacer;
+    border: $border-width * 4 solid $brand-primary;
+    border-radius: $spacer / 2;
+    background-color: $white;
+    content: '';
+  }
+}
+
+.icheckbox.checked {
+  @extend %icon;
+  font-size: $font-size-sm;
+  text-align: center;
+  background-color: $brand-primary;
+  border-color: $brand-primary;
+
+  &::before {
+    display: block;
+    margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
+    color: $white;
+    @include char-content($icon-ok);
+  }
+}
+
+label[id^=iCheck] {
+  padding-left: 0;
+}
+

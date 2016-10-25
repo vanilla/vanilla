@@ -107,6 +107,10 @@ class TagModel extends Gdn_Model {
             return $ToID;
         } else {
             if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
+                // Tag-type tags (i.e., user generated tags) are saved with no type.
+                if (strtolower(val('Type', $FormPostValues)) == 'tag') {
+                    $FormPostValues['Type'] = '';
+                }
                 return parent::save($FormPostValues, $Settings);
             } else {
                 return false;
@@ -131,13 +135,20 @@ class TagModel extends Gdn_Model {
     public function types() {
         if (!isset($this->Types)) {
             $this->Types = array(
-                '' => array(
+                '' => [
                     'key' => '',
+                    'name' => 'All',
+                    'plural' => 'All',
+                    'default' => true,
+                    'addtag' => false
+                ],
+                'tags' => [
+                    'key' => 'tags',
                     'name' => 'Tag',
                     'plural' => 'Tags',
-                    'default' => true,
+                    'default' => false,
                     'addtag' => true
-                )
+                ]
             );
 
             $this->fireEvent('Types');
@@ -158,11 +169,18 @@ class TagModel extends Gdn_Model {
             $TagTypes = array();
         }
 
+        // Remove the defaults out of the list, and add them to the start
+        $start = array_intersect_key($TagTypes, ['' => [], 'tags' => []]);
+        unset($TagTypes['']);
+        unset($TagTypes['tags']);
+
         // Sort by keys, and because the default, "Tags," has a blank key, it
         // will be set as the first key, which is good for the tabs.
         if (count($TagTypes)) {
             ksort($TagTypes);
         }
+
+        $TagTypes = array_merge($start, $TagTypes);
 
         return $TagTypes;
     }
@@ -296,7 +314,7 @@ class TagModel extends Gdn_Model {
                 $tags = $all_tags[$discussionId];
 
                 if ($this->StringTags) {
-                    $tags = consolidateArrayValuesByKey($tags, 'Name');
+                    $tags = array_column($tags, 'Name');
                     setValue('Tags', $row, implode(',', $tags));
                 } else {
                     foreach ($tags as &$trow) {
@@ -528,7 +546,7 @@ class TagModel extends Gdn_Model {
             ->whereIn('Name', $Tags)
             ->get()->resultArray();
 
-        $TagIDs = consolidateArrayValuesByKey($TagIDs, 'TagID');
+        $TagIDs = array_column($TagIDs, 'TagID');
 
         if ($Op == 'and' && count($Tags) > 1) {
             $DiscussionIDs = $TagSql
@@ -544,7 +562,7 @@ class TagModel extends Gdn_Model {
             $Limit = '';
             $Offset = 0;
 
-            $DiscussionIDs = consolidateArrayValuesByKey($DiscussionIDs, 'DiscussionID');
+            $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
 
             $Sql->whereIn('d.DiscussionID', $DiscussionIDs);
             $SortField = 'd.DiscussionID';

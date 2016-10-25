@@ -201,6 +201,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // We need to save this state now because it's lost after this method.
         $this->passData('isHomepage', $this->isHomepage);
 
+        // Let plugins change augment the request before dispatch, but after internal routing.
+        $this->fireEvent('BeforeAnalyzeRequest');
+
         // If we're in a private community and can block, redirect to signin
         if (c('Garden.PrivateCommunity') && $this->getCanBlock($request) > self::BLOCK_PERMISSION) {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
@@ -301,6 +304,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // /controller
 
         $parts = explode('/', str_replace('\\', '/', $request->path()));
+        // Decode path parts at the dispatcher level.
+        array_walk($parts, function(&$value) {
+            $value = rawurldecode($value);
+        });
 
         // Parse the file extension.
         list($parts, $deliveryMethod) = $this->parseDeliveryMethod($parts);

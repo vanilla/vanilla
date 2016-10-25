@@ -48,10 +48,6 @@ class CamelCaseScheme extends NameScheme {
         // Make sure the first character is lowercase.
         $name = lcfirst($name);
 
-        if (preg_match('`Php`i', $name)) {
-            $foo = 'bar';
-        }
-
         // Fix some known exceptions.
         $name = preg_replace_callback('`(Id|Ip|Php)(?=[A-Z0-9]|$|s$)`', function ($m) {
             return strtoupper($m[1]);

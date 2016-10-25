@@ -18,7 +18,8 @@ $PluginInfo['Quotes'] = array(
     'HasLocale' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'quotes.png'
 );
 
 /**
@@ -238,7 +239,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function addQuoteButton($Sender, $Args) {
-        if (!Gdn::session()->UserID) {
+        if (!Gdn::session()->UserID || !checkPermission('Vanilla.Comments.Add')) {
             return;
         }
 

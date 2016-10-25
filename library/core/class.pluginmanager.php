@@ -253,7 +253,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public static function calcOldInfoArray(Addon $addon) {
         $info = $addon->getInfo();
-        $info = self::convertArrayKeys($info);
+
+        $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
+        $info = $capitalCaseSheme->convertArrayKeys($info, ['RegisterPermissions']);
 
         // This is the basic information from scanPluginFile().
         $name = $addon->getInfoValue('keyRaw', $addon->getKey());
@@ -326,24 +328,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
 
         return $info;
-    }
-
-    /**
-     * Uppercase the first letters of an info array recursively.
-     *
-     * @param array $array The array to change.
-     * @return array Returns a new changed array.
-     */
-    private static function convertArrayKeys(array $array) {
-        $result = [];
-        foreach ($array as $key => $value) {
-            $key = ucfirst($key);
-            if (is_array($value) && !in_array($key, ['RegisterPermissions'])) {
-                $value = self::convertArrayKeys($value);
-            }
-            $result[$key] = $value;
-        }
-        return $result;
     }
 
     /**
@@ -718,6 +702,22 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Register a a callback to handle an event.
+     *
+     * @param string $eventName The name of the event to register.
+     * @param callable $callback The callback to call when the event is fired.
+     */
+    public function registerCallback($eventName, callable $callback) {
+        if (stringEndsWith($eventName, '_create', true)) {
+            $this->newMethods[strtolower($eventName)] = $callback;
+        } elseif (stringEndsWith($eventName, '_override', true)) {
+            $this->methodOverrides[strtolower($eventName)] = $callback;
+        } else {
+            $this->eventHandlers[strtolower($eventName)][] = $callback;
+        }
+    }
+
+    /**
      * Registers a plugin override method.
      *
      * @param string $OverrideClassName The name of the plugin class that will override the existing method.
@@ -825,7 +825,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param array $Options An array of options to modify the call.
      * @return mixed Returns whatever the event handler returns or **false** of there is not event handler.
      */
-    public function callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType, $Options = array()) {
+    public function callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler', $Options = []) {
         $this->trace("CallEventHandler $EventClassName $EventName $EventHandlerType");
         $Return = false;
 
@@ -862,25 +862,37 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         // Loop through the handlers and execute them
         foreach ($this->eventHandlers[$EventKey] as $PluginKey) {
-            $PluginKeyParts = explode('.', $PluginKey);
-            if (count($PluginKeyParts) == 2) {
-                list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
-
-
-                if (isset($Sender->Returns)) {
-                    if (array_key_exists($EventKey, $Sender->Returns) === false || is_array($Sender->Returns[$EventKey]) === false) {
-                        $Sender->Returns[$EventKey] = array();
-                    }
-
-                    $Return = $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-
-                    $Sender->Returns[$EventKey][$PluginKey] = $Return;
-                    $Return = true;
-                } elseif (isset($Sender->EventArguments)) {
-                    $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, $Sender->EventArguments, $PassedEventKey);
-                } else {
-                    $this->getPluginInstance($PluginClassName)->$PluginEventHandlerName($Sender, array(), $PassedEventKey);
+            $callback = null;
+            if (is_array($PluginKey) || $PluginKey instanceof \Closure) {
+                // The event handler is an array or a closure so we can call it directly.
+                $callback = $PluginKey;
+            } else {
+                // Decode how `self::register[Handler|NewMethod|Override]` store event names.
+                $PluginKeyParts = explode('.', $PluginKey);
+                if (count($PluginKeyParts) == 2) {
+                    // The event handler is a class and method name.
+                    list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
+                    $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
+                } elseif (is_callable($PluginKey)) {
+                    // The event handler is a global function.
+                    $callback = $PluginKey;
                 }
+            }
+
+            if (!$callback) {
+                continue;
+            } elseif (isset($Sender->Returns)) {
+                if (array_key_exists($EventKey, $Sender->Returns) === false || is_array($Sender->Returns[$EventKey]) === false) {
+                    $Sender->Returns[$EventKey] = array();
+                }
+
+                $Return = call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
+                $Sender->Returns[$EventKey][$PluginKey] = $Return;
+                $Return = true;
+            } elseif (isset($Sender->EventArguments)) {
+                call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
+            } else {
+                call_user_func($callback, $Sender, [], $PassedEventKey);
             }
         }
 
@@ -899,16 +911,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return mixed Returns the value of overridden method.
      */
     public function callMethodOverride($Sender, $ClassName, $MethodName) {
-        $EventKey = strtolower($ClassName.'_'.$MethodName.'_Override');
-        $OverrideKey = val($EventKey, $this->methodOverrides, '');
-        $OverrideKeyParts = explode('.', $OverrideKey);
-        if (count($OverrideKeyParts) != 2) {
-            return false;
+        $callback = $this->getCallback($ClassName, $MethodName, 'Override');
+        if (is_callable($callback)) {
+            return call_user_func($callback, $Sender, val('RequestArgs', $Sender, []));
         }
-
-        list($OverrideClassName, $OverrideMethodName) = $OverrideKeyParts;
-
-        return $this->getPluginInstance($OverrideClassName, self::ACCESS_CLASSNAME, $Sender)->$OverrideMethodName($Sender, $Sender->EventArguments);
     }
 
     /**
@@ -919,7 +925,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return bool Returns **true** if an override exists or **false** otherwise.
      */
     public function hasMethodOverride($ClassName, $MethodName) {
-        return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Override'), $this->methodOverrides) ? true : false;
+        return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Override'), $this->methodOverrides);
     }
 
     /**
@@ -934,20 +940,10 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return mixed Return value of new method.
      */
     public function callNewMethod($Sender, $ClassName, $MethodName) {
-        $EventKey = strtolower($ClassName.'_'.$MethodName.'_Create');
-        $NewMethodKey = val($EventKey, $this->newMethods, '');
-        $NewMethodKeyParts = explode('.', $NewMethodKey);
-        if (count($NewMethodKeyParts) != 2) {
-            return false;
+        $callback = $this->getCallback($ClassName, $MethodName, 'Create');
+        if (is_callable($callback)) {
+            return call_user_func($callback, $Sender, val('RequestArgs', $Sender, []));
         }
-
-        list($NewMethodClassName, $NewMethodName) = $NewMethodKeyParts;
-
-        return $this->getPluginInstance(
-            $NewMethodClassName,
-            self::ACCESS_CLASSNAME,
-            $Sender
-        )->$NewMethodName($Sender, GetValue('RequestArgs', $Sender, array()));
     }
 
     /**
@@ -964,24 +960,34 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     public function getCallback($ClassName, $MethodName, $Type = 'Create') {
         $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
 
-        switch ($Type) {
-            case 'Create':
-                $MethodKey = GetValue($EventKey, $this->newMethods);
+        switch (strtolower($Type)) {
+            case 'create':
+                $MethodKey = val($EventKey, $this->newMethods);
                 break;
-            case 'Override':
-                $MethodKey = GetValue($EventKey, $this->methodOverrides);
+            case 'override':
+                $MethodKey = val($EventKey, $this->methodOverrides);
                 break;
             default:
-                $MethodKey = '';
-        }
-        $Parts = explode('.', $MethodKey, 2);
-        if (count($Parts) != 2) {
-            return false;
+                return null;
         }
 
-        list($ClassName, $MethodName) = $Parts;
-        $Instance = $this->getPluginInstance($ClassName, self::ACCESS_CLASSNAME);
-        return array($Instance, $MethodName);
+        $callback = null;
+        if (is_array($MethodKey) || $MethodKey instanceof \Closure) {
+            // The event handler is an array or a closure so we can call it directly.
+            $callback = $MethodKey;
+        } else {
+            // Decode how `self::register[Handler|NewMethod|Override]` store event names.
+            $PluginKeyParts = explode('.', $MethodKey);
+            if (count($PluginKeyParts) == 2) {
+                // The event handler is a class and method name.
+                list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
+                $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
+            } elseif (is_callable($MethodKey)) {
+                // The event handler is a global function.
+                $callback = $MethodKey;
+            }
+        }
+        return $callback;
     }
 
     /**
@@ -993,12 +999,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      */
     public function hasNewMethod($ClassName, $MethodName) {
         $Key = strtolower($ClassName.'_'.$MethodName.'_Create');
-        if (array_key_exists($Key, $this->newMethods)) {
-            $Result = explode('.', $this->newMethods[$Key]);
-            return $Result[0];
-        } else {
-            return false;
-        }
+        return array_key_exists($Key, $this->newMethods);
     }
 
     /**
@@ -1237,6 +1238,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             return false;
         }
 
+        $pluginClassName = $addon->getPluginClass();
         $pluginName = $addon->getRawKey();
         $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
@@ -1253,6 +1255,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         saveToConfig("EnabledPlugins.{$pluginName}", false);
 
         $this->addonManager->stopAddon($addon);
+
+        // 4. Unregister the plugin properly.
+        $this->unregisterPlugin($pluginClassName);
 
         if ($enabled) {
             Logger::event(

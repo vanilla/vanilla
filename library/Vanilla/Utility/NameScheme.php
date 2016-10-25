@@ -24,14 +24,17 @@ abstract class NameScheme {
      * Recursively convert all of the array keys in an array to this name scheme.
      *
      * @param array $array The array to convert.
+     * @param array $keysSkipRecursion Skip recursion for the following keys.
      * @return array Returns the converted array.
      */
-    public function convertArrayKeys(array $array) {
+    public function convertArrayKeys(array $array, array $keysSkipRecursion = []) {
         $result = [];
         foreach ($array as $key => $value) {
             $key = $this->convert($key);
             if (is_array($value)) {
-                $value = $this->convertArrayKeys($value);
+                if (!in_array($key, $keysSkipRecursion)) {
+                    $value = $this->convertArrayKeys($value);
+                }
             }
             $result[$key] = $value;
         }

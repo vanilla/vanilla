@@ -1,0 +1,21 @@
+// Alerts
+//
+// Alerts are warning/info/danger/success messages that generally appear at the top of a page. Alerts use twbs's scss.
+//
+// Styleguide 11.
+
+// Alerts
+//
+// Alerts come in four different flavours.
+//
+// .alert-info - Inform the user about something. It's not going to break anything if they don't see this, but it's good to know.
+// .alert-warning - Warn the user about something. It's best that they heed this advice if they want everything to run smoothly.
+// .alert-danger - Alert the user of a failure or if they're about to do something that has serious consequences.
+// .alert-success - Let the user know that what they've tried to do has been successful.
+//
+// Markup:
+// <div class="alert {{modifier_class}} padded">
+//   This is an alert message. Take note ye all.
+// </div>
+//
+// Styleguide 11.1.

@@ -1,0 +1,21 @@
+// The moderation section still uses jquery.popup.js. We can get rid of these styles when we migrate the
+// moderation section over to modal.js
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  background-color: rgba(0,0,0,.5);
+}
+
+.Popup .Footer {
+  display: none !important;
+}
+
+.Popup .Body {
+  overflow-y: hidden !important;
+  max-height: inherit !important;
+}

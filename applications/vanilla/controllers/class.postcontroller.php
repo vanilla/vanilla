@@ -125,7 +125,7 @@ class PostController extends VanillaController {
             $this->Category = (object)$Category;
             $this->setData('Category', $Category);
             $this->Form->addHidden('CategoryID', $this->Category->CategoryID);
-            if (val('DisplayAs', $this->Category) == 'Discussions') {
+            if (val('DisplayAs', $this->Category) == 'Discussions' && !$DraftID) {
                 $this->ShowCategorySelector = false;
             } else {
                 // Get all our subcategories to add to the category if we are in a Header or Categories category.
@@ -241,11 +241,21 @@ class PostController extends VanillaController {
                     }
                 }
 
-                // Make sure that the title will not be invisible after rendering
+                $isTitleValid = true;
                 $Name = trim($this->Form->getFormValue('Name', ''));
-                if ($Name != '' && Gdn_Format::text($Name) == '') {
-                    $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
-                } else {
+
+                if (!$Draft) {
+                    // Let's be super aggressive and disallow titles with no word characters in them!
+                    $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
+
+                    if (!$hasWordCharacter || ($Name != '' && Gdn_Format::text($Name) == '')) {
+
+                        $this->Form->addError(t('You have entered an invalid discussion title'), 'Name');
+                        $isTitleValid = false;
+                    }
+                }
+
+                if ($isTitleValid) {
                     // Trim the name.
                     $FormValues['Name'] = $Name;
                     $this->Form->setFormValue('Name', $Name);
@@ -930,6 +940,13 @@ class PostController extends VanillaController {
         // Mark the notification as in progress.
         $this->DiscussionModel->setField($DiscussionID, 'Notified', ActivityModel::SENT_INPROGRESS);
 
+        $discussionType = val('Type', $Discussion);
+        if ($discussionType) {
+            $Code = "HeadlineFormat.Discussion.{$discussionType}";
+        } else {
+            $Code = 'HeadlineFormat.Discussion';
+        }
+
         $HeadlineFormat = t($Code, '{ActivityUserID,user} started a new discussion: <a href="{Url,html}">{Data.Name,text}</a>');
         $Category = CategoryModel::categories(val('CategoryID', $Discussion));
         $Activity = array(
@@ -990,7 +1007,7 @@ function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
 
         $Result = ' <b>'.t($LabelCode)."</b> <ul class=\"$CssClass\">";
         foreach ($ListOptions as $Value => $Code) {
-            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value)).'</li> ';
+            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
         }
         $Result .= '</ul>';
         return $Result;

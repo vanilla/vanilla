@@ -1,0 +1,6 @@
+// Once we can be certain all out buttons have `btn btn-primary` css classes, we can get rid of this guy.
+
+.Button {
+  @extend .btn;
+  @extend .btn-primary;
+}

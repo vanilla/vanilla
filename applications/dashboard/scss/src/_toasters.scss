@@ -1,0 +1,74 @@
+// Toasters
+//
+// Styleguide 13.
+
+// Toasters
+//
+// Toasters are "growl" style messages that appear in a fixed position on the page. The `InformMessages` rendered in
+// global.js extend the `toaster*` css classes used below. The fixed toaster positioning for the toaster messages gets
+// applied when the toaster is nested in a element with the `toasters` css class applied to it.
+//
+// Markup:
+// <div role="alert" class="toaster">
+//   <span class="toaster-close"></span>
+//   <div class="toaster-body">
+//     This is a toaster message. The additional text will be hidden if it goes longer than 60 characters.
+//   </div>
+// </div>
+//
+// Styleguide 13.1.
+
+.toaster {
+  position: relative;
+  display: block;
+  width: 448px;
+  padding: $spacer $spacer * 3 $spacer $spacer;
+  margin-top: $spacer / 8;
+  font-weight: 400;
+  font-size: $font-size-md;
+  line-height: to-rem(18);
+  color: $white;
+  background: #333;
+  border: $border-width solid $black;
+  opacity: .9;
+  box-shadow: inset 0px 0px 1px 0px rgba(255,255,255,0.72);
+  border-radius: $border-radius;
+
+  @include media-breakpoint-down(sm) {
+    width: 100%;
+  }
+
+  a {
+    color: $white;
+    text-decoration: underline;
+  }
+
+  &:hover {
+    background-color: rgba(0,0,0,.8);
+  }
+}
+
+.toaster-close {
+  position: absolute;
+  top: $spacer - to-rem(2);
+  right: $spacer;
+  cursor: pointer;
+
+  &::before {
+    display: inline-block;
+    content: $close-white;
+  }
+}
+
+.toasters {
+  position: fixed;
+  bottom: to-rem(24);
+  left: to-rem(24);
+  z-index: 1050;
+
+  @include media-breakpoint-down(sm) {
+    left: to-rem(12);
+    right: to-rem(12);
+    bottom: to-rem(12);
+  }
+}

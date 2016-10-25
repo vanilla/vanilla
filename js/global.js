@@ -342,8 +342,8 @@ jQuery(document).ready(function($) {
         //$('a.Popup').popup();
         //$('a.PopConfirm').popup({'confirm' : true, 'followConfirm' : true});
 
-        $('a.Popup:not(.Message a.Popup)').popup();
-        $('a.PopConfirm:not(.Message a.PopConfirm)').popup({'confirm': true, 'followConfirm': true});
+        $('a.Popup:not(.dashboard a.Popup):not(.Section-Dashboard a.Popup)').popup();
+        $('a.PopConfirm').popup({'confirm': true, 'followConfirm': true});
     }
 
     $(document).delegate(".PopupWindow:not(.Message .PopupWindow)", 'click', function() {
@@ -376,14 +376,14 @@ jQuery(document).ready(function($) {
     // This turns any anchor with the "Popdown" class into an in-page pop-up, but
     // it does not hijack forms in the popup.
     if ($.fn.popup)
-        $('a.Popdown:not(.Message a.Popdown)').popup({hijackForms: false});
+        $('a.Popdown').popup({hijackForms: false});
 
     // This turns SignInPopup anchors into in-page popups
     if ($.fn.popup)
-        $('a.SignInPopup:not(.Message a.SignInPopup)').popup({containerCssClass: 'SignInPopup'});
+        $('a.SignInPopup').popup({containerCssClass: 'SignInPopup'});
 
     if ($.fn.popup)
-        $(document).delegate('.PopupClose:not(.Message .PopupClose)', 'click', function(event) {
+        $(document).delegate('.PopupClose', 'click', function(event) {
             var Popup = $(event.target).parents('.Popup');
             if (Popup.length) {
                 var PopupID = Popup.prop('id');
@@ -392,7 +392,7 @@ jQuery(document).ready(function($) {
         });
 
     // Make sure that message dismissalls are ajax'd
-    $(document).delegate('a.Dismiss:not(.Message a.Dismiss)', 'click', function() {
+    $(document).delegate('a.Dismiss', 'click', function() {
         var anchor = this;
         var container = $(anchor).parent();
         var transientKey = gdn.definition('TransientKey');
@@ -410,7 +410,7 @@ jQuery(document).ready(function($) {
     // without a refresh. The form must be within an element with the "AjaxForm"
     // class.
     if ($.fn.handleAjaxForm)
-        $('.AjaxForm').not('.Message .AjaxForm').handleAjaxForm();
+        $('.AjaxForm').handleAjaxForm();
 
     // Handle ToggleMenu toggling and set up default state
     $('[class^="Toggle-"]').hide(); // hide all toggle containers
@@ -712,7 +712,7 @@ jQuery(document).ready(function($) {
             });
         });
     };
-    $('.Popin, .js-popin').not('.Message .Popin, .Message .js-popin').popin();
+    $('.Popin, .js-popin').popin();
 
     var hijackClick = function(e) {
         var $elem = $(this);
@@ -761,7 +761,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack:not(.Message .Hijack)', 'click', hijackClick);
+    $(document).delegate('.Hijack', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus
@@ -779,7 +779,7 @@ jQuery(document).ready(function($) {
         return false;
     });
     var lastOpen = null;
-    $(document).delegate('.ToggleFlyout:not(.Message .ToggleFlyout)', 'click', function(e) {
+    $(document).delegate('.ToggleFlyout', 'click', function(e) {
 
         var $flyout = $('.Flyout', this);
         var isHandle = false;
@@ -993,9 +993,11 @@ jQuery(document).ready(function($) {
                 var message = response.InformMessages[i].Message;
                 var emptyMessage = message === '';
 
+                message = '<span class="InformMessageBody">' + message + '</span>';
+
                 // Is there a sprite?
                 if (sprite !== '')
-                    message = '<span class="InformSprite ' + sprite + '"></span>' + message;
+                    message = '<span class="InformSprite ' + sprite + '"></span>';
 
                 // If the message is dismissable, add a close button
                 if (css.indexOf('Dismissable') > 0)
@@ -1023,7 +1025,7 @@ jQuery(document).ready(function($) {
                         elementId = ' id="' + elementId + '"';
                     }
                     if (!emptyMessage) {
-                        informMessages.prepend('<div class="' + css + '"' + elementId + '>' + message + '</div>');
+                        informMessages.prependTrigger('<div class="' + css + '"' + elementId + '>' + message + '</div>');
                         // Is there a callback or callback url to request on dismiss of the inform message?
                         if (dismissCallback) {
                             $('div.InformWrapper:first').find('a.Close').click(eval(dismissCallback));
@@ -1916,7 +1918,7 @@ jQuery(document).ready(function($) {
                 // Either @ or : for now.
                 var at = context.at;
                 var text = context.query.text;
-                var font_mirror = $('.BodyBox');
+                var font_mirror = $('.BodyBox,.js-bodybox');
                 var font = font_mirror.css('font-size') + ' ' + font_mirror.css('font-family');
 
                 // Get font width
@@ -1965,9 +1967,9 @@ jQuery(document).ready(function($) {
     // handle an iframe, and the editor instance needs to be referenced.
     if ($.fn.atwho && gdn.atCompleteInit) {
         $(document).on('contentLoad', function() {
-            gdn.atCompleteInit('.BodyBox', '');
+            gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
         });
-        gdn.atCompleteInit('.BodyBox', '');
+        gdn.atCompleteInit('.BodyBox,.js-bodybox', '');
     }
 
 
@@ -2086,3 +2088,42 @@ jQuery.fn.effect = function(name) {
             that.removeClass(name);
         });
 };
+
+// Setup AJAX filtering for flat category module.
+$(document).on("contentLoad", function(e) {
+    // Find each flat category module container, if any.
+    $(".BoxFlatCategory", e.target).each(function(index, value){
+        // Setup the constants we'll need to perform the lookup for this module instance.
+        var container = value;
+        var categoryID = $("input[name=CategoryID]", container).val();
+        var limit = parseInt($("input[name=Limit]", container).val());
+
+        // If we don't even have a category, don't bother setting up filtering.
+        if (typeof categoryID === "undefined") {
+            return;
+        }
+
+        // limit was parsed as an int when originally defined.  If it isn't a valid value now, default to 10.
+        if (isNaN(limit) || limit < 1) {
+            limit = 10;
+        }
+
+        // Anytime someone types something into the search box in this instance's container...
+        $(container).on("keyup", ".SearchForm .InputBox", function(filterEvent) {
+            var url = gdn.url("module/flatcategorymodule/vanilla");
+
+            // ...perform an AJAX request, replacing the current category data with the result's data.
+            jQuery.get(
+                gdn.url("module/flatcategorymodule/vanilla"),
+                {
+                    categoryID: categoryID,
+                    filter: filterEvent.target.value,
+                    limit: limit
+                },
+                function(data, textStatus, jqXHR) {
+                    $(".FlatCategoryResult", container).replaceWith($(".FlatCategoryResult", data));
+                }
+            )
+        });
+    });
+});

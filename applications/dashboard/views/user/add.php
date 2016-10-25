@@ -10,61 +10,73 @@ echo $this->Form->open(array('class' => 'User'));
 echo $this->Form->errors();
 ?>
     <ul>
-        <li>
-            <?php
-            echo $this->Form->label('Username', 'Name');
-            echo $this->Form->textBox('Name');
-            ?>
-        </li>
-        <li>
-            <?php
-            echo $this->Form->label('Password', 'Password');
-            echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password '));
-            echo ' '.$this->Form->checkbox('NoPassword', 'No password', array('class' => 'Inline CheckBoxLabel js-nopassword'));
-            ?>
-            <div class="InputButtons js-password-related">
-                <?php
-                echo anchor(t('Generate Password'), '#', 'GeneratePassword Button SmallButton');
-                echo anchor(t('Reveal Password'), '#', 'RevealPassword Button SmallButton');
-                ?>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Username', 'Name'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Name'); ?>
             </div>
         </li>
-        <li>
-            <?php
-            echo $this->Form->label('Email', 'Email');
-            echo $this->Form->textBox('Email');
-            ?>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Email', 'Email'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Email'); ?>
+            </div>
         </li>
-
-        <li>
-            <?php
-            echo $this->Form->checkBox('ShowEmail', t('Email visible to other users'));
-            ?>
+        <li class="form-group">
+            <div class="input-wrap no-label">
+                <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users')); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Password', 'Password'); ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->input('Password', 'password', array('class' => 'InputBox js-password ')); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <div class="InputButtons js-password-related input-wrap no-label">
+                <?php echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary'); ?>
+            </div>
         </li>
 
         <?php if (c('Garden.Profile.Locations', false)): ?>
-            <li class="User-Location">
-                <?php
-                echo $this->Form->label('Location', 'Location');
-                echo $this->Form->textBox('Location');
-                ?>
+            <li class="form-group User-Location">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Location', 'Location'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('Location'); ?>
+                </div>
             </li>
         <?php endif; ?>
 
         <?php if (c('Garden.Profile.Titles', false)): ?>
-            <li class="User-Title">
-                <?php
-                echo $this->Form->label('Title', 'Title');
-                echo $this->Form->textBox('Title');
-                ?>
+            <li class="form-group User-Title">
+                <div class="label-wrap">
+                    <?php echo $this->Form->label('Title', 'Title'); ?>
+                </div>
+                <div class="input-wrap">
+                    <?php echo $this->Form->textBox('Title'); ?>
+                </div>
             </li>
         <?php endif; ?>
         <?php
         $this->fireEvent('CustomUserFields')
         ?>
-        <li>
-            <strong><?php echo t('Check all roles that apply to this user:'); ?></strong>
-            <?php echo $this->Form->checkBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo t('Check all roles that apply to this user:');  ?>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->checkBoxList("RoleID", array_flip($this->RoleData), array_flip($this->UserRoleData)); ?>
+            </div>
         </li>
     </ul>
-<?php echo $this->Form->close('Save');
+<?php echo $this->Form->close('Save'); ?>

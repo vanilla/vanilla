@@ -1,59 +1,67 @@
 {
-	"name": "vanilla/vanilla",
-	"description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
-	"type": "project",
-	"license": "GPL-2.0",
-	"authors": [
-		{
-			"name": "Todd Burry",
-			"email": "todd@vanillaforums.com"
-		},
-		{
-			"name": "Mark O'Sullivan",
-			"email": "mark@vanillaforums.com"
-		},
-		{
-			"name": "Tim Gunter",
-			"email": "tim@vanillaforums.com"
-		},
-		{
-			"name": "Lincoln Russell",
-			"email": "lincoln@vanillaforums.com"
-		}
-
-	],
-	"require": {
-		"psr/log": "~1.0",
-		"smarty/smarty": "~3.1",
-		"vanilla/garden-http": "~1.0",
-		"vanilla/htmlawed": "~2.0",
-		"vanilla/nbbc": "~2.1",
-		"vanilla/garden-password": "~1.0"
-	},
-	"autoload": {
-		"classmap": [
-			"library/core/",
-			"library/database/",
-			"library/setup/",
-			"library/vendors/"
-		],
-		"files": [
-			"library/core/functions.error.php",
-			"library/core/functions.general.php",
-			"library/core/functions.compatibility.php",
-			"library/core/functions.deprecated.php"
-		],
-		"psr-4": {
-			"Vanilla\\": "library/Vanilla"
-		}
-	},
-	"scripts": {
-		"pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
-		"pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate"
-	},
-	"autoload-dev": {
-		"psr-4": {
-			"VanillaTests\\": "tests"
-		}
-	}
+    "name": "vanilla/vanilla",
+    "description": "Vanilla is a powerfully simple discussion forum you can easily customize to make as unique as your community.",
+    "type": "project",
+    "license": "GPL-2.0",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com"
+        },
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com"
+        },
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com"
+        },
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com"
+        }
+    ],
+    "repositories": [{
+        "type": "git",
+        "url": "https://github.com/vanilla/php-ico.git"
+    }],
+    "require": {
+        "psr/log": "~1.0",
+        "smarty/smarty": "~3.1",
+        "vanilla/garden-http": "~1.0",
+        "vanilla/htmlawed": "~2.0",
+        "vanilla/nbbc": "~2.1",
+        "vanilla/garden-password": "~1.0",
+        "vanilla/php-ico": "~1.0",
+        "tburry/pquery": "~1.1",
+        "phpmailer/phpmailer": "~5.2",
+        "container-interop/container-interop": "^1.1"
+    },
+    "autoload": {
+        "classmap": [
+            "library/core/",
+            "library/database/",
+            "library/setup/",
+            "library/vendors/"
+        ],
+        "files": [
+            "library/core/functions.error.php",
+            "library/core/functions.general.php",
+            "library/core/functions.compatibility.php",
+            "library/core/functions.deprecated.php"
+        ],
+        "psr-4": {
+			"Vanilla\\": "library/Vanilla",
+			"Garden\\": "library/Garden"
+        }
+    },
+    "scripts": {
+        "pre-install-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate",
+        "pre-update-cmd": "Vanilla\\Setup\\ComposerHelper::preUpdate"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "VanillaTests\\": "tests"
+        }
+    }
 }

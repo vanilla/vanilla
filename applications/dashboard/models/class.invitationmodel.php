@@ -193,7 +193,14 @@ class InvitationModel extends Gdn_Model {
                 ->setTitle(sprintf(t('Join %s'), $AppTitle));
 
             $Email->setEmailTemplate($emailTemplate);
-            $Email->send();
+
+            try {
+                $Email->send();
+            } catch (Exception $e) {
+                if (debug()) {
+                    throw $e;
+                }
+            }
         }
     }
 

@@ -13,6 +13,7 @@ $PluginInfo['EmojiExtender'] = array(
     'AuthorEmail' => 'rvanbussel@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
     'License' => 'GNU GPL2',
+    'Icon' => 'emoji_set.png',
     'SettingsUrl' => '/settings/EmojiExtender',
     'MobileFriendly' => true
 );
@@ -167,17 +168,28 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function settingsController_emojiExtender_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+
         $cf = new ConfigurationModule($sender);
         $items = array();
 
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
-
-            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'])) : '';
-            $items[$key] = '@'.$icon.
+            $selected = '<svg class="icon icon-svg-checkmark" viewBox="0 0 17 17"><use xlink:href="#checkmark" /></svg>';
+            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'], 'class' => 'label-selector-image')) : '';
+            $items[$key] =
+                '@<div class="image-wrap">'.
+                $icon.
+                '<div class="overlay">'.
+                   '<div class="buttons">'.
+                        '<a class="btn btn-overlay">'.t('Select').'</a>'.
+                   '</div>'.
+                   '<div class="selected">'.$selected.'</div>'.
+                '</div>'.
+                '</div>'.
                 '<div emojiset-body>'.
                 '<div><b>'.htmlspecialchars($manifest['name']).'</b></div>'.
-                (empty($manifest['author']) ? '' : '<div class="emojiset-author">'.sprintf(t('by %s'), $manifest['author']).'</div>').
+                (empty($manifest['author']) ? '' : '<div class="emojiset-author info">'.sprintf(t('by %s'), $manifest['author']).'</div>').
                 (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::wysiwyg($manifest['description']).'</p>').
                 '</div>';
         }
@@ -185,17 +197,15 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
             'Garden.EmojiSet' => array(
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
-                'Description' => '<p>Which emoji set would you like to use?</p>',
                 'Items' => $items,
-                'Options' => array('list' => true, 'listclass' => 'emojiext-list', 'display' => 'after')
+                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list label-selector', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true)
             ),
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
         ));
 
-        $sender->addCssFile('settings.css', 'plugins/EmojiExtender');
-        $sender->addSideMenu();
-        $sender->setData('Title', sprintf(t('%s Settings'), 'Emoji'));
+
+        $sender->setData('Title', t('Choose Your Emoji Set'));
         $cf->renderAll();
     }
 }

@@ -1,0 +1,106 @@
+// Cards
+//
+// Styleguide 12.
+
+// Card
+//
+// A card is a collection of info that appears in a vertical card-looking container. We currently use a card for the
+// user dropdown in the navbar. A card's width will expand or contract based on the size of the container it's in.
+//
+// Markup:
+// <div class="card card-user">
+//   <div class="card-block media media-sm">
+//     <div class="media-left">
+//       <div class="media-image-wrap">
+//         <a title="LittleChick" href="#">
+//           <img src="./public/resources/images/little-chick.jpg">
+//         </a>
+//       </div>
+//     </div>
+//     <div class="media-content">
+//       <div class="media-title">
+//         <a href="#">LittleChick</a>
+//       </div>
+//       <div class="info">Administrator</div>
+//       <a class="btn btn-sm-rounded btn-secondary padded-top" href="#">
+//         My Profile
+//         <svg class="icon icon-11 icon-text icon-svg-external-link" viewBox="0 0 17 17">
+//           <use xlink:href="#external-link"></use>
+//         </svg>
+//       </a>
+//     </div>
+//   </div>
+//   <div class="list-group list-group-flush"> <!-- Uses twbs css -->
+//     <a href="#" class="list-group-item" target="_blank">
+//       Customer Support
+//       <svg class="icon icon-svg-external-link" viewBox="0 0 17 17">
+//         <use xlink:href="#external-link"></use>
+//       </svg>
+//     </a>
+//   </div>
+//   <div class="card-footer">
+//     <a href="#" class="btn btn-secondary">Sign Out</a>
+//   </div>
+// </div>
+//
+// Styleguide 12.1.
+
+.card {
+  position: relative;
+  display: block;
+  background-color: $card-bg;
+  border: $card-border-width solid $card-border-color;
+  @include border-radius($card-border-radius);
+
+  // list-group uses twbs's scss.
+  .list-group-item {
+    font-weight: 500;
+    background-color: $grey-lighter;
+
+    &:hover {
+      background-color: lighten($grey-lighter, 1%);
+    }
+
+    .icon {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+    }
+  }
+
+  svg {
+    position: relative;
+    width: $font-size-base;
+  }
+
+  .media-sm {
+    .media-image-wrap {
+      @include image-wrap();
+    }
+
+    .media-left {
+      height: 5.25rem;
+      padding-right: $spacer;
+    }
+  }
+
+  .media {
+    align-items: flex-start;
+  }
+}
+
+.card-footer {
+  @include has-top-border;
+
+  padding: $spacer * 1.25;
+  text-align: center;
+  border-top: $border-width solid $card-border-color;
+}
+
+.card-block {
+  padding: $spacer;
+}
+
+.drop {
+  z-index: 1005;
+}

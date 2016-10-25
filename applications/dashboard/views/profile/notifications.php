@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
 echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.t('Notifications').'</h2>';
+echo '<h1 class="H">'.t('Notifications').'</h1>';
 
 if (count($this->data('Activities'))) {
     echo '<ul class="DataList Activities Notifications">';
@@ -10,7 +10,7 @@ if (count($this->data('Activities'))) {
     echo PagerModule::write(array('CurrentRecords' => count($this->data('Activities'))));
 } else {
     ?>
-    <div class="Empty"><?php echo sprintf(t('You do not have any %s yet.'), t('notifications')); ?></div>
+    <div class="Empty"><?php echo t('Notifications will appear here.', sprintf(t('You do not have any %s yet.'), t('notifications'))); ?></div>
 <?php
 }
 echo '</div>';

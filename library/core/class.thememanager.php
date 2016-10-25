@@ -326,7 +326,17 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function currentTheme() {
-        return c(!IsMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+        if (IsMobile()) {
+            if ($this->hasMobilePreview()) {
+                return $this->getMobilePreview();
+            }
+            return c('Garden.MobileTheme', 'default');
+        } else {
+            if ($this->hasPreview()) {
+                return $this->getPreview();
+            }
+            return c('Garden.Theme', 'default');
+        }
     }
 
     /**
@@ -335,6 +345,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function desktopTheme() {
+        if ($this->hasPreview()) {
+            return $this->getPreview();
+        }
         return c('Garden.Theme', 'default');
     }
 
@@ -549,7 +562,47 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function mobileTheme() {
+        if ($this->hasMobilePreview()) {
+            return $this->getMobilePreview();
+        }
         return c('Garden.MobileTheme', 'default');
+    }
+
+    /**
+     * Returns the folder name (aka slug) of the previewed theme, or an empty string if there is no previewed theme.
+     *
+     * @return string The folder name of the previewed mobile theme or an empty string.
+     */
+    public function getPreview() {
+        return htmlspecialchars(Gdn::session()->getPreference('PreviewThemeFolder', ''));
+    }
+
+    /**
+     * Returns whether there's a theme being previewed.
+     *
+     * @return bool Whether there's a theme being previewed.
+     */
+    public function hasPreview() {
+        return Gdn::session()->getPreference('PreviewThemeFolder', '') !== '';
+    }
+
+    /**
+     * Returns whether there's a mobile theme being previewed.
+     *
+     * @return bool Whether there's a mobile theme being previewed.
+     */
+    public function hasMobilePreview() {
+        return Gdn::session()->getPreference('PreviewMobileThemeFolder', '') !== '';
+    }
+
+    /**
+     * Returns the folder name (aka slug) of the previewed mobile theme, or an empty string if there is no
+     * previewed mobile theme.
+     *
+     * @return string The folder name of the previewed mobile theme or an empty string.
+     */
+    public function getMobilePreview() {
+        return htmlspecialchars(Gdn::session()->getPreference('PreviewMobileThemeFolder', ''));
     }
 
     /**

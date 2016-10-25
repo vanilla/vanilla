@@ -1,39 +1,29 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+$desc = t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.');
+helpAsset(sprintf(t('About %s'), t('Messages')), $desc);
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'));
+echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'js-modal btn btn-primary');
 ?>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', t('Need More Help?'), '</h2>';
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing appearance"), 'settings/tutorials/appearance'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <h1><?php echo t('Manage Messages'); ?></h1>
-    <div
-        class="Info"><?php echo t('Messages can appear anywhere in your application.', 'Messages can appear anywhere in your application, and can be used to inform your users of news and events. Use this page to re-organize your messages by dragging them up or down.'); ?></div>
-    <div
-        class="FilterMenu"><?php echo anchor(t('Add Message'), 'dashboard/message/add', 'AddMessage SmallButton'); ?></div>
 <?php if ($this->MessageData->numRows() > 0) { ?>
-    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="AltColumns Sortable">
+<div class="table-wrap">
+    <table id="MessageTable" border="0" cellpadding="0" cellspacing="0" class="table-data js-tj Sortable">
         <thead>
         <tr id="0">
-            <th><?php echo t('Location'); ?></th>
-            <th class="Alt"><?php echo t('Message'); ?></th>
+            <th class="column-lg"><?php echo t('Messages'); ?></th>
+            <th><?php echo t('Type'); ?></th>
+            <th class="options column-md"></th>
         </tr>
         </thead>
         <tbody>
         <?php
-        $Alt = false;
         foreach ($this->MessageData->result() as $Message) {
             $Message = $this->MessageModel->DefineLocation($Message);
-            $Alt = !$Alt;
             ?>
             <tr id="<?php
             echo $Message->MessageID;
-            echo $Alt ? '" class="Alt' : '';
             ?>">
-                <td class="Info nowrap"><?php
+                <td><?php
                     printf(
                         t('%1$s on %2$s'),
                         val($Message->AssetTarget, $this->_GetAssetData(), 'Custom Location'),
@@ -49,22 +39,65 @@ $Session = Gdn::session();
                         }
 
                         echo '</div>';
+                    } else {
+                        echo '<div>'.t('All Categories').'</div>';
+                    }
+                    if (val('AllowDismiss', $Message) == '1') {
+                        echo '<div>'.t('Dismissable').'</div>';
+                    } else {
+                        echo '<div>'.t('Not Dismissable').'</div>';
                     }
                     ?>
-                    <div>
-                        <strong><?php echo $Message->Enabled == '1' ? t('Enabled') : t('Disabled'); ?></strong>
+                </td>
+                <td class="message-type">
+                    <?php
+                    $cssClass = val('CssClass', $Message);
+                    switch ($cssClass) {
+                        case 'CasualMessage':
+                            $type =  t('Casual');
+                            break;
+                        case 'InfoMessage':
+                            $type = t('Information');
+                            break;
+                        case 'AlertMessage':
+                            $type = t('Alert');
+                            break;
+                        case 'WarningMessage':
+                            $type = t('Warning');
+                            break;
+                        default:
+                            $type = t('Casual');
+                    }
+                    echo $type;
+                    ?>
+                </td>
+                <td class="options">
+                    <div class="btn-group">
                         <?php
-                        echo anchor(t('Edit'), '/dashboard/message/edit/'.$Message->MessageID, 'EditMessage SmallButton');
-                        echo anchor(t('Delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'DeleteMessage SmallButton');
+                        echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
+                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
+                        <div id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
+                            <?php
+                            if ($Message->Enabled == '1') {
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                            } else {
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                            }
+                            ?>
+                        </div>
                     </div>
                 </td>
-                <td class="Alt">
-                    <div
-                        class="Message <?php echo $Message->CssClass; ?>"><?php echo Gdn_Format::text($Message->Content); ?></div>
+            </tr>
+            <tr>
+                <td colspan="3"  data-tj-ignore="true">
+                    <div class="Message DismissMessage <?php echo $Message->CssClass; ?>">
+                        <?php echo Gdn_Format::text($Message->Content); ?>
+                    </div>
                 </td>
             </tr>
         <?php } ?>
         </tbody>
     </table>
+</div>
 <?php } ?>

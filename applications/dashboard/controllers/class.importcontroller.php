@@ -205,6 +205,7 @@ class ImportController extends DashboardController {
             $Imp->saveState();
             $this->View = 'Index';
         }
+        $this->addJsFile('import.js');
         $this->render();
     }
 

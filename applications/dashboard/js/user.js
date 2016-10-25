@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
         var inp = $(':password');
         var inp2 = $(inp).next();
         if ($(inp2).attr('id') != 'Form_ShowPassword') {
-            $(inp).after('<input id="Form_ShowPassword" type="text" class="InputBox" value="' + $(inp).val() + '" />');
+            $(inp).after('<input id="Form_ShowPassword" type="text" class="form-control" value="' + $(inp).val() + '" />');
             inp2 = $(inp).next();
             $(inp).hide();
             $(inp).change(function() {
@@ -80,5 +80,4 @@ jQuery(document).ready(function($) {
 //      pageContainerSelector: '#Users',
 //      pagerInContainer: true
 //   });
-
 });

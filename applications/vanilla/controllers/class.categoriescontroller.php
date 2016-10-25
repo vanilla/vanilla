@@ -146,16 +146,12 @@ class CategoriesController extends VanillaController {
                     ->setJoinUserCategory(true)
                     ->getChildTree(
                         $categoryIdentifier ?: null,
-                        CategoryModel::instance()->getMaxDisplayDepth() ?: 10
+                        ['depth' => CategoryModel::instance()->getMaxDisplayDepth() ?: 10]
                     );
         }
 
         if ($recent) {
             $this->CategoryModel->joinRecent($categoryTree);
-        }
-
-        if ($watching && $this->CategoryModel->Watching) {
-            $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);
         }
 
         return $categoryTree;
@@ -268,8 +264,8 @@ class CategoriesController extends VanillaController {
             }
 
             $this->setData('CategoryTree', $this->getCategoryTree(
-                $CategoryIdentifier, val('DisplayAs', $Category
-            )));
+                $CategoryIdentifier, val('DisplayAs', $Category)
+            ));
 
             // Add a backwards-compatibility shim for the old categories.
             $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {
@@ -346,6 +342,11 @@ class CategoriesController extends VanillaController {
             $AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($Wheres) : new Gdn_DataSet();
             $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
             $Wheres['d.CategoryID'] = $CategoryIDs;
+
+            // RSS should include announcements.
+            if ($this->SyndicationMethod !== SYNDICATION_NONE) {
+                $Wheres['Announce'] = 'all';
+            }
 
             $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
 
@@ -453,11 +454,8 @@ class CategoriesController extends VanillaController {
             ->setJoinUserCategory(true)
             ->getChildTree(
                 $Category ?: null,
-                $maxDisplayDepth
+                ['depth' => $this->CategoryModel->getMaxDisplayDepth() ?: 10]
             );
-        if ($this->CategoryModel->Watching) {
-            $categoryTree = $this->CategoryModel->filterFollowing($categoryTree);
-        }
         $this->CategoryModel->joinRecent($categoryTree);
         $this->setData('CategoryTree', $this->getCategoryTree($Category, null, true, true));
 

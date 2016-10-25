@@ -1,0 +1,487 @@
+// Typography
+//
+// Type and typography styles.
+//
+// Styleguide 1.
+
+// Headings
+//
+// Base heading styles. Each header level has a css class associated with it, so one can emulate the heading style.
+// (i.e., p class='h1' would adopt the styles associated with a h1 tag.) Most headings on settings pages will need
+// to have an additional CSS class associated with them.
+//
+// Markup:
+// <h1>Heading level 1</h1>
+// <h2>Heading level 2</h2>
+// <h3>Heading level 3</h3>
+// <h4>Heading level 4</h4>
+// <h5>Heading level 5</h5>
+// <h6>Heading level 6</h6>
+//
+// Styleguide 1.1.
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  font-family: $headings-font-family;
+  font-weight: $headings-font-weight;
+  line-height: $headings-line-height;
+  color: $headings-color;
+}
+
+h1, .h1 { font-size: $font-size-h1; }
+h2, .h2 { font-size: $font-size-h2; }
+h3, .h3 { font-size: $font-size-h3; }
+h4, .h4 { font-size: $font-size-h4; }
+h5, .h5 { font-size: $font-size-h5; }
+h6, .h6 { font-size: $font-size-h6; }
+
+h1, .h1,
+h2, .h2,
+h3, .h3,
+h4, .h4,
+h5, .h5,
+h6, .h6 {
+  margin-top: $spacer;
+  margin-bottom: $headings-margin-bottom;
+}
+
+// Paragraph
+//
+// Base paragraph style
+//
+// Markup:
+// <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam adipiscing
+// mauris a ante mollis congue. Nam quis mauris nulla. Aenean accumsan volutpat
+// purus vitae venenatis. Fusce non lacus quis erat aliquam pharetra.</p>
+// <p>Nunc quis lobortis nunc. Duis mattis porta gravida. In sit amet eros ac
+// nisl fermentum sagittis. Cras condimentum felis sed tincidunt varius. Cum
+// sociis natoque penatibus et magnis dis parturient montes, nascetur
+// ridiculus mus.</p>
+//
+// Styleguide 1.2.
+
+p {
+  margin-bottom: ($spacer / 2);
+}
+
+pre {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}
+
+// Full Border
+//
+// Adds a bottom border property to an element that spans the entire content container. Has negative margins
+// and then adds padding to the element.
+//
+// Markup:
+// <div class="full-border">Here's some text with a full border underneath.</div>
+//
+// Styleguide 1.3.
+
+.full-border {
+  @include full-border(block)
+}
+
+// Heading Block
+//
+// Maintains backwards compatibility for any view that just has an h1 heading.
+//
+// No styleguide reference.
+
+.heading-h1-block {
+  @extend .full-border;
+  @extend .heading-h1;
+  padding-bottom: $spacer;
+}
+
+.heading-h1 {
+  font-size: $font-size-lg;
+  margin-bottom: 0;
+}
+
+.content > h1 {
+  @extend .heading-h1-block;
+}
+
+// Header Block
+//
+// This is the area at the top of a settings page. It contains the page title
+// and optionally a button. This button should be of the 'Add *' variety. It can
+// also contain a 'return' link to its parent settings page.
+//
+// Styleguide 1.4.
+
+// Header Block with Button
+//
+// Here'a an example of a header block with an 'add'-type button. This button
+// should only be facilitate an 'Add *' action.
+//
+// PHP rendering: `heading(title, [buttonText, buttonUrl, buttonAttributes, returnUrl]);`
+//
+// Markup:
+// <header class="header-block">
+//   <h1>Title</h1>
+//   <a class="btn btn-primary" href="#">Add Something</a>
+// </header>
+//
+// Styleguide 1.4.1.
+
+.header-block {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: $spacer / 2;
+  padding-bottom: $spacer / 2;
+  min-height: $header-block-height;
+  @extend .full-border;
+
+  h1 {
+    @extend .heading-h1;
+    margin: 0;
+    padding: ($spacer / 2) 0;
+  }
+}
+
+.title-block {
+  display: flex;
+}
+
+// Header Block with Return Button
+//
+// Here's a header with a return button. This should always be in place when a a user navigates to a settings
+// page that is not part of the panel nav.
+//
+// PHP rendering: `heading(title, [buttonText, buttonUrl, buttonAttributes, returnUrl]);`
+//
+// Markup:
+// <header class="header-block">
+//   <div class="title-block">
+//     <a class="btn btn-icon btn-return" aria-label="Return" href="#">
+//       <svg class="icon icon-svg icon-svg-chevron-left" viewBox="0 0 17 17">
+//         <use xlink:href="#chevron-left"></use>
+//       </svg>
+//     </a>
+//     <h1>Title</h1>
+//   </div>
+// </header>
+//
+// Styleguide 1.4.2.
+
+.btn-return {
+  position: relative;
+  padding-left: 0;
+  margin-right: $spacer / 2;
+
+  svg {
+    position: relative;
+    top: 4px;
+    width: $font-size-lg;
+  }
+
+  &:hover svg {
+    fill: $brand-primary;
+  }
+}
+
+// Header Menu
+//
+// A header that's also a menu.
+//
+// Styleguide 1.5.
+
+// Header Menu Navigation
+//
+// Handles navigating to other pages.
+//
+// Markup:
+// <header class="header-menu">
+//   <a class="header-menu-item active" href="#" class="active" role="heading" aria-level="1">Option One</a>
+//   <a class="header-menu-item" href="#">Option Two</a>
+// </header>
+//
+// Styleguide 1.5.1.
+
+// Header Menu Tabs
+//
+// Handles hiding and showing content that exists on a single page. This doesn't have any javascript rigged up
+// for it yet. Custom Theme is the only place it's used and the javascript functionality only exists in that plugin's
+// javascript file.
+//
+// Markup:
+// <div class="header-menu" role="tablist">
+//   <div class="header-menu-item active" role="tab" aria-selected="true" aria-controls="optionOneID">Option One</div>
+//   <div class="header-menu-item" role="tab" aria-selected="false" aria-controls="optionTwoID">Option Two</div>
+// </div>
+//
+// Styleguide 1.5.2.
+
+.header-menu {
+  $header-menu-border-width: to-rem(3);
+  $header-menu-font-size: to-rem(18);
+  $header-menu-height: $header-block-height;
+  $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  @extend .full-border;
+
+  .header-menu-item {
+    padding: ($header-menu-padding) 0;
+    margin: 0 $spacer * 2;
+    font-size: $header-menu-font-size;
+    line-height: 1;
+    color: $grey;
+    text-decoration: none;
+    border-top: $header-menu-border-width solid transparent;
+    border-bottom: $header-menu-border-width solid transparent;
+    cursor: pointer;
+
+    &.active {
+      border-bottom-color: $brand-primary;
+      color: $brand-primary;
+    }
+
+    &:hover {
+      color: $brand-primary;
+    }
+  }
+}
+
+// Subheading
+//
+// Most subheadings should be of this variety. Optimally, the section for which this is a heading should be
+// wrapped in an `<section>` tag.
+//
+// PHP rendering: `subheading(title [description])`
+//
+// Markup:
+// <h2 class="subheading-border">This is a Subheading</h2>
+//
+// Styleguide 1.6.
+
+.subheading-border {
+  @extend .full-border;
+  @include has-top-border;
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  margin-bottom: 0;
+  font-size: $font-size-base;
+  line-height: $line-height;
+  font-weight: 500;
+  border-top: $border-width solid #e7e8e9;
+}
+
+// Subheading Block
+//
+// This element is for a subheading that requires a bit of explanation. Optimally, the section for which this is a
+// heading should be wrapped in an `<section>` tag.
+//
+// PHP rendering: `subheading(title [description])`
+//
+// Markup:
+// <header class="subheading-block">
+//   <h2 class="subheading-title">Subtitle Title</h2>
+//   <div class="subheading-description">
+//     This is a description of this section. It makes this section easier to understand.
+//   </div>
+// </header>
+//
+// Styleguide 1.7.
+
+.subheading-block {
+  @include has-top-border;
+  padding-top: $spacer;
+  padding-bottom: $spacer;
+  border-top: $border-width solid $border-color;
+
+  @extend .full-border;
+
+  .subheading-title {
+    margin-top: 0;
+    margin-bottom: 0;
+    font-size: to-rem(16);
+    line-height: 1.5;
+    font-weight: 500;
+  }
+}
+
+// Flags
+//
+// Makes a flag-style element.
+//
+// Markup:
+// <div class="flag">The best!</div>
+//
+// Styleguide 1.8.
+
+.flag {
+  $flag-height: to-rem(18);
+  display: inline-block;
+  padding-left: .125rem;
+  padding-right: .75rem;
+  line-height: 0;
+  font-size: $font-size-xs;
+  color: $white;
+  border-style: solid;
+  border-color: $brand-secondary;
+  border-right-color: transparent;
+  border-width: ($flag-height / 2) ($flag-height / 2);
+  text-transform: uppercase;
+}
+
+// Badges
+//
+// Makes a badge element, usually used to display a count on a navigation item.
+//
+// Markup:
+// <button class="btn btn-primary">
+//   Tags
+//   <span class="badge">42</span>
+// </button>
+//
+// Styleguide 1.9.
+
+.badge {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 0 ($spacer / 4);
+  margin-left: $spacer / 4;
+  font-size: $font-size-xs;
+  background-color: rgba(0,0,0,.1875);
+  color: $white;
+  border-radius: .25rem;
+
+  .btn-group & {
+    margin-top: - to-rem(2);
+  }
+}
+
+// Semantic Text Colors
+//
+// Applies a semantic color to some text.
+//
+// .text-danger - Danger color.
+// .text-warning - Warning color.
+// .text-info - Info color.
+// .text-success - Success color.
+//
+// Markup:
+// <p class="{{modifier_class}}">
+//   Here is some text.
+// </p>
+//
+// Styleguide 1.10.
+
+// Generates .text-* css rules to change text color for all our semantic colors in variables.
+@each $semantic-color in map-keys($semantic-colors) {
+  $color: map-get($semantic-colors, $semantic-color);
+  .text-#{$semantic-color} {
+    color: $color;
+  }
+}
+
+// Spacer
+//
+// Spacer to put around bullets or pipes in meta descriptions.
+//
+// Markup:
+// <div>Written by Jane<span class="spacer">|</span>July 5, 2000</div>
+//
+//Styleguide 1.11.
+
+.spacer {
+  display: inline-block;
+  padding: 0 .25rem;
+}
+
+
+// Anchors
+//
+// .reverse-link - Makes the hover-color the link color and vice-versa.
+//
+// Markup:
+// <a class="{{modifier_class}}" href="#">I am some text.</a>
+//
+// Styleguide 1.12.
+
+.reverse-link {
+  color: $grey-dark;
+
+  &:hover {
+    color: $brand-primary;
+  }
+}
+
+// Font Helpers
+//
+// Add some font styling to a block of text.
+//
+// .italic - Sets the text font-style to italic.
+// .strong - Adds a font-weight of 500 to the text.
+// .info - Makes the text smaller and muted, good for adding meta info to an item.
+//
+// Markup:
+// <span class="{{modifier_class}}">Here is some text.</span>
+//
+// Styleguide 1.13.
+
+.italic {
+  font-style: italic;
+}
+
+strong,
+.strong {
+  font-weight: 500;
+}
+
+.Info,
+.Info2,
+.info {
+  display: block;
+  font-size: $font-size-sm;
+  line-height: $line-height-lg;
+  color: $grey;
+}
+
+// List Reset
+//
+// .list-reset - Removes list styling.
+//
+// Markup:
+// <ul class="{{modifier_class}}">
+//   <li>List item one</li>
+//   <li>List item two</li>
+//   <li>List item three</li>
+// </ul>
+//
+// Styleguide 1.14.
+
+.list-reset {
+  &,
+  ul,
+  ol {
+    @include list-reset;
+  }
+}
+
+// Truncate
+//
+// Trucates text that flows longer than the width of its container.
+// Note that the `ex-block` class here is for examples in the styleguide only.
+//
+// Markup:
+// <div class="ex-block truncate">I am some really really long text. Nobody can put me in a box!</div>
+//
+// Styleguide 1.15.
+
+.truncate {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

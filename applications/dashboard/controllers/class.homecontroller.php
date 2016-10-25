@@ -59,6 +59,7 @@ class HomeController extends Gdn_Controller {
         $this->setData('_NoMessages', true);
 
         $Code = $this->data('Code', 400);
+        $this->clearNavigationPreferences();
         safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
         Gdn_Theme::section('Error');
 
@@ -89,10 +90,24 @@ class HomeController extends Gdn_Controller {
         Gdn_Theme::section('Error');
 
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
+            $this->clearNavigationPreferences();
             safeHeader("HTTP/1.0 404", true, 404);
             $this->render();
         } else {
             $this->RenderException(NotFoundException());
+        }
+    }
+
+    /**
+     * Clears the request uri from the user's navigation preferences. This stops the user from getting locked out of
+     * the dashboard if they saved a preference for a page that no longer exists or that they no longer have
+     * permission to view.
+     */
+    private function clearNavigationPreferences() {
+        if (Gdn::session()->isValid()) {
+            $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+            $userModel = new UserModel();
+            $userModel->clearSectionNavigationPreference($uri);
         }
     }
 
@@ -116,6 +131,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function updateMode() {
+        $this->clearNavigationPreferences();
         safeHeader("HTTP/1.0 503", true, 503);
         $this->setData('UpdateMode', true);
         $this->render();
@@ -128,6 +144,7 @@ class HomeController extends Gdn_Controller {
      * @access public
      */
     public function deleted() {
+        $this->clearNavigationPreferences();
         safeHeader("HTTP/1.0 410", true, 410);
         Gdn_Theme::section('Error');
         $this->render();
@@ -213,6 +230,7 @@ class HomeController extends Gdn_Controller {
         Gdn_Theme::section('Error');
 
         if ($this->deliveryMethod() == DELIVERY_METHOD_XHTML) {
+            $this->clearNavigationPreferences();
             safeHeader("HTTP/1.0 401", true, 401);
             $this->render();
         } else {

@@ -1,0 +1,16 @@
+// Autocomplete css. We should have jquery.autocomplete.js use our css classes instead of the default.
+
+.ac_input {
+  @extend .form-control;
+  height: $control-height-rem !important;
+}
+
+.ac_results {
+  @extend .dropdown-menu;
+  @include list-reset;
+  z-index: 1100;
+
+  li {
+    @extend .dropdown-item
+  }
+}

@@ -15,7 +15,8 @@ $PluginInfo['SplitMerge'] = array(
     'HasLocale' => true,
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
+    'AuthorUrl' => 'http://www.vanillaforums.com',
+    'Icon' => 'split-merge.png'
 );
 
 /**
@@ -80,6 +81,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                 }
             }
         }
+
         // Load category data.
         $Sender->ShowCategorySelector = (bool)c('Vanilla.Categories.Use');
         $CountCheckedComments = count($CommentIDs);
@@ -91,6 +93,9 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Data['Body'] = sprintf(t('This discussion was created from comments split from: %s.'), anchor(Gdn_Format::text($Discussion->Name), 'discussion/'.$Discussion->DiscussionID.'/'.Gdn_Format::url($Discussion->Name).'/'));
             $Data['Format'] = 'Html';
             $Data['Type'] = 'Discussion';
+
+            // Use the System user as the author.
+            $Data['InsertUserID'] = Gdn::userModel()->getSystemUserID();
 
             // Pass a forced input formatter around this exception.
             if (c('Garden.ForceInputFormatter')) {

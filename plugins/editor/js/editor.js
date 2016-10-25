@@ -1,6 +1,6 @@
 (function($) {
     $.fn.setAsEditor = function(selector) {
-        selector = selector || '.BodyBox';
+        selector = selector || '.BodyBox,.js-bodybox';
 
         // If editor can be loaded, add class to body
         $('body').addClass('editor-active');
@@ -133,7 +133,7 @@
                     // TODO move into own function
                     var ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                     if (ifr.length) {
-                        var iframeBodyBox = ifr.contents().find('.BodyBox');
+                        var iframeBodyBox = ifr.contents().find('.BodyBox,.js-bodybox');
                         //$(iframeBodyBox).addClass('iframe-bodybox-lightsoff');
                         iframeBodyBox.off('focus blur');
                         $(fullPageCandidate).removeClass('editor-lights-candidate');
@@ -163,7 +163,7 @@
                 if (typeof wysiwygInstance != 'undefined') {
                     wysiwygInstance.focus();
                 } else {
-                    editorSetCaretFocusEnd($(formWrapper).find('.BodyBox')[0]);
+                    editorSetCaretFocusEnd($(formWrapper).find('.BodyBox,.js-bodybox')[0]);
                 }
             };
 
@@ -236,7 +236,7 @@
                     // the external stylesheet and override the iframe inlines.
                     ifr = $(fullPageCandidate).find('.wysihtml5-sandbox');
                     if (ifr.length) {
-                        var iframeBodyBox = ifr.contents().find('.BodyBox');
+                        var iframeBodyBox = ifr.contents().find('.BodyBox,.js-bodybox');
                         iframeBodyBox.css({
                             "transition": "background-color 0.4s ease, color 0.4s ease"
                         });
@@ -979,15 +979,9 @@
                 });
             }
 
-            // This will grab all the files--saved and session--currently
-            // attached to a discussion. This is useful to
-            // prevent the same files being uploaded multiple times to the
-            // same discussion. It's better to constrain check to whole
-            // discussion instead of on a per-comment basis, as it's not
-            // useful to have the same file uploaded by multiple users in
-            // a discussion as a whole.
-            var getAllFileNamesInDiscussion = function() {
-                var filesInDiscussion = $('.editor-file-preview');
+            // List of already uploaded files.
+            var getCurrentEditorFiles = function() {
+                var filesInDiscussion = $(editor).closest('.FormWrapper').find('.editor-file-preview');
                 var fileNames = [];
 
                 filesInDiscussion.each(function(i, el) {
@@ -1072,9 +1066,8 @@
                                     : false;
 
                                 // Check if the file is already a part of the
-                                // discussion--that is, already uploaded to the
-                                // current discussion.
-                                var fileAlreadyExists = ($.inArray(filename, getAllFileNamesInDiscussion()) > -1)
+                                // current post.
+                                var fileAlreadyExists = ($.inArray(filename, getCurrentEditorFiles()) > -1)
                                     ? true
                                     : false;
 
@@ -1108,7 +1101,7 @@
                                     }
 
                                     if (fileAlreadyExists) {
-                                        message += 'is already in this discussion. It will not be uploaded again';
+                                        message += 'is already in this post. It will not be uploaded again';
                                     }
 
                                     gdn.informMessage(message + '.');
@@ -1147,7 +1140,7 @@
                             // If it's an image, then indicate that it's been embedded
                             // in the post
                             var imageEmbeddedText = (payload.thumbnail_url)
-                                ? ' &middot; <em title="This image has been inserted into the body of text.">inserted</em>'
+                                ? ' &middot; <em title="' + gdn.meta['fileUpload-insertedTooltip'] + '">' + gdn.meta['fileUpload-inserted'] + '</em>'
                                 : '';
 
                             var html = ''
@@ -1158,8 +1151,8 @@
                                 + '<a class="filename" data-type="' + payload.type + '" data-width="' + payload.original_width + '" data-height="' + payload.original_height + '" href="' + payload.original_url + '" target="_blank">' + payload.Filename + '</a>'
                                 + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
                                 + '</div>'
-                                + '<span class="editor-file-remove" title="Remove file"></span>'
-                                + '<span class="editor-file-reattach" title="Click to re-attach \'' + payload.Filename + '\'"></span>'
+                                + '<span class="editor-file-remove" title="' + window.gdn.meta['fileUpload-remove']  + '"></span>'
+                                + '<span class="editor-file-reattach" title="' + window.gdn.meta['fileUpload-reattatch']  + ' \'' + payload.Filename + '\'"></span>'
                                 + '</div>';
 
 
@@ -1183,7 +1176,7 @@
 
                                 var payloadHeight = payload.original_height;
                                 var payloadWidth = payload.original_width;
-                                var editorWidth = $(this).find('.BodyBox').width();
+                                var editorWidth = $(this).find('.BodyBox,.js-bodybox').width();
 
                                 // Image max-width is 100%. Change the height to refect scaling down the width.
                                 if (editorWidth < payloadWidth) {
@@ -1456,7 +1449,7 @@
                 format = currentEditorFormat + '';
                 $currentEditorToolbar = $t.find('.editor-format-' + format);
                 //currentEditableTextarea = t.find('#Form_Body');
-                $currentEditableTextarea = $t.find('.BodyBox');
+                $currentEditableTextarea = $t.find('.BodyBox,.js-bodybox');
 
                 if (textareaObj) {
                     $currentEditableTextarea = textareaObj;
@@ -1823,7 +1816,7 @@
 }(jQuery));
 
 $(document).on('contentLoad', function(e) {
-    $('.BodyBox', e.target).setAsEditor();
+    $('.BodyBox,.js-bodybox', e.target).setAsEditor();
 });
 
 /*

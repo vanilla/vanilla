@@ -1826,7 +1826,7 @@ class UserModel extends Gdn_Model {
      * @return bool|int|string
      */
     public function register($FormPostValues, $Options = []) {
-        $FormPostValues['LastIPAddress'] = Gdn::request()->ipAddress();
+        $FormPostValues['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
 
         // Check for banning first.
         $Valid = BanModel::checkUser($FormPostValues, null, true);
@@ -1989,9 +1989,12 @@ class UserModel extends Gdn_Model {
             $FormPostValues['Verified'] = forceBool($FormPostValues['Verified'], '0', '1', '0');
         }
 
+        // Do not allowing setting this via general save.
         unset($FormPostValues['Admin']);
 
-        // Validate the form posted values
+        // This field is deprecated but included on user objects for backwards compatibility.
+        // It will absolutely break if you try to save it back to the database.
+        unset($FormPostValues['AllIPAddresses']);
 
         if (array_key_exists('Gender', $FormPostValues)) {
             $FormPostValues['Gender'] = self::fixGender($FormPostValues['Gender']);
@@ -2101,6 +2104,15 @@ class UserModel extends Gdn_Model {
 
             // Check the validation results again in case something was added during the BeforeSave event.
             if (count($this->Validation->results()) == 0) {
+                // Encode any IP fields that aren't already encoded.
+                $ipCols = ['InsertIPAddress', 'LastIPAddress', 'UpdateIPAddress'];
+                foreach ($ipCols as $col) {
+                    if (isset($Fields[$col]) && filter_var($Fields[$col], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+                        $Fields[$col] = ipEncode($Fields[$col]);
+                    }
+                }
+                unset($col);
+
                 // If the primary key exists in the validated fields and it is a
                 // numeric value greater than zero, update the related database row.
                 if ($UserID > 0) {
@@ -2400,7 +2412,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->where('u.Banned >', 0);
             $Keywords = '';
         } elseif (preg_match('/^\d+$/', $Keywords)) {
-            $UserID = $Keywords;
+            $numericQuery = $Keywords;
             $Keywords = '';
         } else {
             // Check to see if the search exactly matches a role name.
@@ -2430,8 +2442,12 @@ class UserModel extends Gdn_Model {
             }
 
             $this->SQL->endWhereGroup();
-        } elseif (isset($UserID)) {
-            $this->SQL->where('u.UserID', $UserID);
+        } elseif (isset($numericQuery)) {
+            // We've searched for a number. Return UserID AND any exact numeric name match.
+            $this->SQL->beginWhereGroup()
+                ->where('u.UserID', $numericQuery)
+                ->orWhere('u.Name', $numericQuery)
+                ->endWhereGroup();
         } elseif ($Keywords) {
             if ($Optimize) {
                 // An optimized search should only be done against name OR email.
@@ -2894,8 +2910,8 @@ class UserModel extends Gdn_Model {
         $Fields[$this->DateInserted] = $Now;
         touchValue('DateFirstVisit', $Fields, $Now);
         $Fields['DateLastActive'] = $Now;
-        $Fields['InsertIPAddress'] = Gdn::request()->ipAddress();
-        $Fields['LastIPAddress'] = Gdn::request()->ipAddress();
+        $Fields['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
+        $Fields['LastIPAddress'] = ipEncode(Gdn::request()->ipAddress());
     }
 
     /**
@@ -2963,7 +2979,7 @@ class UserModel extends Gdn_Model {
         // Update session level information if necessary.
         if ($UserID == Gdn::session()->UserID) {
             $IP = Gdn::request()->ipAddress();
-            $Fields['LastIPAddress'] = $IP;
+            $Fields['LastIPAddress'] = ipEncode($IP);
             $this->saveIP($UserID, $IP);
 
             if (Gdn::session()->newVisit()) {
@@ -3230,7 +3246,14 @@ class UserModel extends Gdn_Model {
                     ->setTitle(t('Membership Approved'));
 
                 $Email->setEmailTemplate($emailTemplate);
-                $Email->send();
+
+                try {
+                    $Email->send();
+                } catch (Exception $e) {
+                    if (debug()) {
+                        throw $e;
+                    }
+                }
 
                 // Report that the user was approved.
                 $ActivityModel = new ActivityModel();
@@ -3892,7 +3915,14 @@ class UserModel extends Gdn_Model {
             ->setButton($url, t('Confirm My Email Address'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -3947,7 +3977,14 @@ class UserModel extends Gdn_Model {
         $emailTemplate->setTitle(t('Welcome Aboard!'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -3961,7 +3998,7 @@ class UserModel extends Gdn_Model {
      * @return string The welcome email for the registration type.
      */
     protected function getEmailWelcome($registerType, $user, $data, $password = '') {
-        $appTitle = c('Garden.Title');
+        $appTitle = c('Garden.Title', c('Garden.HomepageTitle'));
 
         // Backwards compatability. See if anybody has overridden the EmailWelcome string.
         if (($emailFormat = t('EmailWelcome'.$registerType, ''))) {
@@ -4026,7 +4063,14 @@ class UserModel extends Gdn_Model {
             ->setButton(externalUrl('/'), t('Access the Site'));
 
         $Email->setEmailTemplate($emailTemplate);
-        $Email->send();
+
+        try {
+            $Email->send();
+        } catch (Exception $e) {
+            if (debug()) {
+                throw $e;
+            }
+        }
     }
 
     /**
@@ -4061,7 +4105,7 @@ class UserModel extends Gdn_Model {
             $UserData['DateOfBirth'] = val('DateOfBirth', $Data, '');
             $UserData['CountNotifications'] = 0;
             $UserData['Attributes'] = $Attributes;
-            $UserData['InsertIPAddress'] = Gdn::request()->ipAddress();
+            $UserData['InsertIPAddress'] = ipEncode(Gdn::request()->ipAddress());
             if ($UserData['DateOfBirth'] == '') {
                 $UserData['DateOfBirth'] = '1975-09-16';
             }
@@ -4178,7 +4222,14 @@ class UserModel extends Gdn_Model {
                 ->setButton(externalUrl('/entry/passwordreset/'.$User->UserID.'/'.$PasswordResetKey), t('Change My Password'));
             $Email->setEmailTemplate($emailTemplate);
 
-            $Email->send();
+            try {
+                $Email->send();
+            } catch (Exception $e) {
+                if (debug()) {
+                    throw $e;
+                }
+            }
+
             $NoEmail = false;
         }
 
@@ -4519,5 +4570,59 @@ class UserModel extends Gdn_Model {
             }
         }
         return $RoleIDs;
+    }
+
+    /**
+     * Clears navigation preferences for a user.
+     *
+     * @param string $userID Optional - defaults to sessioned user
+     */
+    public function clearNavigationPreferences($userID = '') {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        $this->savePreference($userID, 'DashboardNav.Collapsed', []);
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', []);
+        $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+    }
+
+    /**
+     * Checks if a url is saved as a navigation preference and if so, deletes it.
+     * Also optionally resets the section dashboard landing page, which may be desirable if a user no longer has
+     * permission to access pages in that section.
+     *
+     * @param string $url The url to search the user navigation preferences for, defaults to the request
+     * @param string $userID The ID of the user to clear the preferences for, defaults to the sessioned user
+     * @param bool $resetSectionPreference Whether to reset the dashboard section landing page
+     */
+    public function clearSectionNavigationPreference($url = '', $userID = '', $resetSectionPreference = true) {
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
+        }
+
+        if ($url == '') {
+            $url = Gdn::request()->url();
+        }
+
+        $user = $this->getID($userID);
+        $preferences = val('Preferences', $user, []);
+        $landingPages = val('DashboardNav.SectionLandingPages', $preferences, []);
+
+        // Run through the user's saved landing page per section and if the url matches the passed url,
+        // remove that preference.
+        foreach ($landingPages as $section => $landingPage) {
+            $url = strtolower(trim($url, '/'));
+            $landingPage = strtolower(trim($landingPage, '/'));
+            if ($url == $landingPage || stringEndsWith($url, $landingPage)) {
+                unset($landingPages[$section]);
+            }
+        }
+
+        $this->savePreference($userID, 'DashboardNav.SectionLandingPages', $landingPages);
+
+        if ($resetSectionPreference) {
+            $this->savePreference($userID, 'DashboardNav.DashboardLandingPage', '');
+        }
     }
 }

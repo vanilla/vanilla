@@ -340,7 +340,8 @@ class Gdn_Factory {
 
         $arr = array_filter($arr);
         $arr = array_reduce($arr, function ($carry, $av) {
-            $key = array_pop(array_keys($av));
+            $keys = array_keys($av);
+            $key = array_pop($keys);
             $carry[$key] = $av[$key];
             return $carry;
         }, []);

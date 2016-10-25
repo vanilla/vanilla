@@ -628,7 +628,7 @@ class RoleModel extends Gdn_Model {
      * @param string $RolesColumn
      */
     public static function setUserRoles(&$Users, $UserIDColumn = 'UserID', $RolesColumn = 'Roles') {
-        $UserIDs = array_unique(ConsolidateArrayValuesByKey($Users, $UserIDColumn));
+        $UserIDs = array_unique(array_column($Users, $UserIDColumn));
 
         // Try and get all of the mappings from the cache.
         $Keys = array();
@@ -658,7 +658,7 @@ class RoleModel extends Gdn_Model {
 
             // Store the user role mappings.
             foreach ($DbUserRoles as $UserID => $Rows) {
-                $RoleIDs = consolidateArrayValuesByKey($Rows, 'RoleID');
+                $RoleIDs = array_column($Rows, 'RoleID');
                 $Key = $Keys[$UserID];
                 Gdn::cache()->store($Key, $RoleIDs);
                 $UserRoles[$Key] = $RoleIDs;
@@ -782,5 +782,20 @@ class RoleModel extends Gdn_Model {
         $formattedRoles = array_column($unformattedRoles, $field);
 
         return $formattedRoles;
+    }
+
+    /**
+     * Enforce integrity between users and roles.
+     */
+    public static function cleanUserRoles() {
+        $px = Gdn::database()->DatabasePrefix;
+        Gdn::sql()->query("
+            delete ur
+            from {$px}UserRole as ur
+                left join {$px}Role as r on r.RoleID = ur.RoleID
+                left join {$px}User as u on u.UserID = ur.UserID
+            where r.RoleID is null
+                or u.UserID is null
+        ");
     }
 }

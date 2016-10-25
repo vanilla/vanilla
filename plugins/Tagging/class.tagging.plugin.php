@@ -10,14 +10,16 @@
 $PluginInfo['Tagging'] = array(
     'Name' => 'Tagging',
     'Description' => 'Users may add tags to each discussion they create. Existing tags are shown in the sidebar for navigation by tag.',
-    'Version' => '1.9.0',
+    'Version' => '1.9.1',
     'SettingsUrl' => '/dashboard/settings/tagging',
+    'UsePopupSettings' => false,
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org',
     'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit')
+    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit'),
+    'Icon' => 'tagging.png'
 );
 
 /**
@@ -36,6 +38,7 @@ $PluginInfo['Tagging'] = array(
  *  1.8.8   Added tabs.
  *  1.8.9   Ability to add tags based on tab.
  *  1.8.12  Fix issues with CSS and js loading.
+ *  1.9.1   Add tokenLimit enforcement; cleanup.
  */
 class TaggingPlugin extends Gdn_Plugin {
 
@@ -243,13 +246,6 @@ class TaggingPlugin extends Gdn_Plugin {
 
         $Sender->View = c('Vanilla.Discussions.Layout');
 
-        /*
-        // If these don't equal, then there is a category that should be inserted.
-        if ($UseCategories && $Category && $TagRow['FullName'] != val('Name', $Category)) {
-           $Sender->Data['Breadcrumbs'][] = array('Name' => $Category['Name'], 'Url' => TagUrl($TagRow));
-        }
-        $Sender->Data['Breadcrumbs'][] = array('Name' => $TagRow['FullName'], 'Url' => '');
-  */
         // Render the controller.
         $this->View = c('Vanilla.Discussions.Layout') == 'table' && $Sender->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
         $Sender->render($this->View, 'discussions', 'vanilla');
@@ -350,50 +346,44 @@ class TaggingPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Should we limit the discussion query to a specific tagid?
-     * @param DiscussionModel $Sender
-     */
-//   public function DiscussionModel_BeforeGet_handler($Sender) {
-//      if (c('Plugins.Tagging.Enabled') && property_exists($Sender, 'FilterToDiscussionIDs')) {
-//         $Sender->SQL->whereIn('d.DiscussionID', $Sender->FilterToDiscussionIDs)
-//            ->limit(FALSE);
-//      }
-//   }
-
-    /**
      * Validate tags when saving a discussion.
+     *
+     * @param DiscussionModel $Sender
+     * @param array $Args
      */
     public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        // Allow an addon to set disallowed tag names.
         $reservedTags = [];
         $Sender->EventArguments['ReservedTags'] = &$reservedTags;
-        $Sender->FireEvent('ReservedTags');
+        $Sender->fireEvent('ReservedTags');
 
-        $FormPostValues = val('FormPostValues', $Args, array());
-        $TagsString = trim(strtolower(val('Tags', $FormPostValues, '')));
-        $NumTagsMax = c('Plugin.Tagging.Max', 5);
-        // Tags can only contain unicode and the following ASCII: a-z 0-9 + # _ .
+        // Set some tagging requirements.
+        $TagsString = trim(strtolower(valr('FormPostValues.Tags', $Args, '')));
         if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
+            // Break apart our tags and lowercase them all for comparisons.
             $Tags = TagModel::splitTags($TagsString);
-            // Handle upper/lowercase
             $Tags = array_map('strtolower', $Tags);
             $reservedTags = array_map('strtolower', $reservedTags);
+            $maxTags = c('Plugin.Tagging.Max', 5);
+
+            // Validate our tags.
             if ($reservedTags = array_intersect($Tags, $reservedTags)) {
                 $names = implode(', ', $reservedTags);
                 $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
             }
             if (!TagModel::validateTags($Tags)) {
                 $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
-            } elseif (count($Tags) > $NumTagsMax) {
-                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $NumTagsMax));
-            } else {
+            }
+            if (count($Tags) > $maxTags) {
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
             }
         }
     }
 
     /**
-     *
+     * Handle tag association deletion when a discussion is deleted.
      *
      * @param $Sender
      * @throws Exception
@@ -620,6 +610,7 @@ class TaggingPlugin extends Gdn_Plugin {
     public function postController_render_before($Sender) {
         $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
         $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
+        $Sender->addDefinition('MaxTagsAllowed', c('Plugin.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();
@@ -658,9 +649,8 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param SettingsController $Sender
      */
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
-
         $Sender->title('Tagging');
-        $Sender->addSideMenu('settings/tagging');
+        $Sender->setHighlightRoute('settings/tagging');
         $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
         $SQL = Gdn::sql();
 
@@ -674,31 +664,24 @@ class TaggingPlugin extends Gdn_Plugin {
         $Sender->setData('_Limit', $Limit);
 
         if ($Search) {
-            $SQL->like('FullName', $Search, 'right');
+            $SQL->like('Name', $Search, 'right');
+        }
+
+        $queryType = $Type;
+
+        if (strtolower($Type) == 'all' || $Search || $Type === null) {
+            $queryType = false;
+            $Type = '';
         }
 
         // This type doesn't actually exist, but it will represent the
         // blank types in the column.
         if (strtolower($Type) == 'tags') {
-            $Type = '';
+            $queryType = '';
         }
 
-        if (!$Search) {
-            if ($Type !== null) {
-                if ($Type === 'null') {
-                    $Type = null;
-                }
-                $SQL->where('Type', $Type);
-            } elseif ($Type == '') {
-                $SQL->where('Type', '');
-            }
-        } else {
-            $Type = 'Search Results';
-            // This is made up, and exists so search results can be placed in
-            // their own tab.
-            $TagTypes[$Type] = array(
-                'key' => $Type
-            );
+        if (!$Search && ($queryType !== false)) {
+            $SQL->where('Type', $queryType);
         }
 
         $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
@@ -706,7 +689,7 @@ class TaggingPlugin extends Gdn_Plugin {
         // Store type for view
         $TagType = (!empty($Type))
             ? $Type
-            : 'Tags';
+            : 'All';
         $Sender->setData('_TagType', $TagType);
 
         // Store tag types
@@ -723,7 +706,6 @@ class TaggingPlugin extends Gdn_Plugin {
         $Data = $SQL
             ->select('t.*')
             ->from('Tag t')
-            ->orderBy('t.FullName', 'asc')
             ->orderBy('t.CountDiscussions', 'desc')
             ->limit($Limit, $Offset)
             ->get()->resultArray();
@@ -740,9 +722,9 @@ class TaggingPlugin extends Gdn_Plugin {
 
         // Search results pagination will mess up a bit, so don't provide a type
         // in the count.
-        $RecordCountWhere = array('Type' => $Type);
-        if ($Type == '') {
-            $RecordCountWhere = array('Type' => '');
+        $RecordCountWhere = array('Type' => $queryType);
+        if ($queryType === false) {
+            $RecordCountWhere = [];
         }
         if ($Search) {
             $RecordCountWhere = array();
@@ -877,8 +859,7 @@ class TaggingPlugin extends Gdn_Plugin {
             $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
         }
 
-        $Sender->setData('Title', t('Delete Tag'));
-        $Sender->render('delete', '', 'plugins/Tagging');
+        $Sender->render('Blank', 'Utility', 'dashboard');
     }
 
     /**

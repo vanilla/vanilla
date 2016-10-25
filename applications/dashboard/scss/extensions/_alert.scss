@@ -1,0 +1,176 @@
+// We can get rid of part one of this when we replace *Message classes with alert alert-* css classes.
+// The message preview part of this file requires a reworking of site messages before we can get rid of it.
+
+.CasualMessage {
+  @extend .alert;
+  @extend .alert-success;
+}
+
+.InfoMessage {
+  @extend .alert;
+  @extend .alert-info;
+}
+
+.WarningMessage {
+  @extend .alert;
+  @extend .alert-warning;
+}
+
+.AlertMessage {
+  @extend .alert;
+  @extend .alert-warning;
+}
+
+div.Messages.Errors {
+  @extend .padded;
+  @extend .alert;
+  @extend .alert-danger;
+}
+
+// For message previews. We pull these styles from style.scss so the previews will presumably look the
+// Way the alerts will look on the front-end. However, if the user overrides style.css, or styles the alerts
+// differently in custom.css, then the preview will not be the sam.
+.Section-Dashboard.Message.index {
+  /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
+    that it renders in a div with this DismissMessage class. */
+  /* Messages */
+  .DismissMessage a.Dismiss {
+    font-family: arial;
+    position: absolute;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+    color: #777;
+    top: -1px;
+    right: -1px;
+    padding: 1px 3px;
+    text-decoration: none;
+  }
+
+  .DismissMessage a.Dismiss:hover {
+    border: none;
+    background: #333;
+    color: #fff;
+  }
+
+  .DismissMessage strong,
+  .DismissMessage b {
+    font-weight: bold;
+  }
+
+  .DismissMessage {
+    font-size: 13px;
+    text-align: left;
+    position: relative;
+    color: #000;
+    border: none;
+    border-radius: 1px;
+    margin: 10px 0;
+    padding: 10px;
+  }
+
+  .DismissMessage.Info {
+    background: #f3f4f8;
+    border: 1px solid #ddd;
+  }
+
+  .DismissMessage.Warning {
+    background: #ffebe9;
+    border: 1px solid #ffccc9;
+  }
+
+  .DismissMessage.Box {
+    background: #fff8ce;
+    border: 1px solid #c5bea4;
+    box-shadow: none;
+    margin: 0 0 10px;
+    /* Make sure that .Box definitions don't override the base DismissMessage margin! */
+  }
+
+  .CasualMessage {
+    background: #cfecff;
+    border: 1px solid #abdafb;
+    color: #1e79a7;
+  }
+
+  .InfoMessage {
+    background: #f6f6f6;
+    border: 1px solid #ddd;
+  }
+
+  .AlertMessage {
+    background: #fff8ce;
+    border: 1px solid #deddaf;
+  }
+
+  .WarningMessage {
+    background: #ffebe9;
+    border: 1px solid #ffccc9;
+  }
+
+  div.Message {
+    line-height: 1.7;
+    font-size: 100%;
+    word-wrap: break-word;
+    margin-top: 5px;
+  }
+
+  div.Message h1, div.Message h2, div.Message h3, div.Message p, div.Message .P {
+    margin: 10px 0;
+  }
+
+  div.Message small {
+    font-size: 11px;
+    color: #777;
+  }
+
+  div.Message img.LeftAlign,
+  img.LeftAlign {
+    float: left;
+    margin: 0 10px 5px 0;
+    max-width: 300px;
+  }
+
+  div.Message dt {
+    font-weight: bold;
+    margin: 10px 0 4px;
+  }
+
+  div.Message dd {
+    margin-left: 30px;
+  }
+
+  div.Message dd > p {
+    margin-top: 4px;
+  }
+
+  div.Message li {
+    margin: 5px 0;
+  }
+
+  div.Message strong, div.Message b {
+    font-weight: bold;
+  }
+
+  div.Message em,
+  div.Message i {
+    font-style: oblique;
+  }
+
+  div.Message ul,
+  div.Message ol {
+    margin: 1em 0 1em 3em;
+  }
+
+  div.Message ol li {
+    list-style: decimal !important;
+  }
+
+  div.Message ul li {
+    list-style: disc !important;
+  }
+
+  div.Message img {
+    max-width: 100%;
+  }
+}

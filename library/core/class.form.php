@@ -16,6 +16,52 @@
  * Helps with the rendering of form controls that link directly to a data model.
  */
 class Gdn_Form extends Gdn_Pluggable {
+    /**
+     * @var array
+     */
+    private $styles = [];
+
+    /**
+     * @var array All of the available styles.
+     */
+    private $allStyles = [
+        'legacy' => [
+            'bodybox' => 'TextBox BodyBox js-bodybox',
+            'button' => 'Button',
+            'button-element' => 'input',
+            'checkbox' => 'CheckBoxLabel',
+            'dropdown' => '',
+            'file' => '',
+            'radio' => 'RadioLabel',
+            'textarea' => 'TextBox',
+            'textbox' => 'InputBox',
+            'input-wrap' => 'TextBoxWrapper',
+            'form-group' => '',
+            'form-footer' => 'Buttons'
+        ],
+        'bootstrap' => [
+            'default' => 'form-control',
+            'bodybox' => 'form-control js-bodybox',
+            'button' => 'btn btn-primary',
+            'button-element' => 'button',
+            'checkbox' => '',
+            'checkbox-container' => 'checkbox',
+            'checkbox-inline' => 'checkbox-inline',
+            'file' => 'form-control-file',
+            'inputbox' => 'form-control',
+            'textbox' => 'form-control',
+            'popup' => 'js-popup',
+            'primary' => 'btn-primary',
+            'radio' => '',
+            'radio-container' => 'radio',
+            'smallbutton' => 'btn btn-sm',
+            'textarea' => 'form-control',
+            'dropdown' => 'form-control',
+            'input-wrap' => 'input-wrap',
+            'form-group' => 'form-group',
+            'form-footer' => 'js-modal-footer form-footer'
+        ]
+    ];
 
     /** @var string Action with which the form should be sent. */
     public $Action = '';
@@ -74,12 +120,20 @@ class Gdn_Form extends Gdn_Pluggable {
      * Constructor
      *
      * @param string $TableName
+     * @param string $style The style key to use.
      */
-    public function __construct($TableName = '') {
+    public function __construct($TableName = '', $style = '') {
         if ($TableName != '') {
             $TableModel = new Gdn_Model($TableName);
             $this->setModel($TableModel);
         }
+
+        if ($style === '') {
+            $themeInfo = Gdn::themeManager()->getThemeInfo(Gdn::themeManager()->currentTheme());
+            $style = val('ControlStyle', $themeInfo);
+        }
+
+        $this->setStyles($style);
 
         // Get custom error class
         $this->ErrorClass = c('Garden.Forms.InlineErrorClass', 'Error');
@@ -134,6 +188,68 @@ class Gdn_Form extends Gdn_Pluggable {
         }
     }
 
+
+    /**
+     * Set the styles to use when outputting controls.
+     *
+     * @param string $name The name of the style. Currently this should be **legacy** or **bootstrap**.
+     * @return bool Returns **true** if the styles were set or **false** otherwise.
+     */
+    public function setStyles($name) {
+        if (isset($this->allStyles[$name])) {
+            $this->styles = $this->allStyles[$name];
+            return true;
+        } else {
+            $this->styles = $this->allStyles['legacy'];
+            return false;
+        }
+    }
+
+    /**
+     * Get a style element for the form.
+     *
+     * @param string $item The item, such as the element name or whatnot.
+     * @param null $default The default. If this isn't supplied then the "default" class will be returned.
+     * @return string Returns the element.
+     */
+    public function getStyle($item, $default = null) {
+        $item = strtolower($item);
+
+        if (isset($this->styles[$item])) {
+            return $this->styles[$item];
+        } elseif ($default !== null) {
+            return $default;
+        } elseif (isset($this->styles['default'])) {
+            return $this->styles['default'];
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Translate old CSS classes using the style array.
+     *
+     * @param string|string[] $classes The classes to translate.
+     * @return string Returns the translated class string.
+     */
+    private function translateClasses($classes) {
+        if (is_string($classes)) {
+            $parts = explode(' ', trim($classes));
+        } elseif (is_array($classes)) {
+            $parts = $classes;
+        } else {
+            return '';
+        }
+        $classes = [];
+        foreach ($parts as $part) {
+            if (!empty($part)) {
+                $classes[] = $this->getStyle($part, $part);
+            }
+        }
+
+        return implode(' ', $classes);
+    }
+
     /**
      * A special text box for formattable text.
      *
@@ -148,7 +264,7 @@ class Gdn_Form extends Gdn_Pluggable {
         touchValue('MultiLine', $Attributes, true);
         touchValue('Wrap', $Attributes, true);
         touchValue('class', $Attributes, '');
-        $Attributes['class'] .= ' TextBox BodyBox';
+        $Attributes['class'] .= ' '.$this->getStyle('bodybox');
 
         $this->setValue('Format', val('Format', $Attributes, $this->getValue('Format', Gdn_Format::defaultFormat())));
 
@@ -196,16 +312,45 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $CssClass = arrayValueI('class', $Attributes);
         if ($CssClass === false) {
-            $Attributes['class'] = 'Button';
+            $Attributes['class'] = $this->getStyle('button');
+        } else {
+            $Attributes['class'] = $this->translateClasses($Attributes['class']);
         }
 
-        $Return = '<input type="'.$Type.'"';
+        $elem = $this->getStyle('button-element');
+
+        $Return = "<$elem type=\"$Type\"";
         $Return .= $this->_idAttribute($ButtonCode, $Attributes);
         $Return .= $this->_nameAttribute($ButtonCode, $Attributes);
-        $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
         $Return .= $this->_attributesToString($Attributes);
-        $Return .= " />\n";
+
+        if ($elem === 'button') {
+            $Return .= ' value="'.val('value', $Attributes, $ButtonCode).'">'.htmlspecialchars(t($ButtonCode, val('value', $Attributes))).'</button>';
+        } else {
+            $Return .= ' value="'.t($ButtonCode, val('value', $Attributes)).'"';
+            $Return .= " />\n";
+        }
         return $Return;
+    }
+
+    /**
+     * Return a linked that will look like a button.
+     *
+     * @param string $code The text of the anchor.
+     * @param string $destination The URL path of the anchor.
+     * @param array $attributes Additional attributes for the anchor.
+     * @see anchor()
+     */
+    public function linkButton($code, $destination = '', $attributes = []) {
+        if (empty($attributes['class'])) {
+            $cssClass = $this->getStyle('button', '');
+        } else {
+            $cssClass = $this->translateClasses($attributes['class']);
+            unset($attributes['class']);
+        }
+
+        $result = anchor(t($code), $destination, $cssClass, $attributes, true);
+        return $result;
     }
 
     /**
@@ -219,11 +364,11 @@ class Gdn_Form extends Gdn_Pluggable {
     public function color($fieldName) {
         Gdn::controller()->addJsFile('colorpicker.js');
 
-        $valueAttributes['class'] = 'js-color-picker-value color-picker-value InputBox Hidden';
-        $textAttributes['class'] = 'js-color-picker-text color-picker-text InputBox';
+        $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
+        $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
-        return '<div id="'.$this->escapeString($fieldName).'" class="js-color-picker color-picker input-group">'
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="js-color-picker color-picker input-group">'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'
@@ -345,6 +490,12 @@ class Gdn_Form extends Gdn_Pluggable {
 
         unset($Options['Filter'], $Options['PermFilter'], $Options['Context'], $Options['CategoryData']);
 
+        if (!isset($Options['class'])) {
+            $Options['class'] = $this->getStyle('dropdown');
+        } else {
+            $Options['class'] = $this->translateClasses($Attributes['class']);
+        }
+
         // Opening select tag
         $Return = '<select';
         $Return .= $this->_idAttribute($FieldName, $Options);
@@ -418,6 +569,226 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Outputs a checkbox painted as a toggle. Includes label wrap id a label is given.
+     *
+     * @param string $fieldName
+     * @param string $label
+     * @param array $attributes
+     * @return string
+     */
+    public function toggle($fieldName, $label, $attributes = []) {
+        $value = arrayValueI('value', $attributes, true);
+        $attributes['value'] = $value;
+        if (stringEndsWith($fieldName, '[]')) {
+            if (!isset($attributes['checked'])) {
+                $getValue = $this->getValue(substr($fieldName, 0, -2));
+                if (is_array($getValue) && in_array($value, $getValue)) {
+                    $attributes['checked'] = 'checked';
+                } elseif ($getValue == $value)
+                    $attributes['checked'] = 'checked';
+            }
+        } else {
+            if ($this->getValue($fieldName) == $value) {
+                $attributes['checked'] = 'checked';
+            }
+        }
+
+        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
+
+        $attributes['aria-labelledby'] = 'label-'.$id;
+        $attributes['class'] = 'toggle-input';
+        $input = $this->input($fieldName, 'checkbox', $attributes);
+        $toggleLabel = '<label for="'.$id.'"'.
+            attribute('class', 'toggle').
+            attribute('title', val('title', $attributes)) .'>';
+
+        if ($label) {
+            $toggle = '
+                <div class="label-wrap-wide">
+                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.t($label).'</div>
+                </div>
+                <div class="input-wrap-right">
+                    <div class="toggle-wrap">'.
+                        $input.
+                        $toggleLabel.'
+                    </div>
+                </div>';
+        } else {
+            $toggle = '<div class="toggle-wrap">'.$input.$toggleLabel.'</div>';
+        }
+
+        return $toggle;
+    }
+
+    /**
+     * Renders a search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered form.
+     */
+    public function searchForm($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        return $this->open(['action' => url($url)]).
+            $this->errors().
+            $this->searchInput($field, $url, $textBoxAttributes, $searchInfo).
+            $this->close();
+    }
+
+
+    /**
+     * Renders a stylized search field. Requires dashboard.css to look as intended. Use with searchForm() to output an
+     * entire search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered search field.
+     */
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        $clear = '';
+        $searchTermFound = false;
+        $searchKeys = ['search', 'keywords'];
+
+        $getValues = Gdn::request()->get();
+
+        // Check to see if any values in the above array exist in the get request and if so, add a clear button.
+        foreach ($getValues as $key => $value) {
+            if (in_array(strtolower($key), $searchKeys)) {
+                $searchTermFound = true;
+            }
+        }
+
+        if ($searchTermFound) {
+            $closeIcon = dashboardSymbol('close');
+            $clear = '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url($url).'">'.$closeIcon.'</a>';
+        }
+
+        if ($searchInfo) {
+            $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
+        }
+
+        return '
+            <div class="search-wrap input-wrap" role="search">
+                <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
+                $this->textBox($field, $textBoxAttributes).
+                $this->button('Go', ['class' => 'search-submit']).
+                $clear.
+                $searchInfo.'
+            </div>';
+    }
+
+
+    /**
+     * Outputs a stylized file upload input. Requires dashboard.js and dashboard.css to look and work as intended.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
+    public function fileUpload($fieldName, $attributes = []) {
+        $id = arrayValueI('id', $attributes, $this->escapeID($fieldName, false));
+        unset($attributes['id']);
+        $attributes['class'] = val('class', $attributes, '');
+        $attributes['class'] .=  " js-file-upload form-control";
+        $attributes = $this->_attributesToString($attributes);
+
+        $upload = '
+            <label class="file-upload">
+              <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
+              <span class="file-upload-choose" data-placeholder="'.t('Choose').'">'.t('Choose').'</span>
+              <span class="file-upload-browse">'.t('Browse').'</span>
+            </label>';
+
+        return $upload;
+    }
+
+    /**
+     * Outputs a stylized file upload input with a input wrapper div. Requires dashboard.js and dashboard.css to look
+     * and work as intended.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
+    public function fileUploadWrap($fieldName, $attributes = []) {
+        return '<div class="input-wrap">'.$this->fileUpload($fieldName, $attributes).'</div>';
+    }
+
+
+    /**
+     * Outputs the entire form group with both the label and input. Adds an image preview and a link to delete the
+     * current image. Handles the ajax clearing of the image preview on removal.
+     * Requires dashboard.js and dashboard.css to look and work as intended.
+     *
+     * @param string $fieldName The form field name for the input.
+     * @param string $label The label.
+     * @param string $labelDescription The label description.
+     * @param string $currentImageUrl The url to the current image.
+     * @param string $removeUrl The endpoint to remove the image.
+     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
+     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The attributes to pass to the file upload function.
+     * @return string
+     */
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
+                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
+                                       $attributes = []) {
+
+        $imageWrapperId = slugify($fieldName).'-preview-wrapper';
+
+        // Compile the data for our current image and current image removal.
+        $removeAttributes = [];
+        $removeCurrentImage = '';
+        $currentImage = '';
+
+        if ($currentImageUrl) {
+            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
+            if ($removeUrl) {
+                if (!$removeText) {
+                    $removeText = t('Remove');
+                }
+                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
+                if ($removeConfirmText) {
+                    $removeAttributes['data-body'] = $removeConfirmText;
+                }
+                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+            }
+        }
+
+        if ($label) {
+            $label = wrap($label, 'div', ['class' => 'label']);
+        }
+
+        if ($labelDescription) {
+            $labelDescription = wrap($labelDescription, 'div', ['class' => 'info']);
+        }
+
+        $label = '
+            <div class="label-wrap">'
+                .$label
+                .$labelDescription.'
+                <div id="'.$imageWrapperId.'" class="js-image-preview-old">'
+                    .$currentImage
+                    .$removeCurrentImage.'
+                </div>
+                <div class="js-image-preview-new hidden">
+                    <div><img class="js-image-preview"></div>
+                    <div><a class="js-remove-image-preview" href="#">'.t('Undo').'</a></div>
+                </div>
+            </div>';
+
+        $attributes['class'] .= 'js-image-upload';
+        $input = $this->fileUploadWrap($fieldName, $attributes);
+
+        return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
+    }
+
+
+    /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
@@ -453,22 +824,30 @@ class Gdn_Form extends Gdn_Pluggable {
         // Show inline errors?
         $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
 
-        // Add error class to input element
+        // Add error class to input element.
         if ($ShowErrors) {
             $this->addErrorClass($Attributes);
+        }
+
+        if (isset($Attributes['class'])) {
+            $class = $this->translateClasses($Attributes['class']);
+        } else {
+            $class = $this->getStyle('checkbox', '');
         }
 
         $Input = $this->input($FieldName, 'checkbox', $Attributes);
         if ($Label != '') {
             $LabelElement = '<label for="'.
-                arrayValueI('id', $Attributes, $this->escapeID($FieldName, false)).
-                '" class="'.val('class', $Attributes, 'CheckBoxLabel').'"'.
+                arrayValueI('id', $Attributes, $this->escapeID($FieldName, false)).'"'.
+                attribute('class', $class).
                 attribute('title', val('title', $Attributes)).'>';
 
             if ($Display === 'wrap') {
                 $Input = $LabelElement.$Input.' '.T($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.T($Label).'</label> '.$Input;
+            } elseif ($Display === 'toggle') {
+                $Input = '<div class="label-wrap"><label>'.T($Label).'</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.$Input.$LabelElement.'</label></div></div> ';
             } else {
                 $Input = $Input.' '.$LabelElement.T($Label).'</label>';
             }
@@ -477,6 +856,11 @@ class Gdn_Form extends Gdn_Pluggable {
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
             $Input .= $this->inlineError($FieldName);
+        }
+
+        if ($this->getStyle('checkbox-container', '') && stripos($class, 'inline') == false) {
+            $container = $this->getStyle('checkbox-container');
+            $Input = "<div class=\"$container\">".$Input.'</div>';
         }
 
         return $Input;
@@ -725,17 +1109,14 @@ class Gdn_Form extends Gdn_Pluggable {
             unset($Data['_Info']);
         }
 
-        $Result = '<table class="CheckBoxGrid">';
+        $Result = '<div class="table-wrap"><table class="table-data js-checkbox-grid table-checkbox-grid">';
         // Append the header.
         $Result .= '<thead><tr><th>'.T($GroupName).'</th>';
-        $Alt = true;
         foreach ($Columns as $ColumnName => $X) {
             $Result .=
-                '<td'.($Alt ? ' class="Alt"' : '').'>'
+                '<td>'
                 .T($ColumnName)
                 .'</td>';
-
-            $Alt = !$Alt;
         }
         $Result.'</tr></thead>';
 
@@ -752,9 +1133,8 @@ class Gdn_Form extends Gdn_Pluggable {
             }
             $Result .= T(self::labelCode($RowNames[count($RowNames) - 1])).'</th>';
             // Append the columns within the rows.
-            $Alt = true;
             foreach ($Columns as $ColumnName => $Y) {
-                $Result .= '<td'.($Alt ? ' class="Alt"' : '').'>';
+                $Result .= '<td>';
                 // Check to see if there is a row corresponding to this area.
                 if (array_key_exists($RowName.'.'.$ColumnName, $Data)) {
                     $CheckBox = $Data[$RowName.'.'.$ColumnName];
@@ -770,12 +1150,10 @@ class Gdn_Form extends Gdn_Pluggable {
                     $Result .= ' ';
                 }
                 $Result .= '</td>';
-
-                $Alt = !$Alt;
             }
             $Result .= '</tr>';
         }
-        $Result .= '</tbody></table>';
+        $Result .= '</tbody></table></div>';
         return $Result;
     }
 
@@ -793,7 +1171,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if ($ButtonCode != '') {
-            $Return = '<div class="Buttons">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
         }
 
         return $Return;
@@ -960,8 +1338,21 @@ class Gdn_Form extends Gdn_Pluggable {
             $this->addErrorClass($Attributes);
         }
 
+        if (!isset($Attributes['class'])) {
+            $Attributes['class'] = $this->getStyle('dropdown');
+        } else {
+            $Attributes['class'] = $this->translateClasses($Attributes['class']);
+        }
+
+        $Return = '';
+
+        $Wrap = val('Wrap', $Attributes, false);
+        if ($Wrap) {
+            $Return = '<div class="'.$this->getStyle('input-wrap').'">';
+        }
+
         // Opening select tag
-        $Return = '<select';
+        $Return .= '<select';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
         $Return .= $this->_nameAttribute($FieldName, $Attributes);
         $Return .= $this->_attributesToString($Attributes);
@@ -1024,6 +1415,10 @@ class Gdn_Form extends Gdn_Pluggable {
             }
         }
         $Return .= '</select>';
+
+        if ($Wrap) {
+            $Return .= '</div>';
+        }
 
         // Append validation error message
         if ($ShowErrors && arrayValueI('InlineErrors', $Attributes, true)) {
@@ -1231,7 +1626,7 @@ class Gdn_Form extends Gdn_Pluggable {
             $Headings = '';
             $Cells = '';
         }
-        return $Return == '' ? '' : '<table class="CheckBoxGrid">'.$Return.'</tbody></table>';
+        return $Return == '' ? '' : '<div class="table-wrap"><table class="table-data js-tj js-checkbox-grid table-checkbox-grid">'.$Return.'</tbody></table></div>';
     }
 
     /**
@@ -1292,6 +1687,17 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
     /**
+     * Return a control for uploading images with a wrapper div. The existing image should be displayed by the label.
+     *
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
+     */
+    public function imageUploadWrap($fieldName, $attributes = []) {
+        return $this->fileUploadWrap($fieldName.'_New', $attributes);
+    }
+
+    /**
      * Returns XHTML of inline error for specified field.
      *
      * @since 2.0.18
@@ -1322,12 +1728,23 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      */
     public function input($FieldName, $Type = 'text', $Attributes = array()) {
-        if ($Type == 'text' || $Type == 'password') {
-            $CssClass = arrayValueI('class', $Attributes);
-            if ($CssClass == false) {
-                $Attributes['class'] = 'InputBox';
-            }
+        switch ($Type) {
+            case 'checkbox':
+            case 'button':
+            case 'hidden':
+            case 'radio':
+            case 'reset':
+            case 'submit':
+                $typeClass = '';
+                break;
+            case 'file':
+                $typeClass = 'file';
+                break;
+            default:
+                $typeClass = 'textbox';
+                break;
         }
+        $Attributes['class'] = $this->translateClasses(arrayValueI('class', $Attributes).' '.$typeClass);
 
         // Show inline errors?
         $ShowErrors = $this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults);
@@ -1341,7 +1758,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Wrap = val('Wrap', $Attributes, false, true);
         $Strength = val('Strength', $Attributes, false, true);
         if ($Wrap) {
-            $Return .= '<div class="TextBoxWrapper">';
+            $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
         if (strtolower($Type) == 'checkbox') {
@@ -1400,7 +1817,12 @@ PASSWORDMETER;
         return $Return;
     }
 
-    /**
+
+    public function inputWrap($FieldName, $Type = 'text', $Attributes = array()) {
+        return '<div class="input-wrap">'.$this->input($FieldName, $Type, $Attributes).'</div>';
+    }
+
+        /**
      * Returns XHTML for a label element.
      *
      * @param string $TranslationCode Code to be translated and presented within the label tag.
@@ -1416,7 +1838,12 @@ PASSWORDMETER;
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
         $For = arrayValueI('for', $Attributes, arrayValueI('id', $Attributes, $this->escapeID($DefaultFor, false)));
 
-        return '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        $return = '<label for="'.$For.'"'.$this->_attributesToString($Attributes).'>'.t($TranslationCode)."</label>\n";
+        return $return;
+    }
+
+    public function labelWrap($TranslationCode, $FieldName = '', $Attributes = array()) {
+        return '<div class="label-wrap">'.$this->label($TranslationCode, $FieldName, $Attributes).'</div>';
     }
 
     /**
@@ -1571,11 +1998,17 @@ PASSWORDMETER;
         // Get standard radio Input
         $Input = $this->Input($FieldName, 'radio', $Attributes);
 
+        if (isset($Attributes['class'])) {
+            $class = $this->translateClasses($Attributes['class']);
+        } else {
+            $class = $this->getStyle('radio');
+        }
+
         // Wrap with label.
         if ($Label != '') {
             $LabelElement = '<label for="'.arrayValueI('id', $Attributes, $this->EscapeID($FieldName, false)).'" class="'.val('class', $Attributes, 'RadioLabel').'">';
             if ($Display === 'wrap') {
-                $LabelElement = '<label class="'.val('class', $Attributes, 'RadioLabel').'">';
+                $LabelElement = '<label'.attribute('class', $class).'>';
                 $Input = $LabelElement.$Input.' '.t($Label).'</label>';
             } elseif ($Display === 'before') {
                 $Input = $LabelElement.t($Label).'</label> '.$Input;
@@ -1615,12 +2048,17 @@ PASSWORDMETER;
      */
     public function radioList($FieldName, $DataSet, $Attributes = array()) {
         $List = val('list', $Attributes);
+
         $Return = '';
 
         if ($List) {
             $Return .= '<ul'.(isset($Attributes['listclass']) ? " class=\"{$Attributes['listclass']}\"" : '').'>';
-            $LiOpen = '<li>';
+            $LiOpen = '<li'.attribute('class', $this->getStyle('radio-container', '').' '.val('list-item-class', $Attributes)).'>';
             $LiClose = '</li>';
+        } elseif ($this->getStyle('radio-container', '') && stripos(val('class', $Attributes), 'inline') === false) {
+            $class = $this->getStyle('radio-container');
+            $LiOpen = "<div class=\"$class\">";
+            $LiClose = '</div>';
         } else {
             $LiOpen = '';
             $LiClose = ' ';
@@ -1694,7 +2132,9 @@ PASSWORDMETER;
 
         $CssClass = arrayValueI('class', $Attributes);
         if ($CssClass == false) {
-            $Attributes['class'] = $MultiLine ? 'TextBox' : 'InputBox';
+            $Attributes['class'] = $this->getStyle($MultiLine ? 'textarea' : 'textbox');
+        } else {
+            $Attributes['class'] = $this->translateClasses($CssClass);
         }
 
         // Add error class to input element
@@ -1705,7 +2145,7 @@ PASSWORDMETER;
         $Return = '';
         $Wrap = val('Wrap', $Attributes, false, true);
         if ($Wrap) {
-            $Return .= '<div class="TextBoxWrapper">';
+            $Return .= '<div class="'.$this->getStyle('input-wrap').'">';
         }
 
         $Return .= $MultiLine === true ? '<textarea' : '<input type="'.val('type', $Attributes, 'text').'"';
@@ -1730,8 +2170,12 @@ PASSWORDMETER;
         return $Return;
     }
 
+    public function textBoxWrap($FieldName, $Attributes = array()) {
+        return '<div class="input-wrap">'.$this->textBox($FieldName, $Attributes).'</div>';
+    }
 
-    /// =========================================================================
+
+        /// =========================================================================
     /// Methods for interfacing with the model & db.
     /// =========================================================================
 
@@ -2447,8 +2891,6 @@ PASSWORDMETER;
     public function simple($Schema, $Options = array()) {
         $Result = valr('Wrap.0', $Options, '<ul>');
 
-        $ItemWrap = val('ItemWrap', $Options, array("<li>\n  ", "\n</li>\n"));
-
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {
                 $Row = array('Name' => $Index, 'Control' => $Row);
@@ -2461,13 +2903,35 @@ PASSWORDMETER;
                 $Row['Options'] = array();
             }
 
+            if (strtolower($Row['Control']) == 'callback') {
+                $ItemWrap = '';
+            } else {
+                $ItemWrap = val('ItemWrap', $Options, array('<li class="' . $this->getStyle('form-group') . "\">\n", "\n</li>\n"));
+            }
+
             $Result .= $ItemWrap[0];
 
             $LabelCode = self::labelCode($Row);
 
+            $image = '';
+
+            if (strtolower($Row['Control']) == 'imageupload') {
+                $image = $this->currentImage($Row['Name'], $Row['Options']);
+                $image = wrap($image, 'div', ['class' => 'image-wrap-label']);
+            }
+
             $Description = val('Description', $Row, '');
+
             if ($Description) {
-                $Description = '<div class="Info">'.$Description.'</div>';
+                $Description = wrap($Description, 'div', ['class' => 'description info']);
+            }
+
+            $Description .= $image;
+
+            if ($Description) {
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
+            } else {
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
             }
 
             touchValue('Control', $Row, 'TextBox');
@@ -2479,31 +2943,33 @@ PASSWORDMETER;
                         .$this->categoryDropDown($Row['Name'], $Row['Options']);
                     break;
                 case 'checkbox':
+                    $Result .= $labelWrap
+                        .wrap($this->checkBox($Row['Name'], $LabelCode, $Row['Options']), 'div', ['class' => 'input-wrap']);
+                    break;
+                case 'toggle':
                     $Result .= $Description
-                        .$this->checkBox($Row['Name'], $LabelCode, $Row['Options']);
+                        .$this->toggle($Row['Name'], $LabelCode, $Row['Options']);
                     break;
                 case 'dropdown':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
+                    $Row['Options']['Wrap'] = true;
+                    $Result .= $labelWrap
                         .$this->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'radiolist':
-                    $Result .= $Description
-                        .$this->radioList($Row['Name'], $Row['Items'], $Row['Options']);
+                    $Result .= $labelWrap
+                        .wrap($this->radioList($Row['Name'], $Row['Items'], $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'checkboxlist':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
-                        .$this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
+                    $Result .= $labelWrap
+                        .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'imageupload':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
-                        .$this->imageUpload($Row['Name'], $Row['Options']);
+                    $Result .= $labelWrap
+                        .$this->imageUploadWrap($Row['Name'], $Row['Options']);
                     break;
                 case 'textbox':
-                    $Result .= $this->label($LabelCode, $Row['Name'])
-                        .$Description
+                    $Row['Options']['Wrap'] = true;
+                    $Result .= $labelWrap
                         .$this->textBox($Row['Name'], $Row['Options']);
                     break;
                 case 'callback':

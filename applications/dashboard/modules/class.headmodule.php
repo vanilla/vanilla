@@ -410,13 +410,9 @@ if (!class_exists('HeadModule', false)) {
 
             if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
                 $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
-                $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
-            } else {
-                // Required by twitter.
-                $this->addTag('meta', array('name' => 'twitter:description', 'content' => '...'));
             }
 
-            $hasImage = false;
+            $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.
             if (count($this->_Sender->Image()) == 0) {
@@ -428,23 +424,33 @@ if (!class_exists('HeadModule', false)) {
                     }
 
                     $Logo = Gdn_Upload::url($Logo);
-                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
-                    $hasImage = true;
+                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
                     $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
-                    $hasImage = true;
+                    $hasRelevantImage = true;
                 }
             }
 
-            if ($hasImage) {
-                $twitterCardType = 'summary_large_image';
-            } else {
-                $twitterCardType = 'summary';
-            }
+            // For the moment at least, only discussions are supported.
+            if (val('DiscussionID', $this->_Sender)) {
+                if ($hasRelevantImage) {
+                    $twitterCardType = 'summary_large_image';
+                    if (!$Description) {
+                        $Description = '...'; // Let's force a description since a card needs one.
+                    }
+                } else {
+                    if ($Description) {
+                        $twitterCardType = 'summary';
+                    }
+                }
 
-            $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
+                if ($twitterCardType) {
+                    $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
+                    $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
+                }
+            }
 
             $this->fireEvent('BeforeToString');
 

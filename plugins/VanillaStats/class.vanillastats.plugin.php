@@ -14,6 +14,7 @@ $PluginInfo['VanillaStats'] = array(
     'Version' => '2.0.7',
     'MobileFriendly' => true,
     'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'Icon' => 'vanilla_stats.png',
     'Author' => "Vanilla Staff",
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

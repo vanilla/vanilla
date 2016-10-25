@@ -1279,8 +1279,9 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->_Json['Data'] = utf8_encode($this->_Json['Data']);
             }
 
-            $Json = json_encode($this->_Json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-            $this->_Json['Data'] = $Json;
+            $json = ipDecodeRecursive($this->_Json);
+            $json = json_encode($json, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+            $this->_Json['Data'] = $json;
             exit($this->_Json['Data']);
         } else {
             if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {

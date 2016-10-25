@@ -17,6 +17,7 @@ echo $this->Form->open();
         echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
         ?>
         </div>
+        <?php PagerModule::write(['Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard']); ?>
     </div>
 <?php
 

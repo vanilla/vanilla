@@ -714,7 +714,13 @@ var vanillaStats = (function() {
     };
 
     VanillaStats.prototype.getSummaries = function(container) {
-        var dateRange = this.getRange();
+        var rangeFrom = this.getRange("from");
+        var rangeTo = this.getRange("to");
+        var dateRange = {
+            from: rangeFrom instanceof Date ? rangeFrom.toUTCString() : rangeFrom,
+            to: rangeTo instanceof Date ? rangeTo.toUTCString() : rangeTo
+        };
+
         $.ajax({
             url: gdn.url('/dashboard/settings/dashboardsummaries?DeliveryType=VIEW'),
             data: {range: dateRange},

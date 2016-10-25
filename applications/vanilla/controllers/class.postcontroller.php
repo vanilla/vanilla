@@ -241,13 +241,21 @@ class PostController extends VanillaController {
                     }
                 }
 
+                $isTitleValid = true;
                 $Name = trim($this->Form->getFormValue('Name', ''));
-                // Let's be super aggressive and disallow titles with no word characters in them!
-                $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
 
-                if (!$hasWordCharacter || ($Name != '' && Gdn_Format::text($Name) == '')) {
-                    $this->Form->addError('You have entered an invalid discussion title', 'Name');
-                } else {
+                if (!$Draft) {
+                    // Let's be super aggressive and disallow titles with no word characters in them!
+                    $hasWordCharacter = preg_match('/\w/u', $Name) === 1;
+
+                    if (!$hasWordCharacter || ($Name != '' && Gdn_Format::text($Name) == '')) {
+
+                        $this->Form->addError('You have entered an invalid discussion title', 'Name');
+                        $isTitleValid = false;
+                    }
+                }
+
+                if ($isTitleValid) {
                     // Trim the name.
                     $FormValues['Name'] = $Name;
                     $this->Form->setFormValue('Name', $Name);
@@ -552,7 +560,7 @@ class PostController extends VanillaController {
 
         // If no discussion was found, error out
         if (!$Discussion) {
-            $this->Form->addError('Failed to find discussion for commenting.');
+            $this->Form->addError(t('Failed to find discussion for commenting.'));
         }
 
         /**
@@ -993,13 +1001,13 @@ function checkOrRadio($FieldName, $LabelCode, $ListOptions, $Attributes = array(
         $Value = array_pop(array_keys($ListOptions));
 
         // This can be represented by a checkbox.
-        return $Form->CheckBox($FieldName, $LabelCode);
+        return $Form->checkBox($FieldName, $LabelCode);
     } else {
         $CssClass = val('ListClass', $Attributes, 'List Inline');
 
         $Result = ' <b>'.t($LabelCode)."</b> <ul class=\"$CssClass\">";
         foreach ($ListOptions as $Value => $Code) {
-            $Result .= ' <li>'.$Form->Radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
+            $Result .= ' <li>'.$Form->radio($FieldName, $Code, array('Value' => $Value, 'class' => 'radio-inline')).'</li> ';
         }
         $Result .= '</ul>';
         return $Result;

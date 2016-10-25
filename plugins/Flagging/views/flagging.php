@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-<?php echo header(t($this->data('Title'))); ?>
+<?php echo heading(t($this->data('Title'))); ?>
 <section>
     <?php
     echo subheading(t('Flagging Settings'));

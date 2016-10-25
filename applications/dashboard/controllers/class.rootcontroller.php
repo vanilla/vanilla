@@ -25,10 +25,11 @@ class RootController extends Gdn_Controller {
      * @param bool $ControllerName
      * @param bool $ApplicationFolder
      * @param bool $ThrowError
+     * @param bool $useController
      * @return bool|mixed
      * @throws Exception
      */
-    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true) {
+    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true, $useController = true) {
         if (!$ControllerName) {
             $ControllerName = '';
         }

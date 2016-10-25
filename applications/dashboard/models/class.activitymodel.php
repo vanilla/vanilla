@@ -1510,7 +1510,7 @@ class ActivityModel extends Gdn_Model {
                             return UNAPPROVED;
                         }
                     }
-
+                }
                 $ActivityID = $this->SQL->insert('Activity', $Activity);
                 $Activity['ActivityID'] = $ActivityID;
 

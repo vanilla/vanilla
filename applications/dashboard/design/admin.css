@@ -4825,7 +4825,7 @@ output {
   display: none !important;
 }
 
-.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+.toolbar-stats > *:not(.nav-stats) {
   margin-top: 2.25rem;
 }
 
@@ -6379,7 +6379,8 @@ label,
   border: 0;
 }
 
-.toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-slider, .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-active .toggle-slider, .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-wrap .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after,
+.toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-slider, .toggle-wrap .InProgress input[type="checkbox"] + label::after,
+.toggle-wrap .toggle-wrap-active .toggle-slider, .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-wrap .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after,
 .toggle-wrap-sm .toggle-wrap-active .toggle-wrap .toggle-slider,
 .toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after {
   left: 1.3125rem;
@@ -6437,7 +6438,10 @@ label,
 }
 
 .toggle-wrap-sm .toggle-slider-active, .table-data .toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .InProgress .toggle-wrap-sm input[type="checkbox"] + label::after,
-.toggle-wrap .toggle-wrap-active .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-active .toggle-wrap-sm input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-slider, .table-data .toggle-wrap .InProgress .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .InProgress input[type="checkbox"] + label::after, .table-data .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap-sm .toggle-wrap-active .toggle-slider, .table-data .toggle-wrap .toggle-wrap-active .toggle-slider, .toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .toggle-wrap-active input[type="checkbox"] + label::after, .table-data .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after {
+.toggle-wrap .toggle-wrap-active .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-active .toggle-wrap-sm input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-slider, .table-data .toggle-wrap .InProgress .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .InProgress input[type="checkbox"] + label::after, .table-data .toggle-wrap .InProgress input[type="checkbox"] + label::after,
+.toggle-wrap-sm .toggle-wrap-active .toggle-slider, .table-data .toggle-wrap .toggle-wrap-active .toggle-slider,
+.toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap
+.toggle-wrap-sm .toggle-wrap-active input[type="checkbox"] + label::after, .table-data .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after {
   left: 0.875rem;
   transition: left .4s;
 }
@@ -9524,6 +9528,7 @@ strong,
   left: 0;
   top: 0;
   cursor: move;
+  cursor: -webkit-grab;
   cursor: -moz-grab;
   cursor: grab;
   line-height: 1;
@@ -9551,6 +9556,7 @@ strong,
   margin-top: 0;
   margin-left: 0;
   opacity: .8;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }
@@ -9567,6 +9573,7 @@ strong,
   border: 1px dashed #0291db;
   min-height: 2.25rem;
   border-radius: 2px;
+  cursor: -webkit-grabbing;
   cursor: -moz-grabbing;
   cursor: grabbing;
 }

@@ -1,8 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(sprintf(t('About %s'), t('Pockets')), t('Pockets allow you to add free-form HTML to various places around the application.'));
-echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal')
+echo heading($this->data('Title'), sprintf(t('Add %s'), t('Pocket')), 'settings/pockets/add', 'btn btn-primary js-modal');
 ?>
-</div>
 <div class="form-group">
     <div class="label-wrap-wide">
         <div class="label"><?php echo t('Enable Pocket Locations'); ?></div>

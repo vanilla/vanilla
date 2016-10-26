@@ -13,7 +13,7 @@
     "grunt-contrib-jshint": "0.11.x",
     "grunt-contrib-watch": "0.6.x",
     "grunt-kss": "^4.0.0",
-    "grunt-sass": "1.1.x",
+    "grunt-sass": "1.1.0",
     "grunt-sass-globbing": "^1.5.1",
     "grunt-scss-lint": "^0.3.8",
     "grunt-wiredep": "2.0.x",

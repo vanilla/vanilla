@@ -6,7 +6,6 @@ conf/**
 container.html
 index.php
 js/**
-LICENSE.md
 library/**
 locales/**
 login.php

@@ -214,6 +214,26 @@ if (!function_exists('arrayValueI')) {
     }
 }
 
+if (!function_exists('array_select')) {
+    /**
+     * Select the first non-empty value from an array.
+     *
+     * @param array $keys An array of keys to try.
+     * @param array $array The array to select from.
+     * @param mixed $default The default value if non of the keys exist.
+     * @return mixed Returns the first non-empty value of {@link $default} if none are found.
+     * @category Array Functions
+     */
+    function array_select(array $keys, array $array, $default = null) {
+        foreach ($keys as $key) {
+            if (isset($array[$key]) && $array[$key]) {
+                return $array[$key];
+            }
+        }
+        return $default;
+    }
+}
+
 if (!function_exists('asset')) {
     /**
      * Takes the path to an asset (image, js file, css file, etc) and prepends the web root.
@@ -3869,8 +3889,24 @@ if (!function_exists('sprintft')) {
      */
     function sprintft($formatCode, $arg1 = null) {
         $args = func_get_args();
-        $args[0] = t($formatCode);
+        $args[0] = t($formatCode, $formatCode);
         return call_user_func_array('sprintf', $args);
+    }
+}
+
+if (!function_exists('str_ends')) {
+    /**
+     * Returns whether or not a string ends with another string.
+     *
+     * This function is not case-sensitive.
+     *
+     * @param string $haystack The string to test.
+     * @param string $needle The substring to test against.
+     * @return bool Whether or not `$string` ends with `$with`.
+     * @category String Functions
+     */
+    function str_ends($haystack, $needle) {
+        return strcasecmp(substr($haystack, -strlen($needle)), $needle) === 0;
     }
 }
 

@@ -44,7 +44,7 @@ echo $this->Form->open();
                                 'skip' => 'Install Vanilla without a .htaccess file.'
                             ], ['Default' => 'dist']); ?>
                     <?php else: ?>
-                    <?php echo $this->Form->CheckBox('SkipHtaccess', t('Install Vanilla without a .htaccess file.')); ?>
+                    <?php echo $this->Form->checkBox('HtaccessAction', t('Install Vanilla without a .htaccess file.'),['value' => 'skip']); ?>
                     <?php endif; ?>
                 </li>
             <?php endif; ?>

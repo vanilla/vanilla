@@ -58,22 +58,25 @@ class SetupController extends DashboardController {
 
             // Make sure the user has copied the htaccess file over.
             if (!file_exists(PATH_ROOT.'/.htaccess')) {
-                $htaccessAction = $this->Form->getFormValue('HtaccessAction');
+                $this->setData('NoHtaccess', true);
 
-                switch ($htaccessAction) {
-                    case 'skip':
-                        break;
-                    case 'dist':
-                        $htaccessCopied = copy(PATH_ROOT.'/.htaccess.dist', PATH_ROOT.'/.htaccess');
+                if ($this->Form->isPostBack()) {
+                    $htaccessAction = $this->Form->getFormValue('HtaccessAction');
 
-                        if ($htaccessCopied === true) {
+                    switch ($htaccessAction) {
+                        case 'skip':
                             break;
-                        }
+                        case 'dist':
+                            $htaccessCopied = copy(PATH_ROOT . '/.htaccess.dist', PATH_ROOT . '/.htaccess');
 
-                        $this->Form->addError(t('Unable to copy .htaccess.dist to .htaccess.', 'Unable to copy .htaccess.dist to .htaccess. You may need to manually copy this file.'));
-                    default:
-                        $this->setData('NoHtaccess', true);
-                        $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
+                            if ($htaccessCopied === false) {
+                                $this->Form->addError(t('Unable to copy .htaccess.dist to .htaccess.', 'Unable to copy .htaccess.dist to .htaccess. You may need to manually copy this file.'));
+                            }
+
+                            break;
+                        default:
+                            $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
+                    }
                 }
             }
 

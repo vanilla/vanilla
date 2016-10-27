@@ -150,7 +150,7 @@ class Schema implements \JsonSerializable {
      */
     public static function parseShortParam($str, $other = []) {
         // Is the parameter optional?
-        if (str_ends($str, '?')) {
+        if (strEnds($str, '?')) {
             $required = false;
             $str = substr($str, 0, -1);
         } else {

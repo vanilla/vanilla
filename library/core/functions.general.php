@@ -3894,7 +3894,7 @@ if (!function_exists('sprintft')) {
     }
 }
 
-if (!function_exists('str_ends')) {
+if (!function_exists('strEnds')) {
     /**
      * Returns whether or not a string ends with another string.
      *
@@ -3905,7 +3905,7 @@ if (!function_exists('str_ends')) {
      * @return bool Whether or not `$string` ends with `$with`.
      * @category String Functions
      */
-    function str_ends($haystack, $needle) {
+    function strEnds($haystack, $needle) {
         return strcasecmp(substr($haystack, -strlen($needle)), $needle) === 0;
     }
 }

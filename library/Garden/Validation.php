@@ -76,7 +76,7 @@ class Validation {
             $error['code'] = $messageCode;
         }
         if (is_array($field)) {
-            $fieldname = arraySelect(['path', 'name'], $field);
+            $fieldname = self::arraySelect(['path', 'name'], $field);
 
             if ($fieldname) {
                 // This is a full field object.
@@ -102,6 +102,24 @@ class Validation {
         $this->errors[$fieldKey][] = $error;
 
         return $this;
+    }
+
+    /**
+     * Select the first non-empty value from an array.
+     *
+     * @param array $keys An array of keys to try.
+     * @param array $array The array to select from.
+     * @param mixed $default The default value if non of the keys exist.
+     * @return mixed Returns the first non-empty value of {@link $default} if none are found.
+     * @category Array Functions
+     */
+    private static function arraySelect(array $keys, array $array, $default = null) {
+        foreach ($keys as $key) {
+            if (isset($array[$key]) && $array[$key]) {
+                return $array[$key];
+            }
+        }
+        return $default;
     }
 
     /**

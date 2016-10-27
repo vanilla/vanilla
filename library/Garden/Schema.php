@@ -47,6 +47,24 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Select the first non-empty value from an array.
+     *
+     * @param array $keys An array of keys to try.
+     * @param array $array The array to select from.
+     * @param mixed $default The default value if non of the keys exist.
+     * @return mixed Returns the first non-empty value of {@link $default} if none are found.
+     * @category Array Functions
+     */
+    private static function arraySelect(array $keys, array $array, $default = null) {
+        foreach ($keys as $key) {
+            if (isset($array[$key]) && $array[$key]) {
+                return $array[$key];
+            }
+        }
+        return $default;
+    }
+
+    /**
      * Create a new schema and return it.
      *
      * @param array $schema The schema array.
@@ -150,7 +168,7 @@ class Schema implements \JsonSerializable {
      */
     public static function parseShortParam($str, $other = []) {
         // Is the parameter optional?
-        if (strEnds($str, '?')) {
+        if (self::strEnds($str, '?')) {
             $required = false;
             $str = substr($str, 0, -1);
         } else {
@@ -303,13 +321,13 @@ class Schema implements \JsonSerializable {
         foreach ($schema as $name => $field) {
             // Prepend the path the field label.
             if ($path) {
-                $field['path'] = $path.arraySelect(['path', 'name'], $field);
+                $field['path'] = $path.self::arraySelect(['path', 'name'], $field);
             }
 
             if (array_key_exists($name, $data)) {
                 $this->validateField($data[$name], $field, $validation);
             } elseif (val('required', $field)) {
-                $validation->addError('missing_field', arraySelect(['path', 'name'], $field));
+                $validation->addError('missing_field', self::arraySelect(['path', 'name'], $field));
             }
         }
 
@@ -324,6 +342,20 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Returns whether or not a string ends with another string.
+     *
+     * This function is not case-sensitive.
+     *
+     * @param string $haystack The string to test.
+     * @param string $needle The substring to test against.
+     * @return bool Whether or not `$string` ends with `$with`.
+     * @category String Functions
+     */
+    private static function strEnds($haystack, $needle) {
+        return strcasecmp(substr($haystack, -strlen($needle)), $needle) === 0;
+    }
+
+    /**
      * Validate a field.
      *
      * @param mixed &$value The value to validate.
@@ -334,7 +366,7 @@ class Schema implements \JsonSerializable {
      * @return bool Returns true if the field is valid, false otherwise.
      */
     protected function validateField(&$value, array $field, Validation $validation) {
-        $path = arraySelect(['path', 'name'], $field);
+        $path = self::arraySelect(['path', 'name'], $field);
         $type = val('type', $field, '');
         $valid = true;
 
@@ -425,9 +457,9 @@ class Schema implements \JsonSerializable {
 
             if (isset($field['items'])) {
                 // Validate each of the types.
-                $path = arraySelect(['path', 'name'], $field);
+                $path = self::arraySelect(['path', 'name'], $field);
                 $itemField = $field['items'];
-                $itemField['validatorName'] = arraySelect(['validatorName', 'path', 'name'], $field).'.items';
+                $itemField['validatorName'] = self::arraySelect(['validatorName', 'path', 'name'], $field).'.items';
                 foreach ($value as $i => &$item) {
                     $itemField['path'] = "$path.$i";
                     $this->validateField($item, $itemField, $validation);
@@ -574,7 +606,7 @@ class Schema implements \JsonSerializable {
         if (!is_array($value) || isset($value[0])) {
             return false;
         } elseif (isset($field['properties'])) {
-            $path = arraySelect(['path', 'name'], $field);
+            $path = self::arraySelect(['path', 'name'], $field);
             // Validate the data against the internal schema.
             $this->isValidInternal($value, $field['properties'], $validation, $path.'.');
         }

@@ -15,7 +15,7 @@ use Garden\Validation;
  * The validation object collects errors and is mutable. Once it's ready to be thrown as an exception it gets converted
  * to an instance of the immutable {@link ValidationException} class.
  */
-class ValidationException extends ClientException {
+class ValidationException extends \Exception implements \JsonSerializable {
     protected $validation;
 
     /**

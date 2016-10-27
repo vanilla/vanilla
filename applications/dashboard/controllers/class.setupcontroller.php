@@ -57,7 +57,7 @@ class SetupController extends DashboardController {
             $this->View = 'configure';
 
             // Make sure the user has copied the htaccess file over.
-            if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->getFormValue('SkipHtaccess')) {
+            if (!file_exists(PATH_ROOT.'/.htaccess') && !$this->Form->getFormValue('HtaccessAction')) {
                 $this->setData('NoHtaccess', true);
                 $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
             }

@@ -434,19 +434,20 @@ if (!class_exists('HeadModule', false)) {
             }
 
             // For the moment at least, only discussions are supported.
-            if (val('DiscussionID', $this->_Sender)) {
+            if ($Title && val('DiscussionID', $this->_Sender)) {
                 if ($hasRelevantImage) {
                     $twitterCardType = 'summary_large_image';
-                    if (!$Description) {
-                        $Description = '...'; // Let's force a description since a card needs one.
-                    }
                 } else {
-                    if ($Description) {
-                        $twitterCardType = 'summary';
-                    }
+                    $twitterCardType = 'summary';
                 }
 
-                if ($twitterCardType) {
+                // Let's force a description for the image card since it makes sense to see a card with only an image and a title.
+                if (!$Description && $twitterCardType === 'summary_large_image') {
+                    $Description = '...';
+                }
+
+                // Card && Title && Description are required
+                if ($twitterCardType && $Description) {
                     $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
                     $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
                 }

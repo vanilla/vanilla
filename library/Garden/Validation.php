@@ -76,7 +76,7 @@ class Validation {
             $error['code'] = $messageCode;
         }
         if (is_array($field)) {
-            $fieldname = array_select(['path', 'name'], $field);
+            $fieldname = arraySelect(['path', 'name'], $field);
 
             if ($fieldname) {
                 // This is a full field object.

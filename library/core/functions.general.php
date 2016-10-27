@@ -214,7 +214,7 @@ if (!function_exists('arrayValueI')) {
     }
 }
 
-if (!function_exists('array_select')) {
+if (!function_exists('arraySelect')) {
     /**
      * Select the first non-empty value from an array.
      *
@@ -224,7 +224,7 @@ if (!function_exists('array_select')) {
      * @return mixed Returns the first non-empty value of {@link $default} if none are found.
      * @category Array Functions
      */
-    function array_select(array $keys, array $array, $default = null) {
+    function arraySelect(array $keys, array $array, $default = null) {
         foreach ($keys as $key) {
             if (isset($array[$key]) && $array[$key]) {
                 return $array[$key];

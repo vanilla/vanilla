@@ -303,13 +303,13 @@ class Schema implements \JsonSerializable {
         foreach ($schema as $name => $field) {
             // Prepend the path the field label.
             if ($path) {
-                $field['path'] = $path.array_select(['path', 'name'], $field);
+                $field['path'] = $path.arraySelect(['path', 'name'], $field);
             }
 
             if (array_key_exists($name, $data)) {
                 $this->validateField($data[$name], $field, $validation);
             } elseif (val('required', $field)) {
-                $validation->addError('missing_field', array_select(['path', 'name'], $field));
+                $validation->addError('missing_field', arraySelect(['path', 'name'], $field));
             }
         }
 
@@ -334,7 +334,7 @@ class Schema implements \JsonSerializable {
      * @return bool Returns true if the field is valid, false otherwise.
      */
     protected function validateField(&$value, array $field, Validation $validation) {
-        $path = array_select(['path', 'name'], $field);
+        $path = arraySelect(['path', 'name'], $field);
         $type = val('type', $field, '');
         $valid = true;
 
@@ -425,9 +425,9 @@ class Schema implements \JsonSerializable {
 
             if (isset($field['items'])) {
                 // Validate each of the types.
-                $path = array_select(['path', 'name'], $field);
+                $path = arraySelect(['path', 'name'], $field);
                 $itemField = $field['items'];
-                $itemField['validatorName'] = array_select(['validatorName', 'path', 'name'], $field).'.items';
+                $itemField['validatorName'] = arraySelect(['validatorName', 'path', 'name'], $field).'.items';
                 foreach ($value as $i => &$item) {
                     $itemField['path'] = "$path.$i";
                     $this->validateField($item, $itemField, $validation);
@@ -574,7 +574,7 @@ class Schema implements \JsonSerializable {
         if (!is_array($value) || isset($value[0])) {
             return false;
         } elseif (isset($field['properties'])) {
-            $path = array_select(['path', 'name'], $field);
+            $path = arraySelect(['path', 'name'], $field);
             // Validate the data against the internal schema.
             $this->isValidInternal($value, $field['properties'], $validation, $path.'.');
         }

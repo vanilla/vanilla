@@ -15,6 +15,10 @@ use Garden\Exception\ValidationException;
  */
 class Schema implements \JsonSerializable {
     /// Properties ///
+
+    /** @var string */
+    protected $description = '';
+
     protected $schema = [];
 
     protected static $types = [
@@ -73,6 +77,15 @@ class Schema implements \JsonSerializable {
     public static function create($schema = []) {
         $new = new Schema($schema);
         return $new;
+    }
+
+    /**
+     * Grab the schema's current description.
+     *
+     * @return string
+     */
+    public function getDescription() {
+        return $this->description;
     }
 
     /**
@@ -339,6 +352,23 @@ class Schema implements \JsonSerializable {
         }
 
         return $validation->isValid();
+    }
+
+    /**
+     * Set the description for the schema.
+     *
+     * @param string $description
+     * @throws \InvalidArgumentException when the provided description is not a string.
+     * @return Schema
+     */
+    public function setDescription($description) {
+        if (is_string($description)) {
+            $this->description = $description;
+        } else {
+            throw new \InvalidArgumentException("Invalid description type.", 500);
+        }
+
+        return $this;
     }
 
     /**

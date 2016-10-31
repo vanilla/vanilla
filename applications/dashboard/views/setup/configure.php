@@ -40,7 +40,7 @@ echo $this->Form->open();
                     <div class="Box"><?php echo t('You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'); ?></div>
                     <?php if (file_exists(PATH_ROOT.'/.htaccess.dist')): ?>
                         <?php echo $this->Form->radioList('HtaccessAction', [
-                            'dist' => 'Copy .htaccess from .htaccess.dist.',
+                                'dist' => 'Copy .htaccess from .htaccess.dist.',
                                 'skip' => 'Install Vanilla without a .htaccess file.'
                             ], ['Default' => 'dist']); ?>
                     <?php else: ?>

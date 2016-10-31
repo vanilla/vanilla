@@ -70,7 +70,7 @@ class BasicSchemaTest extends SchemaTest {
         $data = [
             'id' => 123,
             'name' => 'foo',
-            'descriptiom' => 456,
+            'description' => 456,
             'timestamp' => time(),
             'date' => new \DateTime(),
             'amount' => 5.99,

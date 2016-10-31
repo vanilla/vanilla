@@ -14,6 +14,17 @@ use Garden\Exception\ValidationException;
  * A class for defining and validating data schemas.
  */
 class Schema implements \JsonSerializable {
+    /// Constants ///
+
+    /** Silently remove invalid parameters when validating input. */
+    const VALIDATE_REMOVE = 1;
+
+    /** Automatically remove invalid parameters from input and trigger an E_USER_NOTICE error during validation. */
+    const VALIDATE_NOTICE = 2;
+
+    /** Throw a ValidationException when invalid parameters are encountered during validation. */
+    const VALIDATE_EXCEPTION = 4;
+
     /// Properties ///
 
     /** @var string */
@@ -33,6 +44,9 @@ class Schema implements \JsonSerializable {
         'ts' => 'timestamp',
         'dt' => 'datetime'
     ];
+
+    /** @var int */
+    protected $validationBehavior = self::VALIDATE_NOTICE;
 
     /**
      * @var array An array of callbacks that will custom validate the schema.
@@ -132,12 +146,67 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Filter fields not in the schema.  The action taken is determined by the configured validation behavior.
+     *
+     * @param array $data
+     * @return Schema
+     */
+    protected function filterData(array &$data) {
+        $validation = new Validation();
+        $filtered = false;
+
+        foreach ($data as $key => $val) {
+            if (array_key_exists($key, $this->schema)) {
+                continue;
+            } elseif ($filtered === false) {
+                $filtered = true;
+            }
+
+            $errorMessage = sprintft('Unexpected parameter: %1$s.', $key);
+            $validation->addError(
+                'unexpected_parameter',
+                $key,
+                [
+                    'parameter' => $key,
+                    'message' => $errorMessage,
+                    'status' => 500
+                ]
+            );
+
+            switch ($this->validationBehavior) {
+                case self::VALIDATE_EXCEPTION:
+                    continue;
+                case self::VALIDATE_NOTICE:
+                    trigger_error($errorMessage, E_USER_NOTICE);
+                case self::VALIDATE_REMOVE:
+                default:
+                    unset($data[$key]);
+            }
+        }
+
+        if ($filtered && $this->validationBehavior === self::VALIDATE_EXCEPTION) {
+            throw new ValidationException($validation);
+        }
+
+        return $this;
+    }
+
+    /**
      * Grab the schema's current description.
      *
      * @return string
      */
     public function getDescription() {
         return $this->description;
+    }
+
+    /**
+     * Return a Schema::VALIDATE_* constant representing the currently configured validation behavior.
+     *
+     * @return int
+     */
+    public function getValidationBehavior() {
+        return $this->validationBehavior;
     }
 
     /**
@@ -382,6 +451,8 @@ class Schema implements \JsonSerializable {
             $validation = new Validation();
         }
 
+        $this->filterData($data);
+
         // Loop through the schema fields and validate each one.
         foreach ($schema as $name => $field) {
             // Prepend the path the field label.
@@ -418,6 +489,26 @@ class Schema implements \JsonSerializable {
             $this->description = $description;
         } else {
             throw new \InvalidArgumentException("Invalid description type.", 500);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the validation behavior for the schema, which determines how invalid properties are handled.
+     *
+     * @param int $validationBehavior One of the Schema::VALIDATE_* constants.
+     * @return Schema
+     */
+    public function setValidationBehavior($validationBehavior) {
+        switch ($validationBehavior) {
+            case self::VALIDATE_REMOVE:
+            case self::VALIDATE_NOTICE:
+            case self::VALIDATE_EXCEPTION:
+                $this->validationBehavior = $validationBehavior;
+                break;
+            default:
+                throw new \InvalidArgumentException('Invalid validation behavior.', 500);
         }
 
         return $this;

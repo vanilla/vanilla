@@ -72,6 +72,7 @@
             <fileset
                     dir="${project.dir}"
                     includes="**/license.*"
+                    excludesfile="license-exclude.txt"
                     casesensitive="false" />
         </copy>
 

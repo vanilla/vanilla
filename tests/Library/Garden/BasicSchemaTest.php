@@ -355,7 +355,7 @@ class BasicSchemaTest extends SchemaTest {
             [
                 'i:id',
                 's:name' => 'The name of the object.',
-                'description?',
+                's:description?',
                 'ts:timestamp?',
                 'dt:date?',
                 'f:amount?',

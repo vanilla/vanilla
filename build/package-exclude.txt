@@ -2,9 +2,12 @@
 **/.editorconfig
 **/.gitkeep
 **/.jshintrc
+**/bower_components/**
 **/bower.json
 **/composer.json
 **/Gruntfile.js
+**/node_modules/**
+**/npm-shrinkwrap.json
 **/package.json
 **/*.dist
 **/*.scss

@@ -80,6 +80,58 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Build an OpenAPI-compatible specification of the current schema.
+     *
+     * @return array
+     */
+    public function dumpSpec() {
+        $schema = $this->schema;
+
+        if (is_array($schema)) {
+            foreach ($schema as &$parameter) {
+                if (!is_array($parameter) || !$parameter['type']) {
+                    unset($parameter);
+                    continue;
+                }
+
+                // Massage schema's types into their Open API v2 counterparts, including potential formatting flags.
+                // string, boolean and array pass through without adjustment.
+                switch ($parameter['type']) {
+                    case 'object':
+                        $parameter['type'] = 'array';
+                        break;
+                    case 'timestamp':
+                        $parameter['type'] = 'integer';
+                        break;
+                    case 'float':
+                        $parameter['type'] = 'number';
+                        $parameter['format'] = 'float';
+                        break;
+                    case 'base64':
+                        $parameter['type'] = 'string';
+                        $parameter['format'] = 'byte';
+                        break;
+                    case 'datetime':
+                        $parameter['type'] = 'string';
+                        $parameter['format'] = 'dateTime';
+                        break;
+                    default:
+                        $parameter['type'] = 'string';
+                }
+            }
+        } else {
+            $schema = [];
+        }
+
+        $spec = [
+            'description' => $this->description,
+            'parameters' => $schema
+        ];
+
+        return $spec;
+    }
+
+    /**
      * Grab the schema's current description.
      *
      * @return string

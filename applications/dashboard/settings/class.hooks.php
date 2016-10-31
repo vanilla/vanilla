@@ -419,8 +419,12 @@ class DashboardHooks extends Gdn_Plugin {
         if (!empty($args['PathArgs'])) {
             if (Gdn::session()->isValid()) {
                 $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
-                $userModel = new UserModel();
-                $userModel->clearSectionNavigationPreference($uri);
+                try {
+                    $userModel = new UserModel();
+                    $userModel->clearSectionNavigationPreference($uri);
+                } catch (Exception $ex) {
+                    // Nothing
+                }
             }
         }
     }

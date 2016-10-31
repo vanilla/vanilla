@@ -3859,6 +3859,21 @@ if (!function_exists('slugify')) {
     }
 }
 
+if (!function_exists('sprintft')) {
+    /**
+     * A version of {@link sprintf()} That translates the string format.
+     *
+     * @param string $formatCode The format translation code.
+     * @param mixed $arg1 The arguments to pass to {@link sprintf()}.
+     * @return string The translated string.
+     */
+    function sprintft($formatCode, $arg1 = null) {
+        $args = func_get_args();
+        $args[0] = t($formatCode, $formatCode);
+        return call_user_func_array('sprintf', $args);
+    }
+}
+
 if (!function_exists('urlMatch')) {
 
     /**

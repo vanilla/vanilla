@@ -61,7 +61,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "VanillaTests\\": "tests"
+            "VanillaTests\\": "tests",
+            "GardenTests\\": "tests"
         }
     }
 }

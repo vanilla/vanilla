@@ -406,6 +406,28 @@ class DashboardHooks extends Gdn_Plugin {
         }
     }
 
+    /**
+     * Clear user navigation preferences if we can't find the explicit method on the controller.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args Event arguments. We can expect a 'PathArgs' key here.
+     */
+    public function gdn_dispatcher_methodNotFound_handler($sender, $args) {
+        // If PathArgs is empty, the user hit the root, and we assume they want the index.
+        // If not, they got redirected to the root because their controller method was not
+        // found. We should clear the user prefs in that case.
+        if (!empty($args['PathArgs'])) {
+            if (Gdn::session()->isValid()) {
+                $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+                try {
+                    $userModel = new UserModel();
+                    $userModel->clearSectionNavigationPreference($uri);
+                } catch (Exception $ex) {
+                    // Nothing
+                }
+            }
+        }
+    }
 
     /**
      *

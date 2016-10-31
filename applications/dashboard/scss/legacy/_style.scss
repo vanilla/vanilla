@@ -2334,6 +2334,10 @@ mark {
   max-width: 100%;
 }
 
+.Message td, .Message th {
+  padding: .5em;
+}
+
 /* =============================================================== Categories */
 .ChildCategories {
   border-top: 1px dotted $grey-2;

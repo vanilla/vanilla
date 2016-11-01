@@ -149,14 +149,16 @@ class Schema implements \JsonSerializable {
      * Filter fields not in the schema.  The action taken is determined by the configured validation behavior.
      *
      * @param array $data
+     * @param array $schema
+     * @throws ValidationException when configured to do so and an unexpected parameter is encountered
      * @return Schema
      */
-    protected function filterData(array &$data) {
+    protected function filterData(array &$data, array $schema) {
         $validation = new Validation();
         $filtered = false;
 
         foreach ($data as $key => $val) {
-            if (array_key_exists($key, $this->schema)) {
+            if (array_key_exists($key, $schema)) {
                 continue;
             } elseif ($filtered === false) {
                 $filtered = true;
@@ -451,7 +453,7 @@ class Schema implements \JsonSerializable {
             $validation = new Validation();
         }
 
-        $this->filterData($data);
+        $this->filterData($data, $schema);
 
         // Loop through the schema fields and validate each one.
         foreach ($schema as $name => $field) {

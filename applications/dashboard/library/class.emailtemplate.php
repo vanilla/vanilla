@@ -474,7 +474,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
             }
         }
 
-        return Gdn_Format::plainText(Gdn_Format::text(implode('<br>', $email)));
+        return Gdn_Format::plainText(Gdn_Format::text(implode('<br>', $email), false));
     }
 
     /**

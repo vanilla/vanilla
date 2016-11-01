@@ -150,34 +150,32 @@ class Schema implements \JsonSerializable {
      *
      * @param array $data
      * @param array $schema
+     * @param Validation $validation
      * @param string $path
      * @throws ValidationException when configured to do so and an unexpected parameter is encountered
      * @return Schema
      */
-    protected function filterData(array &$data, array $schema, $path = '') {
-        $validation = new Validation();
+    protected function filterData(array &$data, array $schema, Validation &$validation, $path = '') {
         $filtered = false;
 
         foreach ($data as $key => $val) {
             if (array_key_exists($key, $schema)) {
                 continue;
-            } elseif ($filtered === false) {
-                $filtered = true;
             }
 
             $errorMessage = sprintft('Unexpected parameter: %1$s.', $path.$key);
-            $validation->addError(
-                'unexpected_parameter',
-                $key,
-                [
-                    'parameter' => $key,
-                    'message' => $errorMessage,
-                    'status' => 500
-                ]
-            );
 
             switch ($this->validationBehavior) {
                 case self::VALIDATE_EXCEPTION:
+                    $validation->addError(
+                        'unexpected_parameter',
+                        $key,
+                        [
+                            'parameter' => $key,
+                            'message' => $errorMessage,
+                            'status' => 500
+                        ]
+                    );
                     continue;
                 case self::VALIDATE_NOTICE:
                     trigger_error($errorMessage, E_USER_NOTICE);
@@ -185,10 +183,6 @@ class Schema implements \JsonSerializable {
                 default:
                     unset($data[$key]);
             }
-        }
-
-        if ($filtered && $this->validationBehavior === self::VALIDATE_EXCEPTION) {
-            throw new ValidationException($validation);
         }
 
         return $this;
@@ -454,7 +448,7 @@ class Schema implements \JsonSerializable {
             $validation = new Validation();
         }
 
-        $this->filterData($data, $schema, $path);
+        $this->filterData($data, $schema, $validation, $path);
 
         // Loop through the schema fields and validate each one.
         foreach ($schema as $name => $field) {

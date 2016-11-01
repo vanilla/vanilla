@@ -150,10 +150,11 @@ class Schema implements \JsonSerializable {
      *
      * @param array $data
      * @param array $schema
+     * @param string $path
      * @throws ValidationException when configured to do so and an unexpected parameter is encountered
      * @return Schema
      */
-    protected function filterData(array &$data, array $schema) {
+    protected function filterData(array &$data, array $schema, $path = '') {
         $validation = new Validation();
         $filtered = false;
 
@@ -164,7 +165,7 @@ class Schema implements \JsonSerializable {
                 $filtered = true;
             }
 
-            $errorMessage = sprintft('Unexpected parameter: %1$s.', $key);
+            $errorMessage = sprintft('Unexpected parameter: %1$s.', $path.$key);
             $validation->addError(
                 'unexpected_parameter',
                 $key,
@@ -453,7 +454,7 @@ class Schema implements \JsonSerializable {
             $validation = new Validation();
         }
 
-        $this->filterData($data, $schema);
+        $this->filterData($data, $schema, $path);
 
         // Loop through the schema fields and validate each one.
         foreach ($schema as $name => $field) {

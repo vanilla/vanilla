@@ -148,16 +148,13 @@ class Schema implements \JsonSerializable {
     /**
      * Filter fields not in the schema.  The action taken is determined by the configured validation behavior.
      *
-     * @param array $data
-     * @param array $schema
-     * @param Validation $validation
-     * @param string $path
-     * @throws ValidationException when configured to do so and an unexpected parameter is encountered
-     * @return Schema
+     * @param array &$data The data to filter.
+     * @param array $schema The schema array.  Its configured parameters are used to filter $data.
+     * @param Validation &$validation This argument will be filled with the validation result.
+     * @param string $path The path to current parameters for nested objects.
+     * @return Schema Returns the current instance for fluent calls.
      */
     protected function filterData(array &$data, array $schema, Validation &$validation, $path = '') {
-        $filtered = false;
-
         foreach ($data as $key => $val) {
             if (array_key_exists($key, $schema)) {
                 continue;
@@ -200,7 +197,7 @@ class Schema implements \JsonSerializable {
     /**
      * Return a Schema::VALIDATE_* constant representing the currently configured validation behavior.
      *
-     * @return int
+     * @return int Returns a Schema::VALIDATE_* constant to indicate this instance's validation behavior.
      */
     public function getValidationBehavior() {
         return $this->validationBehavior;
@@ -495,7 +492,7 @@ class Schema implements \JsonSerializable {
      * Set the validation behavior for the schema, which determines how invalid properties are handled.
      *
      * @param int $validationBehavior One of the Schema::VALIDATE_* constants.
-     * @return Schema
+     * @return Schema Returns the current instance for fluent calls.
      */
     public function setValidationBehavior($validationBehavior) {
         switch ($validationBehavior) {

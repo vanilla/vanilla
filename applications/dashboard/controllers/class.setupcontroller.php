@@ -75,7 +75,7 @@ class SetupController extends DashboardController {
 
                             break;
                         default:
-                            $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using FTP to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'));
+                            $this->Form->addError(t('You are missing Vanilla\'s .htaccess file.', 'You are missing an <b>.htaccess</b> file. This file can be automatically created from Vanilla\'s <b>.htaccess.dist</b>.  However, it may not have been copied if you are using FTP to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess.dist</b> file before continuing.'));
                     }
                 }
             }

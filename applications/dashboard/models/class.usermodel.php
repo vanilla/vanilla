@@ -2428,20 +2428,8 @@ class UserModel extends Gdn_Model {
         if (!empty($RoleID)) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } elseif (isset($IPAddress)) {
-            $this->SQL->join('UserIP uip', 'u.userID = uip.UserID');
-
-            $this->SQL
-                ->orOp()
-                ->beginWhereGroup()
-                ->orWhereIn('u.LastIPAddress', [$IPAddress, inet_pton($IPAddress)])
-                ->orWhere('uip.IPAddress', inet_pton($IPAddress));
-
-            // An or is expensive so only do it if the query isn't optimized.
-            if (!$Optimize) {
-                $this->SQL->orWhereIn('u.InsertIPAddress', [$IPAddress, inet_pton($IPAddress)]);
-            }
-
-            $this->SQL->endWhereGroup();
+            $fields = ['LastIPAddress'];
+            $this->searchByIp($IPAddress, $fields);
         } elseif (isset($numericQuery)) {
             // We've searched for a number. Return UserID AND any exact numeric name match.
             $this->SQL->beginWhereGroup()
@@ -2495,6 +2483,32 @@ class UserModel extends Gdn_Model {
         return $Data;
     }
 
+
+    /**
+     * Searches the UserIP table for users with a given IP Address. Extends the search to GDN_User fields
+     * passed in the $fields param.
+     *
+     * @param string $ip The IP Address to search for.
+     * @param array $fields The additional fields to check in the UserTable
+     */
+    public function searchByIp($ip, $fields = []) {
+        $this->SQL->join('UserIP uip', 'u.userID = uip.UserID', 'left');
+        $this->SQL
+            ->orOp()
+            ->beginWhereGroup()
+            ->orWhere('uip.IPAddress', inet_pton($ip));
+
+        $allowedFields = ['LastIPAddress', 'InsertIPAddress', 'UpdateIPAddress'];
+
+        foreach ($fields as $field) {
+            if (in_array($field, $allowedFields)) {
+                $this->SQL->orWhereIn('u.'.$field, [$ip, inet_pton($ip)]);
+            }
+        }
+
+        $this->SQL->endWhereGroup();
+    }
+
     /**
      * Count search results.
      *
@@ -2527,7 +2541,11 @@ class UserModel extends Gdn_Model {
             ->select('u.UserID', 'count', 'UserCount')
             ->from('User u');
 
-        if ($RoleID) {
+        // Check for an IP address.
+        if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
+            $fields = ['LastIPAddress'];
+            $this->searchByIp($Keywords, $fields);
+        } else if ($RoleID) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } else {
             // Search on the user table.

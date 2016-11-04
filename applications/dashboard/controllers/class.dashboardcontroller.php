@@ -51,7 +51,7 @@ class DashboardController extends Gdn_Controller {
                 $this->addCssFile('https://fonts.googleapis.com/css?family=Rokkitt');
             }
             $this->addCssFile('admin.css');
-            $this->addCssFile('magnific-popup.css');
+            $this->addCssFile('magnific-popup.css', 'dashboard');
         }
 
         $this->MasterView = 'admin';

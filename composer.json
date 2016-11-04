@@ -21,10 +21,6 @@
             "email": "lincoln@vanillaforums.com"
         }
     ],
-    "repositories": [{
-        "type": "git",
-        "url": "https://github.com/vanilla/php-ico.git"
-    }],
     "require": {
         "psr/log": "~1.0",
         "smarty/smarty": "~3.1",
@@ -32,7 +28,7 @@
         "vanilla/htmlawed": "~2.0",
         "vanilla/nbbc": "~2.1",
         "vanilla/garden-password": "~1.0",
-        "vanilla/php-ico": "~1.0",
+        "chrisjean/php-ico": "~1.0",
         "tburry/pquery": "~1.1",
         "phpmailer/phpmailer": "~5.2",
         "container-interop/container-interop": "^1.1"

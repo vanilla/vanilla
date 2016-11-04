@@ -4,9 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "49ee0b16274683adcd2edab7bf5d9d61",
-    "content-hash": "6fffe98fe429d468e6cc13ccbde08208",
+    "hash": "3c2901be3d44ca6e302e4ef664074ec1",
+    "content-hash": "91afffeaed3f32060aa77a126f489a0b",
     "packages": [
+        {
+            "name": "chrisjean/php-ico",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrisbliss18/php-ico.git",
+                "reference": "ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrisbliss18/php-ico/zipball/ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6",
+                "reference": "ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "class-php-ico.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Jean",
+                    "homepage": "https://chrisjean.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "An easy-to-use library to generate valid ICO files.",
+            "homepage": "https://github.com/chrisbliss18/php-ico",
+            "keywords": [
+                "favicon",
+                "ico"
+            ],
+            "time": "2016-09-27 22:00:56"
+        },
         {
             "name": "container-interop/container-interop",
             "version": "1.1.0",
@@ -415,34 +458,6 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "time": "2016-04-26 18:19:47"
-        },
-        {
-            "name": "vanilla/php-ico",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/php-ico.git",
-                "reference": "8bd36d560152e84ad5f9e42a5df1fa9fc0649940"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": {
-                    "Vanilla\\": [
-                        "class-php-ico.php"
-                    ]
-                }
-            },
-            "license": [
-                "GPL-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Jean",
-                    "homepage": "https://github.com/chrisbliss18"
-                }
-            ],
-            "description": "An easy-to-use library to generate valid ICO files.",
-            "time": "2016-09-20 21:59:42"
         }
     ],
     "packages-dev": [],

@@ -2429,7 +2429,7 @@ class UserModel extends Gdn_Model {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } elseif (isset($IPAddress)) {
             $fields = ['LastIPAddress'];
-            $this->searchByIp($IPAddress, $fields);
+            $this->addIpFilters($IPAddress, $fields);
         } elseif (isset($numericQuery)) {
             // We've searched for a number. Return UserID AND any exact numeric name match.
             $this->SQL->beginWhereGroup()
@@ -2485,13 +2485,13 @@ class UserModel extends Gdn_Model {
 
 
     /**
-     * Searches the UserIP table for users with a given IP Address. Extends the search to GDN_User fields
-     * passed in the $fields param.
+     * Appends filters to the current SQL object. Filters users with a given IP Address in the UserIP table. Extends
+     * filtering to IPs in the GDN_User table for any fields passed in the $fields param.
      *
      * @param string $ip The IP Address to search for.
      * @param array $fields The additional fields to check in the UserTable
      */
-    public function searchByIp($ip, $fields = []) {
+    private function addIpFilters($ip, $fields = []) {
         $this->SQL->join('UserIP uip', 'u.userID = uip.UserID', 'left');
         $this->SQL
             ->orOp()
@@ -2544,7 +2544,7 @@ class UserModel extends Gdn_Model {
         // Check for an IP address.
         if (preg_match('`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`', $Keywords)) {
             $fields = ['LastIPAddress'];
-            $this->searchByIp($Keywords, $fields);
+            $this->addIpFilters($Keywords, $fields);
         } else if ($RoleID) {
             $this->SQL->join('UserRole ur2', "u.UserID = ur2.UserID and ur2.RoleID = $RoleID");
         } else {

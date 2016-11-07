@@ -1017,8 +1017,8 @@ class DiscussionModel extends VanillaModel {
      * @access public
      *
      * @param array $Wheres SQL conditions.
-     * @param int $Offset SQL conditions.
-     * @param int $Limit SQL conditions.
+     * @param int $Offset The number of records to skip.
+     * @param int $Limit The number of records to limit the query to.
      * @return object SQL result.
      */
     public function getAnnouncements($Wheres = '', $Offset = 0, $Limit = false) {

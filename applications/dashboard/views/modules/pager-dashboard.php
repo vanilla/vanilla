@@ -3,18 +3,11 @@ $pager = Gdn::controller()->data('Pager');
 
 $pagerType = !($pager->TotalRecords) ? 'more' : 'numbered';
 
-$hasNext = true;
+$hasNext = $pager->hasMorePages();
 
 // Get total page count, allowing override
 $pageCount = ceil($pager->TotalRecords / $pager->Limit);
 $currentPage = pageNumber($pager->Offset, $pager->Limit);
-
-if ($pagerType === 'numbered' && $currentPage >= $pageCount) {
-    $hasNext = false;
-}
-if ($pagerType === 'more' && $pager->CurrentRecords !== false && $pager->CurrentRecords < $pager->Limit) {
-    $hasNext = false;
-}
 
 $pagerString = '<div class="pager">';
 

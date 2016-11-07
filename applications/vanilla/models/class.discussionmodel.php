@@ -1017,13 +1017,16 @@ class DiscussionModel extends VanillaModel {
      * @access public
      *
      * @param array $Wheres SQL conditions.
+     * @param int $Offset The number of records to skip.
+     * @param int $Limit The number of records to limit the query to.
      * @return object SQL result.
      */
-    public function getAnnouncements($Wheres = '') {
+    public function getAnnouncements($Wheres = '', $Offset = 0, $Limit = false) {
         $Wheres = $this->combineWheres($this->getWheres(), $Wheres);
         $Session = Gdn::session();
-        $Limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
-        $Offset = 0;
+        if ($Limit === false) {
+            c('Vanilla.Discussions.PerPage', 30);
+        }
         $UserID = $Session->UserID > 0 ? $Session->UserID : 0;
         $CategoryID = val('d.CategoryID', $Wheres, 0);
         $GroupID = val('d.GroupID', $Wheres, 0);
@@ -2292,7 +2295,7 @@ class DiscussionModel extends VanillaModel {
 
     /**
      * Update a user's discussion count.
-     * 
+     *
      * @param int $UserID The user to calculate.
      * @param bool $Inc Whether to increment of recalculate from scratch.
      */

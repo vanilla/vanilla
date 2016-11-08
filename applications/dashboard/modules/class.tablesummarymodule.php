@@ -12,7 +12,7 @@
 class TableSummaryModule extends Gdn_Module {
 
     const CSS_PREFIX = 'table-summary';
-    const MAIN_CSS_CLASS = self::CSS_PREFIX.'-cell-main';
+    const MAIN_CSS_CLASS = 'table-summary-cell-main';
 
     /**
      * @var array An array of column-type arrays.

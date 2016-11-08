@@ -6,26 +6,16 @@ $DeleteUser = $Session->checkPermission('Garden.Users.Delete');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 foreach ($this->UserData->result() as $User) {
     $Alt = !$Alt;
+    $userBlock = new MediaItemModule(val('Name', $User), userUrl($User));
+    $userBlock->setView('media-sm')
+        ->setImage(userPhotoUrl($User))
+        ->addMetaIf($ViewPersonalInfo, Gdn_Format::Email($User->Email));
     ?>
     <tr id="<?php echo "UserID_{$User->UserID}"; ?>"<?php echo $Alt ? ' class="Alt"' : ''; ?>
         data-userid="<?php echo $User->UserID ?>">
         <!--      <td class="CheckboxCell"><input type="checkbox" name="LogID[]" value="<?php echo $User->UserID; ?>" /></td>-->
         <td>
-            <div class="media media-sm">
-                <div class="media-left">
-                    <div class="media-image-wrap">
-                        <?php echo userPhoto($User); ?>
-                    </div>
-                </div>
-                <div class="media-body">
-                    <div class="media-title username">
-                        <?php echo userAnchor($User, 'Username'); ?>
-                    </div>
-                    <?php if ($ViewPersonalInfo) : ?>
-                    <div class="info user-email"><?php echo Gdn_Format::Email($User->Email); ?></div>
-                    <?php endif; ?>
-                </div>
-            </div>
+            <?php echo $userBlock; ?>
         </td>
         <td style="max-width: 200px;">
             <?php

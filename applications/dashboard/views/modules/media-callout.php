@@ -1,9 +1,4 @@
-<?php
-/**
- * Mostly a duplicate of 'media-callout' view, but adds specific options for themes.
- * @var MediaItemModule $this
- */
-?>
+<?php /** @var MediaItemModule $this */ ?>
 <div <?php echo attribute($this->getAttributes()); ?>>
     <?php if ($this->getImageHtml()) { ?>
         <div class="media-left">

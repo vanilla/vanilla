@@ -96,6 +96,10 @@ class MediaItemModule extends Gdn_Module {
         $this->attributes = $attributes;
     }
 
+    /**
+     * @param string $view
+     * @return MediaItemModule $this
+     */
     public function setView($view) {
         $class = $this->attributes['class'];
         $class .= ' media '.$view;
@@ -135,9 +139,11 @@ class MediaItemModule extends Gdn_Module {
 
     /**
      * @param string $title
+     * @return MediaItemModule $this
      */
     public function setTitle($title) {
         $this->title = $title;
+        return $this;
     }
 
     /**
@@ -149,9 +155,11 @@ class MediaItemModule extends Gdn_Module {
 
     /**
      * @param string $titleUrl Url for title, function handles url()-ing.
+     * @return MediaItemModule $this
      */
     public function setTitleUrl($titleUrl) {
         $this->titleUrl = url($titleUrl);
+        return $this;
     }
 
     /**
@@ -274,7 +282,7 @@ class MediaItemModule extends Gdn_Module {
      * @return MediaItemModule $this
      */
     public function setDropdown($dropdown) {
-        if (is_a($dropdown, 'DropdownModule') && $dropdown->hasItems()) {
+        if (is_a($dropdown, 'DropdownModule')) {
             $this->dropdown = $dropdown;
         }
         return $this;
@@ -421,7 +429,17 @@ class MediaItemModule extends Gdn_Module {
         return $this->addButton($text, $url, $attributes);
     }
 
-    public function addToggle($key, $enabled, $url, $label, $cssClass = '', $anchorCssClass = 'Hijack') {
+    /**
+     * Sets up a anchor-style toggle.
+     *
+     * @param string $key The toggle key/slug
+     * @param bool $enabled Whether the toggle is enabled.
+     * @param string $url The endpoint the toggle hits.
+     * @param string $label The aria-label for the toggle.
+     * @param string $cssClass The toggle css class.
+     * @param string $anchorCssClass The css class for the anchor. Should probably have 'Hijack' in there.
+     */
+    public function setToggle($key, $enabled, $url, $label, $cssClass = '', $anchorCssClass = 'Hijack') {
         $state = $enabled ? 'on' : 'off';
         $this->toggle = [
             'key' => $key,
@@ -433,6 +451,11 @@ class MediaItemModule extends Gdn_Module {
         ];
     }
 
+    /**
+     * Rendering helper for the toggle.
+     *
+     * @return string An HTML-formatted string for a toggle.
+     */
     public function getToggleHtml() {
         $slider = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>',
             val('url', $this->toggle), val('anchorCssClass', $this->toggle),

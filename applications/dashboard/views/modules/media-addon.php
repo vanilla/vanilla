@@ -30,7 +30,7 @@
                 </a>
             </div>
         <?php } ?>
-        <?php if (!empty($this->getToggle())) {
+        <?php if ($this->getToggle()) {
             echo $this->getToggleHtml();
         } ?>
     </div>

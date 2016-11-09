@@ -4904,20 +4904,18 @@ output {
 }
 
 .analytics-panel-metrics {
-  display: -ms-flexbox;
-  display: flex;
+  display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-top: 0.0625rem solid #e7e8e9;
+  border-bottom: 0.0625rem solid #e7e8e9;
   overflow: hidden;
   -ms-flex-pack: center;
   justify-content: center;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding: 0.5625rem 0 1.125rem;
-  border-top-color: #ededed;
 }
 
 .analytics-panel-metrics .metric-value {
@@ -7234,6 +7232,7 @@ label[id^=iCheck] {
 .media-callout .media-title {
   font-weight: 500;
   margin-bottom: 0.28125rem;
+  margin-top: 0;
 }
 
 .media-options {
@@ -7285,6 +7284,11 @@ label[id^=iCheck] {
 
 .media-callout {
   padding-left: 0;
+}
+
+.media-callout .media-title {
+  font-weight: 400;
+  margin-bottom: 0.5625rem;
 }
 
 .media-callout.media-callout-grey-bg {
@@ -8001,6 +8005,8 @@ button.close {
 .drawer-toggle {
   color: #fff;
   font-size: 1.125rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 .drawer-toggle:hover, .drawer-toggle:active, .drawer-toggle:focus {
@@ -8615,8 +8621,8 @@ button.close {
   border-bottom: 0.0625rem solid #ddd;
 }
 
-.table-summary thead th:first-child,
-.table-summary thead td:first-child {
+.table-summary thead th .table-summary-cell-main,
+.table-summary thead td .table-summary-cell-main {
   width: 100%;
   min-width: 7.5rem;
 }

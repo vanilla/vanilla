@@ -14,6 +14,8 @@
 // .media-addon - Used for addons.
 // .media-sm - Used for user cells in tables.
 //
+// PHP rendering helper: The MediaItemModule
+//
 // Markup:
 // <div class="media {{modifier_class}}">
 //   <div class="media-left">
@@ -23,7 +25,7 @@
 //   </div>
 //   <div class="media-body">
 //     <div class="media-heading">
-//       <div class="media-title">Media Title</div>
+//       <h3 class="media-title">Media Title</h3>
 //       <div class="info">
 //         Created by Becky Van Bussel<span class="spacer">•</span>Version 1.0.0
 //       </div>
@@ -108,6 +110,7 @@
   .media-title {
     font-weight: 500;
     margin-bottom: $spacer / 4;
+    margin-top: 0;
   }
 
 }
@@ -167,7 +170,7 @@
 // A media callout is a media item of certain prominence. Usually appears at the top of the page as a kind of
 // "current selection" marker. See the theme settings pages for this.
 //
-// PHP rendering helper: ThemeInfoModule
+// PHP rendering helper: MediaItemModule
 //
 // .media-callout-grey-bg - Makes the background grey.
 //
@@ -180,8 +183,8 @@
 //   </div>
 //   <div class="media-body">
 //     <div class="flag">Current Theme</div>
-//     <div class="media-title">
-//       <h3 class="media-heading theme-name">+Baseline</h3>
+//     <div class="media-heading">
+//       <h3 class="media-title theme-name">+Baseline</h3>
 //       <div class="info">
 //         <span class="media-meta author">Created by <a href="#">Mark O'Sullivan</a></span>
 //         <span class="spacer">|</span><span class="media-meta version">Version 2.2.112.3</span>
@@ -200,6 +203,10 @@
   // Counteracts the padding placed on the grid-item in the media-left
   padding-left: 0;
 
+  .media-title {
+    font-weight: 400;
+    margin-bottom: $spacer / 2;
+  }
 
   .media-left {
     @include grid-item();

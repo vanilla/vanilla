@@ -140,6 +140,8 @@
 .drawer-toggle {
   color: $white;
   font-size: $font-size-lg;
+  padding-top: $spacer / 2 + $border-width;
+  padding-bottom: $spacer / 2 + $border-width;
 
   &:hover,
   &:active,

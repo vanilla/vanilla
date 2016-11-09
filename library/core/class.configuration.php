@@ -304,7 +304,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         if (is_string($Value)) {
-            $Result = Gdn_Format::unserialize($Value);
+            $Result = dbdecode($Value);
         } else {
             $Result = $Value;
         }
@@ -1292,7 +1292,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
         }
 
         if (is_string($Value)) {
-            $Result = Gdn_Format::unserialize($Value);
+            $Result = dbdecode($Value);
         } else {
             $Result = $Value;
         }

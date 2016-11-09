@@ -195,7 +195,7 @@ class UpdateModel extends Gdn_Model {
                     unset($Requirements[$Type]);
                 }
             }
-            $Addon['Requirements'] = serialize($Requirements);
+            $Addon['Requirements'] = dbencode($Requirements);
 
             $Addon['Checked'] = true;
             $Addon['Path'] = $Path;

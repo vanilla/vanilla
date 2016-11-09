@@ -937,7 +937,7 @@ class Gdn_Format {
      */
     public static function image($Body) {
         if (is_string($Body)) {
-            $Image = @unserialize($Body);
+            $Image = dbdecode($Body);
 
             if (!$Image) {
                 return Gdn_Format::html($Body);

@@ -8,7 +8,6 @@ $(document).on('contentLoad', function() {
         if ($(inp2).attr('id') != 'Form_ShowPassword') {
             $(inp).after('<input id="Form_ShowPassword" type="text" class="form-control" value="' + $(inp).val() + '" />');
             inp2 = $(inp).next();
-            $(this).html($(this).data('hideText'));
             $(inp).change(function() {
                 $(inp2).val($(inp).val());
             });

@@ -1,5 +1,5 @@
 // This file contains javascript that is specific to the /profile controller.
-jQuery(document).ready(function($) {
+$(document).on('contentLoad', function() {
 
     // Reveal password
     $(document).on('click', 'a.RevealPassword', function() {
@@ -8,16 +8,21 @@ jQuery(document).ready(function($) {
         if ($(inp2).attr('id') != 'Form_ShowPassword') {
             $(inp).after('<input id="Form_ShowPassword" type="text" class="form-control" value="' + $(inp).val() + '" />');
             inp2 = $(inp).next();
-            $(inp).hide();
             $(inp).change(function() {
                 $(inp2).val($(inp).val());
             });
             $(inp2).change(function() {
                 $(inp).val($(inp2).val());
             });
+        }
+        if ($(inp).is(":visible")) {
+            $(this).html($(this).data('hideText'));
+            $(inp).hide();
+            $(inp2).show();
         } else {
-            $(inp).toggle();
-            $(inp2).toggle();
+            $(this).html($(this).data('showText'));
+            $(inp).show();
+            $(inp2).hide();
         }
         return false;
     });
@@ -67,17 +72,11 @@ jQuery(document).ready(function($) {
     // When the password options are clicked, check to see if the admin/mod
     // wishes to set a new password for the user. If that's the case, show the
     // password reset input. Otherwise, hide it.
-    $(document).on('click', '.PasswordOptions', function() {
+    $(document).on('change', '.PasswordOptions', function() {
         if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual') {
             $('#NewPassword').slideDown('fast');
         } else {
             $('#NewPassword').slideUp('fast');
         }
     });
-
-    // Make paging function in the user table
-//   $('.MorePager').morepager({
-//      pageContainerSelector: '#Users',
-//      pagerInContainer: true
-//   });
 });

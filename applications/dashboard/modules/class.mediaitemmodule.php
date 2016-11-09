@@ -101,9 +101,10 @@ class MediaItemModule extends Gdn_Module {
      * @return MediaItemModule $this
      */
     public function setView($view) {
-        $class = $this->attributes['class'];
+        $class = val('class', $this->attributes, '');
         $class .= ' media '.$view;
         $this->attributes['class'] = $class;
+
         return parent::setView($view);
     }
 

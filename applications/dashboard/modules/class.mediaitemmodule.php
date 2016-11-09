@@ -84,7 +84,7 @@ class MediaItemModule extends Gdn_Module {
      * @param string $tag The root-level tag of the media item, usually a div or li.
      * @param array $attributes The root-level attributes for the Media Item.
      */
-    function __construct($title = '', $titleUrl = '', $description = '', $tag = 'div', $attributes = []) {
+    public function __construct($title = '', $titleUrl = '', $description = '', $tag = 'div', $attributes = []) {
         parent::__construct();
 
         $this->description = $description;
@@ -354,7 +354,7 @@ class MediaItemModule extends Gdn_Module {
      * @param string $alt The image alt.
      * @return MediaItemModule $this
      */
-    function setImage($source = '', $url = '', $cssClass = '', $alt = '') {
+    public function setImage($source = '', $url = '', $cssClass = '', $alt = '') {
         $this->imageSource = $source;
         $this->imageUrl = $url;
         $this->imageCssClass = $cssClass;
@@ -374,7 +374,7 @@ class MediaItemModule extends Gdn_Module {
      * @param string $alt The image alt.
      * @return MediaItemModule $this
      */
-    function setImageIf($isAllowed, $source = '', $url = '', $cssClass = '', $alt = '') {
+    public function setImageIf($isAllowed, $source = '', $url = '', $cssClass = '', $alt = '') {
         if (!$this->allowed($isAllowed)) {
             return $this;
         }

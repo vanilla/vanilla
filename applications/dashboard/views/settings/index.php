@@ -19,10 +19,11 @@ foreach ($this->ActiveUserData as $userdata) {
         'count-comments' => number_format($user->CountComments)
     ]);
 }
-
-echo $leaderboard;
 ?>
 
+<div class="summaries">
+    <?php echo $leaderboard; ?>
+</div>
 <div class="summaries">
     <div class="ReleasesColumn">
         <div class="table-summary-title"><?php echo t('Updates'); ?></div>

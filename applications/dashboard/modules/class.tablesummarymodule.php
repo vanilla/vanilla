@@ -151,10 +151,11 @@ class TableSummaryModule extends Gdn_Module {
         // Add css classes to cells
         foreach ($this->rows as $rowKey => $row) {
             foreach ($row['cells'] as $key => $value) {
+                $cellClass = self::CSS_PREFIX.'-cell-'.$key;
                 if (isset($this->columns[$key]['column-class'])) {
-                    $this->rows[$rowKey]['cells'][$key]['attributes']['class']
-                        = self::CSS_PREFIX.'-cell-'.$key.' '.$this->columns[$key]['column-class'];
+                    $cellClass .= ' '.$this->columns[$key]['column-class'];
                 }
+                $this->rows[$rowKey]['cells'][$key]['attributes']['class'] = $cellClass;
             }
         }
         return true;

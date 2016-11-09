@@ -19,7 +19,7 @@ foreach ($this->Data['UserData'] as $userdata) {
 }
 echo $userBoard;
 
-$discussionBoard = new TableSummaryModule(t('Active Users'));
+$discussionBoard = new TableSummaryModule(t('Popular Discussions'));
 $discussionBoard->addColumn('discussion', t('Title'), ['class' => 'column-xs'], TableSummaryModule::MAIN_CSS_CLASS)
     ->addColumn('count-comments', t('Comments'), ['class' => 'column-xs'])
     ->addColumn('count-bookmarks', t('Follows'), ['class' => 'column-xs'])

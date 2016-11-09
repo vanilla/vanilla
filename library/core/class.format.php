@@ -932,8 +932,10 @@ class Gdn_Format {
     }
 
     /**
-     * Format a serialized string of image properties as html.
-     * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
+     * Format an encoded string of image properties as html.
+     *
+     * @param string $Body a encoded array of image properties (Image, Thumbnail, Caption)
+     * @return string
      */
     public static function image($Body) {
         if (is_string($Body)) {

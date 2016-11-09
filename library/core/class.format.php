@@ -12,15 +12,16 @@
  */
 
 /**
- * Output formatter
+ * Output formatter.
  *
  * Utility class that helps to format strings, objects, and arrays.
  */
 class Gdn_Format {
 
     /**
-     * Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
-     * Example: a plugin can run on "BeforeCommentBody" to check the current users role and decide if his/her post
+     * @var bool Flag which allows plugins to decide if the output should include rel="nofollow" on any <a> links.
+     *
+     * @example a plugin can run on "BeforeCommentBody" to check the current users role and decide if his/her post
      * should contain rel="nofollow" links. The default setting is true, meaning all links will contain
      * the rel="nofollow" attribute.
      */
@@ -39,9 +40,12 @@ class Gdn_Format {
 
     /**
      * The ActivityType table has some special sprintf search/replace values in the
-     * FullHeadline and ProfileHeadline fields. The ProfileHeadline field is to be
-     * used on this page (the user profile page). The FullHeadline field is to be
-     * used on the main activity page. The replacement definitions are as follows:
+     * FullHeadline and ProfileHeadline fields.
+     *
+     * The ProfileHeadline field is to be used on this page (the user profile page).
+     * The FullHeadline field is to be used on the main activity page.
+     *
+     * The replacement definitions are as follows:
      *  %1$s = ActivityName
      *  %2$s = ActivityName Possessive
      *  %3$s = RegardingName
@@ -189,11 +193,12 @@ class Gdn_Format {
 
     /**
      *
-     *
+     * @deprecated 9 Nov 2016
      * @param array $Array
      * @return string
      */
     public static function arrayAsAttributes($Array) {
+        deprecated('arrayAsAttributes');
         $Return = '';
         foreach ($Array as $Property => $Value) {
             $Return .= ' '.$Property.'="'.$Value.'"';
@@ -221,8 +226,9 @@ class Gdn_Format {
     }
 
     /**
-     * Takes a string and formats it so that it can be saved to a PHP file in
-     * double-quotes of an array value assignment. For example, from garden/library/core/class.locale.php:
+     * Formats a string so that it can be saved to a PHP file in double-quotes of an array value assignment.
+     *
+     * @example from garden/library/core/class.locale.php:
      *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->ArrayValueForPhp($LocaleSources[$i])."';";
      *
      * @param string The string to be formatted.
@@ -337,7 +343,8 @@ class Gdn_Format {
         }
     }
 
-    /** Format a number by putting K/M/B suffix after it when appropriate.
+    /**
+     * Format a number by putting K/M/B suffix after it when appropriate.
      *
      * @param mixed $Number The number to format. If a number isn't passed then it is returned as is.
      * @return string The formatted number.
@@ -390,7 +397,8 @@ class Gdn_Format {
         return $Result;
     }
 
-    /** Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
+    /**
+     * Format a number as if it's a number of bytes by adding the appropriate B/K/M/G/T suffix.
      *
      * @param int $Bytes The bytes to format.
      * @param int $Precision The number of decimal places to return.
@@ -405,10 +413,7 @@ class Gdn_Format {
         return round($Bytes, $Precision).$Units[$Pow];
     }
 
-    /**
-     * @var array Unicode to ascii conversion table.
-     */
-
+    /** @var array Unicode to ascii conversion table. */
     protected static $_CleanChars = array(
         '-' => ' ', '_' => ' ', '&lt;' => '', '&gt;' => '', '&#039;' => '', '&amp;' => '',
         '&quot;' => '', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae',
@@ -590,7 +595,7 @@ class Gdn_Format {
      */
     public static function dateFull($Timestamp, $Format = '') {
         if ($Timestamp === null) {
-            return T('Null Date', '-');
+            return t('Null Date', '-');
         }
 
         // Was a mysqldatetime passed?
@@ -670,8 +675,7 @@ class Gdn_Format {
     }
 
     /**
-     * Takes a mixed variable, formats it for display on the screen, and returns
-     * it.
+     * Takes a mixed variable, formats it for display on the screen, and returns it.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
      * @return string
@@ -734,9 +738,7 @@ class Gdn_Format {
     }
 
     /**
-     * Show times relative to now
-     *
-     * e.g. "4 hours ago"
+     * Show times relative to now, e.g. "4 hours ago".
      *
      * Credit goes to: http://byteinn.com/res/426/Fuzzy_Time_function/
      *
@@ -777,10 +779,10 @@ class Gdn_Format {
         $sod = mktime(0, 0, 0, date('m', $time), date('d', $time), date('Y', $time));
         $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW));
 
-        // used to convert numbers to strings
-        $convert = array(0 => T('a'), 1 => T('a'), 2 => T('two'), 3 => T('three'), 4 => T('four'), 5 => T('five'), 6 => T('six'), 7 => T('seven'), 8 => T('eight'), 9 => T('nine'), 10 => T('ten'), 11 => T('eleven'));
+        // Used to convert numbers to strings
+        $convert = array(0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven'));
 
-        // today
+        // Today
         if ($sod_now == $sod) {
             if ($time > $NOW - (ONE_MINUTE * 3)) {
                 return t('just now');
@@ -796,7 +798,7 @@ class Gdn_Format {
             return sprintf(t('today at %s'), date('g:ia', $time));
         }
 
-        // yesterday
+        // Yesterday
         if (($sod_now - $sod) <= ONE_DAY) {
             if (date('i', $time) > (ONE_MINUTE + 30)) {
                 $time += ONE_HOUR / 2;
@@ -804,7 +806,7 @@ class Gdn_Format {
             return sprintf(t('yesterday around %s'), date('ga', $time));
         }
 
-        // within the last 5 days
+        // Within the last 5 days.
         if (($sod_now - $sod) <= (ONE_DAY * 5)) {
             $str = date('l', $time);
             $hour = date('G', $time);
@@ -820,7 +822,7 @@ class Gdn_Format {
             return $str;
         }
 
-        // number of weeks (between 1 and 3)...
+        // Number of weeks (between 1 and 3).
         if (($sod_now - $sod) < (ONE_WEEK * 3.5)) {
             if (($sod_now - $sod) < (ONE_WEEK * 1.5)) {
                 return t('about a week ago');
@@ -831,7 +833,7 @@ class Gdn_Format {
             }
         }
 
-        // number of months (between 1 and 11)...
+        // Number of months (between 1 and 11).
         if (($sod_now - $sod) < (ONE_MONTH * 11.5)) {
             for ($i = (ONE_WEEK * 3.5), $m = 0; $i < ONE_YEAR; $i += ONE_MONTH, $m++) {
                 if (($sod_now - $sod) <= $i) {
@@ -840,23 +842,24 @@ class Gdn_Format {
             }
         }
 
-        // number of years...
+        // Number of years.
         for ($i = (ONE_MONTH * 11.5), $y = 0; $i < (ONE_YEAR * 10); $i += ONE_YEAR, $y++) {
             if (($sod_now - $sod) <= $i) {
                 return sprintf(t('about %s year%s ago'), $convert[$y], (($y > 1) ? 's' : ''));
             }
         }
 
-        // more than ten years...
+        // More than ten years.
         return t('more than ten years ago');
     }
 
     /**
      * Takes a mixed variable, filters unsafe HTML and returns it.
+     *
      * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string HTML
      */
     public static function html($Mixed) {
         if (!is_string($Mixed)) {
@@ -872,15 +875,9 @@ class Gdn_Format {
                     $Mixed = fixNl2Br($Mixed);
                 }
 
-                $Mixed = Gdn_Format::processHTML($Mixed);
-
-                $Result = $Mixed;
-
-//            $Result = $Result.
-//               "<h3>Html</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Mixed)))."</pre>".
-//               "<h3>Formatted</h3><pre>".nl2br(htmlspecialchars(str_replace("<br />", "\n", $Result)))."</pre>";
+                $Result = Gdn_Format::processHTML($Mixed);
             } else {
-                // The text does not contain html and does not have to be purified.
+                // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
                 $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
                 if (c('Garden.Format.ReplaceNewlines', true)) {
@@ -896,10 +893,11 @@ class Gdn_Format {
 
     /**
      * Takes a mixed variable, filters unsafe HTML and returns it.
+     *
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string HTML
      */
     public static function htmlFilter($Mixed) {
         if (!is_string($Mixed)) {
@@ -933,7 +931,9 @@ class Gdn_Format {
 
     /**
      * Format a serialized string of image properties as html.
+     *
      * @param string $Body a serialized array of image properties (Image, Thumbnail, Caption)
+     * @return string HTML
      */
     public static function image($Body) {
         if (is_string($Body)) {
@@ -944,14 +944,14 @@ class Gdn_Format {
             }
         }
 
-        $Url = GetValue('Image', $Image);
+        $Url = val('Image', $Image);
         $Caption = Gdn_Format::plainText(val('Caption', $Image));
         return '<div class="ImageWrap">'
-        .'<div class="Image">'
-        .Img($Url, array('alt' => $Caption, 'title' => $Caption))
-        .'</div>'
-        .'<div class="Caption">'.$Caption.'</div>'
-        .'</div>';
+            .'<div class="Image">'
+            .img($Url, array('alt' => $Caption, 'title' => $Caption))
+            .'</div>'
+            .'<div class="Caption">'.$Caption.'</div>'
+            .'</div>';
     }
 
     /**
@@ -965,8 +965,9 @@ class Gdn_Format {
     }
 
     /**
-     * Check to see if a string has spoilers and replace them with an innocuous string. Good for displaying excerpts
-     * from discussions and without showing the spoiler text.
+     * Check to see if a string has spoilers and replace them with an innocuous string.
+     *
+     * Good for displaying excerpts from discussions and without showing the spoiler text.
      *
      * @param string $html An HTML-formatted string.
      * @param string $replaceWith The translation code to replace spoilers with.
@@ -986,8 +987,10 @@ class Gdn_Format {
     }
 
     /**
-     * Returns spoiler text wrapped in a HTML spoiler wrapper. Parsers for NBBC and Markdown should use this function
-     * to format thier spoilers. All spoilers in HTML-formatted posts are saved in this way. We use javascript in
+     * Returns spoiler text wrapped in a HTML spoiler wrapper.
+     *
+     * Parsers for NBBC and Markdown should use this function to format thier spoilers.
+     * All spoilers in HTML-formatted posts are saved in this way. We use javascript in
      * spoilers.js to add markup and render Spoilers with the "Spoiler" css class name.
      *
      * @param string $spoilerText The inner text of the spoiler.
@@ -998,8 +1001,9 @@ class Gdn_Format {
     }
 
     /**
-     * For backwards compatibility. In the Spoilers plugin, we would render BBCode-style spoilers in any format post
-     * and allow a title.
+     * Spoilers with backwards compatibility.
+     *
+     * In the Spoilers plugin, we would render BBCode-style spoilers in any format post and allow a title.
      *
      * @param string $html
      * @return string
@@ -1016,6 +1020,7 @@ class Gdn_Format {
 
     /**
      * Replaces opening html list tags with an asterisk and closing list tags with new lines.
+     *
      * Accepts both encoded and decoded html strings.
      *
      * @param  string $html An HTML-formatted string.
@@ -1030,6 +1035,7 @@ class Gdn_Format {
 
     /**
      * Format a string as plain text.
+     *
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
      * @return string
@@ -1054,12 +1060,13 @@ class Gdn_Format {
 
             $Result = strip_tags($Result);
         }
-        $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
-        return $Result;
+
+        return trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
     }
 
     /**
      * Format some text in a way suitable for passing into an rss/atom feed.
+     *
      * @since 2.1
      * @param string $Text The text to format.
      * @param string $Format The current format of the text.
@@ -1096,7 +1103,6 @@ class Gdn_Format {
         $inTag = false;
         $inAnchor = false;
         $inCode = false;
-        $tagName = false;
 
         foreach ($parts as $i => $str) {
             switch ($str) {
@@ -1144,7 +1150,8 @@ class Gdn_Format {
         return implode($parts);
     }
 
-    /** Formats the anchor tags around the links in text.
+    /**
+     * Formats the anchor tags around the links in text.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
      * @return string
@@ -1162,9 +1169,6 @@ class Gdn_Format {
             } else {
                 $Regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/;\x3f-\x7a\x7e\x3d]+)`i";
             }
-
-//         $Parts = preg_split($Regex, $Mixed, null, PREG_SPLIT_DELIM_CAPTURE);
-//         echo '<pre>', print_r($Parts, TRUE), '</pre>';
 
             self::linksCallback(null);
 
@@ -1475,7 +1479,8 @@ EOT;
         return $Result;
     }
 
-    /** Formats BBCode list items.
+    /**
+     * Formats BBCode list items.
      *
      * @param array $Matches
      * @return string
@@ -1528,7 +1533,7 @@ EOT;
     }
 
     /**
-     * Format a string using Markdown syntax. Also purifies the output html.
+     * Format a string using Markdown syntax. Also purifies the output HTML.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
      * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true
@@ -1755,13 +1760,17 @@ EOT;
         return $Subject;
     }
 
-    /** Return the input without any operations performed at all.
-     *  This format should only be used when administrators have access.
+    /**
+     * Return the input without any operations performed at all.
      *
+     * This format should only be used when administrators have access.
+     *
+     * @deprecated 9 Nov 2016
      * @param string|object|array $Mixed The data to format.
      * @return string
      */
     public static function raw($Mixed) {
+        deprecated('raw', 'wysiwyg');
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Raw');
         } else {
@@ -1771,7 +1780,7 @@ EOT;
     }
 
     /**
-     * Takes an object and convert's it's properties => values to an associative
+     * Takes an object and converts its properties => values to an associative
      * array of $Array[Property] => Value sets.
      *
      * @param object $Object The object to be converted to an array.
@@ -1792,6 +1801,9 @@ EOT;
 
     /**
      * Formats seconds in a human-readable way (ie. 45 seconds, 15 minutes, 2 hours, 4 days, 2 months, etc).
+     *
+     * @param int $Seconds
+     * @return string
      */
     public static function seconds($Seconds) {
         if (!is_numeric($Seconds)) {
@@ -1870,7 +1882,7 @@ EOT;
     }
 
     /**
-     *
+     * Process as plain text + our magic formatting.
      *
      * @param string $Str
      * @return string
@@ -1883,8 +1895,7 @@ EOT;
     }
 
     /**
-     * Takes a mixed variable, formats it in the specified format type, and
-     * returns it.
+     * Takes a mixed variable, formats it in the specified format type, and returns it.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
      * @param string $FormatMethod The method with which the variable should be formatted.
@@ -1919,7 +1930,8 @@ EOT;
         return $Mixed;
     }
 
-    /** Format a timestamp or the current time to go into the database.
+    /**
+     * Format a timestamp or the current time to go into the database.
      *
      * @param int $Timestamp
      * @return string The formatted date.
@@ -1927,8 +1939,9 @@ EOT;
     public static function toDate($Timestamp = '') {
         if ($Timestamp == '') {
             $Timestamp = time();
-        } elseif (!is_numeric($Timestamp))
+        } elseif (!is_numeric($Timestamp)) {
             $Timestamp = self::toTimestamp($Timestamp);
+        }
 
         return date('Y-m-d', $Timestamp);
     }
@@ -1947,12 +1960,11 @@ EOT;
     }
 
     /**
-     * Convert a datetime to a timestamp
+     * Convert a datetime to a timestamp.
      *
      * @param string $DateTime The Mysql-formatted datetime to convert to a timestamp. Should be in one
-     * of the following formats: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS. Returns
-     * FALSE upon failure.
-     * @return unknown
+     * of the following formats: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.
+     * @return string|bool Returns FALSE upon failure.
      */
     public static function toTimestamp($DateTime = '') {
         if ($DateTime === '0000-00-00 00:00:00') {
@@ -1972,8 +1984,6 @@ EOT;
             $Month = $Matches[2];
             $Day = $Matches[3];
             return mktime(0, 0, 0, $Month, $Day, $Year);
-            // } elseif ($DateTime == '') {
-            //    return time();
         } else {
             return false;
         }
@@ -2021,6 +2031,12 @@ EOT;
         return $Timestamp;
     }
 
+    /**
+     *
+     *
+     * @param $timespan
+     * @return string
+     */
     public static function timespan($timespan) {
         //$timespan -= 86400 * ($days = (int) floor($timespan / 86400));
         $timespan -= 3600 * ($hours = (int)floor($timespan / 3600));
@@ -2031,6 +2047,7 @@ EOT;
         return $Result;
     }
 
+    /** @var array  */
     protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya');
 
     /**
@@ -2064,8 +2081,7 @@ EOT;
     }
 
     /**
-     * Takes a serialized variable and unserializes it back into it's
-     * original state.
+     * Takes a serialized variable and unserializes it back into its original state.
      *
      * @param string $SerializedString A json or php serialized string to be unserialized.
      * @return mixed
@@ -2076,10 +2092,12 @@ EOT;
         if (is_string($SerializedString)) {
             if (substr_compare('a:', $SerializedString, 0, 2) === 0 || substr_compare('O:', $SerializedString, 0, 2) === 0) {
                 $Result = unserialize($SerializedString);
-            } elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0)
+            } elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0) {
                 $Result = json_decode(substr($SerializedString, 4), false);
-            elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0)
+            }
+            elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0) {
                 $Result = json_decode(substr($SerializedString, 4), true);
+            }
         }
         return $Result;
     }
@@ -2131,7 +2149,7 @@ EOT;
     }
 
     /**
-     *
+     * Format text from WYSIWYG editor input.
      *
      * @param $Mixed
      * @return mixed|string

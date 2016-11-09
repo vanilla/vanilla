@@ -2473,7 +2473,7 @@ class UserModel extends Gdn_Model {
 
         foreach ($Result as &$Row) {
             if ($Row->Photo && !isUrl($Row->Photo)) {
-                $Row->Photo = Gdn_Upload::url($Row->Photo);
+                $Row->Photo = Gdn_Upload::url(changeBasename($Row->Photo, 'n%s'));
             }
 
             $Row->Attributes = dbdecode($Row->Attributes);

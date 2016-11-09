@@ -27,24 +27,14 @@ $roleTitles = implode(', ', $roleTitlesArray);
 /** var UserController $user */
 ?>
 <div class="card card-user">
-    <div class="card-block media media-sm">
-        <div class="media-left">
-            <div class="media-image-wrap">
-                <?php echo userPhoto($user); ?>
-            </div>
-        </div>
-        <div class="media-content">
-            <div class="media-title username">
-                <?php echo userAnchor($user); ?>
-            </div>
-            <div class="info user-roles">
-                <?php echo $roleTitles; ?>
-            </div>
-            <a class="btn btn-sm-rounded btn-secondary padded-top" href="<?php echo url(userUrl($user)); ?>">
-                <?php echo t('My Profile').' '.dashboardSymbol('external-link', '', 'icon-11 icon-text'); ?>
-            </a>
-        </div>
-    </div>
+    <?php
+    $userBlock = new MediaItemModule(val('Name', $user), userUrl($user), $roleTitles, '', ['class' => 'card-block']);
+    $userBlock->setView('media-sm')
+        ->setImage(userPhotoUrl($user))
+        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', '', 'icon-11 icon-text'), userUrl($user),
+        ['class' => 'btn btn-sm-rounded btn-secondary padded-top']);
+    echo $userBlock;
+    ?>
     <div class="list-group list-group-flush">
         <?php
         foreach($this->data('meList', []) as $meItem) {

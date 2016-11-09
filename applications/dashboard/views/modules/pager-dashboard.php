@@ -12,7 +12,7 @@ $currentPage = pageNumber($pager->Offset, $pager->Limit);
 if ($pagerType === 'numbered' && $currentPage >= $pageCount) {
     $hasNext = false;
 }
-if ($pagerType === 'more' && $pager->CurrentRecords !== false && $pager->CurrentRecords < $pager->Limit) {
+if ($pagerType === 'more' && ($pager->CurrentRecords === false || $pager->CurrentRecords < $pager->Limit)) {
     $hasNext = false;
 }
 

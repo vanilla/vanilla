@@ -113,20 +113,23 @@ if ($this->data('AllowEditing')) { ?>
             </div>
         </li>
         <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
-            <li id="NewPassword" class="form-group">
-                <div class="label-wrap">
-                    <?php echo $this->Form->label('New Password', 'NewPassword'); ?>
+            <li id="NewPassword">
+                <div class="form-group">
+                    <div class="label-wrap">
+                        <?php echo $this->Form->label('New Password', 'NewPassword'); ?>
+                    </div>
+                    <div class="input-wrap">
+                        <?php echo $this->Form->Input('NewPassword', 'password'); ?>
+                    </div>
                 </div>
-                <div class="input-wrap">
-                    <?php echo $this->Form->Input('NewPassword', 'password'); ?>
-                </div>
-            </li>
-            <li class="form-group">
-                <div class="buttons input-wrap no-label">
-                    <?php
-                    echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
-                    echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary');
-                    ?>
+                <div class="form-group">
+                    <div class="buttons input-wrap no-label">
+                        <?php
+                        echo anchor(t('Generate Password'), '#', 'GeneratePassword btn btn-secondary');
+                        echo anchor(t('Reveal Password'), '#', 'RevealPassword btn btn-secondary',
+                            ['data-hide-text' => t('Hide Password'), 'data-show-text' => t('Reveal Password')]);
+                        ?>
+                    </div>
                 </div>
             </li>
         <?php endif; ?>

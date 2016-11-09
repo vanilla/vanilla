@@ -146,7 +146,9 @@ if (!function_exists('WriteListItem')):
                 echo '<div class="Options">'.getOptions($Row).'</div>';
                 echo '<'.$H.' class="CategoryName TitleWrap">';
                 echo CategoryPhoto($Row);
-                echo anchor(htmlspecialchars($Row['Name']), $Row['Url'], 'Title');
+
+                $safeName = htmlspecialchars($Row['Name']);
+                echo $Row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $Row['Url'], 'Title');
 
                 Gdn::controller()->EventArguments['Category'] = $Row;
                 Gdn::controller()->fireEvent('AfterCategoryTitle');
@@ -244,7 +246,8 @@ if (!function_exists('WriteTableRow')):
                     echo CategoryPhoto($Row);
 
                     echo "<{$H}>";
-                    echo anchor(htmlspecialchars($Row['Name']), $Row['Url']);
+                    $safeName = htmlspecialchars($Row['Name']);
+                    echo $Row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $Row['Url']);
                     Gdn::controller()->EventArguments['Category'] = $Row;
                     Gdn::controller()->fireEvent('AfterCategoryTitle');
                     echo "</{$H}>";

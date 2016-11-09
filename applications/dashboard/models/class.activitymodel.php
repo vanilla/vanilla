@@ -876,9 +876,10 @@ class ActivityModel extends Gdn_Model {
 
                 $Email->setEmailTemplate($emailTemplate);
 
-                $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity];
+                $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => &$Email, 'Route' => $Activity->Route, 'Story' => $Story, 'Headline' => $ActivityHeadline, 'Activity' => $Activity];
                 $this->EventArguments = $Notification;
                 $this->fireEvent('BeforeSendNotification');
+                //send notification
                 try {
                     // Only send if the user is not banned
                     if (!val('Banned', $User)) {
@@ -999,7 +1000,7 @@ class ActivityModel extends Gdn_Model {
         $Email->setEmailTemplate($emailTemplate);
 
         // Fire an event for the notification.
-        $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => $Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity];
+        $Notification = ['ActivityID' => $ActivityID, 'User' => $User, 'Email' => &$Email, 'Route' => $Activity['Route'], 'Story' => $Activity['Story'], 'Headline' => $Activity['Headline'], 'Activity' => $Activity];
         $this->EventArguments = $Notification;
         $this->fireEvent('BeforeSendNotification');
 

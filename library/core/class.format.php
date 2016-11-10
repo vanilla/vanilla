@@ -930,7 +930,7 @@ class Gdn_Format {
     }
 
     /**
-     * Format a encoded string of image properties as html.
+     * Format an encoded string of image properties as HTML.
      *
      * @param string $Body a encoded array of image properties (Image, Thumbnail, Caption)
      * @return string HTML

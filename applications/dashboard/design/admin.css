@@ -6495,6 +6495,10 @@ label,
   opacity: 0;
 }
 
+.file-upload input:disabled, .file-upload input.disabled {
+  opacity: 0;
+}
+
 .file-upload-choose {
   position: absolute;
   top: 0;
@@ -6520,6 +6524,11 @@ label,
 .file-upload input:hover ~ .file-upload-browse {
   border-color: #66afe9;
   outline: none;
+}
+
+.file-upload input:disabled ~ .file-upload-choose,
+.file-upload input.disabled ~ .file-upload-choose {
+  background-color: #f4f6fb;
 }
 
 select,
@@ -9895,5 +9904,21 @@ img.jcrop-preview {
 
 .progress {
   background: url("images/progress.gif") center center no-repeat;
+}
+
+.foggy {
+  position: relative;
+  -webkit-filter: blur(2px);
+}
+
+.foggy:before {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background-color: #fff;
+  z-index: 1;
+  content: '';
 }
 /*# sourceMappingURL=admin.css.map */

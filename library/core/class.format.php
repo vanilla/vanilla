@@ -2034,7 +2034,7 @@ EOT;
     /**
      *
      *
-     * @param $timespan
+     * @param int $timespan
      * @return string
      */
     public static function timespan($timespan) {
@@ -2094,8 +2094,7 @@ EOT;
                 $Result = unserialize($SerializedString);
             } elseif (substr_compare('obj:', $SerializedString, 0, 4) === 0) {
                 $Result = json_decode(substr($SerializedString, 4), false);
-            }
-            elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0) {
+            } elseif (substr_compare('arr:', $SerializedString, 0, 4) === 0) {
                 $Result = json_decode(substr($SerializedString, 4), true);
             }
         }

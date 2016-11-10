@@ -1157,8 +1157,6 @@ class CommentModel extends VanillaModel {
             $Activity['NotifyUserID'] = $UserID;
             $Activity['Emailed'] = val('Emailed', $Prefs, false);
             $Activity['Notified'] = val('Notified', $Prefs, false);
-            $this->EventArguments['Activity'] = &$Activity;
-            $this->fireEvent('BeforeCommentQueue');
             $ActivityModel->Queue($Activity);
         }
     }

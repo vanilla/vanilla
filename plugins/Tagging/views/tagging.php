@@ -99,15 +99,12 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
                 title="<?php echo $Title; ?>">
                 <td>
                     <?php
-                    $DisplayName = TagFullName($Tag); ?>
-                    <div class="media media-sm">
-                        <div class="media-body">
-                            <?php
-                            echo '<div class="media-title"><a href="'.url('/discussions/tagged/'.val('Name', $Tag)).'">'.htmlspecialchars($DisplayName).'</a></div>';
-                            echo '<div class="info">'.sprintf(t('Created by %s'), userAnchor($createdBy)).'</div>';
-                            ?>
-                        </div>
-                    </div>
+                    $DisplayName = TagFullName($Tag);
+                    $tagBlock = new MediaItemModule(htmlspecialchars($DisplayName), '/discussions/tagged/'.val('Name', $Tag));
+                    $tagBlock->setView('media-sm')
+                        ->addMeta(sprintf(t('Created by %s'), userAnchor($createdBy)));
+                    echo $tagBlock;
+                    ?>
                 </td>
                 <td class="type">
                     <?php echo $type; ?>

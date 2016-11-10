@@ -8,9 +8,9 @@ include $this->fetchViewLocation('helper_functions');
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
             <th class="UsernameCell column-lg"><?php echo t('Flagged By', 'Flagged By'); ?></th>
             <th class="content-cell column-xl" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
-            <th class="PostedByCell"><?php echo t('Type', 'Type'); ?></th>
-            <th class="DateCell"><?php echo t('Applied On', 'Date'); ?></th>
-            <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="TypeCell column-sm"><?php echo t('Type', 'Type'); ?></th>
+            <th class="DateCell column-md"><?php echo t('Applied On', 'Date'); ?></th>
+            <th class="PostTypeCell column-lg"><?php echo t('Posted By', 'Posted By'); ?></th>
         </tr>
         </thead>
         <tbody>
@@ -24,26 +24,16 @@ include $this->fetchViewLocation('helper_functions');
             $user = Gdn::userModel()->getByUsername(val('Name', $user));
             $viewPersonalInfo = gdn::session()->checkPermission('Garden.PersonalInfo.View');
 
+            $userBlock = new MediaItemModule(val('Name', $user), userUrl($user));
+            $userBlock->setView('media-sm')
+                ->setImage(userPhotoUrl($user))
+                ->addMetaIf($viewPersonalInfo, Gdn_Format::Email($user->Email));
             ?>
             <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
                 <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
                 </td>
                 <td class="UsernameCell">
-                    <div class="media media-sm">
-                        <div class="media-left">
-                            <div class="media-image-wrap">
-                                <?php echo userPhoto($user); ?>
-                            </div>
-                        </div>
-                        <div class="media-body">
-                            <div class="media-title">
-                                <?php echo userAnchor($user, 'Username reverse-link'); ?>
-                            </div>
-                            <?php if ($viewPersonalInfo) : ?>
-                                <div class="info user-email"><?php echo Gdn_Format::Email($user->Email); ?></div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
+                    <?php echo $userBlock; ?>
                 </td>
                 <td class="content-cell">
                     <?php
@@ -96,29 +86,20 @@ include $this->fetchViewLocation('helper_functions');
                 <td class="PostType">
                     <?php echo t($RecordLabel); ?>
                 </td>
-                <td class="DateCell"><?php
-                    echo Gdn_Format::date($Row['DateInserted'], 'html');
-                    ?>
+                <td class="DateCell">
+                    <?php echo Gdn_Format::date($Row['DateInserted'], 'html'); ?>
                 </td>
                 <td class="PostedByCell"><?php
                     $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
-                    if ($Row['RecordName']) { ?>
-                        <div class="media media-sm">
-                            <div class="media-body">
-                                <div class="media-title username"><?php echo userAnchor($Row, 'Meta-Value', 'Record'); ?>
-                                    <?php
-                                    if ($RecordUser['Banned']) {
-                                        echo ' <span class="Tag Tag-Ban">'.t('Banned').'</span>';
-                                    }
-                                    echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
-                                    ?>
-                                </div>
-                                <?php if ($viewPersonalInfo && val('RecordIPAddress', $Row)) { ?>
-                                    <div class="info"><?php echo iPAnchor($Row['RecordIPAddress'], 'Meta-Value'); ?></div>
-                                <?php } ?>
-                            </div>
-                        </div>
-                    <?php } ?>
+                    if ($Row['RecordName']) {
+                        $userBlock = new MediaItemModule(val('Name', $RecordUser), userUrl($RecordUser));
+                        $userBlock->setView('media-sm')
+                            ->addMeta(plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts'))
+                            ->addMetaIf($RecordUser['Banned'] ? true : false, wrap(t('Banned'), 'span', ['class' => 'text-danger']))
+                            ->addMetaIf(($viewPersonalInfo && val('RecordIPAddress', $Row)), iPAnchor($Row['RecordIPAddress']));
+
+                        echo $userBlock;
+                    } ?>
                 </td>
             </tr>
         <?php

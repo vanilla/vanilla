@@ -400,6 +400,11 @@ label,
     margin: 0;
     filter: alpha(opacity = 0);
     opacity: 0;
+
+    &:disabled,
+    &.disabled {
+      opacity: 0;
+    }
   }
 }
 
@@ -432,6 +437,14 @@ label,
     border-color: #66afe9;
     outline: none;
     @extend .active;
+  }
+}
+
+//Disabled state
+.file-upload input:disabled,
+.file-upload input.disabled {
+  ~ .file-upload-choose {
+    background-color: $grey-lighter;
   }
 }
 

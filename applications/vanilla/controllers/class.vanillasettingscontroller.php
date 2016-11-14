@@ -41,6 +41,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(array(
+            'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
@@ -68,6 +69,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setData($ConfigurationModel->Data);
         } else {
             // Define some validation rules for the fields being saved
+            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');

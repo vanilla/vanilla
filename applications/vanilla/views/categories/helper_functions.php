@@ -227,8 +227,10 @@ if (!function_exists('WriteTableRow')):
     function writeTableRow($Row, $Depth = 1) {
         $Children = $Row['Children'];
         $WriteChildren = FALSE;
+        $maxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth');
+
         if (!empty($Children)) {
-            if (($Depth + 1) >= c('Vanilla.Categories.MaxDisplayDepth')) {
+            if ($maxDisplayDepth > 0 && ($Depth + 1) >= $maxDisplayDepth) {
                 $WriteChildren = 'list';
             } else {
                 $WriteChildren = 'rows';

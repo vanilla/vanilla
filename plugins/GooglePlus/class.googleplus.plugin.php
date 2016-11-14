@@ -456,6 +456,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
      */
     public function entryController_signIn_handler($Sender, $Args) {
 //      if (!$this->IsEnabled()) return;
+        if (!$this->isConfigured()) {
+            return;
+        }
 
         if (isset($Sender->Data['Methods'])) {
             $Url = $this->authorizeUri();

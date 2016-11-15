@@ -7,10 +7,11 @@ include $this->fetchViewLocation('helper_functions');
         <tr>
             <th class="column-checkbox" data-tj-ignore="true"><input id="SelectAll" type="checkbox"/></th>
             <th class="UsernameCell column-lg"><?php echo t('Flagged By', 'Flagged By'); ?></th>
-            <th class="content-cell column-xl" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
+            <th class="content-cell column-lg" data-tj-main="true"><?php echo t('Record Content', 'Content') ?></th>
             <th class="TypeCell column-sm"><?php echo t('Type', 'Type'); ?></th>
             <th class="DateCell column-md"><?php echo t('Applied On', 'Date'); ?></th>
-            <th class="PostTypeCell column-lg"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="PostTypeCell column-md"><?php echo t('Posted By', 'Posted By'); ?></th>
+            <th class="options column-checkbox"></th>
         </tr>
         </thead>
         <tbody>
@@ -28,6 +29,23 @@ include $this->fetchViewLocation('helper_functions');
             $userBlock->setView('media-sm')
                 ->setImage(userPhotoUrl($user))
                 ->addMetaIf($viewPersonalInfo, Gdn_Format::Email($user->Email));
+
+            $Url = FALSE;
+            if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
+                switch (strtolower($Row['RecordType'])) {
+                    case 'discussion':
+                        $Url = "/discussion/{$Row['RecordID']}/x/p1";
+                        break;
+                    case 'comment':
+                        $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
+                }
+            } elseif ($Row['Operation'] === 'Delete') {
+                switch (strtolower($Row['RecordType'])) {
+                    case 'comment':
+                        $Url = "/discussion/{$Row['ParentRecordID']}/x/p1";
+                }
+            }
+
             ?>
             <tr id="<?php echo "LogID_{$Row['LogID']}"; ?>">
                 <td class="column-checkbox"><input type="checkbox" name="LogID[]" value="<?php echo $Row['LogID']; ?>"/>
@@ -37,25 +55,6 @@ include $this->fetchViewLocation('helper_functions');
                 </td>
                 <td class="content-cell">
                     <?php
-                    $Url = FALSE;
-                    if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
-                        switch (strtolower($Row['RecordType'])) {
-                            case 'discussion':
-                                $Url = "/discussion/{$Row['RecordID']}/x/p1";
-                                break;
-                            case 'comment':
-                                $Url = "/discussion/comment/{$Row['RecordID']}#Comment_{$Row['RecordID']}";
-                        }
-                    } elseif ($Row['Operation'] === 'Delete') {
-                        switch (strtolower($Row['RecordType'])) {
-                            case 'comment':
-                                $Url = "/discussion/{$Row['ParentRecordID']}/x/p1";
-                        }
-                    }
-
-                    if ($Url) {
-                        echo '<div class="pull-right">'.anchor(dashboardSymbol('external-link'), $Url, 'icon icon-text').'</div>';
-                    }
                     echo '<div class="post-content Expander">', $this->FormatContent($Row), '</div>';
 
                     // Write the other record counts.
@@ -87,7 +86,7 @@ include $this->fetchViewLocation('helper_functions');
                     <?php echo t($RecordLabel); ?>
                 </td>
                 <td class="DateCell">
-                    <?php echo Gdn_Format::date($Row['DateInserted'], 'html'); ?>
+                    <?php echo Gdn_Format::date($Row['DateInserted'], '%e %b %Y'); ?>
                 </td>
                 <td class="PostedByCell"><?php
                     $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);
@@ -100,6 +99,14 @@ include $this->fetchViewLocation('helper_functions');
 
                         echo $userBlock;
                     } ?>
+                </td>
+                <td class="options">
+                    <?php
+                    if ($Url) {
+                        $attr = ['title' => t('View Post'), 'aria-label' => t('View Post'), 'class' => 'btn btn-icon btn-icon-sm'];
+                        echo anchor(dashboardSymbol('external-link', '', 'icon icon-text'), $Url, '', $attr);
+                    }
+                    ?>
                 </td>
             </tr>
         <?php

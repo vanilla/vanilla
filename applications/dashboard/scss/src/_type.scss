@@ -183,8 +183,8 @@ pre {
     width: $font-size-lg;
   }
 
-  &:hover svg {
-    fill: $brand-primary;
+  &:hover {
+    color: $brand-primary;
   }
 }
 
@@ -261,17 +261,17 @@ pre {
 // PHP rendering: `subheading(title [description])`
 //
 // Markup:
-// <h2 class="subheading-border">This is a Subheading</h2>
+// <h2 class="subheading">This is a Subheading</h2>
 //
 // Styleguide 1.6.
 
-.subheading-border {
-  @extend .full-border;
+.subheading {
+  @include full-border(block, false, true);
   @include has-top-border;
   padding-top: $spacer;
-  padding-bottom: $spacer;
+  padding-bottom: $spacer / 2;
   margin-bottom: 0;
-  font-size: $font-size-base;
+  font-size: to-rem(16);
   line-height: $line-height;
   font-weight: 500;
   border-top: $border-width solid #e7e8e9;
@@ -295,12 +295,11 @@ pre {
 // Styleguide 1.7.
 
 .subheading-block {
+  @include full-border(block, false, true);
   @include has-top-border;
   padding-top: $spacer;
-  padding-bottom: $spacer;
+  padding-bottom: $spacer / 2;
   border-top: $border-width solid $border-color;
-
-  @extend .full-border;
 
   .subheading-title {
     margin-top: 0;

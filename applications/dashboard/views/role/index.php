@@ -22,6 +22,7 @@ echo $this->Form->open();
         <tr id="0">
             <th><?php echo t('Role'); ?></th>
             <th class="column-xl"><?php echo t('Description'); ?></th>
+            <th><?php echo t('Default Type'); ?></th>
             <th class="options column-sm"></th>
         </tr>
         </thead>
@@ -35,17 +36,13 @@ echo $this->Form->open();
                 <td>
                     <?php echo $Role['Name']; ?>
                 </td>
-                <td class="Alt">
-                    <?php
-                    echo $Role['Description'];
-
-                    if (val('Type', $Role)) {
-                        echo '<div class="Meta-Container"><span class="Meta-Label">'.
-                            t('default type', 'default').': '.
-                            t(val('Type', $Role)).
-                            '</span></div>';
-                    }
-                    ?>
+                <td>
+                    <?php echo $Role['Description']; ?>
+                </td>
+                <td>
+                    <?php if (val('Type', $Role)) {
+                        echo t(val('Type', $Role));
+                    } ?>
                 </td>
                 <td class="options">
                     <div class="btn-group">

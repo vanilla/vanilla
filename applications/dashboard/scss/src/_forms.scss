@@ -363,6 +363,10 @@ label,
   height: 0;
   opacity: 0;
   padding: 0;
+
+  &:disabled {
+    opacity: 0;
+  }
 }
 
 .color-picker-preview {

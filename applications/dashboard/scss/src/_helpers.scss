@@ -253,6 +253,10 @@
   position: relative;
   -webkit-filter: blur(2px);
 
+  input {
+    user-select: none;
+  }
+
   &:before {
     position: absolute;
     display: block;

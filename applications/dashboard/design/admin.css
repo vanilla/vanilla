@@ -6470,6 +6470,10 @@ label,
   padding: 0;
 }
 
+.color-picker-color:disabled {
+  opacity: 0;
+}
+
 .color-picker-preview {
   position: absolute;
   top: 0.28125rem;
@@ -9909,6 +9913,13 @@ img.jcrop-preview {
 .foggy {
   position: relative;
   -webkit-filter: blur(2px);
+}
+
+.foggy input {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .foggy:before {

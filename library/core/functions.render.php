@@ -45,9 +45,9 @@ if (!function_exists('dashboardSymbol')) {
             $alt = 'alt="'.htmlspecialchars($alt).'" ';
         }
         $r = <<<EOT
-    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
+<svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
 EOT;
-        return $r;
+        return trim($r);
     }
 }
 

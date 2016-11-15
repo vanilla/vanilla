@@ -582,6 +582,9 @@ jQuery(document).ready(function($) {
                 case 'Text':
                     $target.text(item.Data);
                     break;
+                case 'Trigger':
+                    $target.trigger(item.Data);
+                    break;
                 case 'Html':
                     $target.htmlTrigger(item.Data);
                     break;

@@ -255,6 +255,15 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the display type for the root category.
+     *
+     * @return string
+     */
+    public static function getRootDisplayAs() {
+        return c('Vanilla.RootCategory.DisplayAs', 'Categories');
+    }
+
+    /**
      *
      *
      * @since 2.0.18

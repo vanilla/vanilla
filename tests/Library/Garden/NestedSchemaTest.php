@@ -242,6 +242,31 @@ class NestedSchemaTest extends SchemaTest {
     }
 
     /**
+     * Test throwing an exception when removing unexpected parameters from validated data.
+     *
+     * @expectedException \Garden\Exception\ValidationException
+     */
+    public function testValidateException() {
+        $this->doValidationBehavior(Schema::VALIDATE_EXCEPTION);
+    }
+
+    /**
+     * Test triggering a notice when removing unexpected parameters from validated data.
+     *
+     * @expectedException \PHPUnit_Framework_Error_Notice
+     */
+    public function testValidateNotice() {
+        $this->doValidationBehavior(Schema::VALIDATE_NOTICE);
+    }
+
+    /**
+     * Test silently removing unexpected parameters from validated data.
+     */
+    public function testValidateRemove() {
+        $this->doValidationBehavior(Schema::VALIDATE_REMOVE);
+    }
+
+    /**
      * Get a schema that consists of an array of objects.
      *
      * @return Schema Returns the schema.
@@ -274,5 +299,35 @@ class NestedSchemaTest extends SchemaTest {
         ]);
 
         return $schema;
+    }
+
+    /**
+     * Call validate on an instance of Schema where the data contains unexpected parameters.
+     *
+     * @param int $validationBehavior
+     */
+    protected function doValidationBehavior($validationBehavior) {
+        $schema = new Schema([
+            'i:groupID' => 'The ID of the group.',
+            's:name' => 'The name of the group.',
+            's:description' => 'A description of the group.',
+            'o:member' => [
+                's:email' => 'The ID of the new member.'
+            ]
+        ]);
+        $schema->setValidationBehavior($validationBehavior);
+
+        $data = [
+            'groupID' => 123,
+            'name' => 'Group Foo',
+            'description' => 'A group for testing.',
+            'member' => [
+                'email' => 'user@example.com',
+                'role' => 'Leader',
+            ]
+        ];
+
+        $schema->validate($data);
+        $this->assertArrayNotHasKey('role', $data['member']);
     }
 }

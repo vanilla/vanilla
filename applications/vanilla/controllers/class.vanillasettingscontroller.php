@@ -723,17 +723,17 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Category', $categoryRow);
             $parentID = $categoryRow['CategoryID'];
             $parentDisplayAs = val('DisplayAs', $categoryRow);
-
-            if (in_array($parentDisplayAs, ['Flat'])) {
-                $allowSorting = false;
-                $usePagination = true;
-            }
         } else {
             $parentID = -1;
-            $parentDisplayAs = false;
+            $parentDisplayAs = CategoryModel::getRootDisplayAs();
         }
 
-        if ($parentID > 0 && $parentDisplayAs === 'Flat') {
+        if (in_array($parentDisplayAs, ['Flat'])) {
+            $allowSorting = false;
+            $usePagination = true;
+        }
+
+        if ($parentDisplayAs === 'Flat') {
             $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);

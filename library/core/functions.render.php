@@ -41,7 +41,7 @@ if (!function_exists('dashboardSymbol')) {
      * Render svg icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
      *
      * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
-     * @param string $class If set, overrides any 'class' param in the $attr param.
+     * @param string $class If set, overrides any 'class' attribute in the $attr param.
      * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
      * @return string An HTML-formatted string to render svg icons.
      */

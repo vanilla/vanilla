@@ -7,7 +7,7 @@
 // The toolbar is a tray that is at the top of a settings page that provides tools for filtering or managing
 // the page data.
 //
-// .toolbar-main - Element with `toolbar-main` class fills up available space.
+// .toolbar-main - Element with `toolbar-main` class has a basis of half the size of the toolbar at full-page width and shrinks slower than its siblings.
 //
 // Markup:
 // <div class="toolbar">
@@ -63,7 +63,8 @@
 
   > * {
     margin-top: $spacer / 2;
-    margin-right: $spacer;
+    padding-right: $spacer;
+    flex-shrink: 2;
   }
 
   .toolbar-buttons {
@@ -81,7 +82,8 @@
   }
 
   .toolbar-main {
-    flex-grow: 1;
+    flex-basis: to-rem(1024) / 2 - $spacer;
+    flex-shrink: 1;
   }
 }
 
@@ -127,5 +129,6 @@
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  justify-content: flex-end;
 }
 

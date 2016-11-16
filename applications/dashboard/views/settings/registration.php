@@ -8,17 +8,16 @@ helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"),
 echo $this->Form->open();
 echo $this->Form->errors(); ?>
 
+<?php if (UserModel::noEmail()) {
+    echo '<div class="alert alert-danger padded-top">'.
+        t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.').
+        '</div>';
+} ?>
 <div class="form-group">
-    <div class="no-grid">
     <?php
-    echo $this->Form->checkBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
-    if (UserModel::noEmail()) {
-        echo '<div class="text-danger">',
-            t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
-            '</div>';
-    }
+    $label = t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)');
+    echo $this->Form->toggle('Garden.Registration.ConfirmEmail', $label);
     ?>
-    </div>
 </div>
 
 <div id="RegistrationMethods">

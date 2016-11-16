@@ -150,7 +150,7 @@ if (!function_exists('subheading')) {
      */
     function subheading($title, $description = '') {
         if ($description === '') {
-            return '<h2 class="subheading-border">'.$title.'</h2>';
+            return '<h2 class="subheading">'.$title.'</h2>';
         } else {
             return '<header class="subheading-block">
                 <h2 class="subheading-title">'.$title.'</h2>

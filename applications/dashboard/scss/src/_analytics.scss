@@ -43,9 +43,10 @@
 
 // Bookmark Icons
 .bookmark {
+  @extend .reverse-link;
+
   svg {
     transition: transform .1s;
-    fill: $grey;
     width: to-rem(18);
   }
 

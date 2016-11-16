@@ -52,6 +52,10 @@
 }
 
 .video.label-selector-item {
+  a {
+    color: $white;
+  }
+
   .video-title {
     font-size: $font-size-sm;
     text-align: left;
@@ -66,7 +70,6 @@
   }
 
   svg {
-    fill: $white;
     width: 40%;
   }
 }

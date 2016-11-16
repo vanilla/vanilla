@@ -10,10 +10,10 @@ echo $this->Form->open();
 echo $this->Form->errors(); ?>
 <div class="form-group">
     <?php echo
-    '<div class="label-wrap">', t('Default Locale'), '</div> ',
-    '<div class="input-wrap input-wrap-multiple">',
-    $this->Form->DropDown('Locale', $this->data('Locales')),
-    $this->Form->button('Save', array('style' => 'margin-bottom: 0px')),
+    '<div class="label-wrap-wide">'.$this->Form->label(t('Default Locale'), 'Locales').'</div> ';
+    echo '<div class="input-wrap-right input-wrap-multiple">',
+    $this->Form->dropDown('Locale', $this->data('Locales'), ['class' => '']),
+    $this->Form->button('Save'),
     '</div>';
     ?>
 </div>

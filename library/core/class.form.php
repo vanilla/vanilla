@@ -571,12 +571,13 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * Outputs a checkbox painted as a toggle. Includes label wrap id a label is given.
      *
-     * @param string $fieldName
-     * @param string $label
-     * @param array $attributes
-     * @return string
+     * @param string $fieldName The key name for the field.
+     * @param string $label The label for the field.
+     * @param array $attributes The attributes for the checkbox input.
+     * @param string $info The label description.
+     * @return string And HTML-formatted form field for a toggle.
      */
-    public function toggle($fieldName, $label, $attributes = []) {
+    public function toggle($fieldName, $label, $attributes = [], $info = '') {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {
@@ -602,10 +603,15 @@ class Gdn_Form extends Gdn_Pluggable {
             attribute('class', 'toggle').
             attribute('title', val('title', $attributes)) .'>';
 
+        if ($info) {
+            $info = '<div class="info">'.t($info).'</div>';
+        }
+
         if ($label) {
             $toggle = '
                 <div class="label-wrap-wide">
-                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.t($label).'</div>
+                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.t($label).'</div>'.
+                    $info.'
                 </div>
                 <div class="input-wrap-right">
                     <div class="toggle-wrap">'.

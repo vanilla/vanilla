@@ -36,18 +36,32 @@ if (!function_exists('alternate')) {
     }
 }
 
-/**
- * Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
- */
 if (!function_exists('dashboardSymbol')) {
-    function dashboardSymbol($name, $alt = '', $class = '') {
-        if (!empty($alt)) {
-            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+    /**
+     * Render svg icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
+     *
+     * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
+     * @param string $class If set, overrides any 'class' param in the $attr param.
+     * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
+     * @return string An HTML-formatted string to render svg icons.
+     */
+    function dashboardSymbol($name, $class = '', $attr = []) {
+        if (!empty($attr['alt'])) {
+            $attr['alt'] = htmlspecialchars($attr['alt']);
+        } else {
+            $attr['alt'] = $name;
         }
-        $r = <<<EOT
-<svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
-EOT;
-        return trim($r);
+
+        if (!empty($class)) {
+            $attr['class'] = $class.' ';
+        } else {
+            $attr['class'] = $attr['class'] ? $attr['class'].' ' : '';
+        }
+
+        $baseCssClass = 'icon icon-svg-'.$name;
+        $attr['class'] .= $baseCssClass;
+
+        return '<svg '.attribute($attr).'" viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
     }
 }
 

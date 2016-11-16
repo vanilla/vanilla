@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) return; ?>
-<script language="javascript">
+<script>
     jQuery(document).ready(function($) {
         $('#Form_ReasonText').focus(function() {
             $('#Form_Reason2').prop('checked', true);

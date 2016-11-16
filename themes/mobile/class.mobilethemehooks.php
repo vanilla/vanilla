@@ -38,7 +38,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
         if (isMobile() && is_object($Sender->Head)) {
             $Sender->Head->addTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
             $Sender->Head->addString('
-<script type="text/javascript">
+<script>
    // If not looking for a specific comment, hide the address bar in iphone
    var hash = window.location.href.split("#")[1];
    if (typeof(hash) == "undefined") {
@@ -129,7 +129,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
         // Make sure that discussion clicks (anywhere in a discussion row) take the user to the discussion.
         if (property_exists($Sender, 'Head') && is_object($Sender->Head)) {
             $Sender->Head->addString('
-<script type="text/javascript">
+<script>
    jQuery(document).ready(function($) {
       $("ul.DataList li.Item").click(function() {
          var href = $(this).find(".Title a").attr("href");

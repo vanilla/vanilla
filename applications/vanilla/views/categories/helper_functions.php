@@ -345,13 +345,13 @@ if (!function_exists('WriteCategoryList')):
     }
 endif;
 
-if (!function_exists('WriteCategoryTable')):
-    function writeCategoryTable($Categories, $Depth = 1, $inTable = false, $inSection = false) {
-        foreach ($Categories as $Category) {
-            $displayAs = val('DisplayAs', $Category);
-            $urlCode = $Category['UrlCode'];
-            $class = val('CssClass', $Category);
-            $name = htmlspecialchars($Category['Name']);
+if (!function_exists('writeCategoryTable')):
+    function writeCategoryTable($categories, $depth = 1, $inTable = false, $inSection = false) {
+        foreach ($categories as $category) {
+            $displayAs = val('DisplayAs', $category);
+            $urlCode = $category['UrlCode'];
+            $class = val('CssClass', $category);
+            $name = htmlspecialchars($category['Name']);
 
             if ($displayAs === 'Heading') :
                 if ($inTable) {
@@ -363,18 +363,18 @@ if (!function_exists('WriteCategoryTable')):
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
                 <h2 class="H"><?php echo $name; ?></h2>
                 <?php
-                writeCategoryTable($Category['Children'], $Depth + 1, $inTable, $inSection);
+                writeCategoryTable($category['Children'], $depth + 1, $inTable, $inSection);
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
                         <table class="DataTable CategoryTable">
                             <thead>
-                            <?php WriteTableHead(); ?>
+                            <?php writeTableHead(); ?>
                             </thead>
                             <tbody>
                     <?php $inTable = true;
                 }
-                WriteTableRow($Category, $Depth);
+                writeTableRow($category, $depth);
             endif;
         }
         if ($inTable) {

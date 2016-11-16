@@ -46,9 +46,7 @@ if (!function_exists('dashboardSymbol')) {
      * @return string An HTML-formatted string to render svg icons.
      */
     function dashboardSymbol($name, $class = '', $attr = []) {
-        if (!empty($attr['alt'])) {
-            $attr['alt'] = htmlspecialchars($attr['alt']);
-        } else {
+        if (empty($attr['alt'])) {
             $attr['alt'] = $name;
         }
 

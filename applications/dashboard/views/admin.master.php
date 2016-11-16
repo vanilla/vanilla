@@ -31,7 +31,7 @@ $roleTitles = implode(', ', $roleTitlesArray);
     $userBlock = new MediaItemModule(val('Name', $user), userUrl($user), $roleTitles, '', ['class' => 'card-block']);
     $userBlock->setView('media-sm')
         ->setImage(userPhotoUrl($user))
-        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', '', 'icon-11 icon-text'), userUrl($user),
+        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', 'icon-11 icon-text'), userUrl($user),
         ['class' => 'btn btn-sm-rounded btn-secondary padded-top']);
     echo $userBlock;
     ?>
@@ -64,7 +64,7 @@ Gdn_Theme::assetEnd();
         <div class="navbar-brand">
             <?php $title = c('Garden.Title'); ?>
             <div class="navbar-image logo"><?php echo wrap('Vanilla Forums', 'span', ['class' => 'vanilla-logo vanilla-logo-white']); ?></div>
-            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', '', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
+            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
@@ -94,7 +94,7 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
                 <div id="panel-nav" class="js-fluid-fixed panel-content">
-                    <?php echo anchor($title.' '.dashboardSymbol('external-link', '', 'icon-16'), '/', 'title'); ?>
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
                     <?php echo $dashboardNav; ?>
                 </div>
             </div>

@@ -274,6 +274,7 @@ class SettingsController extends DashboardController {
         } else if ($this->Form->save() !== false) {
             $upload = new Gdn_UploadImage();
             $newAvatar = false;
+            $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
                 // New upload
                 $newUpload = true;

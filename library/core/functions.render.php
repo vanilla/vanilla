@@ -59,7 +59,7 @@ if (!function_exists('dashboardSymbol')) {
         $baseCssClass = 'icon icon-svg-'.$name;
         $attr['class'] .= $baseCssClass;
 
-        return '<svg '.attribute($attr).'" viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
+        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
     }
 }
 

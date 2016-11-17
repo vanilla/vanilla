@@ -346,7 +346,7 @@ if (!function_exists('WriteCategoryList')):
 endif;
 
 if (!function_exists('writeCategoryTable')):
-    function writeCategoryTable($categories, $depth = 1, $inTable = false, $inSection = false) {
+    function writeCategoryTable($categories, $depth = 1, $inTable = false) {
         foreach ($categories as $category) {
             $displayAs = val('DisplayAs', $category);
             $urlCode = $category['UrlCode'];
@@ -358,12 +358,12 @@ if (!function_exists('writeCategoryTable')):
                     echo '</tbody></table></div>';
                     $inTable = false;
                 }
-                $inSection = true;
                 ?>
                 <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
-                <h2 class="H"><?php echo $name; ?></h2>
+                    <h2 class="H"><?php echo $name; ?></h2>
+                    <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
+                </div>
                 <?php
-                writeCategoryTable($category['Children'], $depth + 1, $inTable, $inSection);
             else :
                 if (!$inTable) { ?>
                     <div class="DataTableWrap">
@@ -379,9 +379,6 @@ if (!function_exists('writeCategoryTable')):
         }
         if ($inTable) {
             echo '</tbody></table></div>';
-        }
-        if ($inSection) {
-            echo '</div>';
         }
     }
 endif;

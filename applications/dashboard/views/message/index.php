@@ -75,7 +75,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
                         <div id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
                             <?php

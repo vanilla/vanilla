@@ -104,7 +104,7 @@ include $this->fetchViewLocation('helper_functions');
                     <?php
                     if ($Url) {
                         $attr = ['title' => t('View Post'), 'aria-label' => t('View Post'), 'class' => 'btn btn-icon btn-icon-sm'];
-                        echo anchor(dashboardSymbol('external-link', '', 'icon icon-text'), $Url, '', $attr);
+                        echo anchor(dashboardSymbol('external-link', 'icon icon-text'), $Url, '', $attr);
                     }
                     ?>
                 </td>

@@ -221,11 +221,6 @@ class CategoriesController extends VanillaController {
                 case 'Flat':
                 case 'Heading':
                 case 'Categories':
-                    if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
-                        // Headings don't make sense if we've cascaded down one level.
-                        saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-                    }
-
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);
@@ -442,12 +437,6 @@ class CategoriesController extends VanillaController {
             $this->categoriesCompatibilityCallback = function () {
                 return $this->CategoryModel->GetFull()->resultArray();
             };
-        }
-
-        // Compensate for categories displaying as headings by increasing the display depth by one.
-        $maxDisplayDepth = CategoryModel::instance()->getMaxDisplayDepth() ?: 10;
-        if (c('Vanilla.Categories.DoHeadings')) {
-            $maxDisplayDepth++;
         }
 
         $categoryTree = $this->CategoryModel

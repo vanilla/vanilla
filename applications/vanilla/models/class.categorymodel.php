@@ -403,6 +403,18 @@ class CategoryModel extends Gdn_Model {
             $category['PhotoUrl'] = '';
         }
 
+        self::calculateDisplayAs($category);
+
+        if (!val('CssClass', $category)) {
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        }
+
+        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
+            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        }
+    }
+
+    public static function calculateDisplayAs(&$category) {
         if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
                 $category['DisplayAs'] = 'Categories';
@@ -413,12 +425,9 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        if (!val('CssClass', $category)) {
-            $category['CssClass'] = 'Category-'.$category['UrlCode'];
-        }
-
-        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
-            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        if (val('Depth', $category) > self::instance()->getNavDepth() && $category['DisplayAs'] == 'Heading') {
+            // Headings don't make sense if we've cascaded down a level.
+            saveToConfig('Vanilla.Categories.DoHeadings', false, false);
         }
     }
 

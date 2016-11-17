@@ -22,7 +22,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
             ?>
             <tr id="<?php
             echo $Message->MessageID;
-            ?>">
+            ?>" class="js-message-<?php echo $Message->MessageID; ?>">
                 <td><?php
                     printf(
                         t('%1$s on %2$s'),
@@ -75,7 +75,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     <div class="btn-group">
                         <?php
                         echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID.'/'.$Session->TransientKey(), 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                        echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID, 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                         ?>
                         <div id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
                             <?php
@@ -89,7 +89,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr class="js-message-<?php echo $Message->MessageID; ?>">
                 <td colspan="3"  data-tj-ignore="true">
                     <div class="Message DismissMessage <?php echo $Message->CssClass; ?>">
                         <?php echo Gdn_Format::text($Message->Content); ?>

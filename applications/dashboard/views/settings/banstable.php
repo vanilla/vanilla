@@ -2,6 +2,7 @@
 <div class="toolbar">
 <?php
 PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => count($this->data('Bans')), 'View' => 'pager-dashboard'));
+$session = Gdn::session();
 ?>
 </div>
 <div class="table-wrap">
@@ -40,7 +41,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-httpMethod' => 'post']);
+                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'js-modal-confirm Hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     ?>
                     </div>
                 </td>

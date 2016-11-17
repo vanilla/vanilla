@@ -264,6 +264,21 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Take a list of categories and return whether any of them are DisplayAs: Heading
+     *
+     * @param $categories An array of Categories.
+     * @return bool Whether there are headings in the group of categories.
+     */
+    public static function hasHeadings($categories) {
+        foreach ($categories as $category) {
+            if (val('DisplayAs', $category) == 'Heading') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      *
      *
      * @since 2.0.18

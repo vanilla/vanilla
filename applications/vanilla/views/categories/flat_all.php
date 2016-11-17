@@ -14,7 +14,7 @@
     $this->fireEvent('AfterPageTitle');
 
     $categories = $this->data('CategoryTree');
-    $doHeadings = c('Vanilla.Categories.DoHeadings');
+    $doHeadings = CategoryModel::hasHeadings($categories);
     $this->EventArguments['NumRows'] = count($categories);
 ?>
 

@@ -33,6 +33,9 @@
         "phpmailer/phpmailer": "~5.2",
         "container-interop/container-interop": "^1.1"
     },
+    "provide": {
+        "ext-gd": "*"
+    },
     "autoload": {
         "classmap": [
             "library/core/",

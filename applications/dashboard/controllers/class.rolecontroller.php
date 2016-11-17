@@ -228,6 +228,13 @@ class RoleController extends DashboardController {
             $this->setData('Roles', [$Role]);
         }
 
+        // Grab the total users for each role.
+        if (is_array($this->data('Roles'))) {
+            foreach ($this->data('Roles') as &$role) {
+                $role['CountUsers'] = $this->RoleModel->getUserCount($role['RoleID']);
+            }
+        }
+
         $this->render();
     }
 

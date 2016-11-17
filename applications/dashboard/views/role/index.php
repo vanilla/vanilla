@@ -23,6 +23,7 @@ echo $this->Form->open();
             <th><?php echo t('Role'); ?></th>
             <th class="column-xl"><?php echo t('Description'); ?></th>
             <th><?php echo t('Default Type'); ?></th>
+            <th><?php echo t('Users'); ?></th>
             <th class="options column-sm"></th>
         </tr>
         </thead>
@@ -44,6 +45,7 @@ echo $this->Form->open();
                         echo t(val('Type', $Role));
                     } ?>
                 </td>
+                <td><?php echo anchor($Role['CountUsers'] ?: 0, '/dashboard/user?Filter='.urlencode($Role['Name'])); ?></td>
                 <td class="options">
                     <div class="btn-group">
                     <?php

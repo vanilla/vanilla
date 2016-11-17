@@ -5,5 +5,5 @@
 $this->fireEvent('AfterDescription');
 $this->fireEvent('AfterPageTitle');
 $categories = $this->data('CategoryTree');
-writeCategoryTable($Categories);
+writeCategoryTable($categories);
 ?>

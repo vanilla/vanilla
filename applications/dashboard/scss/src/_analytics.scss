@@ -43,32 +43,13 @@
 
 // Bookmark Icons
 .bookmark {
-  @extend .reverse-link;
-
-  svg {
-    transition: transform .1s;
-    width: to-rem(18);
-  }
-
-
-  &:hover,
-  &:focus {
-    svg {
-      transform: rotate(30deg);
-    }
-  }
+  @extend .btn-icon;
+  @extend .btn-icon-sm;
 }
 
 .bookmarked {
   svg {
     transform: rotate(30deg);
-  }
-
-  &:hover,
-  &:focus {
-    svg {
-      transform: rotate(0deg);
-    }
   }
 }
 

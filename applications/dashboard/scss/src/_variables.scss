@@ -270,15 +270,10 @@ $drawer-width:                   222px;
 $modal-inner-padding:            to-rem(18);
 
 // Category settings
-
-$icon-color:                     transparentize($body-color, .4);
-$icon-size:                      to-rem(16);
-
 $tree-background:                #fdfdff;
-$tree-border:                    $border-color;
 $tree-item-height:               to-rem(36);
 $tree-padding:                   to-rem(6);
-$tree-icon-padding:              ($tree-item-height - $icon-size) / 2;
+$tree-icon-padding:              ($tree-item-height - to-rem(16)) / 2;
 
 $placeholder-background:         #f1faff;
 $placeholder-border:             #0291db;

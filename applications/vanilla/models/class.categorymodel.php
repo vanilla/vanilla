@@ -403,6 +403,26 @@ class CategoryModel extends Gdn_Model {
             $category['PhotoUrl'] = '';
         }
 
+        self::calculateDisplayAs($category);
+
+        if (!val('CssClass', $category)) {
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        }
+
+        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
+            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        }
+    }
+
+    /**
+     * Maintains backwards compatibilty with `DisplayAs: Default`-type categories by calculating the DisplayAs property
+     * into an expected DisplayAs type: Categories, Heading, or Discussions. Respects the now-deprecated config setting
+     * `Vanilla.Categories.DoHeadings`. Once we can be sure that all instances have their categories' DisplayAs
+     * properties explicitly set in the database (i.e., not `Default`) we can deprecate/remove this function.
+     *
+     * @param $category The category to calculate the DisplayAs property for.
+     */
+    public static function calculateDisplayAs(&$category) {
         if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
                 $category['DisplayAs'] = 'Categories';
@@ -413,12 +433,11 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        if (!val('CssClass', $category)) {
-            $category['CssClass'] = 'Category-'.$category['UrlCode'];
-        }
-
-        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
-            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        if ($category['DisplayAs'] == 'Heading' && val('Depth', $category) > self::instance()->getNavDepth()) {
+            // Headings don't make sense if we've cascaded down a level.
+            if (c('Vanilla.Categories.DoHeadings')) {
+                saveToConfig('Vanilla.Categories.DoHeadings', false, false);
+            }
         }
     }
 

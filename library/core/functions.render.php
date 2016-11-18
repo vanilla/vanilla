@@ -45,7 +45,7 @@ if (!function_exists('dashboardSymbol')) {
      * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
      * @return string An HTML-formatted string to render svg icons.
      */
-    function dashboardSymbol($name, $class = '', $attr = []) {
+    function dashboardSymbol($name, $class = '', array $attr = []) {
         if (empty($attr['alt'])) {
             $attr['alt'] = $name;
         }

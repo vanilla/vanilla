@@ -414,6 +414,14 @@ class CategoryModel extends Gdn_Model {
         }
     }
 
+    /**
+     * Maintains backwards compatibilty with `DisplayAs: Default`-type categories by calculating the DisplayAs property
+     * into an expected DisplayAs type: Categories, Heading, or Discussions. Respects the now-deprecated config setting
+     * `Vanilla.Categories.DoHeadings`. Once we can be sure that all instances have their categories' DisplayAs
+     * properties explicitly set in the database (i.e., not `Default`) we can deprecate/remove this function.
+     *
+     * @param $category The category to calculate the DisplayAs property for.
+     */
     public static function calculateDisplayAs(&$category) {
         if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
@@ -425,9 +433,11 @@ class CategoryModel extends Gdn_Model {
             }
         }
 
-        if (val('Depth', $category) > self::instance()->getNavDepth() && $category['DisplayAs'] == 'Heading') {
+        if ($category['DisplayAs'] == 'Heading' && val('Depth', $category) > self::instance()->getNavDepth()) {
             // Headings don't make sense if we've cascaded down a level.
-            saveToConfig('Vanilla.Categories.DoHeadings', false, false);
+            if (c('Vanilla.Categories.DoHeadings')) {
+                saveToConfig('Vanilla.Categories.DoHeadings', false, false);
+            }
         }
     }
 

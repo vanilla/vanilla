@@ -221,6 +221,8 @@ class CategoriesController extends VanillaController {
                 case 'Flat':
                 case 'Heading':
                 case 'Categories':
+                    $stopHeadings = val('Depth', $Category) > CategoryModel::instance()->getNavDepth();
+                    CategoryModel::instance()->setStopHeadingsCalculation($stopHeadings);
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);
@@ -441,7 +443,6 @@ class CategoriesController extends VanillaController {
 
         $categoryTree = $this->CategoryModel
             ->setJoinUserCategory(true)
-            ->setStopHeadingsCalculation($Category && val('Depth', $Category) > CategoryModel::instance()->getNavDepth())
             ->getChildTree(
                 $Category ?: null,
                 ['depth' => $this->CategoryModel->getMaxDisplayDepth() ?: 10]

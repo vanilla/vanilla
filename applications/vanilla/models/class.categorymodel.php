@@ -756,7 +756,6 @@ class CategoryModel extends Gdn_Model {
     public static function getByPermission($Permission = 'Discussions.Add', $CategoryID = null, $Filter = array(), $PermFilter = array()) {
         static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
         $Field = $Map[$Permission];
-        $DoHeadings = c('Vanilla.Categories.DoHeadings');
         $PermFilters = array();
 
         $Result = array();
@@ -796,7 +795,7 @@ class CategoryModel extends Gdn_Model {
                     continue;
                 }
 
-                if ($DoHeadings && $Category['Depth'] <= 1) {
+                if ($Category['DisplayAs'] == 'Heading') {
                     if ($Permission == 'Discussions.Add') {
                         continue;
                     } else {
@@ -1164,7 +1163,6 @@ class CategoryModel extends Gdn_Model {
      */
     public static function joinUserData(&$Categories, $AddUserCategory = true) {
         $IDs = array_keys($Categories);
-        $DoHeadings = c('Vanilla.Categories.DoHeadings');
 
         if ($AddUserCategory) {
             $UserData = self::instance()->getUserCategories();
@@ -1192,7 +1190,7 @@ class CategoryModel extends Gdn_Model {
                 $Categories[$ID]['Following'] = $Following;
 
                 // Calculate the read field.
-                if ($DoHeadings && $Category['Depth'] <= 1) {
+                if ($Category['DisplayAs'] == 'Heading') {
                     $Categories[$ID]['Read'] = false;
                 } elseif ($DateMarkedRead) {
                     if (val('LastDateInserted', $Category)) {

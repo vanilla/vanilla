@@ -48,7 +48,6 @@ class MessageController extends DashboardController {
         // Reset the message cache
         $this->MessageModel->setMessageCache();
 
-        $this->jsonTarget('.js-message-'.$MessageID, '', 'SlideUp');
         $this->informMessage(sprintf(t('%s deleted'), t('Message')));
         $this->render('blank', 'utility', 'dashboard');
     }

@@ -16,9 +16,8 @@ $ChildCategories = '';
 $CategoryTree = $this->data('CategoryTree');
 $Categories = CategoryModel::flattenTree($CategoryTree);
 $this->EventArguments['NumRows'] = $Categories;
-$doHeadings = CategoryModel::hasHeadings($Categories);
 
-echo '<ul class="DataList CategoryList'.($doHeadings ? ' CategoryListWithHeadings' : '').'">';
+echo '<ul class="DataList CategoryList">';
 foreach ($Categories as $CategoryRow) {
     $Category = (object)$CategoryRow;
 

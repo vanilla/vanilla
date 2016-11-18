@@ -1760,54 +1760,6 @@ overflow: hidden;
   padding-left: 275px !important;
 }
 
-.CategoryListWithHeadings .Depth1 {
-  padding-left: 0 !important;
-}
-
-.CategoryListWithHeadings .Depth2 {
-  padding-left: 0 !important;
-}
-
-.CategoryListWithHeadings .Depth3 {
-  padding-left: 25px !important;
-}
-
-.CategoryListWithHeadings .Depth4 {
-  padding-left: 50px !important;
-}
-
-.CategoryListWithHeadings .Depth5 {
-  padding-left: 75px !important;
-}
-
-.CategoryListWithHeadings .Depth6 {
-  padding-left: 100px !important;
-}
-
-.CategoryListWithHeadings .Depth7 {
-  padding-left: 125px !important;
-}
-
-.CategoryListWithHeadings .Depth8 {
-  padding-left: 150px !important;
-}
-
-.CategoryListWithHeadings .Depth9 {
-  padding-left: 175px !important;
-}
-
-.CategoryListWithHeadings .Depth10 {
-  padding-left: 200px !important;
-}
-
-.CategoryListWithHeadings .Depth11 {
-  padding-left: 225px !important;
-}
-
-.CategoryListWithHeadings .Depth12 {
-  padding-left: 250px !important;
-}
-
 .Box.RecentUsers {
   float: left;
 }

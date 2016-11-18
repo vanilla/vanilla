@@ -30,6 +30,9 @@ class CategoryModel extends Gdn_Model {
      */
     private static $instance;
 
+    /** @var bool Whether to allow the calculation of Headings in the `calculateDisplayAs` method */
+    private static $stopHeadingsCalculation = false;
+
     /**
      * @var CategoryCollection $collection;
      */
@@ -415,10 +418,11 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Maintains backwards compatibilty with `DisplayAs: Default`-type categories by calculating the DisplayAs property
-     * into an expected DisplayAs type: Categories, Heading, or Discussions. Respects the now-deprecated config setting
-     * `Vanilla.Categories.DoHeadings`. Once we can be sure that all instances have their categories' DisplayAs
-     * properties explicitly set in the database (i.e., not `Default`) we can deprecate/remove this function.
+     * Maintains backwards compatibilty with `DisplayAs: Default`-type categories by calculating the DisplayAs
+     * property into an expected DisplayAs type: Categories, Heading, or Discussions. Respects the now-deprecated
+     * config setting `Vanilla.Categories.DoHeadings`. Once we can be sure that all instances have their
+     * categories' DisplayAs properties explicitly set in the database (i.e., not `Default`) we can deprecate/remove
+     * this function.
      *
      * @param $category The category to calculate the DisplayAs property for.
      */
@@ -426,19 +430,30 @@ class CategoryModel extends Gdn_Model {
         if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
                 $category['DisplayAs'] = 'Categories';
-            } elseif ($category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
+            } elseif (
+                $category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1)
+                && c('Vanilla.Categories.DoHeadings')
+                && !self::$stopHeadingsCalculation
+            ) {
                 $category['DisplayAs'] = 'Heading';
             } else {
                 $category['DisplayAs'] = 'Discussions';
             }
         }
+    }
 
-        if ($category['DisplayAs'] == 'Heading' && val('Depth', $category) > self::instance()->getNavDepth()) {
-            // Headings don't make sense if we've cascaded down a level.
-            if (c('Vanilla.Categories.DoHeadings')) {
-                saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-            }
-        }
+    /**
+     * Checks to see if the passed category depth is greater than the NavDepth and if so, stops calculating
+     * Headings as a DisplayAs property in the `calculateDisplayAs` method. Once we can be sure that all
+     * instances have their categories' DisplayAs properties explicitly set in the database (i.e., not `Default`)
+     * we can deprecate/remove this function.
+     *
+     * @param bool $stopHeadingCalculation
+     * @return CategoryModel 
+     */
+    public function setStopHeadingsCalculation($stopHeadingCalculation) {
+        self::$stopHeadingsCalculation = $stopHeadingCalculation;
+        return $this;
     }
 
     /**

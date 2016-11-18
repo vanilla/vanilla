@@ -441,6 +441,7 @@ class CategoriesController extends VanillaController {
 
         $categoryTree = $this->CategoryModel
             ->setJoinUserCategory(true)
+            ->setStopHeadingsCalculation($Category && val('Depth', $Category) > CategoryModel::instance()->getNavDepth())
             ->getChildTree(
                 $Category ?: null,
                 ['depth' => $this->CategoryModel->getMaxDisplayDepth() ?: 10]

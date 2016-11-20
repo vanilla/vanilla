@@ -11,7 +11,7 @@ if (!$User) {
 
 $Photo = $User->Photo;
 if ($Photo) {
-    $Photo = (isUrl($Photo)) ?: Gdn_Upload::url(changeBasename($Photo, 'p%s'));
+    $Photo = (isUrl($Photo)) ? $Photo : Gdn_Upload::url(changeBasename($Photo, 'p%s'));
 } else {
     $Photo = UserModel::getDefaultAvatarUrl($User, 'profile');
 }

@@ -70,7 +70,7 @@ class BasicSchemaTest extends SchemaTest {
         $data = [
             'id' => 123,
             'name' => 'foo',
-            'descriptiom' => 456,
+            'description' => 456,
             'timestamp' => time(),
             'date' => new \DateTime(),
             'amount' => 5.99,
@@ -346,6 +346,57 @@ class BasicSchemaTest extends SchemaTest {
     }
 
     /**
+     * Call validate on an instance of Schema where the data contains unexpected parameters.
+     * *
+     * @param int $validationBehavior
+     */
+    protected function doValidationBehavior($validationBehavior) {
+        $schema = new Schema([
+            'i:userID' => 'The ID of the user.',
+            's:name' => 'The username of the user.',
+            's:email' => 'The email of the user.',
+        ]);
+        $schema->setValidationBehavior($validationBehavior);
+
+        $data = [
+            'userID' => 123,
+            'name' => 'foo',
+            'email' => 'user@example.com',
+            'admin' => true,
+            'role' => 'Administrator'
+        ];
+
+        $schema->validate($data);
+        $this->assertArrayNotHasKey('admin', $data);
+        $this->assertArrayNotHasKey('role', $data);
+    }
+
+    /**
+     * Test throwing an exception when removing unexpected parameters from validated data.
+     *
+     * @expectedException \Garden\Exception\ValidationException
+     */
+    public function testValidateException() {
+        $this->doValidationBehavior(Schema::VALIDATE_EXCEPTION);
+    }
+
+    /**
+     * Test triggering a notice when removing unexpected parameters from validated data.
+     *
+     * @expectedException \PHPUnit_Framework_Error_Notice
+     */
+    public function testValidateNotice() {
+        $this->doValidationBehavior(Schema::VALIDATE_NOTICE);
+    }
+
+    /**
+     * Test silently removing unexpected parameters from validated data.
+     */
+    public function testValidateRemove() {
+        $this->doValidationBehavior(Schema::VALIDATE_REMOVE);
+    }
+
+    /**
      * Get a schema of atomic types.
      *
      * @return Schema Returns the schema of atomic types.
@@ -355,7 +406,7 @@ class BasicSchemaTest extends SchemaTest {
             [
                 'i:id',
                 's:name' => 'The name of the object.',
-                'description?',
+                's:description?',
                 'ts:timestamp?',
                 'dt:date?',
                 'f:amount?',

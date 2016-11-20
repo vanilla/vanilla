@@ -203,3 +203,68 @@
 .progress {
   background: url('images/progress.gif') center center no-repeat;
 }
+
+// Foggy
+//
+// Makes a section look foggy and covers it with an absolute positioned pseudo-element. Pairs well with the js-foggy
+// javascript functionality in `dashboard.js` to disable form fields within the `.js-foggy` block and add the
+// appropriate aria classes. On initialization, the foggy css class and properties will get added to any `.js-foggy`
+// element with a `data-is-foggy="true"` attribute set.
+//
+// Markup:
+// <div class="form-group">
+//   <div class="label-wrap-wide">
+//      <label for="fieldID1">Enable something</label>
+//   </div>
+//   <div class="input-wrap-right">
+//     <div class="toggle-wrap">
+//       <input id="toggle-checkbox" type="checkbox" class="toggle-input" />
+//       <label for="toggle-checkbox"></label>
+//     </div>
+//   </div>
+// </div>
+// <div class="form-group js-foggy" data-is-foggy="true">
+//   <div class="label-wrap">
+//     <label for="fieldID2">
+//       Label for this input
+//     </label>
+//     <div class="info">
+//       You won't actually be able to get at this field until you enable the toggle.
+//     </div>
+//   </div>
+//   <div class="input-wrap">
+//     <input type="text" id="fieldID2" class="form-control" />
+//   </div>
+// </div>
+// <script>
+//   $('#toggle-checkbox').on('change', function() {
+//     if ($(this).is(':checked')) {
+//       $('.js-foggy').trigger('foggyOff');
+//     } else {
+//       $('.js-foggy').trigger('foggyOn');
+//     }
+//   });
+// </script>
+//
+//
+// Styleguide 2.7.
+
+.foggy {
+  position: relative;
+  -webkit-filter: blur(2px);
+
+  input {
+    user-select: none;
+  }
+
+  &:before {
+    position: absolute;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: .5;
+    background-color: $white;
+    z-index: 1;
+    content: '';
+  }
+}

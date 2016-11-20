@@ -117,11 +117,7 @@ form {
   padding-bottom: 1rem;
   margin-bottom: 0;
   border-bottom: $border-width dotted #e7e8e9;
-
-  &:first-child {
-    border-top: $border-width solid $border-color;
-    @include has-top-border;
-  }
+  border-bottom: $border-width dotted #e7e8e9;
 
   > .no-grid {
     @extend .row-padding-left;
@@ -216,7 +212,6 @@ label,
 }
 
 .label-wrap {
-
   min-width: 0;
   overflow: hidden;
 
@@ -248,7 +243,7 @@ label,
 .input-wrap-multiple {
   display: flex;
 
-  > *:last-child {
+  > *:not(:first-child) {
     margin-left: $spacer / 2;
   }
 }
@@ -363,6 +358,10 @@ label,
   height: 0;
   opacity: 0;
   padding: 0;
+
+  &:disabled {
+    opacity: 0;
+  }
 }
 
 .color-picker-preview {
@@ -400,6 +399,11 @@ label,
     margin: 0;
     filter: alpha(opacity = 0);
     opacity: 0;
+
+    &:disabled,
+    &.disabled {
+      opacity: 0;
+    }
   }
 }
 
@@ -432,6 +436,14 @@ label,
     border-color: #66afe9;
     outline: none;
     @extend .active;
+  }
+}
+
+//Disabled state
+.file-upload input:disabled,
+.file-upload input.disabled {
+  ~ .file-upload-choose {
+    background-color: $grey-lighter;
   }
 }
 
@@ -532,6 +544,7 @@ select + select {
 .label-selector {
   @extend .row;
   @include list-reset;
+  margin-bottom: $spacer / 2;
 
   label {
     padding-left: 0;
@@ -581,10 +594,7 @@ select + select {
 
       &:hover {
         text-decoration: none;
-
-        svg {
-          fill: $brand-primary;
-        }
+        color: $brand-primary;
       }
     }
   }
@@ -603,11 +613,10 @@ select + select {
 
   .selected {
     display: none;
-
+    color: $brand-success;
     svg {
       display: block;
       width: 84px;
-      fill: $brand-success;
     }
   }
 
@@ -660,12 +669,12 @@ select + select {
 
     svg {
       display: block;
-      fill: $white;
     }
 
     a {
-      &:hover svg {
-        fill: $navbar-active-link-active-bg;
+      color: $white;
+      &:hover {
+        color: $navbar-active-link-active-bg;
       }
     }
   }
@@ -704,6 +713,7 @@ select + select {
   position: relative;
   overflow: hidden;
   margin-bottom: $spacer / 2;
+  color: rgba(85,90,98,.27);
 
   .mobile-frame {
     position: relative;
@@ -712,7 +722,6 @@ select + select {
 
   svg {
     display: block;
-    fill: rgba(85,90,98,.27);
   }
 
   .image-wrap {
@@ -800,10 +809,6 @@ select + select {
 
   .search-icon-search-wrap {
     left: 0;
-
-    svg {
-      opacity: 1;
-    }
   }
 
   .search-info {

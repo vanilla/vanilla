@@ -15,6 +15,7 @@ if ($this->data('crop')) {
 <?php } ?>
 <?php if ($this->data('crop')) { ?>
 <div class="form-footer js-modal-footer">
+    <?php echo anchor('Cancel', '/dashboard/settings/avatars', '', ['class' => 'btn btn-secondary']); ?>
     <?php echo $this->Form->button('Save', ['class' => 'js-save-avatar-crop btn btn-primary']); ?>
 </div>
 <?php } ?>

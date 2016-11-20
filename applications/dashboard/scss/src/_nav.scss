@@ -73,8 +73,6 @@
     }
 
     svg {
-      fill: $grey-dark;
-      opacity: .7;
       display: block;
       height: to-rem(24);
     }
@@ -217,11 +215,6 @@
   .title {
     display: block;
     margin-bottom: $spacer;
-  }
-
-  // External link on forum title.
-  svg {
-    fill: $grey;
   }
 
   .badge {

@@ -159,8 +159,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function index() {
-        $this->View = 'managecategories';
-        $this->ManageCategories();
+        redirect('/vanilla/settings/categories');
     }
 
     /**

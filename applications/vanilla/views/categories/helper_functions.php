@@ -345,26 +345,40 @@ if (!function_exists('WriteCategoryList')):
     }
 endif;
 
-if (!function_exists('WriteCategoryTable')):
+if (!function_exists('writeCategoryTable')):
+    function writeCategoryTable($categories, $depth = 1, $inTable = false) {
+        foreach ($categories as $category) {
+            $displayAs = val('DisplayAs', $category);
+            $urlCode = $category['UrlCode'];
+            $class = val('CssClass', $category);
+            $name = htmlspecialchars($category['Name']);
 
-    function writeCategoryTable($Categories, $Depth = 1) {
-        ?>
-        <div class="DataTableWrap">
-            <table class="DataTable CategoryTable">
-                <thead>
-                <?php
-                WriteTableHead();
-                ?>
-                </thead>
-                <tbody>
-                <?php
-                foreach ($Categories as $Category) {
-                    WriteTableRow($Category, $Depth);
+            if ($displayAs === 'Heading') :
+                if ($inTable) {
+                    echo '</tbody></table></div>';
+                    $inTable = false;
                 }
                 ?>
-                </tbody>
-            </table>
-        </div>
-    <?php
+                <div id="CategoryGroup-<?php echo $urlCode; ?>" class="CategoryGroup <?php echo $class; ?>">
+                    <h2 class="H"><?php echo $name; ?></h2>
+                    <?php writeCategoryTable($category['Children'], $depth + 1, $inTable); ?>
+                </div>
+                <?php
+            else :
+                if (!$inTable) { ?>
+                    <div class="DataTableWrap">
+                        <table class="DataTable CategoryTable">
+                            <thead>
+                            <?php writeTableHead(); ?>
+                            </thead>
+                            <tbody>
+                    <?php $inTable = true;
+                }
+                writeTableRow($category, $depth);
+            endif;
+        }
+        if ($inTable) {
+            echo '</tbody></table></div>';
+        }
     }
 endif;

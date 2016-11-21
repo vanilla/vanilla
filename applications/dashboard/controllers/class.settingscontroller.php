@@ -274,8 +274,10 @@ class SettingsController extends DashboardController {
         } else if ($this->Form->save() !== false) {
             $upload = new Gdn_UploadImage();
             $newAvatar = false;
+            $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
                 // New upload
+                $newUpload = true;
                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
                 $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions);
             } else if ($avatar && $crop && $crop->isCropped()) {
@@ -303,9 +305,14 @@ class SettingsController extends DashboardController {
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
+
+                    // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
+                    if (!$newUpload) {
+                        redirect('/dashboard/settings/avatars');
+                    }
                 }
+                $this->informMessage(t("Your settings have been saved."));
             }
-            $this->informMessage(t("Your settings have been saved."));
         }
         $this->render();
     }

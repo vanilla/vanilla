@@ -4,3 +4,12 @@
   border-radius: $border-radius;
   background-color: transparent;
 }
+
+// Make code blocks in forms look disabled.
+.input-wrap pre.prettyprint {
+  min-height: to-rem(36);
+  padding-top: 0.40625rem;
+  padding-bottom: 0.40625rem;
+  line-height: $font-size-root * 1.5;
+  background-color: $input-bg-disabled;
+}

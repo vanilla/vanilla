@@ -8,6 +8,9 @@ echo $this->Form->errors();
 ?>
     <ul>
         <li class="form-group">
+            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
+        </li>
+        <li class="form-group">
             <?php
             $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];
             $Fields = ['TextField' => 'Code', 'ValueField' => 'Code'];
@@ -67,9 +70,6 @@ echo $this->Form->errors();
             <div class="input-wrap">
             <?php echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
             </div>
-        </li>
-        <li class="form-group">
-            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
         </li>
         <li class="form-group">
             <div class="label-wrap">

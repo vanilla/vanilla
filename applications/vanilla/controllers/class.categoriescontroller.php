@@ -221,11 +221,6 @@ class CategoriesController extends VanillaController {
                 case 'Flat':
                 case 'Heading':
                 case 'Categories':
-                    if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
-                        // Headings don't make sense if we've cascaded down one level.
-                        saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-                    }
-
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);

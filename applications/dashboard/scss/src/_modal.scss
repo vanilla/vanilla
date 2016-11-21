@@ -332,15 +332,7 @@
 .modal-close {
   padding: 0;
 
-  &:hover {
-    svg {
-      opacity: 1;
-    }
-  }
-
   svg {
-    fill: $grey-dark;
-    opacity: 0.7;
     height: to-rem(52) - 1.5rem;
   }
 }

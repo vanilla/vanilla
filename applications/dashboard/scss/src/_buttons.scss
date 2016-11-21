@@ -83,10 +83,6 @@ button::-moz-focus-inner {
     &:hover {
       color: $btn-link-disabled-color;
       border-color: $btn-link-disabled-color;
-
-      svg {
-        fill: $btn-link-disabled-color;
-      }
     }
   }
 }
@@ -180,25 +176,37 @@ fieldset[disabled] a.btn {
   font-size: $font-size-sm;
   line-height: 1;
   border-width: 0;
+  color: $grey-dark;
 
   &:first-child {
     margin-left: 0;
   }
 
   svg {
-    fill: $grey-dark;
-    opacity: 0.7;
     height: to-rem(24);
     width: to-rem(24);
   }
 
-  &:hover svg {
+  &:hover {
+    color: $grey-dark;
     opacity: 1;
   }
 
   &.disabled {
     border: none;
   }
+
+  &.btn-icon-sm {
+    svg {
+      height: to-rem(18);
+      width: to-rem(18);
+    }
+  }
+}
+
+a.btn-icon,
+button.btn-icon {
+  opacity: 0.7;
 }
 
 
@@ -209,10 +217,10 @@ fieldset[disabled] a.btn {
   $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height) - ($border-width * 2)) / 2;
   padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
   margin: 0 0 0 .5rem;
+  color: $grey-dark;
+  opacity: 0.7;
 
   svg {
-    fill: $grey-dark;
-    opacity: 0.7;
     height: to-rem($btn-icon-height);
     width: to-rem($btn-icon-height);
   }
@@ -331,8 +339,5 @@ fieldset[disabled] a.btn {
 
 .btn-navbar {
   @include button-sm-rounded();
-  svg {
-    fill: $white;
-  }
-  @include button-variant($navbar-link-color, $brand-primary, $navbar-link-color, $navbar-link-color, $navbar-active-link-active-bg, $navbar-link-color);
+  @include button-variant($navbar-link-color, $brand-primary, $navbar-link-color, $navbar-link-color, lighten($brand-primary, 12%), $navbar-link-color);
 }

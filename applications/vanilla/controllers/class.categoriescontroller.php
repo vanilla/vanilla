@@ -440,12 +440,6 @@ class CategoriesController extends VanillaController {
             };
         }
 
-        // Compensate for categories displaying as headings by increasing the display depth by one.
-        $maxDisplayDepth = CategoryModel::instance()->getMaxDisplayDepth() ?: 10;
-        if (c('Vanilla.Categories.DoHeadings')) {
-            $maxDisplayDepth++;
-        }
-
         $this->setData('CategoryTree', $this->getCategoryTree(
             $Category ?: -1,
             $Category ? null : CategoryModel::getRootDisplayAs(),

@@ -717,6 +717,11 @@ jQuery(document).ready(function($) {
     };
     $('.Popin, .js-popin').popin();
 
+    // Make poplist items with a rel attribute clickable.
+    $(document).on('click', '.PopList .Item[rel]', function() {
+        window.location.href = $(this).attr('rel');
+    });
+
     var hijackClick = function(e) {
         var $elem = $(this);
         var $parent = $(this).closest('.Item');

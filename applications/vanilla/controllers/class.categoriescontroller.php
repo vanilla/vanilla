@@ -196,7 +196,7 @@ class CategoriesController extends VanillaController {
                     break;
                 default:
                     $this->View = 'all';
-                    $this->all();
+                    $this->all('', CategoryModel::getRootDisplayAs());
                     break;
             }
             return;
@@ -396,6 +396,7 @@ class CategoriesController extends VanillaController {
      * Show all (nested) categories.
      *
      * @param string $Category The url code of the parent category.
+     * @param string $displayAs
      * @since 2.0.17
      * @access public
      */
@@ -439,14 +440,12 @@ class CategoriesController extends VanillaController {
             };
         }
 
-        $categoryTree = $this->CategoryModel
-            ->setJoinUserCategory(true)
-            ->getChildTree(
-                $Category ?: null,
-                ['depth' => $this->CategoryModel->getMaxDisplayDepth() ?: 10]
-            );
-        $this->CategoryModel->joinRecent($categoryTree);
-        $this->setData('CategoryTree', $this->getCategoryTree($Category, null, true, true));
+        $this->setData('CategoryTree', $this->getCategoryTree(
+            $Category ?: -1,
+            $Category ? null : CategoryModel::getRootDisplayAs(),
+            true,
+            true
+        ));
 
         // Add modules
         $this->addModule('NewDiscussionModule');

@@ -274,6 +274,8 @@ class ImportModel extends Gdn_Model {
     public function customFinalization() {
         $this->setRoleDefaults();
         PermissionModel::resetAllRoles();
+        // Remove invalid relation between non existing users/roles
+        RoleModel::cleanUserRoles();
 
         $Imp = $this->getCustomImportModel();
         if ($Imp !== null) {

@@ -37,7 +37,6 @@ form {
 // adding the `label` class to a div around your fake label. Accessibility matters, though. Don't forget to add
 // appropriate aria-label or aria-labelledby attributes in these cases.
 //
-//
 // Markup:
 // <form>
 //   <ul>
@@ -117,7 +116,8 @@ form {
   padding-top: 1rem;
   padding-bottom: 1rem;
   margin-bottom: 0;
-  border-bottom: 1px dotted #e7e8e9;
+  border-bottom: $border-width dotted #e7e8e9;
+  border-bottom: $border-width dotted #e7e8e9;
 
   > .no-grid {
     @extend .row-padding-left;
@@ -161,7 +161,7 @@ form {
 //
 // If you have a form field with multiple options, you can display them inline, or stacked.
 //
-// .stacked - Stacks radio or checkboxes.
+// .inline - Displays input inline.
 //
 // Markup:
 // <form>
@@ -188,8 +188,14 @@ label,
   margin-bottom: 0;
 }
 
-.stacked label {
+.input-wrap:not(.inline) label {
   display: block;
+}
+
+.input-wrap.inline {
+  label {
+    margin-right: $spacer / 4;
+  }
 }
 
 .form-control {
@@ -206,7 +212,6 @@ label,
 }
 
 .label-wrap {
-
   min-width: 0;
   overflow: hidden;
 
@@ -222,6 +227,8 @@ label,
   border: 0;
   padding-top: 0;
   padding-bottom: $spacer;
+  margin-left: 0;
+  margin-right: 0;
 
   &:last-child {
     padding-bottom: 0;
@@ -236,7 +243,7 @@ label,
 .input-wrap-multiple {
   display: flex;
 
-  > *:last-child {
+  > *:not(:first-child) {
     margin-left: $spacer / 2;
   }
 }
@@ -251,7 +258,7 @@ label,
 //
 // Here's how to build an anchor toggle.
 //
-// .toggle-wrap-on - On state
+// .toggle-wrap-on - On state.
 //
 // Markup:
 // <div class="toggle-wrap {{modifier_class}}">
@@ -351,6 +358,10 @@ label,
   height: 0;
   opacity: 0;
   padding: 0;
+
+  &:disabled {
+    opacity: 0;
+  }
 }
 
 .color-picker-preview {
@@ -388,6 +399,11 @@ label,
     margin: 0;
     filter: alpha(opacity = 0);
     opacity: 0;
+
+    &:disabled,
+    &.disabled {
+      opacity: 0;
+    }
   }
 }
 
@@ -423,20 +439,26 @@ label,
   }
 }
 
+//Disabled state
+.file-upload input:disabled,
+.file-upload input.disabled {
+  ~ .file-upload-choose {
+    background-color: $grey-lighter;
+  }
+}
+
 
 // Select
 //
 // Includes IE9-specific hacks (noted by ` \9`).
-
+select,
 select.form-control {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
-}
-
-select {
   display: inline-block;
   height: $control-height-rem;
   max-width: 100%;
   padding-right: 2rem;
+  padding-left: .75rem;
+
   color: $input-color;
   vertical-align: middle;
 
@@ -522,6 +544,7 @@ select + select {
 .label-selector {
   @extend .row;
   @include list-reset;
+  margin-bottom: $spacer / 2;
 
   label {
     padding-left: 0;
@@ -540,12 +563,7 @@ select + select {
     cursor: default;
 
     .overlay {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
       opacity: 1;
-      background-color: $white;
       background-color: rgba(255,255,255,.7);
 
       > .buttons {
@@ -570,6 +588,15 @@ select + select {
   .title {
     text-align: center;
     font-weight: 500;
+
+    a {
+      @extend .reverse-link;
+
+      &:hover {
+        text-decoration: none;
+        color: $brand-primary;
+      }
+    }
   }
 
   .image-wrap {
@@ -586,17 +613,19 @@ select + select {
 
   .selected {
     display: none;
-
+    color: $brand-success;
     svg {
       display: block;
       width: 84px;
-      fill: $brand-success;
     }
   }
 
   .overlay {
-    display: block;
+    display: flex;
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     bottom: 0;
     left: 0;
     right: 0;
@@ -618,14 +647,12 @@ select + select {
     padding: $spacer / 2;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 100%;
 
     > .btn {
       display: block;
       margin: ($spacer / 6) ($spacer / 4);
       max-height: $line-height * $font-size-base + ($btn-padding-y * 2) + ($border-width * 2);
-      min-width: 5rem;
+      min-width: to-rem(96);
     }
   }
 
@@ -642,12 +669,12 @@ select + select {
 
     svg {
       display: block;
-      fill: $white;
     }
 
     a {
-      &:hover svg {
-        fill: $navbar-active-link-active-bg;
+      color: $white;
+      &:hover {
+        color: $navbar-active-link-active-bg;
       }
     }
   }
@@ -686,6 +713,7 @@ select + select {
   position: relative;
   overflow: hidden;
   margin-bottom: $spacer / 2;
+  color: rgba(85,90,98,.27);
 
   .mobile-frame {
     position: relative;
@@ -694,7 +722,6 @@ select + select {
 
   svg {
     display: block;
-    fill: rgba(85,90,98,.27);
   }
 
   .image-wrap {
@@ -728,15 +755,19 @@ select + select {
 
 // Search Input
 //
-// Search inputs have a hidden button and a search icon on the input.
+// Search inputs have a hidden submit button, a search icon on the input, and a clear button if a search has been
+// performed.
+//
+// PHP rendering: In Gdn_Form, use either searchForm(field, url, [textboxAttributes, info]) to render the entire
+// search form or search(field, url, [textboxAttributes, info]) to render the search field.
 //
 // Markup:
 // <form>
-//   <div class="search-wrap">
+//   <div role="search" class="search-wrap">
 //     <div class="search-icon-wrap search-icon-search-wrap">
 //       <svg class="icon icon-svg icon-svg-search" viewBox="0 0 17 17"><use xlink:href="#search" /></svg>
 //     </div>
-//     <input class="form-control">
+//     <input class="form-control" />
 //     <button type="submit" class="search-submit">Search</button>
 //     <div class="search-icon-wrap search-icon-clear-wrap">
 //       <svg class="icon icon-svg icon-svg-close" viewBox="0 0 17 17"><use xlink:href="#close" /></svg>
@@ -753,21 +784,19 @@ select + select {
   .form-control {
     border-radius: $control-height / $rem-base / 2 * 1rem;
     padding-left: $spacer * 2.5;
+    padding-right: $spacer * 2.5;
+
+    &[placeholder] {
+      text-overflow: ellipsis;
+    }
   }
 
   .search-icon-wrap {
-    @extend .icon;
-    $btn-icon-height: 24;
-    $btn-icon-padding-v: (to-rem($control-height) - to-rem($btn-icon-height)) / 2;
-    padding: $btn-icon-padding-v $btn-icon-padding-v * 2;
-    margin: 0 0 0 .5rem;
+    @extend .btn-icon;
+    padding: to-rem(6) to-rem(12);
 
     &:first-child {
       margin-left: 0;
-    }
-
-    svg {
-      height: to-rem($btn-icon-height);
     }
 
     position: absolute;
@@ -889,7 +918,7 @@ select + select {
 
 .radio + .radio,
 .checkbox + .checkbox {
-  margin-top: $spacer / 4;
+  margin-top: 0; // Override twbs
 }
 
 // Checkboxes and Radios
@@ -936,7 +965,7 @@ select + select {
     background-color: $brand-primary;
     border-color: $brand-primary;
 
-    &:before {
+    &::before {
       display: block;
       color: $white;
     }
@@ -946,7 +975,7 @@ select + select {
 .iradio {
   border-radius: $spacer / 2;
 
-  &.checked:before {
+  &.checked::before {
     position: absolute;
     display: block;
     top: -$border-width;
@@ -967,7 +996,7 @@ select + select {
   background-color: $brand-primary;
   border-color: $brand-primary;
 
-  &:before {
+  &::before {
     display: block;
     margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
     color: $white;

@@ -46,12 +46,7 @@ $this->EventArguments['AvailableAddons'] = &$availableAddons;
 $this->fireAs('SettingsController');
 $this->fireEvent('BeforeAddonList');
 
-Gdn_Theme::assetBegin('Help'); ?>
-<div>
-    <h2><?php echo $helpTitle; ?></h2>
-    <?php echo $pathHelp; ?>
-</div>
-<?php Gdn_Theme::assetEnd();
+helpAsset($helpTitle, $pathHelp);
 ?>
 <?php echo $title; ?>
 <?php if ($this->addonType !== 'locales') { ?>
@@ -81,10 +76,8 @@ Gdn_Theme::assetBegin('Help'); ?>
             || ($this->Filter === 'disabled' && $isEnabled)
             || ($this->Filter === 'enabled' && !$isEnabled)) {
             echo '';
-        } else { ?>
-        <li <?php echo 'id="'.Gdn_Format::url($addonName).'-addon"', ' class="media media-addon"'; ?>>
-            <?php writeAddonMedia($addonName, $addonInfo, $isEnabled, $this->addonType, $this->Filter); ?>
-        </li>
-    <?php }
+        } else {
+            writeAddonMedia($addonName, $addonInfo, $isEnabled, $this->addonType, $this->Filter);
+        }
     } ?>
 </ul>

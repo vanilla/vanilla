@@ -67,7 +67,6 @@ if (!class_exists('HeadModule', false)) {
         public function addCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
             $Properties = array(
                 'rel' => 'stylesheet',
-                'type' => 'text/css',
                 'href' => Asset($HRef, false, $AddVersion),
                 'media' => $Media);
 
@@ -152,7 +151,10 @@ if (!class_exists('HeadModule', false)) {
             if ($Src) {
                 $Attributes['src'] = asset($Src, false, $AddVersion);
             }
-            $Attributes['type'] = $Type;
+            if ($Type !== 'text/javascript') {
+                // Not needed in HTML5
+                $Attributes['type'] = $Type;
+            }
             if (isset($Options['defer'])) {
                 $Attributes['defer'] = $Options['defer'];
             }
@@ -399,16 +401,18 @@ if (!class_exists('HeadModule', false)) {
 
             $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
             if ($Title != '') {
-                $this->addTag('meta', array('property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
+                $this->addTag('meta', array('name' => 'twitter:title', 'property' => 'og:title', 'content' => $Title));
             }
 
             if (isset($CanonicalUrl)) {
                 $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
             }
 
-            if ($Description = Gdn_Format::reduceWhiteSpaces($this->_Sender->Description())) {
-                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
+            if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
+                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'content' => $Description));
             }
+
+            $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.
             if (count($this->_Sender->Image()) == 0) {
@@ -420,11 +424,32 @@ if (!class_exists('HeadModule', false)) {
                     }
 
                     $Logo = Gdn_Upload::url($Logo);
-                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
+                    $this->addTag('meta', array('property' => 'og:image', 'content' => $Logo));
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
-                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
+                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'content' => $Img));
+                    $hasRelevantImage = true;
+                }
+            }
+
+            // For the moment at least, only discussions are supported.
+            if ($Title && val('DiscussionID', $this->_Sender)) {
+                if ($hasRelevantImage) {
+                    $twitterCardType = 'summary_large_image';
+                } else {
+                    $twitterCardType = 'summary';
+                }
+
+                // Let's force a description for the image card since it makes sense to see a card with only an image and a title.
+                if (!$Description && $twitterCardType === 'summary_large_image') {
+                    $Description = '...';
+                }
+
+                // Card && Title && Description are required
+                if ($twitterCardType && $Description) {
+                    $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
+                    $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
                 }
             }
 

@@ -1,9 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('WriteModuleDiscussion')):
-    function writeModuleDiscussion($Discussion, $Px = 'Bookmark') {
+    function writeModuleDiscussion($Discussion, $Px = 'Bookmark', $showPhotos = false) {
         ?>
         <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
+            <?php if ($showPhotos) :
+                $firstUser = userBuilder($Discussion, 'First');
+                echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
+            endif; ?>
    <span class="Options">
       <?php
       //      echo OptionsList($Discussion);

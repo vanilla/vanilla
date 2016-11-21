@@ -392,6 +392,15 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Remove the button.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function removeButton() {
+        $this->button = [];
+        return $this;
+    }
+
+    /**
      * @return array An array representing an image with the following keys:
      * 'source' => The image source url.
      * 'link' => The href value of the image wrapper.
@@ -455,22 +464,26 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @return string A plaintext email.
      */
     protected function plainTextEmail() {
-        $email = array(
+        $email = [
             'banner' => val('alt', $this->image).' '.val('link', $this->image),
             'title' => $this->getTitle(),
             'lead' => $this->getLead(),
             'message' => $this->getMessage(),
             'button' => sprintf(t('%s: %s'), val('text', $this->button), val('url', $this->button)),
             'footer' => $this->getFooter()
-        );
+        ];
 
         foreach ($email as $key => $val) {
             if (!$val) {
                 unset($email[$key]);
+            } else {
+                if ($key == 'message') {
+                    $email[$key] = "<br>$val<br>";
+                }
             }
         }
 
-        return Gdn_Format::plainText(Gdn_Format::text(implode("<br><br>", $email)));
+        return Gdn_Format::plainText(Gdn_Format::text(implode('<br>', $email), false));
     }
 
     /**

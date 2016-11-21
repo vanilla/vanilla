@@ -163,7 +163,7 @@ class SettingsController extends DashboardController {
                 ob_start();
                 writeAddonMedia($addonName, $addonInfo, $isEnabled, $type, $filter);
                 $row = ob_get_clean();
-                $this->jsonTarget('#'.Gdn_Format::url($addonName).'-addon', $row);
+                $this->jsonTarget('#'.Gdn_Format::url($addonName).'-addon', $row, 'ReplaceWith');
             }
         }
 
@@ -274,8 +274,10 @@ class SettingsController extends DashboardController {
         } else if ($this->Form->save() !== false) {
             $upload = new Gdn_UploadImage();
             $newAvatar = false;
+            $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
                 // New upload
+                $newUpload = true;
                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
                 $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions);
             } else if ($avatar && $crop && $crop->isCropped()) {
@@ -303,9 +305,14 @@ class SettingsController extends DashboardController {
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
+
+                    // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
+                    if (!$newUpload) {
+                        redirect('/dashboard/settings/avatars');
+                    }
                 }
+                $this->informMessage(t("Your settings have been saved."));
             }
-            $this->informMessage(t("Your settings have been saved."));
         }
         $this->render();
     }
@@ -709,6 +716,11 @@ class SettingsController extends DashboardController {
      * Garden.EmailTemplate.BackgroundColor
      * Garden.EmailTemplate.ButtonBackgroundColor
      * Garden.EmailTemplate.ButtonTextColor
+     * Garden.EmailTemplate.Image
+     *
+     * Saves the image based on 2 config settings:
+     * Garden.EmailTemplate.ImageMaxWidth (default 400px) and
+     * Garden.EmailTemplate.ImageMaxHeight (default 300px)
      *
      * @throws Gdn_UserException
      */
@@ -756,16 +768,49 @@ class SettingsController extends DashboardController {
             // Apply the config settings to the form.
             $this->Form->setData($configurationModel->Data);
         } else {
+            $image = c('Garden.EmailTemplate.Image');
+            try {
+                $upload = new Gdn_UploadImage();
+                // Validate the upload
+                $tmpImage = $upload->validateUpload('EmailImage', false);
+                if ($tmpImage) {
+                    // Generate the target image name
+                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+                    // Delete any previously uploaded images.
+                    if ($image) {
+                        $upload->delete($image);
+                    }
+                    // Save the uploaded image
+                    $parts = $upload->saveImageAs(
+                        $tmpImage,
+                        $imageBaseName,
+                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
+                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
+                    );
+
+                    $imageBaseName = $parts['SaveName'];
+                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
+                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                } else {
+                    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
+                }
+            } catch (Exception $ex) {
+                $this->Form->addError($ex);
+            }
+
             if ($this->Form->save() !== false) {
                 $this->informMessage(t("Your settings have been saved."));
             }
         }
+
         $this->render();
     }
 
     /**
      * Sets up a new Gdn_Email object with a test email.
      *
+     * @param string $image The img src of the previewed image
      * @param string $textColor The hex color code of the text.
      * @param string $backGroundColor The hex color code of the background color.
      * @param string $containerBackgroundColor The hex color code of the container background color.
@@ -773,9 +818,13 @@ class SettingsController extends DashboardController {
      * @param string $buttonBackgroundColor The hex color code of the button background.
      * @return Gdn_Email The email object with the test colors set.
      */
-    public function getTestEmail($textColor = '', $backGroundColor = '', $containerBackgroundColor = '', $buttonTextColor = '', $buttonBackgroundColor = '') {
+    public function getTestEmail($image = '', $textColor = '', $backGroundColor = '', $containerBackgroundColor = '', $buttonTextColor = '', $buttonBackgroundColor = '') {
         $emailer = new Gdn_Email();
         $email = $emailer->getEmailTemplate();
+
+        if ($image) {
+            $email->setImage($image);
+        }
         if ($textColor) {
             $email->setTextColor($textColor);
         }
@@ -801,24 +850,21 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Echoes out a test email with the colors in the post request.
+     * Echoes out a test email with the colors and image in the post request.
      *
      * @throws Exception
      * @throws Gdn_UserException
      */
     public function emailPreview() {
         $request = Gdn::request();
-//        if (!$request->isAuthenticatedPostBack(true)) {
-//            throw new Exception('Requires POST', 405);
-//        }
-
+        $image = $request->post('image', '');
         $textColor = $request->post('textColor', '');
         $backGroundColor = $request->post('backgroundColor', '');
         $containerBackGroundColor = $request->post('containerBackgroundColor', '');
         $buttonTextColor = $request->post('buttonTextColor', '');
         $buttonBackgroundColor = $request->post('buttonBackgroundColor', '');
 
-        echo $this->getTestEmail($textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
+        echo $this->getTestEmail($image, $textColor, $backGroundColor, $containerBackGroundColor, $buttonTextColor, $buttonBackgroundColor)->getEmailTemplate()->toString();
     }
 
     /**
@@ -879,9 +925,11 @@ class SettingsController extends DashboardController {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
                 } else {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOn', 'Trigger');
                 }
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }
@@ -905,7 +953,7 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Endpoint for retrieving email image url.
+     * Endpoint for retrieving current email image url.
      */
     public function emailImageUrl() {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
@@ -915,63 +963,6 @@ class SettingsController extends DashboardController {
             $image = Gdn_UploadImage::url($image);
         }
         $this->setData('EmailImage', $image);
-        $this->render();
-    }
-
-    /**
-     * Form for adding an email image.
-     * Exposes the Garden.EmailTemplate.Image setting.
-     * Garden.EmailTemplate.Image must be an upload.
-     *
-     * Saves the image based on 2 config settings:
-     * Garden.EmailTemplate.ImageMaxWidth (default 400px) and
-     * Garden.EmailTemplate.ImageMaxHeight (default 300px)
-     *
-     * @throws Gdn_UserException
-     */
-    public function emailImage() {
-        if (!Gdn::session()->checkPermission('Garden.Community.Manage')) {
-            throw permissionException();
-        }
-        $this->addJsFile('email.js');
-        $this->setHighlightRoute('dashboard/settings/email');
-        $image = c('Garden.EmailTemplate.Image');
-        $this->Form = new Gdn_Form();
-        $validation = new Gdn_Validation();
-        $configurationModel = new Gdn_ConfigurationModel($validation);
-        // Set the model on the form.
-        $this->Form->setModel($configurationModel);
-        if ($this->Form->authenticatedPostBack() !== false) {
-            try {
-                $upload = new Gdn_UploadImage();
-                // Validate the upload
-                $tmpImage = $upload->validateUpload('EmailImage', false);
-                if ($tmpImage) {
-                    // Generate the target image name
-                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
-                    // Delete any previously uploaded images.
-                    if ($image) {
-                        $upload->delete($image);
-                    }
-                    // Save the uploaded image
-                    $parts = $upload->saveImageAs(
-                        $tmpImage,
-                        $imageBaseName,
-                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
-                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
-                    );
-
-                    $imageBaseName = $parts['SaveName'];
-                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
-                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
-                } else {
-                    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
-                }
-            } catch (Exception $ex) {
-                $this->Form->addError($ex);
-            }
-        }
         $this->render();
     }
 
@@ -1053,6 +1044,8 @@ class SettingsController extends DashboardController {
         $this->fireEvent('DashboardData');
 
         Gdn_Theme::section('DashboardHome');
+        $this->setData('IsWidePage', true);
+
         $this->render('index');
     }
 
@@ -1636,8 +1629,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/themes');
 
         $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
-        $currentTheme = new ThemeInfoModule(val('Index', $ThemeInfo));
-        $currentTheme->setIsCurrent(true);
+        $currentTheme = $this->themeInfoToMediaItem(val('Index', $ThemeInfo), true);
         $this->setData('CurrentTheme', $currentTheme);
 
         $Themes = Gdn::themeManager()->availableThemes();
@@ -1687,9 +1679,79 @@ class SettingsController extends DashboardController {
 
     public function themeInfo($themeName) {
         $this->permission('Garden.Settings.Manage');
-        $theme = new ThemeInfoModule($themeName);
-        $this->setData('Theme', $theme);
+        $themeMedia = $this->themeInfoToMediaItem($themeName);
+        $this->setData('Theme', $themeMedia);
         $this->render();
+    }
+
+    /**
+     * Compiles theme info data into a media module.
+     *
+     * @param string $themeKey The theme key from the themeinfo array.
+     * @param bool $isCurrent Whether the theme is the current theme (if so, adds a little current-theme flag when rendering).
+     * @return MediaItemModule A media item representing the theme.
+     * @throws Exception
+     */
+    private function themeInfoToMediaItem($themeKey, $isCurrent = false) {
+        $themeInfo = Gdn::themeManager()->getThemeInfo($themeKey);
+
+        if (!$themeInfo) {
+            throw new Exception(sprintf(t('Theme with key %s not found.'), $themeKey));
+        }
+        $options = val('Options', $themeInfo, []);
+        $iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo,
+            "applications/dashboard/design/images/theme-placeholder.svg"));
+        $themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeKey));
+        $themeUrl = val('ThemeUrl', $themeInfo, '');
+        $description = val('Description', $themeInfo, '');
+        $version = val('Version', $themeInfo, '');
+        $newVersion = val('NewVersion', $themeInfo, '');
+        $attr = [];
+
+        if ($isCurrent) {
+            $attr['class'] = 'media-callout-grey-bg';
+        }
+
+        $media = new MediaItemModule($themeName, $themeUrl, $description, 'div', $attr);
+        $media->setView('media-callout');
+        $media->addOption('has-options', !empty($options));
+        $media->addOption('has-upgrade', $newVersion != '' && version_compare($newVersion, $version, '>'));
+        $media->addOption('new-version', val('NewVersion', $themeInfo, ''));
+        $media->setImage($iconUrl);
+
+        if ($isCurrent) {
+            $media->addOption('is-current', $isCurrent);
+        }
+
+        // Meta
+
+        // Add author meta
+        $author = val('Author', $themeInfo, '');
+        $authorUrl = val('AuthorUrl', $themeInfo, '');
+        $media->addMetaIf($author != '', '<span class="media-meta author">'
+            .sprintf('Created by %s', $authorUrl != '' ? anchor($author, $authorUrl) : $author).'</span>');
+
+        // Add version meta
+        $version = val('Version', $themeInfo, '');
+        $media->addMetaIf($version != '', '<span class="media-meta version">'
+            .sprintf(t('Version %s'), $version).'</span>');
+
+        // Add requirements meta
+        $requirements = val('RequiredApplications', $themeInfo, []);
+        $required = [];
+        $requiredString = '';
+
+        if (!empty($requirements)) {
+            foreach ($requirements as $requirement => $versionInfo) {
+                $required[] = printf(t('%1$s Version %2$s'), $requirement, $versionInfo);
+            }
+        }
+
+        if (!empty($required)) {
+            $requiredString .= '<span class="media-meta requirements">'.t('Requires: ').implode(', ', $required).'</span>';
+        }
+        $media->addMetaIf($requiredString != '', $requiredString);
+        return $media;
     }
 
     /**
@@ -1746,7 +1808,7 @@ class SettingsController extends DashboardController {
                     throw new Exception(sprintf(t("Could not find a theme identified by '%s'"), $ThemeName));
                 }
 
-                Gdn::session()->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '')); // Clear out the preview
+                Gdn::session()->setPreference(array('PreviewMobileThemeName' => '', 'PreviewMobileThemeFolder' => '')); // Clear out the preview
                 Gdn::themeManager()->enableTheme($ThemeName, $IsMobile);
                 $this->EventArguments['ThemeName'] = $ThemeName;
                 $this->EventArguments['ThemeInfo'] = $ThemeInfo;
@@ -1789,42 +1851,73 @@ class SettingsController extends DashboardController {
      * @since 2.0.0
      * @access public
      * @param string $ThemeName Unique ID.
+     * @param string $transientKey
      */
-    public function previewTheme($ThemeName = '') {
+    public function previewTheme($ThemeName = '', $transientKey = '') {
         $this->permission('Garden.Settings.Manage');
-        $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
 
-        $PreviewThemeName = $ThemeName;
-        $PreviewThemeFolder = val('Folder', $ThemeInfo);
-        $IsMobile = val('IsMobile', $ThemeInfo);
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $ThemeInfo = Gdn::themeManager()->getThemeInfo($ThemeName);
+            $PreviewThemeName = $ThemeName;
+            $displayName = val('Name', $ThemeInfo);
+            $IsMobile = val('IsMobile', $ThemeInfo);
 
-        // If we failed to get the requested theme, cancel preview
-        if ($ThemeInfo === false) {
-            $PreviewThemeName = '';
-            $PreviewThemeFolder = '';
+            // If we failed to get the requested theme, cancel preview
+            if ($ThemeInfo === false) {
+                $PreviewThemeName = '';
+            }
+
+            if ($IsMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => $PreviewThemeName,
+                    'PreviewMobileThemeName' => $displayName]
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => $PreviewThemeName,
+                    'PreviewThemeName' => $displayName]
+                );
+            }
+
+            $this->fireEvent('PreviewTheme', ['ThemeInfo' => $ThemeInfo]);
+
+            redirect('/');
+        } else {
+            redirect('settings/themes');
         }
-
-        Gdn::session()->setPreference(array(
-            'PreviewThemeName' => $PreviewThemeName,
-            'PreviewThemeFolder' => $PreviewThemeFolder,
-            'PreviewIsMobile' => $IsMobile
-        ));
-
-        redirect('/');
     }
 
     /**
-     * Closes current theme preview.
+     * Closes theme preview.
      *
      * @since 2.0.0
      * @access public
+     *
+     * @param string $previewThemeFolder
+     * @param string $transientKey
      */
-    public function cancelPreview() {
-        $Session = Gdn::session();
-        $IsMobile = $Session->User->Preferences['PreviewIsMobile'];
-        $Session->setPreference(array('PreviewThemeName' => '', 'PreviewThemeFolder' => '', 'PreviewIsMobile' => ''));
+    public function cancelPreview($previewThemeFolder = '', $transientKey = '') {
+        $this->permission('Garden.Settings.Manage');
+        $isMobile = false;
 
-        if ($IsMobile) {
+        if (Gdn::session()->validateTransientKey($transientKey)) {
+            $themeInfo = Gdn::themeManager()->getThemeInfo($previewThemeFolder);
+            $isMobile = val('IsMobile', $themeInfo);
+
+            if ($isMobile) {
+                Gdn::session()->setPreference(
+                    ['PreviewMobileThemeFolder' => '',
+                    'PreviewMobileThemeName' => '']
+                );
+            } else {
+                Gdn::session()->setPreference(
+                    ['PreviewThemeFolder' => '',
+                    'PreviewThemeName' => '']
+                );
+            }
+        }
+
+        if ($isMobile) {
             redirect('settings/mobilethemes');
         } else {
             redirect('settings/themes');
@@ -1835,38 +1928,32 @@ class SettingsController extends DashboardController {
      * Remove the logo from config & delete it.
      *
      * @since 2.1
-     * @param string $TransientKey Security token.
      */
-    public function removeFavicon($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeFavicon() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $Favicon = c('Garden.FavIcon', '');
             RemoveFromConfig('Garden.FavIcon');
             $Upload = new Gdn_Upload();
             $Upload->delete($Favicon);
+            $this->informMessage(sprintf(t('%s deleted.'), t('Favicon')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
      * Remove the share image from config & delete it.
      *
      * @since 2.1
-     * @param string $TransientKey Security token.
      */
-    public function removeShareImage($TransientKey = '') {
-        $this->permission('Garden.Community.Manage');
-
-        if (Gdn::request()->isAuthenticatedPostBack()) {
+    public function removeShareImage() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $ShareImage = c('Garden.ShareImage', '');
             removeFromConfig('Garden.ShareImage');
             $Upload = new Gdn_Upload();
             $Upload->delete($ShareImage);
+            $this->informMessage(sprintf(t('%s deleted.'), t('Share image')));
         }
-
-        $this->RedirectUrl = '/settings/banner';
-        $this->render('Blank', 'Utility');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
 
@@ -1875,17 +1962,15 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $TransientKey Security token.
      */
-    public function removeLogo($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeLogo() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $Logo = c('Garden.Logo', '');
             RemoveFromConfig('Garden.Logo');
             safeUnlink(PATH_ROOT."/$Logo");
+            $this->informMessage(sprintf(t('%s deleted.'), t('Logo')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -1893,17 +1978,15 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $TransientKey Security token.
      */
-    public function removeMobileLogo($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey) && $Session->checkPermission('Garden.Community.Manage')) {
+    public function removeMobileLogo() {
+        if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
             $MobileLogo = c('Garden.MobileLogo', '');
             RemoveFromConfig('Garden.MobileLogo');
             safeUnlink(PATH_ROOT."/$MobileLogo");
+            $this->informMessage(sprintf(t('%s deleted.'), t('Mobile logo')));
         }
-
-        redirect('/settings/banner');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
 
@@ -1912,7 +1995,6 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $transientKey Security token.
      */
     public function removeDefaultAvatar() {
         if (Gdn::request()->isAuthenticatedPostBack(true) && Gdn::session()->checkPermission('Garden.Community.Manage')) {
@@ -1951,6 +2033,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/gettingstarted');
 
         Gdn_Theme::section('Tutorials');
+        $this->setData('IsWidePage', true);
         $this->render();
     }
 
@@ -1965,6 +2048,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/tutorials');
         $this->setData('CurrentTutorial', $Tutorial);
         Gdn_Theme::section('Tutorials');
+        $this->setData('IsWidePage', true);
         $this->render();
     }
 }

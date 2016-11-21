@@ -134,6 +134,24 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     }
 
     /**
+     * Checks whether an item is allowed by returning it if it is already a boolean,
+     * or checking the permission if it is a string or array.
+     *
+     * @param bool|string|array $isAllowed Either a boolean to indicate whether to actually add the item
+     * or a permission string or array of permission strings (full match) to check.
+     * @return bool Whether the item has permission to be added to the items list.
+     */
+    public function allowed($isAllowed) {
+        if (is_bool($isAllowed)) {
+            return $isAllowed;
+        }
+        if (is_string($isAllowed) || is_array($isAllowed)) {
+            return Gdn::session()->checkPermission($isAllowed);
+        }
+        return false;
+    }
+
+    /**
      * Returns the location of the view for this module in the filesystem.
      *
      * @param string $View

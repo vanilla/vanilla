@@ -1,9 +1,6 @@
-<div class="header-block">
-    <div class="title-block">
-        <?php echo anchor(dashboardSymbol('chevron-left'), "/embed/forum", 'btn btn-icon btn-return', ['aria-label' => t('Return')]); ?>
-        <h1><?php echo t('Vanilla Plugin for WordPress'); ?></h1>
-    </div>
-</div>
+<?php if (!defined('APPLICATION')) exit();
+echo heading(t('Vanilla Plugin for WordPress'), '', '', [], '/embed/forum');
+?>
 <div class="media media-addon">
     <div class="media-left">
         <?php echo wrap(img('applications/dashboard/design/images/vanilla-wordpress.png', array('class' => 'PluginIcon')), 'div', ['class' => 'media-image-wrap']); ?>

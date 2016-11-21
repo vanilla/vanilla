@@ -1,8 +1,10 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<h1><?php echo $this->data('Title'); ?></h1>
-<?php
+<?php if (!defined('APPLICATION')) exit();
+
+echo heading($this->data('Title'), '', '', [], '/vanilla/settings/categories');
 echo $this->Form->open(array('enctype' => 'multipart/form-data'));
 echo $this->Form->errors();
+echo $this->Form->hidden('ParentCategoryID');
+helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.'));
 ?>
 <ul>
     <li class="form-group">
@@ -15,7 +17,7 @@ echo $this->Form->errors();
     </li>
     <li class="form-group">
         <div class="label-wrap">
-        <?php echo wrap(t('Category Url:'), 'strong'); ?>
+            <?php echo wrap(t('Category Url:'), 'strong'); ?>
         </div>
         <div id="UrlCode" class="input-wrap category-url-code">
             <?php
@@ -47,31 +49,24 @@ echo $this->Form->errors();
             <?php echo $this->Form->textBox('CssClass', array('MultiLine' => FALSE)); ?>
         </div>
     </li>
-    <li class="form-group">
-        <div class="label-wrap">
-            <?php echo $this->Form->label('Photo', 'PhotoUpload');
-            if ($Photo = $this->Form->getValue('Photo')) {
-                echo img(Gdn_Upload::url($Photo));
-                echo '<br />'.anchor(t('Delete Photo'),
-                        CombinePaths(array('vanilla/settings/deletecategoryphoto', $this->Category->CategoryID, Gdn::session()->TransientKey())),
-                        'SmallButton Danger PopConfirm');
-            } ?>
-        </div>
-        <div class="input-wrap">
-            <?php echo $this->Form->fileUpload('PhotoUpload'); ?>
-        </div>
-    </li>
-    <?php
-    echo $this->Form->Simple(
-        $this->data('_ExtendedFields', array()),
-        array('Wrap' => array('', '')));
+    <?php echo $this->Form->imageUploadPreview(
+        'PhotoUpload',
+        t('Photo'),
+        '',
+        $this->Form->getValue('Photo'),
+        'vanilla/settings/deletecategoryphoto/'.$this->Category->CategoryID,
+        t('Delete Photo'),
+        t('Are you sure you want to delete this category photo?')
+    ); ?>
+    <?php echo $this->Form->Simple(
+        $this->data('_ExtendedFields', array()));
     ?>
     <li class="form-group">
         <div class="label-wrap">
             <?php echo $this->Form->label('Display As', 'DisplayAs'); ?>
         </div>
         <div class="input-wrap">
-        <?php echo $this->Form->DropDown('DisplayAs', $this->data('DisplayAsOptions')); ?>
+            <?php echo $this->Form->dropDown('DisplayAs', $this->data('DisplayAsOptions'), ['Wrap' => true]); ?>
         </div>
     </li>
     <li class="form-group">
@@ -82,12 +77,14 @@ echo $this->Form->errors();
             <?php echo $this->Form->toggle('CustomPoints', 'Track points for this category separately.'); ?>
         </li>
     <?php endif; ?>
-    <li class="form-group">
-        <?php
-        echo $this->Form->toggle('Archived', 'This category is archived.');
-        ?>
-    </li>
-    <?php $this->fireEvent('AfterCategorySettings'); ?>
+    <?php if ($this->data('Operation') == 'Edit'): ?>
+        <li class="form-group">
+            <?php
+            echo $this->Form->toggle('Archived', 'This category is archived.');
+            ?>
+        </li>
+        <?php $this->fireEvent('AfterCategorySettings'); ?>
+    <?php endif; ?>
     <?php if (count($this->PermissionData) > 0) { ?>
         <li id="Permissions" class="form-group">
             <?php echo $this->Form->toggle('CustomPermissions', 'This category has custom permissions.'); ?>
@@ -116,7 +113,4 @@ echo $this->Form->Simple(
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
 echo $this->Form->CheckBoxGridGroups($this->PermissionData, 'Permission');
 echo '</div>';
-?>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+echo $this->Form->close('Save');

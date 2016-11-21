@@ -2,11 +2,6 @@
   color: $body-color;
   padding: 0 0 18px;
   position: relative;
-  fill: $body-color;
-
-  * {
-    box-sizing: border-box;
-  }
 }
 
 .dd-list {
@@ -34,7 +29,8 @@
     position: absolute;
     top: 0;
     left: 30px;
-    padding: $tree-icon-padding 6px;
+    padding: 10px;
+    line-height: 1;
     cursor: pointer;
 
     &:active,
@@ -45,24 +41,18 @@
   }
 
   .options {
-    float: right;
-    fill: $icon-color;
-    //margin-top: -$tree-padding - 1px;
-    //margin-right: -$tree-padding;
-  }
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: $grey;
 
-  .OptionsTitle {
-    display: inline-block;
-    padding-right: 2px;
-    line-height: 1;
-  }
-  .Button-Options {
-    padding: $tree-icon-padding;
-  }
+    .dropdown-toggle {
+      padding: to-rem(6) to-rem(10);
+      line-height: to-rem(22);
+    }
 
-  .ToggleFlyout {
-    .Flyout {
-      top: $tree-item-height - $tree-icon-padding + 2px;
+    svg {
+      height: to-rem(16);
     }
   }
 }
@@ -76,7 +66,7 @@
   cursor: move;
   cursor: grab;
   line-height: 1;
-  fill: $tree-border;
+  color: $grey;
 
   &:hover {
     fill: transparentize($body-color, .4);
@@ -85,11 +75,12 @@
 
 .dd-content {
   display: block;
-  border: solid 1px $tree-border;
+  border: solid 1px $border-color;
   background: $tree-background;
   border-radius: 2px;
   padding: 6px 9px 6px 60px;
   margin: 3px 0;
+  line-height: 22px;
 }
 
 .dd-dragel {
@@ -100,10 +91,6 @@
   margin-left: 0; //-9px;
   opacity: .8;
   cursor: grabbing;
-
-  > .dd-item > .dd-handle {
-    fill: $body-color;
-  }
 }
 
 .dd-placeholder,
@@ -115,11 +102,6 @@
   min-height: $tree-item-height;
   border-radius: 2px;
   cursor: grabbing;
-}
-
-.SpFlyoutHandle,
-.DropHandle {
-  border-top-color: $icon-color;
 }
 
 .bigcrumbs {

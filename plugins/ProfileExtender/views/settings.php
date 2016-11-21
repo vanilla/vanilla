@@ -1,12 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
-
 $Fields = $this->data('ExtendedFields');
-
+echo heading(t('Custom Profile Fields'), t('Add Field'), '/settings/profilefieldaddedit/', 'js-modal btn btn-primary')
 ?>
-<div class="header-block">
-    <h1>Custom Profile Fields</h1>
-    <?php echo wrap(Anchor('Add Field', '/settings/profilefieldaddedit/', 'js-modal btn btn-primary'), 'div', array('class' => 'Wrap')); ?>
-</div>
 <div class="table-wrap">
     <table class="table-data js-tj">
         <thead>
@@ -35,7 +30,7 @@ $Fields = $this->data('ExtendedFields');
                     <?php
                     echo anchor(dashboardSymbol('edit'), '/settings/profilefieldaddedit/'.$Name, 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
                     echo anchor(dashboardSymbol('delete'), '/settings/profilefielddelete/'.$Name, 'js-modal btn btn-icon',
-                        ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-content' => ['cssClass' => 'modal-sm modal-confirm']]);
+                        ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-css-class' => 'modal-sm modal-confirm']);
                     ?>
                     </div>
                 </td>

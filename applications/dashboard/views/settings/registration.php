@@ -1,32 +1,23 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(sprintf(t('About %s'), t('Registration')), 'h2');
-        echo '<div>'.t('Change the way that new users register with the site.').'</div>';
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
-    <h1><?php echo t('User Registration Settings'); ?></h1>
+<?php if (!defined('APPLICATION')) exit();
+
+helpAsset(sprintf(t('About %s'), t('Registration')), t('Change the way that new users register with the site.'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on user registration"), 'settings/tutorials/user-registration'))
+?>
+<h1><?php echo t('User Registration Settings'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors(); ?>
 
+<?php if (UserModel::noEmail()) {
+    echo '<div class="alert alert-danger padded-top">'.
+        t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.').
+        '</div>';
+} ?>
 <div class="form-group">
-    <div class="no-grid">
     <?php
-    echo $this->Form->checkBox('Garden.Registration.ConfirmEmail', '@'.t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)'));
-    if (UserModel::noEmail()) {
-        echo '<div class="text-danger">',
-            t('Email addresses are disabled.', 'Email addresses are disabled. You can only add an email address if you are an administrator.'),
-            '</div>';
-    }
+    $label = t('Confirm email addresses', 'Require users to confirm their email addresses (recommended)');
+    echo $this->Form->toggle('Garden.Registration.ConfirmEmail', $label);
     ?>
-    </div>
 </div>
 
 <div id="RegistrationMethods">
@@ -129,6 +120,4 @@ echo $this->Form->errors(); ?>
     </table>
     </div>
 </div>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
-</div>

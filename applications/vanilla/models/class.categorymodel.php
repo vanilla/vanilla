@@ -30,6 +30,9 @@ class CategoryModel extends Gdn_Model {
      */
     private static $instance;
 
+    /** @var bool Whether to allow the calculation of Headings in the `calculateDisplayAs` method */
+    private static $stopHeadingsCalculation = false;
+
     /**
      * @var CategoryCollection $collection;
      */
@@ -107,7 +110,7 @@ class CategoryModel extends Gdn_Model {
         Gdn::pluginManager()->EventArguments['AllowedDiscussionTypes'] = &$allowedTypes;
         Gdn::pluginManager()->EventArguments['Category'] = $category;
         Gdn::pluginManager()->EventArguments['PermissionCategory'] = $PermissionCategory;
-        Gdn::pluginManager()->fireEvent('AllowedDiscussionTypes');
+        Gdn::pluginManager()->fireAs('CategoryModel')->fireEvent('AllowedDiscussionTypes');
 
         return $allowedTypes;
     }
@@ -209,8 +212,8 @@ class CategoryModel extends Gdn_Model {
             } else {
                 $category['Unfollow'] = false;
         }
-            // Calculate the following field.
 
+            // Calculate the following field.
             $Following = !((bool)val('Archived', $category) || (bool)val('Unfollow', $userData, false));
             $category['Following'] = $Following;
 
@@ -252,6 +255,15 @@ class CategoryModel extends Gdn_Model {
             $userData = [];
             return $userData;
         }
+        }
+
+    /**
+     * Get the display type for the root category.
+     *
+     * @return string
+     */
+    public static function getRootDisplayAs() {
+        return c('Vanilla.RootCategory.DisplayAs', 'Categories');
     }
 
     /**
@@ -394,23 +406,54 @@ class CategoryModel extends Gdn_Model {
             $category['PhotoUrl'] = '';
             }
 
+        self::calculateDisplayAs($category);
+
+        if (!val('CssClass', $category)) {
+            $category['CssClass'] = 'Category-'.$category['UrlCode'];
+        }
+
+        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
+            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
+        }
+    }
+
+    /**
+     * Maintains backwards compatibilty with `DisplayAs: Default`-type categories by calculating the DisplayAs
+     * property into an expected DisplayAs type: Categories, Heading, or Discussions. Respects the now-deprecated
+     * config setting `Vanilla.Categories.DoHeadings`. Once we can be sure that all instances have their
+     * categories' DisplayAs properties explicitly set in the database (i.e., not `Default`) we can deprecate/remove
+     * this function.
+     *
+     * @param $category The category to calculate the DisplayAs property for.
+     */
+    public static function calculateDisplayAs(&$category) {
         if ($category['DisplayAs'] === 'Default') {
             if ($category['Depth'] <= c('Vanilla.Categories.NavDepth', 0)) {
                 $category['DisplayAs'] = 'Categories';
-            } elseif ($category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1) && c('Vanilla.Categories.DoHeadings')) {
+            } elseif (
+                $category['Depth'] == (c('Vanilla.Categories.NavDepth', 0) + 1)
+                && c('Vanilla.Categories.DoHeadings')
+                && !self::$stopHeadingsCalculation
+            ) {
                 $category['DisplayAs'] = 'Heading';
                 } else {
                 $category['DisplayAs'] = 'Discussions';
                 }
             }
-
-        if (!val('CssClass', $category)) {
-            $category['CssClass'] = 'Category-'.$category['UrlCode'];
             }
 
-        if (isset($category['AllowedDiscussionTypes']) && is_string($category['AllowedDiscussionTypes'])) {
-            $category['AllowedDiscussionTypes'] = dbdecode($category['AllowedDiscussionTypes']);
-            }
+    /**
+     * Checks to see if the passed category depth is greater than the NavDepth and if so, stops calculating
+     * Headings as a DisplayAs property in the `calculateDisplayAs` method. Once we can be sure that all
+     * instances have their categories' DisplayAs properties explicitly set in the database (i.e., not `Default`)
+     * we can deprecate/remove this function.
+     *
+     * @param bool $stopHeadingCalculation
+     * @return CategoryModel 
+     */
+    public function setStopHeadingsCalculation($stopHeadingCalculation) {
+        self::$stopHeadingsCalculation = $stopHeadingCalculation;
+        return $this;
         }
 
     /**
@@ -728,7 +771,6 @@ class CategoryModel extends Gdn_Model {
     public static function getByPermission($Permission = 'Discussions.Add', $CategoryID = null, $Filter = array(), $PermFilter = array()) {
         static $Map = array('Discussions.Add' => 'PermsDiscussionsAdd', 'Discussions.View' => 'PermsDiscussionsView');
         $Field = $Map[$Permission];
-        $DoHeadings = c('Vanilla.Categories.DoHeadings');
         $PermFilters = array();
 
         $Result = array();
@@ -768,7 +810,7 @@ class CategoryModel extends Gdn_Model {
                     continue;
                 }
 
-                if ($DoHeadings && $Category['Depth'] <= 1) {
+                if ($Category['DisplayAs'] == 'Heading') {
                     if ($Permission == 'Discussions.Add') {
                         continue;
                     } else {
@@ -1136,7 +1178,6 @@ class CategoryModel extends Gdn_Model {
     */
     public static function joinUserData(&$Categories, $AddUserCategory = true) {
         $IDs = array_keys($Categories);
-        $DoHeadings = c('Vanilla.Categories.DoHeadings');
 
         if ($AddUserCategory) {
             $UserData = self::instance()->getUserCategories();
@@ -1164,7 +1205,7 @@ class CategoryModel extends Gdn_Model {
                 $Categories[$ID]['Following'] = $Following;
 
                 // Calculate the read field.
-                if ($DoHeadings && $Category['Depth'] <= 1) {
+                if ($Category['DisplayAs'] == 'Heading') {
                     $Categories[$ID]['Read'] = false;
                 } elseif ($DateMarkedRead) {
                     if (val('LastDateInserted', $Category)) {

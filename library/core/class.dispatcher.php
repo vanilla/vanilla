@@ -464,6 +464,8 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             return ['x'.$method, $pathArgs];
         } elseif ($this->methodExists($controller, 'index')) {
             // "index" is the default controller method if an explicit method cannot be found.
+            $this->EventArguments['PathArgs'] = $pathArgs;
+            $this->fireEvent('MethodNotFound');
             return ['index', $pathArgs];
         } else {
             return ['', $pathArgs];

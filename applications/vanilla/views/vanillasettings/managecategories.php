@@ -1,17 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
+helpAsset(t('Need More Help?'), $links);
 ?>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on managing categories"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-        echo wrap(Anchor(t('Managing Categories'), 'http://docs.vanillaforums.com/features/categories/'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd(); ?>
     <h1><?php echo t('Manage Categories'); ?></h1>
     <div class="Info">
         <?php
@@ -35,19 +25,16 @@ $Session = Gdn::session();
         ?></div>
 <?php
 if (c('Vanilla.Categories.Use')) {
+    
+    $desc = '<ul>';
+    $desc .= '<li>'.sprintf(t('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), url('/dashboard/settings/homepage')).'</li>';
+    $desc .= '<li>'.sprintf(t('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), url('/categories')).'</li>';
+    $desc .= '<li>'.t('Drag and drop the categories below to sort and nest them.').'</li>';
+    $desc .= '</ul>';
+
+    helpAsset(t('Did You Know?'), $desc);
+
     ?>
-    <?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo '<h2>', t('Did You Know?'), '</h2>';
-        echo '<ul>';
-        echo '<li>', sprintf(t('You can make the categories page your homepage.', 'You can make your categories page your homepage <a href="%s">here</a>.'), url('/dashboard/settings/homepage')), '</li>';
-        echo '<li>', sprintf(t('Make sure you click View Page', 'Make sure you click <a href="%s">View Page</a> to see what your categories page looks like after saving.'), url('/categories')), '</li>';
-        echo '<li>', t('Drag and drop the categories below to sort and nest them.'), '</li>';
-        echo '</ul>';
-        ?>
-    </div>
-    <?php Gdn_Theme::assetEnd('Help'); ?>
     <h1><?php
         echo t('Category Page Layout');
         echo ' ';

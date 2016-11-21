@@ -198,7 +198,8 @@ class APIv0 extends HttpClient {
             'Email' => 'travis@example.com',
             'Name' => 'travis',
             'Password' => 'travis',
-            'PasswordMatch' => 'travis'
+            'PasswordMatch' => 'travis',
+            'HtaccessAction' => 'skip'
         ];
 
         $r = $this->post('/dashboard/setup.json', $post);

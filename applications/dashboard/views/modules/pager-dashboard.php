@@ -12,7 +12,7 @@ $currentPage = pageNumber($pager->Offset, $pager->Limit);
 if ($pagerType === 'numbered' && $currentPage >= $pageCount) {
     $hasNext = false;
 }
-if ($pagerType === 'more' && $pager->CurrentRecords !== false && $pager->CurrentRecords < $pager->Limit) {
+if ($pagerType === 'more' && ($pager->CurrentRecords === false || $pager->CurrentRecords < $pager->Limit)) {
     $hasNext = false;
 }
 
@@ -30,7 +30,7 @@ if ($pagerType === 'more') {
 
 $pagerString .= $pagerCount;
 
-$pagerString .= '<div class="btn-group">';
+$pagerString .= '<nav class="btn-group">';
 // Previous
 if ($currentPage == 1) {
     $disabled = 'disabled';
@@ -46,6 +46,6 @@ if (!$hasNext) {
     $disabled = '';
 }
 $pagerString .= anchor(dashboardSymbol("chevron-right"), $pager->PageUrl($currentPage + 1), $disabled.' Next pager-next btn btn-icon-border', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
-$pagerString .= '</div></div>';
+$pagerString .= '</nav></div>';
 
 echo '<div class="pager-wrap '.$pager->CssClass.'">'.$pagerString.'</div>';

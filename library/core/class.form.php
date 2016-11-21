@@ -36,7 +36,8 @@ class Gdn_Form extends Gdn_Pluggable {
             'textarea' => 'TextBox',
             'textbox' => 'InputBox',
             'input-wrap' => 'TextBoxWrapper',
-            'form-group' => ''
+            'form-group' => '',
+            'form-footer' => 'Buttons'
         ],
         'bootstrap' => [
             'default' => 'form-control',
@@ -58,6 +59,7 @@ class Gdn_Form extends Gdn_Pluggable {
             'dropdown' => 'form-control',
             'input-wrap' => 'input-wrap',
             'form-group' => 'form-group',
+            'form-footer' => 'js-modal-footer form-footer'
         ]
     ];
 
@@ -194,7 +196,6 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return bool Returns **true** if the styles were set or **false** otherwise.
      */
     public function setStyles($name) {
-//        if (inSection('Dashboard') && isset($this->allStyles[$name])) {
         if (isset($this->allStyles[$name])) {
             $this->styles = $this->allStyles[$name];
             return true;
@@ -570,12 +571,13 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * Outputs a checkbox painted as a toggle. Includes label wrap id a label is given.
      *
-     * @param string $fieldName
-     * @param string $label
-     * @param array $attributes
-     * @return string
+     * @param string $fieldName The key name for the field.
+     * @param string $label The label for the field.
+     * @param array $attributes The attributes for the checkbox input.
+     * @param string $info The label description.
+     * @return string And HTML-formatted form field for a toggle.
      */
-    public function toggle($fieldName, $label, $attributes = []) {
+    public function toggle($fieldName, $label, $attributes = [], $info = '') {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {
@@ -601,10 +603,15 @@ class Gdn_Form extends Gdn_Pluggable {
             attribute('class', 'toggle').
             attribute('title', val('title', $attributes)) .'>';
 
+        if ($info) {
+            $info = '<div class="info">'.t($info).'</div>';
+        }
+
         if ($label) {
             $toggle = '
                 <div class="label-wrap-wide">
-                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.$label.'</div>
+                    <div class="label label-'.$fieldName.'" id="'.$attributes['aria-labelledby'].'">'.t($label).'</div>'.
+                    $info.'
                 </div>
                 <div class="input-wrap-right">
                     <div class="toggle-wrap">'.
@@ -618,6 +625,67 @@ class Gdn_Form extends Gdn_Pluggable {
 
         return $toggle;
     }
+
+    /**
+     * Renders a search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered form.
+     */
+    public function searchForm($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        return $this->open(['action' => url($url)]).
+            $this->errors().
+            $this->searchInput($field, $url, $textBoxAttributes, $searchInfo).
+            $this->close();
+    }
+
+
+    /**
+     * Renders a stylized search field. Requires dashboard.css to look as intended. Use with searchForm() to output an
+     * entire search form.
+     *
+     * @param string $field The search field, supported field names are 'search' or 'Keywords'
+     * @param string $url The url to show the search results.
+     * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
+     * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @return string The rendered search field.
+     */
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+        $clear = '';
+        $searchTermFound = false;
+        $searchKeys = ['search', 'keywords'];
+
+        $getValues = Gdn::request()->get();
+
+        // Check to see if any values in the above array exist in the get request and if so, add a clear button.
+        foreach ($getValues as $key => $value) {
+            if (in_array(strtolower($key), $searchKeys)) {
+                $searchTermFound = true;
+            }
+        }
+
+        if ($searchTermFound) {
+            $closeIcon = dashboardSymbol('close');
+            $clear = '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url($url).'">'.$closeIcon.'</a>';
+        }
+
+        if ($searchInfo) {
+            $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
+        }
+
+        return '
+            <div class="search-wrap input-wrap" role="search">
+                <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
+                $this->textBox($field, $textBoxAttributes).
+                $this->button('Go', ['class' => 'search-submit']).
+                $clear.
+                $searchInfo.'
+            </div>';
+    }
+
 
     /**
      * Outputs a stylized file upload input. Requires dashboard.js and dashboard.css to look and work as intended.
@@ -636,7 +704,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $upload = '
             <label class="file-upload">
               <input type="file" name="'.$fieldName.'" id="'.$id.'" '.$attributes.'>
-              <span class="file-upload-choose">'.t('Choose').'</span>
+              <span class="file-upload-choose" data-placeholder="'.t('Choose').'">'.t('Choose').'</span>
               <span class="file-upload-browse">'.t('Browse').'</span>
             </label>';
 
@@ -656,7 +724,77 @@ class Gdn_Form extends Gdn_Pluggable {
     }
 
 
-        /**
+    /**
+     * Outputs the entire form group with both the label and input. Adds an image preview and a link to delete the
+     * current image. Handles the ajax clearing of the image preview on removal.
+     * Requires dashboard.js and dashboard.css to look and work as intended.
+     *
+     * @param string $fieldName The form field name for the input.
+     * @param string $label The label.
+     * @param string $labelDescription The label description.
+     * @param string $currentImageUrl The url to the current image.
+     * @param string $removeUrl The endpoint to remove the image.
+     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
+     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The attributes to pass to the file upload function.
+     * @return string
+     */
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
+                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
+                                       $attributes = []) {
+
+        $imageWrapperId = slugify($fieldName).'-preview-wrapper';
+
+        // Compile the data for our current image and current image removal.
+        $removeAttributes = [];
+        $removeCurrentImage = '';
+        $currentImage = '';
+
+        if ($currentImageUrl) {
+            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
+            if ($removeUrl) {
+                if (!$removeText) {
+                    $removeText = t('Remove');
+                }
+                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
+                if ($removeConfirmText) {
+                    $removeAttributes['data-body'] = $removeConfirmText;
+                }
+                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+            }
+        }
+
+        if ($label) {
+            $label = wrap($label, 'div', ['class' => 'label']);
+        }
+
+        if ($labelDescription) {
+            $labelDescription = wrap($labelDescription, 'div', ['class' => 'info']);
+        }
+
+        $label = '
+            <div class="label-wrap">'
+                .$label
+                .$labelDescription.'
+                <div id="'.$imageWrapperId.'" class="js-image-preview-old">'
+                    .$currentImage
+                    .$removeCurrentImage.'
+                </div>
+                <div class="js-image-preview-new hidden">
+                    <div><img class="js-image-preview"></div>
+                    <div><a class="js-remove-image-preview" href="#">'.t('Undo').'</a></div>
+                </div>
+            </div>';
+
+        $attributes['class'] .= 'js-image-upload';
+        $input = $this->fileUploadWrap($fieldName, $attributes);
+
+        return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
+    }
+
+
+    /**
      * Returns XHTML for a checkbox input element.
      *
      * Cannot consider all checkbox values to be boolean. (2009-04-02 mosullivan)
@@ -1039,7 +1177,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         if ($ButtonCode != '') {
-            $Return = '<div class="Buttons">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
         }
 
         return $Return;
@@ -2796,9 +2934,7 @@ PASSWORDMETER;
 
             $Description .= $image;
 
-            if (in_array(strtolower($Row['Control']), ['checkbox', 'checkboxlist', 'radiolist'])) {
-                $labelWrap = wrap($Description, 'div', ['class' => 'label-wrap']);
-            } elseif ($Description) {
+            if ($Description) {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
@@ -2826,11 +2962,11 @@ PASSWORDMETER;
                         .$this->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                     break;
                 case 'radiolist':
-                    $Result .= $Description
+                    $Result .= $labelWrap
                         .wrap($this->radioList($Row['Name'], $Row['Items'], $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'checkboxlist':
-                    $Result .= $Description
+                    $Result .= $labelWrap
                         .wrap($this->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'imageupload':

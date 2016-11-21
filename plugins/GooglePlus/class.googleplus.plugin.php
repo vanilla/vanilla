@@ -22,7 +22,7 @@ $PluginInfo['GooglePlus'] = array(
     'Hidden' => false,
     'SocialConnect' => true,
     'RequiresRegistration' => false,
-    'Icon' => 'google.svg'
+    'Icon' => 'google_social_connect.png'
 );
 
 /**

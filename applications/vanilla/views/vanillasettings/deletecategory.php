@@ -53,8 +53,6 @@ if (is_object($this->OtherCategories)) {
         </ul>
 
     <?php } ?>
-    <div class="form-footer js-modal-footer">
     <?php echo $this->Form->close('Proceed'); ?>
-    </div>
 <?php
 }

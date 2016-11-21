@@ -11,14 +11,7 @@
 /**
  * Event handlers for the Dashboard application.
  */
-class DashboardHooks implements Gdn_IPlugin {
-
-    /**
-     * Do nothing.
-     */
-    public function setup() {
-    }
-
+class DashboardHooks extends Gdn_Plugin {
 
     /**
      * Fire before every page render.
@@ -64,7 +57,6 @@ class DashboardHooks implements Gdn_IPlugin {
             $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
             $Sender->addJsFile('jquery.tablejenga.js', 'dashboard');
             $Sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
-            $Sender->addJsFile('vendors/jquery-scrolltofixed-min.js', 'dashboard');
             $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
             $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
             $Sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');
@@ -76,22 +68,43 @@ class DashboardHooks implements Gdn_IPlugin {
             Gdn::statistics()->check();
         }
 
-       // Enable theme previewing
+        // Inform user of theme previewing
         if ($Session->isValid()) {
-            $PreviewThemeName = htmlspecialchars($Session->getPreference('PreviewThemeName', ''));
             $PreviewThemeFolder = htmlspecialchars($Session->getPreference('PreviewThemeFolder', ''));
-            if ($PreviewThemeName != '') {
-                $Sender->Theme = $PreviewThemeName;
+            $PreviewMobileThemeFolder = htmlspecialchars($Session->getPreference('PreviewMobileThemeFolder', ''));
+            $PreviewThemeName = htmlspecialchars($Session->getPreference(
+                'PreviewThemeName',
+                $PreviewThemeFolder
+            ));
+            $PreviewMobileThemeName = htmlspecialchars($Session->getPreference(
+                'PreviewMobileThemeName',
+                $PreviewMobileThemeFolder
+            ));
+
+            if ($PreviewThemeFolder != '') {
                 $Sender->informMessage(
-                    sprintf(t('You are previewing the %s theme.'), wrap($PreviewThemeName, 'em'))
+                    sprintf(t('You are previewing the %s desktop theme.'), wrap($PreviewThemeName, 'em'))
                     .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/themes/'.$PreviewThemeName.'/'.$Session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/', 'PreviewThemeButton')
+                    .anchor(t('Apply'), 'settings/themes/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .'</div>',
+                    'DoNotDismiss'
+                );
+            }
+
+            if ($PreviewMobileThemeFolder != '') {
+                $Sender->informMessage(
+                    sprintf(t('You are previewing the %s mobile theme.'), wrap($PreviewMobileThemeName, 'em'))
+                    .'<div class="PreviewThemeButtons">'
+                    .anchor(t('Apply'), 'settings/mobilethemes/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
                     .'</div>',
                     'DoNotDismiss'
                 );
             }
         }
+
+
         if ($Session->isValid()) {
             $Confirmed = val('Confirmed', Gdn::session()->User, true);
             if (UserModel::requireConfirmEmail() && !$Confirmed) {
@@ -195,6 +208,38 @@ class DashboardHooks implements Gdn_IPlugin {
         }
         }
 
+    /**
+     * Checks if the user is previewing a theme and, if so, updates the default master view.
+     *
+     * @param Gdn_Controller $sender
+     */
+    public function base_beforeFetchMaster_handler($sender) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
+            return;
+        }
+        if (isMobile()) {
+            $theme = htmlspecialchars($session->getPreference('PreviewMobileThemeFolder', ''));
+        } else {
+            $theme = htmlspecialchars($session->getPreference('PreviewThemeFolder', ''));
+        }
+        $isDefaultMaster = $sender->MasterView == 'default' || $sender->MasterView == '';
+        if ($theme != '' && $isDefaultMaster) {
+            $htmlFile = paths(PATH_THEMES, $theme, 'views', 'default.master.tpl');
+            if (file_exists($htmlFile)) {
+                $sender->EventArguments['MasterViewPath'] = $htmlFile;
+            } else {
+                // for default theme
+                $sender->EventArguments['MasterViewPath'] = $sender->fetchViewLocation('default.master', '', 'dashboard');
+            }
+        }
+    }
+
+    /**
+     * Setup dashboard navigation.
+     *
+     * @param $sender
+     */
     public function dashboardNavModule_init_handler($sender) {
         /** @var DashboardNavModule $nav */
         $nav = $sender;
@@ -244,7 +289,32 @@ class DashboardHooks implements Gdn_IPlugin {
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
             ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
             ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'forum-data.import', '', $sort);
+    }
+
+    /**
+     * Aggressively prompt users to upgrade PHP version.
+     *
+     * @param $sender
+     */
+    public function settingsController_render_before($sender) {
+        // Set this in your config to dismiss our upgrade warnings. Not recommended.
+        if (c('Vanilla.WarnedMeToUpgrade') === 'PHP 5.6') {
+            return;
         }
+
+        if (version_compare(phpversion(), '5.6') < 0) {
+            $UpgradeMessage = ['Content' => 'Upgrade to <b>PHP 5.6</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+            $MessageModule = new MessageModule($sender, $UpgradeMessage);
+            $sender->addModule($MessageModule);
+        }
+
+        $mysqlVersion = gdn::sql()->version();
+        if (version_compare($mysqlVersion, '5.6') < 0) {
+            $UpgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
+            $MessageModule = new MessageModule($sender, $UpgradeMessage);
+            $sender->addModule($MessageModule);
+        }
+    }
 
     /**
      * Set P3P header because IE won't allow cookies thru the iFrame without it.
@@ -355,8 +425,6 @@ class DashboardHooks implements Gdn_IPlugin {
             }
         }
 
-       // TODO: Make sure the target is a safe redirect.
-
        // Get the default authentication provider.
         $DefaultProvider = Gdn_AuthenticationProviderModel::getDefault();
         $Sender->EventArguments['Target'] = $Target;
@@ -368,10 +436,32 @@ class DashboardHooks implements Gdn_IPlugin {
 
        // If an event handler didn't handle the signin then just redirect to the target.
         if (!$Handled) {
-            redirect($Target, 302);
+            safeRedirect($Target, 302);
         }
     }
 
+    /**
+     * Clear user navigation preferences if we can't find the explicit method on the controller.
+     *
+     * @param Gdn_Controller $sender
+     * @param array $args Event arguments. We can expect a 'PathArgs' key here.
+     */
+    public function gdn_dispatcher_methodNotFound_handler($sender, $args) {
+        // If PathArgs is empty, the user hit the root, and we assume they want the index.
+        // If not, they got redirected to the root because their controller method was not
+        // found. We should clear the user prefs in that case.
+        if (!empty($args['PathArgs'])) {
+            if (Gdn::session()->isValid()) {
+                $uri = Gdn::request()->getRequestArguments('server')['REQUEST_URI'];
+                try {
+                    $userModel = new UserModel();
+                    $userModel->clearSectionNavigationPreference($uri);
+                } catch (Exception $ex) {
+                    // Nothing
+                }
+            }
+        }
+    }
 
     /**
      *
@@ -434,6 +524,7 @@ class DashboardHooks implements Gdn_IPlugin {
 
     /**
      * After executing /settings/utility/update check if any role permissions have been changed, if not reset all the permissions on the roles.
+     *
      * @param $sender
      */
     public function updateModel_afterStructure_handler($sender) {

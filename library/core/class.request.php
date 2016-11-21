@@ -61,9 +61,9 @@ class Gdn_Request {
     protected $_RequestArguments;
 
     /**
-     *
+     * Instantiate a new instance of the {@link Gdn_Request} class.
      */
-    private function __construct() {
+    public function __construct() {
         $this->reset();
     }
 
@@ -949,7 +949,7 @@ class Gdn_Request {
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
         }
 
         if (!$allowSSL) {

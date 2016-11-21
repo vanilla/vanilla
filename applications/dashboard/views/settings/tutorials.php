@@ -14,8 +14,8 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
 
 ?>
 <div class="header-menu">
-    <a href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
-    <a href="<?php echo url('/dashboard/settings/tutorials'); ?>" class="active"><?php echo t('Help &amp; Tutorials'); ?></a>
+    <a class="header-menu-item" href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
+    <a class="header-menu-item active" role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/tutorials'); ?>"><?php echo t('Help &amp; Tutorials'); ?></a>
 </div>
 <div class="hero">
     <div class="hero-content">
@@ -34,15 +34,12 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
         <div class="videos label-selector">
         <?php
         foreach ($Tutorials as $Tutorial) {
-        $current = ($CurrentTutorialCode == $Tutorial['Code']) ? 'current' : '';
+        $current = ($CurrentTutorialCode == $Tutorial['Code']) ? 'active' : '';
         echo '<div class="video label-selector-item '.$current.'">';
         echo '<div class="image-wrap">';
         echo '<img src="'.$Tutorial['Thumbnail'].'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
             <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
-                <div class="buttons">
-                    <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
-                </div>
-                <div class="selected"></div>
+                <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
             </a>
             <?php
             echo '</div>';

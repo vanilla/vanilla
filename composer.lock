@@ -4,9 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "94d7fe7056f087d7050fbb2e913479b6",
-    "content-hash": "3804390c6d59c1a86e7da48ddd657692",
+    "hash": "3c2901be3d44ca6e302e4ef664074ec1",
+    "content-hash": "91afffeaed3f32060aa77a126f489a0b",
     "packages": [
+        {
+            "name": "chrisjean/php-ico",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrisbliss18/php-ico.git",
+                "reference": "ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrisbliss18/php-ico/zipball/ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6",
+                "reference": "ccd5c0d56554f3ddcd7a823e695be83e0d1e43b6",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": ">=5.2.4"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "class-php-ico.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Chris Jean",
+                    "homepage": "https://chrisjean.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "An easy-to-use library to generate valid ICO files.",
+            "homepage": "https://github.com/chrisbliss18/php-ico",
+            "keywords": [
+                "favicon",
+                "ico"
+            ],
+            "time": "2016-09-27 22:00:56"
+        },
         {
             "name": "container-interop/container-interop",
             "version": "1.1.0",
@@ -33,6 +76,66 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "time": "2014-12-30 15:22:37"
+        },
+        {
+            "name": "phpmailer/phpmailer",
+            "version": "v5.2.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPMailer/PHPMailer.git",
+                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
+                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0.0"
+            },
+            "require-dev": {
+                "phpdocumentor/phpdocumentor": "*",
+                "phpunit/phpunit": "4.7.*"
+            },
+            "suggest": {
+                "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "class.phpmailer.php",
+                    "class.phpmaileroauth.php",
+                    "class.phpmaileroauthgoogle.php",
+                    "class.smtp.php",
+                    "class.pop3.php",
+                    "extras/EasyPeasyICS.php",
+                    "extras/ntlm_sasl_client.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Jim Jagielski",
+                    "email": "jimjag@gmail.com"
+                },
+                {
+                    "name": "Marcus Bointon",
+                    "email": "phpmailer@synchromedia.co.uk"
+                },
+                {
+                    "name": "Andy Prevost",
+                    "email": "codeworxtech@users.sourceforge.net"
+                },
+                {
+                    "name": "Brent R. Matzelle"
+                }
+            ],
+            "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
+            "time": "2016-06-06 09:09:37"
         },
         {
             "name": "psr/log",
@@ -355,34 +458,6 @@
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
             "time": "2016-04-26 18:19:47"
-        },
-        {
-            "name": "vanilla/php-ico",
-            "version": "1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vanilla/php-ico.git",
-                "reference": "8bd36d560152e84ad5f9e42a5df1fa9fc0649940"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": {
-                    "Vanilla\\": [
-                        "class-php-ico.php"
-                    ]
-                }
-            },
-            "license": [
-                "GPL-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Chris Jean",
-                    "homepage": "https://github.com/chrisbliss18"
-                }
-            ],
-            "description": "An easy-to-use library to generate valid ICO files.",
-            "time": "2016-09-20 21:59:42"
         }
     ],
     "packages-dev": [],

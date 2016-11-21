@@ -2334,6 +2334,10 @@ mark {
   max-width: 100%;
 }
 
+.Message td, .Message th {
+  padding: .5em;
+}
+
 /* =============================================================== Categories */
 .ChildCategories {
   border-top: 1px dotted $grey-2;
@@ -5543,11 +5547,11 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 .SocialIcon .Icon {
   background-image: url('images/socialcons-small.png');
   background-repeat: no-repeat;
-  background-size: 24px 168px;
+  background-size: 24px 192px;
 }
 
 .SocialIcon.HasText .Icon {
-  background-size: 32px 224px;
+  background-size: 32px 256px;
   background-image: url('images/socialcons.png');
 }
 

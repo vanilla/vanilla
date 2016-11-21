@@ -168,7 +168,7 @@ class Gdn_Smarty {
 
             $Smarty->setCacheDir(PATH_CACHE.'/Smarty/cache');
             $Smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');
-            $Smarty->addPluginsDir(PATH_LIBRARY.'/vendors/SmartyPlugins');
+            $Smarty->addPluginsDir(PATH_LIBRARY.'/SmartyPlugins');
 
 //         Gdn::PluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($Smarty, 'Gdn_Smarty', 'Init');

@@ -55,6 +55,4 @@ echo $this->Form->errors();
          <?php echo $this->Form->checkBox('OnDiscussion', 'Show on discussions'); ?>
       </div>-->
 </div>
-<div class="form-footer js-modal-footer">
-    <?php echo $this->Form->close('Save'); ?>
-</div>
+<?php echo $this->Form->close('Save'); ?>

@@ -814,12 +814,26 @@ class UserController extends DashboardController {
                 $FilterValue = $Parts[2];
             }
 
-            if (strpos($Field, '.') !== false) {
-                $Field = array_pop(explode('.', $Field));
+            // If we're using a DB function (e.g. converting binary IPs), separate it from the field.
+            if (preg_match('/^(?<function>[A-Za-z0-9_]+)\((?<fieldName>[A-Za-z0-9_\.]+)\)$/', $Field, $fieldParts)) {
+                $Field = $fieldParts['fieldName'];
+                $dbFunction = $fieldParts['function'];
             }
 
-            if (!in_array($Field, array('Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastActive'))) {
+            if (strpos($Field, '.') !== false) {
+                $fieldParts = explode('.', $Field);
+                $Field = array_pop($fieldParts);
+            }
+
+            $validFields = ['Name', 'Email', 'LastIPAddress', 'InsertIPAddress', 'RankID', 'DateFirstVisit', 'DateLastActive'];
+            if (!in_array($Field, $validFields)) {
                 return false;
+            }
+
+            // If we have a valid DB function, re-apply it to the field.
+            $validDBFunctions = ['inet6_ntoa'];
+            if (isset($dbFunction) && in_array($dbFunction, $validDBFunctions)) {
+                $Field = "{$dbFunction}({$Field})";
             }
 
             return array("$Field $Op" => $FilterValue);

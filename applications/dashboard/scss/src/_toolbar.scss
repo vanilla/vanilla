@@ -7,7 +7,7 @@
 // The toolbar is a tray that is at the top of a settings page that provides tools for filtering or managing
 // the page data.
 //
-// .toolbar-main - element with `toolbar-main` class fills up available space
+// .toolbar-main - Element with `toolbar-main` class has a basis of half the size of the toolbar at full-page width and shrinks slower than its siblings.
 //
 // Markup:
 // <div class="toolbar">
@@ -35,7 +35,7 @@
 //   <div class="pager-wrap Pager">
 //     <div class="pager">
 //       <div class="pager-count">Page 1 of 2</div>
-//       <div class="btn-group">
+//       <nav class="btn-group">
 //         <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
 //           <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
 //             <use xlink:href="#chevron-left" />
@@ -46,7 +46,7 @@
 //             <use xlink:href="#chevron-right" />
 //           </svg>
 //         </a>
-//       </div>
+//       </nav>
 //     </div>
 //   </div>
 // </div>
@@ -54,34 +54,36 @@
 // Styleguide 8.1.
 
 .toolbar {
-  display: flex;
+  @include full-border(flex);
   align-items: flex-start;
   justify-content: space-between;
   padding-top: $spacer / 2;
   padding-bottom: $spacer;
+  padding-right: 0;
 
   > * {
     margin-top: $spacer / 2;
-    margin-right: $spacer;
-
-    &:last-child {
-      margin-right: 0;
-    }
+    padding-right: $spacer;
+    flex-shrink: 2;
   }
 
-  &.flex-wrap {
-    > * {
-      margin-right: 0;
-    }
+  .toolbar-buttons {
+    display: flex;
+    flex-wrap: nowrap;
   }
 
-  &.empty {
+  .toolbar-btn-group {
+
+  }
+
+  &:empty {
     padding-top: 0;
-    padding-bottom: 0;
+    border-bottom: 0;
   }
 
   .toolbar-main {
-    flex-grow: 1;
+    flex-basis: to-rem(1024) / 2 - $spacer;
+    flex-shrink: 1;
   }
 }
 
@@ -95,7 +97,7 @@
 // <div class="pager-wrap">
 //   <div class="pager">
 //     <div class="pager-count">Page 1 of 2</div>
-//     <div class="btn-group">
+//     <nav class="btn-group">
 //       <a href="#" class="disabled btn btn-icon-border" rel="prev" aria-label="Previous page">
 //         <svg class="icon icon-svg-chevron-left" viewBox="0 0 17 17">
 //           <use xlink:href="#chevron-left" />
@@ -106,7 +108,7 @@
 //           <use xlink:href="#chevron-right" />
 //         </svg>
 //       </a>
-//     </div>
+//     </nav>
 //   </div>
 // </div>
 //
@@ -116,11 +118,17 @@
   line-height: 1;
   font-weight: 500;
   padding-right: $spacer / 2;
+  white-space: nowrap;
+}
+
+.pager-wrap {
+  margin-left: auto;
 }
 
 .pager {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
+  justify-content: flex-end;
 }
 

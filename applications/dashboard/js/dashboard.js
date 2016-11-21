@@ -355,48 +355,46 @@ var DashboardModal = (function() {
             cssClass: '',
             title: '',
             footer: '',
-            closeIcon: '',
             body: '',
+            closeIcon: '',
             form: {
                 open: '',
                 close: ''
             }
         },
 
-        settings: {},
-
         target: '',
 
         trigger: {},
 
-
         modalHtml: ' \
-        <div><div class="modal-dialog {cssClass}" role="document"> \
+        <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
-                <div class="modal-header"> \
+                <div class="modal-header js-modal-fixed"> \
+                    <h4 id="modalTitle" class="modal-title">{title}</h4> \
                     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
-                    <h4 class="modal-title">{title}</h4> \
                 </div> \
                 {form.open} \
                 <div class="modal-body">{body}</div> \
-                <div class="modal-footer">{footer}</div> \
+                <div class="modal-footer js-modal-fixed">{footer}</div> \
                 {form.close} \
             </div> \
-        </div></div>',
+        </div>',
 
         modalHtmlNoHeader: ' \
-        <div><div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+        <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+            <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
             <div class="modal-content"> \
                 <div class="modal-body">{body}</div> \
                 <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                     {closeIcon} \
                 </button> \
             </div> \
-        </div></div>',
+        </div>',
 
-        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
         start: function($trigger, settings) {
             $('#' + this.id).modal('show').focus();
@@ -439,42 +437,53 @@ var DashboardModal = (function() {
         handleConfirm: function() {
             var self = this;
 
-            // request the target via ajax
-            var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            if (self.settings.httpmethod === 'post') {
-                ajaxData.TransientKey = gdn.definition('TransientKey');
-            }
-
-            $.ajax({
-                method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-                    if (json.RedirectUrl) {
-                        setTimeout(function() {
-                            document.location.replace(json.RedirectUrl);
-                        }, 300);
-                    } else {
-                        $('#' + self.id).modal('hide');
-                        self.afterConfirmSuccess();
-                    }
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
-            });
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json) {
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        if (json.RedirectUrl) {
+                            setTimeout(function() {
+                                document.location.replace(json.RedirectUrl);
+                            }, 300);
+                        } else {
+                            $('#' + self.id).modal('hide');
+                            self.afterConfirmSuccess();
+                        }
+                    }
+                });
+            }
         },
 
         // Default is to remove the closest item with the class 'js-modal-item'
         afterConfirmSuccess: function() {
             var found = false;
             if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                found = this.trigger.closest('.js-modal-item').length !== 0;
-                this.trigger.closest('.js-modal-item').remove();
+                var $remove;
+                if (this.settings.removeSelector) {
+                    $remove = $(this.settings.removeSelector)
+                } else {
+                    $remove = this.trigger.closest('.js-modal-item');
+                }
+                found = $remove.length !== 0;
+                $remove.remove();
             }
 
             // Refresh the page.
@@ -490,8 +499,8 @@ var DashboardModal = (function() {
             var ok = gdn.definition('Okay', 'Okay');
             var cancel = gdn.definition('Cancel', 'Cancel');
 
-            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
-            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>';
+            var footer = '<button class="btn btn-secondary btn-cancel js-cancel">' + cancel + '</button>';
+            footer += '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
 
             return {
                 title: confirmHeading,
@@ -513,7 +522,7 @@ var DashboardModal = (function() {
             $.extend(true, content, this.defaultContent);
 
             // Data attributes override parsed content, content overrides defaults.
-            $.extend(true, parsedContent, this.settings.content);
+            $.extend(true, parsedContent, this.settings);
             $.extend(true, content, parsedContent);
 
             var html = '';
@@ -609,7 +618,7 @@ var DashboardModal = (function() {
             var formCloseTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
-            var $footer = $elem.find('.Buttons, .js-modal-footer');
+            var $footer = $elem.find('.Buttons, .form-footer, .js-modal-footer');
             var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title
@@ -724,36 +733,21 @@ var DashboardModal = (function() {
     function aceInit(element) {
         // Editor classes
         codeInput.init($('.pockets #Form_Body', element), 'html', 200);
-        codeInput.init($('#Form_CustomHtml', element), 'html', 800);
-        codeInput.init($('#Form_CustomCSS', element), 'css', 800);
+        // Don't let our code editor go taller than the window length. Makes for weird scrolling.
+        codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
+        codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
         codeInput.start(element);
     }
 
-    function scrollToFixedInit(element) {
 
+    function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
-        var $spacer = $('.js-scroll-to-fixed-spacer');
 
         $navbar.addClass('navbar-short');
         var navShortHeight = $navbar.outerHeight(true);
         $navbar.removeClass('navbar-short');
         var navHeight = $navbar.outerHeight(true);
-        $spacer.height(navHeight);
-
         var navOffset = navHeight - navShortHeight;
-
-        $navbar.scrollToFixed({
-            zIndex: 1005,
-            spacerClass: 'js-scroll-to-fixed-spacer'
-        });
-
-        $('.modal-header', element).scrollToFixed({
-            zIndex: 1005
-        });
-
-        $('.modal-footer', element).scrollToFixed({
-            zIndex: 1005
-        });
 
         // If we load in the middle of the page, we should have a short navbar.
         if ($(window).scrollTop() > navOffset) {
@@ -765,14 +759,14 @@ var DashboardModal = (function() {
                 $navbar.addClass('navbar-short');
             } else {
                 $navbar.removeClass('navbar-short');
-                $spacer.height(navHeight);
             }
         });
     }
 
     function fluidFixedInit(element) {
+        // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
-            offsetBottom: 72
+            offsetBottom: 72 + 9
         });
     }
 
@@ -829,31 +823,41 @@ var DashboardModal = (function() {
 
     function drawerInit(element) {
 
-        $('.panel-left', element).drawer({
-            toggle    : '.js-panel-left-toggle'
-            , container : '.main-container'
-            , content   : '.main-row .main'
+        // Selectors
+        var drawer = '.js-drawer';
+        var drawerToggle = '.js-drawer-toggle';
+        var content = '.main-row .main';
+        var container = '.main-container';
+
+        $(drawer, element).drawer({
+            toggle: drawerToggle,
+            container: container,
+            content: content
         });
 
-        $('.panel-left', element).on('drawer.show', function() {
+        $(drawerToggle).on('click', function() {
             window.scrollTo(0, 0);
-            $('.panel-nav .js-fluid-fixed').trigger('detach.FluidFixed');
-            $('.main-row .main').height($('.panel-nav .js-fluid-fixed').outerHeight(true) + 132);
-            $('.main-row .main').css('overflow', 'hidden');
+        });
+
+        $(drawer, element).on('drawer.show', function() {
+            $('.panel-nav .js-fluid-fixed', element).trigger('detach.FluidFixed');
+            $(content, element).height($('.panel-nav .js-fluid-fixed', element).outerHeight(true) + 132);
+            $(content, element).css('overflow', 'hidden');
 
         });
 
-        $('.panel-left', element).on('drawer.hide', function() {
-            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
-            $('.main-row .main').height('auto');
-            $('.main-row .main').css('overflow', 'auto');
+        $(drawer, element).on('drawer.hide', function() {
+            // TODO: We should only reset if the panel is actually displayed.
+            $('.panel-nav .js-fluid-fixed', element).trigger('reset.FluidFixed');
+            $(content, element).height('auto');
+            $(content, element).css('overflow', 'inherit');
         });
 
         $(window).resize(function() {
-            if ($('.js-panel-left-toggle').css('display') !== 'none') {
-                $('.main-container', element).addClass('drawer-hide');
-                $('.main-container', element).removeClass('drawer-show');
-                $('.panel-left', element).trigger('drawer.hide');
+            if ($(drawerToggle, element).css('display') !== 'none') {
+                $(container, element).addClass('drawer-hide');
+                $(container, element).removeClass('drawer-show');
+                $(drawer, element).trigger('drawer.hide');
             }
         });
     }
@@ -879,8 +883,15 @@ var DashboardModal = (function() {
         $('.FeedDescription', element).expander({
             slicePoint: 65,
             normalizeWhitespace: true,
-            expandText: gdn.definition('ExpandText'),
-            userCollapseText: gdn.definition('CollapseText')
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('CollapseText', 'less')
+        });
+
+        $('.InformMessageBody, .toaster-body', element).expander({
+            slicePoint: 60,
+            normalizeWhitespace: true,
+            expandText: gdn.definition('ExpandText', 'more'),
+            userCollapseText: gdn.definition('', '')
         });
     }
 
@@ -901,11 +912,18 @@ var DashboardModal = (function() {
         $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
+    function foggyInit(element) {
+        var $foggy = $('.js-foggy', element);
+        if ($foggy.data('isFoggy')) {
+            $foggy.trigger('foggyOn');
+        }
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
-        scrollToFixedInit(e.target); // navbar scroll settings and modal fixed header and footer
+        navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
         userDropDownInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
@@ -914,16 +932,63 @@ var DashboardModal = (function() {
         icheckInit(e.target); // checkboxes and radios
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
+        foggyInit(e.target); // makes settings blurred out
     });
+
+    /**
+     * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
+     * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     */
+    function readUrl(input) {
+        if (input.files && input.files[0]) {
+            var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $preview.attr('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
     // Event handlers
 
+    /**
+     * Adds a preview of the uploaded, not-yet-saved image.
+     */
+    $(document).on('change', '.js-image-upload', function() {
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
+        $(this).parents('.js-image-preview-form-group').find('.js-image-preview-old').addClass('hidden');
+        readUrl(this);
+    });
+
+    /**
+     * Removes the preview image and clears the file name from the input.
+     */
+    $(document).on('click', '.js-remove-image-preview', function(e) {
+        e.preventDefault();
+        var $parent = $(this).parents('.js-image-preview-form-group');
+        $parent.find('.js-image-preview-old').removeClass('hidden');
+        $parent.find('.js-image-preview-new').addClass('hidden').find('.js-image-preview').attr('src', '');
+        var $input = $parent.find('.js-image-upload');
+        var $inputFileName = $parent.find('.file-upload-choose');
+        $input.val('');
+        $inputFileName.html($inputFileName.data('placeholder'));
+    });
+
     $(document).on('shown.bs.collapse', function() {
-        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
+        } else {
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        }
     });
 
     $(document).on('hidden.bs.collapse', function() {
-        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        if ($('.main-container').hasClass('drawer-show')) {
+            $('.js-drawer').trigger('drawer.show');
+        } else {
+            $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
+        }
     });
 
     $(document).on('click', '.js-save-pref-collapse', function() {
@@ -1008,7 +1073,8 @@ var DashboardModal = (function() {
         e.preventDefault();
         DashboardModal.activeModal = new DashboardModal($(this), {
             httpmethod: 'get',
-            modalType: 'confirm'
+            modalType: 'confirm',
+            followLink: true // no ajax
         });
     });
 
@@ -1024,6 +1090,36 @@ var DashboardModal = (function() {
         if (typeof(DashboardModal.activeModal) === 'object') {
             $('#' + DashboardModal.activeModal.id).modal('hide');
         }
+    });
+
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop("disabled")) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop("disabled", true);
+            }
+        });
+    });
+
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop("disabled", false);
+            }
+        });
     });
 
 })(jQuery);

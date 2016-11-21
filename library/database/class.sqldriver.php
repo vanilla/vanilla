@@ -1933,7 +1933,7 @@ abstract class Gdn_SQLDriver {
      */
     public function version() {
         $Query = $this->query($this->fetchVersionSql());
-        return $Query->value('version');
+        return $Query->value('Version');
     }
 
     /**

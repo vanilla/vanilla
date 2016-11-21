@@ -36,18 +36,30 @@ if (!function_exists('alternate')) {
     }
 }
 
-/**
- * Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
- */
 if (!function_exists('dashboardSymbol')) {
-    function dashboardSymbol($name, $alt = '', $class = '') {
-        if (!empty($alt)) {
-            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+    /**
+     * Render svg icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
+     *
+     * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
+     * @param string $class If set, overrides any 'class' attribute in the $attr param.
+     * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
+     * @return string An HTML-formatted string to render svg icons.
+     */
+    function dashboardSymbol($name, $class = '', array $attr = []) {
+        if (empty($attr['alt'])) {
+            $attr['alt'] = $name;
         }
-        $r = <<<EOT
-    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
-EOT;
-        return $r;
+
+        if (!empty($class)) {
+            $attr['class'] = $class.' ';
+        } else {
+            $attr['class'] = $attr['class'] ? $attr['class'].' ' : '';
+        }
+
+        $baseCssClass = 'icon icon-svg-'.$name;
+        $attr['class'] .= $baseCssClass;
+
+        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
     }
 }
 
@@ -62,6 +74,89 @@ if (!function_exists('bigPlural')) {
         $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
 
         return '<span title="'.$Title.'" class="Number">'.Gdn_Format::bigNumber($Number).'</span>';
+    }
+}
+
+/**
+ * Formats a help element and adds it to the help asset.
+ */
+if (!function_exists('helpAsset')) {
+    function helpAsset($title, $description) {
+        Gdn_Theme::assetBegin('Help');
+        echo '<aside role="note" class="help">';
+        echo wrap($title, 'h2', ['class' => 'help-title']);
+        echo wrap($description, 'div', ['class' => 'help-description']);
+        echo '</aside>';
+        Gdn_Theme::assetEnd();
+    }
+}
+
+if (!function_exists('heading')) {
+    /**
+     * Formats a h1 header block for the dashboard. Only to be used once on a page as the h1 header.
+     * Handles url-ifying. Adds an optional button or return link.
+     *
+     * @param string $title The page title.
+     * @param string $buttonText The text appearing on the button.
+     * @param string $buttonUrl The url for the button.
+     * @param string|array $buttonAttributes Can be string CSS class or an array of attributes. CSS class defaults to `btn btn-primary`.
+     * @param string $returnUrl The url for the return chrevron button.
+     * @return string The structured heading string.
+     */
+    function heading($title, $buttonText = '', $buttonUrl = '', $buttonAttributes = [], $returnUrl = '') {
+
+        if (is_string($buttonAttributes)) {
+            $buttonAttributes = ['class' => $buttonAttributes];
+        }
+
+        if ($buttonText !== '') {
+            if (val('class', $buttonAttributes, false) === false) {
+                $buttonAttributes['class'] = 'btn btn-primary';
+            }
+            $buttonAttributes = attribute($buttonAttributes);
+        }
+
+        $button = '';
+
+        if ($buttonText !== '' && $buttonUrl === '') {
+            $button = '<button type="button" '.$buttonAttributes.'>'.$buttonText.'</button>';
+        } else if ($buttonText !== '' && $buttonUrl !== '') {
+            $button = '<a '.$buttonAttributes.' href="'.url($buttonUrl).'">'.$buttonText.'</a>';
+        }
+
+        $title = '<h1>'.$title.'</h1>';
+
+        if ($returnUrl !== '') {
+            $title = '<div class="title-block">
+                <a class="btn btn-icon btn-return" aria-label="Return" href="'.url($returnUrl).'">'.
+                    dashboardSymbol('chevron-left').'
+                </a>
+                <h1>'.$title.'</h1>
+            </div>';
+        }
+
+        return '<header class="header-block">'.$title.$button.'</header>';
+    }
+}
+
+
+if (!function_exists('subheading')) {
+    /**
+     * Renders a h2 subheading for the dashboard.
+     *
+     * @param string $title The subheading title.
+     * @param string $description The optional description for the subheading.
+     * @return string The structured subheading string.
+     */
+    function subheading($title, $description = '') {
+        if ($description === '') {
+            return '<h2 class="subheading">'.$title.'</h2>';
+        } else {
+            return '<header class="subheading-block">
+                <h2 class="subheading-title">'.$title.'</h2>
+                <div class="subheading-description">'.$description.'</div>
+            </header>';
+        }
     }
 }
 
@@ -1045,7 +1140,6 @@ if (!function_exists('userPhoto')) {
         $Photo = val('Photo', $FullUser, val('PhotoUrl', $User));
         $Name = val('Name', $FullUser);
         $Title = htmlspecialchars(val('Title', $Options, $Name));
-        $Href = url(userUrl($FullUser));
 
         if ($FullUser && $FullUser['Banned']) {
             $Photo = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
@@ -1062,9 +1156,11 @@ if (!function_exists('userPhoto')) {
             $PhotoUrl = UserModel::getDefaultAvatarUrl($FullUser, 'thumbnail');
         }
 
-        return '<a title="'.$Title.'" href="'.$Href.'"'.$LinkClass.'>'
-        .img($PhotoUrl, array('alt' => $Name, 'class' => $ImgClass))
-        .'</a>';
+        $href = (val('NoLink', $Options)) ? '' : ' href="'.url(userUrl($FullUser)).'"';
+
+        return '<a title="'.$Title.'"'.$href.$LinkClass.'>'
+                .img($PhotoUrl, ['alt' => $Name, 'class' => $ImgClass])
+            .'</a>';
     }
 }
 

@@ -10,18 +10,18 @@
 $hasCustomStyles = is_array($this->data('ThemeInfo.Options.Styles'));
 $hasCustomText = is_array($this->data('ThemeInfo.Options.Text'));
 
-Gdn_Theme::assetBegin('Help');
-echo wrap(t('Theme Options'), 'h2');
-echo ($hasCustomStyles) ? t('This theme has customizable styles.', 'You can choose from one of the different styles this theme offers. ') : '';
-echo ($hasCustomText) ? t('This theme has customizable text.', 'This theme has text that you can customize.') : '';
-Gdn_Theme::assetEnd();
+$desc = ($hasCustomStyles) ? t('This theme has customizable styles.', 'You can choose from one of the different styles this theme offers. ') : '';
+$desc .= ($hasCustomText) ? t('This theme has customizable text.', 'This theme has text that you can customize.') : '';
+
+helpAsset(t('Theme Options'), $desc);
 
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
 
 <?php if ($hasCustomStyles): ?>
-    <h2 class="subheading-border"><?php echo t('Styles'); ?></h2>
+<section>
+    <?php echo subheading(t('Styles')); ?>
     <ul class="label-selector theme-styles">
         <?php
         foreach ($this->data('ThemeInfo.Options.Styles') as $Key => $Options) {
@@ -65,11 +65,12 @@ echo $this->Form->errors();
         }
         ?>
     </ul>
-
+</section>
 <?php endif; ?>
 
 <?php if ($hasCustomText): ?>
-    <h2 class="subheading-border"><?php echo t('Text'); ?></h2>
+<section>
+    <?php echo subheading(t('Text')); ?>
     <ul>
         <?php foreach ($this->data('ThemeInfo.Options.Text') as $Code => $Options) {
 
@@ -98,6 +99,7 @@ echo $this->Form->errors();
     <div class="form-footer js-modal-footer">
     <?php echo $this->Form->button('Save'); ?>
     </div>
+</section>
 <?php endif; ?>
 
 <?php echo '<br />'.$this->Form->close();

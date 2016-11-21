@@ -36,24 +36,20 @@ class MessageController extends DashboardController {
      * @access public
      *
      * @param int|string $MessageID
-     * @param mixed $TransientKey
      */
-    public function delete($MessageID = '', $TransientKey = false) {
+    public function delete($MessageID = '') {
         $this->permission('Garden.Community.Manage');
-        $this->deliveryType(DELIVERY_TYPE_BOOL);
-        $Session = Gdn::session();
 
-        if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
-            $Message = $this->MessageModel->delete(array('MessageID' => $MessageID));
-            // Reset the message cache
-            $this->MessageModel->setMessageCache();
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
         }
+        $this->MessageModel->delete(array('MessageID' => $MessageID));
 
-        if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect('dashboard/message');
-        }
+        // Reset the message cache
+        $this->MessageModel->setMessageCache();
 
-        $this->render();
+        $this->informMessage(sprintf(t('%s deleted'), t('Message')));
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

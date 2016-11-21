@@ -3,52 +3,26 @@ $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 
-Gdn_Theme::assetBegin('Help');
+helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'));
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'));
+
+if (checkPermission('Garden.Users.Add')) {
+    echo heading(t('Manage Users'), t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
+} else {
+    echo heading(t('Manage Users'));
+}
 ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Heads up!'), 'h2');
-        echo '<div>', t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'), '</div>';
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd('Help'); ?>
-<div class="header-block">
-    <div class="header-title">
-    <h1><?php echo t('Manage Users'); ?></h1>
-    </div>
-    <div class="header-buttons btn-group">
-    <?php
-    if (checkPermission('Garden.Users.Add')) {
-        echo anchor(t('Add User'), 'dashboard/user/add', 'js-modal btn btn-primary');
-    }
-    ?>
-    </div>
-</div>
 <div class="toolbar">
     <div class="toolbar-main">
         <?php
-        echo $this->Form->open(array('action' => url('/user/browse')));
-        echo $this->Form->errors();
-        echo '<div class="search-wrap input-wrap">';
-        echo '<div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>';
-        echo $this->Form->textBox('Keywords');
-        echo ' ', $this->Form->button(t('Go'), ['class' => 'search-submit']);
-        echo '<a class="search-icon-wrap search-icon-clear-wrap" href="'.url('/user').'">'.dashboardSymbol('close').'</a>';
-        echo '<div class="info search-info">';
+        $info = '';
         $count = $this->data('RecordCount', $this->data('UserCount', null));
         if ($count !== null) {
-            echo ' ', sprintf(plural($count, '%s user found.', '%s users found.'), $count);
+            $info = sprintf(plural($count, '%s user found.', '%s users found.'), $count);
         } elseif ($this->data('UserEstimate', null) !== null) {
-            echo ' ', sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
+            $info = sprintf(t('Approximately %s users exist.'), $this->data('UserEstimate'));
         }
-        echo '</div>';
-        echo '</div>';
-        echo $this->Form->close();
+        echo $this->Form->searchForm('Keywords', '/user/browse', [], $info);
         ?>
     </div>
     <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>

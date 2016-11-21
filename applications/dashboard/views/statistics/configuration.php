@@ -10,25 +10,16 @@
                 </div>
             </li>
             <li class="form-group">
-                <div class="label-wrap">
-                    <?php echo $this->Form->label('Application ID', 'InstallationID'); ?>
-                </div>
-                <div class="input-wrap">
-                    <?php echo $this->Form->textBox('InstallationID'); ?>
-                </div>
+                <?php echo $this->Form->labelWrap('Application ID', 'InstallationID'); ?>
+                <?php echo $this->Form->textBoxWrap('InstallationID'); ?>
             </li>
             <li class="form-group">
-                <div class="label-wrap">
-                    <?php echo $this->Form->label('Application Secret', 'InstallationSecret'); ?>
-                </div>
-                <div class="input-wrap">
-                    <?php echo $this->Form->textBox('InstallationSecret'); ?>
-                </div>
+                <?php echo $this->Form->labelWrap('Application Secret', 'InstallationSecret'); ?>
+                <?php echo $this->Form->textBoxWrap('InstallationSecret'); ?>
             </li>
         </ul>
         <div class="form-footer js-modal-footer">
-            <?php echo $this->Form->button('Save', array('class' => 'Button')); ?>
+            <?php echo $this->Form->button('Save'); ?>
         </div>
     </div>
 </div>
-

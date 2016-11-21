@@ -32,48 +32,46 @@ var DashboardModal = (function() {
             cssClass: '',
             title: '',
             footer: '',
-            closeIcon: '',
             body: '',
+            closeIcon: '',
             form: {
                 open: '',
                 close: ''
             }
         },
 
-        settings: {},
-
         target: '',
 
         trigger: {},
 
-
         modalHtml: ' \
-        <div><div class="modal-dialog {cssClass}" role="document"> \
+        <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
-                <div class="modal-header"> \
+                <div class="modal-header js-modal-fixed"> \
+                    <h4 id="modalTitle" class="modal-title">{title}</h4> \
                     <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                         {closeIcon} \
                     </button> \
-                    <h4 class="modal-title">{title}</h4> \
                 </div> \
                 {form.open} \
                 <div class="modal-body">{body}</div> \
-                <div class="modal-footer">{footer}</div> \
+                <div class="modal-footer js-modal-fixed">{footer}</div> \
                 {form.close} \
             </div> \
-        </div></div>',
+        </div>',
 
         modalHtmlNoHeader: ' \
-        <div><div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+        <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
+            <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
             <div class="modal-content"> \
                 <div class="modal-body">{body}</div> \
                 <button type="button" class="btn-icon modal-close close" data-dismiss="modal" aria-label="Close"> \
                     {closeIcon} \
                 </button> \
             </div> \
-        </div></div>',
+        </div>',
 
-        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="true"></div>',
+        modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
         start: function($trigger, settings) {
             $('#' + this.id).modal('show').focus();
@@ -116,42 +114,53 @@ var DashboardModal = (function() {
         handleConfirm: function() {
             var self = this;
 
-            // request the target via ajax
-            var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-            if (self.settings.httpmethod === 'post') {
-                ajaxData.TransientKey = gdn.definition('TransientKey');
-            }
-
-            $.ajax({
-                method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-                    if (json.RedirectUrl) {
-                        setTimeout(function() {
-                            document.location.replace(json.RedirectUrl);
-                        }, 300);
-                    } else {
-                        $('#' + self.id).modal('hide');
-                        self.afterConfirmSuccess();
-                    }
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
                 }
-            });
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json) {
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        if (json.RedirectUrl) {
+                            setTimeout(function() {
+                                document.location.replace(json.RedirectUrl);
+                            }, 300);
+                        } else {
+                            $('#' + self.id).modal('hide');
+                            self.afterConfirmSuccess();
+                        }
+                    }
+                });
+            }
         },
 
         // Default is to remove the closest item with the class 'js-modal-item'
         afterConfirmSuccess: function() {
             var found = false;
             if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                found = this.trigger.closest('.js-modal-item').length !== 0;
-                this.trigger.closest('.js-modal-item').remove();
+                var $remove;
+                if (this.settings.removeSelector) {
+                    $remove = $(this.settings.removeSelector)
+                } else {
+                    $remove = this.trigger.closest('.js-modal-item');
+                }
+                found = $remove.length !== 0;
+                $remove.remove();
             }
 
             // Refresh the page.
@@ -167,8 +176,8 @@ var DashboardModal = (function() {
             var ok = gdn.definition('Okay', 'Okay');
             var cancel = gdn.definition('Cancel', 'Cancel');
 
-            var footer = '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
-            footer += '<button class="btn btn-primary btn-cancel js-cancel">' + cancel + '</button>';
+            var footer = '<button class="btn btn-secondary btn-cancel js-cancel">' + cancel + '</button>';
+            footer += '<button class="btn btn-primary btn-ok js-ok">' + ok + '</button>';
 
             return {
                 title: confirmHeading,
@@ -190,7 +199,7 @@ var DashboardModal = (function() {
             $.extend(true, content, this.defaultContent);
 
             // Data attributes override parsed content, content overrides defaults.
-            $.extend(true, parsedContent, this.settings.content);
+            $.extend(true, parsedContent, this.settings);
             $.extend(true, content, parsedContent);
 
             var html = '';
@@ -286,7 +295,7 @@ var DashboardModal = (function() {
             var formCloseTag = '';
             var $elem = $('<div />').append($($.parseHTML(body + ''))); // Typecast html to a string and create a DOM node
             var $title = $elem.find('h1');
-            var $footer = $elem.find('.Buttons, .js-modal-footer');
+            var $footer = $elem.find('.Buttons, .form-footer, .js-modal-footer');
             var $form = $elem.find('form');
 
             // Pull out the H1 block from the view to add to the modal title

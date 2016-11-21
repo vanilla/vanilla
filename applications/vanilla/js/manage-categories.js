@@ -60,6 +60,7 @@ jQuery(document).ready(function ($) {
         } else {
             $('.CategoryPermissions').hide();
         }
+        $('.panel-nav .js-fluid-fixed').trigger('reset.FluidFixed');
     };
     $('#Form_CustomPermissions').click(displayCategoryPermissions);
     displayCategoryPermissions();

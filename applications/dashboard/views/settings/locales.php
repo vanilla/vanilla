@@ -10,10 +10,10 @@ echo $this->Form->open();
 echo $this->Form->errors(); ?>
 <div class="form-group">
     <?php echo
-    '<div class="label-wrap">', t('Default Locale'), '</div> ',
-    '<div class="input-wrap input-wrap-multiple">',
-    $this->Form->DropDown('Locale', $this->data('Locales')),
-    $this->Form->button('Save', array('style' => 'margin-bottom: 0px')),
+    '<div class="label-wrap-wide">'.$this->Form->label(t('Default Locale'), 'Locales').'</div> ';
+    echo '<div class="input-wrap-right input-wrap-multiple">',
+    $this->Form->dropDown('Locale', $this->data('Locales'), ['class' => '']),
+    $this->Form->button('Save'),
     '</div>';
     ?>
 </div>
@@ -23,15 +23,5 @@ echo $this->Form->close();
 <?php echo $this->Form->errors();
 $this->addonType = 'locales';
 include_once PATH_APPLICATIONS.'/dashboard/views/settings/plugins.php';
+helpAsset(t('Need More Help?'), anchor(t('Internationalization & Localization'), 'http://docs.vanillaforums.com/developers/locales/'));
 ?>
-
-<?php Gdn_Theme::assetBegin('Help'); ?>
-<div class="Help Aside">
-    <?php
-    echo '<h2>', t('Need More Help?'), '</h2>';
-    echo '<ul>';
-    echo '<li>', anchor(t('Internationalization & Localization'), 'http://docs.vanillaforums.com/developers/locales/'), '</li>';
-    echo '</ul>';
-    ?>
-</div>
-<?php Gdn_Theme::assetEnd(); ?>

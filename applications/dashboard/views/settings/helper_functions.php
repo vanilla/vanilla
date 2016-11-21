@@ -105,148 +105,160 @@ function getTutorials($tutorialCode = '') {
     }
 }
 
+/**
+ * Converts addon info into a media item.
+ *
+ * @param $addonName
+ * @param $addonInfo
+ * @param $isEnabled
+ * @param $addonType
+ * @param $filter
+ */
 function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter) {
+    $capitalCaseSheme = new \Vanilla\Utility\CapitalCaseScheme();
+    $addonInfo = $capitalCaseSheme->convertArrayKeys($addonInfo, ['RegisterPermissions']);
 
-    $Version = Gdn_Format::display(val('Version', $addonInfo, val('version', $addonInfo, '')));
-    $ScreenName = Gdn_Format::display(val('Name', $addonInfo, val('name', $addonInfo, $addonName)));
+    $screenName = Gdn_Format::display(val('Name', $addonInfo, $addonName));
+    $description = Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, '')));
+    $id = Gdn_Format::url($addonName).'-addon';
 
-    $SettingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, val('settingsUrl', $addonInfo, '')) : '';
-    $SettingsPopupClass = 'js-modal';
+    $media = new MediaItemModule($screenName, '', $description, 'li', ['id' => $id]);
+    $media->setView('media-addon');
 
-    if (!val('UsePopupSettings', $addonInfo, true)) {
-        $SettingsPopupClass = '';
-    }
+    // Icon
 
-    $PluginUrl = val('PluginUrl', $addonInfo, '');
-    $Author = val('Author', $addonInfo, '');
-    $AuthorUrl = val('AuthorUrl', $addonInfo, '');
-    $authors = [];
-    if ($Author) {
-        if ($AuthorUrl) {
-            $authors[] = anchor($Author, $AuthorUrl);
-        } else {
-            $authors[] = $Author;
-        }
-    }
-    foreach (val('authors', $addonInfo, []) as $author) {
-        if (val('homepage', $author)) {
-            $authors[] = anchor(val('name', $author), val('homepage', $author));
-        } else {
-            $authors[] = val('name', $author);
-        }
-    }
-    $NewVersion = val('NewVersion', $addonInfo, '');
-    $Upgrade = $NewVersion != '' && version_compare($NewVersion, $Version, '>');
-    $RowClass = $isEnabled ? 'Enabled' : 'Disabled';
     $addon = Gdn::addonManager()->lookupAddon($addonName);
-    $IconPath = '';
+    $iconPath = '';
     if ($addon) {
-        $IconPath = $addon->getIcon();
+        $iconPath = $addon->getIcon();
     }
-    if (!$IconPath) {
-        $IconPath = val('IconUrl', $addonInfo, 'applications/dashboard/design/images/addon-placeholder.png');
+    if (!$iconPath) {
+        $iconPath = val('IconUrl', $addonInfo, 'applications/dashboard/design/images/addon-placeholder.png');
     }
-    ?>
-    <div class="media-left">
-        <?php echo wrap(img($IconPath, array('class' => 'PluginIcon')), 'div', ['class' => 'media-image-wrap']); ?>
-    </div>
-    <div class="media-body">
-        <div class="media-heading"><div class="media-title"><?php echo $ScreenName; ?></div>
-            <div class="info"><?php
-                $Info = [];
 
-                $RequiredApplications = val('RequiredApplications', $addonInfo, false);
-                $RequiredPlugins = val('RequiredPlugins', $addonInfo, false);
-                $requirements = '';
-                if (is_array($RequiredApplications) || is_array($RequiredPlugins)) {
-                    $requirements = t('Requires: ');
-                }
-                $i = 0;
-                if (is_array($RequiredApplications)) {
-                    if ($i > 0)
-                        $requirements .= ', ';
+    $media->setImage($iconPath);
 
-                    foreach ($RequiredApplications as $RequiredApplication => $VersionInfo) {
-                        $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredApplication, $VersionInfo);
-                        ++$i;
-                    }
-                }
-                if ($RequiredPlugins !== FALSE) {
-                    foreach ($RequiredPlugins as $RequiredPlugin => $VersionInfo) {
-                        if ($i > 0)
-                            $requirements .= ', ';
+    // Settings button
 
-                        $requirements .= sprintf(t('%1$s Version %2$s'), $RequiredPlugin, $VersionInfo);
-                        ++$i;
-                    }
-                }
+    $settingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, '') : '';
+    $settingsPopupClass = val('UsePopupSettings', $addonInfo, true) ? ' js-modal' : '';
 
-                if ($requirements != '') {
-                    $Info[] = $requirements;
-                }
+    if ($settingsUrl != '') {
+        $attr['class'] = 'btn btn-icon-border'.$settingsPopupClass;
+        $attr['aria-label'] = sprintf(t('Settings for %s'), $screenName);
+        $attr['data-reload-page-on-save'] = false;
 
-                if ($authors) {
-                    $authors = implode(', ', $authors);
-                    $Info[] = sprintf(t('Created by %s'), $authors);
-                }
+        $media->addButton(dashboardSymbol('settings'), $settingsUrl, $attr);
+    }
 
-                if ($Version != '') {
-                    $Info[] = sprintf(t('Version %s'), $Version);
-                }
+    // Toggle
 
-                if ($PluginUrl != '') {
-                    $Info[] = anchor(t('Visit Site'), $PluginUrl);
-                }
+    if ($addonType === 'locales') {
+        $action = $isEnabled ? 'disable' : 'enable';
+    } else {
+        $action = $filter;
+    }
+    if ($isEnabled) {
+        $label = sprintf(t('Disable %s'), $screenName);
+    } else {
+        $label = sprintf(t('Enable %s'), $screenName);
+    }
 
-                if ($meta = val('meta', $addonInfo)) {
-                    foreach ($meta as $key => $value) {
-                        if (is_numeric($key)) {
-                            $Info[] = $value;
-                        } else {
-                            $Info[] = t($key).': '.$value;
-                        }
-                    }
-                }
+    $url = '/settings/'.$addonType.'/'.$action.'/'.$addonName;
 
-                echo implode('<span class="spacer">•</span>', $Info);
+    $media->setToggle(slugify($addonName), $isEnabled, $url, $label);
 
-                ?>
-                <?php
-                if ($Upgrade) {
-                    ?>
-                    <div class="<?php echo $RowClass; ?>">
-                        <div class="Alert"><a href="<?php
-                            echo combinePaths(array($PluginUrl, 'find', urlencode($ScreenName)), '/');
-                            ?>"><?php
-                                printf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion);
-                                ?></a></div>
-                    </div>
-                    <?php
-                }
-                ?>
-            </div>
-        </div>
-        <div class="media-description"><?php echo Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, val('description', $addonInfo, '')))); ?></div>
-    </div>
-    <div class="media-right media-options">
-        <?php if ($SettingsUrl != '') {
-            echo wrap(anchor(dashboardSymbol('settings'), $SettingsUrl, 'btn btn-icon-border '.$SettingsPopupClass, ['aria-label' => sprintf(t('Settings for %s'), $ScreenName), 'data-reload-page-on-save' => 'false']), 'div', ['class' => 'btn-wrap']);
+    // Meta
+
+    $info = [];
+
+    // Requirements
+
+    $requiredApplications = val('RequiredApplications', $addonInfo, false);
+    $requiredPlugins = val('RequiredPlugins', $addonInfo, false);
+    $requirements = [];
+
+    if (is_array($requiredApplications)) {
+        foreach ($requiredApplications as $requiredApplication => $versionInfo) {
+            $requirements[] = sprintf(t('%1$s Version %2$s'), $requiredApplication, $versionInfo);
         }
-        ?>
-        <div id="<?php echo strtolower($addonName); ?>-toggle">
-            <?php
-            if ($addonType === 'locales') {
-                $action = $isEnabled ? 'disable' : 'enable';
+    }
+    if (is_array($requiredPlugins)) {
+        foreach ($requiredPlugins as $requiredPlugin => $versionInfo) {
+            $requirements[] = sprintf(t('%1$s Version %2$s'), $requiredPlugin, $versionInfo);
+        }
+    }
+
+    if (!empty($requirements)) {
+        $requirementsMeta = sprintf(t('Requires: %s'), implode(', ', $requirements));
+        $info[] = $requirementsMeta;
+    }
+
+    // Authors
+
+    $author = val('Author', $addonInfo, '');
+    $authors = [];
+
+    // Check if singular author is set
+
+    if ($author) {
+        $authorUrl = val('AuthorUrl', $addonInfo, '');
+        if ($authorUrl) {
+            $authors[] = anchor($author, $authorUrl);
+        } else {
+            $authors[] = $author;
+        }
+    }
+
+    // Check for multiple authors
+
+    foreach (val('Authors', $addonInfo, []) as $author) {
+        if (val('Homepage', $author)) {
+            $authors[] = anchor(val('Name', $author), val('Homepage', $author));
+        } else {
+            $authors[] = val('Name', $author);
+        }
+    }
+
+    if ($authors) {
+        $authors = implode(', ', $authors);
+        $info[] = sprintf(t('Created by %s'), $authors);
+    }
+
+    // Version Info
+
+    $version = Gdn_Format::display(val('Version', $addonInfo, ''));
+    $newVersion = val('NewVersion', $addonInfo, '');
+    $upgrade = $newVersion != '' && version_compare($newVersion, $version, '>');
+
+    if ($version != '') {
+        $info[] = sprintf(t('Version %s'), $version);
+    }
+
+    $pluginUrl = val('PluginUrl', $addonInfo, '');
+
+    if ($upgrade && $pluginUrl) {
+        $info[] = anchor(printf(t('%1$s version %2$s is available.'), $screenName, $newVersion),
+            combinePaths(array($pluginUrl, 'find', urlencode($screenName)), '/'));
+    }
+
+    if ($pluginUrl != '') {
+        $info[] = anchor(t('Visit Site'), $pluginUrl);
+    }
+
+    // Extra meta in addon array
+
+    if ($meta = val('Meta', $addonInfo)) {
+        foreach ($meta as $key => $value) {
+            if (is_numeric($key)) {
+                $info[] = $value;
             } else {
-                $action = $filter;
+                $info[] = t($key).': '.$value;
             }
-            if ($isEnabled) {
-                $toggleState = 'on';
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$addonType.'/'.$action.'/'.$addonName, 'Hijack', ['aria-label' =>sprintf(t('Disable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
-            } else {
-                $toggleState = 'off';
-                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/'.$addonType.'/'.$action.'/'.$addonName, 'Hijack', ['aria-label' =>sprintf(t('Enable %s'), $ScreenName)]), 'span', array('class' => "toggle-wrap toggle-wrap-{$toggleState}"));
-            } ?>
-        </div>
-    </div>
-<?php }
+        }
+    }
+
+    $media->setMeta($info);
+    echo $media;
+}
+

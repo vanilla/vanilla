@@ -1,3 +1,11 @@
+/*
+ * This CSS sheet is split into three sections:
+ * 1. admin.css overrides - Fix file paths, show items that may be hidden otherwise, etc.
+ * 2. Template CSS - Global CSS for the styleguide styling
+ * 3. Example CSS - CSS to make examples clear. These classes should have a `ex-` prefix
+ */
+
+/* admin.css overrides */
 
 @font-face {
   font-family: "vanillicon";
@@ -15,9 +23,12 @@
   background-image: url(./resources/images/vanilla-black.svg);
 }
 
-.kss-example-heading {
-  /*border-bottom: 0.0625rem solid #555a62;*/
+.main .content .control-panel {
+  display: block;
 }
+
+
+/* KSS Template CSS */
 
 .kss-example-heading-wrap {
   margin-bottom: .5rem;
@@ -25,7 +36,18 @@
 
 .kss-component-description {
   background-color: #f9fdfe;
+  padding-top: 1.125rem;
   border-top: 0.0625rem solid #e7e8e9;
+  margin-top: -0.0625rem;
+}
+
+.kss-component-description .kss-title {
+  margin-top: 0;
+}
+
+.main-row pre.prettyprint {
+  background-color: #fff;
+  padding: 10px;
 }
 
 .navbar-title {
@@ -46,10 +68,38 @@
 
 .navbar {
   height: 60px !important;
+  justify-content: flex-start;
 }
 
 .navbar-brand {
   display: flex !important;
+}
+
+.drawer-toggle {
+  margin-left: -30px;
+  margin-right: 12px;
+}
+
+.navbar {
+  padding-left: 30px;
+}
+
+hr {
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  border: 0;
+  border-top: 0.0625rem solid #e7e8e9;
+  margin-top: 1.125rem;
+}
+
+/* Example styles */
+
+.main code {
+  border: 1px solid #e7e8e9;
+  background-color: #f6f9fb;
+  border-radius: 2px;
+  padding: 2px 3px;
+  font-size: 0.9em;
 }
 
 .ex-block {

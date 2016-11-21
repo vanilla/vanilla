@@ -21,17 +21,19 @@ class RootController extends Gdn_Controller {
     /**
      * Get the file location of a view.
      *
-     * @param string $View
-     * @param bool $ControllerName
-     * @param bool $ApplicationFolder
-     * @param bool $ThrowError
+     * @param string $view
+     * @param bool $controllerName
+     * @param bool $applicationFolder
+     * @param bool $throwError
+     * @param bool $useController
      * @return bool|mixed
      * @throws Exception
      */
-    public function fetchViewLocation($View = '', $ControllerName = false, $ApplicationFolder = false, $ThrowError = true) {
-        if (!$ControllerName) {
-            $ControllerName = '';
+    public function fetchViewLocation($view = '', $controllerName = false, $applicationFolder = false, $throwError = true, $useController = true) {
+        if (!$controllerName) {
+            $controllerName = '';
         }
-        return parent::fetchViewLocation($View, $ControllerName, $ApplicationFolder, $ThrowError);
+
+        return parent::fetchViewLocation($view, $controllerName, $applicationFolder, $throwError, $useController);
     }
 }

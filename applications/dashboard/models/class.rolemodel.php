@@ -783,4 +783,19 @@ class RoleModel extends Gdn_Model {
 
         return $formattedRoles;
     }
+
+    /**
+     * Enforce integrity between users and roles.
+     */
+    public static function cleanUserRoles() {
+        $px = Gdn::database()->DatabasePrefix;
+        Gdn::sql()->query("
+            delete ur
+            from {$px}UserRole as ur
+                left join {$px}Role as r on r.RoleID = ur.RoleID
+                left join {$px}User as u on u.UserID = ur.UserID
+            where r.RoleID is null
+                or u.UserID is null
+        ");
+    }
 }

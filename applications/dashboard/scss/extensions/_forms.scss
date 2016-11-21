@@ -1,19 +1,4 @@
-
-.Sortable,
-.DataList {
-  padding-left: 0;
-
-  li {
-    list-style: none;
-  }
-}
-
-.Current,
-.current-theme {
-  @extend .active;
-}
-
-// Autocomplete
+// Autocomplete css. We should have jquery.autocomplete.js use our css classes instead of the default.
 
 .ac_input {
   @extend .form-control;

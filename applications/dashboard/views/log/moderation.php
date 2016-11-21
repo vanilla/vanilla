@@ -1,23 +1,21 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.$this->data('Title').'</h2>';
-echo t('To prevent abuse, some tools automatically hide content and list it here until it is manually approved by a moderator.');
-Gdn_Theme::assetEnd();
+
+$desc = t('To prevent abuse, some tools automatically hide content and list it here until it is manually approved by a moderator.');
+helpAsset($this->data('Title'), $desc);
+
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
+echo heading($this->data('Title'));
 ?>
-<div class="header-block">
-    <h1><?php echo $this->data('Title'); ?></h1>
-</div>
-<div class="toolbar">
-    <div class="buttons">
+<div class="toolbar flex-wrap">
+    <div class="toolbar-buttons">
         <?php
         echo anchor(t('Approve'), '#', array('class' => 'RestoreButton btn btn-primary'));
         echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
         ?>
     </div>
-    <div class="search"><?php
+    <div class="search toolbar-main"><?php
         if (c('Vanilla.Categories.Use')) {
             echo '<div class="input-wrap input-wrap-multiple">';
             echo $this->Form->CategoryDropDown('CategoryID', [

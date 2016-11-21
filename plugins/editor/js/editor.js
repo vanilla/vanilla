@@ -979,15 +979,9 @@
                 });
             }
 
-            // This will grab all the files--saved and session--currently
-            // attached to a discussion. This is useful to
-            // prevent the same files being uploaded multiple times to the
-            // same discussion. It's better to constrain check to whole
-            // discussion instead of on a per-comment basis, as it's not
-            // useful to have the same file uploaded by multiple users in
-            // a discussion as a whole.
-            var getAllFileNamesInDiscussion = function() {
-                var filesInDiscussion = $('.editor-file-preview');
+            // List of already uploaded files.
+            var getCurrentEditorFiles = function() {
+                var filesInDiscussion = $(editor).closest('.FormWrapper').find('.editor-file-preview');
                 var fileNames = [];
 
                 filesInDiscussion.each(function(i, el) {
@@ -1072,9 +1066,8 @@
                                     : false;
 
                                 // Check if the file is already a part of the
-                                // discussion--that is, already uploaded to the
-                                // current discussion.
-                                var fileAlreadyExists = ($.inArray(filename, getAllFileNamesInDiscussion()) > -1)
+                                // current post.
+                                var fileAlreadyExists = ($.inArray(filename, getCurrentEditorFiles()) > -1)
                                     ? true
                                     : false;
 
@@ -1108,7 +1101,7 @@
                                     }
 
                                     if (fileAlreadyExists) {
-                                        message += 'is already in this discussion. It will not be uploaded again';
+                                        message += 'is already in this post. It will not be uploaded again';
                                     }
 
                                     gdn.informMessage(message + '.');

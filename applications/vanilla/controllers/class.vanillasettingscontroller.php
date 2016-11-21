@@ -41,6 +41,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(array(
+            'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
             'Garden.Html.AllowedElements',
@@ -68,6 +69,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setData($ConfigurationModel->Data);
         } else {
             // Define some validation rules for the fields being saved
+            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Discussions.PerPage', 'Integer');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comments.PerPage', 'Required');
@@ -156,8 +159,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function index() {
-        $this->View = 'managecategories';
-        $this->ManageCategories();
+        redirect('/vanilla/settings/categories');
     }
 
     /**
@@ -345,6 +347,21 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
+            $upload = new Gdn_Upload();
+            $tmpImage = $upload->validateUpload('PhotoUpload', false);
+            if ($tmpImage) {
+                // Generate the target image name
+                $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+
+                // Save the uploaded image
+                $parts = $upload->saveAs(
+                    $tmpImage,
+                    $imageBaseName
+                );
+                $this->Form->setFormValue('Photo', $parts['SaveName']);
+            }
+
             $CategoryID = $this->Form->save();
             if ($CategoryID) {
                 $Category = CategoryModel::categories($CategoryID);
@@ -383,9 +400,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('PermissionData', $Permissions, true);
         }
 
-        // Render default view
+        $this->setData('Operation', 'Add');
         $this->setData('DisplayAsOptions', $displayAsOptions);
-        $this->render();
+        $this->render('editcategory', 'vanillasettings', 'vanilla');
     }
 
     /**
@@ -516,31 +533,24 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Deleting a category photo.
+     * Delete a category photo.
      *
      * @since 2.1
      * @access public
      *
-     * @param int $CategoryID Unique ID of the category to have its photo deleted.
+     * @param String $CategoryID Unique ID of the category to have its photo deleted.
      */
-    public function deleteCategoryPhoto($CategoryID = false, $TransientKey = '') {
+    public function deleteCategoryPhoto($CategoryID = '') {
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
 
-        $RedirectUrl = 'vanilla/settings/editcategory/'.$CategoryID;
-
-        if (Gdn::session()->validateTransientKey($TransientKey)) {
-            // Do removal, set message, redirect
+        if ($CategoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
+            // Do removal, set message
             $CategoryModel = new CategoryModel();
             $CategoryModel->setField($CategoryID, 'Photo', null);
-            $this->informMessage(t('Category photo has been deleted.'));
+            $this->informMessage(t('Category photo was successfully deleted.'));
         }
-        if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($RedirectUrl);
-        } else {
-            $this->RedirectUrl = url($RedirectUrl);
-            $this->render();
-        }
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -658,7 +668,8 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/categories');
+                    $destination = $this->categoryPageByParent($parentCategory);
+                    redirect($destination);
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -680,6 +691,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Render default view
+        $this->setData('Operation', 'Edit');
         $this->setData('DisplayAsOptions', $displayAsOptions);
         $this->render();
     }
@@ -711,17 +723,17 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Category', $categoryRow);
             $parentID = $categoryRow['CategoryID'];
             $parentDisplayAs = val('DisplayAs', $categoryRow);
-
-            if (in_array($parentDisplayAs, ['Flat'])) {
-                $allowSorting = false;
-                $usePagination = true;
-            }
         } else {
             $parentID = -1;
-            $parentDisplayAs = false;
+            $parentDisplayAs = CategoryModel::getRootDisplayAs();
         }
 
-        if ($parentID > 0 && $parentDisplayAs === 'Flat') {
+        if (in_array($parentDisplayAs, ['Flat'])) {
+            $allowSorting = false;
+            $usePagination = true;
+        }
+
+        if ($parentDisplayAs === 'Flat') {
             $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
@@ -748,6 +760,38 @@ class VanillaSettingsController extends Gdn_Controller {
         require_once $this->fetchViewLocation('category-settings-functions');
         $this->addAsset('Content', $this->fetchView('symbols'));
         $this->render();
+    }
+
+    /**
+     * Move through the category's parents to determine the proper management page URL.
+     *
+     * @param array|object $category
+     * @return string
+     */
+    private function categoryPageByParent($category) {
+        $default = 'vanilla/settings/categories';
+        $parentID = val('ParentCategoryID', $category);
+
+        if ($parentID === -1) {
+            return $default;
+        }
+
+        $parent = CategoryModel::categories($parentID);
+        if (!$parent) {
+            return $default;
+        }
+
+        switch (val('DisplayAs', $parent)) {
+            case 'Categories':
+            case 'Flat':
+                $urlCode = val('UrlCode', $parent);
+                return "vanilla/settings/categories?parent={$urlCode}";
+            case 'Discussions':
+            case 'Heading':
+                return $this->categoryPageByParent($parent);
+            default:
+                return $default;
+        }
     }
 
     /**

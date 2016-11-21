@@ -37,11 +37,15 @@ echo $this->Form->open();
             </li>
             <?php if ($this->data('NoHtaccess')): ?>
                 <li>
-                    <div
-                        class="Box"><?php echo t('You are missing Vanilla\'s <b>.htaccess</b> file. Sometimes this file isn\'t copied if you are using ftp to upload your files because this file is hidden. Make sure you\'ve copied the <b>.htaccess</b> file before continuing.'); ?></div>
-                    <?php
-                    echo $this->Form->CheckBox('SkipHtaccess', t('Install Vanilla without a .htaccess file.'));
-                    ?>
+                    <div class="Box"><?php echo t('You are missing an <b>.htaccess</b> file.'); ?></div>
+                    <?php if (file_exists(PATH_ROOT.'/.htaccess.dist')): ?>
+                        <?php echo $this->Form->radioList('HtaccessAction', [
+                            'dist' => 'Use Vanilla\'s .htaccess.',
+                            'skip' => 'I don\'t need an .htaccess file.'
+                        ], ['Default' => 'dist']); ?>
+                    <?php else: ?>
+                    <?php echo $this->Form->checkBox('HtaccessAction', t('I don\'t need an .htaccess file.'),['value' => 'skip']); ?>
+                    <?php endif; ?>
                 </li>
             <?php endif; ?>
             <li class="Warning">

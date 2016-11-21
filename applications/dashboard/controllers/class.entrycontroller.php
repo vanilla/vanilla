@@ -1145,8 +1145,8 @@ EOT;
                         $CookiePayload = array(
                             'Sync' => 'Failed'
                         );
-                        $SerializedCookiePayload = Gdn_Format::serialize($CookiePayload);
-                        $Authenticator->remember($UserInfo['ConsumerKey'], $SerializedCookiePayload);
+                        $encodedCookiePayload = dbencode($CookiePayload);
+                        $Authenticator->remember($UserInfo['ConsumerKey'], $encodedCookiePayload);
 
                         // This resets vanilla's internal "where am I" to the homepage. Needed.
                         Gdn::request()->withRoute('DefaultController');

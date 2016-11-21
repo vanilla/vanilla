@@ -398,17 +398,19 @@ class CategoryCollection {
      * - maxdepth: The maximum depth of the tree.
      * - collapsed: Stop when looking at a category of a certain type.
      * - permission: The permission to use when looking at the tree.
+     * @return array
      */
     public function getTree($parentID = -1, $options = []) {
         $tree = [];
         $categories = [];
         $parentID = $parentID ?: -1;
-        $options = array_change_key_case($options) + [
-                'maxdepth' => 3,
-                'collapsecategories' => false,
-                'permission' => 'PermsDiscussionsView'
-            ];
-
+        $defaultOptions = [
+            'maxdepth' => 3,
+            'collapsecategories' => false,
+            'permission' => 'PermsDiscussionsView'
+        ];
+        $options = array_change_key_case($options) ?: [];
+        $options = $options + $defaultOptions ;
 
         $currentDepth = 1;
         $parents = [$parentID];
@@ -702,15 +704,7 @@ class CategoryCollection {
 //            $category['PhotoUrl'] = '';
 //        }
 
-        if ($category['DisplayAs'] == 'Default') {
-            if ($category['Depth'] <= $this->config('Vanilla.Categories.NavDepth', 0)) {
-                $category['DisplayAs'] = 'Categories';
-            } elseif ($category['Depth'] == ($this->config('Vanilla.Categories.NavDepth', 0) + 1) && $this->config('Vanilla.Categories.DoHeadings')) {
-                $category['DisplayAs'] = 'Heading';
-            } else {
-                $category['DisplayAs'] = 'Discussions';
-            }
-        }
+        CategoryModel::calculateDisplayAs($category);
 
         if (!val('CssClass', $category)) {
             $category['CssClass'] = 'Category-'.$category['UrlCode'];

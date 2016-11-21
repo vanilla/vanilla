@@ -2,16 +2,13 @@
     <h1><?php echo $this->data('Title'); ?></h1>
 <?php
 
-Gdn_Theme::assetBegin('Help');
-echo '<h2>'.$this->data('Title').'</h2>';
-echo '<p>'.t('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.').'</p>';
-Gdn_Theme::assetEnd();
+helpAsset($this->data('Title'), t('Every edit or deletion is recorded here. Use &lsquo;Restore&rsquo; to undo any change.'));
 
 echo '<noscript><div class="Errors"><ul><li>', t('This page requires Javascript.'), '</li></ul></div></noscript>';
 echo $this->Form->open();
 ?>
-    <div class="toolbar">
-        <div class="buttons">
+    <div class="toolbar flex-wrap">
+        <div class="toolbar-buttons">
         <?php
         echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-primary'));
         echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));

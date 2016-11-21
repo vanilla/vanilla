@@ -37,7 +37,6 @@
   border-left: $caret-width solid transparent;
 }
 
-
 @mixin button-variant(
   $color,
   $background,
@@ -251,10 +250,12 @@
 
   .toggle-well-on {
     background-color: $brand-primary;
+    border: 0;
   }
 
   .toggle-slider-on {
     left: $toggle-width - $toggle-slider-width - $toggle-slider-padding;
+    border: 0;
   }
 
   .toggle-slider-active {

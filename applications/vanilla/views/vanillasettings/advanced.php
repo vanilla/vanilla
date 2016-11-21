@@ -1,20 +1,34 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php Gdn_Theme::assetBegin('Help'); ?>
-    <div class="Help Aside">
-        <?php
-        echo wrap(t('Need More Help?'), 'h2');
-        echo '<ul>';
-        echo wrap(Anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'), 'li');
-        echo '</ul>';
-        ?>
-    </div>
-<?php Gdn_Theme::assetEnd(); ?>
-    <h1><?php echo t('Advanced'); ?></h1>
+<?php if (!defined('APPLICATION')) exit();
+helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'));
+?>
+<h1><?php echo t('Advanced'); ?></h1>
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
 ?>
     <ul>
+        <li class="form-group">
+            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
+        </li>
+        <li class="form-group">
+            <?php
+            $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];
+            $Fields = ['TextField' => 'Code', 'ValueField' => 'Code'];
+            ?>
+            <div class="label-wrap">
+            <?php
+            echo $this->Form->label('Maximum Category Display Depth', 'Vanilla.Categories.MaxDisplayDepth');
+            echo wrap(
+                t('CategoryMaxDisplayDepth.Notes', 'Nested categories deeper than this depth will be placed in a comma-delimited list.'),
+                'div',
+                ['class' => 'info']
+            );
+            ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
+            </div>
+        </li>
         <li class="form-group">
             <?php
             $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
@@ -58,9 +72,6 @@ echo $this->Form->errors();
             </div>
         </li>
         <li class="form-group">
-            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
-        </li>
-        <li class="form-group">
             <div class="label-wrap">
             <?php echo $this->Form->label('Max Comment Length', 'Vanilla.Comment.MaxLength'); ?>
             <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
@@ -98,6 +109,4 @@ echo $this->Form->errors();
             </div>
         </li>
     </ul>
-<div class="form-footer js-modal-footer">
 <?php echo $this->Form->close('Save'); ?>
-</div>

@@ -355,6 +355,10 @@ class Gdn_Locale extends Gdn_Pluggable {
             }
         }
 
+        $this->EventArguments['Code'] = $Code;
+        $this->EventArguments['Default'] = $Default;
+        $this->fireEvent('BeforeTranslate');
+
         return $Translation;
     }
 

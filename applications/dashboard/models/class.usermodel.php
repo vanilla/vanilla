@@ -1777,14 +1777,18 @@ class UserModel extends Gdn_Model {
         }
 
         // Grab the user's total points.
-        $Points = Gdn::sql()->getWhere('UserPoints', ['UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total', 'CategoryID' => 0])->value('Points');
+        $totalPoints = Gdn::sql()->getWhere('UserPoints', ['UserID' => $UserID, 'SlotType' => 'a', 'Source' => 'Total', 'CategoryID' => 0])->value('Points');
 
-        Gdn::userModel()->setField($UserID, 'Points', $Points);
+        Gdn::userModel()->setField($UserID, 'Points', $totalPoints);
 
         // Fire a give points event.
         Gdn::userModel()->EventArguments['UserID'] = $UserID;
         Gdn::userModel()->EventArguments['CategoryID'] = $CategoryID;
-        Gdn::userModel()->EventArguments['Points'] = $Points;
+        Gdn::userModel()->EventArguments['TotalPoints'] = $totalPoints;
+        Gdn::userModel()->EventArguments['GivenPoints'] = $Points;
+        Gdn::userModel()->EventArguments['Source'] = $Source;
+        Gdn::userModel()->EventArguments['Timestamp'] = $Timestamp;
+        Gdn::userModel()->EventArguments['Points'] = $totalPoints; // Deprecated over total points
         Gdn::userModel()->fireEvent('GivePoints');
     }
 

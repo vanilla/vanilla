@@ -58,6 +58,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
     /** @var string The default top level group for new configs. */
     protected $defaultGroup = 'Configuration';
 
+    /** @var null @var The sort flag to use with ksort. */
+    private $sortFlag = null;
+
     /**
      * Initialize a new instance of the {@link Gdn_Configuration} class.
      *
@@ -74,6 +77,25 @@ class Gdn_Configuration extends Gdn_Pluggable {
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
         }
+    }
+
+    /**
+     * Set the sort flag to be used with ksort.
+     *
+     * @link http://php.net/manual/en/function.ksort.php
+     * @param int $sortFlag As defined in php standard definitions
+     * @return Gdn_Configuration $this
+     */
+    public function setSortFlag($sortFlag) {
+        $this->sortFlag = $sortFlag;
+        return $this;
+    }
+
+    /**
+     * @return null|int The sort flag to be used with ksort.
+     */
+    public function getSortFlag() {
+        return $this->sortFlag;
     }
 
     /**
@@ -710,7 +732,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         $Data = &$this->Data;
-        ksort($Data);
+        ksort($Data, $this->getSortFlag());
 
         // Check for the case when the configuration is the group.
         if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
@@ -1363,7 +1385,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
                 $Group = $this->Group;
                 $Data = &$this->Settings;
-                ksort($Data);
+                ksort($Data, $this->Configuration->getSortFlag());
 
                 // Check for the case when the configuration is the group.
                 if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {

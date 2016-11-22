@@ -1788,7 +1788,7 @@ class UserModel extends Gdn_Model {
         Gdn::userModel()->EventArguments['GivenPoints'] = $Points;
         Gdn::userModel()->EventArguments['Source'] = $Source;
         Gdn::userModel()->EventArguments['Timestamp'] = $Timestamp;
-        Gdn::userModel()->EventArguments['Points'] = $totalPoints; // Deprecated over total points
+        Gdn::userModel()->EventArguments['Points'] = $totalPoints; // Deprecated in favor of TotalPoints
         Gdn::userModel()->fireEvent('GivePoints');
     }
 

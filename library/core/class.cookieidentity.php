@@ -348,6 +348,10 @@ class Gdn_CookieIdentity {
      * @param $CookieName
      */
     protected function _deleteCookie($CookieName) {
+        if (!array_key_exists($CookieName, $_COOKIE)) {
+            return;
+        }
+
         unset($_COOKIE[$CookieName]);
         self::deleteCookie($CookieName, $this->CookiePath, $this->CookieDomain);
     }

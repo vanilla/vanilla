@@ -274,8 +274,10 @@ class SettingsController extends DashboardController {
         } else if ($this->Form->save() !== false) {
             $upload = new Gdn_UploadImage();
             $newAvatar = false;
+            $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
                 // New upload
+                $newUpload = true;
                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
                 $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions);
             } else if ($avatar && $crop && $crop->isCropped()) {
@@ -303,9 +305,14 @@ class SettingsController extends DashboardController {
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
+
+                    // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
+                    if (!$newUpload) {
+                        redirect('/dashboard/settings/avatars');
+                    }
                 }
+                $this->informMessage(t("Your settings have been saved."));
             }
-            $this->informMessage(t("Your settings have been saved."));
         }
         $this->render();
     }
@@ -918,9 +925,11 @@ class SettingsController extends DashboardController {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
                 } else {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOn', 'Trigger');
                 }
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }

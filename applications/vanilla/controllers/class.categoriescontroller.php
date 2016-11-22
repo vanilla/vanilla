@@ -196,7 +196,7 @@ class CategoriesController extends VanillaController {
                     break;
                 default:
                     $this->View = 'all';
-                    $this->all();
+                    $this->all('', CategoryModel::getRootDisplayAs());
                     break;
             }
             return;
@@ -221,11 +221,8 @@ class CategoriesController extends VanillaController {
                 case 'Flat':
                 case 'Heading':
                 case 'Categories':
-                    if (val('Depth', $Category) > CategoryModel::instance()->getNavDepth()) {
-                        // Headings don't make sense if we've cascaded down one level.
-                        saveToConfig('Vanilla.Categories.DoHeadings', false, false);
-                    }
-
+                    $stopHeadings = val('Depth', $Category) > CategoryModel::instance()->getNavDepth();
+                    CategoryModel::instance()->setStopHeadingsCalculation($stopHeadings);
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);
@@ -401,6 +398,7 @@ class CategoriesController extends VanillaController {
      * Show all (nested) categories.
      *
      * @param string $Category The url code of the parent category.
+     * @param string $displayAs
      * @since 2.0.17
      * @access public
      */
@@ -444,20 +442,12 @@ class CategoriesController extends VanillaController {
             };
         }
 
-        // Compensate for categories displaying as headings by increasing the display depth by one.
-        $maxDisplayDepth = CategoryModel::instance()->getMaxDisplayDepth() ?: 10;
-        if (c('Vanilla.Categories.DoHeadings')) {
-            $maxDisplayDepth++;
-        }
-
-        $categoryTree = $this->CategoryModel
-            ->setJoinUserCategory(true)
-            ->getChildTree(
-                $Category ?: null,
-                ['depth' => $this->CategoryModel->getMaxDisplayDepth() ?: 10]
-            );
-        $this->CategoryModel->joinRecent($categoryTree);
-        $this->setData('CategoryTree', $this->getCategoryTree($Category, null, true, true));
+        $this->setData('CategoryTree', $this->getCategoryTree(
+            $Category ?: -1,
+            $Category ? null : CategoryModel::getRootDisplayAs(),
+            true,
+            true
+        ));
 
         // Add modules
         $this->addModule('NewDiscussionModule');

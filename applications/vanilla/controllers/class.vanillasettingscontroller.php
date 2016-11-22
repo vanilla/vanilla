@@ -159,8 +159,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function index() {
-        $this->View = 'managecategories';
-        $this->ManageCategories();
+        redirect('/vanilla/settings/categories');
     }
 
     /**
@@ -669,7 +668,8 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/categories');
+                    $destination = $this->categoryPageByParent($parentCategory);
+                    redirect($destination);
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -723,17 +723,17 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Category', $categoryRow);
             $parentID = $categoryRow['CategoryID'];
             $parentDisplayAs = val('DisplayAs', $categoryRow);
-
-            if (in_array($parentDisplayAs, ['Flat'])) {
-                $allowSorting = false;
-                $usePagination = true;
-            }
         } else {
             $parentID = -1;
-            $parentDisplayAs = false;
+            $parentDisplayAs = CategoryModel::getRootDisplayAs();
         }
 
-        if ($parentID > 0 && $parentDisplayAs === 'Flat') {
+        if (in_array($parentDisplayAs, ['Flat'])) {
+            $allowSorting = false;
+            $usePagination = true;
+        }
+
+        if ($parentDisplayAs === 'Flat') {
             $categories = $this->CategoryModel->getTreeAsFlat($parentID, $offset, $limit);
         } else {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
@@ -760,6 +760,38 @@ class VanillaSettingsController extends Gdn_Controller {
         require_once $this->fetchViewLocation('category-settings-functions');
         $this->addAsset('Content', $this->fetchView('symbols'));
         $this->render();
+    }
+
+    /**
+     * Move through the category's parents to determine the proper management page URL.
+     *
+     * @param array|object $category
+     * @return string
+     */
+    private function categoryPageByParent($category) {
+        $default = 'vanilla/settings/categories';
+        $parentID = val('ParentCategoryID', $category);
+
+        if ($parentID === -1) {
+            return $default;
+        }
+
+        $parent = CategoryModel::categories($parentID);
+        if (!$parent) {
+            return $default;
+        }
+
+        switch (val('DisplayAs', $parent)) {
+            case 'Categories':
+            case 'Flat':
+                $urlCode = val('UrlCode', $parent);
+                return "vanilla/settings/categories?parent={$urlCode}";
+            case 'Discussions':
+            case 'Heading':
+                return $this->categoryPageByParent($parent);
+            default:
+                return $default;
+        }
     }
 
     /**

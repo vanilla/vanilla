@@ -704,15 +704,7 @@ class CategoryCollection {
 //            $category['PhotoUrl'] = '';
 //        }
 
-        if ($category['DisplayAs'] == 'Default') {
-            if ($category['Depth'] <= $this->config('Vanilla.Categories.NavDepth', 0)) {
-                $category['DisplayAs'] = 'Categories';
-            } elseif ($category['Depth'] == ($this->config('Vanilla.Categories.NavDepth', 0) + 1) && $this->config('Vanilla.Categories.DoHeadings')) {
-                $category['DisplayAs'] = 'Heading';
-            } else {
-                $category['DisplayAs'] = 'Discussions';
-            }
-        }
+        CategoryModel::calculateDisplayAs($category);
 
         if (!val('CssClass', $category)) {
             $category['CssClass'] = 'Category-'.$category['UrlCode'];

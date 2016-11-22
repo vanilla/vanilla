@@ -38,21 +38,28 @@ if (!function_exists('alternate')) {
 
 if (!function_exists('dashboardSymbol')) {
     /**
-     * Render SVG icons. Icon must exist in applications/dashboard/views/symbols.php.
+     * Render SVG icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
      *
-     * @param string $name
-     * @param string $alt
-     * @param string $class
-     * @return string
+     * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
+     * @param string $class If set, overrides any 'class' attribute in the $attr param.
+     * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
+     * @return string An HTML-formatted string to render svg icons.
      */
-    function dashboardSymbol($name, $alt = '', $class = '') {
-        if (!empty($alt)) {
-            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+    function dashboardSymbol($name, $class = '', array $attr = []) {
+        if (empty($attr['alt'])) {
+            $attr['alt'] = $name;
         }
-        $r = <<<EOT
-    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
-EOT;
-        return $r;
+
+        if (!empty($class)) {
+            $attr['class'] = $class.' ';
+        } else {
+            $attr['class'] = $attr['class'] ? $attr['class'].' ' : '';
+        }
+
+        $baseCssClass = 'icon icon-svg-'.$name;
+        $attr['class'] .= $baseCssClass;
+
+        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
     }
 }
 
@@ -151,7 +158,7 @@ if (!function_exists('subheading')) {
      */
     function subheading($title, $description = '') {
         if ($description === '') {
-            return '<h2 class="subheading-border">'.$title.'</h2>';
+            return '<h2 class="subheading">'.$title.'</h2>';
         } else {
             return '<header class="subheading-block">
                 <h2 class="subheading-title">'.$title.'</h2>

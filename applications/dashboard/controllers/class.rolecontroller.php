@@ -231,13 +231,9 @@ class RoleController extends DashboardController {
         // Grab the total users for each role.
         if (is_array($this->data('Roles'))) {
             $pastThreshold = Gdn::userModel()->pastUserMegaThreshold();
-            $thresholdTypeExceptions = [
-                'administrator',
-                'moderator',
-                'applicant',
-                'unconfirmed',
-                'guest'
-            ];
+            $thresholdTypeExceptions = RoleModel::getDefaultTypes();
+            unset($thresholdTypeExceptions[RoleModel::TYPE_MEMBER]);
+
             $roles = $this->data('Roles');
             foreach ($roles as &$role) {
                 if ($pastThreshold && !in_array($role['Type'], $thresholdTypeExceptions)) {

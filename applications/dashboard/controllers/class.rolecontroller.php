@@ -241,7 +241,7 @@ class RoleController extends DashboardController {
             $roles = $this->data('Roles');
             foreach ($roles as &$role) {
                 if ($pastThreshold && !in_array($role['Type'], $thresholdTypeExceptions)) {
-                    $countUsers = '-';
+                    $countUsers = t('View');
                 } else {
                     $countUsers = $this->RoleModel->getUserCount($role['RoleID']);
                 }

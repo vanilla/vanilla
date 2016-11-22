@@ -919,6 +919,20 @@ var DashboardModal = (function() {
         }
     }
 
+    /**
+     * Initializes the check-all jquery plugin. Adds 'select all' functionality to checkboxes.
+     * The trigger must have a `js-check-all` css class applied to it. It manages input checkboxes
+     * with the `js-check-me` css class applied.
+     *
+     * @param element The scope of the function.
+     */
+    function checkallInit(element) {
+        $('.js-check-all', element).checkall({
+            target: '.js-check-me',
+            icheck: true
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -933,6 +947,7 @@ var DashboardModal = (function() {
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
+        checkallInit(e.target); // handles 'select all' type checkboxes
     });
 
     /**

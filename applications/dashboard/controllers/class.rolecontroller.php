@@ -228,6 +228,25 @@ class RoleController extends DashboardController {
             $this->setData('Roles', [$Role]);
         }
 
+        // Grab the total users for each role.
+        if (is_array($this->data('Roles'))) {
+            $pastThreshold = Gdn::userModel()->pastUserMegaThreshold();
+            $thresholdTypeExceptions = RoleModel::getDefaultTypes();
+            unset($thresholdTypeExceptions[RoleModel::TYPE_MEMBER]);
+
+            $roles = $this->data('Roles');
+            foreach ($roles as &$role) {
+                if ($pastThreshold && !in_array($role['Type'], $thresholdTypeExceptions)) {
+                    $countUsers = t('View');
+                } else {
+                    $countUsers = $this->RoleModel->getUserCount($role['RoleID']);
+                }
+
+                $role['CountUsers'] = $countUsers;
+            }
+            $this->setData('Roles', $roles);
+        }
+
         $this->render();
     }
 

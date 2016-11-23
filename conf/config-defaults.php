@@ -105,7 +105,7 @@ $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 $Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
 $Configuration['Garden']['Embed']['SortComments']               = 'desc';
 $Configuration['Garden']['Embed']['PageToForum']                = TRUE;
-$Configuration['Garden']['BannedPhoto']                         = 'http://images.v-cdn.net/banned_large.png';
+$Configuration['Garden']['BannedPhoto']                         = 'https://images.v-cdn.net/banned_large.png';
 
 
 // Formatting

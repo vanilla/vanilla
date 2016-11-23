@@ -17,7 +17,7 @@ if ($Photo) {
 }
 
 if ($User->Banned) {
-    $BannedPhoto = c('Garden.BannedPhoto', 'http://images.v-cdn.net/banned_large.png');
+    $BannedPhoto = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
     if ($BannedPhoto)
         $Photo = Gdn_Upload::url($BannedPhoto);
     }

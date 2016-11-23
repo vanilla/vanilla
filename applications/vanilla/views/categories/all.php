@@ -10,7 +10,6 @@ if ($Description = $this->Description()) {
 $this->fireEvent('AfterPageTitle');
 
 $CatList = '';
-$DoHeadings = c('Vanilla.Categories.DoHeadings');
 $MaxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth') + $this->data('Category.Depth', 0);
 $ChildCategories = '';
 
@@ -18,7 +17,7 @@ $CategoryTree = $this->data('CategoryTree');
 $Categories = CategoryModel::flattenTree($CategoryTree);
 $this->EventArguments['NumRows'] = $Categories;
 
-echo '<ul class="DataList CategoryList'.($DoHeadings ? ' CategoryListWithHeadings' : '').'">';
+echo '<ul class="DataList CategoryList">';
 foreach ($Categories as $CategoryRow) {
     $Category = (object)$CategoryRow;
 

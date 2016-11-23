@@ -14,11 +14,10 @@
     $this->fireEvent('AfterPageTitle');
 
     $categories = $this->data('CategoryTree');
-    $doHeadings = c('Vanilla.Categories.DoHeadings');
     $this->EventArguments['NumRows'] = count($categories);
 ?>
 
-<ul class="DataList CategoryList<?php echo $doHeadings ? ' CategoryListWithHeadings' : ''; ?>">
+<ul class="DataList CategoryList">
 <?php
     foreach ($categories as $category) {
         $this->EventArguments['Category'] = &$category;

@@ -266,8 +266,7 @@
      */
     function checkallInit(element) {
         $('.js-check-all', element).checkall({
-            target: '.js-check-me',
-            icheck: true
+            target: '.js-check-me'
         });
     }
 

@@ -1154,7 +1154,11 @@ class Gdn_Form extends Gdn_Pluggable {
 //               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
                     $CheckCount++;
 
-                    $Result .= wrap($this->checkBox($FieldName.'[]', $RowName.'.'.$ColumnName, $Attributes), 'div', ['class' => 'checkbox-painted-wrapper']);
+                    $Result .= wrap(
+                        $this->checkBox($FieldName.'[]', $RowName.'.'.$ColumnName, $Attributes),
+                        'div',
+                        ['class' => 'checkbox-painted-wrapper']
+                    );
                 } else {
                     $Result .= ' ';
                 }

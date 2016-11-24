@@ -84,7 +84,8 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
-* Go to `yourforum.com/utility/update` to force any updates needed.
+* Delete all files in `/cache`.
+* Go to `yourforum.com/utility/update` to run any database updates needed.
 * If it fails, try it a second times by refreshing the page.
 
 To upgrade from **2.1 or earlier**:

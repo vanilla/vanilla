@@ -94,7 +94,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Sender->RegistrationFields[$Name] = $Field;
             }
         }
-        include_once $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
+        include $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
     }
 
     /**
@@ -108,7 +108,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Sender->RegistrationFields[$Name] = $Field;
             }
         }
-        include_once $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
+        include $Sender->fetchViewLocation('registrationfields', '', 'plugins/ProfileExtender');
     }
 
     /**

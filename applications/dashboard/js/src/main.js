@@ -201,7 +201,20 @@
     }
 
     function icheckInit(element) {
-        var selector = 'input:not(.label-selector-input):not(.toggle-input):not(.avatar-delete-input):not(.jcrop-keymgr)';
+        var ignores = [
+            '.label-selector-input',
+            '.toggle-input',
+            '.avatar-delete-input',
+            '.jcrop-keymgr',
+            '.checkbox-painted-wrapper input',
+            '.radio-painted-wrapper input'
+        ];
+
+        var selector = 'input';
+
+        ignores.forEach(function(element) {
+            selector += ':not(' + element + ')';
+        });
 
         $(selector, element).iCheck({
             aria: true

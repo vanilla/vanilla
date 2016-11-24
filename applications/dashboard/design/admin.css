@@ -25,7 +25,7 @@
   transition-property: height;
 }
 
-.icon-vanillicon:before, .icheckbox.checked {
+.icon-vanillicon:before, .icheckbox.checked, .checkbox-painted-wrapper input:checked + label {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -7026,12 +7026,22 @@ select + select {
   margin-top: 0;
 }
 
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  position: relative;
+  margin-top: initial;
+  margin-left: initial;
+}
+
 .icheck-label {
   padding-left: 0;
 }
 
 .iradio,
 .icheckbox {
+  background-color: #fff;
   display: inline-block;
   width: 1.125rem;
   height: 1.125rem;
@@ -7107,6 +7117,94 @@ select + select {
 
 label[id^=iCheck] {
   padding-left: 0;
+}
+
+.checkbox-painted-wrapper,
+.radio-painted-wrapper {
+  position: relative;
+}
+
+.checkbox-painted-wrapper .checkbox,
+.checkbox-painted-wrapper .radio,
+.radio-painted-wrapper .checkbox,
+.radio-painted-wrapper .radio {
+  width: 2.25rem;
+  margin: 0;
+}
+
+.checkbox-painted-wrapper label,
+.radio-painted-wrapper label {
+  padding-left: 0;
+  font: "0/0" a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+  background-color: #fff;
+  display: inline-block;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-right: 0.28125rem;
+  vertical-align: middle;
+  border: 0.0625rem solid #e7e8e9;
+  margin-right: 0;
+}
+
+.checkbox-painted-wrapper label:hover, .checkbox-painted-wrapper label:focus,
+.radio-painted-wrapper label:hover,
+.radio-painted-wrapper label:focus {
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.checkbox-painted-wrapper label:hover::before, .checkbox-painted-wrapper label:focus::before,
+.radio-painted-wrapper label:hover::before,
+.radio-painted-wrapper label:focus::before {
+  display: block;
+  color: #fff;
+}
+
+.checkbox-painted-wrapper input[type="radio"],
+.checkbox-painted-wrapper input[type="checkbox"],
+.radio-painted-wrapper input[type="radio"],
+.radio-painted-wrapper input[type="checkbox"] {
+  margin-left: -9999px;
+  position: absolute;
+}
+
+.checkbox-painted-wrapper input:checked + label {
+  font-size: 0.75rem;
+  text-align: center;
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.checkbox-painted-wrapper input:checked + label::before {
+  display: block;
+  margin-top: 0.125rem;
+  color: #fff;
+  content: "\f171";
+}
+
+.radio-painted-wrapper {
+  position: relative;
+}
+
+.radio-painted-wrapper label {
+  border-radius: 0.5625rem;
+}
+
+.radio-painted-wrapper input:checked + label::before {
+  position: absolute;
+  display: block;
+  top: -0.0625rem;
+  left: -0.0625rem;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 0.25rem solid #0291db;
+  border-radius: 0.5625rem;
+  background-color: #fff;
+  content: '';
 }
 
 .media {
@@ -8479,6 +8577,8 @@ button.close {
 
 .table-checkbox-grid .checkbox {
   margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .table-checkbox-grid th {

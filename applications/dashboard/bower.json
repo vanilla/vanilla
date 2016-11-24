@@ -11,6 +11,7 @@
     "tether-drop": "^1.4.2",
     "clipboard": "^1.5.12",
     "jquery-icheck": "^1.0.1",
-    "bootstrap-daterangepicker": "^2.1.24"
+    "bootstrap-daterangepicker": "^2.1.24",
+    "jquery-checkall": "^0.0.3"
   }
 }

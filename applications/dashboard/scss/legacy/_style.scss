@@ -1992,6 +1992,11 @@ overflow: hidden;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+.PopList .Item[rel] {
+  cursor: pointer;
+}
+
+
 .PopList .ItemContent {
   margin: 0 0 0 48px;
   line-height: 1.4;

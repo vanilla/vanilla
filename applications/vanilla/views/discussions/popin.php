@@ -9,7 +9,7 @@
         <?php
         foreach ($this->data('Discussions') as $Row):
             ?>
-            <li class="Item">
+            <li class="Item" rel="<?php echo url($Row->Url); ?>">
                 <div class="Author Photo"><?php echo userPhoto($Row, array('Px' => 'First')); ?></div>
                 <div class="ItemContent">
                     <b class="Subject"><?php echo anchor($Row->Name, $Row->Url.'#latest'); ?></b>

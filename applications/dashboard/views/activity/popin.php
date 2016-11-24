@@ -8,7 +8,10 @@
             echo wrap(t('Notifications'), 'strong');
             ?></li>
         <?php foreach ($this->data('Activities') as $Activity): ?>
-        <li class="Item">
+        <?php
+        $rel = !empty($Activity['Route']) ? ' rel="'.url($Activity['Route']).'"' : null;
+        ?>
+        <li class="Item"<?php echo $rel?>>
             <?php
             if ($Activity['Photo']) {
                 $PhotoAnchor = anchor(

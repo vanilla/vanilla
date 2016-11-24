@@ -1112,24 +1112,13 @@ label[id^=iCheck] {
 }
 
 .radio-painted-wrapper {
-  position: relative;
-
   label {
     border-radius: $spacer / 2;
   }
 
   input:checked + label {
-    &::before {
-      position: absolute;
-      display: block;
-      top: -$border-width;
-      left: -$border-width;
-      width: $spacer;
-      height: $spacer;
-      border: $border-width * 4 solid $brand-primary;
-      border-radius: $spacer / 2;
-      background-color: $white;
-      content: '';
-    }
+    border: $border-width * 4 solid $brand-primary;
+    border-radius: $spacer / 2;
+    background-color: $white;
   }
 }

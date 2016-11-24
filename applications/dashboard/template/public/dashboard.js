@@ -8911,7 +8911,20 @@ var DashboardModal = (function() {
     }
 
     function icheckInit(element) {
-        var selector = 'input:not(.label-selector-input):not(.toggle-input):not(.avatar-delete-input):not(.jcrop-keymgr)';
+        var ignores = [
+            '.label-selector-input',
+            '.toggle-input',
+            '.avatar-delete-input',
+            '.jcrop-keymgr',
+            '.checkbox-painted-wrapper input',
+            '.radio-painted-wrapper input'
+        ];
+
+        var selector = 'input';
+
+        ignores.forEach(function(element) {
+            selector += ':not(' + element + ')';
+        });
 
         $(selector, element).iCheck({
             aria: true
@@ -8960,6 +8973,13 @@ var DashboardModal = (function() {
         $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
+    function foggyInit(element) {
+        var $foggy = $('.js-foggy', element);
+        if ($foggy.data('isFoggy')) {
+            $foggy.trigger('foggyOn');
+        }
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -8973,6 +8993,7 @@ var DashboardModal = (function() {
         icheckInit(e.target); // checkboxes and radios
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
+        foggyInit(e.target); // makes settings blurred out
     });
 
     /**
@@ -9130,6 +9151,36 @@ var DashboardModal = (function() {
         if (typeof(DashboardModal.activeModal) === 'object') {
             $('#' + DashboardModal.activeModal.id).modal('hide');
         }
+    });
+
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop("disabled")) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop("disabled", true);
+            }
+        });
+    });
+
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop("disabled", false);
+            }
+        });
     });
 
 })(jQuery);

@@ -86,6 +86,7 @@
                                 <li><a href="#2-3" class="nav-link">Float Helpers</a></li>
                                 <li><a href="#2-5" class="nav-link">Hidden Helper</a></li>
                                 <li><a href="#2-6" class="nav-link">Progress Spinner</a></li>
+                                <li><a href="#2-7" class="nav-link">Foggy</a></li>
                         </ul>
                     </div>
                 </div>
@@ -338,6 +339,87 @@ It also add a small margin to its items. Most of the flex elements in the dashbo
                                                 </div> <!-- end kss-component-description -->
                                                 <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
                                                 <div class="kss-example padded-bottom"><div class="progress"></div></div>
+                                    </div>
+                                </section>
+                                <section class="kss-depth-2">
+                                    <div class="kss-component">
+                                        <div class="kss-component-description row full-border">
+                                            <h2 class="kss-title" id="2-7">
+                                            <span class="kss-ref badge pull-right">2-7</span> Foggy
+                                            </h2>
+                                                <div class="kss-box padded"><p>Makes a section look foggy and covers it with an absolute positioned pseudo-element. Pairs well with the js-foggy
+javascript functionality in <code>dashboard.js</code> to disable form fields within the <code>.js-foggy</code> block and add the
+appropriate aria classes. On initialization, the foggy css class and properties will get added to any <code>.js-foggy</code>
+element with a <code>data-is-foggy=&quot;true&quot;</code> attribute set.</p>
+</div>
+                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;form-group&quot;&gt;
+  &lt;div class=&quot;label-wrap-wide&quot;&gt;
+     &lt;label for=&quot;fieldID1&quot;&gt;Enable something&lt;/label&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;input-wrap-right&quot;&gt;
+    &lt;div class=&quot;toggle-wrap&quot;&gt;
+      &lt;input id=&quot;toggle-checkbox&quot; type=&quot;checkbox&quot; class=&quot;toggle-input&quot; /&gt;
+      &lt;label for=&quot;toggle-checkbox&quot;&gt;&lt;/label&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;form-group js-foggy&quot; data-is-foggy=&quot;true&quot;&gt;
+  &lt;div class=&quot;label-wrap&quot;&gt;
+    &lt;label for=&quot;fieldID2&quot;&gt;
+      Label for this input
+    &lt;/label&gt;
+    &lt;div class=&quot;info&quot;&gt;
+      You won&#x27;t actually be able to get at this field until you enable the toggle.
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;input-wrap&quot;&gt;
+    &lt;input type=&quot;text&quot; id=&quot;fieldID2&quot; class=&quot;form-control&quot; /&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+  $(&#x27;#toggle-checkbox&#x27;).on(&#x27;change&#x27;, function() {
+    if ($(this).is(&#x27;:checked&#x27;)) {
+      $(&#x27;.js-foggy&#x27;).trigger(&#x27;foggyOff&#x27;);
+    } else {
+      $(&#x27;.js-foggy&#x27;).trigger(&#x27;foggyOn&#x27;);
+    }
+  });
+&lt;/script&gt;</pre>
+                                                </div> <!-- end kss-component-description -->
+                                                <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                                                <div class="kss-example padded-bottom"><div class="form-group">
+  <div class="label-wrap-wide">
+     <label for="fieldID1">Enable something</label>
+  </div>
+  <div class="input-wrap-right">
+    <div class="toggle-wrap">
+      <input id="toggle-checkbox" type="checkbox" class="toggle-input" />
+      <label for="toggle-checkbox"></label>
+    </div>
+  </div>
+</div>
+<div class="form-group js-foggy" data-is-foggy="true">
+  <div class="label-wrap">
+    <label for="fieldID2">
+      Label for this input
+    </label>
+    <div class="info">
+      You won't actually be able to get at this field until you enable the toggle.
+    </div>
+  </div>
+  <div class="input-wrap">
+    <input type="text" id="fieldID2" class="form-control" />
+  </div>
+</div>
+<script>
+  $('#toggle-checkbox').on('change', function() {
+    if ($(this).is(':checked')) {
+      $('.js-foggy').trigger('foggyOff');
+    } else {
+      $('.js-foggy').trigger('foggyOn');
+    }
+  });
+</script></div>
                                     </div>
                                 </section>
                 </div>

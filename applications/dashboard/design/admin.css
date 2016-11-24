@@ -7124,14 +7124,6 @@ label[id^=iCheck] {
   position: relative;
 }
 
-.checkbox-painted-wrapper .checkbox,
-.checkbox-painted-wrapper .radio,
-.radio-painted-wrapper .checkbox,
-.radio-painted-wrapper .radio {
-  width: 2.25rem;
-  margin: 0;
-}
-
 .checkbox-painted-wrapper label,
 .radio-painted-wrapper label {
   padding-left: 0;
@@ -7186,25 +7178,14 @@ label[id^=iCheck] {
   content: "\f171";
 }
 
-.radio-painted-wrapper {
-  position: relative;
-}
-
 .radio-painted-wrapper label {
   border-radius: 0.5625rem;
 }
 
-.radio-painted-wrapper input:checked + label::before {
-  position: absolute;
-  display: block;
-  top: -0.0625rem;
-  left: -0.0625rem;
-  width: 1.125rem;
-  height: 1.125rem;
+.radio-painted-wrapper input:checked + label {
   border: 0.25rem solid #0291db;
   border-radius: 0.5625rem;
   background-color: #fff;
-  content: '';
 }
 
 .media {

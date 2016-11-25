@@ -489,7 +489,7 @@ class ProfileController extends Gdn_Controller {
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
         } else {
-            return Gdn::dispatcher()->dispatch(userUrl($this->User, '', 'discussions'));
+            safeRedirect(userUrl($this->User, '', 'discussions'));
         }
     }
 

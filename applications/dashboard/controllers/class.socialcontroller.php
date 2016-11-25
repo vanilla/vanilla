@@ -65,23 +65,22 @@ class SocialController extends DashboardController {
                 continue;
             }
 
-            if (!array_key_exists($addonName, $connections)) {
-                // See if addon is enabled.
-                $isEnabled = Gdn::addonManager()->isEnabled($addonName, \Vanilla\Addon::TYPE_ADDON);
-                setValue('enabled', $addonInfo, $isEnabled);
+            // See if addon is enabled.
+            $isEnabled = Gdn::addonManager()->isEnabled($addonName, \Vanilla\Addon::TYPE_ADDON);
+            setValue('enabled', $addonInfo, $isEnabled);
 
-                // See if we can detect whether connection is configured.
-                $isConfigured = null;
-                if ($isEnabled) {
-                    $pluginInstance = Gdn::pluginManager()->getPluginInstance($addonName, Gdn_PluginManager::ACCESS_PLUGINNAME);
-                    if (method_exists($pluginInstance, 'isConfigured')) {
-                        $isConfigured = $pluginInstance->isConfigured();
-                    }
+            // See if we can detect whether connection is configured.
+            $isConfigured = null;
+            if ($isEnabled) {
+                $pluginInstance = Gdn::pluginManager()->getPluginInstance($addonName, Gdn_PluginManager::ACCESS_PLUGINNAME);
+                if (method_exists($pluginInstance, 'isConfigured')) {
+                    $isConfigured = $pluginInstance->isConfigured();
                 }
-
-                setValue('configured', $addonInfo, $isConfigured);
-                $connections[$addonName] = $addonInfo;
             }
+            setValue('configured', $addonInfo, $isConfigured);
+
+            // Add the connection.
+            $connections[$addonName] = $addonInfo;
         }
 
         return $connections;

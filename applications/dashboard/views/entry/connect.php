@@ -58,8 +58,10 @@ $allowConnect = $this->data('AllowConnect');
             </div>
         <?php
         else:
-            $ExistingUsers = (array)$this->data('ExistingUsers', array());
+            $ExistingUsers = (array)$this->data('ExistingUsers', []);
             $NoConnectName = $this->data('NoConnectName');
+            $firstTimeSeeingThePage = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
+            $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
             $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
             ?>
             <ul>
@@ -73,7 +75,9 @@ $allowConnect = $this->data('AllowConnect');
                 <?php endif; ?>
                 <li>
                     <?php
-                      if (!$this->Form->getFormValue('ConnectName') || !$allowConnect) {
+                      if (($firstTimeSeeingThePage xor $connectNameProvided)
+                            || (!$firstTimeSeeingThePage && count($ExistingUsers))
+                            || !$allowConnect) {
                           if (count($ExistingUsers) == 1 && $NoConnectName) {
                               $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
                               $Row = reset($ExistingUsers);
@@ -84,7 +88,7 @@ $allowConnect = $this->data('AllowConnect');
                           } else {
                               echo $this->Form->label('Username', 'ConnectName');
                               echo '<div class="FinePrint">', t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), '</div>';
-      
+
                               if (count($ExistingUsers) > 0) {
                                   foreach ($ExistingUsers as $Row) {
                                       echo wrap($this->Form->Radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
@@ -92,9 +96,10 @@ $allowConnect = $this->data('AllowConnect');
                                   echo wrap($this->Form->Radio('UserSelect', t('Other'), array('value' => 'other')), 'div');
                               }
                           }
-      
-                          if (!$NoConnectName)
+
+                          if (!$NoConnectName) {
                               echo $this->Form->Textbox('ConnectName');
+                          }
                        }
                     ?>
                 </li>

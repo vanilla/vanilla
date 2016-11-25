@@ -1144,14 +1144,21 @@ class Gdn_Form extends Gdn_Pluggable {
                 // Check to see if there is a row corresponding to this area.
                 if (array_key_exists($RowName.'.'.$ColumnName, $Data)) {
                     $CheckBox = $Data[$RowName.'.'.$ColumnName];
-                    $Attributes = array('value' => $CheckBox['PostValue']);
+                    $Attributes = [
+                        'value' => $CheckBox['PostValue'],
+                        'display' => 'after'
+                    ];
                     if ($CheckBox['Value']) {
                         $Attributes['checked'] = 'checked';
                     }
 //               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
                     $CheckCount++;
 
-                    $Result .= $this->checkBox($FieldName.'[]', '', $Attributes);
+                    $Result .= wrap(
+                        $this->checkBox($FieldName.'[]', $RowName.'.'.$ColumnName, $Attributes),
+                        'div',
+                        ['class' => 'checkbox-painted-wrapper']
+                    );
                 } else {
                     $Result .= ' ';
                 }

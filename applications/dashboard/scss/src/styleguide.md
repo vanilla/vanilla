@@ -105,7 +105,6 @@ The specific scss files we use are listed here.
 * reboot.scss
 * utilities.scss
 * nav.scss
-* alert.scss
 * tooltip.scss
 * dropdown.scss
 * list-group.scss
@@ -130,6 +129,7 @@ The specific javascript files we use are listed here.
 * iCheck - For our radio and checkbox styling.
 * Drop - For our user card dropdown.
 * Clipboard - For copying text. (Used in the embed section.)
+* CheckAll - For checking/unchecking a set of checkboxes at the same time. 
 
 ---
 

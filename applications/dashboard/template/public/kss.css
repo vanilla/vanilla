@@ -94,7 +94,7 @@ hr {
 
 /* Example styles */
 
-.main code {
+p .main code {
   border: 1px solid #e7e8e9;
   background-color: #f6f9fb;
   border-radius: 2px;

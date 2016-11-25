@@ -168,6 +168,7 @@ class AddonManager {
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array
      */
     public function lookupAllByType($type) {
         if ($this->typeUsesMultiCaching($type)) {

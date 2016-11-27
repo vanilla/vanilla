@@ -172,10 +172,10 @@ class Permissions {
      * @return $this
      */
     public function merge(Permissions $source) {
-        $this->permissions = array_merge_recursive(
+        $this->setPermissions(array_merge_recursive(
             $this->permissions,
             $source->getPermissions()
-        );
+        ));
 
         return $this;
     }

@@ -48,6 +48,44 @@ class Permissions {
     }
 
     /**
+     * Compile raw permission rows into a formatted array of granted permissions.
+     *
+     * @param array $permissions
+     * @return $this
+     */
+    public function compileAndLoad(array $permissions) {
+        foreach ($permissions as $row) {
+            // Store the junction ID, if we have one.
+            $junctionID = array_key_exists('JunctionID', $row) ? $row['JunctionID'] : null;
+
+            // Clear out any non-permission fields.
+            unset(
+                $row['PermissionID'],
+                $row['RoleID'],
+                $row['JunctionTable'],
+                $row['JunctionColumn'],
+                $row['JunctionID']
+            );
+
+            // Iterate through the row's individual permissions.
+            foreach ($row as $permission => $value) {
+                // If the user doesn't have this permission, move on to the next one.
+                if ($value === 0) {
+                    continue;
+                }
+
+                if ($junctionID === null) {
+                    $this->set($permission, true);
+                } else {
+                    $this->add($permission, $junctionID);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Grab the current permissions.
      *
      * @return array
@@ -128,44 +166,6 @@ class Permissions {
     }
 
     /**
-     * Compile raw permission rows into a formatted array of granted permissions.
-     *
-     * @param array $permissions
-     * @return $this
-     */
-    public function compileAndLoad(array $permissions) {
-        foreach ($permissions as $row) {
-            // Store the junction ID, if we have one.
-            $junctionID = array_key_exists('JunctionID', $row) ? $row['JunctionID'] : null;
-
-            // Clear out any non-permission fields.
-            unset(
-                $row['PermissionID'],
-                $row['RoleID'],
-                $row['JunctionTable'],
-                $row['JunctionColumn'],
-                $row['JunctionID']
-            );
-
-            // Iterate through the row's individual permissions.
-            foreach ($row as $permission => $value) {
-                // If the user doesn't have this permission, move on to the next one.
-                if ($value === 0) {
-                    continue;
-                }
-
-                if ($junctionID === null) {
-                    $this->set($permission, true);
-                } else {
-                    $this->add($permission, $junctionID);
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * Merge in data from another Permissions instance.
      *
      * @param Permissions $source
@@ -211,12 +211,10 @@ class Permissions {
             }
 
             foreach ($IDs as $currentID) {
-                if (is_numeric($currentID)) {
-                    $index = array_search($currentID, $this->permissions[$permission]);
+                $index = array_search($currentID, $this->permissions[$permission]);
 
-                    if ($index !== false) {
-                        unset($this->permissions[$permission][$index]);
-                    }
+                if ($index !== false) {
+                    unset($this->permissions[$permission][$index]);
                 }
             }
         }

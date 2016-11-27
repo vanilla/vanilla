@@ -38,12 +38,6 @@ class Permissions {
             $IDs = [$IDs];
         }
 
-        foreach ($IDs as $currentID) {
-            if (!is_numeric($currentID)) {
-                throw new \InvalidArgumentException("Invalid ID: {$currentID}");
-            }
-        }
-
         if (!array_key_exists($permission, $this->permissions) || !is_array($this->permissions[$permission])) {
             $this->permissions[$permission] = [];
         }
@@ -100,7 +94,7 @@ class Permissions {
 
     /**
      * Determine if any of the provided permissions are present.
-     * 
+     *
      * @param array $permissions
      * @param int|null $id
      * @return bool
@@ -172,20 +166,35 @@ class Permissions {
     }
 
     /**
-     * Merge in permissions from another instance.
+     * Merge in data from another Permissions instance.
      *
-     * @param Permissions $permissions
+     * @param Permissions $source
+     * @return $this
      */
-    public function merge(Permissions $permissions) {
+    public function merge(Permissions $source) {
+        $this->permissions = array_merge_recursive(
+            $this->permissions,
+            $source->getPermissions()
+        );
+
+        return $this;
     }
 
     /**
-     * Set global and all per-category settings for a permission.
+     * Set global or replace per-ID permissions.
      *
      * @param string $permission
      * @param bool|array $value
+     * @return $this
      */
     public function overwrite($permission, $value) {
+        if ($value === true || $value === false) {
+            $this->set($permission, $value);
+        } elseif (is_array($value)) {
+            $this->permissions[$permission] = $value;
+        }
+
+        return $this;
     }
 
     /**

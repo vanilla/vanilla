@@ -9,7 +9,7 @@
  */
 
 /**
- * Handles /social endpoint, so it must be an extrovert.
+ * Handles management of addon groups and their respective settings pages.
  */
 class AddonsController extends DashboardController {
 

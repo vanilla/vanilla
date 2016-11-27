@@ -10,13 +10,13 @@
 // Define the plugin:
 $PluginInfo['OpenID'] = array(
     'Name' => 'OpenID',
-    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
+    'Description' => 'Allows users to sign in with OpenID. This is an open protocol that is supported by many independent providers.',
     'Version' => '1.2.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/openid',
+    'SettingsUrl' => '/addons/openid',
     'SettingsPermission' => 'Garden.Settings.Manage',
-    'SocialConnect' => true,
+    'Group' => 'SocialConnect',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
@@ -308,7 +308,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      *
      * Let's allow users to remove the ability to sign in with OpenID.
      */
-    public function settingsController_openID_create($Sender) {
+    public function addonsController_openID_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);

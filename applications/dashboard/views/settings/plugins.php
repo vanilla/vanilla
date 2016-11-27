@@ -70,13 +70,12 @@ helpAsset($helpTitle, $pathHelp);
     require_once($this->fetchViewLocation('helper_functions'));
     foreach ($availableAddons as $addonName => $addonInfo) {
         $isEnabled = array_key_exists($addonName, $enabledAddons);
-        // Skip Hidden & Trigger plugins
-        if ((isset($addonInfo['Hidden']) && $addonInfo['Hidden'] === true)
-            || (isset($addonInfo['Trigger']) && $addonInfo['Trigger'] == true)
-            || ($this->Filter === 'disabled' && $isEnabled)
-            || ($this->Filter === 'enabled' && !$isEnabled)) {
-            echo '';
-        } else {
+
+        // Skip addons with Hidden, Trigger, or Group info set.
+        $skip = (val('Hidden', $addonInfo) || val('Trigger', $addonInfo) || val('Group', $addonInfo));
+        $filtered = (($this->Filter === 'disabled' && $isEnabled) || ($this->Filter === 'enabled' && !$isEnabled));
+
+        if (!$skip && !$filtered) {
             writeAddonMedia($addonName, $addonInfo, $isEnabled, $this->addonType, $this->Filter);
         }
     } ?>

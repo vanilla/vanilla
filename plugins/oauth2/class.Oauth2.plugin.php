@@ -5,14 +5,15 @@
  */
 
 $PluginInfo['oauth2'] = array(
-    'Name' => 'OAuth2 SSO',
+    'Name' => 'OAuth 2.0',
     'ClassName' => "OAuth2Plugin",
-    'Description' => 'Connect to an authentication provider to allow users to log on using SSO.',
+    'Description' => 'Connect forum sign on to a basic OAuth 2.0 provider.',
     'Version' => '1.0.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'SettingsUrl' => '/settings/oauth2',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
+    'Group' => 'SSO',
     'Author' => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

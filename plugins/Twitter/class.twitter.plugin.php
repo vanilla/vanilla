@@ -20,7 +20,7 @@ $PluginInfo['Twitter'] = array(
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'group' => 'socialConnect',
+    'Group' => 'SocialConnect',
     'RequiresRegistration' => true,
     'Icon' => 'twitter_social_connect.png'
 );

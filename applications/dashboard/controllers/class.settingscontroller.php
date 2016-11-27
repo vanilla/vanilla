@@ -1227,7 +1227,7 @@ class SettingsController extends DashboardController {
         self::sortAddons($this->AvailablePlugins);
 
         if ($PluginName != '') {
-            if (array_key_exists($PluginName, $this->EnabledPlugins) === true) {
+            if (in_array(strtolower($PluginName), array_map('strtolower', array_keys($this->EnabledPlugins)))) {
                 $this->disablePlugin($PluginName, $Filter);
             } else {
                 $this->enablePlugin($PluginName, $Filter);

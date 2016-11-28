@@ -5110,12 +5110,12 @@ input + .ReactSprite {
 /* Switch to the white icons when hovering over a menuitem sprite */
 .MenuItems a:hover .ReactSprite,
 .MenuItems a:hover .Sprite {
-  background-image: url("https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-fff.png");
+  background-image: url("https://images.v-cdn.net/sprites-14-fff.png");
 }
 
 /* Switch to bordered icons for user reaction overlays */
 .UserReactionWrap .ReactSprite {
-  background-image: url("https://c3409409.ssl.cf0.rackcdn.com/images/sprites-14-000-bordered.png");
+  background-image: url("https://images.v-cdn.net/sprites-14-000-bordered.png");
 }
 
 .ActionBlock {
@@ -5137,7 +5137,7 @@ input + .ReactSprite {
 }
 
 .Video.YouTube .VideoPreview:after {
-  background: url("https://c3409409.ssl.cf0.rackcdn.com/images/youtube-overlay-button.png") 0 -44px no-repeat transparent;
+  background: url("https://images.v-cdn.net/youtube-overlay-button.png") 0 -44px no-repeat transparent;
   position: absolute;
   display: block;
   content: '';

@@ -1,7 +1,7 @@
 _Vanilla uses Composer!
 You cannot clone this repo right into a web directory - it requires a build step. [Learn more](http://vanillaforums.org/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](http://vanillaforums.org/addon/vanilla-core) instead_.
 
-![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
+![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
 [![Build Status](https://api.travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
 [![PR Stats](http://issuestats.com/github/vanilla/vanilla/badge/pr?style=flat-square)](http://issuestats.com/github/vanilla/vanilla)
@@ -155,4 +155,4 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 ## Bonk!
 
-Just kidding, everything's awesome. ![dance](http://cdn.vanillaforums.com/dance.gif)
+Just kidding, everything's awesome. ![dance](http://images.v-cdn.net/dance.gif)

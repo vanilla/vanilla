@@ -20,7 +20,7 @@ $PluginInfo['GooglePlus'] = array(
     'SettingsUrl' => '/addons/googleplus',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Hidden' => false,
-    'Group' => 'SocialConnect',
+    'Groups' => ['SocialConnect'],
     'RequiresRegistration' => false,
     'Icon' => 'google_social_connect.png'
 );

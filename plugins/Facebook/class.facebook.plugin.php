@@ -21,7 +21,7 @@ $PluginInfo['Facebook'] = array(
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Group' => 'SocialConnect',
+    'Groups' => ['SocialConnect'],
     'RequiresRegistration' => true,
     'Icon' => 'facebook_social_connect.png'
 );

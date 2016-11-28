@@ -91,7 +91,8 @@ class AddonsController extends DashboardController {
             $addonInfo = $addon->getInfo();
 
             // Limit to group specified.
-            if (!(strtolower(val('group', $addonInfo)) === strtolower($type))) {
+            $groups = array_map('strtolower', val('groups', $addonInfo));
+            if (!in_array(strtolower($type), $groups)) {
                 continue;
             }
 

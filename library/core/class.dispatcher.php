@@ -630,7 +630,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 if ($ControllerPath) {
                     $InterimPath = explode('/controllers/', $ControllerPath);
                     array_pop($InterimPath); // Get rid of the end. Useless;
-                    $InterimPath = explode('/', trim(array_pop($InterimPath)));
+                    $InterimPath = explode('/', str_replace('\\', '/', trim(array_pop($InterimPath))));
                     $Application = array_pop($InterimPath);
                     $AddonType = array_pop($InterimPath);
                     switch ($AddonType) {

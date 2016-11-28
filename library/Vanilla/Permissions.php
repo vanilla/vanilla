@@ -1,14 +1,23 @@
 <?php
 /**
  * @copyright 2009-2016 Vanilla Forums Inc.
- * @license GPLv2
+ * @license GNU GPLv2
  */
 
 namespace Vanilla;
 
+/**
+ * Compile, manage and check user permissions.
+ *
+ * @package Vanilla
+ */
 class Permissions {
 
-    /** @var array */
+    /**
+     * Global permissions are stored as numerical indexes.
+     * Per-ID permissions are stored as associative keys. The key is the permission name and the values are the IDs.
+     * @var array
+     */
     private $permissions = [];
 
     /** @var bool */
@@ -29,8 +38,8 @@ class Permissions {
     /**
      * Add a permission.
      *
-     * @param string $permission
-     * @param int|array $IDs
+     * @param string $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View)
+     * @param int|array $IDs One or more IDs of foreign objects (e.g. category IDs)
      * @return $this
      */
     public function add($permission, $IDs) {
@@ -50,7 +59,7 @@ class Permissions {
     /**
      * Compile raw permission rows into a formatted array of granted permissions.
      *
-     * @param array $permissions
+     * @param array $permissions Rows from the Permissions database table.
      * @return $this
      */
     public function compileAndLoad(array $permissions) {
@@ -97,8 +106,8 @@ class Permissions {
     /**
      * Determine if the permission is present.
      *
-     * @param string $permission
-     * @param int|null $id
+     * @param string $permission Permission slug to check the value for (e.g. Vanilla.Discussions.View)
+     * @param int|null $id Foreign object ID to validate the permission against (e.g. a category ID)
      * @return bool
      */
     public function has($permission, $id = null) {
@@ -116,8 +125,8 @@ class Permissions {
     /**
      * Determine if all of the provided permissions are present.
      *
-     * @param array $permissions
-     * @param int|null $id
+     * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View)
+     * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID)
      * @return bool
      */
     public function hasAll(array $permissions, $id = null) {
@@ -133,8 +142,8 @@ class Permissions {
     /**
      * Determine if any of the provided permissions are present.
      *
-     * @param array $permissions
-     * @param int|null $id
+     * @param array $permissions Permission slugs to check the value for (e.g. Vanilla.Discussions.View)
+     * @param int|null $id Foreign object ID to validate the permissions against (e.g. a category ID)
      * @return bool
      */
     public function hasAny(array $permissions, $id = null) {
@@ -168,7 +177,7 @@ class Permissions {
     /**
      * Merge in data from another Permissions instance.
      *
-     * @param Permissions $source
+     * @param Permissions $source The source Permissions instance to import permissions from.
      * @return $this
      */
     public function merge(Permissions $source) {
@@ -183,8 +192,8 @@ class Permissions {
     /**
      * Set global or replace per-ID permissions.
      *
-     * @param string $permission
-     * @param bool|array $value
+     * @param string $permission  Permission slug to set the value for (e.g. Vanilla.Discussions.View)
+     * @param bool|array $value A single value for global permissions or an array of foreign object IDs for per-ID permissions.
      * @return $this
      */
     public function overwrite($permission, $value) {
@@ -200,8 +209,8 @@ class Permissions {
     /**
      * Remove a permission.
      *
-     * @param $permission
-     * @param int|array $IDs
+     * @param $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View)
+     * @param int|array $IDs One or more IDs of foreign objects (e.g. category IDs)
      * @return $this;
      */
     public function remove($permission, $IDs) {
@@ -225,8 +234,8 @@ class Permissions {
     /**
      * Add a global permission.
      *
-     * @param string $permission
-     * @param bool $value
+     * @param string $permission Permission slug to set the value for (e.g. Vanilla.Discussions.View)
+     * @param bool $value Toggle value for the permission: true for granted, false for revoked.
      * @return $this
      */
     public function set($permission, $value) {
@@ -246,7 +255,7 @@ class Permissions {
     /**
      * Set the admin flag.
      *
-     * @param bool $isAdmin
+     * @param bool $isAdmin Is the user an administrator?
      * @return $this
      */
     public function setAdmin($isAdmin) {
@@ -256,7 +265,8 @@ class Permissions {
 
     /**
      * Set the banned flag.
-     * @param bool $isBanned
+     *
+     * @param bool $isBanned Is the user banned?
      * @return $this
      */
     public function setBanned($isBanned) {
@@ -267,7 +277,7 @@ class Permissions {
     /**
      * Set the permission array.
      *
-     * @param array $permissions
+     * @param array $permissions A properly-formatted permissions array.
      * @return $this
      */
     public function setPermissions(array $permissions) {

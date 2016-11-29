@@ -115,6 +115,8 @@ class RoleController extends DashboardController {
             $this->title(t('Edit Role'));
         }
 
+        $showCategories = c('Vanilla.CategoriesOnRoleEdit', true);
+
         $this->setHighlightRoute('dashboard/role');
         $PermissionModel = Gdn::permissionModel();
         $this->Role = $this->RoleModel->getByRoleID($RoleID);
@@ -133,6 +135,22 @@ class RoleController extends DashboardController {
         if ($this->Form->authenticatedPostBack() === false) {
             // Get the role data for the requested $RoleID and put it into the form.
             $Permissions = $PermissionModel->getPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
+
+            // Should we be filtering out per-category permissions?
+            if (!$showCategories) {
+                foreach ($Permissions as $key => $fields) {
+                    // Verify this is a category permission.
+                    if (preg_match('#^Category/PermissionCategoryID/(?<CategoryID>-?\d+)#', $key, $category)) {
+                        // Keep the default category permissions.  Ditch the rest.
+                        if ($category['CategoryID'] == '-1') {
+                            continue;
+                        } else {
+                            unset($Permissions[$key]);
+                        }
+                    }
+                }
+            }
+
             // Remove permissions the user doesn't have access to.
             if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                 foreach ($this->RoleModel->RankPermissions as $Permission) {
@@ -155,6 +173,41 @@ class RoleController extends DashboardController {
             // column from other places.
             if (!$this->Form->getFormValue('PersonalInfo')) {
                 $this->Form->setFormValue('PersonalInfo', false);
+            }
+
+            // If the form didn't have category permissions, they'll need to be added before saving.
+            $permissions = $this->Form->getFormValue('Permission');
+            if (!$showCategories && is_array($permissions)) {
+
+                // Grab all the per-category permissions for this role and format them for form fields.
+                $permissionModel = new PermissionModel();
+                $categoryPermissions = $permissionModel->getJunctionPermissions(['RoleID' => $RoleID], 'Category');
+                $categoryPermissions = $permissionModel->unpivotPermissions($categoryPermissions);
+
+                // Iterate through each per-category permission.
+                foreach ($categoryPermissions as $categoryRow) {
+                    foreach ($categoryRow as $categoryField => $categoryPermission) {
+                        // Not a permission.  Skip it.
+                        if (substr($categoryField, 0, 1) == '_') {
+                            continue;
+                        }
+
+                        // Not a permission granted to this role? Skip it.
+                        if (!array_key_exists('Value', $categoryPermission) || $categoryPermission['Value'] === 0) {
+                            continue;
+                        }
+
+                        // It's a permission *and* it's granted? Make sure it's included!
+                        if (array_key_exists('PostValue', $categoryPermission)) {
+                            if (array_search($categoryPermission['PostValue'], $permissions) === false) {
+                                $permissions[] = $categoryPermission['PostValue'];
+                            }
+                        }
+                    }
+                }
+
+                // Update those role permissions.
+                $this->Form->setFormValue('Permission', $permissions);
             }
 
             // If the form has been posted back...

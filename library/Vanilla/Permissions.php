@@ -242,7 +242,7 @@ class Permissions {
         $exists = array_search($permission, $this->permissions);
 
         if ($value) {
-            if (!$exists) {
+            if ($exists === false) {
                 $this->permissions[] = $permission;
             }
         } elseif ($exists !== false) {

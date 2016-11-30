@@ -60,7 +60,9 @@ $allowConnect = $this->data('AllowConnect');
         else:
             $ExistingUsers = (array)$this->data('ExistingUsers', []);
             $NoConnectName = $this->data('NoConnectName');
-            $firstTimeSeeingThePage = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
+
+            // You just landed on this page.
+            $firstTimeHere = !($this->Form->isPostBack() && $this->Form->getFormValue('Connect', null) !== null);
             $connectNameProvided = (bool)$this->Form->getFormValue('ConnectName');
             $PasswordMessage = t('ConnectLeaveBlank', 'Leave blank unless connecting to an existing account.');
             ?>
@@ -75,31 +77,44 @@ $allowConnect = $this->data('AllowConnect');
                 <?php endif; ?>
                 <li>
                     <?php
-                      if (($firstTimeSeeingThePage xor $connectNameProvided)
-                            || (!$firstTimeSeeingThePage && count($ExistingUsers))
-                            || !$allowConnect) {
-                          if (count($ExistingUsers) == 1 && $NoConnectName) {
-                              $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
-                              $Row = reset($ExistingUsers);
-			                        echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
-                              wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
-                              $this->addDefinition('NoConnectName', true);
-                              echo $this->Form->Hidden('UserSelect', array('Value' => $Row['UserID']));
-                          } else {
-                              echo $this->Form->label('Username', 'ConnectName');
-                              echo '<div class="FinePrint">', t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), '</div>';
+                        $displayConnectNameField =
+                        // If you just landed on the page and ConnectName is not part of the form's fields
+                        // (Then you need to provide a connect name)
+                        // OR
+                        // If it is not your first time on the page and ConnectName is part of the form's fields
+                        // (Then you click submit and ConnectName was submitted. This means you need to display the field again so that you can edit it)
+                        ($firstTimeHere xor $connectNameProvided)
+                        // You just landed on the page and there are some $ExistingUsers.
+                        // This means that somehow you chose an existing user but the validation failed so you need to be able to choose again.
+                        || (!$firstTimeHere && count($ExistingUsers))
+                        // See above on variable declaration!
+                        ||!$allowConnect
+                        ;
+                    if ($displayConnectNameField) {
 
-                              if (count($ExistingUsers) > 0) {
-                                  foreach ($ExistingUsers as $Row) {
-                                      echo wrap($this->Form->Radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
-                                  }
-                                  echo wrap($this->Form->Radio('UserSelect', t('Other'), array('value' => 'other')), 'div');
-                              }
-                          }
+                            if (count($ExistingUsers) == 1 && $NoConnectName) {
+                                $PasswordMessage = t('ConnectExistingPassword', 'Enter your existing account password.');
+                                $Row = reset($ExistingUsers);
 
-                          if (!$NoConnectName) {
-                              echo $this->Form->Textbox('ConnectName');
-                          }
+                                echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
+                                wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
+                                $this->addDefinition('NoConnectName', true);
+                                echo $this->Form->Hidden('UserSelect', array('Value' => $Row['UserID']));
+                            } else {
+                                echo $this->Form->label('Username', 'ConnectName');
+                                echo '<div class="FinePrint">', t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), '</div>';
+
+                                if (count($ExistingUsers) > 0) {
+                                    foreach ($ExistingUsers as $Row) {
+                                        echo wrap($this->Form->Radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
+                                    }
+                                    echo wrap($this->Form->Radio('UserSelect', t('Other'), array('value' => 'other')), 'div');
+                                }
+                            }
+
+                            if (!$NoConnectName) {
+                                echo $this->Form->Textbox('ConnectName');
+                            }
                        }
                     ?>
                 </li>

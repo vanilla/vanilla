@@ -38,6 +38,9 @@ class Gdn_Session {
     /** @var object The current user's transient key. */
     protected $_TransientKey;
 
+    /** @var  Vanilla\Permissions */
+    private $permissions;
+
     /**
      * @var DateTimeZone The current timezone of the user.
      */
@@ -53,6 +56,8 @@ class Gdn_Session {
         $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
+
+        $this->permissions = new Vanilla\Permissions();
     }
 
 

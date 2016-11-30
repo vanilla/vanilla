@@ -104,6 +104,22 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMerge() {
+        $permissions = new Permissions([
+            'Garden.SignIn.Allow',
+            'Vanilla.Discussions.Add' => [10]
+        ]);
+        $additionalPermissions = new Permissions([
+            'Garden.Profiles.View',
+            'Vanilla.Discussions.Add' => [20, 30]
+        ]);
+        $permissions->merge($additionalPermissions);
+
+        $this->assertTrue($permissions->has('Garden.SignIn.Allow'));
+        $this->assertTrue($permissions->has('Garden.Profiles.View'));
+        $this->assertFalse($permissions->has('Vanilla.Discussions.Add'));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 20));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 30));
     }
 
     public function testOverwrite() {

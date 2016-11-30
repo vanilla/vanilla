@@ -245,8 +245,8 @@ class Permissions {
             if (!$exists) {
                 $this->permissions[] = $permission;
             }
-        } elseif ($exists) {
-            unset($this->permissions[$permission]);
+        } elseif ($exists !== false) {
+            unset($this->permissions[$exists]);
         }
 
         return $this;

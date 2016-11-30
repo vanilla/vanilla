@@ -107,6 +107,25 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testOverwrite() {
+        $permissions = new Permissions([
+            'Garden.Settings.Manage',
+            'Garden.Discussions.Add' => [1, 2, 3]
+        ]);
+
+        $this->assertTrue($permissions->has('Garden.Settings.Manage'));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 1));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 2));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 3));
+
+        $permissions->overwrite('Garden.Settings.Manage', false);
+        $permissions->overwrite('Garden.Discussions.Add', [4, 5, 6]);
+        $this->assertFalse($permissions->has('Garden.Settings.Manage'));
+        $this->assertFalse($permissions->has('Garden.Discussions.Add', 1));
+        $this->assertFalse($permissions->has('Garden.Discussions.Add', 2));
+        $this->assertFalse($permissions->has('Garden.Discussions.Add', 3));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 4));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 5));
+        $this->assertTrue($permissions->has('Garden.Discussions.Add', 6));
     }
 
     public function testRemove() {

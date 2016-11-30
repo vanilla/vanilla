@@ -97,7 +97,7 @@ class Gdn_Session {
              * assigned to their role.
              */
             for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                if ($this->checkPermission($permissionsRanked[$i])) {
+                if ($this->permissions->has($permissionsRanked[$i])) {
                     return true;
                 }
             }
@@ -105,7 +105,7 @@ class Gdn_Session {
         }
 
         // Check to see if the user has at least the given permission.
-        return $this->checkPermission($permission);
+        return $this->permissions->has($permission);
     }
 
     /**
@@ -117,12 +117,12 @@ class Gdn_Session {
      * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
      * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
      * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param in $JunctionID The ID of the junction permission.
-     * * @return boolean
+     * @param int|string $JunctionID The ID of the junction permission.
+     * @return boolean
      */
     public function checkPermission($Permission, $FullMatch = true, $JunctionTable = '', $JunctionID = '') {
         if (is_object($this->User)) {
-            if ($this->User->Banned || GetValue('Deleted', $this->User)) {
+            if ($this->User->Banned || val('Deleted', $this->User)) {
                 return false;
             } elseif ($this->User->Admin) {
                 return true;
@@ -134,42 +134,34 @@ class Gdn_Session {
             $JunctionID = '';
         }
 
-        $Permissions = $this->getPermissions();
-        if ($JunctionTable && !c('Garden.Permissions.Disabled.'.$JunctionTable)) {
-            // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
+        if ($JunctionID === '') {
+            $JunctionID = null;
+        }
+
+        $allPermissions = $this->permissions->getPermissions();
+        if ($JunctionTable && !c("Garden.Permissions.Disabled.{$JunctionTable}")) {
             if (is_array($Permission)) {
-                $Pass = false;
-                foreach ($Permission as $PermissionName) {
-                    if ($this->checkPermission($PermissionName, false, $JunctionTable, $JunctionID)) {
-                        if (!$FullMatch) {
-                            return true;
-                        }
-                        $Pass = true;
-                    } else {
-                        if ($FullMatch) {
-                            return false;
-                        }
-                    }
-                }
-                return $Pass;
-            } else {
-                if ($JunctionID !== '') {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && in_array($JunctionID, $Permissions[$Permission]);
+                if ($FullMatch) {
+                    return $this->permissions->hasAll($Permission, $JunctionID);
                 } else {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && count($Permissions[$Permission]);
+                    return $this->permissions->hasAny($Permission, $JunctionID);
                 }
-                return $Result;
+            } else {
+                if ($JunctionID !== null) {
+                    return $this->permissions->has($Permission, $JunctionID);
+                } else {
+                    return array_key_exists($Permission, $allPermissions) && count($allPermissions[$Permission]);
+                }
             }
         } else {
-            // Non-junction permission ($Permissions = array(PermissionNames))
             if (is_array($Permission)) {
-                return arrayInArray($Permission, $Permissions, $FullMatch);
+                if ($FullMatch) {
+                    return $this->permissions->hasAll($Permission);
+                } else {
+                    return $this->permissions->hasAny($Permission);
+                }
             } else {
-                return in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
+                return $this->permissions->has($Permission) || array_key_exists($Permission, $allPermissions);
             }
         }
     }

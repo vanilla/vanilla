@@ -115,7 +115,7 @@ class RoleController extends DashboardController {
             $this->title(t('Edit Role'));
         }
 
-        $showCategories = c('Vanilla.CategoriesOnRoleEdit', true);
+        $hideCategories = c('Vanilla.HideCategoriesOnRole', false);
 
         $this->setHighlightRoute('dashboard/role');
         $PermissionModel = Gdn::permissionModel();
@@ -137,7 +137,7 @@ class RoleController extends DashboardController {
             $Permissions = $PermissionModel->getPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
 
             // Should we be filtering out per-category permissions?
-            if (!$showCategories) {
+            if ($hideCategories) {
                 foreach ($Permissions as $key => $fields) {
                     // Verify this is a category permission.
                     if (preg_match('#^Category/PermissionCategoryID/(?<CategoryID>-?\d+)#', $key, $category)) {
@@ -177,7 +177,7 @@ class RoleController extends DashboardController {
 
             // If the form didn't have category permissions, they'll need to be added before saving.
             $permissions = $this->Form->getFormValue('Permission');
-            if (!$showCategories && is_array($permissions)) {
+            if ($hideCategories && is_array($permissions)) {
 
                 // Grab all the per-category permissions for this role and format them for form fields.
                 $permissionModel = new PermissionModel();

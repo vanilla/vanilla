@@ -81,8 +81,8 @@ $allowConnect = $this->data('AllowConnect');
                         // If you just landed on the page and ConnectName is not part of the form's fields
                         // (Then you need to provide a connect name)
                         // OR
-                        // If it is not your first time on the page and ConnectName is part of the form's fields
-                        // (Then you click submit and ConnectName was submitted. This means you need to display the field again so that you can edit it)
+                        // If you did no just land on the page and ConnectName is part of the form's fields
+                        // (Then you clicked submit and ConnectName was submitted. This means that we need to display the field again so that you can edit it)
                         ($firstTimeHere xor $connectNameProvided)
                         // You just landed on the page and there are some $ExistingUsers.
                         // This means that somehow you chose an existing user but the validation failed so you need to be able to choose again.

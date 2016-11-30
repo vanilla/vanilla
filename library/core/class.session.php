@@ -139,6 +139,8 @@ class Gdn_Session {
         }
 
         $allPermissions = $this->permissions->getPermissions();
+
+        // Junction (e.g. category) permissions
         if ($JunctionTable && !c("Garden.Permissions.Disabled.{$JunctionTable}")) {
             if (is_array($Permission)) {
                 if ($FullMatch) {
@@ -150,6 +152,7 @@ class Gdn_Session {
                 if ($JunctionID !== null) {
                     return $this->permissions->has($Permission, $JunctionID);
                 } else {
+                    // Backwards-compatible support for a null JunctionID meaning "permission on any ID"
                     return array_key_exists($Permission, $allPermissions) && count($allPermissions[$Permission]);
                 }
             }
@@ -161,6 +164,7 @@ class Gdn_Session {
                     return $this->permissions->hasAny($Permission);
                 }
             } else {
+                // Backwards-compatible permission check
                 return $this->permissions->has($Permission) || array_key_exists($Permission, $allPermissions);
             }
         }

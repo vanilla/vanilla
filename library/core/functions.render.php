@@ -53,7 +53,7 @@ if (!function_exists('dashboardSymbol')) {
         if (!empty($class)) {
             $attr['class'] = $class.' ';
         } else {
-            $attr['class'] = $attr['class'] ? $attr['class'].' ' : '';
+            $attr['class'] = isset($attr['class']) ? $attr['class'].' ' : '';
         }
 
         $baseCssClass = 'icon icon-svg-'.$name;

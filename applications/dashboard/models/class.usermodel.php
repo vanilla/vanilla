@@ -1129,37 +1129,13 @@ class UserModel extends Gdn_Model {
     /**
      * Take raw permission definitions and create.
      *
-     * @param array $Permissions
+     * @param array $rawPermissions Database rows from the permissions table.
      * @return array Compiled permissions
      */
-    public static function compilePermissions($Permissions) {
-        $Compiled = [];
-        foreach ($Permissions as $i => $Row) {
-            $JunctionID = array_key_exists('JunctionID', $Row) ? $Row['JunctionID'] : null;
-            unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
-
-            foreach ($Row as $PermissionName => $Value) {
-                if ($Value == 0) {
-                    continue;
-                }
-
-                if (is_numeric($JunctionID) && $JunctionID !== null) {
-                    if (!array_key_exists($PermissionName, $Compiled)) {
-                        $Compiled[$PermissionName] = [];
-                    }
-
-                    if (!is_array($Compiled[$PermissionName])) {
-                        $Compiled[$PermissionName] = [];
-                    }
-
-                    $Compiled[$PermissionName][] = $JunctionID;
-                } else {
-                    $Compiled[] = $PermissionName;
-                }
-            }
-        }
-
-        return $Compiled;
+    public static function compilePermissions($rawPermissions) {
+        $permissions = new Vanilla\Permissions();
+        $permissions->compileAndLoad($rawPermissions);
+        return $permissions->getPermissions();
     }
 
     /**

@@ -1103,11 +1103,17 @@ class UserModel extends Gdn_Model {
         }
 
         $Data = Gdn::permissionModel()->cachePermissions($UserID);
-        $Permissions = UserModel::compilePermissions($Data);
+        $permissions = new Vanilla\Permissions();
+        $permissions->compileAndLoad($Data);
 
-        $PermissionsSerialized = dbencode($Permissions);
+        $this->EventArguments['UserID'] = $UserID;
+        $this->EventArguments['Permissions'] = $permissions;
+        $this->fireEvent('loadPermissions');
+
+        $permissionsArray = $permissions->getPermissions();
+        $PermissionsSerialized = dbencode($permissionsArray);
         if (Gdn::cache()->activeEnabled()) {
-            Gdn::cache()->store($UserPermissionsKey, $Permissions);
+            Gdn::cache()->store($UserPermissionsKey, $permissionsArray);
         } else {
             // Save the permissions to the user table
             if ($UserID > 0) {
@@ -1115,7 +1121,7 @@ class UserModel extends Gdn_Model {
             }
         }
 
-        return $Serialize ? $PermissionsSerialized : $Permissions;
+        return $Serialize ? $PermissionsSerialized : $permissionsArray;
     }
 
     /**

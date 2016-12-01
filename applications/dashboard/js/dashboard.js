@@ -770,11 +770,31 @@ var DashboardModal = (function() {
         });
     }
 
-    function userDropDownInit(element) {
-        var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.js-navbar .js-card-user', element).length !== 0) {
+    /**
+     * Initialized drop.js on any element with the class 'js-card'. The element must have their id attribute set and
+     * must specify the html content it will reveal when it is clicked.
+     *
+     * @param element The context
+     */
+    function dropInit(element) {
+        $('.js-card', element).each(function() {
+            var $trigger = $(this);
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
+
+            if (triggerSelector === undefined) {
+                console.error('Drop trigger must be unique and have an id attribute set.');
+                return;
+            }
+
+            if (html === undefined) {
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
+                return;
+            }
+
             new Drop({
-                target: document.querySelector('.js-navbar .js-card-user', element),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -783,8 +803,10 @@ var DashboardModal = (function() {
                     targetAttachment: 'bottom right',
                     offset: '-10 0'
                 }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
-        }
+        });
     }
 
     /**
@@ -951,7 +973,7 @@ var DashboardModal = (function() {
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
-        userDropDownInit(e.target); // navbar 'me' dropdown
+        dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav

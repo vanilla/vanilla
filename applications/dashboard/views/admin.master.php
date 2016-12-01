@@ -85,7 +85,12 @@ Gdn_Theme::assetEnd();
             <?php
             if (Gdn::session()->isValid()) {
                 $photo = '<img src="'.userPhotoUrl($user).'">';
-                echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
+                $attr = [
+                    'class' => 'navbar-profile js-card-user js-card',
+                    'data-content-id' => 'cardUserContent',
+                    'id' => 'cardUserTrigger'
+                ];
+                echo wrap($photo.' <span class="icon icon-caret-down"></span>', 'div', $attr);
             }
             ?>
         </div>
@@ -128,7 +133,7 @@ Gdn_Theme::assetEnd();
         </div>
     </div>
 </div>
-<aside aria-hidden="true" class="hidden js-dashboard-user-dropdown">
+<aside id="cardUserContent" aria-hidden="true" class="hidden">
     <?php $this->renderAsset('DashboardUserDropDown'); ?>
 </aside>
 <?php $this->fireEvent('AfterBody'); ?>

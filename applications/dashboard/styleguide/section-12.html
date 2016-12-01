@@ -94,14 +94,14 @@
                                             <h3 class="kss-title" id="12-1-1">
                                             <span class="kss-ref badge pull-right">12-1-1</span> Configuring drop.js
                                             </h3>
-                                                <div class="kss-box padded"><p>For any element with the <code>.js-card</code> class applied, dashboard.js initializes this html to be content of the block
+                                                <div class="kss-box padded"><p>For any element with the <code>.js-drop</code> class applied, dashboard.js initializes this html to be content of the block
 with an id that matches the <code>data-content-id</code> attribute. Note that the trigger needs to have an id set in order for
 this functionality to work, as drop expects a unique query selector.</p>
 </div>
-                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div id=&quot;trigger&quot; class=&quot;js-card btn btn-secondary&quot; data-content-id=&quot;content&quot;&gt;
+                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div id=&quot;trigger&quot; class=&quot;js-drop btn btn-secondary&quot; data-content-id=&quot;content&quot;&gt;
   Click Me
 &lt;/div&gt;
-&lt;aside id=&quot;content&quot; class=&quot;js-card-content hidden&quot; aria-hidden=&quot;true&quot;&gt;
+&lt;aside id=&quot;content&quot; class=&quot;hidden&quot; aria-hidden=&quot;true&quot;&gt;
   &lt;div class=&quot;card card-user&quot;&gt;
     &lt;div class=&quot;card-block media media-sm&quot;&gt;
       &lt;div class=&quot;media-left&quot;&gt;
@@ -139,10 +139,10 @@ this functionality to work, as drop expects a unique query selector.</p>
 &lt;/aside&gt;</pre>
                                                 </div> <!-- end kss-component-description -->
                                                 <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                                                <div class="kss-example padded-bottom"><div id="trigger" class="js-card btn btn-secondary" data-content-id="content">
+                                                <div class="kss-example padded-bottom"><div id="trigger" class="js-drop btn btn-secondary" data-content-id="content">
   Click Me
 </div>
-<aside id="content" class="js-card-content hidden" aria-hidden="true">
+<aside id="content" class="hidden" aria-hidden="true">
   <div class="card card-user">
     <div class="card-block media media-sm">
       <div class="media-left">

@@ -109,13 +109,13 @@
     }
 
     /**
-     * Initialized drop.js on any element with the class 'js-card'. The element must have their id attribute set and
+     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
      * @param element The context
      */
     function dropInit(element) {
-        $('.js-card', element).each(function() {
+        $('.js-drop', element).each(function() {
             var $trigger = $(this);
             var contentSelector = $trigger.data('contentId');
             var triggerSelector = $trigger.attr('id');

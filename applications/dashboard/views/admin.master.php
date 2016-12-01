@@ -86,7 +86,7 @@ Gdn_Theme::assetEnd();
             if (Gdn::session()->isValid()) {
                 $photo = '<img src="'.userPhotoUrl($user).'">';
                 $attr = [
-                    'class' => 'navbar-profile js-card-user js-card',
+                    'class' => 'navbar-profile js-drop',
                     'data-content-id' => 'cardUserContent',
                     'id' => 'cardUserTrigger'
                 ];

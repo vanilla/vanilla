@@ -13,15 +13,15 @@
 
 // Configuring drop.js
 //
-// For any element with the `.js-card` class applied, dashboard.js initializes this html to be content of the block
+// For any element with the `.js-drop` class applied, dashboard.js initializes this html to be content of the block
 // with an id that matches the `data-content-id` attribute. Note that the trigger needs to have an id set in order for
 // this functionality to work, as drop expects a unique query selector.
 //
 // Markup:
-// <div id="trigger" class="js-card btn btn-secondary" data-content-id="content">
+// <div id="trigger" class="js-drop btn btn-secondary" data-content-id="content">
 //   Click Me
 // </div>
-// <aside id="content" class="js-card-content hidden" aria-hidden="true">
+// <aside id="content" class="hidden" aria-hidden="true">
 //   <div class="card card-user">
 //     <div class="card-block media media-sm">
 //       <div class="media-left">

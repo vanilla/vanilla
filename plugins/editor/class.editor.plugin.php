@@ -748,13 +748,23 @@ class EditorPlugin extends Gdn_Plugin {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
-                    array(
+                    [
                         'OriginalFilename' => $fileName,
                         'source' => 'content'
-                    )
+                    ]
                 );
             } else {
-                $filePathParsed = Gdn_UploadImage::saveImageAs($tmpFilePath, $absoluteFileDestination, '', '', array('SaveGif' => true));
+                $filePathParsed = Gdn_UploadImage::saveImageAs(
+                    $tmpFilePath,
+                    $absoluteFileDestination,
+                    '',
+                    '',
+                    [
+                        'OriginalFilename' => $fileName,
+                        'source' => 'content',
+                        'SaveGif' => true
+                    ]
+                );
                 $tmpwidth = $filePathParsed['Width'];
                 $tmpheight = $filePathParsed['Height'];
             }

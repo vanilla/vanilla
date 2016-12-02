@@ -241,15 +241,12 @@ class UserModel extends Gdn_Model {
 
         // Grab the permissions for the user.
         if ($User->UserID == 0) {
-            $Permissions = $this->definePermissions(0, false);
+            $permissions = $this->getPermissions(0);
         } elseif (is_array($User->Permissions)) {
-            $Permissions = $User->Permissions;
+            $permissions = new Vanilla\Permissions($User->Permissions);
         } else {
-            $Permissions = $this->definePermissions($User->UserID, false);
+            $permissions = $this->getPermissions($User->UserID);
         }
-
-        // TODO: Check for junction table permissions.
-        $permissions = new Vanilla\Permissions($Permissions);
 
         return $permissions->has($Permission);
     }
@@ -1616,7 +1613,8 @@ class UserModel extends Gdn_Model {
             // Otherwise normal loadings!
         } else {
             if ($User && ($User->Permissions == '' || Gdn::cache()->activeEnabled())) {
-                $User->Permissions = $this->definePermissions($UserID, false);
+                $userPermissions = $this->getPermissions($UserID);
+                $User->Permissions = $userPermissions->getPermissions();
             }
         }
 

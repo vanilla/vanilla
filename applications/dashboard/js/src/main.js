@@ -283,6 +283,27 @@
         });
     }
 
+    /**
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
+     * close to the bottom of the page.
+     *
+     * @param element The scope of the function.
+     */
+    function dropDownInit(element) {
+        $('.dropdown', element).each(function() {
+            var $dropdown = $(this);
+            var offset = $dropdown.offset();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
+            var documentHeight = $(document).height();
+            var padding = 6;
+
+            if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
+                $dropdown.addClass('dropup');
+            }
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -298,6 +319,7 @@
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
+        dropDownInit(e.target); // makes sure our dropdowns open in the right direction
     });
 
     /**
@@ -486,7 +508,6 @@
             }
         });
     });
-
 })(jQuery);
 
 var dashboardSymbol =  function(name, alt, cssClass) {

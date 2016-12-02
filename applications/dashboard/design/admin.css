@@ -6176,6 +6176,11 @@ button.bookmark,
   color: #cbcdd2;
 }
 
+.dropup .dropdown-toggle::after {
+  border-top: 0.375em solid;
+  border-bottom: 0;
+}
+
 .footer {
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;

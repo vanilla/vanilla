@@ -13,12 +13,22 @@
  */
 class RoleController extends DashboardController {
 
+    /** @var bool Should categories be hidden when editing a role? */
+    private $hideCategories;
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form', 'RoleModel');
 
     /** @var RoleModel */
     public $RoleModel;
 
+    /**
+     * RoleController constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->hideCategories = c('Vanilla.HideRoleCategoryPermissions', false);
+    }
     /**
      * Set menu path. Automatically run on every use.
      *
@@ -114,8 +124,6 @@ class RoleController extends DashboardController {
         if ($this->title() == '') {
             $this->title(t('Edit Role'));
         }
-
-        $hideCategories = c('Vanilla.HideCategoriesOnRole', false);
 
         $this->setHighlightRoute('dashboard/role');
         $PermissionModel = Gdn::permissionModel();

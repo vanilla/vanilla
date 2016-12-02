@@ -4537,6 +4537,53 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Get a user's permissions.
+     *
+     * @param int $userID Unique ID of the user.
+     * @return Vanilla\Permissions
+     */
+    public function getPermissions($userID) {
+        $permissions = new Vanilla\Permissions();
+        $permissionsKey = '';
+
+        if (Gdn::cache()->activeEnabled()) {
+            $permissionsIncrement = $this->getPermissionsIncrement();
+            $permissionsKey = formatString(self::USERPERMISSIONS_KEY, [
+                'UserID' => $userID,
+                'PermissionsIncrement' => $permissionsIncrement
+            ]);
+
+            $cachedPermissions = Gdn::cache()->get($permissionsKey);
+            if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
+                $permissions->setPermissions($cachedPermissions);
+                return $permissions;
+            }
+        }
+
+        $data = Gdn::permissionModel()->cachePermissions($userID);
+        $permissions->compileAndLoad($data);
+
+        $this->EventArguments['UserID'] = $userID;
+        $this->EventArguments['Permissions'] = $permissions;
+        $this->fireEvent('loadPermissions');
+
+        if (Gdn::cache()->activeEnabled()) {
+            Gdn::cache()->store($permissionsKey, $permissions->getPermissions());
+        } else {
+            // Save the permissions to the user table
+            if ($userID > 0) {
+                $this->SQL->put(
+                    'User',
+                    ['Permissions' => dbencode($permissions->getPermissions())],
+                    ['UserID' => $userID]
+                );
+            }
+        }
+
+        return $permissions;
+    }
+
+    /**
      *
      *
      * @return bool|int|mixed

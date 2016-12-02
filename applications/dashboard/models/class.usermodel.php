@@ -1076,6 +1076,7 @@ class UserModel extends Gdn_Model {
     /**
      * Load and compile user permissions
      *
+     * @deprecated Use UserModel::getPermissions instead.
      * @param integer $UserID
      * @param boolean $Serialize
      * @return array
@@ -1085,45 +1086,9 @@ class UserModel extends Gdn_Model {
             deprecated("UserModel->definePermissions(id, true)", "UserModel->definePermissions(id)");
         }
 
-        $UserPermissionsKey = '';
+        $permissions = $this->getPermissions($UserID);
 
-        if (Gdn::cache()->activeEnabled()) {
-            $PermissionsIncrement = $this->getPermissionsIncrement();
-            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [
-                'UserID' => $UserID,
-                'PermissionsIncrement' => $PermissionsIncrement
-            ]);
-
-            $CachePermissions = Gdn::cache()->get($UserPermissionsKey);
-            if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) {
-                if ($Serialize) {
-                    return dbencode($CachePermissions);
-                } else {
-                    return $CachePermissions;
-                }
-            }
-        }
-
-        $Data = Gdn::permissionModel()->cachePermissions($UserID);
-        $permissions = new Vanilla\Permissions();
-        $permissions->compileAndLoad($Data);
-
-        $this->EventArguments['UserID'] = $UserID;
-        $this->EventArguments['Permissions'] = $permissions;
-        $this->fireEvent('loadPermissions');
-
-        $permissionsArray = $permissions->getPermissions();
-        $PermissionsSerialized = dbencode($permissionsArray);
-        if (Gdn::cache()->activeEnabled()) {
-            Gdn::cache()->store($UserPermissionsKey, $permissionsArray);
-        } else {
-            // Save the permissions to the user table
-            if ($UserID > 0) {
-                $this->SQL->put('User', ['Permissions' => $PermissionsSerialized], ['UserID' => $UserID]);
-            }
-        }
-
-        return $Serialize ? $PermissionsSerialized : $permissionsArray;
+        return $Serialize ? dbencode($permissions->getPermissions()) : $permissions->getPermissions();
     }
 
     /**

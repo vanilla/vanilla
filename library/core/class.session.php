@@ -130,15 +130,9 @@ class Gdn_Session {
         }
 
         // Allow wildcard permission checks (e.g. 'any' Category)
-        if ($JunctionID == 'any') {
-            $JunctionID = '';
-        }
-
         if ($JunctionID === '') {
-            $JunctionID = null;
+            $JunctionID = Vanilla\Permissions::ANY;
         }
-
-        $allPermissions = $this->permissions->getPermissions();
 
         // Junction (e.g. category) permissions
         if ($JunctionTable && !c("Garden.Permissions.Disabled.{$JunctionTable}")) {
@@ -149,12 +143,7 @@ class Gdn_Session {
                     return $this->permissions->hasAny($Permission, $JunctionID);
                 }
             } else {
-                if ($JunctionID !== null) {
-                    return $this->permissions->has($Permission, $JunctionID);
-                } else {
-                    // Backwards-compatible support for a null JunctionID meaning "permission on any ID"
-                    return array_key_exists($Permission, $allPermissions) && count($allPermissions[$Permission]);
-                }
+                return $this->permissions->has($Permission, $JunctionID);
             }
         } else {
             if (is_array($Permission)) {
@@ -164,8 +153,7 @@ class Gdn_Session {
                     return $this->permissions->hasAny($Permission);
                 }
             } else {
-                // Backwards-compatible permission check
-                return $this->permissions->has($Permission) || array_key_exists($Permission, $allPermissions);
+                return $this->permissions->has($Permission, Vanilla\Permissions::ANY);
             }
         }
     }

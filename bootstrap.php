@@ -90,7 +90,7 @@ Gdn::config()->load(PATH_CONF.'/config-defaults.php');
 Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
 
 // Default request object
-Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactoryRealSingleton, 'Create');
+Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactorySingleton);
 Gdn::request()->fromEnvironment();
 
 /**
@@ -198,7 +198,7 @@ Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
 Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // Smarty Templating Engine
-Gdn::factoryInstall('Smarty', 'Smarty', PATH_LIBRARY.'/vendors/smarty/libs/Smarty.class.php');
+Gdn::factoryInstall('Smarty', 'Smarty');
 Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 
 // Slice handler

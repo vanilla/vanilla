@@ -131,7 +131,7 @@ class Gdn_Session {
 
         // Allow wildcard permission checks (e.g. 'any' Category)
         if ($junctionID === 'any') {
-            $junctionID = Vanilla\Permissions::ANY;
+            $junctionID = null;
         }
 
         // Junction (e.g. category) permissions
@@ -153,7 +153,7 @@ class Gdn_Session {
                     return $this->permissions->hasAny($permission);
                 }
             } else {
-                return $this->permissions->has($permission, Vanilla\Permissions::ANY);
+                return $this->permissions->has($permission);
             }
         }
     }

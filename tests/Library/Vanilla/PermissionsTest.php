@@ -206,4 +206,14 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($perms->has('bar', 3));
         $this->assertTrue($perms->has('bar', Permissions::ANY));
     }
+
+    /**
+     * Make sure that removing all permissions will return false for an any permission scenario.
+     */
+    public function testAddRemovePermission() {
+        $perms = new Permissions();
+        $perms->add('foo', 1);
+        $perms->remove('foo', 1);
+        $this->assertFalse($perms->has('foo', Permissions::ANY));
+    }
 }

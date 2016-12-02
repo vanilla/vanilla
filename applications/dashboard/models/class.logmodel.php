@@ -95,6 +95,17 @@ class LogModel extends Gdn_Pluggable {
                     $Result .= "<br />".t('Banned');
                 }
                 break;
+            case 'Group':
+                $Result =
+                    '<b>'.$this->formatKey('Name', $Data).'</b><br />'.
+                    $this->formatKey('Description', $Data);
+                break;
+            case 'Event':
+                $Result =
+                    '<b>'.$this->formatKey('Name', $Data).'</b><br />'.
+                    $this->formatKey('Body', $Data).'<br />'.
+                    t('Location').': '.$this->formatKey('Location', $Data);
+                break;
             default:
                 $Result = '';
         }

@@ -29,14 +29,14 @@ class Gdn_Session {
     /** @var object Attributes of the current user. */
     protected $_Attributes;
 
-    /** @var object Permissions of the current user. */
-    protected $_Permissions;
-
     /** @var object Preferences of the current user. */
     protected $_Preferences;
 
     /** @var object The current user's transient key. */
     protected $_TransientKey;
+
+    /** @var  Vanilla\Permissions */
+    private $permissions;
 
     /**
      * @var DateTimeZone The current timezone of the user.
@@ -50,9 +50,10 @@ class Gdn_Session {
         $this->UserID = 0;
         $this->User = false;
         $this->_Attributes = array();
-        $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
+
+        $this->permissions = new Vanilla\Permissions();
     }
 
 
@@ -62,7 +63,8 @@ class Gdn_Session {
      * @param array $perms The permissions to add.
      */
     public function addPermissions($perms) {
-        $this->_Permissions = PermissionModel::addPermissions($this->_Permissions, $perms);
+        $newPermissions = new Vanilla\Permissions($perms);
+        $this->permissions->merge($newPermissions);
     }
 
     /**
@@ -95,7 +97,7 @@ class Gdn_Session {
              * assigned to their role.
              */
             for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                if ($this->checkPermission($permissionsRanked[$i])) {
+                if ($this->permissions->has($permissionsRanked[$i])) {
                     return true;
                 }
             }
@@ -103,72 +105,43 @@ class Gdn_Session {
         }
 
         // Check to see if the user has at least the given permission.
-        return $this->checkPermission($permission);
+        return $this->permissions->has($permission);
     }
 
     /**
-     * Checks the currently authenticated user's permissions for the specified
-     * permission. Returns a boolean value indicating if the action is
-     * permitted.
+     * Checks the currently authenticated user's permissions for the specified permission.
      *
-     * @param mixed $Permission The permission (or array of permissions) to check.
-     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
-     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-     * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param in $JunctionID The ID of the junction permission.
-     * * @return boolean
+     * Returns a boolean value indicating if the action is permitted.
+     *
+     * @param string|array $permission The permission (or array of permissions) to check.
+     * @param bool $fullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required.
+     * If false, the user only needs one of the specified permissions.
+     * @param string $junctionTable The name of the junction table for a junction permission.
+     * @param int|string $junctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
-    public function checkPermission($Permission, $FullMatch = true, $JunctionTable = '', $JunctionID = '') {
+    public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
         if (is_object($this->User)) {
-            if ($this->User->Banned || GetValue('Deleted', $this->User)) {
+            if ($this->User->Banned || val('Deleted', $this->User)) {
                 return false;
             } elseif ($this->User->Admin) {
                 return true;
             }
         }
 
-        // Allow wildcard permission checks (e.g. 'any' Category)
-        if ($JunctionID == 'any') {
-            $JunctionID = '';
+        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
+            c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            $junctionID = null;
         }
 
-        $Permissions = $this->getPermissions();
-        if ($JunctionTable && !c('Garden.Permissions.Disabled.'.$JunctionTable)) {
-            // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
-            if (is_array($Permission)) {
-                $Pass = false;
-                foreach ($Permission as $PermissionName) {
-                    if ($this->checkPermission($PermissionName, false, $JunctionTable, $JunctionID)) {
-                        if (!$FullMatch) {
-                            return true;
-                        }
-                        $Pass = true;
-                    } else {
-                        if ($FullMatch) {
-                            return false;
-                        }
-                    }
-                }
-                return $Pass;
+        if (is_array($permission)) {
+            if ($fullMatch) {
+                return $this->permissions->hasAll($permission);
             } else {
-                if ($JunctionID !== '') {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && in_array($JunctionID, $Permissions[$Permission]);
-                } else {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && count($Permissions[$Permission]);
-                }
-                return $Result;
+                return $this->permissions->hasAny($permission);
             }
         } else {
-            // Non-junction permission ($Permissions = array(PermissionNames))
-            if (is_array($Permission)) {
-                return arrayInArray($Permission, $Permissions, $FullMatch);
-            } else {
-                return in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
-            }
+            return $this->permissions->has($permission);
         }
     }
 
@@ -196,20 +169,29 @@ class Gdn_Session {
         $this->UserID = 0;
         $this->User = false;
         $this->_Attributes = array();
-        $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
         $this->timeZone = null;
     }
 
     /**
-     * Returns all "allowed" permissions for the authenticated user in a
-     * one-dimensional array of permission names.
+     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
+     *
+     * @return array
+     * @deprecated We want to make this an accessor for the permissions property.
+     */
+    public function getPermissions() {
+        deprecated('Gdn_Session->getPermissions()', 'Gdn_Session->getPermissionsArray()');
+        return $this->permissions->getPermissions();
+    }
+
+    /**
+     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
      *
      * @return array
      */
-    public function getPermissions() {
-        return is_array($this->_Permissions) ? $this->_Permissions : array();
+    public function getPermissionsArray() {
+        return $this->permissions->getPermissions();
     }
 
     /**
@@ -351,23 +333,20 @@ class Gdn_Session {
     public function setPermission($PermissionName, $Value = null) {
         if (is_string($PermissionName)) {
             if ($Value === null || $Value === true) {
-                $this->_Permissions[] = $PermissionName;
+                $this->permissions->overwrite($PermissionName, true);
             } elseif ($Value === false) {
-                $Index = array_search($PermissionName, $this->_Permissions);
-                if ($Index !== false) {
-                    unset($this->_Permissions[$Index]);
-                }
+                $this->permissions->overwrite($PermissionName, false);
             } elseif (is_array($Value)) {
-                $this->_Permissions[$PermissionName] = $Value;
+                $this->permissions->overwrite($PermissionName, $Value);
             }
         } elseif (is_array($PermissionName)) {
             if (array_key_exists(0, $PermissionName)) {
                 foreach ($PermissionName as $Name) {
-                    $this->setPermission($Name);
+                    $this->permissions->set($Name, true);
                 }
             } else {
                 foreach ($PermissionName as $Name => $Value) {
-                    $this->setPermission($Name, $Value);
+                    $this->permissions->set($Name, $Value);
                 }
             }
         }
@@ -468,7 +447,7 @@ class Gdn_Session {
                 $UserModel->EventArguments['User'] =& $this->User;
                 $UserModel->fireEvent('AfterGetSession');
 
-                $this->_Permissions = $this->User->Permissions;
+                $this->permissions->setPermissions($this->User->Permissions);
                 $this->_Preferences = $this->User->Preferences;
                 $this->_Attributes = $this->User->Attributes;
                 $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
@@ -497,7 +476,8 @@ class Gdn_Session {
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = $UserModel->definePermissions(0, false);
+            $guestPermissions = $UserModel->definePermissions(0, false);
+            $this->permissions->setPermissions($guestPermissions);
         }
     }
 

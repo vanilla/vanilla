@@ -15,7 +15,6 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
 
         $permissions->add('Vanilla.Discussions.Add', 10);
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Add'));
     }
 
     public function testCompileAndLoad() {
@@ -46,7 +45,6 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($permissions->has('Vanilla.Discussions.View'));
         $this->assertFalse($permissions->has('Garden.Settings.Manage'));
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Add'));
     }
 
     public function testHasAny() {
@@ -101,6 +99,10 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Add', 100));
+
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', null));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.View', null));
+        $this->assertFalse($permissions->has('Vanilla.Discussions.Edit'));
     }
 
     public function testMerge() {
@@ -116,7 +118,6 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($permissions->has('Garden.SignIn.Allow'));
         $this->assertTrue($permissions->has('Garden.Profiles.View'));
-        $this->assertFalse($permissions->has('Vanilla.Discussions.Add'));
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 20));
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 30));
@@ -179,7 +180,31 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($permissions->has('Vanilla.Comments.Add', 10));
         $this->assertTrue($permissions->has('Vanilla.Comments.Edit', 10));
         $this->assertFalse($permissions->has('Garden.Settings.Manage'));
-        $this->assertFalse($permissions->has('Vanilla.Comments.Add'));
-        $this->assertFalse($permissions->has('Vanilla.Comments.Edit'));
+    }
+
+    /**
+     * Test permissions with the any.
+     */
+    public function testAnyIDPermission() {
+        $perms = new Permissions();
+
+        $this->assertFalse($perms->has('foo'));
+
+        $perms->set('foo', true);
+        $this->assertTrue($perms->has('foo'));
+
+        $perms->add('bar', [1, 2]);
+        $this->assertFalse($perms->has('bar', 3));
+        $this->assertTrue($perms->has('bar'));
+    }
+
+    /**
+     * Make sure that removing all permissions will return false for an any permission scenario.
+     */
+    public function testAddRemovePermission() {
+        $perms = new Permissions();
+        $perms->add('foo', 1);
+        $perms->remove('foo', 1);
+        $this->assertFalse($perms->has('foo'));
     }
 }

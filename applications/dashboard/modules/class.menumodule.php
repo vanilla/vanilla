@@ -160,14 +160,12 @@ if (!class_exists('MenuModule', false)) {
             $Session_TransientKey = '';
             $Permissions = array();
             $Session = Gdn::session();
-            $HasPermissions = false;
             $Admin = false;
             if ($Session->isValid() === true) {
                 $UserID = $Session->User->UserID;
                 $Username = $Session->User->Name;
                 $Session_TransientKey = $Session->TransientKey();
-                $Permissions = $Session->GetPermissions();
-                $HasPermissions = count($Permissions) > 0;
+                $Permissions = $Session->getPermissionsArray();
                 $Admin = $Session->User->Admin > 0 ? true : false;
             }
 

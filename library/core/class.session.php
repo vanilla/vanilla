@@ -188,12 +188,22 @@ class Gdn_Session {
     }
 
     /**
-     * Returns all "allowed" permissions for the authenticated user in a
-     * one-dimensional array of permission names.
+     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
+     *
+     * @return array
+     * @deprecated We want to make this an accessor for the permissions property.
+     */
+    public function getPermissions() {
+        deprecated('Gdn_Session->getPermissions()', 'Gdn_Session->getPermissionsArray()');
+        return $this->permissions->getPermissions();
+    }
+
+    /**
+     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
      *
      * @return array
      */
-    public function getPermissions() {
+    public function getPermissionsArray() {
         return $this->permissions->getPermissions();
     }
 

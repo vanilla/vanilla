@@ -129,32 +129,19 @@ class Gdn_Session {
             }
         }
 
-        // Allow wildcard permission checks (e.g. 'any' Category)
-        if ($junctionID === 'any') {
+        if ($junctionID === 'any' || $junctionID == '' || empty($junctionTable) ||
+            c("Garden.Permissions.Disabled.{$junctionTable}")) {
             $junctionID = null;
         }
 
-        // Junction (e.g. category) permissions
-        if ($junctionTable && !c("Garden.Permissions.Disabled.{$junctionTable}")) {
-            if (is_array($permission)) {
-                if ($fullMatch) {
-                    return $this->permissions->hasAll($permission, $junctionID);
-                } else {
-                    return $this->permissions->hasAny($permission, $junctionID);
-                }
+        if (is_array($permission)) {
+            if ($fullMatch) {
+                return $this->permissions->hasAll($permission);
             } else {
-                return $this->permissions->has($permission, $junctionID);
+                return $this->permissions->hasAny($permission);
             }
         } else {
-            if (is_array($permission)) {
-                if ($fullMatch) {
-                    return $this->permissions->hasAll($permission);
-                } else {
-                    return $this->permissions->hasAny($permission);
-                }
-            } else {
-                return $this->permissions->has($permission);
-            }
+            return $this->permissions->has($permission);
         }
     }
 

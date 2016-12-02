@@ -186,4 +186,24 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($permissions->has('Vanilla.Comments.Add'));
         $this->assertFalse($permissions->has('Vanilla.Comments.Edit'));
     }
+
+    /**
+     * Test permissions with the {@link Permissions::ANY} constant.
+     */
+    public function testAnyIDPermission() {
+        $perms = new Permissions();
+
+        $this->assertFalse($perms->has('foo', Permissions::ANY));
+
+        $perms->set('foo', true);
+        $this->assertTrue($perms->has('foo', Permissions::ANY));
+
+        $perms->set('foo', false);
+        $this->assertFalse($perms->has('foo', Permissions::ANY));
+
+        $perms->add('bar', [1, 2]);
+        $this->assertFalse($perms->has('bar'));
+        $this->assertFalse($perms->has('bar', 3));
+        $this->assertTrue($perms->has('bar', Permissions::ANY));
+    }
 }

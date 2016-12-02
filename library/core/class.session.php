@@ -109,18 +109,18 @@ class Gdn_Session {
     }
 
     /**
-     * Checks the currently authenticated user's permissions for the specified
-     * permission. Returns a boolean value indicating if the action is
-     * permitted.
+     * Checks the currently authenticated user's permissions for the specified permission.
      *
-     * @param mixed $Permission The permission (or array of permissions) to check.
-     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
-     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-     * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param int|string $JunctionID The ID of the junction permission.
-     * @return boolean
+     * Returns a boolean value indicating if the action is permitted.
+     *
+     * @param string|array $permission The permission (or array of permissions) to check.
+     * @param bool $fullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required.
+     * If false, the user only needs one of the specified permissions.
+     * @param string $junctionTable The name of the junction table for a junction permission.
+     * @param int|string $junctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
-    public function checkPermission($Permission, $FullMatch = true, $JunctionTable = '', $JunctionID = '') {
+    public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
         if (is_object($this->User)) {
             if ($this->User->Banned || val('Deleted', $this->User)) {
                 return false;
@@ -130,30 +130,30 @@ class Gdn_Session {
         }
 
         // Allow wildcard permission checks (e.g. 'any' Category)
-        if ($JunctionID === '') {
-            $JunctionID = Vanilla\Permissions::ANY;
+        if ($junctionID === 'any') {
+            $junctionID = Vanilla\Permissions::ANY;
         }
 
         // Junction (e.g. category) permissions
-        if ($JunctionTable && !c("Garden.Permissions.Disabled.{$JunctionTable}")) {
-            if (is_array($Permission)) {
-                if ($FullMatch) {
-                    return $this->permissions->hasAll($Permission, $JunctionID);
+        if ($junctionTable && !c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            if (is_array($permission)) {
+                if ($fullMatch) {
+                    return $this->permissions->hasAll($permission, $junctionID);
                 } else {
-                    return $this->permissions->hasAny($Permission, $JunctionID);
+                    return $this->permissions->hasAny($permission, $junctionID);
                 }
             } else {
-                return $this->permissions->has($Permission, $JunctionID);
+                return $this->permissions->has($permission, $junctionID);
             }
         } else {
-            if (is_array($Permission)) {
-                if ($FullMatch) {
-                    return $this->permissions->hasAll($Permission);
+            if (is_array($permission)) {
+                if ($fullMatch) {
+                    return $this->permissions->hasAll($permission);
                 } else {
-                    return $this->permissions->hasAny($Permission);
+                    return $this->permissions->hasAny($permission);
                 }
             } else {
-                return $this->permissions->has($Permission, Vanilla\Permissions::ANY);
+                return $this->permissions->has($permission, Vanilla\Permissions::ANY);
             }
         }
     }

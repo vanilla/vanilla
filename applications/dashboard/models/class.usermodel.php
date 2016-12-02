@@ -251,8 +251,7 @@ class UserModel extends Gdn_Model {
         // TODO: Check for junction table permissions.
         $permissions = new Vanilla\Permissions($Permissions);
 
-        // Secondary check added for backwards compatibility
-        return $permissions->has($Permission) || array_key_exists($Permission, $permissions->getPermissions());
+        return $permissions->has($Permission);
     }
 
     /**

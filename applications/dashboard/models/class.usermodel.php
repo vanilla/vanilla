@@ -241,16 +241,14 @@ class UserModel extends Gdn_Model {
 
         // Grab the permissions for the user.
         if ($User->UserID == 0) {
-            $Permissions = $this->definePermissions(0, false);
+            $permissions = $this->getPermissions(0);
         } elseif (is_array($User->Permissions)) {
-            $Permissions = $User->Permissions;
+            $permissions = new Vanilla\Permissions($User->Permissions);
         } else {
-            $Permissions = $this->definePermissions($User->UserID, false);
+            $permissions = $this->getPermissions($User->UserID);
         }
 
-        // TODO: Check for junction table permissions.
-        $Result = in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
-        return $Result;
+        return $permissions->has($Permission);
     }
 
     /**
@@ -1074,6 +1072,7 @@ class UserModel extends Gdn_Model {
     /**
      * Load and compile user permissions
      *
+     * @deprecated Use UserModel::getPermissions instead.
      * @param integer $UserID
      * @param boolean $Serialize
      * @return array
@@ -1083,75 +1082,21 @@ class UserModel extends Gdn_Model {
             deprecated("UserModel->definePermissions(id, true)", "UserModel->definePermissions(id)");
         }
 
-        $UserPermissionsKey = '';
+        $permissions = $this->getPermissions($UserID);
 
-        if (Gdn::cache()->activeEnabled()) {
-            $PermissionsIncrement = $this->getPermissionsIncrement();
-            $UserPermissionsKey = formatString(self::USERPERMISSIONS_KEY, [
-                'UserID' => $UserID,
-                'PermissionsIncrement' => $PermissionsIncrement
-            ]);
-
-            $CachePermissions = Gdn::cache()->get($UserPermissionsKey);
-            if ($CachePermissions !== Gdn_Cache::CACHEOP_FAILURE) {
-                if ($Serialize) {
-                    return dbencode($CachePermissions);
-                } else {
-                    return $CachePermissions;
-                }
-            }
-        }
-
-        $Data = Gdn::permissionModel()->cachePermissions($UserID);
-        $Permissions = UserModel::compilePermissions($Data);
-
-        $PermissionsSerialized = dbencode($Permissions);
-        if (Gdn::cache()->activeEnabled()) {
-            Gdn::cache()->store($UserPermissionsKey, $Permissions);
-        } else {
-            // Save the permissions to the user table
-            if ($UserID > 0) {
-                $this->SQL->put('User', ['Permissions' => $PermissionsSerialized], ['UserID' => $UserID]);
-            }
-        }
-
-        return $Serialize ? $PermissionsSerialized : $Permissions;
+        return $Serialize ? dbencode($permissions->getPermissions()) : $permissions->getPermissions();
     }
 
     /**
      * Take raw permission definitions and create.
      *
-     * @param array $Permissions
+     * @param array $rawPermissions Database rows from the permissions table.
      * @return array Compiled permissions
      */
-    public static function compilePermissions($Permissions) {
-        $Compiled = [];
-        foreach ($Permissions as $i => $Row) {
-            $JunctionID = array_key_exists('JunctionID', $Row) ? $Row['JunctionID'] : null;
-            unset($Row['JunctionColumn'], $Row['JunctionColumn'], $Row['JunctionID'], $Row['RoleID'], $Row['PermissionID']);
-
-            foreach ($Row as $PermissionName => $Value) {
-                if ($Value == 0) {
-                    continue;
-                }
-
-                if (is_numeric($JunctionID) && $JunctionID !== null) {
-                    if (!array_key_exists($PermissionName, $Compiled)) {
-                        $Compiled[$PermissionName] = [];
-                    }
-
-                    if (!is_array($Compiled[$PermissionName])) {
-                        $Compiled[$PermissionName] = [];
-                    }
-
-                    $Compiled[$PermissionName][] = $JunctionID;
-                } else {
-                    $Compiled[] = $PermissionName;
-                }
-            }
-        }
-
-        return $Compiled;
+    public static function compilePermissions($rawPermissions) {
+        $permissions = new Vanilla\Permissions();
+        $permissions->compileAndLoad($rawPermissions);
+        return $permissions->getPermissions();
     }
 
     /**
@@ -1654,8 +1599,9 @@ class UserModel extends Gdn_Model {
             // Replace permissions with those of the ConfirmEmailRole
             $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
             $RoleModel = new RoleModel();
+            $permissions = new Vanilla\Permissions();
             $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
-            $Permissions = UserModel::compilePermissions($RolePermissions);
+            $Permissions = $permissions->compileAndLoad($RolePermissions);
 
             // Ensure Confirm Email role can always sign in
             if (!in_array('Garden.SignIn.Allow', $Permissions)) {
@@ -1667,7 +1613,8 @@ class UserModel extends Gdn_Model {
             // Otherwise normal loadings!
         } else {
             if ($User && ($User->Permissions == '' || Gdn::cache()->activeEnabled())) {
-                $User->Permissions = $this->definePermissions($UserID, false);
+                $userPermissions = $this->getPermissions($UserID);
+                $User->Permissions = $userPermissions->getPermissions();
             }
         }
 
@@ -4549,6 +4496,53 @@ class UserModel extends Gdn_Model {
         } else {
             Gdn::cache()->increment($PermissionsIncrementKey);
         }
+    }
+
+    /**
+     * Get a user's permissions.
+     *
+     * @param int $userID Unique ID of the user.
+     * @return Vanilla\Permissions
+     */
+    public function getPermissions($userID) {
+        $permissions = new Vanilla\Permissions();
+        $permissionsKey = '';
+
+        if (Gdn::cache()->activeEnabled()) {
+            $permissionsIncrement = $this->getPermissionsIncrement();
+            $permissionsKey = formatString(self::USERPERMISSIONS_KEY, [
+                'UserID' => $userID,
+                'PermissionsIncrement' => $permissionsIncrement
+            ]);
+
+            $cachedPermissions = Gdn::cache()->get($permissionsKey);
+            if ($cachedPermissions !== Gdn_Cache::CACHEOP_FAILURE) {
+                $permissions->setPermissions($cachedPermissions);
+                return $permissions;
+            }
+        }
+
+        $data = Gdn::permissionModel()->cachePermissions($userID);
+        $permissions->compileAndLoad($data);
+
+        $this->EventArguments['UserID'] = $userID;
+        $this->EventArguments['Permissions'] = $permissions;
+        $this->fireEvent('loadPermissions');
+
+        if (Gdn::cache()->activeEnabled()) {
+            Gdn::cache()->store($permissionsKey, $permissions->getPermissions());
+        } else {
+            // Save the permissions to the user table
+            if ($userID > 0) {
+                $this->SQL->put(
+                    'User',
+                    ['Permissions' => dbencode($permissions->getPermissions())],
+                    ['UserID' => $userID]
+                );
+            }
+        }
+
+        return $permissions;
     }
 
     /**

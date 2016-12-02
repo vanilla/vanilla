@@ -338,6 +338,25 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
   }
 }
 
+.filter-date {
+  position: relative;
+  &:after {
+    position: absolute;
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    right: 9px;
+    top: 9px;
+    transform: scale(1.5);
+    opacity: .7;
+    content: $calendar;
+  }
+
+  .form-control {
+    padding-right: 36px;
+  }
+}
+
 //
 // Predefined Ranges
 //

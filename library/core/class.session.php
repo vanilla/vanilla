@@ -129,7 +129,7 @@ class Gdn_Session {
             }
         }
 
-        if ($junctionID === 'any' || $junctionID == '' || empty($junctionTable) ||
+        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
             c("Garden.Permissions.Disabled.{$junctionTable}")) {
             $junctionID = null;
         }

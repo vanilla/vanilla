@@ -101,6 +101,10 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertTrue($permissions->has('Vanilla.Discussions.Add', 10));
         $this->assertFalse($permissions->has('Vanilla.Discussions.Add', 100));
+
+        $this->assertTrue($permissions->has('Vanilla.Discussions.Add', Permissions::ANY));
+        $this->assertTrue($permissions->has('Vanilla.Discussions.View', Permissions::ANY));
+        $this->assertFalse($permissions->has('Vanilla.Discussions.Edit', Permissions::ANY));
     }
 
     public function testMerge() {

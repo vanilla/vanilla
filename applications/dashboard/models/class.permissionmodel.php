@@ -639,7 +639,11 @@ class PermissionModel extends Gdn_Model {
                     ->orderBy('junc.Name');
 
                 if (isset($JuncIDs)) {
-                    $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
+                    if (val('LimitToDefault', $Options)) {
+                        $SQL->where("junc.{$JunctionTable}ID", -1);
+                    } else {
+                        $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
+                    }
                 }
             } else {
                 // Here we are getting permissions for all roles.
@@ -695,16 +699,27 @@ class PermissionModel extends Gdn_Model {
      *
      * @param int|array $RoleID The role(s) to get the permissions for.
      * @param string $LimitToSuffix An optional suffix to limit the permission names to.
+     * @param bool $includeJunction
      * @return array
      */
-    public function getPermissions($RoleID, $LimitToSuffix = '') {
+    public function getPermissions($RoleID, $LimitToSuffix = '', $includeJunction = true) {
         $RoleID = (array)$RoleID;
         $Result = array();
 
         $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);
         $Result[] = $GlobalPermissions;
 
-        $JunctionPermissions = $this->GetJunctionPermissions(array('RoleID' => $RoleID), null, $LimitToSuffix);
+        $junctionOptions = [];
+        if ($includeJunction === false) {
+            // If we're skipping junction permissions, just grab the defaults.
+            $junctionOptions['LimitToDefault'] = true;
+        }
+        $JunctionPermissions = $this->GetJunctionPermissions(
+            ['RoleID' => $RoleID],
+            null,
+            $LimitToSuffix,
+            $junctionOptions
+        );
         $Result = array_merge($Result, $JunctionPermissions);
 
         return $Result;
@@ -749,10 +764,11 @@ class PermissionModel extends Gdn_Model {
      *
      * @param $RoleID
      * @param string $LimitToSuffix
+     * @param bool $includeJunction
      * @return array
      */
-    public function getPermissionsEdit($RoleID, $LimitToSuffix = '') {
-        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix);
+    public function getPermissionsEdit($RoleID, $LimitToSuffix = '', $includeJunction = true) {
+        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix, $includeJunction);
         return $this->UnpivotPermissions($Permissions);
     }
 

@@ -14,7 +14,7 @@
 class RoleController extends DashboardController {
 
     /** @var bool Should categories be hidden when editing a role? */
-    private $hideCategories;
+    private $hideCategoryPermissions;
 
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form', 'RoleModel');
@@ -27,8 +27,9 @@ class RoleController extends DashboardController {
      */
     public function __construct() {
         parent::__construct();
-        $this->hideCategories = c('Vanilla.HideRoleCategoryPermissions', false);
+        $this->hideCategoryPermissions = c('Vanilla.HideRoleCategoryPermissions', false);
     }
+
     /**
      * Set menu path. Automatically run on every use.
      *
@@ -142,22 +143,11 @@ class RoleController extends DashboardController {
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Get the role data for the requested $RoleID and put it into the form.
-            $Permissions = $PermissionModel->getPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
-
-            // Should we be filtering out per-category permissions?
-            if ($hideCategories) {
-                foreach ($Permissions as $key => $fields) {
-                    // Verify this is a category permission.
-                    if (preg_match('#^Category/PermissionCategoryID/(?<CategoryID>-?\d+)#', $key, $category)) {
-                        // Keep the default category permissions.  Ditch the rest.
-                        if ($category['CategoryID'] == '-1') {
-                            continue;
-                        } else {
-                            unset($Permissions[$key]);
-                        }
-                    }
-                }
-            }
+            $Permissions = $PermissionModel->getPermissionsEdit(
+                $RoleID ? $RoleID : 0,
+                $LimitToSuffix,
+                $this->hideCategoryPermissions === false
+            );
 
             // Remove permissions the user doesn't have access to.
             if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
@@ -183,39 +173,8 @@ class RoleController extends DashboardController {
                 $this->Form->setFormValue('PersonalInfo', false);
             }
 
-            // If the form didn't have category permissions, they'll need to be added before saving.
-            $permissions = $this->Form->getFormValue('Permission');
-            if ($hideCategories && is_array($permissions)) {
-
-                // Grab all the per-category permissions for this role and format them for form fields.
-                $permissionModel = new PermissionModel();
-                $categoryPermissions = $permissionModel->getJunctionPermissions(['RoleID' => $RoleID], 'Category');
-                $categoryPermissions = $permissionModel->unpivotPermissions($categoryPermissions);
-
-                // Iterate through each per-category permission.
-                foreach ($categoryPermissions as $categoryRow) {
-                    foreach ($categoryRow as $categoryField => $categoryPermission) {
-                        // Not a permission.  Skip it.
-                        if (substr($categoryField, 0, 1) == '_') {
-                            continue;
-                        }
-
-                        // Not a permission granted to this role? Skip it.
-                        if (!array_key_exists('Value', $categoryPermission) || $categoryPermission['Value'] === 0) {
-                            continue;
-                        }
-
-                        // It's a permission *and* it's granted? Make sure it's included!
-                        if (array_key_exists('PostValue', $categoryPermission)) {
-                            if (array_search($categoryPermission['PostValue'], $permissions) === false) {
-                                $permissions[] = $categoryPermission['PostValue'];
-                            }
-                        }
-                    }
-                }
-
-                // Update those role permissions.
-                $this->Form->setFormValue('Permission', $permissions);
+            if ($this->hideCategoryPermissions) {
+                $this->Form->setFormValue('IgnoreCategoryPermissions', true);
             }
 
             // If the form has been posted back...
@@ -229,7 +188,11 @@ class RoleController extends DashboardController {
                 $this->informMessage(t('Your changes have been saved.'));
                 $this->RedirectUrl = url('dashboard/role');
                 // Reload the permission data.
-                $this->setData('PermissionData', $PermissionModel->getPermissionsEdit($RoleID, $LimitToSuffix), true);
+                $this->setData('PermissionData', $PermissionModel->getPermissionsEdit(
+                    $RoleID,
+                    $LimitToSuffix,
+                    $this->hideCategoryPermissions === false
+                ), true);
             }
         }
 

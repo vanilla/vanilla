@@ -3,7 +3,7 @@ $Session = Gdn::session();
 $EditUser = $Session->checkPermission('Garden.Users.Edit');
 $ViewPersonalInfo = $Session->checkPermission('Garden.PersonalInfo.View');
 
-helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or enter the name of a role to see all users with that role.'));
+helpAsset(t('Heads Up!'), t('Search by user or role.', 'Search for users by name or email, optionally using % as a wildcard. You can also search by user ID, the name of a role, or \'banned\'.'));
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on finding &amp; managing users"), 'settings/tutorials/users'));
 
 if (checkPermission('Garden.Users.Add')) {

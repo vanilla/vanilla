@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$CancelUrl = $this->data('CancelUrl');
+$CancelUrl = $this->data('_CancelUrl');
 if (!$CancelUrl) {
     $CancelUrl = '/discussions';
     if (c('Vanilla.Categories.Use') && is_object($this->Category)) {

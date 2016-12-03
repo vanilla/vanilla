@@ -307,15 +307,16 @@ class ConversationModel extends ConversationsModel {
         }
 
         // Start conservative.
-        $defaultMax = 5;
+        $maxRecipients = c('Conversations.MaxRecipients', 5);
 
         // Verified users are more trusted.
         if (val('Verified', Gdn::session()->User)) {
-            $defaultMax = 50;
+            $verifiedMax = c('Conversations.MaxRecipientsVerified', 50);
+            // Only allow raising the limit for verified users.
+            $maxRecipients = ($verifiedMax > $maxRecipients) ? $verifiedMax : $maxRecipients;
         }
 
-        // Let a site override our decisions.
-        return c('Conversations.MaxRecipients', $defaultMax);
+        return $maxRecipients;
     }
 
     /**

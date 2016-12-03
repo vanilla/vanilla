@@ -12,8 +12,10 @@ if (!$User) {
 $Photo = $User->Photo;
 if ($Photo) {
     $Photo = (isUrl($Photo)) ? $Photo : Gdn_Upload::url(changeBasename($Photo, 'p%s'));
+    $PhotoAlt = t('Avatar');
 } else {
     $Photo = UserModel::getDefaultAvatarUrl($User, 'profile');
+    $PhotoAlt = t('Default Avatar');
 }
 
 if ($User->Banned) {
@@ -32,7 +34,7 @@ if ($Photo) : ?>
             echo anchor(wrap(t('Change Picture')), '/profile/picture?userid='.$User->UserID, 'ChangePicture Popup');
         }
 
-        echo img($Photo, ['class' => 'ProfilePhotoLarge']);
+        echo img($Photo, ['class' => 'ProfilePhotoLarge', 'alt' => $PhotoAlt]);
         ?>
     </div>
 <?php elseif ($User->UserID == Gdn::session()->UserID || Gdn::session()->checkPermission('Garden.Users.Edit')) : ?>

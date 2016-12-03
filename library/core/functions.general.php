@@ -3106,7 +3106,7 @@ if (!function_exists('safeUnlink')) {
      * A version of {@link unlink()} that won't raise a warning.
      *
      * @param string $filename Path to the file.
-     * @return Returns TRUE on success or FALSE on failure.
+     * @return bool TRUE on success or FALSE on failure.
      */
     function safeUnlink($filename) {
         try {

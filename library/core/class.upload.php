@@ -88,7 +88,8 @@ class Gdn_Upload extends Gdn_Pluggable {
     /**
      * Copy an upload locally so that it can be operated on.
      *
-     * @param string $Name
+     * @param string $Name Filename to be copied.
+     * @return string Local file path.
      */
     public function copyLocal($Name) {
         $Parsed = self::parse($Name);
@@ -108,6 +109,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * Delete an uploaded file.
      *
      * @param string $Name The name of the upload as saved in the database.
+     * @return bool
      */
     public function delete($Name) {
         $Parsed = $this->parse($Name);
@@ -121,7 +123,7 @@ class Gdn_Upload extends Gdn_Pluggable {
         if (!$Handled) {
             $Path = PATH_UPLOADS.'/'.ltrim($Name, '/');
             if ($Path === realpath($Path) && file_exists($Path)) {
-                return  safeUnlink($Path);
+                return safeUnlink($Path);
             }
         }
         return true;

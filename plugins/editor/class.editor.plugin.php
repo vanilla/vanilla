@@ -11,7 +11,7 @@
 $PluginInfo['editor'] = array(
    'Name' => 'Advanced Editor',
    'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.8.0',
+   'Version' => '1.8.1',
    'Author' => "Dane MacMillan",
    'AuthorUrl' => 'http://www.vanillaforums.org/profile/dane',
    'RequiredApplications' => array('Vanilla' => '>=2.2'),
@@ -748,13 +748,23 @@ class EditorPlugin extends Gdn_Plugin {
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
-                    array(
+                    [
                         'OriginalFilename' => $fileName,
                         'source' => 'content'
-                    )
+                    ]
                 );
             } else {
-                $filePathParsed = Gdn_UploadImage::saveImageAs($tmpFilePath, $absoluteFileDestination, '', '', array('SaveGif' => true));
+                $filePathParsed = Gdn_UploadImage::saveImageAs(
+                    $tmpFilePath,
+                    $absoluteFileDestination,
+                    '',
+                    '',
+                    [
+                        'OriginalFilename' => $fileName,
+                        'source' => 'content',
+                        'SaveGif' => true
+                    ]
+                );
                 $tmpwidth = $filePathParsed['Width'];
                 $tmpheight = $filePathParsed['Height'];
             }

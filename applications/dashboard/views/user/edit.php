@@ -1,13 +1,16 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
-    <h1><?php
-        if ($this->data('User'))
-            echo t('Edit User');
-        else
-            echo t('Add User');
-        ?></h1>
+
+<h1><?php
+    if ($this->data('User')) {
+        echo t('Edit User');
+    } else {
+        echo t('Add User');
+    }
+    ?></h1>
 <?php
 echo $this->Form->open(array('class' => 'User', 'autocomplete' => 'off'));
 echo $this->Form->errors();
+
 if ($this->data('AllowEditing')) { ?>
     <ul>
         <li class="form-group">
@@ -15,7 +18,7 @@ if ($this->data('AllowEditing')) { ?>
                 <?php echo $this->Form->label('Username', 'Name'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->textBox('Name'); ?>
+                <?php echo $this->Form->textBox('Name', ['autocomplete' => 'off']); ?>
             </div>
         </li>
         <li class="form-group">
@@ -29,11 +32,12 @@ if ($this->data('AllowEditing')) { ?>
             </div>
             <div class="input-wrap">
                 <?php
-                $EmailAttributes = [];
+                $EmailAttributes = ['autocomplete' => 'off'];
 
                 // Email confirmation
-                if (!$this->data('_EmailConfirmed'))
+                if (!$this->data('_EmailConfirmed')) {
                     $EmailAttributes['class'] = 'Unconfirmed';
+                }
 
                 echo $this->Form->textBox('Email', $EmailAttributes); ?>
             </div>
@@ -42,23 +46,23 @@ if ($this->data('AllowEditing')) { ?>
         <?php if ($this->data('_CanConfirmEmail')): ?>
             <li class="User-ConfirmEmail form-group">
                 <div class="input-wrap no-label">
-                    <?php echo $this->Form->CheckBox('ConfirmEmail', t("Email is confirmed"), array('value' => '1')); ?>
+                    <?php echo $this->Form->checkBox('ConfirmEmail', t("Email is confirmed"), array('value' => '1')); ?>
                 </div>
             </li>
         <?php endif ?>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->CheckBox('ShowEmail', t('Email visible to other users'), array('value' => '1')); ?>
+                <?php echo $this->Form->checkBox('ShowEmail', t('Email visible to other users'), array('value' => '1')); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->CheckBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1')); ?>
+                <?php echo $this->Form->checkBox('Verified', t('Verified Label', 'Verified. Bypasses spam and pre-moderation filters.'), array('value' => '1')); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="input-wrap no-label">
-                <?php echo $this->Form->CheckBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
+                <?php echo $this->Form->checkBox('Banned', t('Banned'), array('value' => $this->data('BanFlag'))); ?>
                 <?php if ($this->data('BannedOtherReasons')): ?>
                 <div class="text-danger info"><?php echo t(
                         'This user is also banned for other reasons and may stay banned.',
@@ -68,24 +72,24 @@ if ($this->data('AllowEditing')) { ?>
             </div>
         </li>
 
-        <?php if (c('Garden.Profile.Locations', false)): ?>
+        <?php if (c('Garden.Profile.Locations', false)) : ?>
             <li class="form-group User-Location">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Location', 'Location'); ?>
                 </div>
                 <div class="input-wrap">
-                    <?php echo $this->Form->textBox('Location'); ?>
+                    <?php echo $this->Form->textBox('Location', ['autocomplete' => 'off']); ?>
                 </div>
             </li>
         <?php endif; ?>
 
-        <?php if (c('Garden.Profile.Titles', false)): ?>
+        <?php if (c('Garden.Profile.Titles', false)) : ?>
             <li class="form-group User-Title">
                 <div class="label-wrap">
                     <?php echo $this->Form->label('Title', 'Title'); ?>
                 </div>
                 <div class="input-wrap">
-                    <?php echo $this->Form->textBox('Title'); ?>
+                    <?php echo $this->Form->textBox('Title', ['autocomplete' => 'off']); ?>
                 </div>
             </li>
         <?php endif; ?>
@@ -100,7 +104,7 @@ if ($this->data('AllowEditing')) { ?>
                 <?php echo t('Check all roles that apply to this user:'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->CheckBoxList("RoleID", array_flip($this->data('Roles')), array_flip($this->data('UserRoles'))); ?>
+                <?php echo $this->Form->checkBoxList("RoleID", array_flip($this->data('Roles')), array_flip($this->data('UserRoles'))); ?>
             </div>
         </li>
     <?php endif; ?>
@@ -109,7 +113,7 @@ if ($this->data('AllowEditing')) { ?>
                 <?php echo t('Password Options'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->RadioList('ResetPassword', $this->ResetOptions); ?>
+                <?php echo $this->Form->radioList('ResetPassword', $this->ResetOptions); ?>
             </div>
         </li>
         <?php if (array_key_exists('Manual', $this->ResetOptions)) : ?>
@@ -119,7 +123,7 @@ if ($this->data('AllowEditing')) { ?>
                         <?php echo $this->Form->label('New Password', 'NewPassword'); ?>
                     </div>
                     <div class="input-wrap">
-                        <?php echo $this->Form->Input('NewPassword', 'password'); ?>
+                        <?php echo $this->Form->input('NewPassword', 'password'); ?>
                     </div>
                 </div>
                 <div class="form-group">

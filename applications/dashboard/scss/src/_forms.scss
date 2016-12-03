@@ -117,11 +117,7 @@ form {
   padding-bottom: 1rem;
   margin-bottom: 0;
   border-bottom: $border-width dotted #e7e8e9;
-
-  &:first-child {
-    border-top: $border-width solid $border-color;
-    @include has-top-border;
-  }
+  border-bottom: $border-width dotted #e7e8e9;
 
   > .no-grid {
     @extend .row-padding-left;
@@ -216,7 +212,6 @@ label,
 }
 
 .label-wrap {
-
   min-width: 0;
   overflow: hidden;
 
@@ -248,7 +243,7 @@ label,
 .input-wrap-multiple {
   display: flex;
 
-  > *:last-child {
+  > *:not(:first-child) {
     margin-left: $spacer / 2;
   }
 }
@@ -363,6 +358,10 @@ label,
   height: 0;
   opacity: 0;
   padding: 0;
+
+  &:disabled {
+    opacity: 0;
+  }
 }
 
 .color-picker-preview {
@@ -400,6 +399,11 @@ label,
     margin: 0;
     filter: alpha(opacity = 0);
     opacity: 0;
+
+    &:disabled,
+    &.disabled {
+      opacity: 0;
+    }
   }
 }
 
@@ -432,6 +436,14 @@ label,
     border-color: #66afe9;
     outline: none;
     @extend .active;
+  }
+}
+
+//Disabled state
+.file-upload input:disabled,
+.file-upload input.disabled {
+  ~ .file-upload-choose {
+    background-color: $grey-lighter;
   }
 }
 
@@ -532,6 +544,7 @@ select + select {
 .label-selector {
   @extend .row;
   @include list-reset;
+  margin-bottom: $spacer / 2;
 
   label {
     padding-left: 0;
@@ -581,10 +594,7 @@ select + select {
 
       &:hover {
         text-decoration: none;
-
-        svg {
-          fill: $brand-primary;
-        }
+        color: $brand-primary;
       }
     }
   }
@@ -603,11 +613,10 @@ select + select {
 
   .selected {
     display: none;
-
+    color: $brand-success;
     svg {
       display: block;
       width: 84px;
-      fill: $brand-success;
     }
   }
 
@@ -660,12 +669,12 @@ select + select {
 
     svg {
       display: block;
-      fill: $white;
     }
 
     a {
-      &:hover svg {
-        fill: $navbar-active-link-active-bg;
+      color: $white;
+      &:hover {
+        color: $navbar-active-link-active-bg;
       }
     }
   }
@@ -704,6 +713,7 @@ select + select {
   position: relative;
   overflow: hidden;
   margin-bottom: $spacer / 2;
+  color: rgba(85,90,98,.27);
 
   .mobile-frame {
     position: relative;
@@ -712,7 +722,6 @@ select + select {
 
   svg {
     display: block;
-    fill: rgba(85,90,98,.27);
   }
 
   .image-wrap {
@@ -800,10 +809,6 @@ select + select {
 
   .search-icon-search-wrap {
     left: 0;
-
-    svg {
-      opacity: 1;
-    }
   }
 
   .search-info {
@@ -918,9 +923,68 @@ select + select {
 
 // Checkboxes and Radios
 //
+// We use either the jquery iCheck library to render our checkboxes or the good ol' checkbox hack. A rule of thumb is
+// to use iCheck if the checkbox has a functional label. Use the checkbox hack if there are many checkboxes on the
+// page and they don't need visible labels.
+//
+// The dashboard will render checkboxes using iCheck by default. If you would rather use the checkbox hack, you'll
+// need to wrap your checkbox in a `checkbox-painted-wrapper` div and use some very specific markup, as noted in
+// Section 5.10.2
+//
+// Styleguide 5.10.
+
+// Override twbs
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  position: relative;
+  margin-top: initial;
+  margin-left: initial;
+}
+
+@mixin checkbox-painted {
+  background-color: $white;
+  display: inline-block;
+  width: $spacer;
+  height: $spacer;
+  margin-right: $spacer / 4;
+  vertical-align: middle;
+  border: $border-width solid $border-color;
+}
+
+@mixin checkbox-painted-hover {
+  background-color: $brand-primary;
+  border-color: $brand-primary;
+
+  &::before {
+    display: block;
+    color: $white;
+  }
+}
+
+@mixin checkbox-painted-checked {
+  @extend %icon;
+  font-size: $font-size-sm;
+  text-align: center;
+  background-color: $brand-primary;
+  border-color: $brand-primary;
+
+  &::before {
+    display: block;
+    margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
+    color: $white;
+    @include char-content($icon-ok);
+  }
+}
+
+// iCheck
+//
 // We use iCheck to make our checkboxes and radios look nice. It does some magic wrap the input in a style-able div.
 // The most important thing to note is that you cannot listen for the click event, since the click happens on the
 // wrapper. Listen for the change event instead.
+//
+// PHP rendering: This is the default styling for checkbox and radio inputs.
 //
 // Markup:
 // <script>
@@ -929,7 +993,7 @@ select + select {
 // </script>
 // <label><input id="checkbox-1" type="checkbox" />A label for checkbox 1</label>
 //
-// Styleguide 5.10.
+// Styleguide 5.10.1
 
 // iCheck
 .icheck-label {
@@ -938,32 +1002,20 @@ select + select {
 
 .iradio,
 .icheckbox {
-
   label {
     padding-left: 0;
     height: $spacer;
     vertical-align: middle;
   }
 
-  display: inline-block;
-  width: $spacer;
-  height: $spacer;
-  margin-right: $spacer / 4;
-  vertical-align: middle;
-  border: $border-width solid $border-color;
+  @include checkbox-painted;
   cursor: pointer;
 
   &:hover,
   &:focus,
   .icheck-label:hover &,
   .icheck-label:focus & {
-    background-color: $brand-primary;
-    border-color: $brand-primary;
-
-    &::before {
-      display: block;
-      color: $white;
-    }
+    @include checkbox-painted-hover;
   }
 }
 
@@ -985,21 +1037,88 @@ select + select {
 }
 
 .icheckbox.checked {
-  @extend %icon;
-  font-size: $font-size-sm;
-  text-align: center;
-  background-color: $brand-primary;
-  border-color: $brand-primary;
-
-  &::before {
-    display: block;
-    margin-top: ($spacer - $font-size-sm) / 2 - $border-width;
-    color: $white;
-    @include char-content($icon-ok);
-  }
+  @include checkbox-painted-checked;
 }
 
 label[id^=iCheck] {
   padding-left: 0;
 }
 
+
+// Checkbox-hack checkboxes
+//
+// iCheck is nice, but comes with a rather notable blow to performance when there are many checkboxes on a page.
+// If this is the case, render your checkboxes this way. No javascript necessary!
+//
+// PHP rendering: Something like this should work nicely:
+// ```
+// <?php echo wrap(
+//     $form->checkBox(
+//         'StringsToAdd[]',
+//         val('title', $string),
+//         ['display' => 'after']
+//     ),
+//     'div',
+//     ['class' => 'checkbox-painted-wrapper']
+// ); ?>
+//
+// ```
+//
+// Markup:
+// <div class="checkbox-painted-wrapper checkbox">
+//   <input type="checkbox" id="CheckMe">
+//   <label for="CheckMe">Check Me</label>
+// </div>
+// <div class="radio-painted-wrapper radio">
+//   <input type="radio" id="CheckRadioOne" name="CheckRadio">
+//   <label for="CheckRadioOne"></label>
+// </div>
+// <div class="radio-painted-wrapper radio">
+//   <input type="radio" id="CheckRadioTwo" name="CheckRadio">
+//   <label for="CheckRadioTwo"></label>
+// </div>
+//
+// Styleguide 5.10.2
+
+.checkbox-painted-wrapper,
+.radio-painted-wrapper {
+  position: relative;
+
+  label {
+    padding-left: 0;
+
+    @include text-hide;
+    @include checkbox-painted;
+
+    margin-right: 0;
+
+    &:hover,
+    &:focus {
+      @include checkbox-painted-hover;
+    }
+  }
+
+  input[type="radio"],
+  input[type="checkbox"] {
+    margin-left: -9999px;
+    position: absolute;
+  }
+}
+
+.checkbox-painted-wrapper {
+  input:checked + label {
+    @include checkbox-painted-checked;
+  }
+}
+
+.radio-painted-wrapper {
+  label {
+    border-radius: $spacer / 2;
+  }
+
+  input:checked + label {
+    border: $border-width * 4 solid $brand-primary;
+    border-radius: $spacer / 2;
+    background-color: $white;
+  }
+}

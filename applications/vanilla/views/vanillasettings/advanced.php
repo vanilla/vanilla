@@ -8,6 +8,28 @@ echo $this->Form->errors();
 ?>
     <ul>
         <li class="form-group">
+            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
+        </li>
+        <li class="form-group">
+            <?php
+            $Options = ['1' => '1', '2' => '2', '3' => '3', '4' => '4', '5' => '5', '0' => 'No limit'];
+            $Fields = ['TextField' => 'Code', 'ValueField' => 'Code'];
+            ?>
+            <div class="label-wrap">
+            <?php
+            echo $this->Form->label('Maximum Category Display Depth', 'Vanilla.Categories.MaxDisplayDepth');
+            echo wrap(
+                t('CategoryMaxDisplayDepth.Notes', 'Nested categories deeper than this depth will be placed in a comma-delimited list.'),
+                'div',
+                ['class' => 'info']
+            );
+            ?>
+            </div>
+            <div class="input-wrap">
+            <?php echo $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
+            </div>
+        </li>
+        <li class="form-group">
             <?php
             $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
             $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
@@ -48,9 +70,6 @@ echo $this->Form->errors();
             <div class="input-wrap">
             <?php echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
             </div>
-        </li>
-        <li class="form-group">
-            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
         </li>
         <li class="form-group">
             <div class="label-wrap">

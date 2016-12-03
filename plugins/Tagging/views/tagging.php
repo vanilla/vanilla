@@ -61,6 +61,7 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
         <thead>
         <tr>
             <th class="column-md"><?php echo t('Tag') ?></th>
+            <th><?php echo t('Created By') ?></th>
             <th><?php echo t('Type') ?></th>
             <th class="column-md"><?php echo t('Date Added'); ?></th>
             <th class="column-xs"><?php echo t('Count'); ?></th>
@@ -87,6 +88,7 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
             $createdBy = $userModel->getID(val('InsertUserID', $Tag));
             $dateInserted = Gdn_Format::date(val('DateInserted', $Tag), '%e %b %Y');
             $count = val('CountDiscussions', $Tag, 0);
+            $displayName = TagFullName($Tag);
 
             if (val('Type', $Tag)) {
                 $Special = TRUE;
@@ -97,17 +99,11 @@ if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
             ?>
             <tr id="<?php echo "Tag_{$Tag['TagID']}"; ?>" class="<?php echo $CssClass; ?>"
                 title="<?php echo $Title; ?>">
-                <td>
-                    <?php
-                    $DisplayName = TagFullName($Tag); ?>
-                    <div class="media media-sm">
-                        <div class="media-body">
-                            <?php
-                            echo '<div class="media-title"><a href="'.url('/discussions/tagged/'.val('Name', $Tag)).'">'.htmlspecialchars($DisplayName).'</a></div>';
-                            echo '<div class="info">'.sprintf(t('Created by %s'), userAnchor($createdBy)).'</div>';
-                            ?>
-                        </div>
-                    </div>
+                <td class="tag-name">
+                    <?php echo anchor(htmlspecialchars($displayName), '/discussions/tagged/'.val('Name', $Tag)); ?>
+                </td>
+                <td class="created-by">
+                    <?php echo userAnchor($createdBy); ?>
                 </td>
                 <td class="type">
                     <?php echo $type; ?>

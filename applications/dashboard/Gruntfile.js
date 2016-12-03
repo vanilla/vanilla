@@ -81,8 +81,8 @@ module.exports = function (grunt) {
               , 'jquery-icheck/icheck.min.js'
               , 'moment/min/moment.min.js'
               , 'tether/dist/js/tether.min.js'
-              , 'tether/dist/js/tether.min.js'
               , 'tether-drop/dist/js/drop.min.js'
+              , 'jquery-checkall/dist/jquery.checkall.min.js'
             ],
             dest: 'js/vendors'
           },
@@ -253,7 +253,6 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_normalize.scss',
             'scss/vendors/bootstrap/scss/_utilities.scss',
             'scss/vendors/bootstrap/scss/_nav.scss',
-            'scss/vendors/bootstrap/scss/_alert.scss',
             'scss/vendors/bootstrap/scss/_tooltip.scss',
             'scss/vendors/bootstrap/scss/_dropdown.scss',
             'scss/vendors/bootstrap/scss/_list-group.scss',
@@ -261,7 +260,13 @@ module.exports = function (grunt) {
             'scss/vendors/bootstrap/scss/_grid.scss',
             'scss/vendors/bootstrap/scss/_reboot.scss'
           ],
-          'scss/maps/_dashboard.scss': ['scss/src/*.scss', '!scss/src/_variables.scss', '!scss/src/_svgs.scss', '!scss/src/_helpers.scss']
+          'scss/maps/_dashboard.scss': [
+            'scss/src/*.scss',
+            '!scss/src/_variables.scss',
+            '!scss/src/_icons.scss',
+            '!scss/src/_svgs.scss',
+            '!scss/src/_helpers.scss'
+          ]
         },
         options: {
           useSingleQuotes: true,

@@ -279,7 +279,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $CssClass = 'ReactButton PopupWindow';
 //      }
 
-        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite'), $Url, $CssClass).' ';
+        echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $Url, $CssClass).' ';
     }
 
     /**

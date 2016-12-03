@@ -582,6 +582,9 @@ jQuery(document).ready(function($) {
                 case 'Text':
                     $target.text(item.Data);
                     break;
+                case 'Trigger':
+                    $target.trigger(item.Data);
+                    break;
                 case 'Html':
                     $target.htmlTrigger(item.Data);
                     break;
@@ -713,6 +716,11 @@ jQuery(document).ready(function($) {
         });
     };
     $('.Popin, .js-popin').popin();
+
+    // Make poplist items with a rel attribute clickable.
+    $(document).on('click', '.PopList .Item[rel]', function() {
+        window.location.href = $(this).attr('rel');
+    });
 
     var hijackClick = function(e) {
         var $elem = $(this);

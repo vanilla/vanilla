@@ -186,7 +186,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
                     <?php echo $PreviewImageHtml; ?>
                         <div class="overlay">
                             <div class="label-selector-corner-link">
-                                <?php echo anchor(dashboardSymbol('expand', '', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-modal-type' => 'noheader']); ?>
+                                <?php echo anchor(dashboardSymbol('expand', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-modal-type' => 'noheader']); ?>
                             </div>
                             <div class="buttons">
                                 <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-overlay', array('target' => '_top'));

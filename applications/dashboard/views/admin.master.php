@@ -27,24 +27,14 @@ $roleTitles = implode(', ', $roleTitlesArray);
 /** var UserController $user */
 ?>
 <div class="card card-user">
-    <div class="card-block media media-sm">
-        <div class="media-left">
-            <div class="media-image-wrap">
-                <?php echo userPhoto($user); ?>
-            </div>
-        </div>
-        <div class="media-content">
-            <div class="media-title username">
-                <?php echo userAnchor($user); ?>
-            </div>
-            <div class="info user-roles">
-                <?php echo $roleTitles; ?>
-            </div>
-            <a class="btn btn-sm-rounded btn-secondary padded-top" href="<?php echo url(userUrl($user)); ?>">
-                <?php echo t('My Profile').' '.dashboardSymbol('external-link', '', 'icon-11 icon-text'); ?>
-            </a>
-        </div>
-    </div>
+    <?php
+    $userBlock = new MediaItemModule(val('Name', $user), userUrl($user), $roleTitles, '', ['class' => 'card-block']);
+    $userBlock->setView('media-sm')
+        ->setImage(userPhotoUrl($user))
+        ->addButton(t('My Profile').' '.dashboardSymbol('external-link', 'icon-11 icon-text'), userUrl($user),
+        ['class' => 'btn btn-sm-rounded btn-secondary padded-top']);
+    echo $userBlock;
+    ?>
     <div class="list-group list-group-flush">
         <?php
         foreach($this->data('meList', []) as $meItem) {
@@ -74,7 +64,7 @@ Gdn_Theme::assetEnd();
         <div class="navbar-brand">
             <?php $title = c('Garden.Title'); ?>
             <div class="navbar-image logo"><?php echo wrap('Vanilla Forums', 'span', ['class' => 'vanilla-logo vanilla-logo-white']); ?></div>
-            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', '', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
+            <?php echo anchor(t('Visit Site').' '.dashboardSymbol('external-link', 'icon-11'), '/', 'btn btn-navbar padded-left'); ?>
         </div>
         <?php
         /** @var DashboardNavModule $dashboardNav */
@@ -104,7 +94,7 @@ Gdn_Theme::assetEnd();
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
                 <div id="panel-nav" class="js-fluid-fixed panel-content">
-                    <?php echo anchor($title.' '.dashboardSymbol('external-link', '', 'icon-16'), '/', 'title'); ?>
+                    <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
                     <?php echo $dashboardNav; ?>
                 </div>
             </div>

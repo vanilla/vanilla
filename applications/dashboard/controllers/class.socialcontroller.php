@@ -36,10 +36,10 @@ class SocialController extends DashboardController {
      */
     public function manage() {
         $this->permission('Garden.Settings.Manage');
-        $this->title("Social Integration");
+        $this->title("Social Connect Addons");
         $this->setHighlightRoute('/social/manage');
 
-        $Connections = $this->GetConnections();
+        $Connections = $this->getConnections();
         $this->setData('Connections', $Connections);
 
         $this->render();
@@ -53,104 +53,36 @@ class SocialController extends DashboardController {
      */
     protected function getConnections() {
         $this->fireEvent('GetConnections');
-        $Connections = [];
+        $connections = [];
 
-        foreach (Gdn::pluginManager()->AvailablePlugins() as $PluginKey => $PluginInfo) {
-            if (!array_key_exists('SocialConnect', $PluginInfo)) {
+        $addons = Gdn::addonManager()->lookupAllByType(\Vanilla\Addon::TYPE_ADDON);
+
+        foreach ($addons as $addonName => $addon) {
+            $addonInfo = $addon->getInfo();
+
+            // Limit to designated social addons.
+            if (!array_key_exists('socialConnect', $addonInfo)) {
                 continue;
             }
 
-            if (!array_key_exists($PluginKey, $Connections)) {
-                $Connections[$PluginKey] = array();
+            // See if addon is enabled.
+            $isEnabled = Gdn::addonManager()->isEnabled($addonName, \Vanilla\Addon::TYPE_ADDON);
+            setValue('enabled', $addonInfo, $isEnabled);
+
+            // See if we can detect whether connection is configured.
+            $isConfigured = null;
+            if ($isEnabled) {
+                $pluginInstance = Gdn::pluginManager()->getPluginInstance($addonName, Gdn_PluginManager::ACCESS_PLUGINNAME);
+                if (method_exists($pluginInstance, 'isConfigured')) {
+                    $isConfigured = $pluginInstance->isConfigured();
+                }
             }
+            setValue('configured', $addonInfo, $isConfigured);
 
-            $ConnectionName = $PluginInfo['Index'];
-
-            if (Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON) &&
-                (method_exists(Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME), 'IsConfigured'))) {
-                $Configured = Gdn::pluginManager()->GetPluginInstance($ConnectionName, Gdn_PluginManager::ACCESS_PLUGINNAME)->IsConfigured();
-            } else {
-                $Configured = null;
-            }
-
-            $Connections[$PluginKey] = array_merge($Connections[$PluginKey], $PluginInfo, array(
-                'Enabled' => Gdn::addonManager()->isEnabled($PluginKey, \Vanilla\Addon::TYPE_ADDON),
-                'Configured' => $Configured
-            ), array(
-                'Icon' => sprintf("/plugins/%s/icon.png", $PluginInfo['Folder'])
-            ));
+            // Add the connection.
+            $connections[$addonName] = $addonInfo;
         }
 
-        return $Connections;
-    }
-
-    /**
-     * Turn off a social plugin.
-     *
-     * @param $Plugin
-     * @throws Exception
-     */
-    public function disable($Plugin) {
-        $this->permission('Garden.Settings.Manage');
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
-        $Connections = $this->GetConnections();
-        unset($this->Data['Connections']);
-
-        if (!array_key_exists($Plugin, $Connections)) {
-            throw notFoundException('SocialConnect Plugin');
-        }
-
-        Gdn::pluginManager()->DisablePlugin($Plugin);
-
-        $Connections = $this->GetConnections();
-        $Connection = val($Plugin, $Connections);
-
-        require_once($this->fetchViewLocation('connection_functions'));
-        ob_start();
-        WriteConnection($Connection, false);
-        $Row = ob_get_clean();
-
-        $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
-        $this->informMessage(t("Plugin disabled."));
-
-        unset($this->Data['Connections']);
-        $this->render('blank', 'utility');
-    }
-
-    /**
-     * Turn on a social plugin.
-     *
-     * @param $Plugin
-     * @throws Exception
-     * @throws Gdn_UserException
-     */
-    public function enable($Plugin) {
-        $this->permission('Garden.Settings.Manage');
-        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
-            throw new Exception('Requires POST', 405);
-        }
-        $Connections = $this->GetConnections();
-
-        if (!array_key_exists($Plugin, $Connections)) {
-            throw notFoundException('SocialConnect Plugin');
-        }
-
-        Gdn::pluginManager()->EnablePlugin($Plugin, null);
-
-        $Connections = $this->GetConnections();
-        $Connection = val($Plugin, $Connections);
-
-        require_once($this->fetchViewLocation('connection_functions'));
-        ob_start();
-        WriteConnection($Connection, false);
-        $Row = ob_get_clean();
-
-//        $this->informMessage(t("Plugin enabled."));
-        $this->jsonTarget("#Provider_{$Connection['Index']}", $Row);
-
-        unset($this->Data['Connections']);
-        $this->render('blank', 'utility');
+        return $connections;
     }
 }

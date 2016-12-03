@@ -333,6 +333,8 @@
 
   .checkbox {
     margin-bottom: 0;
+    margin-left: auto;
+    margin-right: auto;
   }
 
   th {
@@ -572,7 +574,7 @@
       line-height: $line-height-lg;
       border-bottom: $table-border-width solid #ddd;
 
-      &:first-child {
+      .table-summary-cell-main {
         width: 100%;
         min-width: to-rem(120);
       }

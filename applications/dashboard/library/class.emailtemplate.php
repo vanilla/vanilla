@@ -392,6 +392,15 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Remove the button.
+     * @return EmailTemplate $this The calling object.
+     */
+    public function removeButton() {
+        $this->button = [];
+        return $this;
+    }
+
+    /**
      * @return array An array representing an image with the following keys:
      * 'source' => The image source url.
      * 'link' => The href value of the image wrapper.

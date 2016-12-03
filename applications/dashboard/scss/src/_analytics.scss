@@ -43,31 +43,13 @@
 
 // Bookmark Icons
 .bookmark {
-  svg {
-    transition: transform .1s;
-    fill: $grey;
-    width: to-rem(18);
-  }
-
-
-  &:hover,
-  &:focus {
-    svg {
-      transform: rotate(30deg);
-    }
-  }
+  @extend .btn-icon;
+  @extend .btn-icon-sm;
 }
 
 .bookmarked {
   svg {
     transform: rotate(30deg);
-  }
-
-  &:hover,
-  &:focus {
-    svg {
-      transform: rotate(0deg);
-    }
   }
 }
 
@@ -83,7 +65,7 @@
 }
 
 .analytics-panel-metrics {
-  @include full-border(flex, false, true);
+  @include full-border;
   @extend .nav-stats;
   overflow: hidden;
 
@@ -91,8 +73,6 @@
   flex-wrap: wrap;
 
   padding: ($spacer / 2) 0 $spacer;
-  border-top-color: $grey-dark-border;
-  //border-bottom-color: $grey-dark-border;
 
   .metric-value {
     text-align: center;
@@ -108,7 +88,6 @@
 
   .analytics-widget-metric {
     @extend .nav-stats-item;
-    //border-right: $border-width solid $grey-dark-border;
     padding: $spacer ($spacer * 2) !important;
     margin-top: ($spacer / 2);
     min-width: to-rem(180);

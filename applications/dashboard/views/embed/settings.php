@@ -15,21 +15,15 @@ echo $this->Form->errors();
         </div>
     </li>
     <li class="form-group">
-        <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceForum', "Force the forum to only be accessible through this url"); ?></div>
+        <?php echo $this->Form->toggle('Garden.Embed.ForceForum', "Force the forum to only be accessible through the above url"); ?>
     </li>
     <li class="form-group">
-        <div class="input-wrap no-label"><?php echo $this->Form->Checkbox('Garden.Embed.ForceMobile', "Force the forum to only be accessible through this url when viewed on a mobile device."); ?></div>
+        <?php echo $this->Form->toggle('Garden.Embed.ForceMobile', "Force the forum to only be accessible through the above url when viewed on a mobile device"); ?>
     </li>
     <li class="form-group">
-        <div class="input-wrap no-label"><?php echo $this->Form->CheckBox('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?></div>
+        <?php echo $this->Form->toggle('Garden.Embed.ForceDashboard', "Force the dashboard to only be accessible through this url <em>(not recommended)</em>"); ?>
     </li>
 </ul>
-<section>
-    <?php echo subheading(t('Sign In Settings')); ?>
-    <div class="form-group">
-    <?php echo $this->Form->toggle('Garden.SignIn.Popup', "<div class=\"label-title\">Enable popups for sign in pages.</div><div class=\"info\">If you are using SSO you probably need to disable sign in popups.</div>"); ?>
-    </div>
-</section>
 <section>
     <?php echo subheading(t('Comment Embed Settings')); ?>
     <ul>
@@ -69,5 +63,11 @@ echo $this->Form->errors();
             </div>
         </li>
     </ul>
+</section>
+<section>
+    <?php echo subheading(t('Sign In Settings')); ?>
+    <div class="form-group">
+        <?php echo $this->Form->toggle('Garden.SignIn.Popup', 'Enable popups for sign in pages.', [], 'If you are using SSO, you probably want to leave this disabled'); ?>
+    </div>
 </section>
 <?php echo $this->Form->close('Save'); ?>

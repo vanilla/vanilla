@@ -163,7 +163,7 @@ class SettingsController extends DashboardController {
                 ob_start();
                 writeAddonMedia($addonName, $addonInfo, $isEnabled, $type, $filter);
                 $row = ob_get_clean();
-                $this->jsonTarget('#'.Gdn_Format::url($addonName).'-addon', $row);
+                $this->jsonTarget('#'.Gdn_Format::url($addonName).'-addon', $row, 'ReplaceWith');
             }
         }
 
@@ -274,8 +274,10 @@ class SettingsController extends DashboardController {
         } else if ($this->Form->save() !== false) {
             $upload = new Gdn_UploadImage();
             $newAvatar = false;
+            $newUpload = false;
             if ($tmpAvatar = $upload->validateUpload('DefaultAvatar', false)) {
                 // New upload
+                $newUpload = true;
                 $thumbOptions = array('Crop' => true, 'SaveGif' => c('Garden.Thumbnail.SaveGif'));
                 $newAvatar = $this->saveDefaultAvatars($tmpAvatar, $thumbOptions);
             } else if ($avatar && $crop && $crop->isCropped()) {
@@ -303,9 +305,14 @@ class SettingsController extends DashboardController {
                     $crop->setExistingCropUrl(Gdn_UploadImage::url(changeBasename($avatar, "n%s")));
                     $crop->setSourceImageUrl(Gdn_UploadImage::url(changeBasename($avatar, "p%s")));
                     $this->setData('crop', $crop);
+
+                    // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
+                    if (!$newUpload) {
+                        redirect('/dashboard/settings/avatars');
+                    }
                 }
+                $this->informMessage(t("Your settings have been saved."));
             }
-            $this->informMessage(t("Your settings have been saved."));
         }
         $this->render();
     }
@@ -918,9 +925,11 @@ class SettingsController extends DashboardController {
             if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
                 saveToConfig('Garden.Email.Format', $value);
                 if ($value === 'html') {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack', array('onclick' => 'emailStyles.hideSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/text', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
                 } else {
-                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack', array('onclick' => 'emailStyles.showSettings();')), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                    $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/setemailformat/html', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                    $this->jsonTarget('.js-foggy', 'foggyOn', 'Trigger');
                 }
                 $this->jsonTarget("#plaintext-toggle", $newToggle);
             }
@@ -1218,7 +1227,7 @@ class SettingsController extends DashboardController {
         self::sortAddons($this->AvailablePlugins);
 
         if ($PluginName != '') {
-            if (array_key_exists($PluginName, $this->EnabledPlugins) === true) {
+            if (in_array(strtolower($PluginName), array_map('strtolower', array_keys($this->EnabledPlugins)))) {
                 $this->disablePlugin($PluginName, $Filter);
             } else {
                 $this->enablePlugin($PluginName, $Filter);
@@ -1620,8 +1629,7 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/themes');
 
         $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
-        $currentTheme = new ThemeInfoModule(val('Index', $ThemeInfo));
-        $currentTheme->setIsCurrent(true);
+        $currentTheme = $this->themeInfoToMediaItem(val('Index', $ThemeInfo), true);
         $this->setData('CurrentTheme', $currentTheme);
 
         $Themes = Gdn::themeManager()->availableThemes();
@@ -1671,9 +1679,79 @@ class SettingsController extends DashboardController {
 
     public function themeInfo($themeName) {
         $this->permission('Garden.Settings.Manage');
-        $theme = new ThemeInfoModule($themeName);
-        $this->setData('Theme', $theme);
+        $themeMedia = $this->themeInfoToMediaItem($themeName);
+        $this->setData('Theme', $themeMedia);
         $this->render();
+    }
+
+    /**
+     * Compiles theme info data into a media module.
+     *
+     * @param string $themeKey The theme key from the themeinfo array.
+     * @param bool $isCurrent Whether the theme is the current theme (if so, adds a little current-theme flag when rendering).
+     * @return MediaItemModule A media item representing the theme.
+     * @throws Exception
+     */
+    private function themeInfoToMediaItem($themeKey, $isCurrent = false) {
+        $themeInfo = Gdn::themeManager()->getThemeInfo($themeKey);
+
+        if (!$themeInfo) {
+            throw new Exception(sprintf(t('Theme with key %s not found.'), $themeKey));
+        }
+        $options = val('Options', $themeInfo, []);
+        $iconUrl = val('IconUrl', $themeInfo, val('ScreenshotUrl', $themeInfo,
+            "applications/dashboard/design/images/theme-placeholder.svg"));
+        $themeName = val('Name', $themeInfo, val('Index', $themeInfo, $themeKey));
+        $themeUrl = val('ThemeUrl', $themeInfo, '');
+        $description = val('Description', $themeInfo, '');
+        $version = val('Version', $themeInfo, '');
+        $newVersion = val('NewVersion', $themeInfo, '');
+        $attr = [];
+
+        if ($isCurrent) {
+            $attr['class'] = 'media-callout-grey-bg';
+        }
+
+        $media = new MediaItemModule($themeName, $themeUrl, $description, 'div', $attr);
+        $media->setView('media-callout');
+        $media->addOption('has-options', !empty($options));
+        $media->addOption('has-upgrade', $newVersion != '' && version_compare($newVersion, $version, '>'));
+        $media->addOption('new-version', val('NewVersion', $themeInfo, ''));
+        $media->setImage($iconUrl);
+
+        if ($isCurrent) {
+            $media->addOption('is-current', $isCurrent);
+        }
+
+        // Meta
+
+        // Add author meta
+        $author = val('Author', $themeInfo, '');
+        $authorUrl = val('AuthorUrl', $themeInfo, '');
+        $media->addMetaIf($author != '', '<span class="media-meta author">'
+            .sprintf('Created by %s', $authorUrl != '' ? anchor($author, $authorUrl) : $author).'</span>');
+
+        // Add version meta
+        $version = val('Version', $themeInfo, '');
+        $media->addMetaIf($version != '', '<span class="media-meta version">'
+            .sprintf(t('Version %s'), $version).'</span>');
+
+        // Add requirements meta
+        $requirements = val('RequiredApplications', $themeInfo, []);
+        $required = [];
+        $requiredString = '';
+
+        if (!empty($requirements)) {
+            foreach ($requirements as $requirement => $versionInfo) {
+                $required[] = printf(t('%1$s Version %2$s'), $requirement, $versionInfo);
+            }
+        }
+
+        if (!empty($required)) {
+            $requiredString .= '<span class="media-meta requirements">'.t('Requires: ').implode(', ', $required).'</span>';
+        }
+        $media->addMetaIf($requiredString != '', $requiredString);
+        return $media;
     }
 
     /**

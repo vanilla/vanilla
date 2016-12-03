@@ -27,20 +27,8 @@ var emailStyles = {
     start: function() {
         // Ajax call for preview popup
         $('.js-email-preview-button').click(emailStyles.emailPreview);
-
-        if ($('.toggle-wrap-off').length > 0) {
-            emailStyles.hideSettings();
-        }
     },
-
-    hideSettings: function() {
-        $('.js-html-email-settings').hide();
-    },
-
-    showSettings: function() {
-        $('.js-html-email-settings').show();
-    },
-
+    
     /**
      * Opens a popup with a email preview showing the current color values in the color pickers.
      */

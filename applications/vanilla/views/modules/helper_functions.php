@@ -1,9 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 
 if (!function_exists('WriteModuleDiscussion')):
-    function writeModuleDiscussion($Discussion, $Px = 'Bookmark') {
+    function writeModuleDiscussion($Discussion, $Px = 'Bookmark', $showPhotos = false) {
         ?>
         <li id="<?php echo "{$Px}_{$Discussion->DiscussionID}"; ?>" class="<?php echo CssClass($Discussion); ?>">
+            <?php if ($showPhotos) :
+                $firstUser = userBuilder($Discussion, 'First');
+                echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
+            endif; ?>
    <span class="Options">
       <?php
       //      echo OptionsList($Discussion);
@@ -14,7 +18,7 @@ if (!function_exists('WriteModuleDiscussion')):
             <div class="Title"><?php
                 echo anchor(Gdn_Format::text($Discussion->Name, false), DiscussionUrl($Discussion).($Discussion->CountCommentWatch > 0 ? '#Item_'.$Discussion->CountCommentWatch : ''), 'DiscussionLink');
                 ?></div>
-            <div class="Meta">
+            <div class="Meta DiscussionsModuleMeta">
                 <?php
                 $Last = new stdClass();
                 $Last->UserID = $Discussion->LastUserID;
@@ -22,7 +26,9 @@ if (!function_exists('WriteModuleDiscussion')):
 
                 echo NewComments($Discussion);
 
+                $translation = pluralTranslate($Discussion->CountComments, '%s comment html', '%s comments html', t('%s comment'), t('%s comments'));
                 echo '<span class="MItem">'.Gdn_Format::date($Discussion->LastDate, 'html').UserAnchor($Last).'</span>';
+                echo '<span class="MItem CountComments Hidden">'.sprintf($translation, $Discussion->CountComments).'</span>';
                 ?>
             </div>
         </li>

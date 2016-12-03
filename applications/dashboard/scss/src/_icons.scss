@@ -33,6 +33,7 @@
   svg {
     vertical-align: middle;
     display: inline-block;
+    fill: currentColor;
   }
 }
 
@@ -49,6 +50,6 @@
 .icon-text {
   width: $font-size-base;
   height: $font-size-base;
-  fill: $grey-dark;
+  color: $grey-dark;
   vertical-align: middle;
 }

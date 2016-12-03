@@ -109,3 +109,8 @@
     color: lighten($grey, 20%);
   }
 }
+
+.dropup .dropdown-toggle::after {
+  border-top: 0.375em solid;
+  border-bottom: 0;
+}

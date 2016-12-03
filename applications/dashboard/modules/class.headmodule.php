@@ -401,7 +401,7 @@ if (!class_exists('HeadModule', false)) {
 
             $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
             if ($Title != '') {
-                $this->addTag('meta', array('name' => 'twitter:title', 'property' => 'og:title', 'itemprop' => 'name', 'content' => $Title));
+                $this->addTag('meta', array('name' => 'twitter:title', 'property' => 'og:title', 'content' => $Title));
             }
 
             if (isset($CanonicalUrl)) {
@@ -409,7 +409,7 @@ if (!class_exists('HeadModule', false)) {
             }
 
             if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
-                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'itemprop' => 'description', 'content' => $Description));
+                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'content' => $Description));
             }
 
             $hasRelevantImage = false;
@@ -424,11 +424,11 @@ if (!class_exists('HeadModule', false)) {
                     }
 
                     $Logo = Gdn_Upload::url($Logo);
-                    $this->addTag('meta', array('property' => 'og:image', 'itemprop' => 'image', 'content' => $Logo));
+                    $this->addTag('meta', array('property' => 'og:image', 'content' => $Logo));
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
-                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'itemprop' => 'image', 'content' => $Img));
+                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'content' => $Img));
                     $hasRelevantImage = true;
                 }
             }

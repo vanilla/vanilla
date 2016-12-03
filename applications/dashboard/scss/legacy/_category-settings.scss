@@ -2,11 +2,6 @@
   color: $body-color;
   padding: 0 0 18px;
   position: relative;
-  fill: $body-color;
-
-  * {
-    box-sizing: border-box;
-  }
 }
 
 .dd-list {
@@ -49,7 +44,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    fill: $icon-color;
+    color: $grey;
 
     .dropdown-toggle {
       padding: to-rem(6) to-rem(10);
@@ -71,7 +66,7 @@
   cursor: move;
   cursor: grab;
   line-height: 1;
-  fill: $tree-border;
+  color: $grey;
 
   &:hover {
     fill: transparentize($body-color, .4);
@@ -80,7 +75,7 @@
 
 .dd-content {
   display: block;
-  border: solid 1px $tree-border;
+  border: solid 1px $border-color;
   background: $tree-background;
   border-radius: 2px;
   padding: 6px 9px 6px 60px;
@@ -96,10 +91,6 @@
   margin-left: 0; //-9px;
   opacity: .8;
   cursor: grabbing;
-
-  > .dd-item > .dd-handle {
-    fill: $body-color;
-  }
 }
 
 .dd-placeholder,

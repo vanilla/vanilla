@@ -19,6 +19,9 @@ class DiscussionsModule extends Gdn_Module {
     /** @var string  */
     public $Prefix = 'Discussion';
 
+    /** @var bool Whether to show the discussion author avatar. */
+    private $showPhotos = false;
+
     /** @var array Limit the discussions to just this list of categories, checked for view permission. */
     protected $categoryIDs;
 
@@ -31,6 +34,22 @@ class DiscussionsModule extends Gdn_Module {
         parent::__construct();
         $this->_ApplicationFolder = 'vanilla';
         $this->fireEvent('Init');
+    }
+
+    /**
+     * @param $showPhotos Whether to show the discussion author avatar.
+     * @return DiscussionsModule
+     */
+    public function setShowPhotos($showPhotos) {
+        $this->showPhotos = $showPhotos;
+        return $this;
+    }
+
+    /**
+     * @return bool Whether to show the discussion author avatar.
+     */
+    public function getShowPhotos() {
+        return $this->showPhotos;
     }
 
     /**

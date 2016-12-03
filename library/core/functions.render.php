@@ -8,18 +8,18 @@
  * @since 2.0
  */
 
-/**
- * Write alternating strings on each call.
- *
- * Useful for adding different classes to alternating lines in a list
- * or table to enhance their readability.
- *
- * @param string $odd The text for the first and every further "odd" call.
- * @param string $even The text for the second and every further "even" call.
- * @param string $attributeName The html attribute name that should embrace $even/$odd output.
- * @return string
- */
 if (!function_exists('alternate')) {
+    /**
+     * Write alternating strings on each call.
+     *
+     * Useful for adding different classes to alternating lines in a list
+     * or table to enhance their readability.
+     *
+     * @param string $odd The text for the first and every further "odd" call.
+     * @param string $even The text for the second and every further "even" call.
+     * @param string $attributeName The html attribute name that should embrace $even/$odd output.
+     * @return string
+     */
     function alternate($odd = '', $even = 'Alt', $attributeName = 'class') {
         static $b = false;
         if ($b = !$b) {
@@ -36,39 +36,59 @@ if (!function_exists('alternate')) {
     }
 }
 
-/**
- * Render svg icons. Icon must exist in applications/dashboard/views/symbols.php
- */
 if (!function_exists('dashboardSymbol')) {
-    function dashboardSymbol($name, $alt = '', $class = '') {
-        if (!empty($alt)) {
-            $alt = 'alt="'.htmlspecialchars($alt).'" ';
+    /**
+     * Render SVG icons in the dashboard. Icon must exist in applications/dashboard/views/symbols.php
+     *
+     * @param string $name The name of the icon to render. Must be set in applications/dashboard/views/symbols.php.
+     * @param string $class If set, overrides any 'class' attribute in the $attr param.
+     * @param array $attr The dashboard symbol attributes. The default 'alt' attribute will be set to $name.
+     * @return string An HTML-formatted string to render svg icons.
+     */
+    function dashboardSymbol($name, $class = '', array $attr = []) {
+        if (empty($attr['alt'])) {
+            $attr['alt'] = $name;
         }
-        $r = <<<EOT
-    <svg {$alt}class="icon $class icon-svg-$name" viewBox="0 0 17 17"><use xlink:href="#$name" /></svg>
-EOT;
-        return $r;
+
+        if (!empty($class)) {
+            $attr['class'] = $class.' ';
+        } else {
+            $attr['class'] = isset($attr['class']) ? $attr['class'].' ' : '';
+        }
+
+        $baseCssClass = 'icon icon-svg-'.$name;
+        $attr['class'] .= $baseCssClass;
+
+        return '<svg '.attribute($attr).' viewBox="0 0 17 17"><use xlink:href="#'.$name.'" /></svg>';
     }
 }
 
-/**
- * English "plural" formatting for numbers that can get really big.
- */
 if (!function_exists('bigPlural')) {
+    /**
+     * English "plural" formatting for numbers that can get really big.
+     *
+     * @param $Number
+     * @param $Singular
+     * @param bool $Plural
+     * @return string
+     */
     function bigPlural($Number, $Singular, $Plural = false) {
         if (!$Plural) {
             $Plural = $Singular.'s';
         }
-        $Title = sprintf(T($Number == 1 ? $Singular : $Plural), number_format($Number));
+        $Title = sprintf(t($Number == 1 ? $Singular : $Plural), number_format($Number));
 
         return '<span title="'.$Title.'" class="Number">'.Gdn_Format::bigNumber($Number).'</span>';
     }
 }
 
-/**
- * Formats a help element and adds it to the help asset.
- */
 if (!function_exists('helpAsset')) {
+    /**
+     * Formats a help element and adds it to the help asset.
+     *
+     * @param $title
+     * @param $description
+     */
     function helpAsset($title, $description) {
         Gdn_Theme::assetBegin('Help');
         echo '<aside role="note" class="help">';
@@ -138,7 +158,7 @@ if (!function_exists('subheading')) {
      */
     function subheading($title, $description = '') {
         if ($description === '') {
-            return '<h2 class="subheading-border">'.$title.'</h2>';
+            return '<h2 class="subheading">'.$title.'</h2>';
         } else {
             return '<header class="subheading-block">
                 <h2 class="subheading-title">'.$title.'</h2>
@@ -148,41 +168,44 @@ if (!function_exists('subheading')) {
     }
 }
 
-/**
- * Outputs standardized HTML for a badge.
- * A badge generally designates a count, and displays with a contrasting background.
- *
- * @param string|int $badge Info to put into a badge, usually a number.
- * @return string Badge HTML string.
- */
 if (!function_exists('badge')) {
+    /**
+     * Outputs standardized HTML for a badge.
+     *
+     * A badge generally designates a count, and displays with a contrasting background.
+     *
+     * @param string|int $badge Info to put into a badge, usually a number.
+     * @return string Badge HTML string.
+     */
     function badge($badge) {
         return ' <span class="badge">'.$badge.'</span> ';
     }
 }
 
-/**
- * Outputs standardized HTML for a popin badge.
- * A popin contains data that is injected after the page loads.
- * A badge generally designates a count, and displays with a contrasting background.
- *
- * @param string $rel Endpoint for a popin.
- * @return string Popin HTML string.
- */
 if (!function_exists('popin')) {
+    /**
+     * Outputs standardized HTML for a popin badge.
+     *
+     * A popin contains data that is injected after the page loads.
+     * A badge generally designates a count, and displays with a contrasting background.
+     *
+     * @param string $rel Endpoint for a popin.
+     * @return string Popin HTML string.
+     */
     function popin($rel) {
         return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
     }
 }
 
-/**
- * Outputs standardized HTML for an icon.
- * Uses the same css class naming conventions as font-vanillicon.
- *
- * @param string $icon Name of the icon you want to use, excluding the 'icon-' prefix.
- * @return string Icon HTML string.
- */
 if (!function_exists('icon')) {
+    /**
+     * Outputs standardized HTML for an icon.
+     *
+     * Uses the same css class naming conventions as font-vanillicon.
+     *
+     * @param string $icon Name of the icon you want to use, excluding the 'icon-' prefix.
+     * @return string Icon HTML string.
+     */
     function icon($icon) {
         if (substr(trim($icon), 0, 1) === '<') {
             return $icon;
@@ -233,25 +256,24 @@ if (!function_exists('buttonDropDown')) {
         if (count($Links) < 2) {
             $Link = array_pop($Links);
 
-
-            if (strpos(GetValue('CssClass', $Link, ''), 'Popup') !== false) {
+            if (strpos(val('CssClass', $Link, ''), 'Popup') !== false) {
                 $CssClass .= ' Popup';
             }
 
-            echo Anchor($Link['Text'], $Link['Url'], GetValue('ButtonCssClass', $Link, $CssClass));
+            echo anchor($Link['Text'], $Link['Url'], val('ButtonCssClass', $Link, $CssClass));
         } else {
             // NavButton or Button?
-            $ButtonClass = ConcatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
+            $ButtonClass = concatSep(' ', $ButtonClass, strpos($CssClass, 'NavButton') !== false ? 'NavButton' : 'Button');
             if (strpos($CssClass, 'Primary') !== false) {
                 $ButtonClass .= ' Primary';
             }
+
             // Strip "Button" or "NavButton" off the group class.
             echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
-//            echo Anchor($Text, $Url, $ButtonClass);
 
             echo '<ul class="Dropdown MenuItems">';
             foreach ($Links as $Link) {
-                echo wrap(Anchor($Link['Text'], $Link['Url'], val('CssClass', $Link, '')), 'li');
+                echo wrap(anchor($Link['Text'], $Link['Url'], val('CssClass', $Link, '')), 'li');
             }
             echo '</ul>';
 
@@ -294,7 +316,7 @@ if (!function_exists('buttonGroup')) {
             // Find the default button.
             $Default = ltrim($Default, '/');
             foreach ($Links as $Link) {
-                if (StringBeginsWith(ltrim($Link['Url'], '/'), $Default)) {
+                if (stringBeginsWith(ltrim($Link['Url'], '/'), $Default)) {
                     $Text = $Link['Text'];
                     $Url = $Link['Url'];
                     break;
@@ -336,6 +358,7 @@ if (!function_exists('category')) {
      *
      * @param int $Depth The level you want to look at.
      * @param array $Category
+     * @return array
      */
     function category($Depth = null, $Category = null) {
         if (!$Category) {
@@ -389,11 +412,17 @@ if (!function_exists('categoryUrl')) {
         if ($Page && $Page > 1) {
             $Result .= '/p'.$Page;
         }
-        return Url($Result, $WithDomain);
+        return url($Result, $WithDomain);
     }
 }
 
 if (!function_exists('condense')) {
+    /**
+     *
+     *
+     * @param string $Html
+     * @return mixed
+     */
     function condense($Html) {
         $Html = preg_replace('`(?:<br\s*/?>\s*)+`', "<br />", $Html);
         $Html = preg_replace('`/>\s*<br />\s*<img`', "/> <img", $Html);
@@ -402,6 +431,14 @@ if (!function_exists('condense')) {
 }
 
 if (!function_exists('countString')) {
+    /**
+     *
+     *
+     * @param $Number
+     * @param string $Url
+     * @param array $Options
+     * @return string
+     */
     function countString($Number, $Url = '', $Options = array()) {
         if (!$Number && $Number !== null) {
             return '';
@@ -452,7 +489,7 @@ if (!function_exists('cssClass')) {
         if (array_key_exists('UrlCode', $Row)) {
             $CssClass .= ' Category-'.Gdn_Format::alphaNumeric($Row['UrlCode']);
         }
-        if (GetValue('CssClass', $Row)) {
+        if (val('CssClass', $Row)) {
             $CssClass .= ' Item-'.$Row['CssClass'];
         }
 
@@ -521,6 +558,13 @@ if (!function_exists('cssClass')) {
 }
 
 if (!function_exists('dateUpdated')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @param null $Wrap
+     * @return string
+     */
     function dateUpdated($Row, $Wrap = null) {
         $Result = '';
         $DateUpdated = val('DateUpdated', $Row);
@@ -547,14 +591,18 @@ if (!function_exists('dateUpdated')) {
     }
 }
 
-/**
- * Writes an anchor tag
- */
 if (!function_exists('anchor')) {
     /**
      * Builds and returns an anchor tag.
+     *
+     * @param $Text
+     * @param string $Destination
+     * @param string $CssClass
+     * @param array $Attributes
+     * @param bool $ForceAnchor
+     * @return string
      */
-    function anchor($Text, $Destination = '', $CssClass = '', $Attributes = array(), $ForceAnchor = false) {
+    function anchor($Text, $Destination = '', $CssClass = '', $Attributes = [], $ForceAnchor = false) {
         if (!is_array($CssClass) && $CssClass != '') {
             $CssClass = array('class' => $CssClass);
         }
@@ -564,7 +612,7 @@ if (!function_exists('anchor')) {
         }
 
         if (!is_array($Attributes)) {
-            $Attributes = array();
+            $Attributes = [];
         }
 
         $SSL = null;
@@ -593,6 +641,7 @@ if (!function_exists('commentUrl')) {
      * Return a URL for a comment. This function is in here and not functions.general so that plugins can override.
      *
      * @param object $Comment
+     * @param bool $WithDomain
      * @return string
      */
     function commentUrl($Comment, $WithDomain = true) {
@@ -607,21 +656,28 @@ if (!function_exists('discussionUrl')) {
      * Return a URL for a discussion. This function is in here and not functions.general so that plugins can override.
      *
      * @param object $Discussion
+     * @param int|string $Page
+     * @param bool $WithDomain
      * @return string
      */
     function discussionUrl($Discussion, $Page = '', $WithDomain = true) {
         $Discussion = (object)$Discussion;
         $Name = Gdn_Format::url($Discussion->Name);
+
+        // Disallow an empty name slug in discussion URLs.
         if (empty($Name)) {
             $Name = 'x';
         }
+
         $Result = '/discussion/'.$Discussion->DiscussionID.'/'.$Name;
+
         if ($Page) {
             if ($Page > 1 || Gdn::session()->UserID) {
                 $Result .= '/p'.$Page;
             }
         }
-        return Url($Result, $WithDomain);
+
+        return url($Result, $WithDomain);
     }
 }
 
@@ -632,7 +688,7 @@ if (!function_exists('exportCSV')) {
      * @param array $columnNames
      * @param array $data
      */
-    function exportCSV($columnNames, $data = array()) {
+    function exportCSV($columnNames, $data = []) {
         $output = fopen("php://output",'w');
         header("Content-Type:application/csv");
         header("Content-Disposition:attachment;filename=profiles_export.csv");
@@ -706,6 +762,14 @@ if (!function_exists('formatPossessive')) {
 }
 
 if (!function_exists('formatUsername')) {
+    /**
+     *
+     *
+     * @param $User
+     * @param $Format
+     * @param bool $ViewingUserID
+     * @return mixed|string
+     */
     function formatUsername($User, $Format, $ViewingUserID = false) {
         if ($ViewingUserID === false) {
             $ViewingUserID = Gdn::session()->UserID;
@@ -715,7 +779,6 @@ if (!function_exists('formatUsername')) {
         $Gender = strtolower(val('Gender', $User));
 
         $UCFirst = substr($Format, 0, 1) == strtoupper(substr($Format, 0, 1));
-
 
         switch (strtolower($Format)) {
             case 'you':
@@ -783,8 +846,8 @@ if (!function_exists('hoverHelp')) {
     /**
      * Add span with hover text to a string.
      *
-     * @param $String
-     * @param $Help
+     * @param string $String
+     * @param string $Help
      * @return string
      */
     function hoverHelp($String, $Help) {
@@ -796,7 +859,7 @@ if (!function_exists('img')) {
     /**
      * Returns an img tag.
      *
-     * @param $Image
+     * @param string $Image
      * @param string $Attributes
      * @param bool|false $WithDomain
      * @return string
@@ -806,7 +869,7 @@ if (!function_exists('img')) {
             $Attributes = attribute($Attributes);
         }
 
-        if (!IsUrl($Image)) {
+        if (!isUrl($Image)) {
             $Image = smartAsset($Image, $WithDomain);
         }
 
@@ -851,6 +914,10 @@ if (!function_exists('inSection')) {
 if (!function_exists('ipAnchor')) {
     /**
      * Returns an IP address with a link to the user search.
+     *
+     * @param string $IP
+     * @param string $CssClass
+     * @return string
      */
     function ipAnchor($IP, $CssClass = '') {
         if ($IP) {
@@ -867,11 +934,10 @@ if (!function_exists('panelHeading')) {
      *
      * @param string $content The content of the tag.
      * @param string $attributes The attributes of the tag.
-     *
      * @return string The full tag.
      */
     function panelHeading($content, $attributes = '') {
-        return Wrap($content, 'h4', $attributes);
+        return wrap($content, 'h4', $attributes);
     }
 }
 
@@ -884,6 +950,12 @@ if (!function_exists('plural')) {
      * ```
      * /applications/garden/locale/en-US/definitions.php.
      * ```
+     *
+     * @param $Number
+     * @param $Singular
+     * @param $Plural
+     * @param bool $FormattedNumber
+     * @return string
      */
     function plural($Number, $Singular, $Plural, $FormattedNumber = false) {
         // Make sure to fix comma-formatted numbers
@@ -905,8 +977,8 @@ if (!function_exists('pluralTranslate')) {
      * @param int $Number
      * @param string $Singular
      * @param string $Plural
-     * @param string|false $SingularDefault
-     * @param string|false $PluralDefault
+     * @param string|bool $SingularDefault
+     * @param string|bool $PluralDefault
      * @return string
      * @since 2.1
      */
@@ -920,6 +992,15 @@ if (!function_exists('pluralTranslate')) {
 }
 
 if (!function_exists('searchExcerpt')) {
+    /**
+     * Excerpt a search result.
+     *
+     * @param string $PlainText
+     * @param array|string $SearchTerms
+     * @param int $Length
+     * @param bool $Mark
+     * @return string
+     */
     function searchExcerpt($PlainText, $SearchTerms, $Length = 200, $Mark = true) {
         if (empty($SearchTerms)) {
             return substrWord($PlainText, 0, $Length);
@@ -964,6 +1045,14 @@ if (!function_exists('searchExcerpt')) {
         return '';
     }
 
+    /**
+     *
+     *
+     * @param int $str
+     * @param int $start
+     * @param int $length
+     * @return string
+     */
     function substrWord($str, $start, $length) {
         // If we are offsetting on a word then find it.
         if (is_string($start)) {
@@ -1012,6 +1101,11 @@ if (!function_exists('searchExcerpt')) {
 if (!function_exists('userAnchor')) {
     /**
      * Take a user object, and writes out an anchor of the user's name to the user's profile.
+     *
+     * @param array|object $User
+     * @param null $CssClass
+     * @param null $Options
+     * @return string
      */
     function userAnchor($User, $CssClass = null, $Options = null) {
         static $NameUnique = null;
@@ -1027,9 +1121,7 @@ if (!function_exists('userAnchor')) {
         }
 
         $Px = val('Px', $Options, '');
-
         $Name = val($Px.'Name', $User, t('Unknown'));
-//        $UserID = GetValue($Px.'UserID', $User, 0);
         $Text = val('Text', $Options, htmlspecialchars($Name)); // Allow anchor text to be overridden.
 
         $Attributes = array(
@@ -1039,7 +1131,9 @@ if (!function_exists('userAnchor')) {
         if (isset($Options['title'])) {
             $Attributes['title'] = $Options['title'];
         }
+
         $UserUrl = userUrl($User, $Px);
+
         return '<a href="'.htmlspecialchars(url($UserUrl)).'"'.attribute($Attributes).'>'.$Text.'</a>';
     }
 }
@@ -1094,6 +1188,7 @@ if (!function_exists('userPhoto')) {
      *
      * @param object|array $User A user object or array.
      * @param array $Options
+     * @return string HTML.
      */
     function userPhoto($User, $Options = array()) {
         if (is_string($Options)) {
@@ -1130,7 +1225,7 @@ if (!function_exists('userPhoto')) {
         $Title = htmlspecialchars(val('Title', $Options, $Name));
 
         if ($FullUser && $FullUser['Banned']) {
-            $Photo = c('Garden.BannedPhoto', 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_large.png');
+            $Photo = c('Garden.BannedPhoto', 'https://images.v-cdn.net/banned_large.png');
             $Title .= ' ('.t('Banned').')';
         }
 
@@ -1157,12 +1252,13 @@ if (!function_exists('userPhotoUrl')) {
      * Take a user object an return the URL to their photo.
      *
      * @param object|array $User
+     * @return string
      */
     function userPhotoUrl($User) {
         $FullUser = Gdn::userModel()->getID(val('UserID', $User), DATASET_TYPE_ARRAY);
         $Photo = val('Photo', $User);
         if ($FullUser && $FullUser['Banned']) {
-            $Photo = 'https://c3409409.ssl.cf0.rackcdn.com/images/banned_100.png';
+            $Photo = 'https://images.v-cdn.net/banned_100.png';
         }
 
         if ($Photo) {
@@ -1212,18 +1308,24 @@ if (!function_exists('userUrl')) {
     }
 }
 
-
-/**
- * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
- */
 if (!function_exists('wrap')) {
+    /**
+     * Wrap the provided string in the specified tag.
+     *
+     * @example wrap('This is bold!', 'b');
+     *
+     * @param $String
+     * @param string $Tag
+     * @param string $Attributes
+     * @return string
+     */
     function wrap($String, $Tag = 'span', $Attributes = '') {
         if ($Tag == '') {
             return $String;
         }
 
         if (is_array($Attributes)) {
-            $Attributes = Attribute($Attributes);
+            $Attributes = attribute($Attributes);
         }
 
         // Strip the first part of the tag as the closing tag - this allows us to
@@ -1240,7 +1342,7 @@ if (!function_exists('wrapIf')) {
      *
      * @param string $String
      * @param string $Tag
-     * @param array $Attributes
+     * @param array|string $Attributes
      * @return string
      * @since 2.1
      */
@@ -1253,11 +1355,18 @@ if (!function_exists('wrapIf')) {
     }
 }
 
-/**
- * Wrap the provided string in the specified tag. ie. Wrap('This is bold!', 'b');
- */
 if (!function_exists('discussionLink')) {
+    /**
+     * Build URL for discussion.
+     *
+     * @deprecated discussionUrl()
+     * @param $Discussion
+     * @param bool $Extended
+     * @return string
+     */
     function discussionLink($Discussion, $Extended = true) {
+        deprecated('discussionLink', 'discussionUrl');
+
         $DiscussionID = val('DiscussionID', $Discussion);
         $DiscussionName = val('Name', $Discussion);
         $Parts = array(
@@ -1273,6 +1382,13 @@ if (!function_exists('discussionLink')) {
 }
 
 if (!function_exists('registerUrl')) {
+    /**
+     * Build URL for registration.
+     *
+     * @param string $Target
+     * @param bool $force
+     * @return string
+     */
     function registerUrl($Target = '', $force = false) {
         $registrationMethod = strtolower(c('Garden.Registration.Method'));
 
@@ -1293,6 +1409,13 @@ if (!function_exists('registerUrl')) {
 }
 
 if (!function_exists('signInUrl')) {
+    /**
+     * Build URL for signin.
+     *
+     * @param string $target
+     * @param bool $force
+     * @return string
+     */
     function signInUrl($target = '', $force = false) {
         // Check to see if there is even a sign in button.
         if (!$force && strcasecmp(c('Garden.Registration.Method'), 'Connect') !== 0) {
@@ -1307,6 +1430,12 @@ if (!function_exists('signInUrl')) {
 }
 
 if (!function_exists('signOutUrl')) {
+    /**
+     * Build URL for signout.
+     *
+     * @param string $Target
+     * @return string
+     */
     function signOutUrl($Target = '') {
         if ($Target) {
             // Strip out the SSO from the target so that the user isn't signed back in again.
@@ -1323,15 +1452,24 @@ if (!function_exists('signOutUrl')) {
 }
 
 if (!function_exists('socialSignInButton')) {
-    function socialSignInButton($Name, $Url, $Type = 'button', $Attributes = array()) {
-        TouchValue('title', $Attributes, sprintf(T('Sign In with %s'), $Name));
+    /**
+     * Build HTML for a social signin button.
+     *
+     * @param $Name
+     * @param $Url
+     * @param string $Type
+     * @param array $Attributes
+     * @return string HTML.
+     */
+    function socialSignInButton($Name, $Url, $Type = 'button', $Attributes = []) {
+        touchValue('title', $Attributes, sprintf(t('Sign In with %s'), $Name));
         $Title = $Attributes['title'];
         $Class = val('class', $Attributes, '');
         unset($Attributes['class']);
 
         switch ($Type) {
             case 'icon':
-                $Result = Anchor(
+                $Result = anchor(
                     '<span class="Icon"></span>',
                     $Url,
                     'SocialIcon SocialIcon-'.$Name.' '.$Class,
@@ -1340,7 +1478,7 @@ if (!function_exists('socialSignInButton')) {
                 break;
             case 'button':
             default:
-                $Result = Anchor(
+                $Result = anchor(
                     '<span class="Icon"></span><span class="Text">'.$Title.'</span>',
                     $Url,
                     'SocialIcon SocialIcon-'.$Name.' HasText '.$Class,
@@ -1354,6 +1492,14 @@ if (!function_exists('socialSignInButton')) {
 }
 
 if (!function_exists('sprite')) {
+    /**
+     * Build HTML for a sprite.
+     *
+     * @param string $Name
+     * @param string $Type
+     * @param bool $Text
+     * @return string
+     */
     function sprite($Name, $Type = 'Sprite', $Text = false) {
         $Sprite = '<span class="'.$Type.' '.$Name.'"></span>';
         if ($Text) {
@@ -1365,22 +1511,27 @@ if (!function_exists('sprite')) {
 }
 
 if (!function_exists('writeReactions')) {
+    /**
+     * Write the HTML for a reaction button.
+     *
+     * @param $Row
+     */
     function writeReactions($Row) {
-        $Attributes = GetValue('Attributes', $Row);
+        $Attributes = val('Attributes', $Row);
         if (is_string($Attributes)) {
             $Attributes = dbdecode($Attributes);
-            SetValue('Attributes', $Row, $Attributes);
+            setValue('Attributes', $Row, $Attributes);
         }
 
-        Gdn::controller()->EventArguments['ReactionTypes'] = array();
+        Gdn::controller()->EventArguments['ReactionTypes'] = [];
 
-        if ($ID = GetValue('CommentID', $Row)) {
+        if ($ID = val('CommentID', $Row)) {
             $RecordType = 'comment';
-        } elseif ($ID = GetValue('ActivityID', $Row)) {
+        } elseif ($ID = val('ActivityID', $Row)) {
             $RecordType = 'activity';
         } else {
             $RecordType = 'discussion';
-            $ID = GetValue('DiscussionID', $Row);
+            $ID = val('DiscussionID', $Row);
         }
         Gdn::controller()->EventArguments['RecordType'] = $RecordType;
         Gdn::controller()->EventArguments['RecordID'] = $ID;

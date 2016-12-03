@@ -639,9 +639,26 @@ search form or search(field, url, [textboxAttributes, info]) to render the searc
                                             <h2 class="kss-title" id="5-10">
                                             <span class="kss-ref badge pull-right">5-10</span> Checkboxes and Radios
                                             </h2>
+                                                <div class="kss-box padded"><p>We use either the jquery iCheck library to render our checkboxes or the good ol&#39; checkbox hack. A rule of thumb is
+to use iCheck if the checkbox has a functional label. Use the checkbox hack if there are many checkboxes on the
+page and they don&#39;t need visible labels.</p>
+<p>The dashboard will render checkboxes using iCheck by default. If you would rather use the checkbox hack, you&#39;ll
+need to wrap your checkbox in a <code>checkbox-painted-wrapper</code> div and use some very specific markup, as noted in
+Section 5.10.2</p>
+</div>
+                                                </div> <!-- end kss-component-description -->
+                                    </div>
+                                </section>
+                                <section class="kss-depth-3">
+                                    <div class="kss-component">
+                                        <div class="kss-component-description row full-border">
+                                            <h3 class="kss-title" id="5-10-1">
+                                            <span class="kss-ref badge pull-right">5-10-1</span> iCheck
+                                            </h3>
                                                 <div class="kss-box padded"><p>We use iCheck to make our checkboxes and radios look nice. It does some magic wrap the input in a style-able div.
 The most important thing to note is that you cannot listen for the click event, since the click happens on the
 wrapper. Listen for the change event instead.</p>
+<p>PHP rendering: This is the default styling for checkbox and radio inputs.</p>
 </div>
                                                 <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;script&gt;
   $(document).on(&#x27;click&#x27;, &#x27;#checkbox-1&#x27;, function() {console.log(&#x27;clicked!&#x27;)}); // doesn&#x27;t work
@@ -655,6 +672,53 @@ wrapper. Listen for the change event instead.</p>
   $(document).on('change', '#checkbox-1', function() {console.log('changed!')});
 </script>
 <label><input id="checkbox-1" type="checkbox" />A label for checkbox 1</label></div>
+                                    </div>
+                                </section>
+                                <section class="kss-depth-3">
+                                    <div class="kss-component">
+                                        <div class="kss-component-description row full-border">
+                                            <h3 class="kss-title" id="5-10-2">
+                                            <span class="kss-ref badge pull-right">5-10-2</span> Checkbox-hack checkboxes
+                                            </h3>
+                                                <div class="kss-box padded"><p>iCheck is nice, but comes with a rather notable blow to performance when there are many checkboxes on a page.
+If this is the case, render your checkboxes this way. No javascript necessary!</p>
+<p>PHP rendering: Something like this should work nicely:</p>
+<pre><code>&lt;?php echo wrap(
+    $form-&gt;checkBox(
+        &#39;StringsToAdd[]&#39;,
+        val(&#39;title&#39;, $string),
+        [&#39;display&#39; =&gt; &#39;after&#39;]
+    ),
+    &#39;div&#39;,
+    [&#39;class&#39; =&gt; &#39;checkbox-painted-wrapper&#39;]
+); ?&gt;
+</code></pre></div>
+                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;checkbox-painted-wrapper checkbox&quot;&gt;
+  &lt;input type=&quot;checkbox&quot; id=&quot;CheckMe&quot;&gt;
+  &lt;label for=&quot;CheckMe&quot;&gt;Check Me&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class=&quot;radio-painted-wrapper radio&quot;&gt;
+  &lt;input type=&quot;radio&quot; id=&quot;CheckRadioOne&quot; name=&quot;CheckRadio&quot;&gt;
+  &lt;label for=&quot;CheckRadioOne&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class=&quot;radio-painted-wrapper radio&quot;&gt;
+  &lt;input type=&quot;radio&quot; id=&quot;CheckRadioTwo&quot; name=&quot;CheckRadio&quot;&gt;
+  &lt;label for=&quot;CheckRadioTwo&quot;&gt;&lt;/label&gt;
+&lt;/div&gt;</pre>
+                                                </div> <!-- end kss-component-description -->
+                                                <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                                                <div class="kss-example padded-bottom"><div class="checkbox-painted-wrapper checkbox">
+  <input type="checkbox" id="CheckMe">
+  <label for="CheckMe">Check Me</label>
+</div>
+<div class="radio-painted-wrapper radio">
+  <input type="radio" id="CheckRadioOne" name="CheckRadio">
+  <label for="CheckRadioOne"></label>
+</div>
+<div class="radio-painted-wrapper radio">
+  <input type="radio" id="CheckRadioTwo" name="CheckRadio">
+  <label for="CheckRadioTwo"></label>
+</div></div>
                                     </div>
                                 </section>
                 </div>

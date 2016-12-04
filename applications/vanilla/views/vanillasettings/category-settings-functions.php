@@ -1,5 +1,13 @@
 <?php
+/**
+ *
+ */
 
+/**
+ * @param array $categories
+ * @param int $indent
+ * @param bool $allowSorting
+ */
 function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
     $i = str_repeat('  ', $indent);
 
@@ -11,6 +19,13 @@ function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
     echo "$i</ol>\n";
 }
 
+/**
+ *
+ *
+ * @param array $category
+ * @param int $indent
+ * @param bool $allowSorting
+ */
 function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
     $i = str_repeat('  ', $indent);
 
@@ -42,6 +57,12 @@ function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
     echo "$i</li>\n";
 }
 
+/**
+ *
+ *
+ * @param string $displayAs
+ * @return string
+ */
 function displayAsSymbol($displayAs) {
     switch (strtolower($displayAs)) {
         case 'heading':
@@ -56,6 +77,13 @@ function displayAsSymbol($displayAs) {
     }
 }
 
+/**
+ *
+ *
+ * @param $name
+ * @param string $alt
+ * @return string
+ */
 function symbol($name, $alt = '') {
     if (!empty($alt)) {
         $alt = 'alt="'.htmlspecialchars($alt).'" ';
@@ -68,6 +96,11 @@ EOT;
     return $r;
 }
 
+/**
+ *
+ *
+ * @param array $category
+ */
 function writeCategoryOptions($category) {
     $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
     $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'button', 'btn');
@@ -114,6 +147,11 @@ function writeCategoryOptions($category) {
     echo $cdd->toString();
 }
 
+/**
+ *
+ *
+ * @param array $ancestors
+ */
 function writeCategoryBreadcrumbs($ancestors) {
     echo '<div class="bigcrumbs full-border">';
 
@@ -139,6 +177,13 @@ function writeCategoryBreadcrumbs($ancestors) {
     echo '</div>';
 }
 
+/**
+ *
+ *
+ * @param string $text
+ * @param string $uri
+ * @param string $cssClass
+ */
 function writeCategoryBreadcrumb($text, $uri, $cssClass = '') {
     echo anchor($text, $uri, trim('crumb '.$cssClass));
 }

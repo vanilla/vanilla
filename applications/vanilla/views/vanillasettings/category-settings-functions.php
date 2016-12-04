@@ -136,13 +136,15 @@ function writeCategoryOptions($category) {
             'actions.add'
         );
 
-    $cdd->addGroup('', 'delete')
-        ->addLink(
-            t('Delete'),
-            "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
-            'delete.delete',
-            'js-modal'
-        );
+    if (val('CanDelete', $category, true)) {
+        $cdd->addGroup('', 'delete')
+            ->addLink(
+                t('Delete'),
+                "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
+                'delete.delete',
+                'js-modal'
+            );
+    }
 
     echo $cdd->toString();
 }

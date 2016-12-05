@@ -167,11 +167,25 @@ class Gdn_PasswordHash extends PasswordHash {
                 } else {
                     $Hash = val('hash', $Data);
                     $Function = val('hashFunc', $Data);
-                    if (!$Function) {
-                        $Function = strlen($Hash) == 32 ? 'md5' : 'sha1';
+                    switch (strlen($Hash)) {
+                        //xf11, XenForo_Authentication_Core11
+                        case 32:
+                            $Function = 'md5';
+                            break;
+                        case 40:
+                            $Function = 'sha1';
+                            break;
+                        //xf12, XenForo_Authentication_Core12
+                        default:
+                            $Function = 'crypt';
+                            break;
                     }
-                    $Salt = val('salt', $Data);
-                    $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
+                    if ($Function !== 'crypt') {
+                        $Salt = val('salt', $Data);
+                        $ComputedHash = hash($Function, hash($Function, $Password).$Salt);
+                    } else {
+                        $ComputedHash = crypt($Password, $StoredHash);
+                    }
 
                     $Result = $ComputedHash == $Hash;
                 }

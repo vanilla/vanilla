@@ -31,7 +31,7 @@ if (!$hasUserID) {
         // 1) If you arrived with NO ConnectName OR you've clicked Submit WITH a ConnectName (not not both!)
         //    we need to display the field again so that you can add/edit it.
         ($firstTimeHere xor $connectNameProvided)
-        // 2) If you just got here and we found matches (but validation failed and you need to try again).
+        // 2) If you clicked submit and we found matches (but validation failed and you need to try again).
         || (!$firstTimeHere && count($ExistingUsers))
         // 3) We're forcing a manual username selection.
         || !$allowConnect;

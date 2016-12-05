@@ -4,7 +4,7 @@ echo '<div class="Connect">';
 echo '<h1>', $this->data('Title'), '</h1>';
 
 // Post this form back to our current location.
-$path = Gdn_Format::htmlFilter(Gdn::request()->path());
+$path = htmlspecialchars(Gdn::request()->path());
 
 echo $this->Form->open(['Action' => url($path), 'Method' => 'get']);
 echo $this->Form->errors();

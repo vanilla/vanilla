@@ -39,7 +39,7 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
 
 ?>
     <h1><?php echo t('Homepage'); ?></h1>
-    <script type="text/javascript">
+    <script>
         jQuery(document).ready(function($) {
 
             $('.HomeOptions a').click(function() {

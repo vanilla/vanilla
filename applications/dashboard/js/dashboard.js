@@ -770,11 +770,31 @@ var DashboardModal = (function() {
         });
     }
 
-    function userDropDownInit(element) {
-        var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.js-navbar .js-card-user', element).length !== 0) {
+    /**
+     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * must specify the html content it will reveal when it is clicked.
+     *
+     * @param element The context
+     */
+    function dropInit(element) {
+        $('.js-drop', element).each(function() {
+            var $trigger = $(this);
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
+
+            if (triggerSelector === undefined) {
+                console.error('Drop trigger must be unique and have an id attribute set.');
+                return;
+            }
+
+            if (html === undefined) {
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
+                return;
+            }
+
             new Drop({
-                target: document.querySelector('.js-navbar .js-card-user', element),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -783,8 +803,10 @@ var DashboardModal = (function() {
                     targetAttachment: 'bottom right',
                     offset: '-10 0'
                 }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
-        }
+        });
     }
 
     /**
@@ -945,13 +967,34 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
+     * close to the bottom of the page.
+     *
+     * @param element The scope of the function.
+     */
+    function dropDownInit(element) {
+        $('.dropdown', element).each(function() {
+            var $dropdown = $(this);
+            var offset = $dropdown.offset();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
+            var documentHeight = $(document).height();
+            var padding = 6;
+
+            if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
+                $dropdown.addClass('dropup');
+            }
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
-        userDropDownInit(e.target); // navbar 'me' dropdown
+        dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav
@@ -960,6 +1003,7 @@ var DashboardModal = (function() {
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
+        dropDownInit(e.target); // makes sure our dropdowns open in the right direction
     });
 
     /**
@@ -1148,7 +1192,6 @@ var DashboardModal = (function() {
             }
         });
     });
-
 })(jQuery);
 
 var dashboardSymbol =  function(name, alt, cssClass) {

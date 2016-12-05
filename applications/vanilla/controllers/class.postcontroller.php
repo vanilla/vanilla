@@ -391,6 +391,8 @@ class PostController extends VanillaController {
             $this->Form->removeFormValue('Format');
         }
 
+        $this->setData('_CancelUrl', discussionUrl($this->data('Discussion')));
+
         // Set view and render
         $this->View = 'Discussion';
         $this->discussion($this->CategoryID);

@@ -62,7 +62,11 @@ class ActivityModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Activity');
-        $this->setPruneAfter('-2 months');
+        try {
+            $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
+        } catch (Exception $ex) {
+            $this->setPruneAfter('2 months');
+        }
     }
 
     /**
@@ -1736,7 +1740,17 @@ class ActivityModel extends Gdn_Model {
         if (!$this->pruneAfter) {
             return null;
         } else {
-            return new \DateTime($this->pruneAfter, new DateTimeZone('UTC'));
+            $tz = new \DateTimeZone('UTC');
+            $now = new DateTime('now', $tz);
+            $test = new DateTime($this->pruneAfter, $tz);
+
+            $interval = $test->diff($now);
+
+            if ($interval->invert === 1) {
+                return $now->add($interval);
+            } else {
+                return $test;
+            }
         }
     }
 
@@ -1753,9 +1767,6 @@ class ActivityModel extends Gdn_Model {
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
                 throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);
-            }
-            if ($testTime >= $now) {
-                throw new InvalidArgumentException('You must specify a timespan in the past for "prune after".', 400);
             }
         }
 

@@ -12,7 +12,6 @@ namespace Vanilla;
  * @package Vanilla
  */
 class Permissions {
-
     /**
      * Global permissions are stored as numerical indexes.
      * Per-ID permissions are stored as associative keys. The key is the permission name and the values are the IDs.
@@ -112,7 +111,7 @@ class Permissions {
      */
     public function has($permission, $id = null) {
         if ($id === null) {
-            return (array_search($permission, $this->permissions) !== false);
+            return !empty($this->permissions[$permission]) || (array_search($permission, $this->permissions) !== false);
         } else {
             if (array_key_exists($permission, $this->permissions) && is_array($this->permissions[$permission])) {
                 return (array_search($id, $this->permissions[$permission]) !== false);

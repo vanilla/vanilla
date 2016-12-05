@@ -1599,9 +1599,10 @@ class UserModel extends Gdn_Model {
             // Replace permissions with those of the ConfirmEmailRole
             $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
             $RoleModel = new RoleModel();
-            $permissions = new Vanilla\Permissions();
+            $permissionsModel = new Vanilla\Permissions();
             $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
-            $Permissions = $permissions->compileAndLoad($RolePermissions);
+            $permissionsModel->compileAndLoad($RolePermissions);
+            $Permissions = $permissionsModel->getPermissions();
 
             // Ensure Confirm Email role can always sign in
             if (!in_array('Garden.SignIn.Allow', $Permissions)) {

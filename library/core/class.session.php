@@ -136,12 +136,12 @@ class Gdn_Session {
 
         if (is_array($permission)) {
             if ($fullMatch) {
-                return $this->permissions->hasAll($permission);
+                return $this->permissions->hasAll($permission, $junctionID);
             } else {
-                return $this->permissions->hasAny($permission);
+                return $this->permissions->hasAny($permission, $junctionID);
             }
         } else {
-            return $this->permissions->has($permission);
+            return $this->permissions->has($permission, $junctionID);
         }
     }
 

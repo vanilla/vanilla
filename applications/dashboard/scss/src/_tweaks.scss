@@ -42,7 +42,7 @@
 }
 
 .filter-date {
-  min-width: to-rem(184);
+  min-width: to-rem(210);
 }
 
 table,
@@ -62,6 +62,10 @@ body {
 
 ul {
   margin-bottom: 0;
+}
+
+.drop-enabled {
+  @extend .active;
 }
 
 // TODO: I don't know where to put this yet.

@@ -106,3 +106,30 @@
   width: 5px !important;
   height: 1px !important;
 }
+
+// Hide the toolbar filter button when the panel is visible
+.toolbar .filter-category {
+  display: none;
+
+  svg {
+    transform: scale(.75);
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .toolbar .filter-category {
+    display: block;
+  }
+}
+
+.table-summary-cell-position-change svg {
+  margin-top: -4px;
+
+  .rise & {
+    color: $brand-success;
+  }
+
+  .fall & {
+    color: $brand-danger;
+  }
+}

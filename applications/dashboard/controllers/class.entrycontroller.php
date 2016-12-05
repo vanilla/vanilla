@@ -444,7 +444,9 @@ EOT;
 
         // Allow a provider to not send an email address but require one be manually entered.
         if (!UserModel::noEmail()) {
-            if (!$this->Form->getFormValue('Email') || $this->Form->getFormValue('EmailVisible')) {
+            $emailProvided = $this->Form->getFormValue('Email');
+            $emailRequested = $this->Form->getFormValue('EmailVisible');
+            if (!$emailProvided || $emailRequested) {
                 $this->Form->setFormValue('EmailVisible', true);
                 $this->Form->addHidden('EmailVisible', true);
 
@@ -452,9 +454,11 @@ EOT;
                     $this->Form->setFormValue('Email', val('Email', $currentData));
                 }
             }
+            if ($IsPostBack && $emailRequested) {
+                $this->Form->validateRule('Email', 'ValidateRequired');
+                $this->Form->validateRule('Email', 'ValidateEmail');
+            }
         }
-
-        $FormData = $this->Form->formValues(); // debug
 
         // Make sure the minimum required data has been provided by the connection.
         if (!$this->Form->getFormValue('Provider')) {
@@ -473,16 +477,11 @@ EOT;
 
         // If we've accrued errors, stop here and show them.
         if ($this->Form->errorCount() > 0) {
-            return $this->render();
+            $this->render();
+            return;
         }
 
-        $UserModel = Gdn::userModel();
-
-        // Find an existing user associated with this provider & uniqueid.
-        $Auth = $UserModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
-        $UserID = val('UserID', $Auth);
-
-        // Check to synchronise roles upon connecting.
+        // Check if we need to sync roles
         if (($this->data('Trusted') || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
             $SaveRoles = $SaveRolesRegister = true;
 
@@ -507,8 +506,14 @@ EOT;
             $SaveRolesRegister = false;
         }
 
+        $UserModel = Gdn::userModel();
+
+        // Find an existing user associated with this provider & uniqueid.
+        $Auth = $UserModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
+        $UserID = val('UserID', $Auth);
+
+        // The user is already in the UserAuthentication table
         if ($UserID) {
-            // The user is already connected.
             $this->Form->setFormValue('UserID', $UserID);
 
             // Update their info.
@@ -538,6 +543,7 @@ EOT;
             // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
 
+        // If a name of email has been provided
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
             $NameUnique = c('Garden.Registration.NameUnique', true);

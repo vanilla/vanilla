@@ -171,6 +171,7 @@ class CategoryModel extends Gdn_Model {
      * Calculate the user-specific information on a category.
      *
      * @param array &$category The category to calculate.
+     * @param bool|null $addUserCategory
      */
     private function calculateUser(&$category, $addUserCategory = null) {
         $category['Url'] = url($category['Url'], '//');
@@ -181,13 +182,11 @@ class CategoryModel extends Gdn_Model {
         if (!empty($category['LastUrl'])) {
             $category['LastUrl'] = url($category['LastUrl'], '//');
         }
-        $session = Gdn::session();
-        $permissionID = $category['PermissionCategoryID'];
 
-        $category['PermsDiscussionsView'] = $session->checkPermission('Vanilla.Discussions.View', true, 'Category', $permissionID);
-        $category['PermsDiscussionsAdd'] = $session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $permissionID);
-        $category['PermsDiscussionsEdit'] = $session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $permissionID);
-        $category['PermsCommentsAdd'] = $session->checkPermission('Vanilla.Comments.Add', true, 'Category', $permissionID);
+        $category['PermsDiscussionsView'] = self::checkPermission($category, 'Vanilla.Discussions.View');
+        $category['PermsDiscussionsAdd'] = self::checkPermission($category, 'Vanilla.Discussions.Add');
+        $category['PermsDiscussionsEdit'] = self::checkPermission($category, 'Vanilla.Discussions.Edit');
+        $category['PermsCommentsAdd'] = self::checkPermission($category, 'Vanilla.Comments.Add');
 
         $Code = $category['UrlCode'];
         $category['Name'] = translateContent("Categories.".$Code.".Name", $category['Name']);
@@ -642,7 +641,13 @@ class CategoryModel extends Gdn_Model {
      */
     public static function checkPermission($category, $permission) {
         $permissionCategoryID = val('PermissionCategoryID', $category);
+
         $result = Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID);
+        if ($result === false) {
+            $categoryID = val('CategoryID', $category);
+            $result = Gdn::session()->checkPermission($permission, true, 'Category', $categoryID);
+        }
+
         return $result;
     }
 

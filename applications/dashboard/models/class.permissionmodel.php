@@ -639,12 +639,10 @@ class PermissionModel extends Gdn_Model {
                     ->orderBy('junc.Sort')
                     ->orderBy('junc.Name');
 
-                if (isset($JuncIDs)) {
-                    if ($limitToDefault) {
-                        $SQL->where("junc.{$JunctionTable}ID", -1);
-                    } else {
-                        $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
-                    }
+                if ($limitToDefault) {
+                    $SQL->where("junc.{$JunctionTable}ID", -1);
+                } elseif (isset($JuncIDs)) {
+                    $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
                 }
             } else {
                 // Here we are getting permissions for all roles.

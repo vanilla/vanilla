@@ -78,7 +78,7 @@ class Permissions {
             // Iterate through the row's individual permissions.
             foreach ($row as $permission => $value) {
                 // If the user doesn't have this permission, move on to the next one.
-                if ($value === 0) {
+                if ($value == 0) {
                     continue;
                 }
 

@@ -12,10 +12,22 @@ namespace VanillaTests\APIv0;
  */
 class SmokeTest extends BaseTest {
 
+    /** @var  int */
+    protected static $restrictedCategoryID;
+
     /**
      * @var array
      */
     protected static $testUser;
+
+    /**
+     * Get the ID of the restricted category.
+     *
+     * @return int
+     */
+    public function getRestrictedCategoryID() {
+        return static::$restrictedCategoryID;
+    }
 
     /**
      * Get the testUser.
@@ -24,6 +36,17 @@ class SmokeTest extends BaseTest {
      */
     public function getTestUser() {
         return self::$testUser;
+    }
+
+    /**
+     * Set the ID of the restricted category.
+     *
+     * @param int $categoryID
+     * @return $this
+     */
+    public function setRestrictedCategoryID($categoryID) {
+        static::$restrictedCategoryID = $categoryID;
+        return $this;
     }
 
     /**
@@ -118,6 +141,37 @@ class SmokeTest extends BaseTest {
 
         $dbUser['tk'] = $this->api()->getTK($dbUser['UserID']);
         return $dbUser;
+    }
+
+    /**
+     * Test that a category with restricted permissions can be created.
+     */
+    public function testCreateRestrictedCategory() {
+        $r = $this->api()->post('/vanilla/settings/addcategory.json', [
+            'Name' => 'Moderators Only',
+            'UrlCode' => 'moderators-only',
+            'DisplayAs' => 'Discussions',
+            'CustomPermissions' => 1,
+            'Permission' => http_build_query([
+                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Delete',
+                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Edit',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Add',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Announce',
+                'Category/PermissionCategoryID/0/32//Vanilla.Comments.Add',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Close',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Delete',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Edit',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.Sink',
+                'Category/PermissionCategoryID/0/32//Vanilla.Discussions.View'
+            ])
+        ]);
+
+        $body = $r->getBody();
+        $category = $body['Category'];
+        $this->assertArrayHasKey('CategoryID', $category);
+
+        $this->setRestrictedCategoryID($category['CategoryID']);
     }
 
     /**
@@ -267,5 +321,54 @@ class SmokeTest extends BaseTest {
         $postedComment = $r->getBody();
         $postedComment = $postedComment['Comment'];
         $this->assertArraySubset($comment, $postedComment);
+    }
+
+    /**
+     * Test posting a discussion in a restricted category.
+     *
+     * @depends testCreateRestrictedCategory
+     * @expectedException \Exception
+     * @expectedExceptionMessage You do not have permission to post in this category.
+     */
+    public function testPostRestrictedDiscussion() {
+        $categoryID = $this->getRestrictedCategoryID();
+
+        if (!is_numeric($categoryID)) {
+            throw new \Exception('Invalid restricted category ID.');
+        }
+
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $discussion = [
+            'CategoryID' => $categoryID,
+            'Name' => 'SmokeTest::testPostRestrictedDiscussion()',
+            'Body' => 'Test '.date('r')
+        ];
+
+        $api->post(
+            '/post/discussion.json',
+            $discussion
+        );
+    }
+
+    /**
+     * Test viewing a restricted category.
+     *
+     * @depends testCreateRestrictedCategory
+     * @expectedException \Exception
+     * @expectedExceptionMessage You don't have permission to do that.
+     */
+    public function testViewRestrictedCategory() {
+        $categoryID = $this->getRestrictedCategoryID();
+
+        if (!is_numeric($categoryID)) {
+            throw new \Exception('Invalid restricted category ID.');
+        }
+
+        $api = $this->api();
+        $api->setUser($this->getTestUser());
+
+        $api->get("categories.json?CategoryIdentifier={$categoryID}");
     }
 }

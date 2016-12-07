@@ -6,7 +6,7 @@
 <!--<![endif]--><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--[if (gte mso 9)|(IE)]>
     {literal}
-    <style>
+    <style type="text/css">
         table {
             border-collapse: collapse;
         }

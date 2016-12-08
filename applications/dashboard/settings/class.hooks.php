@@ -501,4 +501,33 @@ class DashboardHooks extends Gdn_Plugin {
             PermissionModel::resetAllRoles();
         }
     }
+
+    /**
+     * Copy a file locally so that it can be manipulated by php.
+     *
+     * @param Gdn_Upload $sender The upload object doing the manipulation.
+     * @param array $args Arguments useful for copying the file.
+     * @throws Exception Throws an exception if there was a problem copying the file for local use.
+     */
+    public function gdn_upload_copyLocal_handler($sender, $args) {
+        $parsed = $args['Parsed'];
+        if ($parsed['Type'] !== 'static' || $parsed['Domain'] !== 'v') {
+            return;
+        }
+
+        $remotePath = PATH_ROOT.'/'.$parsed['Name'];
+
+        // Since this is just a temp file we don't want to nest it in a bunch of subfolders.
+        $localPath = paths(PATH_UPLOADS, 'tmp-static', str_replace('/', '-', $parsed['Name']));
+
+        // Make sure the destination path exists
+        if (!file_exists(dirname($localPath))) {
+            mkdir(dirname($localPath), 0777, true);
+        }
+
+        // Copy
+        copy($remotePath, $localPath);
+
+        $args['Path'] = $localPath;
+    }
 }

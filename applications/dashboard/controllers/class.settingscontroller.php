@@ -772,7 +772,7 @@ class SettingsController extends DashboardController {
             try {
                 $upload = new Gdn_UploadImage();
                 // Validate the upload
-                $tmpImage = $upload->validateUpload('EmailImage', false);
+                $tmpImage = $upload->validateUpload('EmailImage');
                 if ($tmpImage) {
                     // Generate the target image name
                     $targetImage = $upload->generateTargetName(PATH_UPLOADS);
@@ -792,8 +792,6 @@ class SettingsController extends DashboardController {
                     $imageBaseName = $parts['SaveName'];
                     saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
                     $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
-                } else {
-                    $this->Form->addError(t('There\'s been an error uploading the image. Your email logo can uploaded in one of the following filetypes: gif, jpg, png'));
                 }
             } catch (Exception $ex) {
                 $this->Form->addError($ex);

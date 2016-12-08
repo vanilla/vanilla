@@ -635,11 +635,15 @@ class CategoryModel extends Gdn_Model {
     /**
      * Check a category's permission.
      *
-     * @param array $category The category to check.
+     * @param int|array|object $category The category to check.
      * @param string $permission The permission name to check.
      * @return bool Returns **true** if the current user has the permission or **false** otherwise.
      */
     public static function checkPermission($category, $permission) {
+        if (is_numeric($category)) {
+            $category = static::categories($category);
+        }
+        
         $permissionCategoryID = val('PermissionCategoryID', $category);
 
         $result = Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID);

@@ -13,11 +13,22 @@
  */
 class RoleController extends DashboardController {
 
+    /** @var bool Should categories be hidden when editing a role? */
+    private $hideCategoryPermissions;
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Database', 'Form', 'RoleModel');
 
     /** @var RoleModel */
     public $RoleModel;
+
+    /**
+     * RoleController constructor.
+     */
+    public function __construct() {
+        parent::__construct();
+        $this->hideCategoryPermissions = c('Vanilla.HideRoleCategoryPermissions', false);
+    }
 
     /**
      * Set menu path. Automatically run on every use.
@@ -132,7 +143,12 @@ class RoleController extends DashboardController {
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
             // Get the role data for the requested $RoleID and put it into the form.
-            $Permissions = $PermissionModel->getPermissionsEdit($RoleID ? $RoleID : 0, $LimitToSuffix);
+            $Permissions = $PermissionModel->getPermissionsEdit(
+                $RoleID ? $RoleID : 0,
+                $LimitToSuffix,
+                $this->hideCategoryPermissions === false
+            );
+
             // Remove permissions the user doesn't have access to.
             if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                 foreach ($this->RoleModel->RankPermissions as $Permission) {
@@ -157,6 +173,10 @@ class RoleController extends DashboardController {
                 $this->Form->setFormValue('PersonalInfo', false);
             }
 
+            if ($this->hideCategoryPermissions) {
+                $this->Form->setFormValue('IgnoreCategoryPermissions', true);
+            }
+
             // If the form has been posted back...
             // 2. Save the data (validation occurs within):
             if ($RoleID = $this->Form->save()) {
@@ -168,7 +188,11 @@ class RoleController extends DashboardController {
                 $this->informMessage(t('Your changes have been saved.'));
                 $this->RedirectUrl = url('dashboard/role');
                 // Reload the permission data.
-                $this->setData('PermissionData', $PermissionModel->getPermissionsEdit($RoleID, $LimitToSuffix), true);
+                $this->setData('PermissionData', $PermissionModel->getPermissionsEdit(
+                    $RoleID,
+                    $LimitToSuffix,
+                    $this->hideCategoryPermissions === false
+                ), true);
             }
         }
 

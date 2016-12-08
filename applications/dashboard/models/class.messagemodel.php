@@ -203,7 +203,7 @@ class MessageModel extends Gdn_Model {
         $Result = array_filter($Result, function($Message) use ($Session, $category) {
             $visible = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
             if ($category !== null) {
-                $visible = $visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+                $visible = $visible && CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
             }
             return $visible;
         });

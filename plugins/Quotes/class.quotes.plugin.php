@@ -239,7 +239,15 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function addQuoteButton($Sender, $Args) {
-        if (!Gdn::session()->UserID || !checkPermission('Vanilla.Comments.Add')) {
+        if (!isset($Args['Discussion'])) {
+            return;
+        }
+
+        $session = Gdn::session();
+        if (!$session->UserID) {
+            return;
+        }
+        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $Args['Discussion']->PermissionCategoryID)) {
             return;
         }
 

@@ -319,6 +319,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
             case 'Display':
             case 'Text':
+            case 'TextEx':
             default:
                 break;
         }
@@ -471,6 +472,7 @@ BQ;
                 case 'Markdown':
                 case 'Display':
                 case 'Text':
+                case 'TextEx':
                     $QuoteBody = $Data->Body;
                     $insertName = $Data->InsertName;
                     if (strpos($insertName, ' ') !== false) {

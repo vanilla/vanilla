@@ -319,6 +319,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
             case 'Display':
             case 'Text':
+            case 'TextEx':
             default:
                 break;
         }

@@ -471,6 +471,7 @@ BQ;
                 case 'Markdown':
                 case 'Display':
                 case 'Text':
+                case 'TextEx':
                     $QuoteBody = $Data->Body;
                     $insertName = $Data->InsertName;
                     if (strpos($insertName, ' ') !== false) {

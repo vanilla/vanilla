@@ -522,6 +522,9 @@ class EntryController extends Gdn_Controller {
 
                 // Synchronize the user's data.
                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
+                $this->EventArguments['Form'] = $this->Form;
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
             }
 
             // Always save the attributes because they may contain authorization information.
@@ -600,6 +603,9 @@ class EntryController extends Gdn_Controller {
 
                                 // Update the user.
                                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
+                                $this->EventArguments['Form'] = $this->Form;
+                                $this->EventArguments['UserID'] = $UserID;
+                                $this->fireEvent('AfterConnectSave');
                             }
 
                             // Always save the attributes because they may contain authorization information.
@@ -708,6 +714,11 @@ class EntryController extends Gdn_Controller {
                     'SaveRoles' => $SaveRolesRegister
                 ]);
                 $User['UserID'] = $UserID;
+
+                $this->EventArguments['Form'] = $this->Form;
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
+
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 // Save the association to the new user.
@@ -809,6 +820,11 @@ class EntryController extends Gdn_Controller {
                     'SaveRoles' => $SaveRolesRegister
                 ]);
                 $User['UserID'] = $UserID;
+
+                $this->EventArguments['Form'] = $this->Form;
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
+
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 // Send the welcome email.

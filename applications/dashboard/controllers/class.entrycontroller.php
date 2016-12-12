@@ -522,7 +522,6 @@ class EntryController extends Gdn_Controller {
 
                 // Synchronize the user's data.
                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
-                $this->EventArguments['Form'] = $this->Form;
                 $this->EventArguments['UserID'] = $UserID;
                 $this->fireEvent('AfterConnectSave');
             }
@@ -603,7 +602,6 @@ class EntryController extends Gdn_Controller {
 
                                 // Update the user.
                                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
-                                $this->EventArguments['Form'] = $this->Form;
                                 $this->EventArguments['UserID'] = $UserID;
                                 $this->fireEvent('AfterConnectSave');
                             }
@@ -715,7 +713,6 @@ class EntryController extends Gdn_Controller {
                 ]);
                 $User['UserID'] = $UserID;
 
-                $this->EventArguments['Form'] = $this->Form;
                 $this->EventArguments['UserID'] = $UserID;
                 $this->fireEvent('AfterConnectSave');
 
@@ -821,7 +818,6 @@ class EntryController extends Gdn_Controller {
                 ]);
                 $User['UserID'] = $UserID;
 
-                $this->EventArguments['Form'] = $this->Form;
                 $this->EventArguments['UserID'] = $UserID;
                 $this->fireEvent('AfterConnectSave');
 

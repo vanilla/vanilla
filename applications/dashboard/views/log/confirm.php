@@ -77,7 +77,7 @@
                             $this->Form->checkBox(
                                 'UserID[]',
                                 htmlspecialchars($User['Name']),
-                                array('value' => $User['UserID'], 'display' => 'after', 'class' => 'js-check-me checkbox checkbox-inline')
+                                ['value' => $User['UserID'], 'display' => 'after', 'class' => 'js-check-me checkbox checkbox-inline']
                             ).' '.htmlspecialchars($User['Name']),
                             'span',
                             ['class' => 'checkbox-painted-wrapper']

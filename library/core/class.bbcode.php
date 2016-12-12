@@ -130,9 +130,9 @@ class BBCode extends Gdn_Pluggable {
 
             if (preg_match('/(c|d)-(\d+)/', strtolower($url), $matches)) {
                 if ($matches[1] === 'd') {
-                    $url = "/discussion/$matches[2]";
+                    $url = "/discussion/{$matches[2]}";
                 } else {
-                    $url = "/discussion/comment/$matches[2]#Comment_$matches[2]";
+                    $url = "/discussion/comment/{$matches[2]}#Comment_{$matches[2]}";
                 }
             } elseif (is_numeric($url)) {
                 $url = "/discussion/comment/$url#Comment_{$url}";

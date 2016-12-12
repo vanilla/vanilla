@@ -158,14 +158,12 @@ if (!class_exists('MenuModule', false)) {
             $Username = '';
             $UserID = '';
             $Session_TransientKey = '';
-            $Permissions = array();
             $Session = Gdn::session();
             $Admin = false;
             if ($Session->isValid() === true) {
                 $UserID = $Session->User->UserID;
                 $Username = $Session->User->Name;
                 $Session_TransientKey = $Session->TransientKey();
-                $Permissions = $Session->getPermissionsArray();
                 $Admin = $Session->User->Admin > 0 ? true : false;
             }
 
@@ -202,7 +200,7 @@ if (!class_exists('MenuModule', false)) {
                         }
 
                         // Show if there are no permissions or the user has ANY of the specified permissions or the user is admin
-                        $ShowLink = $Admin || $RequiredPermissions === false || ArrayInArray($RequiredPermissions, $Permissions, false) === true;
+                        $ShowLink = $Admin || $RequiredPermissions === false || Gdn::session()->checkPermission($RequiredPermissions, false);
 
                         if ($ShowLink === true) {
                             if ($ItemCount == 1) {

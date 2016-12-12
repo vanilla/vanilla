@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "3c2901be3d44ca6e302e4ef664074ec1",
-    "content-hash": "91afffeaed3f32060aa77a126f489a0b",
+    "hash": "28132570334a7d5b640dcd6f0263fac6",
+    "content-hash": "a2ccf8ebda910960e23ddc07bea16c24",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -79,16 +79,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.16",
+            "version": "v5.2.17",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a"
+                "reference": "208913c6042967ba404f4bfa0819bf5bef79dbec"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
-                "reference": "1d85f9ef3ecfc42bbc4f3c70d5e37ca9a65f629a",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/208913c6042967ba404f4bfa0819bf5bef79dbec",
+                "reference": "208913c6042967ba404f4bfa0819bf5bef79dbec",
                 "shasum": ""
             },
             "require": {
@@ -135,20 +135,20 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2016-06-06 09:09:37"
+            "time": "2016-12-09 10:03:48"
         },
         {
             "name": "psr/log",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "5277094ed527a1c4477177d102fe4c53551953e0"
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/5277094ed527a1c4477177d102fe4c53551953e0",
-                "reference": "5277094ed527a1c4477177d102fe4c53551953e0",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
+                "reference": "4ebe3a8bf773a19edfe0a84b6585ba3d401b724d",
                 "shasum": ""
             },
             "require": {
@@ -182,7 +182,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-09-19 16:02:08"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "smarty/smarty",
@@ -333,16 +333,16 @@
         },
         {
             "name": "vanilla/garden-password",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-password.git",
-                "reference": "bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e"
+                "reference": "62c1182687e82ed3e941af635deb2b1a1d96c980"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-password/zipball/bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e",
-                "reference": "bd7e0f6918d99aa6cf2d9bb21146d65e5df4439e",
+                "url": "https://api.github.com/repos/vanilla/garden-password/zipball/62c1182687e82ed3e941af635deb2b1a1d96c980",
+                "reference": "62c1182687e82ed3e941af635deb2b1a1d96c980",
                 "shasum": ""
             },
             "require": {
@@ -382,7 +382,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2016-04-18 01:43:52"
+            "time": "2016-10-21 20:47:48"
         },
         {
             "name": "vanilla/htmlawed",

@@ -28,6 +28,9 @@ class SettingsController extends DashboardController {
     /** @var array List of permissions that should all have access to main dashboard. */
     public $RequiredAdminPermissions = array();
 
+    /** @var BanModel The ban model. */
+    private $_BanModel;
+
     /**
      * Highlight menu path. Automatically run on every use.
      *
@@ -171,6 +174,19 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Gets the ban model and instantiates it if it doesn't exist.
+     *
+     * @return BanModel
+     */
+    public function getBanModel() {
+        if ($this->_BanModel === null) {
+            $BanModel = new BanModel();
+            $this->_BanModel = $BanModel;
+        }
+        return $this->_BanModel;
+    }
+
+    /**
      * Application management screen.
      *
      * @since 2.0.0
@@ -180,7 +196,7 @@ class SettingsController extends DashboardController {
      *    Valid values for BanType are email, ipaddress or name.
      */
     protected function _banFilter($Ban) {
-        $BanModel = $this->_BanModel;
+        $BanModel = $this->getBanModel();
         $BanWhere = $BanModel->banWhere($Ban);
         foreach ($BanWhere as $Name => $Value) {
             if (!in_array($Name, array('u.Admin', 'u.Deleted'))) {
@@ -535,8 +551,7 @@ class SettingsController extends DashboardController {
 
         list($Offset, $Limit) = offsetLimit($Page, 20);
 
-        $BanModel = new BanModel();
-        $this->_BanModel = $BanModel;
+        $BanModel = $this->getBanModel();
 
         switch (strtolower($Action)) {
             case 'add':

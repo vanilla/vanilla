@@ -463,7 +463,7 @@ BLOCKQUOTE;
                 case 'BBCode':
                     $Author = htmlspecialchars($Data->InsertName);
                     if ($ID) {
-                        $IDString = ';'.htmlspecialchars($ID);
+                        $IDString = ';'.($Type === 'comment' ? 'c' : 'd').'-'.htmlspecialchars($ID);
                     }
 
                     $QuoteBody = $Data->Body;

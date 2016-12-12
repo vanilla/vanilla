@@ -68,10 +68,9 @@ class LogModel extends Gdn_Pluggable {
         $Data = $Log['Data'];
 
         $Result = '';
-        Gdn::pluginManager()->fireAs('LogModel')->fireEvent('FormatContent', [
-            'Log' => $Log,
-            'Result' => &$Result,
-        ]);
+        $this->EventArguments['Log'] = $Log;
+        $this->EventArguments['Result'] = &$Result;
+        $this->fireEvent('FormatContent');
 
         if ($Result === '') {
             switch ($Log['RecordType']) {

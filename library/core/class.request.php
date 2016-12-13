@@ -511,43 +511,31 @@ class Gdn_Request {
         }
         $this->port($port);
 
-        if (is_array($_GET)) {
-            $get = false;
-            if ($get === false) {
-                $get =& $_GET;
-            }
-            if (!is_array($get)) {
-                $original = [];
-                parse_str($get, $original);
-                safeParseStr($get, $get, $original);
-            }
+        $path = '';
+        if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
+            $path = val('PATH_INFO', $_SERVER, '');
 
-            if (!empty($_SERVER['X_REWRITE']) || !empty($_SERVER['REDIRECT_X_REWRITE'])) {
-                $path = val('PATH_INFO', $_SERVER, '');
-
-                // Some hosts block PATH_INFO from being passed (or even manually set).
-                // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
-                // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
-                if (!$path) {
-                    if (!empty($_SERVER['X_PATH_INFO'])) {
-                        $path = $_SERVER['X_PATH_INFO'];
-                    } elseif (!empty($_SERVER['REDIRECT_X_PATH_INFO'])) {
-                        $path = $_SERVER['REDIRECT_X_PATH_INFO'];
-                    }
+            // Some hosts block PATH_INFO from being passed (or even manually set).
+            // We set X_PATH_INFO in the .htaccess as a fallback for those situations.
+            // If you work for one of those hosts, know that many beautiful kittens lost their lives for your sins.
+            if (!$path) {
+                if (!empty($_SERVER['X_PATH_INFO'])) {
+                    $path = $_SERVER['X_PATH_INFO'];
+                } elseif (!empty($_SERVER['REDIRECT_X_PATH_INFO'])) {
+                    $path = $_SERVER['REDIRECT_X_PATH_INFO'];
                 }
-            } elseif (isset($get['_p'])) {
-                $path = $get['_p'];
-                unset($_GET['_p']);
-            } elseif (isset($get['p'])) {
-                $path = $get['p'];
-                unset($_GET['p']);
-            } else {
-                $path = '';
             }
-
-            // Set URI directly to avoid double decoding.
-            $this->_Environment['URI'] = $path;
+        } elseif (is_array($_GET)) {
+            if (isset($_GET['_p'])) {
+                $path = $_GET['_p'];
+                unset($_GET['_p']);
+            } elseif (isset($_GET['p'])) {
+                $path = $_GET['p'];
+                unset($_GET['p']);
+            }
         }
+        // Set URI directly to avoid double decoding.
+        $this->_Environment['URI'] = $path;
 
         $possibleScriptNames = [];
         if (isset($_SERVER['SCRIPT_NAME'])) {

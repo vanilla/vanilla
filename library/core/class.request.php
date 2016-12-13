@@ -870,7 +870,7 @@ class Gdn_Request {
                 break;
 
             case self::INPUT_POST:
-                $argumentData = $_POST;
+                $argumentData = $this->decodePost($_POST, $_SERVER, 'php://input');
                 break;
 
             case self::INPUT_SERVER:
@@ -895,6 +895,30 @@ class Gdn_Request {
 
         }
         $this->_RequestArguments[$paramsType] = $argumentData;
+    }
+
+    /**
+     * Decode the environment's post depending on content type.
+     *
+     * @param array $post Usually the {@link $_POST} super-global.
+     * @param array $server Usually the {@link $_SERVER} super-global.
+     * @param array $inputFile Usually **php://input** for the raw input stream.
+     */
+    private function decodePost($post, $server, $inputFile) {
+        $contentType = !isset($server['CONTENT_TYPE']) ? 'application/x-www-form-urlencoded' : $server['CONTENT_TYPE'];
+
+        if (stripos($contentType, 'json') !== false) {
+            // Decode the JSON from the content type.
+            $result = json_decode(file_get_contents($inputFile), true);
+
+            if ($result === null) {
+                $result = $post;
+            }
+        } else {
+            $result = $post;
+        }
+
+        return $result;
     }
 
     public function setRequestArguments($paramsType, $paramsData) {

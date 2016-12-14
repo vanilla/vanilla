@@ -97,6 +97,13 @@ class Gdn_Configuration extends Gdn_Pluggable {
     }
 
     /**
+     * Getter for formatOptions.
+     */
+    public function getFormatOptions() {
+        return $this->formatOptions;
+    }
+
+    /**
      * Set the sort flag to be used with ksort.
      *
      * @link http://php.net/manual/en/function.ksort.php
@@ -1435,7 +1442,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                     'ByLine' => true
                 ];
 
-                $options = array_merge($options, $this->formatOptions);
+                $options = array_merge($options, $this->Configuration->getFormatOptions());
 
                 // Write config data to string format, ready for saving
                 $FileContents = Gdn_Configuration::format($Data, $options);

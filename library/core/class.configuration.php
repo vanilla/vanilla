@@ -61,6 +61,9 @@ class Gdn_Configuration extends Gdn_Pluggable {
     /** @var null @var The sort flag to use with ksort. */
     private $sortFlag = null;
 
+    /** @var array @var Format option overrides. */
+    private $formatOptions = [];
+
     /**
      * Initialize a new instance of the {@link Gdn_Configuration} class.
      *
@@ -76,6 +79,20 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $this->defaultPath = PATH_CONF_DEFAULT;
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
+        }
+    }
+
+    /**
+     * Set a format option to be used by the Gdn_Configuration::format function.
+     *
+     * @param string $formatOption The option in $allowedOptions that you want to update.
+     * @param string|bool $value The value of the option you want to update.
+     */
+    public function setFormatOption($formatOption, $value) {
+        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'ByLine', 'FormatStyle'];
+
+        if (in_array($formatOption, $allowedOptions)) {
+            $this->formatOptions[$formatOption] = $value;
         }
     }
 
@@ -1412,12 +1429,16 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                     }
                 }
 
-                // Write config data to string format, ready for saving
-                $FileContents = Gdn_Configuration::format($Data, array(
+                $options = [
                     'VariableName' => $Group,
                     'WrapPHP' => true,
                     'ByLine' => true
-                ));
+                ];
+
+                $options = array_merge($options, $this->formatOptions);
+
+                // Write config data to string format, ready for saving
+                $FileContents = Gdn_Configuration::format($Data, $options);
 
                 if ($FileContents === false) {
                     trigger_error(errorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);

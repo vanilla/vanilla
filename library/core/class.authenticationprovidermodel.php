@@ -177,7 +177,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             if (stringBeginsWith($providerKey, $mapKey, false)) {
                 $subArrayKey = str_replace($mapKey, '', $providerKey);
                 if ($subArrayKey) {
-                    $map[$subArrayKey]= $value;
+                    $map[$value]= $subArrayKey;
                 }
             }
         }

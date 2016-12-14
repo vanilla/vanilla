@@ -85,8 +85,12 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Delete all files in `/cache`.
-* Go to `yourforum.com/utility/update` to run any database updates needed.
+* Go to `yourforum.com/utility/update` to run any database updates needed. (404? See next paragraph.)
 * If it fails, try it a second times by refreshing the page.
+
+If your forum still uses URLs including `?p=`:
+
+Support for this URL structure is ending after 2.3 in favor of "pretty" URLs so it's time to make the switch. First, confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. Then, open `conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. Your site should immediately switch to "pretty" URL paths instead of using the 'p' parameter. If there is a problem, re-add the line to your config and do further troubleshooting.
 
 To upgrade from **2.1 or earlier**:
 

@@ -769,32 +769,34 @@ class SettingsController extends DashboardController {
             $this->Form->setData($configurationModel->Data);
         } else {
             $image = c('Garden.EmailTemplate.Image');
-            try {
-                $upload = new Gdn_UploadImage();
-                // Validate the upload
-                $tmpImage = $upload->validateUpload('EmailImage');
-                if ($tmpImage) {
-                    // Generate the target image name
-                    $targetImage = $upload->generateTargetName(PATH_UPLOADS);
-                    $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
-                    // Delete any previously uploaded images.
-                    if ($image) {
-                        $upload->delete($image);
-                    }
-                    // Save the uploaded image
-                    $parts = $upload->saveImageAs(
-                        $tmpImage,
-                        $imageBaseName,
-                        c('Garden.EmailTemplate.ImageMaxWidth', 400),
-                        c('Garden.EmailTemplate.ImageMaxHeight', 300)
-                    );
+            $upload = new Gdn_UploadImage();
+            if ($upload->isUpload('EmailImage')) {
+                try {
+                    $tmpImage = $upload->validateUpload('EmailImage');
 
-                    $imageBaseName = $parts['SaveName'];
-                    saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
-                    $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                    if ($tmpImage) {
+                        // Generate the target image name
+                        $targetImage = $upload->generateTargetName(PATH_UPLOADS);
+                        $imageBaseName = pathinfo($targetImage, PATHINFO_BASENAME);
+                        // Delete any previously uploaded images.
+                        if ($image) {
+                            $upload->delete($image);
+                        }
+                        // Save the uploaded image
+                        $parts = $upload->saveImageAs(
+                            $tmpImage,
+                            $imageBaseName,
+                            c('Garden.EmailTemplate.ImageMaxWidth', 400),
+                            c('Garden.EmailTemplate.ImageMaxHeight', 300)
+                        );
+
+                        $imageBaseName = $parts['SaveName'];
+                        saveToConfig('Garden.EmailTemplate.Image', $imageBaseName);
+                        $this->setData('EmailImage', Gdn_UploadImage::url($imageBaseName));
+                    }
+                } catch (Exception $ex) {
+                    $this->Form->addError($ex);
                 }
-            } catch (Exception $ex) {
-                $this->Form->addError($ex);
             }
 
             if ($this->Form->save() !== false) {

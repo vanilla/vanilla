@@ -191,7 +191,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('BeforeDispatch');
 
         // If we're in update mode and aren't explicitly prevented from blocking, block.
-        if (Gdn::config('Garden.UpdateMode', false) && $this->getCanBlock($request) > self::BLOCK_NEVER) {
+        if (inMaintenanceMode() && $this->getCanBlock($request) > self::BLOCK_NEVER) {
             $request->withURI(Gdn::router()->getDestination('UpdateMode'));
         }
 

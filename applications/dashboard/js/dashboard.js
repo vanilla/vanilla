@@ -1015,7 +1015,9 @@ var DashboardModal = (function() {
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                $preview.attr('src', e.target.result);
+                if (e.target.result.startsWith("data:image")) {
+                    $preview.attr('src', e.target.result);
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }

@@ -1598,6 +1598,11 @@ class UserModel extends Gdn_Model {
         if ($ConfirmEmail && !$Confirmed) {
             // Replace permissions with those of the ConfirmEmailRole
             $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+
+            if (!is_array($ConfirmEmailRoleID) || count($ConfirmEmailRoleID) == 0) {
+                throw new Exception(sprintf(t('No role configured with a type of "%s".'), RoleModel::TYPE_UNCONFIRMED), 400);
+            }
+
             $RoleModel = new RoleModel();
             $permissionsModel = new Vanilla\Permissions();
             $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
@@ -1605,11 +1610,11 @@ class UserModel extends Gdn_Model {
             $Permissions = $permissionsModel->getPermissions();
 
             // Ensure Confirm Email role can always sign in
-            if (!in_array('Garden.SignIn.Allow', $Permissions)) {
-                $Permissions[] = 'Garden.SignIn.Allow';
+            if (!$Permissions->has('Garden.SignIn.Allow')) {
+                $Permissions->set('Garden.SignIn.Allow', true);
             }
 
-            $User->Permissions = $Permissions;
+            $User->Permissions = $Permissions->getPermissions();
 
             // Otherwise normal loadings!
         } else {

@@ -644,14 +644,18 @@ class PermissionModel extends Gdn_Model {
                 } elseif (isset($JuncIDs)) {
                     $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
                 }
-            } else {
+
+                $JuncData = $SQL->get()->resultArray();
+            } elseif (!empty($JunctionID)) {
                 // Here we are getting permissions for all roles.
-                $SQL->select('r.RoleID, r.Name, r.CanSession')
+                $JuncData = $SQL->select('r.RoleID, r.Name, r.CanSession')
                     ->from('Role r')
                     ->join('Permission p', "p.RoleID = r.RoleID and p.JunctionTable = '$JunctionTable' and p.JunctionColumn = '$JunctionColumn' and p.JunctionID = $JunctionID", 'left')
-                    ->orderBy('r.Sort, r.Name');
+                    ->orderBy('r.Sort, r.Name')
+                    ->get()->resultArray();
+            } else {
+                $JuncData = [];
             }
-            $JuncData = $SQL->get()->resultArray();
 
             // Add all of the necessary information back to the result.
             foreach ($JuncData as $JuncRow) {

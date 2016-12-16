@@ -1598,6 +1598,11 @@ class UserModel extends Gdn_Model {
         if ($ConfirmEmail && !$Confirmed) {
             // Replace permissions with those of the ConfirmEmailRole
             $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+
+            if (empty($ConfirmEmailRoleID)) {
+                throw new Gdn_UserException(sprintf('No role configured with a type of "%s".', RoleModel::TYPE_UNCONFIRMED));
+            }
+
             $RoleModel = new RoleModel();
             $permissions = new Vanilla\Permissions();
             $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);

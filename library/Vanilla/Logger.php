@@ -100,7 +100,7 @@ class Logger implements LoggerInterface {
      */
     public function removeLogger(LoggerInterface $logger, $trigger = true) {
         foreach ($this->loggers as $i => $addedLogger) {
-            if ($addedLogger === $logger) {
+            if ($addedLogger[0] === $logger) {
                 unset($this->loggers[$i]);
                 return $this;
             }

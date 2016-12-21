@@ -1771,7 +1771,7 @@ class EntryController extends Gdn_Controller {
                 Logger::NOTICE,
                 '{username} has an expired reset token.'
             );
-            $this->fireEvent('ResetFailed', [
+            $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $UserID
             ]);
         }

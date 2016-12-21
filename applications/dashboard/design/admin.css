@@ -5536,6 +5536,30 @@ button.bookmark,
   align-items: flex-start;
 }
 
+.panel-nav .card {
+  display: block;
+  padding: 0;
+  margin-top: 0.5625rem;
+  background: 0;
+  border: 0;
+  border-top: 1px dotted rgba(0, 0, 0, 0.0875);
+}
+
+.panel-nav .card .card-block {
+  padding-left: 0;
+}
+
+.panel-nav .card .btn.btn-sm-rounded, .panel-nav .card .btn-sm-rounded.file-upload-browse, .panel-nav .card .btn-sm-rounded.Button {
+  min-width: 3.75rem;
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.5625rem;
+}
+
+.panel-nav .card .btn.btn-sm-rounded svg, .panel-nav .card .btn-sm-rounded.file-upload-browse svg, .panel-nav .card .btn-sm-rounded.Button svg {
+  position: relative;
+  width: 0.5625rem;
+}
+
 .card-footer {
   margin-top: -0.0625rem;
   padding: 1.40625rem;
@@ -8492,6 +8516,14 @@ button.close {
 
 .drawer-toggle {
   display: none;
+}
+
+.drawer-only {
+  display: none;
+}
+
+.drawer-show .drawer-only {
+  display: block;
 }
 
 @media (max-width: 991px) {

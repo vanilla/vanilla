@@ -101,6 +101,9 @@ Gdn_Theme::assetEnd();
                 <div id="panel-nav" class="js-fluid-fixed panel-content">
                     <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
                     <?php echo $dashboardNav; ?>
+                    <aside class="drawer-only">
+                        <?php $this->renderAsset('DashboardUserDropDown'); ?>
+                    </aside>
                 </div>
             </div>
         </div>

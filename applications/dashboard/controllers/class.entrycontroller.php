@@ -998,9 +998,10 @@ class EntryController extends Gdn_Controller {
                 if (!$User) {
                     $this->Form->addError('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
-                    $this->fireEvent('BadLogin', [
-                        'Login' => $Email,
-                        'Password' => $this->Form->getFormValue('Password')
+                    $this->fireEvent('BadSignIn', [
+                        'Email' => $Email,
+                        'Password' => $this->Form->getFormValue('Password'),
+                        'Reason' => 'NotFound'
                     ]);
                 } else {
                     // Check the password.
@@ -1047,10 +1048,11 @@ class EntryController extends Gdn_Controller {
                                 '{username} failed to sign in.  Invalid password.',
                                 array('InsertName' => $User->Name)
                             );
-                            $this->fireEvent('BadPassword', [
-                                'Login' => $Email,
+                            $this->fireEvent('BadSignIn', [
+                                'Email' => $Email,
                                 'Password' => $Password,
-                                'User' => $User
+                                'User' => $User,
+                                'Reason' => 'Password'
                             ]);
                         }
                     } catch (Gdn_UserException $Ex) {
@@ -1716,7 +1718,7 @@ class EntryController extends Gdn_Controller {
                         array('Input' => $Email)
                     );
                     $this->fireEvent('PasswordRequest', [
-                        'Login' => $Email
+                        'Email' => $Email
                     ]);
                 }
             } else {

@@ -998,6 +998,11 @@ class EntryController extends Gdn_Controller {
                 if (!$User) {
                     $this->Form->addError('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
+                    $this->fireEvent('BadSignIn', [
+                        'Email' => $Email,
+                        'Password' => $this->Form->getFormValue('Password'),
+                        'Reason' => 'NotFound'
+                    ]);
                 } else {
                     // Check the password.
                     $PasswordHash = new Gdn_PasswordHash();
@@ -1043,7 +1048,12 @@ class EntryController extends Gdn_Controller {
                                 '{username} failed to sign in.  Invalid password.',
                                 array('InsertName' => $User->Name)
                             );
-
+                            $this->fireEvent('BadSignIn', [
+                                'Email' => $Email,
+                                'Password' => $Password,
+                                'User' => $User,
+                                'Reason' => 'Password'
+                            ]);
                         }
                     } catch (Gdn_UserException $Ex) {
                         $this->Form->addError($Ex);
@@ -1707,6 +1717,9 @@ class EntryController extends Gdn_Controller {
                         '{Input} has been sent a password reset email.',
                         array('Input' => $Email)
                     );
+                    $this->fireEvent('PasswordRequest', [
+                        'Email' => $Email
+                    ]);
                 }
             } else {
                 if ($this->Form->errorCount() == 0) {
@@ -1745,6 +1758,9 @@ class EntryController extends Gdn_Controller {
                 Logger::NOTICE,
                 '{username} failed to authenticate password reset request.'
             );
+            $this->fireEvent('PasswordResetFailed', [
+                'UserID' => $UserID
+            ]);
         }
 
         $Expires = $this->UserModel->getAttribute($UserID, 'PasswordResetExpires');
@@ -1755,8 +1771,10 @@ class EntryController extends Gdn_Controller {
                 Logger::NOTICE,
                 '{username} has an expired reset token.'
             );
+            $this->fireEvent('PasswordResetFailed', [
+                'UserID' => $UserID
+            ]);
         }
-
 
         if ($this->Form->errorCount() == 0) {
             $User = $this->UserModel->getID($UserID, DATASET_TYPE_ARRAY);

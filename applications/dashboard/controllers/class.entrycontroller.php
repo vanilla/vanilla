@@ -1758,7 +1758,7 @@ class EntryController extends Gdn_Controller {
                 Logger::NOTICE,
                 '{username} failed to authenticate password reset request.'
             );
-            $this->fireEvent('ResetFailed', [
+            $this->fireEvent('PasswordResetFailed', [
                 'UserID' => $UserID
             ]);
         }

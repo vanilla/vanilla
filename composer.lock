@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "28132570334a7d5b640dcd6f0263fac6",
-    "content-hash": "a2ccf8ebda910960e23ddc07bea16c24",
+    "hash": "6d73866981a100666544b931a21af4e6",
+    "content-hash": "9540f301284a2af824668059a39c2904",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -186,16 +186,16 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.30",
+            "version": "v3.1.31",
             "source": {
                 "type": "git",
                 "url": "https://github.com/smarty-php/smarty.git",
-                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e"
+                "reference": "c7d42e4a327c402897dd587871434888fde1e7a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
-                "reference": "ed2b7f1146cfda13df1eea8a5f707a1b771b6e7e",
+                "url": "https://api.github.com/repos/smarty-php/smarty/zipball/c7d42e4a327c402897dd587871434888fde1e7a9",
+                "reference": "c7d42e4a327c402897dd587871434888fde1e7a9",
                 "shasum": ""
             },
             "require": {
@@ -208,10 +208,8 @@
                 }
             },
             "autoload": {
-                "classmap": [
-                    "libs/Smarty.class.php",
-                    "libs/SmartyBC.class.php",
-                    "libs/sysplugins/"
+                "files": [
+                    "libs/bootstrap.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -237,7 +235,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-08-07 18:46:49"
+            "time": "2016-12-14 21:57:25"
         },
         {
             "name": "tburry/pquery",
@@ -290,6 +288,43 @@
                 "php"
             ],
             "time": "2016-01-14 20:55:00"
+        },
+        {
+            "name": "vanilla/garden-container",
+            "version": "v1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-container.git",
+                "reference": "4cc73331f2fea296ecbdfa1f5193861ce6dc32b9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/4cc73331f2fea296ecbdfa1f5193861ce6dc32b9",
+                "reference": "4cc73331f2fea296ecbdfa1f5193861ce6dc32b9",
+                "shasum": ""
+            },
+            "require": {
+                "container-interop/container-interop": "^1.1",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Container\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A dependency injection container.",
+            "time": "2016-12-22 19:18:56"
         },
         {
             "name": "vanilla/garden-http",

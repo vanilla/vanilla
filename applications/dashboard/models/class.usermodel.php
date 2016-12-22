@@ -2932,17 +2932,23 @@ class UserModel extends Gdn_Model {
 
     /**
      * Updates visit level information such as date last active and the user's ip address.
-     *
-     * @param int $UserID
-     * @param string|int|float $ClientHour
+     * @param $UserID
+     * @param int|float $ClientHour
+     * @throws Exception
+     * @return bool True on success false on failure
      */
-    public function updateVisit($UserID, $ClientHour = false) {
+    public function updateVisit($UserID, $ClientHour = null) {
         $UserID = (int)$UserID;
         if (!$UserID) {
             throw new Exception('A valid User ID is required.');
         }
 
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
+
+        // Do not update visit information if the user is banned or deleted.
+        if (val('Banned', $User) || val('Deleted', $User)) {
+            return false;
+        }
 
         $Fields = [];
 
@@ -2993,6 +2999,8 @@ class UserModel extends Gdn_Model {
                 $BanModel->setCounts($Ban);
             }
         }
+
+        return true;
     }
 
     /**

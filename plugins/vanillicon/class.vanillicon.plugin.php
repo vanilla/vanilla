@@ -16,7 +16,7 @@ $PluginInfo['vanillicon'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
    'SettingsPermission' => 'Garden.Settings.Manage',

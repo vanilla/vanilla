@@ -1,5 +1,5 @@
 _Vanilla uses Composer!
-You cannot clone this repo right into a web directory - it requires a build step. [Learn more](http://vanillaforums.org/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](http://vanillaforums.org/addon/vanilla-core) instead_.
+You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
@@ -28,11 +28,11 @@ can build a custom-tailored environment that meets your community's particular n
 
 Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
-You can join us on the [Vanilla Community Forums](http://vanillaforums.org/discussions) to be part of that discussion.
+You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the `release/2.3` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.3` branch.
 
-New plugins and themes can be listed in the [Official Addon Directory](http://vanillaforums.org/addon/).
+New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
 
 ## Cloud Solution
@@ -73,7 +73,7 @@ by default for all smartphones & tablets. Heck, it even works on the PlayStation
 
 Vanilla is built to be simple, and its installation is no exception.
 
-* Upload Vanilla's [pre-built version](https://vanillaforums.org/addon/vanilla-core) to your server.
+* Upload Vanilla's [pre-built version](https://open.vanillaforums.com/addon/vanilla-core) to your server.
 * Confirm the cache, conf, and uploads folders are writable by PHP.
 * Navigate to that folder in your web browser.
 * Follow the instructions on screen.
@@ -102,7 +102,7 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 ## Migrating to Vanilla
 
-* Get [Vanilla Porter](http://vanillaforums.org/addon/porter-core) and verify it supports your platform.
+* Get [Vanilla Porter](https://open.vanillaforums.com/addon/porter-core) and verify it supports your platform.
 * Read the Advanced Uses notes on that page.
 * Upload it to your current server.
 * Navigate to the file in your web browser & run it.
@@ -112,15 +112,15 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 * [Troubleshooting upgrades & installs](http://docs.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://docs.vanillaforums.com)
-* [Vanilla community forums](http://vanillaforums.org/discussions)
+* [Vanilla community forums](https://open.vanillaforums.com/discussions)
 * [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)
 
 ## Contributing
 
 * Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
-* Got an idea or suggestion? Use the [forum](http://vanillaforums.org/discussions) to discuss it.
+* Got an idea or suggestion? Use the [forum](https://open.vanillaforums.com/discussions) to discuss it.
 * File detailed [issues](https://github.com/vanilla/vanilla/issues) on GitHub (version number, what you did, and actual vs expected outcomes).
-* Sign the [Contributors' Agreement](http://vanillaforums.org/contributors) to send us code.
+* Sign the [Contributors' Agreement](https://open.vanillaforums.com/contributors) to send us code.
 * Use pull requests against the `master` branch.
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 

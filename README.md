@@ -37,10 +37,10 @@ We encourage addon developers to release their code under the GPL as well, but d
 
 ## Cloud Solution
 
-Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](http://vanillaforums.com)
+Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](https://vanillaforums.com)
 with a 1-click install, automatic upgrades, amazing professional support, incredible scalability,
 integration assistance, theming and migration services, and exclusive features. For the very best Vanilla forum experience,
-you can skip the rest of this technical stuff and [go there directly](http://vanillaforums.com/plans).
+you can skip the rest of this technical stuff and [go there directly](https://vanillaforums.com/plans).
 
 If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
 
@@ -113,7 +113,7 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 * [Troubleshooting upgrades & installs](http://docs.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://docs.vanillaforums.com)
 * [Vanilla community forums](https://open.vanillaforums.com/discussions)
-* [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)
+* [Official cloud hosting with professional support & migration services](https://vanillaforums.com/plans)
 
 ## Contributing
 

@@ -45,7 +45,7 @@ $this->fireEvent('BeforeCommentForm');
 
                     echo '<span class="'.$CancelClass.'">';
                     echo anchor($CancelText, '/');
-                    if ($CategoryID = $this->data('Discussion.CategoryID') && c('Vanilla.Categories.Use')) {
+                    if ($CategoryID = $this->data('Discussion.CategoryID') && c('Vanilla.Categories.Use', true)) {
                         $Category = CategoryModel::categories($CategoryID);
                         if ($Category) {
                             echo ' <span class="Bullet">•</span> '.anchor(htmlspecialchars($Category['Name']), categoryUrl($Category));

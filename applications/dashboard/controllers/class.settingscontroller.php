@@ -397,10 +397,12 @@ class SettingsController extends DashboardController {
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.HomepageTitle' => [
+                'LabelCode' => t('Homepage Title'),
                 'Control' => 'textbox',
                 'Description' => t('The homepage title is displayed on your home page.', 'The homepage title is displayed on your home page. Pick a title that you would want to see appear in search engines.')
             ],
             'Garden.Description' => [
+                'LabelCode' => t('Site Description'),
                 'Control' => 'textbox',
                 'Description' => t("The site description usually appears in search engines.", 'The site description usually appears in search engines. You should try having a description that is 100–150 characters long.'),
                 'Options' => [
@@ -408,21 +410,24 @@ class SettingsController extends DashboardController {
                 ]
             ],
             'Garden.Title' => [
+                'LabelCode' => t('Banner Title'),
                 'Control' => 'textbox',
                 'Description' => t("The banner title appears on your site's banner and in your browser's title bar.",
                     "The banner title appears on your site's banner and in your browser's title bar. It should be less than 20 characters. If a banner logo is uploaded, it will replace the banner title on user-facing forum pages. Also, keep in mind some themes may hide this title.")
 
             ],
             'Garden.Logo' => [
+                'LabelCode' => t('Banner Logo'),
                 'Control' => 'imageupload',
                 'Description' => t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.')
             ],
             'Garden.MobileLogo' => [
+                'LabelCode' => t('Mobile Banner Logo'),
                 'Control' => 'imageupload',
                 'Description' => t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.')
             ],
             'Garden.FavIcon' => [
-                'LabelCode' => 'Favicon',
+                'LabelCode' => t('Favicon'),
                 'Control' => 'imageupload',
                 'Size' => '16x16',
                 'OutputType' => 'ico',
@@ -431,6 +436,7 @@ class SettingsController extends DashboardController {
                 'Description' => t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels.")
             ],
             'Garden.ShareImage' => [
+                'LabelCode' => t('Share Image'),
                 'Control' => 'imageupload',
                 'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200.")
 

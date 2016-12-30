@@ -419,12 +419,18 @@ class SettingsController extends DashboardController {
             'Garden.Logo' => [
                 'LabelCode' => t('Banner Logo'),
                 'Control' => 'imageupload',
-                'Description' => t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.')
+                'Description' => t('LogoDescription', 'The banner logo appears at the top of your site. Some themes may not display this logo.'),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('banner logo'))
+                ]
             ],
             'Garden.MobileLogo' => [
                 'LabelCode' => t('Mobile Banner Logo'),
                 'Control' => 'imageupload',
-                'Description' => t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.')
+                'Description' => t('MobileLogoDescription', 'The mobile banner logo appears at the top of your site. Some themes may not display this logo.'),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('mobile banner logo'))
+                ]
             ],
             'Garden.FavIcon' => [
                 'LabelCode' => t('Favicon'),
@@ -433,13 +439,18 @@ class SettingsController extends DashboardController {
                 'OutputType' => 'ico',
                 'Prefix' => 'favicon_',
                 'Crop' => true,
-                'Description' => t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels.")
+                'Description' => t('FaviconDescription', "Your site's favicon appears in your browser's title bar. It will be scaled to 16x16 pixels."),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
+                ]
             ],
             'Garden.ShareImage' => [
                 'LabelCode' => t('Share Image'),
                 'Control' => 'imageupload',
-                'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200.")
-
+                'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('share image'))
+                ]
             ]
         ]);
         $this->setData('ConfigurationModule', $configurationModule);
@@ -681,7 +692,10 @@ class SettingsController extends DashboardController {
                 'Size' => c('Garden.EmailTemplate.ImageMaxWidth', '400').'x'.c('Garden.EmailTemplate.ImageMaxHeight', '300'),
                 'Description' => sprintf(t('Large images will be scaled down.'),
                     c('Garden.EmailTemplate.ImageMaxWidth', 400),
-                    c('Garden.EmailTemplate.ImageMaxHeight', 300))
+                    c('Garden.EmailTemplate.ImageMaxHeight', 300)),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('email logo'))
+                ]
             ],
             'Garden.EmailTemplate.TextColor' => [
                 'Control' => 'color'

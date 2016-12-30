@@ -75,7 +75,7 @@ echo $Form->errors();
                 break;
             case 'imageupload':
                 $removeUrl = 'asset/deleteconfigimage/'.urlencode($Row['Name']);
-                echo $Form->imageUploadPreview($Row['Name'], $LabelCode, $Description, $removeUrl);
+                echo $Form->imageUploadPreview($Row['Name'], $LabelCode, $Description, $removeUrl, $Row['Options']);
                 break;
             case 'color':
                 echo '<div class="label-wrap">';

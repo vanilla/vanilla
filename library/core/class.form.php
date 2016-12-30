@@ -734,10 +734,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $labelDescription The label description.
      * @param string $removeUrl The endpoint to remove the image.
      * @param array $options An array of options with the following keys:
-     *      'currentImage' (string) The current image to preview.
-     *      'removeText' (string) The text for the remove image anchor, defaults to t('Remove').
-     *      'removeConfirmText' (string) The text for the confirm modal, defaults to t('Are you sure you want to do that?').
-     *      'tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
+     *      'CurrentImage' (string) The current image to preview.
+     *      'RemoveText' (string) The text for the remove image anchor, defaults to t('Remove').
+     *      'RemoveConfirmText' (string) The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     *      'Tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
      * @param array $attributes The html attributes to pass to the file upload function.
      * @return string
 
@@ -747,7 +747,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $imageWrapperId = slugify($fieldName).'-preview-wrapper';
 
         // Compile the data for our current image and current image removal.
-        $currentImage = val('currentImage', $options, '');
+        $currentImage = val('CurrentImage', $options, '');
         if ($currentImage === '') {
             $currentImage = $this->currentImage($fieldName);
         }
@@ -755,10 +755,10 @@ class Gdn_Form extends Gdn_Pluggable {
         $removeCurrentImage = '';
 
         if ($this->getValue($fieldName) && $removeUrl) {
-            $removeText = val('removeText', $options, t('Remove'));
+            $removeText = val('RemoveText', $options, t('Remove'));
             $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
-            if (val('removeConfirmText', $options, false)) {
-                $removeAttributes['data-body'] = val('removeConfirmText', $options);
+            if (val('RemoveConfirmText', $options, false)) {
+                $removeAttributes['data-body'] = val('RemoveConfirmText', $options);
             }
             $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
         }
@@ -789,7 +789,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $attributes['class'] = trim($class.' js-image-upload');
         $input = $this->imageUploadWrap($fieldName, $attributes);
 
-        $tag = val('tag', $options, 'li');
+        $tag = val('Tag', $options, 'li');
         return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
     }
 

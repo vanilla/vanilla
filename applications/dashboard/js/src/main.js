@@ -382,7 +382,7 @@
         $parent.find('.js-image-preview-new').addClass('hidden').find('.js-image-preview').attr('src', '');
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
-        $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 

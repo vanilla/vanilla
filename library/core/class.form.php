@@ -732,37 +732,35 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $fieldName The form field name for the input.
      * @param string $label The label.
      * @param string $labelDescription The label description.
-     * @param string $currentImageUrl The url to the current image.
      * @param string $removeUrl The endpoint to remove the image.
-     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
-     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
-     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
-     * @param array $attributes The attributes to pass to the file upload function.
+     * @param array $options An array of options with the following keys:
+     *      'currentImage' (string) The current image to preview.
+     *      'removeText' (string) The text for the remove image anchor, defaults to t('Remove').
+     *      'removeConfirmText' (string) The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     *      'tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The html attributes to pass to the file upload function.
      * @return string
+
      */
-    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
-                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
-                                       $attributes = []) {
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $removeUrl = '', $options = [], $attributes = []) {
 
         $imageWrapperId = slugify($fieldName).'-preview-wrapper';
 
         // Compile the data for our current image and current image removal.
+        $currentImage = val('currentImage', $options, '');
+        if ($currentImage === '') {
+            $currentImage = $this->currentImage($fieldName);
+        }
         $removeAttributes = [];
         $removeCurrentImage = '';
-        $currentImage = '';
 
-        if ($currentImageUrl) {
-            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
-            if ($removeUrl) {
-                if (!$removeText) {
-                    $removeText = t('Remove');
-                }
-                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
-                if ($removeConfirmText) {
-                    $removeAttributes['data-body'] = $removeConfirmText;
-                }
-                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+        if ($this->getValue($fieldName) && $removeUrl) {
+            $removeText = val('removeText', $options, t('Remove'));
+            $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
+            if (val('removeConfirmText', $options, false)) {
+                $removeAttributes['data-body'] = val('removeConfirmText', $options);
             }
+            $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
         }
 
         if ($label) {
@@ -788,8 +786,9 @@ class Gdn_Form extends Gdn_Pluggable {
             </div>';
 
         $attributes['class'] .= 'js-image-upload';
-        $input = $this->fileUploadWrap($fieldName, $attributes);
+        $input = $this->imageUploadWrap($fieldName, $attributes);
 
+        $tag = val('tag', $options, 'li');
         return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
     }
 
@@ -1194,20 +1193,20 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns the current image in a field.
      * This is meant to be used with image uploads so that users can see the current value.
      *
-     * @param type $FieldName
-     * @param type $Attributes
-     * @since 2.1
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
      */
-    public function currentImage($FieldName, $Attributes = array()) {
-        $Result = $this->hidden($FieldName);
+    public function currentImage($fieldName, $attributes = array()) {
+        $result = $this->hidden($fieldName);
 
-        $Value = $this->getValue($FieldName);
-        if ($Value) {
-            touchValue('class', $Attributes, 'CurrentImage');
-            $Result .= img(Gdn_Upload::url($Value), $Attributes);
+        $value = $this->getValue($fieldName);
+        if ($value) {
+            touchValue('class', $attributes, 'CurrentImage');
+            $result .= img(Gdn_Upload::url($value), $attributes);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**

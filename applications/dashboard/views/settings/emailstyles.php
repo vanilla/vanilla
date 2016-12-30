@@ -21,7 +21,4 @@ $isTextFormat = strtolower(c('Garden.Email.Format', 'text') === 'text');
 </div>
 <div class="html-email-settings js-foggy" <?php echo $isTextFormat ? 'data-is-foggy="true"' : 'data-is-foggy="false"'; ?>>
     <?php $this->data('ConfigurationModule')->render(); ?>
-    <div class="buttons form-footer">
-        <?php echo wrap(t('Preview'), 'span', array('class' => 'js-email-preview-button btn btn-secondary')); ?>
-    </div>
 </div>

@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/** @var ConfigurationModule $Sf */
 $Sf = $this->ConfigurationModule;
 /* @var Gdn_Form $Form */
 $Form = $Sf->Form();
@@ -117,4 +118,4 @@ echo $Form->errors();
     }
     ?>
 </ul>
-<?php echo $Form->close('Save'); ?>
+<?php echo $Form->close('Save', '', $Sf->controller()->data('FormFooter', [])); ?>

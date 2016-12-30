@@ -673,7 +673,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
         $this->addJsFile('email.js');
 
-        $configurationModule = new ConfigurationModule();
+        $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.EmailTemplate.Image' => [
                 'Control' => 'imageupload',
@@ -700,6 +700,9 @@ class SettingsController extends DashboardController {
                 'Control' => 'color'
             ],
         ]);
+
+        $previewButton = wrap(t('Preview'), 'span', array('class' => 'js-email-preview-button btn btn-secondary'));
+        $configurationModule->controller()->setData('FormFooter', ['FormFooter' => $previewButton]);
 
         $this->setData('ConfigurationModule', $configurationModule);
         $this->render();

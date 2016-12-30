@@ -785,7 +785,8 @@ class Gdn_Form extends Gdn_Pluggable {
                 </div>
             </div>';
 
-        $attributes['class'] .= 'js-image-upload';
+        $class = val('class', $attributes, '');
+        $attributes['class'] = trim($class.' js-image-upload');
         $input = $this->imageUploadWrap($fieldName, $attributes);
 
         $tag = val('tag', $options, 'li');
@@ -1178,12 +1179,23 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
         $Return = "</div>\n</form>";
+
         if ($Xhtml != '') {
             $Return = $Xhtml.$Return;
         }
 
+        $formFooter = val('FormFooter', $Attributes, false);
+
+        if ($formFooter) {
+            unset($Attributes['FormFooter']);
+        }
+
         if ($ButtonCode != '') {
-            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $ButtonCode = $this->button($ButtonCode, $Attributes);
+        }
+
+        if ($formFooter || $ButtonCode) {
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$formFooter.$ButtonCode.'</div>'.$Return;
         }
 
         return $Return;

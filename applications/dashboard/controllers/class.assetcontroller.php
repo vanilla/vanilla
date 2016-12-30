@@ -45,8 +45,10 @@ class AssetController extends DashboardController {
 
         if (c($config, false) !== false) {
             $upload = new Gdn_UploadImage();
-            $upload->delete(c($config));
-            removeFromConfig($config);
+            if ($upload->delete(c($config))) {
+                // Fore extra safety, ensure an image has been deleted before removing from config.
+                removeFromConfig($config);
+            }
             $this->informMessage(t('Image deleted.'));
         }
 

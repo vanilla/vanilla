@@ -58,10 +58,10 @@ class Gdn_Configuration extends Gdn_Pluggable {
     /** @var string The default top level group for new configs. */
     protected $defaultGroup = 'Configuration';
 
-    /** @var null @var The sort flag to use with ksort. */
+    /** @var null The sort flag to use with ksort. */
     private $sortFlag = null;
 
-    /** @var array @var Format option overrides. */
+    /** @var array Format option overrides. */
     private $formatOptions = [];
 
     /**

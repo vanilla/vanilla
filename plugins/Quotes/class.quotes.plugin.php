@@ -239,7 +239,10 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function addQuoteButton($Sender, $Args) {
-        if (!isset($Args['Discussion'])) {
+
+        // There are some case were Discussion is not set as an event argument so we use the sender data instead.
+        $discussion = $Sender->data('Discussion');
+        if (!$discussion) {
             return;
         }
 
@@ -247,15 +250,15 @@ class QuotesPlugin extends Gdn_Plugin {
         if (!$session->UserID) {
             return;
         }
-        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $Args['Discussion']->PermissionCategoryID)) {
+        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
             $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-        } elseif (isset($Args['Discussion'])) {
-            $Object = $Args['Discussion'];
+        } elseif ($discussion) {
+            $Object = $discussion;
             $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
         } else {
             return;

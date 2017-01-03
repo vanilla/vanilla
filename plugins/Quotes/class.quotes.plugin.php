@@ -256,7 +256,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
-            $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
+            $ObjectID = 'Comment_'.$Object->CommentID;
         } elseif ($discussion) {
             $Object = $discussion;
             $ObjectID = 'Discussion_'.$Object->DiscussionID;

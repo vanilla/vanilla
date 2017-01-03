@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <!--<![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style type="text/css">
+    <style>
         body * {
             margin: 0;
             padding: 0;
@@ -192,7 +192,7 @@
     </style>
     <!--[if (gte mso 9)|(IE)]>
     [[literal]]
-    <style type="text/css">
+    <style>
         table {
             border-collapse: collapse;
         }

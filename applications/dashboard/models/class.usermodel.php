@@ -2934,8 +2934,8 @@ class UserModel extends Gdn_Model {
      * Updates visit level information such as date last active and the user's ip address.
      * @param $UserID
      * @param int|float $ClientHour
-     * @throws Exception
-     * @return bool True on success false on failure
+     * @throws Exception If the user ID is not valid.
+     * @return bool True on success, false if the user is banned or deleted.
      */
     public function updateVisit($UserID, $ClientHour = null) {
         $UserID = (int)$UserID;

@@ -637,6 +637,36 @@ class SettingsController extends DashboardController {
             $this->informMessage(t("Your changes were saved successfully."));
         }
 
+        // Add warnings for layouts that have been specified by the theme.
+        $themeManager = Gdn::themeManager();
+        $theme = $themeManager->enabledThemeInfo();
+        $layout = val('Layout', $theme);
+
+        $warningText = t('Your theme has specified the layout selected below. Changing the layout may make your theme look broken.');
+        $warningAlert = wrap($warningText, 'div', ['class' => 'alert alert-warning padded']);
+        $dangerText = t('Your theme recommends the %s layout, but you\'ve selected the %s layout. This may make your theme look broken.');
+        $dangerAlert = wrap($dangerText, 'div', ['class' => 'alert alert-danger padded']);
+
+        if (val('Discussions', $layout)) {
+            $dicussionsLayout = strtolower(val('Discussions', $layout));
+            if ($dicussionsLayout != c('Vanilla.Discussions.Layout')) {
+                $discussionsAlert = sprintf($dangerAlert, $dicussionsLayout, c('Vanilla.Discussions.Layout'));
+            } else {
+                $discussionsAlert = $warningAlert;
+            }
+            $this->setData('DiscussionsAlert', $discussionsAlert);
+        }
+
+        if (val('Categories', $layout)) {
+            $categoriesLayout = strtolower(val('Categories', $layout));
+            if ($categoriesLayout != c('Vanilla.Categories.Layout')) {
+                $categoriesAlert = sprintf($dangerAlert, $categoriesLayout, c('Vanilla.Categories.Layout'));
+            } else {
+                $categoriesAlert = $warningAlert;
+            }
+            $this->setData('CategoriesAlert', $categoriesAlert);
+        }
+
         $this->render();
     }
 

@@ -916,15 +916,19 @@ class UserModel extends Gdn_Model {
             unset($Fields['Admin']);
         }
 
+        $Roles = val('Roles', $Fields);
+        unset($Fields['Roles']);
+
         // Massage the roles for email confirmation.
         if (self::requireConfirmEmail() && !val('NoConfirmEmail', $Options)) {
-            $ConfirmRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+            $ConfirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
 
-            if (!empty($ConfirmRoleID)) {
+            if (!empty($ConfirmRoleIDs)) {
                 touchValue('Attributes', $Fields, []);
                 $ConfirmationCode = randomString(8);
                 $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
                 $Fields['Confirmed'] = 0;
+                $Roles = array_merge($Roles, $ConfirmRoleIDs);
             }
         }
 
@@ -939,9 +943,6 @@ class UserModel extends Gdn_Model {
         if (val('Email', $Fields, null) === null) {
             $Fields['Email'] = '';
         }
-
-        $Roles = val('Roles', $Fields);
-        unset($Fields['Roles']);
 
         if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
             $Fields['Attributes'] = dbencode($Fields['Attributes']);

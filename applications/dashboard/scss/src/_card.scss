@@ -144,6 +144,31 @@
   .media {
     align-items: flex-start;
   }
+
+  // Variant for panel.
+  .panel-nav & {
+    display: block;
+    padding: 0;
+    margin-top: $spacer / 2;
+    background: 0;
+    border: 0;
+    border-top: 1px dotted rgba(0,0,0,.0875);
+
+    .card-block {
+      padding-left: 0;
+    }
+
+    .btn.btn-sm-rounded {
+      min-width: 3.75rem;
+      padding: 0.0625rem 0.5rem;
+      font-size: to-rem(9);
+
+      svg {
+        position: relative;
+        width: to-rem(9);
+      }
+    }
+  }
 }
 
 .card-footer {

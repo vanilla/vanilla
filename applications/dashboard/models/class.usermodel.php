@@ -1607,14 +1607,13 @@ class UserModel extends Gdn_Model {
             $permissionsModel = new Vanilla\Permissions();
             $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
             $permissionsModel->compileAndLoad($RolePermissions);
-            $Permissions = $permissionsModel->getPermissions();
 
             // Ensure Confirm Email role can always sign in
-            if (!$Permissions->has('Garden.SignIn.Allow')) {
-                $Permissions->set('Garden.SignIn.Allow', true);
+            if (!$permissionsModel->has('Garden.SignIn.Allow')) {
+                $permissionsModel->set('Garden.SignIn.Allow', true);
             }
 
-            $User->Permissions = $Permissions->getPermissions();
+            $User->Permissions = $permissionsModel->getPermissions();
 
             // Otherwise normal loadings!
         } else {

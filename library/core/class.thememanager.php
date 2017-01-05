@@ -40,10 +40,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     private $hasRequest = true;
 
     /** @var array The layout options for a category list. */
-    private $allowedCategoryLayouts = ['table', 'modern'];
+    private $allowedCategoriesLayouts = ['table', 'modern', 'mixed'];
 
     /** @var array The layout options for a discussions list. */
-    private $allowedDiscussionLayouts = ['table', 'modern', 'mixed'];
+    private $allowedDiscussionsLayouts = ['table', 'modern'];
 
     /**
      * @var AddonManager
@@ -500,10 +500,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($layout = val('Layout', $themeInfo, false)) {
             $discussionsLayout = strtolower(val('Discussions', $layout, ''));
             $categoriesLayout = strtolower(val('Categories', $layout, ''));
-            if ($discussionsLayout && in_array($discussionsLayout, $this->allowedDiscussionLayouts)) {
+            if ($discussionsLayout && in_array($discussionsLayout, $this->allowedDiscussionsLayouts)) {
                 saveToConfig('Vanilla.Discussions.Layout', $discussionsLayout, $save);
             }
-            if ($categoriesLayout && in_array($categoriesLayout, $this->allowedCategoryLayouts)) {
+            if ($categoriesLayout && in_array($categoriesLayout, $this->allowedCategoriesLayouts)) {
                 saveToConfig('Vanilla.Categories.Layout', $categoriesLayout, $save);
             }
         }

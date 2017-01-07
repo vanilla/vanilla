@@ -531,6 +531,10 @@ class Gdn_Session {
      */
     public function ensureTransientKey() {
         if (!$this->_TransientKey) {
+            // Check cookie
+            $this->_TransientKey = getAppCookie('tk');
+        }
+        if (!$this->_TransientKey) {
             // Generate a transient key in the browser.
             $tk = betterRandomString(16, 'Aa0');
             setAppCookie('tk', $tk);

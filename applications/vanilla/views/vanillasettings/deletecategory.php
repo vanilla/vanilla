@@ -13,7 +13,7 @@ if (is_object($this->OtherCategories)) {
         <div class="padded"><?php echo t('Are you sure you want to delete this category?'); ?></div>
     <?php
     } else { ?>
-        <div class="alert alert-danger padded"><?php echo t('All discussions in this category will be permanently deleted.'); ?></div>
+        <div class="alert alert-danger padded"><?php echo t('All content in this category will be permanently deleted.'); ?></div>
 
         <?php
         // Only show the delete discussions checkbox if we're deleting a non-parent category.
@@ -21,7 +21,7 @@ if (is_object($this->OtherCategories)) {
             ?>
             <li class="form-group">
                 <div class="input-wrap">
-                <?php echo $this->Form->CheckBox('DeleteDiscussions', "Move discussions in this category to a replacement category.", array('value' => '1')); ?>
+                <?php echo $this->Form->CheckBox('MoveContent', "Move content in this category to a replacement category.", array('value' => '1')); ?>
                 </div>
             </li>
         <?php }

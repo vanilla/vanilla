@@ -1271,6 +1271,7 @@ class CategoryModel extends Gdn_Model {
         if (is_numeric($category)) {
             $category = $this->getID($category, DATASET_TYPE_OBJECT);
         }
+
         if (is_array($category)) {
             $category = (object)$category;
         }
@@ -1365,6 +1366,12 @@ class CategoryModel extends Gdn_Model {
                 // Delete tags
                 $this->SQL->delete('Tag', array('CategoryID' => $category->CategoryID));
                 $this->SQL->delete('TagDiscussion', array('CategoryID' => $category->CategoryID));
+
+                // Recursively delete child categories and their content.
+                $children = self::flattenTree($this->collection->getTree($category->CategoryID));
+                foreach ($children as $child) {
+                    self::deleteAndReplace($child, 0);
+                }
             }
 
             // Delete the category

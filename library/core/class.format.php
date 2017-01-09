@@ -1757,7 +1757,7 @@ EOT;
 
         // Do the requested replacement.
         if ($IsCallback) {
-            $Subject = preg_replace_callback($Search, $Replace, $Subject));
+            $Subject = preg_replace_callback($Search, $Replace, $Subject);
         } else {
             $Subject = preg_replace($Search, $Replace, $Subject);
         }

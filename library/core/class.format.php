@@ -1462,9 +1462,9 @@ EOT;
 
             // Special case where &nbsp; is right after an url and is not part of it!
             // This can happen in WYSIWYG format if the url is the last text of the body.
-            if (stringEndsWith($Url, '&nbsp;')) {
+            while(stringEndsWith($Url, '&nbsp;')) {
                 $Url = substr($Url, 0, -6);
-                $Punc = '&nbsp;';
+                $Punc .= '&nbsp;';
             }
 
             if (preg_match('`^(.+)([.?,;:])$`', $Url, $Matches)) {

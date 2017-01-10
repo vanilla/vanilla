@@ -1,5 +1,7 @@
 <?php
 
+use Vanilla\Addon;
+
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
@@ -41,6 +43,27 @@ require PATH_CONF . '/constants.php';
 
 // Install the configuration handler.
 Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
+
+// AddonManager
+Gdn::factoryInstall(
+    Gdn::AliasAddonManager,
+    '\\Vanilla\\AddonManager',
+    '',
+    Gdn::FactorySingleton,
+    [
+        [
+            Addon::TYPE_ADDON => ['/applications', '/plugins'],
+            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_LOCALE => '/locales'
+        ],
+        __DIR__.'/cache'
+    ]
+);
+// This is for satisfying dependencies.
+Gdn::factoryInstall('\\Vanilla\\AddonManager', '\\Vanilla\\AddonManager', '', Gdn::FactorySingleton, Gdn::addonManager());
+
+// Install a bogus locale because the "Locale" alias of Gdn clashes with a built in Locale object.
+Gdn::factoryInstall(Gdn::AliasLocale, '\VanillaTests\fixtures\Locale');
 
 // ThemeManager
 Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');

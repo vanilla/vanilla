@@ -149,7 +149,7 @@ class DraftModel extends VanillaModel {
         // Get the DraftID from the form so we know if we are inserting or updating.
         $DraftID = (int) val('DraftID', $formPostValues, 0);
         $Insert = $DraftID === 0 ? true : false;
-        
+
         if (!$DraftID) {
             unset($formPostValues['DraftID']);
         }

@@ -1401,6 +1401,9 @@ class CategoryModel extends Gdn_Model {
         if (val('AllowedDiscussionTypes', $category) && is_string(val('AllowedDiscussionTypes', $category))) {
             setValue('AllowedDiscussionTypes', $category, dbdecode(val('AllowedDiscussionTypes', $category)));
         }
+        if (val('LastPost', $category) && is_string(val('LastPost', $category))) {
+            setValue('LastPost', $category, dbdecode(val('LastPost', $category)));
+        }
 
         return $category;
     }
@@ -2510,6 +2513,10 @@ class CategoryModel extends Gdn_Model {
             $Property['AllowedDiscussionTypes'] = dbencode($Property['AllowedDiscussionTypes']);
         }
 
+        if (isset($Property['LastPost']) && is_array($Property['LastPost'])) {
+            $Property['LastPost'] = dbencode($Property['LastPost']);
+        }
+
         $this->SQL->put($this->Name, $Property, array('CategoryID' => $ID));
 
         // Set the cache.
@@ -2540,21 +2547,73 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Update the latest discussion and comment data for a category.
      *
-     *
-     * @param $CategoryID
+     * @param int $categoryID
+     * @param array|object|null $discussion
+     * @param array|object|null $comment
      */
-    public function setRecentPost($CategoryID) {
-        $Row = $this->SQL->getWhere('Discussion', array('CategoryID' => $CategoryID), 'DateLastComment', 'desc', 1)->firstRow(DATASET_TYPE_ARRAY);
+    public function setRecentPost($categoryID, $discussion = null, $comment = null) {
+        $discussionModel = new DiscussionModel();
 
-        $Fields = array('LastCommentID' => null, 'LastDiscussionID' => null);
-
-        if ($Row) {
-            $Fields['LastCommentID'] = $Row['LastCommentID'];
-            $Fields['LastDiscussionID'] = $Row['DiscussionID'];
+        if ($discussion === null) {
+            $discussion = $discussionModel->getWhere(
+                ['CategoryID' => $categoryID],
+                'DateLastComment',
+                'desc',
+                1
+            )->firstRow();
         }
-        $this->setField($CategoryID, $Fields);
-        self::setCache($CategoryID, array('LastTitle' => null, 'LastUserID' => null, 'LastDateInserted' => null, 'LastUrl' => null));
+
+        $commentID = null;
+        $discussionID = null;
+        $lastPost = null;
+        $title = null;
+        $url = null;
+        $userID = null;
+        $dateInserted = null;
+
+        if ($discussion) {
+            $discussionID = val('DiscussionID', $discussion);
+            $title = val('Name', $discussion);
+            $url = discussionUrl($discussion, false, '//').'#latest';
+
+            // Aggregate fields.
+            $lastPost = [
+                'LastTitle' => $title,
+                'LastUserID' => null,
+                'LastDateInserted' => null,
+                'LastUrl' => $url
+            ];
+
+            if ($comment === null && ($commentID = val('LastCommentID', $discussion))) {
+                $commentModel = new CommentModel();
+                $comment = $commentModel->getID($commentID);
+            }
+
+            // If we have a valid comment, let those values override certain discussion values.
+            $commentID = $comment ? val('CommentID', $comment) : val('LastCommentID', $discussion);
+            $userID = $comment ? val('InsertUserID', $comment) : val('InsertUserID', $discussion);
+            $dateInserted = $comment ? val('DateInserted', $comment) : val('DateInserted', $discussion);
+
+            $lastPost['LastUserID'] = $userID;
+            $lastPost['LastDateInserted'] = $dateInserted;
+        }
+
+        // Update the database.
+        $this->setField($categoryID, [
+            'LastCommentID' => $commentID,
+            'LastDiscussionID' => $discussionID,
+            'LastPost' => $lastPost
+        ]);
+
+        // Update the cache.
+        self::setCache($categoryID, [
+            'LastTitle' => $title,
+            'LastUserID' => $userID,
+            'LastDateInserted' => $dateInserted,
+            'LastUrl' => $url
+        ]);
     }
 
     /**

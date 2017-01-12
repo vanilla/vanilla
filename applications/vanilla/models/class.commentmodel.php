@@ -975,20 +975,8 @@ class CommentModel extends VanillaModel {
                 }
                 $CategoryModel = new CategoryModel();
 
-                $CategoryModel->setField($Discussion->CategoryID, array(
-                    'LastDiscussionID' => $DiscussionID,
-                    'LastCommentID' => $CommentID,
-                    'CountComments' => $CountComments,
-                    'LastDateInserted' => $Fields['DateInserted']
-                ));
-
-                // Update the cache.
-                $CategoryCache = array(
-                    'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
-                    'LastUserID' => $Fields['InsertUserID'],
-                    'LastUrl' => DiscussionUrl($Discussion).'#latest'
-                );
-                CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
+                $CategoryModel->setField($Discussion->CategoryID, ['CountComments' => $CountComments]);
+                $CategoryModel->setRecentPost($Discussion->CategoryID, $Discussion, $Fields);
             }
 
             // Prepare the notification queue.

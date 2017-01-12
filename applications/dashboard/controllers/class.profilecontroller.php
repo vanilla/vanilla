@@ -757,7 +757,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->isUploadedAvatar($avatar)) {
             // Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
-            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            $thumbnailSize = c('Garden.Thumbnail.Size');
             $basename = changeBasename($avatar, "p%s");
             $source = $upload->copyLocal($basename);
 
@@ -791,7 +791,7 @@ class ProfileController extends Gdn_Controller {
             }
             if ($this->Form->errorCount() == 0) {
                 if ($newAvatar !== false) {
-                    $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+                    $thumbnailSize = c('Garden.Thumbnail.Size');
                     // Update crop properties.
                     $basename = changeBasename($newAvatar, "p%s");
                     $source = $upload->copyLocal($basename);
@@ -874,12 +874,12 @@ class ProfileController extends Gdn_Controller {
             $parts = Gdn_UploadImage::saveImageAs(
                 $source,
                 self::AVATAR_FOLDER."/$subdir/p$imageBaseName",
-                c('Garden.Profile.MaxHeight', 1000),
-                c('Garden.Profile.MaxWidth', 250),
+                c('Garden.Profile.MaxHeight'),
+                c('Garden.Profile.MaxWidth'),
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 
-            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            $thumbnailSize = c('Garden.Thumbnail.Size');
 
             // Save the thumbnail size image.
             Gdn_UploadImage::saveImageAs(

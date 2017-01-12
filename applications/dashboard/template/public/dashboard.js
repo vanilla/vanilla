@@ -9015,6 +9015,27 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
+     * close to the bottom of the page.
+     *
+     * @param element The scope of the function.
+     */
+    function dropDownInit(element) {
+        $('.dropdown', element).each(function() {
+            var $dropdown = $(this);
+            var offset = $dropdown.offset();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
+            var documentHeight = $(document).height();
+            var padding = 6;
+
+            if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
+                $dropdown.addClass('dropup');
+            }
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -9030,6 +9051,7 @@ var DashboardModal = (function() {
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
+        dropDownInit(e.target); // makes sure our dropdowns open in the right direction
     });
 
     /**
@@ -9041,7 +9063,9 @@ var DashboardModal = (function() {
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                $preview.attr('src', e.target.result);
+                if (e.target.result.startsWith("data:image")) {
+                    $preview.attr('src', e.target.result);
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -9218,7 +9242,6 @@ var DashboardModal = (function() {
             }
         });
     });
-
 })(jQuery);
 
 var dashboardSymbol =  function(name, alt, cssClass) {

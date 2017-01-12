@@ -78,7 +78,7 @@ class CategoryCollection {
      * @param Gdn_Cache|null $cache The cache layer dependency.
      */
     public function __construct(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null) {
-        $this->absoluteLimit = c('Vanilla.Category.QueryLimit', 300);
+        $this->absoluteLimit = c('Vanilla.Categories.QueryLimit', 300);
 
         if ($sql === null) {
             $sql = Gdn::sql();

@@ -930,20 +930,23 @@ class CategoryModel extends Gdn_Model {
      *
      * @param array $categoryTree A nested array of categories.
      * @param array &$result Where to store the result.
+     * @param bool $noLastPost Limit results to rows with an empty LastPost field?
      */
-    private function gatherLastIDs($categoryTree, &$result = null) {
+    private function gatherLastIDs($categoryTree, &$result = null, $noLastPost = false) {
         if ($result === null) {
             $result = [];
         }
 
         foreach ($categoryTree as $category) {
-            $result["{$category['LastDiscussionID']}/{$category['LastCommentID']}"] = [
-                'DiscussionID' => $category['LastDiscussionID'],
-                'CommentID' => $category['LastCommentID']
-            ];
+            if ($noLastPost === false || empty($category['LastPost'])) {
+                $result["{$category['LastDiscussionID']}/{$category['LastCommentID']}"] = [
+                    'DiscussionID' => $category['LastDiscussionID'],
+                    'CommentID' => $category['LastCommentID']
+                ];
+            }
 
             if (!empty($category['Children'])) {
-                $this->gatherLastIDs($category['Children'], $result);
+                $this->gatherLastIDs($category['Children'], $result, $noLastPost);
             }
         }
     }
@@ -955,8 +958,8 @@ class CategoryModel extends Gdn_Model {
      */
     public function joinRecent(&$categoryTree) {
         // Gather all of the IDs from the posts.
-        $this->gatherLastIDs($categoryTree, $ids);
-        $discussionIDs = array_unique(array_column($ids, 'DiscussionID'));
+        $this->gatherLastIDs($categoryTree, $ids, true);
+        $discussionIDs = array_filter(array_unique(array_column($ids, 'DiscussionID')));
         $commentIDs = array_filter(array_unique(array_column($ids, 'CommentID')));
 
         if (!empty($discussionIDs)) {
@@ -981,8 +984,6 @@ class CategoryModel extends Gdn_Model {
                 $userIDs[] = $discussions[$row['DiscussionID']]['InsertUserID'];
             }
         }
-        // Just gather the users into the local cache.
-        Gdn::userModel()->getIDs($userIDs);
 
         $this->joinRecentInternal($categoryTree, $discussions, $comments);
     }
@@ -996,27 +997,46 @@ class CategoryModel extends Gdn_Model {
      */
     private function joinRecentInternal(&$categoryTree, $discussions, $comments) {
         foreach ($categoryTree as &$category) {
-            $discussion = val($category['LastDiscussionID'], $discussions, null);
-            $comment = val($category['LastCommentID'], $comments, null);
+            $discussionID = $category['LastDiscussionID'];
+            $commentID = $category['LastCommentID'];
 
-            if (!empty($discussion)) {
-                $category['LastTitle'] = $discussion['Name'];
-                $category['LastUrl'] = discussionUrl($discussion, false, '/').'#latest';
-                $category['LastDiscussionUserID'] = $discussion['InsertUserID'];
+            $lastPost = val('LastPost', $category);
+            if (is_string($lastPost)) {
+                $lastPost = dbdecode($lastPost);
             }
 
-            if (!empty($comment)) {
-                $category['LastUserID'] = $comment['InsertUserID'];
-            } elseif (!empty($discussion)) {
-                $category['LastUserID'] = $discussion['InsertUserID'];
-            } else {
-                $category['LastTitle'] = '';
-                $category['LastUserID'] = null;
-            }
-            $user = Gdn::userModel()->getID($category['LastUserID']);
-                foreach (['Name', 'Email', 'Photo'] as $field) {
-                    $category['Last'.$field] = val($field, $user);
+            if (!empty($lastPost)) {
+                $category['LastDiscussionUserID'] = val('LastDiscussionUserID', $lastPost, null);
+                $category['LastTitle'] = val('LastTitle', $lastPost, null);
+                $category['LastUrl'] = val('LastUrl', $lastPost, null);
+                $category['LastUserID'] = val('LastUserID', $lastPost, null);
+                $category['LastDateInserted'] = val('LastDateInserted', $lastPost, null);
+            } elseif ($discussionID || $commentID) {
+                $discussion = val($discussionID, $discussions, null);
+                $comment = val($commentID, $comments, null);
+
+                if (!empty($discussion)) {
+                    $category['LastTitle'] = $discussion['Name'];
+                    $category['LastUrl'] = discussionUrl($discussion, false, '/') . '#latest';
+                    $category['LastDiscussionUserID'] = $discussion['InsertUserID'];
                 }
+
+                if (!empty($comment)) {
+                    $category['LastUserID'] = $comment['InsertUserID'];
+                } elseif (!empty($discussion)) {
+                    $category['LastUserID'] = $discussion['InsertUserID'];
+                } else {
+                    $category['LastTitle'] = '';
+                    $category['LastUserID'] = null;
+                }
+
+                $this->setRecentPost($category['CategoryID'], $discussion, $comment);
+            }
+
+            $user = Gdn::userModel()->getID($category['LastUserID']);
+            foreach (['Name', 'Email', 'Photo'] as $field) {
+                $category['Last'.$field] = val($field, $user);
+            }
 
             if (!empty($category['Children'])) {
                 $this->joinRecentInternal($category['Children'], $discussions, $comments);
@@ -2580,6 +2600,7 @@ class CategoryModel extends Gdn_Model {
 
             // Aggregate fields.
             $lastPost = [
+                'LastDiscussionUserID' => val('InsertUserID', $discussion),
                 'LastTitle' => $title,
                 'LastUserID' => null,
                 'LastDateInserted' => null,

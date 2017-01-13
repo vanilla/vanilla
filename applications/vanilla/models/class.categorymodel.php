@@ -1005,33 +1005,15 @@ class CategoryModel extends Gdn_Model {
                 $lastPost = dbdecode($lastPost);
             }
 
-            if (!empty($lastPost)) {
-                $category['LastDiscussionUserID'] = val('LastDiscussionUserID', $lastPost, null);
-                $category['LastTitle'] = val('LastTitle', $lastPost, null);
-                $category['LastUrl'] = val('LastUrl', $lastPost, null);
-                $category['LastUserID'] = val('LastUserID', $lastPost, null);
-                $category['LastDateInserted'] = val('LastDateInserted', $lastPost, null);
-            } elseif ($discussionID || $commentID) {
+            if (empty($lastPost)) {
                 $discussion = val($discussionID, $discussions, null);
                 $comment = val($commentID, $comments, null);
 
-                if (!empty($discussion)) {
-                    $category['LastTitle'] = $discussion['Name'];
-                    $category['LastUrl'] = discussionUrl($discussion, false, '/') . '#latest';
-                    $category['LastDiscussionUserID'] = $discussion['InsertUserID'];
-                }
-
-                if (!empty($comment)) {
-                    $category['LastUserID'] = $comment['InsertUserID'];
-                } elseif (!empty($discussion)) {
-                    $category['LastUserID'] = $discussion['InsertUserID'];
-                } else {
-                    $category['LastTitle'] = '';
-                    $category['LastUserID'] = null;
-                }
-
+                $lastPost = $this->lastPostFields($discussion, $comment);
                 $this->setRecentPost($category['CategoryID'], $discussion, $comment);
             }
+
+            $category = array_merge($category, $lastPost);
 
             $user = Gdn::userModel()->getID($category['LastUserID']);
             foreach (['Name', 'Email', 'Photo'] as $field) {
@@ -1244,6 +1226,50 @@ class CategoryModel extends Gdn_Model {
             $Category = &$Categories[$CID];
             self::instance()->calculateUser($Category);
         }
+    }
+
+    /**
+     * Generate values for the LastPost column.
+     *
+     * @param int|object|array $discussion A discussion row.
+     * @param int|object|array|null $comment A comment row.
+     * @return array
+     */
+    public function lastPostFields($discussion, $comment = null) {
+        // Defaults.  Any new fields should be added here.
+        $lastPost = [
+            'LastDiscussionUserID' => null,
+            'LastTitle' => '',
+            'LastUserID' => null,
+            'LastUrl' => null
+        ];
+
+        if (is_numeric($discussion)) {
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($discussion);
+        }
+
+        if ($discussion) {
+            $lastPost['LastDiscussionUserID'] = val('InsertUserID', $discussion);
+            $lastPost['LastTitle'] = val('Name', $discussion);
+            $lastPost['LastUrl'] = discussionUrl($discussion, '', '//').'#latest';
+
+            if ($comment === null) {
+                if ($commentID = val('LastCommentID', $discussion)) {
+                    $commentModel = new CommentModel();
+                    $comment = $commentModel->getID($commentID);
+                }
+            }
+        }
+
+        // If we have a comment, allow it to take priority on some fields.
+        if ($comment) {
+            $lastPost['LastUserID'] = val('InsertUserID', $comment);
+        } elseif ($discussion) {
+            $lastPost['LastUserID'] = val('InsertUserID', $discussion);
+        }
+
+        return $lastPost;
     }
 
     /**
@@ -2587,7 +2613,6 @@ class CategoryModel extends Gdn_Model {
 
         $commentID = null;
         $discussionID = null;
-        $lastPost = null;
         $title = null;
         $url = null;
         $userID = null;
@@ -2598,34 +2623,28 @@ class CategoryModel extends Gdn_Model {
             $title = val('Name', $discussion);
             $url = discussionUrl($discussion, false, '//').'#latest';
 
-            // Aggregate fields.
-            $lastPost = [
-                'LastDiscussionUserID' => val('InsertUserID', $discussion),
-                'LastTitle' => $title,
-                'LastUserID' => null,
-                'LastDateInserted' => null,
-                'LastUrl' => $url
-            ];
-
-            if ($comment === null && ($commentID = val('LastCommentID', $discussion))) {
-                $commentModel = new CommentModel();
-                $comment = $commentModel->getID($commentID);
+            if ($comment === null) {
+                if ($commentID = val('LastCommentID', $discussion)) {
+                    $commentModel = new CommentModel();
+                    $comment = $commentModel->getID($commentID);
+                }
             }
+        }
 
-            // If we have a valid comment, let those values override certain discussion values.
-            $commentID = $comment ? val('CommentID', $comment) : val('LastCommentID', $discussion);
-            $userID = $comment ? val('InsertUserID', $comment) : val('InsertUserID', $discussion);
-            $dateInserted = $comment ? val('DateInserted', $comment) : val('DateInserted', $discussion);
-
-            $lastPost['LastUserID'] = $userID;
-            $lastPost['LastDateInserted'] = $dateInserted;
+        if ($comment) {
+            $commentID = val('CommentID', $comment);
+            $userID = val('InserUserID', $comment);
+            $dateInserted = val('DateInserted', $comment);
+        } elseif ($discussion) {
+            $userID = val('InsertUserID', $discussion);
+            $dateInserted = val('DateInserted', $discussion);
         }
 
         // Update the database.
         $this->setField($categoryID, [
             'LastCommentID' => $commentID,
             'LastDiscussionID' => $discussionID,
-            'LastPost' => $lastPost
+            'LastPost' => $this->lastPostFields($discussion, $comment)
         ]);
 
         // Update the cache.

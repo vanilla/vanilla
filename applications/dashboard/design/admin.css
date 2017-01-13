@@ -6279,6 +6279,29 @@ select.nav-stats-users:focus,
   border-bottom: 0;
 }
 
+.Section-Error {
+  color: #000;
+  font: 75%/1.7em "Helvetica Neue", Helvetica, arial, sans-serif;
+  margin: 0;
+  padding: 80px;
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.Section-Error .SplashInfo h1 {
+  font-weight: bold;
+  color: #000;
+  font-size: 300%;
+  margin: 20px 0;
+  padding: 0;
+}
+
+.Section-Error .SplashInfo p {
+  margin: 10px 0;
+  color: #777;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
 .footer {
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;

@@ -2604,7 +2604,7 @@ class CategoryModel extends Gdn_Model {
 
         if ($discussion === null) {
             $discussion = $discussionModel->getWhere(
-                ['CategoryID' => $categoryID],
+                ['d.CategoryID' => $categoryID],
                 'DateLastComment',
                 'desc',
                 1
@@ -2620,8 +2620,6 @@ class CategoryModel extends Gdn_Model {
 
         if ($discussion) {
             $discussionID = val('DiscussionID', $discussion);
-            $title = val('Name', $discussion);
-            $url = discussionUrl($discussion, false, '//').'#latest';
 
             if ($comment === null) {
                 if ($commentID = val('LastCommentID', $discussion)) {
@@ -2633,28 +2631,24 @@ class CategoryModel extends Gdn_Model {
 
         if ($comment) {
             $commentID = val('CommentID', $comment);
-            $userID = val('InserUserID', $comment);
             $dateInserted = val('DateInserted', $comment);
         } elseif ($discussion) {
-            $userID = val('InsertUserID', $discussion);
             $dateInserted = val('DateInserted', $discussion);
         }
 
-        // Update the database.
-        $this->setField($categoryID, [
+        $lastPost = $this->lastPostFields($discussion, $comment);
+        $fields = [
             'LastCommentID' => $commentID,
             'LastDateInserted' => $dateInserted,
             'LastDiscussionID' => $discussionID,
-            'LastPost' => $this->lastPostFields($discussion, $comment)
-        ]);
+            'LastPost' => $lastPost
+        ];
+        // Update the database.
+        $this->setField($categoryID, $fields);
+        unset($fields['LastPost']);
 
         // Update the cache.
-        self::setCache($categoryID, [
-            'LastTitle' => $title,
-            'LastUserID' => $userID,
-            'LastDateInserted' => $dateInserted,
-            'LastUrl' => $url
-        ]);
+        self::setCache($categoryID, array_merge($fields, $lastPost));
     }
 
     /**

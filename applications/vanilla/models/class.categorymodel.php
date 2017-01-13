@@ -1235,7 +1235,7 @@ class CategoryModel extends Gdn_Model {
      * @param int|object|array|null $comment A comment row.
      * @return array
      */
-    public function lastPostFields($discussion, $comment = null) {
+    private function lastPostFields($discussion, $comment = null) {
         // Defaults.  Any new fields should be added here.
         $lastPost = [
             'LastDiscussionUserID' => null,

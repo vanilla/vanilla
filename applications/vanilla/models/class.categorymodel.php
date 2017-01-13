@@ -269,7 +269,7 @@ class CategoryModel extends Gdn_Model {
     /**
      *
      *
-     * @param bool $honorHideAllDiscussion Whether of not the HideAllDiscussions flag will be checked on categories.
+     * @param bool $honorHideAllDiscussion Whether or not the HideAllDiscussions flag will be checked on categories.
      * @return array|bool Category IDs or true if all categories are watched.
      */
     public static function categoryWatch($honorHideAllDiscussion = true) {

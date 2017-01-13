@@ -1000,7 +1000,7 @@ class CategoryModel extends Gdn_Model {
             $discussionID = $category['LastDiscussionID'];
             $commentID = $category['LastCommentID'];
 
-            $lastPost = val('LastPost', $category);
+            $lastPost = val('LastPost', $category, []);
             if (is_string($lastPost)) {
                 $lastPost = dbdecode($lastPost);
             }
@@ -2643,6 +2643,7 @@ class CategoryModel extends Gdn_Model {
         // Update the database.
         $this->setField($categoryID, [
             'LastCommentID' => $commentID,
+            'LastDateInserted' => $dateInserted,
             'LastDiscussionID' => $discussionID,
             'LastPost' => $this->lastPostFields($discussion, $comment)
         ]);

@@ -24,6 +24,7 @@
     "require": {
         "chrisjean/php-ico": "~1.0",
         "container-interop/container-interop": "^1.1",
+        "openid/php-openid": "~2.3.0",
         "phpmailer/phpmailer": "~5.2",
         "psr/log": "~1.0",
         "smarty/smarty": "~3.1",

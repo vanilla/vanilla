@@ -1890,8 +1890,8 @@ class DiscussionModel extends VanillaModel {
         }
 
         if (count($ValidationResults) == 0) {
-            // If the post is new and it validates, make sure the user isn't spamming
-            if (!$Insert || !$this->checkForSpam('Discussion')) {
+            // If the post is new and it validates, make sure the user isn't spamming (flood control)
+            if (!$Insert || !$this->isSpamming('Discussion')) {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 

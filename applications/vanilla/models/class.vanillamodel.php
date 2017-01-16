@@ -34,10 +34,10 @@ abstract class VanillaModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param string $Type Valid values are 'Comment' or 'Discussion'.
-     * @return bool Whether spam check is positive (TRUE = spammer).
+     * @param string $Type Valid values are ['Activity', 'ActivityComment', 'Comment', 'Discussion'].
+     * @return bool Whether spam check is positive (true = spammer).
      */
-    public function checkForSpam($Type) {
+    public function isSpamming($Type) {
         $Session = Gdn::session();
 
         // If spam checking is disabled or user is an admin, skip
@@ -49,7 +49,7 @@ abstract class VanillaModel extends Gdn_Model {
         $Spam = false;
 
         // Validate $Type
-        if (!in_array($Type, array('Comment', 'Discussion'))) {
+        if (!in_array($Type, ['Activity', 'ActivityComment', 'Comment', 'Discussion'])) {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $Type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
         }
 

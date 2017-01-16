@@ -112,7 +112,8 @@ class EditorPlugin extends Gdn_Plugin {
             'emoji' => true,
             'links' => true,
             'images' => true,
-            'uploads' => false,
+            'fileuploads' => false,
+            'imageuploads' => false,
 
             'sep-align' => true, // separator
             'alignleft' => true,
@@ -340,8 +341,9 @@ class EditorPlugin extends Gdn_Plugin {
         $editorToolbarAll = array();
         $allowedEditorActions = $this->getAllowedEditorActions();
         $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
-        if (val('FileUpload', $attributes)) {
-            $allowedEditorActions['uploads'] = true;
+        if (val('FileUpload', $attributes) && $this->canUpload()) {
+            $allowedEditorActions['fileuploads'] = true;
+            $allowedEditorActions['imageuploads'] = true;
             $allowedEditorActions['images'] = false;
         }
         $fontColorList = $this->getFontColorList();
@@ -475,7 +477,8 @@ class EditorPlugin extends Gdn_Plugin {
         $editorToolbarAll['links'] = array('edit' => 'media', 'action' => 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => t('Url'), 'data-editor' => '{"action":"url","value":""}'));
         $editorToolbarAll['images'] = array('edit' => 'media', 'action' => 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => t('Image'), 'data-editor' => '{"action":"image","value":""}'));
 
-        $editorToolbarAll['uploads'] = array('edit' => 'media', 'action' => 'upload', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-file editor-dd-upload', 'data-wysihtml5-command' => '', 'title' => t('Attach image/file'), 'data-editor' => '{"action":"upload","value":""}'));
+        $editorToolbarAll['fileuploads'] = ['edit' => 'media', 'action' => 'fileupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-file editor-dd-fileupload', 'data-wysihtml5-command' => '', 'title' => t('Attach file'), 'data-editor' => '{"action":"fileupload","value":""}']];
+        $editorToolbarAll['imageuploads'] = ['edit' => 'media', 'action' => 'imageupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-picture editor-dd-imageupload', 'data-wysihtml5-command' => '', 'title' => t('Attach image'), 'data-editor' => '{"action":"imageupload","value":""}']];
 
         $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align editor-optional-button'));
         $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => t('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
@@ -613,7 +616,38 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorFileInputName', $this->editorFileInputName);
         $Sender->setData('_editorFileInputName', $this->editorFileInputName);
         // Save allowed file types
-        $c->addDefinition('allowedFileExtensions', json_encode(c('Garden.Upload.AllowedFileExtensions')));
+        $allowedFileExtensions = c('Garden.Upload.AllowedFileExtensions');
+        $imageExtensions = ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'];
+
+        $allowedImageExtensions = array_intersect($allowedFileExtensions, $imageExtensions);
+
+        $c->addDefinition('allowedImageExtensions', json_encode($allowedImageExtensions));
+        $c->addDefinition('allowedFileExtensions', json_encode($allowedFileExtensions));
+
+        $allowedMimeTypes = [];
+        foreach($allowedFileExtensions as $ext) {
+            if ($mime = $this->lookupMime($ext)) {
+                $allowedMimeTypes = array_merge($allowedMimeTypes, $mime);
+            }
+        }
+
+        $allowedImageMimeTypes = [];
+        foreach($allowedImageExtensions as $ext) {
+            if ($mime = $this->lookupMime($ext)) {
+                $allowedImageMimeTypes = array_merge($allowedImageMimeTypes, $mime);
+            }
+        }
+
+        // prepend extensions with a '.'
+        $allowedFileExtensions = array_map(function($str) { return '.'.$str; }, $allowedFileExtensions);
+        $accept = implode(',', array_merge($allowedFileExtensions, $allowedMimeTypes));
+        $Sender->setData('Accept', $accept);
+
+        // prepend extensions with a '.'
+        $allowedImageExtensions = array_map(function($str) { return '.'.$str; }, $allowedImageExtensions);
+        $acceptImage = implode(',', array_merge($allowedImageExtensions, $allowedImageMimeTypes));
+        $Sender->setData('AcceptImage', $acceptImage);
+
         // Get max file uploads, to be used for max drops at once.
         $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
     }
@@ -669,8 +703,6 @@ class EditorPlugin extends Gdn_Plugin {
                 $c->setData('_EditorToolbar', $editorToolbar);
             }
 
-            $c->setData('_canUpload', $this->canUpload());
-
             // Determine which controller (post or discussion) is invoking this.
             // At the moment they're both the same, but in future you may want
             // to know this information to modify it accordingly.
@@ -681,12 +713,14 @@ class EditorPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint to upload files.
      *
      * @param PostController $Sender
-     * @param array $Args
+     * @param array $args Expects the first argument to be the type of the upload, either 'file', 'image', or 'unknown'.
+     * @throws Exception
+     * @throws Gdn_UserException
      */
-    public function postController_editorUpload_create($Sender, $Args = array()) {
+    public function postController_editorUpload_create($Sender, $args = array()) {
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
 
@@ -706,6 +740,17 @@ class EditorPlugin extends Gdn_Plugin {
 
         // New upload instance
         $Upload = new Gdn_Upload();
+
+        // Upload type is either 'file', for an upload that adds an attachment to the post, or 'image' for an upload
+        // that is automatically inserted into the post. If the user uploads using drag-and-drop rather than browsing
+        // for the files using one of the dropdowns, we assume images-type uploads are to be inserted into the post
+        // and other uploads are to be attached to the post.
+
+        $uploadType = val(0, $args, 'unknown');
+        $uploadType = strtolower($uploadType);
+        if ($uploadType !== 'image' && $uploadType !== 'file') {
+            $uploadType = 'unknown';
+        }
 
         // This will validate, such as size maxes, file extensions. Upon doing
         // this, $_FILES is set as a protected property, so all the other Gdn_Upload methods work on it.
@@ -745,6 +790,9 @@ class EditorPlugin extends Gdn_Plugin {
             $this->fireEvent('BeforeSaveUploads');
 
             if (!$validImage) {
+                if ($uploadType === 'unknown') {
+                    $uploadType = 'file';
+                }
                 $filePathParsed = $Upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -754,6 +802,9 @@ class EditorPlugin extends Gdn_Plugin {
                     ]
                 );
             } else {
+                if ($uploadType === 'unknown') {
+                    $uploadType = 'image';
+                }
                 $filePathParsed = Gdn_UploadImage::saveImageAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
@@ -826,7 +877,8 @@ class EditorPlugin extends Gdn_Plugin {
                 'original_url' => $Upload->url($filePathParsed['SaveName']),
                 'thumbnail_url' => $thumbUrl,
                 'original_width' => $imageWidth,
-                'original_height' => $imageHeight
+                'original_height' => $imageHeight,
+                'upload_type' => $uploadType
             );
 
             $json = array(
@@ -1392,6 +1444,17 @@ class EditorPlugin extends Gdn_Plugin {
             ->table('Category')
             ->column('AllowFileUploads', 'tinyint(1)', '1')
             ->set();
+    }
+
+    /**
+     * Retrieve mime type from file extension.
+     *
+     * @param string $extension The extension to look up. (i.e., 'png')
+     * @return bool|string The mime type associated with the file extension or false if it doesn't exist.
+     */
+    private function lookupMime($extension){
+        include_once 'mimetypes.php';
+        return val($extension, $mimeTypes, false);
     }
 
     /**

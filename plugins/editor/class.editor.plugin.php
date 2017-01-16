@@ -1453,6 +1453,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @return bool|string The mime type associated with the file extension or false if it doesn't exist.
      */
     private function lookupMime($extension){
+        global $mimeTypes;
         include_once 'mimetypes.php';
         return val($extension, $mimeTypes, false);
     }

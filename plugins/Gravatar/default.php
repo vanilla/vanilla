@@ -15,6 +15,7 @@ $PluginInfo['Gravatar'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.com',
+    'SettingsUrl' => '/settings/gravatar',
     'Icon' => 'gravatar.png',
     'MobileFriendly' => true
 );
@@ -61,18 +62,13 @@ class GravatarPlugin extends Gdn_Plugin {
 
             $default = "{$vanilliconBaseUrl}/{$avatarID}_{$vanilliconSize}.png";
         } else {
-            $configuredDefaultAvatar = c('Plugins.Gravatar.DefaultAvatar', c('Garden.DefaultAvatar'));
+            $configuredDefaultAvatar = c('Garden.DefaultAvatar', false);
             if ($configuredDefaultAvatar) {
                 $defaultParsed = Gdn_Upload::parse($configuredDefaultAvatar);
                 $default = val('Url', $defaultParsed);
+            } else {
+                $default = asset('applications/dashboard/design/images/defaulticon.png', true);
             }
-        }
-
-        if (empty($default)){
-            $default = asset(
-                $size <= 50 ? 'plugins/Gravatar/default.png' : 'plugins/Gravatar/default_250.png',
-                true
-            );
         }
 
         $query = [
@@ -82,6 +78,28 @@ class GravatarPlugin extends Gdn_Plugin {
         ];
 
         return $baseUrl."/{$avatarID}/?".http_build_query($query);
+    }
+
+
+    /**
+     * Gravatar settings page.
+     *
+     * @param SettingsController $sender
+     * @param array $args
+     */
+    public function settingsController_gravatar_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+
+        $cf = new ConfigurationModule($sender);
+        $cf->initialize([
+            'Plugins.Gravatar.UseVanillicon' => [
+                'LabelCode' => 'Enable Vanillicon icons as your default avatars',
+                'Control' => 'toggle'
+            ]
+        ]);
+
+        $sender->setData('Title', t('Gravatar Settings'));
+        $cf->renderAll();
     }
 
     /**
@@ -97,6 +115,42 @@ class GravatarPlugin extends Gdn_Plugin {
                 c('Garden.Profile.MaxWidth', 200)
             );
         }
+    }
+
+    /**
+     * Overrides allowing admins to set the default avatar when Plugins.Gravatar.UseVanillicon
+     * is set, since it has no effect. Adds messages to the top of avatar settings page and to the help panel asset.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_avatarSettings_handler($sender) {
+        $message = '';
+        $help = t('Users with a Gravatar account will by default get their Gravatar avatar.');
+
+        $useVanillicon = c('Plugins.Gravatar.UseVanillicon', false);
+
+        if ($useVanillicon) {
+            $message = t('You\'re using Vanillicon avatars as your default avatars.');
+            $message .= ' '.t('To set a custom default avatar, disable Vanillicon from your Gravatar settings.');
+            $help .= ' '.t('Users without a Gravatar account will get a Vanillicon avatar.');
+            $sender->setData('canSetDefaultAvatar', false);
+        } else {
+            $help .= ' '.t('Users without a Gravatar account will get the default avatar.');
+        }
+
+        if (Gdn::addonManager()->isEnabled('vanillicon', \Vanilla\Addon::TYPE_ADDON) && !$useVanillicon) {
+            // Gravatar overrides Vanillicon
+            $message = t('The Gravatar plugin overrides the Vanillicon plugin.');
+            $message .= ' '.t('To use both Vanillicon and Gravatar, enable Vanillicon from your Gravatar settings.');
+        }
+
+        if ($message) {
+            $messages = $sender->data('messages', []);
+            $messages = array_merge($messages, [$message]);
+            $sender->setData('messages', $messages);
+        }
+
+        helpAsset(t('How are my users\' default avatars set?'), $help);
     }
 }
 

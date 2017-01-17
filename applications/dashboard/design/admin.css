@@ -6760,7 +6760,9 @@ select + select {
 .file-upload input:hover ~ .file-upload-browse,
 .file-upload .label-selector input:hover ~ .file-upload-browse, .label-selector select:focus, .label-selector .drop-enabled,
 .label-selector input[type=radio]:checked ~ label,
-.label-selector input[type=radio]:checked ~ label {
+.label-selector input[type=radio]:checked ~ label,
+.label-selector input[type=checkbox]:checked ~ label,
+.label-selector input[type=checkbox]:checked ~ label {
   cursor: default;
 }
 
@@ -6772,7 +6774,9 @@ select + select {
 .file-upload input:hover ~ .file-upload-browse .overlay,
 .file-upload .label-selector input:hover ~ .file-upload-browse .overlay, .label-selector select:focus .overlay, .label-selector .drop-enabled .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay,
-.label-selector input[type=radio]:checked ~ label .overlay {
+.label-selector input[type=radio]:checked ~ label .overlay,
+.label-selector input[type=checkbox]:checked ~ label .overlay,
+.label-selector input[type=checkbox]:checked ~ label .overlay {
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.7);
 }
@@ -6785,7 +6789,9 @@ select + select {
 .file-upload input:hover ~ .file-upload-browse .overlay > .buttons,
 .file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons, .label-selector select:focus .overlay > .buttons, .label-selector .drop-enabled .overlay > .buttons,
 .label-selector input[type=radio]:checked ~ label .overlay > .buttons,
-.label-selector input[type=radio]:checked ~ label .overlay > .buttons {
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .buttons,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .buttons {
   display: none;
 }
 
@@ -6797,7 +6803,9 @@ select + select {
 .file-upload input:hover ~ .file-upload-browse .overlay > .selected,
 .file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected, .label-selector select:focus .overlay > .selected, .label-selector .drop-enabled .overlay > .selected,
 .label-selector input[type=radio]:checked ~ label .overlay > .selected,
-.label-selector input[type=radio]:checked ~ label .overlay > .selected {
+.label-selector input[type=radio]:checked ~ label .overlay > .selected,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .selected,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .selected {
   display: block;
 }
 
@@ -6809,7 +6817,9 @@ select + select {
 .file-upload input:hover ~ .file-upload-browse .label-selector-image,
 .file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image, .label-selector select:focus .label-selector-image, .label-selector .drop-enabled .label-selector-image,
 .label-selector input[type=radio]:checked ~ label .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .label-selector-image {
+.label-selector input[type=radio]:checked ~ label .label-selector-image,
+.label-selector input[type=checkbox]:checked ~ label .label-selector-image,
+.label-selector input[type=checkbox]:checked ~ label .label-selector-image {
   opacity: .5;
 }
 

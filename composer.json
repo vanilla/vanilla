@@ -23,6 +23,7 @@
     ],
     "require": {
         "psr/log": "~1.0",
+        "pclzip/pclzip": "~2.0",
         "smarty/smarty": "~3.1",
         "vanilla/garden-http": "~1.0",
         "vanilla/htmlawed": "~2.0",

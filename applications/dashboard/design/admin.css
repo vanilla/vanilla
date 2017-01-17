@@ -6980,6 +6980,7 @@ select + select {
 }
 
 .mobile-theme-wrap svg {
+  max-width: 100%;
   display: block;
 }
 

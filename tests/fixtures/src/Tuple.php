@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\fixtures;
+namespace VanillaTests\Fixtures;
 
 class Tuple {
     public $a;

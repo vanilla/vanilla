@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace VanillaTests\fixtures;
+namespace VanillaTests\Fixtures;
 
 
 class Locale {

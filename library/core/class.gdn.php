@@ -5,10 +5,8 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
- * @package Core
- * @since 2.0
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 /**
@@ -185,25 +183,44 @@ class Gdn {
     /**
      * Get an object from the factory.
      *
-     * @param string $Alias The alias of the class.
-     * @param mixed $Args A variable number of arguments to pass to the constructor.
-     * @see Gdn_Factory::Factory()
+     * @param string $alias The alias of the class.
      */
-    public static function factory($Alias = false) {
+    public static function factory($alias = false) {
+        if ($alias === false) {
+            return static::getFactory();
+        }
+
+        // Get the arguments to pass to the factory.
+        $args = func_get_args();
+        array_shift($args);
+
+        // Get the item from the container.
+        // This code has been brought in from {@link Gdn_Factory::factory()}.
+        $dic = static::getContainer();
+        try {
+            if (!$dic->has($alias) && $dic->has("Gdn_$alias")) {
+                $alias = "Gdn_$alias";
+            }
+
+            $result = $dic->getArgs($alias, (array)$args);
+            return $result;
+        } catch (\Garden\Container\NotFoundException $ex) {
+            return null;
+        }
+    }
+
+    /**
+     * Get or lazy-create the factory.
+     *
+     * @return Gdn_Factory
+     */
+    private static function getFactory() {
+        deprecated('Gdn::getFactory()');
         if (is_null(self::$_Factory)) {
             static::setFactory(new Gdn_Factory(static::getContainer()));
             static::factoryOverwrite(false);
         }
-
-        if ($Alias === false) {
-            return self::$_Factory;
-        }
-
-        // Get the arguments to pass to the factory.
-        //$Args = array($Arg1, $Arg2, $Arg3, $Arg4, $Arg5);
-        $Args = func_get_args();
-        array_shift($Args);
-        return self::$_Factory->factory($Alias, $Args);
+        return self::$_Factory;
     }
 
     /**
@@ -214,7 +231,7 @@ class Gdn {
      * @see Gdn_Factory::Exists()
      */
     public static function factoryExists($Alias) {
-        return self::factory()->exists($Alias);
+        return static::getContainer()->hasRule($Alias);
     }
 
     /**
@@ -233,7 +250,44 @@ class Gdn {
             return;
         }
 
-        self::factory()->install($Alias, $ClassName, $Path, $FactoryType, $Data);
+        $dic = static::getContainer();
+
+        $dic->rule($Alias);
+
+        if ($Alias !== $ClassName) {
+            $dic->setClass($ClassName);
+        }
+
+        // Set the other data of the object.
+        switch (ucfirst($FactoryType)) {
+            case Gdn::FactoryInstance:
+                $dic->setShared(false);
+                break;
+            case Gdn::FactoryPrototype:
+                if (is_null($Data)) {
+                    throw new Exception('You must supply a prototype object when installing an object of type Prototype.');
+                }
+                $dic->setShared(false)
+                    ->setFactory(function () use ($Data) {
+                        $r = clone $Data;
+                        return $r;
+                    });
+                break;
+            case Gdn::FactorySingleton:
+                if (is_array($Data)) {
+                    $dic->setShared(true)
+                        ->setConstructorArgs($Data);
+                } elseif ($Data !== null) {
+                    $dic->setInstance($Alias, $Data);
+                }
+                break;
+            case Gdn::FactoryRealSingleton:
+                $dic->setShared(true)
+                    ->setFactory([$ClassName, $Data]);
+                break;
+            default:
+                throw new \Exception("Unknown factory type '$FactoryType'.", 500);
+        }
     }
 
     /**
@@ -251,41 +305,18 @@ class Gdn {
     /**
      * Installs a dependency to the factory with the settings from a configuration.
      *
-     * @param mixed $Config The configuration of the factory definition. This argument can be of the following types:
-     * - <b>string</b>: The configuration will be looked up by calling inline{@link Gdn::Config()}
-     * - <b>array</b>: The configuration will be set from the array.
-     * @param string $Alias The class alias to install into the factory. If omitted then it must be in the configuration.
-     *
-     * The dependency will be installed from the configuration array depending on the following keys:
-     * - <b>Alias</b>: Optional if $Alias is passed as an argument.
-     * - <b>PropertyName</b>: Required.
-     * - <b>SourceAlias</b>: Required.
-     * - <b>Override</b> Optional.
-     * All of these values are passed to the corresponding argument in inline{@link Gdn::FactoryInstallDependency()}.
      * @deprecated
      */
-    public static function factoryInstallDependencyFromConfig($Config, $Alias = null) {
+    public static function factoryInstallDependencyFromConfig() {
         deprecated('Gdn::factoryInstallDependencyFromConfig()');
     }
 
     /**
      * Installs a class to the factory with the settings from a configuration.
      *
-     * @param mixed $Config The configuration of the factory definition. This argument can be of the following types:
-     * - <b>string</b>: The configuration will be looked up by calling inline{@link Gdn::Config()}
-     * - <b>array</b>: The configuration will be set from the array.
-     * @param string $Alias The class alias to install into the factory. If omitted then it must be in the configuration.
-     *
-     * The factory will be installed from the configuration array depending on the following keys:
-     * - <b>Alias</b>: Optional if $Alias is passed as an argument.
-     * - <b>FactoryType</b>: Required.
-     * - <b>Data</b>: Optional.
-     * - <b>Override</b> Optional.
-     * - <b>Dependencies</b> Optional. Dependencies for the class can be defined as a subarray. Each item in the subarray will be passed to inline{@link Gdn::FactoryInstallDependencyFromConfig}.
-     * All of these values (except Dependencies) are passed to the corresponding argument in inline{@link Gdn::FactoryInstall()}.
      * @deprecated
      */
-    public static function factoryInstallFromConfig($Config, $Alias = null) {
+    public static function factoryInstallFromConfig() {
         deprecated('Gdn::factoryInstallFromConfig()');
     }
 
@@ -309,20 +340,18 @@ class Gdn {
     /**
      * Uninstall an class from the factory.
      *
-     * @param string $Alias The alias of the class to uninstall.
-     * @see Gdn_Factory::Uninstall()
+     * @deprecated
      */
-    public static function factoryUninstall($Alias) {
-        self::factory()->uninstall($Alias);
+    public static function factoryUninstall() {
+        deprecated('Gdn::factoryUninstall()');
     }
 
     /**
      * Uninstall a dependency from the factory.
      *
-     * @see Gdn_Factory::UninstallDependency()
      * @deprecated
      */
-    public static function factoryUninstallDependency($Alias, $PropertyName = null) {
+    public static function factoryUninstallDependency() {
         deprecated('Gdn::factoryUninstallDependency()');
     }
 

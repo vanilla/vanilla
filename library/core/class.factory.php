@@ -4,10 +4,8 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
- * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
- * @package Core
- * @since 2.0
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 /**
@@ -34,6 +32,7 @@ class Gdn_Factory {
      *
      */
     public function __construct(Garden\Container\Container $container = null) {
+        deprecated('Gdn_Factory', 'Garden\Container\Container');
         register_shutdown_function(array($this, 'Cleanup'));
 
         $this->container = $container !== null ? $container : new Garden\Container\Container();

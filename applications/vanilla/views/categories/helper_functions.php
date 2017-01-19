@@ -246,6 +246,7 @@ endif;
 if (!function_exists('WriteTableRow')):
 
     function writeTableRow($Row, $Depth = 1) {
+        $Children = $Row['Children'];
         $WriteChildren = getWriteChildrenMethod($Row, $Depth);
         $H = 'h'.($Depth + 1);
         ?>
@@ -271,7 +272,7 @@ if (!function_exists('WriteTableRow')):
                         <div class="ChildCategories">
                             <?php
                             echo wrap(t('Child Categories').': ', 'b');
-                            echo categoryString(val('Children', $Row), $Depth + 1);
+                            echo categoryString($Children, $Depth + 1);
                             ?>
                         </div>
                     <?php endif; ?>

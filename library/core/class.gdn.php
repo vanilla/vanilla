@@ -245,7 +245,7 @@ class Gdn {
      * @see Gdn_Factory::InstalDependency()
      */
     public static function factoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
-        self::factory()->installDependency($Alias, $PropertyName, $SourceAlias);
+        deprecated('Gdn::factoryInstallDependency()');
     }
 
     /**
@@ -287,25 +287,6 @@ class Gdn {
      */
     public static function factoryInstallFromConfig($Config, $Alias = null) {
         deprecated('Gdn::factoryInstallFromConfig()');
-        if (is_string($Config)) {
-            $Config = self::config($Config);
-        }
-        if (is_null($Alias)) {
-            $Alias = $Config['Alias'];
-        }
-
-        $FactoryType = $Config['FactoryType'];
-        $Data = val('Data', $Config, null);
-        $Override = val('Override', $Config, true);
-
-        self::factoryInstall($Alias, $Config['ClassName'], $Config['Path'], $FactoryType, $Data, $Override);
-
-        if (array_key_exists('Dependencies', $Config)) {
-            $Dependencies = $Config['Dependencies'];
-            foreach ($Dependencies as $Index => $DependencyConfig) {
-                self::factoryInstallFromConfig($DependencyConfig, $Alias);
-            }
-        }
     }
 
     /**
@@ -343,7 +324,6 @@ class Gdn {
      */
     public static function factoryUninstallDependency($Alias, $PropertyName = null) {
         deprecated('Gdn::factoryUninstallDependency()');
-        self::factory()->uninstallDependency($Alias, $PropertyName);
     }
 
     /**
@@ -590,6 +570,7 @@ class Gdn {
      * @param boolean $Override whether to override the property if it is already set.
      */
     public static function setFactory($Factory, $Override = true) {
+        deprecated('Gdn::setFactory()');
         if ($Override || is_null(self::$_Factory)) {
             self::$_Factory = $Factory;
         }

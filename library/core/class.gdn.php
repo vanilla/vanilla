@@ -135,6 +135,9 @@ class Gdn {
      * @return Gdn_Configuration|mixed The configuration setting.
      */
     public static function config($Name = false, $Default = false) {
+        if (self::$_Config === null) {
+            self::$_Config = static::getContainer()->get(self::AliasConfig);
+        }
         $Config = self::$_Config;
         if ($Name === false) {
             $Result = $Config;
@@ -231,25 +234,6 @@ class Gdn {
         }
 
         self::factory()->install($Alias, $ClassName, $Path, $FactoryType, $Data);
-
-        // Cache some of the more commonly used factory objects as properties.
-        switch ($Alias) {
-            case self::AliasConfig:
-                self::$_Config = self::factory($Alias);
-                break;
-            case self::AliasLocale:
-                self::$_Locale = self::factory($Alias);
-                break;
-            case self::AliasRequest:
-                self::$_Request = self::factory($Alias);
-                break;
-            case self::AliasPluginManager:
-                self::$_PluginManager = self::factory($Alias);
-                break;
-            case self::AliasSession:
-                self::$_Session = null;
-                break;
-        }
     }
 
     /**
@@ -445,6 +429,10 @@ class Gdn {
      * @return Gdn_PluginManager
      */
     public static function pluginManager() {
+        if (self::$_PluginManager === null) {
+            self::$_PluginManager = static::getContainer()->get(self::AliasPluginManager);
+        }
+
         return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
     }
 
@@ -462,6 +450,10 @@ class Gdn {
      * @return Gdn_Request
      */
     public static function request($NewRequest = null) {
+        if (self::$_Request === null) {
+            self::$_Request = static::getContainer()->get(self::AliasRequest);
+        }
+
         $Request = self::$_Request; //self::Factory(self::AliasRequest);
         if (!is_null($NewRequest)) {
             if (is_string($NewRequest)) {
@@ -613,7 +605,7 @@ class Gdn {
      *
      * @return \Garden\Container\Container Returns the container.
      */
-    public static function getContainer() {
+    private static function getContainer() {
         if (self::$container === null) {
             self::$container = new Garden\Container\Container();
         }

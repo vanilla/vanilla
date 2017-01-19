@@ -93,7 +93,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @param $PluginWhiteList
      * @param bool $ForceRemapping
      */
-    public function __construct($LocaleName, $addonManager = null) {
+    public function __construct($LocaleName, AddonManager $addonManager = null) {
         parent::__construct();
         $this->ClassName = __CLASS__;
 

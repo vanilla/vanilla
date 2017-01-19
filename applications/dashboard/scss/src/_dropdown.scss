@@ -114,3 +114,13 @@
   border-top: 0.375em solid;
   border-bottom: 0;
 }
+
+// btn-groups transform into dropdowns when they get too wide for their container.
+// This styles that specific dropdown trigger button.
+
+.dropdown-filter .btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 120px;
+}

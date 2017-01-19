@@ -4884,14 +4884,26 @@ output {
   color: #e6e6e6;
 }
 
+.toolbar-stats {
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
 .toolbar-stats > *:not(.nav-stats) {
   margin-top: 2.25rem;
 }
 
-.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
-  margin-right: 0;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
+@media (max-width: 991px) {
+  .toolbar-stats > *:not(.nav-stats) {
+    margin-top: 1.125rem;
+  }
+}
+
+.toolbar-stats > * {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .analytics-panel,
@@ -6277,6 +6289,39 @@ select.nav-stats-users:focus,
 .dropup .dropdown-toggle::after {
   border-top: 0.375em solid;
   border-bottom: 0;
+}
+
+.dropdown-filter .btn, .dropdown-filter .file-upload-browse, .dropdown-filter .Button {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-align: center;
+  align-items: center;
+  min-width: 120px;
+}
+
+.Section-Error {
+  color: #000;
+  font: 75%/1.7em "Helvetica Neue", Helvetica, arial, sans-serif;
+  margin: 0;
+  padding: 80px;
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.Section-Error .SplashInfo h1 {
+  font-weight: bold;
+  color: #000;
+  font-size: 300%;
+  margin: 20px 0;
+  padding: 0;
+}
+
+.Section-Error .SplashInfo p {
+  margin: 10px 0;
+  color: #777;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .footer {
@@ -7865,7 +7910,7 @@ button.close {
   -ms-flex-align: center;
   align-items: center;
   line-height: 1;
-  padding: 1.125rem 1.125rem 0;
+  padding: 0.5625rem 1.125rem 0;
   color: rgba(25, 25, 25, 0.2);
 }
 

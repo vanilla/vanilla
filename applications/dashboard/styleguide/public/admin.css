@@ -1526,19 +1526,20 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse, .nav-tabs .nav-link.active:focus, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:focus, .nav-tabs
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse, .nav-tabs select.nav-link:focus, .nav-tabs .nav-link.drop-enabled, .nav-tabs .nav-link.active:focus, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:focus, .nav-tabs
 .file-upload input:focus ~ .nav-link.file-upload-browse:focus,
 .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:focus, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-choose:focus,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:focus, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse:focus,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:hover, .nav-tabs
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:focus, .nav-tabs select.nav-link:focus, .nav-tabs
+select.nav-link.form-control:focus, .nav-tabs select.nav-link.ac_input:focus, .nav-tabs .nav-link.drop-enabled:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:hover, .nav-tabs
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:hover, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:hover, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:hover, .nav-tabs select.nav-link:hover:focus, .nav-tabs .nav-link.drop-enabled:hover,
 .nav-tabs .nav-item.open .nav-link,
 .nav-tabs .nav-item.open .nav-link:focus,
 .nav-tabs .nav-item.open .nav-link:hover {
@@ -1573,19 +1574,20 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse, .nav-pills .nav-link.active:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:focus, .nav-pills
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse, .nav-pills select.nav-link:focus, .nav-pills .nav-link.drop-enabled, .nav-pills .nav-link.active:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:focus, .nav-pills
 .file-upload input:focus ~ .nav-link.file-upload-browse:focus,
 .file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:focus, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-choose:focus,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:focus, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse:focus,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:focus, .nav-pills .nav-link.active:hover, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:hover, .nav-pills
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:focus, .nav-pills select.nav-link:focus, .nav-pills
+select.nav-link.form-control:focus, .nav-pills select.nav-link.ac_input:focus, .nav-pills .nav-link.drop-enabled:focus, .nav-pills .nav-link.active:hover, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:hover, .nav-pills
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:hover, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:hover, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:hover, .nav-pills select.nav-link:hover:focus, .nav-pills .nav-link.drop-enabled:hover,
 .nav-pills .nav-item.open .nav-link,
 .nav-pills .nav-item.open .nav-link:focus,
 .nav-pills .nav-item.open .nav-link:hover {
@@ -1611,7 +1613,7 @@ a.text-danger:focus, a.text-danger:hover {
 .tab-content > .active, .file-upload .tab-content > input:focus ~ .file-upload-choose,
 .file-upload .tab-content > input:focus ~ .file-upload-browse,
 .file-upload .tab-content > input:hover ~ .file-upload-choose,
-.file-upload .tab-content > input:hover ~ .file-upload-browse {
+.file-upload .tab-content > input:hover ~ .file-upload-browse, .tab-content > select:focus, .tab-content > .drop-enabled {
   display: block;
 }
 
@@ -1800,7 +1802,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse,
 .file-upload .ac_results input:hover ~ li.file-upload-browse, .ac_results
-.file-upload input:hover ~ li.file-upload-browse, .ac_results li.active, .dropdown-item.active:focus, .file-upload input:focus ~ .dropdown-item.file-upload-choose:focus, .file-upload .ac_results input:focus ~ li.file-upload-choose:focus, .ac_results .file-upload input:focus ~ li.file-upload-choose:focus,
+.file-upload input:hover ~ li.file-upload-browse, select.dropdown-item:focus, .dropdown-item.drop-enabled, .ac_results li.drop-enabled, .ac_results li.active, .dropdown-item.active:focus, .file-upload input:focus ~ .dropdown-item.file-upload-choose:focus, .file-upload .ac_results input:focus ~ li.file-upload-choose:focus, .ac_results .file-upload input:focus ~ li.file-upload-choose:focus,
 .file-upload input:focus ~ .dropdown-item.file-upload-browse:focus,
 .file-upload .ac_results input:focus ~ li.file-upload-browse:focus, .ac_results
 .file-upload input:focus ~ li.file-upload-browse:focus,
@@ -1809,7 +1811,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose:focus,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse:focus,
 .file-upload .ac_results input:hover ~ li.file-upload-browse:focus, .ac_results
-.file-upload input:hover ~ li.file-upload-browse:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .file-upload input:focus ~ .dropdown-item.file-upload-choose:hover, .file-upload .ac_results input:focus ~ li.file-upload-choose:hover, .ac_results .file-upload input:focus ~ li.file-upload-choose:hover,
+.file-upload input:hover ~ li.file-upload-browse:focus, select.dropdown-item:focus, .dropdown-item.drop-enabled:focus, .ac_results li.drop-enabled:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .file-upload input:focus ~ .dropdown-item.file-upload-choose:hover, .file-upload .ac_results input:focus ~ li.file-upload-choose:hover, .ac_results .file-upload input:focus ~ li.file-upload-choose:hover,
 .file-upload input:focus ~ .dropdown-item.file-upload-browse:hover,
 .file-upload .ac_results input:focus ~ li.file-upload-browse:hover, .ac_results
 .file-upload input:focus ~ li.file-upload-browse:hover,
@@ -1818,7 +1820,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose:hover,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse:hover,
 .file-upload .ac_results input:hover ~ li.file-upload-browse:hover, .ac_results
-.file-upload input:hover ~ li.file-upload-browse:hover, .ac_results li.active:hover {
+.file-upload input:hover ~ li.file-upload-browse:hover, select.dropdown-item:hover:focus, .dropdown-item.drop-enabled:hover, .ac_results li.drop-enabled:hover, .ac_results li.active:hover {
   color: #fff;
   text-decoration: none;
   background-color: #0291db;
@@ -1968,13 +1970,13 @@ button.list-group-item:hover {
 .list-group-item.active, .file-upload input:focus ~ .list-group-item.file-upload-choose,
 .file-upload input:focus ~ .list-group-item.file-upload-browse,
 .file-upload input:hover ~ .list-group-item.file-upload-choose,
-.file-upload input:hover ~ .list-group-item.file-upload-browse, .list-group-item.active:focus, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus,
+.file-upload input:hover ~ .list-group-item.file-upload-browse, select.list-group-item:focus, .list-group-item.drop-enabled, .list-group-item.active:focus, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus, .list-group-item.active:hover, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus, select.list-group-item:focus, .list-group-item.drop-enabled:focus, .list-group-item.active:hover, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover, select.list-group-item:hover:focus, .list-group-item.drop-enabled:hover {
   z-index: 2;
   color: #fff;
   background-color: #0291db;
@@ -1984,50 +1986,54 @@ button.list-group-item:hover {
 .list-group-item.active .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading, select.list-group-item:focus .list-group-item-heading, .list-group-item.drop-enabled .list-group-item-heading,
 .list-group-item.active .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > small, select.list-group-item:focus .list-group-item-heading > small, .list-group-item.drop-enabled .list-group-item-heading > small,
 .list-group-item.active .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > .small, select.list-group-item:focus .list-group-item-heading > .small, .list-group-item.drop-enabled .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading, select.list-group-item:focus .list-group-item-heading,
+select.list-group-item.form-control:focus .list-group-item-heading, select.list-group-item.ac_input:focus .list-group-item-heading, .list-group-item.drop-enabled:focus .list-group-item-heading,
 .list-group-item.active:focus .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small, select.list-group-item:focus .list-group-item-heading > small,
+select.list-group-item.form-control:focus .list-group-item-heading > small, select.list-group-item.ac_input:focus .list-group-item-heading > small, .list-group-item.drop-enabled:focus .list-group-item-heading > small,
 .list-group-item.active:focus .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small, select.list-group-item:focus .list-group-item-heading > .small,
+select.list-group-item.form-control:focus .list-group-item-heading > .small, select.list-group-item.ac_input:focus .list-group-item-heading > .small, .list-group-item.drop-enabled:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading, select.list-group-item:hover:focus .list-group-item-heading, .list-group-item.drop-enabled:hover .list-group-item-heading,
 .list-group-item.active:hover .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small, select.list-group-item:hover:focus .list-group-item-heading > small, .list-group-item.drop-enabled:hover .list-group-item-heading > small,
 .list-group-item.active:hover .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small, select.list-group-item:hover:focus .list-group-item-heading > .small, .list-group-item.drop-enabled:hover .list-group-item-heading > .small {
   color: inherit;
 }
 
 .list-group-item.active .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-text, select.list-group-item:focus .list-group-item-text, .list-group-item.drop-enabled .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-text, select.list-group-item:focus .list-group-item-text,
+select.list-group-item.form-control:focus .list-group-item-text, select.list-group-item.ac_input:focus .list-group-item-text, .list-group-item.drop-enabled:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-text {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-text, select.list-group-item:hover:focus .list-group-item-text, .list-group-item.drop-enabled:hover .list-group-item-text {
   color: #abe2fe;
 }
 
@@ -2056,28 +2062,31 @@ button.list-group-item-success:hover {
 a.list-group-item-success.active, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse, a.list-group-item-success.active:focus, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse, a.list-group-item-success.drop-enabled, a.list-group-item-success.active:focus, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:focus, a.list-group-item-success.active:hover, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:focus, a.list-group-item-success.drop-enabled:focus, a.list-group-item-success.active:hover, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:hover, a.list-group-item-success.drop-enabled:hover,
 button.list-group-item-success.active,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-browse,
+button.list-group-item-success.drop-enabled,
 button.list-group-item-success.active:focus,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-browse:focus,
+button.list-group-item-success.drop-enabled:focus,
 button.list-group-item-success.active:hover,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:hover,
+button.list-group-item-success.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2108,28 +2117,31 @@ button.list-group-item-info:hover {
 a.list-group-item-info.active, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse, a.list-group-item-info.active:focus, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse, a.list-group-item-info.drop-enabled, a.list-group-item-info.active:focus, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:focus, a.list-group-item-info.active:hover, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:focus, a.list-group-item-info.drop-enabled:focus, a.list-group-item-info.active:hover, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:hover, a.list-group-item-info.drop-enabled:hover,
 button.list-group-item-info.active,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-browse,
+button.list-group-item-info.drop-enabled,
 button.list-group-item-info.active:focus,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-browse:focus,
+button.list-group-item-info.drop-enabled:focus,
 button.list-group-item-info.active:hover,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:hover,
+button.list-group-item-info.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2160,28 +2172,31 @@ button.list-group-item-warning:hover {
 a.list-group-item-warning.active, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse, a.list-group-item-warning.active:focus, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse, a.list-group-item-warning.drop-enabled, a.list-group-item-warning.active:focus, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:focus, a.list-group-item-warning.active:hover, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:focus, a.list-group-item-warning.drop-enabled:focus, a.list-group-item-warning.active:hover, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:hover, a.list-group-item-warning.drop-enabled:hover,
 button.list-group-item-warning.active,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-browse,
+button.list-group-item-warning.drop-enabled,
 button.list-group-item-warning.active:focus,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:focus,
+button.list-group-item-warning.drop-enabled:focus,
 button.list-group-item-warning.active:hover,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:hover,
+button.list-group-item-warning.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2212,28 +2227,31 @@ button.list-group-item-danger:hover {
 a.list-group-item-danger.active, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse, a.list-group-item-danger.active:focus, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse, a.list-group-item-danger.drop-enabled, a.list-group-item-danger.active:focus, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:focus, a.list-group-item-danger.active:hover, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:focus, a.list-group-item-danger.drop-enabled:focus, a.list-group-item-danger.active:hover, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:hover, a.list-group-item-danger.drop-enabled:hover,
 button.list-group-item-danger.active,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-browse,
+button.list-group-item-danger.drop-enabled,
 button.list-group-item-danger.active:focus,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:focus,
+button.list-group-item-danger.drop-enabled:focus,
 button.list-group-item-danger.active:hover,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:hover,
+button.list-group-item-danger.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -4866,14 +4884,26 @@ output {
   color: #e6e6e6;
 }
 
+.toolbar-stats {
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+}
+
 .toolbar-stats > *:not(.nav-stats) {
   margin-top: 2.25rem;
 }
 
-.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
-  margin-right: 0;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
+@media (max-width: 991px) {
+  .toolbar-stats > *:not(.nav-stats) {
+    margin-top: 1.125rem;
+  }
+}
+
+.toolbar-stats > * {
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .analytics-panel,
@@ -4971,6 +5001,33 @@ output {
   height: 1px !important;
 }
 
+.toolbar .filter-category {
+  display: none;
+}
+
+.toolbar .filter-category svg {
+  -webkit-transform: scale(0.75);
+  transform: scale(0.75);
+}
+
+@media (max-width: 991px) {
+  .toolbar .filter-category {
+    display: block;
+  }
+}
+
+.table-summary-cell-position-change svg {
+  margin-top: -4px;
+}
+
+.rise .table-summary-cell-position-change svg {
+  color: #6bc573;
+}
+
+.fall .table-summary-cell-position-change svg {
+  color: #fa2e1f;
+}
+
 input[type="submit"],
 input[type="reset"],
 input[type="button"],
@@ -5028,9 +5085,9 @@ button::-moz-focus-inner {
 
 .btn:active, .file-upload-browse:active, .Button:active, .btn.active, .active.file-upload-browse,
 .file-upload input:focus ~ .file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse, .file-upload input:focus ~ .btn.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
+.file-upload input:hover ~ .file-upload-browse, select.file-upload-browse:focus, .file-upload-browse.drop-enabled, .file-upload input:focus ~ .btn.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
 .file-upload input:hover ~ .btn.file-upload-choose,
-.file-upload input:hover ~ .file-upload-choose.Button, .active.Button {
+.file-upload input:hover ~ .file-upload-choose.Button, select.btn:focus, select.Button:focus, .btn.drop-enabled, .drop-enabled.Button, .active.Button {
   background-image: none;
   outline: 0;
 }
@@ -5086,7 +5143,7 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ .btn-primary.file-upload-choose,
 .file-upload input:hover ~ .file-upload-choose.Button,
 .file-upload input:hover ~ .btn-primary.file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse.Button, .active.Button,
+.file-upload input:hover ~ .file-upload-browse.Button, select.btn-primary:focus, select.Button:focus, .btn-primary.drop-enabled, .drop-enabled.Button, .active.Button,
 .open > .btn-primary.dropdown-toggle,
 .open > .dropdown-toggle.Button {
   color: #fff;
@@ -5125,8 +5182,8 @@ fieldset[disabled] a.Button {
 
 .btn-secondary:active, .file-upload-browse:active, .btn-secondary.active, .active.file-upload-browse,
 .file-upload input:focus ~ .file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse, .file-upload input:focus ~ .btn-secondary.file-upload-choose,
-.file-upload input:hover ~ .btn-secondary.file-upload-choose,
+.file-upload input:hover ~ .file-upload-browse, select.file-upload-browse:focus, .file-upload-browse.drop-enabled, .file-upload input:focus ~ .btn-secondary.file-upload-choose,
+.file-upload input:hover ~ .btn-secondary.file-upload-choose, select.btn-secondary:focus, .btn-secondary.drop-enabled,
 .open > .btn-secondary.dropdown-toggle,
 .open > .dropdown-toggle.file-upload-browse {
   color: #fff;
@@ -5153,7 +5210,7 @@ fieldset[disabled] a.Button {
 .btn-link, .btn-icon, .bookmark, .search-wrap .search-icon-wrap, .btn-link:active, .btn-icon:active, .bookmark:active, .search-wrap .search-icon-wrap:active, .btn-link.active, .active.btn-icon, .active.bookmark, .file-upload input:focus ~ .bookmark.file-upload-choose,
 .file-upload input:focus ~ .bookmark.file-upload-browse,
 .file-upload input:hover ~ .bookmark.file-upload-choose,
-.file-upload input:hover ~ .bookmark.file-upload-browse, .file-upload input:focus ~ .btn-icon.file-upload-choose, .file-upload .search-wrap input:focus ~ .file-upload-choose.search-icon-wrap, .search-wrap .file-upload input:focus ~ .file-upload-choose.search-icon-wrap,
+.file-upload input:hover ~ .bookmark.file-upload-browse, select.bookmark:focus, .bookmark.drop-enabled, .file-upload input:focus ~ .btn-icon.file-upload-choose, .file-upload .search-wrap input:focus ~ .file-upload-choose.search-icon-wrap, .search-wrap .file-upload input:focus ~ .file-upload-choose.search-icon-wrap,
 .file-upload input:focus ~ .btn-icon.file-upload-browse,
 .file-upload .search-wrap input:focus ~ .file-upload-browse.search-icon-wrap, .search-wrap
 .file-upload input:focus ~ .file-upload-browse.search-icon-wrap,
@@ -5162,10 +5219,10 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ .file-upload-choose.search-icon-wrap,
 .file-upload input:hover ~ .btn-icon.file-upload-browse,
 .file-upload .search-wrap input:hover ~ .file-upload-browse.search-icon-wrap, .search-wrap
-.file-upload input:hover ~ .file-upload-browse.search-icon-wrap, .search-wrap .active.search-icon-wrap, .file-upload input:focus ~ .btn-link.file-upload-choose,
+.file-upload input:hover ~ .file-upload-browse.search-icon-wrap, select.btn-icon:focus, .search-wrap select.search-icon-wrap:focus, .search-wrap .active.search-icon-wrap, .search-wrap .search-icon-wrap.drop-enabled, .btn-icon.drop-enabled, .file-upload input:focus ~ .btn-link.file-upload-choose,
 .file-upload input:focus ~ .btn-link.file-upload-browse,
 .file-upload input:hover ~ .btn-link.file-upload-choose,
-.file-upload input:hover ~ .btn-link.file-upload-browse, .btn-link:disabled, .btn-icon:disabled, .bookmark:disabled, .search-wrap .search-icon-wrap:disabled {
+.file-upload input:hover ~ .btn-link.file-upload-browse, select.btn-link:focus, .btn-link.drop-enabled, .btn-link:disabled, .btn-icon:disabled, .bookmark:disabled, .search-wrap .search-icon-wrap:disabled {
   background-color: transparent;
 }
 
@@ -5254,7 +5311,7 @@ button.bookmark,
 .btn-icon-border:active, .btn-icon-border.active, .file-upload input:focus ~ .btn-icon-border.file-upload-choose,
 .file-upload input:focus ~ .btn-icon-border.file-upload-browse,
 .file-upload input:hover ~ .btn-icon-border.file-upload-choose,
-.file-upload input:hover ~ .btn-icon-border.file-upload-browse,
+.file-upload input:hover ~ .btn-icon-border.file-upload-browse, select.btn-icon-border:focus, .btn-icon-border.drop-enabled,
 .open > .btn-icon-border.dropdown-toggle {
   color: #555a62;
   background-color: #ddf3ff;
@@ -5292,9 +5349,9 @@ button.bookmark,
 
 .btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse,
 .file-upload .btn-group > input:focus ~ .file-upload-browse,
-.file-upload .btn-group > input:hover ~ .file-upload-browse, .file-upload .btn-group > input:focus ~ .btn.file-upload-choose, .file-upload .btn-group > input:focus ~ .file-upload-choose.Button,
+.file-upload .btn-group > input:hover ~ .file-upload-browse, .btn-group > select.file-upload-browse:focus, .btn-group > .file-upload-browse.drop-enabled, .file-upload .btn-group > input:focus ~ .btn.file-upload-choose, .file-upload .btn-group > input:focus ~ .file-upload-choose.Button,
 .file-upload .btn-group > input:hover ~ .btn.file-upload-choose,
-.file-upload .btn-group > input:hover ~ .file-upload-choose.Button, .btn-group > .active.Button {
+.file-upload .btn-group > input:hover ~ .file-upload-choose.Button, .btn-group > select.btn:focus, .btn-group > select.Button:focus, .btn-group > .btn.drop-enabled, .btn-group > .drop-enabled.Button, .btn-group > .active.Button {
   z-index: 2;
 }
 
@@ -5362,7 +5419,7 @@ button.bookmark,
 .btn-sm-rounded:active, .btn-sm-rounded.active, .file-upload input:focus ~ .btn-sm-rounded.file-upload-choose,
 .file-upload input:focus ~ .btn-sm-rounded.file-upload-browse,
 .file-upload input:hover ~ .btn-sm-rounded.file-upload-choose,
-.file-upload input:hover ~ .btn-sm-rounded.file-upload-browse,
+.file-upload input:hover ~ .btn-sm-rounded.file-upload-browse, select.btn-sm-rounded:focus, .btn-sm-rounded.drop-enabled,
 .open > .btn-sm-rounded.dropdown-toggle {
   color: #fff;
   background-color: #0291db;
@@ -5412,7 +5469,7 @@ button.bookmark,
 .btn-navbar:active, .btn-navbar.active, .file-upload input:focus ~ .btn-navbar.file-upload-choose,
 .file-upload input:focus ~ .btn-navbar.file-upload-browse,
 .file-upload input:hover ~ .btn-navbar.file-upload-choose,
-.file-upload input:hover ~ .btn-navbar.file-upload-browse,
+.file-upload input:hover ~ .btn-navbar.file-upload-browse, select.btn-navbar:focus, .btn-navbar.drop-enabled,
 .open > .btn-navbar.dropdown-toggle {
   color: #ceeeff;
   background-color: #1db1fd;
@@ -5489,6 +5546,30 @@ button.bookmark,
 .card .media {
   -ms-flex-align: start;
   align-items: flex-start;
+}
+
+.panel-nav .card {
+  display: block;
+  padding: 0;
+  margin-top: 0.5625rem;
+  background: 0;
+  border: 0;
+  border-top: 1px dotted rgba(0, 0, 0, 0.0875);
+}
+
+.panel-nav .card .card-block {
+  padding-left: 0;
+}
+
+.panel-nav .card .btn.btn-sm-rounded, .panel-nav .card .btn-sm-rounded.file-upload-browse, .panel-nav .card .btn-sm-rounded.Button {
+  min-width: 3.75rem;
+  padding: 0.0625rem 0.5rem;
+  font-size: 0.5625rem;
+}
+
+.panel-nav .card .btn.btn-sm-rounded svg, .panel-nav .card .btn-sm-rounded.file-upload-browse svg, .panel-nav .card .btn-sm-rounded.Button svg {
+  position: relative;
+  width: 0.5625rem;
 }
 
 .card-footer {
@@ -5639,6 +5720,8 @@ button.bookmark,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse,
+select.nav-stats-pageviews:focus,
+.nav-stats-pageviews.drop-enabled,
 .nav-stats-pageviews:hover {
   color: #f15854;
 }
@@ -5647,7 +5730,7 @@ button.bookmark,
 .nav-stats-pageviews.active .c3-circle, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-circle, select.nav-stats-pageviews:focus .c3-circle, .nav-stats-pageviews.drop-enabled .c3-circle,
 .nav-stats-pageviews:hover .c3-circle {
   fill: #f15854 !important;
 }
@@ -5656,7 +5739,7 @@ button.bookmark,
 .nav-stats-pageviews.active .c3-line, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-line, select.nav-stats-pageviews:focus .c3-line, .nav-stats-pageviews.drop-enabled .c3-line,
 .nav-stats-pageviews:hover .c3-line {
   stroke: #f15854 !important;
 }
@@ -5665,7 +5748,7 @@ button.bookmark,
 .nav-stats-pageviews.active .c3-area, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-area, select.nav-stats-pageviews:focus .c3-area, .nav-stats-pageviews.drop-enabled .c3-area,
 .nav-stats-pageviews:hover .c3-area {
   fill: #f15854 !important;
   opacity: 0.15 !important;
@@ -5675,7 +5758,7 @@ button.bookmark,
 .nav-stats-pageviews.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus, select.nav-stats-pageviews:focus .c3-xgrid-focus, .nav-stats-pageviews.drop-enabled .c3-xgrid-focus,
 .nav-stats-pageviews:hover .c3-xgrid-focus {
   stroke: #f15854 !important;
 }
@@ -5684,7 +5767,7 @@ button.bookmark,
 .nav-stats-pageviews.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover, select.nav-stats-pageviews:focus .c3-event-rect:hover, .nav-stats-pageviews.drop-enabled .c3-event-rect:hover,
 .nav-stats-pageviews:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
   fill: #f15854 !important;
@@ -5696,6 +5779,8 @@ button.bookmark,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-browse,
+select.nav-stats-comments:focus,
+.nav-stats-comments.drop-enabled,
 .nav-stats-comments:hover {
   color: #60bd68;
 }
@@ -5704,7 +5789,7 @@ button.bookmark,
 .nav-stats-comments.active .c3-circle, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-circle, select.nav-stats-comments:focus .c3-circle, .nav-stats-comments.drop-enabled .c3-circle,
 .nav-stats-comments:hover .c3-circle {
   fill: #60bd68 !important;
 }
@@ -5713,7 +5798,7 @@ button.bookmark,
 .nav-stats-comments.active .c3-line, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-line, select.nav-stats-comments:focus .c3-line, .nav-stats-comments.drop-enabled .c3-line,
 .nav-stats-comments:hover .c3-line {
   stroke: #60bd68 !important;
 }
@@ -5722,7 +5807,7 @@ button.bookmark,
 .nav-stats-comments.active .c3-area, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-area, select.nav-stats-comments:focus .c3-area, .nav-stats-comments.drop-enabled .c3-area,
 .nav-stats-comments:hover .c3-area {
   fill: #60bd68 !important;
   opacity: 0.15 !important;
@@ -5732,7 +5817,7 @@ button.bookmark,
 .nav-stats-comments.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus, select.nav-stats-comments:focus .c3-xgrid-focus, .nav-stats-comments.drop-enabled .c3-xgrid-focus,
 .nav-stats-comments:hover .c3-xgrid-focus {
   stroke: #60bd68 !important;
 }
@@ -5741,7 +5826,7 @@ button.bookmark,
 .nav-stats-comments.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover, select.nav-stats-comments:focus .c3-event-rect:hover, .nav-stats-comments.drop-enabled .c3-event-rect:hover,
 .nav-stats-comments:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
   fill: #60bd68 !important;
@@ -5753,6 +5838,8 @@ button.bookmark,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-browse,
+select.nav-stats-discussions:focus,
+.nav-stats-discussions.drop-enabled,
 .nav-stats-discussions:hover {
   color: #faa43a;
 }
@@ -5761,7 +5848,7 @@ button.bookmark,
 .nav-stats-discussions.active .c3-circle, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-circle, select.nav-stats-discussions:focus .c3-circle, .nav-stats-discussions.drop-enabled .c3-circle,
 .nav-stats-discussions:hover .c3-circle {
   fill: #faa43a !important;
 }
@@ -5770,7 +5857,7 @@ button.bookmark,
 .nav-stats-discussions.active .c3-line, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-line, select.nav-stats-discussions:focus .c3-line, .nav-stats-discussions.drop-enabled .c3-line,
 .nav-stats-discussions:hover .c3-line {
   stroke: #faa43a !important;
 }
@@ -5779,7 +5866,7 @@ button.bookmark,
 .nav-stats-discussions.active .c3-area, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-area, select.nav-stats-discussions:focus .c3-area, .nav-stats-discussions.drop-enabled .c3-area,
 .nav-stats-discussions:hover .c3-area {
   fill: #faa43a !important;
   opacity: 0.15 !important;
@@ -5789,7 +5876,7 @@ button.bookmark,
 .nav-stats-discussions.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus, select.nav-stats-discussions:focus .c3-xgrid-focus, .nav-stats-discussions.drop-enabled .c3-xgrid-focus,
 .nav-stats-discussions:hover .c3-xgrid-focus {
   stroke: #faa43a !important;
 }
@@ -5798,7 +5885,7 @@ button.bookmark,
 .nav-stats-discussions.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover, select.nav-stats-discussions:focus .c3-event-rect:hover, .nav-stats-discussions.drop-enabled .c3-event-rect:hover,
 .nav-stats-discussions:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
   fill: #faa43a !important;
@@ -5810,6 +5897,8 @@ button.bookmark,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-users.file-upload-browse,
+select.nav-stats-users:focus,
+.nav-stats-users.drop-enabled,
 .nav-stats-users:hover {
   color: #57c1c2;
 }
@@ -5818,7 +5907,7 @@ button.bookmark,
 .nav-stats-users.active .c3-circle, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-circle, select.nav-stats-users:focus .c3-circle, .nav-stats-users.drop-enabled .c3-circle,
 .nav-stats-users:hover .c3-circle {
   fill: #57c1c2 !important;
 }
@@ -5827,7 +5916,7 @@ button.bookmark,
 .nav-stats-users.active .c3-line, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-line, select.nav-stats-users:focus .c3-line, .nav-stats-users.drop-enabled .c3-line,
 .nav-stats-users:hover .c3-line {
   stroke: #57c1c2 !important;
 }
@@ -5836,7 +5925,7 @@ button.bookmark,
 .nav-stats-users.active .c3-area, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-area, select.nav-stats-users:focus .c3-area, .nav-stats-users.drop-enabled .c3-area,
 .nav-stats-users:hover .c3-area {
   fill: #57c1c2 !important;
   opacity: 0.15 !important;
@@ -5846,7 +5935,7 @@ button.bookmark,
 .nav-stats-users.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus, select.nav-stats-users:focus .c3-xgrid-focus, .nav-stats-users.drop-enabled .c3-xgrid-focus,
 .nav-stats-users:hover .c3-xgrid-focus {
   stroke: #57c1c2 !important;
 }
@@ -5855,7 +5944,7 @@ button.bookmark,
 .nav-stats-users.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover, select.nav-stats-users:focus .c3-event-rect:hover, .nav-stats-users.drop-enabled .c3-event-rect:hover,
 .nav-stats-users:hover .c3-event-rect:hover {
   fill-opacity: 0.1 !important;
   fill: #57c1c2 !important;
@@ -6019,13 +6108,13 @@ button.bookmark,
 .file-upload input:hover ~ td.file-upload-choose,
 .file-upload .daterangepicker input:hover ~ td.file-upload-choose, .daterangepicker
 .file-upload input:hover ~ td.file-upload-browse,
-.file-upload .daterangepicker input:hover ~ td.file-upload-browse, .daterangepicker td.active:hover, .daterangepicker .file-upload input:focus ~ td.file-upload-choose:hover, .file-upload .daterangepicker input:focus ~ td.file-upload-choose:hover, .daterangepicker
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse, .daterangepicker td.drop-enabled, .daterangepicker td.active:hover, .daterangepicker .file-upload input:focus ~ td.file-upload-choose:hover, .file-upload .daterangepicker input:focus ~ td.file-upload-choose:hover, .daterangepicker
 .file-upload input:focus ~ td.file-upload-browse:hover,
 .file-upload .daterangepicker input:focus ~ td.file-upload-browse:hover, .daterangepicker
 .file-upload input:hover ~ td.file-upload-choose:hover,
 .file-upload .daterangepicker input:hover ~ td.file-upload-choose:hover, .daterangepicker
 .file-upload input:hover ~ td.file-upload-browse:hover,
-.file-upload .daterangepicker input:hover ~ td.file-upload-browse:hover {
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse:hover, .daterangepicker td.drop-enabled:hover {
   background-color: #0291db;
   border-color: transparent;
   color: #fff;
@@ -6070,7 +6159,7 @@ button.bookmark,
 .file-upload input:hover ~ .input-mini.file-upload-choose,
 .file-upload .daterangepicker input:hover ~ .input-mini.file-upload-choose, .daterangepicker
 .file-upload input:hover ~ .input-mini.file-upload-browse,
-.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse {
+.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse, .daterangepicker select.input-mini:focus, .daterangepicker .input-mini.drop-enabled {
   border: 0.0625rem solid #08c;
   border-radius: 0.125rem;
 }
@@ -6116,6 +6205,7 @@ button.bookmark,
   top: 9px;
   -webkit-transform: scale(1.5);
   transform: scale(1.5);
+  opacity: .7;
   content: url(data:image/svg+xml,%3Csvg%20width%3D%2217px%22%20height%3D%2217px%22%20viewBox%3D%220%200%2017%2017%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3Cg%20id%3D%22-Styles%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Calendar%22%20fill%3D%22%23555A62%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M12.7528056%2C4.25811336%20L12.7528056%2C3.5504246%20C12.7528056%2C3.2519202%2012.5010049%2C3%2012.2026422%2C3%20L11.4166944%2C3%20C11.1183317%2C3%2010.866531%2C3.2519202%2010.866531%2C3.5504246%20L10.866531%2C4.25811336%20L6.19749183%2C4.25811336%20L6.19749183%2C3.5504246%20C6.19749183%2C3.2519202%205.94569118%2C3%205.64732843%2C3%20L4.86138072%2C3%20C4.56301797%2C3%204.31121732%2C3.2519202%204.31121732%2C3.5504246%20L4.31121732%2C4.25811336%20L2.97514869%2C4.25811336%20C2.44100163%2C4.25811336%202%2C4.69785798%202%2C5.23372502%20L2%2C14.0243883%20C2%2C14.558789%202.43953595%2C15%202.97514869%2C15%20L14.0248513%2C15%20C14.5589984%2C15%2015%2C14.5602554%2015%2C14.0243883%20L15%2C5.23372502%20C15%2C4.69785798%2014.5604641%2C4.25811336%2014.026317%2C4.25811336%20L12.7528056%2C4.25811336%20Z%20M11.4487271%2C3.59703004%20L12.1720752%2C3.59703004%20L12.1720752%2C4.55661776%20L12.1720752%2C5.32691466%20L11.4487271%2C5.32691466%20L11.4487271%2C4.55661776%20L11.4487271%2C3.59703004%20L11.4487271%2C3.59703004%20Z%20M4.8934134%2C3.59703004%20L5.61676144%2C3.59703004%20L5.61676144%2C4.55661776%20L5.61676144%2C5.32691466%20L4.8934134%2C5.32691466%20L4.8934134%2C4.55661776%20L4.8934134%2C3.59703004%20L4.8934134%2C3.59703004%20Z%20M4.3272549%2C4.84056459%20L4.3272549%2C5.3589413%20C4.3272549%2C5.6574457%204.57905556%2C5.9093659%204.8774183%2C5.9093659%20L5.66336601%2C5.9093659%20C5.96172876%2C5.9093659%206.21352941%2C5.6574457%206.21352941%2C5.3589413%20L6.21352941%2C4.84056459%20L10.8665523%2C4.84056459%20L10.8665523%2C5.3589413%20C10.8665523%2C5.6574457%2011.1183529%2C5.9093659%2011.4167157%2C5.9093659%20L12.2026634%2C5.9093659%20C12.5010261%2C5.9093659%2012.7528268%2C5.6574457%2012.7528268%2C5.3589413%20L12.7528268%2C4.84056459%20L14.0423546%2C4.84056459%20C14.2621225%2C4.84056459%2014.4353284%2C5.01385271%2014.4353284%2C5.23372502%20L14.4353284%2C6.43134547%20L2.59819118%2C6.43134547%20L2.59819118%2C5.23372502%20C2.59819118%2C5.01238632%202.77137582%2C4.84056459%202.99116503%2C4.84056459%20L4.3272549%2C4.84056459%20Z%20M2.99116503%2C14.4174796%20C2.77139706%2C14.4174796%202.59819118%2C14.265274%202.59819118%2C14.0721517%20L2.59819118%2C7.01235157%20L14.4192908%2C7.01235157%20L14.4192908%2C14.0721517%20C14.4192696%2C14.265274%2014.246085%2C14.4174796%2014.026317%2C14.4174796%20L2.99116503%2C14.4174796%20Z%20M5.15266728%2C8.83119751%20C5.15266728%2C9.11607082%205.02819831%2C9.34289157%204.87192037%2C9.34289157%20L3.934126%2C9.34289157%20C3.77782693%2C9.34289157%203.65337908%2C9.11603232%203.65337908%2C8.83119751%20C3.65337908%2C8.5463242%203.77784805%2C8.31950345%203.934126%2C8.31950345%20L4.87189925%2C8.31950345%20C5.02676205%2C8.29047717%205.15266728%2C8.54636269%205.15266728%2C8.83119751%20L5.15266728%2C8.83119751%20Z%20M7.87145159%2C8.83119751%20C7.87145159%2C9.11607082%207.74698087%2C9.34289157%207.59070073%2C9.34289157%20L6.65291426%2C9.34289157%20C6.496613%2C9.34289157%206.3721634%2C9.11603232%206.3721634%2C8.83119751%20C6.3721634%2C8.5463242%206.49663412%2C8.31950345%206.65291426%2C8.31950345%20L7.59070073%2C8.31950345%20C7.73107616%2C8.29047717%207.87145159%2C8.54636269%207.87145159%2C8.83119751%20L7.87145159%2C8.83119751%20Z%20M10.575664%2C8.83119751%20C10.575664%2C9.11607082%2010.4512144%2C9.34289157%2010.2949131%2C9.34289157%20L9.35712668%2C9.34289157%20C9.20082542%2C9.34289157%209.07637582%2C9.11603232%209.07637582%2C8.83119751%20C9.07637582%2C8.5463242%209.20084654%2C8.31950345%209.35712668%2C8.31950345%20L10.2949131%2C8.31950345%20C10.449757%2C8.29047717%2010.575664%2C8.54636269%2010.575664%2C8.83119751%20L10.575664%2C8.83119751%20Z%20M13.011576%2C9.34289157%20L12.0753847%2C9.34289157%20C11.9193528%2C9.34289157%2011.7951176%2C9.11603232%2011.7951176%2C8.83119751%20C11.7951176%2C8.5463242%2011.9193739%2C8.31950345%2012.0753847%2C8.31950345%20L13.011576%2C8.31950345%20C13.1676079%2C8.29047717%2013.291843%2C8.54636269%2013.291843%2C8.83119751%20C13.291843%2C9.11607082%2013.1675868%2C9.34289157%2013.011576%2C9.34289157%20Z%20M5.16120915%2C10.765069%20C5.16120915%2C11.0505694%205.03603105%2C11.2778895%204.87886275%2C11.2778895%20L3.93572549%2C11.2778895%20C3.77853595%2C11.2778895%203.65337908%2C11.0505309%203.65337908%2C10.765069%20C3.65337908%2C10.4795686%203.77855719%2C10.2522485%203.93572549%2C10.2522485%20L4.8788415%2C10.2522485%20C5.0345866%2C10.2522485%205.16120915%2C10.4795686%205.16120915%2C10.765069%20L5.16120915%2C10.765069%20Z%20M7.87997222%2C10.765069%20C7.87997222%2C11.0505694%207.75479412%2C11.2778895%207.59762582%2C11.2778895%20L6.6545098%2C11.2778895%20C6.49732026%2C11.2778895%206.3721634%2C11.0505309%206.3721634%2C10.765069%20C6.3721634%2C10.4795686%206.4973415%2C10.2522485%206.6545098%2C10.2522485%20L7.59762582%2C10.2522485%20C7.73879902%2C10.2522485%207.87997222%2C10.4795686%207.87997222%2C10.765069%20L7.87997222%2C10.765069%20Z%20M10.5841846%2C10.765069%20C10.5841846%2C11.0505694%2010.4590278%2C11.2778895%2010.3018382%2C11.2778895%20L9.35872222%2C11.2778895%20C9.20153268%2C11.2778895%209.07637582%2C11.0505309%209.07637582%2C10.765069%20C9.07637582%2C10.4795686%209.20155392%2C10.2522485%209.35872222%2C10.2522485%20L10.3018382%2C10.2522485%20C10.4575621%2C10.2522485%2010.5841846%2C10.4795686%2010.5841846%2C10.765069%20L10.5841846%2C10.765069%20Z%20M13.3029477%2C10.765069%20C13.3029477%2C11.0505694%2013.1777696%2C11.2778895%2013.0206013%2C11.2778895%20L12.0774641%2C11.2778895%20C11.9202745%2C11.2778895%2011.7951176%2C11.0505309%2011.7951176%2C10.765069%20C11.7951176%2C10.4795686%2011.9202958%2C10.2522485%2012.0774641%2C10.2522485%20L13.0206013%2C10.2522485%20C13.1777908%2C10.2522485%2013.3029477%2C10.4795686%2013.3029477%2C10.765069%20L13.3029477%2C10.765069%20Z%20M5.16120915%2C12.7161392%20C5.16120915%2C13.0008264%205.03603105%2C13.227499%204.87886275%2C13.227499%20L3.93572549%2C13.227499%20C3.77853595%2C13.227499%203.65337908%2C13.0008264%203.65337908%2C12.7161392%20C3.65337908%2C12.431452%203.77855719%2C12.2047794%203.93572549%2C12.2047794%20L4.8788415%2C12.2047794%20C5.0345866%2C12.1731176%205.16120915%2C12.4024447%205.16120915%2C12.7161392%20L5.16120915%2C12.7161392%20Z%20M7.87997222%2C12.7161392%20C7.87997222%2C13.0008264%207.75479412%2C13.227499%207.59762582%2C13.227499%20L6.6545098%2C13.227499%20C6.49732026%2C13.227499%206.3721634%2C13.0008264%206.3721634%2C12.7161392%20C6.3721634%2C12.431452%206.4973415%2C12.2047794%206.6545098%2C12.2047794%20L7.59762582%2C12.2047794%20C7.73879902%2C12.1731176%207.87997222%2C12.4024447%207.87997222%2C12.7161392%20L7.87997222%2C12.7161392%20Z%20M10.5841846%2C12.7161392%20C10.5841846%2C13.0008264%2010.4590278%2C13.227499%2010.3018382%2C13.227499%20L9.35872222%2C13.227499%20C9.20153268%2C13.227499%209.07637582%2C13.0008264%209.07637582%2C12.7161392%20C9.07637582%2C12.431452%209.20155392%2C12.2047794%209.35872222%2C12.2047794%20L10.3018382%2C12.2047794%20C10.4575621%2C12.1731176%2010.5841846%2C12.4024447%2010.5841846%2C12.7161392%20L10.5841846%2C12.7161392%20Z%20M13.3029477%2C12.7161392%20C13.3029477%2C13.0008264%2013.1777696%2C13.227499%2013.0206013%2C13.227499%20L12.0774641%2C13.227499%20C11.9202745%2C13.227499%2011.7951176%2C13.0008264%2011.7951176%2C12.7161392%20C11.7951176%2C12.431452%2011.9202958%2C12.2047794%2012.0774641%2C12.2047794%20L13.0206013%2C12.2047794%20C13.1777908%2C12.1731176%2013.3029477%2C12.4024447%2013.3029477%2C12.7161392%20L13.3029477%2C12.7161392%20Z%22%20id%3D%22Shape-Copy-14%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E);
 }
 
@@ -6159,7 +6249,7 @@ button.bookmark,
 .file-upload input:hover ~ li.file-upload-choose,
 .file-upload .ranges input:hover ~ li.file-upload-choose, .ranges
 .file-upload input:hover ~ li.file-upload-browse,
-.file-upload .ranges input:hover ~ li.file-upload-browse {
+.file-upload .ranges input:hover ~ li.file-upload-browse, .ranges li.drop-enabled {
   color: #0291db;
 }
 
@@ -6194,6 +6284,21 @@ button.bookmark,
 
 .dropdown-menu .dropdown-item.disabled, .ac_results .dropdown-item.disabled, .dropdown-menu .ac_results li.disabled, .ac_results .dropdown-menu li.disabled, .ac_results li.disabled {
   color: #cbcdd2;
+}
+
+.dropup .dropdown-toggle::after {
+  border-top: 0.375em solid;
+  border-bottom: 0;
+}
+
+.dropdown-filter .btn, .dropdown-filter .file-upload-browse, .dropdown-filter .Button {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  -ms-flex-align: center;
+  align-items: center;
+  min-width: 120px;
 }
 
 .footer {
@@ -6610,6 +6715,13 @@ select.ac_input::-ms-expand {
   opacity: 0;
 }
 
+select:focus,
+select.form-control:focus,
+select.ac_input:focus {
+  border-color: #66afe9;
+  outline: none;
+}
+
 select + select {
   margin-left: 0.5625rem;
 }
@@ -6645,7 +6757,7 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose,
 .file-upload .label-selector input:hover ~ .file-upload-choose, .label-selector
 .file-upload input:hover ~ .file-upload-browse,
-.file-upload .label-selector input:hover ~ .file-upload-browse,
+.file-upload .label-selector input:hover ~ .file-upload-browse, .label-selector select:focus, .label-selector .drop-enabled,
 .label-selector input[type=radio]:checked ~ label,
 .label-selector input[type=radio]:checked ~ label {
   cursor: default;
@@ -6657,7 +6769,7 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay, .label-selector select:focus .overlay, .label-selector .drop-enabled .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay {
   opacity: 1;
@@ -6670,7 +6782,7 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay > .buttons,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .buttons, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay > .buttons,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons, .label-selector select:focus .overlay > .buttons, .label-selector .drop-enabled .overlay > .buttons,
 .label-selector input[type=radio]:checked ~ label .overlay > .buttons,
 .label-selector input[type=radio]:checked ~ label .overlay > .buttons {
   display: none;
@@ -6682,7 +6794,7 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay > .selected,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .selected, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay > .selected,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected, .label-selector select:focus .overlay > .selected, .label-selector .drop-enabled .overlay > .selected,
 .label-selector input[type=radio]:checked ~ label .overlay > .selected,
 .label-selector input[type=radio]:checked ~ label .overlay > .selected {
   display: block;
@@ -6694,7 +6806,7 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .label-selector-image,
 .file-upload .label-selector input:hover ~ .file-upload-choose .label-selector-image, .label-selector
 .file-upload input:hover ~ .file-upload-browse .label-selector-image,
-.file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image,
+.file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image, .label-selector select:focus .label-selector-image, .label-selector .drop-enabled .label-selector-image,
 .label-selector input[type=radio]:checked ~ label .label-selector-image,
 .label-selector input[type=radio]:checked ~ label .label-selector-image {
   opacity: .5;
@@ -6922,7 +7034,7 @@ select + select {
 .btn-overlay:active, .btn-overlay.active, .file-upload input:focus ~ .btn-overlay.file-upload-choose,
 .file-upload input:focus ~ .btn-overlay.file-upload-browse,
 .file-upload input:hover ~ .btn-overlay.file-upload-choose,
-.file-upload input:hover ~ .btn-overlay.file-upload-browse,
+.file-upload input:hover ~ .btn-overlay.file-upload-browse, select.btn-overlay:focus, .btn-overlay.drop-enabled,
 .open > .btn-overlay.dropdown-toggle {
   color: #fff;
   background-color: #04a8fd;
@@ -7775,7 +7887,7 @@ button.close {
   -ms-flex-align: center;
   align-items: center;
   line-height: 1;
-  padding: 1.125rem 1.125rem 0;
+  padding: 0.5625rem 1.125rem 0;
   color: rgba(25, 25, 25, 0.2);
 }
 
@@ -7884,7 +7996,7 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse {
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus, .panel-nav .nav-link.drop-enabled {
   border-radius: 0.125rem 0 0 0.125rem;
 }
 
@@ -7894,13 +8006,13 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav .nav-link.active:hover, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover, .panel-nav
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus, .panel-nav .nav-link.drop-enabled, .panel-nav .nav-link.active:hover, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover, .panel-nav
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse:hover, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose:hover, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover {
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover, .panel-nav select.nav-link:hover:focus, .panel-nav .nav-link.drop-enabled:hover {
   color: #fff;
   background-color: #0291db;
 }
@@ -7917,7 +8029,7 @@ button.close {
 .nav-link, .nav-link.active, .file-upload input:focus ~ .nav-link.file-upload-choose,
 .file-upload input:focus ~ .nav-link.file-upload-browse,
 .file-upload input:hover ~ .nav-link.file-upload-choose,
-.file-upload input:hover ~ .nav-link.file-upload-browse, .nav-link:active, .nav-link.hover, .nav-link:hover {
+.file-upload input:hover ~ .nav-link.file-upload-browse, select.nav-link:focus, .nav-link.drop-enabled, .nav-link:active, .nav-link.hover, .nav-link:hover {
   cursor: pointer;
 }
 
@@ -7979,13 +8091,13 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar .nav-link.active:hover, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover, .navbar
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar select.nav-link:focus, .navbar .nav-link.drop-enabled, .navbar .nav-link.active:hover, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover, .navbar
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover {
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover, .navbar select.nav-link:hover:focus, .navbar .nav-link.drop-enabled:hover {
   background-color: #04a8fd;
 }
 
@@ -7995,13 +8107,13 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose > *,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse > *,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse > *, .navbar .nav-link.active:hover > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover > *, .navbar
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse > *, .navbar select.nav-link:focus > *, .navbar .nav-link.drop-enabled > *, .navbar .nav-link.active:hover > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover > *, .navbar
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover > *,
 .file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover > *,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover > *,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover > * {
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover > *, .navbar select.nav-link:hover:focus > *, .navbar .nav-link.drop-enabled:hover > * {
   color: #fff;
 }
 
@@ -8271,7 +8383,7 @@ button.close {
 .btn-control-panel:active, .btn-control-panel.active, .file-upload input:focus ~ .btn-control-panel.file-upload-choose,
 .file-upload input:focus ~ .btn-control-panel.file-upload-browse,
 .file-upload input:hover ~ .btn-control-panel.file-upload-choose,
-.file-upload input:hover ~ .btn-control-panel.file-upload-browse,
+.file-upload input:hover ~ .btn-control-panel.file-upload-browse, select.btn-control-panel:focus, .btn-control-panel.drop-enabled,
 .open > .btn-control-panel.dropdown-toggle {
   color: #fff;
   background-color: #0291db;
@@ -8426,6 +8538,14 @@ button.close {
 
 .drawer-toggle {
   display: none;
+}
+
+.drawer-only {
+  display: none;
+}
+
+.drawer-show .drawer-only {
+  display: block;
 }
 
 @media (max-width: 991px) {
@@ -9138,7 +9258,7 @@ pre {
 .file-upload input:hover ~ .header-menu-item.file-upload-choose,
 .file-upload .header-menu input:hover ~ .header-menu-item.file-upload-choose, .header-menu
 .file-upload input:hover ~ .header-menu-item.file-upload-browse,
-.file-upload .header-menu input:hover ~ .header-menu-item.file-upload-browse {
+.file-upload .header-menu input:hover ~ .header-menu-item.file-upload-browse, .header-menu select.header-menu-item:focus, .header-menu .header-menu-item.drop-enabled {
   border-bottom-color: #0291db;
   color: #0291db;
 }

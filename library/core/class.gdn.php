@@ -262,20 +262,10 @@ class Gdn {
      * - <b>SourceAlias</b>: Required.
      * - <b>Override</b> Optional.
      * All of these values are passed to the corresponding argument in inline{@link Gdn::FactoryInstallDependency()}.
+     * @deprecated
      */
     public static function factoryInstallDependencyFromConfig($Config, $Alias = null) {
-        if (is_string($Config)) {
-            $Config = self::config($Config);
-        }
-        if (is_null($Alias)) {
-            $Alias = $Config['Alias'];
-        }
-
-        $PropertyName = $Config['PropertyName'];
-        $SourceAlias = $Config['SourceAlias'];
-        $Override = val('Override', $Config, true);
-
-        self::factoryInstallDependency($Alias, $PropertyName, $SourceAlias, $Override);
+        deprecated('Gdn::factoryInstallDependencyFromConfig()');
     }
 
     /**
@@ -293,8 +283,10 @@ class Gdn {
      * - <b>Override</b> Optional.
      * - <b>Dependencies</b> Optional. Dependencies for the class can be defined as a subarray. Each item in the subarray will be passed to inline{@link Gdn::FactoryInstallDependencyFromConfig}.
      * All of these values (except Dependencies) are passed to the corresponding argument in inline{@link Gdn::FactoryInstall()}.
+     * @deprecated
      */
     public static function factoryInstallFromConfig($Config, $Alias = null) {
+        deprecated('Gdn::factoryInstallFromConfig()');
         if (is_string($Config)) {
             $Config = self::config($Config);
         }
@@ -321,6 +313,7 @@ class Gdn {
      *
      * @param null $Value
      * @return int
+     * @deprecated
      */
     public static function factoryOverwrite($Value = null) {
         $Result = (self::$_FactoryOverwrite & 1 > 0);
@@ -346,8 +339,10 @@ class Gdn {
      * Uninstall a dependency from the factory.
      *
      * @see Gdn_Factory::UninstallDependency()
+     * @deprecated
      */
     public static function factoryUninstallDependency($Alias, $PropertyName = null) {
+        deprecated('Gdn::factoryUninstallDependency()');
         self::factory()->uninstallDependency($Alias, $PropertyName);
     }
 

@@ -874,8 +874,8 @@ class ProfileController extends Gdn_Controller {
             $parts = Gdn_UploadImage::saveImageAs(
                 $source,
                 self::AVATAR_FOLDER."/$subdir/p$imageBaseName",
-                c('Garden.Profile.MaxHeight', 1000),
-                c('Garden.Profile.MaxWidth', 250),
+                c('Garden.Profile.MaxHeight'),
+                c('Garden.Profile.MaxWidth'),
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 

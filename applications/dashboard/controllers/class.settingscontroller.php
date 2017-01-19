@@ -360,8 +360,8 @@ class SettingsController extends DashboardController {
             Gdn_UploadImage::saveImageAs(
                 $source,
                 self::DEFAULT_AVATAR_FOLDER."/p$imageBaseName",
-                c('Garden.Profile.MaxHeight', 1000),
-                c('Garden.Profile.MaxWidth', 250),
+                c('Garden.Profile.MaxHeight'),
+                c('Garden.Profile.MaxWidth'),
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 

@@ -53,8 +53,8 @@ class Smf2ImportModel extends Gdn_Model {
                     $UploadImage->SaveImageAs(
                         $Image,
                         PATH_ROOT.'/uploads/userpics/p'.$ImageBaseName,
-                        Gdn::config('Garden.Profile.MaxHeight', 1000),
-                        Gdn::config('Garden.Profile.MaxWidth', 250)
+                        Gdn::config('Garden.Profile.MaxHeight'),
+                        Gdn::config('Garden.Profile.MaxWidth')
                     );
                 }
 

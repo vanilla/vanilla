@@ -732,37 +732,35 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $fieldName The form field name for the input.
      * @param string $label The label.
      * @param string $labelDescription The label description.
-     * @param string $currentImageUrl The url to the current image.
      * @param string $removeUrl The endpoint to remove the image.
-     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
-     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
-     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
-     * @param array $attributes The attributes to pass to the file upload function.
+     * @param array $options An array of options with the following keys:
+     *      'CurrentImage' (string) The current image to preview.
+     *      'RemoveText' (string) The text for the remove image anchor, defaults to t('Remove').
+     *      'RemoveConfirmText' (string) The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     *      'Tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The html attributes to pass to the file upload function.
      * @return string
+
      */
-    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
-                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
-                                       $attributes = []) {
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $removeUrl = '', $options = [], $attributes = []) {
 
         $imageWrapperId = slugify($fieldName).'-preview-wrapper';
 
         // Compile the data for our current image and current image removal.
+        $currentImage = val('CurrentImage', $options, '');
+        if ($currentImage === '') {
+            $currentImage = $this->currentImage($fieldName);
+        }
         $removeAttributes = [];
         $removeCurrentImage = '';
-        $currentImage = '';
 
-        if ($currentImageUrl) {
-            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
-            if ($removeUrl) {
-                if (!$removeText) {
-                    $removeText = t('Remove');
-                }
-                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
-                if ($removeConfirmText) {
-                    $removeAttributes['data-body'] = $removeConfirmText;
-                }
-                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+        if ($this->getValue($fieldName) && $removeUrl) {
+            $removeText = val('RemoveText', $options, t('Remove'));
+            $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
+            if (val('RemoveConfirmText', $options, false)) {
+                $removeAttributes['data-body'] = val('RemoveConfirmText', $options);
             }
+            $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
         }
 
         if ($label) {
@@ -787,9 +785,11 @@ class Gdn_Form extends Gdn_Pluggable {
                 </div>
             </div>';
 
-        $attributes['class'] .= 'js-image-upload';
-        $input = $this->fileUploadWrap($fieldName, $attributes);
+        $class = val('class', $attributes, '');
+        $attributes['class'] = trim($class.' js-image-upload');
+        $input = $this->imageUploadWrap($fieldName, $attributes);
 
+        $tag = val('Tag', $options, 'li');
         return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
     }
 
@@ -1179,12 +1179,23 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
         $Return = "</div>\n</form>";
+
         if ($Xhtml != '') {
             $Return = $Xhtml.$Return;
         }
 
+        $formFooter = val('FormFooter', $Attributes, false);
+
+        if ($formFooter) {
+            unset($Attributes['FormFooter']);
+        }
+
         if ($ButtonCode != '') {
-            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $ButtonCode = $this->button($ButtonCode, $Attributes);
+        }
+
+        if ($formFooter || $ButtonCode) {
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$formFooter.$ButtonCode.'</div>'.$Return;
         }
 
         return $Return;
@@ -1194,20 +1205,20 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns the current image in a field.
      * This is meant to be used with image uploads so that users can see the current value.
      *
-     * @param type $FieldName
-     * @param type $Attributes
-     * @since 2.1
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
      */
-    public function currentImage($FieldName, $Attributes = array()) {
-        $Result = $this->hidden($FieldName);
+    public function currentImage($fieldName, $attributes = array()) {
+        $result = $this->hidden($fieldName);
 
-        $Value = $this->getValue($FieldName);
-        if ($Value) {
-            touchValue('class', $Attributes, 'CurrentImage');
-            $Result .= img(Gdn_Upload::url($Value), $Attributes);
+        $value = $this->getValue($fieldName);
+        if ($value) {
+            touchValue('class', $attributes, 'CurrentImage');
+            $result .= img(Gdn_Upload::url($value), $attributes);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**

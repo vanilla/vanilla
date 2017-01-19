@@ -1150,6 +1150,7 @@ var DashboardModal = (function() {
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
         $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 

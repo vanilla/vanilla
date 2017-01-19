@@ -902,9 +902,9 @@ class Gdn_Request {
      *
      * @param array $post Usually the {@link $_POST} super-global.
      * @param array $server Usually the {@link $_SERVER} super-global.
-     * @param array $inputFile Usually **php://input** for the raw input stream.
+     * @param string $inputFile Usually **php://input** for the raw input stream.
      */
-    private function decodePost($post, $server, $inputFile) {
+    private function decodePost($post, $server, $inputFile = 'php://input') {
         $contentType = !isset($server['CONTENT_TYPE']) ? 'application/x-www-form-urlencoded' : $server['CONTENT_TYPE'];
 
         if (stripos($contentType, 'json') !== false) {

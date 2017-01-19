@@ -63,7 +63,7 @@ Gdn::factoryInstall(
 Gdn::factoryInstall('\\Vanilla\\AddonManager', '\\Vanilla\\AddonManager', '', Gdn::FactorySingleton, Gdn::addonManager());
 
 // Install a bogus locale because the "Locale" alias of Gdn clashes with a built in Locale object.
-Gdn::factoryInstall(Gdn::AliasLocale, '\VanillaTests\fixtures\Locale');
+Gdn::factoryInstall(Gdn::AliasLocale, '\VanillaTests\Fixtures\Locale');
 
 // ThemeManager
 Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');

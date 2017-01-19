@@ -62,7 +62,9 @@
     "autoload-dev": {
         "psr-4": {
             "VanillaTests\\": "tests",
-            "GardenTests\\": "tests"
+            "VanillaTests\\Fixtures\\": "tests\\fixtures\\src",
+            "GardenTests\\": "tests",
+            "GardenTests\\Fixtures\\": "tests\\fixtures\\src"
         }
     }
 }

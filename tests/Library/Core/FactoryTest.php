@@ -7,13 +7,13 @@
 
 namespace Library\Core;
 use Gdn;
-use VanillaTests\fixtures\Tuple;
+use VanillaTests\Fixtures\Tuple;
 
 /**
  * Tests for the {@link Gdn_Factory}.
  */
 class FactoryTest extends \PHPUnit_Framework_TestCase {
-    const TUPLE = 'VanillaTests\fixtures\Tuple';
+    const TUPLE = 'VanillaTests\Fixtures\Tuple';
 
     /**
      * The factory should create new instances with arguments.

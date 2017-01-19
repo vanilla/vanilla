@@ -65,6 +65,11 @@ class Gdn {
 
     const FactoryRealSingleton = 'RealSingleton';
 
+    /**
+     * @var \Garden\Container\Container
+     */
+    private static $container;
+
     /** @var object  */
     protected static $_Config = null;
 
@@ -183,8 +188,8 @@ class Gdn {
      */
     public static function factory($Alias = false) {
         if (is_null(self::$_Factory)) {
-            self::setFactory(new Gdn_Factory());
-            self::factoryOverwrite(false);
+            static::setFactory(new Gdn_Factory(static::getContainer()));
+            static::factoryOverwrite(false);
         }
 
         if ($Alias === false) {
@@ -215,7 +220,8 @@ class Gdn {
      * @param string $Alias An alias for the class that will be used to retreive instances of it.
      * @param string $ClassName The actual name of the class.
      * @param string $Path The path to the class' file. You can prefix the path with ~ to start at the application root.
-     * @param string $FactoryType The way objects will be instantiated for the class. One of (Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton).
+     * @param string $FactoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
+     * @param mixed $Data Additional data for the installation.
      * @see Gdn_Factory::Install()
      */
     public static function factoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = null) {
@@ -600,5 +606,29 @@ class Gdn {
         if ($Override || is_null(self::$_Factory)) {
             self::$_Factory = $Factory;
         }
+    }
+
+    /**
+     * Get the global container.
+     *
+     * @return \Garden\Container\Container Returns the container.
+     */
+    public static function getContainer() {
+        if (self::$container === null) {
+            self::$container = new Garden\Container\Container();
+        }
+        return self::$container;
+    }
+
+    /**
+     * Set the container used in this object.
+     *
+     * There is intentionally only a setter for the container because use of the Gdn object should begin to be limited in
+     * favor of the container.
+     *
+     * @param \Garden\Container\Container $container
+     */
+    public static function setContainer(\Garden\Container\Container $container) {
+        self::$container = $container;
     }
 }

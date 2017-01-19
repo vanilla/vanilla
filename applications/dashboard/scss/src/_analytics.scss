@@ -1,14 +1,26 @@
 
 // Vanilla Stats
 .toolbar-stats {
+  flex-wrap: wrap;
+  justify-content: space-between;
+
   > *:not(.nav-stats) {
     margin-top: $spacer * 2;
+
+      @include media-breakpoint-down(md) {
+        margin-top: $spacer;
+      }
+    }
+
+  > * {
+    margin-left: auto;
+    margin-right: auto;
   }
 }
 
 .toolbar > .nav-stats {
-  margin-right: 0;
-  flex-shrink: 1;
+  //margin-right: 0;
+  //flex-shrink: 1;
 }
 
 

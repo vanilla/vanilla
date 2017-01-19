@@ -159,19 +159,34 @@ Use a <code>&lt;button&gt;</code> element if it&#39;s a form element or if the b
                                             <h2 class="kss-title" id="4-3">
                                             <span class="kss-ref badge pull-right">4-3</span> Button Group
                                             </h2>
-                                                <div class="kss-box padded"><p>A button group.</p>
+                                                <div class="kss-box padded"><p>A button group is a group of buttons, ofter used for pagers or filters on a page. The button group collapses
+into a dropdown selector when if overflows past the window width.</p>
+<p>If you want to choose the point at which the button group collapses, you can specify a max width for the button
+group using <code>data-max-width=&quot;*&quot;</code> where <code>*</code> is a number, in pixels; or you can specify the button group container,
+which the button group will never overflow outside of by setting <code>data-container-selector=&quot;*&quot;</code> where <code>*</code> is the
+jQuery selector string for the element.</p>
 </div>
-                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;btn-group&quot;&gt;
-  &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary active&quot;&gt;Button 1&lt;/button&gt;
-  &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary&quot;&gt;Button 2&lt;/button&gt;
-  &lt;button type=&quot;button&quot; class=&quot;btn btn-secondary&quot;&gt;Button 3&lt;/button&gt;
+                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;btn-group padded-bottom&quot;&gt;
+  &lt;a class=&quot;btn btn-secondary active&quot;&gt;Button 1&lt;/a&gt;
+  &lt;a class=&quot;btn btn-secondary&quot;&gt;Button 2&lt;/a&gt;
+  &lt;a class=&quot;btn btn-secondary&quot;&gt;Button 3&lt;/a&gt;
+&lt;/div&gt;
+&lt;div class=&quot;btn-group&quot; data-max-width=&quot;200&quot;&gt;
+  &lt;a class=&quot;btn btn-secondary active&quot;&gt;Button 1&lt;/a&gt;
+  &lt;a class=&quot;btn btn-secondary&quot;&gt;Button 2&lt;/a&gt;
+  &lt;a class=&quot;btn btn-secondary&quot;&gt;Button 3&lt;/a&gt;
 &lt;/div&gt;</pre>
                                                 </div> <!-- end kss-component-description -->
                                                 <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
-                                                <div class="kss-example padded-bottom"><div class="btn-group">
-  <button type="button" class="btn btn-secondary active">Button 1</button>
-  <button type="button" class="btn btn-secondary">Button 2</button>
-  <button type="button" class="btn btn-secondary">Button 3</button>
+                                                <div class="kss-example padded-bottom"><div class="btn-group padded-bottom">
+  <a class="btn btn-secondary active">Button 1</a>
+  <a class="btn btn-secondary">Button 2</a>
+  <a class="btn btn-secondary">Button 3</a>
+</div>
+<div class="btn-group" data-max-width="200">
+  <a class="btn btn-secondary active">Button 1</a>
+  <a class="btn btn-secondary">Button 2</a>
+  <a class="btn btn-secondary">Button 3</a>
 </div></div>
                                     </div>
                                 </section>

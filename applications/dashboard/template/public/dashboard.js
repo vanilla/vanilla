@@ -1792,6 +1792,15 @@ return Tether;
 
 }));
 
+/** File generated -- do not modify
+ *  JQUERY-CHECKALL
+ *
+ *  @version 0.0.3
+ *  @website http://simivar.github.io/jquery-checkall/
+ *  @author simivar
+ *  @license 
+ */
+!function(a){"use strict";function b(b,c){function d(){g.uniform&&(a.uniform.update(i),a.uniform.update(h)),g.icheck&&(i.iCheck("update"),h.iCheck("update"))}function e(){f=a(g.target+":checked").length,f>0?g.onAnyTargetChecked(f):g.onNoTargetChecked()}var f=0,g=a.extend({target:null,uniform:!1,icheck:!1,onAnyTargetChecked:function(a){},onNoTargetChecked:function(){},onTargetClick:function(a){},onElementClick:function(a){}},c);if(null===g.target&&"object"==typeof g.target)throw new Error("checkAll: element has no target specified.");if(g.uniform&&!jQuery().uniform)throw new Error("checkAll: setting 'uniform' set to 'true' yet can not locate uniformjs.");if(g.icheck&&!jQuery().iCheck)throw new Error("checkAll: setting 'icheck' set to 'true' yet can not locate iCheck.");var h=a(b),i=a(g.target);h.on("click ifToggled",function(b){i.check(h.check()),e(),g.onElementClick(a(b.target)),d()}),i.on("click ifToggled",function(b){e(),g.onTargetClick(a(b.target));var c=i.length;f===c?h.check(!0):h.check(!1),d()})}function c(b,c){var d=a(b);return"undefined"==typeof c?b.length>1?!1:d.prop("checked"):(d.prop("checked",c),d)}a.extend(a.fn,{checkall:function(a){return this.each(function(){b(this,a)})},check:function(a){return c(this,a)}})}(jQuery);
 /*! iCheck v1.0.2 by Damir Sultanov, http://git.io/arlzeA, MIT Licensed */
 (function(f){function A(a,b,d){var c=a[0],g=/er/.test(d)?_indeterminate:/bl/.test(d)?n:k,e=d==_update?{checked:c[k],disabled:c[n],indeterminate:"true"==a.attr(_indeterminate)||"false"==a.attr(_determinate)}:c[g];if(/^(ch|di|in)/.test(d)&&!e)x(a,g);else if(/^(un|en|de)/.test(d)&&e)q(a,g);else if(d==_update)for(var f in e)e[f]?x(a,f,!0):q(a,f,!0);else if(!b||"toggle"==d){if(!b)a[_callback]("ifClicked");e?c[_type]!==r&&q(a,g):x(a,g)}}function x(a,b,d){var c=a[0],g=a.parent(),e=b==k,u=b==_indeterminate,
 v=b==n,s=u?_determinate:e?y:"enabled",F=l(a,s+t(c[_type])),B=l(a,b+t(c[_type]));if(!0!==c[b]){if(!d&&b==k&&c[_type]==r&&c.name){var w=a.closest("form"),p='input[name="'+c.name+'"]',p=w.length?w.find(p):f(p);p.each(function(){this!==c&&f(this).data(m)&&q(f(this),b)})}u?(c[b]=!0,c[k]&&q(a,k,"force")):(d||(c[b]=!0),e&&c[_indeterminate]&&q(a,_indeterminate,!1));D(a,e,b,d)}c[n]&&l(a,_cursor,!0)&&g.find("."+C).css(_cursor,"default");g[_add](B||l(a,b)||"");g.attr("role")&&!u&&g.attr("aria-"+(v?n:k),"true");
@@ -9036,6 +9045,110 @@ var DashboardModal = (function() {
         });
     }
 
+    function buttonGroupInit(element) {
+
+        /**
+         * Transforms a button group into a dropdown-filter.
+         *
+         * @param $buttonGroup
+         */
+        var transformButtonGroup = function(buttonGroup) {
+            var elem = document.createElement('div');
+            $(elem).addClass('dropdown');
+            $(elem).addClass('dropdown-filter');
+
+            var items = $(buttonGroup).html();
+            var title = gdn.definition('Filter');
+            var list = document.createElement('div');
+            var id = Math.random().toString(36).substr(2, 9);
+
+
+            $(list).addClass('dropdown-menu');
+            $(list).attr('aria-labelledby', id);
+            $(list).html(items);
+
+            $('.btn', list).each(function() {
+                $(this).removeClass('btn');
+                $(this).removeClass('btn-secondary');
+                $(this).addClass('dropdown-item');
+
+                if ($(this).hasClass('active')) {
+                    title = $(this).html();
+                }
+            });
+
+            $(elem).prepend(
+                '<button ' +
+                'id="' + id + '" ' +
+                'type="button" ' +
+                'class="btn btn-secondary dropdown-toggle" ' +
+                'data-toggle="dropdown" ' +
+                'aria-haspopup="true" ' +
+                'aria-expanded="false"' +
+                '>' +
+                title +
+                '</button>'
+            );
+
+            $(elem).append($(list));
+
+            return elem;
+        };
+
+        var showButtonGroup = function(buttonGroup, dropdown) {
+            $(buttonGroup).show();
+            $(dropdown).hide();
+        };
+
+        var showDropdown = function(buttonGroup, dropdown) {
+            $(buttonGroup).hide();
+            $(dropdown).show();
+        };
+
+        /**
+         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
+         * or btn-group, and then shows/hides the appropriate one.
+         *
+         * @param element The scope of the function
+         */
+        var checkWidth = function(element) {
+            $('.btn-group', element).each(function() {
+                var self = this;
+                var maxWidth = $(self).data('maxWidth');
+                var container = $(self).data('containerSelector');
+
+                if (!container && !maxWidth) {
+                    maxWidth = $(window).width();
+                }
+
+                if (container) {
+                    maxWidth = $(container).width();
+                }
+
+                if (!self.width) {
+                    self.width = $(self).width();
+                }
+
+                if (!self.dropdown) {
+                    self.dropdown = transformButtonGroup(self);
+                    $(self).after(self.dropdown);
+                }
+
+                if (self.width <= maxWidth) {
+                    showButtonGroup(self, self.dropdown);
+                } else {
+                    showDropdown(self, self.dropdown);
+                }
+            });
+        };
+
+        checkWidth(element);
+
+        $(window).resize(function() {
+            checkWidth(document);
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -9052,6 +9165,7 @@ var DashboardModal = (function() {
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
         dropDownInit(e.target); // makes sure our dropdowns open in the right direction
+        buttonGroupInit(e.target); // changes button groups that get too long into selects
     });
 
     /**

@@ -133,7 +133,7 @@
   flex-direction: column;
   align-items: center;
   line-height: 1;
-  padding: $spacer $spacer 0;
+  padding: ($spacer / 2) $spacer 0;
   color: rgba(25,25,25,.20);
 }
 

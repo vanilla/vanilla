@@ -9207,6 +9207,7 @@ var DashboardModal = (function() {
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
         $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
@@ -9296,21 +9297,20 @@ var DashboardModal = (function() {
         DashboardModal.activeModal = new DashboardModal($(this), {});
     });
 
-    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
+    $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'post',
-            modalType: 'confirm'
-        });
-    });
-
-    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'get',
-            modalType: 'confirm',
-            followLink: true // no ajax
-        });
+        if ($(this).data('followLink') === 'true') {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'get',
+                modalType: 'confirm',
+                followLink: true // no ajax
+            });
+        } else {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'post',
+                modalType: 'confirm'
+            });
+        }
     });
 
     // Get new banner image.

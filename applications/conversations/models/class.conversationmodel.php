@@ -302,7 +302,7 @@ class ConversationModel extends ConversationsModel {
      */
     public static function getMaxRecipients() {
         // Moderators can add as many as they want.
-        if (checkPermission('Garden.Moderation.Manage')) {
+        if (Gdn::session()->checkRankedPermission('Garden.Moderation.Manage')) {
             return false;
         }
 

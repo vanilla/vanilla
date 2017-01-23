@@ -61,7 +61,7 @@ class MessagesController extends ConversationsController {
         $this->Form->setModel($this->ConversationModel);
 
         // Detect our recipient limit.
-        $maxRecipients = self::getMaxRecipients();
+        $maxRecipients = ConversationModel::getMaxRecipients();
 
         // Set recipient limit for the frontend.
         if ($maxRecipients) {

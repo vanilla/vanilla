@@ -461,6 +461,10 @@ class VanillaSettingsController extends Gdn_Controller {
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
 
+        // Block deleting special categories.
+        if (val('CanDelete', $this->Category, true)) {
+            $this->Form->addError('The specified category cannot be deleted.');
+        }
 
         if (!$this->Category) {
             $this->Form->addError('The specified category could not be found.');

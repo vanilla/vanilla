@@ -760,7 +760,7 @@ class Gdn_Form extends Gdn_Pluggable {
             if (val('RemoveConfirmText', $options, false)) {
                 $removeAttributes['data-body'] = val('RemoveConfirmText', $options);
             }
-            $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+            $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm', $removeAttributes), 'div');
         }
 
         if ($label) {

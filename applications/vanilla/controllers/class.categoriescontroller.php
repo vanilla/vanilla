@@ -207,6 +207,10 @@ class CategoriesController extends VanillaController {
                 throw notFoundException();
             }
             $Category = (object)$Category;
+
+            // Check permission
+            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
+
             Gdn_Theme::section($Category->CssClass);
 
             // Load the breadcrumbs.
@@ -300,9 +304,6 @@ class CategoriesController extends VanillaController {
             }
             $Wheres = array('d.CategoryID' => $CategoryIDs);
             $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
-
-            // Check permission
-            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
 
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);

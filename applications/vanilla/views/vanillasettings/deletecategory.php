@@ -14,42 +14,33 @@ if (is_object($this->OtherCategories)) {
     <?php
     } else { ?>
         <div class="alert alert-danger padded"><?php echo t('All content in this category will be permanently deleted.'); ?></div>
-
-        <?php
-        // Only show the delete discussions checkbox if we're deleting a non-parent category.
-        if ($this->Category->AllowDiscussions == '1') {
-            ?>
+        <ul>
             <li class="form-group">
                 <div class="input-wrap">
-                <?php echo $this->Form->CheckBox('MoveContent', "Move content in this category to a replacement category.", array('value' => '1')); ?>
+                <?php echo $this->Form->checkBox('MoveContent', "Move content in this category to a replacement category.", ['value' => '1']); ?>
                 </div>
             </li>
-        <?php }
-        ?>
-        <li id="ReplacementCategory" class="form-group">
-            <div class="label-wrap">
-            <?php
-            echo $this->Form->label('Replacement Category', 'ReplacementCategoryID');
-            if ($this->Category->AllowDiscussions == '1') {
-                ?>
-                <div id="ReplacementWarning" class="info"><div
-                        class="text-danger"><?php echo t('<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'); ?></div>
+            <li id="ReplacementCategory" class="form-group">
+                <div class="label-wrap">
+                    <?php
+                    echo $this->Form->label('Replacement Category', 'ReplacementCategoryID');
+                    ?>
+                    <div id="ReplacementWarning" class="info"><div
+                            class="text-danger"><?php echo t('<strong>Heads Up!</strong> Moving discussions into a replacement category can result in discussions vanishing (or appearing) if the replacement category has different permissions than the category being deleted.'); ?></div>
+                    </div>
                 </div>
-                <?php
-            } ?>
-            </div>
-            <div class="input-wrap">
-            <?php echo $this->Form->DropDown(
-                'ReplacementCategoryID',
-                $this->OtherCategories,
-                array(
-                    'ValueField' => 'CategoryID',
-                    'TextField' => 'Name',
-                    'IncludeNull' => TRUE
-                ));
-            ?>
-            </div>
-        </li>
+                <div class="input-wrap">
+                <?php echo $this->Form->dropDown(
+                    'ReplacementCategoryID',
+                    $this->OtherCategories,
+                    [
+                        'ValueField' => 'CategoryID',
+                        'TextField' => 'Name',
+                        'IncludeNull' => true
+                    ]);
+                ?>
+                </div>
+            </li>
         </ul>
 
     <?php } ?>

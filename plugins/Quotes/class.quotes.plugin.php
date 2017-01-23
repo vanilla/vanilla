@@ -239,16 +239,27 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function addQuoteButton($Sender, $Args) {
-        if (!Gdn::session()->UserID || !checkPermission('Vanilla.Comments.Add')) {
+
+        // There are some case were Discussion is not set as an event argument so we use the sender data instead.
+        $discussion = $Sender->data('Discussion');
+        if (!$discussion) {
+            return;
+        }
+
+        $session = Gdn::session();
+        if (!$session->UserID) {
+            return;
+        }
+        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
-            $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-        } elseif (isset($Args['Discussion'])) {
-            $Object = $Args['Discussion'];
-            $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
+            $ObjectID = 'Comment_'.$Object->CommentID;
+        } elseif ($discussion) {
+            $Object = $discussion;
+            $ObjectID = 'Discussion_'.$Object->DiscussionID;
         } else {
             return;
         }
@@ -319,6 +330,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
             case 'Display':
             case 'Text':
+            case 'TextEx':
             default:
                 break;
         }
@@ -454,7 +466,7 @@ BLOCKQUOTE;
                 case 'BBCode':
                     $Author = htmlspecialchars($Data->InsertName);
                     if ($ID) {
-                        $IDString = ';'.htmlspecialchars($ID);
+                        $IDString = ';'.($Type === 'comment' ? 'c' : 'd').'-'.htmlspecialchars($ID);
                     }
 
                     $QuoteBody = $Data->Body;
@@ -471,6 +483,7 @@ BQ;
                 case 'Markdown':
                 case 'Display':
                 case 'Text':
+                case 'TextEx':
                     $QuoteBody = $Data->Body;
                     $insertName = $Data->InsertName;
                     if (strpos($insertName, ' ') !== false) {

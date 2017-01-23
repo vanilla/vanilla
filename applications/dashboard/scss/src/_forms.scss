@@ -480,6 +480,12 @@ select.form-control {
   &::-ms-expand {
     opacity: 0;
   }
+
+  &:focus {
+    border-color: #66afe9;
+    outline: none;
+    @extend .active;
+  }
 }
 
 select + select {
@@ -721,6 +727,7 @@ select + select {
   }
 
   svg {
+    max-width: 100%;
     display: block;
   }
 

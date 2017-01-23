@@ -1,8 +1,10 @@
 // This file contains javascript that is specific to the /profile controller.
-$(document).on('contentLoad', function() {
+$(document).on('contentLoad', function(e) {
+
+    var context = e.target;
 
     // Reveal password
-    $(document).on('click', 'a.RevealPassword', function() {
+    $(context).on('click', 'a.RevealPassword', function() {
         var inp = $(':password');
         var inp2 = $(inp).next();
         if ($(inp2).attr('id') != 'Form_ShowPassword') {
@@ -28,7 +30,7 @@ $(document).on('contentLoad', function() {
     });
 
     // Generate password
-    $(document).on('click', 'a.GeneratePassword', function() {
+    $(context).on('click', 'a.GeneratePassword', function() {
         var passwd = gdn.generateString(7);
         $(':password').val(passwd);
         $('#Form_ShowPassword').val(passwd);
@@ -48,7 +50,7 @@ $(document).on('contentLoad', function() {
         }
     };
 
-    $(document).on('click', '.js-nopassword input[type=checkbox]', checkNoPassword);
+    $(context).on('click', '.js-nopassword input[type=checkbox]', checkNoPassword);
 
     checkNoPassword.apply($('.js-nopassword input[type=checkbox]'));
 
@@ -67,12 +69,12 @@ $(document).on('contentLoad', function() {
 
     // Hide the password reset input when any of the specified events are
     // triggered
-    $(document).on(newPasswordTriggers.join(' '), hideNewPassword);
+    $(context).on(newPasswordTriggers.join(' '), hideNewPassword);
 
     // When the password options are clicked, check to see if the admin/mod
     // wishes to set a new password for the user. If that's the case, show the
     // password reset input. Otherwise, hide it.
-    $(document).on('change', '.PasswordOptions', function() {
+    $(context).on('change', '.PasswordOptions', function() {
         if ($("input:radio[name='ResetPassword']:checked").val() == 'Manual') {
             $('#NewPassword').slideDown('fast');
         } else {

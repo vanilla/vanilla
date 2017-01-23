@@ -39,7 +39,7 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
 
 ?>
     <h1><?php echo t('Homepage'); ?></h1>
-    <script type="text/javascript">
+    <script>
         jQuery(document).ready(function($) {
 
             $('.HomeOptions a').click(function() {
@@ -92,14 +92,20 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
             ?>
         </div>
         <?php if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)): ?>
-            <?php echo subheading(t('Discussions Layout'), t('Choose the preferred layout for the discussions page.')); ?>
+            <?php
+            echo subheading(t('Discussions Layout'), t('Choose the preferred layout for the discussions page.'));
+            echo $this->data('DiscussionsAlert', '');
+            ?>
             <div class="LayoutOptions DiscussionsLayout label-selector">
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
                 echo WriteHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
                 ?>
             </div>
-            <?php echo subheading(t('Categories Layout'), t('Choose the preferred layout for the categories page.')); ?>
+            <?php
+            echo subheading(t('Categories Layout'), t('Choose the preferred layout for the categories page.'));
+            echo $this->data('CategoriesAlert', '');
+            ?>
             <div class="LayoutOptions CategoriesLayout label-selector">
                 <?php
                 echo WriteHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));

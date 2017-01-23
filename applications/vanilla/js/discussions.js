@@ -2,8 +2,16 @@ jQuery(document).ready(function($) {
 
     // Set up paging
     if ($.morepager) {
-        $('.MorePager').not('.Message .MorePager').morepager({
+        $('.MorePager').not('.Section-Profile .MorePager').morepager({
             pageContainerSelector: 'ul.Discussions:last, ul.Drafts:last',
+            afterPageLoaded: function() {
+                $(document).trigger('DiscussionPagingComplete');
+            }
+        });
+
+        // profile/discussions paging
+        $('.Section-Profile .MorePager').morepager({
+            pagerInContainer: true,
             afterPageLoaded: function() {
                 $(document).trigger('DiscussionPagingComplete');
             }

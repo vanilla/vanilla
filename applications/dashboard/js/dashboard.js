@@ -770,11 +770,31 @@ var DashboardModal = (function() {
         });
     }
 
-    function userDropDownInit(element) {
-        var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.js-navbar .js-card-user', element).length !== 0) {
+    /**
+     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * must specify the html content it will reveal when it is clicked.
+     *
+     * @param element The context
+     */
+    function dropInit(element) {
+        $('.js-drop', element).each(function() {
+            var $trigger = $(this);
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
+
+            if (triggerSelector === undefined) {
+                console.error('Drop trigger must be unique and have an id attribute set.');
+                return;
+            }
+
+            if (html === undefined) {
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
+                return;
+            }
+
             new Drop({
-                target: document.querySelector('.js-navbar .js-card-user', element),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -783,8 +803,10 @@ var DashboardModal = (function() {
                     targetAttachment: 'bottom right',
                     offset: '-10 0'
                 }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
-        }
+        });
     }
 
     /**
@@ -966,13 +988,117 @@ var DashboardModal = (function() {
         });
     }
 
+    function buttonGroupInit(element) {
+
+        /**
+         * Transforms a button group into a dropdown-filter.
+         *
+         * @param $buttonGroup
+         */
+        var transformButtonGroup = function(buttonGroup) {
+            var elem = document.createElement('div');
+            $(elem).addClass('dropdown');
+            $(elem).addClass('dropdown-filter');
+
+            var items = $(buttonGroup).html();
+            var title = gdn.definition('Filter');
+            var list = document.createElement('div');
+            var id = Math.random().toString(36).substr(2, 9);
+
+
+            $(list).addClass('dropdown-menu');
+            $(list).attr('aria-labelledby', id);
+            $(list).html(items);
+
+            $('.btn', list).each(function() {
+                $(this).removeClass('btn');
+                $(this).removeClass('btn-secondary');
+                $(this).addClass('dropdown-item');
+
+                if ($(this).hasClass('active')) {
+                    title = $(this).html();
+                }
+            });
+
+            $(elem).prepend(
+                '<button ' +
+                'id="' + id + '" ' +
+                'type="button" ' +
+                'class="btn btn-secondary dropdown-toggle" ' +
+                'data-toggle="dropdown" ' +
+                'aria-haspopup="true" ' +
+                'aria-expanded="false"' +
+                '>' +
+                title +
+                '</button>'
+            );
+
+            $(elem).append($(list));
+
+            return elem;
+        };
+
+        var showButtonGroup = function(buttonGroup, dropdown) {
+            $(buttonGroup).show();
+            $(dropdown).hide();
+        };
+
+        var showDropdown = function(buttonGroup, dropdown) {
+            $(buttonGroup).hide();
+            $(dropdown).show();
+        };
+
+        /**
+         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
+         * or btn-group, and then shows/hides the appropriate one.
+         *
+         * @param element The scope of the function
+         */
+        var checkWidth = function(element) {
+            $('.btn-group', element).each(function() {
+                var self = this;
+                var maxWidth = $(self).data('maxWidth');
+                var container = $(self).data('containerSelector');
+
+                if (!container && !maxWidth) {
+                    maxWidth = $(window).width();
+                }
+
+                if (container) {
+                    maxWidth = $(container).width();
+                }
+
+                if (!self.width) {
+                    self.width = $(self).width();
+                }
+
+                if (!self.dropdown) {
+                    self.dropdown = transformButtonGroup(self);
+                    $(self).after(self.dropdown);
+                }
+
+                if (self.width <= maxWidth) {
+                    showButtonGroup(self, self.dropdown);
+                } else {
+                    showDropdown(self, self.dropdown);
+                }
+            });
+        };
+
+        checkWidth(element);
+
+        $(window).resize(function() {
+            checkWidth(document);
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
-        userDropDownInit(e.target); // navbar 'me' dropdown
+        dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav
@@ -982,6 +1108,7 @@ var DashboardModal = (function() {
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
         dropDownInit(e.target); // makes sure our dropdowns open in the right direction
+        buttonGroupInit(e.target); // changes button groups that get too long into selects
     });
 
     /**
@@ -993,7 +1120,9 @@ var DashboardModal = (function() {
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                $preview.attr('src', e.target.result);
+                if (e.target.result.startsWith("data:image")) {
+                    $preview.attr('src', e.target.result);
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -1021,6 +1150,7 @@ var DashboardModal = (function() {
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
         $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
@@ -1110,21 +1240,20 @@ var DashboardModal = (function() {
         DashboardModal.activeModal = new DashboardModal($(this), {});
     });
 
-    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
+    $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'post',
-            modalType: 'confirm'
-        });
-    });
-
-    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'get',
-            modalType: 'confirm',
-            followLink: true // no ajax
-        });
+        if ($(this).data('followLink') === 'true') {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'get',
+                modalType: 'confirm',
+                followLink: true // no ajax
+            });
+        } else {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'post',
+                modalType: 'confirm'
+            });
+        }
     });
 
     // Get new banner image.

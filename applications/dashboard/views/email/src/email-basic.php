@@ -192,7 +192,7 @@
     </style>
     <!--[if (gte mso 9)|(IE)]>
     [[literal]]
-    <style type="text/css">
+    <style>
         table {
             border-collapse: collapse;
         }

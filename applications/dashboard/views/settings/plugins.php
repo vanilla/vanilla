@@ -50,7 +50,7 @@ helpAsset($helpTitle, $pathHelp);
 ?>
 <?php echo $title; ?>
 <?php if ($this->addonType !== 'locales') { ?>
-    <div class="toolbar full-border">
+    <div class="toolbar">
 <div class="btn-group filters">
         <?php $active = $this->Filter == 'all' ? 'active' : ''; ?><?php echo anchor(sprintf(t('All %1$s'), wrap($addonCount, 'span', ['class' => 'badge'])), 'settings/'.$this->addonType.'/all', ''.$this->addonType.'-all btn btn-secondary '.$active); ?>
         <?php $active = $this->Filter == 'enabled' ? 'active' : ''; ?><?php echo anchor(sprintf(t('Enabled %1$s'), wrap($enabledCount, 'span', ['class' => 'badge'])), 'settings/'.$this->addonType.'/enabled', ''.$this->addonType.'-enabled btn btn-secondary '.$active); ?>

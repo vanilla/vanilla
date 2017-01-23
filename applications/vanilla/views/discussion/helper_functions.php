@@ -610,7 +610,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                 echo "<div class=\"Buttons\">\n";
 
                 $AllowSigninPopup = c('Garden.SignIn.Popup');
-                $Attributes = array('tabindex' => '-1', 'target' => '_top');
+                $Attributes = ['target' => '_top'];
 
                 // If we aren't ajaxing this call then we need to target the url of the parent frame.
                 $ReturnUrl = $Controller->data('ForeignSource.vanilla_url', Gdn::request()->pathAndQuery());

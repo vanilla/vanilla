@@ -1792,6 +1792,15 @@ return Tether;
 
 }));
 
+/** File generated -- do not modify
+ *  JQUERY-CHECKALL
+ *
+ *  @version 0.0.3
+ *  @website http://simivar.github.io/jquery-checkall/
+ *  @author simivar
+ *  @license 
+ */
+!function(a){"use strict";function b(b,c){function d(){g.uniform&&(a.uniform.update(i),a.uniform.update(h)),g.icheck&&(i.iCheck("update"),h.iCheck("update"))}function e(){f=a(g.target+":checked").length,f>0?g.onAnyTargetChecked(f):g.onNoTargetChecked()}var f=0,g=a.extend({target:null,uniform:!1,icheck:!1,onAnyTargetChecked:function(a){},onNoTargetChecked:function(){},onTargetClick:function(a){},onElementClick:function(a){}},c);if(null===g.target&&"object"==typeof g.target)throw new Error("checkAll: element has no target specified.");if(g.uniform&&!jQuery().uniform)throw new Error("checkAll: setting 'uniform' set to 'true' yet can not locate uniformjs.");if(g.icheck&&!jQuery().iCheck)throw new Error("checkAll: setting 'icheck' set to 'true' yet can not locate iCheck.");var h=a(b),i=a(g.target);h.on("click ifToggled",function(b){i.check(h.check()),e(),g.onElementClick(a(b.target)),d()}),i.on("click ifToggled",function(b){e(),g.onTargetClick(a(b.target));var c=i.length;f===c?h.check(!0):h.check(!1),d()})}function c(b,c){var d=a(b);return"undefined"==typeof c?b.length>1?!1:d.prop("checked"):(d.prop("checked",c),d)}a.extend(a.fn,{checkall:function(a){return this.each(function(){b(this,a)})},check:function(a){return c(this,a)}})}(jQuery);
 /*! iCheck v1.0.2 by Damir Sultanov, http://git.io/arlzeA, MIT Licensed */
 (function(f){function A(a,b,d){var c=a[0],g=/er/.test(d)?_indeterminate:/bl/.test(d)?n:k,e=d==_update?{checked:c[k],disabled:c[n],indeterminate:"true"==a.attr(_indeterminate)||"false"==a.attr(_determinate)}:c[g];if(/^(ch|di|in)/.test(d)&&!e)x(a,g);else if(/^(un|en|de)/.test(d)&&e)q(a,g);else if(d==_update)for(var f in e)e[f]?x(a,f,!0):q(a,f,!0);else if(!b||"toggle"==d){if(!b)a[_callback]("ifClicked");e?c[_type]!==r&&q(a,g):x(a,g)}}function x(a,b,d){var c=a[0],g=a.parent(),e=b==k,u=b==_indeterminate,
 v=b==n,s=u?_determinate:e?y:"enabled",F=l(a,s+t(c[_type])),B=l(a,b+t(c[_type]));if(!0!==c[b]){if(!d&&b==k&&c[_type]==r&&c.name){var w=a.closest("form"),p='input[name="'+c.name+'"]',p=w.length?w.find(p):f(p);p.each(function(){this!==c&&f(this).data(m)&&q(f(this),b)})}u?(c[b]=!0,c[k]&&q(a,k,"force")):(d||(c[b]=!0),e&&c[_indeterminate]&&q(a,_indeterminate,!1));D(a,e,b,d)}c[n]&&l(a,_cursor,!0)&&g.find("."+C).css(_cursor,"default");g[_add](B||l(a,b)||"");g.attr("role")&&!u&&g.attr("aria-"+(v?n:k),"true");
@@ -8818,11 +8827,31 @@ var DashboardModal = (function() {
         });
     }
 
-    function userDropDownInit(element) {
-        var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.js-navbar .js-card-user', element).length !== 0) {
+    /**
+     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * must specify the html content it will reveal when it is clicked.
+     *
+     * @param element The context
+     */
+    function dropInit(element) {
+        $('.js-drop', element).each(function() {
+            var $trigger = $(this);
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
+
+            if (triggerSelector === undefined) {
+                console.error('Drop trigger must be unique and have an id attribute set.');
+                return;
+            }
+
+            if (html === undefined) {
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
+                return;
+            }
+
             new Drop({
-                target: document.querySelector('.js-navbar .js-card-user', element),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -8831,8 +8860,10 @@ var DashboardModal = (function() {
                     targetAttachment: 'bottom right',
                     offset: '-10 0'
                 }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
-        }
+        });
     }
 
     /**
@@ -8980,13 +9011,151 @@ var DashboardModal = (function() {
         }
     }
 
+    /**
+     * Initializes the check-all jquery plugin. Adds 'select all' functionality to checkboxes.
+     * The trigger must have a `js-check-all` css class applied to it. It manages input checkboxes
+     * with the `js-check-me` css class applied.
+     *
+     * @param element The scope of the function.
+     */
+    function checkallInit(element) {
+        $('.js-check-all', element).checkall({
+            target: '.js-check-me'
+        });
+    }
+
+    /**
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
+     * close to the bottom of the page.
+     *
+     * @param element The scope of the function.
+     */
+    function dropDownInit(element) {
+        $('.dropdown', element).each(function() {
+            var $dropdown = $(this);
+            var offset = $dropdown.offset();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
+            var documentHeight = $(document).height();
+            var padding = 6;
+
+            if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
+                $dropdown.addClass('dropup');
+            }
+        });
+    }
+
+    function buttonGroupInit(element) {
+
+        /**
+         * Transforms a button group into a dropdown-filter.
+         *
+         * @param $buttonGroup
+         */
+        var transformButtonGroup = function(buttonGroup) {
+            var elem = document.createElement('div');
+            $(elem).addClass('dropdown');
+            $(elem).addClass('dropdown-filter');
+
+            var items = $(buttonGroup).html();
+            var title = gdn.definition('Filter');
+            var list = document.createElement('div');
+            var id = Math.random().toString(36).substr(2, 9);
+
+
+            $(list).addClass('dropdown-menu');
+            $(list).attr('aria-labelledby', id);
+            $(list).html(items);
+
+            $('.btn', list).each(function() {
+                $(this).removeClass('btn');
+                $(this).removeClass('btn-secondary');
+                $(this).addClass('dropdown-item');
+
+                if ($(this).hasClass('active')) {
+                    title = $(this).html();
+                }
+            });
+
+            $(elem).prepend(
+                '<button ' +
+                'id="' + id + '" ' +
+                'type="button" ' +
+                'class="btn btn-secondary dropdown-toggle" ' +
+                'data-toggle="dropdown" ' +
+                'aria-haspopup="true" ' +
+                'aria-expanded="false"' +
+                '>' +
+                title +
+                '</button>'
+            );
+
+            $(elem).append($(list));
+
+            return elem;
+        };
+
+        var showButtonGroup = function(buttonGroup, dropdown) {
+            $(buttonGroup).show();
+            $(dropdown).hide();
+        };
+
+        var showDropdown = function(buttonGroup, dropdown) {
+            $(buttonGroup).hide();
+            $(dropdown).show();
+        };
+
+        /**
+         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
+         * or btn-group, and then shows/hides the appropriate one.
+         *
+         * @param element The scope of the function
+         */
+        var checkWidth = function(element) {
+            $('.btn-group', element).each(function() {
+                var self = this;
+                var maxWidth = $(self).data('maxWidth');
+                var container = $(self).data('containerSelector');
+
+                if (!container && !maxWidth) {
+                    maxWidth = $(window).width();
+                }
+
+                if (container) {
+                    maxWidth = $(container).width();
+                }
+
+                if (!self.width) {
+                    self.width = $(self).width();
+                }
+
+                if (!self.dropdown) {
+                    self.dropdown = transformButtonGroup(self);
+                    $(self).after(self.dropdown);
+                }
+
+                if (self.width <= maxWidth) {
+                    showButtonGroup(self, self.dropdown);
+                } else {
+                    showDropdown(self, self.dropdown);
+                }
+            });
+        };
+
+        checkWidth(element);
+
+        $(window).resize(function() {
+            checkWidth(document);
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
-        userDropDownInit(e.target); // navbar 'me' dropdown
+        dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav
@@ -8994,6 +9163,9 @@ var DashboardModal = (function() {
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
+        checkallInit(e.target); // handles 'select all' type checkboxes
+        dropDownInit(e.target); // makes sure our dropdowns open in the right direction
+        buttonGroupInit(e.target); // changes button groups that get too long into selects
     });
 
     /**
@@ -9005,7 +9177,9 @@ var DashboardModal = (function() {
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                $preview.attr('src', e.target.result);
+                if (e.target.result.startsWith("data:image")) {
+                    $preview.attr('src', e.target.result);
+                }
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -9033,6 +9207,7 @@ var DashboardModal = (function() {
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
         $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
@@ -9122,21 +9297,20 @@ var DashboardModal = (function() {
         DashboardModal.activeModal = new DashboardModal($(this), {});
     });
 
-    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
+    $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'post',
-            modalType: 'confirm'
-        });
-    });
-
-    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'get',
-            modalType: 'confirm',
-            followLink: true // no ajax
-        });
+        if ($(this).data('followLink') === 'true') {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'get',
+                modalType: 'confirm',
+                followLink: true // no ajax
+            });
+        } else {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'post',
+                modalType: 'confirm'
+            });
+        }
     });
 
     // Get new banner image.
@@ -9182,7 +9356,6 @@ var DashboardModal = (function() {
             }
         });
     });
-
 })(jQuery);
 
 var dashboardSymbol =  function(name, alt, cssClass) {

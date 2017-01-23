@@ -351,13 +351,6 @@ class EntryController extends Gdn_Controller {
                 redirectUrl($Url, 302);
             } else {
                 $this->setData('Url', $Url);
-                $Script = <<<EOT
-<script type="text/javascript">
-   window.location = "$Url";
-</script>
-EOT;
-
-
                 $this->render('Redirect', 'Utility');
                 die();
             }
@@ -444,7 +437,9 @@ EOT;
 
         // Allow a provider to not send an email address but require one be manually entered.
         if (!UserModel::noEmail()) {
-            if (!$this->Form->getFormValue('Email') || $this->Form->getFormValue('EmailVisible')) {
+            $emailProvided = $this->Form->getFormValue('Email');
+            $emailRequested = $this->Form->getFormValue('EmailVisible');
+            if (!$emailProvided || $emailRequested) {
                 $this->Form->setFormValue('EmailVisible', true);
                 $this->Form->addHidden('EmailVisible', true);
 
@@ -452,9 +447,11 @@ EOT;
                     $this->Form->setFormValue('Email', val('Email', $currentData));
                 }
             }
+            if ($IsPostBack && $emailRequested) {
+                $this->Form->validateRule('Email', 'ValidateRequired');
+                $this->Form->validateRule('Email', 'ValidateEmail');
+            }
         }
-
-        $FormData = $this->Form->formValues(); // debug
 
         // Make sure the minimum required data has been provided by the connection.
         if (!$this->Form->getFormValue('Provider')) {
@@ -473,16 +470,11 @@ EOT;
 
         // If we've accrued errors, stop here and show them.
         if ($this->Form->errorCount() > 0) {
-            return $this->render();
+            $this->render();
+            return;
         }
 
-        $UserModel = Gdn::userModel();
-
-        // Find an existing user associated with this provider & uniqueid.
-        $Auth = $UserModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
-        $UserID = val('UserID', $Auth);
-
-        // Check to synchronise roles upon connecting.
+        // Check if we need to sync roles
         if (($this->data('Trusted') || c('Garden.SSO.SyncRoles')) && $this->Form->getFormValue('Roles', null) !== null) {
             $SaveRoles = $SaveRolesRegister = true;
 
@@ -507,8 +499,14 @@ EOT;
             $SaveRolesRegister = false;
         }
 
+        $UserModel = Gdn::userModel();
+
+        // Find an existing user associated with this provider & uniqueid.
+        $Auth = $UserModel->getAuthentication($this->Form->getFormValue('UniqueID'), $this->Form->getFormValue('Provider'));
+        $UserID = val('UserID', $Auth);
+
+        // The user is already in the UserAuthentication table
         if ($UserID) {
-            // The user is already connected.
             $this->Form->setFormValue('UserID', $UserID);
 
             // Update their info.
@@ -524,6 +522,8 @@ EOT;
 
                 // Synchronize the user's data.
                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
             }
 
             // Always save the attributes because they may contain authorization information.
@@ -538,6 +538,7 @@ EOT;
             // Send them on their way.
             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
 
+        // If a name of email has been provided
         } elseif ($this->Form->getFormValue('Name') || $this->Form->getFormValue('Email')) {
             // Decide how to handle our first time connecting.
             $NameUnique = c('Garden.Registration.NameUnique', true);
@@ -601,6 +602,8 @@ EOT;
 
                                 // Update the user.
                                 $UserModel->save($Data, ['NoConfirmEmail' => true, 'FixUnique' => true, 'SaveRoles' => $SaveRoles]);
+                                $this->EventArguments['UserID'] = $UserID;
+                                $this->fireEvent('AfterConnectSave');
                             }
 
                             // Always save the attributes because they may contain authorization information.
@@ -709,6 +712,10 @@ EOT;
                     'SaveRoles' => $SaveRolesRegister
                 ]);
                 $User['UserID'] = $UserID;
+
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
+
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 // Save the association to the new user.
@@ -810,6 +817,10 @@ EOT;
                     'SaveRoles' => $SaveRolesRegister
                 ]);
                 $User['UserID'] = $UserID;
+
+                $this->EventArguments['UserID'] = $UserID;
+                $this->fireEvent('AfterConnectSave');
+
                 $this->Form->setValidationResults($UserModel->validationResults());
 
                 // Send the welcome email.
@@ -987,6 +998,11 @@ EOT;
                 if (!$User) {
                     $this->Form->addError('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
+                    $this->fireEvent('BadSignIn', [
+                        'Email' => $Email,
+                        'Password' => $this->Form->getFormValue('Password'),
+                        'Reason' => 'NotFound'
+                    ]);
                 } else {
                     // Check the password.
                     $PasswordHash = new Gdn_PasswordHash();
@@ -1032,7 +1048,12 @@ EOT;
                                 '{username} failed to sign in.  Invalid password.',
                                 array('InsertName' => $User->Name)
                             );
-
+                            $this->fireEvent('BadSignIn', [
+                                'Email' => $Email,
+                                'Password' => $Password,
+                                'User' => $User,
+                                'Reason' => 'Password'
+                            ]);
                         }
                     } catch (Gdn_UserException $Ex) {
                         $this->Form->addError($Ex);
@@ -1696,6 +1717,9 @@ EOT;
                         '{Input} has been sent a password reset email.',
                         array('Input' => $Email)
                     );
+                    $this->fireEvent('PasswordRequest', [
+                        'Email' => $Email
+                    ]);
                 }
             } else {
                 if ($this->Form->errorCount() == 0) {
@@ -1734,6 +1758,9 @@ EOT;
                 Logger::NOTICE,
                 '{username} failed to authenticate password reset request.'
             );
+            $this->fireEvent('PasswordResetFailed', [
+                'UserID' => $UserID
+            ]);
         }
 
         $Expires = $this->UserModel->getAttribute($UserID, 'PasswordResetExpires');
@@ -1744,8 +1771,10 @@ EOT;
                 Logger::NOTICE,
                 '{username} has an expired reset token.'
             );
+            $this->fireEvent('PasswordResetFailed', [
+                'UserID' => $UserID
+            ]);
         }
-
 
         if ($this->Form->errorCount() == 0) {
             $User = $this->UserModel->getID($UserID, DATASET_TYPE_ARRAY);

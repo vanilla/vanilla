@@ -600,7 +600,13 @@ class RoleModel extends Gdn_Model {
                 $Permissions = val('Permission', $FormPostValues);
                 $Permissions = $PermissionModel->pivotPermissions($Permissions, array('RoleID' => $RoleID));
             }
-            $PermissionModel->saveAll($Permissions, array('RoleID' => $RoleID));
+
+            $permissionsWhere = ['RoleID' => $RoleID];
+            if (val('IgnoreCategoryPermissions', $FormPostValues)) {
+                // Include the default category permissions when ignoring the rest.
+                $permissionsWhere['JunctionID'] = [null, -1];
+            }
+            $PermissionModel->saveAll($Permissions, $permissionsWhere);
 
             if (Gdn::cache()->activeEnabled()) {
                 // Don't update the user table if we are just using cached permissions.

@@ -646,7 +646,7 @@ if (!$FullNameColumnExists) {
 $Construct->table('Log')
     ->primaryKey('LogID')
     ->column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), false, 'index')
-    ->column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group'), false, 'index')
+    ->column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group', 'Event'), false, 'index')
     ->column('TransactionLogID', 'int', null)
     ->column('RecordID', 'int', null, 'index')
     ->column('RecordUserID', 'int', null, 'index')// user responsible for the record; indexed for user deletion

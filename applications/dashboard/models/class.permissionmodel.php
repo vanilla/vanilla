@@ -545,6 +545,7 @@ class PermissionModel extends Gdn_Model {
         $Namespaces = $this->GetAllowedPermissionNamespaces();
         $RoleID = val('RoleID', $Where, null);
         $JunctionID = val('JunctionID', $Where, null);
+        $limitToDefault = val('LimitToDefault', $Options);
         $SQL = $this->SQL;
 
         // Load all of the default junction permissions.
@@ -580,7 +581,7 @@ class PermissionModel extends Gdn_Model {
             unset($Row['PermissionID'], $Row['RoleID'], $Row['JunctionTable'], $Row['JunctionColumn'], $Row['JunctionID']);
 
             // If the junction column is not the primary key then we must figure out and limit the permissions.
-            if ($JunctionColumn != $JunctionTable.'ID') {
+            if ($limitToDefault === false && $JunctionColumn != $JunctionTable.'ID') {
                 $JuncIDs = $SQL
                     ->Distinct(true)
                     ->select("p.{$JunctionTable}ID")
@@ -597,58 +598,68 @@ class PermissionModel extends Gdn_Model {
                 }
             }
 
-            // Figure out which columns to select.
-            foreach ($Row as $PermissionName => $Value) {
-                if (!($Value & 2)) {
-                    continue; // permission not applicable to this junction table
-                }                if (!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
-                    continue; // permission not in $LimitToSuffix
-                }                if ($index = strpos($PermissionName, '.')) {
-                    if (!in_array(substr($PermissionName, 0, $index), $Namespaces) &&
-                        !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces)
-                    ) {
-                        continue; // permission not in allowed namespaces
+            if (!empty($RoleID) || !empty($JunctionID)) {
+                // Figure out which columns to select.
+                foreach ($Row as $PermissionName => $Value) {
+                    if (!($Value & 2)) {
+                        continue; // permission not applicable to this junction table
                     }
+                    if (!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+                        continue; // permission not in $LimitToSuffix
+                    }
+                    if ($index = strpos($PermissionName, '.')) {
+                        if (!in_array(substr($PermissionName, 0, $index), $Namespaces) &&
+                            !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces)
+                        ) {
+                            continue; // permission not in allowed namespaces
+                        }
+                    }
+
+                    // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
+                    if (!$RoleID && $JunctionColumn != $JunctionTable.'ID' && val('AddDefaults', $Options)) {
+                        $DefaultValue = $Value & 1 ? 1 : 0;
+                    } else {
+                        $DefaultValue = 0;
+                    }
+
+                    $SQL->select("p.`$PermissionName`, $DefaultValue", 'coalesce', $PermissionName);
                 }
 
-                // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
-                if (!$RoleID && $JunctionColumn != $JunctionTable.'ID' && val('AddDefaults', $Options)) {
-                    $DefaultValue = $Value & 1 ? 1 : 0;
-                } else {
-                    $DefaultValue = 0;
-                }
+                if (!empty($RoleID)) {
+                    $roleIDs = (array)$RoleID;
+                    if (count($roleIDs) === 1) {
+                        $roleOn = 'p.RoleID = '.$this->SQL->Database->connection()->quote(reset($roleIDs));
+                    } else {
+                        $roleIDs = array_map(array($this->SQL->Database->connection(), 'quote'), $roleIDs);
+                        $roleOn = 'p.RoleID in ('.implode(',', $roleIDs).')';
+                    }
 
-                $SQL->select("p.`$PermissionName`, $DefaultValue", 'coalesce', $PermissionName);
-            }
+                    // Get the permissions for the junction table.
+                    $SQL->select('junc.Name')
+                        ->select('junc.'.$JunctionColumn, '', 'JunctionID')
+                        ->from($JunctionTable.' junc')
+                        ->join('Permission p', "p.JunctionID = junc.$JunctionColumn and $roleOn", 'left')
+                        ->orderBy('junc.Sort')
+                        ->orderBy('junc.Name');
 
-            if (!empty($RoleID)) {
-                $roleIDs = (array)$RoleID;
-                if (count($roleIDs) === 1) {
-                    $roleOn = 'p.RoleID = '.$this->SQL->Database->connection()->quote(reset($roleIDs));
-                } else {
-                    $roleIDs = array_map(array($this->SQL->Database->connection(), 'quote'), $roleIDs);
-                    $roleOn = 'p.RoleID in ('.implode(',', $roleIDs).')';
-                }
+                    if ($limitToDefault) {
+                        $SQL->where("junc.{$JunctionTable}ID", -1);
+                    } elseif (isset($JuncIDs)) {
+                        $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
+                    }
 
-                // Get the permissions for the junction table.
-                $SQL->select('junc.Name')
-                    ->select('junc.'.$JunctionColumn, '', 'JunctionID')
-                    ->from($JunctionTable.' junc')
-                    ->join('Permission p', "p.JunctionID = junc.$JunctionColumn and $roleOn", 'left')
-                    ->orderBy('junc.Sort')
-                    ->orderBy('junc.Name');
-
-                if (isset($JuncIDs)) {
-                    $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
+                    $JuncData = $SQL->get()->resultArray();
+                } elseif (!empty($JunctionID)) {
+                    // Here we are getting permissions for all roles.
+                    $JuncData = $SQL->select('r.RoleID, r.Name, r.CanSession')
+                        ->from('Role r')
+                        ->join('Permission p', "p.RoleID = r.RoleID and p.JunctionTable = '$JunctionTable' and p.JunctionColumn = '$JunctionColumn' and p.JunctionID = $JunctionID", 'left')
+                        ->orderBy('r.Sort, r.Name')
+                        ->get()->resultArray();
                 }
             } else {
-                // Here we are getting permissions for all roles.
-                $SQL->select('r.RoleID, r.Name, r.CanSession')
-                    ->from('Role r')
-                    ->join('Permission p', "p.RoleID = r.RoleID and p.JunctionTable = '$JunctionTable' and p.JunctionColumn = '$JunctionColumn' and p.JunctionID = $JunctionID", 'left')
-                    ->orderBy('r.Sort, r.Name');
+                $JuncData = [];
             }
-            $JuncData = $SQL->get()->resultArray();
 
             // Add all of the necessary information back to the result.
             foreach ($JuncData as $JuncRow) {
@@ -695,16 +706,27 @@ class PermissionModel extends Gdn_Model {
      *
      * @param int|array $RoleID The role(s) to get the permissions for.
      * @param string $LimitToSuffix An optional suffix to limit the permission names to.
+     * @param bool $includeJunction
      * @return array
      */
-    public function getPermissions($RoleID, $LimitToSuffix = '') {
+    public function getPermissions($RoleID, $LimitToSuffix = '', $includeJunction = true) {
         $RoleID = (array)$RoleID;
         $Result = array();
 
         $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);
         $Result[] = $GlobalPermissions;
 
-        $JunctionPermissions = $this->GetJunctionPermissions(array('RoleID' => $RoleID), null, $LimitToSuffix);
+        $junctionOptions = [];
+        if ($includeJunction === false) {
+            // If we're skipping junction permissions, just grab the defaults.
+            $junctionOptions['LimitToDefault'] = true;
+        }
+        $JunctionPermissions = $this->GetJunctionPermissions(
+            ['RoleID' => $RoleID],
+            null,
+            $LimitToSuffix,
+            $junctionOptions
+        );
         $Result = array_merge($Result, $JunctionPermissions);
 
         return $Result;
@@ -749,10 +771,11 @@ class PermissionModel extends Gdn_Model {
      *
      * @param $RoleID
      * @param string $LimitToSuffix
+     * @param bool $includeJunction
      * @return array
      */
-    public function getPermissionsEdit($RoleID, $LimitToSuffix = '') {
-        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix);
+    public function getPermissionsEdit($RoleID, $LimitToSuffix = '', $includeJunction = true) {
+        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix, $includeJunction);
         return $this->UnpivotPermissions($Permissions);
     }
 
@@ -1140,7 +1163,7 @@ class PermissionModel extends Gdn_Model {
                 $Where['JunctionColumn'] = null;
                 $Where['JunctionID'] = null;
             }
-            
+
             unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
 
             $this->SQL->replace('Permission', $this->_Backtick($Values), $Where, true);

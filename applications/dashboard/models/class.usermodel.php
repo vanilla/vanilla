@@ -916,15 +916,19 @@ class UserModel extends Gdn_Model {
             unset($Fields['Admin']);
         }
 
+        $Roles = val('Roles', $Fields);
+        unset($Fields['Roles']);
+
         // Massage the roles for email confirmation.
         if (self::requireConfirmEmail() && !val('NoConfirmEmail', $Options)) {
-            $ConfirmRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
+            $ConfirmRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
 
-            if (!empty($ConfirmRoleID)) {
+            if (!empty($ConfirmRoleIDs)) {
                 touchValue('Attributes', $Fields, []);
                 $ConfirmationCode = randomString(8);
                 $Fields['Attributes']['EmailKey'] = $ConfirmationCode;
                 $Fields['Confirmed'] = 0;
+                $Roles = array_merge($Roles, $ConfirmRoleIDs);
             }
         }
 
@@ -939,9 +943,6 @@ class UserModel extends Gdn_Model {
         if (val('Email', $Fields, null) === null) {
             $Fields['Email'] = '';
         }
-
-        $Roles = val('Roles', $Fields);
-        unset($Fields['Roles']);
 
         if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
             $Fields['Attributes'] = dbencode($Fields['Attributes']);
@@ -1598,17 +1599,22 @@ class UserModel extends Gdn_Model {
         if ($ConfirmEmail && !$Confirmed) {
             // Replace permissions with those of the ConfirmEmailRole
             $ConfirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
-            $RoleModel = new RoleModel();
-            $permissions = new Vanilla\Permissions();
-            $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
-            $Permissions = $permissions->compileAndLoad($RolePermissions);
 
-            // Ensure Confirm Email role can always sign in
-            if (!in_array('Garden.SignIn.Allow', $Permissions)) {
-                $Permissions[] = 'Garden.SignIn.Allow';
+            if (!is_array($ConfirmEmailRoleID) || count($ConfirmEmailRoleID) == 0) {
+                throw new Exception(sprintf(t('No role configured with a type of "%s".'), RoleModel::TYPE_UNCONFIRMED), 400);
             }
 
-            $User->Permissions = $Permissions;
+            $RoleModel = new RoleModel();
+            $permissionsModel = new Vanilla\Permissions();
+            $RolePermissions = $RoleModel->getPermissions($ConfirmEmailRoleID);
+            $permissionsModel->compileAndLoad($RolePermissions);
+
+            // Ensure Confirm Email role can always sign in
+            if (!$permissionsModel->has('Garden.SignIn.Allow')) {
+                $permissionsModel->set('Garden.SignIn.Allow', true);
+            }
+
+            $User->Permissions = $permissionsModel->getPermissions();
 
             // Otherwise normal loadings!
         } else {
@@ -2926,17 +2932,23 @@ class UserModel extends Gdn_Model {
 
     /**
      * Updates visit level information such as date last active and the user's ip address.
-     *
      * @param int $UserID
-     * @param string|int|float $ClientHour
+     * @param null|int|float $ClientHour
+     * @throws Exception If the user ID is not valid.
+     * @return bool True on success, false if the user is banned or deleted.
      */
-    public function updateVisit($UserID, $ClientHour = false) {
+    public function updateVisit($UserID, $ClientHour = null) {
         $UserID = (int)$UserID;
         if (!$UserID) {
             throw new Exception('A valid User ID is required.');
         }
 
         $User = Gdn::userModel()->getID($UserID, DATASET_TYPE_ARRAY);
+
+        // Do not update visit information if the user is banned or deleted.
+        if (val('Banned', $User) || val('Deleted', $User)) {
+            return false;
+        }
 
         $Fields = [];
 
@@ -2987,6 +2999,8 @@ class UserModel extends Gdn_Model {
                 $BanModel->setCounts($Ban);
             }
         }
+
+        return true;
     }
 
     /**

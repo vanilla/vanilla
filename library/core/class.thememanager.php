@@ -39,6 +39,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      */
     private $hasRequest = true;
 
+    /** @var array The layout options for a category list. */
+    private $allowedCategoriesLayouts = ['table', 'modern', 'mixed'];
+
+    /** @var array The layout options for a discussions list. */
+    private $allowedDiscussionsLayouts = ['table', 'modern'];
+
     /**
      * @var AddonManager
      */
@@ -321,6 +327,16 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Sets the layout for the theme preview without saving the config values.
+     *
+     * @param string $themeName The name of the theme.
+     */
+    private function preparePreview($themeName) {
+        $themeInfo = $this->getThemeInfo($themeName);
+        $this->setLayout($themeInfo, false);
+    }
+
+    /**
      *
      *
      * @return mixed
@@ -333,7 +349,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             return c('Garden.MobileTheme', 'default');
         } else {
             if ($this->hasPreview()) {
-                return $this->getPreview();
+                $preview = $this->getPreview();
+                $this->preparePreview($preview);
+                return $preview;
             }
             return c('Garden.Theme', 'default');
         }
@@ -346,7 +364,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      */
     public function desktopTheme() {
         if ($this->hasPreview()) {
-            return $this->getPreview();
+            $preview = $this->getPreview();
+            $this->preparePreview($preview);
+            return $preview;
         }
         return c('Garden.Theme', 'default');
     }
@@ -471,6 +491,25 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Set the layout config settings based on a theme's specifications.
+     *
+     * @param array $themeInfo A theme info array.
+     * @param bool $save Whether to save the layout to config.
+     */
+    private function setLayout($themeInfo, $save = true) {
+        if ($layout = val('Layout', $themeInfo, false)) {
+            $discussionsLayout = strtolower(val('Discussions', $layout, ''));
+            $categoriesLayout = strtolower(val('Categories', $layout, ''));
+            if ($discussionsLayout && in_array($discussionsLayout, $this->allowedDiscussionsLayouts)) {
+                saveToConfig('Vanilla.Discussions.Layout', $discussionsLayout, $save);
+            }
+            if ($categoriesLayout && in_array($categoriesLayout, $this->allowedCategoriesLayouts)) {
+                saveToConfig('Vanilla.Categories.Layout', $categoriesLayout, $save);
+            }
+        }
+    }
+
+    /**
      *
      *
      * @param $ThemeName
@@ -491,6 +530,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($ThemeFolder == '') {
             throw new Exception(t('The theme folder was not properly defined.'));
         } else {
+            $this->setLayout($ThemeInfo);
             $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
             if ($Options) {
                 if ($IsMobile) {

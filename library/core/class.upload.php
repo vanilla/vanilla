@@ -341,33 +341,47 @@ class Gdn_Upload extends Gdn_Pluggable {
 
     /**
      * Returns the url prefix for a given type.
-     * If there is a plugin that wants to store uploads at a different location or in a different way then they register themselves by subscribing to the Gdn_Upload_GetUrls_Handler event.
-     * After that they will be available here.
      *
-     * @param string $Type The type of upload to get the prefix for.
+     * If there is a plugin that wants to store uploads at a different location or in a different way then they register
+     * themselves by subscribing to the Gdn_Upload_GetUrls_Handler event. After that they will be available here.
+     *
+     * @param string $type The type of upload to get the prefix for.
      * @return string The url prefix.
      */
-    public static function urls($Type = null) {
-        static $Urls = null;
+    public static function urls($type = null) {
+        static $urls = null;
 
-        if ($Urls === null) {
-            $Urls = array('' => asset('/uploads', true));
+        if ($urls === null) {
+            $urls = [
+                '' => asset('/uploads', true),
+                'static://v' => rtrim(asset('/', true), '/')
+            ];
 
-            $Sender = new stdClass();
-            $Sender->Returns = array();
-            $Sender->EventArguments = array();
-            $Sender->EventArguments['Urls'] =& $Urls;
+            $sender = new stdClass();
+            $sender->Returns = [];
+            $sender->EventArguments = [];
+            $sender->EventArguments['Urls'] =& $urls;
 
-            Gdn::pluginManager()->callEventHandlers($Sender, 'Gdn_Upload', 'GetUrls');
+            Gdn::pluginManager()->callEventHandlers($sender, 'Gdn_Upload', 'GetUrls');
         }
 
-        if ($Type === null) {
-            return $Urls;
+        if ($type === null) {
+            return $urls;
         }
-        if (isset($Urls[$Type])) {
-            return $Urls[$Type];
+        if (isset($urls[$type])) {
+            return $urls[$type];
         }
         return false;
+    }
+
+    /**
+     * Check to see whether the user has selected a file for uploading.
+     * 
+     * @param $inputName The input name of the file.
+     * @return bool Whether a file has been selected for the fiels.
+     */
+    public function isUpload($inputName) {
+        return val('name', val($inputName, $_FILES, '')) !== '';
     }
 
     /**

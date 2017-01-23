@@ -38,7 +38,6 @@ class UtilityController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
         set_time_limit(0); // Is this even doing anything?
     }
 

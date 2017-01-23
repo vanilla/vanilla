@@ -494,7 +494,7 @@ class UtilityController extends DashboardController {
             $feedFormat = 'normal';
         }
 
-        echo file_get_contents("http://vanillaforums.org/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
+        echo file_get_contents("https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
         $this->deliveryType(DELIVERY_TYPE_NONE);
         $this->render();
     }

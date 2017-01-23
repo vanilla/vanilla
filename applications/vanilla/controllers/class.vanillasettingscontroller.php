@@ -354,7 +354,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
 
             $upload = new Gdn_Upload();
-            $tmpImage = $upload->validateUpload('PhotoUpload', false);
+            $tmpImage = $upload->validateUpload('Photo_New', false);
+
             if ($tmpImage) {
                 // Generate the target image name
                 $targetImage = $upload->generateTargetName(PATH_UPLOADS);
@@ -465,6 +466,11 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
+
+        // Block deleting special categories.
+        if (val('CanDelete', $this->Category, true)) {
+            $this->Form->addError('The specified category cannot be deleted.');
+        }
 
         if (!$this->Category) {
             $this->Form->addError('The specified category could not be found.');
@@ -619,7 +625,7 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack()) {
             $this->setupDiscussionTypes($this->Category);
             $Upload = new Gdn_Upload();
-            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
+            $TmpImage = $Upload->validateUpload('Photo_New', false);
             if ($TmpImage) {
                 // Generate the target image name
                 $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
@@ -781,6 +787,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function manageCategories() {
+        deprecated('categories');
 
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);

@@ -200,9 +200,10 @@ content.</p>
                                             <h3 class="kss-title" id="10-4-2">
                                             <span class="kss-ref badge pull-right">10-4-2</span> Modal Confirm
                                             </h3>
-                                                <div class="kss-box padded"><p>This modal navigates to the url if the user confirms and cancels the navigation if the user declines. It&#39;s often
-paired with <code>.js-hijack</code> to delete content at the given endpoint. By default, the confirm modal has the <code>.modal-sm</code>
-class attached to it, but this can be overridden.</p>
+                                                <div class="kss-box padded"><p>This modal navigates to the url if the user confirms and cancels the navigation if the user declines. If the confirm
+is to direct the user to a new page (rather than process content at an endpoint), add the attribute:
+<code>data-follow-link: true</code> By default, the confirm modal has the <code>.modal-sm</code> class attached to it, but this can be
+overridden.</p>
 </div>
                                                 <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;a href=&quot;#&quot; class=&quot;js-modal&quot; data-modal-type=&quot;confirm&quot;&gt;
   I&#x27;m a confirm modal

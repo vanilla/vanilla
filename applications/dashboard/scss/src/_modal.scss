@@ -65,9 +65,10 @@
 
 // Modal Confirm
 //
-// This modal navigates to the url if the user confirms and cancels the navigation if the user declines. It's often
-// paired with `.js-hijack` to delete content at the given endpoint. By default, the confirm modal has the `.modal-sm`
-// class attached to it, but this can be overridden.
+// This modal navigates to the url if the user confirms and cancels the navigation if the user declines.
+// If the confirm is to direct the user to a new page (rather than ajax-style processing content at an endpoint),
+// add the attribute: `data-follow-link: true`. By default, the confirm modal has the `.modal-sm` class
+// attached to it, but this can be overridden.
 //
 // Markup:
 // <a href="#" class="js-modal" data-modal-type="confirm">

@@ -1739,6 +1739,19 @@ if (!function_exists('inArrayI')) {
     }
 }
 
+if (!function_exists('inMaintenanceMode')) {
+    /**
+     * Determine if the site is in maintenance mode.
+     *
+     * @return bool
+     */
+    function inMaintenanceMode() {
+        $updateMode = c('Garden.UpdateMode');
+
+        return (bool)$updateMode;
+    }
+}
+
 if (!function_exists('inSubArray')) {
     /**
      * Loop through {@link $Haystack} looking for subarrays that contain {@link $Needle}.

@@ -9357,6 +9357,30 @@ pre {
   margin-top: -0.125rem;
 }
 
+.badge-primary {
+  background-color: #0291db;
+}
+
+.badge-secondary {
+  background-color: #f5296d;
+}
+
+.badge-success {
+  background-color: #6bc573;
+}
+
+.badge-info {
+  background-color: #a1b8c6;
+}
+
+.badge-warning {
+  background-color: #faae42;
+}
+
+.badge-danger {
+  background-color: #fa2e1f;
+}
+
 .text-primary {
   color: #0291db;
 }

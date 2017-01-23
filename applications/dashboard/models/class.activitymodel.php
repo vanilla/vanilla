@@ -11,7 +11,7 @@
 /**
  * Activity data management.
  */
-class ActivityModel extends Gdn_Model {
+class ActivityModel extends \Vanilla\VanillaModel {
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
@@ -1103,6 +1103,11 @@ class ActivityModel extends Gdn_Model {
                 $Comment['ActivityID'] = $CommentActivityID;
             }
 
+            // Make sure the user isn't spamming (flood control)
+            if ($this->isSpamming('ActivityComment')) {
+                return false;
+            }
+
             // Check for spam.
             $Spam = SpamModel::isSpam('ActivityComment', $Comment);
             if ($Spam) {
@@ -1476,6 +1481,10 @@ class ActivityModel extends Gdn_Model {
         $ActivityID = val('ActivityID', $Activity);
         if (!$ActivityID) {
             if (!$Delete) {
+                // Make sure the user isn't spamming (flood control)
+                if ($this->isSpamming('Activity')) {
+                    return false;
+                }
                 $this->addInsertFields($Activity);
                 touchValue('DateUpdated', $Activity, $Activity['DateInserted']);
 

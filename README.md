@@ -1,5 +1,5 @@
 _Vanilla uses Composer!
-You cannot clone this repo right into a web directory - it requires a build step. [Learn more](http://vanillaforums.org/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](http://vanillaforums.org/addon/vanilla-core) instead_.
+You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
 
 ![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
@@ -28,19 +28,19 @@ can build a custom-tailored environment that meets your community's particular n
 
 Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
-You can join us on the [Vanilla Community Forums](http://vanillaforums.org/discussions) to be part of that discussion.
+You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the `release/2.3` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.3` branch.
 
-New plugins and themes can be listed in the [Official Addon Directory](http://vanillaforums.org/addon/).
+New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
 
 ## Cloud Solution
 
-Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](http://vanillaforums.com)
+Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](https://vanillaforums.com)
 with a 1-click install, automatic upgrades, amazing professional support, incredible scalability,
 integration assistance, theming and migration services, and exclusive features. For the very best Vanilla forum experience,
-you can skip the rest of this technical stuff and [go there directly](http://vanillaforums.com/plans).
+you can skip the rest of this technical stuff and [go there directly](https://vanillaforums.com/plans).
 
 If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
 
@@ -73,7 +73,7 @@ by default for all smartphones & tablets. Heck, it even works on the PlayStation
 
 Vanilla is built to be simple, and its installation is no exception.
 
-* Upload Vanilla's [pre-built version](https://vanillaforums.org/addon/vanilla-core) to your server.
+* Upload Vanilla's [pre-built version](https://open.vanillaforums.com/addon/vanilla-core) to your server.
 * Confirm the cache, conf, and uploads folders are writable by PHP.
 * Navigate to that folder in your web browser.
 * Follow the instructions on screen.
@@ -85,8 +85,12 @@ Follow these steps to upgrade Vanilla when a new stable release is announced.
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Delete all files in `/cache`.
-* Go to `yourforum.com/utility/update` to run any database updates needed.
+* Go to `yourforum.com/utility/update` to run any database updates needed. (404? See next paragraph.)
 * If it fails, try it a second times by refreshing the page.
+
+If your forum still uses URLs including `?p=`:
+
+Support for this URL structure is ending after 2.3 in favor of "pretty" URLs so it's time to make the switch. First, confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. Then, open `conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. Your site should immediately switch to "pretty" URL paths instead of using the 'p' parameter. If there is a problem, re-add the line to your config and do further troubleshooting.
 
 To upgrade from **2.1 or earlier**:
 
@@ -98,7 +102,7 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 ## Migrating to Vanilla
 
-* Get [Vanilla Porter](http://vanillaforums.org/addon/porter-core) and verify it supports your platform.
+* Get [Vanilla Porter](https://open.vanillaforums.com/addon/porter-core) and verify it supports your platform.
 * Read the Advanced Uses notes on that page.
 * Upload it to your current server.
 * Navigate to the file in your web browser & run it.
@@ -108,15 +112,15 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 * [Troubleshooting upgrades & installs](http://docs.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://docs.vanillaforums.com)
-* [Vanilla community forums](http://vanillaforums.org/discussions)
-* [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)
+* [Vanilla community forums](https://open.vanillaforums.com/discussions)
+* [Official cloud hosting with professional support & migration services](https://vanillaforums.com/plans)
 
 ## Contributing
 
 * Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
-* Got an idea or suggestion? Use the [forum](http://vanillaforums.org/discussions) to discuss it.
+* Got an idea or suggestion? Use the [forum](https://open.vanillaforums.com/discussions) to discuss it.
 * File detailed [issues](https://github.com/vanilla/vanilla/issues) on GitHub (version number, what you did, and actual vs expected outcomes).
-* Sign the [Contributors' Agreement](http://vanillaforums.org/contributors) to send us code.
+* Sign the [Contributors' Agreement](https://open.vanillaforums.com/contributors) to send us code.
 * Use pull requests against the `master` branch.
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 

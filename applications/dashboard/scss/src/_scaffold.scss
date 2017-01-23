@@ -145,6 +145,16 @@
   display: none;
 }
 
+.drawer-only {
+  display: none;
+}
+
+.drawer-show {
+  .drawer-only {
+    display: block;
+  }
+}
+
 @include media-breakpoint-down(md) {
   .panel-right {
     display: none;

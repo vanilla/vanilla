@@ -1350,19 +1350,30 @@ class EditorPlugin extends Gdn_Plugin {
             'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter'))
         ));
 
-        
+
         $Sender->setData('Title', t('Advanced Editor Settings'));
         $Cf->renderAll();
     }
 
     /**
-     * When enabled, disable other known editors that may clash with this one.
-     *
      * If editor is loaded, then the other editors loaded after, there are CSS rules that hide them.
      * This way, the editor plugin always takes precedence.
      */
     public function setup() {
-        $pluginEditors = array(
+        touchConfig(array(
+            'Garden.MobileInputFormatter' => 'TextEx',
+            'Plugins.editor.ForceWysiwyg' => false
+        ));
+        $this->structure();
+    }
+
+    /**
+     * When enabled or on utility/update, disable other known editors that may clash with this one.
+     *
+     * @throws Exception
+     */
+    public function structure() {
+         $pluginEditors = array(
             'cleditor',
             'ButtonBar',
             'Emotify',
@@ -1372,19 +1383,7 @@ class EditorPlugin extends Gdn_Plugin {
         foreach ($pluginEditors as $pluginName) {
             Gdn::pluginManager()->disablePlugin($pluginName);
         }
-        touchConfig(array(
-            'Garden.MobileInputFormatter' => 'TextEx',
-            'Plugins.editor.ForceWysiwyg' => false
-        ));
-        $this->structure();
-    }
 
-    /**
-     *
-     *
-     * @throws Exception
-     */
-    public function structure() {
         // Set to false by default, so change in config if uploads allowed.
         touchConfig('Garden.AllowFileUploads', true);
 

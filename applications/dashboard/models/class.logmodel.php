@@ -67,37 +67,41 @@ class LogModel extends Gdn_Pluggable {
     public function formatContent($Log) {
         $Data = $Log['Data'];
 
-        // TODO: Check for a custom log type handler.
+        $Result = '';
+        $this->EventArguments['Log'] = $Log;
+        $this->EventArguments['Result'] = &$Result;
+        $this->fireEvent('FormatContent');
 
-        switch ($Log['RecordType']) {
-            case 'Activity':
-                $Result = $this->formatKey('Story', $Data);
-                break;
-            case 'Discussion':
-                $Result =
-                    '<b>'.$this->formatKey('Name', $Data).'</b><br />'.
-                    $this->formatKey('Body', $Data);
-                break;
-            case 'ActivityComment':
-            case 'Comment':
-                $Result = $this->formatKey('Body', $Data);
-                break;
-            case 'Configuration':
-                $Result = $this->formatConfiguration($Data);
-                break;
-            case 'Registration':
-            case 'User':
-                $Result = $this->formatRecord(['Email', 'Name'], $Data);
-                if ($DiscoveryText = val('DiscoveryText', $Data)) {
-                    $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::display($DiscoveryText);
-                }
-                if (val('Banned', $Data)) {
-                    $Result .= "<br />".t('Banned');
-                }
-                break;
-            default:
-                $Result = '';
+        if ($Result === '') {
+            switch ($Log['RecordType']) {
+                case 'Activity':
+                    $Result = $this->formatKey('Story', $Data);
+                    break;
+                case 'Discussion':
+                    $Result =
+                        '<b>'.$this->formatKey('Name', $Data).'</b><br />'.
+                        $this->formatKey('Body', $Data);
+                    break;
+                case 'ActivityComment':
+                case 'Comment':
+                    $Result = $this->formatKey('Body', $Data);
+                    break;
+                case 'Configuration':
+                    $Result = $this->formatConfiguration($Data);
+                    break;
+                case 'Registration':
+                case 'User':
+                    $Result = $this->formatRecord(['Email', 'Name'], $Data);
+                    if ($DiscoveryText = val('DiscoveryText', $Data)) {
+                        $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::display($DiscoveryText);
+                    }
+                    if (val('Banned', $Data)) {
+                        $Result .= "<br />".t('Banned');
+                    }
+                    break;
+            }
         }
+
         return $Result;
     }
 

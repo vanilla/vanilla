@@ -207,6 +207,10 @@ class CategoriesController extends VanillaController {
                 throw notFoundException();
             }
             $Category = (object)$Category;
+
+            // Check permission
+            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
+
             Gdn_Theme::section($Category->CssClass);
 
             // Load the breadcrumbs.

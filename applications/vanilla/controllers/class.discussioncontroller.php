@@ -782,7 +782,7 @@ class DiscussionController extends VanillaController {
 
         // Add some css to help with the transparent bg on embedded comments
         if ($this->Head) {
-            $this->Head->addString('<style type="text/css">
+            $this->Head->addString('<style>
 body { background: transparent !important; }
 </style>');
         }

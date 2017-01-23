@@ -24,7 +24,7 @@ class CategoryCollection {
     /**
      * @var int The absolute select limit of the categories.
      */
-    private $absoluteLimit = 300;
+    private $absoluteLimit;
 
     /**
      * @var Gdn_Cache The cache dependency.
@@ -78,6 +78,8 @@ class CategoryCollection {
      * @param Gdn_Cache|null $cache The cache layer dependency.
      */
     public function __construct(Gdn_SQLDriver $sql = null, Gdn_Cache $cache = null) {
+        $this->absoluteLimit = c('Vanilla.Categories.QueryLimit', 300);
+
         if ($sql === null) {
             $sql = Gdn::sql();
         }

@@ -268,18 +268,17 @@ class CategoryModel extends Gdn_Model {
     /**
      *
      *
-     * @since 2.0.18
-     * @access public
-     * @return array Category IDs.
+     * @param bool $honorHideAllDiscussion Whether or not the HideAllDiscussions flag will be checked on categories.
+     * @return array|bool Category IDs or true if all categories are watched.
      */
-    public static function categoryWatch($AllDiscussions = true) {
+    public static function categoryWatch($honorHideAllDiscussion = true) {
         $Categories = self::categories();
         $AllCount = count($Categories);
 
         $Watch = array();
 
         foreach ($Categories as $CategoryID => $Category) {
-            if ($AllDiscussions && val('HideAllDiscussions', $Category)) {
+            if ($honorHideAllDiscussion && val('HideAllDiscussions', $Category)) {
                 continue;
             }
 
@@ -448,7 +447,7 @@ class CategoryModel extends Gdn_Model {
      * we can deprecate/remove this function.
      *
      * @param bool $stopHeadingCalculation
-     * @return CategoryModel 
+     * @return CategoryModel
      */
     public function setStopHeadingsCalculation($stopHeadingCalculation) {
         self::$stopHeadingsCalculation = $stopHeadingCalculation;

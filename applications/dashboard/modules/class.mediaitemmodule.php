@@ -79,7 +79,7 @@ class MediaItemModule extends Gdn_Module {
      * MediaItemModule constructor.
      *
      * @param string $title The media item heading.
-     * @param string $titleUrl If the heading is an anchor, the anchor url (not passed through the url function).
+     * @param string $titleUrl If the heading is an anchor, the anchor url (the view handles url()-ing).
      * @param string $description The media item description text.
      * @param string $tag The root-level tag of the media item, usually a div or li.
      * @param array $attributes The root-level attributes for the Media Item.
@@ -90,7 +90,7 @@ class MediaItemModule extends Gdn_Module {
         $this->description = $description;
         $this->title = $title;
         if ($titleUrl) {
-            $this->titleUrl = url($titleUrl);
+            $this->titleUrl = $titleUrl;
         }
         $this->tag = $tag;
         $this->attributes = $attributes;
@@ -155,11 +155,11 @@ class MediaItemModule extends Gdn_Module {
     }
 
     /**
-     * @param string $titleUrl Url for title, function handles url()-ing.
+     * @param string $titleUrl Url for title, the view handles url()-ing.
      * @return MediaItemModule $this
      */
     public function setTitleUrl($titleUrl) {
-        $this->titleUrl = url($titleUrl);
+        $this->titleUrl = $titleUrl;
         return $this;
     }
 

@@ -125,80 +125,101 @@ if (!function_exists('MostRecentString')):
     }
 endif;
 
-if (!function_exists('WriteListItem')):
+if (!function_exists('writeListItem')):
+    /**
+     * Renders a list item in a category list (modern view).
+     *
+     * @param $category
+     * @param $depth
+     * @throws Exception
+     */
+    function writeListItem($category, $depth) {
+        $children = $category['Children'];
+        $categoryID = val('CategoryID', $category);
+        $cssClass = cssClass($category);
+        $writeChildren = getWriteChildrenMethod($category, $depth);
+        $rssIcon = '';
 
-    function writeListItem($Row, $Depth = 1) {
-        $Children = $Row['Children'];
-        $WriteChildren = FALSE;
-        if (!empty($Children)) {
-            if (($Depth + 1) >= c('Vanilla.Categories.MaxDisplayDepth')) {
-                $WriteChildren = 'list';
-            } else {
-                $WriteChildren = 'items';
-            }
+        if (val('DisplayAs', $category) === 'Discussions') {
+            $rssImage = img('applications/dashboard/design/images/rss.gif', ['alt' => t('RSS Feed')]);
+            $rssIcon = anchor($rssImage, '/categories/'.val('UrlCode', $category).'/feed.rss', '', ['title' => t('RSS Feed')]);
         }
 
-        $H = 'h'.($Depth + 1);
-        ?>
-        <li id="Category_<?php echo $Row['CategoryID']; ?>" class="<?php echo CssClass($Row); ?>">
-            <div class="ItemContent Category">
-                <?php
-                echo '<div class="Options">'.getOptions($Row).'</div>';
-                echo '<'.$H.' class="CategoryName TitleWrap">';
-                echo CategoryPhoto($Row);
-
-                $safeName = htmlspecialchars($Row['Name']);
-                echo $Row['DisplayAs'] === 'Heading' ? $safeName : anchor($safeName, $Row['Url'], 'Title');
-
-                Gdn::controller()->EventArguments['Category'] = $Row;
-                Gdn::controller()->fireEvent('AfterCategoryTitle');
-                echo '</'.$H.'>';
-                ?>
-
-                <div class="CategoryDescription">
-                    <?php echo $Row['Description']; ?>
+        if (val('DisplayAs', $category) === 'Heading') : ?>
+            <li id="Category_<?php echo $categoryID; ?>" class="CategoryHeading <?php echo $cssClass; ?>">
+                <div class="ItemContent Category">
+                    <div class="Options"><?php echo getOptions($category); ?></div>
+                    <?php echo Gdn_Format::text(val('Name', $category)); ?>
                 </div>
-
-                <?php if ($WriteChildren === 'list'): ?>
-                    <div class="ChildCategories">
-                        <?php
-                        echo wrap(t('Child Categories').': ', 'b');
-                        echo CategoryString($Children, $Depth + 1);
+            </li>
+        <?php else: ?>
+            <li id="Category_<?php echo $categoryID; ?>" class="<?php echo $cssClass; ?>">
+                <?php
+                Gdn::controller()->EventArguments['ChildCategories'] = &$children;
+                Gdn::controller()->EventArguments['Category'] = &$category;
+                Gdn::controller()->fireEvent('BeforeCategoryItem');
+                ?>
+                <div class="ItemContent Category">
+                    <div class="Options">
+                        <?php echo getOptions($category) ?>
+                    </div>
+                    <?php echo CategoryPhoto($category); ?>
+                    <div class="TitleWrap">
+                        <?php echo anchor(Gdn_Format::text(val('Name', $category)), CategoryUrl($category), 'Title');
+                        Gdn::controller()->fireEvent('AfterCategoryTitle');
                         ?>
                     </div>
-                <?php endif; ?>
+                    <div class="CategoryDescription">
+                        <?php echo val('Description', $category) ?>
+                    </div>
+                    <div class="Meta">
+                        <span class="MItem RSS"><?php echo $rssIcon ?></span>
+                        <span class="MItem DiscussionCount">
+                            <?php echo sprintf(
+                                PluralTranslate(
+                                    val('CountDiscussions', $category),
+                                    '%s discussion html',
+                                    '%s discussions html',
+                                    t('%s discussion'),
+                                    t('%s discussions')
+                                ), BigPlural(val('CountDiscussions', $category), '%s discussion')) ?>
+                        </span>
+                        <span class="MItem CommentCount">
+                            <?php echo sprintf(
+                                PluralTranslate(
+                                    val('CountComments', $category), '%s comment html',
+                                    '%s comments html',
+                                    t('%s comment'),
+                                    t('%s comments')
+                                ), BigPlural(val('CountComments', $category), '%s comment')); ?>
+                        </span>
 
-                <div class="Meta">
-            <span class="MItem RSS"><?php
-                echo anchor(' ', '/categories/'.rawurlencode($Row['UrlCode']).'/feed.rss', 'SpRSS');
-                ?></span>
-
-            <span class="MItem MItem-Count DiscussionCount"><?php
-                printf(PluralTranslate($Row['CountAllDiscussions'],
-                    '%s discussion html', '%s discussions html', t('%s discussion'), t('%s discussions')),
-                    BigPlural($Row['CountAllDiscussions'], '%s discussion'));
-                ?></span>
-
-            <span class="MItem MItem-Count CommentCount"><?php
-                printf(PluralTranslate($Row['CountAllComments'],
-                    '%s comment html', '%s comments html', t('%s comment'), t('%s comments')),
-                    BigPlural($Row['CountAllComments'], '%s comment'));
-                ?></span>
-
-            <span class="MItem LastestPost LastDiscussionTitle"><?php
-                echo MostRecentString($Row);
-                ?></span>
+                        <?php if (val('LastTitle', $category) != '') : ?>
+                            <span class="MItem LastDiscussionTitle">
+                                <?php echo mostRecentString($category); ?>
+                            </span>
+                            <span class="MItem LastCommentDate">
+                                <?php echo Gdn_Format::date(val('LastDateInserted', $category)); ?>
+                            </span>
+                        <?php endif;
+                        if ($writeChildren === 'list'): ?>
+                            <div class="ChildCategories">
+                                <?php echo wrap(t('Child Categories').': ', 'b'); ?>
+                                <?php echo CategoryString($children, $depth + 1); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
-            </div>
-        </li>
-        <?php
-        if ($WriteChildren === 'items') {
-            foreach ($Children as $ChildRow) {
-                WriteListItem($ChildRow, $Depth + 1);
+            </li>
+        <?php endif;
+        if ($writeChildren === 'items') {
+            foreach ($children as $child) {
+                writeListItem($child, $depth + 1);
             }
         }
     }
 endif;
+
 
 if (!function_exists('WriteTableHead')):
 
@@ -226,17 +247,7 @@ if (!function_exists('WriteTableRow')):
 
     function writeTableRow($Row, $Depth = 1) {
         $Children = $Row['Children'];
-        $WriteChildren = FALSE;
-        $maxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth');
-
-        if (!empty($Children)) {
-            if ($maxDisplayDepth > 0 && ($Depth + 1) >= $maxDisplayDepth) {
-                $WriteChildren = 'list';
-            } else {
-                $WriteChildren = 'rows';
-            }
-        }
-
+        $WriteChildren = getWriteChildrenMethod($Row, $Depth);
         $H = 'h'.($Depth + 1);
         ?>
         <tr class="<?php echo CssClass($Row); ?>">
@@ -261,7 +272,7 @@ if (!function_exists('WriteTableRow')):
                         <div class="ChildCategories">
                             <?php
                             echo wrap(t('Child Categories').': ', 'b');
-                            echo CategoryString($Children, $Depth + 1);
+                            echo categoryString($Children, $Depth + 1);
                             ?>
                         </div>
                     <?php endif; ?>
@@ -320,7 +331,7 @@ if (!function_exists('WriteTableRow')):
             </td>
         </tr>
         <?php
-        if ($WriteChildren === 'rows') {
+        if ($WriteChildren === 'items') {
             foreach ($Children as $ChildRow) {
                 WriteTableRow($ChildRow, $Depth + 1);
             }
@@ -328,20 +339,25 @@ if (!function_exists('WriteTableRow')):
     }
 endif;
 
-if (!function_exists('WriteCategoryList')):
-
-    function writeCategoryList($Categories, $Depth = 1) {
+if (!function_exists('writeCategoryList')):
+    /**
+     * Renders a category list (modern view).
+     *
+     * @param $categories
+     * @param int $depth
+     */
+    function writeCategoryList($categories, $depth = 1) {
         ?>
         <div class="DataListWrap">
             <ul class="DataList CategoryList">
                 <?php
-                foreach ($Categories as $Category) {
-                    WriteListItem($Category, $Depth);
+                foreach ($categories as $category) {
+                    writeListItem($category, $depth);
                 }
                 ?>
             </ul>
         </div>
-    <?php
+        <?php
     }
 endif;
 
@@ -380,5 +396,32 @@ if (!function_exists('writeCategoryTable')):
         if ($inTable) {
             echo '</tbody></table></div>';
         }
+    }
+endif;
+
+if (!function_exists('getWriteChildrenMethod')):
+    /**
+     * Calculates how to display category children. Either 'list' for a comma-separated list (usually appears in meta) or
+     * 'items' to nest children below the parent or false if there are no children.
+     *
+     * @param $category
+     * @param $depth
+     * @return bool|string
+     */
+    function getWriteChildrenMethod($category, $depth) {
+        $children = val('Children', $category);
+        $writeChildren = false;
+        $maxDisplayDepth = c('Vanilla.Categories.MaxDisplayDepth');
+        $isHeading = val('DisplayAs', $category) === 'Heading';
+
+        if (!empty($children)) {
+            if (!$isHeading && $maxDisplayDepth > 0 && ($depth + 1) >= $maxDisplayDepth) {
+                $writeChildren = 'list';
+            } else {
+                $writeChildren = 'items';
+            }
+        }
+
+        return $writeChildren;
     }
 endif;

@@ -55,6 +55,7 @@ class DashboardController extends Gdn_Controller {
         }
 
         $this->MasterView = 'admin';
+        Gdn_Theme::section('Dashboard');
         parent::initialize();
     }
 

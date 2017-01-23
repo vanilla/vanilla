@@ -395,6 +395,11 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param type $Code
      */
     public function profileController_FacebookConnect_create($Sender, $UserReference, $Username, $Code = false) {
+        $transientKey = Gdn::request()->get('state');
+        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $Sender->permission('Garden.SignIn.Allow');
 
         $Sender->getUserInfo($UserReference, $Username, '', true);
@@ -642,9 +647,13 @@ class FacebookPlugin extends Gdn_Plugin {
             $RedirectUri .= '&'.$Query;
         }
 
-        $RedirectUri = urlencode($RedirectUri);
-
-        $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=$Scopes";
+        $authQuery = http_build_query([
+            'client_id' => $AppID,
+            'redirect_uri' => $RedirectUri,
+            'scope' => $Scopes,
+            'state' => Gdn::session()->transientKey()
+        ]);
+        $SigninHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
         if ($Query) {
             $SigninHref .= '&'.$Query;

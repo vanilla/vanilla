@@ -211,6 +211,7 @@ module.exports = function (grunt) {
       styleguide: {
         src: ([]).concat([
           'js/vendors/tether.js',
+          'js/vendors/jquery.checkall.min.js',
           'js/vendors/icheck.min.js',
           'js/vendors/clipboard.min.js',
           'js/vendors/drop.min.js',

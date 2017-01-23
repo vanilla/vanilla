@@ -9,18 +9,18 @@
 
 // Define the plugin:
 $PluginInfo['GooglePlus'] = array(
-    'Name' => 'Google+ Social Connect',
-    'Description' => 'Users may sign into your site using their Google Plus account.',
+    'Name' => 'Google+',
+    'Description' => 'Users may sign into your site using their Google+ account. Provides options for social reactions and sharing via Google+.',
     'Version' => '1.1.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SettingsUrl' => '/dashboard/social/googleplus',
+    'SettingsUrl' => '/addons/googleplus',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Hidden' => false,
-    'SocialConnect' => true,
+    'Groups' => ['SocialConnect'],
     'RequiresRegistration' => false,
     'Icon' => 'google_social_connect.png'
 );
@@ -519,7 +519,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function socialController_googlePlus_create($Sender, $Args) {
+    public function addonsController_googlePlus_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
@@ -537,7 +537,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             $Model->save(array('AuthenticationKey' => self::ProviderKey, 'IsDefault' => c('Plugins.GooglePlus.Default')));
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->addSideMenu('addons/socialconnect');
         $Sender->setData('Title', sprintf(t('%s Settings'), 'Google+'));
         $Sender->ConfigurationModule = $Conf;
         $Sender->render('Settings', '', 'plugins/GooglePlus');

@@ -7,21 +7,21 @@
 
 // Define the plugin:
 $PluginInfo['Facebook'] = array(
-    'Name' => 'Facebook Social Connect',
-    'Description' => 'Users may sign into your site using their Facebook account.',
+    'Name' => 'Facebook',
+    'Description' => 'Users may sign into your site using their Facebook account. Provides options for social reactions and sharing via Facebook.',
     'Version' => '1.2.0',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'MobileFriendly' => true,
-    'SettingsUrl' => '/dashboard/social/facebook',
+    'SettingsUrl' => '/addons/facebook',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'HasLocale' => true,
     'RegisterPermissions' => false,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SocialConnect' => true,
+    'Groups' => ['SocialConnect'],
     'RequiresRegistration' => true,
     'Icon' => 'facebook_social_connect.png'
 );
@@ -448,7 +448,7 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function socialController_facebook_create($Sender, $Args) {
+    public function addonsController_facebook_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
         if ($Sender->Form->authenticatedPostBack()) {
             $Settings = array(
@@ -473,7 +473,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->addSideMenu('addons/socialconnect');
         $Sender->setData('Title', t('Facebook Settings'));
         $Sender->render('Settings', '', 'plugins/Facebook');
     }

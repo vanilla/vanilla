@@ -9,18 +9,18 @@
 
 // Define the plugin:
 $PluginInfo['Twitter'] = array(
-    'Name' => 'Twitter Social Connect',
-    'Description' => 'Users may sign into your site using their Twitter account.',
+    'Name' => 'Twitter',
+    'Description' => 'Users may sign into your site using their Twitter account. Provides options for social reactions and sharing via Twitter.',
     'Version' => '1.1.10',
     'RequiredApplications' => array('Vanilla' => '2.2'),
     'MobileFriendly' => true,
-    'SettingsUrl' => '/dashboard/social/twitter',
+    'SettingsUrl' => '/addons/twitter',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'HasLocale' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'SocialConnect' => true,
+    'Groups' => ['SocialConnect'],
     'RequiresRegistration' => true,
     'Icon' => 'twitter_social_connect.png'
 );
@@ -922,7 +922,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param $Args
      */
-    public function socialController_twitter_create($Sender, $Args) {
+    public function addonsController_twitter_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
         if ($Sender->Form->authenticatedPostBack()) {
             $Settings = array(
@@ -944,7 +944,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->addSideMenu('addons/socialconnect');
         $Sender->setData('Title', t('Twitter Settings'));
         $Sender->render('Settings', '', 'plugins/Twitter');
     }

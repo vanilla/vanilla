@@ -193,7 +193,7 @@ if (!function_exists('popin')) {
      * @return string Popin HTML string.
      */
     function popin($rel) {
-        return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
+        return ' <span class="badge js-popin" rel="'.$rel.'"></span> ';
     }
 }
 

@@ -19,7 +19,7 @@ $PluginInfo['OpenID'] = array(
     'SocialConnect' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'Icon' => 'open-id.png'
 );
 

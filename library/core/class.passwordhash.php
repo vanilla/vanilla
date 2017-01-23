@@ -67,8 +67,7 @@ class Gdn_PasswordHash {
                 $Result = $this->getAlgorithm('Django')->verify($Password, $StoredHash);
                 break;
             case 'drupal':
-                require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
-                $Result = Drupal\user_check_password($Password, $StoredHash);
+                $Result = $this->getAlgorithm('Drupal')->verify($Password, $StoredHash);
                 break;
             case 'ipb':
                 $Result = $this->getAlgorithm('Ipb')->verify($Password, $StoredHash);
@@ -113,8 +112,7 @@ class Gdn_PasswordHash {
                 $Result = $this->checkYAF($Password, $StoredHash);
                 break;
             case 'webwiz':
-                require_once PATH_LIBRARY.'/vendors/misc/functions.webwizhash.php';
-                $Result = ww_CheckPassword($Password, $StoredHash);
+                $Result = $this->getAlgorithm('WebWiz')->verify($Password, $StoredHash);
                 break;
             case 'vanilla':
             default:

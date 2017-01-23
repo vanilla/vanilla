@@ -201,9 +201,6 @@ Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySing
 Gdn::factoryInstall('Smarty', 'Smarty');
 Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
 
-// Slice handler
-Gdn::factoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
-
 // Remote Statistics
 Gdn::factoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);
 Gdn::statistics();

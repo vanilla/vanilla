@@ -277,7 +277,6 @@ class UpdateModel extends Gdn_Model {
         }
 
         if (!$Zip) {
-            require_once PATH_LIBRARY."/vendors/pclzip/class.pclzipadapter.php";
             $Zip = new PclZipAdapter();
             $ZipOpened = $Zip->open($Path);
         }

@@ -117,7 +117,6 @@ form {
   padding-bottom: 1rem;
   margin-bottom: 0;
   border-bottom: $border-width dotted #e7e8e9;
-  border-bottom: $border-width dotted #e7e8e9;
 
   > .no-grid {
     @extend .row-padding-left;
@@ -463,9 +462,9 @@ select.form-control {
   vertical-align: middle;
 
   background-color: #fff;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
   background-repeat: no-repeat;
   background-position: right .75rem center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
   background-image: none \9;
   background-size: 8px 10px;
 
@@ -620,6 +619,7 @@ select + select {
   .selected {
     display: none;
     color: $brand-success;
+
     svg {
       display: block;
       width: 84px;
@@ -629,7 +629,6 @@ select + select {
   .overlay {
     display: flex;
     position: absolute;
-    display: flex;
     align-items: center;
     justify-content: center;
     bottom: 0;
@@ -679,6 +678,7 @@ select + select {
 
     a {
       color: $white;
+
       &:hover {
         color: $navbar-active-link-active-bg;
       }

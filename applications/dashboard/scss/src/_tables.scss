@@ -177,6 +177,7 @@
 
 .table-data-body {
   font-size: $font-size-tables;
+
   tr {
     &:hover {
       background-color: #f9fdfe;
@@ -275,6 +276,7 @@
 
   .media-sm {
     display: inline-block;
+
     .media-left,
     .info {
       display: none;
@@ -353,7 +355,7 @@
     // Permission column headings
     td {
       text-align: center;
-      padding: ($spacer / 2) ($spacer / 2);
+      padding: $spacer / 2;
       border: 1px solid #eee;
       border-top: 1px solid #ddd;
       text-transform: uppercase;

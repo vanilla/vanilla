@@ -114,7 +114,7 @@ module.exports = function (grunt) {
             cwd: 'bower_components',
             src: [
               'google-code-prettify/src/prettify.css'
-              , 'color-themes-for-google-code-prettify/themes/tomorrow.css'
+              , 'color-themes-for-google-code-prettify/dist/themes/tomorrow.css'
             ],
             dest: 'design/vendors'
           },

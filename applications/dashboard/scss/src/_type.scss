@@ -330,7 +330,7 @@ pre {
   border-style: solid;
   border-color: $brand-secondary;
   border-right-color: transparent;
-  border-width: ($flag-height / 2) ($flag-height / 2);
+  border-width: $flag-height / 2;
   text-transform: uppercase;
 }
 
@@ -380,6 +380,7 @@ pre {
 // Generates .text-* css rules to change text color for all our semantic colors in variables.
 @each $semantic-color in map-keys($semantic-colors) {
   $color: map-get($semantic-colors, $semantic-color);
+
   .text-#{$semantic-color} {
     color: $color;
   }

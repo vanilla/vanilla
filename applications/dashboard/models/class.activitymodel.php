@@ -11,7 +11,7 @@
 /**
  * Activity data management.
  */
-class ActivityModel extends VanillaModel {
+class ActivityModel extends \Vanilla\VanillaModel {
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;

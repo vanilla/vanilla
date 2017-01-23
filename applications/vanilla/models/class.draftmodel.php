@@ -11,7 +11,7 @@
 /**
  * Manages unpublished drafts of comments and discussions.
  */
-class DraftModel extends VanillaModel {
+class DraftModel extends \Vanilla\VanillaModel {
 
     /**
      * Class constructor. Defines the related database table name.

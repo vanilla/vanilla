@@ -11,7 +11,7 @@
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends VanillaModel {
+class CommentModel extends \Vanilla\VanillaModel {
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;

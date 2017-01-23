@@ -11,7 +11,7 @@
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends VanillaModel {
+class DiscussionModel extends \Vanilla\VanillaModel {
 
     use StaticInitializer;
 

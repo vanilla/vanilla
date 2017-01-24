@@ -1269,6 +1269,8 @@ class CategoryModel extends Gdn_Model {
      * @param int $newCategoryID ID of the category that will replace this one.
      */
     public function deleteAndReplace($category, $newCategoryID) {
+        static $recursionLevel = 0;
+
         // Coerce the category into an object for deletion.
         if (is_numeric($category)) {
             $category = $this->getID($category, DATASET_TYPE_OBJECT);
@@ -1371,16 +1373,21 @@ class CategoryModel extends Gdn_Model {
 
                 // Recursively delete child categories and their content.
                 $children = self::flattenTree($this->collection->getTree($category->CategoryID));
+                $recursionLevel++;
                 foreach ($children as $child) {
                     self::deleteAndReplace($child, 0);
                 }
+                $recursionLevel--;
             }
 
             // Delete the category
             $this->SQL->delete('Category', array('CategoryID' => $category->CategoryID));
         }
+
         // Make sure to reorganize the categories after deletes
-        $this->RebuildTree();
+        if ($recursionLevel === 0) {
+            $this->rebuildTree();
+        }
     }
 
     /**

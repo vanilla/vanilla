@@ -207,7 +207,7 @@ class PermissionModel extends Gdn_Model {
      * @throws Exception
      */
     public function define($PermissionNames, $Type = 'tinyint', $JunctionTable = null, $JunctionColumn = null) {
-        if (!is_array($PermissionNames)) {Perm
+        if (!is_array($PermissionNames)) {
             trigger_error(__CLASS__.'->'.__METHOD__.' was called with an invalid $PermissionNames parameter.', E_USER_ERROR);
             return;
         }

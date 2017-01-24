@@ -5036,19 +5036,50 @@ output {
           justify-content: space-between;
 }
 
-.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+.toolbar-stats > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-slot {
   margin-top: 2.25rem;
 }
 
 @media (max-width: 991px) {
-  .toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+  .toolbar-stats .toolbar-stats-slot {
     margin-top: 1.125rem;
   }
 }
 
-.toolbar-stats > * {
+.toolbar-stats .toolbar-stats-date-picker {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin-top: 1.125rem;
+}
+
+@media (max-width: 991px) {
+  .toolbar-stats .toolbar-stats-date-picker {
+    margin-top: 0;
+  }
+}
+
+.toolbar-stats .toolbar-stats-date-picker > * {
+  margin-top: 1.125rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date {
+  padding-left: 0.5625rem;
+  padding-right: 0.5625rem;
+  min-width: 14.25rem;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date:after {
+  right: 1.125rem;
 }
 
 .analytics-panel,
@@ -6344,6 +6375,7 @@ select.nav-stats-users:focus,
 
 .filter-date {
   position: relative;
+  min-width: 13.125rem;
 }
 
 .filter-date:after {
@@ -9361,10 +9393,6 @@ button.close {
   .main .content .control-panel {
     display: block;
   }
-}
-
-.filter-date {
-  min-width: 13.125rem;
 }
 
 table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,

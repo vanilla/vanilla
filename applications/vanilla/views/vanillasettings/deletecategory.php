@@ -53,14 +53,14 @@ if (is_object($this->OtherCategories)) {
                 <div class="alert alert-danger padded">
                 <?php if ($this->data('DiscussionsCount')) { ?>
                     <p>
-                        <?php printf(t('<strong>%s</strong> discussions will be deleted. There will be no way to restore them. They will not go in the changelog!'), $this->data('DiscussionsCount')); ?>
+                        <?php printf(t('<strong>%s</strong> discussion(s) will be deleted. There will be no way to restore them. They will not go in the changelog!'), $this->data('DiscussionsCount')); ?>
                     </p>
                 <?php
                 }
                 if ($subcategories) {
                 ?>
                     <p>
-                        <?php printf(t('<strong>%s</strong> Sub-categories will be deleted!'), count($subcategories)); ?>
+                        <?php printf(t('<strong>%s</strong> sub-category(ies) will be deleted!'), count($subcategories)); ?>
                         <a tabindex="0" role="button" class="js-category-list-toggle" data-show="Show the category list" data-hide="Hide the category list">Show the category list</a>.
                     </p>
                     <div class="js-category-list">

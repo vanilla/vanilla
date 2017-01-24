@@ -7,6 +7,7 @@
 /** @var Gdn_Form $form */
 $form = $this->Form;
 $subcategories = $this->data('Subcategories');
+$discussionsCount = $this->data('DiscussionsCount');
 
 echo $form->open();
 echo $form->errors();
@@ -24,7 +25,7 @@ if (is_object($this->OtherCategories)) {
                 <?php echo $form->radio('ContentAction', 'Move content from this category to a replacement category.', ['value' => 'move']); ?>
                 </div>
                 <div class="input-wrap">
-                <?php echo $form->radio('ContentAction', 'Delete all the content in this category.', ['value' => 'delete']); ?>
+                <?php echo $form->radio('ContentAction', 'Permanently delete all content in this category.', ['value' => 'delete']); ?>
                 </div>
             </li>
             <li id="ReplacementCategory" class="form-group">
@@ -49,19 +50,35 @@ if (is_object($this->OtherCategories)) {
                 </div>
             </li>
             <li id="DeleteCategory">
-            <?php if ($this->data('DiscussionsCount') || $subcategories) { ?>
+            <?php if ($discussionsCount || $subcategories) { ?>
                 <div class="alert alert-danger padded">
-                <?php if ($this->data('DiscussionsCount')) { ?>
+                <?php if ($discussionsCount) { ?>
                     <p>
-                        <?php printf(t('<strong>%s</strong> discussion(s) will be deleted. There will be no way to restore them. They will not go in the changelog!'), $this->data('DiscussionsCount')); ?>
+                        <?php printf(
+                            t(plural(
+                                $discussionsCount,
+                                '<strong>%s</strong> discussion will be deleted. There is no undo and it will not be logged.',
+                                '<strong>%s</strong> discussions will be deleted. There is no undo and they will not be logged.'
+                            )),
+                            $discussionsCount
+                        );
+                        ?>
                     </p>
                 <?php
                 }
                 if ($subcategories) {
                 ?>
                     <p>
-                        <?php printf(t('<strong>%s</strong> sub-category(ies) will be deleted!'), count($subcategories)); ?>
-                        <a tabindex="0" role="button" class="js-category-list-toggle" data-show="Show the category list" data-hide="Hide the category list">Show the category list</a>.
+                        <?php printf(
+                            t(plural(
+                                count($subcategories),
+                                '<strong>%s</strong> child category will be deleted.',
+                                '<strong>%s</strong> child categories will be deleted.'
+                            )),
+                            count($subcategories)
+                        );
+                        ?>
+                        <a tabindex="0" role="button" class="js-category-list-toggle" data-show="<?php echo t('Show category list') ?>" data-hide="<?php echo t('Hide category list') ?>"><?php echo t('Show category list') ?></a>.
                     </p>
                     <div class="js-category-list">
                         <ul>
@@ -75,7 +92,7 @@ if (is_object($this->OtherCategories)) {
             <?php } ?>
                 <div class="form-group">
                     <div class="input-wrap">
-                        <?php echo $form->checkBox('ConfirmDelete', 'I understand and want to delete the category and all its content.'); ?>
+                        <?php echo $form->checkBox('ConfirmDelete', 'Yes, permanently delete it all.'); ?>
                     </div>
                 </div>
             </li>

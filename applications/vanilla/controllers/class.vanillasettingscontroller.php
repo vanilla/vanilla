@@ -493,7 +493,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Subcategories', $subcategories);
             // Number of discussions contained in the subcategories
             $discussionModel = new DiscussionModel();
-            $categoryIDs = array_column($subcategories, 'CategoryID');
+            $categoryIDs = array_merge([$CategoryID], array_column($subcategories, 'CategoryID'));
             $this->setData('DiscussionsCount', $discussionModel->getCountForCategory($categoryIDs));
 
             if ($this->Form->authenticatedPostBack()) {
@@ -508,12 +508,12 @@ class VanillaSettingsController extends Gdn_Controller {
                         case 'move':
                             $newCategoryID = $this->Form->getFormValue('ReplacementCategoryID');
                             if (!$newCategoryID) {
-                                $this->Form->addError('A replacement category should have been selected!');
+                                $this->Form->addError('Replacement category is required.');
                             }
                             break;
                         case 'delete':
                             if (!$this->Form->getFormValue('ConfirmDelete', false)) {
-                                $this->Form->addError('The confirmation box was not checked!');
+                                $this->Form->addError('You must confirm the deletion.');
                             }
                             break;
                         default:

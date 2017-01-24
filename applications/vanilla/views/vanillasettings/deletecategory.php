@@ -24,7 +24,7 @@ if (is_object($this->OtherCategories)) {
                 <?php echo $form->radio('ContentAction', 'Move content from this category to a replacement category.', ['value' => 'move']); ?>
                 </div>
                 <div class="input-wrap">
-                <?php echo $form->radio('ContentAction', 'Delete all the content in this category', ['value' => 'delete']); ?>
+                <?php echo $form->radio('ContentAction', 'Delete all the content in this category.', ['value' => 'delete']); ?>
                 </div>
             </li>
             <li id="ReplacementCategory" class="form-group">

@@ -4011,3 +4011,65 @@ if (!function_exists('ipDecodeRecursive')) {
         return $input;
     }
 }
+
+if (!function_exists('TagUrl')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @param string $Page
+     * @param mixed $WithDomain
+     * @see url() for $WithDomain docs.
+     * @return string
+     */
+    function tagUrl($Row, $Page = '', $WithDomain = false) {
+        static $UseCategories;
+        if (!isset($UseCategories)) {
+            $UseCategories = c('Plugins.Tagging.UseCategories');
+        }
+
+        // Add the p before a numeric page.
+        if (is_numeric($Page)) {
+            if ($Page > 1) {
+                $Page = 'p'.$Page;
+            } else {
+                $Page = '';
+            }
+        }
+        if ($Page) {
+            $Page = '/'.$Page;
+        }
+
+        $Tag = rawurlencode(val('Name', $Row));
+
+        if ($UseCategories) {
+            $Category = CategoryModel::categories($Row['CategoryID']);
+            if ($Category && $Category['CategoryID'] > 0) {
+                $Category = rawurlencode(val('UrlCode', $Category, 'x'));
+            } else {
+                $Category = 'x';
+            }
+            $Result = "/discussions/tagged/$Category/$Tag{$Page}";
+        } else {
+            $Result = "/discussions/tagged/$Tag{$Page}";
+        }
+
+        return url($Result, $WithDomain);
+    }
+}
+
+if (!function_exists('TagFullName')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @return mixed
+     */
+    function tagFullName($Row) {
+        $Result = val('FullName', $Row);
+        if (!$Result) {
+            $Result = val('Name', $Row);
+        }
+        return $Result;
+    }
+}

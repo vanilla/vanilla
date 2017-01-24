@@ -24,11 +24,11 @@ class TagModule extends Gdn_Module {
      * @param string $Sender
      */
     public function __construct($Sender = '') {
+        parent::__construct($Sender);
         $this->_TagData = false;
         $this->ParentID = null;
         $this->ParentType = 'Global';
         $this->CategorySearch = c('Plugins.Tagging.CategorySearch', false);
-        parent::__construct($Sender);
     }
 
     /**

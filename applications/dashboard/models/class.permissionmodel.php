@@ -207,7 +207,10 @@ class PermissionModel extends Gdn_Model {
      * @throws Exception
      */
     public function define($PermissionNames, $Type = 'tinyint', $JunctionTable = null, $JunctionColumn = null) {
-        $PermissionNames = (array)$PermissionNames;
+        if (!is_array($PermissionNames)) {Perm
+            trigger_error(__CLASS__.'->'.__METHOD__.' was called with an invalid $PermissionNames parameter.', E_USER_ERROR);
+            return;
+        }
 
         $Structure = $this->Database->structure();
         $Structure->table('Permission');

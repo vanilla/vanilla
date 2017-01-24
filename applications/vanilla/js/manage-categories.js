@@ -1,26 +1,49 @@
 (function(window, $) {
     $(document)
-        // Categories->Delete().
-        // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
-        .on('change', '[name$=MoveContent]', function () {
-            if ($(this).prop('checked')) {
-                $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
-                $('#DeleteDiscussions').slideUp('fast');
+    // Categories->Delete().
+    // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
+        .on('change', '[name=ContentAction]', function () {
+            if ($(this).val() === 'move') {
+                $('[name=ReplacementCategoryID]').trigger('change');
+                $('#ReplacementCategory').slideDown('fast');
+                $('#DeleteCategory').slideUp('fast');
             } else {
-                $('#ReplacementCategory,#ReplacementWarning').slideUp('fast');
-                $('#DeleteDiscussions').slideDown('fast');
+                $('[name=ConfirmDelete]').trigger('change');
+                $('#ReplacementCategory').slideUp('fast');
+                $('#DeleteCategory').slideDown('fast');
+            }
+        })
+        .on('change', '[name=ReplacementCategoryID]', function () {
+            $('[name=Proceed]').prop('disabled', !$(this).val());
+        })
+        .on('change', '[name=ConfirmDelete]', function () {
+            $('[name=Proceed]').prop('disabled', !$(this).prop('checked'));
+        })
+        .on('click', '.js-category-list-toggle', function() {
+            var $this = $(this);
+            var $list = $('.js-category-list', '#DeleteCategory');
+            if ($list.is(':hidden')) {
+                $this.text($this.data('hide'));
+                $list.slideDown();
+            } else {
+                $this.text($this.data('show'));
+                $list.slideUp();
             }
         })
         // Categories->Delete()
         // Hide onload if unchecked.
         .on('contentLoad', function (e) {
-            if (!$('[name$=MoveContent]', e.target).prop('checked')) {
-                $('#ReplacementCategory,#ReplacementWarning', e.target).hide();
-                $('#DeleteDiscussions', e.target).show();
-            } else {
-                $('#ReplacementCategory,#ReplacementWarning', e.target).show();
-                $('#DeleteDiscussions', e.target).hide();
+            $('#ReplacementCategory, #DeleteCategory, .js-category-list', e.target).hide();
+
+            if ($('[name$=MoveContent]', e.target).is('checked')) {
+                if ($('[name$=MoveContent]', e.target).val() === 'move') {
+                    $('#ReplacementCategory').slideDown('fast');
+                } else {
+                    $('#DeleteCategory').slideDown('fast');
+                }
             }
+
+            $('#Form_Proceed').prop('disabled', true);
         })
     ;
 })(window, jQuery);

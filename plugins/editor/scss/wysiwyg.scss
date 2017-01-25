@@ -332,8 +332,45 @@ div.Quote {
   padding: inherit;
   font: inherit;
   outline: none;
+
   img {
     max-width: 100%;
+  }
+
+  div.Spoiler {
+    padding: 10px 10px;
+    margin: 4px 10px 4px 0;
+    background-color: #e6e6e6;
+    border-radius: 3px;
+  }
+
+  div.Spoiler p {
+    padding: 3px 0 3px 5px;
+    margin: 0;
+    border-left: 1px solid #818181;
+    border-left: 1px solid rgba(0, 0, 0, .2);
+  }
+
+  pre {
+    display: block;
+    padding: 4px 8px;
+    margin: 1em 0;
+    font-size: 13px;
+    word-break: break-all;
+    word-wrap: break-word;
+    background: #ff9;
+    border-radius: 2px;
+    border: 1px solid #eec;
+  }
+
+  pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0;
   }
 }
 

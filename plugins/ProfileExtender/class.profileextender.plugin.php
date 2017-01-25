@@ -271,7 +271,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $Data = $this->getProfileFields();
         $Sender->setData('ExtendedFields', $Data);
 
-        $Sender->addSideMenu('settings/profileextender');
+        $Sender->setHighlightRoute('settings/profileextender');
         $Sender->setData('Title', t('Profile Fields'));
         $Sender->render('settings', '', 'plugins/ProfileExtender');
     }

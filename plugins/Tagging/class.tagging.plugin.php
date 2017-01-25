@@ -742,7 +742,7 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     public function controller_add($Sender) {
-        $Sender->addSideMenu('settings/tagging');
+        $Sender->setHighlightRoute('settings/tagging');
         $Sender->title('Add Tag');
 
         // Set the model on the form.
@@ -802,7 +802,7 @@ class TaggingPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     public function controller_edit($Sender) {
-        $Sender->addSideMenu('settings/tagging');
+        $Sender->setHighlightRoute('settings/tagging');
         $Sender->title(t('Edit Tag'));
         $TagID = val(1, $Sender->RequestArgs);
 

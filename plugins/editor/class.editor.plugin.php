@@ -889,7 +889,7 @@ class EditorPlugin extends Gdn_Plugin {
         $CanDelete = ($IsOwner || Gdn::session()->checkPermission('Garden.Moderation.Manage'));
         if ($Media && $CanDelete) {
             try {
-                if ($Model->delete($MediaID)) {
+                if ($Model->deleteID($MediaID)) {
                     // unlink the images.
                     $path = PATH_UPLOADS.'/'.$Media['Path'];
                     $thumbPath = PATH_UPLOADS.'/'.$Media['ThumbPath'];
@@ -1063,7 +1063,7 @@ class EditorPlugin extends Gdn_Plugin {
 
                 $Sender->setData('_attachments', $attachments);
                 $Sender->setData('_editorkey', strtolower($param.$foreignId));
-                echo $Sender->fetchView($this->getView('attachments.php'));
+                echo $Sender->fetchView('attachments.php', '', 'plugins/editor');
             }
         }
     }

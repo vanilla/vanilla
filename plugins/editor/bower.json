@@ -1,7 +1,4 @@
 {
   "name": "advanced-editor",
-  "private": true,
-  "dependencies": {
-    "bourbon": "~3.2.1"
-  }
+  "private": true
 }

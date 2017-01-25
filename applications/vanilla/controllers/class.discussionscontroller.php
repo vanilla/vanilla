@@ -686,6 +686,10 @@ class DiscussionsController extends VanillaController {
      *
      */
     public function tagged() {
+        if (!c('EnabledPlugins.Tagging')) {
+            throw new Exception('Not found', 404);
+        }
+
         Gdn_Theme::section('DiscussionList');
 
         $Args = $this->RequestArgs;

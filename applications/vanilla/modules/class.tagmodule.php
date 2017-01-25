@@ -157,6 +157,10 @@ class TagModule extends Gdn_Module {
      * @return string
      */
     public function inlineDisplay() {
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
+
         if (!$this->_TagData) {
             $this->getData();
         }
@@ -199,6 +203,10 @@ endforeach; ?>
      * @return string
      */
     public function toString() {
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
+
         if (!$this->_TagData) {
             $this->getData();
         }

@@ -304,6 +304,10 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param Gdn_Controller $Sender
      */
     public function postController_afterDiscussionFormOptions_handler($Sender) {
+//        if (!c('EnabledPlugins.Tagging')) {
+//            return;
+//        }
+
         if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
@@ -603,7 +607,6 @@ class VanillaHooks implements Gdn_IPlugin {
             $sender->addJsFile('spoilers.js', 'vanilla');
             $sender->addCssFile('spoilers.css', 'vanilla');
             $sender->addCssFile('tag.css', 'vanilla');
-            $sender->addCssFile('childtagslist.css', 'vanilla');
             $sender->addDefinition('Spoiler', t('Spoiler'));
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));

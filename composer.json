@@ -33,7 +33,8 @@
         "vanilla/nbbc": "~2.1",
         "tburry/pquery": "~1.1",
         "phpmailer/phpmailer": "~5.2",
-        "psr/log": "~1.0"
+        "psr/log": "~1.0",
+        "symfony/yaml": "^3.2"
     },
     "provide": {
         "ext-gd": "*"

@@ -338,10 +338,15 @@ pre {
 //
 // Makes a badge element, usually used to display a count on a navigation item.
 //
+// .badge-danger - Danger color.
+// .badge-warning - Warning color.
+// .badge-info - Info color.
+// .badge-success - Success color.
+//
 // Markup:
 // <button class="btn btn-primary">
 //   Tags
-//   <span class="badge">42</span>
+//   <span class="badge {{modifier_class}}">42</span>
 // </button>
 //
 // Styleguide 1.9.
@@ -358,6 +363,13 @@ pre {
 
   .btn-group & {
     margin-top: - to-rem(2);
+  }
+}
+
+@each $semantic-color in map-keys($semantic-colors) {
+  $color: map-get($semantic-colors, $semantic-color);
+  .badge-#{$semantic-color} {
+    background-color: $color;
   }
 }
 

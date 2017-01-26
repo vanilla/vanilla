@@ -43,8 +43,6 @@ class Gdn {
 
     const AliasSession = 'Session';
 
-    const AliasSlice = 'Slice';
-
     const AliasSqlDriver = 'SqlDriver';
 
     const AliasUserMetaModel = 'UserMetaModel';
@@ -486,17 +484,6 @@ class Gdn {
             self::$_Session = self::factory(self::AliasSession);
         }
         return self::$_Session;
-    }
-
-    /**
-     * Get a reference to the Gdn_Slice
-     *
-     * @param string $Slice Slice to execute
-     * @return Gdn_Slice
-     */
-    public static function slice($Slice) {
-        $Result = self::factory(self::AliasSlice);
-        return $Result->execute($Slice);
     }
 
     public static function set($Key, $Value = null) {

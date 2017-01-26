@@ -11,7 +11,7 @@ echo heading(t('Avatars')); ?>
 $permissions = ['Garden.ProfilePicture.Edit', 'Garden.Profiles.Edit'];
 $permissions = implode(' or ', $permissions);
 $desc = 'Allow users with the '.$permissions.' permission to change their own avatars from their profile pages in Vanilla.';
-$allowEditPhotos = c('Garden.Profile.EditPhotos');
+$allowEditPhotos = c('Garden.Profile.EditPhotos', true);
 ?>
 <div class="form-group">
     <div class="label-wrap-wide">

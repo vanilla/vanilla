@@ -564,7 +564,9 @@ select + select {
 
   .active,
   input[type=radio]:checked ~ label,
-  input[type=radio]:checked ~ label {
+  input[type=radio]:checked ~ label,
+  input[type=checkbox]:checked ~ label,
+  input[type=checkbox]:checked ~ label {
     cursor: default;
 
     .overlay {

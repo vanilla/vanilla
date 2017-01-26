@@ -256,18 +256,21 @@ class SettingsController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $allow = strtolower($allow);
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            saveToConfig('Garden.Profile.EditPhotos', $allow);
-            if ($allow === 'true') {
-                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
-                $this->informMessage(t('Editing photos allowed.'));
-            } else {
-                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
-                $this->informMessage(t('Editing photos not allowed.'));
-            }
-            $this->jsonTarget("#editphotos-toggle", $newToggle);
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            throw new Exception('You don\'t have permisison to do that.', 401);
         }
+
+        $allow = strtolower($allow);
+        saveToConfig('Garden.Profile.EditPhotos', $allow === 'true');
+        if ($allow === 'true') {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+            $this->informMessage(t('Editing photos allowed.'));
+        } else {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+            $this->informMessage(t('Editing photos not allowed.'));
+        }
+        $this->jsonTarget("#editphotos-toggle", $newToggle);
+
         $this->render('Blank', 'Utility');
     }
 

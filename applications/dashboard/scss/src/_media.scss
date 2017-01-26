@@ -217,15 +217,15 @@
 
   .media-left {
     @include grid-item();
+
+    img {
+      display: block;
+      width: 100%;
+    }
   }
 
   &.media-callout-grey-bg {
     background-color: $grey-lighter;
-  }
-
-  .media-left img {
-    display: block;
-    width: 100%;
   }
 
   .media-image-wrap {

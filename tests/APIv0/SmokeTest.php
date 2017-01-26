@@ -96,12 +96,9 @@ class SmokeTest extends BaseTest {
 
         $this->assertEquals($user['Name'], $siteUser['Name']);
 
-        $siteUser['tk'] = $this->api()->getTK($siteUser['UserID']);
         $this->setTestUser($siteUser);
         return $siteUser;
     }
-
-
 
     /**
      * Test adding an admin user.
@@ -139,7 +136,6 @@ class SmokeTest extends BaseTest {
         $userRoleIDs = array_column($userRoles, 'RoleID');
         $this->assertEquals($adminUser['RoleID'], $userRoleIDs);
 
-        $dbUser['tk'] = $this->api()->getTK($dbUser['UserID']);
         return $dbUser;
     }
 

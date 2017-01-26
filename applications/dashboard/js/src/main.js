@@ -326,6 +326,110 @@
         });
     }
 
+    function buttonGroupInit(element) {
+
+        /**
+         * Transforms a button group into a dropdown-filter.
+         *
+         * @param $buttonGroup
+         */
+        var transformButtonGroup = function(buttonGroup) {
+            var elem = document.createElement('div');
+            $(elem).addClass('dropdown');
+            $(elem).addClass('dropdown-filter');
+
+            var items = $(buttonGroup).html();
+            var title = gdn.definition('Filter');
+            var list = document.createElement('div');
+            var id = Math.random().toString(36).substr(2, 9);
+
+
+            $(list).addClass('dropdown-menu');
+            $(list).attr('aria-labelledby', id);
+            $(list).html(items);
+
+            $('.btn', list).each(function() {
+                $(this).removeClass('btn');
+                $(this).removeClass('btn-secondary');
+                $(this).addClass('dropdown-item');
+
+                if ($(this).hasClass('active')) {
+                    title = $(this).html();
+                }
+            });
+
+            $(elem).prepend(
+                '<button ' +
+                'id="' + id + '" ' +
+                'type="button" ' +
+                'class="btn btn-secondary dropdown-toggle" ' +
+                'data-toggle="dropdown" ' +
+                'aria-haspopup="true" ' +
+                'aria-expanded="false"' +
+                '>' +
+                title +
+                '</button>'
+            );
+
+            $(elem).append($(list));
+
+            return elem;
+        };
+
+        var showButtonGroup = function(buttonGroup, dropdown) {
+            $(buttonGroup).show();
+            $(dropdown).hide();
+        };
+
+        var showDropdown = function(buttonGroup, dropdown) {
+            $(buttonGroup).hide();
+            $(dropdown).show();
+        };
+
+        /**
+         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
+         * or btn-group, and then shows/hides the appropriate one.
+         *
+         * @param element The scope of the function
+         */
+        var checkWidth = function(element) {
+            $('.btn-group', element).each(function() {
+                var self = this;
+                var maxWidth = $(self).data('maxWidth');
+                var container = $(self).data('containerSelector');
+
+                if (!container && !maxWidth) {
+                    maxWidth = $(window).width();
+                }
+
+                if (container) {
+                    maxWidth = $(container).width();
+                }
+
+                if (!self.width) {
+                    self.width = $(self).width();
+                }
+
+                if (!self.dropdown) {
+                    self.dropdown = transformButtonGroup(self);
+                    $(self).after(self.dropdown);
+                }
+
+                if (self.width <= maxWidth) {
+                    showButtonGroup(self, self.dropdown);
+                } else {
+                    showDropdown(self, self.dropdown);
+                }
+            });
+        };
+
+        checkWidth(element);
+
+        $(window).resize(function() {
+            checkWidth(document);
+        });
+    }
+
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -342,6 +446,7 @@
         foggyInit(e.target); // makes settings blurred out
         checkallInit(e.target); // handles 'select all' type checkboxes
         dropDownInit(e.target); // makes sure our dropdowns open in the right direction
+        buttonGroupInit(e.target); // changes button groups that get too long into selects
     });
 
     /**
@@ -353,10 +458,10 @@
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                if (e.target.result.startsWith("data:image")) {
+                if (e.target.result.startsWith('data:image')) {
                     $preview.attr('src', e.target.result);
                 }
-            }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }
@@ -473,21 +578,20 @@
         DashboardModal.activeModal = new DashboardModal($(this), {});
     });
 
-    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
+    $(document).on('click', '.js-modal-confirm', function(e) {
         e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'post',
-            modalType: 'confirm'
-        });
-    });
-
-    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'get',
-            modalType: 'confirm',
-            followLink: true // no ajax
-        });
+        if ($(this).data('followLink') === 'true') {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'get',
+                modalType: 'confirm',
+                followLink: true // no ajax
+            });
+        } else {
+            DashboardModal.activeModal = new DashboardModal($(this), {
+                httpmethod: 'post',
+                modalType: 'confirm'
+            });
+        }
     });
 
     // Get new banner image.
@@ -512,10 +616,10 @@
 
         // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
         $target.find(':input').each(function() {
-            if ($(this).prop("disabled")) {
+            if ($(this).prop('disabled')) {
                 $(this).data('foggy-disabled', 'true');
             } else {
-                $(this).prop("disabled", true);
+                $(this).prop('disabled', true);
             }
         });
     });
@@ -529,7 +633,7 @@
         // Be careful not to enable fields that should be disabled.
         $target.find(':input').each(function() {
             if (!$(this).data('foggy-disabled')) {
-                $(this).prop("disabled", false);
+                $(this).prop('disabled', false);
             }
         });
     });

@@ -49,7 +49,7 @@ $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
         }
         ?>
         <div class="options padded-top flex">
-            <?php echo anchor(t('Remove'), '/dashboard/settings/removedefaultavatar/', $disabled.'btn btn-primary js-hijack js-modal-confirm remove-avatar'); ?>
+            <?php echo anchor(t('Remove'), '/dashboard/settings/removedefaultavatar/', $disabled.'btn btn-primary js-modal-confirm remove-avatar'); ?>
             <?php echo anchor(t('Change'), '/dashboard/settings/defaultavatar', 'btn btn-primary change-avatar'); ?>
         </div>
     </div>

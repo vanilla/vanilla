@@ -31,7 +31,7 @@
   margin-right: .25rem;
   margin-left: .25rem;
   vertical-align: middle;
-  content: "";
+  content: '';
   border-top: $caret-width solid;
   border-right: $caret-width solid transparent;
   border-left: $caret-width solid transparent;
@@ -84,6 +84,7 @@
     &.focus {
       background-color: $background;
     }
+
     @include hover {
       background-color: $background;
     }

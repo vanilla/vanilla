@@ -112,7 +112,7 @@ class GravatarPlugin extends Gdn_Plugin {
         if (!$sender->User->Photo) {
             $sender->User->Photo = self::generateUrl(
                 val('Email', $sender->User),
-                c('Garden.Profile.MaxWidth', 200)
+                c('Garden.Profile.MaxWidth')
             );
         }
     }
@@ -164,7 +164,7 @@ if (!function_exists('UserPhotoDefaultUrl')) {
     function userPhotoDefaultUrl($user) {
         return GravatarPlugin::generateUrl(
             val('Email', $user),
-            c('Garden.Thumbnail.Width', 50)
+            c('Garden.Thumbnail.Size')
         );
     }
 }

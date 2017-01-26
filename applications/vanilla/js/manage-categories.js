@@ -2,7 +2,7 @@
     $(document)
         // Categories->Delete().
         // Hide/reveal the delete options when the DeleteDiscussions checkbox is un/checked.
-        .on('change', '[name$=DeleteDiscussions]', function () {
+        .on('change', '[name$=MoveContent]', function () {
             if ($(this).prop('checked')) {
                 $('#ReplacementCategory,#ReplacementWarning').slideDown('fast');
                 $('#DeleteDiscussions').slideUp('fast');
@@ -14,7 +14,7 @@
         // Categories->Delete()
         // Hide onload if unchecked.
         .on('contentLoad', function (e) {
-            if (!$('[name$=DeleteDiscussions]', e.target).prop('checked')) {
+            if (!$('[name$=MoveContent]', e.target).prop('checked')) {
                 $('#ReplacementCategory,#ReplacementWarning', e.target).hide();
                 $('#DeleteDiscussions', e.target).show();
             } else {

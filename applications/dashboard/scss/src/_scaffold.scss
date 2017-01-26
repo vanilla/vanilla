@@ -128,7 +128,7 @@
 .drawer-show .main {
   transform: translate3d($drawer-width, 0, 0);
 
-  &:after {
+  &::after {
     position: absolute;
     display: block;
     width: 100%;

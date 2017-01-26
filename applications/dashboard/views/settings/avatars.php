@@ -9,7 +9,7 @@ echo heading(t('Avatars')); ?>
 <?php endforeach;
 
 $permissions = ['Garden.ProfilePicture.Edit', 'Garden.Profiles.Edit'];
-$permissions = implode(' or ', $permissions);
+$permissions = implode(t('permissions or', ' or '), $permissions);
 $desc = t('Allow users with the %s permission to change their own avatars from their profile pages in Vanilla.', $permissions);
 $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
 ?>

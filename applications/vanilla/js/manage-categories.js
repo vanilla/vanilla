@@ -19,21 +19,10 @@
         .on('change', '[name=ConfirmDelete]', function () {
             $('[name=Proceed]').prop('disabled', !$(this).prop('checked'));
         })
-        .on('click', '.js-category-list-toggle', function() {
-            var $this = $(this);
-            var $list = $('.js-category-list', '#DeleteCategory');
-            if ($list.is(':hidden')) {
-                $this.text($this.data('hide'));
-                $list.slideDown();
-            } else {
-                $this.text($this.data('show'));
-                $list.slideUp();
-            }
-        })
         // Categories->Delete()
         // Hide onload if unchecked.
         .on('contentLoad', function (e) {
-            $('#ReplacementCategory, #DeleteCategory, .js-category-list', e.target).hide();
+            $('#ReplacementCategory, #DeleteCategory', e.target).hide();
 
             if ($('[name$=MoveContent]', e.target).is('checked')) {
                 if ($('[name$=MoveContent]', e.target).val() === 'move') {

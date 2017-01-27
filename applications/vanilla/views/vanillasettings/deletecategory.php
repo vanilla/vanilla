@@ -78,9 +78,8 @@ if (is_object($this->OtherCategories)) {
                             count($subcategories)
                         );
                         ?>
-                        <a tabindex="0" role="button" class="js-category-list-toggle" data-show="<?php echo t('Show category list') ?>" data-hide="<?php echo t('Hide category list') ?>"><?php echo t('Show category list') ?></a>.
                     </p>
-                    <div class="js-category-list">
+                    <div class="list-un-reset">
                         <ul>
                             <?php foreach ($subcategories as $subcategory): ?>
                                 <li><?php echo $subcategory['Name'] ?></li>

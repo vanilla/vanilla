@@ -683,7 +683,7 @@ class DiscussionsController extends VanillaController {
     }
 
     /**
-     *
+     * Add the discussions/tagged/{TAG} endpoint.
      */
     public function tagged() {
         if (!c('EnabledPlugins.Tagging')) {

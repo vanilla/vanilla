@@ -152,7 +152,7 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
-     *
+     * Add tag data to discussions.
      *
      * @param DiscussionController $sender
      */
@@ -178,10 +178,12 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Show tags after discussion body.
      *
+     * @param DiscussionController $Sender
      */
     public function discussionController_afterDiscussionBody_handler($Sender) {
-        /* Show tags after discussion body. */
+        /*  */
         // Allow disabling of inline tags.
         if (!c('Plugins.Tagging.DisableInline', false)) {
             if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
@@ -236,6 +238,8 @@ class VanillaHooks implements Gdn_IPlugin {
 
     /**
      * Save tags when saving a discussion.
+     *
+     * @param DiscussionModel $Sender
      */
     public function discussionModel_afterSaveDiscussion_handler($Sender) {
         $FormPostValues = val('FormPostValues', $Sender->EventArguments, array());
@@ -304,9 +308,9 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param Gdn_Controller $Sender
      */
     public function postController_afterDiscussionFormOptions_handler($Sender) {
-//        if (!c('EnabledPlugins.Tagging')) {
-//            return;
-//        }
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
 
         if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
             // Setup, get most popular tags

@@ -13,6 +13,7 @@ $PluginInfo['oauth2'] = array(
     'SettingsUrl' => '/settings/oauth2',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'MobileFriendly' => true,
+    'Icon' => 'oauth2.png',
     'Author' => "Patrick Kelly",
     'AuthorEmail' => 'patrick.k@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com'

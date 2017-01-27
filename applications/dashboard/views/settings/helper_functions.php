@@ -138,6 +138,19 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
 
     $media->setImage($iconPath);
 
+    // IsConfigured badge
+
+    $badges = [];
+
+    if (isset($addonInfo['Configured'])) {
+        $badges[] = [
+            'text' => $addonInfo['Configured'] ? t('Configured') : t('Not Configured'),
+            'cssClass' => $addonInfo['Configured'] ? 'badge-success' : 'badge-warning',
+        ];
+    }
+
+    $media->addOption('badges', $badges);
+
     // Settings button
 
     $settingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, '') : '';

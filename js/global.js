@@ -769,7 +769,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack', 'click', hijackClick);
+    $(document).delegate('.Hijack, .js-hijack', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus

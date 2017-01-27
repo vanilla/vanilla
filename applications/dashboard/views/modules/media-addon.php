@@ -11,6 +11,9 @@
         <div class="media-heading">
             <div class="media-title">
                 <?php echo $this->getTitleUrl() != '' ? anchor($this->getTitle(), $this->getTitleUrl()) : $this->getTitle(); ?>
+                <?php foreach(val('badges', $this->getOptions()) as $badge) : ?>
+                    <span class="badge <?php echo val('cssClass', $badge); ?>"><?php echo val('text', $badge); ?></span>
+                <?php endforeach; ?>
             </div>
             <?php if ($this->getMeta()) { ?>
                 <div class="info">

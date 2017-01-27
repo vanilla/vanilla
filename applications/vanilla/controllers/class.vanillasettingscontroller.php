@@ -488,14 +488,38 @@ class VanillaSettingsController extends Gdn_Controller {
                 'Sort'
             );
 
-            if (!$this->Form->authenticatedPostBack()) {
-                $this->Form->setFormValue('MoveContent', '0');
-            } else {
-                $newCategoryID = $this->Form->getValue('ReplacementCategoryID') ?: 0;
+            // Get the list of sub-categories
+            $subcategories = $this->CategoryModel->getSubtree($CategoryID, false);
+            $this->setData('Subcategories', $subcategories);
+            // Number of discussions contained in the subcategories
+            $discussionModel = new DiscussionModel();
+            $categoryIDs = array_merge([$CategoryID], array_column($subcategories, 'CategoryID'));
+            $this->setData('DiscussionsCount', $discussionModel->getCountForCategory($categoryIDs));
 
+            if ($this->Form->authenticatedPostBack()) {
                 // Error if the category being deleted is the last remaining category that allows discussions.
                 if ($this->Category->AllowDiscussions == '1' && $this->OtherCategories->numRows() == 0) {
                     $this->Form->addError('You cannot remove the only remaining category that allows discussions');
+                } else {
+                    $newCategoryID = 0;
+                    $contentAction = $this->Form->getFormValue('ContentAction', false);
+
+                    switch($contentAction) {
+                        case 'move':
+                            $newCategoryID = $this->Form->getFormValue('ReplacementCategoryID');
+                            if (!$newCategoryID) {
+                                $this->Form->addError('Replacement category is required.');
+                            }
+                            break;
+                        case 'delete':
+                            if (!$this->Form->getFormValue('ConfirmDelete', false)) {
+                                $this->Form->addError('You must confirm the deletion.');
+                            }
+                            break;
+                        default:
+                            $this->Form->addError('Something went wrong.');
+                            break;
+                    }
                 }
 
                 if ($this->Form->errorCount() == 0) {

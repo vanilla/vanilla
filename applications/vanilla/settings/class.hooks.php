@@ -19,10 +19,11 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param DbaController $Sender
      */
     public function dbaController_countJobs_handler($Sender) {
-        $Counts = array(
-            'Discussion' => array('CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'),
-            'Category' => array('CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted')
-        );
+        $Counts = [
+            'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
+            'Category' => ['CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
+            'Tag' => ['table' => 'Tag', 'column' => 'CountDiscussions'],
+        ];
 
         foreach ($Counts as $Table => $Columns) {
             foreach ($Columns as $Column) {
@@ -151,12 +152,249 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Add tag data to discussions.
+     *
+     * @param DiscussionController $sender
+     */
+    public function discussionController_render_before($sender) {
+        $discussionID = $sender->data('Discussion.DiscussionID');
+        if ($discussionID) {
+            // Get the tags on this discussion.
+            $tags = TagModel::instance()->getDiscussionTags($discussionID, TagModel::IX_EXTENDED);
+
+            foreach ($tags as $key => $value) {
+                $sender->setData('Discussion.'.$key, $value);
+            }
+        }
+    }
+
+    /**
      *
      *
-     * @param $sender
+     * @param DiscussionController $sender
      */
     public function discussionController_beforeCommentBody_handler($sender) {
         Gdn::regarding()->beforeCommentBody($sender);
+    }
+
+    /**
+     * Show tags after discussion body.
+     *
+     * @param DiscussionController $Sender
+     */
+    public function discussionController_afterDiscussionBody_handler($Sender) {
+        /*  */
+        // Allow disabling of inline tags.
+        if (!c('Plugins.Tagging.DisableInline', false)) {
+            if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
+                $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
+
+                if (!$DiscussionID) {
+                    return;
+                }
+
+                $TagModule = new TagModule($Sender);
+                echo $TagModule->inlineDisplay();
+            }
+        }
+    }
+
+    /**
+     * Validate tags when saving a discussion.
+     *
+     * @param DiscussionModel $Sender
+     * @param array $Args
+     */
+    public function discussionModel_beforeSaveDiscussion_handler($Sender, $Args) {
+        // Allow an addon to set disallowed tag names.
+        $reservedTags = [];
+        $Sender->EventArguments['ReservedTags'] = &$reservedTags;
+        $Sender->fireEvent('ReservedTags');
+
+        // Set some tagging requirements.
+        $TagsString = trim(strtolower(valr('FormPostValues.Tags', $Args, '')));
+        if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
+            $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
+        } else {
+            // Break apart our tags and lowercase them all for comparisons.
+            $Tags = TagModel::splitTags($TagsString);
+            $Tags = array_map('strtolower', $Tags);
+            $reservedTags = array_map('strtolower', $reservedTags);
+            $maxTags = c('Plugin.Tagging.Max', 5);
+
+            // Validate our tags.
+            if ($reservedTags = array_intersect($Tags, $reservedTags)) {
+                $names = implode(', ', $reservedTags);
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('These tags are reserved and cannot be used: %s'), $names));
+            }
+            if (!TagModel::validateTags($Tags)) {
+                $Sender->Validation->addValidationResult('Tags', '@'.t('ValidateTag', 'Tags cannot contain commas.'));
+            }
+            if (count($Tags) > $maxTags) {
+                $Sender->Validation->addValidationResult('Tags', '@'.sprintf(t('You can only specify up to %s tags.'), $maxTags));
+            }
+        }
+    }
+
+    /**
+     * Save tags when saving a discussion.
+     *
+     * @param DiscussionModel $Sender
+     */
+    public function discussionModel_afterSaveDiscussion_handler($Sender) {
+        $FormPostValues = val('FormPostValues', $Sender->EventArguments, array());
+        $DiscussionID = val('DiscussionID', $Sender->EventArguments, 0);
+        $CategoryID = valr('Fields.CategoryID', $Sender->EventArguments, 0);
+        $RawFormTags = val('Tags', $FormPostValues, '');
+        $FormTags = TagModel::splitTags($RawFormTags);
+
+        // If we're associating with categories
+        $CategorySearch = c('Plugins.Tagging.CategorySearch', false);
+        if ($CategorySearch) {
+            $CategoryID = val('CategoryID', $FormPostValues, false);
+        }
+
+        // Let plugins have their information getting saved.
+        $Types = [];
+
+        // We fire as TaggingPlugin since this code was taken from the old TaggingPlugin and we do not
+        // want to break any hooks
+        Gdn::pluginManager()->fireAs('TaggingPlugin')->fireEvent('SaveDiscussion', [
+            'Data' => $FormPostValues,
+            'Tags' => &$FormTags,
+            'Types' => &$Types,
+            'CategoryID' => $CategoryID,
+        ]);
+
+        // Save the tags to the db.
+        TagModel::instance()->saveDiscussion($DiscussionID, $FormTags, $Types, $CategoryID);
+    }
+
+    /**
+     * Handle tag association deletion when a discussion is deleted.
+     *
+     * @param $Sender
+     * @throws Exception
+     */
+    public function discussionModel_deleteDiscussion_handler($Sender) {
+        // Get discussionID that is being deleted
+        $DiscussionID = $Sender->EventArguments['DiscussionID'];
+
+        // Get List of tags to reduce count for
+        $TagDataSet = Gdn::sql()->select('TagID')
+            ->from('TagDiscussion')
+            ->where('DiscussionID', $DiscussionID)
+            ->get()->resultArray();
+
+        $RemovedTagIDs = array_column($TagDataSet, 'TagID');
+
+        // Check if there are even any tags to delete
+        if (count($RemovedTagIDs) > 0) {
+            // Step 1: Reduce count
+            Gdn::sql()
+                ->update('Tag')
+                ->set('CountDiscussions', 'CountDiscussions - 1', false)
+                ->whereIn('TagID', $RemovedTagIDs)
+                ->put();
+
+            // Step 2: Delete mapping data between discussion and tag (tagdiscussion table)
+            $Sender->SQL->where('DiscussionID', $DiscussionID)->delete('TagDiscussion');
+        }
+    }
+
+    /**
+     * Add the tag input to the discussion form.
+     *
+     * @param Gdn_Controller $Sender
+     */
+    public function postController_afterDiscussionFormOptions_handler($Sender) {
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
+
+        if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
+            // Setup, get most popular tags
+            $TagModel = TagModel::instance();
+            $Tags = $TagModel->getWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', c('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
+            $TagsHtml = (count($Tags)) ? '' : t('No tags have been created yet.');
+            $Tags = Gdn_DataSet::index($Tags, 'FullName');
+            ksort($Tags);
+
+            // The tags must be fetched.
+            if ($Sender->Request->isPostBack()) {
+                $tag_ids = TagModel::SplitTags($Sender->Form->getFormValue('Tags'));
+                $tags = TagModel::instance()->getWhere(array('TagID' => $tag_ids))->resultArray();
+                $tags = array_column($tags, 'TagID', 'FullName');
+            } else {
+                // The tags should be set on the data.
+                $tags = array_column($Sender->data('Tags', array()), 'FullName', 'TagID');
+                $xtags = $Sender->data('XTags', array());
+                foreach (TagModel::instance()->defaultTypes() as $key => $row) {
+                    if (isset($xtags[$key])) {
+                        $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
+                        foreach ($xtags2 as $id => $name) {
+                            $tags[$id] = $name;
+                        }
+                    }
+                }
+            }
+
+            echo '<div class="Form-Tags P">';
+
+            // Tag text box
+            echo $Sender->Form->label('Tags', 'Tags');
+            echo $Sender->Form->textBox('Tags', array('data-tags' => json_encode($tags)));
+
+            // Available tags
+            echo wrap(Anchor(t('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
+            foreach ($Tags as $Tag) {
+                $TagsHtml .= anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', array('data-name' => $Tag['Name'], 'data-id' => $Tag['TagID'])).' ';
+            }
+            echo wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+
+            echo '</div>';
+        }
+    }
+
+    /**
+     * Add javascript to the post/edit discussion page so that tagging autocomplete works.
+     *
+     * @param PostController $Sender
+     */
+    public function postController_render_before($Sender) {
+        $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
+        $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
+        $Sender->addDefinition('MaxTagsAllowed', c('Plugin.Tagging.Max', 5));
+
+        // Make sure that detailed tag data is available to the form.
+        $TagModel = TagModel::instance();
+
+        $DiscussionID = $Sender->data('Discussion.DiscussionID');
+
+        if ($DiscussionID) {
+            $Tags = $TagModel->getDiscussionTags($DiscussionID, TagModel::IX_EXTENDED);
+            $Sender->setData($Tags);
+        } elseif (!$Sender->Request->isPostBack() && $tagString = $Sender->Request->get('tags')) {
+            $tags = explodeTrim(',', $tagString);
+            $types = array_column(TagModel::instance()->defaultTypes(), 'key');
+
+            // Look up the tags by name.
+            $tagData = Gdn::sql()->getWhere(
+                'Tag',
+                array('Name' => $tags, 'Type' => $types)
+            )->resultArray();
+
+            // Add any missing tags.
+            $tagNames = array_change_key_case(array_column($tagData, 'Name', 'Name'));
+            foreach ($tags as $tag) {
+                $tagKey = strtolower($tag);
+                if (!isset($tagNames[$tagKey])) {
+                    $tagData[] = array('TagID' => $tag, 'Name' => $tagKey, 'FullName' => $tag, 'Type' => '');
+                }
+            }
+
+            $Sender->setData('Tags', $tagData);
+        }
     }
 
     /**
@@ -372,6 +610,7 @@ class VanillaHooks implements Gdn_IPlugin {
             // Spoilers assets
             $sender->addJsFile('spoilers.js', 'vanilla');
             $sender->addCssFile('spoilers.css', 'vanilla');
+            $sender->addCssFile('tag.css', 'vanilla');
             $sender->addDefinition('Spoiler', t('Spoiler'));
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));
@@ -384,6 +623,54 @@ class VanillaHooks implements Gdn_IPlugin {
                 Gdn::controller()->addDefinition("Roles", $roleModel->getPublicUserRoles(Gdn::session()->UserID, "Name"));
             }
         }
+
+        // Tagging BEGIN
+        // Set breadcrumbs where relevant
+        if (null !== $sender->data('Tag', null) && null !== $sender->data('Tags')) {
+            $ParentTag = array();
+            $CurrentTag = $sender->data('Tag');
+            $CurrentTags = $sender->data('Tags');
+
+            $ParentTagID = ($CurrentTag['ParentTagID'])
+                ? $CurrentTag['ParentTagID']
+                : '';
+
+            foreach ($CurrentTags as $Tag) {
+                foreach ($Tag as $SubTag) {
+                    if ($SubTag['TagID'] == $ParentTagID) {
+                        $ParentTag = $SubTag;
+                    }
+                }
+            }
+
+            $Breadcrumbs = array();
+
+            if (is_array($ParentTag) && count(array_filter($ParentTag))) {
+                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag, '', '/'));
+            }
+
+            if (is_array($CurrentTag) && count(array_filter($CurrentTag))) {
+                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag, '', '/'));
+            }
+
+            if (count($Breadcrumbs)) {
+                // Rebuild breadcrumbs in discussions when there is a child, as the
+                // parent must come before it.
+                $sender->setData('Breadcrumbs', $Breadcrumbs);
+            }
+        }
+
+        if (null !== $sender->data('Announcements', null)) {
+            TagModel::instance()->joinTags($sender->Data['Announcements']);
+        }
+
+        if (null !== $sender->data('Discussions', null)) {
+            TagModel::instance()->joinTags($sender->Data['Discussions']);
+        }
+
+        $sender->addJsFile('tagging.js', 'vanilla');
+        $sender->addJsFile('jquery.tokeninput.js');
+        // Tagging END
     }
 
     /**

@@ -296,6 +296,30 @@ class ConversationModel extends ConversationsModel {
     }
 
     /**
+     * Get how many recipients current user can send a message to.
+     *
+     * @return int|bool A maximum number of recipients or FALSE for unlimited.
+     */
+    public static function getMaxRecipients() {
+        // Moderators can add as many as they want.
+        if (Gdn::session()->checkRankedPermission('Garden.Moderation.Manage')) {
+            return false;
+        }
+
+        // Start conservative.
+        $maxRecipients = c('Conversations.MaxRecipients', 5);
+
+        // Verified users are more trusted.
+        if (val('Verified', Gdn::session()->User)) {
+            $verifiedMax = c('Conversations.MaxRecipientsVerified', 50);
+            // Only allow raising the limit for verified users.
+            $maxRecipients = ($verifiedMax > $maxRecipients) ? $verifiedMax : $maxRecipients;
+        }
+
+        return $maxRecipients;
+    }
+
+    /**
      * Get all users involved in conversation.
      *
      * @since 2.0.0
@@ -317,6 +341,12 @@ class ConversationModel extends ConversationsModel {
         return $Data;
     }
 
+    /**
+     *
+     *
+     * @param $Data
+     * @param int $Max
+     */
     public function joinParticipants(&$Data, $Max = 5) {
         // Loop through the data and find the conversations with >= $Max participants.
         $IDs = array();
@@ -808,10 +838,10 @@ class ConversationModel extends ConversationsModel {
     public function addUserAllowed($ConversationID = 0, $CountRecipients = 0) {
         // Determine whether recipients can be added
         $CanAddRecipients = true;
-        $MaxCount = c('Conversations.MaxRecipients');
+        $maxRecipients = self::getMaxRecipients();
 
         // Avoid a query if we already know we can add. MaxRecipients being unset means unlimited.
-        if ($MaxCount && !checkPermission('Garden.Moderation.Manage')) {
+        if ($maxRecipients) {
             if (!$CountRecipients) {
                 // Count current recipients
                 $ConversationModel = new ConversationModel();
@@ -819,7 +849,7 @@ class ConversationModel extends ConversationsModel {
             }
 
             // Add 1 because sender counts as a recipient.
-            $CanAddRecipients = (count($CountRecipients) < ($MaxCount + 1));
+            $CanAddRecipients = (count($CountRecipients) < ($maxRecipients + 1));
         }
 
         return $CanAddRecipients;

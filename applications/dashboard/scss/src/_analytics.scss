@@ -7,10 +7,10 @@
   > *:not(.nav-stats) {
     margin-top: $spacer * 2;
 
-      @include media-breakpoint-down(md) {
-        margin-top: $spacer;
-      }
+    @include media-breakpoint-down(md) {
+      margin-top: $spacer;
     }
+  }
 
   > * {
     margin-left: auto;

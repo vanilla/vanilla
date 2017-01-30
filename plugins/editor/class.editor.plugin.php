@@ -638,7 +638,10 @@ class EditorPlugin extends Gdn_Plugin {
             }
         }
 
-        $prependDot = function($str) { return '.'.$str; };
+        // Prefix extension strings with a dot.
+        $prependDot = function($str) {
+            return '.'.$str;
+        };
 
         // prepend extensions with a '.'
         $allowedFileExtensions = array_map($prependDot, $allowedFileExtensions);

@@ -11,7 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 $PluginInfo['stubcontent'] = array(
     'Name' => 'Stub Content',
     'Description' => "This plugin adds stub content to new forums.",
-    'Version' => '1.0a',
+    'Version' => '1.0',
     'MobileFriendly' => true,
     'RequiredApplications' => false,
     'RequiredTheme' => false,
@@ -105,6 +105,9 @@ class StubContentPlugin extends Gdn_Plugin {
 
         // Comments
         $this->addStubContent('comment');
+
+        // Conversations @TODO
+        //$this->addStubContent('conversation');
 
         try {
             Gdn::set(sprintf(self::RECORD_KEY, 'locale'), C('Garden.Locale'));

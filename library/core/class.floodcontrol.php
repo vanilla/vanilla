@@ -7,8 +7,10 @@ final class FloodControl {
     const TYPE_ACTIVITY = 'Activity';
     const TYPE_ACTIVITY_COMMENT = 'ActivityComment';
 
+    /** @var FloodControl */
     private static $instance;
 
+     /** @var Array */
     private $floodControlStates = [
         self::TYPE_COMMENT => true,
         self::TYPE_DISCUSSION => true,

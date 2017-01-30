@@ -271,7 +271,7 @@ class PostController extends VanillaController {
 
                         if ($DiscussionID > 0) {
                             if ($DraftID > 0) {
-                                $this->DraftModel->delete($DraftID);
+                                $this->DraftModel->deleteID($DraftID);
                             }
                         }
                         if ($DiscussionID == SPAM || $DiscussionID == UNAPPROVED) {
@@ -696,7 +696,7 @@ class PostController extends VanillaController {
 
                 $this->Form->setValidationResults($this->CommentModel->validationResults());
                 if ($CommentID > 0 && $DraftID > 0) {
-                    $this->DraftModel->delete($DraftID);
+                    $this->DraftModel->deleteID($DraftID);
                 }
             }
 
@@ -806,7 +806,7 @@ class PostController extends VanillaController {
 //                     }
 
                             // Make sure to set the user's discussion watch records
-                            $CountComments = $this->CommentModel->getCount($DiscussionID);
+                            $CountComments = $this->CommentModel->getCountByDiscussion($DiscussionID);
                             $Limit = is_object($this->data('Comments')) ? $this->data('Comments')->numRows() : $Discussion->CountComments;
                             $Offset = $CountComments - $Limit;
                             $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);

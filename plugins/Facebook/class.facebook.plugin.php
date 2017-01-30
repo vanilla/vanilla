@@ -20,7 +20,7 @@ $PluginInfo['Facebook'] = array(
     'RegisterPermissions' => false,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
     'Icon' => 'facebook_social_connect.png'
@@ -473,7 +473,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Facebook Settings'));
         $Sender->render('Settings', '', 'plugins/Facebook');
     }

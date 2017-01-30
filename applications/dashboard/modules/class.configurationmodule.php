@@ -65,7 +65,7 @@ class ConfigurationModule extends Gdn_Module {
         if ($NewValue !== null) {
             $Form = $NewValue;
         } elseif ($Form === null)
-            $Form = new Gdn_Form();
+            $Form = new Gdn_Form('', 'bootstrap');
 
         return $Form;
     }
@@ -100,7 +100,8 @@ class ConfigurationModule extends Gdn_Module {
         if ($Schema !== null) {
             $this->schema($Schema);
         }
-        
+
+        /** @var Gdn_Form $Form */
         $Form = $this->form();
 
         if ($Form->authenticatedPostBack()) {
@@ -118,7 +119,14 @@ class ConfigurationModule extends Gdn_Module {
                 }
 
                 if (strtolower(val('Control', $Row)) == 'imageupload') {
-                    $Form->saveImage($Name, arrayTranslate($Row, array('Prefix', 'Size')));
+                    $options = arrayTranslate($Row, ['Prefix', 'Size']);
+                    if (val('OutputType', $Row, false)) {
+                        $options['OutputType'] = val('OutputType', $Row);
+                    }
+                    if (val('Crop', $Row, false)) {
+                        $options['Crop'] = val('Crop', $Row);
+                    }
+                    $Form->saveImage($Name, $options);
                 }
 
                 $Value = $Form->getFormValue($Name);

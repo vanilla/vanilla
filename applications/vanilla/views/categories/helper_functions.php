@@ -247,7 +247,7 @@ if (!function_exists('WriteTableRow')):
 
     function writeTableRow($Row, $Depth = 1) {
         $Children = $Row['Children'];
-        $WriteChildren = getWriteChildrenMethod($Children, $Depth);
+        $WriteChildren = getWriteChildrenMethod($Row, $Depth);
         $H = 'h'.($Depth + 1);
         ?>
         <tr class="<?php echo CssClass($Row); ?>">
@@ -272,7 +272,7 @@ if (!function_exists('WriteTableRow')):
                         <div class="ChildCategories">
                             <?php
                             echo wrap(t('Child Categories').': ', 'b');
-                            echo CategoryString($Children, $Depth + 1);
+                            echo categoryString($Children, $Depth + 1);
                             ?>
                         </div>
                     <?php endif; ?>

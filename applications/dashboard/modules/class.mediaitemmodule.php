@@ -236,7 +236,7 @@ class MediaItemModule extends Gdn_Module {
     }
 
     /**
-     * Adds a HTML-formatted string to the meta array. It's up to the view to add the info in the options.
+     * Adds a HTML-formatted string to the options array. It's up to the view to add the info in the options.
      *
      * @param string $key A key to access the data.
      * @param string $value An HTML-formatted string.

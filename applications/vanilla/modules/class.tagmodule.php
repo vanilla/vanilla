@@ -24,11 +24,11 @@ class TagModule extends Gdn_Module {
      * @param string $Sender
      */
     public function __construct($Sender = '') {
+        parent::__construct($Sender);
         $this->_TagData = false;
         $this->ParentID = null;
         $this->ParentType = 'Global';
         $this->CategorySearch = c('Plugins.Tagging.CategorySearch', false);
-        parent::__construct($Sender);
     }
 
     /**
@@ -157,6 +157,10 @@ class TagModule extends Gdn_Module {
      * @return string
      */
     public function inlineDisplay() {
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
+
         if (!$this->_TagData) {
             $this->getData();
         }
@@ -199,6 +203,10 @@ endforeach; ?>
      * @return string
      */
     public function toString() {
+        if (!c('EnabledPlugins.Tagging')) {
+            return;
+        }
+
         if (!$this->_TagData) {
             $this->getData();
         }

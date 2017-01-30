@@ -16,7 +16,7 @@ $PluginInfo['GooglePlus'] = array(
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SettingsUrl' => '/dashboard/social/googleplus',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Hidden' => false,
@@ -537,7 +537,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             $Model->save(array('AuthenticationKey' => self::ProviderKey, 'IsDefault' => c('Plugins.GooglePlus.Default')));
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', sprintf(t('%s Settings'), 'Google+'));
         $Sender->ConfigurationModule = $Conf;
         $Sender->render('Settings', '', 'plugins/GooglePlus');

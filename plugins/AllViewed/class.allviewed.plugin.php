@@ -249,7 +249,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      *    $this->EventArguments['Data'] = $Data;
      *    $this->fireEvent('AfterAddColumns');
      *
-     * @link http://vanillaforums.org/discussion/13227
+     * @link https://open.vanillaforums.com/discussion/13227
      * @since 1.0
      * @access public
      *

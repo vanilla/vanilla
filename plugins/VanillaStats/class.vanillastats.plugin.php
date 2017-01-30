@@ -166,7 +166,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
         $Sender->fireEvent('DefineAdminPermissions');
         $Sender->permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->addSideMenu('dashboard/settings');
+        $Sender->setHighlightRoute('dashboard/settings');
 
         $range = Gdn::request()->getValue('range');
         $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));

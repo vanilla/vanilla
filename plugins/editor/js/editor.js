@@ -346,13 +346,22 @@
                 $(el).removeClass('editor-dropdown-open');
                 $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             });
-        }
+        };
 
         /**
          * Deal with clashing JS for opening dialogs on click, and do not let
          * more than one dialog/dropdown appear at once.
          */
         var editorSetupDropdowns = function(editorInstance) {
+            $(document).on('click touchstart', function() {
+                editorDropdownsClose();
+            });
+
+            $(document).on('click touchstart', '.editor-dropdown', function(e) {
+                e.stopPropagation();
+            });
+
+
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {

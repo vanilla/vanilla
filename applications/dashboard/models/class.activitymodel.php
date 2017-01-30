@@ -1336,7 +1336,7 @@ class ActivityModel extends Gdn_Model {
 
         $this->EventArguments['Preference'] = $Preference;
         $this->EventArguments['Options'] = $Options;
-        $this->EventArguments['Data'] = $Data;
+        $this->EventArguments['Data'] = &$Data;
         $this->fireEvent('BeforeCheckPreference');
         if (!empty($Preference)) {
             list($Popup, $Email) = self::notificationPreference($Preference, $Data['NotifyUserID'], 'both');

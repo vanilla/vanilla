@@ -75,7 +75,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addListFix() {
         $this->block_gamut = array_replace($this->block_gamut, [
-            'doListFix' => 39
+            'doListFix' => 5
         ]);
     }
 

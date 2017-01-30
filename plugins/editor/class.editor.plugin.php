@@ -788,7 +788,7 @@ class EditorPlugin extends Gdn_Plugin {
             }
 
             // Save data to database using model with media table
-            $Model = new Gdn_Model('Media');
+            $Model = new MediaModel();
 
             // Will be passed to model for database insertion/update. All thumb vars will be empty.
             $Media = array(
@@ -852,7 +852,7 @@ class EditorPlugin extends Gdn_Plugin {
      */
     protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
         // Save data to database using model with media table
-        $Model = new Gdn_Model('Media');
+        $Model = new MediaModel();
 
         $Media = $Model->getID($FileID);
         if ($Media) {
@@ -880,8 +880,8 @@ class EditorPlugin extends Gdn_Plugin {
      */
     protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
         // Save data to database using model with media table
-        $Model = new Gdn_Model('Media');
-        $Media = (array)$Model->getID($MediaID);
+        $Model = new MediaModel();
+        $Media = $Model->getID($MediaID, DATASET_TYPE_ARRAY);
 
         $IsOwner = (!empty($Media['InsertUserID']) && Gdn::session()->UserID == $Media['InsertUserID']);
         // @todo Per-category edit permission would be better, but this global is far simpler to check here.
@@ -889,19 +889,7 @@ class EditorPlugin extends Gdn_Plugin {
         $CanDelete = ($IsOwner || Gdn::session()->checkPermission('Garden.Moderation.Manage'));
         if ($Media && $CanDelete) {
             try {
-                if ($Model->delete($MediaID)) {
-                    // unlink the images.
-                    $path = PATH_UPLOADS.'/'.$Media['Path'];
-                    $thumbPath = PATH_UPLOADS.'/'.$Media['ThumbPath'];
-
-                    if (file_exists($path)) {
-                        unlink($path);
-                    }
-
-                    if (file_exists($thumbPath)) {
-                        unlink($thumbPath);
-                    }
-                }
+                $Model->delete(['MediaID' => $MediaID], ['deleteFile' => true]);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;
@@ -1195,7 +1183,7 @@ class EditorPlugin extends Gdn_Plugin {
         $mediaData = array();
         $mediaDataDiscussion = array();
         $mediaDataComment = array();
-        $mediaModel = new Gdn_Model('Media');
+        $mediaModel = new MediaModel();
 
         // Query the Media table for discussion media.
         if ($type === 'discussion') {
@@ -1402,7 +1390,7 @@ class EditorPlugin extends Gdn_Plugin {
         // functions.general.php
         require 'generate_thumbnail.php';
 
-        $model = new Gdn_Model('Media');
+        $model = new MediaModel();
         $media = $model->getID($media_id, DATASET_TYPE_ARRAY);
 
         if (!$media) {

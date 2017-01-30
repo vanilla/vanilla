@@ -81,6 +81,19 @@ class MediaModel extends Gdn_Model {
     }
 
     /**
+     * Delete record by ID.
+     *
+     * @param int $mediaID ID of the record to delete
+     * @param array $options An array of options to control the delete.
+     * - deleteFile: Delete the file from the disk. True by default
+     *
+     * @return Gdn_Dataset
+     */
+    public function deleteID($mediaID, $options = []) {
+        return $this->delete(['MediaID' => $mediaID], $options);
+    }
+
+    /**
      * Te be removed soon™
      *
      * @deprecated

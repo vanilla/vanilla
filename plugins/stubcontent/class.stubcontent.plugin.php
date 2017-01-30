@@ -32,8 +32,33 @@ $PluginInfo['stubcontent'] = array(
  * improves its look-and-feel by filling empty spaces with content, and also helps
  * familiarize new admins and moderators with best practices.
  *
+ * All pieces of stub content receive a unique ID. When they're inserted into the
+ * forum, this ID is associated with a "receipt" that is stored in the UserMeta
+ * table. This receipt prevent repeat insertions of stub content when that content
+ * is deleted from the forum.
+ *
+ * LOCALE SUPPORT
+ *
+ * The titles and body contents of all stub content can be easily translated using
+ * Vanilla's locale system. Whenever a piece of content is being added, it is passed
+ * through the translation system. Translation codes are used, and are based on the
+ * "tag" field of each piece of content.
+ *
+ * For a discussion, the available translations are:
+ *
+ *      <tag>.title
+ *      <tag>.body
+ *
+ * For a comment:
+ *
+ *      <tag>.body
+ *
+ * For a conversation:
+ *
+ *      <tag>.subject
+ *      <tag>.body
+ *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @package internal
  * @since 1.0
  */
 class StubContentPlugin extends Gdn_Plugin {
@@ -47,9 +72,40 @@ class StubContentPlugin extends Gdn_Plugin {
         'conversation' => 'content/conversation.yaml'
     ];
 
+    /**
+     * Handle locale changes to translate stub content
+     *
+     * @param Gdn_ConfigurationSource $sender
+     */
+    public function gdn_configurationSource_beforeSave_handler($sender) {
 
-    public function __construct() {
+        $newLocale = $sender->get('Garden.Locale');
+        $oldLocale = Gdn::get(sprintf(self::RECORD_KEY, 'locale'));
 
+        if ($newLocale != $oldLocale) {
+            // Initialize new locale
+            Gdn::locale()->set($newLocale);
+
+            // Process stub content under new locale
+            $this->processStubContent();
+        }
+    }
+
+    /**
+     * Add or update all stub content
+     *
+     */
+    public function processStubContent() {
+        // User
+        $this->addStubContent('user');
+
+        // Discussions
+        $this->addStubContent('discussion');
+
+        // Comments
+        $this->addStubContent('comment');
+
+        Gdn::set(sprintf(self::RECORD_KEY, 'locale'), C('Garden.Locale'));
     }
 
     /**
@@ -98,44 +154,45 @@ class StubContentPlugin extends Gdn_Plugin {
      * @return boolean
      */
     public function addStubContent($type) {
-        debugMethod(__METHOD__, func_get_args());
-        $allContent = $this->getStubContent($type);
+        $activeLocale = C('Garden.Locale');
 
-        $activeLocale = Gdn::locale()->language();
+        $allContent = $this->getStubContent($type);
 
         // Iterate over each requested piece of content
         foreach ($allContent as $content) {
 
-            $record = $this->getRecordByContent($content);
+            // Retrieve stub content record bundle
 
-            switch ($type) {
-                case 'user':
-                    $name = $content['name'];
-                    break;
-                case 'discussion':
-                    $name = $content['title'];
-                    break;
-                case 'comment':
-                    $name = $content['author'].' on '.$content['parent'];
-                    break;
-            }
-            echo "{$type}: {$name}\n";
+            /*
+             * $record = [
+             *      id => discussion-8733a97ed5cea009
+             *      receipt => [
+             *          contentID => discussion-8733a97ed5cea009
+             *          rowID => 15
+             *          type => discussion
+             *      ]
+             *      row => [
+             *          // actual DB row
+             *      ]
+             * ]
+             *
+             */
+            $record = $this->getRecordByContent($content);
 
             // If no receipt, add record
             if (!$record['receipt']) {
-
-                echo " adding record\n";
 
                 $record = $this->insertContent($content);
 
             // Otherwise, perhaps update
             } else if ($record['row']) {
+
                 // Update if locale mismatch
+                $stubLocale = valr('Attributes.StubLocale', $record['row']);
+                if ($stubLocale != $activeLocale) {
+                    $this->updateContent($content, $record);
+                }
 
-                echo " record exists\n";
-
-            } else {
-                echo " record deleted\n";
             }
 
         }
@@ -149,28 +206,32 @@ class StubContentPlugin extends Gdn_Plugin {
     public function insertContent($content) {
 
         $contentID = $this->getContentID($content);
+        $activeLocale = C('Garden.Locale');
+
         switch ($content['type']) {
 
             case 'user':
 
                 $model = new UserModel;
                 $rowID = $model->save([
-                    'Name'          => $content['name'],
-                    'Email'         => $content['email'],
-                    'Photo'         => $content['photo'],
-                    'Password'      => betterRandomString(24),
-                    'HashMethod'    => 'Random',
-                    'Attributes'    => [
-                        'Locale'            => Gdn::locale()->language(),
+                    'Name'              => $content['name'],
+                    'Email'             => $content['email'],
+                    'Photo'             => $content['photo'],
+                    'Password'          => betterRandomString(24),
+                    'HashMethod'        => 'Random',
+                    'Attributes'        => [
+                        'StubLocale'        => $activeLocale,
                         'StubContentID'     => $contentID,
                         'StubContentTag'    => $content['tag']
                     ]
+                ], [
+                    'ValidateEmail' => false,
+                    'NoConfirmEmail' => true
                 ]);
 
                 if ($rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
                 }
-
                 break;
 
             case 'discussion':
@@ -188,20 +249,24 @@ class StubContentPlugin extends Gdn_Plugin {
                     $authorID = $authorRecord['receipt']['rowID'];
                     $category = (array)$category;
 
+                    // Build translation tags
+                    $translateName = "{$content['tag']}.title";
+                    $translateBody = "{$content['tag']}.body";
+
                     $model = new DiscussionModel;
                     $rowID = $model->save([
-                        'Type'      => 'stub',
-                        'ForeignID' => $contentID,
-                        'CategoryID' => $category['CategoryID'],
-                        'InsertUserID' => $authorID,
-                        'Name'      => $content['title'],
-                        'Body'      => formatString($content['body'],[
+                        'Type'          => 'stub',
+                        'ForeignID'     => $contentID,
+                        'CategoryID'    => $category['CategoryID'],
+                        'InsertUserID'  => $authorID,
+                        'Name'          => t($translateName, $content['title']),
+                        'Body'          => formatString(t($translateBody, $content['body']),[
                             'author' => $authorRecord['row']
                         ]),
-                        'Announce'  => val('announce', $content, 0),
-                        'Format'    => val('format', $content, 'Markdown'),
+                        'Announce'      => val('announce', $content, 0),
+                        'Format'        => val('format', $content, 'Markdown'),
                         'Attributes'    => [
-                            'Locale'            => Gdn::locale()->language(),
+                            'StubLocale'        => $activeLocale,
                             'StubContentID'     => $contentID,
                             'StubContentTag'    => $content['tag']
                         ]
@@ -210,7 +275,6 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     }
-
                 }
 
                 break;
@@ -232,17 +296,20 @@ class StubContentPlugin extends Gdn_Plugin {
 
                     $parentAuthor = Gdn::userModel()->getID($parentRecord['row']['InsertUserID'], DATASET_TYPE_ARRAY);
 
+                    // Build translation tags
+                    $translateBody = "{$content['tag']}.body";
+
                     $model = new CommentModel;
                     $rowID = $model->save([
-                        'DiscussionID' => $parentID,
-                        'InsertUserID' => $authorID,
-                        'Body'      => formatString($content['body'], [
+                        'DiscussionID'  => $parentID,
+                        'InsertUserID'  => $authorID,
+                        'Body'          => formatString(t($translateBody, $content['body']), [
                             'author' => $authorRecord['row'],
                             'parent' => $parentAuthor
                         ]),
-                        'Format'    => val('format', $content, 'Markdown'),
+                        'Format'        => val('format', $content, 'Markdown'),
                         'Attributes'    => [
-                            'Locale'            => Gdn::locale()->language(),
+                            'StubLocale'        => $activeLocale,
                             'StubContentID'     => $contentID,
                             'StubContentTag'    => $content['tag']
                         ]
@@ -251,7 +318,6 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     }
-
                 }
 
                 break;
@@ -260,8 +326,8 @@ class StubContentPlugin extends Gdn_Plugin {
 
                 $model = new ConversationModel;
                 $rowID = $model->save([
-                    'Attributes'    => [
-                        'Locale'            => Gdn::locale()->language(),
+                    'Attributes'        => [
+                        'StubLocale'        => $activeLocale,
                         'StubContentID'     => $contentID,
                         'StubContentTag'    => $content['tag']
                     ]
@@ -270,17 +336,106 @@ class StubContentPlugin extends Gdn_Plugin {
                 if (!$rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
                 }
-
                 break;
         }
 
         if (!$rowID) {
-            echo " failed to insert\n";
+            trace("Failed to insert stub content");
             if ($model) {
-                foreach ($model->validationResults() as $result) {
-                    echo " {$result[0]}\n";
-                }
+                trace($model->validationResults());
             }
+        }
+    }
+
+    /**
+     * Apply locale updates to a record
+     *
+     * @param array $content
+     * @param array $record
+     */
+    public function updateContent($content, $record) {
+
+        $activeLocale = C('Garden.Locale');
+        setvalr('Attributes.StubLocale', $record['row'], $activeLocale);
+
+        switch ($content['type']) {
+            case 'user':
+                $model = new UserModel;
+
+                // Nothing to update except locale
+
+                $model->save($record['row'], [
+                    'ValidateEmail' => false,
+                    'NoConfirmEmail' => true
+                ]);
+                break;
+
+            case 'discussion':
+                $model = new DiscussionModel;
+
+                // Get author
+                $authorTag = $content['author'];
+                $authorRecord = $this->getRecord('user', $authorTag);
+
+                // Build translation tags
+                $translateName = "{$content['tag']}.title";
+                $translateBody = "{$content['tag']}.body";
+
+                // Apply translations
+                $record['row']['Name'] = t($translateName, $content['title']);
+                $record['row']['Body'] = formatString(t($translateBody, $content['body']),[
+                    'author' => $authorRecord['row']
+                ]);
+
+                // Save
+                $model->save($record['row']);
+                break;
+
+            case 'comment':
+                $model = new CommentModel;
+
+                // Get author
+                $authorTag = $content['author'];
+                $authorRecord = $this->getRecord('user', $authorTag);
+
+                // Get parent
+                $parentTag = $content['parent'];
+                $parentRecord = $this->getRecord('discussion', $parentTag);
+
+                // Get parent author
+                $parentAuthor = Gdn::userModel()->getID($parentRecord['row']['InsertUserID'], DATASET_TYPE_ARRAY);
+
+                // Build translation tag
+                $translateBody = "{$content['tag']}.body";
+
+                // Apply translation
+                $record['row']['Body'] = formatString(t($translateBody, $content['body']), [
+                    'author' => $authorRecord['row'],
+                    'parent' => $parentAuthor
+                ]);
+
+                // Save
+                $model->save($record['row']);
+                break;
+
+            case 'conversation':
+                $model = new ConversationModel;
+
+                // Get author
+                $authorTag = $content['author'];
+                $authorRecord = $this->getRecord('user', $authorTag);
+
+                // Build translation tag
+                $translateBody = "{$content['tag']}.body";
+
+                // Apply translation
+                $record['row']['Body'] = formatString(t($translateBody, $content['body']),[
+                    'author' => $authorRecord['row']
+                ]);
+
+                // Save
+                $model->save($record['row']);
+                break;
         }
     }
 
@@ -339,19 +494,13 @@ class StubContentPlugin extends Gdn_Plugin {
         $rowID = $recordReceipt['rowID'];
         $row = $model->getID($rowID, DATASET_TYPE_ARRAY);
         if ($row) {
+            if (array_key_exists('Attributes', $row) && is_string($row['Attributes'])) {
+                $row['Attributes'] = dbdecode($row['Attributes']);
+            }
             $record['row'] = $row;
         }
 
         return $record;
-    }
-
-    /**
-     * Apply locale updates to a record
-     *
-     * @param array $record
-     */
-    public function updateContent($record) {
-
     }
 
     /**
@@ -432,25 +581,12 @@ class StubContentPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add missing stub content on spawn and update
+     * Add or update stub content on spawn and update
      *
      *
      */
     public function structure() {
-
-        // User
-        $this->addStubContent('user');
-
-        // Discussions
-        $this->addStubContent('discussion');
-
-        // Comments
-        $this->addStubContent('comment');
-
-        die();
-
-        // Conversations
-        //$this->addStubContent('conversation');
+        $this->processStubContent();
     }
 
 }

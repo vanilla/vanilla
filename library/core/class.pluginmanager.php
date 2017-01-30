@@ -1177,14 +1177,18 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      *
      * @param $pluginName
      * @param Gdn_Validation $validation
-     * @param bool $setup
+     * @param array|bool $options
      * @return bool
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function enablePlugin($pluginName, $validation, $setup = true) {
+    public function enablePlugin($pluginName, $validation, $options = []) {
+
+        $setup = val('Setup', $options, true);
+        $force = val('Force', $options, false);
+
         // Check to see if the plugin is already enabled.
-        if ($this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON)) {
+        if ($this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON) && !$force) {
             throw new Gdn_UserException(t('The plugin is already enabled.'));
         }
 
@@ -1350,6 +1354,9 @@ class Gdn_PluginManager extends Gdn_Pluggable {
 
         if ($callback && !empty($pluginClass) && class_exists($pluginClass)) {
             $plugin = new $pluginClass();
+            if (method_exists($plugin, 'setAddon')) {
+                $plugin->setAddon($addon);
+            }
             if (method_exists($pluginClass, $methodName)) {
                 $plugin->$methodName();
             }

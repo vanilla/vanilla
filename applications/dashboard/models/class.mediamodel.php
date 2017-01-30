@@ -70,10 +70,23 @@ class MediaModel extends Gdn_Model {
             $mediaID = val('MediaID', $where, false);
             if ($mediaID) {
                 $media = $this->getID($mediaID);
-                $filePath = (defined('PATH_LOCAL_UPLOADS') ? PATH_LOCAL_UPLOADS : PATH_UPLOADS).DS.val('Path', $media);
-                if (file_exists($filePath)) {
-                    safeUnlink($filePath);
+
+                $uploadPath = (defined('PATH_LOCAL_UPLOADS') ? PATH_LOCAL_UPLOADS : PATH_UPLOADS).'/';
+
+                if (!empty($media['Path'])) {
+                    $filePath = $uploadPath.$media['Path'];
+                    if (file_exists($filePath)) {
+                        safeUnlink($filePath);
+                    }
                 }
+                if (!empty($media['ThumbPath'])) {
+                    $filePath = $uploadPath.$media['ThumbPath'];
+                    if (file_exists($filePath)) {
+                        safeUnlink($filePath);
+                    }
+                }
+
+
             }
         }
 

@@ -1051,7 +1051,7 @@ class EditorPlugin extends Gdn_Plugin {
 
                 $Sender->setData('_attachments', $attachments);
                 $Sender->setData('_editorkey', strtolower($param.$foreignId));
-                echo $Sender->fetchView('attachments.php', '', 'plugins/editor');
+                echo $Sender->fetchView('attachments', '', 'plugins/editor');
             }
         }
     }

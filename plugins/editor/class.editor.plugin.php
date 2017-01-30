@@ -889,7 +889,7 @@ class EditorPlugin extends Gdn_Plugin {
         $CanDelete = ($IsOwner || Gdn::session()->checkPermission('Garden.Moderation.Manage'));
         if ($Media && $CanDelete) {
             try {
-                $Model->delete(['MediaID' => $MediaID], ['deleteFile' => true]);
+                $Model->deleteID($MediaID, ['deleteFile' => true]);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;
@@ -1051,7 +1051,7 @@ class EditorPlugin extends Gdn_Plugin {
 
                 $Sender->setData('_attachments', $attachments);
                 $Sender->setData('_editorkey', strtolower($param.$foreignId));
-                echo $Sender->fetchView($this->getView('attachments.php'));
+                echo $Sender->fetchView('attachments.php', '', 'plugins/editor');
             }
         }
     }

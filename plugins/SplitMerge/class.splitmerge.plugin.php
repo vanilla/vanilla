@@ -138,7 +138,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Sender->Form->setValue('CategoryID', val('CategoryID', $Discussion));
         }
 
-        $Sender->render($this->getView('splitcomments.php'));
+        $Sender->render($Sender->fetchViewLocation('splitcomments', '', 'plugins/SplitMerge'));
     }
 
     /**

@@ -638,13 +638,15 @@ class EditorPlugin extends Gdn_Plugin {
             }
         }
 
+        $prependDot = function($str) { return '.'.$str; };
+
         // prepend extensions with a '.'
-        $allowedFileExtensions = array_map(function($str) { return '.'.$str; }, $allowedFileExtensions);
+        $allowedFileExtensions = array_map($prependDot, $allowedFileExtensions);
         $accept = implode(',', array_merge($allowedFileExtensions, $allowedMimeTypes));
         $Sender->setData('Accept', $accept);
 
         // prepend extensions with a '.'
-        $allowedImageExtensions = array_map(function($str) { return '.'.$str; }, $allowedImageExtensions);
+        $allowedImageExtensions = array_map($prependDot, $allowedImageExtensions);
         $acceptImage = implode(',', array_merge($allowedImageExtensions, $allowedImageMimeTypes));
         $Sender->setData('AcceptImage', $acceptImage);
 

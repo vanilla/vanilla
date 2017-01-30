@@ -79,7 +79,7 @@ class StubContentPlugin extends Gdn_Plugin {
      */
     public function gdn_configurationSource_beforeSave_handler($sender) {
 
-        $newLocale = $sender->get('Garden.Locale');
+        $newLocale = $sender->get('Garden.Locale', 'en');
         $oldLocale = Gdn::get(sprintf(self::RECORD_KEY, 'locale'));
 
         if ($newLocale != $oldLocale) {
@@ -96,6 +96,7 @@ class StubContentPlugin extends Gdn_Plugin {
      *
      */
     public function processStubContent() {
+
         // User
         $this->addStubContent('user');
 
@@ -105,7 +106,11 @@ class StubContentPlugin extends Gdn_Plugin {
         // Comments
         $this->addStubContent('comment');
 
-        Gdn::set(sprintf(self::RECORD_KEY, 'locale'), C('Garden.Locale'));
+        try {
+            Gdn::set(sprintf(self::RECORD_KEY, 'locale'), C('Garden.Locale'));
+        } catch (Exception $ex) {
+            // Nothing
+        }
     }
 
     /**
@@ -199,11 +204,16 @@ class StubContentPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Inset stub content
+     * Insert stub content
      *
      * @param array $content
      */
     public function insertContent($content) {
+
+        // Don't affect newly installed forums
+        if (c('Garden.Installed', false) === true) {
+            return;
+        }
 
         $contentID = $this->getContentID($content);
         $activeLocale = C('Garden.Locale');

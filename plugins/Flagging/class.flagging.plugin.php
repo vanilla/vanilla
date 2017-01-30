@@ -303,7 +303,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                 if ($FlagResult) {
                     // New comment in existing discussion
                     $DiscussionID = $FlagResult->DiscussionID;
-                    $ReportBody = $Sender->fetchView('reportcomment.php', '', 'plugins/Flagging');
+                    $ReportBody = $Sender->fetchView('reportcomment', '', 'plugins/Flagging');
                     $SQL->insert('Comment', array(
                         'DiscussionID' => $DiscussionID,
                         'InsertUserID' => $UserID,
@@ -315,7 +315,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                     $CommentModel->updateCommentCount($DiscussionID);
                 } else {
                     // New discussion body
-                    $ReportBody = $Sender->fetchView('report.php', '', 'plugins/Flagging');
+                    $ReportBody = $Sender->fetchView('report', '', 'plugins/Flagging');
                     $DiscussionID = $SQL->insert('Discussion', array(
                         'InsertUserID' => $UserID,
                         'UpdateUserID' => $UserID,
@@ -356,7 +356,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             if (!$FlagResult) { // Only send if this is first time it's being flagged.
                 $Sender->setData('Plugin.Flagging.DiscussionID', $DiscussionID);
                 $Subject = (isset($PrefixedDiscussionName)) ? $PrefixedDiscussionName : t('FlagDiscussion', 'A discussion was flagged');
-                $EmailBody = $Sender->fetchView('reportemail.php', '', 'plugins/Flagging');
+                $EmailBody = $Sender->fetchView('reportemail', '', 'plugins/Flagging');
                 $NotifyUsers = c('Plugins.Flagging.NotifyUsers', array());
 
                 // Send emails

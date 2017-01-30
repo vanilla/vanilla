@@ -11,7 +11,7 @@
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends VanillaModel {
+class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
 
@@ -1890,8 +1890,25 @@ class DiscussionModel extends VanillaModel {
         }
 
         if (count($ValidationResults) == 0) {
+            // Flood control check (spamming)
+            $floodControl = FloodControl::getInstance();
+
+            // Backward compatible check
+            if (!val('SpamCheck', $this, true)) {
+                deprecated('DiscussionModel->SpamCheck attribute', 'FloodControl->setFloodControlState(FloodControl::TYPE_DISCUSSION, false)');
+                $floodControl->setFloodControlState(FloodControl::TYPE_DISCUSSION, false);
+            }
+
+            $isUserSpamming = $floodControl->isCurrentUserSpamming(FloodControl::TYPE_DISCUSSION);
+            if ($isUserSpamming) {
+                $this->Validation->addValidationResult(
+                    'Body',
+                    '@'.$floodControl->getWarningMessage(FloodControl::TYPE_DISCUSSION)
+                );
+            }
+
             // If the post is new and it validates, make sure the user isn't spamming
-            if (!$Insert || !$this->checkForSpam('Discussion')) {
+            if (!$Insert || !$isUserSpamming) {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 

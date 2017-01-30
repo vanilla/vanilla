@@ -11,7 +11,7 @@
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends VanillaModel {
+class CommentModel extends Gdn_Model {
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -843,8 +843,25 @@ class CommentModel extends VanillaModel {
 
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
-            // If the post is new and it validates, check for spam
-            if (!$Insert || !$this->CheckForSpam('Comment')) {
+            // Flood control check (spamming)
+            $floodControl = FloodControl::getInstance();
+
+            // Backward compatible check
+            if (!val('SpamCheck', $this, true)) {
+                deprecated('CommentModel->SpamCheck attribute', 'FloodControl->setFloodControlState(FloodControl::TYPE_COMMENT, false)');
+                $floodControl->setFloodControlState(FloodControl::TYPE_COMMENT, false);
+            }
+
+            $isUserSpamming = $floodControl->isCurrentUserSpamming(FloodControl::TYPE_COMMENT);
+            if ($isUserSpamming) {
+                $this->Validation->addValidationResult(
+                    'Body',
+                    '@'.$floodControl->getWarningMessage(FloodControl::TYPE_COMMENT)
+                );
+            }
+
+            // If the post is new and it validates
+            if (!$Insert || !$isUserSpamming) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 unset($Fields[$this->PrimaryKey]);
 

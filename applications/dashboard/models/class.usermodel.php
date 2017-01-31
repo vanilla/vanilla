@@ -128,7 +128,7 @@ class UserModel extends Gdn_Model {
      */
     public function addPasswordStrength($Controller) {
         $Controller->addJsFile('password.js');
-        $Controller->addDefinition('MinPassLength', c('Garden.Registration.MinPasswordLength'));
+        $Controller->addDefinition('MinPassLength', c('Garden.Password.MinLength'));
         $Controller->addDefinition(
             'PasswordTranslations',
             implode(',', [

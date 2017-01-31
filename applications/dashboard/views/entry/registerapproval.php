@@ -33,7 +33,7 @@
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');
-                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Registration.MinPasswordLength')), 'div', array('class' => 'Gloss'));
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')), 'div', array('class' => 'Gloss'));
                 echo $this->Form->Input('Password', 'password', array('Wrap' => true, 'Strength' => TRUE));
                 ?>
             </li>

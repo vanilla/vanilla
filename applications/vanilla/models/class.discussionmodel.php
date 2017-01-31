@@ -1819,6 +1819,8 @@ class DiscussionModel extends VanillaModel {
             if ($Category && !$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $Category))) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
+        } else {
+            $this->Validation->addValidationResult('CategoryID', 'Invalid CategoryID');
         }
 
         // Get the DiscussionID from the form so we know if we are inserting or updating.

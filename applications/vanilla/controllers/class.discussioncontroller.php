@@ -82,7 +82,13 @@ class DiscussionController extends VanillaController {
         // Check permissions.
         $Category = CategoryModel::categories($this->Discussion->CategoryID);
         $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category, -1));
-        $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
+        if (c('Vanilla.Categories.Use', true)) {
+            $this->CategoryID = $this->Discussion->CategoryID;
+        } else {
+            $this->CategoryID = null;
+        }
+        $this->setData('CategoryID', $this->CategoryID);
+
 
         if (strcasecmp(val('Type', $this->Discussion), 'redirect') === 0) {
             $this->redirectDiscussion($this->Discussion);

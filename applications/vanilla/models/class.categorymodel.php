@@ -1257,15 +1257,20 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Delete a single category and assign its discussions to another.
+     * Delete a category.
+     * If $newCategoryID is:
+     *  - a valid categoryID, every discussions and sub-categories will be moved to the new category.
+     *  - not a valid categoryID, all its discussions and sub-category will be recursively deleted.
      *
      * @since 2.0.0
      * @access public
      *
-     * @param object $category
-     * @param int $newCategoryID Unique ID of category all discussion are being move to.
+     * @param object $category The category to delete
+     * @param int $newCategoryID ID of the category that will replace this one.
      */
     public function deleteAndReplace($category, $newCategoryID) {
+        static $recursionLevel = 0;
+
         // Coerce the category into an object for deletion.
         if (is_numeric($category)) {
             $category = $this->getID($category, DATASET_TYPE_OBJECT);
@@ -1368,16 +1373,21 @@ class CategoryModel extends Gdn_Model {
 
                 // Recursively delete child categories and their content.
                 $children = self::flattenTree($this->collection->getTree($category->CategoryID));
+                $recursionLevel++;
                 foreach ($children as $child) {
                     self::deleteAndReplace($child, 0);
                 }
+                $recursionLevel--;
             }
 
             // Delete the category
             $this->SQL->delete('Category', array('CategoryID' => $category->CategoryID));
         }
+
         // Make sure to reorganize the categories after deletes
-        $this->RebuildTree();
+        if ($recursionLevel === 0) {
+            $this->rebuildTree();
+        }
     }
 
     /**

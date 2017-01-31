@@ -257,7 +257,7 @@
     user-select: none;
   }
 
-  &:before {
+  &::before {
     position: absolute;
     display: block;
     width: 100%;

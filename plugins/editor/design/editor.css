@@ -12,12 +12,12 @@
   border: 1px solid #38ABE3;
   opacity: 0;
   box-shadow: 0 1px 2px -1px #fff;
-  -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
 .editor-upload-progress.fade-out {
   opacity: 0 !important;
-  transition: opacity 0.7s ease; }
+  -webkit-transition: opacity 0.7s ease;
+          transition: opacity 0.7s ease; }
 
 .editor-drop-cue .BodyBox,
 .editor-drop-cue iframe.wysihtml5-sandbox {
@@ -57,7 +57,6 @@
   overflow: hidden;
   padding: 5px;
   margin: 0 -10px;
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   position: relative; }
 
@@ -77,20 +76,20 @@
   border: 1px solid #fff;
   border-radius: 2px;
   box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.2);
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   /* This is for the transition when removing/reattaching files. Height
   is necessary due to floated elements and width, which cause them to
   occupy space under image until width is full. */
-  transition: all 0.1s ease;
+  -webkit-transition: all 0.1s ease;
+          transition: all 0.1s ease;
   -webkit-animation-duration: 0.8s;
-  animation-duration: 0.8s;
+          animation-duration: 0.8s;
   -webkit-animation-name: editor-file-preview;
-  animation-name: editor-file-preview;
+          animation-name: editor-file-preview;
   -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
+          animation-fill-mode: both;
   -webkit-animation-duration: 0.4s;
-  animation-duration: 0.4s;
+          animation-duration: 0.4s;
   /* File permissions */ }
   .editor-file-preview .file-preview {
     display: block;
@@ -177,21 +176,21 @@
   0% {
     opacity: 0;
     -webkit-transform: scale(1.1);
-    transform: scale(1.1); }
+            transform: scale(1.1); }
   100% {
     opacity: 1;
     -webkit-transform: scale(1);
-    transform: scale(1); } }
+            transform: scale(1); } }
 
 @keyframes editor-file-preview {
   0% {
     opacity: 0;
     -webkit-transform: scale(1.1);
-    transform: scale(1.1); }
+            transform: scale(1.1); }
   100% {
     opacity: 1;
     -webkit-transform: scale(1);
-    transform: scale(1); } }
+            transform: scale(1); } }
 
 /**
  * Editor toolbar
@@ -202,9 +201,9 @@
   font-size: 14px;
   line-height: 1.5;
   -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none; }
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none; }
   .editor-active .editor {
     display: block; }
   .editor .icon {
@@ -270,7 +269,6 @@
 .editor-insert-dialog input.InputBox {
   width: 100%;
   margin: 0;
-  -moz-box-sizing: border-box;
   box-sizing: border-box; }
 
 .dd-separator {
@@ -294,15 +292,15 @@
   cursor: pointer;
   border: 1px solid #fff;
   box-shadow: inset 0 0 0 1px #fff;
-  transition: -webkit-transform 0.2s ease;
-  transition: transform 0.2s ease;
+  -webkit-transition: -webkit-transform 0.2s ease;
+          transition: transform 0.2s ease;
   margin: 1px; }
 
 .editor-dropdown-color .editor-insert-dialog .color:hover,
 .editor-dropdown-color .editor-insert-dialog .wysihtml5-command-active {
   border: 1px solid transparent;
   -webkit-transform: scale(1.1);
-  transform: scale(1.1);
+          transform: scale(1.1);
   position: relative;
   z-index: 10;
   border: 1px solid transparent;
@@ -341,7 +339,6 @@
  */
 .editor-dd-emoji + .editor-insert-dialog {
   width: 136px;
-  -moz-box-sizing: content-box;
   box-sizing: content-box; }
   .editor-dd-emoji + .editor-insert-dialog .emoji-wrap {
     line-height: 34px;
@@ -363,49 +360,32 @@
  */
 .editor-file-image {
   padding: 0; }
-  .editor-file-image .drop-section {
-    padding: 10px; }
-  .editor-file-image .file-drop {
-    display: none;
-    padding: 30px;
-    margin: 10px 10px 0 10px;
-    text-align: center;
-    border: 2px dashed rgba(0, 0, 0, 0.25);
-    border-radius: 2px; }
-    .editor-file-image .file-drop.can-drop {
-      display: block !important; }
+  .editor-file-image .file-title {
+    padding: 10px;
+    font-weight: 700; }
+    .editor-file-image .file-title .info {
+      font-size: 80%;
+      font-weight: 400; }
   .editor-file-image .file-input {
     overflow: hidden;
     white-space: nowrap;
-    padding-top: 10px; }
+    padding: 10px; }
     .editor-file-image .file-input input[type=file] {
       visibility: visible !important; }
   .editor-file-image .image-input {
-    padding: 0;
-    border-top: 1px solid #da8f8f; }
-    .editor-file-image .image-input input {
-      padding: 10px;
-      margin: 0;
-      border-bottom-left-radius: 2px;
-      border-bottom-right-radius: 2px;
-      border: 0; }
+    padding: 10px; }
+  .editor-file-image .dd-separator {
+    margin: 0; }
   .editor-file-image.drag-passthrough {
     opacity: 0;
     pointer-events: none;
-    transition: all 200ms ease;
+    -webkit-transition: all 200ms ease;
+            transition: all 200ms ease;
     -webkit-transform: scale(0);
-    transform: scale(0); }
+            transform: scale(0); }
 
 .editor-dropdown-image .editor-file-image .image-input {
   border-top: 0; }
-
-/* If uploads disabled entirely, hide some options in the dropdown */
-.editor-uploads-disabled .file-drop,
-.editor-uploads-disabled .file-input {
-  display: none; }
-
-.editor-uploads-disabled .image-input {
-  border: 0; }
 
 /**
  * Going full page
@@ -423,9 +403,9 @@
     .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
       width: 100% !important;
       color: #000;
-      -moz-box-sizing: border-box !important;
       box-sizing: border-box !important;
-      transition: background-color 400ms ease, color 400ms ease; }
+      -webkit-transition: background-color 400ms ease, color 400ms ease;
+              transition: background-color 400ms ease, color 400ms ease; }
     .editor-fullpage .TextBoxWrapper .BodyBox {
       min-height: 400px; }
     .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
@@ -443,9 +423,9 @@
     padding: 0;
     overflow-y: auto;
     background-color: #fff;
-    transition: background-color 400ms ease; }
+    -webkit-transition: background-color 400ms ease;
+            transition: background-color 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate input {
-      -moz-box-sizing: border-box !important;
       box-sizing: border-box !important; }
     .editor-fullpage #editor-fullpage-candidate .editor {
       position: fixed;
@@ -458,7 +438,8 @@
       background-color: rgba(255, 255, 255, 0.95);
       border: 1px solid transparent;
       box-shadow: 0 2px 5px -5px #000;
-      transition: all 400ms ease; }
+      -webkit-transition: all 400ms ease;
+              transition: all 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
       padding: 50px 0 10px 0;
       margin: 0 auto; }
@@ -467,9 +448,9 @@
     .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
       max-width: 800px;
       -webkit-animation-duration: 800ms;
-      animation-duration: 800ms;
+              animation-duration: 800ms;
       -webkit-animation-name: editor-anim-editor;
-      animation-name: editor-anim-editor; }
+              animation-name: editor-anim-editor; }
     .editor-fullpage #editor-fullpage-candidate .editor-help-text {
       display: none; }
     .editor-fullpage #editor-fullpage-candidate .editor-upload-previews {
@@ -932,6 +913,34 @@ div.Quote {
   outline: none; }
   .editor-composer img {
     max-width: 100%; }
+  .editor-composer div.Spoiler {
+    padding: 10px 10px;
+    margin: 4px 10px 4px 0;
+    background-color: #e6e6e6;
+    border-radius: 3px; }
+  .editor-composer div.Spoiler p {
+    padding: 3px 0 3px 5px;
+    margin: 0;
+    border-left: 1px solid #818181;
+    border-left: 1px solid rgba(0, 0, 0, 0.2); }
+  .editor-composer pre {
+    display: block;
+    padding: 4px 8px;
+    margin: 1em 0;
+    font-size: 13px;
+    word-break: break-all;
+    word-wrap: break-word;
+    background: #ff9;
+    border-radius: 2px;
+    border: 1px solid #eec; }
+  .editor-composer pre code {
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: pre-wrap;
+    background-color: transparent;
+    border: 0;
+    border-radius: 0; }
 
 /**
  * Adjust some styles explicitly within the editor composer. These match the
@@ -947,4 +956,3 @@ div.Quote {
 for more information about the issue */
 .wysihtml5-sandbox {
   padding: 0 !important; }
-/*# sourceMappingURL=editor.css.map */

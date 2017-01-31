@@ -458,10 +458,10 @@
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                if (e.target.result.startsWith("data:image")) {
+                if (e.target.result.startsWith('data:image')) {
                     $preview.attr('src', e.target.result);
                 }
-            }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }
@@ -616,10 +616,10 @@
 
         // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
         $target.find(':input').each(function() {
-            if ($(this).prop("disabled")) {
+            if ($(this).prop('disabled')) {
                 $(this).data('foggy-disabled', 'true');
             } else {
-                $(this).prop("disabled", true);
+                $(this).prop('disabled', true);
             }
         });
     });
@@ -633,7 +633,7 @@
         // Be careful not to enable fields that should be disabled.
         $target.find(':input').each(function() {
             if (!$(this).data('foggy-disabled')) {
-                $(this).prop("disabled", false);
+                $(this).prop('disabled', false);
             }
         });
     });

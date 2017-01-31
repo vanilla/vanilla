@@ -944,7 +944,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Twitter Settings'));
         $Sender->render('Settings', '', 'plugins/Twitter');
     }

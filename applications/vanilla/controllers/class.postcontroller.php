@@ -806,7 +806,7 @@ class PostController extends VanillaController {
 //                     }
 
                             // Make sure to set the user's discussion watch records
-                            $CountComments = $this->CommentModel->getCount($DiscussionID);
+                            $CountComments = $this->CommentModel->getCountByDiscussion($DiscussionID);
                             $Limit = is_object($this->data('Comments')) ? $this->data('Comments')->numRows() : $Discussion->CountComments;
                             $Offset = $CountComments - $Limit;
                             $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);

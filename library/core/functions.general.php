@@ -3026,12 +3026,13 @@ if (!function_exists('safeGlob')) {
     /**
      * A version of {@link glob()} that always returns an array.
      *
-     * @param string $Pattern The glob pattern.
+     * @param string        $Pattern    The glob pattern.
      * @param array[string] $Extensions An array of file extensions to whitelist.
+     *
      * @return array[string] Returns an array of paths that match the glob.
      */
     function safeGlob($Pattern, $Extensions = array()) {
-        $Result = glob($Pattern);
+        $Result = glob($Pattern, GLOB_NOSORT);
         if (!is_array($Result)) {
             $Result = array();
         }

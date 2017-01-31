@@ -473,7 +473,7 @@ class FacebookPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Facebook Settings'));
         $Sender->render('Settings', '', 'plugins/Facebook');
     }

@@ -4,7 +4,12 @@
   flex-wrap: wrap;
   justify-content: space-between;
 
-  > *:not(.nav-stats) {
+  > * {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .toolbar-stats-slot {
     margin-top: $spacer * 2;
 
     @include media-breakpoint-down(md) {
@@ -12,15 +17,31 @@
     }
   }
 
-  > * {
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
+  .toolbar-stats-date-picker {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: $spacer;
 
-.toolbar > .nav-stats {
-  //margin-right: 0;
-  //flex-shrink: 1;
+    @include media-breakpoint-down(md) {
+      margin-top: 0;
+    }
+
+    > * {
+      margin-top: $spacer;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .filter-date {
+      padding-left: $spacer / 2;
+      padding-right: $spacer / 2;
+      min-width: to-rem(210) + $spacer;
+
+      &:after {
+        right: to-rem(9) + $spacer / 2;
+      }
+    }
+  }
 }
 
 

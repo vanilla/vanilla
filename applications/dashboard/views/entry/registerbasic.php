@@ -33,7 +33,7 @@
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');
-                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, inscrease its length and use a combination of lower/upper case letters, digits and special characters such as @!#$.'), 'div', array('class' => 'Gloss'));
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', array('class' => 'Gloss'));
                 echo $this->Form->Input('Password', 'password', array('Wrap' => true, 'Strength' => TRUE));
                 ?>
             </li>

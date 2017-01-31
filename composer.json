@@ -34,7 +34,7 @@
         "tburry/pquery": "~1.1",
         "phpmailer/phpmailer": "~5.2",
         "psr/log": "~1.0",
-        "symphony/yaml": "~3.2"
+        "symfony/yaml": "^3.2"
     },
     "provide": {
         "ext-gd": "*"

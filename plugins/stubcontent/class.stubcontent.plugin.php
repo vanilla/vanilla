@@ -297,6 +297,19 @@ class StubContentPlugin extends Gdn_Plugin {
                             'error' => print_r($model->validationResults(), true)
                         ]);
                     }
+                } else {
+                    $errors = [];
+                    if (!$authorRecord['row']) {
+                        $errors[] = "missing author: {$authorTag}";
+                    }
+                    if (empty($category)) {
+                        $errors[] = "missing category: {$categoryTag}";
+                    }
+
+                    Logger::error("Failed to insert {type}: {error}", [
+                        'type' => $content['type'],
+                        'error' => print_r($errors, true)
+                    ]);
                 }
 
                 break;
@@ -345,6 +358,19 @@ class StubContentPlugin extends Gdn_Plugin {
                             'error' => print_r($model->validationResults(), true)
                         ]);
                     }
+                } else {
+                    $errors = [];
+                    if (!$authorRecord['row']) {
+                        $errors[] = "missing author: {$authorTag}";
+                    }
+                    if (!$parentRecord['row']) {
+                        $errors[] = "missing parent: {$parentTag}";
+                    }
+
+                    Logger::error("Failed to insert {type}: {error}", [
+                        'type' => $content['type'],
+                        'error' => print_r($errors, true)
+                    ]);
                 }
 
                 break;

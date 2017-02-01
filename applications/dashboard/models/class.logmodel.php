@@ -14,7 +14,10 @@
 class LogModel extends Gdn_Pluggable {
 
     private static $instance = null;
-    private $recalcIDs = ['Discussion' => []];
+    private $recalcIDs = [
+        'Discussion' => [],
+        'Category' => [],
+    ];
     private static $transactionID = null;
 
     /**
@@ -567,6 +570,17 @@ class LogModel extends Gdn_Pluggable {
      * Recalculate a record after a log operation.
      */
     public function recalculate() {
+        if ($CategoryIDs = val('Category', $this->recalcIDs)) {
+            foreach ($CategoryIDs as $categoryID => $counts) {
+                Gdn::sql()
+                    ->update('Category')
+                    ->set('CountDiscussions', 'coalesce(CountDiscussions, 0) + '.val('CountDiscussions', $counts, 0), false, false)
+                    ->set('CountComments', 'coalesce(CountComments, 0) + '.val('CountComments', $counts, 0), false, false)
+                    ->where('CategoryID', $categoryID)
+                    ->put();
+            }
+        }
+
         if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {
             $In = implode(',', array_keys($DiscussionIDs));
 
@@ -796,16 +810,32 @@ class LogModel extends Gdn_Pluggable {
                         Gdn::userModel()->setField($ID, 'Banned', 0);
                     }
 
-                    // Keep track of a discussion ID so that its count can be recalculated.
-                    if ($Log['Operation'] != 'Edit') {
-                        switch ($Log['RecordType']) {
-                            case 'Discussion':
-                                $this->recalcIDs['Discussion'][$ID] = true;
-                                break;
-                            case 'Comment':
-                                $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
-                                break;
-                        }
+                    // Keep track of discussions and categories so that there counts can be recalculated.
+                    switch ($Log['RecordType']) {
+                        case 'Discussion':
+                            $this->recalcIDs['Discussion'][$ID] = true;
+
+                            if (empty($this->recalcIDs['Category'][$Log['CategoryID']])) {
+                                $this->recalcIDs['Category'][$Log['CategoryID']] = [
+                                    'CountDiscussions' => 1,
+                                    'CountComments' => 0,
+                                ];
+                            } else {
+                                $this->recalcIDs['Category'][$Log['CategoryID']]['CountDiscussions']++;
+                            }
+                            break;
+                        case 'Comment':
+                            $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
+
+                            if (empty($this->recalcIDs['Category'][$Log['CategoryID']])) {
+                                $this->recalcIDs['Category'][$Log['CategoryID']] = [
+                                    'CountDiscussions' => 0,
+                                    'CountComments' => 1,
+                                ];
+                            } else {
+                                $this->recalcIDs['Category'][$Log['CategoryID']]['CountComments']++;
+                            }
+                            break;
                     }
 
                     if ($Log['Operation'] == 'Pending') {

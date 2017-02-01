@@ -57,10 +57,9 @@ Our _minimum_ requirements are now:
 
 * PHP 5.6 or newer.
 * PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
-* To [import into Vanilla](#migrating-to-vanilla) you _also_ need MySQLi (`--with-mysqli`).
+* To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
+* To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
-
-To use our social plugins, PHP's [OpenSSL support](http://php.net/manual/en/openssl.installation.php) must be enabled.
 
 Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
 

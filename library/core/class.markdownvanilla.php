@@ -87,16 +87,17 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @return string
      */
     protected function doSpoilers($text) {
-        $text = preg_replace_callback('/
-              (                                # Wrap whole match in $1
+        $text = preg_replace_callback(
+            '/(                 # Wrap whole match in $1
                 (?>
-                  ^[ ]*>![ ]?            # ">" at the start of a line
-                    .+\n                    # rest of the first line
-                  \n*                        # blanks
+                    ^[ ]*>![ ]? # ">" at the start of a line
+                    .+\n        # rest of the first line
+                    \n*         # blanks
                 )+
-              )
-            /xm',
-            array(&$this, '_doSpoilers_callback'), $text);
+            )/xm',
+            [$this, '_doSpoilers_callback'],
+            $text
+        );
 
         return $text;
     }
@@ -176,7 +177,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     protected function doBlockQuotes($text) {
         return preg_replace_callback(
-            '/(                   # Wrap whole match in $1
+            '/(                 # Wrap whole match in $1
                 (?>
                     ^[ ]*>[ ]?  # ">" at the start of a line
                     .+\n        # rest of the first line

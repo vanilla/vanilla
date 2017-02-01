@@ -24,7 +24,6 @@ $PluginInfo['stubcontent'] = array(
     'AuthorUrl' => 'http://www.vanillaforums.com'
 );
 
-
 /**
  * Stub Content Plugin
  *
@@ -213,7 +212,7 @@ class StubContentPlugin extends Gdn_Plugin {
      */
     public function insertContent($content) {
 
-        // Don't affect newly installed forums
+        // Don't affect installed forums
         if (c('Garden.Installed', false) === true) {
             return;
         }
@@ -244,6 +243,11 @@ class StubContentPlugin extends Gdn_Plugin {
 
                 if ($rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
+                } else {
+                    Logger::error("Failed to insert {type}: {error}", [
+                        'type' => $content['type'],
+                        'error' => print_r($model->validationResults(), true)
+                    ]);
                 }
                 break;
 
@@ -287,6 +291,11 @@ class StubContentPlugin extends Gdn_Plugin {
 
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
+                    } else {
+                        Logger::error("Failed to insert {type}: {error}", [
+                            'type' => $content['type'],
+                            'error' => print_r($model->validationResults(), true)
+                        ]);
                     }
                 }
 
@@ -330,6 +339,11 @@ class StubContentPlugin extends Gdn_Plugin {
 
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
+                    } else {
+                        Logger::error("Failed to insert {type}: {error}", [
+                            'type' => $content['type'],
+                            'error' => print_r($model->validationResults(), true)
+                        ]);
                     }
                 }
 
@@ -348,7 +362,12 @@ class StubContentPlugin extends Gdn_Plugin {
 
                 if (!$rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
-                }
+                } else {
+                        Logger::error("Failed to insert {type}: {error}", [
+                            'type' => $content['type'],
+                            'error' => print_r($model->validationResults(), true)
+                        ]);
+                    }
                 break;
         }
 

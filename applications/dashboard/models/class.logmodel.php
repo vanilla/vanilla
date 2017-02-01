@@ -91,7 +91,7 @@ class LogModel extends Gdn_Pluggable {
                     break;
                 case 'Registration':
                 case 'User':
-                    $Result = $this->formatRecord(['Email', 'Name'], $Data);
+                    $Result = $this->formatRecord(['Email', 'Name', 'RecordIPAddress' => 'IP Address'], $Data);
                     if ($DiscoveryText = val('DiscoveryText', $Data)) {
                         $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::display($DiscoveryText);
                     }

@@ -119,20 +119,17 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
     width: auto;
   }
 
-  &.dropdown-menu {
-    padding: ($spacer / 2);
-  }
-
   // TODO: Should these be parameterized??
   top: 100px;
   left: 20px;
 
   &.dropdown-menu {
+    padding: ($spacer / 2);
     max-width: none;
     z-index: $daterangepicker-dropdown-z-index;
   }
 
-  /* Calendars */
+  // Calendars
   &.show-calendar {
     .calendar {
       display: block;
@@ -146,11 +143,12 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
     &.single {
       .calendar-table {
-        border: none;
+        border: 0;
       }
     }
 
-    th, td {
+    th,
+    td {
       white-space: nowrap;
       text-align: center;
 
@@ -159,7 +157,8 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
       &.prev.available {
         text-align: left;
-        &:before {
+
+        &::before {
           display: inline-block;
           content: $chevron-left;
         }
@@ -167,7 +166,8 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
       &.next.available {
         text-align: right;
-        &:before {
+
+        &::before {
           display: inline-block;
           content: $chevron-right;
         }
@@ -188,7 +188,8 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
     margin: 0;
   }
 
-  td, th {
+  td,
+  th {
     text-align: center;
     width: $daterangepicker-cell-width;
     height: $daterangepicker-cell-height;
@@ -196,11 +197,6 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
     border: $daterangepicker-cell-border-size solid $daterangepicker-cell-border-color;
     white-space: nowrap;
     cursor: pointer;
-
-    &.available {
-      &:hover {
-      }
-    }
 
     &.week {
       font-size: 80%;
@@ -210,14 +206,16 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
   td {
     &.off {
-      &, &.in-range, &.start-date, &.end-date {
+      &,
+      &.in-range,
+      &.start-date,
+      &.end-date {
         background-color: $daterangepicker-unselected-bg-color;
         border-color: $daterangepicker-unselected-border-color;
         color: $daterangepicker-unselected-color;
       }
     }
 
-    //
     // Date Range
     &.in-range {
       background-color: $daterangepicker-in-range-bg-color;
@@ -230,18 +228,19 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
     &.start-date {
       border-radius: $daterangepicker-cell-border-radius 0 0 $daterangepicker-cell-border-radius;
+
+      &.end-date {
+        border-radius: $daterangepicker-cell-border-radius;
+      }
     }
 
     &.end-date {
       border-radius: 0 $daterangepicker-cell-border-radius $daterangepicker-cell-border-radius 0;
     }
 
-    &.start-date.end-date {
-      border-radius: $daterangepicker-cell-border-radius;
-    }
-
     &.active {
-      &, &:hover {
+      &,
+      &:hover {
         background-color: $daterangepicker-active-bg-color;
         border-color: $daterangepicker-active-border-color;
         color: $daterangepicker-active-color;
@@ -256,10 +255,9 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
     }
   }
 
-  //
   // Disabled Controls
-  //
-  td, option {
+  td,
+  option {
     &.disabled {
       color: #999;
       cursor: not-allowed;
@@ -268,7 +266,8 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
   }
 
   select {
-    &.monthselect, &.yearselect {
+    &.monthselect,
+    &.yearselect {
       font-size: 12px;
       padding: 1px;
       height: auto;
@@ -285,15 +284,16 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
       width: 40%;
     }
 
-    &.hourselect, &.minuteselect, &.secondselect, &.ampmselect {
+    &.hourselect,
+    &.minuteselect,
+    &.secondselect,
+    &.ampmselect {
       width: 50px;
       margin-bottom: 0;
     }
   }
 
-  //
   // Text Input Controls (above calendar)
-  //
   .input-mini {
     &.active {
       border: $daterangepicker-control-active-border-size solid $daterangepicker-control-active-border-color;
@@ -312,6 +312,7 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
       top: 8px;
     }
   }
+
   &.rtl {
     .daterangepicker_input i {
       left: auto;
@@ -340,7 +341,9 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
 .filter-date {
   position: relative;
-  &:after {
+  min-width: to-rem(210);
+
+  &::after {
     position: absolute;
     display: inline-block;
     width: 18px;
@@ -357,10 +360,7 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
   }
 }
 
-//
 // Predefined Ranges
-//
-
 .ranges {
   display: flex;
   flex-direction: column;
@@ -394,8 +394,9 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
     display: flex;
     justify-content: flex-start;
     flex-direction: row-reverse;
-     > * {
-       margin-left: $spacer / 4;
-     }
+
+    > * {
+      margin-left: $spacer / 4;
+    }
   }
 }

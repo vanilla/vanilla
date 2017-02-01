@@ -15,8 +15,6 @@
     $PluginName = $this->Plugin->GetPluginKey('Name');
     $ButtonName = t($this->Plugin->IsEnabled() ? "Disable {$PluginName}" : "Enable {$PluginName}");
 
-    echo $this->Form->close($ButtonName, '', array(
-        'class' => 'SliceSubmit SliceForm SmallButton'
-    ));
+    echo $this->Form->close($ButtonName, '', ['class' => 'SmallButton']);
     ?>
 </div>

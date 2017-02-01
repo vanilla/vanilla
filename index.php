@@ -8,12 +8,12 @@
  * @since 2.0
  */
 
-if (PHP_VERSION_ID < 50400) {
-    die("Vanilla requires PHP 5.4 or greater.");
+if (PHP_VERSION_ID < 50600) {
+    die("Vanilla requires PHP 5.6 or greater.");
 }
 
 define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.3.101');
+define('APPLICATION_VERSION', '2.4.100');
 
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);

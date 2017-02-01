@@ -488,7 +488,7 @@ class ProfileController extends Gdn_Controller {
 
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
-        } else {
+        } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             safeRedirect(userUrl($this->User, '', 'discussions'));
         }
     }

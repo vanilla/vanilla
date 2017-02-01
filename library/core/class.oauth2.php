@@ -368,7 +368,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $sender->setData('_Form', $formFields);
 
-        $sender->addSideMenu();
+        $sender->setHighlightRoute();
         if (!$sender->data('Title')) {
             $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
         }

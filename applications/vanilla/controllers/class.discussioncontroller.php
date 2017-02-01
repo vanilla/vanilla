@@ -80,8 +80,15 @@ class DiscussionController extends VanillaController {
         list($Offset, $Limit) = offsetLimit($Page, $Limit);
 
         // Check permissions.
-        $this->categoryPermission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
-        $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
+        $Category = CategoryModel::categories($this->Discussion->CategoryID);
+        $this->categoryPermission('Vanilla.Discussions.View', $Category);
+
+        if (c('Vanilla.Categories.Use', true)) {
+            $this->CategoryID = $this->Discussion->CategoryID;
+        } else {
+            $this->CategoryID = null;
+        }
+        $this->setData('CategoryID', $this->CategoryID);
 
         if (strcasecmp(val('Type', $this->Discussion), 'redirect') === 0) {
             $this->redirectDiscussion($this->Discussion);

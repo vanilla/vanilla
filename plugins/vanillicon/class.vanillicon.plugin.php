@@ -16,7 +16,7 @@ $PluginInfo['vanillicon'] = array(
    'RequiredApplications' => array('Vanilla' => '2.0.18'),
    'Author' => 'Todd Burry',
    'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+   'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
    'MobileFriendly' => true,
    'SettingsUrl' => '/settings/vanillicon',
    'SettingsPermission' => 'Garden.Settings.Manage',
@@ -82,6 +82,26 @@ class VanilliconPlugin extends Gdn_Plugin {
         
         $sender->setData('Title', sprintf(t('%s Settings'), 'Vanillicon'));
         $cf->renderAll();
+    }
+
+    /**
+     * Overrides allowing admins to set the default avatar, since it has no effect when Vanillicon is on.
+     * Adds messages to the top of avatar settings page and to the help panel asset.
+     *
+     * @param SettingsController $sender
+     */
+    public function settingsController_avatarSettings_handler($sender) {
+        // We check if Gravatar is enabled before adding any messages as Gravatar overrides Vanillicon.
+        if (!Gdn::addonManager()->isEnabled('gravatar', \Vanilla\Addon::TYPE_ADDON)) {
+            $message = t('You\'re using Vanillicon avatars as your default avatars.');
+            $message .= ' '.t('To set a custom default avatar, disable the Vanillicon plugin.');
+            $messages = $sender->data('messages', []);
+            $messages = array_merge($messages, [$message]);
+            $sender->setData('messages', $messages);
+            $sender->setData('canSetDefaultAvatar', false);
+            $help = t('Your users\' default avatars are Vanillicon avatars.');
+            helpAsset(t('How are my users\' default avatars set?'), $help);
+        }
     }
 }
 

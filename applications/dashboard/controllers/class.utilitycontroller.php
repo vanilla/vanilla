@@ -13,6 +13,9 @@
  */
 class UtilityController extends DashboardController {
 
+    /** A flag used to indicate the site was put into maintenance mode in an automated fashion. */
+    const MAINTENANCE_AUTO = 2;
+
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
 
@@ -491,7 +494,7 @@ class UtilityController extends DashboardController {
             $feedFormat = 'normal';
         }
 
-        echo file_get_contents("http://vanillaforums.org/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
+        echo file_get_contents("https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
         $this->deliveryType(DELIVERY_TYPE_NONE);
         $this->render();
     }
@@ -513,6 +516,38 @@ class UtilityController extends DashboardController {
         $this->addCssFile('vanillicon.css', 'static');
 
         $this->setData('_NoPanel', true);
+        $this->render();
+    }
+
+    /**
+     * Toggle whether or not the site is in maintenance mode.
+     *
+     * @param int $updateMode
+     */
+    public function maintenance($updateMode = 0) {
+        $this->permission('Garden.Settings.Manage');
+        $currentMode = c('Garden.UpdateMode');
+
+        /**
+         * If $updateMode is equal to self::MAINTENANCE_AUTO, it assumed this action was performed via an automated
+         * process.  A bit flag is added to the current value, so the original setting is restored, once maintenance
+         * mode is disabled through this endpoint.
+         */
+        if ($updateMode == self::MAINTENANCE_AUTO) {
+            // Apply the is-auto flag to the current maintenance setting, so the original setting can be retrieved.
+            $updateMode = ($currentMode | $updateMode);
+        } elseif ($updateMode == 0 && ($currentMode & self::MAINTENANCE_AUTO)) {
+            // If the is-auto flag is set, restore the original UpdateMode value.
+            $updateMode = ($currentMode & ~self::MAINTENANCE_AUTO);
+        } else {
+            $updateMode = (bool)$updateMode;
+        }
+
+        // Save the new setting and output the result.
+        saveToConfig('Garden.UpdateMode', $updateMode);
+        $this->setData(['UpdateMode' => $updateMode]);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }
 }

@@ -52,7 +52,7 @@ class Logger implements LoggerInterface {
      * A lower number is more severe.
      *
      * @param string|int $level The string log level or an actual priority.
-     * @return int Returns the numeric log level or `-1` if the level is invalid.
+     * @return int Returns the numeric log level or `8` if the level is invalid.
      */
     public static function levelPriority($level) {
         static $priorities = array(
@@ -100,7 +100,7 @@ class Logger implements LoggerInterface {
      */
     public function removeLogger(LoggerInterface $logger, $trigger = true) {
         foreach ($this->loggers as $i => $addedLogger) {
-            if ($addedLogger === $logger) {
+            if ($addedLogger[0] === $logger) {
                 unset($this->loggers[$i]);
                 return $this;
             }

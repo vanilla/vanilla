@@ -19,8 +19,14 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var CategoryModel */
     public $CategoryModel;
 
+    /** @var object The current category, if available. */
+    public $Category;
+
     /** @var Gdn_Form */
     public $Form;
+
+    /** @var array An array of category records. */
+    public $OtherCategories;
 
     /** @var bool */
     public $ShowCustomPoints = false;
@@ -447,7 +453,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $CategoryID Unique ID of the category to be deleted.
+     * @param int|bool $CategoryID Unique ID of the category to be deleted.
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
@@ -462,7 +468,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->Category = $this->CategoryModel->getID($CategoryID);
 
         // Block deleting special categories.
-        if (val('CanDelete', $this->Category, true)) {
+        if (!val('CanDelete', $this->Category, true)) {
             $this->Form->addError('The specified category cannot be deleted.');
         }
 
@@ -474,57 +480,56 @@ class VanillaSettingsController extends Gdn_Controller {
 
             // Get a list of categories other than this one that can act as a replacement
             $this->OtherCategories = $this->CategoryModel->getWhere(
-                array(
+                [
                     'CategoryID <>' => $CategoryID,
                     'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
                     'CategoryID >' => 0
-                ),
+                ],
                 'Sort'
             );
 
-            if (!$this->Form->authenticatedPostBack()) {
-                $this->Form->setFormValue('DeleteDiscussions', '1'); // Checked by default
-            } else {
-                $ReplacementCategoryID = $this->Form->getValue('ReplacementCategoryID');
-                $ReplacementCategory = $this->CategoryModel->getID($ReplacementCategoryID);
-                // Error if:
-                // 1. The category being deleted is the last remaining category that
-                // allows discussions.
-                if ($this->Category->AllowDiscussions == '1'
-                    && $this->OtherCategories->numRows() == 0
-                ) {
+            // Get the list of sub-categories
+            $subcategories = $this->CategoryModel->getSubtree($CategoryID, false);
+            $this->setData('Subcategories', $subcategories);
+            // Number of discussions contained in the subcategories
+            $discussionModel = new DiscussionModel();
+            $categoryIDs = array_merge([$CategoryID], array_column($subcategories, 'CategoryID'));
+            $this->setData('DiscussionsCount', $discussionModel->getCountForCategory($categoryIDs));
+
+            if ($this->Form->authenticatedPostBack()) {
+                // Error if the category being deleted is the last remaining category that allows discussions.
+                if ($this->Category->AllowDiscussions == '1' && $this->OtherCategories->numRows() == 0) {
                     $this->Form->addError('You cannot remove the only remaining category that allows discussions');
-                }
+                } else {
+                    $newCategoryID = 0;
+                    $contentAction = $this->Form->getFormValue('ContentAction', false);
 
-                /*
-                // 2. The category being deleted allows discussions, and it contains
-                // discussions, and there is no replacement category specified.
-                if ($this->Form->errorCount() == 0
-                   && $this->Category->AllowDiscussions == '1'
-                   && $this->Category->CountDiscussions > 0
-                   && ($ReplacementCategory == FALSE || $ReplacementCategory->AllowDiscussions != '1'))
-                   $this->Form->addError('You must select a replacement category in order to remove this category.');
-                */
-
-                // 3. The category being deleted does not allow discussions, and it
-                // does contain other categories, and there are replacement parent
-                // categories available, and one is not selected.
-                /*
-                if ($this->Category->AllowDiscussions == '0'
-                   && $this->OtherCategories->numRows() > 0
-                   && !$ReplacementCategory) {
-                   if ($this->CategoryModel->getWhere(array('ParentCategoryID' => $CategoryID))->numRows() > 0)
-                      $this->Form->addError('You must select a replacement category in order to remove this category.');
+                    switch($contentAction) {
+                        case 'move':
+                            $newCategoryID = $this->Form->getFormValue('ReplacementCategoryID');
+                            if (!$newCategoryID) {
+                                $this->Form->addError('Replacement category is required.');
+                            }
+                            break;
+                        case 'delete':
+                            if (!$this->Form->getFormValue('ConfirmDelete', false)) {
+                                $this->Form->addError('You must confirm the deletion.');
+                            }
+                            break;
+                        default:
+                            $this->Form->addError('Something went wrong.');
+                            break;
+                    }
                 }
-                */
 
                 if ($this->Form->errorCount() == 0) {
                     // Go ahead and delete the category
                     try {
-                        $this->CategoryModel->delete($this->Category, $this->Form->getValue('ReplacementCategoryID'));
+                        $this->CategoryModel->deleteAndReplace($this->Category, $newCategoryID);
                     } catch (Exception $ex) {
                         $this->Form->addError($ex);
                     }
+
                     if ($this->Form->errorCount() == 0) {
                         $this->RedirectUrl = url('vanilla/settings/categories');
                         $this->informMessage(t('Deleting category...'));

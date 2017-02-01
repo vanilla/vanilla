@@ -19,7 +19,7 @@ $PluginInfo['Twitter'] = array(
     'HasLocale' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
     'Icon' => 'twitter_social_connect.png'
@@ -944,7 +944,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Twitter Settings'));
         $Sender->render('Settings', '', 'plugins/Twitter');
     }

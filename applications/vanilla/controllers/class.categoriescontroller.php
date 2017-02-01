@@ -290,6 +290,7 @@ class CategoriesController extends VanillaController {
             $this->addModule('DiscussionFilterModule');
             $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
+            $this->addModule('TagModule');
 
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
@@ -458,6 +459,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
+        $this->addModule('TagModule');
 
         $this->canonicalUrl(url('/categories', true));
 

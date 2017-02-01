@@ -770,7 +770,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 // Admins see a helpful notice
                 if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                     $Warning = sprite('Sliders', 'InformSprite');
-                    $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
+                    $Warning .= t('Your config.php file is not writable.');
                     Gdn::controller()->informMessage($Warning, array('CssClass' => 'HasSprite'));
                 }
                 return;

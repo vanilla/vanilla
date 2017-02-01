@@ -144,11 +144,12 @@ class DropdownModule extends Gdn_Module {
      * @param string $icon Icon for the trigger.
      * @return object $this The calling DropdownModule object.
      */
-    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down') {
+    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down', $url = '') {
         $this->trigger['text'] = $text;
         $this->trigger['type'] = in_array($type, $this->triggerTypes) ? $type : 'button';
         $this->trigger['icon'] = $icon;
         $this->trigger['cssClass'] = trim($cssClass);
+        $this->trigger['url'] = $url;
         return $this;
     }
 }

@@ -109,8 +109,7 @@ class ModerationController extends VanillaController {
             // Can the user delete the comment?
             $DiscussionModel = new DiscussionModel();
             $Discussion = $DiscussionModel->getID($DiscussionID);
-            $PermissionCategory = CategoryModel::categories(val('CategoryID', $Discussion));
-            if ($Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', val('PermissionCategoryID', $PermissionCategory))) {
+            if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Comments.Delete')) {
                 $ActionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmcommentdeletes/'.$DiscussionID, 'Delete Popup');
             }
 
@@ -248,8 +247,7 @@ class ModerationController extends VanillaController {
         }
 
         // Verify that the user has permission to perform the delete
-        $PermissionCategory = CategoryModel::categories($Discussion->CategoryID);
-        $this->permission('Vanilla.Comments.Delete', true, 'Category', val('PermissionCategoryID', $PermissionCategory));
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
         $this->title(t('Confirm'));
 
         $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
@@ -314,9 +312,8 @@ class ModerationController extends VanillaController {
         $AllowedDiscussions = array();
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
         foreach ($DiscussionData->result() as $Discussion) {
-            $PermissionCategory = CategoryModel::categories(val('CategoryID', $Discussion));
             $CountCheckedDiscussions = $DiscussionData->numRows();
-            if ($Session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', val('PermissionCategoryID', $PermissionCategory))) {
+            if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Discussions.Delete')) {
                 $AllowedDiscussions[] = $Discussion->DiscussionID;
             }
         }

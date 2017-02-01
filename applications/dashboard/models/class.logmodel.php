@@ -579,6 +579,7 @@ class LogModel extends Gdn_Pluggable {
                     ->where('CategoryID', $categoryID)
                     ->put();
             }
+            $this->recalcIDs['Category'] = [];
         }
 
         if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {

@@ -1556,8 +1556,7 @@ EOT;
             if (is_null($Formatter)) {
                 return Gdn_Format::display($Mixed);
             } else {
-                require_once(PATH_LIBRARY.'/vendors/markdown/Michelf/MarkdownExtra.inc.php');
-                $Markdown = new MarkdownVanilla;
+                $Markdown = new MarkdownVanilla();
 
                 // Add Vanilla customizations.
                 if ($Flavored) {

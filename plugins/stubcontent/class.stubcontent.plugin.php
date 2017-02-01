@@ -78,6 +78,11 @@ class StubContentPlugin extends Gdn_Plugin {
      */
     public function gdn_configurationSource_beforeSave_handler($sender) {
 
+        // Don't re-check inserted stub content unless an admin caused a config change
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            return;
+        }
+
         $newLocale = $sender->get('Garden.Locale', 'en');
         $oldLocale = Gdn::get(sprintf(self::RECORD_KEY, 'locale'));
 
@@ -254,8 +259,9 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
+                            'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
                         ]);
                     }
@@ -265,8 +271,9 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing role: {$roleTag}";
                     }
 
-                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
+                        'content' => $contentID,
                         'error' => print_r($errors, true)
                     ]);
                 }
@@ -280,7 +287,7 @@ class StubContentPlugin extends Gdn_Plugin {
 
                 // Get category
                 $categoryTag = $content['category'];
-                $category = CategoryModel::instance()->getByCode($categoryTag);
+                $category = (array)CategoryModel::instance()->getByCode($categoryTag);
 
                 if ($authorRecord['row'] && !empty($category)) {
 
@@ -308,13 +315,16 @@ class StubContentPlugin extends Gdn_Plugin {
                             'StubContentID'     => $contentID,
                             'StubContentTag'    => $content['tag']
                         ]
+                    ], [
+                        'CheckPermission' => false
                     ]);
 
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
+                            'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
                         ]);
                     }
@@ -327,8 +337,9 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing category: {$categoryTag}";
                     }
 
-                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
+                        'content' => $contentID,
                         'error' => print_r($errors, true)
                     ]);
                 }
@@ -374,8 +385,9 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                        Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                             'type' => $content['type'],
+                            'content' => $contentID,
                             'error' => print_r($model->validationResults(), true)
                         ]);
                     }
@@ -388,8 +400,9 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing parent: {$parentTag}";
                     }
 
-                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
+                        'content' => $contentID,
                         'error' => print_r($errors, true)
                     ]);
                 }
@@ -410,8 +423,9 @@ class StubContentPlugin extends Gdn_Plugin {
                 if ($rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
                 } else {
-                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent-insertfailed", "Failed to insert {type} ({content}): {error}", [
                         'type' => $content['type'],
+                        'content' => $contentID,
                         'error' => print_r($model->validationResults(), true)
                     ]);
                 }

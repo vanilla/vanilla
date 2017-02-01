@@ -28,9 +28,9 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         $this->addSpoilers();
         $this->addListFix();
 
-		// Sort gamuts by their priority.
-		asort($this->block_gamut);
-		asort($this->span_gamut);
+        // Sort gamuts by their priority.
+        asort($this->block_gamut);
+        asort($this->span_gamut);
     }
 
     /**
@@ -40,8 +40,8 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addBreaks() {
         $this->span_gamut = array_replace($this->span_gamut, [
-            "doStrikeout" 			 =>  15,
-            "doSoftBreaks" => 80
+            'doStrikeout' =>  15,
+            'doSoftBreaks' => 80,
         ]);
     }
 
@@ -52,7 +52,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addStrikeout() {
         $this->span_gamut = array_replace($this->span_gamut, [
-            "doStrikeout" => 15
+            'doStrikeout' => 15,
         ]);
     }
 
@@ -63,7 +63,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addSpoilers() {
         $this->block_gamut = array_replace($this->block_gamut, [
-            "doSpoilers" => 55
+            'doSpoilers' => 55,
         ]);
     }
 
@@ -75,7 +75,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addListFix() {
         $this->block_gamut = array_replace($this->block_gamut, [
-            'doListFix' => 5
+            'doListFix' => 5,
         ]);
     }
 
@@ -86,39 +86,39 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-	protected function doSpoilers($text) {
-		$text = preg_replace_callback('/
-			  (								# Wrap whole match in $1
-				(?>
-				  ^[ ]*>![ ]?			# ">" at the start of a line
-					.+\n					# rest of the first line
-				  \n*						# blanks
-				)+
-			  )
-			/xm',
-			array(&$this, '_doSpoilers_callback'), $text);
+    protected function doSpoilers($text) {
+        $text = preg_replace_callback('/
+              (                                # Wrap whole match in $1
+                (?>
+                  ^[ ]*>![ ]?            # ">" at the start of a line
+                    .+\n                    # rest of the first line
+                  \n*                        # blanks
+                )+
+              )
+            /xm',
+            array(&$this, '_doSpoilers_callback'), $text);
 
-		return $text;
-	}
-	protected function _doSpoilers_callback($matches) {
-		$bq = $matches[1];
-		# trim one level of quoting - trim whitespace-only lines
-		$bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
-		$bq = $this->runBlockGamut($bq);		# recurse
+        return $text;
+    }
+    protected function _doSpoilers_callback($matches) {
+        $bq = $matches[1];
+        # trim one level of quoting - trim whitespace-only lines
+        $bq = preg_replace('/^[ ]*>![ ]?|^[ ]+$/m', '', $bq);
+        $bq = $this->runBlockGamut($bq);        # recurse
 
-		$bq = preg_replace('/^/m', "  ", $bq);
-		# These leading spaces cause problem with <pre> content,
-		# so we need to fix that:
-		$bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-			array(&$this, '_doSpoilers_callback2'), $bq);
+        $bq = preg_replace('/^/m', "  ", $bq);
+        # These leading spaces cause problem with <pre> content,
+        # so we need to fix that:
+        $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+            array(&$this, '_doSpoilers_callback2'), $bq);
 
-		return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
-	}
-	protected function _doSpoilers_callback2($matches) {
-		$pre = $matches[1];
-		$pre = preg_replace('/^  /m', '', $pre);
-		return $pre;
-	}
+        return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
+    }
+    protected function _doSpoilers_callback2($matches) {
+        $pre = $matches[1];
+        $pre = preg_replace('/^  /m', '', $pre);
+        return $pre;
+    }
 
     /**
      * Add Strikeout implementation (2 methods).
@@ -126,18 +126,18 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-	protected function doStrikeout($text) {
-		$text = preg_replace_callback('/
-		~~ # open
-		(.+?) # $1 = strike text
-		~~ # close
-		/xm',
-		array($this, '_doStrikeout_callback'), $text);
-		return $text;
-	}
-	protected function _doStrikeout_callback($matches) {
-		return $this->hashPart("<s>".$this->runSpanGamut($matches[1])."</s>");
-	}
+    protected function doStrikeout($text) {
+        $text = preg_replace_callback('/
+        ~~ # open
+        (.+?) # $1 = strike text
+        ~~ # close
+        /xm',
+        array($this, '_doStrikeout_callback'), $text);
+        return $text;
+    }
+    protected function _doStrikeout_callback($matches) {
+        return $this->hashPart("<s>".$this->runSpanGamut($matches[1])."</s>");
+    }
 
     /**
      * Add soft line breaks implementation (2 methods).
@@ -145,14 +145,14 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-	protected function doSoftBreaks($text) {
-		# Do soft line breaks for 1 return:
-		return preg_replace_callback('/\n{1}/',
-			array($this, '_doSoftBreaks_callback'), $text);
-	}
-	protected function _doSoftBreaks_callback($matches) {
-		return $this->hashPart("<br$this->empty_element_suffix\n");
-	}
+    protected function doSoftBreaks($text) {
+        # Do soft line breaks for 1 return:
+        return preg_replace_callback('/\n{1}/',
+            array($this, '_doSoftBreaks_callback'), $text);
+    }
+    protected function _doSoftBreaks_callback($matches) {
+        return $this->hashPart("<br$this->empty_element_suffix\n");
+    }
 
     /**
      * Work around php-markdown's non-standard implementation of lists.
@@ -161,8 +161,76 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @param string $text
      * @return string
      */
-	protected function doListFix($text) {
+    protected function doListFix($text) {
         return preg_replace('/(^[^*+-].*\n)([*+-] )/m', "$1\n$2", $text);
-	}
+    }
 
+    /**
+     * Parse Markdown blockquotes to HTML.
+     *
+     * Vanilla override.
+     *
+     * @override
+     * @param  string $text
+     * @return string
+     */
+    protected function doBlockQuotes($text) {
+        return preg_replace_callback(
+            '/(                   # Wrap whole match in $1
+                (?>
+                    ^[ ]*>[ ]?  # ">" at the start of a line
+                    .+\n        # rest of the first line
+                    \n*         # blanks
+                )+
+            )/xm',
+            [$this, '_doBlockQuotes_callback'],
+            $text
+        );
+    }
+    /**
+     * Blockquote parsing callback.
+     *
+     * Vanilla override.
+     *
+     * @param  array $matches
+     * @return string
+     */
+    protected function _doBlockQuotes_callback($matches) {
+        $bq = $matches[1];
+        // trim one level of quoting - trim whitespace-only lines
+        $bq = preg_replace('/^[ ]*>[ ]?|^[ ]+$/m', '', $bq);
+        $bq = $this->runBlockGamut($bq); // recurse
+
+        $bq = preg_replace('/^/m', "  ", $bq);
+        // These leading spaces cause problem with <pre> content,
+        // so we need to fix that:
+        $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
+            array($this, '_doBlockQuotes_callback2'), $bq);
+
+        // return "\n" . $this->hashBlock("<blockquote>\n$bq\n</blockquote>") . "\n\n";
+        return "\n" . $this->hashBlock("<blockquote class=\"UserQuote\"><div class=\"QuoteText\">\n$bq\n</div></blockquote>") . "\n\n";
+    }
+
+    /**
+     * Create a code span markup for $code. Called from handleSpanToken.
+     *
+     * Vanilla override.
+     *
+     * @param  string $code
+     * @return string
+     */
+    protected function makeCodeSpan($code) {
+        if ($this->code_span_content_func) {
+            $code = call_user_func($this->code_span_content_func, $code);
+        } else {
+            $code = htmlspecialchars(trim($code), ENT_NOQUOTES);
+        }
+
+        # Vanilla: add 2 lines below to do <pre><code> if there are newlines in the code.
+        if (strpos($code, "\n")) {
+            return $this->hashPart("<pre><code>$code</code></pre>");
+        } else {
+            return $this->hashPart("<code>$code</code>");
+        }
+    }
 }

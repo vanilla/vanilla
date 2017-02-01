@@ -148,7 +148,7 @@ class PostController extends VanillaController {
 
             // Make sure only moderators can edit closed things
             if ($this->Discussion->Closed) {
-                $this->categoryPermission('Vanilla.Discussions.Edit', $this->Category);
+                $this->categoryPermission($this->Category, 'Vanilla.Discussions.Edit');
             }
 
             $this->Form->setFormValue('DiscussionID', $this->Discussion->DiscussionID);
@@ -163,7 +163,7 @@ class PostController extends VanillaController {
         } else {
             // Permission to add.
             if ($this->Category) {
-                $this->categoryPermission('Vanilla.Discussions.Add', $this->Category);
+                $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');
             } else {
                 $this->permission('Vanilla.Discussions.Add');
             }
@@ -614,25 +614,25 @@ class PostController extends VanillaController {
         if ($Discussion && $Editing) {
             // Permission to edit
             if ($this->Comment->InsertUserID != $Session->UserID) {
-                $this->categoryPermission('Vanilla.Comments.Edit', $Discussion->CategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             // Make sure that content can (still) be edited.
             $EditContentTimeout = c('Garden.EditContentTimeout', -1);
             $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
             if (!$CanEdit) {
-                $this->categoryPermission('Vanilla.Comments.Edit', $Discussion->CategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             // Make sure only moderators can edit closed things
             if ($Discussion->Closed) {
-                $this->categoryPermission('Vanilla.Comments.Edit', true, 'Category', $Discussion->CategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             $this->Form->setFormValue('CommentID', $CommentID);
         } elseif ($Discussion) {
             // Permission to add
-            $this->categoryPermission('Vanilla.Comments.Add', $Discussion->CategoryID);
+            $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Add');
         }
 
         if ($this->Form->authenticatedPostBack()) {

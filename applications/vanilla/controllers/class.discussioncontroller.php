@@ -81,7 +81,7 @@ class DiscussionController extends VanillaController {
 
         // Check permissions.
         $Category = CategoryModel::categories($this->Discussion->CategoryID);
-        $this->categoryPermission('Vanilla.Discussions.View', $Category);
+        $this->categoryPermission($Category, 'Vanilla.Discussions.View');
 
         if (c('Vanilla.Categories.Use', true)) {
             $this->CategoryID = $this->Discussion->CategoryID;
@@ -291,7 +291,7 @@ class DiscussionController extends VanillaController {
         $this->setData('Discussion', $this->DiscussionModel->getID($DiscussionID), true);
 
         // Check permissions.
-        $this->categoryPermission('Vanilla.Discussions.View', $this->Discussion->CategoryID);
+        $this->categoryPermission($this->Discussion->CategoryID, 'Vanilla.Discussions.View');
         $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
         // Get the comments.
@@ -518,7 +518,7 @@ class DiscussionController extends VanillaController {
         if (!$Discussion) {
             throw notFoundException('Discussion');
         }
-        $this->categoryPermission('Vanilla.Discussions.Announce', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Announce');
 
         if ($this->Form->authenticatedPostBack()) {
             // Save the property.
@@ -587,7 +587,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->categoryPermission('Vanilla.Discussions.Sink', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Sink');
 
         // Sink the discussion.
         $this->DiscussionModel->setField($DiscussionID, 'Sink', $Sink);
@@ -632,7 +632,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->categoryPermission('Vanilla.Discussions.Close', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Close');
 
         // Close the discussion.
         $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
@@ -678,7 +678,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->categoryPermission('Vanilla.Discussions.Delete', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Delete');
 
         if ($this->Form->authenticatedPostBack()) {
             if (!$this->DiscussionModel->deleteID($DiscussionID)) {
@@ -733,13 +733,13 @@ class DiscussionController extends VanillaController {
 
                 // Make sure comment is this user's or they have Delete permission.
                 if ($Comment->InsertUserID != $Session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
-                    $this->categoryPermission('Vanilla.Comments.Delete', $Discussion->CategoryID);
+                    $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 
                 // Make sure that content can (still) be edited.
                 $CanEdit = DiscussionModel::canEdit($Discussion);
                 if (!$CanEdit) {
-                    $this->categoryPermission('Vanilla.Comments.Delete', $Discussion->CategoryID);
+                    $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 
                 // Delete the comment.
@@ -841,7 +841,7 @@ body { background: transparent !important; }
         if ($Discussion) {
             // Allow Vanilla.Comments.View to be defined to limit access to embedded comments only.
             // Otherwise, go with normal discussion view permissions. Either will do.
-            $this->categoryPermission(['Vanilla.Discussions.View', 'Vanilla.Comments.View'], $Discussion->CategoryID, false);
+            $this->categoryPermission($Discussion->CategoryID, ['Vanilla.Discussions.View', 'Vanilla.Comments.View'], false);
 
             $this->setData('Discussion', $Discussion, true);
             $this->setData('DiscussionID', $Discussion->DiscussionID, true);
@@ -1004,7 +1004,7 @@ body { background: transparent !important; }
         }
 
         // Make sure the user has permission to edit this discussion.
-        $this->categoryPermission('Vanilla.Discussions.Edit', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Edit');
 
         $ForeignUrl = valr('Attributes.ForeignUrl', $Discussion);
         if (!$ForeignUrl) {

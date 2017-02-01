@@ -307,7 +307,7 @@ class CategoriesController extends VanillaController {
             $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
 
             // Check permission.
-            $this->categoryPermission('Vanilla.Discussions.View', $Category);
+            $this->categoryPermission($Category, 'Vanilla.Discussions.View');
 
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);

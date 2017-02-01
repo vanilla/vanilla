@@ -45,11 +45,11 @@ class VanillaController extends Gdn_Controller {
     /**
      * Check a category level permission.
      *
-     * @param string|array $permission The permission(s) to check.
      * @param int|array|object $category The category to check the permission for.
+     * @param string|array $permission The permission(s) to check.
      * @param bool $fullMatch Whether or not several permissions should be a full match.
      */
-    protected function categoryPermission($permission, $category, $fullMatch = true) {
+    protected function categoryPermission($category, $permission, $fullMatch = true) {
         if (!CategoryModel::checkPermission($category, $permission, $fullMatch)) {
             $categoryID = is_numeric($category) ? $category : val('CategoryID', $category);
 

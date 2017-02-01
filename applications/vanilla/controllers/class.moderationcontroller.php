@@ -247,7 +247,7 @@ class ModerationController extends VanillaController {
         }
 
         // Verify that the user has permission to perform the delete
-        $this->categoryPermission('Vanilla.Comments.Delete', $Discussion->CategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
         $this->title(t('Confirm'));
 
         $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());

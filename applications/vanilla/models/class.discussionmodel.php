@@ -1817,9 +1817,9 @@ class DiscussionModel extends VanillaModel {
         // Validate category permissions.
         $CategoryID = val('CategoryID', $FormPostValues);
         if ($CategoryID > 0) {
-            $CheckPermissions = val('CheckPermissions', $Settings, true);
+            $CheckPermission = val('CheckPermission', $Settings, true);
             $Category = CategoryModel::categories($CategoryID);
-            if ($Category && $CheckPermissions && !$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $Category))) {
+            if ($Category && $CheckPermission && !$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $Category))) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }

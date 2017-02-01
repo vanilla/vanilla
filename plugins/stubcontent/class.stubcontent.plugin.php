@@ -224,29 +224,48 @@ class StubContentPlugin extends Gdn_Plugin {
 
             case 'user':
 
-                $model = new UserModel;
-                $rowID = $model->save([
-                    'Name'              => $content['name'],
-                    'Email'             => $content['email'],
-                    'Photo'             => $content['photo'],
-                    'Password'          => betterRandomString(24),
-                    'HashMethod'        => 'Random',
-                    'Attributes'        => [
-                        'StubLocale'        => $activeLocale,
-                        'StubContentID'     => $contentID,
-                        'StubContentTag'    => $content['tag']
-                    ]
-                ], [
-                    'ValidateEmail' => false,
-                    'NoConfirmEmail' => true
-                ]);
+                // Get role
+                $roleTag = val('role', $content, 'member');
+                $roleModel = new RoleModel;
+                $role = $roleModel->getByType($roleTag)->firstRow(DATASET_TYPE_ARRAY);
 
-                if ($rowID) {
-                    $receipt = $this->createReceipt($content, $rowID);
+                if (!empty($role)) {
+                    $model = new UserModel;
+                    $rowID = $model->save([
+                        'Name'              => $content['name'],
+                        'Email'             => $content['email'],
+                        'Photo'             => $content['photo'],
+                        'Password'          => betterRandomString(24),
+                        'HashMethod'        => 'Random',
+                        'RoleID'            => $role['RoleID'],
+                        'Attributes'        => [
+                            'StubLocale'        => $activeLocale,
+                            'StubContentID'     => $contentID,
+                            'StubContentTag'    => $content['tag']
+                        ]
+                    ], [
+                        'ValidateEmail' => false,
+                        'NoConfirmEmail' => true,
+                        'SaveRoles' => true
+                    ]);
+
+                    if ($rowID) {
+                        $receipt = $this->createReceipt($content, $rowID);
+                    } else {
+                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                            'type' => $content['type'],
+                            'error' => print_r($model->validationResults(), true)
+                        ]);
+                    }
                 } else {
-                    Logger::error("Failed to insert {type}: {error}", [
+                    $errors = [];
+                    if (empty($role)) {
+                        $errors[] = "missing role: {$roleTag}";
+                    }
+
+                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
                         'type' => $content['type'],
-                        'error' => print_r($model->validationResults(), true)
+                        'error' => print_r($errors, true)
                     ]);
                 }
                 break;
@@ -292,7 +311,7 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::error("Failed to insert {type}: {error}", [
+                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
                             'type' => $content['type'],
                             'error' => print_r($model->validationResults(), true)
                         ]);
@@ -306,7 +325,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing category: {$categoryTag}";
                     }
 
-                    Logger::error("Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
                         'type' => $content['type'],
                         'error' => print_r($errors, true)
                     ]);
@@ -353,7 +372,7 @@ class StubContentPlugin extends Gdn_Plugin {
                     if ($rowID) {
                         $receipt = $this->createReceipt($content, $rowID);
                     } else {
-                        Logger::error("Failed to insert {type}: {error}", [
+                        Logger::event("stubcontent", "Failed to insert {type}: {error}", [
                             'type' => $content['type'],
                             'error' => print_r($model->validationResults(), true)
                         ]);
@@ -367,7 +386,7 @@ class StubContentPlugin extends Gdn_Plugin {
                         $errors[] = "missing parent: {$parentTag}";
                     }
 
-                    Logger::error("Failed to insert {type}: {error}", [
+                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
                         'type' => $content['type'],
                         'error' => print_r($errors, true)
                     ]);
@@ -386,14 +405,14 @@ class StubContentPlugin extends Gdn_Plugin {
                     ]
                 ]);
 
-                if (!$rowID) {
+                if ($rowID) {
                     $receipt = $this->createReceipt($content, $rowID);
                 } else {
-                        Logger::error("Failed to insert {type}: {error}", [
-                            'type' => $content['type'],
-                            'error' => print_r($model->validationResults(), true)
-                        ]);
-                    }
+                    Logger::event("stubcontent", "Failed to insert {type}: {error}", [
+                        'type' => $content['type'],
+                        'error' => print_r($model->validationResults(), true)
+                    ]);
+                }
                 break;
         }
 

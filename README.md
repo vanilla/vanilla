@@ -55,7 +55,7 @@ If your server is not running PHP 7.0 or higher, **you should address this soon*
 
 Our _minimum_ requirements are now:
 
-* PHP 5.6 or newer
+* PHP 5.6 or newer.
 * PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
 * To [import into Vanilla](#migrating-to-vanilla) you _also_ need MySQLi (`--with-mysqli`).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).

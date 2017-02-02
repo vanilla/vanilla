@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1556,8 +1556,7 @@ EOT;
             if (is_null($Formatter)) {
                 return Gdn_Format::display($Mixed);
             } else {
-                require_once(PATH_LIBRARY.'/vendors/markdown/Michelf/MarkdownExtra.inc.php');
-                $Markdown = new MarkdownVanilla;
+                $Markdown = new MarkdownVanilla();
 
                 // Add Vanilla customizations.
                 if ($Flavored) {

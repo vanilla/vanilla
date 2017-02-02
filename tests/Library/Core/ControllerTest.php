@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Eric Vachaviolos <eric.v@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 

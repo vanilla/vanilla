@@ -2,7 +2,7 @@
 /**
  * New Discussion module
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -84,7 +84,7 @@ class NewDiscussionModule extends Gdn_Module {
         $PermissionCategory = CategoryModel::permissionCategory($this->CategoryID);
         if ($this->CategoryID) {
             $Category = CategoryModel::categories($this->CategoryID);
-            $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('CategoryID', $PermissionCategory));
+            $HasPermission = CategoryModel::checkPermission($this->CategoryID, 'Vanilla.Discussions.Add');
         } else {
             $HasPermission = Gdn::session()->checkPermission('Vanilla.Discussions.Add', true, 'Category', 'any');
         }

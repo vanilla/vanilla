@@ -134,7 +134,7 @@ Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', 
 Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
 
 // PluginManager
-Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager(), 'eventManager' => null]);
 
 // Start the addons, plugins, and applications.
 Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);

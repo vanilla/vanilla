@@ -9944,6 +9944,10 @@ strong,
   display: inline-block;
 }
 
+.FeedItem .FeedDescription img {
+  display: none;
+}
+
 .FeedItem .FeedDescription .details p {
   margin-bottom: 0;
   display: initial;

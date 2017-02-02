@@ -590,6 +590,19 @@ class VanillaHooks implements Gdn_IPlugin {
         return false;
     }
 
+
+    /**
+     * Add CSS assets to front end.
+     *
+     * @param AssetModel $sender
+     */
+    public function assetModel_afterGetCssFiles_handler($sender) {
+        if (!inSection('Dashboard')) {
+            $sender->addCssFile('spoilers.css', 'vanilla', ['Sort' => 800]);
+            $sender->addCssFile('tag.css', 'vanilla', ['Sort' => 800]);
+        }
+    }
+
     /**
      * Adds 'Discussion' item to menu.
      *
@@ -609,8 +622,6 @@ class VanillaHooks implements Gdn_IPlugin {
         if (!inSection('Dashboard')) {
             // Spoilers assets
             $sender->addJsFile('spoilers.js', 'vanilla');
-            $sender->addCssFile('spoilers.css', 'vanilla');
-            $sender->addCssFile('tag.css', 'vanilla');
             $sender->addDefinition('Spoiler', t('Spoiler'));
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));

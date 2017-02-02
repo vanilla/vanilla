@@ -75,7 +75,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      */
     public function addListFix() {
         $this->block_gamut = array_replace($this->block_gamut, [
-            'doListFix' => 5,
+            'doListFix' => 39
         ]);
     }
 
@@ -163,7 +163,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @return string
      */
     protected function doListFix($text) {
-        return preg_replace('/(^[^*+-].*\n)([*+-] )/m', "$1\n$2", $text);
+        return preg_replace('/(^[^\n*+-].*\n)([*+-] )/m', "$1\n$2", $text);
     }
 
     /**

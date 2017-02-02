@@ -769,7 +769,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack', 'click', hijackClick);
+    $(document).delegate('.Hijack, .js-hijack', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus
@@ -1718,7 +1718,6 @@ jQuery(document).ready(function($) {
                     // Note, in contenteditable mode (iframe for us), the value
                     // is surrounded by span tags.
                     before_insert: function(value, $li) {
-
                         // It's better to use the value provided, as it may have
                         // html tags around it, depending on mode. Using the
                         // regular expression avoids the need to check what mode
@@ -1731,7 +1730,7 @@ jQuery(document).ready(function($) {
 
                         // Check if there are any whitespaces, and if so, add
                         // quotation marks around the whole name.
-                        var requires_quotation = /\s/g.test(username);
+                        var requires_quotation = /[^\w-]/.test(username);
 
                         // Check if there are already quotation marks around
                         // the string--double or single.

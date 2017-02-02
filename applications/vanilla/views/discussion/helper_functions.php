@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 
@@ -222,7 +222,6 @@ if (!function_exists('getDiscussionOptions')) :
         if (!$CategoryID && property_exists($Sender, 'Discussion')) {
             $CategoryID = val('CategoryID', $Sender->Discussion);
         }
-        $PermissionCategoryID = val('PermissionCategoryID', $Discussion, val('PermissionCategoryID', $Discussion));
 
         // Build the $Options array based on current user's permission.
         // Can the user edit the discussion?
@@ -235,7 +234,7 @@ if (!function_exists('getDiscussionOptions')) :
         }
 
         // Can the user announce?
-        if ($Session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $PermissionCategoryID)) {
+        if (CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Announce')) {
             $Options['AnnounceDiscussion'] = [
                 'Label' => t('Announce'),
                 'Url' => '/discussion/announce?discussionid='.$Discussion->DiscussionID.'&Target='.urlencode($Sender->SelfUrl.'#Head'),
@@ -244,7 +243,7 @@ if (!function_exists('getDiscussionOptions')) :
         }
 
         // Can the user sink?
-        if ($Session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $PermissionCategoryID)) {
+        if (CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Sink')) {
             $NewSink = (int)!$Discussion->Sink;
             $Options['SinkDiscussion'] = [
                 'Label' => t($Discussion->Sink ? 'Unsink' : 'Sink'),
@@ -254,7 +253,7 @@ if (!function_exists('getDiscussionOptions')) :
         }
 
         // Can the user close?
-        if ($Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $PermissionCategoryID)) {
+        if (CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Close')) {
             $NewClosed = (int)!$Discussion->Closed;
             $Options['CloseDiscussion'] = [
                 'Label' => t($Discussion->Closed ? 'Reopen' : 'Close'),
@@ -281,7 +280,7 @@ if (!function_exists('getDiscussionOptions')) :
         }
 
         // Can the user delete?
-        if ($Session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $PermissionCategoryID)) {
+        if (CategoryModel::checkPermission($CategoryID, 'Vanilla.Discussions.Delete')) {
             $Category = CategoryModel::categories($CategoryID);
             $Options['DeleteDiscussion'] = [
                 'Label' => t('Delete Discussion'),
@@ -330,14 +329,12 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $discussionID = $discussion->DiscussionID;
         $categoryUrl = urlencode(categoryUrl(CategoryModel::categories($categoryID)));
 
-        $permissionCategoryID = val('PermissionCategoryID', $discussion, val('PermissionCategoryID', $discussion));
-
         // Permissions
         $canEdit = DiscussionModel::canEdit($discussion, $timeLeft);
-        $canAnnounce = $session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $permissionCategoryID);
-        $canSink = $session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $permissionCategoryID);
-        $canClose = $session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $permissionCategoryID);
-        $canDelete = $session->checkPermission('Vanilla.Discussions.Delete', true, 'Category', $permissionCategoryID);
+        $canAnnounce = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Announce');
+        $canSink = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Sink');
+        $canClose = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close');
+        $canDelete = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Delete');
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
         $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1' && $session->isValid();
@@ -433,21 +430,20 @@ if (!function_exists('getCommentOptions')) :
         $Session = Gdn::session();
         $Discussion = Gdn::controller()->data('Discussion');
 
-        $CategoryID = val('CategoryID', $Discussion);
-        $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
+        $categoryID = val('CategoryID', $Discussion);
 
         // Determine if we still have time to edit
         $EditContentTimeout = c('Garden.EditContentTimeout', -1);
         $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
         $TimeLeft = '';
-        $canEditDiscussions = $Session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $PermissionCategoryID);
+        $canEditDiscussions = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Edit');
         if ($CanEdit && $EditContentTimeout > 0 && !$canEditDiscussions) {
             $TimeLeft = strtotime($Comment->DateInserted) + $EditContentTimeout - time();
             $TimeLeft = $TimeLeft > 0 ? ' ('.Gdn_Format::seconds($TimeLeft).')' : '';
         }
 
         // Can the user edit the comment?
-        $canEditComments = $Session->checkPermission('Vanilla.Comments.Edit', true, 'Category', $PermissionCategoryID);
+        $canEditComments = CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Edit');
         if (($CanEdit && $Session->UserID == $Comment->InsertUserID) || $canEditComments) {
             $Options['EditComment'] = [
                 'Label' => t('Edit').$TimeLeft,
@@ -458,7 +454,7 @@ if (!function_exists('getCommentOptions')) :
 
         // Can the user delete the comment?
         $SelfDeleting = ($CanEdit && $Session->UserID == $Comment->InsertUserID && c('Vanilla.Comments.AllowSelfDelete'));
-        if ($SelfDeleting || $Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', $PermissionCategoryID)) {
+        if ($SelfDeleting || CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Delete')) {
             $Options['DeleteComment'] = [
                 'Label' => t('Delete'),
                 'Url' => '/discussion/deletecomment/'.$Comment->CommentID.'/'.$Session->transientKey().'/?Target='.urlencode("/discussion/{$Comment->DiscussionID}/x"),
@@ -507,8 +503,7 @@ if (!function_exists('writeCommentOptions')) :
         if (c('Vanilla.AdminCheckboxes.Use')) {
             // Only show the checkbox if the user has permission to affect multiple items
             $Discussion = Gdn::controller()->data('Discussion');
-            $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-            if ($Session->checkPermission('Vanilla.Comments.Delete', true, 'Category', $PermissionCategoryID)) {
+            if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Comments.Delete')) {
                 if (!property_exists($Controller, 'CheckedComments')) {
                     $Controller->CheckedComments = $Session->getAttribute('CheckedComments', array());
                 }
@@ -530,9 +525,9 @@ if (!function_exists('writeCommentForm')) :
         $Controller = Gdn::controller();
 
         $Discussion = $Controller->data('Discussion');
-        $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-        $UserCanClose = $Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $PermissionCategoryID);
-        $UserCanComment = $Session->checkPermission('Vanilla.Comments.Add', true, 'Category', $PermissionCategoryID);
+        $categoryID = val('CategoryID', $Discussion);
+        $UserCanClose = CategoryModel::checkPermission($categoryID, 'Vanilla.Discussions.Close');
+        $UserCanComment = CategoryModel::checkPermission($categoryID, 'Vanilla.Comments.Add');
 
         // Closed notification
         if ($Discussion->Closed == '1') {

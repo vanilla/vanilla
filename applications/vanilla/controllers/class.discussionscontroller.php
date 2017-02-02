@@ -2,7 +2,7 @@
 /**
  * Discussions controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -116,6 +116,8 @@ class DiscussionsController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('TagModule');
+
         $this->setData('Breadcrumbs', array(array('Name' => t('Recent Discussions'), 'Url' => '/discussions')));
 
 
@@ -246,6 +248,8 @@ class DiscussionsController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('TagModule');
+
         $this->setData('Breadcrumbs', array(
             array('Name' => t('Discussions'), 'Url' => '/discussions'),
             array('Name' => t('Unread'), 'Url' => '/discussions/unread')
@@ -419,6 +423,7 @@ class DiscussionsController extends VanillaController {
         $this->addModule('DiscussionFilterModule');
         $this->addModule('NewDiscussionModule');
         $this->addModule('CategoriesModule');
+        $this->addModule('TagModule');
 
         // Render default view (discussions/bookmarked.php)
         $this->setData('Title', t('My Bookmarks'));
@@ -520,6 +525,7 @@ class DiscussionsController extends VanillaController {
         $this->addModule('NewDiscussionModule');
         $this->addModule('CategoriesModule');
         $this->addModule('BookmarkedModule');
+        $this->addModule('TagModule');
 
         // Render view
         $this->setData('Title', t('My Discussions'));
@@ -674,5 +680,133 @@ class DiscussionsController extends VanillaController {
         $this->deliveryMethod();
         Gdn_Theme::section('PromotedContent');
         $this->render('promoted', 'modules', 'vanilla');
+    }
+
+    /**
+     * Add the discussions/tagged/{TAG} endpoint.
+     */
+    public function tagged() {
+        if (!c('EnabledPlugins.Tagging')) {
+            throw new Exception('Not found', 404);
+        }
+
+        Gdn_Theme::section('DiscussionList');
+
+        $Args = $this->RequestArgs;
+        $Get = array_change_key_case($this->Request->get());
+
+        if ($UseCategories = c('Plugins.Tagging.UseCategories')) {
+            // The url is in the form /category/tag/p1
+            $CategoryCode = val(0, $Args);
+            $Tag = val(1, $Args);
+            $Page = val(2, $Args);
+        } else {
+            // The url is in the form /tag/p1
+            $CategoryCode = '';
+            $Tag = val(0, $Args);
+            $Page = val(1, $Args);
+        }
+
+        // Look for explcit values.
+        $CategoryCode = val('category', $Get, $CategoryCode);
+        $Tag = val('tag', $Get, $Tag);
+        $Page = val('page', $Get, $Page);
+        $Category = CategoryModel::categories($CategoryCode);
+
+        $Tag = stringEndsWith($Tag, '.rss', true, true);
+        list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
+
+        $MultipleTags = strpos($Tag, ',') !== false;
+
+        $this->setData('Tag', $Tag, true);
+
+        $TagModel = TagModel::instance();
+        $RecordCount = false;
+        if (!$MultipleTags) {
+            $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
+
+            if (count($Tags) == 0) {
+                throw notFoundException('Page');
+            }
+
+            if (count($Tags) > 1) {
+                foreach ($Tags as $TagRow) {
+                    if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
+                        break;
+                    }
+                }
+            } else {
+                $TagRow = array_pop($Tags);
+            }
+            $Tags = $TagModel->getRelatedTags($TagRow);
+
+            $RecordCount = $TagRow['CountDiscussions'];
+            $this->setData('CountDiscussions', $RecordCount);
+            $this->setData('Tags', $Tags);
+            $this->setData('Tag', $TagRow);
+
+            $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
+            $this->setData('ChildTags', $ChildTags);
+        }
+
+        $this->title(htmlspecialchars($TagRow['FullName']));
+        $UrlTag = empty($CategoryCode) ? rawurlencode($Tag) : rawurlencode($CategoryCode).'/'.rawurlencode($Tag);
+        if (urlencode($Tag) == $Tag) {
+            $this->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
+            $FeedUrl = url(ConcatSep('/', "/discussions/tagged/$UrlTag/feed.rss", PageNumber($Offset, $Limit, true, false)), '//');
+        } else {
+            $this->canonicalUrl(url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true)).'?Tag='.$UrlTag, true));
+            $FeedUrl = url(ConcatSep('/', 'discussions/tagged', PageNumber($Offset, $Limit, true, false), 'feed.rss').'?Tag='.$UrlTag, '//');
+        }
+
+        if ($this->Head) {
+            $this->addJsFile('discussions.js');
+            $this->Head->addRss($FeedUrl, $this->Head->title());
+        }
+
+        if (!is_numeric($Offset) || $Offset < 0) {
+            $Offset = 0;
+        }
+
+        // Add Modules
+        $this->addModule('NewDiscussionModule');
+        $this->addModule('DiscussionFilterModule');
+        $this->addModule('BookmarkedModule');
+
+        $this->setData('Category', false, true);
+
+        $this->AnnounceData = false;
+        $this->setData('Announcements', array(), true);
+
+        $DiscussionModel = new DiscussionModel();
+
+        $TagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
+
+        $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, array('Announce' => 'all'));
+
+        $this->setData('Discussions', $this->DiscussionData, true);
+        $this->setJson('Loading', $Offset.' to '.$Limit);
+
+        // Build a pager.
+        $PagerFactory = new Gdn_PagerFactory();
+        $this->EventArguments['PagerType'] = 'Pager';
+        $this->fireEvent('BeforeBuildPager');
+        if (!$this->data('_PagerUrl')) {
+            $this->setData('_PagerUrl', "/discussions/tagged/$UrlTag/{Page}");
+        }
+        $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager->ClientID = 'Pager';
+        $this->Pager->configure(
+            $Offset,
+            $Limit,
+            $RecordCount,
+            $this->data('_PagerUrl')
+        );
+        $this->setData('_Page', $Page);
+        $this->setData('_Limit', $Limit);
+        $this->fireEvent('AfterBuildPager');
+
+        $this->View = c('Vanilla.Discussions.Layout') == 'table' && $this->SyndicationMethod == SYNDICATION_NONE ? 'table' : 'index';
+        $this->render($this->View, 'discussions', 'vanilla');
     }
 }

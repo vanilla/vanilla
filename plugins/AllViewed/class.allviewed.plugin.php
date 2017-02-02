@@ -4,7 +4,7 @@
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @author Oliver Chung <shoat@cs.washington.edu>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package AllViewed
  */
@@ -249,7 +249,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      *    $this->EventArguments['Data'] = $Data;
      *    $this->fireEvent('AfterAddColumns');
      *
-     * @link http://vanillaforums.org/discussion/13227
+     * @link https://open.vanillaforums.com/discussion/13227
      * @since 1.0
      * @access public
      *

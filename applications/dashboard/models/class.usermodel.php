@@ -2,7 +2,7 @@
 /**
  * User model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -128,7 +128,7 @@ class UserModel extends Gdn_Model {
      */
     public function addPasswordStrength($Controller) {
         $Controller->addJsFile('password.js');
-        $Controller->addDefinition('MinPassLength', c('Garden.Registration.MinPasswordLength'));
+        $Controller->addDefinition('MinPassLength', c('Garden.Password.MinLength'));
         $Controller->addDefinition(
             'PasswordTranslations',
             implode(',', [

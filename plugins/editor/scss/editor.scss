@@ -4,7 +4,6 @@
 // running the `npm run build` command. Don't manually edit this section!
 //
 // bower:scss
-@import "../bower_components/bourbon/dist/_bourbon.scss";
 // endbower
 // bower:sass
 // endbower
@@ -232,27 +231,20 @@ $emoji-width: 34px;
 .editor-file-image {
   padding: 0;
 
-  .drop-section {
+  .file-title {
     padding: 10px;
-  }
+    font-weight: 700;
 
-  .file-drop {
-    display: none;
-    padding: 30px;
-    margin: 10px 10px 0 10px;
-    text-align: center;
-    border: 2px dashed rgba($black, .25);
-    border-radius: 2px;
-
-    &.can-drop {
-      display: block !important;
+    .info {
+      font-size: 80%;
+      font-weight: 400;
     }
   }
 
   .file-input {
     overflow: hidden;
     white-space: nowrap;
-    padding-top: 10px;
+    padding: 10px;
 
     input[type=file] {
       visibility: visible !important;
@@ -260,16 +252,11 @@ $emoji-width: 34px;
   }
 
   .image-input {
-    padding: 0;
-    border-top: 1px solid #da8f8f;
+    padding: 10px;
+  }
 
-    input {
-      padding: 10px;
-      margin: 0;
-      border-bottom-left-radius: 2px;
-      border-bottom-right-radius: 2px;
-      border: 0;
-    }
+  .dd-separator {
+    margin: 0;
   }
 
   &.drag-passthrough {
@@ -282,18 +269,6 @@ $emoji-width: 34px;
 
 .editor-dropdown-image .editor-file-image .image-input {
   border-top: 0;
-}
-
-/* If uploads disabled entirely, hide some options in the dropdown */
-.editor-uploads-disabled {
-  .file-drop,
-  .file-input {
-    display: none;
-  }
-
-  .image-input {
-    border: 0;
-  }
 }
 
 /**

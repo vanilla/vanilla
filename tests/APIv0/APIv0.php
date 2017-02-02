@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -127,26 +127,23 @@ class APIv0 extends HttpClient {
     }
 
     /**
-     * Get the transient key for a user.
+     * Generate a cookie for the user's transient key.
      *
-     * @param int $userID The ID of the user to get the transient key for.
-     * @return string Returns the transient key for the user.
+     * @param int $userID
+     * @param string $tk
+     * @return string
      */
-    public function getTK($userID) {
-        $user = $this->queryOne("select * from GDN_User where UserID = :userID", ['userID' => $userID]);
-        if (empty($user)) {
-            return '';
-        }
-        $attributes = (array)dbdecode($user['Attributes']);
-        if (empty($attributes['TransientKey'])) {
-            $attributes['TransientKey'] = randomString(20);
-            $r = $this->query(
-                "update GDN_User set Attributes = :attributes where UserID = :userID",
-                ['attributes' => dbencode($attributes), 'userID' => $userID],
-                true
-            );
-        }
-        return val('TransientKey', $attributes, '');
+    private function generateTKCookie($userID, $tk) {
+        $timestamp = time();
+
+        $payload = "{$tk}:{$userID}:{$timestamp}";
+        $signature = hash_hmac(
+            $this->getConfig('Garden.Cookie.HashMethod', 'md5'),
+            $payload,
+            $this->getConfig('Garden.Cookie.Salt')
+        );
+
+        return "{$payload}:{$signature}";
     }
 
     /**
@@ -237,7 +234,11 @@ class APIv0 extends HttpClient {
         // Add the cookie of the calling user.
         if ($user = $this->getUser()) {
             $cookieName = $this->getConfig('Garden.Cookie.Name', 'Vanilla');
-            $cookieArray = [$cookieName => $this->vanillaCookieString($user['UserID'])];
+
+            $cookieArray = [
+                $cookieName => $this->vanillaCookieString($user['UserID']),
+                "{$cookieName}-tk" => $this->generateTKCookie($user['UserID'], $user['tk'])
+            ];
 
             $request->setHeader('Cookie', static::cookieEncode($cookieArray));
 
@@ -540,11 +541,11 @@ class APIv0 extends HttpClient {
             $user = $this->queryUserKey($user, true);
         }
 
-        if (empty($user['tk'])) {
-            $user['tk'] = $this->getTK($user['UserID']);
-        }
-
-        $partialUser = ['UserID' => $user['UserID'], 'Name' => $user['Name'], 'tk' => $user['tk']];
+        $partialUser = [
+            'UserID' => $user['UserID'],
+            'Name' => $user['Name'],
+            'tk' => substr(md5(time()), 0, 16)
+        ];
 
         $this->user = $partialUser;
         return $this;

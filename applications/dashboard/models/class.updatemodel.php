@@ -2,7 +2,7 @@
 /**
  * Update model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -14,6 +14,7 @@ use Vanilla\Addon;
  */
 class UpdateModel extends Gdn_Model {
 
+    // TODO Remove when removing other deprecated functions!
     /** @var string URL to the addons site. */
     public $AddonSiteUrl = 'http://vanilla.local';
 
@@ -22,8 +23,10 @@ class UpdateModel extends Gdn_Model {
      *
      * @param $Addon
      * @param $Addons
+     * @deprecated since 2.3
      */
     private static function addAddon($Addon, &$Addons) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $Slug = strtolower($Addon['AddonKey']).'-'.strtolower($Addon['AddonType']);
         $Addons[$Slug] = $Addon;
     }
@@ -36,8 +39,10 @@ class UpdateModel extends Gdn_Model {
      * @return array
      * @throws Exception
      * @throws Gdn_UserException
+     * @deprecated since 2.3
      */
     public static function findFiles($path, $fileNames) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         // Get the list of potential files to analyze.
         if (is_dir($path)) {
             $entries = self::getInfoFiles($path, $fileNames);
@@ -54,8 +59,10 @@ class UpdateModel extends Gdn_Model {
      * @param string $Path The path to the file.
      * @param bool $ThrowError Whether or not to throw an exception if there is a problem analyzing the addon.
      * @return array An array of addon information.
+     * @deprecated since 2.3
      */
     public static function analyzeAddon($Path, $ThrowError = true) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         if (!file_exists($Path)) {
             if ($ThrowError) {
                 throw new Exception("$Path not found.", 404);
@@ -224,8 +231,10 @@ class UpdateModel extends Gdn_Model {
      * @param string $Path
      * @param array $InfoPaths
      * @return array
+     * @deprecated since 2.3
      */
     private static function getInfoFiles($Path, $InfoPaths) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $Path = str_replace('\\', '/', rtrim($Path));
 
         $Result = [];
@@ -251,8 +260,10 @@ class UpdateModel extends Gdn_Model {
      * @param bool $ThrowError
      * @return array
      * @throws Exception
+     * @deprecated since 2.3
      */
     private static function getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         // Extract the zip file so we can make sure it has appropriate information.
         $Zip = null;
         $ZipOpened = false;
@@ -266,7 +277,6 @@ class UpdateModel extends Gdn_Model {
         }
 
         if (!$Zip) {
-            require_once PATH_LIBRARY."/vendors/pclzip/class.pclzipadapter.php";
             $Zip = new PclZipAdapter();
             $ZipOpened = $Zip->open($Path);
         }
@@ -327,8 +337,10 @@ class UpdateModel extends Gdn_Model {
      *
      * @param string $Path The path to the index.php file.
      * @return string A string containing the version or empty if the file could not be parsed.
+     * @deprecated since 2.3
      */
     public static function parseCoreVersion($Path) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $fp = fopen($Path, 'rb');
         $Application = false;
         $Version = '';
@@ -360,8 +372,10 @@ class UpdateModel extends Gdn_Model {
      * @param string $Path The path to the info array.
      * @param string $Variable The name of variable containing the information.
      * @return array|false The info array or false if the file could not be parsed.
+     * @deprecated since 2.3
      */
     public static function parseInfoArray($Path, $Variable = false) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $fp = fopen($Path, 'rb');
         $Lines = array();
         $InArray = false;
@@ -450,8 +464,10 @@ class UpdateModel extends Gdn_Model {
      * @param array $MyAddons
      * @param array $LatestAddons
      * @return bool
+     * @deprecated since 2.3
      */
     public function compareAddons($MyAddons, $LatestAddons) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $UpdateAddons = false;
 
         // Join the site addons with my addons.
@@ -483,8 +499,10 @@ class UpdateModel extends Gdn_Model {
      *
      * @param $info
      * @return array $results
+     * @deprecated since 2.3
      */
     protected static function checkRequiredFields($info) {
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         $results = array();
 
         if (!val('Description', $info)) {
@@ -507,9 +525,10 @@ class UpdateModel extends Gdn_Model {
      *
      * @param bool $Enabled Deprecated.
      * @return array Deprecated.
+     * @deprecated since 2.3
      */
     public function getAddons($Enabled = false) {
-        deprecated('UpdateModel->getAddons()');
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
         return [];
     }
 
@@ -521,7 +540,7 @@ class UpdateModel extends Gdn_Model {
      * @deprecated
      */
     public function getAddonUpdates($Enabled = false) {
-        deprecated('UpdateModel->getAddonUpdates()');
+        deprecated(__CLASS__.'->'.__METHOD__.'()');
     }
 
     /**

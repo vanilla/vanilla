@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -191,7 +191,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('BeforeDispatch');
 
         // If we're in update mode and aren't explicitly prevented from blocking, block.
-        if (Gdn::config('Garden.UpdateMode', false) && $this->getCanBlock($request) > self::BLOCK_NEVER) {
+        if (inMaintenanceMode() && $this->getCanBlock($request) > self::BLOCK_NEVER) {
             $request->withURI(Gdn::router()->getDestination('UpdateMode'));
         }
 

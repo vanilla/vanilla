@@ -2,7 +2,7 @@
 /**
  * UI functions
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -193,7 +193,7 @@ if (!function_exists('popin')) {
      * @return string Popin HTML string.
      */
     function popin($rel) {
-        return ' <span class="badge Popin js-popin" rel="'.$rel.'"></span> ';
+        return ' <span class="badge js-popin" rel="'.$rel.'"></span> ';
     }
 }
 

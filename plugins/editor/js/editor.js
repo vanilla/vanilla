@@ -346,13 +346,22 @@
                 $(el).removeClass('editor-dropdown-open');
                 $(el).find('.wysihtml5-command-dialog-opened').removeClass('wysihtml5-command-dialog-opened');
             });
-        }
+        };
 
         /**
          * Deal with clashing JS for opening dialogs on click, and do not let
          * more than one dialog/dropdown appear at once.
          */
         var editorSetupDropdowns = function(editorInstance) {
+            $(document).on('click touchstart', function() {
+                editorDropdownsClose();
+            });
+
+            $(document).on('click touchstart', '.editor-dropdown', function(e) {
+                e.stopPropagation();
+            });
+
+
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
@@ -732,8 +741,8 @@
 
             // If drag and drop unavailable, remove its cue from the attachment
             // dropdown menu, so it will just have the file input and URL input.
-            if (!!window.FileReader) {
-                $('#drop-cue-dropdown').addClass('can-drop');
+            if (!window.FileReader) {
+                $('.js-can-drop').hide();
             }
 
             // Multi upload element. If an iframe, it will need to be checked
@@ -845,61 +854,18 @@
                 }
             }
 
-            // Used in two places below
             var insertImageIntoBody = function(filePreviewContainer) {
                 $(filePreviewContainer).removeClass('editor-file-removed');
                 var file = $(filePreviewContainer).find('a.filename');
                 var type = $(file).data('type');
                 var href = file.attr('href');
-
-                if (type.indexOf('image') > -1) {
-                    if (handleIframe) {
-                        var iframeBody = $(iframeElement).contents().find('body');
-                        var imgTag = buildImgTag(href, format);
-                        editor.focus();
-                        editor.composer.commands.exec('insertHTML', '<p>' + imgTag + '</p>');
-                        var insertedImage = $(iframeBody).find('img[src="' + href + '"]');
-                        var newHeight = parseInt($(iframeElement).css('min-height')) + insertedImage.height() + 'px';
-                        $(iframeElement).css('min-height', newHeight);
-                    } else {
-                        try {
-                            $(editor).replaceSelectedText(buildImgTag(href, format) + '\n');
-                        } catch (ex) {
-                        }
-                    }
-                }
             };
 
-            // Used in two places below.
             var removeImageFromBody = function(filePreviewContainer) {
                 $(filePreviewContainer).addClass('editor-file-removed');
                 var file = $(filePreviewContainer).find('a.filename');
                 var type = $(file).data('type');
                 var href = file.attr('href');
-
-                // If images, remove insert from body as well
-                if (type.indexOf('image') > -1) {
-                    if (handleIframe) {
-                        var iframeBody = $(iframeElement).contents().find('body');
-                        var insertedImage = $(iframeBody).find('img[src="' + href + '"]');
-                        var newHeight = parseInt($(iframeElement).css('min-height')) - insertedImage.height() + 'px';
-                        $(iframeElement).css('min-height', newHeight);
-                        $(insertedImage).remove();
-                    } else {
-                        var text = $(editor).val();
-                        // A shame that JavaScript does not have this built-in.
-                        // https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions
-                        var imgTagEscaped = buildImgTag(href, format).replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-                        // Make it more loose, so it doesn't matter what the user
-                        // may have done to the markup, it will be removed.
-                        //var imgTagEscaped = '<img(\s+|.*)src\="'+ href.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1") +'"(\s+|.*)\/?>\n?';
-                        // On second thought, if they modify it, don't touch it. Also,
-                        // having to deal with mutltiple formats makes the regex more
-                        // complex.
-                        var reg = new RegExp(imgTagEscaped + '(\s+|.*)\n?', 'gi');
-                        $(editor).val(text.replace(reg, ''));
-                    }
-                }
             };
 
             /**
@@ -1046,6 +1012,14 @@
                                 var extension = filename.split('.').pop().toLowerCase();
                                 var allowedExtensions = JSON.parse(allowedFileExtensions);
 
+                                if (data.fileInput !== undefined) {
+                                    // We're using either the fileupload or imageupload dropdown to upload the file(s).
+                                    // Type hint which dropdown the user is using so we know whether to insert the
+                                    // upload into the post (as an image) or attach it to the post.
+                                    var uploadType = $(data.fileInput).data('uploadType');
+                                    data.url = gdn.url('/post/editorupload/' + uploadType);
+                                }
+
                                 // Make absolutely sure that the file extensions
                                 // provided are all lowercase.
                                 $.each(allowedExtensions, function(index, item) {
@@ -1132,42 +1106,8 @@
                         if (!result.error) {
                             var payload = result.payload;
 
-                            // If has thumbnail, display it instead of generic file icon.
-                            var filePreviewCss = (payload.thumbnail_url)
-                                ? '<i class="file-preview img" style="background-image: url(' + payload.thumbnail_url + ')"></i>'
-                                : '<i class="file-preview icon icon-file"></i>';
-
-                            // If it's an image, then indicate that it's been embedded
-                            // in the post
-                            var imageEmbeddedText = (payload.thumbnail_url)
-                                ? ' &middot; <em title="' + gdn.meta['fileUpload-insertedTooltip'] + '">' + gdn.meta['fileUpload-inserted'] + '</em>'
-                                : '';
-
-                            var html = ''
-                                + '<div class="editor-file-preview" id="media-id-' + payload.MediaID + '" title="' + payload.Filename + '">'
-                                + '<input type="hidden" name="MediaIDs[]" value="' + payload.MediaID + '" />'
-                                + filePreviewCss
-                                + '<div class="file-data">'
-                                + '<a class="filename" data-type="' + payload.type + '" data-width="' + payload.original_width + '" data-height="' + payload.original_height + '" href="' + payload.original_url + '" target="_blank">' + payload.Filename + '</a>'
-                                + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
-                                + '</div>'
-                                + '<span class="editor-file-remove" title="' + window.gdn.meta['fileUpload-remove']  + '"></span>'
-                                + '<span class="editor-file-reattach" title="' + window.gdn.meta['fileUpload-reattatch']  + ' \'' + payload.Filename + '\'"></span>'
-                                + '</div>';
-
-
-                            // Editor upload previews is getting found above, and
-                            // does not change per upload dropzone, which causes
-                            // files to preview on the last found preview zone.
-                            $editorUploadPreviews = $(this).closest('form').find('.editor-upload-previews');
-
-                            // Add file blocksjust below editor area for easy removal
-                            // and preview.
-                            // Find it here.
-                            $editorUploadPreviews.append(html);
-
                             // If photo, insert directly into editor area.
-                            if (payload.type.toLowerCase().indexOf('image') > -1) {
+                            if (payload.upload_type === 'image') {
                                 // Determine max height for sample. They can resize it
                                 // afterwards.
                                 var maxHeight = (payload.original_height >= 400)
@@ -1200,6 +1140,40 @@
                                     } catch (ex) {
                                     }
                                 }
+                            } else {
+                                // If has thumbnail, display it instead of generic file icon.
+                                var filePreviewCss = (payload.thumbnail_url)
+                                    ? '<i class="file-preview img" style="background-image: url(' + payload.thumbnail_url + ')"></i>'
+                                    : '<i class="file-preview icon icon-file"></i>';
+
+                                // If it's an image, then indicate that it's been embedded
+                                // in the post
+                                var imageEmbeddedText = (payload.thumbnail_url)
+                                    ? ' &middot; <em title="' + gdn.meta['fileUpload-insertedTooltip'] + '">' + gdn.meta['fileUpload-inserted'] + '</em>'
+                                    : '';
+
+                                var html = ''
+                                    + '<div class="editor-file-preview" id="media-id-' + payload.MediaID + '" title="' + payload.Filename + '">'
+                                    + '<input type="hidden" name="MediaIDs[]" value="' + payload.MediaID + '" />'
+                                    + filePreviewCss
+                                    + '<div class="file-data">'
+                                    + '<a class="filename" data-type="' + payload.type + '" data-width="' + payload.original_width + '" data-height="' + payload.original_height + '" href="' + payload.original_url + '" target="_blank">' + payload.Filename + '</a>'
+                                    + '<span class="meta">' + payload.FormatFilesize + imageEmbeddedText + '</span>'
+                                    + '</div>'
+                                    + '<span class="editor-file-remove" title="' + window.gdn.meta['fileUpload-remove']  + '"></span>'
+                                    + '<span class="editor-file-reattach" title="' + window.gdn.meta['fileUpload-reattatch']  + ' \'' + payload.Filename + '\'"></span>'
+                                    + '</div>';
+
+
+                                // Editor upload previews is getting found above, and
+                                // does not change per upload dropzone, which causes
+                                // files to preview on the last found preview zone.
+                                $editorUploadPreviews = $(this).closest('form').find('.editor-upload-previews');
+
+                                // Add file blocksjust below editor area for easy removal
+                                // and preview.
+                                // Find it here.
+                                $editorUploadPreviews.append(html);
                             }
                         }
                     },

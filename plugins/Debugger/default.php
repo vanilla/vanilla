@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Debugger
  */
@@ -10,7 +10,7 @@ $PluginInfo['Debugger'] = array(
     'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
     'Version' => '1.1.1',
     'RegisterPermissions' => array('Plugins.Debugger.View', 'Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
-    'PluginUrl' => 'http://vanillaforums.org/addons/debugger',
+    'PluginUrl' => 'https://open.vanillaforums.com/addons/debugger',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',

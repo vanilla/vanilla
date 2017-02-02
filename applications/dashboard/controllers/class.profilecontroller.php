@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -488,7 +488,7 @@ class ProfileController extends Gdn_Controller {
 
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
-        } else {
+        } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             safeRedirect(userUrl($this->User, '', 'discussions'));
         }
     }

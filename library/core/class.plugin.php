@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -271,16 +271,21 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @param $sender
      */
     public function controller_index($sender) {
+        $pluginIndex = $this->getPluginIndex();
         $sender->title($this->getPluginKey('Name'));
-        $sender->addSideMenu('plugin/'.$this->getPluginIndex());
+        $sender->setHighlightRoute('plugin/'.$pluginIndex);
         $sender->setData('Description', $this->getPluginKey('Description'));
 
-        $CSSFile = $this->getResource('css/'.strtolower($this->getPluginIndex()).'.css', false, false);
+        $CSSFile = $this->getResource('css/'.strtolower($pluginIndex).'.css', false, false);
         if (file_exists($CSSFile)) {
             $sender->addCssFile($CSSFile);
         }
 
-        $ViewFile = $this->getView(strtolower($this->getPluginIndex()).'.php');
+        $ViewFile = $sender->fetchViewLocation(
+            strtolower($pluginIndex),
+            '',
+            'plugins/'.$pluginIndex
+        );
         $sender->render($ViewFile);
     }
 

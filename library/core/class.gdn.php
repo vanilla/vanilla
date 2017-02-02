@@ -6,7 +6,9 @@
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license GPLv2
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
+ * @package Core
+ * @since 2.0
  */
 
 /**
@@ -40,8 +42,6 @@ class Gdn {
     const AliasRouter = 'Router';
 
     const AliasSession = 'Session';
-
-    const AliasSlice = 'Slice';
 
     const AliasSqlDriver = 'SqlDriver';
 
@@ -488,17 +488,6 @@ class Gdn {
             self::$_Session = self::factory(self::AliasSession);
         }
         return self::$_Session;
-    }
-
-    /**
-     * Get a reference to the Gdn_Slice
-     *
-     * @param string $Slice Slice to execute
-     * @return Gdn_Slice
-     */
-    public static function slice($Slice) {
-        $Result = self::factory(self::AliasSlice);
-        return $Result->execute($Slice);
     }
 
     public static function set($Key, $Value = null) {

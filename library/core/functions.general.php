@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1739,6 +1739,19 @@ if (!function_exists('inArrayI')) {
     }
 }
 
+if (!function_exists('inMaintenanceMode')) {
+    /**
+     * Determine if the site is in maintenance mode.
+     *
+     * @return bool
+     */
+    function inMaintenanceMode() {
+        $updateMode = c('Garden.UpdateMode');
+
+        return (bool)$updateMode;
+    }
+}
+
 if (!function_exists('inSubArray')) {
     /**
      * Loop through {@link $Haystack} looking for subarrays that contain {@link $Needle}.
@@ -3013,12 +3026,13 @@ if (!function_exists('safeGlob')) {
     /**
      * A version of {@link glob()} that always returns an array.
      *
-     * @param string $Pattern The glob pattern.
+     * @param string        $Pattern    The glob pattern.
      * @param array[string] $Extensions An array of file extensions to whitelist.
+     *
      * @return array[string] Returns an array of paths that match the glob.
      */
     function safeGlob($Pattern, $Extensions = array()) {
-        $Result = glob($Pattern);
+        $Result = glob($Pattern, GLOB_NOSORT);
         if (!is_array($Result)) {
             $Result = array();
         }
@@ -3996,5 +4010,67 @@ if (!function_exists('ipDecodeRecursive')) {
             }
         });
         return $input;
+    }
+}
+
+if (!function_exists('TagUrl')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @param string $Page
+     * @param mixed $WithDomain
+     * @see url() for $WithDomain docs.
+     * @return string
+     */
+    function tagUrl($Row, $Page = '', $WithDomain = false) {
+        static $UseCategories;
+        if (!isset($UseCategories)) {
+            $UseCategories = c('Plugins.Tagging.UseCategories');
+        }
+
+        // Add the p before a numeric page.
+        if (is_numeric($Page)) {
+            if ($Page > 1) {
+                $Page = 'p'.$Page;
+            } else {
+                $Page = '';
+            }
+        }
+        if ($Page) {
+            $Page = '/'.$Page;
+        }
+
+        $Tag = rawurlencode(val('Name', $Row));
+
+        if ($UseCategories) {
+            $Category = CategoryModel::categories($Row['CategoryID']);
+            if ($Category && $Category['CategoryID'] > 0) {
+                $Category = rawurlencode(val('UrlCode', $Category, 'x'));
+            } else {
+                $Category = 'x';
+            }
+            $Result = "/discussions/tagged/$Category/$Tag{$Page}";
+        } else {
+            $Result = "/discussions/tagged/$Tag{$Page}";
+        }
+
+        return url($Result, $WithDomain);
+    }
+}
+
+if (!function_exists('TagFullName')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @return mixed
+     */
+    function tagFullName($Row) {
+        $Result = val('FullName', $Row);
+        if (!$Result) {
+            $Result = val('Name', $Row);
+        }
+        return $Result;
     }
 }

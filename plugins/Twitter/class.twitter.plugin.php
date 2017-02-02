@@ -2,7 +2,7 @@
 /**
  * Twitter plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Twitter
  */
@@ -19,7 +19,7 @@ $PluginInfo['Twitter'] = array(
     'HasLocale' => true,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
     'Icon' => 'twitter_social_connect.png'
@@ -944,7 +944,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SocialSharing', $this->SocialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Twitter Settings'));
         $Sender->render('Settings', '', 'plugins/Twitter');
     }

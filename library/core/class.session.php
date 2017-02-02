@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -427,10 +427,13 @@ class Gdn_Session {
         if (!c('Garden.Installed', false)) {
             return;
         }
+
         // Retrieve the authenticated UserID from the Authenticator module.
         $UserModel = Gdn::authenticator()->getUserModel();
         $this->UserID = $UserID !== false ? $UserID : Gdn::authenticator()->getIdentity();
         $this->User = false;
+
+        $this->ensureTransientKey();
 
         // Now retrieve user information
         if ($this->UserID > 0) {
@@ -450,11 +453,6 @@ class Gdn_Session {
                 $this->permissions->setPermissions($this->User->Permissions);
                 $this->_Preferences = $this->User->Preferences;
                 $this->_Attributes = $this->User->Attributes;
-                $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
-
-                if ($this->_TransientKey === false) {
-                    $this->_TransientKey = $UserModel->setTransientKey($this->UserID);
-                }
 
                 // Save any visit-level information.
                 if ($SetIdentity) {
@@ -464,15 +462,11 @@ class Gdn_Session {
             } else {
                 $this->UserID = 0;
                 $this->User = false;
-                $this->_TransientKey = getAppCookie('tk');
 
                 if ($SetIdentity) {
                     Gdn::authenticator()->setIdentity(null);
                 }
             }
-        } else {
-            // Grab the transient key from the cookie. This doesn't always get set but we'll try it here anyway.
-            $this->_TransientKey = getAppCookie('tk');
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
@@ -525,34 +519,114 @@ class Gdn_Session {
     }
 
     /**
+     * Make sure the transient key matches whats in the user's cookie or create a new one.
      *
-     *
-     * @return bool|object|string
+     * @return string
      */
     public function ensureTransientKey() {
-        if (!$this->_TransientKey) {
-            // Generate a transient key in the browser.
-            $tk = betterRandomString(16, 'Aa0');
-            setAppCookie('tk', $tk);
-            $this->_TransientKey = $tk;
+        $cookieString = getAppCookie('tk');
+        $reset = false;
+
+        if ($cookieString === null) {
+            $reset = true;
+        } else {
+            $cookie = $this->decodeTKCookie($cookieString);
+            if ($cookie === false) {
+                $reset = true;
+            } else {
+                $payload = $this->generateTKPayload(
+                    $cookie['TransientKey'],
+                    $cookie['UserID'],
+                    $cookie['Timestamp']
+                );
+
+                $userInvalid = ($cookie['UserID'] != $this->UserID);
+                $signatureInvalid = $this->generateTKSignature($payload) !== $cookie['Signature'];
+                if ($userInvalid || $signatureInvalid) {
+                    $reset = true;
+                } elseif ($this->transientKey() !== $cookie['TransientKey']) {
+                    $this->transientKey($cookie['TransientKey'], false);
+                }
+            }
         }
-        return $this->_TransientKey;
+
+        if ($reset) {
+            return $this->transientKey(betterRandomString(16, 'Aa0'));
+        } else {
+            return $this->transientKey();
+        }
+    }
+
+    /**
+     * Break down a transient key cookie string into its individual elements.
+     *
+     * @param string $tkCookie
+     * @return array|bool
+     */
+    protected function decodeTKCookie($tkCookie) {
+        if (!is_string($tkCookie)) {
+            return false;
+        }
+
+        $elements = explode(':', $tkCookie);
+
+        if (count($elements) !== 4) {
+            return false;
+        }
+
+        return [
+            'TransientKey' => $elements[0],
+            'UserID' => $elements[1],
+            'Timestamp' => $elements[2],
+            'Signature' => $elements[3]
+        ];
+    }
+
+    /**
+     * Generate the cookie payload value for a transient key.
+     *
+     * @param string $tk
+     * @param int|null $userID
+     * @param int|null $timestamp
+     * @return string
+     */
+    protected function generateTKPayload($tk, $userID = null, $timestamp = null) {
+        $userID = $userID ?: $this->UserID;
+
+        $timestamp = $timestamp ?: time();
+
+        return "{$tk}:{$userID}:{$timestamp}";
+    }
+
+    /**
+     * Generate a signature for a transient key cookie payload value.
+     *
+     * @param string $payload
+     * @return string
+     */
+    protected function generateTKSignature($payload) {
+        return hash_hmac(c('Garden.Cookie.HashMethod'), $payload, c('Garden.Cookie.Salt'));
     }
 
     /**
      * Returns the transient key for the authenticated user.
      *
+     * @param string|null $newKey
+     * @param bool $updateCookie Update the browser cookie when changing the transient key?
      * @return string
      */
-    public function transientKey($NewKey = null) {
-        if (!is_null($NewKey)) {
-            $this->_TransientKey = Gdn::authenticator()->getUserModel()->setTransientKey($this->UserID, $NewKey);
+    public function transientKey($newKey = null, $updateCookie = true) {
+        if (is_string($newKey)) {
+            if ($updateCookie) {
+                $payload = $this->generateTKPayload($newKey);
+                $signature = $this->generateTKSignature($payload);
+                setAppCookie('tk', "{$payload}:{$signature}");
+            }
+
+            $this->_TransientKey = $newKey;
         }
 
-//      if ($this->_TransientKey)
         return $this->_TransientKey;
-//      else
-//         return RandomString(12); // Postbacks will never be authenticated if transientkey is not defined.
     }
 
     /**

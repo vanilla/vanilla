@@ -3,7 +3,7 @@
  * Gdn_Configuration & Gdn_ConfigurationSource
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1409,7 +1409,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
                 $Group = $this->Group;
                 $Data = &$this->Settings;
-                ksort($Data, $this->Configuration->getSortFlag());
+                if ($this->Configuration) {
+                    ksort($Data, $this->Configuration->getSortFlag());
+                }
 
                 // Check for the case when the configuration is the group.
                 if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
@@ -1442,7 +1444,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                     'ByLine' => true
                 ];
 
-                $options = array_merge($options, $this->Configuration->getFormatOptions());
+                if ($this->Configuration) {
+                    $options = array_merge($options, $this->Configuration->getFormatOptions());
+                }
 
                 // Write config data to string format, ready for saving
                 $FileContents = Gdn_Configuration::format($Data, $options);

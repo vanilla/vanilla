@@ -2,7 +2,7 @@
 /**
  * Managing core Dashboard settings.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -233,6 +233,8 @@ class SettingsController extends DashboardController {
         $this->Form->setModel($configurationModel);
         $this->setData('avatar', UserModel::getDefaultAvatarUrl());
 
+        $this->fireEvent('AvatarSettings');
+
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($configurationModel->Data);
         } else {
@@ -241,6 +243,35 @@ class SettingsController extends DashboardController {
             }
         }
         $this->render();
+    }
+
+    /**
+     * Handles the setting of the Garden.Profile.EditPhotos config and updates the edit photos toggle.
+     *
+     * @param $allow Expects either 'true' or 'false'.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function allowEditPhotos($allow) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        if (!Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            throw new Exception('You don\'t have permisison to do that.', 401);
+        }
+
+        $allow = strtolower($allow);
+        saveToConfig('Garden.Profile.EditPhotos', $allow === 'true');
+        if ($allow === 'true') {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+            $this->informMessage(t('Editing photos allowed.'));
+        } else {
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/alloweditphotos/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+            $this->informMessage(t('Editing photos not allowed.'));
+        }
+        $this->jsonTarget("#editphotos-toggle", $newToggle);
+
+        $this->render('Blank', 'Utility');
     }
 
     /**

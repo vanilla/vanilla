@@ -2,7 +2,7 @@
 /**
  * Categories controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -290,6 +290,7 @@ class CategoriesController extends VanillaController {
             $this->addModule('DiscussionFilterModule');
             $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
+            $this->addModule('TagModule');
 
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
@@ -304,6 +305,9 @@ class CategoriesController extends VanillaController {
             }
             $Wheres = array('d.CategoryID' => $CategoryIDs);
             $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
+
+            // Check permission.
+            $this->categoryPermission($Category, 'Vanilla.Discussions.View');
 
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);
@@ -455,6 +459,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
+        $this->addModule('TagModule');
 
         $this->canonicalUrl(url('/categories', true));
 

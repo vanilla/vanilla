@@ -6,7 +6,7 @@ if (!defined('APPLICATION')) exit();
 /**
  * Bootstrap.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -200,9 +200,6 @@ Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySing
 // Smarty Templating Engine
 Gdn::factoryInstall('Smarty', 'Smarty');
 Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
-
-// Slice handler
-Gdn::factoryInstall(Gdn::AliasSlice, 'Gdn_Slice');
 
 // Remote Statistics
 Gdn::factoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);

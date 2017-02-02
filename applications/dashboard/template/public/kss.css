@@ -34,6 +34,16 @@
   margin-bottom: .5rem;
 }
 
+.kss-example-heading-wrap::before,
+.kss-example-heading-wrap::after {
+  content: " ";
+  display: table;
+}
+
+.kss-example-heading-wrap::after {
+  clear: both;
+}
+
 .kss-component-description {
   background-color: #f9fdfe;
   padding-top: 1.125rem;

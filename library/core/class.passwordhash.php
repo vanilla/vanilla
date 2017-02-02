@@ -4,7 +4,7 @@
  *
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -67,8 +67,7 @@ class Gdn_PasswordHash {
                 $Result = $this->getAlgorithm('Django')->verify($Password, $StoredHash);
                 break;
             case 'drupal':
-                require_once PATH_LIBRARY.'/vendors/drupal/password.inc.php';
-                $Result = Drupal\user_check_password($Password, $StoredHash);
+                $Result = $this->getAlgorithm('Drupal')->verify($Password, $StoredHash);
                 break;
             case 'ipb':
                 $Result = $this->getAlgorithm('Ipb')->verify($Password, $StoredHash);
@@ -113,8 +112,7 @@ class Gdn_PasswordHash {
                 $Result = $this->checkYAF($Password, $StoredHash);
                 break;
             case 'webwiz':
-                require_once PATH_LIBRARY.'/vendors/misc/functions.webwizhash.php';
-                $Result = ww_CheckPassword($Password, $StoredHash);
+                $Result = $this->getAlgorithm('WebWiz')->verify($Password, $StoredHash);
                 break;
             case 'vanilla':
             default:

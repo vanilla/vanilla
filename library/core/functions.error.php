@@ -2,7 +2,7 @@
 /**
  * Catch and render errors.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -344,7 +344,7 @@ function Gdn_ExceptionHandler($Exception) {
 
                 echo '<h2>Need Help?</h2>
       <p>If you are a user of this website, you can report this message to a website administrator.</p>
-      <p>If you are an administrator of this website, you can get help at the <a href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
+      <p>If you are an administrator of this website, you can get help at the <a href="https://open.vanillaforums.com/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
       <h2>Additional information for support personnel:</h2>
       <ul>
          <li><strong>Application:</strong> ', APPLICATION, '</li>

@@ -3,7 +3,7 @@
  * Database Structure tools
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -69,7 +69,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
 
         $this->databasePrefix($this->Database->DatabasePrefix);
-        $this->setAlterTableThreshold(c('Database.AlterTableThreshold', 0));
+
+        if (inMaintenanceMode()) {
+            $alterTableThreshold = 0;
+        } else {
+            $alterTableThreshold = c('Database.AlterTableThreshold', 0);
+        }
+        $this->setAlterTableThreshold($alterTableThreshold);
 
         $this->reset();
     }

@@ -3,7 +3,7 @@
  * ProfileExtender Plugin.
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ProfileExtender
  */
@@ -271,7 +271,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         $Data = $this->getProfileFields();
         $Sender->setData('ExtendedFields', $Data);
 
-        $Sender->addSideMenu('settings/profileextender');
+        $Sender->setHighlightRoute('settings/profileextender');
         $Sender->setData('Title', t('Profile Fields'));
         $Sender->render('settings', '', 'plugins/ProfileExtender');
     }

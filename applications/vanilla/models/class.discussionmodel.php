@@ -2,7 +2,7 @@
 /**
  * Discussion model
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -176,13 +176,10 @@ class DiscussionModel extends VanillaModel {
      * @return bool Returns true if the user can edit or false otherwise.
      */
     public static function canEdit($discussion, &$timeLeft = 0) {
-        if (!($permissionCategoryID = val('PermissionCategoryID', $discussion))) {
-            $category = CategoryModel::categories(val('CategoryID', $discussion));
-            $permissionCategoryID = val('PermissionCategoryID', $category);
-        }
+        $category = CategoryModel::categories(val('CategoryID', $discussion));
 
         // Users with global edit permission can edit.
-        if (Gdn::session()->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $permissionCategoryID)) {
+        if (CategoryModel::checkPermission($category, 'Vanilla.Discussions.Edit')) {
             return true;
         }
 
@@ -1816,7 +1813,7 @@ class DiscussionModel extends VanillaModel {
         $CategoryID = val('CategoryID', $FormPostValues);
         if ($CategoryID > 0) {
             $Category = CategoryModel::categories($CategoryID);
-            if ($Category && !$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', val('PermissionCategoryID', $Category))) {
+            if ($Category && !CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }

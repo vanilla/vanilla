@@ -2,7 +2,7 @@
 /**
  * Spam model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -69,8 +69,11 @@ class SpamModel extends Gdn_Pluggable {
             $User = Gdn::userModel()->getID(val('InsertUserID', $Data), DATASET_TYPE_ARRAY);
 
             if ($User) {
-                if (val('Verified', $User)) {
-                    // The user has been verified and isn't a spammer.
+                $verified = val('Verified', $User);
+                $admin = val('Admin', $User);
+
+                if ($verified || $admin) {
+                    // The user has been verified or is an admin and isn't a spammer.
                     return false;
                 }
                 touchValue('Username', $Data, $User['Name']);

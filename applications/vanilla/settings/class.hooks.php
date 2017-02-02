@@ -255,7 +255,7 @@ class VanillaHooks implements Gdn_IPlugin {
         }
 
         // Let plugins have their information getting saved.
-        $Types = [];
+        $Types = [''];
 
         // We fire as TaggingPlugin since this code was taken from the old TaggingPlugin and we do not
         // want to break any hooks

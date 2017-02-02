@@ -601,7 +601,12 @@ class Gdn {
      */
     private static function getContainer() {
         if (self::$container === null) {
-            self::$container = new Garden\Container\Container();
+            $dic = new Garden\Container\Container();
+
+            $dic->setInstance('Garden\Container\Container', $dic)
+                ->setInstance('Interop\Container\ContainerInterface', $dic);
+
+            self::$container = $dic;
         }
         return self::$container;
     }

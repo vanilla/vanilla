@@ -1672,7 +1672,6 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->fireEvent('BeforeAddCss');
 
                 $ETag = AssetModel::eTag();
-                $CombineAssets = c('Garden.CombineAssets');
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
 
                 // And now search for/add all css files.
@@ -1685,17 +1684,11 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                     // style.css and admin.css deserve some custom processing.
                     if (in_array($CssFile, $CssAnchors)) {
-                        if (!$CombineAssets) {
-                            // Grab all of the css files from the asset model.
-                            $AssetModel = new AssetModel();
-                            $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
-                            foreach ($CssFiles as $Info) {
-                                $this->Head->addCss($Info[1], 'all', true, $CssInfo);
-                            }
-                        } else {
-                            $Basename = substr($CssFile, 0, -4);
-
-                            $this->Head->addCss(url("/asset/css/$ThemeType/$Basename-$ETag.css", '//'), 'all', false, $CssInfo['Options']);
+                        // Grab all of the css files from the asset model.
+                        $AssetModel = new AssetModel();
+                        $CssFiles = $AssetModel->getCssFiles($ThemeType, ucfirst(substr($CssFile, 0, -4)), $ETag);
+                        foreach ($CssFiles as $Info) {
+                            $this->Head->addCss($Info[1], 'all', true, $CssInfo);
                         }
                         continue;
                     }

@@ -20,9 +20,9 @@ class NestedSchemaTest extends SchemaTest {
      */
     public function testBasicNested() {
         $schema = Schema::create([
-            'o:obj' => [
-                'i:id',
-                's:name?'
+            'obj:o' => [
+                'id:i',
+                'name:s?'
             ]
         ]);
 
@@ -58,9 +58,9 @@ class NestedSchemaTest extends SchemaTest {
      */
     public function testDoubleNested() {
         $schema = Schema::create([
-            'o:obj' => [
-                'o:obj?' => [
-                    'i:id'
+            'obj:o' => [
+                'obj:o?' => [
+                    'id:i'
                 ]
             ]
         ]);
@@ -135,7 +135,7 @@ class NestedSchemaTest extends SchemaTest {
      * Test a variety of array item validation scenarios.
      */
     public function testArrayItemsType() {
-        $schema = Schema::create(['a:arr' => 'i']);
+        $schema = Schema::create(['arr:a' => 'i']);
 
         $validData = ['arr' => [1, '2', 3]];
         $this->assertTrue($schema->isValid($validData));
@@ -273,9 +273,9 @@ class NestedSchemaTest extends SchemaTest {
      */
     public function getArrayOfObjectsSchema() {
         $schema = new Schema([
-            'a:rows' => [
-                'i:id',
-                's:name?'
+            'rows:a' => [
+                'id:i',
+                'name:s?'
             ]
         ]);
 
@@ -289,12 +289,12 @@ class NestedSchemaTest extends SchemaTest {
      */
     public function getNestedSchema() {
         $schema = Schema::create([
-            'i:id',
-            's:name',
-            'o:addr' => [
-                's:street?',
-                's:city',
-                'i:zip?'
+            'id:i',
+            'name:s',
+            'addr:o' => [
+                'street:s?',
+                'city:s',
+                'zip:i?'
             ]
         ]);
 
@@ -308,11 +308,11 @@ class NestedSchemaTest extends SchemaTest {
      */
     protected function doValidationBehavior($validationBehavior) {
         $schema = new Schema([
-            'i:groupID' => 'The ID of the group.',
-            's:name' => 'The name of the group.',
-            's:description' => 'A description of the group.',
-            'o:member' => [
-                's:email' => 'The ID of the new member.'
+            'groupID:i' => 'The ID of the group.',
+            'name:s' => 'The name of the group.',
+            'description:s' => 'A description of the group.',
+            'member:o' => [
+                'email:s' => 'The ID of the new member.'
             ]
         ]);
         $schema->setValidationBehavior($validationBehavior);

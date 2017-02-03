@@ -24,17 +24,18 @@
     "require": {
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
+        "michelf/php-markdown": "~1.7.0",
         "pclzip/pclzip": "~2.0",
+        "phpmailer/phpmailer": "~5.2",
+        "psr/log": "~1.0",
         "smarty/smarty": "~3.1",
+        "tburry/pquery": "~1.1",
         "vanilla/garden-container": "^1.3.2",
         "vanilla/garden-http": "~1.0",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
         "vanilla/legacy-passwords": "~1.0",
-        "vanilla/nbbc": "~2.1",
-        "tburry/pquery": "~1.1",
-        "phpmailer/phpmailer": "~5.2",
-        "psr/log": "~1.0"
+        "vanilla/nbbc": "~2.1"
     },
     "provide": {
         "ext-gd": "*"

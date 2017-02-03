@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "50abb2542a4104ad8886a78a194ff488",
-    "content-hash": "020ecd79fe093aa5954520efb89dbe9c",
+    "hash": "999eea5921ae44864290b79400f90981",
+    "content-hash": "9a70b80df903fb985eda47672c8f4d4e",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -76,6 +76,57 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "time": "2014-12-30 15:22:37"
+        },
+        {
+            "name": "michelf/php-markdown",
+            "version": "1.7.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michelf/php-markdown.git",
+                "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/1f51cc520948f66cd2af8cbc45a5ee175e774220",
+                "reference": "1f51cc520948f66cd2af8cbc45a5ee175e774220",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-lib": "1.4.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Michelf": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Michel Fortin",
+                    "email": "michel.fortin@michelf.ca",
+                    "homepage": "https://michelf.ca/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "John Gruber",
+                    "homepage": "https://daringfireball.net/"
+                }
+            ],
+            "description": "PHP Markdown",
+            "homepage": "https://michelf.ca/projects/php-markdown/",
+            "keywords": [
+                "markdown"
+            ],
+            "time": "2016-10-29 18:58:20"
         },
         {
             "name": "pclzip/pclzip",
@@ -328,16 +379,16 @@
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.3.2",
+            "version": "v1.3.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "4cc73331f2fea296ecbdfa1f5193861ce6dc32b9"
+                "reference": "6c694e6ee0ef7dd6612408c8e877d61feb36d083"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/4cc73331f2fea296ecbdfa1f5193861ce6dc32b9",
-                "reference": "4cc73331f2fea296ecbdfa1f5193861ce6dc32b9",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/6c694e6ee0ef7dd6612408c8e877d61feb36d083",
+                "reference": "6c694e6ee0ef7dd6612408c8e877d61feb36d083",
                 "shasum": ""
             },
             "require": {
@@ -361,7 +412,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2016-12-22 19:18:56"
+            "time": "2017-02-03 02:29:16"
         },
         {
             "name": "vanilla/garden-http",

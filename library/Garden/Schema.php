@@ -314,10 +314,10 @@ class Schema implements \JsonSerializable {
             }
             $name = $parts[0];
         } else {
-            $name = $parts[1];
+            $name = $parts[0];
 
-            if (isset(self::$types[$parts[0]])) {
-                $type = self::$types[$parts[0]];
+            if (isset(self::$types[$parts[1]])) {
+                $type = self::$types[$parts[1]];
             } else {
                 throw new \InvalidArgumentException("Invalid type {$parts[1]} for field $name.", 500);
             }

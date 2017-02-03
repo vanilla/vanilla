@@ -1040,7 +1040,7 @@ class SettingsController extends DashboardController {
                     $UpdateData[] = [
                         'Name' => $addon->getRawKey(),
                         'Version' => $addon->getVersion(),
-                        'Type' => $addon->getSpecial('oldType', $type)
+                        'Type' => $addon->getInfoValue('oldType', $type)
                     ];
                 }
             }

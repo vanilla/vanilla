@@ -115,7 +115,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $result = [];
         foreach ($addons as $addon) {
             /* @var Addon $addon */
-            if ($addon->getSpecial('oldType') !== 'plugin') {
+            if ($addon->getInfoValue('oldType') !== 'plugin') {
                 continue;
             }
 

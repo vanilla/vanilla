@@ -269,12 +269,12 @@ class Addon {
             $array = $PluginInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_PLUGIN;
-            $this->special['oldType'] = 'plugin';
+            $oldType = 'plugin';
         } elseif (!empty($ApplicationInfo) && is_array($ApplicationInfo)) {
             $array = $ApplicationInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_APPLICATION;
-            $this->special['oldType'] = 'application';
+            $oldType = 'application';
         } elseif (!empty($ThemeInfo) && is_array($ThemeInfo)) {
             $array = $ThemeInfo;
             $type = static::TYPE_THEME;
@@ -301,6 +301,10 @@ class Addon {
         $info['type'] = $type;
         if (empty($info['priority'])) {
             $info['priority'] = $priority;
+        }
+
+        if (isset($oldType)) {
+            $info['oldType'] = $oldType;
         }
 
         // Convert the author.
@@ -920,7 +924,7 @@ class Addon {
         return function (Addon $addon) use ($where) {
             foreach ($where as $key => $value) {
                 if ($key === 'oldType') {
-                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
+                    $valid = isset($addon->info['oldType']) && $addon->info['oldType'] === $value;
                 } elseif ($value === null) {
                     $valid = !isset($addon->info[$key]);
                 } else {

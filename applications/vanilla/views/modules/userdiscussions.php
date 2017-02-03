@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-require_once $this->fetchViewLocation('discussions');
+require_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'Vanilla');
 $user = $this->data('User');
 echo '<div class="DataListWrap">';
 echo '<h2 class="H">'.t('Recent Discussions').'</h2>';

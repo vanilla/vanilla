@@ -26,10 +26,18 @@ class Gdn_Factory {
     protected $_Dependencies = array();
 
     /**
+     * @var \Garden\Container\Container The container used to store the class information.
+     */
+    private $container;
+
+    /**
      *
      */
-    public function __construct() {
+    public function __construct(Garden\Container\Container $container = null) {
+        deprecated('Gdn_Factory', 'Garden\Container\Container');
         register_shutdown_function(array($this, 'Cleanup'));
+
+        $this->container = $container !== null ? $container : new Garden\Container\Container();
     }
 
     /**
@@ -39,96 +47,26 @@ class Gdn_Factory {
      * @return boolean Whether or not a factory definintion exists.
      */
     public function exists($Alias) {
-        $Result = array_key_exists($Alias, $this->_Objects);
-        return $Result;
+        return $this->container->hasRule($Alias);
     }
 
     /**
      * Creates an object with mapped to the name.
      *
-     * @param $Alias The class code of the object to create.
-     * @param $Args The arguments to pass to the constructor of the object.
+     * @param string $Alias The class code of the object to create.
+     * @param array|null $Args The arguments to pass to the constructor of the object.
      */
     public function factory($Alias, $Args = null) {
-        //if (!$this->Exists($Alias))
-        if (!array_key_exists($Alias, $this->_Objects)) {
+        try {
+            if (!$this->container->has($Alias) && $this->container->has("Gdn_$Alias")) {
+                $Alias = "Gdn_$Alias";
+            }
+
+            $result = $this->container->getArgs($Alias, (array)$Args);
+            return $result;
+        } catch (\Garden\Container\NotFoundException $ex) {
             return null;
         }
-
-        $Def = &$this->_Objects[$Alias];
-        $ClassName = $Def['ClassName'];
-
-        // Make sure the class has beeen included.
-        if (!class_exists($ClassName)) {
-            $Path = $Def['Path'];
-            if (substr($Path, 0, 1) == '~') {
-                // Replace the beginning of the path with the root of the application.
-                $Path = PATH_ROOT.substr($Path, 1);
-                $Def['Path'] = $Path;
-            }
-
-            if (file_exists($Path)) {
-                require_once($Path);
-            }
-        }
-
-        if (!class_exists($ClassName, false)) {
-            throw new Exception(sprintf('Class %s not found while trying to get an object for %s. Check the path %s.', $ClassName, $Alias, $Def['Path']));
-        }
-
-        // Create the object differently depending on the type.
-        $Result = null;
-        $FactoryType = $Def['FactoryType'];
-        $FactorySupplimentData = isset($Def[$FactoryType]) ? $Def[$FactoryType] : null;
-        switch ($FactoryType) {
-            case Gdn::FactoryInstance:
-                // Instantiate a new instance of the class.
-                $Result = $this->_instantiateObject($Alias, $ClassName, $Args);
-                break;
-            case Gdn::FactoryPrototype:
-                $Prototype = $FactorySupplimentData;
-                $Result = clone $Prototype;
-                break;
-            case Gdn::FactorySingleton:
-                $SingletonDef = $FactorySupplimentData;
-                if (is_array($SingletonDef)) {
-                    // The singleton has arguments for instantiation.
-                    $Singleton = null;
-                    $Args = $SingletonDef;
-                } else {
-                    $Singleton = $SingletonDef;
-                }
-
-                if (is_null($Singleton)) {
-                    // Lazy create the singleton instance.
-                    $Singleton = $this->_instantiateObject($Alias, $ClassName, $Args);
-                    $Def[$FactoryType] = $Singleton;
-                }
-                $Result = $Def[$FactoryType];
-                break;
-            case Gdn::FactoryRealSingleton:
-                $RealSingletonDef = $FactorySupplimentData;
-
-                // Not yet stored as an object... need to instantiate
-                if (!is_object($RealSingletonDef)) {
-                    $RealSingleton = null;
-                } else {
-                    $RealSingleton = $RealSingletonDef;
-                }
-
-                if (is_null($RealSingleton)) {
-                    // Lazy create the singleton instance.
-                    $RealSingleton = call_user_func_array(array($ClassName, $RealSingletonDef), $Args);
-                    $this->setDependancies($Alias, $RealSingleton);
-                    $Def[$FactoryType] = $RealSingleton;
-                }
-                $Result = $Def[$FactoryType];
-                break;
-            default:
-                throw new Exception();
-                break;
-        }
-        return $Result;
     }
 
     /**
@@ -152,27 +90,46 @@ class Gdn_Factory {
         if (!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton))) {
             throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));
         }
+        $this->container
+            ->rule($Alias);
 
-        // Set the initial definition of the object.
-        $Def = array('ClassName' => $ClassName, 'Path' => $Path, 'FactoryType' => $FactoryType);
+        if ($Alias !== $ClassName) {
+            $this->container->setClass($ClassName);
+        }
 
         // Set the other data of the object.
         switch ($FactoryType) {
             case Gdn::FactoryInstance:
+                $this->container->setShared(false);
                 break;
             case Gdn::FactoryPrototype:
                 if (is_null($Data)) {
                     throw new Exception('You must supply a prototype object when installing an object of type Prototype.');
                 }
+                $this->container
+                    ->setShared(false)
+                    ->setFactory(function () use ($Data) {
+                        $r = clone $Data;
+                        return $r;
+                    });
+                break;
             case Gdn::FactorySingleton:
+                if (is_array($Data)) {
+                    $this->container
+                        ->setShared(true)
+                        ->setConstructorArgs($Data);
+                } elseif ($Data !== null) {
+                    $this->container->setInstance($Alias, $Data);
+                }
+                break;
             case Gdn::FactoryRealSingleton:
-                $Def[$FactoryType] = $Data;
+                $this->container
+                    ->setShared(true)
+                    ->setFactory([$ClassName, $Data]);
                 break;
             default:
                 throw Exception();
         }
-
-        $this->_Objects[$Alias] = $Def;
     }
 
     /**
@@ -194,57 +151,6 @@ class Gdn_Factory {
         } else {
             $this->_Dependencies[$Alias][$PropertyName] = $SourceAlias;
         }
-    }
-
-    /**
-     * Instantiate a new object.
-     *
-     * @param string $ClassName The name of the class to instantiate.
-     * @param array $Args The arguments to pass to the constructor.
-     * Note: This function currently only supports a maximum of 8 arguments.
-     */
-    protected function _instantiateObject($Alias, $ClassName, $Args = null) {
-        if (is_null($Args)) {
-            $Args = array();
-        }
-        $Result = null;
-
-        // Instantiate the object with the correct arguments.
-        // This odd looking case statement is purely for speed optimization.
-        switch (count($Args)) {
-            case 0:
-                $Result = new $ClassName;
-                break;
-            case 1:
-                $Result = new $ClassName($Args[0]);
-                break;
-            case 2:
-                $Result = new $ClassName($Args[0], $Args[1]);
-                break;
-            case 3:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2]);
-                break;
-            case 4:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2], $Args[3]);
-                break;
-            case 5:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2], $Args[3], $Args[4]);
-                break;
-            case 6:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5]);
-                break;
-            case 7:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6]);
-                break;
-            case 8:
-                $Result = new $ClassName($Args[0], $Args[1], $Args[2], $Args[3], $Args[4], $Args[5], $Args[6], $Args[7]);
-                break;
-            default:
-                throw new Exception();
-        }
-
-        $this->setDependancies($Alias, $Result);
-        return $Result;
     }
 
     /**

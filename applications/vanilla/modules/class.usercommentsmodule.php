@@ -16,12 +16,6 @@ class UserCommentsModule extends Gdn_Module {
     /** @var int Display limit. */
     public $limit = 10;
 
-    /** @var bool Whether to show the discussion author avatar. */
-    private $showPhotos = false;
-
-    /** @var array Limit the discussions to just this list of categories, checked for view permission. */
-    protected $categoryIDs;
-
     /** @var  int The ID of the user for whom you are showing the comments. */
     public $userID = null;
 
@@ -41,22 +35,6 @@ class UserCommentsModule extends Gdn_Module {
     }
 
     /**
-     * @param $showPhotos Whether to show the comment author avatar.
-     * @return CommentsModule
-     */
-    public function setShowPhotos($showPhotos) {
-        $this->showPhotos = $showPhotos;
-        return $this;
-    }
-
-    /**
-     * @return bool Whether to show the comment author avatar.
-     */
-    public function getShowPhotos() {
-        return $this->showPhotos;
-    }
-
-    /**
      * Get the data for the module.
      *
      * @param int|bool $limit Override the number of comments to display.
@@ -65,14 +43,27 @@ class UserCommentsModule extends Gdn_Module {
         if (!$limit) {
             $limit = $this->limit;
         }
+
+        $userModel = new UserModel();
+        $this->setData('User', $userModel->getID($this->userID));
         $commentsModel = new CommentModel();
         $this->setData('Comments', $commentsModel->getByUser2($this->userID, $limit));
     }
 
+    /**
+     * Set where the module will be shown.
+     *
+     * @return string
+     */
     public function assetTarget() {
         return 'Panel';
     }
 
+    /**
+     * Output the module as a string.
+     *
+     * @return string|void
+     */
     public function toString() {
         // If there is no userID show nothing.
         if (!$this->userID) {
@@ -84,23 +75,5 @@ class UserCommentsModule extends Gdn_Module {
         }
 
         return parent::toString();
-    }
-
-    /**
-     * Get a list of category IDs to limit.
-     *
-     * @return array
-     */
-    public function getCategoryIDs() {
-        return $this->categoryIDs;
-    }
-
-    /**
-     * Set a list of category IDs to limit.
-     *
-     * @param array $categoryIDs
-     */
-    public function setCategoryIDs($categoryIDs) {
-        $this->categoryIDs = $categoryIDs;
     }
 }

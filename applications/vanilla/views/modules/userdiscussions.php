@@ -1,17 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
-
-require_once Gdn::Controller()->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
-
+require_once $this->fetchViewLocation('discussions');
+$user = $this->data('User');
 echo '<div class="DataListWrap">';
 echo '<h2 class="H">'.t('Recent Discussions').'</h2>';
 echo '<ul class="DataList SearchResults">';
 if (sizeof($this->data('Discussions'))) {
     foreach ($this->data('Discussions') as $discussion) {
         $permalink = '/discussion/'.$discussion->DiscussionID;
-        $user = userBuilder($discussion, 'Insert');
         $this->EventArguments['User'] = $user;
         ?>
-        <li id="<?php echo 'Comment_'.$discussion->CommentID; ?>" class="Item">
+        <li id="<?php echo 'Discussion_'.$discussion->DiscussionID; ?>" class="Item">
             <?php $this->fireEvent('BeforeItemContent'); ?>
             <div class="ItemContent">
                 <div class="Message"><?php
@@ -28,7 +26,8 @@ if (sizeof($this->data('Discussions'))) {
         <?php
     }
 } else {
-    echo '<li class="Item Empty">'.t('This user has not commented yet.').'</li>';
+    echo '<li class="Item Empty">'.t('This user has not made any discussions yet.').'</li>';
 }
 echo '</ul>';
+echo anchor('All Discussions', 'profile/discussions/'.$user->UserID.'/'.rawurlencode($user->Name));
 echo '</div>';

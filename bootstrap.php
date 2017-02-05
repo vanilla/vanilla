@@ -1,5 +1,6 @@
 <?php
 
+use Garden\Container\Reference;
 use Vanilla\Addon;
 
 if (!defined('APPLICATION')) exit();
@@ -60,44 +61,156 @@ if (!class_exists('Gdn')) {
     exit("Class Gdn not found.");
 }
 
-// Cache Layer
-Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
+// Set up the dependency injection container.
+$dic = new \Garden\Container\Container();
+Gdn::setContainer($dic);
+
+$dic->setInstance('Garden\Container\Container', $dic)
+    ->rule('Interop\Container\ContainerInterface')
+    ->setAliasOf('Garden\Container\Container')
+
+    // Cache
+    ->rule('Gdn_Cache')
+    ->setShared(true)
+    ->setFactory(['Gdn_Cache', 'initialize'])
+    ->addAlias('Cache')
+
+    // Configuration
+    ->rule('Gdn_Configuration')
+    ->setShared(true)
+    ->addAlias('Config')
 
 // AddonManager
-Gdn::factoryInstall(
-    Gdn::AliasAddonManager,
-    '\\Vanilla\\AddonManager',
-    '',
-    Gdn::FactorySingleton,
-    [
+    ->rule('Vanilla\\AddonManager')
+    ->setShared(true)
+    ->setConstructorArgs([
         [
             Addon::TYPE_ADDON => ['/applications', '/plugins'],
             Addon::TYPE_THEME => '/themes',
             Addon::TYPE_LOCALE => '/locales'
         ],
         PATH_CACHE
-    ]
-);
+    ])
+    ->addAlias('AddonManager')
 
-// Old Managers
-Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
-Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
-Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager(), 'eventManager' => null]);
+    // ApplicationManager
+    ->rule('Gdn_ApplicationManager')
+    ->setShared(true)
+    ->addAlias('ApplicationManager')
 
-spl_autoload_register([Gdn::addonManager(), 'autoload']);
+    // PluginManager
+    ->rule('Gdn_PluginManager')
+    ->setShared(true)
+    ->addAlias('PluginManager')
 
-// Install the configuration handler.
-Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
+    // ThemeManager
+    ->rule('Gdn_ThemeManager')
+    ->setShared(true)
+    ->addAlias('ThemeManager')
+
+    // EventManager
+    ->rule(\Garden\EventManager::class)
+    ->setShared(true)
+    ->setConstructorArgs(['container' => new Reference(Gdn_PluginManager::class)])
+
+    // Locale
+    ->rule('Gdn_Locale')
+    ->setShared(true)
+    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
+    ->addAlias('Locale')
+
+    // Request
+    ->rule('Gdn_Request')
+    ->setShared(true)
+    ->addCall('fromEnvironment')
+    ->addAlias('Request')
+
+    // Database.
+    ->rule('Gdn_Database')
+    ->setShared(true)
+    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Database'])])
+    ->addAlias('Database')
+
+    ->rule('Gdn_DatabaseStructure')
+    ->setClass('Gdn_MySQLStructure')
+    ->setShared(true)
+    ->addAlias(Gdn::AliasDatabaseStructure)
+    ->addAlias('MySQLStructure')
+
+    ->rule('Gdn_SQLDriver')
+    ->setClass('Gdn_MySQLDriver')
+    ->setShared(true)
+    ->addAlias('Gdn_MySQLDriver')
+    ->addAlias('MySQLDriver')
+    ->addAlias(Gdn::AliasSqlDriver)
+
+    ->rule('Identity')
+    ->setClass('Gdn_CookieIdentity')
+    ->setShared(true)
+
+    ->rule('Gdn_Session')
+    ->setShared(true)
+    ->addAlias('Session')
+
+    ->rule(Gdn::AliasAuthenticator)
+    ->setClass('Gdn_Auth')
+    ->setShared(true)
+
+    ->rule('Gdn_Router')
+    ->addAlias(Gdn::AliasRouter)
+    ->setShared(true)
+
+    ->rule('Gdn_Dispatcher')
+    ->setShared(true)
+    ->addAlias(Gdn::AliasDispatcher)
+
+    ->rule('Gdn_Model')
+    ->setShared(true)
+
+    ->rule('Gdn_IPlugin')
+    ->setShared(true)
+
+    ->rule('Gdn_Slice')
+    ->setShared(true)
+    ->addAlias('Slice')
+
+    ->rule('Gdn_Statistics')
+    ->addAlias('Statistics')
+    ->setShared(true)
+
+    ->rule('Gdn_Regarding')
+    ->setShared(true)
+
+    ->rule('BBCodeFormatter')
+    ->setClass('BBCode')
+    ->setShared(true)
+
+    ->rule('Smarty')
+    ->setShared(true)
+
+    ->rule('ViewHandler.tpl')
+    ->setClass('Gdn_Smarty')
+    ->setShared(true)
+
+    ->rule('Gdn_Form')
+    ->addAlias('Form')
+    ;
+
+// Run through the bootstrap with dependencies.
+$dic->call(function (
+    \Garden\Container\Container $dic,
+    Gdn_Configuration $config,
+    Gdn_Request $request, // remove later
+    \Vanilla\AddonManager $addonManager,
+    Gdn_PluginManager $pluginManager, // remove later
+    \Garden\EventManager $eventManager
+) {
 
 // Load default baseline Garden configurations.
-Gdn::config()->load(PATH_CONF.'/config-defaults.php');
+    $config->load(PATH_CONF.'/config-defaults.php');
 
 // Load installation-specific configuration so that we know what apps are enabled.
-Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
-
-// Default request object
-Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactorySingleton);
-Gdn::request()->fromEnvironment();
+    $config->load($config->defaultPath(), 'Configuration', true);
 
 /**
  * Bootstrap Early
@@ -110,8 +223,8 @@ if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
     require_once PATH_CONF.'/bootstrap.early.php';
 }
 
-Gdn::config()->caching(true);
-debug(c('Debug', false));
+    $config->caching(true);
+    debug($config->get('Debug', false));
 
 setHandlers();
 
@@ -121,10 +234,12 @@ setHandlers();
  * If Garden is not yet installed, force the request to /dashboard/setup and
  * begin installation.
  */
-if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
-    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
+    if ($config->get('Garden.Installed', false) === false && strpos($request->path(), 'setup') === false) {
+        safeHeader('Location: '.$request->url('dashboard/setup', true));
     exit();
 }
+
+    spl_autoload_register([$addonManager, 'autoload']);
 
 /**
  * Extension Managers
@@ -134,23 +249,23 @@ if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(
  */
 
 // Start the addons, plugins, and applications.
-Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
-Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
-Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
+    $addonManager->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
+    $addonManager->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-$currentTheme = c(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
-Gdn::addonManager()->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
+    $currentTheme = $config->get(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+    $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
 // Load the configurations for enabled addons.
-foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    foreach ($addonManager->getEnabled() as $addon) {
     /* @var Addon $addon */
     if ($configPath = $addon->getSpecial('config')) {
-        Gdn::config()->load($addon->path($configPath));
+                $config->load($addon->path($configPath));
     }
 }
 
 // Re-apply loaded user settings.
-Gdn::config()->overlayDynamic();
+    $config->overlayDynamic();
 
 /**
  * Bootstrap Late
@@ -162,53 +277,11 @@ if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
     require_once PATH_CONF.'/bootstrap.late.php';
 }
 
-if (c('Debug')) {
+    if ($config->get('Debug')) {
     debug(true);
 }
 
-Gdn_Cache::trace(debug());
-
-/**
- * Factory Services
- *
- * These are the helper classes that facilitate Garden's operation. They can be
- * overwritten using FactoryOverwrite, but their defaults are installed here.
- */
-
-// Default database.
-Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_Database', null, Gdn::FactorySingleton, array('Database'));
-
-// Database drivers.
-Gdn::factoryInstall('MySQLDriver', 'Gdn_MySQLDriver', null, Gdn::FactoryInstance);
-Gdn::factoryInstall('MySQLStructure', 'Gdn_MySQLStructure', null, Gdn::FactoryInstance);
-
-// Form class
-Gdn::factoryInstall('Form', 'Gdn_Form', null, Gdn::FactoryInstance);
-
-// Identity, Authenticator & Session.
-Gdn::factoryInstall('Identity', 'Gdn_CookieIdentity');
-Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
-Gdn::factoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
-
-// Dispatcher.
-Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
-Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
-
-// Smarty Templating Engine
-Gdn::factoryInstall('Smarty', 'Smarty');
-Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
-
-// Remote Statistics
-Gdn::factoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);
-Gdn::statistics();
-
-// Regarding
-Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
-Gdn::regarding();
-
-// Other objects.
-Gdn::FactoryInstall('BBCodeFormatter', 'BBCode', null, Gdn::FactorySingleton);
-Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
+    Gdn_Cache::trace(debug()); // remove later
 
 /**
  * Extension Startup
@@ -217,7 +290,7 @@ Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
  */
 
 // Bootstrapping.
-foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    foreach ($addonManager->getEnabled() as $addon) {
     /* @var Addon $addon */
     if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
         $bootstrapPath = $addon->path($bootstrapPath);
@@ -225,11 +298,13 @@ foreach (Gdn::addonManager()->getEnabled() as $addon) {
     }
 }
 
-// Themes startup
-Gdn::themeManager()->start();
+    // Plugins startup
+    $pluginManager->start();
 
-// Plugins startup
-Gdn::pluginManager()->start();
+    // Fire an event for plugins to modify the container.
+    $eventManager->fire('container_init', $dic);
+
+});
 
 /**
  * Locales
@@ -238,15 +313,13 @@ Gdn::pluginManager()->start();
  * the locale management system.
  */
 
-// Load the Garden locale system
-$gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::addonManager());
-Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $gdnLocale);
-unset($gdnLocale);
+// Load the Garden locale system.
+$dic->get('Gdn_Locale');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
 
 // Start Authenticators
-Gdn::authenticator()->startAuthenticator();
+$dic->get('Authenticator')->startAuthenticator();
 
 /**
  * Bootstrap After

@@ -7,6 +7,8 @@
 
 namespace Vanilla;
 
+use Garden\EventManager;
+
 /**
  * A class to manage all of the addons in the application.
  *
@@ -14,7 +16,7 @@ namespace Vanilla;
  * be started which makes them available to the application. When an addon is started it can do the following:
  *
  * - Any classes the addon has declared are available via the {@link AddonManager::autoload()} method.
- * - The addon can declare a class ending in "Plugin" and its events will be registered (TODO).
+ * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
 class AddonManager {
@@ -959,5 +961,48 @@ class AddonManager {
             }
         }
         return $result;
+    }
+
+    /**
+     * Bind the events of all of the addon plugin classes managed by this class.
+     *
+     * This method also includes the plugin classes that haven't been included yet.
+     *
+     * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     */
+    public function bindAllEvents(EventManager $eventManager) {
+        $enabled = $this->getEnabled();
+
+        foreach ($enabled as $addon) {
+            /* @var \Vanilla\Addon $addon */
+            if ($pluginClass = $addon->getPluginClass()) {
+                // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
+                include_once $addon->getClassPath($pluginClass);
+
+                $this->bindEvents($addon, $eventManager);
+            }
+        }
+    }
+
+    /**
+     * Bind the events for an addon's plugin class (if any).
+     *
+     * If the addon doesn't have a plugin then nothing will happen.
+     *
+     * @param Addon $addon The addon to bind.
+     * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     */
+    public function bindAddonEvents(Addon $addon, EventManager $eventManager) {
+        // Check that the addon has a plugin.
+        if (!($pluginClass = $addon->getPluginClass())) {
+            return;
+        }
+
+        // Only register the plugin if it implements the Gdn_IPlugin interface.
+        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
+            $eventManager->bindClass($pluginClass, $addon->getPriority());
+        } else {
+            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+        }
     }
 }

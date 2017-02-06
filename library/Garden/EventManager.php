@@ -188,17 +188,15 @@ class EventManager {
      * Fire an event.
      *
      * @param string $event The name of the event.
+     * @param array $args Any arguments to pass along to the event handlers.
      * @return mixed Returns the result of the last event handler.
      */
-    public function fire($event) {
+    public function fire($event, ...$args) {
         $handlers = $this->getHandlers($event);
 
         if (empty($handlers) && empty($this->handlers[self::EVENT_META])) {
             return [];
         }
-
-        // Grab the handlers and call them.
-        $args = array_slice(func_get_args(), 1);
 
         // Do some backwards compatible kludges here.
 //        if (count($args) === 1 && is_object($args[0]) && property_exists($args[0], 'EventArguments')) {
@@ -287,27 +285,26 @@ class EventManager {
      *
      * @param string $event The name of the event to fire.
      * @param mixed $value The value to pass into the filter.
+     * @param array $args Any arguments the event takes.
      * @return mixed The result of the chained event or `$value` if there were no handlers.
      */
-    public function fireFilter($event, $value) {
+    public function fireFilter($event, $value, ...$args) {
         $handlers = $this->getHandlers($event);
         if (empty($handlers) && empty($this->handlers[self::EVENT_META])) {
             return $value; // gotcha, return value
         }
 
-        $callArgs = $args = array_slice(func_get_args(), 1);
-
+        $result = $value;
         foreach ($handlers as $callback) {
-            $value = call_user_func_array($callback, $callArgs);
-            $callArgs[0] = $value;
+            $result = call_user_func($callback, $result, ...$args);
         }
 
         // Call the meta event if it's there.
         if (!empty($this->handlers[self::EVENT_META])) {
-            $this->callMetaHandlers($event, $args, $value);
+            $this->callMetaHandlers($event, array_merge([$value], $args), $result);
         }
 
-        return $value;
+        return $result;
     }
 
     /**

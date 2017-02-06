@@ -491,6 +491,7 @@ class ProfileController extends Gdn_Controller {
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             safeRedirect(userUrl($this->User, '', 'discussions'));
         }
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

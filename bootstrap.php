@@ -78,6 +78,12 @@ Gdn::factoryInstall(
         PATH_CACHE
     ]
 );
+
+// Old Managers
+Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager(), 'eventManager' => null]);
+
 spl_autoload_register([Gdn::addonManager(), 'autoload']);
 
 // Install the configuration handler.
@@ -126,15 +132,6 @@ if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(
  * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
  * process the application-specific configuration defaults.
  */
-
-// ApplicationManager
-Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
-
-// ThemeManager
-Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
-
-// PluginManager
-Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager(), 'eventManager' => null]);
 
 // Start the addons, plugins, and applications.
 Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);

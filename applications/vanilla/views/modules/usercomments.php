@@ -1,11 +1,13 @@
 <?php if (!defined('APPLICATION')) exit();
 $user = $this->data('User');
-echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.t('Recent Comments').'</h2>';
-echo '<ul class="DataList SearchResults">';
+?>
+<div class="DataListWrap">
+    <h2 class="H"><?php echo t('Recent Comments'); ?></h2>
+    <ul class="DataList SearchResults">
+<?php
 if (sizeof($this->data('Comments'))) {
     foreach ($this->data('Comments') as $comment) {
-        $permalink = '/discussion/comment/'.$comment->CommentID.'/#Comment_'.$comment->CommentID;
+        $permalink = commentUrl($comment);
         $this->EventArguments['User'] = $user;
         ?>
         <li id="<?php echo 'Comment_'.$comment->CommentID; ?>" class="Item">
@@ -28,6 +30,7 @@ if (sizeof($this->data('Comments'))) {
 } else {
     echo '<li class="Item Empty">'.t('This user has not commented yet.').'</li>';
 }
-echo '</ul>';
-echo anchor('All Comments', 'profile/comments/'.$user->UserID.'/'.rawurlencode($user->Name));
-echo '</div>';
+?>
+    </ul>
+    <?php echo anchor('All Comments', 'profile/comments/'.$user->UserID.'/'.rawurlencode($user->Name)); ?>
+</div>

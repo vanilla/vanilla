@@ -16,12 +16,14 @@ class UserCommentsModule extends Gdn_Module {
     /** @var int Display limit. */
     public $limit = 10;
 
-    /** @var  int The ID of the user for whom you are showing the comments. */
+    /** @var int The ID of the user for whom you are showing the comments. */
     public $userID = null;
 
     /**
+     * Construct the module. This module is designed to run in the profile controller. If it is not in the
+     * profile controller and no UserID was declared when it was instantiated do not populate $this->userID.
      *
-     *
+     * @param GDN_Controller $sender
      * @throws Exception
      */
     public function __construct($sender) {
@@ -30,7 +32,7 @@ class UserCommentsModule extends Gdn_Module {
         $this->fireEvent('Init');
         //If you are being executed from the profile controller, get the UserID.
         if (strtolower(val('ControllerName', $sender)) === 'profilecontroller') {
-            $this->userID = $sender->User->UserID;
+            $this->userID = valr('User.UserID', $sender);
         }
     }
 
@@ -42,6 +44,10 @@ class UserCommentsModule extends Gdn_Module {
     public function getData($limit = false) {
         if (!$limit) {
             $limit = $this->limit;
+        }
+
+        if (!$this->userID) {
+            return;
         }
 
         $userModel = new UserModel();

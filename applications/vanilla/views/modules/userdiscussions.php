@@ -1,12 +1,14 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once Gdn::controller()->fetchViewLocation('helper_functions', 'discussions', 'Vanilla');
 $user = $this->data('User');
-echo '<div class="DataListWrap">';
-echo '<h2 class="H">'.t('Recent Discussions').'</h2>';
-echo '<ul class="DataList SearchResults">';
+?>
+<div class="DataListWrap">
+    <h2 class="H"><?php echo t('Recent Discussions'); ?></h2>
+    <ul class="DataList SearchResults">
+<?php
 if (sizeof($this->data('Discussions'))) {
     foreach ($this->data('Discussions') as $discussion) {
-        $permalink = '/discussion/'.$discussion->DiscussionID;
+        $permalink = discussionUrl($discussion);
         $this->EventArguments['User'] = $user;
         ?>
         <li id="<?php echo 'Discussion_'.$discussion->DiscussionID; ?>" class="Item">
@@ -28,6 +30,7 @@ if (sizeof($this->data('Discussions'))) {
 } else {
     echo '<li class="Item Empty">'.t('This user has not made any discussions yet.').'</li>';
 }
-echo '</ul>';
-echo anchor('All Discussions', 'profile/discussions/'.$user->UserID.'/'.rawurlencode($user->Name));
-echo '</div>';
+?>
+</ul>
+<?php echo anchor('All Discussions', 'profile/discussions/'.$user->UserID.'/'.rawurlencode($user->Name)); ?>
+</div>

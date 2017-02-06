@@ -139,6 +139,26 @@ class AddonManager {
     }
 
     /**
+     * Register the autoloader for addons managed through this class.
+     *
+     * @param bool $throw This parameter specifies whether **spl_autoload_register()** should throw exceptions when the autoload_function cannot be registered.
+     * @param bool $prepend If true, **spl_autoload_register()** will prepend the autoloader on the autoload queue instead of appending it.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function registerAutoloader($throw = true, $prepend = false) {
+        return spl_autoload_register([$this, 'autoload'], $throw, $prepend);
+    }
+
+    /**
+     * Unregister the autoloader registered with {@link AddonManager::registerAutoloader()}.
+     *
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function unregisterAutoloader() {
+        return spl_autoload_unregister([$this, 'autoload']);
+    }
+
+    /**
      * Lookup an addon by class name.
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.

@@ -22,6 +22,7 @@
         }
     ],
     "require": {
+        "php": ">=5.6.0",
         "container-interop/container-interop": "^1.1",
         "chrisjean/php-ico": "~1.0",
         "michelf/php-markdown": "~1.7.0",

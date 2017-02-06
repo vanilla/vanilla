@@ -574,8 +574,8 @@ class LogModel extends Gdn_Pluggable {
             foreach ($CategoryIDs as $categoryID => $counts) {
                 Gdn::sql()
                     ->update('Category')
-                    ->set('CountDiscussions', 'coalesce(CountDiscussions, 0) + '.val('CountDiscussions', $counts, 0), false, false)
-                    ->set('CountComments', 'coalesce(CountComments, 0) + '.val('CountComments', $counts, 0), false, false)
+                    ->set('CountDiscussions', 'CountDiscussions + '.val('CountDiscussions', $counts, 0), false, false)
+                    ->set('CountComments', 'CountComments + '.val('CountComments', $counts, 0), false, false)
                     ->where('CategoryID', $categoryID)
                     ->put();
             }

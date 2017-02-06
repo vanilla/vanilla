@@ -811,7 +811,7 @@ class LogModel extends Gdn_Pluggable {
                         Gdn::userModel()->setField($ID, 'Banned', 0);
                     }
 
-                    // Keep track of discussions and categories so that there counts can be recalculated.
+                    // Keep track of discussions and categories so that their counts can be recalculated.
                     switch ($Log['RecordType']) {
                         case 'Discussion':
                             $this->recalcIDs['Discussion'][$ID] = true;

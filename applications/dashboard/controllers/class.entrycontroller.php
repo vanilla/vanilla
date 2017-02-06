@@ -1747,6 +1747,7 @@ class EntryController extends Gdn_Controller {
      */
     public function passwordReset($UserID = '', $PasswordResetKey = '') {
         $PasswordResetKey = trim($PasswordResetKey);
+        $this->UserModel->addPasswordStrength($this);
 
         if (!is_numeric($UserID)
             || $PasswordResetKey == ''
@@ -1782,45 +1783,47 @@ class EntryController extends Gdn_Controller {
                 $User = arrayTranslate($User, array('UserID', 'Name', 'Email'));
                 $this->setData('User', $User);
             }
+
+            if ($this->Form->isPostBack() === true) {
+                $this->UserModel->Validation->applyRule('Password', 'Required');
+                $this->UserModel->Validation->applyRule('Password', 'Strength');
+                $this->UserModel->Validation->applyRule('Password', 'Match');
+                $this->UserModel->Validation->validate($this->Form->formValues());
+                $this->Form->setValidationResults($this->UserModel->Validation->results());
+
+                $Password = $this->Form->getFormValue('Password', '');
+                $PasswordMatch = $this->Form->getFormValue('PasswordMatch', '');
+                if ($Password == '') {
+                    Logger::event(
+                        'password_reset_failure',
+                        Logger::NOTICE,
+                        'Failed to reset the password for {username}. Password is invalid.'
+                    );
+                } elseif ($Password != $PasswordMatch) {
+                    Logger::event(
+                        'password_reset_failure',
+                        Logger::NOTICE,
+                        'Failed to reset the password for {username}. Passwords did not match.'
+                    );
+                }
+
+                if ($this->Form->errorCount() == 0) {
+                    $User = $this->UserModel->passwordReset($UserID, $Password);
+                    Logger::event(
+                        'password_reset',
+                        Logger::NOTICE,
+                        '{username} has reset their password.'
+                    );
+                    Gdn::session()->start($User->UserID, true);
+                    redirect('/');
+                }
+            }
+
         } else {
             $this->setData('Fatal', true);
         }
 
-        if ($this->Form->errorCount() == 0
-            && $this->Form->isPostBack() === true
-        ) {
-            $Password = $this->Form->getFormValue('Password', '');
-            $Confirm = $this->Form->getFormValue('Confirm', '');
-            if ($Password == '') {
-                $this->Form->addError('Your new password is invalid');
-                Logger::event(
-                    'password_reset_failure',
-                    Logger::NOTICE,
-                    'Failed to reset the password for {username}. Password is invalid.'
-                );
-            } elseif ($Password != $Confirm) {
-                $this->Form->addError('Your passwords did not match.');
-            }
-            Logger::event(
-                'password_reset_failure',
-                Logger::NOTICE,
-                'Failed to reset the password for {username}. Passwords did not match.'
-            );
-
-            if ($this->Form->errorCount() == 0) {
-                $User = $this->UserModel->passwordReset($UserID, $Password);
-                Logger::event(
-                    'password_reset',
-                    Logger::NOTICE,
-                    '{username} has reset their password.'
-                );
-                Gdn::session()->start($User->UserID, true);
-//            $Authenticator = Gdn::authenticator()->AuthenticateWith('password');
-//            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
-//            $AuthUserID = $Authenticator->Authenticate();
-                redirect('/');
-            }
-        }
+        $this->addJsFile('entry.js');
         $this->render();
     }
 

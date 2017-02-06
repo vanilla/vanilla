@@ -16,13 +16,15 @@
             <li>
                 <?php
                 echo $this->Form->label('New Password', 'Password');
-                echo $this->Form->Input('Password', 'password');
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', array('class' => 'Gloss'));
+                echo $this->Form->Input('Password', 'password', ['Wrap' => true, 'Strength' => true]);
                 ?>
             </li>
             <li>
                 <?php
-                echo $this->Form->label('Confirm Password', 'Confirm');
-                echo $this->Form->Input('Confirm', 'password');
+                echo $this->Form->label('Confirm Password', 'PasswordMatch');
+                echo $this->Form->Input('PasswordMatch', 'password',  ['Wrap' => true]);
+                echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
             <li class="Buttons">

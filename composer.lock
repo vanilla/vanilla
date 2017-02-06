@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "999eea5921ae44864290b79400f90981",
-    "content-hash": "9a70b80df903fb985eda47672c8f4d4e",
+    "content-hash": "510445881b9b591025be1e3a03e7c190",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -48,7 +47,7 @@
                 "favicon",
                 "ico"
             ],
-            "time": "2016-09-27 22:00:56"
+            "time": "2016-09-27T22:00:56+00:00"
         },
         {
             "name": "container-interop/container-interop",
@@ -75,7 +74,7 @@
                 "MIT"
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
-            "time": "2014-12-30 15:22:37"
+            "time": "2014-12-30T15:22:37+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -126,7 +125,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2016-10-29 18:58:20"
+            "time": "2016-10-29T18:58:20+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -163,7 +162,7 @@
                 "php",
                 "zip"
             ],
-            "time": "2014-06-05 11:42:24"
+            "time": "2014-06-05T11:42:24+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -223,7 +222,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-01-09 09:33:47"
+            "time": "2017-01-09T09:33:47+00:00"
         },
         {
             "name": "psr/log",
@@ -270,7 +269,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -323,7 +322,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-12-14 21:57:25"
+            "time": "2016-12-14T21:57:25+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -375,20 +374,20 @@
                 "ganon",
                 "php"
             ],
-            "time": "2016-01-14 20:55:00"
+            "time": "2016-01-14T20:55:00+00:00"
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.3.3",
+            "version": "v1.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "6c694e6ee0ef7dd6612408c8e877d61feb36d083"
+                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/6c694e6ee0ef7dd6612408c8e877d61feb36d083",
-                "reference": "6c694e6ee0ef7dd6612408c8e877d61feb36d083",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/d5af47a643d6fc872ec6d57e35b2583793c8a592",
+                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592",
                 "shasum": ""
             },
             "require": {
@@ -412,7 +411,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-02-03 02:29:16"
+            "time": "2017-02-05T15:17:17+00:00"
         },
         {
             "name": "vanilla/garden-http",
@@ -452,7 +451,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2016-03-25 22:29:23"
+            "time": "2016-03-25T22:29:23+00:00"
         },
         {
             "name": "vanilla/garden-password",
@@ -505,7 +504,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2016-10-21 20:47:48"
+            "time": "2016-10-21T20:47:48+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -544,7 +543,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2016-04-14 21:27:05"
+            "time": "2016-04-14T21:27:05+00:00"
         },
         {
             "name": "vanilla/legacy-passwords",
@@ -597,7 +596,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2017-01-24 20:17:02"
+            "time": "2017-01-24T20:17:02+00:00"
         },
         {
             "name": "vanilla/nbbc",
@@ -633,7 +632,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-04-26 18:19:47"
+            "time": "2016-04-26T18:19:47+00:00"
         }
     ],
     "packages-dev": [],
@@ -642,6 +641,8 @@
     "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "php": ">=5.6.0"
+    },
     "platform-dev": []
 }

@@ -828,13 +828,13 @@ class LogModel extends Gdn_Pluggable {
                         case 'Comment':
                             $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
 
-                            if (empty($this->recalcIDs['Category'][$Log['CategoryID']])) {
-                                $this->recalcIDs['Category'][$Log['CategoryID']] = [
+                            if (empty($this->recalcIDs['Category'][$Log['ParentRecordID']])) {
+                                $this->recalcIDs['Category'][$Log['ParentRecordID']] = [
                                     'CountDiscussions' => 0,
                                     'CountComments' => 1,
                                 ];
                             } else {
-                                $this->recalcIDs['Category'][$Log['CategoryID']]['CountComments']++;
+                                $this->recalcIDs['Category'][$Log['ParentRecordID']]['CountComments']++;
                             }
                             break;
                     }

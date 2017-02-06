@@ -114,10 +114,9 @@ class Gdn_Factory {
                     });
                 break;
             case Gdn::FactorySingleton:
+                $this->container->setShared(true);
                 if (is_array($Data)) {
-                    $this->container
-                        ->setShared(true)
-                        ->setConstructorArgs($Data);
+                    $this->container->setConstructorArgs($Data);
                 } elseif ($Data !== null) {
                     $this->container->setInstance($Alias, $Data);
                 }

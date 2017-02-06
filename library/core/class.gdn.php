@@ -274,9 +274,9 @@ class Gdn {
                     });
                 break;
             case Gdn::FactorySingleton:
+                $dic->setShared(true);
                 if (is_array($Data)) {
-                    $dic->setShared(true)
-                        ->setConstructorArgs($Data);
+                    $dic->setConstructorArgs($Data);
                 } elseif ($Data !== null) {
                     $dic->setInstance($Alias, $Data);
                 }

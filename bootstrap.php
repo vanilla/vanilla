@@ -92,6 +92,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
         PATH_CACHE
     ])
     ->addAlias('AddonManager')
+    ->addCall('registerAutoloader')
 
     // ApplicationManager
     ->rule('Gdn_ApplicationManager')
@@ -239,7 +240,6 @@ $dic->call(function (
         exit();
     }
 
-    spl_autoload_register([$addonManager, 'autoload']);
 
     /**
      * Extension Managers

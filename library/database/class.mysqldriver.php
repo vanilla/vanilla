@@ -322,8 +322,11 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param array $Data An associative array of FieldName => Value pairs that should be inserted $Table.
      * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
      * to the where portion of the update statement.
+     * @param array $orderBy A collection of order by statements.
+     * @param int $limit The number of records to limit the query to.
+     * @return string
      */
-    public function getUpdate($Tables, $Data, $Where) {
+    public function getUpdate($Tables, $Data, $Where, $orderBy = null, $limit = null) {
         if (!is_array($Data)) {
             trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
         }
@@ -337,8 +340,6 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
 
         if (count($this->_Joins) > 0) {
             $sql .= "\n";
-
-            $Join = $this->_Joins[count($this->_Joins) - 1];
 
             $sql .= implode("\n", $this->_Joins);
         }
@@ -355,6 +356,16 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
         } elseif (is_string($Where) && !stringIsNullOrEmpty($Where)) {
             $sql .= ' where '.$Where;
         }
+
+        if (is_array($orderBy) && count($orderBy) > 0) {
+            $sql .= "\norder by ".implode(', ', $orderBy);
+        }
+
+        if (is_numeric($limit)) {
+            $sql .= "\n";
+            $sql = $this->getLimit($sql, $limit, 0);
+        }
+
         return $sql;
     }
 

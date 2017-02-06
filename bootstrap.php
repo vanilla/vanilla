@@ -80,7 +80,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('Config')
 
-// AddonManager
+    // AddonManager
     ->rule('Vanilla\\AddonManager')
     ->setShared(true)
     ->setConstructorArgs([
@@ -194,7 +194,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('Gdn_Form')
     ->addAlias('Form')
-    ;
+;
 
 // Run through the bootstrap with dependencies.
 $dic->call(function (
@@ -206,49 +206,49 @@ $dic->call(function (
     \Garden\EventManager $eventManager
 ) {
 
-// Load default baseline Garden configurations.
+    // Load default baseline Garden configurations.
     $config->load(PATH_CONF.'/config-defaults.php');
 
-// Load installation-specific configuration so that we know what apps are enabled.
+    // Load installation-specific configuration so that we know what apps are enabled.
     $config->load($config->defaultPath(), 'Configuration', true);
 
-/**
- * Bootstrap Early
- *
- * A lot of the framework is loaded now, most importantly the core autoloader,
- * default config and the general and error functions. More control is possible
- * here, but some things have already been loaded and are immutable.
- */
-if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
-    require_once PATH_CONF.'/bootstrap.early.php';
-}
+    /**
+     * Bootstrap Early
+     *
+     * A lot of the framework is loaded now, most importantly the core autoloader,
+     * default config and the general and error functions. More control is possible
+     * here, but some things have already been loaded and are immutable.
+     */
+    if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
+        require_once PATH_CONF.'/bootstrap.early.php';
+    }
 
     $config->caching(true);
     debug($config->get('Debug', false));
 
-setHandlers();
+    setHandlers();
 
-/**
- * Installer Redirect
- *
- * If Garden is not yet installed, force the request to /dashboard/setup and
- * begin installation.
- */
+    /**
+     * Installer Redirect
+     *
+     * If Garden is not yet installed, force the request to /dashboard/setup and
+     * begin installation.
+     */
     if ($config->get('Garden.Installed', false) === false && strpos($request->path(), 'setup') === false) {
         safeHeader('Location: '.$request->url('dashboard/setup', true));
-    exit();
-}
+        exit();
+    }
 
     spl_autoload_register([$addonManager, 'autoload']);
 
-/**
- * Extension Managers
- *
- * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
- * process the application-specific configuration defaults.
- */
+    /**
+     * Extension Managers
+     *
+     * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
+     * process the application-specific configuration defaults.
+     */
 
-// Start the addons, plugins, and applications.
+    // Start the addons, plugins, and applications.
     $addonManager->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
@@ -256,47 +256,47 @@ setHandlers();
     $currentTheme = $config->get(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
-// Load the configurations for enabled addons.
+    // Load the configurations for enabled addons.
     foreach ($addonManager->getEnabled() as $addon) {
-    /* @var Addon $addon */
-    if ($configPath = $addon->getSpecial('config')) {
-                $config->load($addon->path($configPath));
+        /* @var Addon $addon */
+        if ($configPath = $addon->getSpecial('config')) {
+            $config->load($addon->path($configPath));
+        }
     }
-}
 
-// Re-apply loaded user settings.
+    // Re-apply loaded user settings.
     $config->overlayDynamic();
 
-/**
- * Bootstrap Late
- *
- * All configurations are loaded, as well as the Application, Plugin and Theme
- * managers.
- */
-if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
-    require_once PATH_CONF.'/bootstrap.late.php';
-}
+    /**
+     * Bootstrap Late
+     *
+     * All configurations are loaded, as well as the Application, Plugin and Theme
+     * managers.
+     */
+    if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
+        require_once PATH_CONF.'/bootstrap.late.php';
+    }
 
     if ($config->get('Debug')) {
-    debug(true);
-}
+        debug(true);
+    }
 
     Gdn_Cache::trace(debug()); // remove later
 
-/**
- * Extension Startup
- *
- * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
- */
+    /**
+     * Extension Startup
+     *
+     * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
+     */
 
-// Bootstrapping.
+    // Bootstrapping.
     foreach ($addonManager->getEnabled() as $addon) {
-    /* @var Addon $addon */
-    if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
-        $bootstrapPath = $addon->path($bootstrapPath);
-        include $bootstrapPath;
+        /* @var Addon $addon */
+        if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
+            $bootstrapPath = $addon->path($bootstrapPath);
+            include $bootstrapPath;
+        }
     }
-}
 
     // Plugins startup
     $pluginManager->start();

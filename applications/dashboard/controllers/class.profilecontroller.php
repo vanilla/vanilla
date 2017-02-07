@@ -491,6 +491,8 @@ class ProfileController extends Gdn_Controller {
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             safeRedirect(userUrl($this->User, '', 'discussions'));
         }
+
+        // Garden.Profile.ShowActivities is false and the user is expecting an xml or json response, so render blank.
         $this->render('blank', 'utility', 'dashboard');
     }
 

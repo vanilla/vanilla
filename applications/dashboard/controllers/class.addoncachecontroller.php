@@ -31,7 +31,7 @@ class AddonCacheController extends DashboardController {
      *
      * @throws Exception if using an invalid method.
      */
-    public function clear() {
+    public function clear($target) {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::request()->isPostBack() === false) {
@@ -40,9 +40,18 @@ class AddonCacheController extends DashboardController {
 
         Gdn::request()->isAuthenticatedPostBack(true);
 
-        $this->setData(['Cleared' => Gdn::addonManager()->clearCache()]);
+        $cleared = Gdn::addonManager()->clearCache();
 
-        $this->deliveryType(DELIVERY_TYPE_DATA);
+        if ($cleared) {
+            $this->informMessage(t('Addon cache cleared.'));
+        } else {
+            $this->informMessage(t('Unable to clear addon cache.'));
+        }
+
+        if (!empty($target)) {
+            $this->RedirectUrl = $target;
+        }
+
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render('blank', 'utility', 'dashboard');
     }
@@ -53,7 +62,7 @@ class AddonCacheController extends DashboardController {
      * @param string $type
      * @throws Exception if no type specified.
      */
-    public function verify($type) {
+    public function verify($type, $target) {
         $this->permission('Garden.Settings.Manage');
 
         if ($type === null) {
@@ -66,20 +75,22 @@ class AddonCacheController extends DashboardController {
         $new = array_keys(array_diff_key($current, $cached));
         $invalid = array_keys(array_diff_key($cached, $current));
 
-        $this->setData([
-            'Invalid' => $invalid,
-            'New' => $new,
-            'UpdateRequired' => (count($new) || count($invalid))
-        ]);
+        $updateRequired = (count($new) || count($invalid));
 
-        if ($this->data('UpdateRequired')) {
+        if ($updateRequired) {
+            $clearUrl = '/addoncache/clear';
+
+            if (!empty($target)) {
+                $clearUrl .= '?'.http_build_query(['Target' => $target]);
+            }
+
+            $action = anchor(t('Click here to fix.'), $clearUrl, 'Hijack', ['id' => 'ClearAddonCache']);
             $this->informMessage(
-                sprite('Check', 'InformSprite').t('Your cache needs to be updated.'),
-                'Dismissable AutoDismiss HasSprite'
+                t('Your cache needs to be updated.').' '.$action,
+                'Dismissable'
             );
         }
 
-        $this->deliveryType(DELIVERY_TYPE_DATA);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render('blank', 'utility', 'dashboard');
     }

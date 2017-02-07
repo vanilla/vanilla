@@ -180,8 +180,12 @@ class SearchModel extends Gdn_Model {
             }
 
             switch ($Value['RecordType']) {
+                case 'Comment':
+                    $Comment = arrayTranslate($Value, ['PrimaryID' => 'CommentID', 'CategoryID']);
+                    $Result[$Key]['Url'] = commentUrl($Comment);
+                    break;
                 case 'Discussion':
-                    $Discussion = arrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+                    $Discussion = arrayTranslate($Value, ['PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID']);
                     $Result[$Key]['Url'] = discussionUrl($Discussion, 1);
                     break;
             }

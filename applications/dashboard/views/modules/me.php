@@ -65,8 +65,10 @@ if ($Session->isValid()):
     $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
     $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 
-    $dropdown->addLinkIf(hasEditProfile(Gdn::session()->UserID), t('Edit Profile'), '/profile/edit', 'profile.edit', '', [], $editModifiers);
-    $dropdown->addLinkIf(!hasEditProfile(Gdn::session()->UserID), t('Preferences'), '/profile/preferences', 'profile.preferences', '', [], $preferencesModifiers);
+    $canEditProfile = (bool)hasEditProfile(Gdn::session()->UserID);
+
+    $dropdown->addLinkIf($canEditProfile, t('Edit Profile'), '/profile/edit', 'profile.edit', '', [], $editModifiers);
+    $dropdown->addLinkIf(!$canEditProfile, t('Preferences'), '/profile/preferences', 'profile.preferences', '', [], $preferencesModifiers);
 
     $applicantModifiers = $ApplicantCount > 0 ? ['badge' => $ApplicantCount] : [];
     $applicantModifiers['listItemCssClasses'] = ['link-applicants'];

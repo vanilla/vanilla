@@ -842,13 +842,16 @@ abstract class Gdn_SQLDriver {
      * Returns an update statement for the specified table with the provided
      * $Data.
      *
-     * @param array $Tables The names of the tables to updated data in.
-     * @param array $Data An associative array of FieldName => Value pairs that should be inserted
+     * @param array $tables The names of the tables to updated data in.
+     * @param array $data An associative array of FieldName => Value pairs that should be inserted
      * $Table.
-     * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
+     * @param mixed $where A where clause (or array containing multiple where clauses) to be applied
+     * @param mixed $orderBy A collection of order by statements.
+     * @param mixed $limit The number of records to limit the query to.
      * to the where portion of the update statement.
+     * @return string
      */
-    public function getUpdate($Tables, $Data, $Where) {
+    public function getUpdate($tables, $data, $where, $orderBy = null, $limit = null) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetUpdate'), E_USER_ERROR);
     }
 

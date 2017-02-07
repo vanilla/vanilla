@@ -72,6 +72,13 @@ class AddonCacheController extends DashboardController {
             'UpdateRequired' => (count($new) || count($invalid))
         ]);
 
+        if ($this->data('UpdateRequired')) {
+            $this->informMessage(
+                sprite('Check', 'InformSprite').t('Your cache needs to be updated.'),
+                'Dismissable AutoDismiss HasSprite'
+            );
+        }
+
         $this->deliveryType(DELIVERY_TYPE_DATA);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render('blank', 'utility', 'dashboard');

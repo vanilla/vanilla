@@ -6,7 +6,7 @@
 // or adding css to the page. Of particular interest are the `padded*` classes. The dashboard design has many elements
 // flush to one another, so margins are never assumed. The `padded*` classes add margins to elements if they need one.
 //
-// Please note that in the following examples, any css class prefixed with `ex-` is not is the admin.css. They are
+// Please note that in the following examples, any css class prefixed with `ex-` is not in the admin.css. They are
 // for illustrative purposes only.
 //
 // Styleguide 2.
@@ -44,7 +44,7 @@
   margin-bottom: $spacer;
 }
 
-// Horizontal Paddong Helpers
+// Horizontal Padding Helpers
 //
 // .padded-left - Adds a margin to the left of an element.
 // .padded-right - Adds a margin to the right of an element.
@@ -193,7 +193,7 @@
 
 // Progress Spinner
 //
-// Indicates some kind of progess is occuring.
+// Indicates some kind of progress is occuring.
 //
 // Markup:
 // <div class="progress"></div>

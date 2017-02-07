@@ -1,5 +1,6 @@
 <?php
 
+use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
 
@@ -62,7 +63,7 @@ if (!class_exists('Gdn')) {
 }
 
 // Set up the dependency injection container.
-$dic = new \Garden\Container\Container();
+$dic = new Container();
 Gdn::setContainer($dic);
 
 $dic->setInstance('Garden\Container\Container', $dic)
@@ -111,7 +112,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     // EventManager
     ->rule(\Garden\EventManager::class)
     ->setShared(true)
-    ->setConstructorArgs(['container' => new Reference(Gdn_PluginManager::class)])
 
     // Locale
     ->rule('Gdn_Locale')
@@ -170,6 +170,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_IPlugin')
     ->setShared(true)
 
+    ->rule(Gdn_Plugin::class)
+    ->setShared(true)
+    ->addCall('setAddonFromManager')
+
     ->rule('Gdn_Slice')
     ->setShared(true)
     ->addAlias('Slice')
@@ -198,12 +202,11 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
 // Run through the bootstrap with dependencies.
 $dic->call(function (
-    \Garden\Container\Container $dic,
+    Container $dic,
     Gdn_Configuration $config,
-    Gdn_Request $request, // remove later
     \Vanilla\AddonManager $addonManager,
-    Gdn_PluginManager $pluginManager, // remove later
-    \Garden\EventManager $eventManager
+    \Garden\EventManager $eventManager,
+    Gdn_Request $request // remove later
 ) {
 
     // Load default baseline Garden configurations.
@@ -299,11 +302,14 @@ $dic->call(function (
     }
 
     // Plugins startup
-    $pluginManager->start();
+    $addonManager->bindAllEvents($eventManager);
 
-    // Fire an event for plugins to modify the container.
+    if ($eventManager->hasHandler('gdn_pluginManager_afterStart')) {
+        $eventManager->fire('gdn_pluginManager_afterStart', $dic->get(Gdn_PluginManager::class));
+    }
+
+    // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
     $eventManager->fire('container_init', $dic);
-
 });
 
 /**

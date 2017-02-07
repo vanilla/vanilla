@@ -979,7 +979,7 @@ class AddonManager {
                 // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
                 include_once $addon->getClassPath($pluginClass);
 
-                $this->bindEvents($addon, $eventManager);
+                $this->bindAddonEvents($addon, $eventManager);
             }
         }
     }

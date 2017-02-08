@@ -671,6 +671,21 @@ abstract class Gdn_Cache {
             $Result = $Prefix.$Key;
         }
 
+        // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
+        // See https://github.com/memcached/memcached/blob/master/doc/protocol.txt
+        $Result = trim($Result);
+        if (unicodeRegexSupport()) {
+            // No whitespace or control characters.
+            $Result = preg_replace('/[\p{Z}\p{C}]+/u', '-', $Result);
+        } else {
+            // No whitespace.
+            $Result = preg_replace('/\s+/', '-', $Result);
+        }
+
+        if (strlen($Result) > 250) {
+            $Result = substr($Result, 0, 250);
+        }
+
         return $Result;
     }
 

@@ -672,12 +672,13 @@ abstract class Gdn_Cache {
         }
 
         // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
+        // See https://github.com/memcached/memcached/blob/master/doc/protocol.txt
         if (unicodeRegexSupport()) {
             // No whitespace or control characters.
             $replacePattern = '/[\p{Z}\p{C}]/u';
         } else {
-            // No space, newline, carriage return or tab characters.
-            $replacePattern = '/[\s\n\r\t]/';
+            // No whitespace.
+            $replacePattern = '/[\s]/';
         }
         $Result = preg_replace($replacePattern, '-', $Result);
 

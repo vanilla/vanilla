@@ -673,17 +673,17 @@ abstract class Gdn_Cache {
 
         // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
         // See https://github.com/memcached/memcached/blob/master/doc/protocol.txt
+        $Result = trim($Result);
         if (unicodeRegexSupport()) {
             // No whitespace or control characters.
-            $replacePattern = '/[\p{Z}\p{C}]/u';
+            $Result = preg_replace('/[\p{Z}\p{C}]+/u', '-', $Result);
         } else {
             // No whitespace.
-            $replacePattern = '/[\s]/';
+            $Result = preg_replace('/\s+/', '-', $Result);
         }
-        $Result = preg_replace($replacePattern, '-', $Result);
 
-        // Clean up any leading, trailing and consecutive dashes.
-        $Result = trim(preg_replace('/-+/', '-', $Result), '-');
+        // Clean up any leading or trailing dashes.
+        $Result = trim($Result, '-');
 
         if (strlen($Result) > 250) {
             $Result = substr($Result, 0, 250);

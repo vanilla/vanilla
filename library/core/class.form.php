@@ -2710,10 +2710,12 @@ PASSWORDMETER;
     }
 
     /**
-     * Save an image from a field and delete any old image that's been uploaded.
+     * Save an image from a field.
      *
      * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
      * @param array $Options
+     *  - CurrentImage: Current image to clean if the save is successful
+     * @return bool
      */
     public function saveImage($Field, $Options = array()) {
         $Upload = new Gdn_UploadImage();
@@ -2770,13 +2772,14 @@ PASSWORDMETER;
             $Parsed = $Upload->saveImageAs($TmpName, $Name, val('Height', $Options, ''), val('Width', $Options, ''), $Options);
             trace($Parsed, 'Saved Image');
 
-            $Current = $this->getFormValue($Field);
-            if ($Current && val('DeleteOriginal', $Options, true)) {
-                // Delete the current image.
-                trace("Deleting original image: $Current.");
-                if ($Current) {
-                    $Upload->delete($Current);
-                }
+            if (val('DeleteOriginal', $Options, false)) {
+                deprecated('Option DeleteOriginal', 'CurrentImage');
+            }
+
+            $currentImage = val('CurrentImage', $Options, false);
+            if ($currentImage) {
+                trace("Deleting original image: $currentImage.");
+                $Upload->delete($currentImage);
             }
 
             // Set the current value.

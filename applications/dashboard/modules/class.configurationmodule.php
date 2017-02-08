@@ -126,6 +126,11 @@ class ConfigurationModule extends Gdn_Module {
                     if (val('Crop', $Row, false)) {
                         $options['Crop'] = val('Crop', $Row);
                     }
+
+                    // Old image to clean!
+                    $options['CurrentImage'] = c($Name, false);
+
+                    // Save the new image and clean up the old one.
                     $Form->saveImage($Name, $options);
                 }
 

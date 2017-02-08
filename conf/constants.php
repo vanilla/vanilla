@@ -13,7 +13,7 @@ if (!defined('PATH_CACHE')) {
     define('PATH_CACHE', PATH_ROOT.'/cache');
 }
 if (!defined('PATH_UPLOADS')) {
-    define('PATH_UPLOADS', PATH_ROOT.'/uploads');
+    define('PATH_UPLOADS', PATH_ROOT.DS.'uploads');
 }
 
 // You should not change these paths.

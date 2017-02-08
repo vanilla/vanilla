@@ -256,6 +256,10 @@ class ProfileController extends Gdn_Controller {
             $UserID = Gdn::session()->UserID;
         }
 
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
+        }
+
         $Count = $this->UserModel->profileCount($UserID, $Column);
         $this->setData($Column, $Count);
         $this->setData('_Value', $Count);

@@ -682,9 +682,6 @@ abstract class Gdn_Cache {
             $Result = preg_replace('/\s+/', '-', $Result);
         }
 
-        // Clean up any leading or trailing dashes.
-        $Result = trim($Result, '-');
-
         if (strlen($Result) > 250) {
             $Result = substr($Result, 0, 250);
         }

@@ -671,6 +671,23 @@ abstract class Gdn_Cache {
             $Result = $Prefix.$Key;
         }
 
+        // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
+        if (unicodeRegexSupport()) {
+            // No whitespace or control characters.
+            $replacePattern = '/[\p{Z}\p{C}]/u';
+        } else {
+            // No space, newline, carriage return or tab characters.
+            $replacePattern = '/[\s\n\r\t]/';
+        }
+        $Result = preg_replace($replacePattern, '-', $Result);
+
+        // Clean up any leading, trailing and consecutive dashes.
+        $Result = trim(preg_replace('/-+/', '-', $Result), '-');
+
+        if (strlen($Result) > 250) {
+            $Result = substr($Result, 0, 250);
+        }
+
         return $Result;
     }
 

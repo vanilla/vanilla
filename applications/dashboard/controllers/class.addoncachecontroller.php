@@ -80,7 +80,7 @@ class AddonCacheController extends DashboardController {
         if ($updateRequired) {
             $clearUrl = '/addoncache/clear?Target={SelfUrl}';
             $actions = wrap(
-                anchor(t('Click here to fix.'), $clearUrl, 'Hijack DismissMessage'),
+                anchor(t('Click here to fix.'), $clearUrl, 'Hijack js-inform-close'),
                 'div',
                 ['class' => 'Actions']
             );

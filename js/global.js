@@ -918,15 +918,10 @@ jQuery(document).ready(function($) {
         gdn.stats();
 
     // If a dismissable InformMessage close button is clicked, hide it.
-    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
+    $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
         $(this).parents('div.InformWrapper').fadeOut('fast', function() {
             $(this).remove();
         });
-    });
-
-    // Trigger handlers for "Close" button click if an anchor with a DismissMessage class is clicked.
-    $(document).on("click", "div.InformWrapper.Dismissable a.DismissMessage", function(event) {
-        $(this).parents("div.InformWrapper").find("a.Close").trigger("click");
     });
 
     gdn.setAutoDismiss = function() {

@@ -10,10 +10,3 @@ $(document).ready(function(e) {
         });
     }
 });
-
-$(document).on("click", "#ClearAddonCache", function(event) {
-    // Ditch the inform message window this was in.
-    $(event.target).parents(".InformWrapper").fadeOut("fast", function() {
-        $(this).remove();
-    });
-});

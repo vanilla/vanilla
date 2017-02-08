@@ -924,6 +924,11 @@ jQuery(document).ready(function($) {
         });
     });
 
+    // Trigger handlers for "Close" button click if an anchor with a DismissMessage class is clicked.
+    $(document).on("click", "div.InformWrapper.Dismissable a.DismissMessage", function(event) {
+        $(this).parents("div.InformWrapper").find("a.Close").trigger("click");
+    });
+
     gdn.setAutoDismiss = function() {
         var timerId = $('div.InformMessages').attr('autodismisstimerid');
         if (!timerId) {

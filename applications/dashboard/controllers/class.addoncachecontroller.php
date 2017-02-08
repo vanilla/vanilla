@@ -78,16 +78,16 @@ class AddonCacheController extends DashboardController {
         $updateRequired = (count($new) || count($invalid));
 
         if ($updateRequired) {
-            $clearUrl = '/addoncache/clear';
+            $clearUrl = '/addoncache/clear?Target={SelfUrl}';
+            $actions = wrap(
+                anchor(t('Click here to fix.'), $clearUrl, 'Hijack DismissMessage'),
+                'div',
+                ['class' => 'Actions']
+            );
 
-            if (!empty($target)) {
-                $clearUrl .= '?'.http_build_query(['Target' => $target]);
-            }
-
-            $action = anchor(t('Click here to fix.'), $clearUrl, 'Hijack', ['id' => 'ClearAddonCache']);
             $this->informMessage(
-                t('Your cache needs to be updated.').' '.$action,
-                'Dismissable'
+                t('The addon cache is outdated.').$actions,
+                ['CssClass' => 'Dismissable', 'id' => 'CheckSummary']
             );
         }
 

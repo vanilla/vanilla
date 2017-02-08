@@ -62,7 +62,7 @@ class AddonCacheController extends DashboardController {
      * @param string $type
      * @throws Exception if no type specified.
      */
-    public function verify($type, $target) {
+    public function verify($type) {
         $this->permission('Garden.Settings.Manage');
 
         if ($type === null) {

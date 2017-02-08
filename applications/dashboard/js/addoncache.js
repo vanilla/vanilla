@@ -3,7 +3,7 @@ $(document).ready(function(e) {
 
     if (typeof verifyCache === "string") {
         $.ajax({
-            url: gdn.url("addoncache/verify?Type=" + verifyCache + "&Target=" + window.location.pathname),
+            url: gdn.url("addoncache/verify?Type=" + verifyCache),
             success: function(data) {
                 gdn.inform(data);
             }

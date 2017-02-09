@@ -33,7 +33,7 @@ class ClassLocator {
      *
      * @param object $object An object to search.
      * @param string $method The name of the method to look up.
-     * @return callable|null Returns a callback to the method or
+     * @return callable|null Returns a callback to the method or null if it does not exist.
      */
     public function findMethod($object, $method) {
         if (method_exists($object, $method)) {

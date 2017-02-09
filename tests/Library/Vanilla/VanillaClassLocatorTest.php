@@ -7,23 +7,29 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Garden\Container\Container;
+use Interop\Container\ContainerInterface;
+use Garden\EventManager;
+use VanillaTests\Fixtures\BasicEventHandlers;
+use Vanilla\VanillaClassLocator;
+use VanillaTests\Fixtures\SomeController;
 
-class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
+class VanillaClassLocatorTest extends ClassLocatorTest {
 
-    public function testFindMethod() {
+    public function testFindMethodWithOverride() {
         $container = new Container();
-        $eventManager = $container->get('Garden\\EventManager');
-        $container->setInstance('Garden\\EventManager', $eventManager);
+        $container->setInstance(ContainerInterface::class, $container)
+            ->defaultRule()
+            ->setShared(true)
+            ->rule(EventManager::class)
+            ->addCall('bindClass', [BasicEventHandlers::class]);
 
-        $basicEventHandlers = $container->get('VanillaTests\\Fixtures\\BasicEventHandlers');
-        $eventManager->bindClass($basicEventHandlers);
+        $vanillaClassLocator = $container->get(VanillaClassLocator::class);
+        $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), 'someEndpoint');
 
-        $vanillaClassLocator = $container->get('Vanilla\\VanillaClassLocator');
-        $someController = $container->get('VanillaTests\\Fixtures\\SomeController');
-        $method = $vanillaClassLocator->findMethod($someController, 'someEndpoint');
+        $this->assertTrue(is_callable($handler));
 
-        $this->assertNotNull($method);
-        $this->assertSame($basicEventHandlers, $method[0]);
-        $this->assertSame('somecontroller_someendpoint_method', $method[1]);
+        list($object, $method) = $handler;
+        $this->assertSame($container->get(BasicEventHandlers::class), $object);
+        $this->assertSame(strtolower('someController_someEndpoint_method'), strtolower($method));
     }
 }

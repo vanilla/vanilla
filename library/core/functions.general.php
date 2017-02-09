@@ -2152,6 +2152,23 @@ if (!function_exists('jsonEncodeChecked')) {
     }
 }
 
+if (!function_exists('jsonFilter')) {
+    /**
+     * Prepare data for json_encode.
+     *
+     * @param mixed $value
+     */
+    function jsonFilter(&$value) {
+        if (is_array($value)) {
+            array_walk_recursive($value, __FUNCTION__);
+        } elseif ($value instanceof \DateTimeInterface) {
+            $value = $value->format('r');
+        } elseif ($ip = ipDecode($value)) {
+            $value = $ip;
+        }
+    }
+}
+
 if (!function_exists('now')) {
     /**
      * Get the current time in seconds with a millisecond fraction.

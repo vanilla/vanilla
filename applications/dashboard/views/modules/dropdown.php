@@ -1,6 +1,20 @@
 
 <span class="ToggleFlyout OptionsMenu <?php echo val('cssClass', $this); ?>">
-    <span class="Button-Options"><span class="OptionsTitle" title="<?php echo t('Options'); ?>"><?php echo val('text', val('trigger', $this)); ?></span><?php echo sprite('SpFlyoutHandle', 'Arrow'); ?></span>
+    <?php if (val('type', val('trigger', $this)) === 'button') : ?>
+    <span class="Button-Options">
+        <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
+            <?php echo val('text', val('trigger', $this)); ?>
+        </span>
+        <?php echo sprite('SpFlyoutHandle', 'Arrow'); ?>
+    </span>
+    <?php else :
+        $text = val('text', val('trigger', $this));
+        $url = val('url', val('trigger', $this));
+        $icon = val('icon', val('trigger', $this));
+        $cssClass = val('cssClass', val('trigger', $this));
+        $alert = !empty($this->data('DashboardCount', '')) ? wrap($this->data('DashboardCount', ''), 'span', ['class' => 'Alert']) : '';
+        echo anchor($icon.$text.$alert, $url, $cssClass);
+    endif; ?>
     <ul class="Flyout MenuItems list-reset <?php echo val('listCssClass', $this); ?>" role="menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">
         <?php foreach (val('items', $this) as $item) {
             if (val('type', $item) == 'group') { ?>
@@ -21,6 +35,9 @@
                             echo icon(val('icon', $item));
                         }
                         echo val('text', $item);
+                        if (val('badge', $item)) {
+                            echo badge(val('badge', $item));
+                        }
                         ?></a>
                 </li>
             <?php }

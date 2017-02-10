@@ -69,7 +69,7 @@ trait NestedCollection {
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes'];
+    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes', 'listItemCssClasses'];
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
@@ -253,6 +253,7 @@ trait NestedCollection {
      * - **popinRel**: string - Endpoint for a popin.
      * - **badge**: string - Info to put into a badge, usually a number.
      * - **icon**: string - Name of the icon for the item, excluding the 'icon-' prefix.
+     * - **listItemCssClasses**: array - Array of class names to be applied to the list item.
      * @param bool $disabled Whether to disable the link.
      * @return $this The calling object.
      * @throws Exception
@@ -275,7 +276,7 @@ trait NestedCollection {
         $this->touchKey($link);
         $link['cssClass'] = $cssClass.' '.$this->buildCssClass($this->linkCssClassPrefix, $link);
 
-        $listItemCssClasses = [];
+        $listItemCssClasses = val('listItemCssClasses', $modifiers, []);
         if ($disabled) {
             $listItemCssClasses[] = 'disabled';
         }

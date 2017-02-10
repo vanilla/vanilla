@@ -832,7 +832,7 @@ if (!function_exists('hasEditProfile')) {
 
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
-        $result &= (
+        $result = $result && (
             c('Garden.Profile.Titles') ||
             c('Garden.Profile.Locations', false) ||
             c('Garden.Registration.Method') != 'Connect'

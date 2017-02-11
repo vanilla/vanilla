@@ -6,7 +6,7 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Vanilla\ClassLocator;
+use Garden\ClassLocator;
 
 class ClassLocatorTest extends \PHPUnit_Framework_TestCase {
 

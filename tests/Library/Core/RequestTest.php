@@ -6,7 +6,12 @@
 
 namespace VanillaTests\Library\Core;
 
-class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
+use Gdn_Request;
+
+/**
+ * Test the {@link Gdn_Request} class.
+ */
+class RequestTest extends \PHPUnit_Framework_TestCase {
 
     public function provideUrls() {
         return [
@@ -47,7 +52,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testGetUrl() {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setScheme('http');
         $request->setHost('localhost');
         $request->setPort(8080);
@@ -60,7 +65,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testMergeQuery() {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setQuery([
             'One' => 'Alpha',
             'Two' => 'Bravo'
@@ -80,7 +85,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetFullPath() {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setRoot('root-dir');
         $request->setFullPath('/root-dir/path/to/resource.json');
 
@@ -90,7 +95,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetPathExt() {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setPathExt('path/to/resource.json');
 
         $this->assertSame('/path/to/resource', $request->getPath());
@@ -98,7 +103,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testSetQueryItem() {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setQuery([
             'One' => 'Alpha',
             'Two' => 'Bravo',
@@ -115,7 +120,7 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideUrls
      */
     public function testSetUrl($url, $expected) {
-        $request = new \Gdn_Request();
+        $request = new Gdn_Request();
         $request->setUrl($url);
 
         $this->assertSame($expected['scheme'], $request->getScheme());
@@ -124,5 +129,28 @@ class VanillaClassLocatorTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected['path'], $request->getPath());
         $this->assertSame($expected['extension'], $request->getExt());
         $this->assertSame($expected['query'], $request->getQuery());
+    }
+
+    /**
+     * Request paths should start with a slash and fix ones that don't.
+     */
+    public function testPathFixing() {
+        $req = new Gdn_Request();
+
+        $req->setPath('foo');
+        $this->assertSame('/foo', $req->getPath());
+    }
+
+    /**
+     * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
+     */
+    public function testPathEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setPath('/foo');
+        $this->assertSame($req->getPath(), '/'.$req->path());
+
+        $req->path('/bar');
+        $this->assertSame($req->getPath(), '/'.$req->path());
     }
 }

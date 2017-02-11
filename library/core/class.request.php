@@ -380,7 +380,7 @@ class Gdn_Request implements RequestInterface {
      * @return string
      */
     public function getPath() {
-        $path = (string)$this->_environmentElement('URI');
+        $path = (string)$this->_parsedRequestElement('Path');
         if (strpos($path, '/') !== 0) {
             $path = "/{$path}";
         }
@@ -1201,8 +1201,7 @@ class Gdn_Request implements RequestInterface {
      */
     public function setPath($path) {
         $path = trim($path, '/');
-        $path = "/{$path}";
-        $this->_environmentElement('URI', $path);
+        $this->_parsedRequestElement('Path', $path);
         return $this;
     }
 

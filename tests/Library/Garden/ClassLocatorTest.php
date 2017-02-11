@@ -4,7 +4,7 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla;
+namespace VanillaTests\Library\Garden;
 
 use Garden\ClassLocator;
 

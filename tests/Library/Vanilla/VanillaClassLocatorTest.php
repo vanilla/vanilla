@@ -12,6 +12,7 @@ use Garden\EventManager;
 use VanillaTests\Fixtures\BasicEventHandlers;
 use Vanilla\VanillaClassLocator;
 use VanillaTests\Fixtures\SomeController;
+use VanillaTests\Library\Garden\ClassLocatorTest;
 
 class VanillaClassLocatorTest extends ClassLocatorTest {
 

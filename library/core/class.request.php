@@ -9,6 +9,7 @@
  * @package Core
  * @since 2.0
  */
+use Garden\Web\RequestInterface;
 
 /**
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
@@ -22,7 +23,7 @@
  * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
-class Gdn_Request {
+class Gdn_Request implements RequestInterface {
 
     /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
@@ -350,6 +351,27 @@ class Gdn_Request {
      */
     public function getIP() {
         return (string)$this->_environmentElement('ADDRESS');
+    }
+
+
+    /**
+     * Get the HTTP method.
+     *
+     * @return string Returns the HTTP method.
+     */
+    public function getMethod() {
+        return $this->requestMethod();
+    }
+
+    /**
+     * Set the HTTP method.
+     *
+     * @param string $method The new HTTP method.
+     * @return $this
+     */
+    public function setMethod($method) {
+        $this->requestMethod($method);
+        return $this;
     }
 
     /**

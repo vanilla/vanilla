@@ -51,6 +51,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         ];
     }
 
+    public function testBodyEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setBody(['foo' => 'bar']);
+        $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
+
+        $req->setRequestArguments(Gdn_Request::INPUT_POST, ['foo' => 'bar']);
+        $this->assertSame($req->getBody(), $req->getRequestArguments(Gdn_Request::INPUT_POST));
+    }
+
     public function testGetUrl() {
         $request = new Gdn_Request();
         $request->setScheme('http');
@@ -62,6 +72,35 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $request->setQuery(['foo' => 'bar']);
 
         $this->assertSame('http://localhost:8080/root-dir/path/to/resource.json?foo=bar', $request->getUrl());
+    }
+
+    public function testHostEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setHost('localhost');
+        $this->assertSame($req->getHost(), $req->host());
+
+        $req->host('localhost');
+        $this->assertSame($req->getHost(), $req->host());
+    }
+
+    public function testHostAndPortEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setHost('localhost');
+        $req->setPort(8080);
+        $this->assertSame($req->getHostAndPort(), $req->hostAndPort());
+
+        $req->host('localhost');
+        $req->port(8080);
+        $this->assertSame($req->getHostAndPort(), $req->hostAndPort());
+    }
+
+    public function testIPEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setIP('127.0.0.1');
+        $this->assertSame($req->getIP(), $req->ipAddress());
     }
 
     public function testMergeQuery() {
@@ -105,6 +144,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
         $req->setPath('foo');
         $this->assertSame('/foo', $req->getPath());
+    }
+
+    public function testPortEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setPort(8080);
+        $this->assertSame($req->getPort(), $req->port());
+
+        $req->port(8080);
+        $this->assertSame($req->getPort(), $req->port());
+    }
+
+    public function testQueryEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setQuery(['foo' => 'bar']);
+        $this->assertSame($req->getQuery(), $req->getRequestArguments(Gdn_Request::INPUT_GET));
+
+        $req->setRequestArguments(Gdn_Request::INPUT_GET, ['foo' => 'bar']);
+        $this->assertSame($req->getQuery(), $req->getRequestArguments(Gdn_Request::INPUT_GET));
+
+    }
+
+    public function testQueryItemEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setQuery(['foo' => 'bar']);
+        $this->assertSame($req->getQueryItem('foo'), $req->getValueFrom(Gdn_Request::INPUT_GET, 'foo'));
+
+        $req->setRequestArguments(Gdn_Request::INPUT_GET, ['foo' => 'bar']);
+        $this->assertSame($req->getQueryItem('foo'), $req->getValueFrom(Gdn_Request::INPUT_GET, 'foo'));
     }
 
     public function testSetFullPath() {
@@ -154,6 +224,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         $this->assertSame($expected['query'], $request->getQuery());
     }
 
+    public function testRootEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setRoot('root-dir');
+        $this->assertSame($req->getRoot(), '/'.$req->webRoot());
+
+        $req->webRoot('root-dir');
+        $this->assertSame($req->getRoot(), '/'.$req->webRoot());
+    }
+
     /**
      * Request root should start with a slash and fix ones that don't. Slash-only roots should be empty strings.
      */
@@ -165,6 +245,16 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
 
         $req->setRoot('/');
         $this->assertSame('', $req->getRoot());
+    }
+
+    public function testSchemeEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setScheme('https');
+        $this->assertSame($req->getScheme(), $req->scheme());
+
+        $req->scheme('http');
+        $this->assertSame($req->getScheme(), $req->scheme());
     }
 
     public function testUrlEquivalence() {

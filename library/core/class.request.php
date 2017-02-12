@@ -449,7 +449,7 @@ class Gdn_Request implements RequestInterface {
      * @return string
      */
     public function getRoot() {
-        $root = (string)$this->_parsedRequestElement('RootDir');
+        $root = (string)$this->_parsedRequestElement('WebRoot');
         if (strpos($root, '/') !== 0) {
             $root = "/{$root}";
         }
@@ -1279,11 +1279,8 @@ class Gdn_Request implements RequestInterface {
      */
     public function setRoot($root) {
         $root = trim($root, '/');
-        if ($root) {
-            $root = "/{$root}";
-        }
 
-        $this->_parsedRequestElement('RootDir', $root);
+        $this->_parsedRequestElement('WebRoot', $root);
         return $this;
     }
 
@@ -1550,7 +1547,6 @@ class Gdn_Request implements RequestInterface {
         return $withDomain.$this->hostAndPort();
     }
 
-
     /**
      * Gets/Sets the relative path to the application's dispatcher.
      *
@@ -1558,9 +1554,7 @@ class Gdn_Request implements RequestInterface {
      * @return string
      */
     public function webRoot($webRoot = null) {
-        static $path = null;
-
-        if ($webRoot !== null || $path === null || !$this->_HaveParsedRequest) {
+        if ($webRoot !== null || !$this->_HaveParsedRequest) {
             $path = (string)$this->_parsedRequestElement('WebRoot', $webRoot);
             $webRootFromConfig = $this->_environmentElement('ConfigWebRoot');
 
@@ -1568,6 +1562,8 @@ class Gdn_Request implements RequestInterface {
             if ($webRootFromConfig && $removeWebRootConfig) {
                 $path = str_replace($webRootFromConfig, '', $webRoot);
             }
+        } else {
+            $path = $this->_parsedRequestElement('WebRoot');
         }
 
         return $path;

@@ -84,6 +84,29 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
         ], $request->getQuery());
     }
 
+    /**
+     * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
+     */
+    public function testPathEquivalence() {
+        $req = new Gdn_Request();
+
+        $req->setPath('/foo');
+        $this->assertSame($req->getPath(), '/'.$req->path());
+
+        $req->path('/bar');
+        $this->assertSame($req->getPath(), '/'.$req->path());
+    }
+
+    /**
+     * Request paths should start with a slash and fix ones that don't.
+     */
+    public function testPathFixing() {
+        $req = new Gdn_Request();
+
+        $req->setPath('foo');
+        $this->assertSame('/foo', $req->getPath());
+    }
+
     public function testSetFullPath() {
         $request = new Gdn_Request();
         $request->setRoot('root-dir');
@@ -132,25 +155,37 @@ class RequestTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Request paths should start with a slash and fix ones that don't.
+     * Request root should start with a slash and fix ones that don't. Slash-only roots should be empty strings.
      */
-    public function testPathFixing() {
+    public function testRootFixing() {
         $req = new Gdn_Request();
 
-        $req->setPath('foo');
-        $this->assertSame('/foo', $req->getPath());
+        $req->setRoot('root-dir');
+        $this->assertSame('/root-dir', $req->getRoot());
+
+        $req->setRoot('/');
+        $this->assertSame('', $req->getRoot());
     }
 
-    /**
-     * The {@link Gdn_Request::path()} and {@link Gdn_Request::getPath()} methods should be compatible.
-     */
-    public function testPathEquivalence() {
+    public function testUrlEquivalence() {
         $req = new Gdn_Request();
 
-        $req->setPath('/foo');
-        $this->assertSame($req->getPath(), '/'.$req->path());
+        $req->setScheme('http');
+        $req->setHost('localhost');
+        $req->setPort(8080);
+        $req->setRoot('root-dir');
+        $req->setPath('path/to/resource.json');
+        $req->setQueryItem('foo', 'bar');
 
-        $req->path('/bar');
-        $this->assertSame($req->getPath(), '/'.$req->path());
+        $this->assertSame($req->getUrl(), $req->url('', true));
+
+        $req->scheme('http');
+        $req->host('localhost');
+        $req->port(8080);
+        $req->webRoot('root-dir');
+        $req->path('path/to/resource.json');
+        $req->setValueOn(Gdn_Request::INPUT_GET, 'foo', 'bar');
+
+        $this->assertSame($req->getUrl(), $req->url('', true));
     }
 }

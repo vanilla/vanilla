@@ -1121,7 +1121,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
         try {
-            $this->addonManager->checkDependants($addon, true);
+            $this->addonManager->checkDependents($addon, true);
         } catch (\Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), 400);
         }

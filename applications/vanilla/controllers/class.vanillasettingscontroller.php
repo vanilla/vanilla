@@ -28,9 +28,6 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
-    /** @var bool */
-    public $ShowCustomPoints = false;
-
     /**
      * Advanced settings.
      *

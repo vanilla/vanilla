@@ -21,7 +21,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function dbaController_countJobs_handler($Sender) {
         $Counts = [
             'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
-            'Category' => ['CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
+            'Category' => ['CountDiscussions', 'CountAllDiscussions', 'CountComments', 'CountAllComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
             'Tag' => ['table' => 'Tag', 'column' => 'CountDiscussions'],
         ];
 

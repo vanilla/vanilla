@@ -511,6 +511,10 @@ class CategoryModel extends Gdn_Model {
             case 'CountComments':
                 $this->Database->query(DBAModel::getCountSQL('sum', 'Category', 'Discussion', $Column, 'CountComments'));
                 break;
+            case 'CountAllDiscussions':
+            case 'CountAllComments':
+                self::recalculateAggregateCounts();
+                break;
             case 'LastDiscussionID':
                 $this->Database->query(DBAModel::getCountSQL('max', 'Category', 'Discussion'));
                 break;
@@ -2875,5 +2879,115 @@ SQL;
      */
     public static function flattenTree($categories) {
         return self::instance()->collection->flattenTree($categories);
+    }
+
+    /**
+     * Adjust the aggregate post counts for a category.
+     *
+     * @param int|string|object|array $category
+     * @param int $offset
+     */
+    private static function adjustAggregateCounts($category, $offset) {
+        $categoryID = false;
+        $offset = intval($offset);
+
+        if (is_numeric($category)) {
+            $categoryID = $category;
+        } elseif (is_string($category)) {
+            $category = self::instance()->collection->get($category);
+        }
+
+        if (is_array($category) || is_object($category)) {
+            $categoryID = val('CategoryID', $category);
+        }
+
+        if (empty($categoryID)) {
+            return;
+        }
+
+        if ($categoryID) {
+            $categories = self::instance()->collection->getAncestors($categoryID, true);
+
+            foreach ($categories as $current) {
+                $targetID = val('CategoryID', $current);
+
+                Gdn::sql()
+                    ->update('Category')
+                    ->set('CountAllDiscussions', "CountAllDiscussions + {$offset}", false)
+                    ->where('CategoryID', $targetID)
+                    ->put();
+
+                Gdn::sql()
+                    ->update('Category')
+                    ->set('CountAllComments', "CountAllComments + {$offset}", false)
+                    ->where('CategoryID', $targetID)
+                    ->put();
+            }
+        }
+    }
+
+    /**
+     * Move upward through the category tree, incrementing aggregate post counts.
+     *
+     * @param int|string|object|array $category
+     */
+    public static function incrementAggregateCounts($category) {
+        self::adjustAggregateCounts($category, 1);
+    }
+
+    /**
+     * Move upward through the category tree, decrementing aggregate post counts.
+     *
+     * @param int|string|object|array $category
+     */
+    public static function decrementAggregateCounts($category) {
+        self::adjustAggregateCounts($category, -1);
+    }
+
+    /**
+     * Recalculate all aggregate post count columns for all categories.
+     *
+     * @return void
+     */
+    private static function recalculateAggregateCounts() {
+        // First grab the max depth so you know where to loop.
+        $depth = Gdn::sql()
+            ->select('Depth', 'max')
+            ->from('Category')
+            ->get()
+            ->firstRow(DATASET_TYPE_ARRAY);
+        $depth = (int)val('Depth', $depth, 0);
+
+        if ($depth === 0) {
+            return;
+        }
+
+        $prefix = Gdn::database()->DatabasePrefix;
+
+        // Initialize with self count.
+        Gdn::sql()
+            ->update('Category')
+            ->set('CountAllDiscussions', 'CountDiscussions', false)
+            ->set('CountAllComments', 'CountComments', false)
+            ->put();
+
+        while ($depth > 0) {
+            $sql = "update {$prefix}Category c
+                    join (
+                        select
+                            c2.ParentCategoryID,
+                            sum(CountAllDiscussions) as CountAllDiscussions,
+                            sum(CountAllComments) as CountAllComments
+                        from {$prefix}Category c2
+                        where c2.Depth = :Depth
+                        group by c2.ParentCategoryID
+                    ) c2 on c.CategoryID = c2.ParentCategoryID
+                set
+                    c.CountAllDiscussions = c.CountAllDiscussions + c2.CountAllDiscussions,
+                    c.CountAllComments = c.CountAllComments + c2.CountAllComments
+                where c.Depth = :ParentDepth";
+            Gdn::database()->query($sql, [':Depth' => $depth, ':ParentDepth' => ($depth - 1)]);
+            $depth--;
+        }
     }
 }

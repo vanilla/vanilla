@@ -83,7 +83,7 @@ echo $Form->errors();
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->color($Row['Name']);
+                echo $Form->color($Row['Name'], $Row['Options']);
                 echo '</div>';
                 break;
             case 'radiolist':

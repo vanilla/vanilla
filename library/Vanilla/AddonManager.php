@@ -547,28 +547,45 @@ class AddonManager {
     }
 
     /**
-     * Check the enabled dependants of an addon.
+     * Check the enabled dependents of an addon.
      *
-     * Addons should always check their dependants before being disabled. This check does not consider dependants that
+     * Addons should always check their dependents before being disabled. This check does not consider dependents that
+     * are not enabled.
+     *
+     * @deprecated Use checkDependents instead.
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception or just return **false** if the check fails.
+     * @return bool Returns **true** if the addon a
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
+     */
+    public function checkDependants(Addon $addon, $throw = false) {
+        trigger_error('checkDependants is deprecated. Use checkDependents instead.', E_USER_DEPRECATED);
+        return $this->checkDependents($addon, $throw);
+    }
+
+    /**
+     * Check the enabled dependents of an addon.
+     *
+     * Addons should always check their dependents before being disabled. This check does not consider dependents that
      * are not enabled.
      *
      * @param Addon $addon The addon to check.
      * @param bool $throw Whether or not to throw an exception or just return **false** if the check fails.
      * @return bool Returns **true** if the addon a
-     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependants.
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
      */
-    public function checkDependants(Addon $addon, $throw = false) {
-        $dependants = $this->lookupDependants($addon);
+    public function checkDependents(Addon $addon, $throw = false) {
+        $dependents = $this->lookupDependents($addon);
 
-        if (empty($dependants)) {
+        if (empty($dependents)) {
             return true;
         } elseif (!$throw) {
             return false;
         } else {
             $names = [];
-            /* @var Addon $dependant */
-            foreach ($dependants as $dependant) {
-                $names[] = $dependant->getName();
+            /* @var Addon $dependent */
+            foreach ($dependents as $dependent) {
+                $names[] = $dependent->getName();
             }
             $msg = sprintf(
                 'The following addons depend on %1$s: %2$s.',
@@ -582,10 +599,22 @@ class AddonManager {
     /**
      * Get all of the enabled addons that depend on a given addon.
      *
+     * @deprecated Use lookupDependents instead.
      * @param Addon $addon The addon to check the requirements.
      * @return array Returns an array of {@link Addon} objects.
      */
     public function lookupDependants(Addon $addon) {
+        trigger_error('lookupDependants is deprecated. Use lookupDependents instead.', E_USER_DEPRECATED);
+        return $this->lookupDependents($addon);
+    }
+
+    /**
+     * Get all of the enabled addons that depend on a given addon.
+     *
+     * @param Addon $addon The addon to check the requirements.
+     * @return array Returns an array of {@link Addon} objects.
+     */
+    public function lookupDependents(Addon $addon) {
         $result = [];
         foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
             /* @var Addon $enabledAddon */

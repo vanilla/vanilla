@@ -1420,8 +1420,8 @@ class DiscussionModel extends VanillaModel {
 
         // This should not happen but let's throw a warning just in case.
         if (!is_array($wheres)) {
+            trigger_error('Wheres needs to be an array.', E_USER_DEPRECATED);
             $wheres = [];
-            deprecated('Wheres was reset to an empty array because non-array Wheres');
         }
 
         $hasWhere = !empty($wheres);

@@ -635,6 +635,11 @@ class SettingsController extends DashboardController {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
 
+        $transientKey = Gdn::request()->get('TransientKey');
+        if (Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $ConfigData = array(
             'Title' => c('Garden.Title'),
             'Domain' => c('Garden.Domain'),

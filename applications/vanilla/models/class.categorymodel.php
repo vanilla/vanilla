@@ -2905,24 +2905,34 @@ SQL;
             return;
         }
 
+        // Iterate through the category and its ancestors, adjusting aggregate counts based on $offset.
+        $updatedCategories = [];
         if ($categoryID) {
             $categories = self::instance()->collection->getAncestors($categoryID, true);
 
             foreach ($categories as $current) {
                 $targetID = val('CategoryID', $current);
+                $updatedCategories[] = $targetID;
 
                 Gdn::sql()
                     ->update('Category')
                     ->set('CountAllDiscussions', "CountAllDiscussions + {$offset}", false)
-                    ->where('CategoryID', $targetID)
-                    ->put();
-
-                Gdn::sql()
-                    ->update('Category')
                     ->set('CountAllComments', "CountAllComments + {$offset}", false)
                     ->where('CategoryID', $targetID)
                     ->put();
             }
+        }
+
+        // Update the cache.
+        $categoriesToUpdate = self::instance()->getWhere(['CategoryID' => $updatedCategories]);
+        foreach ($categoriesToUpdate as $current) {
+            $currentID = val('CategoryID', $current);
+            $countAllDiscussions = val('CountAllDiscussions', $current);
+            $countAllComments = val('CountAllComments', $current);
+            self::setCache(
+                $currentID,
+                ['CountAllDiscussions' => $countAllDiscussions, 'CountAllComments' => $countAllComments]
+            );
         }
     }
 
@@ -2989,5 +2999,7 @@ SQL;
             Gdn::database()->query($sql, [':Depth' => $depth, ':ParentDepth' => ($depth - 1)]);
             $depth--;
         }
+
+        self::instance()->clearCache();
     }
 }

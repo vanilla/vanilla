@@ -1396,78 +1396,85 @@ class DiscussionModel extends VanillaModel {
      * @since 2.0.0
      * @access public
      *
-     * @param array $Wheres SQL conditions.
-     * @param bool $ForceNoAnnouncements Not used.
+     * @param array $wheres SQL conditions.
+     * @param null $unused Not used.
      * @return int Number of discussions.
      */
-    public function getCount($Wheres = '', $ForceNoAnnouncements = false) {
-        $Wheres = $this->combineWheres($this->getWheres(), $Wheres);
-        if (is_array($Wheres) && count($Wheres) == 0) {
-            $Wheres = '';
-        } elseif (is_array($Wheres) && count($Wheres) === 1 && isset($Wheres['d.CategoryID'])) {
-            return $this->getCountForCategory($Wheres['d.CategoryID']);
-        }
-
-        // Check permission and limit to categories as necessary
+    public function getCount($wheres = [], $unused = null) {
+        // Get permissions.
         if ($this->Watching) {
-            $Perms = CategoryModel::categoryWatch();
+            $perms = CategoryModel::categoryWatch();
         } else {
-            $Perms = self::categoryPermissions();
+            $perms = self::categoryPermissions();
         }
 
-        if (!$Wheres || (count($Wheres) == 1 && isset($Wheres['d.CategoryID']))) {
-            // Grab the counts from the faster category cache.
-            if (isset($Wheres['d.CategoryID'])) {
-                $CategoryIDs = (array)$Wheres['d.CategoryID'];
-                if ($Perms === false) {
-                    $CategoryIDs = [];
-                } elseif (is_array($Perms)) {
-                    $CategoryIDs = array_intersect($CategoryIDs, $Perms);
-                }
-
-                if (count($CategoryIDs) == 0) {
-                    return 0;
-                } else {
-                    $Perms = $CategoryIDs;
-                }
-            }
-
-            $Categories = CategoryModel::categories();
-
-            if (!is_array($Perms)) {
-                $Perms = array_keys($Categories);
-            }
-
-            $Count = 0;
-            foreach ($Perms as $CategoryID) {
-                if (isset($Categories[$CategoryID])) {
-                    $Count += (int)$Categories[$CategoryID]['CountDiscussions'];
-                }
-            }
-
-            return $Count;
+        // No permissions... That is sad :(
+        if (!$perms) {
+            return 0;
         }
 
-        if ($Perms !== true) {
-            $this->SQL->whereIn('c.CategoryID', $Perms);
-        }
+        $wheres = $this->combineWheres($this->getWheres(), $wheres);
 
-        $this->EventArguments['Wheres'] = &$Wheres;
+        $this->EventArguments['Wheres'] = &$wheres;
         $this->fireEvent('BeforeGetCount'); // @see 'BeforeGet' for consistency in count vs. results
 
-        $this->SQL
+        // This should not happen but let's throw a warning just in case.
+        if (!is_array($wheres)) {
+            trigger_error('Wheres needs to be an array.', E_USER_DEPRECATED);
+            $wheres = [];
+        }
+
+        $hasWhere = !empty($wheres);
+        $whereOnCategories = $hasWhere && isset($wheres['d.CategoryID']);
+        $whereOnCategoriesOnly = $whereOnCategories && count($wheres) === 1;
+
+        // We have access to everything and are requesting only by categories. Let's use the cache!
+        if ($perms === true && $whereOnCategoriesOnly) {
+            return $this->getCountForCategory($wheres['d.CategoryID']);
+        }
+
+        // Only keep the categories we actually want and have permission to.
+        if ($whereOnCategories && is_array($perms)) {
+            $categoryIDs = (array)$wheres['d.CategoryID'];
+            if ($categoryIDs) {
+                $perms = array_intersect($categoryIDs, $perms);
+            }
+        }
+
+        // Use the cache if we are requesting only by categories or have no where at all.
+        // In those cases we are gonna use the cached count on the categories we have permission to.
+        if (!$hasWhere || $whereOnCategoriesOnly) {
+            $categories = CategoryModel::categories();
+
+            // We have permission to everything.
+            if ($perms === true) {
+                $perms = array_keys($categories);
+            }
+
+            $count = 0;
+            foreach ($perms as $categoryID) {
+                if (isset($categories[$categoryID])) {
+                    $count += (int)$categories[$categoryID]['CountDiscussions'];
+                }
+            }
+
+            return $count;
+        }
+
+        // Filter the results by permissions.
+        if (is_array($perms)) {
+            $this->SQL->whereIn('c.CategoryID', $perms);
+        }
+
+        return $this->SQL
             ->select('d.DiscussionID', 'count', 'CountDiscussions')
             ->from('Discussion d')
             ->join('Category c', 'd.CategoryID = c.CategoryID')
             ->join('UserDiscussion w', 'd.DiscussionID = w.DiscussionID and w.UserID = '.Gdn::session()->UserID, 'left')
-            ->where($Wheres);
-
-        $Result = $this->SQL
+            ->where($wheres)
             ->get()
             ->firstRow()
             ->CountDiscussions;
-
-        return $Result;
     }
 
     /**

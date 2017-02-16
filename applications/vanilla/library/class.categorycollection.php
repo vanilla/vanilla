@@ -739,12 +739,10 @@ class CategoryCollection {
      * @param array &$result The working result.
      */
     private function flattenTreeInternal(array $category, array &$result) {
-        $children = $category['Children'];
+        $children = val('Children', $category, []);
         unset($category['Children']);
         $result[] = $category;
-        if (empty($children)) {
-            return;
-        }
+
         foreach ($children as $child) {
             $this->flattenTreeInternal($child, $result);
         }

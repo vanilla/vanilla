@@ -693,6 +693,11 @@ class Addon {
         return $issues;
     }
 
+    /**
+     * Trigger the plugin's issues
+     *
+     * @return Addon Returns $this for fluent calls.
+     */
     protected function triggerIssues() {
         $issues = val('Issues', $this->info, []);
         if ($count = count($issues)) {

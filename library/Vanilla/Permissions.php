@@ -12,6 +12,12 @@ namespace Vanilla;
  * @package Vanilla
  */
 class Permissions {
+
+    /**
+     * @var bool|null The result of all permission checks can be overridden based on this value.
+     */
+    private $overrideAll = null;
+
     /**
      * Global permissions are stored as numerical indexes.
      * Per-ID permissions are stored as associative keys. The key is the permission name and the values are the IDs.
@@ -94,6 +100,15 @@ class Permissions {
     }
 
     /**
+     * Get the flag to determine if all permission checks are being overridden.
+     *
+     * @return bool|null
+     */
+    public function getOverrideAll() {
+        return $this->overrideAll;
+    }
+
+    /**
      * Grab the current permissions.
      *
      * @return array
@@ -110,6 +125,10 @@ class Permissions {
      * @return bool
      */
     public function has($permission, $id = null) {
+        if ($this->overrideAll !== null) {
+            return $this->overrideAll;
+        }
+
         if ($id === null) {
             return !empty($this->permissions[$permission]) || (array_search($permission, $this->permissions) !== false);
         } else {
@@ -270,6 +289,21 @@ class Permissions {
      */
     public function setBanned($isBanned) {
         $this->isBanned = ($isBanned == true);
+        return $this;
+    }
+
+    /**
+     * Get the flag to determine if all permission checks are being overridden.
+     *
+     * @param bool|null $overrideAll
+     * @return $this
+     */
+    public function setOverrideAll($overrideAll) {
+        if ($overrideAll !== null) {
+            $overrideAll = boolval($overrideAll);
+        }
+        $this->overrideAll = $overrideAll;
+
         return $this;
     }
 

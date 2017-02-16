@@ -1,14 +1,17 @@
-<?php if (!defined('APPLICATION')) exit();
-deprecated('FlatCategoryModule', 'CategoryFilterModule', 'February 2017');
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 
 <div class="Box BoxFlatCategory">
     <h2><?php echo htmlspecialchars($this->data('ParentCategory.Name')); ?></h2>
 
     <div class="FlatCategoryFilter SearchForm">
-        <input class="InputBox" placeholder="<?php echo t('Search'); ?>" type="text" />
-        <input name="CategoryID" type="hidden" value="<?php echo htmlspecialchars($this->data('ParentCategory.CategoryID'))?>" />
-        <input name="Limit" type="hidden" value="<?php echo $this->getLimit(); ?>" />
+        <?php
+        $options = [
+            'cssClass' => 'InputBox',
+            'containerSelector' => '.FlatCategoryResult',
+            'useSearchInput' => false
+        ];
+        echo $this->categoryFilterBox($options);
+        ?>
     </div>
 
     <div class="FlatCategoryResult">

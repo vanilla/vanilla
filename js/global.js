@@ -2102,8 +2102,10 @@ $(document).on("contentLoad", function(e) {
     $(".BoxFlatCategory", e.target).each(function(index, value){
         // Setup the constants we'll need to perform the lookup for this module instance.
         var container = value;
-        var categoryID = $("input[name=CategoryID]", container).val();
-        var limit = parseInt($("input[name=Limit]", container).val());
+
+        var $input = $('.SearchForm .InputBox');
+        var categoryID = $input.data('categoryId');
+        var limit = $input.data('limit');
 
         // If we don't even have a category, don't bother setting up filtering.
         if (typeof categoryID === "undefined") {
@@ -2121,7 +2123,7 @@ $(document).on("contentLoad", function(e) {
 
             // ...perform an AJAX request, replacing the current category data with the result's data.
             jQuery.get(
-                gdn.url("module/flatcategorymodule/vanilla"),
+                gdn.url("module/categoryfiltermodule/vanilla"),
                 {
                     categoryID: categoryID,
                     filter: filterEvent.target.value,

@@ -628,6 +628,10 @@ class Addon {
      */
     public function check($trigger = false) {
         $issues = [];
+        if (!isset($this->info['Issues'])) {
+            $this->info['Issues'] = &$issues;
+        }
+
 
         $rawKey = $this->getKey();
         $subdir = basename($this->getSubdir());
@@ -682,7 +686,16 @@ class Addon {
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
         }
 
-        if ($trigger && $count = count($issues)) {
+        if ($trigger) {
+            $this->triggerIssues();
+        }
+
+        return $issues;
+    }
+
+    protected function triggerIssues() {
+        $issues = val('Issues', $this->info, []);
+        if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
             trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
@@ -691,7 +704,7 @@ class Addon {
             }
         }
 
-        return $issues;
+        return $this;
     }
 
     /**
@@ -718,7 +731,8 @@ class Addon {
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
             ->setTranslationPaths($array['translations'])
-            ->setSpecialArray(empty($array['special']) ? [] : $array['special']);
+            ->setSpecialArray(empty($array['special']) ? [] : $array['special'])
+            ->triggerIssues();
 
         return $addon;
     }

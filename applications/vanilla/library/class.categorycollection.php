@@ -740,7 +740,7 @@ class CategoryCollection {
      */
     private function flattenTreeInternal(array $category, array &$result) {
         $children = val('Children', $category, []);
-        unset($category['Children']);
+        $category['Children'] = [];
         $result[] = $category;
 
         foreach ($children as $child) {

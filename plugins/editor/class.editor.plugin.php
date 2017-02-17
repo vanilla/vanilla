@@ -1509,7 +1509,7 @@ class EditorPlugin extends Gdn_Plugin {
             ));
 
             // Remove cf scratch copy, typically in cftemp, if there was actually a file pulled in from CF.
-            if (strpos($local_path, 'cftemp') !== false) {
+            if (strpos($local_path, 'temp') !== false) {
                 if (!unlink($local_path)) {
                     // Maybe add logging for local cf copies not deleted.
                 }

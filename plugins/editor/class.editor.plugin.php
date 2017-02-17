@@ -1509,7 +1509,8 @@ class EditorPlugin extends Gdn_Plugin {
             ));
 
             // Remove cloud scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from cloud storage.
-            if (preg_match('`/uploads/[^/]+temp/`', $local_path)) {
+            $uploadFolder = basename(PATH_UPLOADS);
+            if (preg_match("`/{$uploadFolder}/[^/]+temp/`", $local_path)) {
                 unlink($local_path);
             }
 

@@ -172,17 +172,22 @@ class PostController extends VanillaController {
 
         touchValue('Type', $this->Data, 'Discussion');
 
-        // See if we should hide the category dropdown.
-        if ($this->ShowCategorySelector) {
+        if (!$UseCategories || $this->ShowCategorySelector) {
+            // See if we should fill the CategoryID value.
             $AllowedCategories = CategoryModel::getByPermission(
                 'Discussions.Add',
                 $this->Form->getValue('CategoryID', $this->CategoryID),
                 ['Archived' => 0, 'AllowDiscussions' => 1],
                 ['AllowedDiscussionTypes' => $this->Data['Type']]
             );
-            if (count($AllowedCategories) == 1) {
-                $AllowedCategory = array_pop($AllowedCategories);
+            $nbsAllowedCategories = count($AllowedCategories);
+
+            if ($this->ShowCategorySelector && $nbsAllowedCategories === 1) {
                 $this->ShowCategorySelector = false;
+            }
+
+            if (!$this->ShowCategorySelector && $nbsAllowedCategories) {
+                $AllowedCategory = array_pop($AllowedCategories);
                 $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
 
                 if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {

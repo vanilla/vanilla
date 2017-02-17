@@ -281,6 +281,7 @@ class UtilityController extends DashboardController {
 
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
+        Gdn_Theme::section('Utility');
         $this->render('update', 'utility', 'dashboard');
     }
 
@@ -342,7 +343,7 @@ class UtilityController extends DashboardController {
         $this->CssClass = 'Home';
 
         $this->fireEvent('Alive');
-
+        Gdn_Theme::section('Utility');
         $this->render();
     }
 
@@ -399,6 +400,7 @@ class UtilityController extends DashboardController {
         $this->setData('time_s', $time);
         $this->setData('valid', $valid);
         $this->title('Ping');
+        Gdn_Theme::section('Utility');
 
         $this->render();
     }

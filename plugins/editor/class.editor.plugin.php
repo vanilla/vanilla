@@ -1508,11 +1508,9 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbPath' => $filepath_parsed['SaveName']
             ));
 
-            // Remove cf scratch copy, typically in cftemp, if there was actually a file pulled in from CF.
-            if (strpos($local_path, 'temp') !== false) {
-                if (!unlink($local_path)) {
-                    // Maybe add logging for local cf copies not deleted.
-                }
+            // Remove cf scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from CF.
+            if (preg_match('`/uploads/[^/]+temp/`', $local_path)) {
+                unlink($local_path);
             }
 
             $url = $filepath_parsed['Url'];

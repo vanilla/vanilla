@@ -1493,7 +1493,7 @@ class EditorPlugin extends Gdn_Plugin {
             $thumb_width = round($thumb_payload['result_width']);
 
             // Move the thumbnail to its proper location. Calling SaveAs with
-            // cloudfiles enabled will trigger the move to cloudfiles, so use
+            // a cloud storage plugin enabled will trigger the move to the cloud, so use
             // same path for each arg in SaveAs. The file will be removed from the local filesystem.
             $parsed = Gdn_Upload::parse($thumb_destination_path);
             $target = $thumb_destination_path; // $parsed['Name'];
@@ -1508,7 +1508,7 @@ class EditorPlugin extends Gdn_Plugin {
                 'ThumbPath' => $filepath_parsed['SaveName']
             ));
 
-            // Remove cf scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from CF.
+            // Remove cloud scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from cloud storage.
             if (preg_match('`/uploads/[^/]+temp/`', $local_path)) {
                 unlink($local_path);
             }

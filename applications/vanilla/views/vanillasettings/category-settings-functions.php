@@ -20,7 +20,7 @@ function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
 }
 
 /**
- * Renders the category filter input box.
+ * Returns the HTML for a category filter input box for the dashboard.
  *
  * @param array $options
  * @return string
@@ -32,12 +32,14 @@ function categoryFilterBox(array $options = []) {
     $cssClass = isset($options['cssClass']) ? $options['cssClass'] : 'form-control';
     $useSearchInput = isset($options['useSearchInput']) ? $options['useSearchInput'] : true;
     $hideContainerSelector = isset($options['hideContainerSelector']) ? $options['hideContainerSelector'] : '';
+    $limit = isset($options['limit']) ? $options['limit'] : 300;
+    $parentID = isset($options['parentID']) ? options['parentID'] : Gdn::controller()->data('ParentID', -1);
 
     $attr = [
         'class' => 'js-category-filter-input '.$cssClass,
         'placeholder' => t('Search'),
-        'data-category-id' => Gdn::controller()->data('CategoryID', -1),
-        'data-limit' => 300,
+        'data-category-id' => $parentID,
+        'data-limit' => $limit,
         'data-container' => $containerSelector
     ];
 

@@ -1,6 +1,4 @@
-<?php if (!defined('APPLICATION')) exit();
-deprecated('FlatCategoryModule', 'CategoryFilterModule', 'February 2017');
-?>
+<?php if (!defined('APPLICATION')) exit(); ?>
 
 <div class="Box BoxFlatCategory">
     <h2><?php echo htmlspecialchars($this->data('ParentCategory.Name')); ?></h2>

@@ -749,13 +749,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }
 
-        $catfilter = new CategoryFilterModule();
-        $catfilter->setView('categoryfilter-dashboard');
-        $catfilter->setCategoryID($parentID);
-        $this->setData('CategoryFilterModule', $catfilter);
         $this->addJsFile('categoryfilter.js', 'vanilla');
-
-
+        
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);

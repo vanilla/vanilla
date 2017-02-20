@@ -20,6 +20,39 @@ function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
 }
 
 /**
+ * Renders the category filter input box.
+ *
+ * @param array $options
+ * @return string
+ */
+function categoryFilterBox(array $options = []) {
+    $form = new Gdn_Form('');
+
+    $containerSelector = isset($options['containerSelector']) ? $options['containerSelector'] : '.category-filter-container';
+    $cssClass = isset($options['cssClass']) ? $options['cssClass'] : 'form-control';
+    $useSearchInput = isset($options['useSearchInput']) ? $options['useSearchInput'] : true;
+    $hideContainerSelector = isset($options['hideContainerSelector']) ? $options['hideContainerSelector'] : '';
+
+    $attr = [
+        'class' => 'js-category-filter-input '.$cssClass,
+        'placeholder' => t('Search'),
+        'data-category-id' => Gdn::controller()->data('CategoryID', -1),
+        'data-limit' => 300,
+        'data-container' => $containerSelector
+    ];
+
+    if ($hideContainerSelector) {
+        $attr['data-hide-container'] = $hideContainerSelector;
+    }
+
+    if ($useSearchInput) {
+        return $form->searchInput('', '', $attr);
+    }
+
+    return $form->input('', '', $attr);
+}
+
+/**
  *
  *
  * @param array $category

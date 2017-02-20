@@ -173,6 +173,79 @@ class CategoriesController extends VanillaController {
     }
 
     /**
+     * Get a list of immediate children for the configured category.
+     *
+     * @return array|null
+     */
+    private function getFlatCategoryChildren($category, $limit, $filter) {
+        if ($category) {
+            $flatCategoryChildren = $this->CategoryModel->getTreeAsFlat(
+                val('CategoryID', $category),
+                0,
+                $limit,
+                $filter
+            );
+            $this->CategoryModel->joinRecent($flatCategoryChildren);
+        }
+        return $flatCategoryChildren;
+    }
+
+    public function getFlattenedChildren($parentID, $limit, $filter, $showHeadings) {
+        $category = [];
+        if ($parentID) {
+            $category = $this->CategoryModel->categories($parentID);
+        }
+        $parentDisplayAs = val('DisplayAs', $category, 'Nested');
+
+        if ($parentDisplayAs === 'Flat') {
+            $categories = $this->getFlatCategoryChildren($category, $limit, $filter);
+        } else {
+            $options = ['maxdepth' => 10, 'collapsecategories' => true];
+            $categories = $this->CategoryModel->getChildTree(val('CategoryID', $category, -1), $options);
+            $categories = $this->CategoryModel->flattenTree($categories);
+            $categories = $this->filterCategories($categories, $limit, $showHeadings);
+        }
+
+        $this->setData('Categories', $categories);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
+
+    /**
+     * Filters a flattened category list.
+     *
+     * @param array $categories A flattened list of categories to filter by name.
+     * @return array A filtered list of categories.
+     */
+    private function filterCategories(array $categories = [], $limit = 300, $showHeadings = true) {
+        $count = 0;
+        $filteredCategories = [];
+
+        foreach ($categories as &$category) {
+            if ($count === $limit) {
+                continue;
+            }
+            require_once Gdn::controller()->fetchViewLocation('category-settings-functions', 'vanillasettings', 'vanilla');
+            ob_start();
+            writeCategoryOptions($category);
+            $category['Options'] = ob_get_contents();
+            ob_end_clean();
+
+            // See if we show heading-type categories
+            $condition = $showHeadings || val('DisplayAs', $category) !== 'Heading';
+
+            if ($condition) {
+                $filteredCategories[] = $category;
+                $count++;
+            }
+        }
+
+        return $filteredCategories;
+    }
+
+    /**
      * Show all discussions in a particular category.
      *
      * @since 2.0.0

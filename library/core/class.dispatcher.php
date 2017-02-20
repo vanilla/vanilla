@@ -87,9 +87,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var bool */
     private $isHomepage;
 
-    /** @var array */
-    private $blockExceptions;
-
     /**
      * Class constructor.
      */
@@ -97,20 +94,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         parent::__construct();
         $this->addonManager = $addonManager;
         $this->reset();
-
-        $this->blockExceptions = [
-            '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
-            '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
-            '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
-            '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
-        ];
     }
 
     /**
@@ -206,9 +189,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         // Move this up to allow pre-routing
         $this->fireEvent('BeforeDispatch');
-
-        $this->EventArguments['BlockExceptions'] = &$this->blockExceptions;
-        $this->fireEvent('BeforeBlockDetect');
 
         // If we're in update mode and aren't explicitly prevented from blocking, block.
         if (inMaintenanceMode() && $this->getCanBlock($request) > self::BLOCK_NEVER) {
@@ -592,7 +572,22 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     private function getCanBlock($request) {
         $canBlock = self::BLOCK_ANY;
 
-        $blockExceptions = $this->blockExceptions;
+        $blockExceptions = array(
+            '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
+            '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
+            '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
+            '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
+            '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+            '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+        );
+
+        $this->EventArguments['BlockExceptions'] = &$blockExceptions;
+        $this->fireEvent('BeforeBlockDetect');
 
         $PathRequest = $request->path();
         foreach ($blockExceptions as $BlockException => $BlockLevel) {

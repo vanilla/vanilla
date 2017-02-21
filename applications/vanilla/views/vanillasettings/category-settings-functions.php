@@ -28,12 +28,12 @@ function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
 function categoryFilterBox(array $options = []) {
     $form = new Gdn_Form('');
 
-    $containerSelector = isset($options['containerSelector']) ? $options['containerSelector'] : '.category-filter-container';
+    $containerSelector = isset($options['containerSelector']) ? $options['containerSelector'] : '.js-category-filter-container';
     $cssClass = isset($options['cssClass']) ? $options['cssClass'] : 'form-control';
     $useSearchInput = isset($options['useSearchInput']) ? $options['useSearchInput'] : true;
     $hideContainerSelector = isset($options['hideContainerSelector']) ? $options['hideContainerSelector'] : '';
     $limit = isset($options['limit']) ? $options['limit'] : 300;
-    $parentID = isset($options['parentID']) ? options['parentID'] : Gdn::controller()->data('ParentID', -1);
+    $parentID = isset($options['parentID']) ? $options['parentID'] : Gdn::controller()->data('ParentID', -1);
 
     $attr = [
         'class' => 'js-category-filter-input '.$cssClass,
@@ -137,50 +137,7 @@ EOT;
  * @param array $category
  */
 function writeCategoryOptions($category) {
-    $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
-    $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'button', 'btn');
-    $cdd->setView('dropdown-twbs');
-    $cdd->setForceDivider(true);
-
-    $cdd->addGroup('', 'edit')
-        ->addLink(t('View'), $category['Url'], 'edit.view')
-        ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit');
-
-    $cdd->addGroup(t('Display as'), 'displayas');
-
-    foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
-        $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
-
-        $icon = displayAsSymbol($displayAs);
-
-        $cdd->addLink(
-            t($label),
-            '#',
-            'displayas.'.strtolower($displayAs),
-            'js-displayas '.$cssClass,
-            [],
-            ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]],
-            false
-        );
-    }
-
-    $cdd->addGroup('', 'actions')
-        ->addLink(
-            t('Add Subcategory'),
-            "/vanilla/settings/addcategory?parent={$category['CategoryID']}",
-            'actions.add'
-        );
-
-    if (val('CanDelete', $category, true)) {
-        $cdd->addGroup('', 'delete')
-            ->addLink(
-                t('Delete'),
-                "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
-                'delete.delete',
-                'js-modal'
-            );
-    }
-
+    $cdd = CategoryModel::getCategoryDropdown($category);
     echo $cdd->toString();
 }
 

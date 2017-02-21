@@ -1816,6 +1816,15 @@ class DiscussionModel extends VanillaModel {
             $this->Validation->applyRule('Body', 'Length');
         }
 
+        // Validate category permissions.
+        $CategoryID = val('CategoryID', $FormPostValues);
+        if ($CategoryID > 0) {
+            $Category = CategoryModel::categories($CategoryID);
+            if ($Category && !CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
+                $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
+            }
+        }
+
         // Get the DiscussionID from the form so we know if we are inserting or updating.
         $DiscussionID = val('DiscussionID', $FormPostValues, '');
 
@@ -1873,17 +1882,6 @@ class DiscussionModel extends VanillaModel {
         $this->EventArguments['FormPostValues'] = &$FormPostValues;
         $this->EventArguments['DiscussionID'] = $DiscussionID;
         $this->fireEvent('BeforeSaveDiscussion');
-
-        // Validate category permissions.
-        $CategoryID = val('CategoryID', $FormPostValues);
-        if ($CategoryID > 0) {
-            $Category = CategoryModel::categories($CategoryID);
-            if ($Category && !CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
-                $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
-            }
-        } else {
-            $this->Validation->addValidationResult('CategoryID', 'Invalid CategoryID');
-        }
 
         // Validate the form posted values
         $this->validate($FormPostValues, $Insert);

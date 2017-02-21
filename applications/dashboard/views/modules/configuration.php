@@ -62,7 +62,7 @@ echo $Form->errors();
                 echo '</div>';
                 break;
             case 'toggle':
-                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options']);
+                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options'], $Description);
                 break;
             case 'dropdown':
                 echo '<div class="label-wrap">';

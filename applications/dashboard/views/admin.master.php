@@ -128,9 +128,12 @@ Gdn_Theme::assetEnd();
                 </div>
                 <div class="footer-nav nav">
                     <?php
+                    $showVanillaVersion = true;
+                    $this->EventArguments['ShowVanillaVersion'] = &$showVanillaVersion;
                     $this->fireAs('dashboard')->fireEvent('footerNav');
-                    ?>
+                    if ($showVanillaVersion) : ?>
                     <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
+                    <?php endif; ?>
                 </div>
             </footer>
         </div>

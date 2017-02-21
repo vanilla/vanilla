@@ -9,7 +9,7 @@
     <?php } ?>
     <div class="media-body">
         <div class="media-title">
-            <?php echo $this->getTitleUrl() != '' ? anchor($this->getTitle(), $this->getTitleUrl(), 'reverse-link') : $this->getTitle(); ?>
+            <?php echo $this->getTitleUrl() != '' ? anchor(htmlspecialchars($this->getTitle()), $this->getTitleUrl(), 'reverse-link') : htmlspecialchars($this->getTitle()); ?>
         </div>
         <?php if ($this->getDescription()) { ?>
             <div class="media-description">

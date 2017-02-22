@@ -710,6 +710,7 @@ var DashboardModal = (function() {
             var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
             editor.getSession().setMode('ace/mode/' + mode);
+            editor.getSession().setUseWorker(false);
             editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.
@@ -732,7 +733,8 @@ var DashboardModal = (function() {
 
     function aceInit(element) {
         // Editor classes
-        codeInput.init($('.pockets #Form_Body', element), 'html', 200);
+        codeInput.init($('.js-pocket-body', element), 'html', 300);
+
         // Don't let our code editor go taller than the window length. Makes for weird scrolling.
         codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
         codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);

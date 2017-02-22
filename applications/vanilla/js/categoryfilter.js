@@ -130,7 +130,7 @@
         var categoryTemplate = ' \
         <li class="dd-item tree-item" data-id="{CategoryID}"> \
             <div class="dd-content tree-content"> \
-                {Name}' + categoryOptions + ' \
+                {NameHTML}' + categoryOptions + ' \
             </div> \
         </li>';
 
@@ -138,16 +138,18 @@
          * Renders the HTML for any category in our filtered list and displays in the container.
          */
         var renderCategories = function() {
-            var replacements = ['Name', 'CategoryID', 'Options'];
+            var replacements = ['NameHTML', 'CategoryID', 'Options'];
             $(containerSelector).html('');
             var html = '';
             filteredCategories.forEach(function(category) {
                 if (category['DisplayAs'] === 'Categories' || category['DisplayAs'] === 'Flat') {
                     // Wrap in an anchor
-                    category['Name'] = ' \
+                    category['NameHTML'] = ' \
                         <a href="' + gdn.url('vanilla/settings/categories?parent=' + category['UrlCode']) + '"> \
                         ' + category["Name"] + ' \
                         </a>';
+                } else {
+                    category['NameHTML'] = category['Name'];
                 }
                 html += renderTemplate(category, categoryTemplate, replacements);
             });

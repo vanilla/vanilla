@@ -155,8 +155,17 @@ class Schema implements \JsonSerializable {
      * @return Schema Returns the current instance for fluent calls.
      */
     protected function filterData(array &$data, array $schema, Validation &$validation, $path = '') {
+        // Normalize schema key casing for case-insensitive data key comparisons.
+        $schemaKeys = array_combine(array_map('strtolower', array_keys($schema)), array_keys($schema));
+
         foreach ($data as $key => $val) {
             if (array_key_exists($key, $schema)) {
+                continue;
+            } elseif (array_key_exists(strtolower($key), $schemaKeys)) {
+                // Migrate the value to the properly-cased key.
+                $correctedKey = $schemaKeys[strtolower($key)];
+                $data[$correctedKey] = $data[$key];
+                unset($data[$key]);
                 continue;
             }
 

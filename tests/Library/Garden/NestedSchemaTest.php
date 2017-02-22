@@ -280,7 +280,7 @@ class NestedSchemaTest extends SchemaTest {
         $data = [
             'Obj' => [
                 'ID' => 123,
-                'nameE' => 'Frank'
+                'namE' => 'Frank'
             ]
         ];
 

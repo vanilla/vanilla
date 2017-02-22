@@ -2882,24 +2882,13 @@ SQL;
     }
 
     /**
-     * Adjust the aggregate post counts for a category.
+     * Adjust the aggregate post counts for a category, using the provided offset to increment or decrement the value.
      *
-     * @param int|string|object|array $category
-     * @param int $offset
+     * @param int $categoryID
+     * @param int $offset A value, positive or negative, to offset a category's current aggregate post counts.
      */
-    private static function adjustAggregateCounts($category, $offset) {
-        $categoryID = false;
+    private static function adjustAggregateCounts($categoryID, $offset) {
         $offset = intval($offset);
-
-        if (is_numeric($category)) {
-            $categoryID = $category;
-        } elseif (is_string($category)) {
-            $category = self::instance()->collection->get($category);
-        }
-
-        if (is_array($category) || is_object($category)) {
-            $categoryID = val('CategoryID', $category);
-        }
 
         if (empty($categoryID)) {
             return;
@@ -2939,19 +2928,19 @@ SQL;
     /**
      * Move upward through the category tree, incrementing aggregate post counts.
      *
-     * @param int|string|object|array $category
+     * @param int $categoryID
      */
-    public static function incrementAggregateCounts($category) {
-        self::adjustAggregateCounts($category, 1);
+    public static function incrementAggregateCounts($categoryID) {
+        self::adjustAggregateCounts($categoryID, 1);
     }
 
     /**
      * Move upward through the category tree, decrementing aggregate post counts.
      *
-     * @param int|string|object|array $category
+     * @param int $categoryID
      */
-    public static function decrementAggregateCounts($category) {
-        self::adjustAggregateCounts($category, -1);
+    public static function decrementAggregateCounts($categoryID) {
+        self::adjustAggregateCounts($categoryID, -1);
     }
 
     /**

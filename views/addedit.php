@@ -2,11 +2,21 @@
 
 echo '<h1>', $this->data('Title'), '</h1>';
 
+/** @var Gdn_Form $Form */
 $Form = $this->Form; //new Gdn_Form();
 echo $Form->open();
 echo $Form->errors();
 ?>
 <ul>
+    <li class="form-group">
+        <div class="label-wrap-wide">
+            <?php echo $Form->label('Enable Pocket', 'Enabled'); ?>
+            <div class="info"><?php echo t('Disabled pockets will not be displayed.'); ?></div>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $Form->toggle('Enabled'); ?>
+        </div>
+    </li>
     <li class="form-group">
         <div class="label-wrap">
         <?php
@@ -21,7 +31,7 @@ echo $Form->errors();
             echo $Form->label('Body', 'Body');
             echo '<div class="info">', t('The text of the pocket.', 'Enter the text of the pocket. This will be output exactly as you type it so make sure that you enter valid HTML.'), '</div>'; ?>
         </div>
-        <?php echo $Form->textBoxWrap('Body', array('Multiline' => true));
+        <?php echo $Form->textBoxWrap('Body', ['Multiline' => true, 'class' => 'js-pocket-body']);
         ?>
     </li>
     <li class="form-group">
@@ -95,16 +105,12 @@ echo $Form->errors();
         </div>
     </li>
     <li class="form-group">
-        <?php
-            echo $Form->labelWrap('Enable/Disable', 'Disabled'); ?>
-        <div class="input-wrap">
-        <?php
-            echo '<div>', $Form->radio('Disabled', t('Enabled', 'Enabled: The pocket will be displayed.'), array('Value' => Pocket::ENABLED)), '</div>';
-
-            echo '<div>', $Form->radio('Disabled', t('Disabled', 'Disabled: The pocket will <b>not</b> be displayed.'), array('Value' => Pocket::DISABLED)), '</div>';
-
-            echo '<div>', $Form->radio('Disabled', t('Test Mode', 'Test Mode: The pocket will only be displayed for pocket administrators.'), array('Value' => Pocket::TESTING)), '</div>';
-        ?>
+        <div class="label-wrap-wide">
+            <?php echo $Form->label('Test Mode', 'Testing'); ?>
+            <?php echo wrap(t('The pocket will only be displayed for pocket administrators.'), 'div', ['class' => 'info']) ?>
+        </div>
+        <div class="input-wrap-right">
+            <?php echo $Form->toggle('TestMode'); ?>
         </div>
     </li>
 </ul>

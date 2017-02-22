@@ -4,15 +4,15 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['Pockets'] = array(
+$PluginInfo['Pockets'] = [
     'Name' => 'Pockets',
     'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-    'Version' => '1.2',
+    'Version' => '1.3',
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
     'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RegisterPermissions' => array('Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'),
+    'RequiredApplications' => ['Vanilla' => '2.4'],
+    'RegisterPermissions' => ['Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'],
     'SettingsUrl' => '/settings/pockets',
     'UsePopupSettings' => false,
     'SettingsPermission' => 'Plugins.Pockets.Manage',
@@ -20,7 +20,7 @@ $PluginInfo['Pockets'] = array(
     'HasLocale' => true,
     'License' => 'GNU GPLv2',
     'Icon' => 'pocket.png'
-);
+];
 
 /**
  * Class PocketsPlugin
@@ -51,7 +51,7 @@ class PocketsPlugin extends Gdn_Plugin {
     protected $StateLoaded = false;
 
     /** Whether or not to display test items for all pockets. */
-    public $TestMode = null;
+    public $ShowPocketLocations = null;
 
     /**
      * PocketsPlugin constructor.
@@ -74,10 +74,10 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param $Sender
      */
     public function base_render_before($Sender) {
-        if ($this->TestMode === null) {
-            $this->TestMode = c('Plugins.Pockets.ShowLocations');
+        if ($this->ShowPocketLocations === null) {
+            $this->ShowPocketLocations = c('Plugins.Pockets.ShowLocations');
         }
-        if ($this->TestMode && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
+        if ($this->ShowPocketLocations && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
             // Add the css for the test pockets to the page.
             $Sender->addCSSFile('pockets.css', 'plugins/Pockets');
         }
@@ -171,6 +171,12 @@ class PocketsPlugin extends Gdn_Plugin {
             case 'delete':
                 return $this->_delete($Sender, val(1, $Args));
                 break;
+            case 'enable':
+                return $this->_enable($Sender, val(1, $Args));
+                break;
+            case 'disable':
+                return $this->_disable($Sender, val(1, $Args));
+                break;
             default:
                 return $this->_index($Sender, $Args);
         }
@@ -192,18 +198,61 @@ class PocketsPlugin extends Gdn_Plugin {
 
         // Add notes to the pockets data.
         foreach ($PocketData as $Index => &$PocketRow) {
-            // Add notes for the display.
-            $Notes = array();
 
-            if ($PocketRow['Repeat'] && $PocketRow['Repeat'] != Pocket::REPEAT_ONCE)
+            $mobileOnly = $PocketRow['MobileOnly'];
+            $mobileNever = $PocketRow['MobileNever'];
+            $noAds = $PocketRow['Type'] == Pocket::TYPE_AD;
+            $testing = Pocket::inTestMode($PocketRow);
+            $meta = [];
+
+            if ($PocketRow['Repeat'] && $PocketRow['Repeat'] != Pocket::REPEAT_ONCE) {
                 $PocketRow['Location'] .= " ({$PocketRow['Repeat']})";
+            }
 
-            if ($PocketRow['Disabled'] == Pocket::DISABLED)
-                $Notes[] = T('Disabled');
-            elseif ($PocketRow['Disabled'] == Pocket::TESTING)
-                $Notes[] = T('Testing');
+            if ($location = htmlspecialchars($PocketRow['Location'])) {
+                $meta['location'] = [
+                    'label' => t('Location'),
+                    'value' => $location
+                ];
+            }
+            if ($page = htmlspecialchars($PocketRow['Page'])) {
+                $meta['page'] = [
+                    'label' => t('Page'),
+                    'value' => $page
+                ];
+            }
+            if ($mobileNever && $mobileOnly) {
+                $meta['visibility'] = [
+                    'label' => t('Visibility'),
+                    'value' => t('Hidden')
+                ];
+            } else if ($mobileOnly) {
+                $meta['visibility'] = [
+                    'label' => t('Visibility'),
+                    'value' => t('Shown only on mobile')
+                ];
+            } else if ($mobileNever) {
+                $meta['visibility'] = [
+                    'label' => t('Visibility'),
+                    'value' => t('Hidden for mobile')
+                ];
+            }
+            if ($noAds) {
+                $adsDesc = t('Users with the Garden.NoAds.Allow permission will not see this pocket.');
+                $meta['visibility'] = [
+                    'label' => t('This pocket is an ad'),
+                    'value' => $adsDesc
+                ];
+            }
+            if ($testing) {
+                $testingDesc = t('Only visible to users with the Plugins.Pockets.Manage permission.');
+                $meta['testmode'] = [
+                    'label' => t('In test mode'),
+                    'value' => $testingDesc
+                ];
+            }
 
-            $PocketRow['Notes'] = implode(', ', $Notes);
+            $PocketRow['Meta'] = $meta;
         }
 
         $Sender->setData('PocketData', $PocketData);
@@ -233,6 +282,62 @@ class PocketsPlugin extends Gdn_Plugin {
     protected function _add($Sender) {
         $Sender->setData('Title', sprintf(t('Add %s'), t('Pocket')));
         return $this->_addEdit($Sender);
+    }
+
+    /**
+     * Updates the Disabled field for a pocket. Informs the user and updates the HTML for a toggle with the id
+     * `pockets-toggle-{pocketID}`. This is automatically added if using the `renderPocketToggle()` function to
+     * render the toggle.
+     *
+     * @param Gdn_Controller $sender
+     * @param string $pocketID The ID of the pocket to modify.
+     * @param $disabledState Either Pocket::ENABLED or Pocket::DISABLED
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    private function setDisabled($sender, $pocketID, $disabledState) {
+        $sender->permission('Plugins.Pockets.Manage');
+
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
+        if (empty($pocketID)) {
+            $sender->errorMessage('Must specify pocket ID.');
+        }
+
+        $values = [
+            'PocketID' => $pocketID,
+            'Disabled' => $disabledState
+        ];
+
+        $pocketModel = new Gdn_Model('Pocket');
+        $pocketModel->save($values);
+
+        $newToggle = renderPocketToggle($values);
+        $sender->jsonTarget('#pockets-toggle-'.$pocketID, $newToggle);
+        $sender->informMessage($disabledState === Pocket::DISABLED ? t('Pocket disabled.') : t('Pocket enabled.'));
+        $sender->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Endpoint to disable a pocket.
+     *
+     * @param Gdn_Controller $sender
+     * @param string $pocketID
+     */
+    public function _disable($sender, $pocketID = '') {
+        $this->setDisabled($sender, $pocketID, Pocket::DISABLED);
+    }
+
+    /**
+     * Endpoint to enable a pocket.
+     *
+     * @param Gdn_Controller $sender
+     * @param string $pocketID
+     */
+    public function _enable($sender, $pocketID = '') {
+        $this->setDisabled($sender, $pocketID, Pocket::ENABLED);
     }
 
     /**
@@ -290,6 +395,16 @@ class PocketsPlugin extends Gdn_Plugin {
                 $Form->setFormValue('Type', Pocket::TYPE_DEFAULT);
             }
 
+            // Deprecating the 3-state Disabled field (enabled, disabled, testing) in favour of a separate 'TestMode'
+            // field. All testing pockets should be enabled with the testing flag set.
+            if ($Form->getFormValue('Disabled') === Pocket::TESTING) {
+                $Form->setFormValue('Disabled', Pocket::ENABLED);
+                // The 'TestMode' property will already be set to true in the UI, we'll let save() set it.
+            }
+
+            $enabled = $Form->getFormValue('Enabled');
+            $Form->setFormValue('Disabled', $enabled === "1" ? Pocket::ENABLED : Pocket::DISABLED);
+
             $Saved = $Form->save();
             if ($Saved) {
                 $Sender->StatusMessage = t('Your changes have been saved.');
@@ -310,6 +425,10 @@ class PocketsPlugin extends Gdn_Plugin {
                 $Pocket['EveryBegin'] = GetValue(1, $RepeatFrequency, 1);
                 $Pocket['Indexes'] = implode(',', $RepeatFrequency);
                 $Pocket['Ad'] = $Pocket['Type'] == Pocket::TYPE_AD;
+                $Pocket['TestMode'] = Pocket::inTestMode($Pocket);
+
+                // The frontend displays an enable/disable toggle, so we need this value to be turned around.
+                $Pocket['Enabled'] = $Pocket['Disabled'] !== Pocket::DISABLED;
                 $Sender->ConditionModule->conditions(Gdn_Condition::fromString($Pocket['Condition']));
                 $Form->setData($Pocket);
             } else {
@@ -457,7 +576,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $LocationOptions = val($Location, $this->Locations, array());
 
-        if ($this->TestMode && array_key_exists($Location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
+        if ($this->ShowPocketLocations && array_key_exists($Location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
             $LocationName = val("Name", $this->Locations, $Location);
             echo
                 valr('Wrap.0', $LocationOptions, ''),
@@ -587,6 +706,7 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('MobileNever', 'tinyint', '0')
             ->column('EmbeddedNever', 'tinyint', '0')
             ->column('ShowInDashboard', 'tinyint', '0')
+            ->column('TestMode', 'tinyint', '0')
             ->column('Type', array(Pocket::TYPE_DEFAULT, Pocket::TYPE_AD), Pocket::TYPE_DEFAULT)
             ->set();
 
@@ -641,5 +761,27 @@ if (!function_exists('ValidateIntegerArray')) {
         }
 
         return true;
+    }
+}
+
+
+if (!function_exists('renderPocketToggle')) {
+
+    /**
+     * Renders a pocket enable/disable toggle for in a table.
+     *
+     * @param array $pocket Requires 'PocketID' and 'Disabled' keys.
+     * @return string The enable/disable toggle for a pocket to appear in a table.
+     */
+    function renderPocketToggle($pocket) {
+        $enabled = val('Disabled', $pocket) !== Pocket::DISABLED;
+        $return = '<span id="pockets-toggle-'.val('PocketID', $pocket).'">';
+        if ($enabled) {
+            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/disable/'.val('PocketID', $pocket), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+        } else {
+            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/enable/'.val('PocketID', $pocket), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+        }
+        $return .= '</span>';
+        return $return;
     }
 }

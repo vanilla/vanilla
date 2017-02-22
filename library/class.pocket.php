@@ -74,6 +74,17 @@ class Pocket {
     }
 
     /**
+     * The Disabled field used to have 3 states: enabled, disabled, or testing. Testing has since branched out
+     * into its own field: TestMode. We need to check both places to see if a pocket is in test mode.
+     *
+     * @param $pocket
+     * @return bool
+     */
+    public static function inTestMode($pocket) {
+        return (val('Disabled', $pocket) === Pocket::TESTING) || (val('TestMode', $pocket) === 1);
+    }
+
+    /**
      * Whether or not this pocket should be processed based on its state.
      *
      * @param array $Data Data specific to the request.
@@ -101,7 +112,7 @@ class Pocket {
         switch ($this->Disabled) {
             case Pocket::DISABLED:
                 return false;
-            case Pocket::TESTING:
+            case self::inTestMode($this):
                 if (!checkPermission('Plugins.Pockets.Manage'))
                     return false;
                 break;

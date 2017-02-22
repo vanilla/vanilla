@@ -121,11 +121,11 @@ class Gdn_Session {
      * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
     public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
-        if (is_object($this->User)) {
+        if (is_object($this->User) && $this->permissions->getOverrideAll() === null) {
             if ($this->User->Banned || val('Deleted', $this->User)) {
-                return false;
+                $this->permissions->setOverrideAll(false);
             } elseif ($this->User->Admin) {
-                return true;
+                $this->permissions->setOverrideAll(true);
             }
         }
 

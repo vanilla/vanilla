@@ -427,37 +427,44 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
-     * Get list of defined view handlers
+     * Get list of defined view handlers.
      *
-     * @staticvar array $handlers
-     * @param boolean $fresh
-     * @return array
+     * This method no longer really works due to factory changes.
+     *
+     * @return array Returns an array keyed by view handler.
+     * @deprecated
      */
-    public static function viewHandlers($fresh = false) {
-        static $handlers = null;
-        if (is_null($handlers) || $fresh) {
-            $factories = Gdn::factory()->search('viewhandler.*');
-            $handlers = array_change_key_case($factories);
+    public static function viewHandlers() {
+        deprecated('AssetModel::viewHandlers()');
+
+        $exts = static::viewExtensions();
+        $result = [];
+        foreach ($exts as $ext) {
+            if ($ext !== 'php') {
+                $result["ViewHandler.$ext"] = [];
+            }
         }
 
-        return $handlers;
+        return $result;
     }
 
     /**
-     * Get list of allowed view extensions
+     * Get list of allowed view extensions.
      *
-     * @param boolean $fresh
-     * @return array list of extensions
+     * @return array Returns an array of file extensions.
      */
-    public static function viewExtensions($fresh = false) {
-        $handlers = self::viewHandlers($fresh);
+    public static function viewExtensions() {
+        // This is a kludge where all known extensions are included.
+        $knownExts = ['tpl', 'mustache'];
 
-        $extensions = ['php'];
-        foreach ($handlers as $handlerTag => $handlerDef) {
-            $extension = explode('.', $handlerTag);
-            $extensions[] = array_pop($extension);
+        $result = ['php'];
+        foreach ($knownExts as $ext) {
+            $handler = "ViewHandler.$ext";
+            if (Gdn::factory()->exists($handler)) {
+                $result[] = $ext;
+            }
         }
-        return $extensions;
+        return $result;
     }
     /**
      * Get the path to a view.

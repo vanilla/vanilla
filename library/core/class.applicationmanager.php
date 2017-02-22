@@ -301,7 +301,7 @@ class Gdn_ApplicationManager {
 
         // 2. Check to make sure that no other enabled applications rely on this one.
         try {
-            $this->addonManager->checkDependants($addon, true);
+            $this->addonManager->checkDependents($addon, true);
         } catch (Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }

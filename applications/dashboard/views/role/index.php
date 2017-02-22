@@ -45,7 +45,7 @@ echo $this->Form->open();
                         echo t(val('Type', $Role));
                     } ?>
                 </td>
-                <td><?php echo anchor($Role['CountUsers'] ?: 0, '/dashboard/user?Filter='.urlencode($Role['Name'])); ?></td>
+                <td><?php echo anchor($Role['CountUsers'] ?: 0, '/dashboard/user?Keywords='.urlencode($Role['Name'])); ?></td>
                 <td class="options">
                     <div class="btn-group">
                     <?php

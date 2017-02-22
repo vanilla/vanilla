@@ -62,7 +62,7 @@ echo $Form->errors();
                 echo '</div>';
                 break;
             case 'toggle':
-                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options']);
+                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options'], $Description);
                 break;
             case 'dropdown':
                 echo '<div class="label-wrap">';
@@ -83,7 +83,7 @@ echo $Form->errors();
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->color($Row['Name']);
+                echo $Form->color($Row['Name'], $Row['Options']);
                 echo '</div>';
                 break;
             case 'radiolist':

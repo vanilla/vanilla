@@ -89,7 +89,7 @@ class ResourceRoute extends Route {
 
         // Now look for a method.
         $controller = $this->createInstance($controllerClass);
-        $result = $this->findMethodCall($controller, $request, $pathArgs);
+        $result = $this->findAction($controller, $request, $pathArgs);
         return $result;
     }
 
@@ -124,9 +124,9 @@ class ResourceRoute extends Route {
      * @param object $controller The controller to find the method for.
      * @param RequestInterface $request The request being routed.
      * @param array $pathArgs The current path arguments from the request.
-     * @return array|null Returns an array of method call information or **null** if there is no method.
+     * @return Action|null Returns method call information or **null** if there is no method.
      */
-    private function findMethodCall($controller, RequestInterface $request, array $pathArgs) {
+    private function findAction($controller, RequestInterface $request, array $pathArgs) {
         foreach ($this->getControllerMethodNames($request->getMethod(), $pathArgs) as list($methodName, $omit)) {
             if ($callback = $this->classLocator->findMethod($controller, $methodName)) {
                 $args = $pathArgs;
@@ -137,11 +137,8 @@ class ResourceRoute extends Route {
                 $callbackArgs = $this->matchArgs($callback, $request, $args, $controller);
 
                 if ($callbackArgs !== null) {
-                    return [
-                        'method' => $methodName,
-                        'callback' => $callback,
-                        'args' => $callbackArgs
-                    ];
+                    $result = new Action($callback, $callbackArgs);
+                    return $result;
                 }
             }
         }

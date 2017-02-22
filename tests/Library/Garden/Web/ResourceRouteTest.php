@@ -7,6 +7,7 @@
 
 namespace VanillaTests\Library\Garden\Web;
 
+use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
 use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\Fixtures\Request;
@@ -38,18 +39,16 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
         $route = $this->createRoute();
         $request = new Request($path, $method);
 
-        $matched = $route->match($request);
+        $match = $route->match($request);
 
         if ($expectedCall === null) {
-            $this->assertNull($matched);
+            $this->assertNull($match);
         } else {
-            $this->assertTrue(is_array($matched), "The route was supposed to match and return an array.");
-            $this->assertArrayHasKey('callback', $matched);
-            $this->assertArrayHasKey('args', $matched);
-            $callback = $matched['callback'];
+            $this->assertInstanceOf(Action::class, $match, "The route was supposed to match and return an array.");
+            $callback = $match->getCallback();
             $this->assertSame($expectedCall[0], get_class($callback[0]));
             $this->assertEquals(strtolower($expectedCall[1]), strtolower($callback[1]));
-            $this->assertEquals((array)$expectedArgs, $matched['args']);
+            $this->assertEquals((array)$expectedArgs, $match->getArgs());
         }
     }
 
@@ -73,8 +72,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
 
         $match = $route->match($request);
         $this->assertNotNull($match);
-        $this->assertArrayHasKey('args', $match);
-        $this->assertSame($request, $match['args']['request']);
+        $this->assertSame($request, $match->getArgs()['request']);
     }
 
     /**
@@ -86,8 +84,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
 
         $match = $route->match($request);
         $this->assertNotNull($match);
-        $this->assertArrayHasKey('args', $match);
-        $this->assertSame($request, $match['args']['request']);
+        $this->assertSame($request, $match->getArgs()['request']);
     }
 
     /**
@@ -99,9 +96,8 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
 
         $match = $route->match($request);
         $this->assertNotNull($match);
-        $this->assertArrayHasKey('args', $match);
-        $this->isInstanceOf(DiscussionsController::class, $match['args']['sender']);
-        $this->assertSame('bar', $match['args']['foo']);
+        $this->assertInstanceOf(DiscussionsController::class, $match->getArgs()['sender']);
+        $this->assertSame('bar', $match->getArgs()['foo']);
     }
 
     /**
@@ -112,7 +108,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
         $request = new Request('/discussions/123/help/foo/bar/baz');
 
         $match = $route->match($request);
-        $this->assertSame(['foo', 'bar', 'baz'], $match['args']['parts']);
+        $this->assertSame(['foo', 'bar', 'baz'], $match->getArgs()['parts']);
 
     }
 

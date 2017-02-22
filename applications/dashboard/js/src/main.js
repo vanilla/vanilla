@@ -48,6 +48,7 @@
             var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
             editor.getSession().setMode('ace/mode/' + mode);
+            editor.getSession().setUseWorker(false);
             editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.

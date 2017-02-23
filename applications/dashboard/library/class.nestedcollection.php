@@ -554,6 +554,40 @@ trait NestedCollection {
     }
 
     /**
+     * Recursive utility function to support returning this object as an array.
+     *
+     * @param $obj The object to transform.
+     * @param array $blackList Blacklisted property names.
+     * @param array $whiteList Whitelisted property names. If set, only whitelisted properties will appear in the result.
+     * @return array An array transformation of this object.
+     */
+    private function objectToArray($obj, array $blackList = [], array $whiteList = []) {
+        if (is_array($obj) || is_object($obj)) {
+            $result = array();
+            foreach ($obj as $key => $value) {
+                if (!in_array($key, $blackList) && (empty($whiteList) || in_array($key, $whiteList))) {
+                    $result[$key] = $this->objectToArray($value);
+                }
+            }
+            return $result;
+        }
+        return $obj;
+    }
+
+    /**
+     * Copies the object to an array. A simple (array) typecast won't work,
+     * since the properties are private and as such, add unwanted information to the array keys.
+     *
+     * @param array $blackList Blacklisted property names.
+     * @param array $whiteList Whitelisted property names. If set, only whitelisted properties will appear in the result.
+     * @return array Copy of this object in an array format.
+     */
+    public function toArray(array $blackList = [], array $whiteList = []) {
+        $blackList[] = '_Sender';
+        return $this->objectToArray($this, $blackList, $whiteList);
+    }
+
+    /**
      * Creates a flattened array of menu items.
      * Useful for lists like dropdown menu, where nesting lists is not necessary.
      *

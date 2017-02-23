@@ -25,6 +25,12 @@ class CategoryModel extends Gdn_Model {
     /** Cache key. */
     const MASTER_VOTE_KEY = 'Categories.Rebuild.Vote';
 
+    /** Flag for aggregating comment counts. */
+    const AGGREGATE_COMMENT = 'comment';
+
+    /** Flag for aggregating discussion counts. */
+    const AGGREGATE_DISCUSSION = 'discussion';
+
     /**
      * @var CategoryModel $instance;
      */
@@ -1032,6 +1038,127 @@ class CategoryModel extends Gdn_Model {
                 $this->gatherLastIDs($category['Children'], $result);
             }
         }
+    }
+
+    /**
+     * Update a category with a comment's details and increment its comment count.
+     *
+     * @param int|array|stdClass $comment The discussion ID or discussion.
+     * @throws Exception
+     */
+    public static function incrementNewComment($comment) {
+        if (is_numeric($comment)) {
+            $comment = CommentModel::instance()->getID($comment);
+        }
+        if (!$comment) {
+            return;
+        }
+        $commentID = val('CommentID', $comment);
+
+        $discussion = DiscussionModel::instance()->getID(val('DiscussionID', $comment));
+        if (!$discussion) {
+            return;
+        }
+        $discussionID = val('DiscussionID', $discussion);
+
+        $category = CategoryModel::categories(val('CategoryID', $discussion));
+        if (!$category) {
+            return;
+        }
+        $categoryID = val('CategoryID', $category);
+
+        $countComments = val('CountComments', $category, 0) + 1;
+
+        $countBelowThreshold = $countComments < CommentModel::COMMENT_THRESHOLD_SMALL;
+        $countScheduledUpdate = ($countComments < CommentModel::COMMENT_THRESHOLD_LARGE && $countComments % CommentModel::COUNT_RECALC_MOD == 0);
+        if ($countBelowThreshold || $countScheduledUpdate) {
+            $countComments = Gdn::sql()->select('CountComments', 'sum', 'CountComments')
+                ->from('Discussion')
+                ->where('CategoryID', $categoryID)
+                ->get()
+                ->firstRow()
+                ->CountComments;
+        }
+
+        self::instance()->setField($categoryID, [
+            'LastDiscussionID' => $discussionID,
+            'LastCommentID' => $commentID,
+            'CountComments' => $countComments,
+            'LastDateInserted' => val('DateInserted', $comment)
+        ]);
+
+        CategoryModel::incrementAggregateCount($categoryID, self::AGGREGATE_COMMENT);
+        self::updateLastPost($discussion, $comment);
+    }
+
+    /**
+     * Update a category with a discussion's details and increment its discussion count.
+     *
+     * @param int|array|stdClass $discussion The discussion ID or discussion.
+     * @throws Exception
+     */
+    public static function incrementNewDiscussion($discussion) {
+        if (is_numeric($discussion)) {
+            $discussion = DiscussionModel::instance()->getID($discussion);
+        }
+        if (!$discussion) {
+            return;
+        }
+        $categoryID = val('CategoryID', $discussion);
+
+        Gdn::sql()->update('Category')
+            ->set('CountDiscussions', 'CountDiscussions + 1', false)
+            ->set('LastDiscussionID', val('DiscussionID', $discussion))
+            ->set('LastCommentID', null)
+            ->set('LastDateInserted', val('DateInserted', $discussion))
+            ->where('CategoryID', $categoryID)
+            ->put();
+
+        CategoryModel::incrementAggregateCount($categoryID, self::AGGREGATE_DISCUSSION);
+        self::updateLastPost($discussion);
+    }
+
+    /**
+     * Update the latest post info for a category.
+     *
+     * @param int|array|object $discussion
+     * @param int|array|object $comment
+     */
+    public static function updateLastPost($discussion, $comment = null) {
+        if (is_numeric($discussion)) {
+            $discussion = DiscussionModel::instance()->getID($discussion);
+        }
+        if (!$discussion) {
+            return;
+        }
+        $discussionID = val('DiscussionID', $discussion);
+        $categoryID = val('CategoryID', $discussion);
+
+        if (is_numeric($comment)) {
+            $comment = CommentModel::instance()->getID($comment);
+        }
+        if ($comment !== null && !$comment) {
+            $comment = null;
+        }
+
+        $categoryCache = [
+            'LastDiscussionID' => $discussionID,
+            'LastDiscussionUserID' => val('InsertUserID', $discussion),
+            'LastTitle' => Gdn_Format::text(val('Name', $discussion, t('No Title'))),
+            'LastUrl' => discussionUrl($discussion, false, '//').'#latest'
+        ];
+
+        if ($comment !== null) {
+            $categoryCache['LastCommentID'] = val('CommentID', $comment);
+            $categoryCache['LastDateInserted'] = val('DateInserted', $comment);
+            $categoryCache['LastUserID'] = val('InsertUserID', $comment);
+        } else {
+            $categoryCache['LastCommentID'] = null;
+            $categoryCache['LastDateInserted'] = val('DateInserted', $discussion);
+            $categoryCache['LastUserID'] = val('InsertUserID', $discussion);
+        }
+
+        CategoryModel::setCache($categoryID, $categoryCache);
     }
 
     /**
@@ -2885,9 +3012,10 @@ SQL;
      * Adjust the aggregate post counts for a category, using the provided offset to increment or decrement the value.
      *
      * @param int $categoryID
+     * @param string $type
      * @param int $offset A value, positive or negative, to offset a category's current aggregate post counts.
      */
-    private static function adjustAggregateCounts($categoryID, $offset) {
+    private static function adjustAggregateCounts($categoryID, $type, $offset) {
         $offset = intval($offset);
 
         if (empty($categoryID)) {
@@ -2903,12 +3031,16 @@ SQL;
                 $targetID = val('CategoryID', $current);
                 $updatedCategories[] = $targetID;
 
-                Gdn::sql()
-                    ->update('Category')
-                    ->set('CountAllDiscussions', "CountAllDiscussions + {$offset}", false)
-                    ->set('CountAllComments', "CountAllComments + {$offset}", false)
-                    ->where('CategoryID', $targetID)
-                    ->put();
+                Gdn::sql()->update('Category');
+                switch ($type) {
+                    case self::AGGREGATE_COMMENT:
+                        Gdn::sql()->set('CountAllComments', "CountAllComments + {$offset}", false);
+                        break;
+                    case self::AGGREGATE_DISCUSSION:
+                        Gdn::sql()->set('CountAllDiscussions', "CountAllDiscussions + {$offset}", false);
+                        break;
+                }
+                Gdn::sql()->where('CategoryID', $targetID)->put();
             }
         }
 
@@ -2929,9 +3061,10 @@ SQL;
      * Move upward through the category tree, incrementing aggregate post counts.
      *
      * @param int $categoryID
+     * @param string $type
      */
-    public static function incrementAggregateCounts($categoryID) {
-        self::adjustAggregateCounts($categoryID, 1);
+    public static function incrementAggregateCount($categoryID, $type) {
+        self::adjustAggregateCounts($categoryID, $type, 1);
     }
 
     /**
@@ -2939,8 +3072,8 @@ SQL;
      *
      * @param int $categoryID
      */
-    public static function decrementAggregateCounts($categoryID) {
-        self::adjustAggregateCounts($categoryID, -1);
+    public static function decrementAggregateCount($categoryID, $type) {
+        self::adjustAggregateCounts($categoryID, $type, -1);
     }
 
     /**

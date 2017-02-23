@@ -74,6 +74,7 @@ class Action {
      * Call the callback with the arguments.
      */
     public function __invoke() {
-        call_user_func_array($this->callback, $this->args);
+        $result = call_user_func_array($this->callback, $this->args);
+        return $result;
     }
 }

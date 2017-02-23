@@ -59,12 +59,12 @@ class Dispatcher {
      * Dispatch a request and return a response.
      *
      * This method currently returns a {@link Data} object that will be directly rendered. This really only for API calls
-     * and will be changed in the future. When that is done this method will be made public.
+     * and will be changed in the future. If you use this method now you'll have to refactor later.
      *
      * @param RequestInterface $request The request to handle.
      * @return Data Returns the response as a data object.
      */
-    private function dispatch(RequestInterface $request) {
+    public function dispatch(RequestInterface $request) {
         $ex = null;
 
         foreach ($this->routes as $route) {
@@ -90,8 +90,13 @@ class Dispatcher {
         }
 
         if (!isset($response)) {
-            $ex = $ex ?: new NotFoundException($request->getPath());
-            $response = $this->makeResponse($ex);
+            if ($ex) {
+                $response = $this->makeResponse($ex);
+            } else {
+                $response = $this->makeResponse(new NotFoundException($request->getPath()));
+                // This is temporary. Only use internally.
+                $response->setMetaItem('noMatch', true);
+            }
         }
 
         return $response;

@@ -9,6 +9,7 @@
  * @package Core
  * @since 2.0
  */
+use Garden\Web\RequestInterface;
 
 /**
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
@@ -22,7 +23,7 @@
  * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
  *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
-class Gdn_Request {
+class Gdn_Request implements RequestInterface {
 
     /** Superglobal source. */
     const INPUT_CUSTOM = "custom";
@@ -44,6 +45,27 @@ class Gdn_Request {
 
     /** Superglobal source. */
     const INPUT_COOKIES = "cookies";
+
+    /** HTTP request method. */
+    const METHOD_HEAD = 'HEAD';
+
+    /** HTTP request method. */
+    const METHOD_GET = 'GET';
+
+    /** HTTP request method. */
+    const METHOD_POST = 'POST';
+
+    /** HTTP request method. */
+    const METHOD_PUT = 'PUT';
+
+    /** HTTP request method. */
+    const METHOD_PATCH = 'PATCH';
+
+    /** HTTP request method. */
+    const METHOD_DELETE = 'DELETE';
+
+    /** HTTP request method. */
+    const METHOD_OPTIONS = 'OPTIONS';
 
     /** @var bool Whether or not _ParseRequest has been called yet. */
     protected $_HaveParsedRequest = false;
@@ -126,8 +148,8 @@ class Gdn_Request {
      *  - ADDRESS  -> first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR, HTTP_X_CLUSTER_CLIENT_IP,
      *                HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR
      *
-     * @param $key Key to retrieve or set.
-     * @param $value Value of $Key key to set.
+     * @param string $key Key to retrieve or set.
+     * @param string $value Value of $Key key to set.
      * @return string | null
      */
     protected function _environmentElement($key, $value = null) {
@@ -268,6 +290,144 @@ class Gdn_Request {
     }
 
     /**
+     * Get the POST body of the request.
+     *
+     * @return array
+     */
+    public function getBody() {
+        return (array)$this->getRequestArguments(self::INPUT_POST);
+    }
+
+    /**
+     * Get the file extension of the request.
+     *
+     * @return string
+     */
+    public function getExt() {
+        return (string)$this->_parsedRequestElement('Extension');
+    }
+
+    /**
+     * Get the full path of the request.
+     *
+     * @return string;
+     */
+    public function getFullPath() {
+        return $this->getRoot().$this->getPathExt();
+    }
+
+    /**
+     * Get the hostname of the request.
+     *
+     * @return string
+     */
+    public function getHost() {
+        return (string)$this->_environmentElement('HOST');
+    }
+
+    /**
+     * Get the host and port, but only if the port is not the standard port for the request scheme.
+     *
+     * @return string
+     */
+    public function getHostAndPort() {
+        $host = $this->getHost();
+        $port = $this->getPort();
+
+        // Only append the port if it is non-standard.
+        if (($port == 80 && $this->getScheme() === 'http') || ($port == 443 && $this->getScheme() === 'https')) {
+            $port = '';
+        } else {
+            $port = ':'.$port;
+        }
+
+        return $host.$port;
+    }
+
+    /**
+     * Get the IP address of the request.
+     *
+     * @return string;
+     */
+    public function getIP() {
+        return (string)$this->_environmentElement('ADDRESS');
+    }
+
+
+    /**
+     * Get the HTTP method.
+     *
+     * @return string Returns the HTTP method.
+     */
+    public function getMethod() {
+        return $this->requestMethod();
+    }
+
+    /**
+     * Set the HTTP method.
+     *
+     * @param string $method The new HTTP method.
+     * @return $this
+     */
+    public function setMethod($method) {
+        $this->requestMethod($method);
+        return $this;
+    }
+
+    /**
+     * Gets the request path.
+     *
+     * @return string
+     */
+    public function getPath() {
+        $path = (string)$this->_parsedRequestElement('Path');
+        if (strpos($path, '/') !== 0) {
+            $path = "/{$path}";
+        }
+
+        return $path;
+    }
+
+    /**
+     * Get the path and file extenstion.
+     *
+     * @return string
+     */
+    public function getPathExt() {
+        $path = $this->getPath();
+        $extension = $this->getExt();
+
+        return $path.$extension;
+    }
+
+    /**
+     * Gets the port.
+     *
+     * @return int
+     */
+    public function getPort() {
+        return (int)$this->_environmentElement('PORT');
+    }
+
+    /**
+     * Get the request query.
+     *
+     * @return array
+     */
+    public function getQuery() {
+        return (array)$this->getRequestArguments(self::INPUT_GET);
+    }
+
+    /**
+     * Get an item from the query string array.
+     *
+     * @return string
+     */
+    public function getQueryItem($key, $default = null) {
+        return (string)$this->getValueFrom(self::INPUT_GET, $key, '');
+    }
+
+    /**
      * Export an entire dataset (effectively, one of the superglobals) from the request arguments list
      *
      * @param int $paramType Type of data to export. One of the self::INPUT_* constants
@@ -281,6 +441,46 @@ class Gdn_Request {
         } else {
             return $this->_RequestArguments[$paramType];
         }
+    }
+
+    /**
+     * Get the root directory of the request.
+     *
+     * @return string
+     */
+    public function getRoot() {
+        $root = (string)$this->_parsedRequestElement('WebRoot');
+        if (strpos($root, '/') !== 0) {
+            $root = "/{$root}";
+        }
+        $root = rtrim($root, '/');
+
+        return $root;
+    }
+
+    /**
+     * Get the request scheme.
+     *
+     * @return string
+     */
+    public function getScheme() {
+        return (string)$this->_environmentElement('SCHEME');
+    }
+
+    /**
+     * Get the full url of the request.
+     *
+     * @return string
+     */
+    public function getUrl() {
+        $scheme = $this->getScheme();
+        $hostAndPort = $this->getHostAndPort();
+        $fullPath = $this->getFullPath();
+
+        $query = $this->getQuery();
+        $queryString = (empty($query) ? '' : '?'.http_build_query($query));
+
+        return "{$scheme}://{$hostAndPort}{$fullPath}{$queryString}";
     }
 
     /**
@@ -845,6 +1045,19 @@ class Gdn_Request {
     }
 
     /**
+     * Merge an array of values into the request query.
+     *
+     * @param array $query
+     * @return self
+     */
+    public function mergeQuery(array $query) {
+        $current = $this->getQuery();
+        $this->setQuery(array_merge($current, $query));
+
+        return $this;
+    }
+
+    /**
      * Attach an array of request arguments to the request.
      *
      * @param int $paramsType type of data to import. One of the self::INPUT_* constants
@@ -909,8 +1122,219 @@ class Gdn_Request {
         return $result;
     }
 
+    /**
+     * Set the POST body for the request.
+     *
+     * @param array $body
+     * @return self
+     */
+    public function setBody(array $body) {
+        $this->setRequestArguments(self::INPUT_POST, $body);
+        return $this;
+    }
+
+    /**
+     * Sets the file extension of the request.
+     *
+     * @param string $extension
+     * @return self
+     */
+    public function setExt($extension) {
+        $extension = '.'.ltrim($extension, '.');
+
+        $this->_parsedRequestElement('Extension', $extension);
+        return $this;
+    }
+
+    /**
+     * Set the full path of the request.
+     *
+     * @param string $fullPath
+     * @return self
+     */
+    public function setFullPath($fullPath) {
+        $fullPath = '/'.trim($fullPath, '/');
+
+        // Try stripping the root out of the path first.
+        $root = $this->getRoot();
+        $rootStartsPath = (strpos($fullPath, $root) === 0);
+        $canTrimRoot = (strlen($fullPath) === strlen($root) || substr($fullPath, strlen($root), 1) === '/');
+
+        if ($root && $rootStartsPath && $canTrimRoot) {
+            $pathWithoutRoot = substr($fullPath, strlen($root));
+            $this->setPathExt($pathWithoutRoot);
+        } else {
+            $this->setRoot('');
+            $this->setPathExt($fullPath);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the hostname of the request.
+     *
+     * @param string $host
+     * @return self
+     */
+    public function setHost($host) {
+        $this->_environmentElement('HOST', $host);
+        return $this;
+    }
+
+    /**
+     * Set the IP address of the request.
+     *
+     * @param string $ip
+     * @return self
+     */
+    public function setIP($ip) {
+        $this->_environmentElement('ADDRESS', $ip);
+        return $this;
+    }
+
+    /**
+     * Sets the request path.
+     *
+     * @param string $path
+     * @return self
+     */
+    public function setPath($path) {
+        $path = trim($path, '/');
+        $this->_parsedRequestElement('Path', $path);
+        return $this;
+    }
+
+    /**
+     * Parse a path to separate and set the path and file extension of the request.
+     *
+     * @param string $path
+     * @return self
+     */
+    public function setPathExt($path) {
+        $info = pathinfo($path);
+
+        if (isset($info['extension'])) {
+            $this->setExt($info['extension']);
+        }
+
+        $path = ($info['dirname'] === '.' ? $info['filename'] : "{$info['dirname']}/{$info['filename']}");
+        $this->setPath($path);
+
+        return $this;
+    }
+
+    /**
+     * Sets the port.
+     *
+     * @param int|string $port
+     * @return self
+     */
+    public function setPort($port) {
+        $port = intval($port);
+        $this->_environmentElement('PORT', $port);
+
+        // Override the scheme for standard ports.
+        if ($port === 80) {
+            $this->setScheme('http');
+        } elseif ($port === 443) {
+            $this->setScheme('https');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the query for the request.
+     *
+     * @param array $query
+     * @return self
+     */
+    public function setQuery(array $query) {
+        $this->setRequestArguments(self::INPUT_GET, $query);
+        return $this;
+    }
+
+    /**
+     * Sets a value on the request's query.
+     *
+     * @param string $key
+     * @param string $value
+     * @return self
+     */
+    public function setQueryItem($key, $value) {
+        $this->setValueOn(self::INPUT_GET, $key, $value);
+        return $this;
+    }
+
     public function setRequestArguments($paramsType, $paramsData) {
         $this->_RequestArguments[$paramsType] = $paramsData;
+    }
+
+    /**
+     * Set the root directory of the request.
+     *
+     * @param string $root
+     * @return self
+     */
+    public function setRoot($root) {
+        $root = trim($root, '/');
+
+        $this->_parsedRequestElement('WebRoot', $root);
+        return $this;
+    }
+
+    /**
+     * Set the request scheme.
+     *
+     * @param string $scheme
+     * @return self
+     */
+    public function setScheme($scheme) {
+        $this->_environmentElement('SCHEME', $scheme);
+        return $this;
+    }
+
+    /**
+     * Set the full URL of the request.
+     *
+     * @param string $url
+     * @return Gdn_Request
+     */
+    public function setUrl($url) {
+        // Parse a url and set its components.
+        $components = parse_url($url);
+
+        if ($components === false) {
+            throw new \InvalidArgumentException('Invalid URL.');
+        }
+
+        if (isset($components['scheme'])) {
+            $this->setScheme($components['scheme']);
+        }
+
+        if (isset($components['host'])) {
+            $this->setHost($components['host']);
+        }
+
+        if (isset($components['port'])) {
+            $this->setPort($components['port']);
+        } elseif (isset($components['scheme'])) {
+            $this->setPort($this->getScheme() === 'https' ? 443 : 80);
+        }
+
+        if (isset($components['path'])) {
+            $this->setPathExt($components['path']);
+        }
+
+        if (isset($components['query'])) {
+            parse_str($components['query'], $query);
+            if (is_array($query)) {
+                $this->setQuery($query);
+            }
+        }
+
+        return $this;
     }
 
     public function setValueOn($paramType, $paramName, $paramValue) {
@@ -1123,7 +1547,6 @@ class Gdn_Request {
         return $withDomain.$this->hostAndPort();
     }
 
-
     /**
      * Gets/Sets the relative path to the application's dispatcher.
      *
@@ -1131,9 +1554,7 @@ class Gdn_Request {
      * @return string
      */
     public function webRoot($webRoot = null) {
-        static $path = null;
-
-        if ($webRoot !== null || $path === null || !$this->_HaveParsedRequest) {
+        if ($webRoot !== null || !$this->_HaveParsedRequest) {
             $path = (string)$this->_parsedRequestElement('WebRoot', $webRoot);
             $webRootFromConfig = $this->_environmentElement('ConfigWebRoot');
 
@@ -1141,6 +1562,8 @@ class Gdn_Request {
             if ($webRootFromConfig && $removeWebRootConfig) {
                 $path = str_replace($webRootFromConfig, '', $webRoot);
             }
+        } else {
+            $path = $this->_parsedRequestElement('WebRoot');
         }
 
         return $path;

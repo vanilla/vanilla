@@ -984,7 +984,7 @@ class CommentModel extends VanillaModel {
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
-                CategoryModel::instance()->incrementNewComment($Fields);
+                CategoryModel::instance()->incrementLastComment($Fields);
             }
 
             // Prepare the notification queue.
@@ -1361,11 +1361,14 @@ class CommentModel extends VanillaModel {
         $this->UpdateUser($Comment['InsertUserID']);
 
         // Update the category.
-        $Category = CategoryModel::categories(val('CategoryID', $Discussion));
+        $categoryID = val('CategoryID', $Discussion);
+        $Category = CategoryModel::categories($categoryID);
         if ($Category && $Category['LastCommentID'] == $CommentID) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->SetRecentPost($Category['CategoryID']);
         }
+        // Decrement CountAllComments for category and its parents.
+        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT);
 
         // Clear the page cache.
         $this->RemovePageCache($Comment['DiscussionID']);

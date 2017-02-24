@@ -2009,6 +2009,7 @@ class DiscussionModel extends VanillaModel {
                     $DiscussionID = $this->SQL->insert($this->Name, $Fields);
                     $Fields['DiscussionID'] = $DiscussionID;
 
+                    // Update cached last post info for a category.
                     CategoryModel::updateLastPost($Fields);
 
                     // Clear the cache if necessary.
@@ -2119,7 +2120,7 @@ class DiscussionModel extends VanillaModel {
 
                 // Update discussion counter for affected categories.
                 if ($Insert || $StoredCategoryID) {
-                    CategoryModel::instance()->incrementNewDiscussion($Discussion);
+                    CategoryModel::instance()->incrementLastDiscussion($Discussion);
                 }
 
                 if ($StoredCategoryID) {
@@ -2273,16 +2274,17 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * @param int|array|stdClass $Discussion The discussion ID or discussion.
+     * @param int|array|stdClass $discussion The discussion ID or discussion.
      * @throws Exception
      * @deprecated
      */
-    public function incrementNewDiscussion($Discussion) {
+    public function incrementNewDiscussion($discussion) {
         trigger_error(
-            'DiscussionModel::incrementNewDiscussion is deprecated. Use CategoryModel::incrementNewDiscussion instead.',
+            'DiscussionModel::incrementNewDiscussion is deprecated. Use CategoryModel::incrementLastDiscussion instead.',
             E_USER_DEPRECATED
         );
-        CategoryModel::instance()->incrementNewDiscussion($Discussion);
+
+        CategoryModel::instance()->incrementLastDiscussion($discussion);
     }
 
     /**
@@ -2658,8 +2660,9 @@ class DiscussionModel extends VanillaModel {
 
         // Log all of the comment deletes.
         $Comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
+        $totalComments = count($Comments);
 
-        if (count($Comments) > 0 && count($Comments) < 50) {
+        if ($totalComments > 0 && $totalComments < 50) {
             // A smaller number of comments should just be stored with the record.
             $Data['_Data']['Comment'] = $Comments;
             LogModel::insert($Log, 'Discussion', $Data, $LogOptions);
@@ -2677,6 +2680,14 @@ class DiscussionModel extends VanillaModel {
 
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
         $this->updateDiscussionCount($CategoryID);
+
+        // Decrement CountAllDiscussions for category and its parents.
+        CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_DISCUSSION);
+
+        // Decrement CountAllDiscussions for category and its parents.
+        if ($totalComments > 0) {
+            CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
+        }
 
         // Get the user's discussion count.
         $this->updateUserDiscussionCount($UserID);

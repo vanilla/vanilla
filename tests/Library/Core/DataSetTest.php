@@ -1,0 +1,36 @@
+<?php
+/**
+ * @author Todd Burry <todd@vanillaforums.com>
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license Proprietary
+ */
+
+namespace VanillaTests\Library\Core;
+
+use Gdn_DataSet;
+
+/**
+ * Test the {@link Gdn_DataSet} class.
+ */
+class DataSetTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * A basic test of newing up a dataset.
+     */
+    public function testNewingUp() {
+        $ds = new Gdn_DataSet([['foo' => 123, 'bar' => 'baz'], ['foo' => 345, 'bar' => 'sme']]);
+
+        $this->assertSame(2, $ds->numRows());
+    }
+
+    /**
+     * Test json serialization.
+     */
+    public function testJsonSerialize() {
+        $dt = new \DateTimeImmutable('2000-01-01');
+        $ds = new Gdn_DataSet([['dt' => $dt, 'ip' => ipEncode('127.0.0.1')]]);
+
+        $expected = json_encode([['dt' => $dt->format('c'), 'ip' => '127.0.0.1']]);
+        $json = json_encode($ds);
+        $this->assertEquals($expected, $json);
+    }
+}

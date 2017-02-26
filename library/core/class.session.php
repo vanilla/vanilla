@@ -10,6 +10,8 @@
  * @since 2.0
  */
 
+use Vanilla\Permissions;
+
 /**
  * Handles user information throughout a session. This class is a singleton.
  */
@@ -35,7 +37,7 @@ class Gdn_Session {
     /** @var object The current user's transient key. */
     protected $_TransientKey;
 
-    /** @var  Vanilla\Permissions */
+    /** @var Permissions */
     private $permissions;
 
     /**
@@ -53,7 +55,7 @@ class Gdn_Session {
         $this->_Preferences = array();
         $this->_TransientKey = false;
 
-        $this->permissions = new Vanilla\Permissions();
+        $this->permissions = new Permissions();
     }
 
 
@@ -63,7 +65,7 @@ class Gdn_Session {
      * @param array $perms The permissions to add.
      */
     public function addPermissions($perms) {
-        $newPermissions = new Vanilla\Permissions($perms);
+        $newPermissions = new Permissions($perms);
         $this->permissions->merge($newPermissions);
     }
 
@@ -175,14 +177,12 @@ class Gdn_Session {
     }
 
     /**
-     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
+     * Returns the current user's permissions.
      *
-     * @return array
-     * @deprecated We want to make this an accessor for the permissions property.
+     * @return Permissions Returns a {@link Permissions} object with the permissions for the current user.
      */
     public function getPermissions() {
-        deprecated('Gdn_Session->getPermissions()', 'Gdn_Session->getPermissionsArray()');
-        return $this->permissions->getPermissions();
+        return $this->permissions;
     }
 
     /**

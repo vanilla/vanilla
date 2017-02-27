@@ -569,7 +569,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param Gdn_Request $request The current request being inspected.
      * @return int Returns one of the **Gdn_Dispatcher::BLOCK_*** constants.
      */
-    private function getCanBlock($request) {
+    public function getCanBlock($request) {
+        // Never block an admin.
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
+            );
+            return self::BLOCK_NEVER;
+        }
+
         $canBlock = self::BLOCK_ANY;
 
         $blockExceptions = array(
@@ -598,15 +607,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 );
                 return $BlockLevel;
             }
-        }
-
-        // Never block an admin.
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            Logger::debug(
-                "Dispatcher block: {blockException}, {blockLevel}",
-                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
-            );
-            return self::BLOCK_NEVER;
         }
 
         if (Gdn::session()->isValid()) {

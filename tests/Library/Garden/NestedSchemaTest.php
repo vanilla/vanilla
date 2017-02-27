@@ -267,6 +267,36 @@ class NestedSchemaTest extends SchemaTest {
     }
 
     /**
+     * The schema fields should be case-insensitive and fix the case of incorrect keys.
+     */
+    public function testCaseInsensitivity() {
+        $schema = Schema::create([
+            'obj:o' => [
+                'id:i',
+                'name:s?'
+            ]
+        ]);
+
+        $data = [
+            'Obj' => [
+                'ID' => 123,
+                'namE' => 'Frank'
+            ]
+        ];
+
+        $schema->validate($data);
+
+        $expected = [
+            'obj' => [
+                'id' => 123,
+                'name' => 'Frank'
+            ]
+        ];
+
+        $this->assertEquals($expected, $data);
+    }
+
+    /**
      * Get a schema that consists of an array of objects.
      *
      * @return Schema Returns the schema.

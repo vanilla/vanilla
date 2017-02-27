@@ -173,6 +173,40 @@ class CategoriesController extends VanillaController {
     }
 
     /**
+     * Endpoint that returns a flattened list of children categories in JSON format. Collapses the categories,
+     * so we only retrieve the child categories that are not nested under a nested or flat category.
+     * Includes the category options that appear in the category settings dropdown in the response.
+     *
+     * @param int $parentID The ID of the parent to retrieve categories under.
+     */
+    public function getFlattenedChildren($parentID = -1) {
+        $options = ['maxdepth' => 10, 'collapsecategories' => true];
+        $categories = $this->CategoryModel->getChildTree($parentID, $options);
+        $categories = $this->CategoryModel->flattenTree($categories);
+
+        foreach ($categories as &$category) {
+            $category['Options'] = $this->getOptions($category);
+        }
+
+        $this->setData('Categories', $categories);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Returns an array representation of the dropdown object, ready to add to a data array.
+     *
+     * @param array|object $category The category to retrieve the dropdown options for.
+     * @return array
+     */
+    private function getOptions($category) {
+        $cdd = CategoryModel::getCategoryDropdown($category);
+        return $cdd->toArray();
+    }
+
+
+    /**
      * Show all discussions in a particular category.
      *
      * @since 2.0.0

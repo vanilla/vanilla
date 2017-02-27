@@ -13,7 +13,9 @@ if (sizeof($this->data('Comments'))) {
         <li id="<?php echo 'Comment_'.$comment->CommentID; ?>" class="Item">
             <?php $this->fireEvent('BeforeItemContent'); ?>
             <div class="ItemContent">
-                <div class="Message"><?php
+                <div class="Message">
+                    <h2><?php echo anchor(Gdn_Format::text($comment->DiscussionName), $permalink); ?></h2>
+                    <?php
                     echo SliceString(Gdn_Format::plainText($comment->Body, $comment->Format), 250);
                     ?></div>
                 <div class="Meta">

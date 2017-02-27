@@ -694,6 +694,81 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Returns an icon name, given a display as value.
+     *
+     * @param string $displayAs The display as value.
+     * @return string The corresponding icon name.
+     */
+    private static function displayAsIconName($displayAs) {
+        switch (strtolower($displayAs)) {
+            case 'heading':
+                return 'heading';
+            case 'categories':
+                return 'nested';
+            case 'flat':
+                return 'flat';
+            case 'discussions':
+            default:
+                return 'discussions';
+        }
+    }
+
+    /**
+     * Puts together a dropdown for a category's settings.
+     *
+     * @param object|array $category The category to get the settings dropdown for.
+     * @return DropdownModule The dropdown module for the settings.
+     */
+    public static function getCategoryDropdown($category) {
+
+        $triggerIcon = dashboardSymbol(self::displayAsIconName($category['DisplayAs']));
+
+        $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
+        $cdd->setTrigger($triggerIcon, 'button', 'btn');
+        $cdd->setView('dropdown-twbs');
+        $cdd->setForceDivider(true);
+
+        $cdd->addGroup('', 'edit')
+            ->addLink(t('View'), $category['Url'], 'edit.view')
+            ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit')
+            ->addGroup(t('Display as'), 'displayas');
+
+        foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
+            $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
+            $icon = dashboardSymbol(self::displayAsIconName($displayAs));
+
+            $cdd->addLink(
+                t($label),
+                '#',
+                'displayas.'.strtolower($displayAs),
+                'js-displayas '.$cssClass,
+                [],
+                ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]],
+                false
+            );
+        }
+
+        $cdd->addGroup('', 'actions')
+            ->addLink(
+                t('Add Subcategory'),
+                "/vanilla/settings/addcategory?parent={$category['CategoryID']}",
+                'actions.add'
+            );
+
+        if (val('CanDelete', $category, true)) {
+            $cdd->addGroup('', 'delete')
+                ->addLink(
+                    t('Delete'),
+                    "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
+                    'delete.delete',
+                    'js-modal'
+                );
+        }
+
+        return $cdd;
+    }
+
+    /**
      * @param int|string $id The parent category ID or slug.
      * @param int|null $offset Offset results by given value.
      * @param int|null $limit Total number of results should not exceed this value.

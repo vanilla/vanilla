@@ -63,8 +63,14 @@
                 // Change the options SVG.
                 var svgMap = {categories: "nested"};
                 var svg = svgMap[displayAs] || displayAs;
+                var options = '';
                 svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg> ';
-                $('.dropdown-toggle', $content).html(svg);
+                $('.tree-item[data-id="' + categoryID + '"] .dropdown-toggle').each(function() {
+                    $(this).html(svg);
+                    options = $('.tree-item[data-id="' + categoryID + '"] .options').html();
+                });
+
+                $(document).trigger('updateDisplayAs', {categoryID: categoryID, options: options});
             };
 
             // Ajax the value.

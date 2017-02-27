@@ -28,9 +28,6 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var array An array of category records. */
     public $OtherCategories;
 
-    /** @var bool */
-    public $ShowCustomPoints = false;
-
     /**
      * Advanced settings.
      *
@@ -749,6 +746,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }
 
+        $this->addJsFile('categoryfilter.js', 'vanilla');
+        
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);

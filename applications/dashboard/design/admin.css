@@ -8938,25 +8938,38 @@ button.close {
   padding-right: 1.125rem;
 }
 
-.tj-meta {
+.tj-meta,
+.table-meta {
   margin-top: 0.5625rem;
 }
 
-.tj-meta .table-meta-item {
+.tj-meta + .tj-meta,
+.table-meta + .tj-meta, .tj-meta +
+.table-meta,
+.table-meta +
+.table-meta {
+  margin-top: 0;
+}
+
+.tj-meta .table-meta-item,
+.table-meta .table-meta-item {
   font-size: 0.75rem;
 }
 
-.tj-meta .table-meta-item-label {
+.tj-meta .table-meta-item-label,
+.table-meta .table-meta-item-label {
   font-weight: 500;
 }
 
-.tj-meta .table-meta-item-label a {
+.tj-meta .table-meta-item-label a,
+.table-meta .table-meta-item-label a {
   color: #555a62;
   pointer-events: none;
   cursor: default;
 }
 
-.tj-meta .media-sm {
+.tj-meta .media-sm,
+.table-meta .media-sm {
   display: inline-block;
 }
 
@@ -8965,7 +8978,13 @@ button.close {
 .tj-meta .media-sm .FeedItem .FeedDescription, .FeedItem
 .tj-meta .media-sm .FeedDescription,
 .tj-meta .media-sm .FeedItem .Date, .FeedItem
-.tj-meta .media-sm .Date {
+.tj-meta .media-sm .Date,
+.table-meta .media-sm .media-left,
+.table-meta .media-sm .info,
+.table-meta .media-sm .FeedItem .FeedDescription, .FeedItem
+.table-meta .media-sm .FeedDescription,
+.table-meta .media-sm .FeedItem .Date, .FeedItem
+.table-meta .media-sm .Date {
   display: none;
 }
 

@@ -724,7 +724,7 @@ class CategoryModel extends Gdn_Model {
         $triggerIcon = dashboardSymbol(self::displayAsIconName($category['DisplayAs']));
 
         $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
-        $cdd->setTrigger($triggerIcon, 'button', 'btn');
+        $cdd->setTrigger($triggerIcon, 'button', 'btn', 'caret-down', '', ['data-id' => val('CategoryID', $category)]);
         $cdd->setView('dropdown-twbs');
         $cdd->setForceDivider(true);
 

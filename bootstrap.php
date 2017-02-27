@@ -60,6 +60,15 @@ if (!class_exists('Gdn')) {
     exit("Class Gdn not found.");
 }
 
+// Set up the dependency injection container.
+$dic = new \Garden\Container\Container();
+Gdn::setContainer($dic);
+
+$dic->setInstance('Garden\Container\Container', $dic)
+    ->rule('Interop\Container\ContainerInterface')
+    ->setAliasOf('Garden\Container\Container')
+;
+
 // Cache Layer
 Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
 

@@ -33,4 +33,16 @@ class DataSetTest extends \PHPUnit_Framework_TestCase {
         $json = json_encode($ds);
         $this->assertEquals($expected, $json);
     }
+
+    /**
+     * Test json serialization does not affect original data.
+     */
+    public function testJsonSerializeOriginal() {
+        $dt = new \DateTimeImmutable('2000-01-01');
+        $data = [['dt' => $dt, 'IPAddress' => ipEncode('127.0.0.1')]];
+        $ds = new Gdn_DataSet($data);
+
+        json_encode($ds); // The result isn't used, but make sure Gdn_DataSet::jsonSerialize is executed.
+        $this->assertEquals($data, $ds->result());
+    }
 }

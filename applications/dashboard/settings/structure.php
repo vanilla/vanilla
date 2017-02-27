@@ -856,3 +856,8 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 // Make sure the smarty folders exist.
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');
+
+// Lock the current database character Encoding
+saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
+saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
+saveToConfig('Database.ConnectionOptions.1002', c('Database.ConnectionOptions.1002'));

@@ -691,7 +691,8 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      * which is a value of any type other than a resource.
      */
     public function jsonSerialize() {
-        // TODO: 
-        return $this->resultArray();
+        $result = $this->resultArray();
+        jsonFilter($result);
+        return $result;
     }
 }

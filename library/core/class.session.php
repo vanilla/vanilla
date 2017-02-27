@@ -10,10 +10,13 @@
  * @since 2.0
  */
 
+use Vanilla\Permissions;
+use Vanilla\SessionInterface;
+
 /**
  * Handles user information throughout a session. This class is a singleton.
  */
-class Gdn_Session {
+class Gdn_Session implements SessionInterface {
 
     /**
      * Parameter name for incoming CSRF tokens.
@@ -815,5 +818,40 @@ class Gdn_Session {
         }
 
         return $session;
+    }
+
+    public function getUserID() {
+        return $this->UserID;
+    }
+
+    public function setUserID($userID) {
+        $userID = (int)$userID;
+        $this->UserID = $userID;
+
+        if ($userID == 0 || val('UserID', $this->User) != $userID) {
+            // Set to null for lazy loading.
+            $this->User = null;
+        }
+
+        return $this;
+    }
+
+    public function getUser() {
+        if ($this->User === null && $this->UserID != 0) {
+            // Lazy load the user.
+        }
+
+        return $this->User;
+    }
+
+    public function setUser($user) {
+        $this->User = $user;
+        $this->UserID = val('UserID', $user, 0);
+        return $this;
+    }
+
+    public function setPermissions(Permissions $permissions) {
+        $this->permissions = $permissions;
+        return $this;
     }
 }

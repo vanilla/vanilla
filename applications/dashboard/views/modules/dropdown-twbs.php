@@ -1,6 +1,6 @@
 <div class="dropdown <?php echo val('cssClass', $this); ?>">
     <?php $trigger = val('trigger', $this); ?>
-    <<?php echo val('type', $trigger); ?> class="dropdown-toggle <?php echo val('cssClass', $trigger); ?>" id="<?php echo val('triggerId', $this); ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <<?php echo val('type', $trigger); ?> class="dropdown-toggle <?php echo val('cssClass', $trigger); ?>" id="<?php echo val('triggerId', $this); ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?php echo attribute(val('attributes', $trigger)); ?>>
         <?php echo val('text', $trigger); ?>
     </<?php echo val('type', $trigger); ?>>
     <div class="dropdown-menu <?php echo val('listCssClass', $this); ?>" role="menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">

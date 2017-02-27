@@ -146,7 +146,7 @@ class DropdownModule extends Gdn_Module {
      * @param string $url If the trigger has a fallback href for non-js users, add the url here.
      * @return object $this The calling DropdownModule object.
      */
-    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down', $attributes = [], $url = '') {
+    public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down', $url = '', $attributes = []) {
         $this->trigger['text'] = $text;
         $this->trigger['type'] = in_array($type, $this->triggerTypes) ? $type : 'button';
         $this->trigger['icon'] = $icon;

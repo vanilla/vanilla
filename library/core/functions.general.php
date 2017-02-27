@@ -2163,7 +2163,7 @@ if (!function_exists('jsonFilter')) {
             array_walk_recursive($value, __FUNCTION__);
         } elseif ($value instanceof \DateTimeInterface) {
             $value = $value->format('r');
-        } elseif ($ip = ipDecode($value)) {
+        } elseif (is_string($value) && ($ip = ipDecode($value)) !== null) {
             $value = $ip;
         }
     }

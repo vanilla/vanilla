@@ -1,9 +1,9 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
-$UcContext = ucfirst($this->Data['Plugin.Flagging.Data']['Context']);
-$ElementID = $this->Data['Plugin.Flagging.Data']['ElementID'];
-$URL = $this->Data['Plugin.Flagging.Data']['URL'];
-$Title = sprintf("Flag this %s", ucfirst($this->Data['Plugin.Flagging.Data']['Context']));
+$UcContext = ucfirst($this->data('Plugin.Flagging.Data.Context'));
+$ElementID = $this->data('Plugin.Flagging.Data.ElementID');
+$URL = $this->data('Plugin.Flagging.Data.URL');
+$Title = sprintf("Flag this %s", ucfirst($this->data('Plugin.Flagging.Data.Context')));
 ?>
     <h2><?php echo t($Title); ?></h2>
 <?php
@@ -17,7 +17,7 @@ echo $this->Form->errors();
          please enter a brief reason below, then press 'Flag this!'."); ?>
             </div>
             <?php echo t('FlagLinkContent', 'Link to content:').' '.anchor(t('FlagLinkFormat', "{$UcContext} #{$ElementID}"), $URL); ?> &ndash;
-            <?php echo $this->Data['Plugin.Flagging.Data']['ElementAuthor']; ?>
+            <?php echo $this->data('Plugin.Flagging.Data.ElementAuthor'); ?>
         </li>
         <li>
             <?php

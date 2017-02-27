@@ -16,7 +16,7 @@ class JsonFilterTest extends \PHPUnit_Framework_TestCase {
         $data = ['Date' => $date];
         jsonFilter($data);
 
-        $this->assertSame($date->format('r'), $data['Date']);
+        $this->assertSame($date->format('c'), $data['Date']);
     }
 
     public function testJsonFilterDateTimeRecursive() {
@@ -26,7 +26,7 @@ class JsonFilterTest extends \PHPUnit_Framework_TestCase {
         ];
         jsonFilter($data);
 
-        $this->assertSame($date->format('r'), $data['Dates']['FirstDate']);
+        $this->assertSame($date->format('c'), $data['Dates']['FirstDate']);
     }
 
     public function testJsonFilterEncodedIP() {

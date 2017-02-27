@@ -142,8 +142,8 @@ class DropdownModule extends Gdn_Module {
      * @param string $type One of the triggerTypes - currently supports 'anchor' or 'button'.
      * @param string $cssClass CSS class for the trigger.
      * @param string $icon Icon for the trigger.
-     * @param array $attributes The attributes to add to the trigger.
      * @param string $url If the trigger has a fallback href for non-js users, add the url here.
+     * @param array $attributes The attributes to add to the trigger.
      * @return object $this The calling DropdownModule object.
      */
     public function setTrigger($text = '', $type = 'button', $cssClass = 'btn-default', $icon = 'caret-down', $url = '', $attributes = []) {

@@ -31,20 +31,20 @@ class JsonFilterTest extends \PHPUnit_Framework_TestCase {
 
     public function testJsonFilterEncodedIP() {
         $ip = '127.0.0.1';
-        $data = ['IP' => ipEncode($ip)];
+        $data = ['InsertIPAddress' => ipEncode($ip)];
         jsonFilter($data);
 
-        $this->assertSame($ip, $data['IP']);
+        $this->assertSame($ip, $data['InsertIPAddress']);
     }
 
     public function testJsonFilterEncodedIPRecursive() {
         $ip = '127.0.0.1';
         $data = [
-            'IPs' => ['FirstIP' => ipEncode($ip)]
+            'Discussion' => ['UpdateIPAddress' => ipEncode($ip)]
         ];
         jsonFilter($data);
 
-        $this->assertSame($ip, $data['IPs']['FirstIP']);
+        $this->assertSame($ip, $data['Discussion']['UpdateIPAddress']);
     }
 
     public function testJsonFilterPassThrough() {

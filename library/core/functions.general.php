@@ -2159,12 +2159,20 @@ if (!function_exists('jsonFilter')) {
      * @param mixed $value
      */
     function jsonFilter(&$value) {
+        $fn = function (&$value, $key = '') use (&$fn) {
+            if ($value instanceof \DateTimeInterface) {
+                $value = $value->format('r');
+            } elseif (is_string($value)) {
+                if (stringEndsWith($key, 'IPAddress', true) && ($ip = ipDecode($value)) !== null) {
+                    $value = $ip;
+                }
+            }
+        };
+
         if (is_array($value)) {
-            array_walk_recursive($value, __FUNCTION__);
-        } elseif ($value instanceof \DateTimeInterface) {
-            $value = $value->format('r');
-        } elseif (is_string($value) && ($ip = ipDecode($value)) !== null) {
-            $value = $ip;
+            array_walk_recursive($value, $fn);
+        } else {
+            $fn($value);
         }
     }
 }

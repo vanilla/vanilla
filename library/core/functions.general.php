@@ -2159,18 +2159,24 @@ if (!function_exists('jsonFilter')) {
      * @param mixed $value
      */
     function jsonFilter(&$value) {
-        $fn = function (&$value, $key = '') use (&$fn) {
-            if ($value instanceof \DateTimeInterface) {
+        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey, $key);
+                });
+            } elseif ($value instanceof \DateTimeInterface) {
                 $value = $value->format('r');
             } elseif (is_string($value)) {
-                if (stringEndsWith($key, 'IPAddress', true) && ($ip = ipDecode($value)) !== null) {
+                // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
+                $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));
+                if ($isIPField && ($ip = ipDecode($value)) !== null) {
                     $value = $ip;
                 }
             }
         };
 
         if (is_array($value)) {
-            array_walk_recursive($value, $fn);
+            array_walk($value, $fn);
         } else {
             $fn($value);
         }

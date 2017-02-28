@@ -1,5 +1,5 @@
 
-<span class="ToggleFlyout OptionsMenu <?php echo val('cssClass', $this); ?>">
+<span class="ToggleFlyout <?php echo val('cssClass', $this); ?>">
     <?php if (val('type', val('trigger', $this)) === 'button') : ?>
     <span class="Button-Options">
         <span class="OptionsTitle" title="<?php echo t('Options'); ?>">
@@ -36,7 +36,7 @@
                         }
                         echo val('text', $item);
                         if (val('badge', $item)) {
-                            echo badge(val('badge', $item));
+                            echo ' '.wrap(val('badge', $item), 'span', ['class' => 'Alert']);
                         }
                         ?></a>
                 </li>

@@ -96,6 +96,7 @@ class Schema implements \JsonSerializable {
     /**
      * Build an OpenAPI-compatible specification of the current schema.
      *
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
      * @return array
      */
     public function dumpSpec() {
@@ -109,8 +110,13 @@ class Schema implements \JsonSerializable {
                 }
 
                 // Massage schema's types into their Open API v2 counterparts, including potential formatting flags.
-                // string, boolean and array pass through without adjustment.
+                // Valid parameter types for OpenAPI v2: string, number, integer, boolean, array or file
                 switch ($parameter['type']) {
+                    case 'string':
+                    case 'boolean':
+                    case 'array':
+                        // string, boolean and array types should not be altered.
+                        break;
                     case 'object':
                         $parameter['type'] = 'array';
                         break;
@@ -911,6 +917,6 @@ class Schema implements \JsonSerializable {
      * which is a value of any type other than a resource.
      */
     public function jsonSerialize() {
-        return $this->getParameters();
+        return $this->schema;
     }
 }

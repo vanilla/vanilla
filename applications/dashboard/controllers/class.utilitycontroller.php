@@ -307,6 +307,13 @@ class UtilityController extends DashboardController {
 
         $this->fireEvent('AfterUpdate');
 
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // Make sure that we do not disclose anything too sensitive here!
+            $this->Data = array_filter($this->Data, function($key) {
+                return in_array(strtolower($key), ['success', 'error']);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
         $this->render();

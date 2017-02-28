@@ -449,7 +449,7 @@ class Gdn_Session {
                 // Set permission overrides.
                 $this->permissions->setAdmin($this->User->Admin);
                 if (!empty($this->User->Deleted)) {
-                    $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t("Your account has been deleted.")]);
+                    $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
                 }
                 if (!empty($this->User->Banned)) {
                     $this->permissions->addBan(Permissions::BAN_BANNED, ['msg' => t('You are banned.')]);

@@ -85,7 +85,7 @@ class Permissions {
      * @param bool $prepend If **true**, the ban will be prepended to the ban list instead of appending it.
      * @return $this
      */
-    public function addBan($name, $ban = [], $prepend = false) {
+    public function addBan($name, array $ban = [], $prepend = false) {
         if (substr($name, 0, 1) !== '!') {
             throw new \InvalidArgumentException('Ban names must start with "!".', 500);
         }

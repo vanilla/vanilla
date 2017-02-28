@@ -1522,7 +1522,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }
@@ -1649,7 +1649,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }

@@ -111,10 +111,10 @@ class UtilityController extends DashboardController {
 
         if (c('Garden.Profile.ShowActivities', true)) {
             $whiteList = array_merge($whiteList, [
-                'email.wallcomment',
-                'email.activitycomment',
-                'popup.wallcomment',
-                'popup.activitycomment'
+                'Email.WallComment',
+                'Email.ActivityComment',
+                'Popup.WallComment',
+                'Popup.ActivityComment'
             ]);
         }
 
@@ -122,7 +122,19 @@ class UtilityController extends DashboardController {
         $Session = Gdn::session();
         $Success = false;
 
-        if (in_array(strtolower($Name), $whiteList)) {
+        // Get index of whitelisted name
+        $index = array_search(strtolower($Name), array_map('strtolower', $whiteList));
+
+        if (!empty($whiteList) && $index !== false) {
+
+            // Force name to have casing present in whitelist
+            $Name = $whiteList[$index];
+
+            // Force value
+            if ($Value != '1') {
+                $Value = '0';
+            }
+
             if (in_array($UserPropertyColumn, array('preference', 'attribute'))
                 && $Name != ''
                 && $Value != ''

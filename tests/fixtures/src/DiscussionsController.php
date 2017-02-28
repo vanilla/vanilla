@@ -72,4 +72,20 @@ class DiscussionsController {
     public function get_help($id, ...$parts) {
 
     }
+
+    public function getSomething() {
+
+    }
+
+    public function setSomething($val) {
+    }
+
+    public function protectMe() {
+
+    }
+
+    public function isProtected($method) {
+        return strcasecmp($method, 'protectMe') === 0;
+    }
+
 }

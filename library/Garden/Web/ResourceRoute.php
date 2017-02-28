@@ -128,7 +128,7 @@ class ResourceRoute extends Route {
      */
     private function findAction($controller, RequestInterface $request, array $pathArgs) {
         foreach ($this->getControllerMethodNames($request->getMethod(), $pathArgs) as list($methodName, $omit)) {
-            if ($callback = $this->classLocator->findMethod($controller, $methodName)) {
+            if ($callback = $this->findMethod($controller, $methodName)) {
                 $args = $pathArgs;
                 if ($omit !== null) {
                     array_splice($args, $omit, 1);
@@ -143,6 +143,24 @@ class ResourceRoute extends Route {
             }
         }
         return null;
+    }
+
+    /**
+     * Determine whether a method exists on a controller.
+     *
+     * @param object $controller The controller to examine.
+     * @param string $methodName The name of the method.
+     * @return callable|null Returns the method callback or null if it doesn't.
+     */
+    private function findMethod($controller, $methodName) {
+        // Getters and setters aren't found.
+        if (preg_match('`^(get|set|is)[a-z]`i', $methodName)) {
+            return null;
+        } elseif (method_exists($controller, 'isProtected') && $controller->isProtected($methodName)) {
+            return null;
+        }
+
+        return $this->classLocator->findMethod($controller, $methodName);
     }
 
     /**

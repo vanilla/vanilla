@@ -113,6 +113,26 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Getters and setters should not match routes.
+     */
+    public function testGettersSetters() {
+        $route = $this->createRoute();
+
+        $this->assertNull($route->match(new Request('/discussions/getsomething')));
+        $this->assertNull($route->match(new Request('/discussions/setsomething/123')));
+        $this->assertNull($route->match(new Request('/discussions/isProtected/foo')));
+    }
+
+    /**
+     * Controllers can protect methods with isProtected().
+     */
+    public function testIsProtected() {
+        $route = $this->createRoute();
+
+        $this->assertNull($route->match(new Request('/discussions/protectme')));
+    }
+
+    /**
      * Provide test data for {@link testKnownRoutes()}.
      *
      * @return array Returns test data.

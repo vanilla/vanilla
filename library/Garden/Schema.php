@@ -262,6 +262,13 @@ class Schema implements \JsonSerializable {
                 } else {
                     throw new \InvalidArgumentException("Schema at position $key is not a valid param.", 500);
                 }
+            } elseif ($value instanceof Schema) {
+                $param = static::parseShortParam($key);
+                $param['type'] = 'object';
+                $param['properties'] = $value->getParameters();
+
+               $name = $param['name'];
+               $result[$name] = $param;
             } else {
                 // The parameter is defined in the key.
                 $param = static::parseShortParam($key, $value);

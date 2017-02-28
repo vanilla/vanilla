@@ -1414,7 +1414,7 @@ EOT;
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }
@@ -1589,7 +1589,7 @@ EOT;
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }

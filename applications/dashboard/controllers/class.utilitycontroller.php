@@ -105,18 +105,46 @@ class UtilityController extends DashboardController {
      * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
      */
     public function set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
+        deprecated('set', '', 'February 2017');
+
+        $whiteList = [];
+
+        if (c('Garden.Profile.ShowActivities', true)) {
+            $whiteList = array_merge($whiteList, [
+                'Email.WallComment',
+                'Email.ActivityComment',
+                'Popup.WallComment',
+                'Popup.ActivityComment'
+            ]);
+        }
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Session = Gdn::session();
         $Success = false;
-        if (in_array($UserPropertyColumn, array('preference', 'attribute'))
-            && $Name != ''
-            && $Value != ''
-            && $Session->UserID > 0
-            && $Session->validateTransientKey($TransientKey)
-        ) {
-            $UserModel = Gdn::factory("UserModel");
-            $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
-            $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
+
+        // Get index of whitelisted name
+        $index = array_search(strtolower($Name), array_map('strtolower', $whiteList));
+
+        if (!empty($whiteList) && $index !== false) {
+
+            // Force name to have casing present in whitelist
+            $Name = $whiteList[$index];
+
+            // Force value
+            if ($Value != '1') {
+                $Value = '0';
+            }
+
+            if (in_array($UserPropertyColumn, array('preference', 'attribute'))
+                && $Name != ''
+                && $Value != ''
+                && $Session->UserID > 0
+                && $Session->validateTransientKey($TransientKey)
+            ) {
+                $UserModel = Gdn::factory("UserModel");
+                $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
+                $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
+            }
         }
 
         if (!$Success) {

@@ -54,6 +54,18 @@ class PostController extends VanillaController {
     }
 
     /**
+     * Filters form values against a given whitelist.
+     *
+     * @param array $formValues The form values to filter.
+     * @param array $whiteList An array of strings, the whitelisted fields.
+     * @return array The filtered fields.
+     */
+    private function filterFormValues(array $formValues, array $whiteList) {
+        $whiteListFlipped = array_flip($whiteList);
+        return array_intersect_key($formValues, $whiteListFlipped);
+    }
+
+    /**
      * Get available announcement options for discussions.
      *
      * @since 2.1
@@ -209,7 +221,20 @@ class PostController extends VanillaController {
         } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
             // Save as a draft?
             $FormValues = $this->Form->formValues();
-            $FormValues = $this->DiscussionModel->filterForm($FormValues);
+            $whiteListedFields = [
+                'Name',
+                'Body',
+                'Format',
+                'CategoryID',
+                'ForeignID',
+                'Tags',
+                'Type',
+                'Closed',
+                'Announce',
+                'Sink'
+            ];
+            $FormValues = $this->filterFormValues($FormValues, $whiteListedFields);
+
             $this->deliveryType(Gdn::request()->getValue('DeliveryType', $this->_DeliveryType));
             if ($DraftID == 0) {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
@@ -638,7 +663,7 @@ class PostController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
-            $FormValues = $this->CommentModel->filterForm($FormValues);
+            $FormValues = $this->filterFormValues($FormValues, ['Body', 'DiscussionID', 'Format']);
 
             if (!$Editing) {
                 unset($FormValues['CommentID']);

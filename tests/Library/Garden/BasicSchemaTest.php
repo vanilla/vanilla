@@ -323,6 +323,23 @@ class BasicSchemaTest extends SchemaTest {
     }
 
     /**
+     * Test merging basic schemas.
+     */
+    public function testBasicMerge() {
+        $schemaOne = new Schema(['foo:s']);
+        $schemaTwo = new Schema(['bar:s']);
+
+        $schemaOne->merge($schemaTwo);
+
+        $expected = [
+            'foo' => ['name' => 'foo', 'type' => 'string', 'required' => true],
+            'bar' => ['name' => 'bar', 'type' => 'string','required' => true]
+        ];
+
+        $this->assertEquals($expected, $schemaOne->jsonSerialize());
+    }
+
+    /**
      * Provide a variety of valid boolean data.
      *
      * @return array Returns an array of boolean data.

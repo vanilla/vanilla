@@ -213,6 +213,36 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Get the schema's currently configured parameters.
+     *
+     * @return array
+     */
+    public function getParameters() {
+        return $this->schema;
+    }
+
+    /**
+     * Merge a schema with this one.
+     *
+     * @param Schema $schema A scheme instance. Its parameters will be merged into the current instance.
+     */
+    public function merge(Schema $schema) {
+        $fn = function (array &$target, array $source) use (&$fn) {
+            foreach ($source as $key => $val) {
+                if (is_array($val) && array_key_exists($key, $target) && is_array($target[$key])) {
+                    $target[$key] = $fn($target[$key], $val);
+                } else {
+                    $target[$key] = $val;
+                }
+            }
+
+            return $target;
+        };
+
+        $fn($this->schema, $schema->getParameters());
+    }
+
+    /**
      * Parse a schema in short form into a full schema array.
      *
      * @param array $arr The array to parse into a schema.
@@ -874,6 +904,6 @@ class Schema implements \JsonSerializable {
      * which is a value of any type other than a resource.
      */
     public function jsonSerialize() {
-        return $this->schema;
+        return $this->getParameters();
     }
 }

@@ -242,6 +242,39 @@ class NestedSchemaTest extends SchemaTest {
     }
 
     /**
+     * Test merging nested schemas.
+     */
+    public function testNestedMerge() {
+        $schemaOne = $this->getArrayOfObjectsSchema();
+        $schemaTwo = new Schema([
+            'rows:a' => [
+                'email:s'
+            ]
+        ]);
+
+        $expected = [
+            'rows' => [
+                'name' => 'rows',
+                'type' => 'array',
+                'required' => true,
+                'items' => [
+                    'type' => 'object',
+                    'required' => true,
+                    'properties' => [
+                        'id' => ['name' => 'id', 'type' => 'integer', 'required' => true],
+                        'name' => ['name' => 'name', 'type' => 'string', 'required' => false],
+                        'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
+                    ]
+                ]
+            ]
+        ];
+
+        $schemaOne->merge($schemaTwo);
+
+        $this->assertEquals($expected, $schemaOne->jsonSerialize());
+    }
+
+    /**
      * Test throwing an exception when removing unexpected parameters from validated data.
      *
      * @expectedException \Garden\Exception\ValidationException

@@ -175,6 +175,25 @@ class EventManager {
     }
 
     /**
+     * Strip the namespace from a class.
+     *
+     * @param string|object $class The name of the class or a class instance.
+     * @return string Returns the base name as a string.
+     */
+    public static function classBasename($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        if (($i = strrpos($class, '\\')) !== false) {
+            $result = substr($class, $i + 1);
+        } else {
+            $result = $class;
+        }
+        return $result;
+    }
+
+    /**
      * Checks if an event has a handler.
      *
      * @param string $event The name of the event.

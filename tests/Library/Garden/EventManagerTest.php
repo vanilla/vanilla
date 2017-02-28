@@ -422,4 +422,32 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         return $result;
     }
+
+    /**
+     * Test {@link EventManager::classBasename()}.
+     *
+     * @param mixed $class The class name or instance to test.
+     * @param string $expected The expected result.
+     * @dataProvider provideClassBasenameTests
+     */
+    public function testClassBasename($class, $expected) {
+        $basename = EventManager::classBasename($class);
+
+        $this->assertEquals($expected, $basename);
+    }
+
+    /**
+     * Generate test data for {@link EventManagerTest::testClassBasename()}.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideClassBasenameTests() {
+        $r = [
+            'object' => [$this, 'EventManagerTest'],
+            'no namespace' => ['Foo', 'Foo'],
+            'namespace' => ['Foo\Bar', 'Bar']
+        ];
+
+        return $r;
+    }
 }

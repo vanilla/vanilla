@@ -860,4 +860,3 @@ touchFolder(PATH_CACHE.'/Smarty/compile');
 // Lock the current database character Encoding
 saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
 saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
-saveToConfig('Database.ConnectionOptions.1002', c('Database.ConnectionOptions.1002'));

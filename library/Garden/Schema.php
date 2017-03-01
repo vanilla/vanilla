@@ -219,11 +219,11 @@ class Schema implements \JsonSerializable {
     }
 
     /**
-     * Get the schema's currently configured parameters.
+     * Get the schema array.
      *
      * @return array
      */
-    public function getParameters() {
+    public function getSchema() {
         return $this->schema;
     }
 
@@ -245,7 +245,7 @@ class Schema implements \JsonSerializable {
             return $target;
         };
 
-        $fn($this->schema, $schema->getParameters());
+        $fn($this->schema, $schema->getSchema());
     }
 
     /**
@@ -271,7 +271,7 @@ class Schema implements \JsonSerializable {
             } elseif ($value instanceof Schema) {
                 $param = static::parseShortParam($key);
                 $param['type'] = 'object';
-                $param['properties'] = $value->getParameters();
+                $param['properties'] = $value->getSchema();
 
                $name = $param['name'];
                $result[$name] = $param;

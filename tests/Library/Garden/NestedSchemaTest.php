@@ -371,7 +371,7 @@ class NestedSchemaTest extends SchemaTest {
                 ]
         ];
 
-        $this->assertEquals($expected, $schema->getParameters());
+        $this->assertEquals($expected, $schema->getSchema());
     }
 
     /**

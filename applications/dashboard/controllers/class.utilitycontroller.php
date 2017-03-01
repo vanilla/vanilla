@@ -307,6 +307,13 @@ class UtilityController extends DashboardController {
 
         $this->fireEvent('AfterUpdate');
 
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // Make sure that we do not disclose anything too sensitive here!
+            $this->Data = array_filter($this->Data, function($key) {
+                return in_array(strtolower($key), ['success', 'error']);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
         $this->render();
@@ -577,18 +584,5 @@ class UtilityController extends DashboardController {
         $this->deliveryType(DELIVERY_TYPE_DATA);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
-    }
-
-    /**
-     * Render the controller's view.
-     */
-    public function render() {
-        // Make sure that we do not disclose anything too sensitive!
-        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
-            $this->Data = array_filter($this->Data, function($key) {
-                return !in_array(strtolower($key), ['database', 'vanillaid', 'client']);
-            }, ARRAY_FILTER_USE_KEY);
-        }
-        parent::render();
     }
 }

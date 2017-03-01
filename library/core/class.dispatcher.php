@@ -310,23 +310,19 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         });
 
         // Parse the file extension.
-        list($parts, $deliveryMethod) = $this->parseDeliveryMethod($parts);
+        $deliveryMethod = $this->getDeliveryMethod($request);
+        if ($deliveryMethod) {
+            // Remove the extension
+            $filename = substr(array_pop($parts), 0, -(strlen('.'.$deliveryMethod)));
+            $parts[] = $filename;
 
-        // Set some special properties based on the deliver method.
-        $deliveryType = $this->deliveryType;
-        switch ($deliveryMethod) {
-            case DELIVERY_METHOD_JSON:
-            case DELIVERY_METHOD_XML:
-                $deliveryType = DELIVERY_TYPE_DATA;
-                break;
-            case DELIVERY_METHOD_ATOM:
-            case DELIVERY_METHOD_RSS:
-                $result['syndicationMethod'] = DELIVERY_METHOD_RSS; //$deliveryMethod;
-                break;
-            case DELIVERY_METHOD_TEXT:
-                $deliveryType = DELIVERY_TYPE_VIEW;
-                break;
+            if (in_array($deliveryMethod, [DELIVERY_METHOD_ATOM, DELIVERY_METHOD_RSS])) {
+                $result['syndicationMethod'] = DELIVERY_METHOD_RSS;
+            }
         }
+
+        $deliveryType = $this->getDeliveryType($deliveryMethod);
+
         // An explicitly passed delivery type/method overrides the default.
         $result['deliveryMethod'] = self::requestVal('DeliveryMethod', $result['query'], $result['post'], $deliveryMethod ?: $this->deliveryMethod);
         $result['deliveryType'] = self::requestVal('DeliveryType', $result['query'], $result['post'], $deliveryType);
@@ -690,14 +686,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     }
 
     /**
-     * Parse the delivery method base on the file extension.
+     * Get the delivery method, based on the file extension, of the request.
      *
-     * If a valid file extension is found then it will be removed from {@link $parts}.
-     *
-     * @param string[] $parts The path parts to parse.
-     * @return array Returns an array in the form `[$parts, $deliveryMethod]`.
+     * @param Gdn_Request $request the request to parse.
+     * @return string Returns the delivery method or an empty string if none.
      */
-    private function parseDeliveryMethod($parts) {
+    public function getDeliveryMethod($request) {
         $methods = [
             DELIVERY_METHOD_JSON,
             DELIVERY_METHOD_XHTML,
@@ -707,17 +701,36 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             DELIVERY_METHOD_ATOM
         ];
 
-        if ($ext = pathinfo(end($parts), PATHINFO_EXTENSION)) {
+        if ($ext = pathinfo(str_replace('\\', '/', $request->path()), PATHINFO_EXTENSION)) {
             $ext = strtoupper($ext);
             if (in_array($ext, $methods, true)) {
-                // Remove the extension.
-                $filename = substr(array_pop($parts), 0, -(strlen($ext) + 1));
-                $parts[] = $filename;
-                return [$parts, $ext];
+                return $ext;
             }
         }
 
-        return [$parts, ''];
+        return '';
+    }
+
+    /**
+     * Get the delivery type based on the supplied $deliveryMethod.
+     * Default to the current {@link $deliveryType} if $deliveryMethod was not found.
+     *
+     * @param string $deliveryMethod
+     * @return false|string The delivery type
+     */
+    public function getDeliveryType($deliveryMethod) {
+        // Set some special properties based on the deliver method.
+        $deliveryType = $this->deliveryType;
+        switch ($deliveryMethod) {
+            case DELIVERY_METHOD_JSON:
+            case DELIVERY_METHOD_XML:
+                $deliveryType = DELIVERY_TYPE_DATA;
+                break;
+            case DELIVERY_METHOD_TEXT:
+                $deliveryType = DELIVERY_TYPE_VIEW;
+                break;
+        }
+        return $deliveryType;
     }
 
     /**

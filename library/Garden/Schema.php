@@ -25,6 +25,9 @@ class Schema implements \JsonSerializable {
     /** Throw a ValidationException when invalid parameters are encountered during validation. */
     const VALIDATE_EXCEPTION = 4;
 
+    /** Name of the root config element. */
+    const ROOT_CONFIG_NAME = '';
+
     /// Properties ///
 
     /** @var string */
@@ -206,7 +209,36 @@ class Schema implements \JsonSerializable {
      * @return string
      */
     public function getDescription() {
-        return $this->description;
+        return $this->schema['description'];
+    }
+
+    /**
+     * Grab the configured fields from the schema array.
+     *
+     * @param array $schema
+     * @return array
+     */
+    protected function getFields(array $schema) {
+        if (array_key_exists('type', $schema)) {
+            $type = $schema['type'];
+
+            if ($type === 'object' && array_key_exists('properties', $schema)) {
+                $schema = $schema['properties'];
+            } elseif ($type === 'array' && array_key_exists('items', $schema)) {
+                $schema = $schema['items'];
+            }
+        }
+
+        return $schema;
+    }
+
+    /**
+     * Grab the schema's current type.
+     *
+     * @return string
+     */
+    public function getType() {
+        return $this->schema['type'];
     }
 
     /**
@@ -249,14 +281,93 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Attempt to parse top-level array elements to determine a root schema configuration.
+     *
+     * @param array $arr A schema configuration array.
+     * @return array|false An root-level config on success or false on failure.
+     */
+    private static function parseRootDefinition(array $arr) {
+        $result = false;
+
+        if (array_key_exists('type', $arr)) {
+            if (!in_array($arr['type'], static::$types)) {
+                throw new \InvalidArgumentException("Invalid root schema type: {$arr['type']}.", 500);
+            }
+
+            switch ($arr['type']) {
+                case 'array':
+                    if (array_key_exists('items', $arr)) {
+                        $result = static::parseSchema($arr['items']);
+                    }
+                    break;
+                case 'object':
+                    if (array_key_exists('properties', $arr)) {
+                        $result = static::parseSchema($arr['properties']);
+                    }
+                    break;
+                default:
+                    $result = ['type' => $arr['type']];
+            }
+
+            unset($result['name']);
+        } elseif (count($arr)) {
+            // The root config should be the very first key/value.
+            $val = reset($arr);
+            $key = key($arr);
+
+            // We only need the type parameter and any child item/property configs.
+            if (is_int($key)) {
+                $param = static::parseShortParam($val);
+
+                if ($param['name'] === static::ROOT_CONFIG_NAME) {
+                    $result = [
+                        'type' => $param['type']
+                    ];
+                }
+            } else {
+                $param = static::parseShortParam($key);
+
+                if ($param['name'] === static::ROOT_CONFIG_NAME) {
+                    $result = [
+                        'type' => $param['type']
+                    ];
+                    $schema = static::parseSchema($val, 1);
+
+                    if (count($schema)) {
+                        switch ($param['type']) {
+                            case 'array':
+                                $result['items'] = $schema;
+                                break;
+                            case 'object':
+                                $result['properties'] = $schema;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Parse a schema in short form into a full schema array.
      *
      * @param array $arr The array to parse into a schema.
-     * @return array The full schema array.
+     * @param int $depth
      * @throws \InvalidArgumentException Throws an exception when an item in the schema is invalid.
+     * @return  array The full schema array.
      */
-    public static function parseSchema(array $arr) {
+    public static function parseSchema(array $arr, $depth = 0) {
         $result = [];
+
+        if ($depth === 0) {
+            // If we're at the top level, try to parse the array for an alternate root configuration.
+            $root = static::parseRootDefinition($arr);
+            if (is_array($root)) {
+                return $root;
+            }
+        }
 
         foreach ($arr as $key => $value) {
             if (is_int($key)) {
@@ -269,12 +380,13 @@ class Schema implements \JsonSerializable {
                     throw new \InvalidArgumentException("Schema at position $key is not a valid param.", 500);
                 }
             } elseif ($value instanceof Schema) {
+                $nestedSchema = $value->getSchema();
                 $param = static::parseShortParam($key);
-                $param['type'] = 'object';
-                $param['properties'] = $value->getSchema();
+                $name = $param['name'];
 
-               $name = $param['name'];
-               $result[$name] = $param;
+                $nestedSchema['name'] = $name;
+                $nestedSchema['required'] = $param['required'];
+                $result[$name] = $nestedSchema;
             } else {
                 // The parameter is defined in the key.
                 $param = static::parseShortParam($key, $value);
@@ -295,16 +407,16 @@ class Schema implements \JsonSerializable {
                                 $param['items'] = [
                                     'type' => 'object',
                                     'required' => true,
-                                    'properties' => static::parseSchema($value)
+                                    'properties' => static::parseSchema($value, $depth + 1)
                                 ];
                             }
                             break;
                         case 'object':
                             // The value is a schema of the object.
                             if (isset($value['properties'])) {
-                                $param['properties'] = static::parseSchema($value['properties']);
+                                $param['properties'] = static::parseSchema($value['properties'], $depth + 1);
                             } else {
-                                $param['properties'] = static::parseSchema($value);
+                                $param['properties'] = static::parseSchema($value, $depth + 1);
                             }
                             break;
                         default:
@@ -333,6 +445,14 @@ class Schema implements \JsonSerializable {
 
                 $result[$name] = $param;
             }
+        }
+
+        if ($depth === 0) {
+            // Default root config.
+            $result = [
+                'type' => 'object',
+                'properties' => $result
+            ];
         }
 
         return $result;
@@ -457,11 +577,13 @@ class Schema implements \JsonSerializable {
      *
      * @param array &$data The data to validate.
      * @param Validation &$validation This argument will be filled with the validation result.
-     * @return bool Returns true if the data is valid, false otherwise.
+     * @return Schema
      * @throws ValidationException Throws an exception when the data does not validate against the schema.
      */
     public function validate(array &$data, Validation &$validation = null) {
-        if (!$this->isValidInternal($data, $this->schema, $validation, '')) {
+        $schema = static::getFields($this->schema);
+
+        if (!$this->isValidInternal($data, $schema, $validation, '')) {
             if ($validation === null) {
                 // Although this should never be null, scrutinizer complains that it might be.
                 $validation = new Validation();
@@ -469,6 +591,7 @@ class Schema implements \JsonSerializable {
 
             throw new ValidationException($validation);
         }
+
         return $this;
     }
 
@@ -480,7 +603,9 @@ class Schema implements \JsonSerializable {
      * @return bool Returns true if the data is valid. False otherwise.
      */
     public function isValid(array &$data, Validation &$validation = null) {
-        return $this->isValidInternal($data, $this->schema, $validation, '');
+        $schema = static::getFields($this->schema);
+
+        return $this->isValidInternal($data, $schema, $validation, '');
     }
 
     /**
@@ -532,9 +657,26 @@ class Schema implements \JsonSerializable {
      */
     public function setDescription($description) {
         if (is_string($description)) {
-            $this->description = $description;
+            $this->schema['description'] = $description;
         } else {
             throw new \InvalidArgumentException("Invalid description type.", 500);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the type for the schema.
+     *
+     * @param string $type
+     * @throws \InvalidArgumentException when the provided type is not valid.
+     * @return Schema Returns the current instance for fluent calls.
+     */
+    public function setType($type) {
+        if (is_string($type) && in_array($type, static::$types)) {
+            $this->schema['type'] = $type;
+        } else {
+            throw new \InvalidArgumentException("Invalid schema type.", 500);
         }
 
         return $this;
@@ -917,6 +1059,6 @@ class Schema implements \JsonSerializable {
      * which is a value of any type other than a resource.
      */
     public function jsonSerialize() {
-        return $this->schema;
+        return $this->getSchema();
     }
 }

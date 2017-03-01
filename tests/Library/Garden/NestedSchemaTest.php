@@ -26,7 +26,7 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ]);
 
-        $expected = [
+        $expectedProperties = [
             'obj' => [
                 'name' => 'obj',
                 'type' => 'object',
@@ -38,8 +38,8 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ];
 
-        $actual = $schema->jsonSerialize();
-        $this->assertEquals($expected, $actual);
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
     }
 
     /**
@@ -49,8 +49,8 @@ class NestedSchemaTest extends SchemaTest {
         $schema = $this->getNestedSchema();
 
         // Make sure the long form can be used to create the schema.
-        $schema2 = Schema::create($schema->jsonSerialize());
-        $this->assertEquals($schema->jsonSerialize(), $schema2->jsonSerialize());
+        $schema2 = Schema::create($schema->getSchema());
+        $this->assertEquals($schema->getSchema(), $schema2->getSchema());
     }
 
     /**
@@ -65,7 +65,7 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ]);
 
-        $expected = [
+        $expectedProperties = [
             'obj' => [
                 'name' => 'obj',
                 'type' => 'object',
@@ -87,7 +87,8 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ];
 
-        $this->assertEquals($expected, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
     }
 
     /**
@@ -161,7 +162,7 @@ class NestedSchemaTest extends SchemaTest {
     public function testArrayOfObjectsSchema() {
         $schema = $this->getArrayOfObjectsSchema();
 
-        $expected = [
+        $expectedProperties = [
             'rows' => [
                 'name' => 'rows',
                 'type' => 'array',
@@ -177,8 +178,8 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ];
 
-        $actual = $schema->jsonSerialize();
-        $this->assertEquals($expected, $actual);
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
     }
 
     /**
@@ -252,7 +253,7 @@ class NestedSchemaTest extends SchemaTest {
             ]
         ]);
 
-        $expected = [
+        $expectedProperties = [
             'rows' => [
                 'name' => 'rows',
                 'type' => 'array',
@@ -271,7 +272,8 @@ class NestedSchemaTest extends SchemaTest {
 
         $schemaOne->merge($schemaTwo);
 
-        $this->assertEquals($expected, $schemaOne->jsonSerialize());
+        $actual = $schemaOne->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
     }
 
     /**
@@ -346,7 +348,7 @@ class NestedSchemaTest extends SchemaTest {
             'updateUser?' => $userSchema
         ]);
 
-        $expected = [
+        $expectedProperties = [
             'name' => ['name' => 'name', 'type' => 'string', 'required' => true, 'description' => 'The title of the discussion.'],
             'body' => ['name' => 'body', 'type' => 'string', 'required' => true, 'description' => 'The body of the discussion.'],
             'insertUser' => [
@@ -360,15 +362,40 @@ class NestedSchemaTest extends SchemaTest {
                 ]
             ],
             'updateUser' => [
-                    'name' => 'updateUser',
-                    'type' => 'object',
-                    'required' => false,
-                    'properties' => [
-                        'userID' => ['name' => 'userID', 'type' => 'integer', 'required' => true],
-                        'name' => ['name' => 'name', 'type' => 'string', 'required' => true],
-                        'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
-                    ]
+                'name' => 'updateUser',
+                'type' => 'object',
+                'required' => false,
+                'properties' => [
+                    'userID' => ['name' => 'userID', 'type' => 'integer', 'required' => true],
+                    'name' => ['name' => 'name', 'type' => 'string', 'required' => true],
+                    'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
                 ]
+            ]
+        ];
+
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
+    }
+
+    /**
+     * Test definining the root with a schema array.
+     */
+    public function testDefineRoot() {
+        $schema = new Schema([
+            ':a' => [
+                'userID:i',
+                'name:s',
+                'email:s'
+            ]
+        ]);
+
+        $expected = [
+            'type' => 'array',
+            'items' => [
+                'userID' => ['name' => 'userID', 'type' => 'integer', 'required' => true],
+                'name' => ['name' => 'name', 'type' => 'string', 'required' => true],
+                'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
+            ]
         ];
 
         $this->assertEquals($expected, $schema->getSchema());

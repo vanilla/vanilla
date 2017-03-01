@@ -28,10 +28,11 @@ class BasicSchemaTest extends SchemaTest {
             'date' => ['name' => 'date', 'type' => 'datetime', 'required' => false],
             'amount' => ['name' => 'amount', 'type' => 'float', 'required' => false],
             '64ish' => ['name' => '64ish', 'type' => 'base64', 'required' => false],
-            'enabled' => ['name' => 'enabled', 'type' => 'boolean', 'required' => false],
+            'enabled' => ['name' => 'enabled', 'type' => 'boolean', 'required' => false]
         ];
 
-        $this->assertEquals($expected, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expected, $actual['properties']);
     }
 
     /**
@@ -108,12 +109,13 @@ class BasicSchemaTest extends SchemaTest {
     public function testArrayType() {
         $schema = Schema::create(['arr:a']);
 
-        $expectedSchema = [
+        $expectedProperties = [
             'arr' => ['name' => 'arr', 'type' => 'array', 'required' => true]
         ];
 
         // Basic array without a type.
-        $this->assertEquals($expectedSchema, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
 
         $data = ['arr' => [1, 2, 3]];
         $this->assertTrue($schema->isValid($data));
@@ -121,25 +123,28 @@ class BasicSchemaTest extends SchemaTest {
         $this->assertTrue($schema->isValid($data));
 
         // Array with a description and not a type.
-        $expectedSchema['arr']['description'] = 'Hello world!';
+        $expectedProperties['arr']['description'] = 'Hello world!';
         $schema = Schema::create(['arr:a' => 'Hello world!']);
-        $this->assertEquals($expectedSchema, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
 
         // Array with an items type.
-        unset($expectedSchema['arr']['description']);
-        $expectedSchema['arr']['items']['type'] = 'integer';
-        $expectedSchema['arr']['items']['required'] = true;
+        unset($expectedProperties['arr']['description']);
+        $expectedProperties['arr']['items']['type'] = 'integer';
+        $expectedProperties['arr']['items']['required'] = true;
 
         $schema = Schema::create(['arr:a' => 'i']);
-        $this->assertEquals($expectedSchema, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
 
         // Test the longer syntax.
-        $expectedSchema['arr']['description'] = 'Hello world!';
+        $expectedProperties['arr']['description'] = 'Hello world!';
         $schema = Schema::create(['arr:a' => [
             'description' => 'Hello world!',
             'items' => ['type' => 'integer', 'required' => true]
         ]]);
-        $this->assertEquals($expectedSchema, $schema->jsonSerialize());
+        $actual = $schema->getSchema();
+        $this->assertEquals($expectedProperties, $actual['properties']);
     }
 
     /**
@@ -147,9 +152,11 @@ class BasicSchemaTest extends SchemaTest {
      */
     public function testLongCreate() {
         $schema = $this->getAtomicSchema();
-        $schema2 = Schema::create($schema->jsonSerialize());
+        $schema2 = Schema::create($schema->getSchema());
 
-        $this->assertEquals($schema->jsonSerialize(), $schema2->jsonSerialize());
+        $expected = $schema->getSchema();
+        $actual = $schema2->getSchema();
+        $this->assertEquals($expected, $actual);
     }
 
     /**
@@ -336,7 +343,8 @@ class BasicSchemaTest extends SchemaTest {
             'bar' => ['name' => 'bar', 'type' => 'string','required' => true]
         ];
 
-        $this->assertEquals($expected, $schemaOne->jsonSerialize());
+        $actual = $schemaOne->getSchema();
+        $this->assertEquals($expected, $actual['properties']);
     }
 
     /**

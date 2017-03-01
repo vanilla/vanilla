@@ -1,4 +1,10 @@
 @charset "UTF-8";
+.clearfix::after {
+  content: '';
+  display: table;
+  clear: both;
+}
+
 .PageControls .discussion-sort-filter-module {
   margin-left: 10px;
 }
@@ -6164,5 +6170,113 @@ Styleguide Attachments
 .jcrop-holder img,
 img.jcrop-preview {
   max-width: none;
+}
+
+.padded {
+  margin-top: 1.125rem;
+  margin-bottom: 1.125rem;
+}
+
+.padded-top {
+  margin-top: 1.125rem;
+}
+
+.padded-bottom {
+  margin-bottom: 1.125rem;
+}
+
+.padded-left {
+  margin-left: 1.125rem;
+}
+
+.padded-right {
+  margin-right: 1.125rem;
+}
+
+.flex {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.flex > * {
+  margin-right: 0.28125rem;
+}
+
+.flex > *:last-child {
+  margin-right: 0;
+}
+
+.flex-wrap {
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+.shrink {
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+}
+
+.grow {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+
+.no-shrink {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.no-grow {
+  -webkit-box-flex: 0;
+      -ms-flex-positive: 0;
+          flex-grow: 0;
+}
+
+.pull-left {
+  float: left;
+}
+
+.pull-right {
+  float: right;
+}
+
+.Hidden,
+.hidden {
+  display: none;
+}
+
+.progress {
+  background: url("images/progress.gif") center center no-repeat;
+}
+
+.foggy {
+  position: relative;
+  -webkit-filter: blur(2px);
+}
+
+.foggy input {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.foggy::before {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background-color: #fff;
+  z-index: 1;
+  content: '';
 }
 /*# sourceMappingURL=style.css.map */

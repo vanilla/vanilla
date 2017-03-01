@@ -22,6 +22,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
 
     const ACTION_DISABLE = 2;
 
+    const DEFAULT_DESKTOP_THEME = 'default';
+    const DEFAULT_MOBILE_THEME = 'mobile';
+
+
+
     /** @var array An array of search paths for themes and their files. */
     private $themeSearchPaths = null;
 
@@ -346,14 +351,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             if ($this->hasMobilePreview()) {
                 return $this->getMobilePreview();
             }
-            return c('Garden.MobileTheme', 'default');
+            return $this->getEnabledMobileThemeKey();
         } else {
             if ($this->hasPreview()) {
                 $preview = $this->getPreview();
                 $this->preparePreview($preview);
                 return $preview;
             }
-            return c('Garden.Theme', 'default');
+            return $this->getEnabledDesktopThemeKey();
         }
     }
 
@@ -368,7 +373,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             $this->preparePreview($preview);
             return $preview;
         }
-        return c('Garden.Theme', 'default');
+        return $this->getEnabledDesktopThemeKey();
     }
 
     /**
@@ -380,9 +385,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($this->currentTheme() == 'default') {
             throw new Gdn_UserException(T('You cannot disable the default theme.'));
         }
-        $oldTheme = $this->enabledTheme();
+        $oldTheme = $this->getEnabledDesktopThemeKey();
         RemoveFromConfig('Garden.Theme');
-        $newTheme = $this->enabledTheme();
+        $newTheme = $this->getEnabledDesktopThemeKey();
 
         if ($oldTheme != $newTheme) {
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
@@ -434,13 +439,42 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Retrieves the key for the current desktop theme.
      *
-     *
-     * @return Gdn_Config|mixed
+     * @return string
      */
     public function enabledTheme() {
-        $ThemeName = Gdn::config('Garden.Theme', 'default');
-        return $ThemeName;
+        deprecated('enabledTheme', 'getEnabledDesktopThemeKey', 'March 2017');
+        return $this->getEnabledDesktopThemeKey();
+    }
+
+    /**
+     * Retrieves the key for the current desktop theme.
+     *
+     * @return string
+     */
+    public function getEnabledDesktopThemeKey() {
+        $themeName = Gdn::config('Garden.Theme');
+        // Does it actually exist?
+        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+            return self::DEFAULT_DESKTOP_THEME;
+        }
+        return $themeName;
+    }
+
+
+    /**
+     * Retrieves the key for the current mobile theme.
+     *
+     * @return string
+     */
+    public function getEnabledMobileThemeKey() {
+        $themeName = Gdn::config('Garden.MobileTheme');
+        // Does it actually exist?
+        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+            return self::DEFAULT_MOBILE_THEME;
+        }
+        return $themeName;
     }
 
     /**
@@ -450,7 +484,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return array|mixed
      */
     public function enabledThemeInfo($ReturnInSourceFormat = false) {
-        $EnabledThemeName = $this->enabledTheme();
+        $EnabledThemeName = $this->getEnabledDesktopThemeKey();
         $ThemeInfo = $this->getThemeInfo($EnabledThemeName);
 
         if ($ThemeInfo === false) {
@@ -525,7 +559,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         $ThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeFolder = val('Folder', $ThemeInfo, '');
 
-        $oldTheme = $IsMobile ? c('Garden.MobileTheme', 'mobile') : c('Garden.Theme', 'default');
+        $oldTheme = $IsMobile ? c('Garden.MobileTheme', self::DEFAULT_MOBILE_THEME) : c('Garden.Theme', self::DEFAULT_DESKTOP_THEME);
 
         if ($ThemeFolder == '') {
             throw new Exception(t('The theme folder was not properly defined.'));
@@ -605,7 +639,8 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($this->hasMobilePreview()) {
             return $this->getMobilePreview();
         }
-        return c('Garden.MobileTheme', 'default');
+        return $this->getEnabledMobileThemeKey();
+
     }
 
     /**

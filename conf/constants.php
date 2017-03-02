@@ -82,5 +82,8 @@ define('ADDON_TYPE_LOCALE', 4);
 define('ADDON_TYPE_APPLICATION', 5);
 define('ADDON_TYPE_CORE', 10);
 
+// Use this constant if you are sick of looking up how to format dates to go into the database.
+const MYSQL_DATE_FORMAT = 'Y-m-d H:i:s';
+
 // Signal we did all this ^.
-define('VANILLA_CONSTANTS', TRUE);
+define('VANILLA_CONSTANTS', true);

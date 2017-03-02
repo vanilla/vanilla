@@ -39,7 +39,9 @@ if (!defined('PATH_CONF')) {
 
 // Include default constants if none were defined elsewhere.
 if (!defined('VANILLA_CONSTANTS')) {
-    include(PATH_CONF.'/constants.php');
+    include PATH_CONF.'/constants.php';
+} else {
+    deprecated("Defining your own VANILLA_CONSTANTS is deprecated.");
 }
 
 // Make sure a default time zone is set.

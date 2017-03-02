@@ -58,6 +58,22 @@ class AccessTokenModel extends Gdn_Model {
     }
 
     /**
+     * Revoke an already issued token.
+     *
+     * @param string $token The token or access token to revoke.
+     * @return bool Returns true if the token was revoked or false otherwise.
+     */
+    public function revoke($token) {
+        $token = $this->trim($token);
+
+        $this->setField($token, [
+            'DateExpires' => Gdn_Format::toDateTime(strtotime('-1 hour')),
+            'Attributes' => ['revoked' => true]
+        ]);
+        return $this->Database->LastInfo['RowCount'] > 0;
+    }
+
+    /**
      * Serialize a token entry for direct insertion to the database.
      *
      * @param array &$row The row to encode.
@@ -105,6 +121,8 @@ class AccessTokenModel extends Gdn_Model {
             $isObject = true;
             $row = (array)$row;
         }
+
+        $row['InsertIPAddress'] = ipDecode($row['InsertIPAddress']);
 
         foreach (['Scope', 'Attributes'] as $field) {
             if (isset($row[$field]) && is_string($row[$field])) {
@@ -169,6 +187,16 @@ class AccessTokenModel extends Gdn_Model {
     }
 
     /**
+     * Generate and sign a token.
+     *
+     * @param string $expires When the token expires.
+     * @return string
+     */
+    public function randomSignedToken($expires = '2 months') {
+        return $this->signToken($this->randomToken(), $expires);
+    }
+
+    /**
      * Sign a token generated with {@link randomToken()}.
      *
      * @param string $token The token to sign.
@@ -176,6 +204,11 @@ class AccessTokenModel extends Gdn_Model {
      * @return string
      */
     public function signToken($token, $expires = '2 months') {
+        if (empty($this->getSecret())) {
+            // This means something has been misconfigured. Throw a noisy error.
+            throw new \Exception("No secret to sign tokens with.", 500);
+        }
+
         $str = $token.'.'.$this->encodeDate($expires);
         $sig = self::base64urlEncode(hash_hmac('sha256', $str, $this->secret, true));
 
@@ -217,13 +250,19 @@ class AccessTokenModel extends Gdn_Model {
         $row = $this->getID($token, DATASET_TYPE_ARRAY);
 
         if (!$row) {
-            return $this->tokenError('Access token not found.', 401, false);
+            return $this->tokenError('Access token not found.', 401, $throw);
+        }
+
+        if (!empty($row['Attributes']['revoked'])) {
+            return $this->tokenError('Your access token was revoked.', 401, $throw);
         }
 
         // Check the expiry date from the database.
         $dbExpires = $this->toTimestamp($row['DateExpires']);
-        if ($dbExpires < time()) {
-            return $this->tokenError('Token expired.', 401, $throw);
+        if ($dbExpires === 0) {
+
+        } elseif ($dbExpires < time()) {
+            return $this->tokenError('Your access token has expired.', 401, $throw);
         }
 
         return $row;
@@ -252,14 +291,14 @@ class AccessTokenModel extends Gdn_Model {
 
         $expires = $this->decodeDate($expireStr);
         if ($expires === null) {
-            return $this->tokenError('Invalid expiry date.', 401, $throw);
+            return $this->tokenError('Your access token has an invalid expiry date.', 401, $throw);
         } elseif ($expires < time()) {
-            return $this->tokenError('Token expired.', 401, $throw);
+            return $this->tokenError('Your access token has expired.', 401, $throw);
         }
 
         $checkToken = $this->signToken($token, $expires);
         if (!hash_equals($checkToken, $accessToken)) {
-            return $this->tokenError('Invalid signature.', 401, $throw);
+            return $this->tokenError('Your access token has an invalid signature.', 401, $throw);
         }
 
         return true;
@@ -306,6 +345,29 @@ class AccessTokenModel extends Gdn_Model {
             return $ts;
         }
         return null;
+    }
+
+    /**
+     * Trim the expiry date and signature off of a token.
+     *
+     * @param string $accessToken The access token to trim.
+     */
+    public function trim($accessToken) {
+        if (strpos($accessToken, '.') !== false) {
+            list($token) = explode('.', $accessToken);
+            return $token;
+        }
+        return $accessToken;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWhere($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
+        $result = parent::getWhere($Where, $OrderFields, $OrderDirection, $Limit, $Offset);
+        array_walk($result->result(), [$this, 'decodeRow']);
+
+        return $result;
     }
 
     /**

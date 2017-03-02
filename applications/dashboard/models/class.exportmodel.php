@@ -134,7 +134,7 @@ class ExportModel {
             } else {
                 $this->_PDO = new PDO($DsnOrPDO, $Username, $Password);
                 if (strncasecmp($DsnOrPDO, 'mysql', 5) == 0) {
-                    $this->_PDO->exec('set names utf8');
+                    $this->_PDO->exec('set names utf8mb4');
                 }
             }
         }

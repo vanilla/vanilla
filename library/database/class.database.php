@@ -302,11 +302,11 @@ class Gdn_Database {
         // Get the return type.
         if (isset($Options['ReturnType'])) {
             $ReturnType = $Options['ReturnType'];
-        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql))
+        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
             $ReturnType = 'ID';
-        elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql))
+        } elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
             $ReturnType = 'DataSet';
-        else {
+        } else {
             $ReturnType = null;
         }
 

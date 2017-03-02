@@ -66,8 +66,7 @@ Gdn::setContainer($dic);
 
 $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Interop\Container\ContainerInterface')
-    ->setAliasOf('Garden\Container\Container')
-;
+    ->setAliasOf('Garden\Container\Container');
 
 // Cache Layer
 Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');

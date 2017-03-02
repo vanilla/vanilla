@@ -88,6 +88,16 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         ]));
     }
 
+    /**
+     * If you don't require any permission then the user should have all/any of them.
+     */
+    public function testHasAnyAllEmpty() {
+        $perm = new Permissions();
+
+        $this->assertTrue($perm->hasAll([]));
+        $this->assertTrue($perm->hasAny([]));
+    }
+
     public function testHas() {
         $permissions = new Permissions([
             'Vanilla.Discussions.View',
@@ -206,5 +216,164 @@ class PermissionsTest extends \PHPUnit_Framework_TestCase {
         $perms->add('foo', 1);
         $perms->remove('foo', 1);
         $this->assertFalse($perms->has('foo'));
+    }
+
+    /**
+     * An admin should have all permissions.
+     */
+    public function testAdmin() {
+        $perm = new Permissions();
+        $perm->setAdmin(true);
+
+        $this->assertTrue($perm->has('foo'));
+        $this->assertTrue($perm->hasAll(['foo', 'bar', 'baz']));
+        $this->assertTrue($perm->hasAny(['foo', 'bar', 'baz']));
+
+        return $perm;
+    }
+
+    /**
+     * A ban should override an existing permission.
+     */
+    public function testBan() {
+        $perm = $this->createBanned();
+
+        $this->assertFalse($perm->has('foo'));
+
+        return $perm;
+    }
+
+    /**
+     * Removing an existing ban should restore an existing permission.
+     *
+     * @param Permissions $perm A permissions array with a ban.
+     * @depends testBan
+     */
+    public function testRemoveBan(Permissions $perm) {
+        $perm->removeBan(Permissions::BAN_BANNED);
+
+        $this->assertTrue($perm->has('foo'));
+    }
+
+    /**
+     * A ban can be overridden by passing it as a permission name in a check.
+     *
+     * @depends testBan
+     */
+    public function testBanOverrides() {
+        $perm = $this->createBanned();
+
+        $this->assertTrue($perm->has(['foo', Permissions::BAN_BANNED]));
+        $this->assertTrue($perm->hasAll(['foo', Permissions::BAN_BANNED]));
+        $this->assertTrue($perm->hasAny(['foo', Permissions::BAN_BANNED]));
+    }
+
+    /**
+     * A {@link Permissions::hasAny()} test should return **false** if you still don't have any permissions even though you are overriding bans.
+     */
+    public function testBanOverrideWithNone() {
+        $perm = $this->createBanned();
+
+        $this->assertTrue($perm->hasAny([Permissions::BAN_BANNED]));
+        $this->assertTrue($perm->hasAll([Permissions::BAN_BANNED]));
+
+        $this->assertFalse($perm->hasAny(['bink', Permissions::BAN_BANNED]));
+    }
+
+    /**
+     * Admin should not override bans.
+     *
+     * @param Permissions $perm A permissions array with admin.
+     * @depends testAdmin
+     */
+    public function testBanAdmin(Permissions $perm) {
+        $perm->addBan(Permissions::BAN_BANNED);
+
+        $this->assertFalse($perm->has('foo'));
+        $this->assertFalse($perm->hasAll(['foo', 'bar', 'baz']));
+        $this->assertFalse($perm->hasAny(['foo', 'bar', 'baz']));
+    }
+
+    /**
+     * Bans can specify permissions that are exceptions.
+     */
+    public function testBanException() {
+        $perm = $this->createBanned();
+        $perm->addBan(Permissions::BAN_BANNED, ['except' => ['foo', 'baz']]);
+
+        $this->assertTrue($perm->has('foo'));
+    }
+
+    /**
+     * Admin status can be specified as a ban exception with the "admin" permission string.
+     */
+    public function testBanAdminException() {
+        $perm = new Permissions();
+        $perm->setAdmin(true)
+            ->addBan(Permissions::BAN_BANNED, ['except' => 'admin']);
+
+        $this->assertTrue($perm->has('any'));
+    }
+
+    /**
+     * Test {@link Permissions::getBan()}.
+     */
+    public function testGetBan() {
+        $perm = $this->createBanned();
+
+        $ban = $perm->getBan();
+
+        $this->assertEquals(Permissions::BAN_BANNED, $ban['type']);
+        $this->assertEquals(401, $ban['code']);
+        $this->assertArrayHasKey('msg', $ban);
+    }
+
+    /**
+     * You should get the next ban if you bypass the first one.
+     *
+     * @depends testGetBan
+     */
+    public function testBanBypass() {
+        $perm = $this->createBanned();
+        $perm->addBan(Permissions::BAN_DELETED);
+
+        $ban = $perm->getBan([Permissions::BAN_BANNED]);
+        $this->assertEquals(Permissions::BAN_DELETED, $ban['type']);
+    }
+
+    /**
+     * You should get a prepended ban before other ones.
+     *
+     * @depends testGetBan
+     */
+    public function testPrependBan() {
+        $perm = $this->createBanned();
+
+        $perm->addBan(Permissions::BAN_DELETED, [], true);
+
+        $ban = $perm->getBan();
+        $this->assertEquals(Permissions::BAN_DELETED, $ban['type']);
+    }
+
+    /**
+     * Ban names must start with "!".
+     *
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidBanName() {
+        $perm = new Permissions();
+        $perm->addBan('foo');
+    }
+
+    /**
+     * Create a permissions object with a permission and a ban.
+     *
+     * @return Permissions Returns a new {@link Permissions} object.
+     */
+    private function createBanned() {
+        $perm = new Permissions();
+        $perm->set('foo', true)
+            ->addBan(Permissions::BAN_BANNED);
+        return $perm;
     }
 }

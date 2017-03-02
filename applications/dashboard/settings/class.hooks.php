@@ -8,10 +8,32 @@
  * @since 2.0
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+
 /**
  * Event handlers for the Dashboard application.
  */
 class DashboardHooks extends Gdn_Plugin {
+
+    /**
+     * Install the formatter to the container.
+     *
+     * @param Container $dic The container to initialize.
+     */
+    public function container_init_handler(Container $dic) {
+        $dic->rule('HeadModule')
+            ->setShared(true)
+            ->addAlias('Head')
+
+            ->rule('MenuModule')
+            ->setShared(true)
+            ->addAlias('Menu')
+
+            ->rule('Gdn_Dispatcher')
+            ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
+            ;
+    }
 
     /**
      * Fire before every page render.

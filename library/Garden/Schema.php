@@ -96,6 +96,7 @@ class Schema implements \JsonSerializable {
     /**
      * Build an OpenAPI-compatible specification of the current schema.
      *
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
      * @return array
      */
     public function dumpSpec() {
@@ -109,8 +110,13 @@ class Schema implements \JsonSerializable {
                 }
 
                 // Massage schema's types into their Open API v2 counterparts, including potential formatting flags.
-                // string, boolean and array pass through without adjustment.
+                // Valid parameter types for OpenAPI v2: string, number, integer, boolean, array or file
                 switch ($parameter['type']) {
+                    case 'string':
+                    case 'boolean':
+                    case 'array':
+                        // string, boolean and array types should not be altered.
+                        break;
                     case 'object':
                         $parameter['type'] = 'array';
                         break;
@@ -213,6 +219,36 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Get the schema's currently configured parameters.
+     *
+     * @return array
+     */
+    public function getParameters() {
+        return $this->schema;
+    }
+
+    /**
+     * Merge a schema with this one.
+     *
+     * @param Schema $schema A scheme instance. Its parameters will be merged into the current instance.
+     */
+    public function merge(Schema $schema) {
+        $fn = function (array &$target, array $source) use (&$fn) {
+            foreach ($source as $key => $val) {
+                if (is_array($val) && array_key_exists($key, $target) && is_array($target[$key])) {
+                    $target[$key] = $fn($target[$key], $val);
+                } else {
+                    $target[$key] = $val;
+                }
+            }
+
+            return $target;
+        };
+
+        $fn($this->schema, $schema->getParameters());
+    }
+
+    /**
      * Parse a schema in short form into a full schema array.
      *
      * @param array $arr The array to parse into a schema.
@@ -232,6 +268,13 @@ class Schema implements \JsonSerializable {
                 } else {
                     throw new \InvalidArgumentException("Schema at position $key is not a valid param.", 500);
                 }
+            } elseif ($value instanceof Schema) {
+                $param = static::parseShortParam($key);
+                $param['type'] = 'object';
+                $param['properties'] = $value->getParameters();
+
+               $name = $param['name'];
+               $result[$name] = $param;
             } else {
                 // The parameter is defined in the key.
                 $param = static::parseShortParam($key, $value);

@@ -217,8 +217,7 @@ var wysihtml5ParserRules = {
                 "download": "allow"
             },
             "set_attributes": {
-                "rel": "nofollow",
-                "target": "_blank"
+                "rel": "nofollow"
             }
         },
         "img": {

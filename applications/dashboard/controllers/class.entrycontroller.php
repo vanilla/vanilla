@@ -697,6 +697,12 @@ class EntryController extends Gdn_Controller {
             // Should we create a new user?
             if ($didNotPickUser && $haveName && $emailValid && $noMatches) {
                 // Create the user.
+                $registerOptions = [
+                    'CheckCaptcha' => false,
+                    'ValidateEmail' => false,
+                    'NoConfirmEmail' => true,
+                    'SaveRoles' => $SaveRolesRegister
+                ];
                 $User = $this->Form->formValues();
                 $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
@@ -705,18 +711,31 @@ class EntryController extends Gdn_Controller {
                 $User['Attributes'] = $this->Form->getFormValue('Attributes', null);
                 $User['Email'] = $this->Form->getFormValue('ConnectEmail', $this->Form->getFormValue('Email', null));
                 $User['Name'] = $this->Form->getFormValue('ConnectName', $this->Form->getFormValue('Name', null));
-                $UserID = $UserModel->register($User, [
-                    'CheckCaptcha' => false,
-                    'ValidateEmail' => false,
-                    'NoConfirmEmail' => true,
-                    'SaveRoles' => $SaveRolesRegister
-                ]);
+                $UserID = $UserModel->register($User, $registerOptions);
+
                 $User['UserID'] = $UserID;
 
                 $this->EventArguments['UserID'] = $UserID;
                 $this->fireEvent('AfterConnectSave');
 
                 $this->Form->setValidationResults($UserModel->validationResults());
+
+                // The SPAM filter was likely triggered. Send the registration for approval, add some generic "reason" text.
+                if ($UserID === false && val('DiscoveryText', $this->Form->validationResults())) {
+                    unset($User['UserID']);
+                    $User['DiscoveryText'] = sprintft(t('SSO connection (%s)'), $Method);
+                    $UserModel->Validation->reset();
+                    $UserID = $UserModel->register($User, $registerOptions);
+
+                    if ($UserID === UserModel::REDIRECT_APPROVE) {
+                        $this->Form->setFormValue('Target', '/entry/registerthanks');
+                        $this->_setRedirect();
+                        return;
+                    }
+
+                    $this->Form->setValidationResults($UserModel->validationResults());
+                    $User['UserID'] = $UserID;
+                }
 
                 // Save the association to the new user.
                 if ($UserID) {

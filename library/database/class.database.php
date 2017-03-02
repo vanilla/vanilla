@@ -296,11 +296,11 @@ class Gdn_Database {
         // Get the return type.
         if (isset($Options['ReturnType'])) {
             $ReturnType = $Options['ReturnType'];
-        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql))
+        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
             $ReturnType = 'ID';
-        elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql))
+        } elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
             $ReturnType = 'DataSet';
-        else {
+        } else {
             $ReturnType = null;
         }
 
@@ -427,13 +427,13 @@ class Gdn_Database {
         }
 
         // Did this query modify data in any way?
-        if ($ReturnType == 'ID') {
+        if ($ReturnType === 'ID') {
             $this->_CurrentResultSet = $PDO->lastInsertId();
             if (is_a($PDOStatement, 'PDOStatement')) {
                 $PDOStatement->closeCursor();
             }
         } else {
-            if ($ReturnType == 'DataSet') {
+            if ($ReturnType === 'DataSet') {
                 // Create a DataSet to manage the resultset
                 $this->_CurrentResultSet = new Gdn_DataSet();
                 $this->_CurrentResultSet->Connection = $PDO;
@@ -441,6 +441,7 @@ class Gdn_Database {
             } elseif (is_a($PDOStatement, 'PDOStatement')) {
                 $PDOStatement->closeCursor();
             }
+
         }
 
         if (isset($StoreCacheKey)) {

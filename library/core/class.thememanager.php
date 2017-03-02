@@ -25,8 +25,6 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     const DEFAULT_DESKTOP_THEME = 'default';
     const DEFAULT_MOBILE_THEME = 'mobile';
 
-
-
     /** @var array An array of search paths for themes and their files. */
     private $themeSearchPaths = null;
 
@@ -640,7 +638,6 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             return $this->getMobilePreview();
         }
         return $this->getEnabledMobileThemeKey();
-
     }
 
     /**

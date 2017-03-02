@@ -19,9 +19,9 @@ $Configuration['Database']['ConnectionOptions']                = array(
                                                                     12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
                                                                     1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
                                                                 );
-$Configuration['Database']['CharacterEncoding'] = 'utf8';
+$Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
-$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
+$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8mb4_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';

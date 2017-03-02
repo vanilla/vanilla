@@ -209,12 +209,12 @@ class AccessTokenModel extends Gdn_Model {
             throw new \Exception("No secret to sign tokens with.", 500);
         }
 
-        $str = $token.'.'.$this->encodeDate($expires);
+        $str = 'va.'.$token.'.'.$this->encodeDate($expires);
         $sig = self::base64urlEncode(hash_hmac('sha256', $str, $this->secret, true));
 
         // Use a substring of the signature because we don't want the tokens to be too massive.
         // The signature is only the first line of defence. The database is the final verification.
-        $result = $str.'.'.substr($sig, 0, 8);
+        $result = $str.'.'.substr($sig, 0, 7);
         return $result;
     }
 
@@ -245,7 +245,7 @@ class AccessTokenModel extends Gdn_Model {
             return false;
         }
 
-        list($token, $expires, $sig) = explode('.', $accessToken);
+        $token = $this->trim($accessToken);
 
         $row = $this->getID($token, DATASET_TYPE_ARRAY);
 
@@ -283,11 +283,11 @@ class AccessTokenModel extends Gdn_Model {
             return $this->tokenError('Missing access token.', 401, $throw);
         }
 
-        if (count($parts) !== 3) {
+        if (count($parts) !== 4) {
             return $this->tokenError('Access token missing parts.', 401, $throw);
         }
 
-        list($token, $expireStr, $sig) = $parts;
+        list($version, $token, $expireStr, $sig) = $parts;
 
         $expires = $this->decodeDate($expireStr);
         if ($expires === null) {
@@ -354,7 +354,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function trim($accessToken) {
         if (strpos($accessToken, '.') !== false) {
-            list($token) = explode('.', $accessToken);
+            list($_, $token) = explode('.', $accessToken);
             return $token;
         }
         return $accessToken;

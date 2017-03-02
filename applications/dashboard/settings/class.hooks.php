@@ -368,7 +368,7 @@ class DashboardHooks extends Gdn_Plugin {
     private function checkAccessToken() {
         if (empty($_SERVER['HTTP_AUTHORIZATION']) ||
             !stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
-            !preg_match('`^Bearer\s+([^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)
+            !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)
         ) {
             return;
         }
@@ -382,8 +382,6 @@ class DashboardHooks extends Gdn_Plugin {
 
                 Gdn::Session()->Start($authRow['UserID'], false, false);
                 Gdn::Session()->ValidateTransientKey(true);
-
-                die('success!!!');
             } catch (\Exception $ex) {
                 // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
                 $msg = $ex->getMessage();

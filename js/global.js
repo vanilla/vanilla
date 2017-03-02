@@ -918,7 +918,7 @@ jQuery(document).ready(function($) {
         gdn.stats();
 
     // If a dismissable InformMessage close button is clicked, hide it.
-    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
+    $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
         $(this).parents('div.InformWrapper').fadeOut('fast', function() {
             $(this).remove();
         });

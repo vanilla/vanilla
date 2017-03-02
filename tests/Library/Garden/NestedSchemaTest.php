@@ -402,6 +402,41 @@ class NestedSchemaTest extends SchemaTest {
     }
 
     /**
+     * Test definining the root with a schema array.
+     */
+    public function testArrayRoot() {
+        $schema = new Schema([
+            ':a' => [
+                'discussionID:i',
+                'name:s',
+                'body:s',
+                'location:s?'
+            ]
+        ]);
+
+        $data = [
+            ['discussionID' => 1, 'name' => 'foo', 'body' => 'bar', 'location' => 'Montreal'],
+            ['discussionID' => 2, 'name' => 'hello', 'body' => 'world', 'location' => 'Detroit'],
+            ['discussionID' => 3, 'name' => 'vanilla', 'body' => 'forums', 'location' => 'Farmville']
+        ];
+        $this->assertTrue($schema->isValid($data));
+
+        $data = [
+            ['discussionID' => 1, 'name' => 'foo', 'body' => 'bar'],
+            ['discussionID' => 2, 'name' => 'hello', 'body' => 'world'],
+            ['discussionID' => 3, 'name' => 'vanilla', 'body' => 'forums']
+        ];
+        $this->assertTrue($schema->isValid($data), 'location field is optional and should not be invalid.');
+
+        $data = [
+            ['discussionID' => 1, 'name' => 'foo', 'body' => 'bar'],
+            ['discussionID' => 2, 'name' => 'hello'],
+            ['discussionID' => 3, 'name' => 'vanilla', 'body' => 'forums']
+        ];
+        $this->assertFalse($schema->isValid($data), 'body is missing for a row and should be invalid.');
+    }
+
+    /**
      * Get a schema that consists of an array of objects.
      *
      * @return Schema Returns the schema.

@@ -583,13 +583,23 @@ class Schema implements \JsonSerializable {
     public function validate(array &$data, Validation &$validation = null) {
         $schema = static::getFields($this->schema);
 
-        if (!$this->isValidInternal($data, $schema, $validation, '')) {
-            if ($validation === null) {
-                // Although this should never be null, scrutinizer complains that it might be.
-                $validation = new Validation();
-            }
+        $fn = function (&$data) use ($schema, $validation){
+            if (!$this->isValidInternal($data, $schema, $validation, '')) {
+                if ($validation === null) {
+                    // Although this should never be null, scrutinizer complains that it might be.
+                    $validation = new Validation();
+                }
 
-            throw new ValidationException($validation);
+                throw new ValidationException($validation);
+            }
+        };
+
+        if ($this->getType() === 'array') {
+            foreach ($data as &$row) {
+                $fn($row);
+            }
+        } else {
+            $fn($data);
         }
 
         return $this;
@@ -604,8 +614,17 @@ class Schema implements \JsonSerializable {
      */
     public function isValid(array &$data, Validation &$validation = null) {
         $schema = static::getFields($this->schema);
+        $result = true;
 
-        return $this->isValidInternal($data, $schema, $validation, '');
+        if ($this->getType() === 'array') {
+            foreach ($data as &$row) {
+                $result = $result && $this->isValidInternal($row, $schema, $validation, '');
+            }
+        } else {
+            $result = $this->isValidInternal($data, $schema, $validation, '');
+        }
+
+        return $result;
     }
 
     /**

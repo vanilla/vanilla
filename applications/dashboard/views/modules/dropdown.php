@@ -12,8 +12,9 @@
         $url = val('url', val('trigger', $this));
         $icon = val('icon', val('trigger', $this));
         $cssClass = val('cssClass', val('trigger', $this));
+        $attributes = val('attributes', val('trigger', $this));
         $alert = !empty($this->data('DashboardCount', '')) ? wrap($this->data('DashboardCount', ''), 'span', ['class' => 'Alert']) : '';
-        echo anchor($icon.$text.$alert, $url, $cssClass);
+        echo anchor($icon.$text.$alert, $url, $cssClass, $attributes);
     endif; ?>
     <ul class="Flyout MenuItems list-reset <?php echo val('listCssClass', $this); ?>" role="menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">
         <?php foreach (val('items', $this) as $item) {

@@ -61,7 +61,9 @@ if ($Session->isValid()):
     // Profile Settings & Logout
     $dropdown = new DropdownModule();
     $dropdown->setData('DashboardCount', $DashboardCount);
-    $dropdown->setTrigger(wrap(t('Account Options'), 'em'), 'anchor', 'MeButton FlyoutButton', '<span class="Sprite Sprite16 SpOptions"></span>', '/profile/edit');
+    $triggerIcon = '<span class="Sprite Sprite16 SpOptions"></span>';
+    $triggerTitle = t('Account Options');
+    $dropdown->setTrigger(wrap($triggerTitle, 'em'), 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle]);
     $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
     $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 

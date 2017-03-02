@@ -180,13 +180,13 @@ class PostController extends VanillaController {
                 ['Archived' => 0, 'AllowDiscussions' => 1],
                 ['AllowedDiscussionTypes' => $this->Data['Type']]
             );
-            $nbsAllowedCategories = count($AllowedCategories);
+            $AllowedCategoriesCount = count($AllowedCategories);
 
-            if ($this->ShowCategorySelector && $nbsAllowedCategories === 1) {
+            if ($this->ShowCategorySelector && $AllowedCategoriesCount === 1) {
                 $this->ShowCategorySelector = false;
             }
 
-            if (!$this->ShowCategorySelector && $nbsAllowedCategories) {
+            if (!$this->ShowCategorySelector && $AllowedCategoriesCount) {
                 $AllowedCategory = array_pop($AllowedCategories);
                 $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
 

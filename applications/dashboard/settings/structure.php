@@ -267,6 +267,17 @@ $Construct->table('UserAuthenticationToken')
     ->column('Lifetime', 'int', false)
     ->set($Explicit, $Drop);
 
+$Construct->table('AccessToken')
+    ->column('Token', 'varchar(255)', false, 'primary')
+    ->column('UserID', 'int', false, 'index')
+    ->column('Type', 'varchar(20)', false, 'index')
+    ->column('Scope', 'text', true)
+    ->column('DateInserted', 'timestamp', false)
+    ->column('InsertIPAddress', 'ipaddress', false)
+    ->column('DateExpires', 'timestamp', false)
+    ->column('Attributes', 'text', true)
+    ->set($Explicit, $Drop);
+
 // Fix the sync roles config spelling mistake.
 if (c('Garden.SSO.SynchRoles')) {
     saveToConfig(

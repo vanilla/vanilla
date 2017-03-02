@@ -1690,6 +1690,19 @@ jQuery(document).ready(function($) {
                                     "q": query,
                                     "limit": server_limit
                                 }, function(data) {
+                                    if (Array.isArray(data)) {
+                                        data.forEach(function(result) {
+                                            if (typeof result === "object" && typeof result.name === "string") {
+                                                // Convert special characters to safely insert into template.
+                                                result.name = result.name.replace(/&/g, "&amp;")
+                                                    .replace(/</g, "&lt;")
+                                                    .replace(/>/g, "&gt;")
+                                                    .replace(/"/g, "&quot;")
+                                                    .replace(/'/g, "&apos;");
+                                            }
+                                        });
+                                    }
+
                                     callback(data);
 
                                     // If data is empty, cache the results to prevent

@@ -123,14 +123,6 @@ class Gdn_Session {
      * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
     public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
-        if (is_object($this->User) && $this->permissions->getOverrideAll() === null) {
-            if ($this->User->Banned || val('Deleted', $this->User)) {
-                $this->permissions->setOverrideAll(false);
-            } elseif ($this->User->Admin) {
-                $this->permissions->setOverrideAll(true);
-            }
-        }
-
         if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
             c("Garden.Permissions.Disabled.{$junctionTable}")) {
             $junctionID = null;
@@ -451,6 +443,16 @@ class Gdn_Session {
                 $UserModel->fireEvent('AfterGetSession');
 
                 $this->permissions->setPermissions($this->User->Permissions);
+
+                // Set permission overrides.
+                $this->permissions->setAdmin($this->User->Admin);
+                if (!empty($this->User->Deleted)) {
+                    $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
+                }
+                if (!empty($this->User->Banned)) {
+                    $this->permissions->addBan(Permissions::BAN_BANNED, ['msg' => t('You are banned.')]);
+                }
+
                 $this->_Preferences = $this->User->Preferences;
                 $this->_Attributes = $this->User->Attributes;
 

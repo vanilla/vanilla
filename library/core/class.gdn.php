@@ -599,7 +599,7 @@ class Gdn {
      *
      * @return \Garden\Container\Container Returns the container.
      */
-    private static function getContainer() {
+    public static function getContainer() {
         if (self::$container === null) {
             $dic = new Garden\Container\Container();
 

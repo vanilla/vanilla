@@ -41,6 +41,32 @@ if (!defined('APPLICATION_VERSION')) {
 // Loads the constants
 require PATH_CONF . '/constants.php';
 
+// Set up the dependency injection container.
+$dic = new \Garden\Container\Container();
+Gdn::setContainer($dic);
+
+$dic->setInstance('Garden\Container\Container', $dic)
+    ->rule('Interop\Container\ContainerInterface')
+    ->setAliasOf('Garden\Container\Container')
+
+    ->rule('Gdn_Request')
+    ->setShared(true)
+    ->addAlias('Request')
+
+    ->rule('Gdn_DatabaseStructure')
+    ->setClass('Gdn_MySQLStructure')
+    ->setShared(true)
+    ->addAlias(Gdn::AliasDatabaseStructure)
+    ->addAlias('MySQLStructure')
+
+    ->rule('Gdn_SQLDriver')
+    ->setClass('Gdn_MySQLDriver')
+    ->setShared(true)
+    ->addAlias('Gdn_MySQLDriver')
+    ->addAlias('MySQLDriver')
+    ->addAlias(Gdn::AliasSqlDriver);
+;
+
 // Install the configuration handler.
 Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 
@@ -73,3 +99,5 @@ Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
 
 // Clear the test cache.
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
+
+require_once PATH_LIBRARY_CORE.'/functions.validation.php';

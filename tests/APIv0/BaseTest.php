@@ -31,6 +31,10 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
         }
     }
 
+    public static function tearDownAfterClass() {
+        self::$api->terminate();
+    }
+
     /**
      * Get the API to make requests against.
      *

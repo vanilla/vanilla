@@ -142,7 +142,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * @return string Returns the filtered HTML.
      */
     public function format($html) {
-        $attributes = c('Garden.Html.BlockedAttributes', 'on*');
+        $attributes = c('Garden.Html.BlockedAttributes', 'on*, target');
 
         $config = [
             'anti_link_spam' => ['`.`', ''],

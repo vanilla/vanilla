@@ -165,6 +165,12 @@ class MessageController extends DashboardController {
         }
     }
 
+    /**
+     * Enable a message.
+     *
+     * @param $messageID
+     * @throws Exception
+     */
     public function enable($messageID) {
         $this->permission('Garden.Community.Manage');
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -175,6 +181,12 @@ class MessageController extends DashboardController {
         }
     }
 
+    /**
+     * Disable a message.
+     *
+     * @param $messageID
+     * @throws Exception
+     */
     public function disable($messageID) {
         $this->permission('Garden.Community.Manage');
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
@@ -185,6 +197,12 @@ class MessageController extends DashboardController {
         }
     }
 
+    /**
+     * Generic method to set message state on/off.
+     *
+     * @param $messageID
+     * @param $enabled
+     */
     protected function setEnabled($messageID, $enabled) {
         $messageModel = new MessageModel();
         $enabled = forceBool($enabled, '0', '1', '0');
@@ -201,6 +219,7 @@ class MessageController extends DashboardController {
         } else {
             $this->informMessage(sprintf(t('%s disabled.'), t('Message')));
         }
+        Gdn::cache()->remove('Messages');
         $this->render('Blank', 'Utility');
     }
 

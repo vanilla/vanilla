@@ -60,7 +60,7 @@
 
         var dropdownTemplate = ' \
         <div class="dropdown dropdown-category-options"> \
-            <button class="dropdown-toggle btn" id="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> \
+            <button class="dropdown-toggle btn" id="" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-id="{categoryID}"> \
             {text} \
             </button> \
             <div class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby=""> \
@@ -98,7 +98,8 @@
 
         options.items = menuItems;
         options.text = options.trigger.text;
-        return renderTemplate(options, dropdownTemplate, ['text', 'items']);
+        options.categoryID = options.trigger.attributes['data-id'];
+        return renderTemplate(options, dropdownTemplate, ['text', 'items', 'categoryID']);
     };
 
     /**

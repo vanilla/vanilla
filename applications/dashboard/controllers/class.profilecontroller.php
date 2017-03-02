@@ -84,7 +84,6 @@ class ProfileController extends Gdn_Controller {
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('cropimage.css');
         $this->addModule('GuestModule');
         parent::initialize();
 

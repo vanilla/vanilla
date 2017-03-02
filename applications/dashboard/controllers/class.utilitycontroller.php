@@ -316,16 +316,53 @@ class UtilityController extends DashboardController {
 
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
-        $this->render();
+        Gdn_Theme::section('Utility');
+        $this->render('update', 'utility', 'dashboard');
     }
 
     /**
-     * Because people try this a lot and get confused.
+     * Loads the files from resources/deletedfiles.txt into an array and returns it.
+     * Returns null if the deletedfiles.txt file is not found.
+     *
+     * @return array|null
+     */
+    private function loadDeleted() {
+        $deletedFilesPath = PATH_ROOT.'/resources/upgrade/deletedfiles.txt';
+        $deletedFiles = file($deletedFilesPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        return $deletedFiles;
+    }
+
+
+    /**
+     * Checks if any deleted files exist in the vanilla file structure. Saves an array of the existing deleted files
+     * to the data array.
+     */
+    private function checkDeleted() {
+        $deletedFiles = $this->loadDeleted();
+        $okFiles = ['.htaccess'];
+
+        $existingFiles = [];
+        if ($deletedFiles !== null) {
+            foreach ($deletedFiles as $file) {
+                if (file_exists(PATH_ROOT.DS.$file) && !in_array($file, $okFiles)) {
+                    $file = htmlspecialchars($file);
+                    $existingFiles[] = $file;
+                }
+            }
+            $this->setData('DeletedFiles', $existingFiles);
+        }
+    }
+
+    /**
+     * A special endpoint for users upgrading their Vanilla installation.
+     * Adds a special check for deleted files that may still exist post-upgrade.
      *
      * @since 2.0.18
      * @access public
      */
     public function upgrade() {
+        $this->permission('Garden.Settings.Manage');
+        $this->checkDeleted();
         $this->update();
     }
 
@@ -341,7 +378,7 @@ class UtilityController extends DashboardController {
         $this->CssClass = 'Home';
 
         $this->fireEvent('Alive');
-
+        Gdn_Theme::section('Utility');
         $this->render();
     }
 
@@ -398,6 +435,7 @@ class UtilityController extends DashboardController {
         $this->setData('time_s', $time);
         $this->setData('valid', $valid);
         $this->title('Ping');
+        Gdn_Theme::section('Utility');
 
         $this->render();
     }

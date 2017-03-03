@@ -279,6 +279,12 @@ class DashboardHooks implements Gdn_IPlugin {
                 }
                 Gdn::userModel()->Validation->reset();
             }
+
+            $isXML = preg_match('`\.xml`i', Gdn::request()->path());
+            if (!$isXML && !$IsApi && !Gdn::request()->isPostBack()) {
+                $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
+                redirectUrl($url);
+            }
         }
     }
 

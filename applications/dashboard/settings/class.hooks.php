@@ -402,8 +402,8 @@ class DashboardHooks extends Gdn_Plugin {
             try {
                 $authRow = $model->verify($token, true);
 
-                Gdn::Session()->Start($authRow['UserID'], false, false);
-                Gdn::Session()->ValidateTransientKey(true);
+                Gdn::Session()->start($authRow['UserID'], false, false);
+                Gdn::Session()->validateTransientKey(true);
             } catch (\Exception $ex) {
                 // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
                 $msg = $ex->getMessage();

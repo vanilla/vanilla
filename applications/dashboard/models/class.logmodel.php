@@ -797,6 +797,17 @@ class LogModel extends Gdn_Pluggable {
                         throw new Exception(Gdn::userModel()->Validation->resultsText());
                     } else {
                         Gdn::userModel()->sendWelcomeEmail($ID, '', 'Register');
+
+                        // If this record has a Source and a SourceID, it has an SSO mapping that needs to be created.
+                        $source = val('Source', $Data);
+                        $sourceID = val('SourceID', $Data);
+                        if ($source && $sourceID) {
+                            Gdn::userModel()->saveAuthentication([
+                                'UserID' => $ID,
+                                'Provider' => $source,
+                                'UniqueID' => $sourceID
+                            ]);
+                        }
                     }
                 } else {
                     $ID = Gdn::sql()

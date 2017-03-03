@@ -373,14 +373,14 @@ class DiscussionController extends VanillaController {
      * @param string $TransientKey Single-use hash to prove intent.
      */
     public function dismissAnnouncement($DiscussionID = '') {
+        // Make sure we are posting back.
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
         // Confirm announcements may be dismissed
         if (!c('Vanilla.Discussions.Dismiss', 1)) {
             throw permissionException('Vanilla.Discussions.Dismiss');
-        }
-
-        // Make sure we are posting back.
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
         }
 
         $Session = Gdn::session();

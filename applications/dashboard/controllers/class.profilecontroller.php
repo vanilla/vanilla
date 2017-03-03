@@ -84,7 +84,6 @@ class ProfileController extends Gdn_Controller {
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('cropimage.css');
         $this->addModule('GuestModule');
         parent::initialize();
 
@@ -254,6 +253,10 @@ class ProfileController extends Gdn_Controller {
         $Column = 'Count'.ucfirst($Column);
         if (!$UserID) {
             $UserID = Gdn::session()->UserID;
+        }
+
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
         }
 
         $Count = $this->UserModel->profileCount($UserID, $Column);
@@ -538,6 +541,10 @@ class ProfileController extends Gdn_Controller {
      * - 1: Unset the force cookie and use the user agent to determine the theme.
      */
     public function noMobile($type = 'desktop') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
         $type = strtolower($type);
 
         if ($type == '1') {
@@ -561,7 +568,8 @@ class ProfileController extends Gdn_Controller {
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
 
-        redirect("/", 302);
+        $this->RedirectUrl = url('/');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**

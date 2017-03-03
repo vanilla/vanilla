@@ -4,9 +4,9 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla;
+namespace VanillaTests\Library\Garden;
 
-use Vanilla\ClassLocator;
+use Garden\ClassLocator;
 
 class ClassLocatorTest extends \PHPUnit_Framework_TestCase {
 

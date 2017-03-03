@@ -1,0 +1,32 @@
+// Specific styling for the Utility and Error splash screens
+
+.Section-Error,
+.Section-Utility {
+  padding: 100px;
+  margin: 0;
+  background: url('images/eyes.png') 30px 30px no-repeat #fff;
+
+  @include media-breakpoint-down(md) {
+    padding: 10%;
+  }
+}
+
+.Section-Error  {
+  background: url('images/error.png') 30px 30px no-repeat #fff;
+}
+
+.SplashInfo {
+  max-width: 800px;
+  color: $grey-dark;
+  font-size: $font-size-base;
+
+  h1 {
+    font-size: $font-size-h1;
+    font-weight: 700;
+  }
+
+  h2 {
+    font-size: $font-size-h2;
+    font-weight: 700;
+  }
+}

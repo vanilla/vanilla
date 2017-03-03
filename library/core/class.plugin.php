@@ -71,6 +71,18 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
+     * Set the addon associated with the plugin from the given {@link \Vanilla\AddonManager}.
+     *
+     * @param \Vanilla\AddonManager $addonManager The addon manager to search.
+     */
+    public function setAddonFromManager(\Vanilla\AddonManager $addonManager) {
+        $addon = $addonManager->lookupByClassname(get_called_class());
+        if ($addon instanceof Addon) {
+            $this->setAddon($addon);
+        }
+    }
+
+    /**
      * Gets the case-sensitive plugin key.
      *
      * @return string

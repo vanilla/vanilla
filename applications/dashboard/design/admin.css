@@ -6487,29 +6487,6 @@ select.nav-stats-users:focus,
   min-width: 120px;
 }
 
-.Section-Error {
-  color: #000;
-  font: 75%/1.7em "Helvetica Neue", Helvetica, arial, sans-serif;
-  margin: 0;
-  padding: 80px;
-  background: url("images/error.png") 30px 30px no-repeat #fff;
-}
-
-.Section-Error .SplashInfo h1 {
-  font-weight: bold;
-  color: #000;
-  font-size: 300%;
-  margin: 20px 0;
-  padding: 0;
-}
-
-.Section-Error .SplashInfo p {
-  margin: 10px 0;
-  color: #777;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
 .footer {
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
@@ -7559,6 +7536,42 @@ label[id^=iCheck] {
   border: 0.25rem solid #0291db;
   border-radius: 0.5625rem;
   background-color: #fff;
+}
+
+.hero {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 2.25rem 1.125rem;
+}
+
+.hero > * {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+
+.hero .hero-content {
+  padding: 0 6.75rem 0 4.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+}
+
+.hero .hero-media-wrapper {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.hero .btn, .hero .file-upload-browse, .hero .Button {
+  margin-top: 2.25rem;
 }
 
 .media {
@@ -9289,88 +9302,58 @@ button.close {
           justify-content: flex-end;
 }
 
-.hero {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding: 2.25rem 1.125rem;
-}
-
-.hero > * {
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-}
-
-.hero .label-selector {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.hero .hero-content {
-  padding: 0 6.75rem 0 4.5rem;
-  font-size: 0.8125rem;
-  text-align: center;
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
-}
-
-.hero .tagline {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.hero .vanilla-logo {
-  width: 6.75rem;
-  height: 4.5rem;
-}
-
-.hero .btn, .hero .file-upload-browse, .hero .Button {
-  margin-top: 2.25rem;
-}
-
-.hero .hero-media-wrapper {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-}
-
 .video-section-heading {
   padding: 1.125rem 0;
   font-weight: 500;
 }
 
-.video.label-selector-item a {
+.Section-Tutorials .label-selector {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.Section-Tutorials .hero .label-selector-item {
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
+}
+
+.Section-Tutorials .tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.Section-Tutorials .vanilla-logo {
+  width: 6.75rem;
+  height: 4.5rem;
+}
+
+.Section-Tutorials .video.label-selector-item a {
   color: #fff;
 }
 
-.video.label-selector-item .video-title {
+.Section-Tutorials .video.label-selector-item .video-title {
   font-size: 0.75rem;
   text-align: left;
 }
 
-.video.label-selector-item .overlay {
+.Section-Tutorials .video.label-selector-item .overlay {
   background-color: rgba(0, 0, 0, 0.75);
 }
 
-.video.label-selector-item.current .overlay {
+.Section-Tutorials .video.label-selector-item.current .overlay {
   height: 100%;
 }
 
-.video.label-selector-item svg {
+.Section-Tutorials .video.label-selector-item svg {
   width: 40%;
 }
 
-.video-section .info, .video-section .FeedItem .FeedDescription, .FeedItem .video-section .FeedDescription, .video-section .FeedItem .Date, .FeedItem .video-section .Date {
+.Section-Tutorials .video-section .info, .Section-Tutorials .video-section .FeedItem .FeedDescription, .FeedItem .Section-Tutorials .video-section .FeedDescription, .Section-Tutorials .video-section .FeedItem .Date, .FeedItem .Section-Tutorials .video-section .Date {
   padding-top: 1.125rem;
 }
 
-.video-section:first-child .video-section-heading {
+.Section-Tutorials .video-section:first-child .video-section-heading {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
@@ -9401,10 +9384,6 @@ button.close {
 
 .CheckboxCell .icheckbox {
   margin-right: 0;
-}
-
-.crop-label {
-  display: none;
 }
 
 .main .content .control-panel {
@@ -9769,6 +9748,40 @@ strong,
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.Section-Error,
+.Section-Utility {
+  padding: 100px;
+  margin: 0;
+  background: url("images/eyes.png") 30px 30px no-repeat #fff;
+}
+
+@media (max-width: 991px) {
+  .Section-Error,
+  .Section-Utility {
+    padding: 10%;
+  }
+}
+
+.Section-Error {
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.SplashInfo {
+  max-width: 800px;
+  color: #555a62;
+  font-size: 0.875rem;
+}
+
+.SplashInfo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.SplashInfo h2, .SplashInfo .analytics-widget-header .title, .analytics-widget-header .SplashInfo .title {
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 
 .Section-Dashboard.Message.index {

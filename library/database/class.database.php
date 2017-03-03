@@ -153,9 +153,8 @@ class Gdn_Database {
             $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
             $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
 
-            if ($this->ConnectionOptions[1002]) {
-                $PDO->query($this->ConnectionOptions[1002]);
-            }
+            $encoding = c('Database.CharacterEncoding', 'utf8mb4');
+            $PDO->query("set names '$encoding';set time_zone = '+0:0'");
 
             // We only throw exceptions during connect
             $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
@@ -221,6 +220,7 @@ class Gdn_Database {
         if (is_null($config)) {
             $config = [];
         }
+
         if (is_null($defaultConfig)) {
             $defaultConfig = [];
         }
@@ -296,11 +296,11 @@ class Gdn_Database {
         // Get the return type.
         if (isset($Options['ReturnType'])) {
             $ReturnType = $Options['ReturnType'];
-        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql))
+        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
             $ReturnType = 'ID';
-        elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql))
+        } elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
             $ReturnType = 'DataSet';
-        else {
+        } else {
             $ReturnType = null;
         }
 

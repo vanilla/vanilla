@@ -59,10 +59,10 @@ abstract class Route {
      *
      * If you are going to set conditions in this way make sure the array keys are all lowercase.
      *
-     * @param array $constraints An array of conditions tha maps variable names to **Route::MAP_*** constants.
+     * @param array $constraints An array of conditions that map variable names to **Route::MAP_*** constants.
      * @return $this
      */
-    public function setConstraints($constraints) {
+    public function setConstraints(array $constraints) {
         $this->constraints = $constraints;
         return $this;
     }

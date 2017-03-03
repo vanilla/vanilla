@@ -83,7 +83,8 @@ class ResourceRoute extends Route {
 
         // First look for the controller.
         $controllerSlug = $this->filterName(array_shift($pathArgs));
-        if (null === ($controllerClass = $this->classLocator->findClass(sprintf($this->controllerPattern, $controllerSlug)))) {
+        $controllerClass = $this->classLocator->findClass(sprintf($this->controllerPattern, $controllerSlug));
+        if ($controllerClass === null) {
             return null;
         }
 

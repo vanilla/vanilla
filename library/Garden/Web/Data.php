@@ -158,7 +158,7 @@ class Data implements \JsonSerializable {
      * Render the response to the output.
      */
     public function render() {
-        header('', true, $this->getStatus());
+        http_response_code($this->getStatus());
         header('Content-Type: application/json; charset=utf-8', true);
 
         echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);

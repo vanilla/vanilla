@@ -8,6 +8,7 @@
 namespace Vanilla;
 
 
+use Garden\ClassLocator;
 use Garden\EventManager;
 
 /**
@@ -29,6 +30,25 @@ class VanillaClassLocator extends ClassLocator {
     }
 
     /**
+     * Get the name of a class without namespaces.
+     *
+     * @param string|object $class The name of the class or an instance of the class.
+     * @return string Returns the basename of the class.
+     */
+    private function classBasename($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        // If we have a namespace, shave it off.
+        if (($i = strrpos($class, '\\')) !== false) {
+            $class = substr($class, $i + 1);
+        }
+
+        return $class;
+    }
+
+    /**
      * Find a method on an object, allowing for overrides registered through EventManager.
      *
      * @param object $object An object to search.
@@ -36,12 +56,7 @@ class VanillaClassLocator extends ClassLocator {
      * @return callable|null Returns a callback to the method or null if it does not exist.
      */
     public function findMethod($object, $method) {
-        $class = get_class($object);
-
-        // If we have a namespace, shave it off.
-        if (strpos($class, '\\')) {
-            $class = substr($class, strrpos($class, '\\') + 1);
-        }
+        $class = $this->classBasename($object);
 
         $event = "{$class}_{$method}_method";
 

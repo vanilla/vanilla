@@ -166,6 +166,17 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias(Gdn::AliasDispatcher)
 
+    ->rule(\Garden\Web\Dispatcher::class)
+    ->setShared(true)
+    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route')])
+
+    ->rule('@api-v2-route')
+    ->setClass(\Garden\Web\ResourceRoute::class)
+    ->setConstructorArgs(['/api/v2/', '%sApiController'])
+
+    ->rule(\Garden\ClassLocator::class)
+    ->setClass(\Vanilla\VanillaClassLocator::class)
+
     ->rule('Gdn_Model')
     ->setShared(true)
 

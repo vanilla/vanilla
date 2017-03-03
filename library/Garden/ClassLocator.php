@@ -5,7 +5,7 @@
  * @license Proprietary
  */
 
-namespace Vanilla;
+namespace Garden;
 
 
 /**

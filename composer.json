@@ -46,8 +46,7 @@
         "classmap": [
             "library/core/",
             "library/database/",
-            "library/setup/",
-            "library/vendors/"
+            "library/setup/"
         ],
         "files": [
             "library/core/functions.error.php",

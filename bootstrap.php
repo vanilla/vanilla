@@ -147,10 +147,7 @@ Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
 Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
 Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-$currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
-if (isMobile()) {
-    $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
-}
+$currentTheme = $config->get(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
 
 Gdn::addonManager()->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 

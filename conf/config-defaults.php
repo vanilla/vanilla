@@ -13,13 +13,15 @@ $Configuration['Database']['Name']                             = 'dbname';
 $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
-                                                                  12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
-                                                                  1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
-                                                                  1002  => "set names 'utf8'; set time_zone = '+0:0';" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
-                                                               );
-$Configuration['Database']['CharacterEncoding'] = 'utf8';
+                                                                    // We do not use the constants here to be able to throw a
+                                                                    // graceful error message in the setupController if you did not
+                                                                    // install the needed requirement
+                                                                    12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
+                                                                    1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
+                                                                );
+$Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
-$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
+$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8mb4_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';

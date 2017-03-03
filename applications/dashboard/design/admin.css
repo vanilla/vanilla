@@ -6487,29 +6487,6 @@ select.nav-stats-users:focus,
   min-width: 120px;
 }
 
-.Section-Error {
-  color: #000;
-  font: 75%/1.7em "Helvetica Neue", Helvetica, arial, sans-serif;
-  margin: 0;
-  padding: 80px;
-  background: url("images/error.png") 30px 30px no-repeat #fff;
-}
-
-.Section-Error .SplashInfo h1 {
-  font-weight: bold;
-  color: #000;
-  font-size: 300%;
-  margin: 20px 0;
-  padding: 0;
-}
-
-.Section-Error .SplashInfo p {
-  margin: 10px 0;
-  color: #777;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
 .footer {
   -ms-flex-wrap: nowrap;
       flex-wrap: nowrap;
@@ -9403,10 +9380,6 @@ button.close {
   margin-right: 0;
 }
 
-.crop-label {
-  display: none;
-}
-
 .main .content .control-panel {
   display: none;
 }
@@ -9769,6 +9742,40 @@ strong,
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.Section-Error,
+.Section-Utility {
+  padding: 100px;
+  margin: 0;
+  background: url("images/eyes.png") 30px 30px no-repeat #fff;
+}
+
+@media (max-width: 991px) {
+  .Section-Error,
+  .Section-Utility {
+    padding: 10%;
+  }
+}
+
+.Section-Error {
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.SplashInfo {
+  max-width: 800px;
+  color: #555a62;
+  font-size: 0.875rem;
+}
+
+.SplashInfo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.SplashInfo h2, .SplashInfo .analytics-widget-header .title, .analytics-widget-header .SplashInfo .title {
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 
 .Section-Dashboard.Message.index {

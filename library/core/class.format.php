@@ -314,9 +314,9 @@ class Gdn_Format {
                     $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $Mixed2);
                     $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $Mixed2);
                     $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" target="_blank" href="\\1">\\1</a>', $Mixed2);
+                    $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\1</a>', $Mixed2);
                     $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si", '\\1', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" target="_blank" href="\\1">\\3</a>', $Mixed2);
+                    $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\3</a>', $Mixed2);
                     $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si", '\\2', $Mixed2);
                     $Mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si", '<img src="\\1" border="0" />', $Mixed2);
                     $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si", '\\1', $Mixed2);
@@ -1371,7 +1371,7 @@ EOT;
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
-<div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow" target="_blank">{$Matches[0]}</a></div>
+<div class="twitter-card" data-tweeturl="{$Matches[0]}" data-tweetid="{$Matches[1]}"><a href="{$Matches[0]}" class="tweet-url" rel="nofollow">{$Matches[0]}</a></div>
 EOT;
 
         // Vine
@@ -1399,7 +1399,7 @@ EOT;
             && !c('Garden.Format.DisableUrlEmbeds')
         ) {
             $Result = <<<EOT
-<a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow" target="_blank"></a>
+<a data-pin-do="embedPin" href="//pinterest.com/pin/{$Matches[2]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
 
         // Getty
@@ -1482,7 +1482,7 @@ EOT;
             $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
 
             $Result = <<<EOT
-<a href="$Url" target="_blank"$nofollow>$Text</a>$Punc
+<a href="$Url"$nofollow>$Text</a>$Punc
 EOT;
         }
         return $Result;

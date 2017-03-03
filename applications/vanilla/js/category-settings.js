@@ -65,7 +65,7 @@
                 var svg = svgMap[displayAs] || displayAs;
                 var options = '';
                 svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg> ';
-                $('.tree-item[data-id="' + categoryID + '"] .dropdown-toggle').each(function() {
+                $('.dropdown-toggle[data-id="' + categoryID + '"]').each(function() {
                     $(this).html(svg);
                     options = $('.tree-item[data-id="' + categoryID + '"] .options').html();
                 });

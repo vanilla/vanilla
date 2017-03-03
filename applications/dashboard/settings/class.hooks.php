@@ -381,6 +381,35 @@ class DashboardHooks extends Gdn_Plugin {
                 Gdn::userModel()->Validation->reset();
             }
         }
+        $this->checkAccessToken();
+    }
+
+    /**
+     * Check the access token.
+     */
+    private function checkAccessToken() {
+        if (empty($_SERVER['HTTP_AUTHORIZATION']) ||
+            !stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
+            !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)
+        ) {
+            return;
+        }
+
+        $token = $m[1];
+        if ($token) {
+            $model = new AccessTokenModel();
+
+            try {
+                $authRow = $model->verify($token, true);
+
+                Gdn::Session()->start($authRow['UserID'], false, false);
+                Gdn::Session()->validateTransientKey(true);
+            } catch (\Exception $ex) {
+                // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
+                $msg = $ex->getMessage();
+                safeHeader("X-WWW-Authenticate: error=\"invalid_token\", error_description=\"$msg\"");
+            }
+        }
     }
 
     /**

@@ -9,7 +9,11 @@ namespace VanillaTests\APIv0;
 
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
+use Gdn;
 use PDO;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
+use VanillaTests\TestDatabase;
 
 /**
  * The API client for Vanilla's API version 0.
@@ -110,7 +114,7 @@ class APIv0 extends HttpClient {
             $options = [
                 PDO::ATTR_PERSISTENT => false,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8'"
+                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
             ];
             $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
 
@@ -207,6 +211,8 @@ class APIv0 extends HttpClient {
 
         // Get some configuration information.
         $config = $this->saveToConfig([]);
+
+        $this->bootstrap();
     }
 
     /**
@@ -557,5 +563,34 @@ class APIv0 extends HttpClient {
         $dbname = $this->getDbName();
         $pdo->query("create database `$dbname`");
         $pdo->query("use `$dbname`");
+    }
+
+    /**
+     * Bootstrap some of the internal objects with this connection.
+     */
+    public function bootstrap() {
+        $dic = Gdn::getContainer();
+
+        // Make the core applications available.
+        $adm = new AddonManager(
+            [
+                Addon::TYPE_ADDON => ['/applications', '/plugins'],
+                Addon::TYPE_THEME => '/themes',
+                Addon::TYPE_LOCALE => '/locales'
+            ],
+            PATH_ROOT.'/tests/cache/APIv0/vanilla-manager'
+        );
+        $adm->startAddonsByKey(['dashboard' => true, 'vanilla' => true, 'conversations' => true], Addon::TYPE_ADDON);
+        spl_autoload_register([$adm, 'autoload']);
+
+        $db = new TestDatabase($this->getPDO());
+
+        $dic->setInstance(AddonManager::class, $adm)
+            ->setInstance(Gdn::AliasDatabase, $db)
+            ->setInstance(Gdn::AliasUserModel, new \UserModel());
+    }
+
+    public function terminate() {
+        spl_autoload_unregister([Gdn::addonManager(), 'autoload']);
     }
 }

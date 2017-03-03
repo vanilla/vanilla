@@ -220,6 +220,7 @@ class Gdn_Database {
         if (is_null($config)) {
             $config = [];
         }
+
         if (is_null($defaultConfig)) {
             $defaultConfig = [];
         }

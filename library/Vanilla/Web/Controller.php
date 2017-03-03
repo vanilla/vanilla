@@ -86,4 +86,44 @@ abstract class Controller implements InjectableInterface {
     public function isProtected($method) {
         return in_array(strtolower($method), ['permission', 'schema']);
     }
+
+    /**
+     * Get the session.
+     *
+     * @return SessionInterface Returns the session.
+     */
+    public function getSession() {
+        return $this->session;
+    }
+
+    /**
+     * Set the session.
+     *
+     * @param SessionInterface $session The new session.
+     * @return $this
+     */
+    public function setSession($session) {
+        $this->session = $session;
+        return $this;
+    }
+
+    /**
+     * Get the event manager.
+     *
+     * @return mixed Returns the event manager.
+     */
+    public function getEventManager() {
+        return $this->eventManager;
+    }
+
+    /**
+     * Set the event manager.
+     *
+     * @param mixed $eventManager The new event manager.
+     * @return $this
+     */
+    public function setEventManager($eventManager) {
+        $this->eventManager = $eventManager;
+        return $this;
+    }
 }

@@ -525,7 +525,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /**
      * Set the layout config settings based on a theme's specifications.
      *
-     * @param array $themeInfo A theme info array.
+     * @param array $themeInfo A theme info array retrieved from `getThemeInfo()`.
      * @param bool $save Whether to save the layout to config.
      */
     private function setLayout($themeInfo, $save = true) {
@@ -542,10 +542,22 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Checks if a theme has theme options.
+     *
+     * @param $themeKey The key value of the theme we're checking.
+     * @return bool Whether the given theme has theme options.
+     */
+    public function hasThemeOptions($themeKey) {
+        $themeInfo = $this->getThemeInfo($themeKey);
+        $options = val('Options', $themeInfo, []);
+        return !empty($options);
+    }
+
+    /**
      *
      *
      * @param $ThemeName
-     * @param bool $IsMobile
+     * @param bool $IsMobile Whether to enable the theme as the mobile theme or not.
      * @return bool
      * @throws Exception
      */
@@ -562,29 +574,13 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($ThemeFolder == '') {
             throw new Exception(t('The theme folder was not properly defined.'));
         } else {
-            $this->setLayout($ThemeInfo);
-            $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
-            if ($Options) {
-                if ($IsMobile) {
-                    saveToConfig(array(
-                        'Garden.MobileTheme' => $ThemeName,
-                        'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
-                    ));
-                } else {
-                    saveToConfig(array(
-                        'Garden.Theme' => $ThemeName,
-                        'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
-                    ));
-                }
+            if ($IsMobile) {
+                saveToConfig('Garden.MobileTheme', $ThemeName);
             } else {
-                if ($IsMobile) {
-                    saveToConfig('Garden.MobileTheme', $ThemeName);
-                    removeFromConfig('Garden.MobileThemeOptions');
-                } else {
-                    saveToConfig('Garden.Theme', $ThemeName);
-                    removeFromConfig('Garden.ThemeOptions');
-                }
+                saveToConfig('Garden.Theme', $ThemeName);
             }
+
+            $this->setLayout($ThemeInfo);
         }
 
         if ($oldTheme !== $ThemeName) {

@@ -242,6 +242,39 @@ class NestedSchemaTest extends SchemaTest {
     }
 
     /**
+     * Test merging nested schemas.
+     */
+    public function testNestedMerge() {
+        $schemaOne = $this->getArrayOfObjectsSchema();
+        $schemaTwo = new Schema([
+            'rows:a' => [
+                'email:s'
+            ]
+        ]);
+
+        $expected = [
+            'rows' => [
+                'name' => 'rows',
+                'type' => 'array',
+                'required' => true,
+                'items' => [
+                    'type' => 'object',
+                    'required' => true,
+                    'properties' => [
+                        'id' => ['name' => 'id', 'type' => 'integer', 'required' => true],
+                        'name' => ['name' => 'name', 'type' => 'string', 'required' => false],
+                        'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
+                    ]
+                ]
+            ]
+        ];
+
+        $schemaOne->merge($schemaTwo);
+
+        $this->assertEquals($expected, $schemaOne->jsonSerialize());
+    }
+
+    /**
      * Test throwing an exception when removing unexpected parameters from validated data.
      *
      * @expectedException \Garden\Exception\ValidationException
@@ -294,6 +327,51 @@ class NestedSchemaTest extends SchemaTest {
         ];
 
         $this->assertEquals($expected, $data);
+    }
+
+    /**
+     * Test passing a schema instance as details for a parameter.
+     */
+    public function testSchemaAsParameter() {
+        $userSchema = new Schema([
+            'userID:i',
+            'name:s',
+            'email:s'
+        ]);
+
+        $schema = new Schema([
+            'name:s' => 'The title of the discussion.',
+            'body:s' => 'The body of the discussion.',
+            'insertUser' => $userSchema,
+            'updateUser?' => $userSchema
+        ]);
+
+        $expected = [
+            'name' => ['name' => 'name', 'type' => 'string', 'required' => true, 'description' => 'The title of the discussion.'],
+            'body' => ['name' => 'body', 'type' => 'string', 'required' => true, 'description' => 'The body of the discussion.'],
+            'insertUser' => [
+                'name' => 'insertUser',
+                'type' => 'object',
+                'required' => true,
+                'properties' => [
+                        'userID' => ['name' => 'userID', 'type' => 'integer', 'required' => true],
+                        'name' => ['name' => 'name', 'type' => 'string', 'required' => true],
+                        'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
+                ]
+            ],
+            'updateUser' => [
+                    'name' => 'updateUser',
+                    'type' => 'object',
+                    'required' => false,
+                    'properties' => [
+                        'userID' => ['name' => 'userID', 'type' => 'integer', 'required' => true],
+                        'name' => ['name' => 'name', 'type' => 'string', 'required' => true],
+                        'email' => ['name' => 'email', 'type' => 'string', 'required' => true]
+                    ]
+                ]
+        ];
+
+        $this->assertEquals($expected, $schema->getParameters());
     }
 
     /**

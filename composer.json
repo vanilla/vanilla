@@ -31,10 +31,11 @@
         "psr/log": "~1.0",
         "smarty/smarty": "~3.1",
         "tburry/pquery": "~1.1",
-        "vanilla/garden-container": "^1.3.2",
+        "vanilla/garden-container": "^1.3.4",
         "vanilla/garden-http": "~1.0",
         "vanilla/garden-password": "~1.0",
         "vanilla/htmlawed": "~2.0",
+        "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1"
     },
@@ -45,8 +46,7 @@
         "classmap": [
             "library/core/",
             "library/database/",
-            "library/setup/",
-            "library/vendors/"
+            "library/setup/"
         ],
         "files": [
             "library/core/functions.error.php",

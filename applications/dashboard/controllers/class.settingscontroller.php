@@ -75,6 +75,12 @@ class SettingsController extends DashboardController {
         $this->title(t('Applications'));
         $this->setHighlightRoute('dashboard/settings/applications');
 
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'addon');
+        }
+
         if (!in_array($Filter, array('enabled', 'disabled'))) {
             $Filter = 'all';
         }
@@ -502,7 +508,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->title(t('Banning Options'));
+        $this->title(t('Ban Rules'));
 
         list($Offset, $Limit) = offsetLimit($Page, 20);
 
@@ -512,6 +518,7 @@ class SettingsController extends DashboardController {
             case 'add':
             case 'edit':
                 $this->Form->setModel($BanModel);
+                $this->setData('Title', sprintf(t(ucFirst($Action).' %s'), t('Ban Rule')));
 
                 if ($this->Form->authenticatedPostBack()) {
                     if ($ID) {
@@ -547,6 +554,9 @@ class SettingsController extends DashboardController {
                     $BanModel->delete(array('BanID' => $ID));
                     $this->View = 'BanDelete';
                 }
+                break;
+            case 'find':
+                $this->findBanRule($Search);
                 break;
             default:
                 $Bans = $BanModel->getWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->resultArray();
@@ -634,6 +644,11 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
+
+        $transientKey = Gdn::request()->get('TransientKey');
+        if (Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
 
         $ConfigData = array(
             'Title' => c('Garden.Title'),
@@ -1176,6 +1191,12 @@ class SettingsController extends DashboardController {
         $this->title(t('Plugins'));
         $this->setHighlightRoute('dashboard/settings/plugins');
 
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'addon');
+        }
+
         if (!in_array($Filter, array('enabled', 'disabled'))) {
             $Filter = 'all';
         }
@@ -1586,6 +1607,12 @@ class SettingsController extends DashboardController {
         $this->addJsFile('addons.js');
         $this->setData('Title', t('Themes'));
 
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'theme');
+        }
+
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('dashboard/settings/themes');
 
@@ -1820,6 +1847,78 @@ class SettingsController extends DashboardController {
         $this->render();
     }
 
+
+    /**
+     * Finds the bans rules affecting a given user. Valid arguments include either the user ID or the username.
+     *
+     * @param int|string $userIdentifier Either the username or user ID.
+     */
+    private function findBanRule($userIdentifier) {
+        $this->permission('Moderation.Bans.Manage');
+
+        $userModel = new UserModel();
+
+        if (is_numeric($userIdentifier)) {
+            $user = $userModel->getID($userIdentifier);
+        } else {
+            $user = $userModel->getByUsername($userIdentifier);
+        }
+
+        if ($user === false) {
+            $this->setData('Title', sprintf(t('Ban rules matching %s'), htmlspecialchars($userIdentifier)));
+            $emptyMessageTitle = sprintf(t('User does not exist'));
+            $this->setData('EmptyMessageTitle', $emptyMessageTitle);
+            $emptyMessageBody = sprintf(t('Cannot find the user identified by %s.'), htmlspecialchars($userIdentifier));
+            $this->setData('EmptyMessageBody', $emptyMessageBody);
+            $this->render('bans', 'settings', 'dashboard');
+        }
+
+        $matchingBans = [];
+
+        if ($user) {
+            $userID = val('UserID', $user);
+            $userIPs = $userModel->getIPs($userID);
+
+            // Check auto bans
+            $banRules = BanModel::AllBans();
+            foreach ($banRules as $banRule) {
+                // Convert ban to regex.
+                $parts = explode('*', str_replace('%', '*', $banRule['BanValue']));
+                $parts = array_map('preg_quote', $parts);
+                $regex = '`^'.implode('.*', $parts).'$`i';
+
+                switch ($banRule['BanType']) {
+                    case 'IPAddress':
+                        foreach ($userIPs as $ip) {
+                            if (preg_match($regex, $ip)) {
+                                $matchingBans[] = $banRule;
+                            }
+                        }
+                        break;
+                    case 'Email':
+                    case 'Name':
+                        if (preg_match($regex, val($banRule['BanType'], $user))) {
+                            $matchingBans[] = $banRule;
+                        }
+                }
+            }
+        }
+
+        // Join ban's insert username.
+        foreach($matchingBans as &$banRule) {
+            $banRule['InsertName'] = val('Name', $userModel->getID(val('InsertUserID', $banRule)));
+        }
+
+        Gdn_Theme::section('Moderation');
+        $this->setHighlightRoute('dashboard/settings/bans');
+        $this->setData('Title', sprintf(t('Ban rules matching %s'), val('Name', $user)));
+        $this->setData('Bans', $matchingBans);
+        $emptyMessage = sprintf(t('There are no existing ban rules affecting user %s.'), val('Name', $user));
+        $this->setData('EmptyMessageBody', $emptyMessage);
+        $this->render('bans', 'settings', 'dashboard');
+    }
+
+
     protected static function _nameSort($A, $B) {
         return strcasecmp(val('Name', $A), val('Name', $B));
     }
@@ -1963,5 +2062,14 @@ class SettingsController extends DashboardController {
         Gdn_Theme::section('Tutorials');
         $this->setData('IsWidePage', true);
         $this->render();
+    }
+
+    /**
+     * Can we attempt to verify the addon cache's integrity?
+     *
+     * @return bool
+     */
+    private function verifyAddonCache() {
+        return !c('Cache.Addons.DisableEndpoints');
     }
 }

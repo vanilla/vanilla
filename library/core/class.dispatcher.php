@@ -10,6 +10,7 @@
  * @package Core
  * @since 2.0
  */
+use Garden\Web\Dispatcher;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -70,6 +71,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var string|false The delivery type to set on the controller. */
     private $deliveryType;
 
+    /** @var  Dispatcher The forwards compatible dispatcher used for resourceful dispatching. */
+    private $dispatcher;
+
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
@@ -90,9 +94,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Class constructor.
      */
-    public function __construct(AddonManager $addonManager = null) {
+    public function __construct(AddonManager $addonManager = null, Dispatcher $dispatcher = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
+        $this->dispatcher = $dispatcher ?: new Dispatcher();
         $this->reset();
     }
 
@@ -216,12 +221,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             exit();
         }
 
-        // Analyze the request AFTER checking for update mode.
-        $routeArgs = $this->analyzeRequest($request);
-        $this->fireEvent('AfterAnalyzeRequest');
+        // Try and dispatch with the new dispatcher.
+        // This is temporary. We will eventually just have the new dispatcher.
+        $response = $this->dispatcher->dispatch($request);
 
-        // Now that the controller has been found, dispatch to a method on it.
-        $this->dispatchController($request, $routeArgs);
+        if ($response->getMetaItem('noMatch')) { // don't go using noMatch in other code!
+            // Analyze the request AFTER checking for update mode.
+            $routeArgs = $this->analyzeRequest($request);
+            $this->fireEvent('AfterAnalyzeRequest');
+
+            // Now that the controller has been found, dispatch to a method on it.
+            $this->dispatchController($request, $routeArgs);
+        } else {
+            $response->render();
+        }
     }
 
     /*

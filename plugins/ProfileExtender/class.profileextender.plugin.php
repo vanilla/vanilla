@@ -541,7 +541,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->select('u.InviteUserID')
             ->select('u2.Name', '', 'InvitedByName')
             ->from('User u')
-            ->leftJoin('User u2', 'u.InviteUserID = u2.InviteUserID and u.InviteUserID is not null')
+            ->leftJoin('User u2', 'u.InviteUserID = u2.UserID and u.InviteUserID is not null')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
 

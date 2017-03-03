@@ -1,7 +1,5 @@
 <?php
 
-use Garden\Container\Container;
-use Garden\Container\Reference;
 use Vanilla\Addon;
 
 if (!defined('APPLICATION')) exit();
@@ -40,9 +38,7 @@ if (!defined('PATH_CONF')) {
 
 // Include default constants if none were defined elsewhere.
 if (!defined('VANILLA_CONSTANTS')) {
-    include PATH_CONF.'/constants.php';
-} else {
-    deprecated("Defining your own VANILLA_CONSTANTS is deprecated.");
+    include(PATH_CONF.'/constants.php');
 }
 
 // Make sure a default time zone is set.
@@ -65,265 +61,188 @@ if (!class_exists('Gdn')) {
 }
 
 // Set up the dependency injection container.
-$dic = new Container();
+$dic = new \Garden\Container\Container();
 Gdn::setContainer($dic);
 
 $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Interop\Container\ContainerInterface')
     ->setAliasOf('Garden\Container\Container')
+;
 
-    // Cache
-    ->rule('Gdn_Cache')
-    ->setShared(true)
-    ->setFactory(['Gdn_Cache', 'initialize'])
-    ->addAlias('Cache')
+// Cache Layer
+Gdn::factoryInstall(Gdn::AliasCache, 'Gdn_Cache', null, Gdn::FactoryRealSingleton, 'Initialize');
 
-    // Configuration
-    ->rule('Gdn_Configuration')
-    ->setShared(true)
-    ->addAlias('Config')
-
-    // AddonManager
-    ->rule('Vanilla\\AddonManager')
-    ->setShared(true)
-    ->setConstructorArgs([
+// AddonManager
+Gdn::factoryInstall(
+    Gdn::AliasAddonManager,
+    '\\Vanilla\\AddonManager',
+    '',
+    Gdn::FactorySingleton,
+    [
         [
             Addon::TYPE_ADDON => ['/applications', '/plugins'],
             Addon::TYPE_THEME => '/themes',
             Addon::TYPE_LOCALE => '/locales'
         ],
         PATH_CACHE
-    ])
-    ->addAlias('AddonManager')
+    ]
+);
 
-    // ApplicationManager
-    ->rule('Gdn_ApplicationManager')
-    ->setShared(true)
-    ->addAlias('ApplicationManager')
+// Old Managers
+Gdn::factoryInstall(Gdn::AliasApplicationManager, 'Gdn_ApplicationManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+Gdn::factoryInstall(Gdn::AliasPluginManager, 'Gdn_PluginManager', '', Gdn::FactorySingleton, [Gdn::addonManager(), 'eventManager' => null]);
 
-    // PluginManager
-    ->rule('Gdn_PluginManager')
-    ->setShared(true)
-    ->addAlias('PluginManager')
+spl_autoload_register([Gdn::addonManager(), 'autoload']);
 
-    // ThemeManager
-    ->rule('Gdn_ThemeManager')
-    ->setShared(true)
-    ->addAlias('ThemeManager')
+// Install the configuration handler.
+Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
 
-    // EventManager
-    ->rule(\Garden\EventManager::class)
-    ->setShared(true)
+// Load default baseline Garden configurations.
+Gdn::config()->load(PATH_CONF.'/config-defaults.php');
 
-    // Locale
-    ->rule('Gdn_Locale')
-    ->setShared(true)
-    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Garden.Locale'])])
-    ->addAlias('Locale')
+// Load installation-specific configuration so that we know what apps are enabled.
+Gdn::config()->load(Gdn::config()->defaultPath(), 'Configuration', true);
 
-    // Request
-    ->rule('Gdn_Request')
-    ->setShared(true)
-    ->addCall('fromEnvironment')
-    ->addAlias('Request')
+// Default request object
+Gdn::factoryInstall(Gdn::AliasRequest, 'Gdn_Request', null, Gdn::FactorySingleton);
+Gdn::request()->fromEnvironment();
 
-    // Database.
-    ->rule('Gdn_Database')
-    ->setShared(true)
-    ->setConstructorArgs([new Reference(['Gdn_Configuration', 'Database'])])
-    ->addAlias('Database')
+/**
+ * Bootstrap Early
+ *
+ * A lot of the framework is loaded now, most importantly the core autoloader,
+ * default config and the general and error functions. More control is possible
+ * here, but some things have already been loaded and are immutable.
+ */
+if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
+    require_once PATH_CONF.'/bootstrap.early.php';
+}
 
-    ->rule('Gdn_DatabaseStructure')
-    ->setClass('Gdn_MySQLStructure')
-    ->setShared(true)
-    ->addAlias(Gdn::AliasDatabaseStructure)
-    ->addAlias('MySQLStructure')
+Gdn::config()->caching(true);
+debug(c('Debug', false));
 
-    ->rule('Gdn_SQLDriver')
-    ->setClass('Gdn_MySQLDriver')
-    ->setShared(true)
-    ->addAlias('Gdn_MySQLDriver')
-    ->addAlias('MySQLDriver')
-    ->addAlias(Gdn::AliasSqlDriver)
+setHandlers();
 
-    ->rule('Identity')
-    ->setClass('Gdn_CookieIdentity')
-    ->setShared(true)
+/**
+ * Installer Redirect
+ *
+ * If Garden is not yet installed, force the request to /dashboard/setup and
+ * begin installation.
+ */
+if (Gdn::config('Garden.Installed', false) === false && strpos(Gdn_Url::request(), 'setup') === false) {
+    safeHeader('Location: '.Gdn::request()->url('dashboard/setup', true));
+    exit();
+}
 
-    ->rule('Gdn_Session')
-    ->setShared(true)
-    ->addAlias('Session')
+/**
+ * Extension Managers
+ *
+ * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
+ * process the application-specific configuration defaults.
+ */
 
-    ->rule(Gdn::AliasAuthenticator)
-    ->setClass('Gdn_Auth')
-    ->setShared(true)
+// Start the addons, plugins, and applications.
+Gdn::addonManager()->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
+Gdn::addonManager()->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
+Gdn::addonManager()->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-    ->rule('Gdn_Router')
-    ->addAlias(Gdn::AliasRouter)
-    ->setShared(true)
+$currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
+if (isMobile()) {
+    $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
+}
 
-    ->rule('Gdn_Dispatcher')
-    ->setShared(true)
-    ->addAlias(Gdn::AliasDispatcher)
+Gdn::addonManager()->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
-    ->rule(\Garden\Web\Dispatcher::class)
-    ->setShared(true)
-    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route')])
-
-    ->rule('@api-v2-route')
-    ->setClass(\Garden\Web\ResourceRoute::class)
-    ->setConstructorArgs(['/api/v2/', '%sApiController'])
-
-    ->rule(\Garden\ClassLocator::class)
-    ->setClass(\Vanilla\VanillaClassLocator::class)
-
-    ->rule('Gdn_Model')
-    ->setShared(true)
-
-    ->rule('Gdn_IPlugin')
-    ->setShared(true)
-
-    ->rule(Gdn_Plugin::class)
-    ->setShared(true)
-    ->addCall('setAddonFromManager')
-
-    ->rule('Gdn_Slice')
-    ->setShared(true)
-    ->addAlias('Slice')
-
-    ->rule('Gdn_Statistics')
-    ->addAlias('Statistics')
-    ->setShared(true)
-
-    ->rule('Gdn_Regarding')
-    ->setShared(true)
-
-    ->rule('BBCodeFormatter')
-    ->setClass('BBCode')
-    ->setShared(true)
-
-    ->rule('Smarty')
-    ->setShared(true)
-
-    ->rule('ViewHandler.tpl')
-    ->setClass('Gdn_Smarty')
-    ->setShared(true)
-
-    ->rule('Gdn_Form')
-    ->addAlias('Form')
-;
-
-// Run through the bootstrap with dependencies.
-$dic->call(function (
-    Container $dic,
-    Gdn_Configuration $config,
-    \Vanilla\AddonManager $addonManager,
-    \Garden\EventManager $eventManager,
-    Gdn_Request $request // remove later
-) {
-
-    // Load default baseline Garden configurations.
-    $config->load(PATH_CONF.'/config-defaults.php');
-
-    // Load installation-specific configuration so that we know what apps are enabled.
-    $config->load($config->defaultPath(), 'Configuration', true);
-
-    /**
-     * Bootstrap Early
-     *
-     * A lot of the framework is loaded now, most importantly the core autoloader,
-     * default config and the general and error functions. More control is possible
-     * here, but some things have already been loaded and are immutable.
-     */
-    if (file_exists(PATH_CONF.'/bootstrap.early.php')) {
-        require_once PATH_CONF.'/bootstrap.early.php';
+// Load the configurations for enabled addons.
+foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    /* @var Addon $addon */
+    if ($configPath = $addon->getSpecial('config')) {
+        Gdn::config()->load($addon->path($configPath));
     }
+}
 
-    $config->caching(true);
-    debug($config->get('Debug', false));
+// Re-apply loaded user settings.
+Gdn::config()->overlayDynamic();
 
-    setHandlers();
+/**
+ * Bootstrap Late
+ *
+ * All configurations are loaded, as well as the Application, Plugin and Theme
+ * managers.
+ */
+if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
+    require_once PATH_CONF.'/bootstrap.late.php';
+}
 
-    /**
-     * Installer Redirect
-     *
-     * If Garden is not yet installed, force the request to /dashboard/setup and
-     * begin installation.
-     */
-    if ($config->get('Garden.Installed', false) === false && strpos($request->path(), 'setup') === false) {
-        safeHeader('Location: '.$request->url('dashboard/setup', true));
-        exit();
+if (c('Debug')) {
+    debug(true);
+}
+
+Gdn_Cache::trace(debug());
+
+/**
+ * Factory Services
+ *
+ * These are the helper classes that facilitate Garden's operation. They can be
+ * overwritten using FactoryOverwrite, but their defaults are installed here.
+ */
+
+// Default database.
+Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_Database', null, Gdn::FactorySingleton, array('Database'));
+
+// Database drivers.
+Gdn::factoryInstall('MySQLDriver', 'Gdn_MySQLDriver', null, Gdn::FactoryInstance);
+Gdn::factoryInstall('MySQLStructure', 'Gdn_MySQLStructure', null, Gdn::FactoryInstance);
+
+// Form class
+Gdn::factoryInstall('Form', 'Gdn_Form', null, Gdn::FactoryInstance);
+
+// Identity, Authenticator & Session.
+Gdn::factoryInstall('Identity', 'Gdn_CookieIdentity');
+Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
+Gdn::factoryInstall(Gdn::AliasAuthenticator, 'Gdn_Auth');
+
+// Dispatcher.
+Gdn::factoryInstall(Gdn::AliasRouter, 'Gdn_Router');
+Gdn::factoryInstall(Gdn::AliasDispatcher, 'Gdn_Dispatcher', '', Gdn::FactorySingleton, [Gdn::addonManager()]);
+
+// Smarty Templating Engine
+Gdn::factoryInstall('Smarty', 'Smarty');
+Gdn::factoryInstall('ViewHandler.tpl', 'Gdn_Smarty');
+
+// Remote Statistics
+Gdn::factoryInstall('Statistics', 'Gdn_Statistics', null, Gdn::FactorySingleton);
+Gdn::statistics();
+
+// Regarding
+Gdn::factoryInstall('Regarding', 'Gdn_Regarding', null, Gdn::FactorySingleton);
+Gdn::regarding();
+
+// Other objects.
+Gdn::FactoryInstall('BBCodeFormatter', 'BBCode', null, Gdn::FactorySingleton);
+Gdn::factoryInstall('Dummy', 'Gdn_Dummy');
+
+/**
+ * Extension Startup
+ *
+ * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
+ */
+
+// Bootstrapping.
+foreach (Gdn::addonManager()->getEnabled() as $addon) {
+    /* @var Addon $addon */
+    if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
+        $bootstrapPath = $addon->path($bootstrapPath);
+        include $bootstrapPath;
     }
+}
 
-    spl_autoload_register([$addonManager, 'autoload']);
+// Themes startup
+Gdn::themeManager()->start();
 
-    /**
-     * Extension Managers
-     *
-     * Now load the Addon, Application, Theme and Plugin managers into the Factory, and
-     * process the application-specific configuration defaults.
-     */
-
-    // Start the addons, plugins, and applications.
-    $addonManager->startAddonsByKey(c('EnabledPlugins'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
-    $addonManager->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
-
-    $currentTheme = $config->get(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
-    $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
-
-    // Load the configurations for enabled addons.
-    foreach ($addonManager->getEnabled() as $addon) {
-        /* @var Addon $addon */
-        if ($configPath = $addon->getSpecial('config')) {
-            $config->load($addon->path($configPath));
-        }
-    }
-
-    // Re-apply loaded user settings.
-    $config->overlayDynamic();
-
-    /**
-     * Bootstrap Late
-     *
-     * All configurations are loaded, as well as the Application, Plugin and Theme
-     * managers.
-     */
-    if (file_exists(PATH_CONF.'/bootstrap.late.php')) {
-        require_once PATH_CONF.'/bootstrap.late.php';
-    }
-
-    if ($config->get('Debug')) {
-        debug(true);
-    }
-
-    Gdn_Cache::trace(debug()); // remove later
-
-    /**
-     * Extension Startup
-     *
-     * Allow installed addons to execute startup and bootstrap procedures that they may have, here.
-     */
-
-    // Bootstrapping.
-    foreach ($addonManager->getEnabled() as $addon) {
-        /* @var Addon $addon */
-        if ($bootstrapPath = $addon->getSpecial('bootstrap')) {
-            $bootstrapPath = $addon->path($bootstrapPath);
-            include $bootstrapPath;
-        }
-    }
-
-    // Plugins startup
-    $addonManager->bindAllEvents($eventManager);
-
-    if ($eventManager->hasHandler('gdn_pluginManager_afterStart')) {
-        $eventManager->fire('gdn_pluginManager_afterStart', $dic->get(Gdn_PluginManager::class));
-    }
-
-    // Now that all of the events have been bound, fire an event that allows plugins to modify the container.
-    $eventManager->fire('container_init', $dic);
-});
+// Plugins startup
+Gdn::pluginManager()->start();
 
 /**
  * Locales
@@ -332,13 +251,15 @@ $dic->call(function (
  * the locale management system.
  */
 
-// Load the Garden locale system.
-$dic->get('Gdn_Locale');
+// Load the Garden locale system
+$gdnLocale = new Gdn_Locale(c('Garden.Locale', 'en'), Gdn::addonManager());
+Gdn::factoryInstall(Gdn::AliasLocale, 'Gdn_Locale', null, Gdn::FactorySingleton, $gdnLocale);
+unset($gdnLocale);
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
 
 // Start Authenticators
-$dic->get('Authenticator')->startAuthenticator();
+Gdn::authenticator()->startAuthenticator();
 
 /**
  * Bootstrap After

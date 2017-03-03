@@ -25,8 +25,6 @@ $PluginInfo['Twitter'] = array(
     'Icon' => 'twitter_social_connect.png'
 );
 
-require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';
-
 /**
  * Class TwitterPlugin
  */

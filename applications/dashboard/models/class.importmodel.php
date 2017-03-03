@@ -1255,7 +1255,7 @@ class ImportModel extends Gdn_Model {
         Gdn::database()->query("truncate table $Tablename;");
 
         $Sql = "load data infile $Path into table $Tablename
-         character set utf8
+         character set utf8mb4
          columns terminated by ','
          optionally enclosed by '\"'
          escaped by '\\\\'
@@ -1281,7 +1281,7 @@ class ImportModel extends Gdn_Model {
         Gdn::database()->query("truncate table $Tablename;");
 
         $sql = "load data local infile $Path into table $Tablename
-         character set utf8
+         character set utf8mb4
          columns terminated by ','
          optionally enclosed by '\"'
          escaped by '\\\\'

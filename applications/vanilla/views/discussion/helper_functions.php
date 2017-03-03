@@ -188,7 +188,7 @@ if (!function_exists('discussionOptionsToDropdown')):
      */
     function discussionOptionsToDropdown($options, $dropdown = null) {
         if (is_null($dropdown)) {
-            $dropdown = new DropdownModule();
+            $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         }
 
         if (!empty($options)) {
@@ -311,7 +311,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
      * @throws Exception
      */
     function getDiscussionOptionsDropdown($discussion = null) {
-        $dropdown = new DropdownModule();
+        $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         $sender = Gdn::controller();
         $session = Gdn::session();
 

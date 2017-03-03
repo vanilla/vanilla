@@ -20,6 +20,7 @@ class StatisticsController extends DashboardController {
      * Output available info.
      */
     public function info() {
+        $this->permission('Garden.Settings.Manage');
         $this->setData('FirstDate', Gdn::statistics()->firstDate());
         $this->render();
     }
@@ -131,6 +132,7 @@ class StatisticsController extends DashboardController {
      * @access public
      */
     public function verify() {
+        $this->permission('Garden.Settings.Manage');
         $CredentialsValid = Gdn::statistics()->validateCredentials();
         $this->setData('StatisticsVerified', $CredentialsValid);
         $this->render();

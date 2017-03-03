@@ -364,7 +364,7 @@ class DashboardHooks extends Gdn_Plugin {
             // no leak via the Referer field.
             $deliveryType = $Sender->getDeliveryType($deliveryMethod);
             if (!$IsApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
-                $url = preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery());
+                $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
                 redirectUrl($url);
             }
         }

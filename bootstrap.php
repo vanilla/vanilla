@@ -269,7 +269,10 @@ $dic->call(function (
     $addonManager->startAddonsByKey(c('EnabledApplications'), Addon::TYPE_ADDON);
     $addonManager->startAddonsByKey(array_keys(c('EnabledLocales', [])), Addon::TYPE_LOCALE);
 
-    $currentTheme = $config->get(!isMobile() ? 'Garden.Theme' : 'Garden.MobileTheme', 'default');
+    $currentTheme = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
+    if (isMobile()) {
+        $currentTheme = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
+    }
     $addonManager->startAddonsByKey([$currentTheme], Addon::TYPE_THEME);
 
     // Load the configurations for enabled addons.

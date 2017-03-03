@@ -159,15 +159,6 @@ class AddonManager {
     }
 
     /**
-     * Unregister the autoloader registered with {@link AddonManager::registerAutoloader()}.
-     *
-     * @return bool Returns **true** on success or **false** on failure.
-     */
-    public function unregisterAutoloader() {
-        return spl_autoload_unregister([$this, 'autoload']);
-    }
-
-    /**
      * Lookup an addon by class name.
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.

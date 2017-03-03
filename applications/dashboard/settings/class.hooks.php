@@ -277,7 +277,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Messages'), '/dashboard/message', 'site.messages', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'], false), 'Moderation', t('Users'), '/dashboard/user', 'site.users', '', $sort)
             ->addLinkToSectionIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), 'Moderation', t('Applicants'), '/dashboard/user/applicants', 'site.applicants', '', $sort, ['popinRel' => '/dashboard/user/applicantcount'], false)
-            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Auto Bans'), '/dashboard/settings/bans', 'site.bans', '', $sort)
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Ban Rules'), '/dashboard/settings/bans', 'site.bans', '', $sort)
 
             ->addGroupToSection('Moderation', t('Content'), 'moderation')
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)

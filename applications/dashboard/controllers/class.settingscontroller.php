@@ -508,7 +508,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->title(t('Auto Bans'));
+        $this->title(t('Ban Rules'));
 
         list($Offset, $Limit) = offsetLimit($Page, 20);
 
@@ -518,6 +518,7 @@ class SettingsController extends DashboardController {
             case 'add':
             case 'edit':
                 $this->Form->setModel($BanModel);
+                $this->setData('Title', sprintf(t(ucFirst($Action).' %s'), t('Ban Rule')));
 
                 if ($this->Form->authenticatedPostBack()) {
                     if ($ID) {
@@ -553,6 +554,9 @@ class SettingsController extends DashboardController {
                     $BanModel->delete(array('BanID' => $ID));
                     $this->View = 'BanDelete';
                 }
+                break;
+            case 'find':
+                $this->findBanRule($Search);
                 break;
             default:
                 $Bans = $BanModel->getWhere(array(), 'BanType, BanValue', 'asc', $Limit, $Offset)->resultArray();
@@ -1827,11 +1831,11 @@ class SettingsController extends DashboardController {
 
 
     /**
-     * Finds the auto bans for a given user. Valid arguments include either the user ID or the username.
+     * Finds the bans rules affecting a given user. Valid arguments include either the user ID or the username.
      *
      * @param int|string $userIdentifier Either the username or user ID.
      */
-    public function findAutoBan($userIdentifier) {
+    private function findBanRule($userIdentifier) {
         $this->permission('Moderation.Bans.Manage');
 
         $userModel = new UserModel();
@@ -1843,7 +1847,7 @@ class SettingsController extends DashboardController {
         }
 
         if ($user === false) {
-            $this->setData('Title', sprintf(t('Auto Bans matching %s'), htmlspecialchars($userIdentifier)));
+            $this->setData('Title', sprintf(t('Ban rules matching %s'), htmlspecialchars($userIdentifier)));
             $emptyMessageTitle = sprintf(t('User does not exist'));
             $this->setData('EmptyMessageTitle', $emptyMessageTitle);
             $emptyMessageBody = sprintf(t('Cannot find the user identified by %s.'), htmlspecialchars($userIdentifier));
@@ -1851,47 +1855,47 @@ class SettingsController extends DashboardController {
             $this->render('bans', 'settings', 'dashboard');
         }
 
-        $bans = [];
+        $matchingBans = [];
 
         if ($user) {
             $userID = val('UserID', $user);
             $userIPs = $userModel->getIPs($userID);
 
             // Check auto bans
-            $autoBans = BanModel::AllBans();
-            foreach ($autoBans as $ban) {
+            $banRules = BanModel::AllBans();
+            foreach ($banRules as $banRule) {
                 // Convert ban to regex.
-                $parts = explode('*', str_replace('%', '*', $ban['BanValue']));
+                $parts = explode('*', str_replace('%', '*', $banRule['BanValue']));
                 $parts = array_map('preg_quote', $parts);
                 $regex = '`^'.implode('.*', $parts).'$`i';
 
-                switch ($ban['BanType']) {
+                switch ($banRule['BanType']) {
                     case 'IPAddress':
                         foreach ($userIPs as $ip) {
                             if (preg_match($regex, $ip)) {
-                                $bans[] = $ban;
+                                $matchingBans[] = $banRule;
                             }
                         }
                         break;
                     case 'Email':
                     case 'Name':
-                        if (preg_match($regex, val($ban['BanType'], $user))) {
-                            $bans[] = $ban;
+                        if (preg_match($regex, val($banRule['BanType'], $user))) {
+                            $matchingBans[] = $banRule;
                         }
                 }
             }
         }
 
         // Join ban's insert username.
-        foreach($bans as &$ban) {
-            $ban['InsertName'] = val('Name', $userModel->getID(val('InsertUserID', $ban)));
+        foreach($matchingBans as &$banRule) {
+            $banRule['InsertName'] = val('Name', $userModel->getID(val('InsertUserID', $banRule)));
         }
 
         Gdn_Theme::section('Moderation');
         $this->setHighlightRoute('dashboard/settings/bans');
-        $this->setData('Title', sprintf(t('Auto Bans matching %s'), val('Name', $user)));
-        $this->setData('Bans', $bans);
-        $emptyMessage = sprintf(t('There are no existing auto bans for user %s.'), val('Name', $user));
+        $this->setData('Title', sprintf(t('Ban rules matching %s'), val('Name', $user)));
+        $this->setData('Bans', $matchingBans);
+        $emptyMessage = sprintf(t('There are no existing ban rules affecting user %s.'), val('Name', $user));
         $this->setData('EmptyMessageBody', $emptyMessage);
         $this->render('bans', 'settings', 'dashboard');
     }

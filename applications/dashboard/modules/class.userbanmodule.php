@@ -48,10 +48,10 @@ class UserBanModule extends GDN_Module {
                 $reasons[$bit] = t("BanReason.$bit");
             }
 
-            // Add a link to identify the corresponding auto ban.
+            // Add a link to identify the corresponding ban rule.
             if ($bit === 2) {
-                $text = sprintf(t('Find the corresponding auto ban for %s'), val('Name', $user));
-                $reasons[$bit] .= ' '.anchor($text, url('settings/findAutoBan/'.$userID));
+                $text = sprintf(t('Find the corresponding ban rule for %s'), val('Name', $user));
+                $reasons[$bit] .= ' '.anchor($text, url('settings/bans/find/'.$userID));
             }
         }
 

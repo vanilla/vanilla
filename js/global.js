@@ -918,7 +918,7 @@ jQuery(document).ready(function($) {
         gdn.stats();
 
     // If a dismissable InformMessage close button is clicked, hide it.
-    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
+    $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
         $(this).parents('div.InformWrapper').fadeOut('fast', function() {
             $(this).remove();
         });
@@ -1690,6 +1690,19 @@ jQuery(document).ready(function($) {
                                     "q": query,
                                     "limit": server_limit
                                 }, function(data) {
+                                    if (Array.isArray(data)) {
+                                        data.forEach(function(result) {
+                                            if (typeof result === "object" && typeof result.name === "string") {
+                                                // Convert special characters to safely insert into template.
+                                                result.name = result.name.replace(/&/g, "&amp;")
+                                                    .replace(/</g, "&lt;")
+                                                    .replace(/>/g, "&gt;")
+                                                    .replace(/"/g, "&quot;")
+                                                    .replace(/'/g, "&apos;");
+                                            }
+                                        });
+                                    }
+
                                     callback(data);
 
                                     // If data is empty, cache the results to prevent

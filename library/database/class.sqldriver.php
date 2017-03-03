@@ -1625,14 +1625,15 @@ abstract class Gdn_SQLDriver {
     }
 
     public function query($Sql, $Type = 'select') {
-        $QueryOptions = array('Type' => $Type, 'Slave' => GetValue('Slave', $this->_Options, null));
+        $QueryOptions = array('Type' => $Type, 'Slave' => val('Slave', $this->_Options, null));
 
         switch ($Type) {
             case 'insert':
                 $ReturnType = 'ID';
                 break;
             case 'update':
-                $ReturnType = null;
+            case 'delete':
+                $ReturnType = '';
                 break;
             default:
                 $ReturnType = 'DataSet';

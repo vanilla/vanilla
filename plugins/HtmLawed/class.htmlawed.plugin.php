@@ -7,6 +7,8 @@
  * @package HtmLawed
  */
 
+use Garden\Container\Container;
+
 $PluginInfo['HtmLawed'] = [
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
     'Version' => '1.2',
@@ -15,8 +17,6 @@ $PluginInfo['HtmLawed'] = [
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
     'Hidden' => true
 ];
-
-Gdn::factoryInstall('HtmlFormatter', 'HtmLawedPlugin', __FILE__, Gdn::FactorySingleton);
 
 /**
  * Class HTMLawedPlugin
@@ -214,6 +214,17 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * No setup.
      */
     public function setup() {
+    }
+
+    /**
+     * Install the formatter to the container.
+     *
+     * @param Container $dic The container to initialize.
+     */
+    public function container_init_handler(Container $dic) {
+        $dic->rule('HtmlFormatter')
+            ->setClass(__CLASS__)
+            ->setShared(true);
     }
 }
 

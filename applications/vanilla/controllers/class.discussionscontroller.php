@@ -538,6 +538,10 @@ class DiscussionsController extends VanillaController {
             $UserID = Gdn::session()->UserID;
         }
 
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
+        }
+
         if (!$UserID) {
             $CountBookmarks = null;
         } else {

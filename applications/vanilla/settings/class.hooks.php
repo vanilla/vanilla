@@ -1010,6 +1010,32 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * Handle post-restore operations from the log table.
+     *
+     * @param LogModel $sender
+     * @param array $args
+     */
+    public function logModel_AfterRestore_handler($sender, $args) {
+        $recordType = valr('Log.RecordType', $args);
+        $recordUserID = valr('Log.RecordUserID', $args);
+
+        if ($recordUserID === false) {
+            return;
+        }
+
+        switch ($recordType) {
+            case 'Comment':
+                $commentModel = new CommentModel();
+                $commentModel->updateUser($recordUserID, true);
+                break;
+            case 'Discussion':
+                $discussionModel = new DiscussionModel();
+                $discussionModel->updateUserDiscussionCount($recordUserID, true);
+                break;
+        }
+    }
+
+    /**
      * Automatically executed when application is enabled.
      *
      * @since 2.0.0

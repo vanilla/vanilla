@@ -75,6 +75,12 @@ class SettingsController extends DashboardController {
         $this->title(t('Applications'));
         $this->setHighlightRoute('dashboard/settings/applications');
 
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'addon');
+        }
+
         if (!in_array($Filter, array('enabled', 'disabled'))) {
             $Filter = 'all';
         }
@@ -635,6 +641,11 @@ class SettingsController extends DashboardController {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->deliveryType(DELIVERY_TYPE_DATA);
 
+        $transientKey = Gdn::request()->get('TransientKey');
+        if (Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $ConfigData = array(
             'Title' => c('Garden.Title'),
             'Domain' => c('Garden.Domain'),
@@ -1176,6 +1187,12 @@ class SettingsController extends DashboardController {
         $this->title(t('Plugins'));
         $this->setHighlightRoute('dashboard/settings/plugins');
 
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'addon');
+        }
+
         if (!in_array($Filter, array('enabled', 'disabled'))) {
             $Filter = 'all';
         }
@@ -1585,6 +1602,12 @@ class SettingsController extends DashboardController {
     public function themes($ThemeName = '', $TransientKey = '') {
         $this->addJsFile('addons.js');
         $this->setData('Title', t('Themes'));
+
+        // Verify addon cache integrity?
+        if ($this->verifyAddonCache()) {
+            $this->addJsFile('addoncache.js');
+            $this->addDefinition('VerifyCache', 'theme');
+        }
 
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('dashboard/settings/themes');
@@ -2017,5 +2040,14 @@ class SettingsController extends DashboardController {
         Gdn_Theme::section('Tutorials');
         $this->setData('IsWidePage', true);
         $this->render();
+    }
+
+    /**
+     * Can we attempt to verify the addon cache's integrity?
+     *
+     * @return bool
+     */
+    private function verifyAddonCache() {
+        return !c('Cache.Addons.DisableEndpoints');
     }
 }

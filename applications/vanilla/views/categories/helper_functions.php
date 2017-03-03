@@ -69,7 +69,7 @@ if (!function_exists('getOptions')):
         $sender = Gdn::controller();
         $categoryID = val('CategoryID', $category);
 
-        $dropdown = new DropdownModule();
+        $dropdown = new DropdownModule('dropdown', '', 'OptionsMenu');
         $tk = urlencode(Gdn::session()->TransientKey());
         $hide = (int)!val('Following', $category);
 

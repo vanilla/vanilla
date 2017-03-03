@@ -8,10 +8,32 @@
  * @since 2.0
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+
 /**
  * Event handlers for the Dashboard application.
  */
 class DashboardHooks extends Gdn_Plugin {
+
+    /**
+     * Install the formatter to the container.
+     *
+     * @param Container $dic The container to initialize.
+     */
+    public function container_init_handler(Container $dic) {
+        $dic->rule('HeadModule')
+            ->setShared(true)
+            ->addAlias('Head')
+
+            ->rule('MenuModule')
+            ->setShared(true)
+            ->addAlias('Menu')
+
+            ->rule('Gdn_Dispatcher')
+            ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
+            ;
+    }
 
     /**
      * Fire before every page render.
@@ -197,7 +219,7 @@ class DashboardHooks extends Gdn_Plugin {
         // Allow return to mobile site
         $ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
         if ($ForceNoMobile === 'desktop') {
-            $Sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
+            $Sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
         }
 
         // Allow global translation of TagHint
@@ -442,7 +464,7 @@ class DashboardHooks extends Gdn_Plugin {
         // Add a link to the community home.
         $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
         $sender->addGroupToGlobals('', 'etc', '', 100);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', '', 100, array('icon' => 'resize-full'));
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, array('icon' => 'resize-full'));
         $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
         $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
 

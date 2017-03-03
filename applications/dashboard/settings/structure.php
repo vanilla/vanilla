@@ -268,7 +268,7 @@ $Construct->table('UserAuthenticationToken')
     ->set($Explicit, $Drop);
 
 $Construct->table('AccessToken')
-    ->column('Token', 'varchar(255)', false, 'primary')
+    ->column('Token', 'varchar(100)', false, 'primary')
     ->column('UserID', 'int', false, 'index')
     ->column('Type', 'varchar(20)', false, 'index')
     ->column('Scope', 'text', true)

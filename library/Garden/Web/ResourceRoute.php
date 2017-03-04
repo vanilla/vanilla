@@ -67,7 +67,7 @@ class ResourceRoute extends Route {
 
 
         $this
-            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0, 'id' => true])
+            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0])
             ->setConstraint('page', '`^p\d+$`');
     }
 
@@ -138,7 +138,8 @@ class ResourceRoute extends Route {
             if ($callback = $this->findMethod($controller, $methodName)) {
                 $args = $pathArgs;
                 if ($omit !== null) {
-                    array_splice($args, $omit, 1);
+                    unset($args[$omit]);
+//                    array_splice($args, $omit, 1);
                 }
 
                 $callbackArgs = $this->matchArgs($callback, $request, $args, $omit, $controller);
@@ -200,6 +201,7 @@ class ResourceRoute extends Route {
 
         $args = []; // reflected $pathArgs without mappings.
         $i = 0;
+        $pathCapture = false;
         foreach ($params as $param) {
             /* @var \ReflectionParameter $param */
             $name = $param->getName();
@@ -218,6 +220,7 @@ class ResourceRoute extends Route {
                 }
             } else {
                 // Look at the path arguments for the value.
+                $pos = key($pathArgs);
                 $value = array_shift($pathArgs);
                 if ($value === null) {
                     if ($param->isDefaultValueAvailable()) {
@@ -231,10 +234,20 @@ class ResourceRoute extends Route {
                 if ($param === $pathParam) {
                     // If this is the path parameter then it will eat up at least itself up to the remaining parameters.
                     // We do this here so that further parameters don't get set to the wrong args.
-                    $extraPathArgs = array_splice($pathArgs, 0, count($pathArgs) - count($params) + $i + 1);
-                    $defaults[$name] = $args[$name] = array_merge([$value], $extraPathArgs);
-                } elseif ($this->testConstraint($param, $value, $conditions)) {
+                    $extraPathArgs = [$value];
+                    for ($c = count($pathArgs) - count($params) + $i; $c >= 0; $c--) {
+                        $extraPathArgs[] = array_shift($pathArgs);
+                    }
+
+                    $defaults[$name] = $args[$name] = $extraPathArgs;
+                    $pathCapture = true;
+                } elseif ($this->testConstraint($param, $value, ['position' => $pos])) {
                     $defaults[$name] = $args[$name] = $value;
+                    $pathCapture = false;
+                } elseif ($pathCapture === true && $param->isDefaultValueAvailable()) {
+                    // The path argument can take the bad value.
+                    $defaults[$pathParam->getName()][] = $args[$pathParam->getName()][] = $value;
+                    $defaults[$name] = $args[$name] = $param->getDefaultValue();
                 } else {
                     // The condition failed so this callback doesn't match.
                     return null;

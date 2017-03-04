@@ -192,6 +192,10 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
             ['/discussions/path2/a/b/c', ['a' => 'a', 'path' => '/b/c']],
             ['/discussions/path3/a/b/c', ['path' => '/a/b', 'b' => 'c']],
             ['/discussions/path4/a/b/c', ['a' => 'a', 'path' => '/b', 'b' => 'c']],
+
+            'path constraint' => ['/discussions/article/a/p1', ['path' => '/a', 'page' => 'p1']],
+            'path constraint capture 1' => ['/discussions/article/a/b', ['path' => '/a/b', 'page' => '']],
+            'path constraint capture 2' => ['/discussions/article/a/b/c', ['path' => '/a/b/c', 'page' => '']],
         ];
         return $r;
     }
@@ -211,7 +215,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     /**
      * A constraint's path placement should force it's location in the path.
      */
-    public function testConstraintPlacement() {
+    public function testConstraintPosition() {
         $route = $this->createRoute();
         $request = new Request('/discussions/help/1/a/b/c');
 

@@ -107,4 +107,7 @@ class DiscussionsController {
     public function get_path4($a, $path, $b) {
 
     }
+
+    public function get_article($path, $page = '') {
+    }
 }

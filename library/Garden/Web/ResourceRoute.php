@@ -64,6 +64,11 @@ class ResourceRoute extends Route {
         $this->setControllerPattern($controllerPattern);
         $this->container = $container;
         $this->classLocator = $classLocator ?: new ClassLocator();
+
+
+        $this
+            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0, 'id' => true])
+            ->setConstraint('page', '`^p\d+$`');
     }
 
     /**
@@ -136,7 +141,7 @@ class ResourceRoute extends Route {
                     array_splice($args, $omit, 1);
                 }
 
-                $callbackArgs = $this->matchArgs($callback, $request, $args, $controller);
+                $callbackArgs = $this->matchArgs($callback, $request, $args, $omit, $controller);
 
                 if ($callbackArgs !== null) {
                     $result = new Action($callback, $callbackArgs);
@@ -179,32 +184,38 @@ class ResourceRoute extends Route {
      * @param callable $callback The callback to match the arguments for.
      * @param RequestInterface $request The request used to match.
      * @param array $pathArgs The current request path.
+     * @param int|null $namePos The position of the name in the path.
      * @param object $sender The controller running the request.
      */
-    private function matchArgs(callable $callback, RequestInterface $request, array $pathArgs, $sender = null) {
+    private function matchArgs(callable $callback, RequestInterface $request, array $pathArgs, $namePos = null, $sender = null) {
         $method = $this->reflectCallback($callback);
 
-        $result = [];
-        $toMap = []; // keys for late mapping.
-        $args = []; // reflected $pathArgs
-        foreach ($method->getParameters() as $i => $param) {
+        list($defaults, $params, $mapped, $pathParam) = $this->splitMappedParameters($method);
+
+        $conditions = [];
+        // If the method's name was the first position in the path then we won't have a RESTful ID parameter.
+        if ($namePos === 0) {
+            $conditions['id'] = false;
+        }
+
+        $args = []; // reflected $pathArgs without mappings.
+        $i = 0;
+        foreach ($params as $param) {
             /* @var \ReflectionParameter $param */
             $name = $param->getName();
 
-            if ($this->isMapped($param)) {
-                // This is a mapped parameter, but map after everything is reflected.
-                $toMap[] = $name;
-                $result[$name] = null;
-            } elseif ($param->getClass() !== null && is_a($request, $param->getClass()->getName())) {
-                $result[$name] = $request;
-            } elseif ($param->getClass() !== null && is_a($sender, $param->getClass()->getName())) {
-                // This is the sender in a callback.
-                $result[$name] = $sender;
-            } elseif ($param->isVariadic()) {
+            if ($param->isVariadic()) {
                 // This is the last variadic parameter and will take the rest of the arguments.
-                $result[$name] = $pathArgs;
                 $args[$name] = $pathArgs;
-                $pathArgs = [];
+
+                // Variadic args are a little different. They have to be merged separately.
+                if (empty($pathArgs)) {
+                    unset($defaults[$name]);
+                } else {
+                    $defaults[$name] = array_shift($pathArgs);
+                    $defaults = array_merge($defaults, $pathArgs);
+                    $pathArgs = [];
+                }
             } else {
                 // Look at the path arguments for the value.
                 $value = array_shift($pathArgs);
@@ -217,14 +228,19 @@ class ResourceRoute extends Route {
                     }
                 }
 
-                if (($param->isDefaultValueAvailable() && $value === $param->getDefaultValue()) || $this->testConstraint($param, $value)) {
-                    $result[$name] = $value;
-                    $args[$name] = $value;
+                if ($param === $pathParam) {
+                    // If this is the path parameter then it will eat up at least itself up to the remaining parameters.
+                    // We do this here so that further parameters don't get set to the wrong args.
+                    $extraPathArgs = array_splice($pathArgs, 0, count($pathArgs) - count($params) + $i + 1);
+                    $defaults[$name] = $args[$name] = array_merge([$value], $extraPathArgs);
+                } elseif ($this->testConstraint($param, $value, $conditions)) {
+                    $defaults[$name] = $args[$name] = $value;
                 } else {
                     // The condition failed so this callback doesn't match.
                     return null;
                 }
             }
+            $i++;
         }
 
         // If the path still has stuff left then it's not a valid match.
@@ -232,12 +248,54 @@ class ResourceRoute extends Route {
             return null;
         }
 
-        // Fill in all of the mappings now that everything has been reflected.
-        foreach ($toMap as $name) {
-            $result[$name] = $this->mapParam($name, $request, $args);
+        // Fix the path.
+        if ($pathParam !== null && !$pathParam->isArray()) {
+            $args[$pathParam->getName()] = $defaults[$pathParam->getName()] = '/'.implode('/', $defaults[$pathParam->getName()]);
         }
 
-        return $result;
+        // Fill in all of the mappings now that everything has been reflected.
+        foreach ($mapped as $name => $param) {
+            if ($param->getClass() !== null && is_a($sender, $param->getClass()->getName(), true)) {
+                $defaults[$name] = $sender;
+            } else {
+                $defaults[$name] = $this->mapParam($param, $request, $args);
+            }
+        }
+
+        return $defaults;
+    }
+
+    /**
+     * Split a function into its regular parameters and mapped parameters.
+     *
+     * @param \ReflectionFunctionAbstract $method The method to split.
+     * @return array Returns an array in the form `[$mapped[], $params[], $path]`.
+     */
+    private function splitMappedParameters(\ReflectionFunctionAbstract $method) {
+        $defaults = [];
+        $mapped = [];
+        $params = [];
+        $path = null;
+
+        foreach ($method->getParameters() as $param) {
+            $name = $param->getName();
+
+            $defaults[$name] = $param->isDefaultValueAvailable() ? $param->getDefaultValue() : null;
+            if ($this->isMapped($param, Route::MAP_PATH)) {
+                // The path can eat other parameters so keep track of it.
+                $params[$name] = $param;
+                $path = $param;
+            } elseif ($this->isMapped($param)) {
+                $mapped[$name] = $param;
+            } elseif ($param->getClass() !== null) {
+                // Type-hinted parameters can't be mapped from the path.
+                $mapped[$name] = $param;
+            } else {
+                $params[$name] = $param;
+            }
+        }
+
+        return [$defaults, $params, $mapped, $path];
     }
 
     /**

@@ -19,14 +19,12 @@ abstract class Route {
     const MAP_QUERY = 0x2; // map to querystring
     const MAP_BODY = 0x4; // map to post body
     const MAP_PATH = 0x8; // map to the rest of the path
+    const MAP_REQUEST = 0x10; // map to the entire request
 
     /**
      * Route constructor.
      */
     public function __construct() {
-        $this
-            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0])
-            ->setConstraint('page', '`^p\d+$`');
     }
 
     /**
@@ -173,7 +171,9 @@ abstract class Route {
      * @return bool Returns **true** if the condition passes or there is no condition. Returns **false** otherwise.
      */
     protected function testConstraint(\ReflectionParameter $parameter, $value, array $meta = []) {
-        if ($this->hasConstraint($parameter)) {
+        if ($parameter->isDefaultValueAvailable() && $value === $parameter->getDefaultValue()) {
+            return true;
+        } elseif ($this->hasConstraint($parameter)) {
             $constraint = $this->constraints[strtolower($parameter->getName())];
 
             // Check the meta information.
@@ -195,28 +195,42 @@ abstract class Route {
     /**
      * Determine whether or not a parameter is mapped to special request data.
      *
-     * @param \ReflectionParameter $parameter The name of the parameter to check.
+     * @param \ReflectionParameter $param The name of the parameter to check.
+     * @param int $type Pass a **MAP_*** constant if you want to check for a specific mapping.
      * @return bool Returns **true** if the parameter is mapped, or **false** otherwise.
      */
-    protected function isMapped(\ReflectionParameter $parameter) {
-        if (empty($this->mappings[strtolower($parameter->getName())])) {
+    protected function isMapped(\ReflectionParameter $param, $type = 0) {
+        if ($param->getClass() !== null && $param->getClass()->implementsInterface(RequestInterface::class)) {
+            $mapping = Route::MAP_REQUEST;
+        } elseif (empty($this->mappings[strtolower($param->getName())])) {
+            return false;
+        } else {
+            $mapping = $this->mappings[strtolower($param->getName())];
+        }
+        if (($mapping & $type) !== $type) {
             return false;
         }
-        $mapping = $this->mappings[strtolower($parameter->getName())];
+        if (!$param->isArray() && ($mapping & Route::MAP_PATH) !== Route::MAP_PATH) {
+            return false;
+        }
 
-        return $parameter->isArray() || ($mapping & Route::MAP_PATH) === Route::MAP_PATH;
+        return true;
     }
 
     /**
      * Get the mapped data for a parameter.
      *
-     * @param string $name The name of the parameter.
+     * @param \ReflectionParameter $param The name of the parameter.
      * @param RequestInterface $request The request to get the data from.
      * @param array $args The parsed path arguments for a method.
-     * @return array|null Returns the mapped data or null if there is no data.
+     * @return mixed Returns the mapped data or null if there is no data.
      */
-    protected function mapParam($name, RequestInterface $request, array $args = []) {
-        $name = strtolower($name);
+    protected function mapParam(\ReflectionParameter $param, RequestInterface $request, array $args = []) {
+        if ($param->getClass() !== null && $param->getClass()->implementsInterface(RequestInterface::class)) {
+            return $request;
+        }
+
+        $name = strtolower($param->getName());
 
         if (isset($this->mappings[$name])) {
             $mapping = $this->mappings[$name];

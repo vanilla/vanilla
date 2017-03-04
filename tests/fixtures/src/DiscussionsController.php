@@ -70,7 +70,7 @@ class DiscussionsController {
     }
 
     public function get_help($id, ...$parts) {
-
+        return $parts;
     }
 
     public function getSomething() {

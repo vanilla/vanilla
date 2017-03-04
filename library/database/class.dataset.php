@@ -15,7 +15,7 @@
 /**
  * Class Gdn_DataSet
  */
-class Gdn_DataSet implements IteratorAggregate, Countable {
+class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
 
     /** Inner join. */
     const JOIN_INNER = 'inner';
@@ -681,5 +681,18 @@ class Gdn_DataSet implements IteratorAggregate, Countable {
             return array_values($ColumnName);
         }
         return $DefaultValue;
+    }
+
+    /**
+     * Specify data which should be serialized to JSON.
+     *
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     */
+    public function jsonSerialize() {
+        $result = $this->resultArray();
+        jsonFilter($result);
+        return $result;
     }
 }

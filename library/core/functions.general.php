@@ -2165,7 +2165,7 @@ if (!function_exists('jsonFilter')) {
                     $fn($childValue, $childKey, $key);
                 });
             } elseif ($value instanceof \DateTimeInterface) {
-                $value = $value->format('r');
+                $value = $value->format('c');
             } elseif (is_string($value)) {
                 // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
                 $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));

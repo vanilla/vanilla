@@ -18,6 +18,7 @@ abstract class Route {
     const MAP_ARGS = 0x1; // map to path args
     const MAP_QUERY = 0x2; // map to querystring
     const MAP_BODY = 0x4; // map to post body
+    const MAP_PATH = 0x8; // map to the rest of the path
 
     /**
      * Route constructor.
@@ -39,7 +40,8 @@ abstract class Route {
     private $mappings = [
         'query' => Route::MAP_QUERY,
         'body' => Route::MAP_BODY,
-        'data' => Route::MAP_ARGS | Route::MAP_QUERY | Route::MAP_BODY
+        'data' => Route::MAP_ARGS | Route::MAP_QUERY | Route::MAP_BODY,
+        'path' => Route::MAP_PATH
     ];
 
     /**
@@ -194,10 +196,15 @@ abstract class Route {
      * Determine whether or not a parameter is mapped to special request data.
      *
      * @param \ReflectionParameter $parameter The name of the parameter to check.
-     * @return bool Returns true if the parameter is mapped, false otherwise.
+     * @return bool Returns **true** if the parameter is mapped, or **false** otherwise.
      */
     protected function isMapped(\ReflectionParameter $parameter) {
-        return $parameter->isArray() && !empty($this->mappings[strtolower($parameter->getName())]);
+        if (empty($this->mappings[strtolower($parameter->getName())])) {
+            return false;
+        }
+        $mapping = $this->mappings[strtolower($parameter->getName())];
+
+        return $parameter->isArray() || ($mapping & Route::MAP_PATH) === Route::MAP_PATH;
     }
 
     /**

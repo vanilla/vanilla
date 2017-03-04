@@ -23,12 +23,9 @@ abstract class Route {
      * Route constructor.
      */
     public function __construct() {
-        // TODO: Maybe remove this?
-        $this->constraints = [
-            'id' => '`^\d+$`',
-            'slug' => '^[^/.]+$`',
-            'page' => '`^p\d+$`'
-        ];
+        $this
+            ->setConstraint('id', ['regex' => '`^\d+$`', 'position' => 0])
+            ->setConstraint('page', '`^p\d+$`');
     }
 
     /**
@@ -70,21 +67,37 @@ abstract class Route {
     /**
      * Test whether a parameter name has a condition attached to it.
      *
-     * @param string $name The parameter name to test.
+     * @param \ReflectionParameter $parameter The parameter name to test.
      * @return bool Returns **true** if the parameter has a condition or **false** otherwise.
      */
-    public function hasConstraint($name) {
-        return isset($this->constraints[strtolower($name)]);
+    public function hasConstraint(\ReflectionParameter $parameter) {
+        if (!isset($this->constraints[strtolower($parameter->getName())])) {
+            return false;
+        }
+        $constraint = $this->constraints[strtolower($parameter->getName())];
+        if (isset($constraint['position']) && $constraint['position'] !== $parameter->getPosition()) {
+            return false;
+        }
+        return true;
     }
 
     /**
      * Set a condition for a parameter name.
      *
      * @param string $name The parameter to attach the condition to.
-     * @param callable|string $condition Either a callback or a regular expression that can be passed to {@link preg_match()}.
+     * @param callable|string|array $condition Either a callback or a regular expression that can be passed to {@link preg_match()}.
      */
     public function setConstraint($name, $condition) {
-        $this->constraints[strtolower($name)] = $condition;
+        if (is_callable($condition)) {
+            $constraint = ['callback' => $condition];
+        } elseif (is_string($condition)) {
+            $constraint = ['regex' => $condition];
+        } else {
+            $constraint = $condition;
+        }
+
+        $this->constraints[strtolower($name)] = $constraint;
+        return $this;
     }
 
     /**
@@ -151,34 +164,40 @@ abstract class Route {
      *
      * The test will pass if the condition is met or there is no condition with the given name.
      *
-     * @param string $name The name of the parameter.
+     * @param string $parameter The name of the parameter.
      * @param string $value The value of the argument.
+     * @param array $meta Additional meta information to test. If an array is specified then the constraint properties
+     * are checked to see if they match the meta values.
      * @return bool Returns **true** if the condition passes or there is no condition. Returns **false** otherwise.
      */
-    protected function testCondition($name, $value) {
-        $name = strtolower($name);
-        if (isset($this->constraints[$name])) {
-            $condition = $this->constraints[$name];
+    protected function testConstraint(\ReflectionParameter $parameter, $value, array $meta = []) {
+        if ($this->hasConstraint($parameter)) {
+            $constraint = $this->constraints[strtolower($parameter->getName())];
 
-            if (is_callable($condition)) {
-                return $condition($value);
-            } else {
-                return preg_match($condition, $value);
+            // Check the meta information.
+            foreach ($meta as $metaKey => $metaValue) {
+                if (isset($constraint[$metaKey]) && $constraint[$metaKey] !== $metaValue) {
+                    return false;
+                }
             }
-        } else {
-            return true;
+
+            if (!empty($constraint['callback'])) {
+                return $constraint['callback']($value);
+            } elseif (!empty($constraint['regex'])) {
+                return preg_match($constraint['regex'], $value);
+            }
         }
+        return true;
     }
 
     /**
      * Determine whether or not a parameter is mapped to special request data.
      *
-     * @param string $name The name of the parameter to check.
+     * @param \ReflectionParameter $parameter The name of the parameter to check.
      * @return bool Returns true if the parameter is mapped, false otherwise.
      */
-    protected function isMapped($name) {
-        $name = strtolower($name);
-        return !empty($this->mappings[$name]);
+    protected function isMapped(\ReflectionParameter $parameter) {
+        return $parameter->isArray() && !empty($this->mappings[strtolower($parameter->getName())]);
     }
 
     /**

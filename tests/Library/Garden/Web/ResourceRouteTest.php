@@ -37,7 +37,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
      */
     public function testKnownRoutes($method, $path, $expectedCall, $expectedArgs = []) {
         $route = $this->createRoute();
-        $request = new Request($path, $method);
+        $request = new Request($path, $method, $method === 'GET' ? [] : ['!']);
 
         $match = $route->match($request);
 
@@ -149,8 +149,12 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
 
             'get recent' => ['GET', '/discussions/recent?after=1', [$dc, 'get_recent'], ['query' => ['after' => '1']]],
             'get recent too long' => ['GET', '/discussions/recent/1', null],
-
             'get bookmarked' => ['GET', '/discussions/bookmarked', [$dc, 'get_bookmarked'], ['page' => '']],
+
+            'map body' => ['POST', '/discussions', [$dc, 'post'], ['body' => ['!']]],
+            'map data' => ['PATCH', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
+
+            'no mapping' => ['POST', '/discussions/no-map/a/b/c?f=b', [$dc, 'post_noMap'], ['query' => 'a', 'body' => 'b', 'data' => 'c']],
 
             // Special routes are special.
             'bad index' => ['GET', '/discussions/index', null],

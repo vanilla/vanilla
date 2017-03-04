@@ -128,7 +128,8 @@ class ResourceRoute extends Route {
      * @return Action|null Returns method call information or **null** if there is no method.
      */
     private function findAction($controller, RequestInterface $request, array $pathArgs) {
-        foreach ($this->getControllerMethodNames($request->getMethod(), $pathArgs) as list($methodName, $omit)) {
+        $methodNames = $this->getControllerMethodNames($request->getMethod(), $pathArgs);
+        foreach ($methodNames as list($methodName, $omit)) {
             if ($callback = $this->findMethod($controller, $methodName)) {
                 $args = $pathArgs;
                 if ($omit !== null) {
@@ -190,7 +191,7 @@ class ResourceRoute extends Route {
             /* @var \ReflectionParameter $param */
             $name = $param->getName();
 
-            if ($this->isMapped($name)) {
+            if ($this->isMapped($param)) {
                 // This is a mapped parameter, but map after everything is reflected.
                 $toMap[] = $name;
                 $result[$name] = null;
@@ -202,6 +203,7 @@ class ResourceRoute extends Route {
             } elseif ($param->isVariadic()) {
                 // This is the last variadic parameter and will take the rest of the arguments.
                 $result[$name] = $pathArgs;
+                $args[$name] = $pathArgs;
                 $pathArgs = [];
             } else {
                 // Look at the path arguments for the value.
@@ -215,8 +217,9 @@ class ResourceRoute extends Route {
                     }
                 }
 
-                if (($param->isDefaultValueAvailable() && $value === $param->getDefaultValue()) || $this->testCondition($name, $value)) {
+                if (($param->isDefaultValueAvailable() && $value === $param->getDefaultValue()) || $this->testConstraint($param, $value)) {
                     $result[$name] = $value;
+                    $args[$name] = $value;
                 } else {
                     // The condition failed so this callback doesn't match.
                     return null;

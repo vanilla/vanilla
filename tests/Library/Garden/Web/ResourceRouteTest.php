@@ -222,4 +222,18 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
         $a = $route->match($request);
         $this->assertNull($a);
     }
+
+    /**
+     * Test that correct casing on method names is enforced.
+     *
+     * @expectedException \PHPUnit_Framework_Error_Notice
+     */
+    public function testMethodCaseSensitivity() {
+//        post_noMap($query, $body, $data)
+        $route = $this->createRoute();
+        $request = new Request('/discussions/nomap/1/a/b/c', 'POST');
+
+        $a = $route->match($request);
+        $this->assertNull($a);
+    }
 }

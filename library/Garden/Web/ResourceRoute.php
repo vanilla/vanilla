@@ -139,10 +139,14 @@ class ResourceRoute extends Route {
                 $args = $pathArgs;
                 if ($omit !== null) {
                     unset($args[$omit]);
-//                    array_splice($args, $omit, 1);
+                }
+                $method = $this->reflectCallback($callback);
+
+                if (!$this->checkMethodCase($method->getName(), $methodName, $controller, true)) {
+                    continue;
                 }
 
-                $callbackArgs = $this->matchArgs($callback, $request, $args, $omit, $controller);
+                $callbackArgs = $this->matchArgs($method, $request, $args, $controller);
 
                 if ($callbackArgs !== null) {
                     $result = new Action($callback, $callbackArgs);
@@ -151,6 +155,30 @@ class ResourceRoute extends Route {
             }
         }
         return null;
+    }
+
+    /**
+     * Double check to make sure the case of the method matches.
+     * This really shouldn't be done here, but I want to make sure we are strict before bad URLs get out.
+     *
+     * @param string $method The actual object method name.
+     * @param string $compare The method to compare to.
+     * @param object $obj The object the method belongs to.
+     * @param bool $notice Whether to trigger a notice when the check doesn't work.
+     * @return bool Returns **true** if the name is correct or **false** otherwise.
+     */
+    private function checkMethodCase($method, $compare, $obj, $notice = false) {
+        $methodSx = trim(strrchr($method, '_'), '_');
+        $trySx = trim(strrchr($compare, '_'), '_');
+
+        if ($methodSx !== $trySx) {
+            if ($notice) {
+                $expected = get_class($obj).'::'.substr($method, 0, -strlen($methodSx)).$trySx.'()';
+                trigger_error("Method name has incorrect case. Expecting $expected.");
+            }
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -182,22 +210,15 @@ class ResourceRoute extends Route {
      * 4. If the callback has less arguments than the path requires then the match will fail.
      * 5. If the callback is variadic then it will take all of the remaining path arguments.
      *
-     * @param callable $callback The callback to match the arguments for.
+     * @param \ReflectionFunctionAbstract $method The callback to match the arguments for.
      * @param RequestInterface $request The request used to match.
      * @param array $pathArgs The current request path.
-     * @param int|null $namePos The position of the name in the path.
      * @param object $sender The controller running the request.
+     * @return array|mixed|null
+     * @internal param int|null $namePos The position of the name in the path.
      */
-    private function matchArgs(callable $callback, RequestInterface $request, array $pathArgs, $namePos = null, $sender = null) {
-        $method = $this->reflectCallback($callback);
-
+    private function matchArgs(\ReflectionFunctionAbstract $method, RequestInterface $request, array $pathArgs, $sender = null) {
         list($defaults, $params, $mapped, $pathParam) = $this->splitMappedParameters($method);
-
-        $conditions = [];
-        // If the method's name was the first position in the path then we won't have a RESTful ID parameter.
-        if ($namePos === 0) {
-            $conditions['id'] = false;
-        }
 
         $args = []; // reflected $pathArgs without mappings.
         $i = 0;

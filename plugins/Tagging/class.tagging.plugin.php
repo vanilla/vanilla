@@ -18,7 +18,6 @@ $PluginInfo['Tagging'] = array(
     'AuthorEmail' => 'support@vanillaforums.com',
     'AuthorUrl' => 'https://open.vanillaforums.com',
     'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Tagging.Add' => 'Garden.Profiles.Edit'),
     'Icon' => 'tagging.png'
 );
 
@@ -68,7 +67,7 @@ class TaggingPlugin extends Gdn_Plugin {
     public function pluginController_tagSearch_create($Sender, $q = '', $id = false, $parent = false, $type = 'default') {
 
         // Allow per-category tags
-        $CategorySearch = c('Plugins.Tagging.CategorySearch', false);
+        $CategorySearch = c('Vanilla.Tagging.CategorySearch', false);
         if ($CategorySearch) {
             $CategoryID = GetIncomingValue('CategoryID');
         }
@@ -177,7 +176,7 @@ class TaggingPlugin extends Gdn_Plugin {
         $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
             ? 1
             : 0;
-        $CanAddTags &= CheckPermission('Plugins.Tagging.Add');
+        $CanAddTags &= CheckPermission('Vanilla.Tagging.Add');
 
         $Sender->setData('_CanAddTags', $CanAddTags);
 
@@ -338,24 +337,6 @@ class TaggingPlugin extends Gdn_Plugin {
         }
 
         $Sender->render('Blank', 'Utility', 'dashboard');
-    }
-
-    /**
-     * Setup is called when the plugin is enabled.
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
-     * Apply database structure updates
-     */
-    public function structure() {
-        $PM = new PermissionModel();
-
-        $PM->define(array(
-            'Plugins.Tagging.Add' => 'Garden.Profiles.Edit'
-        ));
     }
 }
 

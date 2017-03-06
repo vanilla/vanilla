@@ -32,8 +32,8 @@ var discussionTagging = {
                 }
             }
 
-            var TagSearch = gdn.definition('PluginsTaggingSearchUrl', gdn.url('plugin/tagsearch'));
-            var TagAdd = gdn.definition('PluginsTaggingAdd', false);
+            var TagSearch = gdn.definition('TaggingSearchUrl', gdn.url('plugin/tagsearch'));
+            var TagAdd = gdn.definition('TaggingAdd', false);
             var MaxTags = gdn.definition('MaxTagsAllowed', false);
 
             $element.find("#Form_Tags").tokenInput(TagSearch, {

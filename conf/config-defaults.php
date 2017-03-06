@@ -5,6 +5,8 @@
 // values for configuration settings.
 $Configuration = array();
 
+$Configuration['EnabledPlugins']['stubcontent']                = true;
+
 $Configuration['EnabledApplications']['Dashboard']             = 'dashboard';
 
 $Configuration['Database']['Engine']                           = 'MySQL';

@@ -1,0 +1,84 @@
+discussion:
+    -
+        tag: "welcome-to-vanilla"
+        author: "vanilla-user"
+        category: "general"
+        announce: 1
+        title: "Welcome to awesome!"
+        body: |
+            There's nothing sweeter than a fresh new forum, ready to welcome your community. A Vanilla Forum has all the bits and pieces you need to build an awesome discussion platform customized to your needs. 
+            
+            **Here are a few tips for you as the administrator:**
+            
+            * Use the [Getting Started](/dashboard/settings/gettingstarted) checklist in the Dashboard to get your site ready for visitors.
+            * Don't create too many categories. We recommend 3-8 to start with, keep it simple for your users!
+            * **Announce** a discussion (click the gear) to stick to the top of the list, and **Close** it to stop further comments. This is useful for posting the rules, or welcoming new members.
+            * Use **Sink** to take attention away from a discussion that might be getting out of hand. New comments will no longer bring it back to the top of the list.
+            * **Bookmark** a discussion (click the star) to get notifications for new comments. You can edit notification settings from your [profile](/profile).
+            
+            We've created a few sample discussions to help get you started. They contain some useful "Day 1" information and also show you how things might look once your forum has a bit of real activity. Feel free to keep, edit, or delete them as you see fit!
+            
+            *Now spread the word to get this place cooking. Cheers!*
+        
+    -
+        tag: "sample-rules"
+        author: "user1"
+        category: "general"
+        title: "Please Read Before Posting"
+        body: |
+            *This is an example of a 'rules' discussion, laying out expected behaviour for new users who join the community. Customize it to suit your specific needs, or write your own rules completely from scratch!*  
+
+            This community has been created so that you can exchange ideas, converse and meet others who share a common interest.  
+            
+            **Here are some guidelines:**  
+            
+            * Keep your posts relevant to the forum category.
+            * Please be respectful of others and don’t sweat the small stuff.
+            * Please do not post any personal information or photos that you wouldn’t want to be seen by the public.
+            * Do not post hateful or illegal content. Do not post copyrighted material without proper attribution.
+            * SPAM will not be tolerated.
+            * Use private messages to chat with moderators or other members in private.
+            
+            In summary: be polite, enjoy yourself, and help us build a great community.
+            
+    -
+        tag: "tips-and-tricks"
+        author: "user1"
+        category: "general"
+        title: "Getting the most out of this forum"
+        body: |
+            Here are some tips and tricks for using this forum:  
+            
+            * **Use the reactions**. These let you share how you feel about other’s comments. The most liked content shows up on the [Best Of](/bestof) page.
+            * **Mention others.** Put an @ symbol before the username to mention someone. They’ll get notified when you do.
+            * **Update your notification preferences.** You’ll receive a notification if someone mentions you or posts to a discussion that you’ve bookmarked. You can set notifications from the Edit Profile page.
+            * **Send messages.** You can private message members by going to your inbox, or visiting their profile page (click their username anywhere).
+            * **Don’t want to see everyone’s signature?** You can hide signatures by going to Edit Profile > Signature Settings.
+            * **Check out the forum from your mobile phone.** Just go to the forum URL in your browser - no need to download an app.
+            * **Want to embed a YouTube video, a Pinterest Pin or a Tweet?** Just paste in the link. Vanilla will handle the embedding for you!
+            * Check out what’s going on with other community members on the [Activity](/activity) page.
+            
+            Have fun!
+    
+    -
+        tag: "starting-a-great-discussion"
+        author: "user2"
+        category: "general"
+        title: "How to start a great discussion"
+        body: |
+            Thank you for starting new discussions and asking questions. The more you contribute, the better this forum becomes.  
+            
+            Here are a few tips to help you create great discussions:  
+            
+            * **Make the discussion title or question as descriptive as possible.** A good discussion title is a short preview of your post and is what gets people to click and read. A well written title is also going to help search engines better index your post which will bring more people into the discussion. For example, instead of ‘Won’t Connect’, try ‘Help, I’m having problems getting my Acme modem into bridge mode.’
+            * **Proof read.** Spelling mistakes, typos, and bad grammar will distract readers from the point you’re trying to make. Vanilla automatically saves drafts as you type. If you’re writing a long post, save it as a draft and come back to it after a few minutes or as long as it takes your brain to forget what you had written.
+            * **Use minimal formatting.** Overly formatted posts can also distract from the message and it encourages others to do likewise and you end up with a hard to read thread.
+            * **Put your post in the right category.** The right category can be the one that has a relevant category name or it can be a category where this kind of post is often made.
+            * **Use tags.** Tags are helpful for others to find keyword related posts. It also helps the site admins get a sense for what topics are popular.
+            * **If you want responses, ask for them.** In marketing this is called a ‘call to action’. If you want others to comment, you can encourage them by asking them to do so. If your post is just an FYI then don’t.
+            * **Go easy on the insider jargon.** Inside jokes and inside references can be fun and make the community unique but too much of it can turn off new members.
+            * **Add an image.** Images add visual interest and make your post look great when shared to social networks. You can embed an image using the button bar or you can upload one from your desktop or phone.
+            * **Mention others.** Credit other members if you are building off their previous comments or if you want to draw them into the discussion. Put the @ before a username to mention someone.
+            * **Take ownership.** Most important of all, take ownership of the discussions that you have created. Respond to comments promptly and thoughtfully. Thank others for commenting on your discussion and help with moderation if things get heated.
+            
+            Thanks for posting! Have fun!

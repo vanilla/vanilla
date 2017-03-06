@@ -84,21 +84,44 @@ class SetupController extends DashboardController {
 
             // Need to go through all of the setups for each application. Garden,
             if ($this->configure() && $this->Form->isPostBack()) {
-                // Get list of applications to enable during install
-                // Override by creating the config and adding this setting before install begins
-                $AppNames = c('Garden.Install.Applications', array('Conversations', 'Vanilla'));
-                try {
-                    // Step through the available applications, enabling each of them.
-                    foreach ($AppNames as $AppName) {
-                        $Validation = new Gdn_Validation();
-                        $ApplicationManager->RegisterPermissions($AppName, $Validation);
-                        $ApplicationManager->EnableApplication($AppName, $Validation);
-                    }
 
-                    Gdn::pluginManager()->start(true);
-                } catch (Exception $ex) {
-                    $this->Form->addError($ex);
+                if ($this->Form->errorCount() == 0) {
+                    // Get list of applications to enable during install
+                    // Override by creating the config and adding this setting before install begins
+                    $AppNames = c('Garden.Install.Applications', array('Conversations', 'Vanilla'));
+                    try {
+                        // Step through the available applications, enabling each of them.
+                        foreach ($AppNames as $AppName) {
+                            $Validation = new Gdn_Validation();
+                            $ApplicationManager->RegisterPermissions($AppName, $Validation);
+                            $ApplicationManager->EnableApplication($AppName, $Validation);
+                        }
+
+                        Gdn::pluginManager()->start(true);
+                    } catch (Exception $ex) {
+                        $this->Form->addError($ex);
+                    }
                 }
+
+                if ($this->Form->errorCount() == 0) {
+                    // Install config-defaults plugins
+                    $PluginNames = c('EnabledPlugins', []);
+                    try {
+                        foreach ($PluginNames as $PluginName => $isEnabled) {
+                            if ($isEnabled !== true) {
+                                continue;
+                            }
+
+                            $Validation = new Gdn_Validation();
+                            Gdn::pluginManager()->enablePlugin($PluginName, $Validation, [
+                                'Force' => true
+                            ]);
+                        }
+                    } catch (Exception $ex) {
+                        $this->Form->addError($ex);
+                    }
+                }
+
                 if ($this->Form->errorCount() == 0) {
                     // Save a variable so that the application knows it has been installed.
                     // Now that the application is installed, select a more user friendly error page.

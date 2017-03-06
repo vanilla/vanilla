@@ -1797,7 +1797,9 @@ class DiscussionModel extends VanillaModel {
      * Events: BeforeSaveDiscussion, AfterValidateDiscussion, AfterSaveDiscussion.
      *
      * @param array $FormPostValues Data sent from the form model.
-     * @param array $Settings Currently unused.
+     * @param array $Settings
+     * - CheckPermission - Check permissions during insert. Default true.
+     *
      * @return int $DiscussionID Unique ID of the discussion.
      */
     public function save($FormPostValues, $Settings = false) {
@@ -1819,8 +1821,9 @@ class DiscussionModel extends VanillaModel {
         // Validate category permissions.
         $CategoryID = val('CategoryID', $FormPostValues);
         if ($CategoryID > 0) {
+            $CheckPermission = val('CheckPermission', $Settings, true);
             $Category = CategoryModel::categories($CategoryID);
-            if ($Category && !CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
+            if ($Category && $CheckPermission && !CategoryModel::checkPermission($Category, 'Vanilla.Discussions.Add')) {
                 $this->Validation->addValidationResult('CategoryID', 'You do not have permission to post in this category');
             }
         }

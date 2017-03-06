@@ -363,7 +363,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function postController_render_before($Sender) {
         $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
-        $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
+        $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
         $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.

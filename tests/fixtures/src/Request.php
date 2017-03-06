@@ -54,6 +54,6 @@ class Request implements RequestInterface {
     }
 
     public function getBody() {
-        $this->body;
+        return $this->body;
     }
 }

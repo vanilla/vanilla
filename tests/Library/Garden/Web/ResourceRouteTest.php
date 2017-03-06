@@ -9,6 +9,7 @@ namespace VanillaTests\Library\Garden\Web;
 
 use Garden\Web\Action;
 use Garden\Web\ResourceRoute;
+use Garden\Web\Route;
 use VanillaTests\Fixtures\DiscussionsController;
 use VanillaTests\Fixtures\Request;
 
@@ -37,7 +38,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
      */
     public function testKnownRoutes($method, $path, $expectedCall, $expectedArgs = []) {
         $route = $this->createRoute();
-        $request = new Request($path, $method);
+        $request = new Request($path, $method, $method === 'GET' ? [] : ['!']);
 
         $match = $route->match($request);
 
@@ -50,6 +51,39 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
             $this->assertEquals(strtolower($expectedCall[1]), strtolower($callback[1]));
             $this->assertEquals((array)$expectedArgs, $match->getArgs());
         }
+    }
+
+    /**
+     * Provide test data for {@link testKnownRoutes()}.
+     *
+     * @return array Returns test data.
+     */
+    public function provideKnownRoutes() {
+        $dc = DiscussionsController::class;
+
+        $r = [
+            'index' => ['GET', '/discussions', [$dc, 'index'], ['page' => '']],
+            'index w page' => ['GET', '/discussions/p1', [$dc, 'index'], ['page' => 'p1']],
+            'index with bad page' => ['GET', '/discussions/xxx', null],
+
+            'get' => ['GET', '/discussions/123', [$dc, 'get'], ['id' => '123']],
+
+            'get recent' => ['GET', '/discussions/recent?after=1', [$dc, 'get_recent'], ['query' => ['after' => '1']]],
+            'get recent too long' => ['GET', '/discussions/recent/1', null],
+            'get bookmarked' => ['GET', '/discussions/bookmarked', [$dc, 'get_bookmarked'], ['page' => '']],
+
+            'map body' => ['POST', '/discussions', [$dc, 'post'], ['body' => ['!']]],
+            'map data' => ['PATCH', '/discussions/1', [$dc, 'patch'], ['id' => '1', 'data' => ['id' => '1', 0 => '!']]],
+
+            'no mapping' => ['POST', '/discussions/no-map/a/b/c?f=b', [$dc, 'post_noMap'], ['query' => 'a', 'body' => 'b', 'data' => 'c']],
+
+            // Special routes are special.
+            'bad index' => ['GET', '/discussions/index', null],
+            'bad get' => ['GET', '/discussions/get/123', null],
+            'bad post' => ['PATCH', '/discussions/post', null]
+        ];
+
+        return $r;
     }
 
     /**
@@ -108,8 +142,7 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
         $request = new Request('/discussions/123/help/foo/bar/baz');
 
         $match = $route->match($request);
-        $this->assertSame(['foo', 'bar', 'baz'], $match->getArgs()['parts']);
-
+        $this->assertSame(['foo', 'bar', 'baz'], $match());
     }
 
     /**
@@ -133,31 +166,74 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Provide test data for {@link testKnownRoutes()}.
+     * A path parameter should be filled with the remaining path.
      *
-     * @return array Returns test data.
+     * @param string $path A request path.
+     * @param array $expectedArgs The expected arguments after the mapping.
+     * @dataProvider providePathMappingTests
      */
-    public function provideKnownRoutes() {
-        $dc = DiscussionsController::class;
+    public function testPathMapping($path, array $expectedArgs) {
+        $request = new Request($path);
 
+        $route = $this->createRoute();
+        $action = $route->match($request);
+        $this->assertNotNull($action);
+        $this->assertEquals($expectedArgs, $action->getArgs());
+    }
+
+    /**
+     * Provide path mapping tests.
+     *
+     * @return array Returns a data provider.
+     */
+    public function providePathMappingTests() {
         $r = [
-            'index' => ['GET', '/discussions', [$dc, 'index'], ['page' => '']],
-            'index w page' => ['GET', '/discussions/p1', [$dc, 'index'], ['page' => 'p1']],
-            'index with bad page' => ['GET', '/discussions/xxx', null],
+            ['/discussions/path1/a/b/c', ['path' => '/a/b/c']],
+            ['/discussions/path2/a/b/c', ['a' => 'a', 'path' => '/b/c']],
+            ['/discussions/path3/a/b/c', ['path' => '/a/b', 'b' => 'c']],
+            ['/discussions/path4/a/b/c', ['a' => 'a', 'path' => '/b', 'b' => 'c']],
 
-            'get' => ['GET', '/discussions/123', [$dc, 'get'], ['id' => '123']],
-
-            'get recent' => ['GET', '/discussions/recent?after=1', [$dc, 'get_recent'], ['query' => ['after' => '1']]],
-            'get recent too long' => ['GET', '/discussions/recent/1', null],
-
-            'get bookmarked' => ['GET', '/discussions/bookmarked', [$dc, 'get_bookmarked'], ['page' => '']],
-
-            // Special routes are special.
-            'bad index' => ['GET', '/discussions/index', null],
-            'bad get' => ['GET', '/discussions/get/123', null],
-            'bad post' => ['PATCH', '/discussions/post', null]
+            'path constraint' => ['/discussions/article/a/p1', ['path' => '/a', 'page' => 'p1']],
+            'path constraint capture 1' => ['/discussions/article/a/b', ['path' => '/a/b', 'page' => '']],
+            'path constraint capture 2' => ['/discussions/article/a/b/c', ['path' => '/a/b/c', 'page' => '']],
         ];
-
         return $r;
+    }
+
+    /**
+     * A path mapping hinted as an array should get the path parts as an array.
+     */
+    public function testPathMappingArray() {
+        $route = $this->createRoute();
+        $route->setMapping('body', Route::MAP_PATH);
+
+        $request = new Request('/discussions/a/b/c', 'POST');
+        $a = $route->match($request);
+        $this->assertEquals(['a', 'b', 'c'], $a->getArgs()['body']);
+    }
+
+    /**
+     * A constraint's path placement should force it's location in the path.
+     */
+    public function testConstraintPosition() {
+        $route = $this->createRoute();
+        $request = new Request('/discussions/help/1/a/b/c');
+
+        $a = $route->match($request);
+        $this->assertNull($a);
+    }
+
+    /**
+     * Test that correct casing on method names is enforced.
+     *
+     * @expectedException \PHPUnit_Framework_Error_Notice
+     */
+    public function testMethodCaseSensitivity() {
+//        post_noMap($query, $body, $data)
+        $route = $this->createRoute();
+        $request = new Request('/discussions/nomap/1/a/b/c', 'POST');
+
+        $a = $route->match($request);
+        $this->assertNull($a);
     }
 }

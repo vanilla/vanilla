@@ -30,19 +30,19 @@ class DiscussionsController {
 
     }
 
-    public function post($body) {
+    public function post(array $body) {
 
     }
 
-    public function patch($id, $data) {
+    public function patch($id, array $data) {
 
     }
 
-    public function patch_pin($id, $body) {
+    public function patch_pin($id, array $body) {
 
     }
 
-    public function patch_bookmarked($id, $body) {
+    public function patch_bookmarked($id, array $body) {
 
     }
 
@@ -70,7 +70,7 @@ class DiscussionsController {
     }
 
     public function get_help($id, ...$parts) {
-
+        return $parts;
     }
 
     public function getSomething() {
@@ -88,4 +88,26 @@ class DiscussionsController {
         return strcasecmp($method, 'protectMe') === 0;
     }
 
+    public function post_noMap($query, $body, $data) {
+
+    }
+
+    public function get_path1($path = '') {
+
+    }
+
+    public function get_path2($a, $path = '') {
+
+    }
+
+    public function get_path3($path, $b) {
+
+    }
+
+    public function get_path4($a, $path, $b) {
+
+    }
+
+    public function get_article($path, $page = '') {
+    }
 }

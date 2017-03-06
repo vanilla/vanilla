@@ -1036,6 +1036,14 @@ class VanillaHooks implements Gdn_IPlugin {
     }
 
     /**
+     * @deprecated Request /tags/search instead
+     */
+    public function pluginController_tagsearch_create() {
+        $query = http_build_query(Gdn::request()->getQuery());
+        redirect(url('/tags/search'.($query ? '?'.$query : null)), 301);
+    }
+
+    /**
      * Automatically executed when application is enabled.
      *
      * @since 2.0.0

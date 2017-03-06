@@ -268,8 +268,8 @@ class DashboardHooks extends Gdn_Plugin {
         $nav = $sender;
 
         $session = Gdn::session();
-        $themeOptionsName = c('Garden.ThemeOptions.Name');
-        $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
+        $hasThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledDesktopThemeKey());
+        $hasMobileThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledMobileThemeKey());
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
@@ -289,8 +289,8 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Banner'), '/dashboard/settings/banner', 'appearance.banner', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
-            ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
-            ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
+            ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
+            ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
             ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])

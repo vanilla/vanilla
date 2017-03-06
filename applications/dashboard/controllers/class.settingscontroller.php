@@ -1616,8 +1616,17 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('dashboard/settings/themes');
 
-        $ThemeInfo = Gdn::themeManager()->enabledThemeInfo(true);
-        $currentTheme = $this->themeInfoToMediaItem(val('Index', $ThemeInfo), true);
+        $themeKey = Gdn::themeManager()->getEnabledDesktopThemeKey();
+
+        // Check to see if the resolved theme is the same as the one set in config. If not, we couldn't
+        // find the theme and are using the default theme instead. Show an error.
+        $enabledThemeKey = c('Garden.Theme', Gdn_ThemeManager::DEFAULT_DESKTOP_THEME);
+        if ($ThemeName === '' && $themeKey !== $enabledThemeKey) {
+            $message = t('The theme with key %s could not be found and will not be started.');
+            $this->Form->addError(sprintf($message, $enabledThemeKey));
+        }
+
+        $currentTheme = $this->themeInfoToMediaItem($themeKey, true);
         $this->setData('CurrentTheme', $currentTheme);
 
         $Themes = Gdn::themeManager()->availableThemes();
@@ -1761,8 +1770,17 @@ class SettingsController extends DashboardController {
         $this->setHighlightRoute('dashboard/settings/themes');
 
         // Get currently enabled theme.
-        $EnabledThemeName = Gdn::ThemeManager()->MobileTheme();
-        $ThemeInfo = Gdn::themeManager()->getThemeInfo($EnabledThemeName);
+        $themeKey = Gdn::themeManager()->getEnabledMobileThemeKey();
+        $ThemeInfo = Gdn::themeManager()->getThemeInfo($themeKey);
+
+        // Check to see if the resolved theme is the same as the one set in config. If not, we couldn't
+        // find the theme and are using the default theme instead. Show an error.
+        $enabledThemeKey = c('Garden.MobileTheme', Gdn_ThemeManager::DEFAULT_MOBILE_THEME);
+        if ($ThemeName === '' && $themeKey !== $enabledThemeKey) {
+            $message = t('The theme with key %s could not be found and will not be started.');
+            $this->Form->addError(sprintf($message, $enabledThemeKey));
+        }
+        
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);

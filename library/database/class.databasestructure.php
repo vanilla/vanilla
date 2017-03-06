@@ -525,6 +525,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             return $this->_TableName;
         }
 
+        $this->reset();
         $this->_TableName = $Name;
         if ($CharacterEncoding == '') {
             $CharacterEncoding = Gdn::config('Database.CharacterEncoding', '');

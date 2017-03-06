@@ -298,10 +298,21 @@ class LightOpenID {
     }
 
     protected function request($url, $method = 'GET', $params = array()) {
+        $timeStart = microtime();
         if (function_exists('curl_init') && !ini_get('safe_mode')) {
-            return $this->request_curl($url, $method, $params);
+            $result = $this->request_curl($url, $method, $params);
+        } else {
+            $result = $this->request_streams($url, $method, $params);
         }
-        return $this->request_streams($url, $method, $params);
+        $timeDiff = microtime() - $timeStart;
+
+        // Make sure every request takes at least .5 second.
+        // This nullify brute forcing
+        if ($timeDiff < 500) {
+            usleep($timeDiff);
+        }
+
+        return $result;
     }
 
     protected function build_url($url, $parts) {

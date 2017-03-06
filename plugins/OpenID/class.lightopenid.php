@@ -192,7 +192,13 @@ class LightOpenID {
         }
 
         if (curl_errno($curl)) {
-            throw new ErrorException(curl_error($curl), curl_errno($curl));
+            Logger::log(Logger::ERROR, 'lightopenid error', [
+                'location' => __METHOD__.':'.__LINE__,
+                'message' => 'Curl request failed.',
+                'cURLError' => curl_error($curl),
+                'cURLErrorNo' => curl_errno($curl),
+            ]);
+            throw new ErrorException('Request error.');
         }
 
         return $response;
@@ -200,7 +206,11 @@ class LightOpenID {
 
     protected function request_streams($url, $method = 'GET', $params = array()) {
         if (!$this->hostExists($url)) {
-            throw new ErrorException('Invalid request.');
+            Logger::log(Logger::ERROR, 'lightopenid error', [
+                'location' => __METHOD__.':'.__LINE__,
+                'message' => 'Host "'.$url.'" not found',
+            ]);
+            throw new ErrorException('Request error.');
         }
 
         $params = http_build_query($params, '', '&');

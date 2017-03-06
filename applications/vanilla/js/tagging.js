@@ -32,7 +32,7 @@ var discussionTagging = {
                 }
             }
 
-            var TagSearch = gdn.definition('TaggingSearchUrl', gdn.url('plugin/tagsearch'));
+            var TagSearch = gdn.definition('TaggingSearchUrl', gdn.url('tags/search'));
             var TagAdd = gdn.definition('TaggingAdd', false);
             var MaxTags = gdn.definition('MaxTagsAllowed', false);
 

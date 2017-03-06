@@ -300,12 +300,13 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
 
             ->addGroup(t('Forum Settings'), 'forum', '', ['after' => 'users'])
+                ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
             ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
             ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'reputation'])
-            ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales', '', $sort)
+                ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
+                ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
+                ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
+                ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales', '', $sort)
 
             ->addGroup(t('Site Settings'), 'site-settings', '', ['after' => 'reputation'])
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
@@ -337,6 +338,214 @@ class DashboardHooks extends Gdn_Plugin {
             $UpgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
             $MessageModule = new MessageModule($sender, $UpgradeMessage);
             $sender->addModule($MessageModule);
+        }
+    }
+
+    /**
+     * List all tags and allow searching
+     *
+     * @param SettingsController $Sender
+     */
+    public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
+        $Sender->title('Tagging');
+        $Sender->setHighlightRoute('settings/tagging');
+        $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
+        $SQL = Gdn::sql();
+
+        /** @var Gdn_Form $form */
+        $form = $Sender->Form;
+
+        if ($form->authenticatedPostBack()) {
+            $formValue = (bool)$form->getFormValue('Vanilla.Tagging.EnableUI');
+            saveToConfig('Vanilla.Tagging.EnableUI', $formValue);
+        }
+
+        // Get all tag types
+        $TagModel = TagModel::instance();
+        $TagTypes = $TagModel->getTagTypes();
+
+
+        list($Offset, $Limit) = offsetLimit($Page, 100);
+        $Sender->setData('_Limit', $Limit);
+
+        if ($Search) {
+            $SQL->like('Name', $Search, 'right');
+        }
+
+        $queryType = $Type;
+
+        if (strtolower($Type) == 'all' || $Search || $Type === null) {
+            $queryType = false;
+            $Type = '';
+        }
+
+        // This type doesn't actually exist, but it will represent the
+        // blank types in the column.
+        if (strtolower($Type) == 'tags') {
+            $queryType = '';
+        }
+
+        if (!$Search && ($queryType !== false)) {
+            $SQL->where('Type', $queryType);
+        }
+
+        $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
+
+        // Store type for view
+        $TagType = (!empty($Type))
+            ? $Type
+            : 'All';
+        $Sender->setData('_TagType', $TagType);
+
+        // Store tag types
+        $Sender->setData('_TagTypes', $TagTypes);
+
+        // Determine if new tags can be added for the current type.
+        $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
+            ? 1
+            : 0;
+        $CanAddTags &= CheckPermission('Vanilla.Tagging.Add');
+
+        $Sender->setData('_CanAddTags', $CanAddTags);
+
+        $Data = $SQL
+            ->select('t.*')
+            ->from('Tag t')
+            ->orderBy('t.CountDiscussions', 'desc')
+            ->limit($Limit, $Offset)
+            ->get()->resultArray();
+
+        $Sender->setData('Tags', $Data);
+
+        if ($Search) {
+            $SQL->like('Name', $Search, 'right');
+        }
+
+        // Make sure search uses its own search type, so results appear
+        // in their own tab.
+        $Sender->Form->Action = url('/settings/tagging/?type='.$TagType);
+
+        // Search results pagination will mess up a bit, so don't provide a type
+        // in the count.
+        $RecordCountWhere = array('Type' => $queryType);
+        if ($queryType === false) {
+            $RecordCountWhere = [];
+        }
+        if ($Search) {
+            $RecordCountWhere = array();
+        }
+
+        $Sender->setData('RecordCount', $SQL->getCount('Tag', $RecordCountWhere));
+
+
+        $Sender->render('tagging');
+    }
+
+    /**
+     *
+     *
+     * @param $Sender
+     * @return mixed
+     * @throws Exception
+     */
+    public function settingsController_tags_create($Sender, $action) {
+        $Sender->permission('Garden.Settings.Manage');
+        switch($action) {
+            case 'delete':
+                $TagID = val(1, $Sender->RequestArgs);
+                $TagModel = new TagModel();
+                $Tag = $TagModel->getID($TagID, DATASET_TYPE_ARRAY);
+                if ($Sender->Form->authenticatedPostBack()) {
+                    // Delete tag & tag relations.
+                    $SQL = Gdn::sql();
+                    $SQL->delete('TagDiscussion', array('TagID' => $TagID));
+                    $SQL->delete('Tag', array('TagID' => $TagID));
+
+                    $Sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Tag));
+                    $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
+                }
+
+                $Sender->render('blank', 'utility', 'dashboard');
+                break;
+            case 'edit':
+                $Sender->setHighlightRoute('settings/tagging');
+                $Sender->title(t('Edit Tag'));
+                $TagID = val(1, $Sender->RequestArgs);
+
+                // Set the model on the form.
+                $TagModel = new TagModel;
+                $Sender->Form->setModel($TagModel);
+                $Tag = $TagModel->getID($TagID);
+                $Sender->Form->setData($Tag);
+
+                // Make sure the form knows which item we are editing.
+                $Sender->Form->addHidden('TagID', $TagID);
+
+                if ($Sender->Form->authenticatedPostBack()) {
+                    // Make sure the tag is valid
+                    $TagData = $Sender->Form->getFormValue('Name');
+                    if (!TagModel::validateTag($TagData)) {
+                        $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                    }
+
+                    // Make sure that the tag name is not already in use.
+                    if ($TagModel->getWhere(array('TagID <>' => $TagID, 'Name' => $TagData))->numRows() > 0) {
+                        $Sender->setData('MergeTagVisible', true);
+                        if (!$Sender->Form->getFormValue('MergeTag')) {
+                            $Sender->Form->addError('The specified tag name is already in use.');
+                        }
+                    }
+
+                    if ($Sender->Form->Save()) {
+                        $Sender->informMessage(t('Your changes have been saved.'));
+                    }
+                }
+
+                $Sender->render('tags');
+                break;
+            case 'add':
+            default:
+                $Sender->setHighlightRoute('settings/tagging');
+                $Sender->title('Add Tag');
+
+                // Set the model on the form.
+                $TagModel = new TagModel;
+                $Sender->Form->setModel($TagModel);
+
+                // Add types if allowed to add tags for it, and not '' or 'tags', which
+                // are the same.
+                $TagType = Gdn::request()->get('type');
+                if (strtolower($TagType) != 'tags'
+                    && $TagModel->canAddTagForType($TagType)
+                ) {
+                    $Sender->Form->addHidden('Type', $TagType, true);
+                }
+
+                if ($Sender->Form->authenticatedPostBack()) {
+                    // Make sure the tag is valid
+                    $TagName = $Sender->Form->getFormValue('Name');
+                    if (!TagModel::validateTag($TagName)) {
+                        $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                    }
+
+                    $TagType = $Sender->Form->getFormValue('Type');
+                    if (!$TagModel->canAddTagForType($TagType)) {
+                        $Sender->Form->addError('@'.t('ValidateTagType', 'That type does not accept manually adding new tags.'));
+                    }
+
+                    // Make sure that the tag name is not already in use.
+                    if ($TagModel->getWhere(array('Name' => $TagName))->numRows() > 0) {
+                        $Sender->Form->addError('The specified tag name is already in use.');
+                    }
+
+                    $Saved = $Sender->Form->save();
+                    if ($Saved) {
+                        $Sender->informMessage(t('Your changes have been saved.'));
+                    }
+                }
+
+                $Sender->render('tags');
+            break;
         }
     }
 

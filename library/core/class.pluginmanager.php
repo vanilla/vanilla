@@ -5,11 +5,13 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
  */
+use Garden\EventManager;
+use Interop\Container\ContainerInterface;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -19,7 +21,7 @@ use Vanilla\AddonManager;
  * A singleton class used to identify extensions, register them in a central
  * location, and instantiate/call them when necessary.
  */
-class Gdn_PluginManager extends Gdn_Pluggable {
+class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
     const ACTION_ENABLE = 1;
 
@@ -51,15 +53,6 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /** @var array A simple list of plugins that have already been registered. */
     private $registeredPlugins = [];
 
-    /** @var array  An associative array of EventHandlerName => PluginName pairs. */
-    private $eventHandlers = [];
-
-    /** @var array An associative array of MethodOverrideName => PluginName pairs. */
-    private $methodOverrides = [];
-
-    /** @var array An associative array of NewMethodName => PluginName pairs. */
-    private $newMethods = [];
-
     /** @var array An array of the instances of plugins. */
     protected $instances = [];
 
@@ -74,13 +67,21 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     private $addonManager;
 
     /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
      * Initialize a new instance of the {@link Gdn_PluginManager} class.
      *
      * @param AddonManager $addonManager The addon manager that manages all of the addons.
+     * @param EventManager $eventManager The event manager that handles all plugin events.
      */
-    public function __construct(AddonManager $addonManager = null) {
+    public function __construct(AddonManager $addonManager = null, EventManager $eventManager = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
+
+        $this->eventManager = $eventManager ?: new EventManager($this);
     }
 
     /**
@@ -114,7 +115,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $result = [];
         foreach ($addons as $addon) {
             /* @var Addon $addon */
-            if ($addon->getSpecial('oldType') !== 'plugin') {
+            if ($addon->getInfoValue('oldType') !== 'plugin') {
                 continue;
             }
 
@@ -423,13 +424,17 @@ class Gdn_PluginManager extends Gdn_Pluggable {
                 // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
                 include_once $addon->getClassPath($pluginClass);
 
+                if (!is_a($pluginClass, 'Gdn_IPlugin', true)) {
+                    trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+                }
+
                 // Only register the plugin if it implements the Gdn_IPlugin interface.
                 if (is_a($pluginClass, 'Gdn_IPlugin', true) &&
                     !isset($this->registeredPlugins[$pluginClass])
                 ) {
 
                     // Register this plugin's methods
-                    $this->registerPlugin($pluginClass);
+                    $this->registerPlugin($pluginClass, $addon->getPriority());
                 }
             }
         }
@@ -445,91 +450,41 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     }
 
     /**
+     * Register a plugin's events.
      *
-     *
-     * @param $ClassName
+     * @param string $className The name of the class.
      * @throws Exception
      */
-    public function registerPlugin($ClassName) {
-        $ClassMethods = get_class_methods($ClassName);
-        if ($ClassMethods === null) {
-            throw new Exception("There was an error getting the $ClassName class methods.", 401);
+    public function registerPlugin($className, $priority = EventManager::PRIORITY_NORMAL) {
+        $className = strtolower($className);
+        if (empty($this->registeredPlugins[$className])) {
+            $this->eventManager->bindClass($className, $priority);
         }
-
-        foreach ($ClassMethods as $Method) {
-            $MethodName = strtolower($Method);
-            // Loop through their individual methods looking for event handlers and method overrides.
-            if (isset($MethodName[9])) {
-                $Suffix = trim(strrchr($MethodName, '_'), '_');
-                switch ($Suffix) {
-                    case 'handler':
-                    case 'before':
-                    case 'after':
-                    case 'render':
-                        $this->registerHandler($ClassName, $MethodName);
-                        break;
-                    case 'override':
-                        $this->registerOverride($ClassName, $MethodName);
-                        break;
-                    case 'create':
-                        $this->registerNewMethod($ClassName, $MethodName);
-                        break;
-                }
-            }
-        }
-
-        $this->registeredPlugins[$ClassName] = true;
+        $this->registeredPlugins[$className] = true;
     }
 
     /**
      *
      *
-     * @param $PluginClassName
+     * @param $pluginClassName
      * @return bool
      */
-    public function unregisterPlugin($PluginClassName) {
-        $this->removeFromCollectionByPrefix($PluginClassName, $this->eventHandlers);
-        $this->removeFromCollectionByPrefix($PluginClassName, $this->methodOverrides);
-        $this->removeFromCollectionByPrefix($PluginClassName, $this->newMethods);
-        if (array_key_exists($PluginClassName, $this->registeredPlugins)) {
-            unset($this->registeredPlugins[$PluginClassName]);
-        }
-
+    public function unregisterPlugin($pluginClassName) {
+        $this->eventManager->unbindClass($pluginClassName);
         return true;
-    }
-
-    /**
-     *
-     *
-     * @param $Prefix
-     * @param $Collection
-     */
-    private function removeFromCollectionByPrefix($Prefix, &$Collection) {
-        foreach ($Collection as $Event => $Hooks) {
-            if (is_array($Hooks)) {
-                foreach ($Hooks as $Index => $Hook) {
-                    if (strpos($Hook, $Prefix.'.') === 0) {
-                        unset($Collection[$Event][$Index]);
-                    }
-                }
-            } elseif (is_string($Hooks)) {
-                if (strpos($Hooks, $Prefix.'.') === 0) {
-                    unset($Collection[$Event]);
-                }
-            }
-        }
     }
 
     /**
      * Removes all plugins that are marked as mobile unfriendly.
      */
     public function removeMobileUnfriendlyPlugins() {
-        foreach ($this->enabledPlugins() as $PluginName => $Trash) {
-            $PluginInfo = $this->getPluginInfo($PluginName);
+        $addons = $this->addonManager->getEnabled();
+        $plugins = array_filter($addons, Addon::makeFilterCallback(['oldType' => 'plugin']));
 
-            // Remove plugin hooks from plugins that explicitly claim to not be mobile friendly
-            if (!val('MobileFriendly', $PluginInfo, true)) {
-                $this->unregisterPlugin(val('ClassName', $PluginInfo));
+        /* @var Addon $plugin */
+        foreach ($plugins as $key => $plugin) {
+            if (!$plugin->getInfoValue('mobileFriendly', true) && $plugin->getPluginClass()) {
+                $this->unregisterPlugin($plugin->getPluginClass());
             }
         }
     }
@@ -550,39 +505,49 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Sender
-     * @param $EventName
-     * @param string $HandlerType
-     * @param array $Options
+     * @param $sender
+     * @param $eventName
+     * @param string $handlerType
+     * @param array $options
      * @return array
      */
-    public function getEventHandlers($Sender, $EventName, $HandlerType = 'Handler', $Options = array()) {
+    public function getEventHandlers($sender, $eventName, $handlerType = 'Handler', $options = array()) {
+        deprecated(__METHOD__);
         // Figure out the classname.
-        if (isset($Options['ClassName'])) {
-            $ClassName = $Options['ClassName'];
-        } elseif (property_exists($Sender, 'ClassName') && $Sender->ClassName)
-            $ClassName = $Sender->ClassName;
-        else {
-            $ClassName = get_class($Sender);
+        if (isset($options['ClassName'])) {
+            $ClassName = $options['ClassName'];
+        } elseif (property_exists($sender, 'ClassName') && $sender->ClassName) {
+            $ClassName = $sender->ClassName;
+        } else {
+            $ClassName = get_class($sender);
+        }
+
+        $handlerType = strtolower($handlerType);
+        switch ($handlerType) {
+            case 'handler':
+                $handlerType = '';
+                break;
+            case 'create':
+            case 'override':
+                $handlerType = '_method';
+                break;
+            default:
+                $handlerType = '_'.$handlerType;
         }
 
         // Build the list of event handler names.
-        $Names = array(
-            "{$ClassName}_{$EventName}_{$HandlerType}",
-            "Base_{$EventName}_{$HandlerType}",
-            "{$ClassName}_{$EventName}_All",
-            "Base_{$EventName}_All");
+        $Names = [
+            "{$ClassName}_{$eventName}{$handlerType}",
+            "Base_{$eventName}{$handlerType}"
+        ];
 
         // Grab the event handlers.
-        $Handlers = array();
+        $Handlers = [];
         foreach ($Names as $Name) {
-            $Name = strtolower($Name);
-            if (isset($this->eventHandlers[$Name])) {
-                $Handlers = array_merge($Handlers, $this->eventHandlers[$Name]);
-            }
+            $Handlers[] = $this->eventManager->getHandlers($Name);
         }
 
-        return $Handlers;
+        return call_user_func('array_merge', $Handlers);
     }
 
     /**
@@ -687,17 +652,33 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param string $EventHandlerType The type of event handler.
      */
     public function registerHandler($HandlerClassName, $HandlerMethodName, $EventClassName = '', $EventName = '', $EventHandlerType = '') {
-        $HandlerKey = $HandlerClassName.'.'.$HandlerMethodName;
-        $EventKey = strtolower($EventClassName == '' ? $HandlerMethodName : $EventClassName.'_'.$EventName.'_'.$EventHandlerType);
+        deprecated(__METHOD__);
 
-        // Create a new array of handler class names if it doesn't exist yet.
-        if (array_key_exists($EventKey, $this->eventHandlers) === false) {
-            $this->eventHandlers[$EventKey] = array();
-        }
+        $key = $this->normalizeEventKey($EventClassName ?: $HandlerClassName, $EventName, $EventHandlerType);
+        $this->eventManager->bindLazy($key, $HandlerClassName, $HandlerMethodName);
+    }
 
-        // Specify this class as a handler for this method if it hasn't been done yet.
-        if (in_array($HandlerKey, $this->eventHandlers[$EventKey]) === false) {
-            $this->eventHandlers[$EventKey][] = $HandlerKey;
+    /**
+     * Generate an event name from a class, event, and type.
+     *
+     * @param string $class The name of the class for the handler.
+     * @param string $event The name of the event.
+     * @param string $type The name of the type.
+     * @return string Returns an event name as a string.
+     */
+    private function normalizeEventKey($class, $event, $type = 'handler') {
+        $key = strtolower($class.'_'.$event);
+        $type = strtolower($type);
+
+        switch ($type) {
+            case 'handler':
+            case '':
+                return $key;
+            case 'create':
+            case 'override':
+                return $key.'_method';
+            default:
+                return $key.'_'.$type;
         }
     }
 
@@ -708,59 +689,45 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @param callable $callback The callback to call when the event is fired.
      */
     public function registerCallback($eventName, callable $callback) {
-        if (stringEndsWith($eventName, '_create', true)) {
-            $this->newMethods[strtolower($eventName)] = $callback;
-        } elseif (stringEndsWith($eventName, '_override', true)) {
-            $this->methodOverrides[strtolower($eventName)] = $callback;
-        } else {
-            $this->eventHandlers[strtolower($eventName)][] = $callback;
+        $eventName = strtolower($eventName);
+        $suffix = strrchr($eventName, '_');
+        $basename = substr($eventName, 0, -strlen($suffix));
+
+        switch ($suffix) {
+            case '_handler':
+                $eventName = $basename;
+                break;
+            case '_create':
+            case '_override':
+                $eventName = $basename.'_method';
+                break;
         }
+
+        $this->eventManager->bind($eventName, $callback);
     }
 
     /**
      * Registers a plugin override method.
      *
      * @param string $OverrideClassName The name of the plugin class that will override the existing method.
-     * @param string $OverrideMethodName The name of the plugin method being registered to override the existing method.
-     * @param string $EventClassName The name of the class that will fire the event.
-     * @param string $EventName The name of the event that will fire.
+     * @param string $handlerMethodName The name of the plugin method being registered to override the existing method.
+     * @param string $eventClassName The name of the class that will fire the event.
+     * @param string $eventName The name of the event that will fire.
      */
-    public function registerOverride($OverrideClassName, $OverrideMethodName, $EventClassName = '', $EventName = '') {
-        $OverrideKey = $OverrideClassName.'.'.$OverrideMethodName;
-        $EventKey = strtolower($EventClassName == '' ? $OverrideMethodName : $EventClassName.'_'.$EventName.'_Override');
-
-        // Throw an error if this method has already been overridden.
-        if (array_key_exists($EventKey, $this->methodOverrides) === true) {
-            trigger_error(
-                "The $EventKey is already assigned to {$this->methodOverrides[$EventKey]}. ".
-                "It cannot also be overridden by $OverrideClassName."
-            );
-        }
-
-        // Otherwise, specify this class as the source for the override.
-        $this->methodOverrides[$EventKey] = $OverrideKey;
+    public function registerOverride($handlerClassName, $handlerMethodName, $eventClassName = '', $eventName = '') {
+        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, 'method');
     }
 
     /**
      * Registers a plugin new method.
      *
-     * @param string $NewMethodClassName The name of the plugin class that will add a new method.
-     * @param string $NewMethodName The name of the plugin method being added.
-     * @param string $EventClassName The name of the class that will fire the event.
-     * @param string $EventName The name of the event that will fire.
+     * @param string $handlerClassName The name of the plugin class that will add a new method.
+     * @param string $handlerMethodName The name of the plugin method being added.
+     * @param string $eventClassName The name of the class that will fire the event.
+     * @param string $eventName The name of the event that will fire.
      */
-    public function registerNewMethod($NewMethodClassName, $NewMethodName, $EventClassName = '', $EventName = '') {
-        $NewMethodKey = $NewMethodClassName.'.'.$NewMethodName;
-        $EventKey = strtolower($EventClassName == '' ? $NewMethodName : $EventClassName.'_'.$EventName.'_Create');
-
-        // Throw an error if this method has already been created.
-        if (array_key_exists($EventKey, $this->newMethods) === true) {
-            trigger_error('New object methods must be unique. The new "'.$EventKey.'" method has already been assigned by the "'.$this->newMethods[$EventKey].'" plugin. It cannot also be assigned by the "'.$NewMethodClassName.'" plugin.', E_USER_NOTICE);
-            return;
-        }
-
-        // Otherwise, specify this class as the source for the new method.
-        $this->newMethods[$EventKey] = $NewMethodKey;
+    public function registerNewMethod($handlerClassName, $handlerMethodName, $eventClassName = '', $eventName = '') {
+        $this->registerHandler($handlerClassName, $handlerMethodName, $eventClassName, $eventName, 'method');
     }
 
     /**
@@ -791,112 +758,47 @@ class Gdn_PluginManager extends Gdn_Pluggable {
             $Return = true;
         }
 
-        // Look for Wildcard event handlers
-        $WildEventKey = $EventClassName.'_'.$EventName.'_'.$EventHandlerType;
-        if ($this->callEventHandler($Sender, 'Base', 'All', $EventHandlerType, $WildEventKey)) {
-            $Return = true;
-        }
-        if ($this->callEventHandler($Sender, $EventClassName, 'All', $EventHandlerType, $WildEventKey)) {
-            $Return = true;
-        }
-
         return $Return;
-    }
-
-    /**
-     * Trace a message when tracing is turned on.
-     *
-     * @param string $Message The message to trace.
-     * @param string $Type One of the **TRACE_*** constants.
-     */
-    private function trace($Message, $Type = TRACE_INFO) {
-        if ($this->trace) {
-            trace($Message, $Type);
-        }
     }
 
     /**
      * Call a single event handler.
      *
-     * @param object $Sender The object firing the event.
-     * @param string $EventClassName The name of the class firing the event.
-     * @param string $EventName The name of the event being fired.
-     * @param string $EventHandlerType The type of event handler being looked for.
-     * @param array $Options An array of options to modify the call.
+     * @param object $sender The object firing the event.
+     * @param string $className The name of the class firing the event.
+     * @param string $eventName The name of the event being fired.
+     * @param string $handlerType The type of event handler being looked for.
      * @return mixed Returns whatever the event handler returns or **false** of there is not event handler.
      */
-    public function callEventHandler($Sender, $EventClassName, $EventName, $EventHandlerType = 'Handler', $Options = []) {
-        $this->trace("CallEventHandler $EventClassName $EventName $EventHandlerType");
-        $Return = false;
+    public function callEventHandler($sender, $className, $eventName, $handlerType = 'handler') {
+        $eventKey = strtolower("{$className}_{$eventName}");
+        $handlerType = strtolower($handlerType);
+        $originalEventKey = $eventKey.'_'.$handlerType;
 
-        // Backwards compatible for event key.
-        if (is_string($Options)) {
-            $PassedEventKey = $Options;
-        } else {
-            $PassedEventKey = val('EventKey', $Options, null);
+        switch ($handlerType) {
+            case 'handler':
+                // Do nothing.
+                break;
+            case 'create':
+                $eventKey = $originalEventKey.'_method';
+                break;
+            default:
+                $eventKey = $originalEventKey;
         }
 
-        $EventKey = strtolower($EventClassName.'_'.$EventName.'_'.$EventHandlerType);
-        if (!array_key_exists($EventKey, $this->eventHandlers)) {
+
+        $results = $this->eventManager->fire(
+            $eventKey,
+            $sender,
+            isset($sender->EventArguments) ? $sender->EventArguments : []
+        );
+
+        if (isset($sender->Returns)) {
+            $sender->Returns[$originalEventKey] = $results;
+            return true;
+        } else {
             return false;
         }
-
-        if (is_null($PassedEventKey)) {
-            $PassedEventKey = $EventKey;
-        }
-
-        // For "All" events, calculate the stack
-        if ($EventName == 'All') {
-            $Stack = debug_backtrace();
-            // this call
-            array_shift($Stack);
-
-            // plural call
-            array_shift($Stack);
-
-            $EventCaller = array_shift($Stack);
-            $Sender->EventArguments['WildEventStack'] = $EventCaller;
-        }
-
-        $this->trace($this->eventHandlers[$EventKey], 'Event Handlers');
-
-        // Loop through the handlers and execute them
-        foreach ($this->eventHandlers[$EventKey] as $PluginKey) {
-            $callback = null;
-            if (is_array($PluginKey) || $PluginKey instanceof \Closure) {
-                // The event handler is an array or a closure so we can call it directly.
-                $callback = $PluginKey;
-            } else {
-                // Decode how `self::register[Handler|NewMethod|Override]` store event names.
-                $PluginKeyParts = explode('.', $PluginKey);
-                if (count($PluginKeyParts) == 2) {
-                    // The event handler is a class and method name.
-                    list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
-                    $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
-                } elseif (is_callable($PluginKey)) {
-                    // The event handler is a global function.
-                    $callback = $PluginKey;
-                }
-            }
-
-            if (!$callback) {
-                continue;
-            } elseif (isset($Sender->Returns)) {
-                if (array_key_exists($EventKey, $Sender->Returns) === false || is_array($Sender->Returns[$EventKey]) === false) {
-                    $Sender->Returns[$EventKey] = array();
-                }
-
-                $Return = call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
-                $Sender->Returns[$EventKey][$PluginKey] = $Return;
-                $Return = true;
-            } elseif (isset($Sender->EventArguments)) {
-                call_user_func($callback, $Sender, $Sender->EventArguments, $PassedEventKey);
-            } else {
-                call_user_func($callback, $Sender, [], $PassedEventKey);
-            }
-        }
-
-        return $Return;
     }
 
     /**
@@ -925,7 +827,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
      * @return bool Returns **true** if an override exists or **false** otherwise.
      */
     public function hasMethodOverride($ClassName, $MethodName) {
-        return array_key_exists(strtolower($ClassName.'_'.$MethodName.'_Override'), $this->methodOverrides);
+        return $this->eventManager->hasHandler($this->normalizeEventKey($ClassName, $MethodName, 'method'));
     }
 
     /**
@@ -949,57 +851,33 @@ class Gdn_PluginManager extends Gdn_Pluggable {
     /**
      * Get the callback for an event handler.
      *
-     * @param string $ClassName The name of the class throwing the event.
-     * @param string $MethodName The name of the event.
-     * @param string $Type The type of event handler.
-     *  - Create: A new method creation.
-     *  - Override: A method override.
-     * @return callback
+     * @param string $className The name of the class throwing the event.
+     * @param string $methodName The name of the event.
+     * @return callback|null
      * @since 2.1
      */
-    public function getCallback($ClassName, $MethodName, $Type = 'Create') {
-        $EventKey = strtolower("{$ClassName}_{$MethodName}_{$Type}");
+    public function getCallback($className, $methodName) {
+        $eventKey = "{$className}_{$methodName}_method";
+        $handlers = $this->eventManager->getHandlers($eventKey);
 
-        switch (strtolower($Type)) {
-            case 'create':
-                $MethodKey = val($EventKey, $this->newMethods);
-                break;
-            case 'override':
-                $MethodKey = val($EventKey, $this->methodOverrides);
-                break;
-            default:
-                return null;
-        }
-
-        $callback = null;
-        if (is_array($MethodKey) || $MethodKey instanceof \Closure) {
-            // The event handler is an array or a closure so we can call it directly.
-            $callback = $MethodKey;
+        if (!empty($handlers)) {
+            $callback = reset($handlers);
+            return $callback;
         } else {
-            // Decode how `self::register[Handler|NewMethod|Override]` store event names.
-            $PluginKeyParts = explode('.', $MethodKey);
-            if (count($PluginKeyParts) == 2) {
-                // The event handler is a class and method name.
-                list($PluginClassName, $PluginEventHandlerName) = $PluginKeyParts;
-                $callback = [$this->getPluginInstance($PluginClassName), $PluginEventHandlerName];
-            } elseif (is_callable($MethodKey)) {
-                // The event handler is a global function.
-                $callback = $MethodKey;
-            }
+            return null;
         }
-        return $callback;
     }
 
     /**
      * Checks to see if there are any plugins that create the method being executed.
      *
-     * @param string $ClassName The name of the class that called the method being created.
-     * @param string $MethodName The name of the method that is being created.
+     * @param string $className The name of the class that called the method being created.
+     * @param string $methodName The name of the method that is being created.
      * @return bool Returns **true** if the method exists.
      */
-    public function hasNewMethod($ClassName, $MethodName) {
-        $Key = strtolower($ClassName.'_'.$MethodName.'_Create');
-        return array_key_exists($Key, $this->newMethods);
+    public function hasNewMethod($className, $methodName) {
+        $event = "{$className}_{$methodName}_method";
+        return $this->eventManager->hasHandler($event);
     }
 
     /**
@@ -1247,7 +1125,7 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         $enabled = $this->addonManager->isEnabled($pluginName, Addon::TYPE_ADDON);
 
         try {
-            $this->addonManager->checkDependants($addon, true);
+            $this->addonManager->checkDependents($addon, true);
         } catch (\Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), 400);
         }
@@ -1393,6 +1271,31 @@ class Gdn_PluginManager extends Gdn_Pluggable {
         }
 
         $pluginClassName = $addon->getPluginClass();
-        $this->registerPlugin($pluginClassName);
+        $this->registerPlugin($pluginClassName, $addon->getPriority());
+    }
+
+    /**
+     * Finds an entry of the container by its identifier and returns it.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @throws \Interop\Container\Exception\NotFoundException  No entry was found for this identifier.
+     * @throws \Interop\Container\Exception\ContainerException Error while retrieving the entry.
+     *
+     * @return mixed Entry.
+     */
+    public function get($id) {
+        return $this->getPluginInstance($id, self::ACCESS_CLASSNAME);
+    }
+
+    /**
+     * Returns true if the container can return an entry for the given identifier. Returns false otherwise.
+     *
+     * @param string $id Identifier of the entry to look for.
+     *
+     * @return boolean
+     */
+    public function has($id) {
+        return class_exists($id);
     }
 }

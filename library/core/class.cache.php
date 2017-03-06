@@ -6,7 +6,7 @@
  * caching.
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.10
@@ -669,6 +669,21 @@ abstract class Gdn_Cache {
             }
         } else {
             $Result = $Prefix.$Key;
+        }
+
+        // Make sure key is valid: no control characters or whitespace and no more than 250 characters.
+        // See https://github.com/memcached/memcached/blob/master/doc/protocol.txt
+        $Result = trim($Result);
+        if (unicodeRegexSupport()) {
+            // No whitespace or control characters.
+            $Result = preg_replace('/[\p{Z}\p{C}]+/u', '-', $Result);
+        } else {
+            // No whitespace.
+            $Result = preg_replace('/\s+/', '-', $Result);
+        }
+
+        if (strlen($Result) > 250) {
+            $Result = substr($Result, 0, 250);
         }
 
         return $Result;

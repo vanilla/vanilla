@@ -2,7 +2,7 @@
 /**
  * Discussion controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -81,14 +81,14 @@ class DiscussionController extends VanillaController {
 
         // Check permissions.
         $Category = CategoryModel::categories($this->Discussion->CategoryID);
-        $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category, -1));
+        $this->categoryPermission($Category, 'Vanilla.Discussions.View');
+
         if (c('Vanilla.Categories.Use', true)) {
             $this->CategoryID = $this->Discussion->CategoryID;
         } else {
             $this->CategoryID = null;
         }
         $this->setData('CategoryID', $this->CategoryID);
-
 
         if (strcasecmp(val('Type', $this->Discussion), 'redirect') === 0) {
             $this->redirectDiscussion($this->Discussion);
@@ -291,7 +291,7 @@ class DiscussionController extends VanillaController {
         $this->setData('Discussion', $this->DiscussionModel->getID($DiscussionID), true);
 
         // Check permissions.
-        $this->permission('Vanilla.Discussions.View', true, 'Category', $this->Discussion->PermissionCategoryID);
+        $this->categoryPermission($this->Discussion->CategoryID, 'Vanilla.Discussions.View');
         $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
         // Get the comments.
@@ -373,14 +373,14 @@ class DiscussionController extends VanillaController {
      * @param string $TransientKey Single-use hash to prove intent.
      */
     public function dismissAnnouncement($DiscussionID = '') {
+        // Make sure we are posting back.
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
         // Confirm announcements may be dismissed
         if (!c('Vanilla.Discussions.Dismiss', 1)) {
             throw permissionException('Vanilla.Discussions.Dismiss');
-        }
-
-        // Make sure we are posting back.
-        if (!$this->Request->isPostBack()) {
-            throw permissionException('Javascript');
         }
 
         $Session = Gdn::session();
@@ -518,7 +518,7 @@ class DiscussionController extends VanillaController {
         if (!$Discussion) {
             throw notFoundException('Discussion');
         }
-        $this->permission('Vanilla.Discussions.Announce', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Announce');
 
         if ($this->Form->authenticatedPostBack()) {
             // Save the property.
@@ -587,7 +587,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->permission('Vanilla.Discussions.Sink', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Sink');
 
         // Sink the discussion.
         $this->DiscussionModel->setField($DiscussionID, 'Sink', $Sink);
@@ -632,7 +632,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->permission('Vanilla.Discussions.Close', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Close');
 
         // Close the discussion.
         $this->DiscussionModel->setField($DiscussionID, 'Closed', $Close);
@@ -678,7 +678,7 @@ class DiscussionController extends VanillaController {
             throw notFoundException('Discussion');
         }
 
-        $this->permission('Vanilla.Discussions.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Delete');
 
         if ($this->Form->authenticatedPostBack()) {
             if (!$this->DiscussionModel->deleteID($DiscussionID)) {
@@ -731,19 +731,18 @@ class DiscussionController extends VanillaController {
             if ($Comment && $Discussion) {
                 $DefaultTarget = discussionUrl($Discussion);
 
-                // Make sure comment is this user's or they have Delete permission
+                // Make sure comment is this user's or they have Delete permission.
                 if ($Comment->InsertUserID != $Session->UserID || !c('Vanilla.Comments.AllowSelfDelete')) {
-                    $this->permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+                    $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 
-                // Make sure that content can (still) be edited
-                $EditContentTimeout = c('Garden.EditContentTimeout', -1);
-                $CanEdit = $EditContentTimeout == -1 || strtotime($Comment->DateInserted) + $EditContentTimeout > time();
+                // Make sure that content can (still) be edited.
+                $CanEdit = DiscussionModel::canEdit($Discussion);
                 if (!$CanEdit) {
-                    $this->permission('Vanilla.Comments.Delete', true, 'Category', $Discussion->PermissionCategoryID);
+                    $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
                 }
 
-                // Delete the comment
+                // Delete the comment.
                 if (!$this->CommentModel->deleteID($CommentID)) {
                     $this->Form->addError('Failed to delete comment');
                 }
@@ -842,7 +841,7 @@ body { background: transparent !important; }
         if ($Discussion) {
             // Allow Vanilla.Comments.View to be defined to limit access to embedded comments only.
             // Otherwise, go with normal discussion view permissions. Either will do.
-            $this->permission(array('Vanilla.Discussions.View', 'Vanilla.Comments.View'), false, 'Category', $Discussion->PermissionCategoryID);
+            $this->categoryPermission($Discussion->CategoryID, ['Vanilla.Discussions.View', 'Vanilla.Comments.View'], false);
 
             $this->setData('Discussion', $Discussion, true);
             $this->setData('DiscussionID', $Discussion->DiscussionID, true);
@@ -1005,7 +1004,7 @@ body { background: transparent !important; }
         }
 
         // Make sure the user has permission to edit this discussion.
-        $this->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Discussions.Edit');
 
         $ForeignUrl = valr('Attributes.ForeignUrl', $Discussion);
         if (!$ForeignUrl) {

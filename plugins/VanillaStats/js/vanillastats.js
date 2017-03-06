@@ -286,15 +286,25 @@ var vanillaStats = (function() {
          * @returns {Object|string|bool}
          */
         this.getRange = function(key) {
-            if (typeof key !== "undefined") {
-                if (typeof range[key] !== "undefined") {
-                    return range[key];
-                } else {
-                    return false;
-                }
-            } else {
+            if (typeof key === "undefined") {
                 return range;
             }
+            if (key !== 'to' && key !== 'from') {
+                return false;
+            }
+            if (range[key] === null) {
+                // defaults
+                if (key === 'to') {
+                    // eod yesterday
+                    range.to = moment().subtract(1, 'days').endOf('day').toDate();
+                }
+                if (key === 'from') {
+                    // 1 year from eod yesterday
+                    range.from = moment().subtract(1, 'days').subtract(1, 'years').endOf('day').toDate();
+
+                }
+            }
+            return range[key];
         };
 
         /**
@@ -370,22 +380,65 @@ var vanillaStats = (function() {
         this.initializeUI = function() {
             $("#StatsOverview").find("li").click((function (eventObject) {
                 this.toggleUI("Overview", eventObject.currentTarget.id);
+                this.writeData();
             }).bind(this));
-
-            document.getElementById("StatsSlotDay").disabled = false;
-            document.getElementById("StatsSlotMonth").disabled = false;
 
             $("#StatsSlotSelector").find("button").click((function (eventObject) {
                 switch (eventObject.currentTarget.id) {
                     case "StatsSlotDay":
                         this.setSlotType("d");
-                        this.toggleUI("SlotSelector", "StatsSlotDay");
                         break;
                     default:
                         this.setSlotType("m");
-                        this.toggleUI("SlotSelector", "StatsSlotMonth");
                 }
+                this.updateStats();
             }).bind(this));
+
+            $(".js-daterange").daterangepicker({
+                alwaysShowCalendars: true,
+                startDate: this.getRange('from'),
+                endDate: this.getRange('to'),
+                opens: 'left',
+                buttonClasses: "btn",
+                applyClass: "btn-primary",
+                cancelClass: "btn-secondary",
+                maxDate: moment(this.getRange('to')),
+                ranges: {
+                    'Past Week': [
+                        moment(this.getRange('to')).subtract(1, 'week'),
+                        this.getRange('to')
+                    ],
+                    'Past 30 Days': [
+                        moment(this.getRange('to')).subtract(30, 'days'),
+                        this.getRange('to')
+                    ],
+                    'This Month': [
+                        moment(this.getRange('to')).startOf('month'),
+                        this.getRange('to')
+                    ],
+                    'Last Month': [
+                        moment(this.getRange('to')).startOf('month').subtract(1, 'month'),
+                        moment(this.getRange('to')).startOf('month')
+                    ],
+                    'Past Year': [
+                        moment(this.getRange('to')).subtract(1, 'year'),
+                        this.getRange('to')
+                    ],
+                    'Year to Date': [
+                        moment(this.getRange('to')).startOf('year'),
+                        this.getRange('to')
+                    ]
+                },
+            });
+
+            $(".js-daterange").on('apply.daterangepicker', (function (ev, picker) {
+                this.setRange(picker.startDate.endOf('day'), picker.endDate.endOf('day'));
+                this.updateStats();
+            }).bind(this));
+
+            $(".js-daterange").on('show.daterangepicker', function (ev, picker) {
+                $('.daterangepicker').css('display', 'flex');
+            });
 
             $("#StatsNavigation").find("button").click((function (eventObject) {
                 switch (eventObject.currentTarget.id) {
@@ -396,17 +449,25 @@ var vanillaStats = (function() {
                         this.apiRequest(this.getLinks("Prev"), null, this.timelineResponseHandler);
                         break;
                     default:
+                        var diff = moment(this.getRange('to')).diff(moment(this.getRange('from')), 'days');
+                        var dateTo = moment().endOf('day');
+                        var dateFrom = moment(dateTo).subtract(diff + 1, 'days');
+
+                        var data = {
+                            date: dateTo.toDate(),
+                            dateFrom: dateFrom.toDate(),
+                            slotType: this.getSlotType()
+                        };
+
+                        // Make the formal request.
                         this.apiRequest(
                             this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
-                            { slotType: this.getSlotType() },
+                            data,
                             this.timelineResponseHandler
                         );
                         break;
                 }
             }).bind(this));
-
-            $("#StatsSlotMonth").trigger('click');
-            $("#StatsPageViews").trigger('click');
         };
 
         /**
@@ -457,7 +518,7 @@ var vanillaStats = (function() {
                     var newFrom = typeof data.From !== "undefined" ? data.From : null;
                     var newTo = typeof data.To !== "undefined" ? data.To : null;
 
-                    this.setRange(newFrom, newTo);
+                    this.setRange(moment(newFrom).endOf('day'), moment(newTo).endOf('day'));
                 }
 
                 if (typeof data.SlotType !== "undefined") {
@@ -651,7 +712,6 @@ var vanillaStats = (function() {
                     });
                     $("#StatsChart").addClass('Chart' + activeElementID);
                 }
-                this.writeData();
                 break;
             case "SlotSelector":
                 var slotSelector = document.getElementById("StatsSlotSelector");
@@ -665,7 +725,6 @@ var vanillaStats = (function() {
                         }
                     }
                 }
-                this.updateStats();
                 break;
         }
     };
@@ -674,34 +733,15 @@ var vanillaStats = (function() {
      * Update the navigation UI based on current data.
      */
     VanillaStats.prototype.updateUI = function() {
-        var currentTimeframe = document.getElementById("StatsCurrentTimeframe");
+        var daterangepicker = $(".js-daterange").data('daterangepicker');
         var navNext = document.getElementById("StatsNavNext");
         var navPrev = document.getElementById("StatsNavPrev");
         var navToday = document.getElementById("StatsNavToday");
 
-        if (currentTimeframe !== null) {
-            var dateRange = this.getRange();
-            var timeframe = "";
-
-            if (dateRange.from instanceof Date && dateRange.to instanceof Date) {
-                var from = {
-                    date: dateRange.from.getDate(),
-                    month: dateRange.from.getMonth() + 1,
-                    year: dateRange.from.getFullYear()
-                };
-                var to = {
-                    date: dateRange.to.getDate(),
-                    month: dateRange.to.getMonth() + 1,
-                    year: dateRange.to.getFullYear()
-                };
-
-                timeframe = from.month + "/" + from.date + "/" +from.year + " - ";
-                timeframe = timeframe + to.month + "/" + to.date + "/" + to.year;
-            }
-
-            currentTimeframe.innerHTML = timeframe;
+        if (daterangepicker !== undefined) {
+            daterangepicker.setStartDate(moment(this.getRange('from')));
+            daterangepicker.setEndDate(moment(this.getRange('to')));
         }
-
         if (navPrev !== null) {
             navPrev.disabled = this.getLinks("Prev") === null;
         }
@@ -710,7 +750,6 @@ var vanillaStats = (function() {
             navNext.disabled = navNextDisabled;
             navToday.disabled = navNextDisabled;
         }
-
     };
 
     VanillaStats.prototype.getSummaries = function(container) {
@@ -814,35 +853,56 @@ var vanillaStats = (function() {
     /**
      * Request data from the mothership.
      *
-     * @param {string|Date} refDate The reference date for requested analytics data.
+     * @param {string|Date} refDateTo The ending reference date for requested analytics data.
+     * @param {string|Date} refDateFrom The starting reference date for requested analytics data.
      * @returns {boolean|string}
      */
-    VanillaStats.prototype.updateStats = function(refDate) {
-        // Default to today's date.
-        if (typeof refDate === "undefined") {
-            refDate = new Date();
-        } else {
-            // If refDate isn't already a Date object, try to make one out of it.
-            if (!(refDate instanceof Date)) {
-                refDate = new Date(refDate);
-            }
+    VanillaStats.prototype.updateStats = function() {
+        var refDateTo = this.getRange('to');
+        var refDateFrom = this.getRange('from');
 
-            // Not a valid date?  Default to today.
-            if (isNaN(refDate.getTime())) {
-                refDate = new Date();
-            }
+        var diff = moment(refDateTo).diff(moment(refDateFrom), 'seconds');
+        var daySeconds = 86400;
+        var monthSeconds = 2620800;
+        var maxTicks = 150;
+        var minTicks = 2;
+        var monthDisabled = (diff / monthSeconds) < minTicks;
+        var dayDisabled = (diff / daySeconds) > maxTicks;
+
+        if (monthDisabled) {
+            document.getElementById("StatsSlotMonth").disabled = true;
+        } else {
+            document.getElementById("StatsSlotMonth").disabled = false;
         }
 
+        if (dayDisabled) {
+            document.getElementById("StatsSlotDay").disabled = true;
+        } else {
+            document.getElementById("StatsSlotDay").disabled = false;
+        }
+
+        if (this.getSlotType() === 'm' && monthDisabled) {
+            this.setSlotType('d');
+        } else if (this.getSlotType() === 'd' && dayDisabled) {
+            this.setSlotType('m');
+        }
+
+        this.toggleUI("SlotSelector", this.getSlotType() === 'd' ? "StatsSlotDay" : "StatsSlotMonth");
+
         // Build a date string the API can use (YYYY-MM-DD).
-        var date = refDate.getFullYear() + "-" + (refDate.getMonth() + 1) + "-" + refDate.getDate();
+        var dateTo = refDateTo.getFullYear() + "-" + (refDateTo.getMonth() + 1) + "-" + refDateTo.getDate();
+        var dateFrom = refDateFrom.getFullYear() + "-" + (refDateFrom.getMonth() + 1) + "-" + refDateFrom.getDate();
+
+        var data = {
+            date: dateTo,
+            dateFrom: dateFrom,
+            slotType: this.getSlotType()
+        };
 
         // Make the formal request.
         this.apiRequest(
             this.getPaths("timeline").replace("{vanillaID}", this.getVanillaID()),
-            {
-                date: date,
-                slotType: this.getSlotType()
-            },
+            data,
             this.timelineResponseHandler
         );
     };
@@ -912,4 +972,5 @@ var vanillaStats = (function() {
 $(document).ready(function() {
     // Here we go...
     vanillaStats.updateStats();
+    vanillaStats.toggleUI("Overview", "StatsPageViews");
 });

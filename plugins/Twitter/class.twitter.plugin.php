@@ -2,7 +2,7 @@
 /**
  * Twitter plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Twitter
  */
@@ -24,8 +24,6 @@ $PluginInfo['Twitter'] = array(
     'RequiresRegistration' => true,
     'Icon' => 'twitter_social_connect.png'
 );
-
-require_once PATH_LIBRARY.'/vendors/oauth/OAuth.php';
 
 /**
  * Class TwitterPlugin

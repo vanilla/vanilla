@@ -1,8 +1,8 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
- * @license MIT
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license GPLv2
  */
 
 namespace Garden;
@@ -96,6 +96,7 @@ class Schema implements \JsonSerializable {
     /**
      * Build an OpenAPI-compatible specification of the current schema.
      *
+     * @see https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object
      * @return array
      */
     public function dumpSpec() {
@@ -109,8 +110,13 @@ class Schema implements \JsonSerializable {
                 }
 
                 // Massage schema's types into their Open API v2 counterparts, including potential formatting flags.
-                // string, boolean and array pass through without adjustment.
+                // Valid parameter types for OpenAPI v2: string, number, integer, boolean, array or file
                 switch ($parameter['type']) {
+                    case 'string':
+                    case 'boolean':
+                    case 'array':
+                        // string, boolean and array types should not be altered.
+                        break;
                     case 'object':
                         $parameter['type'] = 'array';
                         break;
@@ -155,8 +161,17 @@ class Schema implements \JsonSerializable {
      * @return Schema Returns the current instance for fluent calls.
      */
     protected function filterData(array &$data, array $schema, Validation &$validation, $path = '') {
+        // Normalize schema key casing for case-insensitive data key comparisons.
+        $schemaKeys = array_combine(array_map('strtolower', array_keys($schema)), array_keys($schema));
+
         foreach ($data as $key => $val) {
             if (array_key_exists($key, $schema)) {
+                continue;
+            } elseif (array_key_exists(strtolower($key), $schemaKeys)) {
+                // Migrate the value to the properly-cased key.
+                $correctedKey = $schemaKeys[strtolower($key)];
+                $data[$correctedKey] = $data[$key];
+                unset($data[$key]);
                 continue;
             }
 
@@ -204,6 +219,36 @@ class Schema implements \JsonSerializable {
     }
 
     /**
+     * Get the schema's currently configured parameters.
+     *
+     * @return array
+     */
+    public function getParameters() {
+        return $this->schema;
+    }
+
+    /**
+     * Merge a schema with this one.
+     *
+     * @param Schema $schema A scheme instance. Its parameters will be merged into the current instance.
+     */
+    public function merge(Schema $schema) {
+        $fn = function (array &$target, array $source) use (&$fn) {
+            foreach ($source as $key => $val) {
+                if (is_array($val) && array_key_exists($key, $target) && is_array($target[$key])) {
+                    $target[$key] = $fn($target[$key], $val);
+                } else {
+                    $target[$key] = $val;
+                }
+            }
+
+            return $target;
+        };
+
+        $fn($this->schema, $schema->getParameters());
+    }
+
+    /**
      * Parse a schema in short form into a full schema array.
      *
      * @param array $arr The array to parse into a schema.
@@ -223,6 +268,13 @@ class Schema implements \JsonSerializable {
                 } else {
                     throw new \InvalidArgumentException("Schema at position $key is not a valid param.", 500);
                 }
+            } elseif ($value instanceof Schema) {
+                $param = static::parseShortParam($key);
+                $param['type'] = 'object';
+                $param['properties'] = $value->getParameters();
+
+               $name = $param['name'];
+               $result[$name] = $param;
             } else {
                 // The parameter is defined in the key.
                 $param = static::parseShortParam($key, $value);
@@ -314,10 +366,10 @@ class Schema implements \JsonSerializable {
             }
             $name = $parts[0];
         } else {
-            $name = $parts[1];
+            $name = $parts[0];
 
-            if (isset(self::$types[$parts[0]])) {
-                $type = self::$types[$parts[0]];
+            if (isset(self::$types[$parts[1]])) {
+                $type = self::$types[$parts[1]];
             } else {
                 throw new \InvalidArgumentException("Invalid type {$parts[1]} for field $name.", 500);
             }

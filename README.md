@@ -48,18 +48,18 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 We strongly recommend:
 
-*  **PHP 5.6** or **7.0**.
+*  **PHP 7.0** or higher.
 *  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
 
-If your server is not running PHP 5.6 or higher, **you must address this immediately**. All lower versions of PHP are no longer updated and are potentially unsafe. We will remove support for them soon.
+If your server is not running PHP 7.0 or higher, **you should address this soon**. While PHP 5.6 will receive security patches thru 2018, Vanilla may end support for it prior to that.
 
 Our _minimum_ requirements are now:
 
-* PHP 5.4 or newer with `--enable-mbstring` and the pdo_mysql module enabled.
-* If you intend to [Migrate to Vanilla](#migrating-to-vanilla) you will _also_ need PHP with `--with-mysqli`.
+* PHP 5.6 or newer.
+* PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
+* To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
+* To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
-
-To use our social plugins, PHP's [OpenSSL support](http://php.net/manual/en/openssl.installation.php) must be enabled.
 
 Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
 
@@ -82,11 +82,13 @@ Vanilla is built to be simple, and its installation is no exception.
 
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
+Please consider using maintenance mode before running database updates if your database is very large (millions of users or discussions).
+
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Delete all files in `/cache`.
-* Go to `yourforum.com/utility/update` to run any database updates needed. (404? See next paragraph.)
-* If it fails, try it a second times by refreshing the page.
+* Go to `yourforum.com/utility/upgrade` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second times by refreshing the page.
+* If any "Deleted Files" are listed on the upgrade page, manually delete the listed files.
 
 If your forum still uses URLs including `?p=`:
 
@@ -147,7 +149,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2008-2016 Vanilla Forums Inc.
+Copyright &copy; 2009-2017 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.

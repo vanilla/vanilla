@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license MIT
  */
 
@@ -92,7 +92,7 @@ class BasicSchemaTest extends SchemaTest {
      * @dataProvider provideBooleanData
      */
     public function testBooleanSchema($input, $expected) {
-        $schema = Schema::create(['b:bool']);
+        $schema = Schema::create(['bool:b']);
         $expected = ['bool' => $expected];
 
         // Test some false data.
@@ -106,7 +106,7 @@ class BasicSchemaTest extends SchemaTest {
      * Test an array type.
      */
     public function testArrayType() {
-        $schema = Schema::create(['a:arr']);
+        $schema = Schema::create(['arr:a']);
 
         $expectedSchema = [
             'arr' => ['name' => 'arr', 'type' => 'array', 'required' => true]
@@ -122,7 +122,7 @@ class BasicSchemaTest extends SchemaTest {
 
         // Array with a description and not a type.
         $expectedSchema['arr']['description'] = 'Hello world!';
-        $schema = Schema::create(['a:arr' => 'Hello world!']);
+        $schema = Schema::create(['arr:a' => 'Hello world!']);
         $this->assertEquals($expectedSchema, $schema->jsonSerialize());
 
         // Array with an items type.
@@ -130,12 +130,12 @@ class BasicSchemaTest extends SchemaTest {
         $expectedSchema['arr']['items']['type'] = 'integer';
         $expectedSchema['arr']['items']['required'] = true;
 
-        $schema = Schema::create(['a:arr' => 'i']);
+        $schema = Schema::create(['arr:a' => 'i']);
         $this->assertEquals($expectedSchema, $schema->jsonSerialize());
 
         // Test the longer syntax.
         $expectedSchema['arr']['description'] = 'Hello world!';
-        $schema = Schema::create(['a:arr' => [
+        $schema = Schema::create(['arr:a' => [
             'description' => 'Hello world!',
             'items' => ['type' => 'integer', 'required' => true]
         ]]);
@@ -161,7 +161,7 @@ class BasicSchemaTest extends SchemaTest {
      */
     public function testNotRequired($shortType, $longType) {
         $schema = new Schema([
-            "$shortType:col?"
+            "col:$shortType?"
         ]);
 
         $emptyData = ['col' => ''];
@@ -194,7 +194,7 @@ class BasicSchemaTest extends SchemaTest {
         }
 
         $schema = new Schema([
-            "$shortType:col"
+            "col:$shortType"
         ]);
 
         $emptyData = ['col' => ''];
@@ -212,7 +212,7 @@ class BasicSchemaTest extends SchemaTest {
      */
     public function testRequiredEmptyBool() {
         $schema = new Schema([
-            'b:col'
+            'col:b'
         ]);
         /* @var Validation $validation */
         $emptyData = ['col' => ''];
@@ -236,7 +236,7 @@ class BasicSchemaTest extends SchemaTest {
      */
     public function testRequiredEmptyString() {
         $schema = new Schema([
-            's:col' => ['minLength' => 0]
+            'col:s' => ['minLength' => 0]
         ]);
 
         /* @var Validation $validation */
@@ -311,7 +311,7 @@ class BasicSchemaTest extends SchemaTest {
      */
     public function testInvalidValues($type, $value) {
         $schema = new Schema([
-            "$type:col?"
+            "col:$type?"
         ]);
         $strval = print_r($value, true);
 
@@ -320,6 +320,23 @@ class BasicSchemaTest extends SchemaTest {
         $isValid = $schema->isValid($invaldData, $validation);
         $this->assertFalse($isValid, "isValid: type $type with value $strval should not be valid.");
         $this->assertFalse($validation->fieldValid('col'), "fieldValid: type $type with value $strval should not be valid.");
+    }
+
+    /**
+     * Test merging basic schemas.
+     */
+    public function testBasicMerge() {
+        $schemaOne = new Schema(['foo:s']);
+        $schemaTwo = new Schema(['bar:s']);
+
+        $schemaOne->merge($schemaTwo);
+
+        $expected = [
+            'foo' => ['name' => 'foo', 'type' => 'string', 'required' => true],
+            'bar' => ['name' => 'bar', 'type' => 'string','required' => true]
+        ];
+
+        $this->assertEquals($expected, $schemaOne->jsonSerialize());
     }
 
     /**
@@ -352,9 +369,9 @@ class BasicSchemaTest extends SchemaTest {
      */
     protected function doValidationBehavior($validationBehavior) {
         $schema = new Schema([
-            'i:userID' => 'The ID of the user.',
-            's:name' => 'The username of the user.',
-            's:email' => 'The email of the user.',
+            'userID:i' => 'The ID of the user.',
+            'name:s' => 'The username of the user.',
+            'email:s' => 'The email of the user.',
         ]);
         $schema->setValidationBehavior($validationBehavior);
 
@@ -404,14 +421,14 @@ class BasicSchemaTest extends SchemaTest {
     public function getAtomicSchema() {
         $schema = Schema::create(
             [
-                'i:id',
-                's:name' => 'The name of the object.',
-                's:description?',
-                'ts:timestamp?',
-                'dt:date?',
-                'f:amount?',
-                '=:64ish?',
-                'b:enabled?',
+                'id:i',
+                'name:s' => 'The name of the object.',
+                'description:s?',
+                'timestamp:ts?',
+                'date:dt?',
+                'amount:f?',
+                '64ish:=?',
+                'enabled:b?',
             ]
         );
 

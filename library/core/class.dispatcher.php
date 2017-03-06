@@ -5,11 +5,12 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
  */
+use Garden\Web\Dispatcher;
 use Vanilla\Addon;
 use Vanilla\AddonManager;
 
@@ -70,6 +71,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** @var string|false The delivery type to set on the controller. */
     private $deliveryType;
 
+    /** @var  Dispatcher The forwards compatible dispatcher used for resourceful dispatching. */
+    private $dispatcher;
+
     /**
      * @var array An associative collection of variables that will get passed into the
      * controller as properties once it has been instantiated.
@@ -90,9 +94,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /**
      * Class constructor.
      */
-    public function __construct(AddonManager $addonManager = null) {
+    public function __construct(AddonManager $addonManager = null, Dispatcher $dispatcher = null) {
         parent::__construct();
         $this->addonManager = $addonManager;
+        $this->dispatcher = $dispatcher ?: new Dispatcher();
         $this->reset();
     }
 
@@ -216,12 +221,20 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             exit();
         }
 
-        // Analyze the request AFTER checking for update mode.
-        $routeArgs = $this->analyzeRequest($request);
-        $this->fireEvent('AfterAnalyzeRequest');
+        // Try and dispatch with the new dispatcher.
+        // This is temporary. We will eventually just have the new dispatcher.
+        $response = $this->dispatcher->dispatch($request);
 
-        // Now that the controller has been found, dispatch to a method on it.
-        $this->dispatchController($request, $routeArgs);
+        if ($response->getMetaItem('noMatch')) { // don't go using noMatch in other code!
+            // Analyze the request AFTER checking for update mode.
+            $routeArgs = $this->analyzeRequest($request);
+            $this->fireEvent('AfterAnalyzeRequest');
+
+            // Now that the controller has been found, dispatch to a method on it.
+            $this->dispatchController($request, $routeArgs);
+        } else {
+            $response->render();
+        }
     }
 
     /*
@@ -569,7 +582,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param Gdn_Request $request The current request being inspected.
      * @return int Returns one of the **Gdn_Dispatcher::BLOCK_*** constants.
      */
-    private function getCanBlock($request) {
+    public function getCanBlock($request) {
+        // Never block an admin.
+        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
+            Logger::debug(
+                "Dispatcher block: {blockException}, {blockLevel}",
+                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
+            );
+            return self::BLOCK_NEVER;
+        }
+
         $canBlock = self::BLOCK_ANY;
 
         $blockExceptions = array(
@@ -598,15 +620,6 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 );
                 return $BlockLevel;
             }
-        }
-
-        // Never block an admin.
-        if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
-            Logger::debug(
-                "Dispatcher block: {blockException}, {blockLevel}",
-                ['blockException' => 'admin', 'blockLevel' => self::BLOCK_NEVER]
-            );
-            return self::BLOCK_NEVER;
         }
 
         if (Gdn::session()->isValid()) {

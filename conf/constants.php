@@ -2,7 +2,7 @@
 /**
  * Framework constants.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -13,7 +13,7 @@ if (!defined('PATH_CACHE')) {
     define('PATH_CACHE', PATH_ROOT.'/cache');
 }
 if (!defined('PATH_UPLOADS')) {
-    define('PATH_UPLOADS', PATH_ROOT.'/uploads');
+    define('PATH_UPLOADS', PATH_ROOT.DS.'uploads');
 }
 
 // You should not change these paths.
@@ -82,5 +82,8 @@ define('ADDON_TYPE_LOCALE', 4);
 define('ADDON_TYPE_APPLICATION', 5);
 define('ADDON_TYPE_CORE', 10);
 
+// Use this constant if you are sick of looking up how to format dates to go into the database.
+const MYSQL_DATE_FORMAT = 'Y-m-d H:i:s';
+
 // Signal we did all this ^.
-define('VANILLA_CONSTANTS', TRUE);
+define('VANILLA_CONSTANTS', true);

@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -2149,6 +2149,37 @@ if (!function_exists('jsonEncodeChecked')) {
         }
 
         return $encoded;
+    }
+}
+
+if (!function_exists('jsonFilter')) {
+    /**
+     * Prepare data for json_encode.
+     *
+     * @param mixed $value
+     */
+    function jsonFilter(&$value) {
+        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey, $key);
+                });
+            } elseif ($value instanceof \DateTimeInterface) {
+                $value = $value->format('c');
+            } elseif (is_string($value)) {
+                // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
+                $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));
+                if ($isIPField && ($ip = ipDecode($value)) !== null) {
+                    $value = $ip;
+                }
+            }
+        };
+
+        if (is_array($value)) {
+            array_walk($value, $fn);
+        } else {
+            $fn($value);
+        }
     }
 }
 

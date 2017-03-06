@@ -2,7 +2,7 @@
 /**
  * Manages users manually authenticating (signing in).
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -697,6 +697,12 @@ class EntryController extends Gdn_Controller {
             // Should we create a new user?
             if ($didNotPickUser && $haveName && $emailValid && $noMatches) {
                 // Create the user.
+                $registerOptions = [
+                    'CheckCaptcha' => false,
+                    'ValidateEmail' => false,
+                    'NoConfirmEmail' => true,
+                    'SaveRoles' => $SaveRolesRegister
+                ];
                 $User = $this->Form->formValues();
                 $User['Password'] = randomString(16); // Required field.
                 $User['HashMethod'] = 'Random';
@@ -705,18 +711,31 @@ class EntryController extends Gdn_Controller {
                 $User['Attributes'] = $this->Form->getFormValue('Attributes', null);
                 $User['Email'] = $this->Form->getFormValue('ConnectEmail', $this->Form->getFormValue('Email', null));
                 $User['Name'] = $this->Form->getFormValue('ConnectName', $this->Form->getFormValue('Name', null));
-                $UserID = $UserModel->register($User, [
-                    'CheckCaptcha' => false,
-                    'ValidateEmail' => false,
-                    'NoConfirmEmail' => true,
-                    'SaveRoles' => $SaveRolesRegister
-                ]);
+                $UserID = $UserModel->register($User, $registerOptions);
+
                 $User['UserID'] = $UserID;
 
                 $this->EventArguments['UserID'] = $UserID;
                 $this->fireEvent('AfterConnectSave');
 
                 $this->Form->setValidationResults($UserModel->validationResults());
+
+                // The SPAM filter was likely triggered. Send the registration for approval, add some generic "reason" text.
+                if ($UserID === false && val('DiscoveryText', $this->Form->validationResults())) {
+                    unset($User['UserID']);
+                    $User['DiscoveryText'] = sprintft(t('SSO connection (%s)'), $Method);
+                    $UserModel->Validation->reset();
+                    $UserID = $UserModel->register($User, $registerOptions);
+
+                    if ($UserID === UserModel::REDIRECT_APPROVE) {
+                        $this->Form->setFormValue('Target', '/entry/registerthanks');
+                        $this->_setRedirect();
+                        return;
+                    }
+
+                    $this->Form->setValidationResults($UserModel->validationResults());
+                    $User['UserID'] = $UserID;
+                }
 
                 // Save the association to the new user.
                 if ($UserID) {
@@ -1522,7 +1541,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }
@@ -1649,7 +1668,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            redirect($Route);
+                            safeRedirect($Route);
                         }
                     }
                 }
@@ -1747,6 +1766,7 @@ class EntryController extends Gdn_Controller {
      */
     public function passwordReset($UserID = '', $PasswordResetKey = '') {
         $PasswordResetKey = trim($PasswordResetKey);
+        $this->UserModel->addPasswordStrength($this);
 
         if (!is_numeric($UserID)
             || $PasswordResetKey == ''
@@ -1782,45 +1802,47 @@ class EntryController extends Gdn_Controller {
                 $User = arrayTranslate($User, array('UserID', 'Name', 'Email'));
                 $this->setData('User', $User);
             }
+
+            if ($this->Form->isPostBack() === true) {
+                $this->UserModel->Validation->applyRule('Password', 'Required');
+                $this->UserModel->Validation->applyRule('Password', 'Strength');
+                $this->UserModel->Validation->applyRule('Password', 'Match');
+                $this->UserModel->Validation->validate($this->Form->formValues());
+                $this->Form->setValidationResults($this->UserModel->Validation->results());
+
+                $Password = $this->Form->getFormValue('Password', '');
+                $PasswordMatch = $this->Form->getFormValue('PasswordMatch', '');
+                if ($Password == '') {
+                    Logger::event(
+                        'password_reset_failure',
+                        Logger::NOTICE,
+                        'Failed to reset the password for {username}. Password is invalid.'
+                    );
+                } elseif ($Password != $PasswordMatch) {
+                    Logger::event(
+                        'password_reset_failure',
+                        Logger::NOTICE,
+                        'Failed to reset the password for {username}. Passwords did not match.'
+                    );
+                }
+
+                if ($this->Form->errorCount() == 0) {
+                    $User = $this->UserModel->passwordReset($UserID, $Password);
+                    Logger::event(
+                        'password_reset',
+                        Logger::NOTICE,
+                        '{username} has reset their password.'
+                    );
+                    Gdn::session()->start($User->UserID, true);
+                    redirect('/');
+                }
+            }
+
         } else {
             $this->setData('Fatal', true);
         }
 
-        if ($this->Form->errorCount() == 0
-            && $this->Form->isPostBack() === true
-        ) {
-            $Password = $this->Form->getFormValue('Password', '');
-            $Confirm = $this->Form->getFormValue('Confirm', '');
-            if ($Password == '') {
-                $this->Form->addError('Your new password is invalid');
-                Logger::event(
-                    'password_reset_failure',
-                    Logger::NOTICE,
-                    'Failed to reset the password for {username}. Password is invalid.'
-                );
-            } elseif ($Password != $Confirm) {
-                $this->Form->addError('Your passwords did not match.');
-            }
-            Logger::event(
-                'password_reset_failure',
-                Logger::NOTICE,
-                'Failed to reset the password for {username}. Passwords did not match.'
-            );
-
-            if ($this->Form->errorCount() == 0) {
-                $User = $this->UserModel->passwordReset($UserID, $Password);
-                Logger::event(
-                    'password_reset',
-                    Logger::NOTICE,
-                    '{username} has reset their password.'
-                );
-                Gdn::session()->start($User->UserID, true);
-//            $Authenticator = Gdn::authenticator()->AuthenticateWith('password');
-//            $Authenticator->FetchData($Authenticator, array('Email' => $User->Email, 'Password' => $Password, 'RememberMe' => FALSE));
-//            $AuthUserID = $Authenticator->Authenticate();
-                redirect('/');
-            }
-        }
+        $this->addJsFile('entry.js');
         $this->render();
     }
 

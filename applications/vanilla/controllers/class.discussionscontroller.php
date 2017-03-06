@@ -2,7 +2,7 @@
 /**
  * Discussions controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -536,6 +536,10 @@ class DiscussionsController extends VanillaController {
     public function userBookmarkCount($UserID = false) {
         if ($UserID === false) {
             $UserID = Gdn::session()->UserID;
+        }
+
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
         }
 
         if (!$UserID) {

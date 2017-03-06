@@ -2,7 +2,7 @@
 /**
  * Tagging plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Tagging
  */
@@ -291,8 +291,15 @@ class TagModel extends Gdn_Model {
      * @param $data
      */
     public function joinTags(&$data) {
+        // If we're dealing with an instance of Gdn_Dataset, grab a reference to its results.
+        if ($data instanceof Gdn_DataSet) {
+            $rows = $data->result();
+        } else {
+            $rows = &$data;
+        }
+
         $ids = array();
-        foreach ($data as $row) {
+        foreach ($rows as $row) {
             $discussionId = val('DiscussionID', $row);
             if ($discussionId) {
                 $ids[] = $discussionId;
@@ -308,7 +315,7 @@ class TagModel extends Gdn_Model {
 
         $all_tags = Gdn_DataSet::index($all_tags, 'DiscussionID', array('Unique' => false));
 
-        foreach ($data as &$row) {
+        foreach ($rows as &$row) {
             $discussionId = val('DiscussionID', $row);
             if (isset($all_tags[$discussionId])) {
                 $tags = $all_tags[$discussionId];

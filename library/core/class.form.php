@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -355,20 +355,33 @@ class Gdn_Form extends Gdn_Pluggable {
 
     /**
      * Builds a color-picker form element. Accepts three-character hex values with or without the leading '#',
-     * but the saved value will be coerced into a six-character hex code with the leading '#'.
-     * The hex value to be saved is the value of the input with the color-picker-value class.
+     * but the saved value will be coerced into a six-character hex code with the leading '#'. Also accepts
+     * 'transparent', 'initial' or 'inherit'. Can be configured to accept an empty string if $options['AllowEmpty']
+     * is set to true. The hex value to be saved is the value of the input with the color-picker-value class.
      *
      * @param string $fieldName Name of the field being posted with this input.
+     * @param array $options Currently supports a key of 'AllowEmpty' which signifies whether to accept empty
+     * values for the color picker
      * @return string The form element for a color picker.
      */
-    public function color($fieldName) {
+    public function color($fieldName, $options = []) {
+
+        $allowEmpty = val('AllowEmpty', $options, false);
+
         Gdn::controller()->addJsFile('colorpicker.js');
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
-        return '<div id="'.$this->escapeFieldName($fieldName).'" class="js-color-picker color-picker input-group">'
+        // Default starting color for color input. Color inputs require one, Chrome will throw a warning if one
+        // doesn't exist. The javascript will override this.
+        $colorAttributes['value'] = '#ffffff';
+
+        $cssClass = 'js-color-picker color-picker input-group';
+        $dataAttribute = $allowEmpty ? 'data-allow-empty="true"' : 'data-allow-empty="false"';
+
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'
@@ -2710,10 +2723,12 @@ PASSWORDMETER;
     }
 
     /**
-     * Save an image from a field and delete any old image that's been uploaded.
+     * Save an image from a field.
      *
      * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
      * @param array $Options
+     *  - CurrentImage: Current image to clean if the save is successful
+     * @return bool
      */
     public function saveImage($Field, $Options = array()) {
         $Upload = new Gdn_UploadImage();
@@ -2770,13 +2785,14 @@ PASSWORDMETER;
             $Parsed = $Upload->saveImageAs($TmpName, $Name, val('Height', $Options, ''), val('Width', $Options, ''), $Options);
             trace($Parsed, 'Saved Image');
 
-            $Current = $this->getFormValue($Field);
-            if ($Current && val('DeleteOriginal', $Options, true)) {
-                // Delete the current image.
-                trace("Deleting original image: $Current.");
-                if ($Current) {
-                    $Upload->delete($Current);
-                }
+            if (val('DeleteOriginal', $Options, false)) {
+                deprecated('Option DeleteOriginal', 'CurrentImage');
+            }
+
+            $currentImage = val('CurrentImage', $Options, false);
+            if ($currentImage) {
+                trace("Deleting original image: $currentImage.");
+                $Upload->delete($currentImage);
             }
 
             // Set the current value.

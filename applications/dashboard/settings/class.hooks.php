@@ -2,16 +2,38 @@
 /**
  * DashboardHooks class.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
  */
 
+use Garden\Container\Container;
+use Garden\Container\Reference;
+
 /**
  * Event handlers for the Dashboard application.
  */
 class DashboardHooks extends Gdn_Plugin {
+
+    /**
+     * Install the formatter to the container.
+     *
+     * @param Container $dic The container to initialize.
+     */
+    public function container_init_handler(Container $dic) {
+        $dic->rule('HeadModule')
+            ->setShared(true)
+            ->addAlias('Head')
+
+            ->rule('MenuModule')
+            ->setShared(true)
+            ->addAlias('Menu')
+
+            ->rule('Gdn_Dispatcher')
+            ->addCall('passProperty', ['Menu', new Reference('MenuModule')])
+            ;
+    }
 
     /**
      * Fire before every page render.
@@ -197,7 +219,7 @@ class DashboardHooks extends Gdn_Plugin {
         // Allow return to mobile site
         $ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
         if ($ForceNoMobile === 'desktop') {
-            $Sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1'), 'div'), 'MobileLink');
+            $Sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
         }
 
         // Allow global translation of TagHint
@@ -246,8 +268,8 @@ class DashboardHooks extends Gdn_Plugin {
         $nav = $sender;
 
         $session = Gdn::session();
-        $themeOptionsName = c('Garden.ThemeOptions.Name');
-        $mobileThemeOptionsName = c('Garden.MobileThemeOptions.Name');
+        $hasThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledDesktopThemeKey());
+        $hasMobileThemeOptions = Gdn::themeManager()->hasThemeOptions(Gdn::themeManager()->getEnabledMobileThemeKey());
 
         $sort = -1; // Ensure these nav items come before any plugin nav items.
 
@@ -255,7 +277,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf('Garden.Community.Manage', 'Moderation', t('Messages'), '/dashboard/message', 'site.messages', '', $sort)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Users.Add', 'Garden.Users.Edit', 'Garden.Users.Delete'], false), 'Moderation', t('Users'), '/dashboard/user', 'site.users', '', $sort)
             ->addLinkToSectionIf($session->checkPermission('Garden.Users.Approve') && (c('Garden.Registration.Method') == 'Approval'), 'Moderation', t('Applicants'), '/dashboard/user/applicants', 'site.applicants', '', $sort, ['popinRel' => '/dashboard/user/applicantcount'], false)
-            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Banning'), '/dashboard/settings/bans', 'site.bans', '', $sort)
+            ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Ban Rules'), '/dashboard/settings/bans', 'site.bans', '', $sort)
 
             ->addGroupToSection('Moderation', t('Content'), 'moderation')
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false), 'Moderation', t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam-queue', '', $sort)
@@ -267,8 +289,8 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Banner'), '/dashboard/settings/banner', 'appearance.banner', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
-            ->addLinkIf($themeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
-            ->addLinkIf($mobileThemeOptionsName && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
+            ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
+            ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
             ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
@@ -359,6 +381,35 @@ class DashboardHooks extends Gdn_Plugin {
                 Gdn::userModel()->Validation->reset();
             }
         }
+        $this->checkAccessToken();
+    }
+
+    /**
+     * Check the access token.
+     */
+    private function checkAccessToken() {
+        if (empty($_SERVER['HTTP_AUTHORIZATION']) ||
+            !stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
+            !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)
+        ) {
+            return;
+        }
+
+        $token = $m[1];
+        if ($token) {
+            $model = new AccessTokenModel();
+
+            try {
+                $authRow = $model->verify($token, true);
+
+                Gdn::Session()->start($authRow['UserID'], false, false);
+                Gdn::Session()->validateTransientKey(true);
+            } catch (\Exception $ex) {
+                // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
+                $msg = $ex->getMessage();
+                safeHeader("X-WWW-Authenticate: error=\"invalid_token\", error_description=\"$msg\"");
+            }
+        }
     }
 
     /**
@@ -442,7 +493,7 @@ class DashboardHooks extends Gdn_Plugin {
         // Add a link to the community home.
         $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
         $sender->addGroupToGlobals('', 'etc', '', 100);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', '', 100, array('icon' => 'resize-full'));
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, array('icon' => 'resize-full'));
         $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
         $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
 

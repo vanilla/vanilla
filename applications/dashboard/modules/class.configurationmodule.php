@@ -2,7 +2,7 @@
 /**
  * Configuration module.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.2
@@ -126,6 +126,11 @@ class ConfigurationModule extends Gdn_Module {
                     if (val('Crop', $Row, false)) {
                         $options['Crop'] = val('Crop', $Row);
                     }
+
+                    // Old image to clean!
+                    $options['CurrentImage'] = c($Name, false);
+
+                    // Save the new image and clean up the old one.
                     $Form->saveImage($Name, $options);
                 }
 

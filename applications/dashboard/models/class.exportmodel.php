@@ -2,7 +2,7 @@
 /**
  * For exporting other database structures into a format that can be imported.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -134,7 +134,7 @@ class ExportModel {
             } else {
                 $this->_PDO = new PDO($DsnOrPDO, $Username, $Password);
                 if (strncasecmp($DsnOrPDO, 'mysql', 5) == 0) {
-                    $this->_PDO->exec('set names utf8');
+                    $this->_PDO->exec('set names utf8mb4');
                 }
             }
         }

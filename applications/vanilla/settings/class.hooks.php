@@ -2,7 +2,7 @@
 /**
  * VanillaHooks Plugin
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @since 2.0
  * @package Vanilla
@@ -255,7 +255,7 @@ class VanillaHooks implements Gdn_IPlugin {
         }
 
         // Let plugins have their information getting saved.
-        $Types = [];
+        $Types = [''];
 
         // We fire as TaggingPlugin since this code was taken from the old TaggingPlugin and we do not
         // want to break any hooks
@@ -590,6 +590,18 @@ class VanillaHooks implements Gdn_IPlugin {
         return false;
     }
 
+
+    /**
+     * Add CSS assets to front end.
+     *
+     * @param AssetModel $sender
+     */
+    public function assetModel_afterGetCssFiles_handler($sender) {
+        if (!inSection('Dashboard')) {
+            $sender->addCssFile('tag.css', 'vanilla', ['Sort' => 800]);
+        }
+    }
+
     /**
      * Adds 'Discussion' item to menu.
      *
@@ -610,7 +622,6 @@ class VanillaHooks implements Gdn_IPlugin {
             // Spoilers assets
             $sender->addJsFile('spoilers.js', 'vanilla');
             $sender->addCssFile('spoilers.css', 'vanilla');
-            $sender->addCssFile('tag.css', 'vanilla');
             $sender->addDefinition('Spoiler', t('Spoiler'));
             $sender->addDefinition('show', t('show'));
             $sender->addDefinition('hide', t('hide'));
@@ -996,6 +1007,32 @@ class VanillaHooks implements Gdn_IPlugin {
             ->addLinkIf(c('Vanilla.Archive.Date', false) &&  Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Archive Discussions'), '/vanilla/settings/archive', 'forum.archive', 'nav-forum-archive', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Embed'), 'embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
+    }
+
+    /**
+     * Handle post-restore operations from the log table.
+     *
+     * @param LogModel $sender
+     * @param array $args
+     */
+    public function logModel_AfterRestore_handler($sender, $args) {
+        $recordType = valr('Log.RecordType', $args);
+        $recordUserID = valr('Log.RecordUserID', $args);
+
+        if ($recordUserID === false) {
+            return;
+        }
+
+        switch ($recordType) {
+            case 'Comment':
+                $commentModel = new CommentModel();
+                $commentModel->updateUser($recordUserID, true);
+                break;
+            case 'Discussion':
+                $discussionModel = new DiscussionModel();
+                $discussionModel->updateUserDiscussionCount($recordUserID, true);
+                break;
+        }
     }
 
     /**

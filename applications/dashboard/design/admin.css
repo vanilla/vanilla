@@ -5036,19 +5036,50 @@ output {
           justify-content: space-between;
 }
 
-.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+.toolbar-stats > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-slot {
   margin-top: 2.25rem;
 }
 
 @media (max-width: 991px) {
-  .toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+  .toolbar-stats .toolbar-stats-slot {
     margin-top: 1.125rem;
   }
 }
 
-.toolbar-stats > * {
+.toolbar-stats .toolbar-stats-date-picker {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin-top: 1.125rem;
+}
+
+@media (max-width: 991px) {
+  .toolbar-stats .toolbar-stats-date-picker {
+    margin-top: 0;
+  }
+}
+
+.toolbar-stats .toolbar-stats-date-picker > * {
+  margin-top: 1.125rem;
   margin-left: auto;
   margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date {
+  padding-left: 0.5625rem;
+  padding-right: 0.5625rem;
+  min-width: 14.25rem;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date:after {
+  right: 1.125rem;
 }
 
 .analytics-panel,
@@ -6337,6 +6368,7 @@ select.nav-stats-users:focus,
 
 .filter-date {
   position: relative;
+  min-width: 13.125rem;
 }
 
 .filter-date::after {
@@ -6453,29 +6485,6 @@ select.nav-stats-users:focus,
       -ms-flex-align: center;
           align-items: center;
   min-width: 120px;
-}
-
-.Section-Error {
-  color: #000;
-  font: 75%/1.7em "Helvetica Neue", Helvetica, arial, sans-serif;
-  margin: 0;
-  padding: 80px;
-  background: url("images/error.png") 30px 30px no-repeat #fff;
-}
-
-.Section-Error .SplashInfo h1 {
-  font-weight: bold;
-  color: #000;
-  font-size: 300%;
-  margin: 20px 0;
-  padding: 0;
-}
-
-.Section-Error .SplashInfo p {
-  margin: 10px 0;
-  color: #777;
-  font-size: 16px;
-  line-height: 1.6;
 }
 
 .footer {
@@ -7527,6 +7536,42 @@ label[id^=iCheck] {
   border: 0.25rem solid #0291db;
   border-radius: 0.5625rem;
   background-color: #fff;
+}
+
+.hero {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 2.25rem 1.125rem;
+}
+
+.hero > * {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+
+.hero .hero-content {
+  padding: 0 6.75rem 0 4.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+}
+
+.hero .hero-media-wrapper {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.hero .btn, .hero .file-upload-browse, .hero .Button {
+  margin-top: 2.25rem;
 }
 
 .media {
@@ -8929,25 +8974,38 @@ button.close {
   padding-right: 1.125rem;
 }
 
-.tj-meta {
+.tj-meta,
+.table-meta {
   margin-top: 0.5625rem;
 }
 
-.tj-meta .table-meta-item {
+.tj-meta + .tj-meta,
+.table-meta + .tj-meta, .tj-meta +
+.table-meta,
+.table-meta +
+.table-meta {
+  margin-top: 0;
+}
+
+.tj-meta .table-meta-item,
+.table-meta .table-meta-item {
   font-size: 0.75rem;
 }
 
-.tj-meta .table-meta-item-label {
+.tj-meta .table-meta-item-label,
+.table-meta .table-meta-item-label {
   font-weight: 500;
 }
 
-.tj-meta .table-meta-item-label a {
+.tj-meta .table-meta-item-label a,
+.table-meta .table-meta-item-label a {
   color: #555a62;
   pointer-events: none;
   cursor: default;
 }
 
-.tj-meta .media-sm {
+.tj-meta .media-sm,
+.table-meta .media-sm {
   display: inline-block;
 }
 
@@ -8956,7 +9014,13 @@ button.close {
 .tj-meta .media-sm .FeedItem .FeedDescription, .FeedItem
 .tj-meta .media-sm .FeedDescription,
 .tj-meta .media-sm .FeedItem .Date, .FeedItem
-.tj-meta .media-sm .Date {
+.tj-meta .media-sm .Date,
+.table-meta .media-sm .media-left,
+.table-meta .media-sm .info,
+.table-meta .media-sm .FeedItem .FeedDescription, .FeedItem
+.table-meta .media-sm .FeedDescription,
+.table-meta .media-sm .FeedItem .Date, .FeedItem
+.table-meta .media-sm .Date {
   display: none;
 }
 
@@ -9238,88 +9302,58 @@ button.close {
           justify-content: flex-end;
 }
 
-.hero {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  padding: 2.25rem 1.125rem;
-}
-
-.hero > * {
-  -webkit-box-flex: 1;
-      -ms-flex-positive: 1;
-          flex-grow: 1;
-}
-
-.hero .label-selector {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.hero .hero-content {
-  padding: 0 6.75rem 0 4.5rem;
-  font-size: 0.8125rem;
-  text-align: center;
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
-}
-
-.hero .tagline {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.hero .vanilla-logo {
-  width: 6.75rem;
-  height: 4.5rem;
-}
-
-.hero .btn, .hero .file-upload-browse, .hero .Button {
-  margin-top: 2.25rem;
-}
-
-.hero .hero-media-wrapper {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
-}
-
 .video-section-heading {
   padding: 1.125rem 0;
   font-weight: 500;
 }
 
-.video.label-selector-item a {
+.Section-Tutorials .label-selector {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.Section-Tutorials .hero .label-selector-item {
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
+}
+
+.Section-Tutorials .tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.Section-Tutorials .vanilla-logo {
+  width: 6.75rem;
+  height: 4.5rem;
+}
+
+.Section-Tutorials .video.label-selector-item a {
   color: #fff;
 }
 
-.video.label-selector-item .video-title {
+.Section-Tutorials .video.label-selector-item .video-title {
   font-size: 0.75rem;
   text-align: left;
 }
 
-.video.label-selector-item .overlay {
+.Section-Tutorials .video.label-selector-item .overlay {
   background-color: rgba(0, 0, 0, 0.75);
 }
 
-.video.label-selector-item.current .overlay {
+.Section-Tutorials .video.label-selector-item.current .overlay {
   height: 100%;
 }
 
-.video.label-selector-item svg {
+.Section-Tutorials .video.label-selector-item svg {
   width: 40%;
 }
 
-.video-section .info, .video-section .FeedItem .FeedDescription, .FeedItem .video-section .FeedDescription, .video-section .FeedItem .Date, .FeedItem .video-section .Date {
+.Section-Tutorials .video-section .info, .Section-Tutorials .video-section .FeedItem .FeedDescription, .FeedItem .Section-Tutorials .video-section .FeedDescription, .Section-Tutorials .video-section .FeedItem .Date, .FeedItem .Section-Tutorials .video-section .Date {
   padding-top: 1.125rem;
 }
 
-.video-section:first-child .video-section-heading {
+.Section-Tutorials .video-section:first-child .video-section-heading {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
@@ -9352,10 +9386,6 @@ button.close {
   margin-right: 0;
 }
 
-.crop-label {
-  display: none;
-}
-
 .main .content .control-panel {
   display: none;
 }
@@ -9364,10 +9394,6 @@ button.close {
   .main .content .control-panel {
     display: block;
   }
-}
-
-.filter-date {
-  min-width: 13.125rem;
 }
 
 table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,
@@ -9724,6 +9750,40 @@ strong,
   text-overflow: ellipsis;
 }
 
+.Section-Error,
+.Section-Utility {
+  padding: 100px;
+  margin: 0;
+  background: url("images/eyes.png") 30px 30px no-repeat #fff;
+}
+
+@media (max-width: 991px) {
+  .Section-Error,
+  .Section-Utility {
+    padding: 10%;
+  }
+}
+
+.Section-Error {
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.SplashInfo {
+  max-width: 800px;
+  color: #555a62;
+  font-size: 0.875rem;
+}
+
+.SplashInfo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.SplashInfo h2, .SplashInfo .analytics-widget-header .title, .analytics-widget-header .SplashInfo .title {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
 .Section-Dashboard.Message.index {
   /* Note: The MessageModule (in /applications/dashboard/modules) wraps all messages
     that it renders in a div with this DismissMessage class. */
@@ -9914,6 +9974,10 @@ strong,
 .FeedItem .FeedDescription p {
   margin-bottom: 0;
   display: inline-block;
+}
+
+.FeedItem .FeedDescription img {
+  display: none;
 }
 
 .FeedItem .FeedDescription .details p {

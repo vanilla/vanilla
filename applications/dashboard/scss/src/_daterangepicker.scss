@@ -341,6 +341,7 @@ $daterangepicker-ranges-active-border-radius: $daterangepicker-border-radius !de
 
 .filter-date {
   position: relative;
+  min-width: to-rem(210);
 
   &::after {
     position: absolute;

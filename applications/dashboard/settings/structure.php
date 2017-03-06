@@ -4,7 +4,7 @@
 /**
  * Dashboard database structure.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -265,6 +265,17 @@ $Construct->table('UserAuthenticationToken')
     ->column('Authorized', 'tinyint(1)', false)
     ->column('Timestamp', 'timestamp', false)
     ->column('Lifetime', 'int', false)
+    ->set($Explicit, $Drop);
+
+$Construct->table('AccessToken')
+    ->column('Token', 'varchar(100)', false, 'primary')
+    ->column('UserID', 'int', false, 'index')
+    ->column('Type', 'varchar(20)', false, 'index')
+    ->column('Scope', 'text', true)
+    ->column('DateInserted', 'timestamp', false)
+    ->column('InsertIPAddress', 'ipaddress', false)
+    ->column('DateExpires', 'timestamp', false)
+    ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 
 // Fix the sync roles config spelling mistake.
@@ -856,3 +867,7 @@ if (c('Garden.Registration.CaptchaPublicKey')) {
 // Make sure the smarty folders exist.
 touchFolder(PATH_CACHE.'/Smarty/cache');
 touchFolder(PATH_CACHE.'/Smarty/compile');
+
+// Lock the current database character Encoding
+saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
+saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));

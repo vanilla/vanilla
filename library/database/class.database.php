@@ -3,7 +3,7 @@
  * Database manager
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -153,9 +153,8 @@ class Gdn_Database {
             $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
             $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
 
-            if ($this->ConnectionOptions[1002]) {
-                $PDO->query($this->ConnectionOptions[1002]);
-            }
+            $encoding = c('Database.CharacterEncoding', 'utf8mb4');
+            $PDO->query("set names '$encoding';set time_zone = '+0:0'");
 
             // We only throw exceptions during connect
             $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
@@ -199,7 +198,7 @@ class Gdn_Database {
     /**
      * Initialize the properties of this object.
      *
-     * @param mixed $Config The database is instantiated differently depending on the type of $Config:
+     * @param mixed $config The database is instantiated differently depending on the type of $Config:
      * - <b>null</b>: The database stored in the factory location Gdn:AliasDatabase will be used.
      * - <b>string</b>: The name of the configuration section to get the connection information from.
      * - <b>array</b>: The database properties will be set from the array. The following items can be in the array:
@@ -210,80 +209,75 @@ class Gdn_Database {
      *   - <b>Password</b>: The password to connect to the database.
      *   - <b>ConnectionOptions</b>: Other PDO connection attributes.
      */
-    public function init($Config = null) {
-        if (is_null($Config)) {
-            $Config = Gdn::config('Database');
-        } elseif (is_string($Config))
-            $Config = Gdn::config($Config);
-
-        $DefaultConfig = Gdn::config('Database');
-        if (is_null($Config)) {
-            $Config = array();
-        }
-        if (is_null($DefaultConfig)) {
-            $DefaultConfig = array();
+    public function init($config = null) {
+        if (is_null($config)) {
+            $config = Gdn::config('Database');
+        } elseif (is_string($config)) {
+            $config = Gdn::config($config);
         }
 
-        // Make sure DefaultConfig has all the keys we need
-        $DefaultConfig = array_merge(array(
+        $defaultConfig = (array)Gdn::config('Database', []);
+        if (is_null($config)) {
+            $config = [];
+        }
+
+        if (is_null($defaultConfig)) {
+            $defaultConfig = [];
+        }
+
+        // Make sure the config has all the keys we need
+        $config += $defaultConfig + [
+            'Dsn' => null,
             'Engine' => null,
             'Host' => '',
+            'Dbname' => '',
+            'Name' => '',
+            'Port' => null,
             'User' => null,
             'Password' => null,
             'ConnectionOptions' => null,
+            'ExtendedProperties' => [],
             'DatabasePrefix' => null,
-            'Prefix' => null
-        ), $DefaultConfig);
+            'Prefix' => null,
+        ];
 
-        $Config = array_merge($DefaultConfig, $Config);
+        $this->Engine = $config['Engine'];
+        $this->User = $config['User'];
+        $this->Password = $config['Password'];
+        $this->ConnectionOptions = $config['ConnectionOptions'];
+        $this->DatabasePrefix = $config['DatabasePrefix'] ?: $config['Prefix'];
+        $this->ExtendedProperties = $config['ExtendedProperties'];
 
-        $this->Engine = val('Engine', $Config);
-        $this->User = val('User', $Config);
-        $this->Password = val('Password', $Config);
-        $this->ConnectionOptions = val('ConnectionOptions', $Config);
-        $this->DatabasePrefix = val('DatabasePrefix', $Config, val('Prefix', $Config));
-        $this->ExtendedProperties = val('ExtendedProperties', $Config, array());
-
-        if (array_key_exists('Dsn', $Config)) {
+        if (!empty($config['Dsn'])) {
             // Get the dsn from the property.
-            $Dsn = $Config['Dsn'];
+            $dsn = $config['Dsn'];
         } else {
-            $Host = val('Host', $Config);
-            if (array_key_exists('Dbname', $Config)) {
-                $Dbname = $Config['Dbname'];
-            } elseif (array_key_exists('Name', $Config))
-                $Dbname = $Config['Name'];
-            elseif (array_key_exists('Dbname', $DefaultConfig))
-                $Dbname = $DefaultConfig['Dbname'];
-            elseif (array_key_exists('Name', $DefaultConfig))
-                $Dbname = $DefaultConfig['Name'];
+            $host = $config['Host'];
+            $dbname = $config['Dbname'] ?: $config['Name'];
 
-            // Was the port explicitly defined in the config?
-            $Port = val('Port', $Config, val('Port', $DefaultConfig, ''));
-
-            if (!isset($Dbname)) {
-                $Dsn = val('Dsn', $DefaultConfig);
+            if (empty($dbname)) {
+                $dsn = '';
             } else {
-                if (empty($Port)) {
+                // Was the port explicitly defined in the config?
+                $port = $config['Port'];
+                if (empty($port) && strpos($host, ':') !== false) {
                     // Was the port explicitly defined with the host name? (ie. 127.0.0.1:3306)
-                    $Host = explode(':', $Host);
-                    $Port = count($Host) == 2 ? $Host[1] : '';
-                    $Host = $Host[0];
+                    list($host, $port) = explode(':', $host);
                 }
 
-                if (empty($Port)) {
-                    $Dsn = sprintf('host=%s;dbname=%s;', $Host, $Dbname);
+                if (empty($port)) {
+                    $dsn = sprintf('host=%s;dbname=%s;', $host, $dbname);
                 } else {
-                    $Dsn = sprintf('host=%s;port=%s;dbname=%s;', $Host, $Port, $Dbname);
+                    $dsn = sprintf('host=%s;port=%s;dbname=%s;', $host, $port, $dbname);
                 }
             }
         }
 
-        if (array_key_exists('Slave', $Config)) {
-            $this->_SlaveConfig = $Config['Slave'];
+        if (array_key_exists('Slave', $config)) {
+            $this->_SlaveConfig = $config['Slave'];
         }
 
-        $this->Dsn = $Dsn;
+        $this->Dsn = $dsn;
     }
 
     /**
@@ -302,11 +296,11 @@ class Gdn_Database {
         // Get the return type.
         if (isset($Options['ReturnType'])) {
             $ReturnType = $Options['ReturnType'];
-        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql))
+        } elseif (preg_match('/^\s*"?(insert)\s+/i', $Sql)) {
             $ReturnType = 'ID';
-        elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql))
+        } elseif (!preg_match('/^\s*"?(update|delete|replace|create|drop|load data|copy|alter|grant|revoke|lock|unlock)\s+/i', $Sql)) {
             $ReturnType = 'DataSet';
-        else {
+        } else {
             $ReturnType = null;
         }
 
@@ -433,13 +427,13 @@ class Gdn_Database {
         }
 
         // Did this query modify data in any way?
-        if ($ReturnType == 'ID') {
+        if ($ReturnType === 'ID') {
             $this->_CurrentResultSet = $PDO->lastInsertId();
             if (is_a($PDOStatement, 'PDOStatement')) {
                 $PDOStatement->closeCursor();
             }
         } else {
-            if ($ReturnType == 'DataSet') {
+            if ($ReturnType === 'DataSet') {
                 // Create a DataSet to manage the resultset
                 $this->_CurrentResultSet = new Gdn_DataSet();
                 $this->_CurrentResultSet->Connection = $PDO;
@@ -447,6 +441,7 @@ class Gdn_Database {
             } elseif (is_a($PDOStatement, 'PDOStatement')) {
                 $PDOStatement->closeCursor();
             }
+
         }
 
         if (isset($StoreCacheKey)) {

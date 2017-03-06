@@ -3,7 +3,7 @@
  * Gdn_Locale.
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -93,7 +93,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @param $PluginWhiteList
      * @param bool $ForceRemapping
      */
-    public function __construct($LocaleName, $addonManager = null) {
+    public function __construct($LocaleName, AddonManager $addonManager = null) {
         parent::__construct();
         $this->ClassName = __CLASS__;
 

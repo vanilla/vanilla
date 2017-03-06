@@ -243,7 +243,7 @@
 // Styling for Table Jenga meta (when a table is collapsed on small screen sizes).
 //
 // Markup:
-// <div class="tj-meta">
+// <div class="table-meta">
 //   <div class="table-meta-item">
 //     <span class="table-meta-item-label">Roles: </span>
 //     <span class="table-meta-item-data">Member, Moderator</span>
@@ -256,8 +256,13 @@
 //
 // Styleguide 7.1.1.
 
-.tj-meta {
+.tj-meta,
+.table-meta {
   margin-top: ($spacer / 2);
+
+  & + & {
+    margin-top: 0;
+  }
 
   .table-meta-item {
     font-size: $font-size-sm;

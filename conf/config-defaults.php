@@ -15,13 +15,15 @@ $Configuration['Database']['Name']                             = 'dbname';
 $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
-                                                                  12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
-                                                                  1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
-                                                                  1002  => "set names 'utf8'; set time_zone = '+0:0';" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
-                                                               );
-$Configuration['Database']['CharacterEncoding'] = 'utf8';
+                                                                    // We do not use the constants here to be able to throw a
+                                                                    // graceful error message in the setupController if you did not
+                                                                    // install the needed requirement
+                                                                    12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
+                                                                    1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
+                                                                );
+$Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
-$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
+$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8mb4_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';
@@ -81,6 +83,7 @@ $Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt', '
 $Configuration['Garden']['Profile']['MaxHeight']                = 1200;
 $Configuration['Garden']['Profile']['MaxWidth']                 = 800;
 $Configuration['Garden']['Thumbnail']['Size']                   = 120;
+$Configuration['Garden']['Password']['MinLength']               = 6;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User');
 $Configuration['Garden']['InputFormatter']                      = 'Markdown'; // Html, BBCode, Markdown, Text
 $Configuration['Garden']['Html']['AllowedElements']             = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";

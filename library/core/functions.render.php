@@ -2,7 +2,7 @@
 /**
  * UI functions
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -832,7 +832,7 @@ if (!function_exists('hasEditProfile')) {
 
         $result = checkPermission('Garden.Profiles.Edit') && c('Garden.UserAccount.AllowEdit');
 
-        $result &= (
+        $result = $result && (
             c('Garden.Profile.Titles') ||
             c('Garden.Profile.Locations', false) ||
             c('Garden.Registration.Method') != 'Connect'
@@ -1507,6 +1507,57 @@ if (!function_exists('sprite')) {
         }
 
         return $Sprite;
+    }
+}
+
+if (!function_exists('hero')) {
+    /**
+     * A hero component is a stand-alone message on a page. It's great for "empty"-type messages, or to really draw
+     * attention. It gets used in the (hidden) Vanilla Tutorial sections and in empty messages.
+     *
+     * @param string $title The title for the message.
+     * @param string $body The message body.
+     * @param array $buttonArray An array representing a button. Appears below the hero body.
+     * Has the following properties:
+     * ** 'text': The text to add on the button.
+     * ** 'url': OPTIONAL The url to follow if the button is an anchor.
+     * ** 'attributes': OPTIONAL The attributes on the button.
+     * @param string $media An image or video to include in the hero.
+     * @return string A string representing a hero component
+     */
+    function hero($title = '', $body = '', array $buttonArray = [], $media = '') {
+        if ($title === '' && $body === '' && $media = '') {
+            return '';
+        }
+
+        if (!empty($title)) {
+            $title = wrap($title, 'div', ['class' => 'hero-title']);
+        }
+
+        if (!empty($body)) {
+            $body = wrap($body, 'div', ['class' => 'hero-body']);
+        }
+
+        if (!empty($media)) {
+            $media = wrap($media, 'div', ['class' => 'hero-media-wrapper']);
+        }
+
+        if (!empty($buttonArray)) {
+            if (!isset($buttonArray['attributes']['class'])) {
+                $buttonArray['attributes']['class'] = 'btn btn-secondary';
+            }
+
+            if (isset($buttonArray['url'])) {
+                $button = anchor(val('text', $buttonArray), val('url', $buttonArray), '', val('attributes', $buttonArray));
+            } else {
+                $button = wrap(val('text', $buttonArray), 'button', val('attributes', $buttonArray));
+            }
+        } else {
+            $button = '';
+        }
+
+        $content = wrap($title.$body.$button, 'div', ['class' => 'hero-content']);
+        return wrap($content.$media, 'div', ['class' => 'hero']);
     }
 }
 

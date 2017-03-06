@@ -2,7 +2,7 @@
 /**
  * Category model
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -171,6 +171,7 @@ class CategoryModel extends Gdn_Model {
      * Calculate the user-specific information on a category.
      *
      * @param array &$category The category to calculate.
+     * @param bool|null $addUserCategory
      */
     private function calculateUser(&$category, $addUserCategory = null) {
         $category['Url'] = url($category['Url'], '//');
@@ -181,13 +182,11 @@ class CategoryModel extends Gdn_Model {
         if (!empty($category['LastUrl'])) {
             $category['LastUrl'] = url($category['LastUrl'], '//');
         }
-        $session = Gdn::session();
-        $permissionID = $category['PermissionCategoryID'];
 
-        $category['PermsDiscussionsView'] = $session->checkPermission('Vanilla.Discussions.View', true, 'Category', $permissionID);
-        $category['PermsDiscussionsAdd'] = $session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $permissionID);
-        $category['PermsDiscussionsEdit'] = $session->checkPermission('Vanilla.Discussions.Edit', true, 'Category', $permissionID);
-        $category['PermsCommentsAdd'] = $session->checkPermission('Vanilla.Comments.Add', true, 'Category', $permissionID);
+        $category['PermsDiscussionsView'] = self::checkPermission($category, 'Vanilla.Discussions.View');
+        $category['PermsDiscussionsAdd'] = self::checkPermission($category, 'Vanilla.Discussions.Add');
+        $category['PermsDiscussionsEdit'] = self::checkPermission($category, 'Vanilla.Discussions.Edit');
+        $category['PermsCommentsAdd'] = self::checkPermission($category, 'Vanilla.Comments.Add');
 
         $Code = $category['UrlCode'];
         $category['Name'] = translateContent("Categories.".$Code.".Name", $category['Name']);
@@ -635,13 +634,21 @@ class CategoryModel extends Gdn_Model {
     /**
      * Check a category's permission.
      *
-     * @param array $category The category to check.
-     * @param string $permission The permission name to check.
+     * @param int|array|object $category The category to check.
+     * @param string|array $permission The permission(s) to check.
+     * @param bool $fullMatch Whether or not the permission has to be a full match.
      * @return bool Returns **true** if the current user has the permission or **false** otherwise.
      */
-    public static function checkPermission($category, $permission) {
-        $permissionCategoryID = val('PermissionCategoryID', $category);
-        $result = Gdn::session()->checkPermission($permission, true, 'Category', $permissionCategoryID);
+    public static function checkPermission($category, $permission, $fullMatch = true) {
+        if (is_numeric($category)) {
+            $category = static::categories($category);
+        }
+        
+        $permissionCategoryID = val('PermissionCategoryID', $category, -1);
+
+        $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
+            || Gdn::session()->checkPermission($permission, $fullMatch, 'Category', val('CategoryID', $category));
+
         return $result;
     }
 
@@ -684,6 +691,81 @@ class CategoryModel extends Gdn_Model {
         $tree = $this->collection->getTree((int)val('CategoryID', $category), $options);
         self::filterChildren($tree);
         return $tree;
+    }
+
+    /**
+     * Returns an icon name, given a display as value.
+     *
+     * @param string $displayAs The display as value.
+     * @return string The corresponding icon name.
+     */
+    private static function displayAsIconName($displayAs) {
+        switch (strtolower($displayAs)) {
+            case 'heading':
+                return 'heading';
+            case 'categories':
+                return 'nested';
+            case 'flat':
+                return 'flat';
+            case 'discussions':
+            default:
+                return 'discussions';
+        }
+    }
+
+    /**
+     * Puts together a dropdown for a category's settings.
+     *
+     * @param object|array $category The category to get the settings dropdown for.
+     * @return DropdownModule The dropdown module for the settings.
+     */
+    public static function getCategoryDropdown($category) {
+
+        $triggerIcon = dashboardSymbol(self::displayAsIconName($category['DisplayAs']));
+
+        $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
+        $cdd->setTrigger($triggerIcon, 'button', 'btn', 'caret-down', '', ['data-id' => val('CategoryID', $category)]);
+        $cdd->setView('dropdown-twbs');
+        $cdd->setForceDivider(true);
+
+        $cdd->addGroup('', 'edit')
+            ->addLink(t('View'), $category['Url'], 'edit.view')
+            ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit')
+            ->addGroup(t('Display as'), 'displayas');
+
+        foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
+            $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
+            $icon = dashboardSymbol(self::displayAsIconName($displayAs));
+
+            $cdd->addLink(
+                t($label),
+                '#',
+                'displayas.'.strtolower($displayAs),
+                'js-displayas '.$cssClass,
+                [],
+                ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]],
+                false
+            );
+        }
+
+        $cdd->addGroup('', 'actions')
+            ->addLink(
+                t('Add Subcategory'),
+                "/vanilla/settings/addcategory?parent={$category['CategoryID']}",
+                'actions.add'
+            );
+
+        if (val('CanDelete', $category, true)) {
+            $cdd->addGroup('', 'delete')
+                ->addLink(
+                    t('Delete'),
+                    "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
+                    'delete.delete',
+                    'js-modal'
+                );
+        }
+
+        return $cdd;
     }
 
     /**

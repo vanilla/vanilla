@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -68,6 +68,18 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     public function setAddon(Addon $addon) {
         $this->addon = $addon;
         return $this;
+    }
+
+    /**
+     * Set the addon associated with the plugin from the given {@link \Vanilla\AddonManager}.
+     *
+     * @param \Vanilla\AddonManager $addonManager The addon manager to search.
+     */
+    public function setAddonFromManager(\Vanilla\AddonManager $addonManager) {
+        $addon = $addonManager->lookupByClassname(get_called_class());
+        if ($addon instanceof Addon) {
+            $this->setAddon($addon);
+        }
     }
 
     /**

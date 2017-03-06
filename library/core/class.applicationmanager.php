@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <mark@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -301,7 +301,7 @@ class Gdn_ApplicationManager {
 
         // 2. Check to make sure that no other enabled applications rely on this one.
         try {
-            $this->addonManager->checkDependants($addon, true);
+            $this->addonManager->checkDependents($addon, true);
         } catch (Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }

@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -269,12 +269,12 @@ class Addon {
             $array = $PluginInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_PLUGIN;
-            $this->special['oldType'] = 'plugin';
+            $oldType = 'plugin';
         } elseif (!empty($ApplicationInfo) && is_array($ApplicationInfo)) {
             $array = $ApplicationInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_APPLICATION;
-            $this->special['oldType'] = 'application';
+            $oldType = 'application';
         } elseif (!empty($ThemeInfo) && is_array($ThemeInfo)) {
             $array = $ThemeInfo;
             $type = static::TYPE_THEME;
@@ -301,6 +301,10 @@ class Addon {
         $info['type'] = $type;
         if (empty($info['priority'])) {
             $info['priority'] = $priority;
+        }
+
+        if (isset($oldType)) {
+            $info['oldType'] = $oldType;
         }
 
         // Convert the author.
@@ -624,6 +628,10 @@ class Addon {
      */
     public function check($trigger = false) {
         $issues = [];
+        if (!isset($this->info['Issues'])) {
+            $this->info['Issues'] = &$issues;
+        }
+
 
         $rawKey = $this->getKey();
         $subdir = basename($this->getSubdir());
@@ -678,7 +686,21 @@ class Addon {
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
         }
 
-        if ($trigger && $count = count($issues)) {
+        if ($trigger) {
+            $this->triggerIssues();
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Trigger the plugin's issues
+     *
+     * @return Addon Returns $this for fluent calls.
+     */
+    protected function triggerIssues() {
+        $issues = val('Issues', $this->info, []);
+        if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
             trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
@@ -687,7 +709,7 @@ class Addon {
             }
         }
 
-        return $issues;
+        return $this;
     }
 
     /**
@@ -714,7 +736,8 @@ class Addon {
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
             ->setTranslationPaths($array['translations'])
-            ->setSpecialArray(empty($array['special']) ? [] : $array['special']);
+            ->setSpecialArray(empty($array['special']) ? [] : $array['special'])
+            ->triggerIssues();
 
         return $addon;
     }
@@ -920,7 +943,7 @@ class Addon {
         return function (Addon $addon) use ($where) {
             foreach ($where as $key => $value) {
                 if ($key === 'oldType') {
-                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
+                    $valid = isset($addon->info['oldType']) && $addon->info['oldType'] === $value;
                 } elseif ($value === null) {
                     $valid = !isset($addon->info[$key]);
                 } else {

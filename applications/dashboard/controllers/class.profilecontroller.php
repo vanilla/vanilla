@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -84,7 +84,6 @@ class ProfileController extends Gdn_Controller {
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('cropimage.css');
         $this->addModule('GuestModule');
         parent::initialize();
 
@@ -254,6 +253,10 @@ class ProfileController extends Gdn_Controller {
         $Column = 'Count'.ucfirst($Column);
         if (!$UserID) {
             $UserID = Gdn::session()->UserID;
+        }
+
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
         }
 
         $Count = $this->UserModel->profileCount($UserID, $Column);
@@ -491,6 +494,9 @@ class ProfileController extends Gdn_Controller {
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             safeRedirect(userUrl($this->User, '', 'discussions'));
         }
+
+        // Garden.Profile.ShowActivities is false and the user is expecting an xml or json response, so render blank.
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -535,6 +541,10 @@ class ProfileController extends Gdn_Controller {
      * - 1: Unset the force cookie and use the user agent to determine the theme.
      */
     public function noMobile($type = 'desktop') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
         $type = strtolower($type);
 
         if ($type == '1') {
@@ -558,7 +568,8 @@ class ProfileController extends Gdn_Controller {
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
 
-        redirect("/", 302);
+        $this->RedirectUrl = url('/');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**

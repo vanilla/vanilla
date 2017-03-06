@@ -3,7 +3,7 @@
  * Gdn_Model.
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -411,7 +411,8 @@ class Gdn_Model extends Gdn_Pluggable {
             deprecated('The $limit parameter is deprecated in Gdn_Model->delete(). Use the limit option.');
             $limit = $options;
         } else {
-            $limit = val('limit', $options);
+            $options += ['rest' => true, 'limit' => null];
+            $limit = $options['limit'];
         }
 
         if ($ResetData) {

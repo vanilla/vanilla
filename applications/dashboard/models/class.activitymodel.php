@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -1336,7 +1336,7 @@ class ActivityModel extends Gdn_Model {
 
         $this->EventArguments['Preference'] = $Preference;
         $this->EventArguments['Options'] = $Options;
-        $this->EventArguments['Data'] = $Data;
+        $this->EventArguments['Data'] = &$Data;
         $this->fireEvent('BeforeCheckPreference');
         if (!empty($Preference)) {
             list($Popup, $Email) = self::notificationPreference($Preference, $Data['NotifyUserID'], 'both');

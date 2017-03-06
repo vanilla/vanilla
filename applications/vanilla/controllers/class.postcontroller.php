@@ -2,7 +2,7 @@
 /**
  * Post controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -148,7 +148,7 @@ class PostController extends VanillaController {
 
             // Make sure only moderators can edit closed things
             if ($this->Discussion->Closed) {
-                $this->permission('Vanilla.Discussions.Edit', true, 'Category', $this->Category->PermissionCategoryID);
+                $this->categoryPermission($this->Category, 'Vanilla.Discussions.Edit');
             }
 
             $this->Form->setFormValue('DiscussionID', $this->Discussion->DiscussionID);
@@ -163,7 +163,7 @@ class PostController extends VanillaController {
         } else {
             // Permission to add.
             if ($this->Category) {
-                $this->permission('Vanilla.Discussions.Add', true, 'Category', $this->Category->PermissionCategoryID);
+                $this->categoryPermission($this->Category, 'Vanilla.Discussions.Add');
             } else {
                 $this->permission('Vanilla.Discussions.Add');
             }
@@ -172,17 +172,22 @@ class PostController extends VanillaController {
 
         touchValue('Type', $this->Data, 'Discussion');
 
-        // See if we should hide the category dropdown.
-        if ($this->ShowCategorySelector) {
+        if (!$UseCategories || $this->ShowCategorySelector) {
+            // See if we should fill the CategoryID value.
             $AllowedCategories = CategoryModel::getByPermission(
                 'Discussions.Add',
                 $this->Form->getValue('CategoryID', $this->CategoryID),
                 ['Archived' => 0, 'AllowDiscussions' => 1],
                 ['AllowedDiscussionTypes' => $this->Data['Type']]
             );
-            if (count($AllowedCategories) == 1) {
-                $AllowedCategory = array_pop($AllowedCategories);
+            $AllowedCategoriesCount = count($AllowedCategories);
+
+            if ($this->ShowCategorySelector && $AllowedCategoriesCount === 1) {
                 $this->ShowCategorySelector = false;
+            }
+
+            if (!$this->ShowCategorySelector && $AllowedCategoriesCount) {
+                $AllowedCategory = array_pop($AllowedCategories);
                 $this->Form->addHidden('CategoryID', $AllowedCategory['CategoryID']);
 
                 if ($this->Form->isPostBack() && !$this->Form->getFormValue('CategoryID')) {
@@ -224,19 +229,20 @@ class PostController extends VanillaController {
 
                 if (is_object($this->Category)) {
                     // Check category permissions.
-                    if ($this->Form->getFormValue('Announce', '') && !$Session->checkPermission('Vanilla.Discussions.Announce', true, 'Category', $this->Category->PermissionCategoryID)) {
+                    if ($this->Form->getFormValue('Announce') && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Announce')) {
+
                         $this->Form->addError('You do not have permission to announce in this category', 'Announce');
                     }
 
-                    if ($this->Form->getFormValue('Close', '') && !$Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $this->Category->PermissionCategoryID)) {
+                    if ($this->Form->getFormValue('Close') && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Close')) {
                         $this->Form->addError('You do not have permission to close in this category', 'Close');
                     }
 
-                    if ($this->Form->getFormValue('Sink', '') && !$Session->checkPermission('Vanilla.Discussions.Sink', true, 'Category', $this->Category->PermissionCategoryID)) {
+                    if ($this->Form->getFormValue('Sink') && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Sink')) {
                         $this->Form->addError('You do not have permission to sink in this category', 'Sink');
                     }
 
-                    if (!isset($this->Discussion) && (!$Session->checkPermission('Vanilla.Discussions.Add', true, 'Category', $this->Category->PermissionCategoryID) || !$this->Category->AllowDiscussions)) {
+                    if (!isset($this->Discussion) && !CategoryModel::checkPermission($this->Category, 'Vanilla.Discussions.Add')) {
                         $this->Form->addError('You do not have permission to start discussions in this category', 'CategoryID');
                     }
                 }
@@ -583,8 +589,6 @@ class PostController extends VanillaController {
             }
         }
 
-        $PermissionCategoryID = val('PermissionCategoryID', $Discussion);
-
         // Setup head
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('autosave.js');
@@ -602,7 +606,7 @@ class PostController extends VanillaController {
         $this->EventArguments['Editing'] = $Editing;
 
         // If closed, cancel & go to discussion
-        if ($Discussion && $Discussion->Closed == 1 && !$Editing && !$Session->checkPermission('Vanilla.Discussions.Close', true, 'Category', $PermissionCategoryID)) {
+        if ($Discussion && $Discussion->Closed == 1 && !$Editing && !CategoryModel::checkPermission($Discussion->CategoryID, 'Vanilla.Discussions.Close')) {
             redirect(DiscussionUrl($Discussion));
         }
 
@@ -615,25 +619,25 @@ class PostController extends VanillaController {
         if ($Discussion && $Editing) {
             // Permission to edit
             if ($this->Comment->InsertUserID != $Session->UserID) {
-                $this->permission('Vanilla.Comments.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             // Make sure that content can (still) be edited.
             $EditContentTimeout = c('Garden.EditContentTimeout', -1);
             $CanEdit = $EditContentTimeout == -1 || strtotime($this->Comment->DateInserted) + $EditContentTimeout > time();
             if (!$CanEdit) {
-                $this->permission('Vanilla.Comments.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             // Make sure only moderators can edit closed things
             if ($Discussion->Closed) {
-                $this->permission('Vanilla.Comments.Edit', true, 'Category', $Discussion->PermissionCategoryID);
+                $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Edit');
             }
 
             $this->Form->setFormValue('CommentID', $CommentID);
         } elseif ($Discussion) {
             // Permission to add
-            $this->permission('Vanilla.Comments.Add', true, 'Category', $Discussion->PermissionCategoryID);
+            $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Add');
         }
 
         if ($this->Form->authenticatedPostBack()) {

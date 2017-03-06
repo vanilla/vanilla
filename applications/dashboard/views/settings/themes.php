@@ -21,17 +21,17 @@ helpAsset(t('Need More Help?'), $links);
     <a class="header-menu-item active" role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/themes'); ?>"><?php echo t('Desktop Themes'); ?></a>
     <a class="header-menu-item" href="<?php echo url('/dashboard/settings/mobilethemes'); ?>"><?php echo t('Mobile Themes'); ?></a>
 </div>
-<?php
-if ($currentTheme = $this->Data('CurrentTheme')) {
-    echo $currentTheme;
-}
-?>
 <?php echo $this->Form->errors(); ?>
     <div class="Messages Errors TestAddonErrors Hidden">
         <ul>
             <li><?php echo t('The addon could not be enabled because it generated a fatal error: <pre>%s</pre>'); ?></li>
         </ul>
     </div>
+<?php
+if ($currentTheme = $this->Data('CurrentTheme')) {
+    echo $currentTheme;
+}
+?>
 <?php if (count($this->data('AvailableThemes', array())) > 1) { ?>
     <div class="BrowseThemes js-themes">
         <ul class="label-selector">

@@ -2,7 +2,7 @@
 /**
  * Settings controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -27,9 +27,6 @@ class VanillaSettingsController extends Gdn_Controller {
 
     /** @var array An array of category records. */
     public $OtherCategories;
-
-    /** @var bool */
-    public $ShowCustomPoints = false;
 
     /**
      * Advanced settings.
@@ -749,6 +746,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }
 
+        $this->addJsFile('categoryfilter.js', 'vanilla');
+        
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);

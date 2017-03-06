@@ -3,7 +3,7 @@
  * ProfileExtender Plugin.
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package ProfileExtender
  */
@@ -541,7 +541,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             ->select('u.InviteUserID')
             ->select('u2.Name', '', 'InvitedByName')
             ->from('User u')
-            ->leftJoin('User u2', 'u.InviteUserID = u2.InviteUserID and u.InviteUserID is not null')
+            ->leftJoin('User u2', 'u.InviteUserID = u2.UserID and u.InviteUserID is not null')
             ->where('u.Deleted', 0)
             ->where('u.Admin <', 2);
 

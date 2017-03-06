@@ -67,19 +67,14 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
     <li class="form-group">
         <?php echo $form->toggle('HideAllDiscussions', 'Hide from the recent discussions page.'); ?>
     </li>
-    <?php if ($this->ShowCustomPoints): ?>
-        <li class="form-group">
-            <?php echo $form->toggle('CustomPoints', 'Track points for this category separately.'); ?>
-        </li>
-    <?php endif; ?>
     <?php if ($this->data('Operation') == 'Edit'): ?>
         <li class="form-group">
             <?php
             echo $form->toggle('Archived', 'This category is archived.');
             ?>
         </li>
-        <?php $this->fireEvent('AfterCategorySettings'); ?>
     <?php endif; ?>
+    <?php $this->fireEvent('AfterCategorySettings'); ?>
     <?php if (count($this->PermissionData) > 0) { ?>
         <li id="Permissions" class="form-group">
             <?php echo $form->toggle('CustomPermissions', 'This category has custom permissions.'); ?>

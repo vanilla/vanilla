@@ -4,7 +4,7 @@
  *
  * @author Lincoln Russell <lincoln@vanillaforums.com>
  * @author Oliver Chung <shoat@cs.washington.edu>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package AllViewed
  */
@@ -80,20 +80,18 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @access public
      *
      * @param MeModule $sender
+     * @param array $args
      */
-    public function meModule_flyoutMenu_handler($sender) {
-        // Add "Mark All Viewed" to menu
-        if (Gdn::session()->isValid()) {
-            echo wrap(anchor(sprite('SpMarkAllViewed').' '.t('Mark All Viewed'), '/discussions/markallviewed', 'Hijack'), 'li', ['class' => 'MarkAllViewed']);
-
-            $CategoryID = (int)(empty(Gdn::controller()->CategoryID) ? 0 : Gdn::controller()->CategoryID);
-            if ($CategoryID > 0) {
-                echo wrap(
-                    anchor(sprite('SpMarkCategoryViewed').' '.t('Mark Category Viewed'), "/discussions/markcategoryviewed/{$CategoryID}", 'Hijack'),
-                    'li',
-                    ['class' => 'MarkCategoryViewed']
-                );
-            }
+    public function meModule_flyoutMenu_handler($sender, $args) {
+        if (val('Dropdown', $args, false) && Gdn::session()->isValid()) {
+            /** @var DropdownModule $dropdown */
+            $dropdown = $args['Dropdown'];
+            $dropdown->addGroup('', 'discussions', '', ['after' => 'profile']); // Add links after profile menu items
+            $allModifiers['listItemCssClasses'] = ['MarkAllViewed', 'link-mark-all-viewed'];
+            $dropdown->addLink(t('Mark All Viewed'), '/discussions/markallviewed', 'discussions.markallviewed', 'Hijack', [], $allModifiers);
+            $categoryID = (int)(empty(Gdn::controller()->CategoryID) ? 0 : Gdn::controller()->CategoryID);
+            $categoryModifiers['listItemCssClasses'] = ['MarkCategoryViewed', 'link-mark-category-viewed'];
+            $dropdown->addLinkIf($categoryID > 0, t('Mark Category Viewed'), "/discussions/markcategoryviewed/{$categoryID}", 'discussions.markcategoryviewed', 'Hijack', [], $categoryModifiers);
         }
     }
 

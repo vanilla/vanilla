@@ -2,10 +2,12 @@
 /**
  * HtmLawed Plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package HtmLawed
  */
+
+use Garden\Container\Container;
 
 $PluginInfo['HtmLawed'] = [
     'Description' => 'Adapts HtmLawed to work with Vanilla.',
@@ -15,8 +17,6 @@ $PluginInfo['HtmLawed'] = [
     'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
     'Hidden' => true
 ];
-
-Gdn::factoryInstall('HtmlFormatter', 'HtmLawedPlugin', __FILE__, Gdn::FactorySingleton);
 
 /**
  * Class HTMLawedPlugin
@@ -142,7 +142,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * @return string Returns the filtered HTML.
      */
     public function format($html) {
-        $attributes = c('Garden.Html.BlockedAttributes', 'on*');
+        $attributes = c('Garden.Html.BlockedAttributes', 'on*, target');
 
         $config = [
             'anti_link_spam' => ['`.`', ''],
@@ -214,6 +214,17 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * No setup.
      */
     public function setup() {
+    }
+
+    /**
+     * Install the formatter to the container.
+     *
+     * @param Container $dic The container to initialize.
+     */
+    public function container_init_handler(Container $dic) {
+        $dic->rule('HtmlFormatter')
+            ->setClass(__CLASS__)
+            ->setShared(true);
     }
 }
 

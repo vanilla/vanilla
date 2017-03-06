@@ -1,0 +1,56 @@
+.bigcrumbs {
+  border-bottom: solid 1px $border-color;
+  fill: $body-color;
+  padding-left: 6px;
+
+  .crumb {
+    display: inline-block;
+    line-height: 24px;
+    padding: 6px (12px + 12px) 6px 12px;
+    position: relative;
+    fill: $body-color;
+    color: $body-color;
+
+    &:hover {
+      fill: $link-color;
+      color: $link-color;
+    }
+
+    &:before,
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: -1px;
+      bottom: -1px;
+      right: -12px;
+      width: 0;
+      border: solid 12px transparent;
+      border-top-width: 19px;
+      border-bottom-width: 19px;
+      border-left-color: $border-color;
+    }
+
+    &:after {
+      content: '';
+      border-left-color: #fff;
+      right: -11px;
+    }
+    &:before {
+      content: '';
+    }
+
+    &:last-child {
+
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+
+  .icon-root {
+    padding: 0 8px;
+    margin-bottom: 4px;
+  }
+}

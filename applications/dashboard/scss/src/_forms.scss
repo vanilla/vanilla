@@ -11,14 +11,6 @@ form {
   }
 }
 
-.row-padding-left {
-  padding-left: $padding-row;
-}
-
-.row-padding-right {
-  padding-right: $padding-row;
-}
-
 // Form Layout
 //
 // Here's how to build a basic form group. The three important classes are the `form-group` class on the wrapper
@@ -119,8 +111,8 @@ form {
   border-bottom: $border-width dotted #e7e8e9;
 
   > .no-grid {
-    @extend .row-padding-left;
-    @extend .row-padding-right;
+    padding-left: $padding-row;
+    padding-right: $padding-row;
   }
 
   > .input-wrap {
@@ -145,8 +137,8 @@ form {
   }
 
   .input-wrap-right {
-    @extend .row-padding-left;
-    @extend .row-padding-right;
+    padding-left: $padding-row;
+    padding-right: $padding-row;
   }
 
   @include media-breakpoint-down(xs) {

@@ -1,0 +1,57 @@
+// Plank items
+//
+// Styleguide 17
+
+// Plank item
+//
+// Markup:
+// <div class="plank-item">
+//   <div class="plank-icon">
+//   </div>
+//   <div class="plank-title">
+//     Plank title
+//   </div>
+//   <div class="plank-options">
+//   </div>
+// </div>
+//
+// Styleguide 17.1
+
+.plank-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: to-rem(6);
+  min-height: $control-height-rem;
+  background-color: $grey-lightest;
+  border: $border-width solid $border-color;
+  border-radius: 2px;
+
+  svg {
+    height: to-rem(16);
+  }
+}
+
+.plank-title {
+  padding: 0 $spacer / 2;
+}
+
+.plank-options {
+  color: $grey;
+  margin-left: auto;
+  margin-top: -$border-width;
+  margin-bottom: -$border-width;
+
+  .dropdown-toggle {
+    padding: to-rem(6) to-rem(10);
+    line-height: to-rem(22);
+  }
+}
+
+.plank-icon {
+  color: $grey;
+
+  &:hover {
+    fill: transparentize($body-color, .4);
+  }
+}
+

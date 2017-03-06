@@ -9,14 +9,12 @@
  * @param bool $allowSorting
  */
 function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
-
-    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
+    echo "<ol class=\"js-nestable-list nestable-list\">\n";
 
     foreach ($categories as $category) {
         writeCategoryItem($category, $indent + 1, $allowSorting);
     }
-    echo "$i</ol>\n";
+    echo "</ol>\n";
 }
 
 /**
@@ -62,13 +60,18 @@ function categoryFilterBox(array $options = []) {
  * @param bool $allowSorting
  */
 function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
-
-    echo "$i<li class=\"dd-item tree-item\" data-id=\"{$category['CategoryID']}\">\n$i";
+    echo "<li class=\"js-nestable-item nestable-item\" data-id=\"{$category['CategoryID']}\">\n";
     if ($allowSorting) {
-        echo "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>";
+        echo '<div class="js-nestable-handle nestable-handle">';
+        echo '</div>';
     }
-    echo "<div class=\"dd-content tree-content\">";
+    echo '<div class="nestable-content plank-item">';
+    if ($allowSorting) {
+        echo '<div class="btn btn-icon plank-icon">';
+        echo symbol('handle', t('Drag'));
+        echo '</div>';
+    }
+    echo '<div class="plank-title">';
 
     if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
         echo anchor(
@@ -78,12 +81,12 @@ function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
     } else {
         echo htmlspecialchars($category['Name']);
     }
+    echo "</div>\n";
 
-    echo "\n$i  <div class=\"options\">";
+    echo "\n$i  <div class=\"plank-options\">";
     writeCategoryOptions($category);
     echo "</div>";
-
-    echo "</div>\n";
+    echo '</div>';
 
     if (!empty($category['Children'])) {
         writeCategoryTree($category['Children'], $indent + 1);

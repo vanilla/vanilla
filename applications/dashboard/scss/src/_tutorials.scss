@@ -1,5 +1,5 @@
 .video-section-heading {
-  @extend .full-border;
+  @include full-border;
   padding: $spacer 0;
   font-weight: 500;
 }

@@ -70,7 +70,7 @@ function writeCategoryItem($category, $allowSorting = true) {
         $categoryName = anchor($categoryName, $url);
     }
     ?>
-    <li class="js-nestable-item nestable-item" data-id="<?php echo $categoryID; ?>'">
+    <li class="js-nestable-item js-category-item nestable-item" data-id="<?php echo $categoryID; ?>">
         <?php echo $handle; ?>
         <div class="nestable-content plank">
             <?php echo $icon; ?>

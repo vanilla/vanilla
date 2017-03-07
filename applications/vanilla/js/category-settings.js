@@ -59,16 +59,15 @@
             e.preventDefault();
 
             var displayAs = $(this).data('displayas');
-            var $content = $(this).closest('.dd-content');
-            var $item = $(this).closest('.dd-item');
+            var $item = $(this).closest('.js-category-item');
             var categoryID = $item.data('id');
 
-            var setUI = function ($content, displayAs) {
+            var setUI = function ($item, displayAs) {
                 displayAs = displayAs.toLowerCase();
 
                 // Deselect the wrong menu items and select the right one.
-                $('.js-displayas', $content).removeClass('selected');
-                $('.js-displayas[data-displayas=' + displayAs + ']', $content).addClass('selected');
+                $('.js-displayas', $item).removeClass('selected');
+                $('.js-displayas[data-displayas=' + displayAs + ']', $item).addClass('selected');
 
                 // Change the options SVG.
                 var svgMap = {categories: "nested"};
@@ -97,7 +96,7 @@
                     gdn.informError(xhr);
                 },
                 success: function (data) {
-                    setUI($content, data.DisplayAs);
+                    setUI($item, data.DisplayAs);
                 }
             });
         })

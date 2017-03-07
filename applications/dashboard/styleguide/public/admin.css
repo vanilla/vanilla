@@ -9838,28 +9838,64 @@ pre {
   margin-top: -0.125rem;
 }
 
+.badge.badge-outline {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.3275);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.25);
+}
+
 .badge-primary {
   background-color: #0291db;
+}
+
+.badge-primary.badge-outline {
+  color: #0291db;
+  border-color: #0291db;
 }
 
 .badge-secondary {
   background-color: #f5296d;
 }
 
+.badge-secondary.badge-outline {
+  color: #f5296d;
+  border-color: #f5296d;
+}
+
 .badge-success {
   background-color: #6bc573;
+}
+
+.badge-success.badge-outline {
+  color: #6bc573;
+  border-color: #6bc573;
 }
 
 .badge-info {
   background-color: #a1b8c6;
 }
 
+.badge-info.badge-outline {
+  color: #a1b8c6;
+  border-color: #a1b8c6;
+}
+
 .badge-warning {
   background-color: #faae42;
 }
 
+.badge-warning.badge-outline {
+  color: #faae42;
+  border-color: #faae42;
+}
+
 .badge-danger {
   background-color: #fa2e1f;
+}
+
+.badge-danger.badge-outline {
+  color: #fa2e1f;
+  border-color: #fa2e1f;
 }
 
 .text-primary {

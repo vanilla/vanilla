@@ -10,13 +10,15 @@
 // Markup:
 // <div class="plank">
 //   <div class="plank-icon">
-//     <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
-//       <use xlink:href="#handle" />
-//     </svg>
+//     <button class="btn btn-icon">
+//       <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//         <use xlink:href="#handle" />
+//       </svg>
+//     </button>
 //   </div>
 //   <div class="plank-title">
 //     One Plank
-//     <span class="badge">42</span>
+//     <span class="badge badge-outline">42</span>
 //   </div>
 //   <div class="plank-options">
 //     <!- dropdown start ->
@@ -37,13 +39,15 @@
 // </div>
 // <div class="plank">
 //   <div class="plank-icon">
-//     <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
-//       <use xlink:href="#handle" />
-//     </svg>
+//     <button class="btn btn-icon">
+//       <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//         <use xlink:href="#handle" />
+//       </svg>
+//     </button>
 //   </div>
 //   <div class="plank-title">
 //     Two Plank
-//     <span class="badge">42</span>
+//     <span class="badge badge-outline">42</span>
 //   </div>
 //   <div class="plank-options">
 //     <!- dropdown start ->
@@ -76,6 +80,10 @@
 
   svg {
     height: to-rem(16);
+  }
+
+  .badge {
+
   }
 }
 
@@ -111,22 +119,14 @@
 // <div class="plank-container-grid">
 //   <div class="plank-wrapper">
 //     <div class="plank">
-//       <div class="plank-icon">
-//         <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
-//           <use xlink:href="#handle" />
-//         </svg>
-//       </div>
 //       <div class="plank-title">
 //         One Plank
-//         <span class="badge">42</span>
+//         <span class="badge badge-outline">42</span>
 //       </div>
 //       <div class="plank-options">
 //         <!- dropdown start ->
 //         <div class="dropdown">
 //           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
-//             <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
-//               <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
-//             </svg>
 //           </button>
 //           <div class="dropdown-menu dropdown-menu-right" role="menu">
 //             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
@@ -140,22 +140,14 @@
 //   </div>
 //   <div class="plank-wrapper">
 //     <div class="plank">
-//       <div class="plank-icon">
-//         <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
-//           <use xlink:href="#handle" />
-//         </svg>
-//       </div>
 //       <div class="plank-title">
 //         Two Plank
-//         <span class="badge">42</span>
+//         <span class="badge badge-outline">42</span>
 //       </div>
 //       <div class="plank-options">
 //         <!- dropdown start ->
 //         <div class="dropdown">
 //           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
-//             <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
-//               <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
-//             </svg>
 //           </button>
 //           <div class="dropdown-menu dropdown-menu-right" role="menu">
 //             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>

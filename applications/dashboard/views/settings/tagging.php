@@ -1,156 +1,107 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
 <?php
-$TagType = $this->data('_TagType');
-$TagTypes = $this->data('_TagTypes');
-$CanAddTags = $this->data('_CanAddTags');
+$tagType = $this->data('_TagType'); // The tag page we're on.
+$tagTypes = $this->data('_TagTypes');
+
 /** @var Gdn_Form $form */
 $form = $this->Form;
 
 $desc = t('Tags are keywords that users can assign to discussions to help categorize their question with similar questions.');
 helpAsset(sprintf(t('About %s'), t('Tagging')), $desc);
 
-if (strtolower($TagType) == 'all' || strtolower($TagType) == 'tags') {
+if (strtolower($tagType) == 'all' || strtolower($tagType) == 'tags') {
     // Only show add button if filter type supports adding new tags.
     echo heading(t($this->data('Title')), t('Add Tag'), '/settings/tags/add?type=Tag', 'js-modal btn btn-primary');
 } else {
     echo heading(t($this->data('Title')));
 }
 
-echo subheading(t('Settings'));
-echo $form->open(['method' => 'post', 'class' => 'full-border']);
-echo $form->errors(); ?>
-    <div class="form-group">
-        <div class="label-wrap-wide">
-            <?php echo $form->label(t('Enable Tagging'), 'Vanilla.Tagging.EnableUI'); ?>
-            <?php echo '<div class="info">'.t('Enable tagging on your forum.').'</div>' ?>
-        </div>
-        <div class="input-wrap-right">
-            <?php
-            $options = c('Vanilla.Tagging.EnableUI') ? ['checked'] : [];
-            echo $form->toggle('Vanilla.Tagging.EnableUI', '', $options); ?>
-        </div>
-    </div>
-<?php
-echo $form->close('Save');
-
-echo subheading(t('Tags'));
+$enabled = c('Vanilla.Tagging.EnableUI', true);
 ?>
-<div class="toolbar flex-wrap">
-    <div class="search-wrap input-wrap toolbar-main">
-        <?php
-        $info = sprintf(t('%s tag(s) found.'), $this->data('RecordCount'));
-        $placeholder = t('Search for a tag.', 'Search for all or part of a tag.');
-        $form->Method = 'get';
-        echo $form->searchForm('search', '/settings/tagging', ['placeholder' => $placeholder], $info);
-        ?>
+<div class="form-group">
+    <div class="label-wrap-wide">
+        <?php echo '<div class="label">'.t('Enable Tagging').'</div>'; ?>
+        <div class="info"><?php echo t('Tagging allows users to add a tag to discussions they start in order to make them more discoverable. '); ?></div>
     </div>
-    <div class="btn-group">
-        <?php foreach ($TagTypes as $TagTypeName => $TagMeta): ?>
+    <div class="input-wrap-right">
+        <span id="enable-tagging-toggle">
             <?php
-            $TagName = ($TagMeta['key'] == '' || strtolower($TagMeta['key']) == 'tags')
-                ? 'Tags'
-                : $TagTypeName;
-
-            $TagName = (!empty($TagMeta['plural']))
-                ? $TagMeta['plural']
-                : $TagName;
-
-            if ($TagMeta['key'] == '') {
-                $TagMeta['key'] = (!empty($TagMeta['plural']))
-                    ? $TagMeta['plural']
-                    : $TagMeta['key'];
+            if ($enabled) {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+            } else {
+                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
             }
-
-            $CurrentTab = '';
-            if (strtolower($TagType) == strtolower($TagMeta['key'])
-                || (!empty($TagMeta['plural']) && strtolower($TagType) == strtolower($TagMeta['plural']))
-            ) {
-                $CurrentTab = 'active';
-            }
-
-            $TabUrl = url('/settings/tagging/?type='.strtolower($TagMeta['key']));
             ?>
-            <a href="<?php echo $TabUrl; ?>" class="<?php echo $CurrentTab; ?> btn btn-secondary">
-                <?php echo ucwords(strtolower($TagName)); ?>
-            </a>
+        </span>
+    </div>
+</div>
+<div class="tagging-settings js-foggy" <?php echo $enabled ? 'data-is-foggy="false"' : 'data-is-foggy="true"'; ?>>
+    <?php
+    $tagTypesDropdown = new DropdownModule('', '', 'dropdown-filter');
+    $tagTypesDropdown->setView('dropdown-twbs');
+
+    foreach ($tagTypes as $tagTypeName => $tagMeta) {
+        $tagName = ($tagMeta['key'] == '' || strtolower($tagMeta['key']) == 'tags') ? 'Tags' : $tagTypeName;
+        $tagName = (!empty($tagMeta['plural'])) ? $tagMeta['plural'] : $tagName;
+
+        if ($tagMeta['key'] == '') {
+            $tagMeta['key'] = (!empty($tagMeta['plural'])) ? $tagMeta['plural'] : $tagMeta['key'];
+        }
+
+        if (strtolower($tagType) == strtolower($tagMeta['key'])
+            || (!empty($tagMeta['plural']) && strtolower($tagType) == strtolower($tagMeta['plural']))
+        ) {
+            $tagTypesDropdown->setTrigger($tagName, 'button', 'btn btn-secondary');
+        }
+
+        $url = '/settings/tagging/?type='.strtolower($tagMeta['key']);
+        $tagTypesDropdown->addLink($tagName, $url, $tagMeta['key']);
+    }
+
+    ?>
+    <div class="toolbar flex-wrap">
+        <div class="search-wrap input-wrap toolbar-main">
+            <?php
+            $info = sprintf(t('%s tag(s) found.'), $this->data('RecordCount'));
+            $placeholder = t('Search for a tag.', 'Search for all or part of a tag.');
+            $form->Method = 'get';
+            echo $form->searchForm('search', '/settings/tagging', ['placeholder' => $placeholder], $info);
+            ?>
+        </div>
+        <?php echo $tagTypesDropdown; ?>
+        <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
+    </div>
+
+    <?php $tags = $this->data('Tags'); ?>
+
+    <div class="plank-container plank-container-grid">
+        <?php foreach ($tags as $tag) :
+            $count = val('CountDiscussions', $tag, 0);
+            $displayName = tagFullName($tag);
+            $dropdown = '';
+
+            if ((val('Type', $tag, '') == '')) {
+                // add dropdown
+                $dropdown = new DropdownModule('dropdown', '', '', 'dropdown-menu-right');
+                $dropdown->setView('dropdown-twbs')
+                    ->addLink(t('Edit'), "/settings/tags/edit/{$tag['TagID']}", 'edit', 'js-modal')
+                    ->addDivider()
+                    ->addLink(t('Delete'), "/settings/tags/edit/{$tag['TagID']}", 'delete', 'js-modal-confirm');
+            }
+            ?>
+            <div class="plank-wrapper">
+                <div class="plank">
+                    <div class="plank-title">
+                        <?php echo anchor(htmlspecialchars($displayName), '/discussions/tagged/'.val('Name', $tag), 'reverse-link'); ?>
+                        <span class="badge badge-outline">
+                            <?php echo $count; ?>
+                        </span>
+                    </div>
+                    <div class="plank-options">
+                        <?php echo $dropdown; ?>
+                    </div>
+                </div>
+            </div>
         <?php endforeach; ?>
     </div>
-    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
-</div>
-<div class="table-wrap">
-    <table class="Tags table-data js-tj">
-        <thead>
-        <tr>
-            <th class="column-md"><?php echo t('Tag') ?></th>
-            <th><?php echo t('Created By') ?></th>
-            <th><?php echo t('Type') ?></th>
-            <th class="column-md"><?php echo t('Date Added'); ?></th>
-            <th class="column-xs"><?php echo t('Count'); ?></th>
-            <?php if ($CanAddTags) { ?>
-                <th class="column-sm"></th>
-            <?php } ?>
-        </tr>
-        </thead>
-        <?php
-        $Session = Gdn::session();
-        $TagCount = $this->data('RecordCount');
-        $Tags = $this->data('Tags'); ?>
-        <tbody>
-        <?php
-        foreach ($Tags as $Tag) {
-            $CssClass = 'TagAdmin';
-            $Title = '';
-            $Special = FALSE;
-            $type = val('Type', $Tag);
-            if (empty($type)) {
-                $type = t('Tag');
-            }
-            $userModel = new UserModel();
-            $createdBy = $userModel->getID(val('InsertUserID', $Tag));
-            $dateInserted = Gdn_Format::date(val('DateInserted', $Tag), '%e %b %Y');
-            $count = val('CountDiscussions', $Tag, 0);
-            $displayName = TagFullName($Tag);
-
-            if (val('Type', $Tag)) {
-                $Special = TRUE;
-                $CssClass .= " Tag-Special Tag-{$Tag['Type']}";
-                $Title = t('This is a special tag.');
-            }
-
-            ?>
-            <tr id="<?php echo "Tag_{$Tag['TagID']}"; ?>" class="<?php echo $CssClass; ?>"
-                title="<?php echo $Title; ?>">
-                <td class="tag-name">
-                    <?php echo anchor(htmlspecialchars($displayName), '/discussions/tagged/'.val('Name', $Tag)); ?>
-                </td>
-                <td class="created-by">
-                    <?php echo userAnchor($createdBy); ?>
-                </td>
-                <td class="type">
-                    <?php echo $type; ?>
-                </td>
-                <td class="date">
-                    <?php echo $dateInserted; ?>
-                </td>
-                <td class="count">
-                    <?php echo $count; ?>
-                </td>
-                <?php if ($CanAddTags) { ?>
-                    <td class="options">
-                        <div class="btn-group">
-                            <?php
-                            if (!$Special) {
-                                echo anchor(dashboardSymbol('edit'), "/settings/tags/edit/{$Tag['TagID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                                echo anchor(dashboardSymbol('delete'), "/settings/tags/delete/{$Tag['TagID']}", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-body' => sprintf(t('Are you sure you want to delete this %s?'), t('tag'))]);
-                            }
-                            ?>
-                        </div>
-                    </td>
-                <?php } ?>
-            </tr>
-            <?php
-        }
-        ?>
-        </tbody>
-    </table>
 </div>

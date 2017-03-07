@@ -664,9 +664,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $url The url to show the search results.
      * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
      * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @param array $wrapperAttributes The attributes to add to the search wrapper div.
      * @return string The rendered search field.
      */
-    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '', $wrapperAttributes = []) {
         $clear = '';
         $searchTermFound = false;
         $searchKeys = ['search', 'keywords'];
@@ -689,8 +690,12 @@ class Gdn_Form extends Gdn_Pluggable {
             $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
         }
 
+        $wrapperAttributes['class'] = val('class', $wrapperAttributes, '');
+        $wrapperAttributes['class'] .= ' search-wrap input-wrap';
+        $wrapperAttributesString = attribute($wrapperAttributes);
+
         return '
-            <div class="search-wrap input-wrap" role="search">
+            <div '.$wrapperAttributesString.' role="search">
                 <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
                 $this->textBox($field, $textBoxAttributes).
                 $this->button('Go', ['class' => 'search-submit']).

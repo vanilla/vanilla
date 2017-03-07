@@ -589,11 +589,10 @@ select + select {
     font-weight: 500;
 
     a {
-      @extend .reverse-link;
+      @include reverse-link();
 
       &:hover {
         text-decoration: none;
-        color: $brand-primary;
       }
     }
   }

@@ -1,26 +1,35 @@
+// Breadcrumbs
+//
+// The breadcrumbs appear on the categories settings page in the dashboard.
+//
+// Styleguide 18
+
+// Breadcrumbs
+//
+// Markup:
+// <div class="bigcrumbs">
+//   <a class="crumb" href="#">Home</a>
+//   <a class="crumb" href="#">Parent location</a>
+//   <a class="crumb" href="#">Current location</a>
+// </div>
+//
+// Styleguide 18.1
+
 .bigcrumbs {
-  border-bottom: solid 1px $border-color;
-  fill: $body-color;
-  padding-left: 6px;
+  @include full-border(block);
 
   .crumb {
-    display: inline-block;
-    line-height: 24px;
-    padding: 6px (12px + 12px) 6px 12px;
     position: relative;
-    fill: $body-color;
-    color: $body-color;
+    display: inline-block;
+    padding: 6px 24px 6px 12px;
+    line-height: 24px;
 
-    &:hover {
-      fill: $link-color;
-      color: $link-color;
-    }
+    @include reverse-link();
 
     &:before,
     &:after {
-      content: '';
-      display: block;
       position: absolute;
+      display: block;
       top: -1px;
       bottom: -1px;
       right: -12px;
@@ -29,28 +38,20 @@
       border-top-width: 19px;
       border-bottom-width: 19px;
       border-left-color: $border-color;
+      content: '';
     }
 
     &:after {
-      content: '';
-      border-left-color: #fff;
       right: -11px;
-    }
-    &:before {
+      border-left-color: #fff;
       content: '';
     }
 
     &:last-child {
-
       &:before,
       &:after {
         display: none;
       }
     }
-  }
-
-  .icon-root {
-    padding: 0 8px;
-    margin-bottom: 4px;
   }
 }

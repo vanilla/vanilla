@@ -129,7 +129,7 @@
         </div>';
 
         var categoryTemplate = ' \
-        <li class="plank-item" data-id="{CategoryID}"> \
+        <li class="plank" data-id="{CategoryID}"> \
             <div class="plank-title"> \
                 {NameHTML} \
             </div> \

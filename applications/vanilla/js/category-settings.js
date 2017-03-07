@@ -27,12 +27,12 @@
                 itemClass       : 'js-nestable-item', // selector
                 dragClass       : 'nestable-dragel', // applied to item being dragged
                 handleClass     : 'js-nestable-handle', // selector
-                collapsedClass  : 'js-nestable-collapsed', // applied to collapsed lists
+                collapsedClass  : 'nestable-collapsed', // applied to collapsed lists
                 placeClass      : 'nestable-placeholder', // applied to position we're moving item from
-                noDragClass     : 'js-nestable-nodrag', //
-                emptyClass      : 'nestable-empty', // applied to position we're moving item to
-                expandBtnHTML: '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
-                collapseBtnHTML: '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
+                noDragClass     : 'js-nestable-nodrag',
+                emptyClass      : 'nestable-empty', // applied to empty list elements
+                expandBtnHTML   : '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
+                collapseBtnHTML : '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
             })
             .on('dragEnd', function(event, item, source, destination, position) {
                 var tree = $(source).nestable('serialize');
@@ -62,7 +62,6 @@
             var $content = $(this).closest('.dd-content');
             var $item = $(this).closest('.dd-item');
             var categoryID = $item.data('id');
-            var currentDisplayAs = $('.js-displayas.selected', $item).data('displayas');
 
             var setUI = function ($content, displayAs) {
                 displayAs = displayAs.toLowerCase();

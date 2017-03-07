@@ -1,23 +1,71 @@
-// Plank items
+// Planks
+//
+// Planks are long, thin item representations. Usually they have a short title, perhaps an icon,
+// perhaps a badge and usually a dropdown. Find them in the category and tag settings pages in the dashboard.
 //
 // Styleguide 17
 
-// Plank item
+// Plank
 //
 // Markup:
-// <div class="plank-item">
+// <div class="plank">
 //   <div class="plank-icon">
+//     <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//       <use xlink:href="#handle" />
+//     </svg>
 //   </div>
 //   <div class="plank-title">
-//     Plank title
+//     One Plank
+//     <span class="badge">42</span>
 //   </div>
 //   <div class="plank-options">
+//     <!- dropdown start ->
+//     <div class="dropdown">
+//       <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
+//         <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
+//           <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
+//         </svg>
+//       </button>
+//       <div class="dropdown-menu dropdown-menu-right" role="menu">
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//         <div class="dropdown-divider"></div>
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//       </div>
+//     </div>
+//     <!- dropdown end ->
+//   </div>
+// </div>
+// <div class="plank">
+//   <div class="plank-icon">
+//     <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//       <use xlink:href="#handle" />
+//     </svg>
+//   </div>
+//   <div class="plank-title">
+//     Two Plank
+//     <span class="badge">42</span>
+//   </div>
+//   <div class="plank-options">
+//     <!- dropdown start ->
+//     <div class="dropdown">
+//       <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
+//         <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
+//           <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
+//         </svg>
+//       </button>
+//       <div class="dropdown-menu dropdown-menu-right" role="menu">
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//         <div class="dropdown-divider"></div>
+//         <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//       </div>
+//     </div>
+//     <!- dropdown end ->
 //   </div>
 // </div>
 //
 // Styleguide 17.1
 
-.plank-item {
+.plank {
   display: flex;
   align-items: center;
   margin-bottom: to-rem(6);
@@ -52,6 +100,85 @@
 
   &:hover {
     fill: transparentize($body-color, .4);
+  }
+}
+
+// Plank Grid
+//
+// To put planks into a grid, you need to wrap each plank item in a wrapper div.
+//
+// Markup:
+// <div class="plank-container-grid">
+//   <div class="plank-wrapper">
+//     <div class="plank">
+//       <div class="plank-icon">
+//         <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//           <use xlink:href="#handle" />
+//         </svg>
+//       </div>
+//       <div class="plank-title">
+//         One Plank
+//         <span class="badge">42</span>
+//       </div>
+//       <div class="plank-options">
+//         <!- dropdown start ->
+//         <div class="dropdown">
+//           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
+//             <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
+//               <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
+//             </svg>
+//           </button>
+//           <div class="dropdown-menu dropdown-menu-right" role="menu">
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//             <div class="dropdown-divider"></div>
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//           </div>
+//         </div>
+//         <!- dropdown end ->
+//       </div>
+//     </div>
+//   </div>
+//   <div class="plank-wrapper">
+//     <div class="plank">
+//       <div class="plank-icon">
+//         <svg class="icon icon-svg icon-svg-handle" viewBox="0 0 17 17">
+//           <use xlink:href="#handle" />
+//         </svg>
+//       </div>
+//       <div class="plank-title">
+//         Two Plank
+//         <span class="badge">42</span>
+//       </div>
+//       <div class="plank-options">
+//         <!- dropdown start ->
+//         <div class="dropdown">
+//           <button aria-expanded="false" aria-haspopup="true" class="dropdown-toggle btn" data-toggle="dropdown">
+//             <svg class="icon icon-svg-discussions" viewbox="0 0 17 17">
+//               <use xlink:href="#discussions" xmlns:xlink="http://www.w3.org/1999/xlink"></use>
+//             </svg>
+//           </button>
+//           <div class="dropdown-menu dropdown-menu-right" role="menu">
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Edit</a>
+//             <div class="dropdown-divider"></div>
+//             <a class="dropdown-item" href="#" role="menuitem" tabindex="-1">Delete</a>
+//           </div>
+//         </div>
+//         <!- dropdown end ->
+//       </div>
+//     </div>
+//   </div>
+// </div>
+//
+// Styleguide 17.2
+
+.plank-container-grid {
+  @extend .row;
+  padding: $spacer $spacer - to-rem(3);
+
+  .plank-wrapper {
+    @include grid-item-large();
+    padding-left: to-rem(3);
+    padding-right: to-rem(3);
   }
 }
 

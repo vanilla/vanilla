@@ -413,11 +413,7 @@ pre {
 // Styleguide 1.12.
 
 .reverse-link {
-  color: $grey-dark;
-
-  &:hover {
-    color: $brand-primary;
-  }
+  @include reverse-link();
 }
 
 // Font Helpers

@@ -14,5 +14,5 @@ writeCategoryBreadcrumbs($this->data('Ancestors', []));
 </div>
 <div class="js-category-filter-container padded-top"></div>
 <div class="js-nestable js-categories-list nestable padded-top" data-parent-id="<?php echo $this->data('ParentID', -1); ?>"><?php
-    writeCategoryTree($this->data('Categories', []), 0, $this->data('AllowSorting', true));
+    writeCategoryTree($this->data('Categories', []), $this->data('AllowSorting', true));
 ?></div>

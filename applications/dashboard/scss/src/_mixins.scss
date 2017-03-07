@@ -37,6 +37,14 @@
   border-left: $caret-width solid transparent;
 }
 
+@mixin reverse-link {
+  color: $grey-dark;
+
+  &:hover {
+    color: $brand-primary;
+  }
+}
+
 @mixin button-variant(
   $color,
   $background,

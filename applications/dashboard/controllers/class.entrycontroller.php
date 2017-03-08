@@ -72,6 +72,21 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
+     * Obscures the sign in error for private communities. Gives a fuzzy error rather than disclosing whether
+     * a username or email exists or not. If private communities is not enabled, adds the passed translation
+     * code to the form property.
+     *
+     * @param String $translationCode The error message translation code.
+     */
+    public function addCredentialErrorToForm($translationCode) {
+        if (c('Garden.PrivateCommunity', false)) {
+            $this->Form->addError('Bad login, double-check your credentials and try again.');
+        } else {
+            $this->Form->addError($translationCode);
+        }
+    }
+
+    /**
      * Authenticate the user attempting to sign in.
      *
      * Events: BeforeAuth
@@ -136,7 +151,7 @@ class EntryController extends Gdn_Controller {
                 $this->addJsFile('entry.js');
                 $Reaction = $Authenticator->loginResponse();
                 if ($this->Form->isPostBack()) {
-                    $this->Form->addError('ErrorCredentials');
+                    $this->addCredentialErrorToForm('ErrorCredentials');
                     Logger::event(
                         'signin_failure',
                         Logger::WARNING,
@@ -175,7 +190,7 @@ class EntryController extends Gdn_Controller {
                                 break;
 
                             case Gdn_Authenticator::AUTH_DENIED:
-                                $this->Form->addError('ErrorCredentials');
+                                $this->addCredentialErrorToForm('ErrorCredentials');
                                 Logger::event(
                                     'signin_failure',
                                     Logger::WARNING,
@@ -191,7 +206,8 @@ class EntryController extends Gdn_Controller {
                                     Logger::WARNING,
                                     '{username} failed to sign in. More information needed from user.'
                                 );
-                                $this->Form->addError('ErrorInsufficient');
+                                $this->addCredentialErrorToForm('ErrorInsufficient');
+
                                 $Reaction = $Authenticator->failedResponse();
                                 break;
 
@@ -814,9 +830,9 @@ class EntryController extends Gdn_Controller {
                             $name = $this->Form->getFormValue('ConnectName');
                             if (!$PasswordHash->checkPassword($password, $User['Password'], $User['HashMethod'], $name)) {
                                 if ($ConnectNameEntered) {
-                                    $this->Form->addError('The username you entered has already been taken.');
+                                    $this->addCredentialErrorToForm('The username you entered has already been taken.');
                                 } else {
-                                    $this->Form->addError('The password you entered is incorrect.');
+                                    $this->addCredentialErrorToForm('The password you entered is incorrect.');
                                 }
                             }
                         } catch (Gdn_UserException $Ex) {
@@ -1015,7 +1031,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if (!$User) {
-                    $this->Form->addError('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
+                    $this->addCredentialErrorToForm('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
                     $this->fireEvent('BadSignIn', [
                         'Email' => $Email,
@@ -1060,7 +1076,7 @@ class EntryController extends Gdn_Controller {
                                 $this->_setRedirect();
                             }
                         } else {
-                            $this->Form->addError('Invalid password.');
+                            $this->addCredentialErrorToForm('Invalid password.');
                             Logger::event(
                                 'signin_failure',
                                 Logger::WARNING,
@@ -1266,7 +1282,7 @@ class EntryController extends Gdn_Controller {
                 if ($UserID < 0) {
                     $this->Form->addError('ErrorPermission');
                 } elseif ($UserID == 0) {
-                    $this->Form->addError('ErrorCredentials');
+                    $this->addCredentialErrorToForm('ErrorCredentials');
                     Logger::event(
                         'signin_failure',
                         Logger::WARNING,
@@ -1742,7 +1758,7 @@ class EntryController extends Gdn_Controller {
                 }
             } else {
                 if ($this->Form->errorCount() == 0) {
-                    $this->Form->addError("Couldn't find an account associated with that email/username.");
+                    $this->addCredentialErrorToForm("Couldn't find an account associated with that email/username.");
                     Logger::event(
                         'password_reset_failure',
                         Logger::INFO,

@@ -942,6 +942,33 @@ class SettingsController extends DashboardController {
         $this->render();
     }
 
+
+    /**
+     * Manages the Garden.PrivateCommunity setting.
+     *
+     * @param String $enabled Either 'true' or 'false', whether to enable a private community.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function privateCommunity($enabled) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        $enabled = strtolower($enabled);
+        if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            saveToConfig('Garden.PrivateCommunity', $enabled === 'true');
+            if ($enabled === 'true') {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/privatecommunity/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                $this->informMessage(sprintf(t('%s enabled.'), t('Private Communities')));
+            } else {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/privatecommunity/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                $this->informMessage(sprintf(t('%s disabled.'), t('Private Communities')));
+            }
+            $this->jsonTarget("#private-community-toggle", $newToggle);
+        }
+        $this->render('blank', 'utility');
+    }
+
     /**
      * Main dashboard.
      *

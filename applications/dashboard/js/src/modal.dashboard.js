@@ -302,6 +302,7 @@ var DashboardModal = (function() {
             if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
                 $title.remove();
+                $elem.find('.header-block').remove();
                 body = $elem.html();
             }
 

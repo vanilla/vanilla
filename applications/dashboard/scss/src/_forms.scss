@@ -972,6 +972,10 @@ select + select {
   }
 }
 
+@mixin checkbox-painted-focus {
+  box-shadow: 0px 0px 4px 1px $brand-primary;
+}
+
 @mixin checkbox-painted-checked {
   @extend %icon;
   font-size: $font-size-sm;
@@ -1021,10 +1025,15 @@ select + select {
   cursor: pointer;
 
   &:hover,
-  &:focus,
-  .icheck-label:hover &,
-  .icheck-label:focus & {
+  &.hover,
+  .icheck-label:hover & {
     @include checkbox-painted-hover;
+  }
+
+  .icheck-label:focus &,
+  &:focus,
+  &.focus {
+    @include checkbox-painted-focus;
   }
 }
 
@@ -1101,10 +1110,13 @@ label[id^=iCheck] {
 
     margin-right: 0;
 
-    &:hover,
-    &:focus {
+    &:hover {
       @include checkbox-painted-hover;
     }
+  }
+
+  input:focus + label {
+    @include checkbox-painted-focus;
   }
 
   input[type="radio"],

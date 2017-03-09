@@ -7408,30 +7408,31 @@ select + select {
   vertical-align: middle;
 }
 
-.iradio:hover, .iradio:focus,
+.iradio:hover, .iradio.hover,
 .icheck-label:hover .iradio,
-.icheck-label:focus .iradio,
 .icheckbox:hover,
-.icheckbox:focus,
+.icheckbox.hover,
 .icheck-label:hover
-.icheckbox,
-.icheck-label:focus
 .icheckbox {
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.iradio:hover::before, .iradio:focus::before,
+.iradio:hover::before, .iradio.hover::before,
 .icheck-label:hover .iradio::before,
-.icheck-label:focus .iradio::before,
 .icheckbox:hover::before,
-.icheckbox:focus::before,
+.icheckbox.hover::before,
 .icheck-label:hover
-.icheckbox::before,
-.icheck-label:focus
 .icheckbox::before {
   display: block;
   color: #fff;
+}
+
+.icheck-label:focus .iradio, .iradio:focus, .iradio.focus, .icheck-label:focus
+.icheckbox,
+.icheckbox:focus,
+.icheckbox.focus {
+  box-shadow: 0px 0px 4px 1px #0291db;
 }
 
 .iradio {
@@ -7492,18 +7493,21 @@ label[id^=iCheck] {
   margin-right: 0;
 }
 
-.checkbox-painted-wrapper label:hover, .checkbox-painted-wrapper label:focus,
-.radio-painted-wrapper label:hover,
-.radio-painted-wrapper label:focus {
+.checkbox-painted-wrapper label:hover,
+.radio-painted-wrapper label:hover {
   background-color: #0291db;
   border-color: #0291db;
 }
 
-.checkbox-painted-wrapper label:hover::before, .checkbox-painted-wrapper label:focus::before,
-.radio-painted-wrapper label:hover::before,
-.radio-painted-wrapper label:focus::before {
+.checkbox-painted-wrapper label:hover::before,
+.radio-painted-wrapper label:hover::before {
   display: block;
   color: #fff;
+}
+
+.checkbox-painted-wrapper input:focus + label,
+.radio-painted-wrapper input:focus + label {
+  box-shadow: 0px 0px 4px 1px #0291db;
 }
 
 .checkbox-painted-wrapper input[type="radio"],

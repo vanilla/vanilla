@@ -20,6 +20,11 @@ class Action {
     private $args;
 
     /**
+     * @var array Meta information about the action.
+     */
+    private $meta;
+
+    /**
      * Create an new instance of an {@link Action}.
      *
      * @param callable $callback The callback that will be invoked for the action.
@@ -76,5 +81,28 @@ class Action {
     public function __invoke() {
         $result = call_user_func_array($this->callback, $this->args);
         return $result;
+    }
+
+    /**
+     * Get the a meta value.
+     *
+     * @param string $name The name of the meta value.
+     * @param mixed $default The value to return if there is no meta value.
+     * @return mixed Returns a meta value or **null** if one does not exist.
+     */
+    public function getMeta($name, $default = null) {
+        return isset($this->meta[$name]) ? $this->meta[$name] : $default;
+    }
+
+    /**
+     * Set a meta value.
+     *
+     * @param string $name The meta key to set.
+     * @param mixed $value The meta value to set.
+     * @return $this
+     */
+    public function setMeta($name, $value) {
+        $this->meta[$name] = $value;
+        return $this;
     }
 }

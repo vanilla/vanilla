@@ -87,7 +87,7 @@ class Data implements \JsonSerializable {
      * @return int Returns the status.
      */
     public function getStatus() {
-        return $this->getMetaItem('status', 200);
+        return $this->getMeta('status', 200);
     }
 
     /**
@@ -97,7 +97,7 @@ class Data implements \JsonSerializable {
      * @return $this
      */
     public function setStatus($status) {
-        return $this->setMetaItem('status', $status);
+        return $this->setMeta('status', $status);
     }
 
     /**
@@ -107,7 +107,7 @@ class Data implements \JsonSerializable {
      * @param mixed $default The default value if no item at the key exists.
      * @return mixed Returns the meta value.
      */
-    public function getMetaItem($name, $default = null) {
+    public function getMeta($name, $default = null) {
         return isset($this->meta[$name]) ? $this->meta[$name] : $default;
     }
 
@@ -118,7 +118,7 @@ class Data implements \JsonSerializable {
      * @param mixed $value The new value.
      * @return $this
      */
-    public function setMetaItem($name, $value) {
+    public function setMeta($name, $value) {
         $this->meta[$name] = $value;
         return $this;
     }
@@ -128,7 +128,7 @@ class Data implements \JsonSerializable {
      *
      * @return array Returns the meta.
      */
-    public function getMeta() {
+    public function getMetaArray() {
         return $this->meta;
     }
 
@@ -138,7 +138,7 @@ class Data implements \JsonSerializable {
      * @param array $meta The new meta array.
      * @return $this
      */
-    public function setMeta(array $meta) {
+    public function setMetaArray(array $meta) {
         $this->meta = $meta;
         return $this;
     }

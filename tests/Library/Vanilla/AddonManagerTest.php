@@ -8,6 +8,8 @@
 namespace VanillaTests\Library\Vanilla;
 
 use Test\OldApplication\Controllers\Api\NewApiController;
+use Test\OldApplication\Controllers\ArchiveController;
+use Test\OldApplication\Controllers\HiddenController;
 use Test\OldApplication\Controllers\OldApiController;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
@@ -459,5 +461,18 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $addon = $am->lookupByClassname(NewApiController::class, true);
         $this->assertNotNull($addon);
         $this->assertEquals('test-old-application', $addon->getKey());
+    }
+
+    /**
+     * Hidden files and directories should not be scanned.
+     */
+    public function testHiddenClassDirectories() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupByClassname(ArchiveController::class);
+        $this->assertNull($addon);
+
+        $addon = $am->lookupByClassname(HiddenController::class);
+        $this->assertNull($addon);
     }
 }

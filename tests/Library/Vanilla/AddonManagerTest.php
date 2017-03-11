@@ -7,6 +7,8 @@
 
 namespace VanillaTests\Library\Vanilla;
 
+use Test\OldApplication\Controllers\Api\NewApiController;
+use Test\OldApplication\Controllers\OldApiController;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
 
@@ -337,7 +339,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Provide all of the theme info currently in Vanilla.
      *
-     * @return \Gdn_ThemeManager Returns a data provider array.
+     * @return array Returns a data provider array.
      */
     public function provideVanillaThemeInfo() {
         $tm = new \Gdn_ThemeManager(static::createVanillaManager(), false);
@@ -357,14 +359,14 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      */
     protected function assertArraySubsetRecursive($subset, $array, $strict = false, $message = '') {
         if (!is_array($subset)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
                 1,
                 'array or ArrayAccess'
             );
         }
 
         if (!is_array($array)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
                 2,
                 'array or ArrayAccess'
             );
@@ -442,5 +444,20 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
             $result[$type] = [$type];
         }
         return $result;
+    }
+
+    /**
+     * Addons should be able to nest classes within specific directories.
+     */
+    public function testClassDirectoryRecursion() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupByClassname(OldApiController::class, true);
+        $this->assertNotNull($addon);
+        $this->assertEquals('test-old-application', $addon->getKey());
+
+        $addon = $am->lookupByClassname(NewApiController::class, true);
+        $this->assertNotNull($addon);
+        $this->assertEquals('test-old-application', $addon->getKey());
     }
 }

@@ -1,0 +1,57 @@
+// Breadcrumbs
+//
+// The breadcrumbs appear on the categories settings page in the dashboard.
+//
+// Styleguide 18
+
+// Breadcrumbs
+//
+// Markup:
+// <div class="bigcrumbs">
+//   <a class="crumb" href="#">Home</a>
+//   <a class="crumb" href="#">Parent location</a>
+//   <a class="crumb" href="#">Current location</a>
+// </div>
+//
+// Styleguide 18.1
+
+.bigcrumbs {
+  @include full-border(block);
+
+  .crumb {
+    position: relative;
+    display: inline-block;
+    padding: 6px 24px 6px 12px;
+    line-height: 24px;
+
+    @include reverse-link();
+
+    &:before,
+    &:after {
+      position: absolute;
+      display: block;
+      top: -1px;
+      bottom: -1px;
+      right: -12px;
+      width: 0;
+      border: solid 12px transparent;
+      border-top-width: 19px;
+      border-bottom-width: 19px;
+      border-left-color: $border-color;
+      content: '';
+    }
+
+    &:after {
+      right: -11px;
+      border-left-color: #fff;
+      content: '';
+    }
+
+    &:last-child {
+      &:before,
+      &:after {
+        display: none;
+      }
+    }
+  }
+}

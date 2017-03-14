@@ -93,19 +93,11 @@ pre {
 //
 // No styleguide reference.
 
-.heading-h1-block {
-  @extend .full-border;
-  @extend .heading-h1;
-  padding-bottom: $spacer;
-}
-
-.heading-h1 {
+.content > h1 {
+  @include full-border(block);
   font-size: $font-size-lg;
   margin-bottom: 0;
-}
-
-.content > h1 {
-  @extend .heading-h1-block;
+  padding-bottom: $spacer;
 }
 
 // Header Block
@@ -132,18 +124,17 @@ pre {
 // Styleguide 1.4.1.
 
 .header-block {
-  display: flex;
+  @include full-border(flex);
   justify-content: space-between;
   align-items: center;
   padding-top: $spacer / 2;
   padding-bottom: $spacer / 2;
   min-height: $header-block-height;
-  @extend .full-border;
 
   h1 {
-    @extend .heading-h1;
     margin: 0;
     padding: ($spacer / 2) 0;
+    font-size: $font-size-lg;
   }
 }
 
@@ -226,10 +217,9 @@ pre {
   $header-menu-height: $header-block-height;
   $header-menu-padding: ($header-menu-height - $header-menu-font-size - ($header-menu-border-width * 2) - $border-width) / 2;
 
-  display: flex;
+  @include full-border(flex);
   justify-content: center;
   align-items: center;
-  @extend .full-border;
 
   .header-menu-item {
     padding: ($header-menu-padding) 0;
@@ -351,6 +341,21 @@ pre {
 //
 // Styleguide 1.9.
 
+// Badge outlines
+//
+// .badge-danger - Danger color.
+// .badge-warning - Warning color.
+// .badge-info - Info color.
+// .badge-success - Success color.
+//
+// Markup:
+// <button class="btn btn-secondary">
+//   Tags
+//   <span class="badge badge-outline {{modifier_class}}">42</span>
+// </button>
+//
+// Styleguide 1.9.1.
+
 .badge {
   display: inline-block;
   vertical-align: middle;
@@ -364,12 +369,23 @@ pre {
   .btn-group & {
     margin-top: - to-rem(2);
   }
+
+  &.badge-outline {
+    background-color: transparent;
+    color: rgba(0,0,0,.3275);
+    border: $border-width solid rgba(0,0,0,.25);
+  }
 }
 
 @each $semantic-color in map-keys($semantic-colors) {
   $color: map-get($semantic-colors, $semantic-color);
   .badge-#{$semantic-color} {
     background-color: $color;
+
+    &.badge-outline {
+      color: $color;
+      border-color: $color;
+    }
   }
 }
 
@@ -423,11 +439,7 @@ pre {
 // Styleguide 1.12.
 
 .reverse-link {
-  color: $grey-dark;
-
-  &:hover {
-    color: $brand-primary;
-  }
+  @include reverse-link();
 }
 
 // Font Helpers

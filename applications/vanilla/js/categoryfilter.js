@@ -124,15 +124,16 @@
         }
 
         var categoryOptions = ' \
-        <div class="options"> \
+        <div class="plank-options"> \
             {Options} \
         </div>';
 
         var categoryTemplate = ' \
-        <li class="dd-item tree-item" data-id="{CategoryID}"> \
-            <div class="dd-content tree-content"> \
-                {NameHTML}' + categoryOptions + ' \
+        <li class="plank js-category-item" data-id="{CategoryID}"> \
+            <div class="plank-title"> \
+                {NameHTML} \
             </div> \
+            '+ categoryOptions + '\
         </li>';
 
         /**

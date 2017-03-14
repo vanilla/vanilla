@@ -66,3 +66,8 @@ ul {
   border-left: $border-width solid $border-color;
   border-right: $border-width solid $border-color;
 }
+
+// Makes room for the collapse button when it exists on the categories page.
+.nestable-collapse ~ .nestable-content > .plank-title {
+  padding-left: to-rem(39);
+}

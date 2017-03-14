@@ -86,7 +86,7 @@ $enabled = c('Vanilla.Tagging.EnableUI', true);
                 $dropdown->setView('dropdown-twbs')
                     ->addLink(t('Edit'), "/settings/tags/edit/{$tag['TagID']}", 'edit', 'js-modal')
                     ->addDivider()
-                    ->addLink(t('Delete'), "/settings/tags/edit/{$tag['TagID']}", 'delete', 'js-modal-confirm');
+                    ->addLink(t('Delete'), "/settings/tags/delete/{$tag['TagID']}", 'delete', 'js-modal-confirm');
             }
             ?>
             <div class="plank-wrapper">

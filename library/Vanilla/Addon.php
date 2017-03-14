@@ -468,14 +468,11 @@ class Addon {
             '/settings/class.hooks.php'
         ];
 
-        $result = [];
         foreach ($dirs as $dir) {
             foreach ($this->scanDirPhp($dir) as $path) {
                 yield $path;
             }
         }
-
-        return $result;
     }
 
     /**

@@ -13,6 +13,7 @@ use Test\OldApplication\Controllers\HiddenController;
 use Test\OldApplication\Controllers\OldApiController;
 use Vanilla\AddonManager;
 use Vanilla\Addon;
+use VanillaTests\Fixtures\TestAddonManager;
 
 
 class AddonManagerTest extends \PHPUnit_Framework_TestCase {
@@ -38,6 +39,25 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Create an {@link AddonManager} against the test fixtures.
+     *
+     * @return AddonManager Returns the manager.
+     */
+    private static function createTestManager() {
+        $root = '/tests/fixtures';
+
+        $manager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
+                Addon::TYPE_THEME => "$root/themes",
+                Addon::TYPE_LOCALE => "$root/locales"
+            ],
+            PATH_ROOT.'/tests/cache/am/test-manager'
+        );
+        return $manager;
+    }
+
+    /**
      * Test basic addon scanning of all currently linked application addons.
      */
     public function testVanillaAddonsScanning() {
@@ -46,6 +66,32 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         foreach (static::$types as $type) {
             $addons = $manager->scan($type, true);
         }
+    }
+
+    /**
+     * Creates an {@link AddonManager} against Vanilla.
+     *
+     * @return AddonManager Returns the manager.
+     */
+    private static function createVanillaManager($singleton = false) {
+        static $instance;
+
+        if ($singleton && $instance !== null) {
+            return $instance;
+        }
+        $manager = new AddonManager(
+            [
+                Addon::TYPE_ADDON => ['/applications', '/plugins'],
+                Addon::TYPE_THEME => '/themes',
+                Addon::TYPE_LOCALE => '/locales'
+            ],
+            PATH_ROOT.'/tests/cache/am/vanilla-manager'
+        );
+        if ($singleton) {
+            $instance = $manager;
+        }
+
+        return $manager;
     }
 
     /**
@@ -200,6 +246,25 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Create an addon manager that won't have any addons.
+     *
+     * @return AddonManager Returns the empty addon manager.
+     */
+    private static function createEmptyManager() {
+        $root = '/tests/fixtures';
+        $em = new AddonManager(
+            [
+                Addon::TYPE_ADDON => "$root/empty",
+                Addon::TYPE_THEME => "$root/empty",
+                Addon::TYPE_LOCALE => "$root/empty"
+            ],
+            PATH_ROOT.'/tests/cache/am/empty-manager'
+        );
+
+        return $em;
+    }
+
+    /**
      * Test that addon directories with no addons works okay.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
@@ -248,70 +313,6 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
 
         $this->assertArraySubsetRecursive($oldInfoArray, $info);
-    }
-
-    /**
-     * Create an addon manager that won't have any addons.
-     *
-     * @return AddonManager Returns the empty addon manager.
-     */
-    private static function createEmptyManager() {
-        $root = '/tests/fixtures';
-        $em = new AddonManager(
-            [
-                Addon::TYPE_ADDON => "$root/empty",
-                Addon::TYPE_THEME => "$root/empty",
-                Addon::TYPE_LOCALE => "$root/empty"
-            ],
-            PATH_ROOT.'/tests/cache/am/empty-manager'
-        );
-
-        return $em;
-    }
-
-    /**
-     * Creates an {@link AddonManager} against Vanilla.
-     *
-     * @return AddonManager Returns the manager.
-     */
-    private static function createVanillaManager($singleton = false) {
-        static $instance;
-
-        if ($singleton && $instance !== null) {
-            return $instance;
-        }
-        $manager = new AddonManager(
-            [
-                Addon::TYPE_ADDON => ['/applications', '/plugins'],
-                Addon::TYPE_THEME => '/themes',
-                Addon::TYPE_LOCALE => '/locales'
-            ],
-            PATH_ROOT.'/tests/cache/am/vanilla-manager'
-        );
-        if ($singleton) {
-            $instance = $manager;
-        }
-
-        return $manager;
-    }
-
-    /**
-     * Create an {@link AddonManager} against the test fixtures.
-     *
-     * @return AddonManager Returns the manager.
-     */
-    private static function createTestManager() {
-        $root = '/tests/fixtures';
-
-        $manager = new AddonManager(
-            [
-                Addon::TYPE_ADDON => ["$root/addons", "$root/applications", "$root/plugins"],
-                Addon::TYPE_THEME => "$root/themes",
-                Addon::TYPE_LOCALE => "$root/locales"
-            ],
-            PATH_ROOT.'/tests/cache/am/test-manager'
-        );
-        return $manager;
     }
 
     /**
@@ -474,5 +475,110 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
 
         $addon = $am->lookupByClassname(HiddenController::class);
         $this->assertNull($addon);
+    }
+
+    /**
+     * Test {link AddonManager::matchClass()}.
+     *
+     * @param string $pattern The pattern to test.
+     * @param string $class The class name to match.
+     * @param bool $expected Whether the match should pass or fail.
+     * @dataProvider provideMatchClassTests
+     */
+    public function testMatchClass($pattern, $class, $expected) {
+        $am = new TestAddonManager();
+
+        $r = $am->matchClass($pattern, $class);
+        $this->assertSame($expected, $r);
+    }
+
+    /**
+     * Provide tests for {@link testMatchClass()}.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideMatchClassTests() {
+        $data = [
+            '*\DiscussionsController' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true
+            ],
+            'discussionsController' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => false,
+                'Vanilla\API\DiscussionsController' => false,
+                'API\DiscussionsController' => false
+            ],
+            '*\api\DiscussionsController' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => false,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true
+            ],
+            'Vanilla\*\DiscussionsController' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => false
+            ],
+            '*\*Controller' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true
+            ],
+            '*Controller' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true
+            ],
+            '*' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true
+            ],
+        ];
+
+        $r = [];
+        foreach ($data as $pattern => $rows) {
+            foreach ($rows as $class => $expected) {
+                $r["$pattern $class"] = [$pattern, $class, $expected];
+            }
+        }
+        return $r;
+    }
+
+    /**
+     * An addon manager that hasn't started any addons will not find any classes.
+     */
+    public function testFindClassesNone() {
+        $am = new TestAddonManager();
+
+        $classes = $am->findClasses('*');
+        $this->assertEmpty($classes);
+    }
+
+    /**
+     * Test finding classes when addons haven't had to start.
+     */
+    public function testFindClassesAll() {
+        $am = new TestAddonManager();
+        $classes = $am->findClasses('*', true);
+        $this->assertNotEmpty($classes);
+    }
+
+    /**
+     * Test finding classes on a started addon.
+     */
+    public function testFindClassesStarted() {
+        $am = new TestAddonManager();
+
+        $am->startAddonsByKey(['test-old-plugin'], Addon::TYPE_ADDON);
+        $classes = $am->findClasses('TestOldPluginPlugin');
+        $this->assertSame(\TestOldPluginPlugin::class, $classes[0]);
     }
 }

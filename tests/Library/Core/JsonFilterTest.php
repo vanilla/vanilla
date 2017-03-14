@@ -6,27 +6,29 @@
 
 namespace VanillaTests\Library\Core;
 
+use DateTime;
+
 /**
  * Test the jsonFilter function.
  */
 class JsonFilterTest extends \PHPUnit_Framework_TestCase {
 
     public function testJsonFilterDateTime() {
-        $date = new \DateTime();
+        $date = new DateTime('now', new \DateTimeZone('UTC'));
         $data = ['Date' => $date];
         jsonFilter($data);
 
-        $this->assertSame($date->format('c'), $data['Date']);
+        $this->assertSame($date->format(DateTime::RFC3339), $data['Date']);
     }
 
     public function testJsonFilterDateTimeRecursive() {
-        $date = new \DateTime();
+        $date = new DateTime();
         $data = [
             'Dates' => ['FirstDate' => $date]
         ];
         jsonFilter($data);
 
-        $this->assertSame($date->format('c'), $data['Dates']['FirstDate']);
+        $this->assertSame($date->format(DateTime::RFC3339), $data['Dates']['FirstDate']);
     }
 
     public function testJsonFilterEncodedIP() {

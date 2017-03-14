@@ -187,6 +187,54 @@ class AddonManager {
     }
 
     /**
+     * Find the classes match a glob style pattern.
+     *
+     * @param string $pattern The pattern to match.
+     * @param bool $searchAll Whether to search all classes or just the started ones.
+     * @return array Returns an array of class names.
+     */
+    public function findClasses($pattern, $searchAll = false) {
+        $fn = function ($name) use ($pattern) {
+            return $this->matchClass($pattern, $name);
+        };
+
+        $result = [];
+        if ($searchAll === false) {
+            /* @var Addon $addon */
+            foreach ($this->autoloadClasses as $classKey => list($path, $addon)) {
+                if ($fn($classKey)) {
+                    $result[] = $addon->getClasses()[$classKey][0];
+                }
+            }
+        } else {
+            foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
+                /* @var Addon $addon */
+                $classes = array_column($addon->getClasses(), 0);
+
+                $result = array_merge($result, array_filter($classes, $fn));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Match a class name against a pattern.
+     *
+     * @param string $pattern A glob style pattern.
+     * @param string $class The class to match.
+     */
+    protected function matchClass($pattern, $class) {
+        $class = '\\'.ltrim($class, '\\');
+
+        $regex = str_replace(['\\*\\', '*', '\\'], ['(\\.+\\|\\)', '.*', '\\\\'], '\\'.ltrim($pattern, '\\'));
+        $regex = "`^$regex$`i";
+
+        $r = preg_match($regex, $class);
+        return (bool)$r;
+    }
+
+    /**
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.

@@ -29,7 +29,7 @@ class DataSetTest extends \PHPUnit_Framework_TestCase {
         $dt = new \DateTimeImmutable('2000-01-01');
         $ds = new Gdn_DataSet([['dt' => $dt, 'IPAddress' => ipEncode('127.0.0.1')]]);
 
-        $expected = json_encode([['dt' => $dt->format('c'), 'IPAddress' => '127.0.0.1']]);
+        $expected = json_encode([['dt' => $dt->format(\DateTime::RFC3339), 'IPAddress' => '127.0.0.1']]);
         $json = json_encode($ds);
         $this->assertEquals($expected, $json);
     }

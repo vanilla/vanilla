@@ -1583,6 +1583,7 @@ EOT;
         $html = Gdn_Format::mentions($html);
         $html = Emoji::instance()->translateToHtml($html);
         $html = Gdn_Format::legacySpoilers($html);
+        $html = Gdn_Format::sanitizeImages($html);
         return $html;
     }
 
@@ -1711,6 +1712,28 @@ EOT;
 
             return $Mixed;
         }
+    }
+
+    /**
+     * Optionally replace any embedded images from untrusted sites with links to the image.
+     *
+     * @param string $html String from which you might want to strip out untrusted images.
+     * @return string The string with images replaced by links.
+     */
+    public static function sanitizeImages($html) {
+        if (!c('Garden.Format.SanitizeImages', false) || !is_string($html)) {
+            return $html;
+        }
+
+        preg_match_all('/\<img\s+src\s*=\s*[\"\'](.*?)[\"\'].*\>/', $html, $matches, PREG_SET_ORDER);
+        foreach ($matches as $image)  {
+            $imageUrl = parse_url($image[1]);
+            if ($matches && !in_array(val('host', $imageUrl), trustedDomains())) {
+                $imageName = trim(substr(val('path', $imageUrl), strrpos(val('path', $imageUrl), '\/')), '/');
+                $html = preg_replace('/\<img\s+src\s*=\s*[\"\']('.preg_quote($image[1], '/').')[\"\'].*\>/', '<a href="$1" target="_blank" title="'.t('Image from unconfirmed host').'">'.$imageName.'</a>', $html);
+            }
+        }
+        return $html;
     }
 
    /**

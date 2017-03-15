@@ -239,7 +239,13 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Discussion.SpamLock',
             'Vanilla.Comment.SpamCount',
             'Vanilla.Comment.SpamTime',
-            'Vanilla.Comment.SpamLock'
+            'Vanilla.Comment.SpamLock',
+            'Vanilla.Activity.SpamCount',
+            'Vanilla.Activity.SpamTime',
+            'Vanilla.Activity.SpamLock',
+            'Vanilla.ActivityComment.SpamCount',
+            'Vanilla.ActivityComment.SpamTime',
+            'Vanilla.ActivityComment.SpamLock',
         );
         if ($IsConversationsEnabled) {
             $ConfigurationFields = array_merge(
@@ -282,6 +288,19 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
 
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Integer');
+
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Integer');
 
             if ($IsConversationsEnabled) {
                 $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
@@ -747,7 +766,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         $this->addJsFile('categoryfilter.js', 'vanilla');
-        
+
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);

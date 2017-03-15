@@ -160,10 +160,7 @@ trait FloodControlTrait {
      * @return bool True if the user is spamming, false otherwise.
      */
     public function isUserSpamming($userID, CacheInterface $storageObject) {
-        // The CheckSpam attribute is deprecated and should be removed in 2018.
-        $checkSpam = property_exists($this, 'CheckSpam') ? $this->CheckSpam : true;
-
-        if (!$this->isFloodControlEnabled() || !$checkSpam) {
+        if (!$this->isFloodControlEnabled()) {
             return false;
         }
 

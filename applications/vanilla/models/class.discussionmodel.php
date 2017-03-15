@@ -11,9 +11,10 @@
 /**
  * Manages discussions data.
  */
-class DiscussionModel extends VanillaModel {
+class DiscussionModel extends Gdn_Model {
 
     use StaticInitializer;
+    use \Vanilla\FloodControlTrait;
 
     /** Cache key. */
     const CACHE_DISCUSSIONVIEWS = 'discussion.%s.countviews';
@@ -80,6 +81,11 @@ class DiscussionModel extends VanillaModel {
     protected $filters = [];
 
     /**
+     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     */
+    protected $floodControlStorageObject;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @since 2.0.0
@@ -87,6 +93,7 @@ class DiscussionModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Discussion');
+        $this->floodControlStorageObject = FloodControlHelper::configure($this, 'Discussion');
     }
 
     /**
@@ -1803,8 +1810,6 @@ class DiscussionModel extends VanillaModel {
      * @return int $DiscussionID Unique ID of the discussion.
      */
     public function save($FormPostValues, $Settings = false) {
-        $Session = Gdn::session();
-
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -1897,8 +1902,16 @@ class DiscussionModel extends VanillaModel {
         }
 
         if (count($ValidationResults) == 0) {
+            // Backward compatible check for flood control
+            if (!val('SpamCheck', $this, true)) {
+                deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
+                $this->setFloodControlEnabled(false);
+            }
+
+            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodControlStorageObject);
+
             // If the post is new and it validates, make sure the user isn't spamming
-            if (!$Insert || !$this->checkForSpam('Discussion')) {
+            if (!$Insert || !$isUserSpamming) {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 

@@ -56,6 +56,11 @@ class FloodControlHelper {
 
             $keyPostCount = 'Count'.$type.'SpamCheck';
             $keyLastDateChecked = 'Date'.$type.'SpamCheck';
+
+            if ($session->getAttribute('Time'.$type.'SpamCheck')) {
+                // Remove old attribute used in the conversationModel
+                Gdn::userModel()->setAttribute('Time'.$type.'SpamCheck', null);
+            }
         }
 
         $instance

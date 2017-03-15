@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d93b7b2cb9f08783708e91e913234c9b",
+    "content-hash": "701901c817dc15dab0fa9b3d6fbdd3c3",
     "packages": [
         {
             "name": "chrisjean/php-ico",

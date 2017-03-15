@@ -20,9 +20,24 @@ class FloodControlHelper {
     public static function configure($instance, $type) {
         $session = Gdn::session();
 
-        // Let's deactivate flood control if the user is an admin :)
-        if (!Gdn::session()->isValid() || $session->User->Admin || $session->checkPermission('Garden.Moderation.Manage')) {
+        // The CheckSpam and SpamCheck attributes are deprecated and should be removed in 2018.
+        if (property_exists($instance, 'CheckSpam')) {
+            deprecated(__CLASS__.'->CheckSpam', __CLASS__.'->setFloodControlEnabled()');
+            $instance->setFloodControlEnabled($instance->CheckSpam);
+        }
+        if (property_exists($instance, 'SpamCheck')) {
+            deprecated(__CLASS__.'->SpamCheck', __CLASS__.'->setFloodControlEnabled()');
+            $instance->setFloodControlEnabled($instance->SpamCheck);
+        }
+
+        if (!Gdn::session()->isValid()) {
             $instance->setFloodControlEnabled(false);
+        } elseif ($session->User->Admin || $session->checkPermission('Garden.Moderation.Manage')) {
+            $instance->setFloodControlEnabled(false);
+        }
+
+        // Let's deactivate flood control if the user is an admin :)
+        if (!$instance->isFloodControlEnabled()) {
             return new UserAttributeCacheAdapter(Gdn::session(), Gdn::userModel());
         }
 

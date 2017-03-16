@@ -151,7 +151,9 @@ class Data implements \JsonSerializable {
      * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
      */
     public function jsonSerialize() {
-        return $this->getData();
+        $data = $this->getData();
+        jsonFilter($data);
+        return $data;
     }
 
     /**

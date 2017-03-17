@@ -8,8 +8,8 @@
 namespace Vanilla\Web;
 
 use Garden\EventManager;
-use Garden\Schema;
-use Garden\Validation;
+use Garden\Schema\Schema;
+use Garden\Schema\Validation;
 
 class EndpointSchema extends Schema {
     /**
@@ -25,7 +25,7 @@ class EndpointSchema extends Schema {
     /**
      * @var string
      */
-    private $type;
+    private $schemaType;
 
     /**
      * @var EventManager
@@ -37,12 +37,12 @@ class EndpointSchema extends Schema {
      */
     private $fired = false;
 
-    public function __construct(array $schema = [], $controller, $method, $type = 'in', EventManager $eventManager = null) {
+    public function __construct(array $schema = [], $controller, $method, $schemaType = 'in', EventManager $eventManager = null) {
         parent::__construct($schema);
         $this
             ->setController($controller)
             ->setMethod($method)
-            ->setType($type);
+            ->setSchemaType($schemaType);
 
         $this->eventManager = $eventManager;
     }
@@ -55,12 +55,20 @@ class EndpointSchema extends Schema {
      */
     private function eventName($suffix = '') {
         $basename = EventManager::classBasename($this->getController());
-        $result = "{$basename}_{$this->method}_{$this->type}Schema{$suffix}";
+        $result = "{$basename}_{$this->method}_{$this->schemaType}Schema{$suffix}";
 
         return $result;
     }
 
-    protected function isValidInternal(array &$data, array $schema, Validation &$validation = null, $path = '') {
+    /**
+     * Validate data against the schema.
+     *
+     * @param mixed $data The data to validate.
+     * @param bool $sparse Whether or not this is a sparse validation.
+     * @return mixed Returns a cleaned version of the data.
+     * @throws \Garden\Schema\ValidationException when the data does not validate against the schema.
+     */
+    public function validate($data, $sparse = false) {
         // Fire an event that allows the schema to be modified.
         if (!$this->fired && $this->eventManager) {
             $this->eventManager->fire(
@@ -69,7 +77,7 @@ class EndpointSchema extends Schema {
             );
         }
 
-        return parent::isValidInternal($data, $schema, $validation, $path);
+        return parent::validate($data, $sparse);
     }
 
     /**
@@ -117,18 +125,18 @@ class EndpointSchema extends Schema {
      *
      * @return string Returns the type.
      */
-    public function getType() {
-        return $this->type;
+    public function getSchemaType() {
+        return $this->schemaType;
     }
 
     /**
      * Set the type.
      *
-     * @param string $type
+     * @param string $schemaType
      * @return $this
      */
-    public function setType($type) {
-        $this->type = $type;
+    public function setSchemaType($schemaType) {
+        $this->schemaType = $schemaType;
         return $this;
     }
 }

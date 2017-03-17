@@ -68,11 +68,10 @@ abstract class Controller implements InjectableInterface {
      * @param array $schema The schema definition.
      * @param string $methodName The name of the method to attach this schema to. Usually you just call this with the **__FUNCTION__** constant.
      * @param string $type The type of schema, either "in" or "out".
-     * @return Schema Returns a new schema attached to this controller.
+     * @return EndpointSchema Returns a new schema attached to this controller.
      */
     public function schema(array $schema, $methodName, $type = 'in') {
-        $result = new EndpointSchema($schema, $this, $methodName, $type, $this->eventManager);
-        return $result;
+        return EndpointSchema::parse($schema, $this, $methodName, $type, $this->eventManager);
     }
 
     /**

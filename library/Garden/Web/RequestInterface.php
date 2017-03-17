@@ -9,9 +9,18 @@ namespace Garden\Web;
 
 
 interface RequestInterface {
-    public function getPath();
+    /**
+     * Get the hostname of the request.
+     *
+     * @return string
+     */
+    public function getHost();
 
     public function getMethod();
+
+    public function getRoot();
+
+    public function getPath();
 
     public function getQuery();
 

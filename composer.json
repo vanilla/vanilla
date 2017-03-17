@@ -39,7 +39,7 @@
         "vanilla/legacy-oauth": "~1.0",
         "vanilla/legacy-passwords": "~1.0",
         "vanilla/nbbc": "~2.1",
-        "vanilla/garden-schema": "^1.4.0"
+        "vanilla/garden-schema": "^1.4.1"
     },
     "provide": {
         "ext-gd": "*"

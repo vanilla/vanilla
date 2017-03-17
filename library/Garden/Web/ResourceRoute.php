@@ -189,10 +189,10 @@ class ResourceRoute extends Route {
      * @return callable|null Returns the method callback or null if it doesn't.
      */
     private function findMethod($controller, $methodName) {
-        $regex = '`^('.implode('|', static::$specialMethods).')(_|$)`i';
+        $regex = '`^(get|post|patch|put|options|delete)(_|$)`i';
 
         // Getters and setters aren't found.
-        if (!preg_match($regex, $methodName)
+        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)
             && !(method_exists($controller, 'isPublic') && $controller->isPublic($methodName))) {
             return null;
         }

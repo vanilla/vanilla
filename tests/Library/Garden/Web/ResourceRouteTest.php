@@ -157,6 +157,14 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Make sure that the index method doesn't act like another HTTP method.
+     */
+    public function testIndexProtection() {
+        $route = $this->createRoute();
+        $this->assertNull($route->match(new Request('/discussions/index_foo')));
+    }
+
+    /**
      * Controllers can publicize methods with isPublic().
      */
     public function testIsPublic() {

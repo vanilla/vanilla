@@ -14,6 +14,10 @@ class DiscussionsController {
 
     }
 
+    public function index_foo() {
+
+    }
+
     public function get($id) {
 
     }

@@ -80,12 +80,12 @@ class DiscussionsController {
     public function setSomething($val) {
     }
 
-    public function protectMe() {
+    public function iAmPublic() {
 
     }
 
-    public function isProtected($method) {
-        return strcasecmp($method, 'protectMe') === 0;
+    public function isPublic($method) {
+        return strcasecmp($method, 'iAmPublic') === 0;
     }
 
     public function post_noMap($query, $body, $data) {

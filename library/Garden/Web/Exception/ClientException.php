@@ -10,9 +10,7 @@ namespace Garden\Web\Exception;
 /**
  * Represents a 400 series exception.
  */
-class ClientException extends \Exception implements \JsonSerializable {
-    protected $context;
-
+class ClientException extends HttpException {
     /**
      * Initialize an instance of the {@link ClientException} class.
      *
@@ -28,34 +26,6 @@ class ClientException extends \Exception implements \JsonSerializable {
      * @param array $context An array of context variables that can be used to render a more detailed response.
      */
     public function __construct($message = '', $code = 400, array $context = []) {
-        parent::__construct($message, $code);
-        $this->context = $context;
-    }
-
-    /**
-     * Gets a longer description for the exception.
-     *
-     * @return string Returns the description of the exception or an empty string if there isn't one.
-     */
-    public function getDescription() {
-        return val('description', $this->context, '');
-    }
-
-    /**
-     * Specify data which should be serialized to JSON.
-     *
-     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
-     * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
-     */
-    public function jsonSerialize() {
-        $result = [
-            'message' => $this->getMessage(),
-            'status' => $this->getCode()
-        ];
-        if ($this->getDescription()) {
-            $result['description'] = $this->getDescription();
-        }
-        return $result;
+        parent::__construct($message, $code, $context);
     }
 }

@@ -193,8 +193,7 @@ class ResourceRoute extends Route {
         $regex = '`^(get|post|patch|put|options|delete)(_|$)`i';
 
         // Getters and setters aren't found.
-        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)
-            && !(method_exists($controller, 'isPublic') && $controller->isPublic($methodName))) {
+        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)) {
             return null;
         }
 
@@ -371,16 +370,10 @@ class ResourceRoute extends Route {
         if (isset($pathArgs[0])) {
             $name = lcfirst($this->filterName($pathArgs[0]));
             $result[] = ["{$method}_{$name}", 0];
-            if (!in_array($name, self::$specialMethods)) {
-                $result[] = [$name, 0];
-            }
         }
         if (isset($pathArgs[1])) {
             $name = lcfirst($this->filterName($pathArgs[1]));
             $result[] = ["{$method}_{$name}", 1];
-            if (!in_array($name, self::$specialMethods)) {
-                $result[] = [$name, 1];
-            }
         }
 
         $result[] = [$method, null];

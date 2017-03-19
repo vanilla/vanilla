@@ -122,7 +122,9 @@ class Dispatcher {
      * @return Data Returns the data response.
      */
     private function makeResponse($raw, $ob = '') {
-        if (is_array($raw)) {
+        if ($raw instanceof Data) {
+            $result = $raw;
+        } elseif (is_array($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Exception) {

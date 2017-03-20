@@ -624,7 +624,11 @@ var DashboardModal = (function() {
             // Pull out the H1 block from the view to add to the modal title
             if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
-                $title.remove();
+                if ($elem.find('.header-block').length !== 0) {
+                    $elem.find('.header-block').remove();
+                } else {
+                    $title.remove();
+                }
                 body = $elem.html();
             }
 

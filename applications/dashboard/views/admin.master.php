@@ -6,7 +6,7 @@ $this->fireAs('dashboard')->fireEvent('render');
 <html lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
     <?php $this->renderAsset('Head'); ?>
-    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
+    <?php // Robots should not see the dashboard, but tell them not to index it just in case. ?>
     <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -98,9 +98,11 @@ Gdn_Theme::assetEnd();
     <div class="main-row pusher<?php echo $this->data('IsWidePage') ? ' main-row-wide' : ''; ?>" id="main-row">
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
-                <div id="panel-nav" class="js-fluid-fixed panel-content">
+                <div class="js-fluid-fixed panel-content">
                     <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
-                    <?php echo $dashboardNav; ?>
+                    <div id="panel-nav" class="js-panel-nav">
+                        <?php echo $dashboardNav; ?>
+                    </div>
                     <aside class="drawer-only">
                         <?php $this->renderAsset('DashboardUserDropDown'); ?>
                     </aside>

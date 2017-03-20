@@ -158,14 +158,11 @@ class UserController extends DashboardController {
         $this->setHighlightRoute('dashboard/user');
 
         $RoleModel = new RoleModel();
-        $AllRoles = $RoleModel->getArray();
         $RoleData = $RoleModel->GetAssignable();
-
-        // By default, people with access here can freely assign all roles
-        $this->RoleData = $RoleData;
+        $UserRoleData = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
 
         $UserModel = new UserModel();
-        $this->User = false;
+        $this->setData('User', false);
 
         // Set the model on the form.
         $this->Form->setModel($UserModel);
@@ -173,8 +170,8 @@ class UserController extends DashboardController {
         try {
             // These are all the 'effective' roles for this add action. This list can
             // be trimmed down from the real list to allow subsets of roles to be edited.
-            $this->EventArguments['RoleData'] = &$this->RoleData;
-
+            $this->EventArguments['RoleData'] = &$RoleData;
+            $this->setData('Roles', $RoleData);
             $this->fireEvent("BeforeUserAdd");
             if ($this->Form->authenticatedPostBack(true)) {
                 // These are the new roles the creating user wishes to apply to the target
@@ -185,7 +182,7 @@ class UserController extends DashboardController {
                     $RequestedRoles = array();
                 }
                 $RequestedRoles = array_flip($RequestedRoles);
-                $UserNewRoles = array_intersect_key($this->RoleData, $RequestedRoles);
+                $UserNewRoles = array_intersect_key($RoleData, $RequestedRoles);
 
                 // Put the data back into the forum object as if the user had submitted
                 // this themselves
@@ -213,17 +210,14 @@ class UserController extends DashboardController {
                     $this->Form->setFormValue('Password', '');
                     $this->Form->setFormValue('HashMethod', '');
                 }
-
-                $this->UserRoleData = $UserNewRoles;
-            } else {
-                // Set the default roles.
-                $this->UserRoleData = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+                $UserRoleData = $UserNewRoles;
             }
-
         } catch (Exception $Ex) {
             $this->Form->addError($Ex);
         }
-        $this->render();
+
+        $this->setData('UserRoles', $UserRoleData);
+        $this->render('edit', 'user');
     }
 
     /**
@@ -671,7 +665,6 @@ class UserController extends DashboardController {
             $this->EventArguments['UserRoleData'] = &$UserRoleData;
 
             $this->fireEvent("BeforeUserEdit");
-            $this->setData('AllowEditing', $AllowEditing);
 
             $BanReversible = $User['Banned'] & (BanModel::BAN_AUTOMATIC | BanModel::BAN_MANUAL);
             $this->setData('BanFlag', $BanReversible ? $User['Banned'] : 1);
@@ -755,6 +748,10 @@ class UserController extends DashboardController {
             }
         } catch (Exception $Ex) {
             $this->Form->addError($Ex);
+        }
+
+        if (!$AllowEditing) {
+            deprecated('The `AllowEditing` event parameter', '', 'March 2017');
         }
 
         $this->setData('User', $User);

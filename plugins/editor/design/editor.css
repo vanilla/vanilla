@@ -5,7 +5,7 @@
   position: absolute;
   width: 0%;
   overflow: hidden;
-  background: #38ABE3 url(/applications/dashboard/design/images/upload-progress-back.gif) repeat;
+  background: #38ABE3 url(../../../applications/dashboard/design/images/upload-progress-back.gif) repeat;
   margin: -2px 0 0 0;
   width: 0;
   height: 5px;

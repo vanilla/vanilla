@@ -8,15 +8,13 @@
  * @param int $indent
  * @param bool $allowSorting
  */
-function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
-
-    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
+function writeCategoryTree($categories, $allowSorting = true) {
+    echo "<ol class=\"js-nestable-list nestable-list\">\n";
 
     foreach ($categories as $category) {
-        writeCategoryItem($category, $indent + 1, $allowSorting);
+        writeCategoryItem($category, $allowSorting);
     }
-    echo "$i</ol>\n";
+    echo "</ol>\n";
 }
 
 /**
@@ -48,7 +46,7 @@ function categoryFilterBox(array $options = []) {
     }
 
     if ($useSearchInput) {
-        return $form->searchInput('', '', $attr);
+        return $form->searchInput('', '', $attr, '', ['class' => 'toolbar-main']);
     }
 
     return $form->input('', '', $attr);
@@ -61,35 +59,35 @@ function categoryFilterBox(array $options = []) {
  * @param int $indent
  * @param bool $allowSorting
  */
-function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
-
-    echo "$i<li class=\"dd-item tree-item\" data-id=\"{$category['CategoryID']}\">\n$i";
-    if ($allowSorting) {
-        echo "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>";
-    }
-    echo "<div class=\"dd-content tree-content\">";
+function writeCategoryItem($category, $allowSorting = true) {
+    $categoryID = $category['CategoryID'];
+    $handle = $allowSorting ? '<div class="js-nestable-handle nestable-handle"></div>' : '';
+    $icon = $allowSorting ? '<div class="btn btn-icon plank-icon">'.symbol('handle', t('Drag')).'</div>' : '';
+    $categoryName = htmlspecialchars($category['Name']);
 
     if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
-        echo anchor(
-            htmlspecialchars($category['Name']),
-            '/vanilla/settings/categories?parent='.urlencode($category['UrlCode'])
-        );
-    } else {
-        echo htmlspecialchars($category['Name']);
+        $url = '/vanilla/settings/categories?parent='.urlencode($category['UrlCode']);
+        $categoryName = anchor($categoryName, $url);
     }
-
-    echo "\n$i  <div class=\"options\">";
-    writeCategoryOptions($category);
-    echo "</div>";
-
-    echo "</div>\n";
-
-    if (!empty($category['Children'])) {
-        writeCategoryTree($category['Children'], $indent + 1);
-    }
-
-    echo "$i</li>\n";
+    ?>
+    <li class="js-nestable-item js-category-item nestable-item" data-id="<?php echo $categoryID; ?>">
+        <?php echo $handle; ?>
+        <div class="nestable-content plank">
+            <?php echo $icon; ?>
+            <div class="plank-title">
+                <?php echo $categoryName; ?>
+            </div>
+            <div class="plank-options">
+                <?php writeCategoryOptions($category); ?>
+            </div>
+        </div>
+        <?php
+        if (!empty($category['Children'])) :
+            writeCategoryTree($category['Children'], $allowSorting);
+        endif;
+        ?>
+    </li>
+    <?php
 }
 
 /**
@@ -147,7 +145,7 @@ function writeCategoryOptions($category) {
  * @param array $ancestors
  */
 function writeCategoryBreadcrumbs($ancestors) {
-    echo '<div class="bigcrumbs full-border">';
+    echo '<div class="bigcrumbs">';
 
     writeCategoryBreadcrumb(
         t('Home'),

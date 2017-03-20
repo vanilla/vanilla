@@ -1,0 +1,111 @@
+// Nestable
+//
+// This works with our implementation of Nestable.js to allow sorting and nesting of items in a list.
+// You can currently see this on the category settings page in the dashboard. The markup for the nestable
+// component is very particular. If you try getting creative with the structure, you may run into some
+// functional issues with the Nestable.js javascript. The nestable handle is the area of the nestable item
+// that is able to be dragged-and-dropped when clicked. The example below shows the nested handle as a
+// sibling to the content. You could also wrap the content in the handle div to make the entire content a
+// clickable drag-and-drop target.
+//
+// The CSS implementation below works with the plank component. You may need to adapt the handle size to work with
+// any other list.
+//
+// Markup:
+// <div class="js-nestable nestable-container">
+//   <ol class="js-nestable-list nestable-list">
+//     <li class="js-nestable-item nestable-item">
+//       <div class="js-nestable-handle nestable-handle"></div>
+//       <div class="nestable-content">
+//         Item 1
+//       </div>
+//     </li>
+//     <li class="js-nestable-item nestable-item">
+//       <div class="js-nestable-handle nestable-handle"></div>
+//       <div class="nestable-content">
+//         Item 2
+//       </div>
+//       <ol class="js-nestable-list nestable-list">
+//         <li class="js-nestable-item nestable-item">
+//           <div class="js-nestable-handle nestable-handle"></div>
+//           <div class="nestable-content">
+//             Item 2.1
+//           </div>
+//         </li>
+//         <li class="js-nestable-item nestable-item">
+//           <div class="js-nestable-handle nestable-handle"></div>
+//           <div class="nestable-content">
+//             Item 2.2
+//           </div>
+//         </li>
+//         <li class="js-nestable-item nestable-item">
+//           <div class="js-nestable-handle nestable-handle"></div>
+//           <div class="nestable-content">
+//             Item 2.3
+//           </div>
+//         </li>
+//       </ol>
+//     </li>
+//   </ol>
+// </div>
+//
+// No styleguide reference.
+
+.nestable-list,
+.nestable-dragel {
+  @include list-reset();
+}
+
+.nestable-item .nestable-item,
+.nestable-item .nestable-placeholder {
+  margin-left: to-rem(30);
+}
+
+.nestable-item,
+.nestable-empty,
+.nestable-placeholder {
+  display: block;
+  position: relative;
+  margin: 0 0 to-rem(6);
+  padding: 0;
+}
+
+// Placeholder positions or empty positions.
+.nestable-empty,
+.nestable-placeholder {
+  background: #f1faff;
+  border: $border-width dashed #0291db;
+  cursor: grabbing;
+}
+
+// Collapse button.
+.nestable-collapse {
+  position: absolute;
+  display: block;
+  width: to-rem(20);
+  height: $control-height-rem;
+  left: to-rem(36);
+}
+
+// The section of the item that you can click on to reorder it.
+.nestable-handle {
+  position: absolute;
+  display: block;
+  width: $control-height-rem;
+  height: $control-height-rem;
+  cursor: move;
+  cursor: grab;
+}
+
+// The floating preview during reordering.
+.nestable-dragel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .8;
+  cursor: grabbing;
+}
+
+.nestable-content {
+  margin-bottom: to-rem(6);
+}

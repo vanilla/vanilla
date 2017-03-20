@@ -19,9 +19,20 @@
                 return;
             }
 
-            $('.dd', e.target).nestable({
-                expandBtnHTML: '<button data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
-                collapseBtnHTML: '<button data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
+            $('.js-nestable', e.target).nestable({
+                listNodeName    : 'ol',
+                itemNodeName    : 'li',
+                rootClass       : 'js-nestable', // selector
+                listClass       : 'js-nestable-list', // selector
+                itemClass       : 'js-nestable-item', // selector
+                dragClass       : 'nestable-dragel', // applied to item being dragged
+                handleClass     : 'js-nestable-handle', // selector
+                collapsedClass  : 'nestable-collapsed', // applied to collapsed lists
+                placeClass      : 'nestable-placeholder', // applied to position we're moving item from
+                noDragClass     : 'js-nestable-nodrag',
+                emptyClass      : 'nestable-empty', // applied to empty list elements
+                expandBtnHTML   : '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
+                collapseBtnHTML : '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
             })
             .on('dragEnd', function(event, item, source, destination, position) {
                 var tree = $(source).nestable('serialize');
@@ -48,17 +59,15 @@
             e.preventDefault();
 
             var displayAs = $(this).data('displayas');
-            var $content = $(this).closest('.dd-content');
-            var $item = $(this).closest('.dd-item');
+            var $item = $(this).closest('.js-category-item');
             var categoryID = $item.data('id');
-            var currentDisplayAs = $('.js-displayas.selected', $item).data('displayas');
 
-            var setUI = function ($content, displayAs) {
+            var setUI = function ($item, displayAs) {
                 displayAs = displayAs.toLowerCase();
 
                 // Deselect the wrong menu items and select the right one.
-                $('.js-displayas', $content).removeClass('selected');
-                $('.js-displayas[data-displayas=' + displayAs + ']', $content).addClass('selected');
+                $('.js-displayas', $item).removeClass('selected');
+                $('.js-displayas[data-displayas=' + displayAs + ']', $item).addClass('selected');
 
                 // Change the options SVG.
                 var svgMap = {categories: "nested"};
@@ -67,7 +76,7 @@
                 svg = ' <svg class="icon icon-16 icon-' + svg + '" viewBox="0 0 16 16"><use xlink:href="#' + svg + '" /></svg> ';
                 $('.dropdown-toggle[data-id="' + categoryID + '"]').each(function() {
                     $(this).html(svg);
-                    options = $('.tree-item[data-id="' + categoryID + '"] .options').html();
+                    options = $('.js-nestable-item[data-id="' + categoryID + '"] .options').html();
                 });
 
                 $(document).trigger('updateDisplayAs', {categoryID: categoryID, options: options});
@@ -87,7 +96,7 @@
                     gdn.informError(xhr);
                 },
                 success: function (data) {
-                    setUI($content, data.DisplayAs);
+                    setUI($item, data.DisplayAs);
                 }
             });
         })

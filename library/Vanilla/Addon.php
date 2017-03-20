@@ -205,14 +205,15 @@ class Addon {
      * Perform a glob from this addon's subdirectory.
      *
      * @param string $pattern The pattern to glob.
+     * @param string $dirs Just directories.
      * @return array Returns an array of root-relative paths.
      * @see glob()
      */
-    private function glob($pattern) {
+    private function glob($pattern, $dirs = false) {
         $px = $this->path();
         $fullPattern = $px.$pattern;
         $strlen = strlen($px);
-        $paths = glob($fullPattern, GLOB_NOSORT);
+        $paths = glob($fullPattern, GLOB_NOSORT | ($dirs ? GLOB_ONLYDIR : 0));
         if (!is_array($paths)) {
             return [];
         }
@@ -448,23 +449,62 @@ class Addon {
         return $classes;
     }
 
+    /**
+     * Scan the addon for potential class paths.
+     *
+     * @return \Traversable Returns a list of paths to PHP files.
+     */
     private function scanClassPaths() {
-        $globs = [
-            '/*.php',
-            '/controllers/*.php',
-            '/library/*.php',
-            '/models/*.php',
-            '/modules/*.php',
+        $dirs = [
+            '',
+            '/controllers',
+            '/Controllers',
+            '/library',
+            '/src',
+            '/models',
+            '/Models',
+            '/modules',
+            '/Modules',
             '/settings/class.hooks.php'
         ];
 
-        $result = [];
-        foreach ($globs as $glob) {
-            $paths = $this->glob($glob);
-            $result = array_merge($result, $paths);
+        foreach ($dirs as $dir) {
+            foreach ($this->scanDirPhp($dir) as $path) {
+                yield $path;
+            }
+        }
+    }
+
+    /**
+     * Recursively scan a directory for PHP files.
+     *
+     * @param string $dir The path to the directory to scan.
+     * @return \Traversable Returns a list of paths to PHP files.
+     */
+    private function scanDirPhp($dir) {
+        if (substr($dir, -4) === '.php') {
+            if (file_exists($this->path($dir, Addon::PATH_FULL))) {
+                yield $dir;
+            }
+            return;
         }
 
-        return $result;
+        // Get the php files in the directory.
+        foreach ($this->glob("$dir/*.php") as $path) {
+            yield $path;
+        }
+
+        // Don't recursively scan the root of an addon.
+        if (empty($dir)) {
+            return;
+        }
+
+        // Get all of the php files from subdirectories.
+        foreach ($this->glob("$dir/*", true) as $subdir) {
+            foreach ($this->scanDirPhp($subdir) as $path) {
+                yield $path;
+            }
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\InjectableInterface;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -84,7 +85,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Config')
 
     // AddonManager
-    ->rule('Vanilla\\AddonManager')
+    ->rule(Vanilla\AddonManager::class)
     ->setShared(true)
     ->setConstructorArgs([
         [
@@ -127,6 +128,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addCall('fromEnvironment')
     ->addAlias('Request')
+    ->addAlias(\Garden\Web\RequestInterface::class)
 
     // Database.
     ->rule('Gdn_Database')

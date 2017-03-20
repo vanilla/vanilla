@@ -168,11 +168,6 @@ abstract class Gdn_Cache {
             $CacheObject->autorun();
         }
 
-        // This should only fire when cache is loading automatically
-        if (!func_num_args() && Gdn::pluginManager() instanceof Gdn_PluginManager) {
-            Gdn::pluginManager()->fireEvent('AfterActiveCache');
-        }
-
         return $CacheObject;
     }
 
@@ -196,12 +191,6 @@ abstract class Gdn_Cache {
             $ActiveCache = CACHE_METHOD_OVERRIDE;
         } else {
             $ActiveCache = c('Cache.Method', false);
-        }
-
-        // This should only fire when cache is loading automatically
-        if (!func_num_args() && Gdn::pluginManager() instanceof Gdn_PluginManager) {
-            Gdn::pluginManager()->EventArguments['ActiveCache'] = &$ActiveCache;
-            Gdn::pluginManager()->fireEvent('BeforeActiveCache');
         }
 
         return $ActiveCache;

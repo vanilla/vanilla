@@ -2280,9 +2280,6 @@ class DiscussionModel extends VanillaModel {
 
         $this->SQL->update('Category')
             ->set('CountDiscussions', 'CountDiscussions + 1', false)
-            ->set('LastDiscussionID', val('DiscussionID', $Discussion))
-            ->set('LastCommentID', null)
-            ->set('LastDateInserted', val('DateInserted', $Discussion))
             ->where('CategoryID', val('CategoryID', $Discussion))
             ->put();
 
@@ -2292,11 +2289,11 @@ class DiscussionModel extends VanillaModel {
                 'CountDiscussions' => $Category['CountDiscussions'] + 1,
                 'LastDiscussionID' => val('DiscussionID', $Discussion),
                 'LastCommentID' => null,
-                'LastDateInserted' => val('DateInserted', $Discussion),
-                'LastTitle' => Gdn_Format::text(val('Name', $Discussion, t('No Title'))),
-                'LastUserID' => val('InsertUserID', $Discussion),
-                'LastDiscussionUserID' => val('InsertUserID', $Discussion),
-                'LastUrl' => DiscussionUrl($Discussion, false, '//').'#latest']);
+                'LastDiscussionUserID' => val('InsertUserID', $Discussion)
+            ]);
+
+            $categoryModel = new CategoryModel;
+            $categoryModel->setRecentPost($Category['CategoryID'], $Discussion);
         }
     }
 

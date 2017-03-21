@@ -153,9 +153,12 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
      * which is a value of any type other than a resource.
      */
     public function jsonSerialize() {
-        $context = array_filter($this->context, function ($key) {
-            return !(strpos($key, 'HTTP_') === 0);
-        }, ARRAY_FILTER_USE_KEY);
+        $context = [];
+        foreach ($this->context as $key => $value) {
+            if (!(strpos($key, 'HTTP_') === 0)) {
+                $context[$key = $value];
+            }
+        }
 
         $result = [
             'message' => $this->getMessage(),

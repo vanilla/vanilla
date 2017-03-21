@@ -113,7 +113,7 @@ abstract class Controller implements InjectableInterface {
             // The type is a specific type of schema.
             $schema->merge(new Schema(['id' => $id])); // kludge for now
 
-            $this->eventManager->fire("{$id}Schema", $schema);
+            $this->eventManager->fire("{$id}Schema_init", $schema);
         }
 
         // Fire a generic schema event for documentation.

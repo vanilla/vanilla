@@ -3110,6 +3110,27 @@ if (!function_exists('safeImage')) {
     }
 }
 
+if (!function_exists('matchesTrustedDomain')) {
+    /**
+     * Tests whether a given url matches one of our trusted domains.
+     *
+     * @param string $url The url to test.
+     * @return bool Whether the url matches a trusted domain.
+     */
+    function matchesTrustedDomain($url = '') {
+        $url = url($url, true);
+        $trustedDomains = trustedDomains();
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $url)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 if (!function_exists('safeRedirect')) {
     /**
      * Redirect, but only to a safe domain.
@@ -3118,20 +3139,12 @@ if (!function_exists('safeRedirect')) {
      * @param int $StatusCode The status of the redirect. Defaults to 302.
      */
     function safeRedirect($Destination = false, $StatusCode = null) {
+        $isTrustedDomain = matchesTrustedDomain($Destination);
+
         if (!$Destination) {
             $Destination = Url('', true);
         } else {
             $Destination = Url($Destination, true);
-        }
-
-        $trustedDomains = TrustedDomains();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $Destination)) {
-                $isTrustedDomain = true;
-                break;
-            }
         }
 
         if ($isTrustedDomain) {
@@ -3141,7 +3154,7 @@ if (!function_exists('safeRedirect')) {
                 'url' => $Destination
             ]);
 
-            redirect(url("/home/leaving?Target=".urlencode($Destination)));
+            redirect("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }

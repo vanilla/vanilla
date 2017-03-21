@@ -52,6 +52,8 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
+            'Garden.Format.WarnLeaving',
+            'Garden.Format.DisableUrlEmbeds',
             'Garden.TrustedDomains'
         ));
 
@@ -88,6 +90,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $TrustedDomains = array_unique(array_filter($TrustedDomains));
             $TrustedDomains = implode("\n", $TrustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
 
             // Save new settings
             $Saved = $this->Form->save();

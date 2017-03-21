@@ -171,7 +171,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
-    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route')])
+    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

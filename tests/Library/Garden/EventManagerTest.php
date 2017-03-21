@@ -450,4 +450,25 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
         return $r;
     }
+
+    /**
+     * Test {@link EventManager::unbind()}.
+     */
+    public function testUnbind() {
+        $em = new EventManager();
+
+        $fired = false;
+        $fn = function () use (&$fired) {
+            $fired = true;
+        };
+
+        $em->bind('e', $fn);
+        $this->assertTrue($em->hasHandler('e'));
+
+        $em->unbind('e', $fn);
+        $this->assertFalse($em->hasHandler('e'));
+
+        $r = $em->fire('e');
+        $this->assertEmpty($r);
+    }
 }

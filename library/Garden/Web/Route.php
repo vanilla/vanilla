@@ -198,8 +198,9 @@ abstract class Route {
      * @param \ReflectionParameter $param The name of the parameter to check.
      * @param int $type Pass a **MAP_*** constant if you want to check for a specific mapping.
      * @return bool Returns **true** if the parameter is mapped, or **false** otherwise.
+     * @internal This method will be protected again at some point. Do not use.
      */
-    protected function isMapped(\ReflectionParameter $param, $type = 0) {
+    public function isMapped(\ReflectionParameter $param, $type = 0) {
         if ($param->getClass() !== null && $param->getClass()->implementsInterface(RequestInterface::class)) {
             $mapping = Route::MAP_REQUEST;
         } elseif (empty($this->mappings[strtolower($param->getName())])) {

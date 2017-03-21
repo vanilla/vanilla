@@ -102,9 +102,26 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
      * @param array $context An array of context variables that can be used to render a more detailed response.
      */
     public static function createFromStatus($code, $message = '', array $context = []) {
+        // Try for a specific error message.
         switch ($code) {
+            case 403:
+                return new ForbiddenException($message, $context);
             case 404:
                 return new NotFoundException($message);
+            case 405:
+                $method = empty($context['method']) ? '' : $context['method'];
+                $allow = empty($context['allow']) ? [] : $context['allow'];
+                unset ($context['method'], $context['allow']);
+
+                return new MethodNotAllowedException($method, $allow, $context);
+        }
+
+        if ($code >= 500) {
+            return new ServerException($message, $code, $context);
+        } elseif ($code >= 400) {
+            return new ClientException($message, $code, $context);
+        } else {
+            return new ServerException($message, 500, $context + ['HTTP_X_ERROR_CODE' => $code]);
         }
     }
 

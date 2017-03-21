@@ -21,8 +21,12 @@ class MethodNotAllowedException extends ClientException {
      */
     public function __construct($method, $allow = [], array $context = []) {
         $allow = (array)$allow;
-        $message = sprintf('%s not allowed.', strtoupper($method));
-        parent::__construct($message, 405, ['HTTP_ALLOW' => strtoupper(implode(', ', $allow))] + $context);
+        if (!empty($method)) {
+            $message = sprintf('%s not allowed.', strtoupper($method));
+        } else {
+            $message = 'Method not allowed.';
+        }
+        parent::__construct($message, 405, ['method' => $method, 'allow' => $allow] + $context);
     }
 
     /**
@@ -31,6 +35,6 @@ class MethodNotAllowedException extends ClientException {
      * @return array Returns an array of allowed methods.
      */
     public function getAllow() {
-        return array_map('trim', explode(',', $this->getContextItem('HTTP_ALLOW', '')));
+        return $this->getContextItem('allow', '');
     }
 }

@@ -1103,6 +1103,16 @@ class ActivityModel extends Gdn_Model {
                 $Comment['ActivityID'] = $CommentActivityID;
             }
 
+            // Flood control check (spamming)
+            $floodControl = FloodControl::getInstance();
+            if ($floodControl->isCurrentUserSpamming(FloodControl::TYPE_ACTIVITY_COMMENT)) {
+                $this->Validation->addValidationResult(
+                    'Body',
+                    '@'.$floodControl->getWarningMessage(FloodControl::TYPE_ACTIVITY_COMMENT)
+                );
+                return false;
+            }
+
             // Check for spam.
             $Spam = SpamModel::isSpam('ActivityComment', $Comment);
             if ($Spam) {
@@ -1476,6 +1486,16 @@ class ActivityModel extends Gdn_Model {
         $ActivityID = val('ActivityID', $Activity);
         if (!$ActivityID) {
             if (!$Delete) {
+                // Flood control check (spamming)
+                $floodControl = FloodControl::getInstance();
+                if ($floodControl->isCurrentUserSpamming(FloodControl::TYPE_ACTIVITY)) {
+                    $this->Validation->addValidationResult(
+                        'Body',
+                        '@'.$floodControl->getWarningMessage(FloodControl::TYPE_ACTIVITY)
+                    );
+                    return false;
+                }
+
                 $this->addInsertFields($Activity);
                 touchValue('DateUpdated', $Activity, $Activity['DateInserted']);
 

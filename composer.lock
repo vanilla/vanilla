@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "701901c817dc15dab0fa9b3d6fbdd3c3",
+    "content-hash": "d78de5241092d2a68acb3bb94a013d25",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -170,24 +170,40 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.22",
+            "version": "v5.2.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663"
+                "reference": "7115df4a6f76281109ebe352900c42403b728bb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/b18cb98131bd83103ccb26a888fdfe3177b8a663",
-                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/7115df4a6f76281109ebe352900c42403b728bb4",
+                "reference": "7115df4a6f76281109ebe352900c42403b728bb4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.0.0"
             },
             "require-dev": {
-                "phpdocumentor/phpdocumentor": "*",
-                "phpunit/phpunit": "4.7.*"
+                "doctrine/annotations": "1.2.*",
+                "jms/serializer": "0.16.*",
+                "phpdocumentor/phpdocumentor": "2.*",
+                "phpunit/phpunit": "4.8.*",
+                "symfony/debug": "2.8.*",
+                "symfony/filesystem": "2.8.*",
+                "symfony/translation": "2.8.*",
+                "symfony/yaml": "2.8.*",
+                "zendframework/zend-cache": "2.5.1",
+                "zendframework/zend-config": "2.5.1",
+                "zendframework/zend-eventmanager": "2.5.1",
+                "zendframework/zend-filter": "2.5.1",
+                "zendframework/zend-i18n": "2.5.1",
+                "zendframework/zend-json": "2.5.1",
+                "zendframework/zend-math": "2.5.1",
+                "zendframework/zend-serializer": "2.5.*",
+                "zendframework/zend-servicemanager": "2.5.*",
+                "zendframework/zend-stdlib": "2.5.1"
             },
             "suggest": {
                 "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
@@ -226,7 +242,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-01-09T09:33:47+00:00"
+            "time": "2017-03-15T19:32:56+00:00"
         },
         {
             "name": "psr/container",
@@ -616,16 +632,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.4.0",
+            "version": "v1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "6342982d3887c7fa9236e8861787a48e89e6c694"
+                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/6342982d3887c7fa9236e8861787a48e89e6c694",
-                "reference": "6342982d3887c7fa9236e8861787a48e89e6c694",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/cb56f87a440a18f92c78d7df2e7d11501fcd837b",
+                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b",
                 "shasum": ""
             },
             "require": {
@@ -648,7 +664,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-03-14T14:00:34+00:00"
+            "time": "2017-03-17T18:00:12+00:00"
         },
         {
             "name": "vanilla/htmlawed",

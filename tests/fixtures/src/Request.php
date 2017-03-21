@@ -56,4 +56,17 @@ class Request implements RequestInterface {
     public function getBody() {
         return $this->body;
     }
+
+    /**
+     * Get the hostname of the request.
+     *
+     * @return string
+     */
+    public function getHost() {
+        return 'example.com';
+    }
+
+    public function getRoot() {
+        return '';
+    }
 }

@@ -84,6 +84,20 @@ class EventManager {
     }
 
     /**
+     * Remove an event handler.
+     *
+     * @param string $event The name of the event to unbind.
+     * @param callable $callback The event handler to remove.
+     */
+    public function unbind($event, callable $callback) {
+        $event = strtolower($event);
+
+        if (!empty($this->handlers[$event]) && $index = array_search($callback, $this->handlers[$event], true)) {
+            unset($this->handlers[$event][$index]);
+        }
+    }
+
+    /**
      * Bind a class' declared event handlers.
      *
      * Plugin classes declare event handlers in the following way:

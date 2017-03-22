@@ -17,7 +17,7 @@ class Request implements RequestInterface {
     private $path;
     private $query = [];
     private $body = [];
-
+    private $headers = [];
 
     public function __construct($path = '/', $method = 'GET', array $data = []) {
         $query = [];
@@ -68,5 +68,26 @@ class Request implements RequestInterface {
 
     public function getRoot() {
         return '';
+    }
+
+    /**
+     * Get a header value.
+     *
+     * @param string $header The name of the header.
+     * @param mixed $default The default value if the header does not exist.
+     * @return mixed Returns the header value or {@link $default}.
+     */
+    public function getHeader($header, $default = null) {
+        return isset($this->headers[$header]) ? $this->headers[$header] : $default;
+    }
+
+    /**
+     * Checks if a header exists by the given case-insensitive name.
+     *
+     * @param string $header Case-insensitive header name.
+     * @return bool Returns **true** if the header exists or **false** otherwise.
+     */
+    public function hasHeader($header) {
+        return !empty($this->headers[$header]);
     }
 }

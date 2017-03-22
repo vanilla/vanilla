@@ -1733,25 +1733,25 @@ EOT;
         }
 
         foreach ($matches as $image)  {
-            $imageUrl = parse_url($image[1]);
-            $stripImage = false;
+            $imageUrl = (isset($image[1])) ? parse_url($image[1]) : null;
+            $stripImage = true;
 
-            // If the image is not coming from this forum's CDN, strip this image.
+            // If the image is coming from this forum's CDN, do not strip this image.
             if (c('S3.Prefix') && c('S3.Zone')) {
-                if ($imageUrl['host'] !== c('S3.Zone').".v-cdn.net" && !stringBeginsWith($imageUrl['path'], '/'.c('S3.Prefix'))) {
-                    $stripImage = true;
+                if (val('host', $imageUrl) === c('S3.Zone').".v-cdn.net" && stringBeginsWith(val('path', $imageUrl), '/'.c('S3.Prefix'))) {
+                    $stripImage = false;
                 }
             }
 
-            // If the host of the image source is a trusted domain, strip this image
-            if (!in_array(val('host', $imageUrl), trustedDomains())) {
-                $stripImage = true;
+            // If the host of the image source is a trusted domain and not from the CDN, strip this image
+            if (in_array(val('host', $imageUrl), trustedDomains()) && $stripImage === true) {
+                $stripImage = false;
             }
 
             // Replace the image embed tag with a link to the image.
             if ($stripImage) {
-                $imageName = trim(substr(val('path', $imageUrl), strrpos(val('path', $imageUrl), '\/')), '/');
-                $html = preg_replace('/\<img\s+src\s*=\s*[\"\']('.preg_quote($image[1], '/').')[\"\'].*\>/', '<a href="$1" target="_blank" title="'.t('Image from unconfirmed host').'">'.$imageName.'</a>', $html);
+                $imageName = trim(substr(val('path', $imageUrl), strrpos(val('path', $imageUrl), '/')), '/');
+                $html = preg_replace('/\<img\s+src\s*=\s*[\"\']('.preg_quote($image[1], '/').')[\"\'].*\>/', '<a href="$1">'.$imageName.'</a>', $html);
             }
         }
         return $html;

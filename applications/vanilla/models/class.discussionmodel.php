@@ -482,6 +482,13 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getDefaultLimit() {
+        return Gdn::config('Vanilla.Discussions.PerPage', 50);
+    }
+
+    /**
      * Get a list of the most recent discussions.
      *
      * @param array|false $Where The where condition of the get.

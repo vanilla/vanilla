@@ -1519,7 +1519,8 @@ EOT;
         $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
 
         if (c('Garden.Format.WarnLeaving', false)) {
-            if (!matchesTrustedDomain($url)) {
+            $domain = parse_url($url, PHP_URL_HOST);
+            if (isTrustedDomain($domain)) {
                 return '<a href="'.url('/home/leaving?target='.$url).'" class="Popup">'.$text.'</a>'.$punc;
             }
         }

@@ -17,5 +17,3 @@ namespace Deeply\Nested\Namespaced\Fixture {
         }
     }
 }
-
-

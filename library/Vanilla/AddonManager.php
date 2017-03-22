@@ -72,11 +72,6 @@ class AddonManager {
      */
     private $autoloadClasses = [];
 
-    /**
-     * @var array A backup of same-named classes from the autoloader.
-     */
-    private $autoloadClassesBak = [];
-
     /// Methods ///
 
     /**

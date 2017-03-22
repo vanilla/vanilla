@@ -420,7 +420,7 @@ class Addon {
         foreach ($paths as $path) {
             $declarations = static::scanFile($this->path($path));
             foreach ($declarations as $namespaceRow) {
-                if (isset($namespaceRow['namespace']) && $namespaceRow) {
+                if (isset($namespaceRow['namespace'])) {
                     $namespace = rtrim($namespaceRow['namespace'], '\\').'\\';
                     $namespaceClasses = $namespaceRow['classes'];
                 } else {
@@ -429,8 +429,12 @@ class Addon {
                 }
 
                 foreach ($namespaceClasses as $classRow) {
-                    $className = $namespace.$classRow['name'];
-                    $classes[strtolower($className)] = [$className, $path];
+                    $className = $classRow['name'];
+                    $classes[strtolower($className)] = [
+                        'namespace' => $namespace,
+                        'className' => $className,
+                        'path' => $path,
+                    ];
 
                     // Check to see if the class is a plugin or a hook.
                     if (strcasecmp(substr($className, -6), 'plugin') === 0
@@ -438,9 +442,9 @@ class Addon {
                     ) {
 
                         if (empty($this->special['plugin'])) {
-                            $this->special['plugin'] = $className;
+                            $this->special['plugin'] = $namespace.$className;
                         } else {
-                            $this->special['otherPlugins'][] = $className;
+                            $this->special['otherPlugins'][] = $namespace.$className;
                         }
                     }
                 }
@@ -564,7 +568,9 @@ class Addon {
                 }
 
                 $ns = trim($ns);
-                $final[$k] = array('namespace' => $ns, 'classes' => $classes[$k + 1]);
+                if (!empty($classes[$k + 1])) {
+                    $final[$k] = array('namespace' => $ns, 'classes' => $classes[$k + 1]);
+                }
             }
             $classes = $final;
         }
@@ -1071,8 +1077,8 @@ class Addon {
         try {
             // Include the plugin file.
             if ($className = $this->getPluginClass()) {
-                list($_, $path) = $this->classes[strtolower($className)];
-                include_once $this->path($path);
+                $classInfo = self::parseFullyQualifiedClass($className);
+                include_once $this->path($this->classes[strtolower($classInfo['className'])]['path']);
             }
 
             // Include the configuration file.
@@ -1104,7 +1110,7 @@ class Addon {
     /**
      * Get the name of the plugin class for this addon, if any.
      *
-     * @return string Returns the name of the class or an empty string if it doesn't have one.
+     * @return string Returns the fully qualified name of the class or an empty string if it doesn't have one.
      */
     public function getPluginClass() {
         return isset($this->special['plugin']) ? $this->special['plugin'] : '';
@@ -1141,14 +1147,15 @@ class Addon {
      *
      * This is a case insensitive lookup.
      *
-     * @param string $classname The name of the class.
+     * @param string $fqClassName Fully qualified class name.
      * @param string $relative One of the **Addon::PATH*** constants.
      * @return string Returns the path or an empty string of the class isn't found.
      */
-    public function getClassPath($classname, $relative = self::PATH_FULL) {
-        $key = strtolower($classname);
+    public function getClassPath($fqClassName, $relative = self::PATH_FULL) {
+        $classInfo = self::parseFullyQualifiedClass($fqClassName);
+        $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
-            $path = $this->path($this->classes[$key][1], $relative);
+            $path = $this->path($this->classes[$key]['path'], $relative);
             return $path;
         }
         return '';
@@ -1172,5 +1179,26 @@ class Addon {
             }
         }
         return '';
+    }
+
+    /**
+     * Parse a fully qualified class name and return the namespace and className of it.
+     *
+     * @param string $fqClassName Fully qualified class name.
+     * @return array ['namespace' => $namespace, 'className' => $className]
+     */
+    public static function parseFullyQualifiedClass($fqClassName) {
+        $lastNamespaceSeparatorPos = strrpos($fqClassName, '\\');
+        if ($lastNamespaceSeparatorPos === false) {
+            $namespace = '';
+            $className = $fqClassName;
+        } else {
+            list($namespace, $className) = str_split($fqClassName, $lastNamespaceSeparatorPos+1);
+        }
+
+        return [
+            'namespace' => $namespace,
+            'className' => $className,
+        ];
     }
 }

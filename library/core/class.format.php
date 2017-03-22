@@ -1239,55 +1239,40 @@ class Gdn_Format {
         // The is an array of strings. If there are more than one way to match the url, you can add multiple regex strings
         // in the regex array. This is useful for backwards-compatibility when a service updates its url structure.
         $embeds = [
-            'youtube' => [
-                'test' => ['youtu'],
+            'YouTube' => [
                 'regex' => ['/https?:\/\/(?:(?:www.)|(?:m.))?(?:(?:youtube.com)|(?:youtu.be))\/(?:(?:playlist?)|(?:(?:watch\?v=)?(?P<videoId>[\w-]{11})))(?:\?|\&)?(?:list=(?P<listId>[\w-]*))?(?:t=(?:(?P<minutes>\d)*m)?(?P<seconds>\d)*s)?(?:#t=(?P<start>\d*))?/i']
             ],
-            'twitter' => [
-                'test' => ['twitter'],
+            'Twitter' => [
                 'regex' => ['/https?:\/\/(?:www\.)?twitter\.com\/(?:#!\/)?(?:[^\/]+)\/status(?:es)?\/([\d]+)/i']
             ],
-            'vimeo' => [
-                'test' => ['vimeo'],
+            'Vimeo' => [
                 'regex' => ['/https?:\/\/(?:www\.)?vimeo\.com\/(?:channels\/[a-z0-9]+\/)?(\d+)/i']
             ],
-            'vine' => [
-                'test' => ['vine'],
+            'Vine' => [
                 'regex' => ['/https?:\/\/(?:www\.)?vine\.co\/(?:v\/)?([\w]+)/i']
             ],
-            'instagram' => [
-                'test' => ['instagr'],
+            'Instagram' => [
                 'regex' => ['/https?:\/\/(?:www\.)?instagr(?:\.am|am\.com)\/p\/([\w-]+)/i']
             ],
-            'pinterest' => [
-                'test' => ['pinterest'],
+            'Pinterest' => [
                 'regex' => ['/https?:\/\/(?:www\.)?pinterest\.com\/pin\/([\d]+)/i']
             ],
-            'getty' => [
-                'test' => ['gettyimages'],
+            'Getty' => [
                 'regex' => ['/https?:\/\/embed.gettyimages\.com\/([\w=?&;+-_]*)\/([\d]*)\/([\d]*)/i']
             ],
-            'twitch' => [
-                'test' => ['twitch'],
+            'Twitch' => [
                 'regex' => ['/https?:\/\/(?:www\.)?twitch\.tv\/([\w]+)/i']
             ],
-            'hitbox' => [
-                'test' => ['hitbox'],
+            'Hitbox' => [
                 'regex' => ['/https?:\/\/(?:www\.)?hitbox\.tv\/([\w]+)/i'],
             ],
-            'soundcloud' => [
-                'test' => ['soundcloud'],
+            'Soundcloud' => [
                 'regex' => ['/https?:(?:www\.)?\/\/soundcloud\.com\/([\w=?&;+-_]*)\/([\w=?&;+-_]*)/i']
             ],
-            'imgurgifv' => [
-                'test' => ['gifv'],
+            'Gifv' => [
                 'regex' => ['/https?:\/\/i\.imgur\.com\/([a-z0-9]+)\.gifv/i'],
             ],
-            'wistia' => [
-                'test' => [
-                    'wistia',
-                    'wi.st'
-                ],
+            'Wistia' => [
                 'regex' => [
                     '/https?:\/\/(?:[A-za-z0-9\-]+\.)?(?:wistia\.com|wi\.st)\/.*?\?wvideo=(?<videoID>([A-za-z0-9]+))(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?/i',
                     '/https?:\/\/([A-za-z0-9\-]+\.)?(wistia\.com|wi\.st)\/medias\/(?<videoID>[A-za-z0-9]+)(\?wtime=(?<time>((\d)+m)?((\d)+s)?))?/i'
@@ -1297,20 +1282,19 @@ class Gdn_Format {
 
         $key = '';
 
-        // First, check the strpos to avoid having to do >= 11 preg_matches against every ugc url.
-        // Note that embedding may not work for urls that have multiple test strings in them
-        // (i.e., https://twitch.tv/twitter).
         foreach ($embeds as $embedKey => $value) {
-            foreach ($value['test'] as $test) {
-                if (strpos($url, $test) !== false) {
-                    $key = $embedKey;
+            foreach ($value['regex'] as $regex) {
+                if (preg_match($regex, $url, $matches)) {
+                    if (c('Garden.Format.'.$embedKey, true)) {
+                        $key = $embedKey;
+                    }
                     break;
                 }
             }
         }
 
         switch ($key) {
-            case 'youtube':
+            case 'YouTube':
                 // Supported youtube embed urls:
                 //
                 // http://www.youtube.com/playlist?list=PL4CFF79651DB8159B
@@ -1325,234 +1309,137 @@ class Gdn_Format {
                 // https://www.youtube.com/watch?v=p5kcBxL7-qI
                 // https://www.youtube.com/watch?v=bG6b3V2MNxQ#t=33
 
-                if (!c('Garden.Format.YouTube', true)) {
-                    return '';
-                }
+                $videoId = val('videoId', $matches);
+                $listId = val('listId', $matches);
 
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        $videoId = val('videoId', $matches);
-                        $listId = val('listId', $matches);
-
-                        if (!empty($listId)) {
-                            // Playlist.
-                            if (empty($videoId)) {
-                                // Playlist, no video.
-                                $result = <<<EOT
+                if (!empty($listId)) {
+                    // Playlist.
+                    if (empty($videoId)) {
+                        // Playlist, no video.
+                        $result = <<<EOT
 <iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/videoseries?list={$listId}" frameborder="0" allowfullscreen></iframe>
 EOT;
-                            } else {
-                                // Video in a playlist.
-                                $result = <<<EOT
+                    } else {
+                        // Video in a playlist.
+                        $result = <<<EOT
 <iframe width="{$width}" height="{$height}" src="https://www.youtube.com/embed/{$videoId}?list={$listId}" frameborder="0" allowfullscreen></iframe>
 EOT;
-                            }
-                        } else {
-                            // Regular ol' youtube video embed.
-                            $minutes = val('minutes', $matches);
-                            $seconds = val('seconds', $matches);
-                            $fullUrl = $videoId.'?autoplay=1';
-                            if (!empty($minutes) || !empty($seconds)) {
-                                $time = $minutes * 60 + $seconds;
-                                $fullUrl .= '&start='.$time;
-                            }
-
-                            // Jump to start time.
-                            if ($start = val('start', $matches)) {
-                                $fullUrl .= '&start='.$start;
-                                $start = '#t='.$start;
-                            }
-
-                            $result = '<span class="VideoWrap">';
-                            $result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
-
-                            $result .= '<span class="VideoPreview"><a href="https://www.youtube.com/watch?v='.$videoId.$start.'">';
-                            $result .= '<img src="https://img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$width.'" height="'.$height.'" border="0" /></a></span>';
-                            $result .= '<span class="VideoPlayer"></span>';
-                            $result .= '</span>';
-
-                        }
-                        $result .= '</span>';
-                        return $result;
                     }
+                } else {
+                    // Regular ol' youtube video embed.
+                    $minutes = val('minutes', $matches);
+                    $seconds = val('seconds', $matches);
+                    $fullUrl = $videoId.'?autoplay=1';
+                    if (!empty($minutes) || !empty($seconds)) {
+                        $time = $minutes * 60 + $seconds;
+                        $fullUrl .= '&start='.$time;
+                    }
+
+                    // Jump to start time.
+                    if ($start = val('start', $matches)) {
+                        $fullUrl .= '&start='.$start;
+                        $start = '#t='.$start;
+                    }
+
+                    $result = '<span class="VideoWrap">';
+                    $result .= '<span class="Video YouTube" data-youtube="youtube-'.$fullUrl.'">';
+
+                    $result .= '<span class="VideoPreview"><a href="https://www.youtube.com/watch?v='.$videoId.$start.'">';
+                    $result .= '<img src="https://img.youtube.com/vi/'.$videoId.'/0.jpg" width="'.$width.'" height="'.$height.'" border="0" /></a></span>';
+                    $result .= '<span class="VideoPlayer"></span>';
+                    $result .= '</span>';
+
                 }
+                $result .= '</span>';
+                return $result;
                 break;
 
-            case 'vimeo':
-                if (!c('Garden.Format.Vimeo', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        $id = $matches[1];
-                        return <<<EOT
+            case 'Vimeo':
+                $id = $matches[1];
+                return <<<EOT
 <iframe src="//player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
-                    }
-                }
                 break;
 
-                case 'imgurgifv':
-                    if (!c('Garden.Format.Gifv', true)) {
-                        return '';
-                    }
-
-                    foreach($embeds[$key]['regex'] as $regex) {
-                        if (preg_match($regex, $url, $matches)) {
-                            $id = $matches[1];
-                            $modernBrowser = T('Your browser does not support HTML5 video!');
-                            return <<<EOT
+            case 'Gifv':
+                $id = $matches[1];
+                $modernBrowser = T('Your browser does not support HTML5 video!');
+                return <<<EOT
 <div class="imgur-gifv VideoWrap">
-    <video poster="https://i.imgur.com/{$id}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
-        <source src="https://i.imgur.com/{$id}.webm" type="video/webm">
-        <source src="https://i.imgur.com/{$id}.mp4" type="video/mp4">
-        <p>{$modernBrowser} https://i.imgur.com/{$id}.gifv</p>
-    </video>
+<video poster="https://i.imgur.com/{$id}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
+<source src="https://i.imgur.com/{$id}.webm" type="video/webm">
+<source src="https://i.imgur.com/{$id}.mp4" type="video/mp4">
+<p>{$modernBrowser} https://i.imgur.com/{$id}.gifv</p>
+</video>
 </div>
 EOT;
-                    }
-                }
                 break;
 
-            case 'twitter':
-                if (!c('Garden.Format.Twitter', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Twitter':
+                return <<<EOT
 <div class="twitter-card" data-tweeturl="{$matches[0]}" data-tweetid="{$matches[1]}"><a href="{$matches[0]}" class="tweet-url" rel="nofollow">{$matches[0]}</a></div>
 EOT;
-                    }
-                }
                 break;
 
-            case 'vine':
-                if (!c('Garden.Format.Vine', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Vine':
+                return <<<EOT
 <div class="vine-video VideoWrap">
    <iframe class="vine-embed" src="//vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
-                    }
-                }
                 break;
 
-            case 'instagram':
-                if (!c('Garden.Format.Instagram', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Instagram':
+                return <<<EOT
 <div class="instagram-video VideoWrap">
    <iframe src="//instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
-                    }
-                }
                 break;
 
-            case 'pinterest':
-                if (!c('Garden.Format.Pinterest', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Pinterest':
+                return <<<EOT
 <a data-pin-do="embedPin" href="//pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
-                    }
-                }
                 break;
 
-            case 'getty':
-                if (!c('Garden.Format.Getty', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Getty':
+                return <<<EOT
 <iframe src="//embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
 EOT;
-                    }
-                }
                 break;
 
-            case 'twitch':
-                if (!c('Garden.Format.Twitch', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Twitch':
+                return <<<EOT
 <iframe src="http://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
-                    }
-                }
                 break;
 
-            case 'hitbox':
-                if (!c('Garden.Format.Hitbox', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        return <<<EOT
+            case 'Hitbox':
+                return <<<EOT
 <iframe src="http://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
 EOT;
-                    }
-                }
                 break;
 
-            case 'soundcloud':
-                if (!c('Garden.Format.Soundcloud', true)) {
-                    return '';
-                }
-
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches) && c('Garden.Format.Soundcloud', true)) {
-                        return <<<EOT
+            case 'Soundcloud':
+                return <<<EOT
 <iframe width="100%" height="166" scrolling="no" frameborder="no" src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/{$matches[1]}/{$matches[2]}&amp;color=ff5500&amp;auto_play=false&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false"></iframe>
 EOT;
-                    }
-                }
                 break;
 
-            case 'wistia':
-                if (!c('Garden.Format.Wistia', true)) {
-                    return '';
+            case 'Wistia':
+                if (!$matches['videoID']) {
+                    break;
+                }
+                $wistiaClass = "wistia_embed wistia_async_{$matches['videoID']} videoFoam=true allowThirdParty=false";
+
+                if (!empty($matches['time'])) {
+                    $wistiaClass .= " time={$matches['time']}";
                 }
 
-                foreach($embeds[$key]['regex'] as $regex) {
-                    if (preg_match($regex, $url, $matches)) {
-                        if (!$matches['videoID']) {
-                            break;
-                        }
-                        $wistiaClass = "wistia_embed wistia_async_{$matches['videoID']} videoFoam=true allowThirdParty=false";
-
-                        if (!empty($matches['time'])) {
-                            $wistiaClass .= " time={$matches['time']}";
-                        }
-
-                        return <<<EOT
+                return <<<EOT
 <script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
-                    }
-                }
-                break;
         }
 
         return '';

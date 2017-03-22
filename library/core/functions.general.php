@@ -3119,7 +3119,12 @@ if (!function_exists('matchesTrustedDomain')) {
      */
     function matchesTrustedDomain($url = '') {
         $url = url($url, true);
-        $trustedDomains = trustedDomains();
+
+        static $trustedDomains = [];
+
+        if (empty($trustedDomains)) {
+            $trustedDomains = trustedDomains();
+        }
 
         foreach ($trustedDomains as $trustedDomain) {
             if (urlMatch($trustedDomain, $url)) {

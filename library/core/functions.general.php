@@ -3570,6 +3570,26 @@ if (!function_exists('trustedDomains')) {
     }
 }
 
+if (!function_exists('isTrustedUrl')) {
+    /**
+     * Determine if a domain is trusted.
+     *
+     * @param string $url A URL or domain to check.
+     * @return bool Returns **true** if the domain is trusted or **false** otherwise.
+     */
+    function isTrustedUrl($url) {
+        $domains = trustedDomains();
+
+        if (preg_match('`^https?://`', $url)) {
+            $host = parse_url($url, PHP_URL_HOST);
+            $hostAndScheme = parse_url($url, PHP_URL_SCHEME).'://'.$host;
+
+            return in_array($host, $domains) || in_array($hostAndScheme, $domains);
+        }
+        return in_array($url, $domains);
+    }
+}
+
 if (!function_exists('unicodeRegexSupport')) {
     /**
      * Test for Unicode PCRE support. On non-UTF8 systems this will result in a blank string.

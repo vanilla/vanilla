@@ -3141,7 +3141,7 @@ if (!function_exists('safeRedirect')) {
                 'url' => $Destination
             ]);
 
-            redirect(url("/home/leaving?Target=".urlencode($Destination)));
+            redirect("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }

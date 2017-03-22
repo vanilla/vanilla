@@ -171,15 +171,20 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideVanillaAddons
      */
     public function testVanillaPluginAndHookDefinition(Addon $addon) {
-        $className = $addon->getPluginClass();
-        $classKey = strtolower($className);
-        if (empty($classKey)) {
+        $class = $addon->getPluginClass();
+
+        // Themes do not have a class
+        if (empty($class)) {
             return;
         }
+
+        $classInfo = Addon::parseFullyQualifiedClass($class);
+        $classKey = strtolower($classInfo['className']);
+
         $classes = $addon->getClasses();
         $this->assertArrayHasKey($classKey, $classes);
-        $subpath = $classes[$classKey][1];
 
+        $subpath = $classes[$classKey]['path'];
         // Kludge: Check for the UserPhoto() function.
         $fileContents = file_get_contents($addon->path($subpath));
         if (preg_match('`function userPhoto`i', $fileContents)) {
@@ -189,8 +194,8 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
 
         require_once $addon->path($subpath);
 
-        $this->assertTrue(class_exists($className, false), "The $className class is not in the $subpath file.");
-        $this->assertTrue(is_a($className, '\Gdn_IPlugin', true), "The $className doesn't implement \Gdn_IPlugin.");
+        $this->assertTrue(class_exists($class, false), "The $class class is not in the $subpath file.");
+        $this->assertTrue(is_a($class, '\Gdn_IPlugin', true), "The $class doesn't implement \Gdn_IPlugin.");
     }
 
     /**
@@ -292,6 +297,11 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
 
         // Can't test requirements so just unset them.
         unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
+
+        // Namespaced plugins were not supported.
+        if (strpos('\\\\', $oldInfoArray['ClassName']) !== false && $info['ClassName'] === '') {
+            unset($info['ClassName'], $oldInfoArray['ClassName']);
+        }
 
         $this->assertArraySubsetRecursive($oldInfoArray, $info);
     }

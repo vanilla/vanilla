@@ -1,0 +1,19 @@
+{
+	"name": "Namespaced Plugin",
+	"description": "This is a test plugin with a namespace.",
+	"version": "1.0",
+	"settingsUrl": "/settings/test",
+	"key": "namespaced-plugin",
+	"type": "addon",
+	"authors": {
+		"0": {
+			"name": "John Smith",
+			"email": "johnsmith@example.com",
+			"homepage": "http://example.com/john-smith"
+		}
+	},
+	"require": {
+		"vanilla": "~2.4"
+	},
+	"license": "GPLv2"
+}

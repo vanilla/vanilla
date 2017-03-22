@@ -1281,16 +1281,22 @@ class Gdn_Format {
         ];
 
         $key = '';
+        $matches = [];
 
         foreach ($embeds as $embedKey => $value) {
             foreach ($value['regex'] as $regex) {
                 if (preg_match($regex, $url, $matches)) {
-                    if (c('Garden.Format.'.$embedKey, true)) {
-                        $key = $embedKey;
-                    }
+                    $key = $embedKey;
                     break;
                 }
             }
+            if ($key !== '') {
+                break;
+            }
+        }
+
+        if (!c('Garden.Format.'.$key, true)) {
+            return '';
         }
 
         switch ($key) {

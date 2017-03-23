@@ -1583,7 +1583,7 @@ EOT;
         $html = Gdn_Format::mentions($html);
         $html = Emoji::instance()->translateToHtml($html);
         $html = Gdn_Format::legacySpoilers($html);
-        if (c('Garden.Format.SanitizeImages', false)) {
+        if (c('Garden.HTML.SanitizeEmbeds', false)) {
             $html = Gdn_Format::sanitizeImages($html);
         }
         return $html;
@@ -1734,7 +1734,8 @@ EOT;
             $stripImage = true;
 
             // If the host of the image source is a trusted domain and not from the CDN, strip this image
-            if (in_array(val('host', $imageUrl), embeddableDomains())) {
+            $embeddableDomains = embeddableDomains();
+            if (in_array(val('host', $imageUrl), $embeddableDomains)) {
                 $stripImage = false;
             }
 

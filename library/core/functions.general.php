@@ -805,21 +805,21 @@ if (!function_exists('embeddableDomains')) {
      * @throws Exception
      */
     function embeddableDomains() {
-        $embeddable = [Gdn::request()->host()];
-        $configuredDomains = c('Garden.Embeddable', []);
+        $embeddableDomains = [Gdn::request()->host()];
+        $configuredDomains = c('Garden.EmbeddableDomains', []);
         if (!is_array($configuredDomains)) {
             $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
         }
         $configuredDomains = array_filter($configuredDomains);
 
-        $embeddable = array_merge($embeddable, $configuredDomains);
+        $embeddableDomains = array_merge($embeddableDomains, $configuredDomains);
 
-        Gdn::pluginManager()->EventArguments['Embeddable'] = &$embeddable;
+        Gdn::pluginManager()->EventArguments['EmbeddableDomains'] = &$embeddableDomains;
         Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
 
-        return array_unique($embeddable);
+        return array_unique($embeddableDomains);
 
-        return $embeddable;
+        return $embeddableDomains;
     }
 }
 

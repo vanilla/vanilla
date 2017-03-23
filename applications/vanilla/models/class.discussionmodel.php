@@ -561,6 +561,15 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
+     * Get the maximum number of discussion pages.
+     *
+     * @return int
+     */
+    public function getMaxPages() {
+        return (int)c('Vanilla.Discussions.MaxPages');
+    }
+
+    /**
      * Get a list of discussions.
      *
      * This method call will remove announcements and may not return exactly {@link $Limit} records for optimization.
@@ -598,6 +607,14 @@ class DiscussionModel extends VanillaModel {
 
         if (!is_array($Where)) {
             $Where = [];
+        }
+
+        // A kludge to allow selective expanding of associated records (e.g. categories, users).
+        if (isset($Where['expand'])) {
+            $expand = boolval($Where['expand']);
+            unset($Where['expand']);
+        } else {
+            $expand = true;
         }
 
         $Sql = $this->SQL;
@@ -686,8 +703,10 @@ class DiscussionModel extends VanillaModel {
         }
 
         // Join in the users.
-        Gdn::userModel()->joinUsers($Data, ['FirstUserID', 'LastUserID']);
-        CategoryModel::joinCategories($Data);
+        if ($expand) {
+            Gdn::userModel()->joinUsers($Data, ['FirstUserID', 'LastUserID']);
+            CategoryModel::joinCategories($Data);
+        }
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->addDenormalizedViews($Data);

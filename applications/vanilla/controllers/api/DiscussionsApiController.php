@@ -163,13 +163,14 @@ class DiscussionsApiController extends AbstractApiController {
         $in = $this->idParamSchema()->setDescription('Get a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
-        $row = $this->discussionModel->getID($id, DATASET_TYPE_ARRAY);
+        $row = $this->discussionByID($id);
         if (!$row) {
             throw new NotFoundException('Discussion');
         }
 
         $this->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
+        $this->formatField($row, 'Body', $row['Format']);
         $result = $out->validate($row);
         return $result;
     }
@@ -228,23 +229,26 @@ class DiscussionsApiController extends AbstractApiController {
                 'description' => 'Page number.',
                 'default' => 1,
                 'minimum' => 1,
-                'maximum' => 3000000
+                'maximum' => $this->discussionModel->getMaxPages()
             ],
             'insertUserID:i?' => 'Filter by author.',
-            'expand:b?' => 'Expand the records.'
+            'expand:b?' => 'Expand associated records.'
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $in->validate($query);
-        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
+        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID', 'expand']));
         list($offset, $limit) = offsetLimit("p{$query['page']}", $this->discussionModel->getDefaultLimit());
 
         if (array_key_exists('categoryID', $where)) {
             $this->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
 
-        $rows = $this->discussionModel->get($offset, $limit, $where);
-        $result = $out->validate($rows->resultArray());
+        $rows = $this->discussionModel->get($offset, $limit, $where)->resultArray();
+        foreach ($rows as &$currentRow) {
+            $this->formatField($currentRow, 'Body', $currentRow['Format']);
+        }
+        $result = $out->validate($rows);
         return $result;
     }
 
@@ -278,6 +282,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->save($data);
 
         $result = $this->discussionByID($id);
+        $this->formatField($result, 'Body', $result['Format']);
         return $out->validate($result);
     }
 
@@ -306,6 +311,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $row = $this->discussionByID($id);
+        $this->formatField($row, 'Body', $row['Format']);
         $result = $out->validate($row);
         return new Data($result, 201);
     }

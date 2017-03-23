@@ -3,6 +3,7 @@
 use Garden\Container\Container;
 use Garden\Container\Reference;
 use Vanilla\Addon;
+use Vanilla\InjectableInterface;
 
 if (!defined('APPLICATION')) exit();
 /**
@@ -72,6 +73,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Interop\Container\ContainerInterface')
     ->setAliasOf('Garden\Container\Container')
 
+    ->rule(InjectableInterface::class)
+    ->addCall('setDependencies')
+
     // Cache
     ->rule('Gdn_Cache')
     ->setShared(true)
@@ -84,7 +88,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addAlias('Config')
 
     // AddonManager
-    ->rule('Vanilla\\AddonManager')
+    ->rule(Vanilla\AddonManager::class)
     ->setShared(true)
     ->setConstructorArgs([
         [
@@ -127,6 +131,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addCall('fromEnvironment')
     ->addAlias('Request')
+    ->addAlias(\Garden\Web\RequestInterface::class)
 
     // Database.
     ->rule('Gdn_Database')
@@ -169,7 +174,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule(\Garden\Web\Dispatcher::class)
     ->setShared(true)
-    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route')])
+    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

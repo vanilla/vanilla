@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "246ad978100d7ff7d6ffa1b5b261be4f",
-    "content-hash": "a76bf9a4e34db9534ee4152298f4b25f",
+    "content-hash": "d78de5241092d2a68acb3bb94a013d25",
     "packages": [
         {
             "name": "chrisjean/php-ico",
@@ -48,7 +47,7 @@
                 "favicon",
                 "ico"
             ],
-            "time": "2016-09-27 22:00:56"
+            "time": "2016-09-27T22:00:56+00:00"
         },
         {
             "name": "container-interop/container-interop",
@@ -79,7 +78,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
-            "time": "2017-02-14 19:40:03"
+            "time": "2017-02-14T19:40:03+00:00"
         },
         {
             "name": "michelf/php-markdown",
@@ -130,7 +129,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2016-10-29 18:58:20"
+            "time": "2016-10-29T18:58:20+00:00"
         },
         {
             "name": "pclzip/pclzip",
@@ -167,28 +166,44 @@
                 "php",
                 "zip"
             ],
-            "time": "2014-06-05 11:42:24"
+            "time": "2014-06-05T11:42:24+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v5.2.22",
+            "version": "v5.2.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663"
+                "reference": "7115df4a6f76281109ebe352900c42403b728bb4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/b18cb98131bd83103ccb26a888fdfe3177b8a663",
-                "reference": "b18cb98131bd83103ccb26a888fdfe3177b8a663",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/7115df4a6f76281109ebe352900c42403b728bb4",
+                "reference": "7115df4a6f76281109ebe352900c42403b728bb4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.0.0"
             },
             "require-dev": {
-                "phpdocumentor/phpdocumentor": "*",
-                "phpunit/phpunit": "4.7.*"
+                "doctrine/annotations": "1.2.*",
+                "jms/serializer": "0.16.*",
+                "phpdocumentor/phpdocumentor": "2.*",
+                "phpunit/phpunit": "4.8.*",
+                "symfony/debug": "2.8.*",
+                "symfony/filesystem": "2.8.*",
+                "symfony/translation": "2.8.*",
+                "symfony/yaml": "2.8.*",
+                "zendframework/zend-cache": "2.5.1",
+                "zendframework/zend-config": "2.5.1",
+                "zendframework/zend-eventmanager": "2.5.1",
+                "zendframework/zend-filter": "2.5.1",
+                "zendframework/zend-i18n": "2.5.1",
+                "zendframework/zend-json": "2.5.1",
+                "zendframework/zend-math": "2.5.1",
+                "zendframework/zend-serializer": "2.5.*",
+                "zendframework/zend-servicemanager": "2.5.*",
+                "zendframework/zend-stdlib": "2.5.1"
             },
             "suggest": {
                 "league/oauth2-google": "Needed for Google XOAUTH2 authentication"
@@ -227,7 +242,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-01-09 09:33:47"
+            "time": "2017-03-15T19:32:56+00:00"
         },
         {
             "name": "psr/container",
@@ -276,7 +291,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14 16:28:37"
+            "time": "2017-02-14T16:28:37+00:00"
         },
         {
             "name": "psr/log",
@@ -323,7 +338,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10 12:19:37"
+            "time": "2016-10-10T12:19:37+00:00"
         },
         {
             "name": "smarty/smarty",
@@ -376,20 +391,20 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-12-14 21:57:25"
+            "time": "2016-12-14T21:57:25+00:00"
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.4",
+            "version": "v3.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "9724c684646fcb5387d579b4bfaa63ee0b0c64c8"
+                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/9724c684646fcb5387d579b4bfaa63ee0b0c64c8",
-                "reference": "9724c684646fcb5387d579b4bfaa63ee0b0c64c8",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/093e416ad096355149e265ea2e4cc1f9ee40ab1a",
+                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a",
                 "shasum": ""
             },
             "require": {
@@ -431,7 +446,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-02-16 22:46:52"
+            "time": "2017-03-07T16:47:02+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -483,7 +498,7 @@
                 "ganon",
                 "php"
             ],
-            "time": "2016-01-14 20:55:00"
+            "time": "2016-01-14T20:55:00+00:00"
         },
         {
             "name": "vanilla/garden-container",
@@ -520,7 +535,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-02-05 15:17:17"
+            "time": "2017-02-05T15:17:17+00:00"
         },
         {
             "name": "vanilla/garden-http",
@@ -560,7 +575,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2016-03-25 22:29:23"
+            "time": "2016-03-25T22:29:23+00:00"
         },
         {
             "name": "vanilla/garden-password",
@@ -613,7 +628,43 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2016-10-21 20:47:48"
+            "time": "2016-10-21T20:47:48+00:00"
+        },
+        {
+            "name": "vanilla/garden-schema",
+            "version": "v1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/vanilla/garden-schema.git",
+                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/cb56f87a440a18f92c78d7df2e7d11501fcd837b",
+                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Garden\\Schema\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Todd Burry",
+                    "email": "todd@vanillaforums.com"
+                }
+            ],
+            "description": "A simple data validation and cleaning library based on JSON Schema.",
+            "time": "2017-03-17T18:00:12+00:00"
         },
         {
             "name": "vanilla/htmlawed",
@@ -652,7 +703,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2016-04-14 21:27:05"
+            "time": "2016-04-14T21:27:05+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -697,7 +748,7 @@
                 }
             ],
             "description": "Provides a way to include OAuth v1 via composer",
-            "time": "2017-02-27 16:22:28"
+            "time": "2017-02-27T16:22:28+00:00"
         },
         {
             "name": "vanilla/legacy-passwords",
@@ -750,7 +801,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2017-01-24 20:17:02"
+            "time": "2017-01-24T20:17:02+00:00"
         },
         {
             "name": "vanilla/nbbc",
@@ -786,7 +837,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-04-26 18:19:47"
+            "time": "2016-04-26T18:19:47+00:00"
         }
     ],
     "packages-dev": [],

@@ -153,16 +153,24 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
 
         $this->assertNull($route->match(new Request('/discussions/getsomething')));
         $this->assertNull($route->match(new Request('/discussions/setsomething/123')));
-        $this->assertNull($route->match(new Request('/discussions/isProtected/foo')));
+        $this->assertNull($route->match(new Request('/discussions/ispublic/foo')));
     }
 
     /**
-     * Controllers can protect methods with isProtected().
+     * Make sure that the index method doesn't act like another HTTP method.
      */
-    public function testIsProtected() {
+    public function testIndexProtection() {
+        $route = $this->createRoute();
+        $this->assertNull($route->match(new Request('/discussions/index_foo')));
+    }
+
+    /**
+     * Controllers can publicize methods with isPublic().
+     */
+    public function testIsPublic() {
         $route = $this->createRoute();
 
-        $this->assertNull($route->match(new Request('/discussions/protectme')));
+        $this->assertNotNull($route->match(new Request('/discussions/i-am-public')));
     }
 
     /**

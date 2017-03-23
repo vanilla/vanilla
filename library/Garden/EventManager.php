@@ -84,6 +84,20 @@ class EventManager {
     }
 
     /**
+     * Remove an event handler.
+     *
+     * @param string $event The name of the event to unbind.
+     * @param callable $callback The event handler to remove.
+     */
+    public function unbind($event, callable $callback) {
+        $event = strtolower($event);
+
+        if (!empty($this->handlers[$event]) && $index = array_search($callback, $this->handlers[$event], true)) {
+            unset($this->handlers[$event][$index]);
+        }
+    }
+
+    /**
      * Bind a class' declared event handlers.
      *
      * Plugin classes declare event handlers in the following way:
@@ -172,6 +186,25 @@ class EventManager {
      */
     public function bindLazy($event, $class, $method, $priority = EventManager::PRIORITY_NORMAL) {
         $this->bindInternal($event, new LazyEventHandler($class, $method), $priority);
+    }
+
+    /**
+     * Strip the namespace from a class.
+     *
+     * @param string|object $class The name of the class or a class instance.
+     * @return string Returns the base name as a string.
+     */
+    public static function classBasename($class) {
+        if (is_object($class)) {
+            $class = get_class($class);
+        }
+
+        if (($i = strrpos($class, '\\')) !== false) {
+            $result = substr($class, $i + 1);
+        } else {
+            $result = $class;
+        }
+        return $result;
     }
 
     /**

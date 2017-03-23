@@ -154,7 +154,8 @@ class Gdn_Database {
             $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
 
             $encoding = c('Database.CharacterEncoding', 'utf8mb4');
-            $PDO->query("set names '$encoding';set time_zone = '+0:0'");
+            $PDO->query("set names '{$encoding}'");
+            $PDO->query("set time_zone = '+0:0'");
 
             // We only throw exceptions during connect
             $PDO->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);

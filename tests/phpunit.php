@@ -49,6 +49,9 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Interop\Container\ContainerInterface')
     ->setAliasOf('Garden\Container\Container')
 
+    ->rule(InjectableInterface::class)
+    ->addCall('setDependencies')
+
     ->rule('Gdn_Request')
     ->setShared(true)
     ->addAlias('Request')

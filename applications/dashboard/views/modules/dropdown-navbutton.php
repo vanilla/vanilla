@@ -25,7 +25,7 @@
             <?php }
         } ?>
     </ul>
-    <a href="#" class="NavButton Handle">
+    <a href="#" class="NavButton Handle <?php echo val('cssClass', val('trigger', $this)); ?>">
         <span><?php echo val('text', val('trigger', $this)); ?></span>
         <?php if (val('icon', val('trigger', $this))) {
             echo icon(val('icon', val('trigger', $this)));

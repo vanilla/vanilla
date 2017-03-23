@@ -7,8 +7,12 @@
 
 namespace VanillaTests\Library\Vanilla;
 
-use Vanilla\Addon;
+use Test\OldApplication\Controllers\Api\NewApiController;
+use Test\OldApplication\Controllers\ArchiveController;
+use Test\OldApplication\Controllers\HiddenController;
+use Test\OldApplication\Controllers\OldApiController;
 use Vanilla\AddonManager;
+use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
 
 
@@ -293,6 +297,62 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * Test that {@link Gdn_PluginManager::calcOldInfoArray()} works for themes.
+     *
+     * @param array $oldInfoArray The old info array.
+     * @dataProvider provideVanillaThemeInfo
+     */
+    public function testCalcOldThemeInfoArray(array $oldInfoArray) {
+        $vm = self::createVanillaManager(true);
+        $addon = $vm->lookupTheme($oldInfoArray['Index']);
+        $this->assertNotNull($addon);
+        $info = \Gdn_PluginManager::calcOldInfoArray($addon);
+        $this->assertTrue(is_array($info));
+
+        // Can't test requirements so just unset them.
+        unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
+
+        $this->assertArraySubsetRecursive($oldInfoArray, $info);
+    }
+
+    /**
+     * Create a Vanilla's plugin manager to compare functionality.
+     *
+     * @return \Gdn_PluginManager
+     */
+    private static function createPluginManager() {
+        $pm = new \Gdn_PluginManager(static::createVanillaManager());
+        return $pm;
+    }
+
+    /**
+     * Provide all of plugin info currently in Vanilla.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideVanillaPluginInfo() {
+        $pm = static::createPluginManager();
+        $infoArrays = [];
+        $classInfo = [];
+        $pm->indexSearchPath(PATH_PLUGINS, $infoArrays, $classInfo);
+
+        return $this->makeProvider($infoArrays);
+    }
+
+    /**
+     * Provide all of the theme info currently in Vanilla.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function provideVanillaThemeInfo() {
+        $tm = new \Gdn_ThemeManager(static::createVanillaManager(), false);
+        $infoArrays = [];
+        $tm->indexSearchPath(PATH_THEMES, $infoArrays);
+
+        return $this->makeProvider($infoArrays);
+    }
+
+    /**
      * Assert that a deep array is a subset of another deep array.
      *
      * @param array $subset The subset to test.
@@ -302,14 +362,14 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      */
     protected function assertArraySubsetRecursive($subset, $array, $strict = false, $message = '') {
         if (!is_array($subset)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
                 1,
                 'array or ArrayAccess'
             );
         }
 
         if (!is_array($array)) {
-            throw PHPUnit_Util_InvalidArgumentHelper::factory(
+            throw \PHPUnit_Util_InvalidArgumentHelper::factory(
                 2,
                 'array or ArrayAccess'
             );
@@ -345,49 +405,6 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Test that {@link Gdn_PluginManager::calcOldInfoArray()} works for themes.
-     *
-     * @param array $oldInfoArray The old info array.
-     * @dataProvider provideVanillaThemeInfo
-     */
-    public function testCalcOldThemeInfoArray(array $oldInfoArray) {
-        $vm = self::createVanillaManager(true);
-        $addon = $vm->lookupTheme($oldInfoArray['Index']);
-        $this->assertNotNull($addon);
-        $info = \Gdn_PluginManager::calcOldInfoArray($addon);
-        $this->assertTrue(is_array($info));
-
-        // Can't test requirements so just unset them.
-        unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
-
-        $this->assertArraySubsetRecursive($oldInfoArray, $info);
-    }
-
-    /**
-     * Provide all of plugin info currently in Vanilla.
-     *
-     * @return array Returns a data provider array.
-     */
-    public function provideVanillaPluginInfo() {
-        $pm = static::createPluginManager();
-        $infoArrays = [];
-        $classInfo = [];
-        $pm->indexSearchPath(PATH_PLUGINS, $infoArrays, $classInfo);
-
-        return $this->makeProvider($infoArrays);
-    }
-
-    /**
-     * Create a Vanilla's plugin manager to compare functionality.
-     *
-     * @return \Gdn_PluginManager
-     */
-    private static function createPluginManager() {
-        $pm = new \Gdn_PluginManager(static::createVanillaManager());
-        return $pm;
-    }
-
-    /**
      * Wrap each element of an array in an array so that it can be used as a data provider.
      *
      * @param array $array The array to massage.
@@ -398,19 +415,6 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
             return [$arr];
         }, $array);
         return $result;
-    }
-
-    /**
-     * Provide all of the theme info currently in Vanilla.
-     *
-     * @return \Gdn_ThemeManager Returns a data provider array.
-     */
-    public function provideVanillaThemeInfo() {
-        $tm = new \Gdn_ThemeManager(static::createVanillaManager(), false);
-        $infoArrays = [];
-        $tm->indexSearchPath(PATH_THEMES, $infoArrays);
-
-        return $this->makeProvider($infoArrays);
     }
 
     /**
@@ -443,6 +447,34 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
             $result[$type] = [$type];
         }
         return $result;
+    }
+
+    /**
+     * Addons should be able to nest classes within specific directories.
+     */
+    public function testClassDirectoryRecursion() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupByClassname(OldApiController::class, true);
+        $this->assertNotNull($addon);
+        $this->assertEquals('test-old-application', $addon->getKey());
+
+        $addon = $am->lookupByClassname(NewApiController::class, true);
+        $this->assertNotNull($addon);
+        $this->assertEquals('test-old-application', $addon->getKey());
+    }
+
+    /**
+     * Hidden files and directories should not be scanned.
+     */
+    public function testHiddenClassDirectories() {
+        $am = $this->createTestManager();
+
+        $addon = $am->lookupByClassname(ArchiveController::class);
+        $this->assertNull($addon);
+
+        $addon = $am->lookupByClassname(HiddenController::class);
+        $this->assertNull($addon);
     }
 
     /**

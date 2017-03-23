@@ -588,9 +588,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $label The label for the field.
      * @param array $attributes The attributes for the checkbox input.
      * @param string $info The label description.
+     * @param bool $reverse Whether to reverse the representation of the toggle (positive value is on, neg value is off).
      * @return string And HTML-formatted form field for a toggle.
      */
-    public function toggle($fieldName, $label, $attributes = [], $info = '') {
+    public function toggle($fieldName, $label, $attributes = [], $info = '', $reverse = false) {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {
@@ -603,6 +604,14 @@ class Gdn_Form extends Gdn_Pluggable {
             }
         } else {
             if ($this->getValue($fieldName) == $value) {
+                $attributes['checked'] = 'checked';
+            }
+        }
+
+        if ($reverse) {
+            if ($attributes['checked'] === 'checked') {
+                unset($attributes['checked']);
+            } else {
                 $attributes['checked'] = 'checked';
             }
         }
@@ -664,9 +673,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $url The url to show the search results.
      * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
      * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @param array $wrapperAttributes The attributes to add to the search wrapper div.
      * @return string The rendered search field.
      */
-    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '', $wrapperAttributes = []) {
         $clear = '';
         $searchTermFound = false;
         $searchKeys = ['search', 'keywords'];
@@ -689,8 +699,12 @@ class Gdn_Form extends Gdn_Pluggable {
             $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
         }
 
+        $wrapperAttributes['class'] = val('class', $wrapperAttributes, '');
+        $wrapperAttributes['class'] .= ' search-wrap input-wrap';
+        $wrapperAttributesString = attribute($wrapperAttributes);
+
         return '
-            <div class="search-wrap input-wrap" role="search">
+            <div '.$wrapperAttributesString.' role="search">
                 <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
                 $this->textBox($field, $textBoxAttributes).
                 $this->button('Go', ['class' => 'search-submit']).

@@ -159,6 +159,7 @@ class ResourceRoute extends Route {
 
     /**
      * Double check to make sure the case of the method matches.
+     *
      * This really shouldn't be done here, but I want to make sure we are strict before bad URLs get out.
      *
      * @param string $method The actual object method name.
@@ -189,10 +190,11 @@ class ResourceRoute extends Route {
      * @return callable|null Returns the method callback or null if it doesn't.
      */
     private function findMethod($controller, $methodName) {
+        $regex = '`^(get|post|patch|put|options|delete)(_|$)`i';
+
         // Getters and setters aren't found.
-        if (preg_match('`^(get|set|is)[a-z]`i', $methodName)) {
-            return null;
-        } elseif (method_exists($controller, 'isProtected') && $controller->isProtected($methodName)) {
+        if (!(preg_match($regex, $methodName) || strcasecmp($methodName, 'index') === 0)
+            && !(method_exists($controller, 'isPublic') && $controller->isPublic($methodName))) {
             return null;
         }
 
@@ -299,11 +301,20 @@ class ResourceRoute extends Route {
         return $defaults;
     }
 
+
+
     /**
      * Split a function into its regular parameters and mapped parameters.
      *
+     * This method returns several {@link \ReflectionParameter} objects:
+     *
+     * - **$defaults[]**: An array of all method parameters with default values or **null** if there is none.
+     * - **$mapped[]**: All mapped parameters.
+     * - **$params[]**: All path parameters.
+     * - **$path**: The path parameter because it requires special handling.
+     *
      * @param \ReflectionFunctionAbstract $method The method to split.
-     * @return array Returns an array in the form `[$mapped[], $params[], $path]`.
+     * @return array Returns an array in the form `[$defaults[], $mapped[], $params[], $path]`.
      */
     private function splitMappedParameters(\ReflectionFunctionAbstract $method) {
         $defaults = [];

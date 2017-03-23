@@ -11,6 +11,8 @@
  * @since 2.0
  */
 
+use Garden\EventManager;
+
 /**
  * Output formatter.
  *
@@ -37,6 +39,11 @@ class Gdn_Format {
     protected static $SanitizedFormats = array(
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
     );
+
+    /**
+     * @var EventManager
+     */
+    private static $eventManager;
 
     /**
      * The ActivityType table has some special sprintf search/replace values in the
@@ -1544,6 +1551,22 @@ EOT;
     }
 
     /**
+     * Get the event manager.
+     *
+     * The event manager should only be used by the formatter itself so leave this private.
+     *
+     * @return EventManager Returns the eventManager.
+     */
+    private static function getEventManager() {
+        if (self::$eventManager === null) {
+            global $dic;
+            static::$eventManager = $dic->get(EventManager::class);
+        }
+
+        return self::$eventManager;
+    }
+
+    /**
      * Formats BBCode list items.
      *
      * @param array $Matches
@@ -1630,10 +1653,12 @@ EOT;
      * Performs replacing operations on a HTML string. Usually for formatting posts.
      * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
      *
-     * @param $html An unparsed HTML string.
+     * @param string $html An unparsed HTML string.
      * @return string The formatted HTML string.
      */
     protected static function processHTML($html) {
+        // Fire a filter event here first so that it doesn't have to deal with the other formatters.
+        $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
         $html = Gdn_Format::links($html);
         $html = Gdn_Format::mentions($html);
         $html = Emoji::instance()->translateToHtml($html);

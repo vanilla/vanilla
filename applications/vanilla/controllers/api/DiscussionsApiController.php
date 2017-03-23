@@ -237,14 +237,17 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
         $query = $in->validate($query);
-        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID', 'expand']));
+        $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         list($offset, $limit) = offsetLimit("p{$query['page']}", $this->discussionModel->getDefaultLimit());
 
         if (array_key_exists('categoryID', $where)) {
             $this->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
 
-        $rows = $this->discussionModel->get($offset, $limit, $where)->resultArray();
+        $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
+        if ($query['expand']) {
+            $this->userModel->expandUsers($rows, ['InsertUserID']);
+        }
         foreach ($rows as &$currentRow) {
             $this->formatField($currentRow, 'Body', $currentRow['Format']);
         }

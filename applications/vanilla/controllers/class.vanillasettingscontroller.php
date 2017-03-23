@@ -54,7 +54,9 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MinLength',
             'Garden.Format.WarnLeaving',
             'Garden.Format.DisableUrlEmbeds',
-            'Garden.TrustedDomains'
+            'Garden.TrustedDomains',
+            'Garden.EmbeddableDomains',
+            'Garden.HTML.SanitizeEmbeds'
         ));
 
         // Set the model on the form.

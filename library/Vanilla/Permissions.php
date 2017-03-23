@@ -8,8 +8,6 @@ namespace Vanilla;
 
 /**
  * Compile, manage and check user permissions.
- *
- * @package Vanilla
  */
 class Permissions {
     const BAN_BANNED = '!banned';
@@ -17,7 +15,8 @@ class Permissions {
     const BAN_UPDATING = '!updating';
     const BAN_PRIVATE = '!private';
     const BAN_2FA = '!2fa';
-    const BAN_XRF = '!xrf';
+    const BAN_CSRF = '!csrf';
+    const BAN_UNINSTALLED = '!uninstalled';
 
     /**
      * Global permissions are stored as numerical indexes.

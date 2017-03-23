@@ -384,7 +384,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
-        $sender->render('settings', '', 'plugins/'.$view);
+        $sender->render('settings', '', $view);
     }
 
 

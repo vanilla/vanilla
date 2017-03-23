@@ -14,6 +14,19 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /**
+     * Format a specific field.
+     *
+     * @param array $row An array representing a database row.
+     * @param string $field The field name.
+     * @param string $format The source format.
+     */
+    public function formatField(array &$row, $field, $format) {
+        if (array_key_exists($field, $row)) {
+            $row[$field] = Gdn_Format::to($row[$field], $format);
+        }
+    }
+
+    /**
      * Get the schema for users joined to records.
      *
      * @return Schema Returns a schema.

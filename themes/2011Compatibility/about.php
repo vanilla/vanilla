@@ -16,6 +16,7 @@ $ThemeInfo['2011Compatibility'] = array(
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://markosullivan.ca',
+    'Hidden' => false,
     'Options' => array(
         'Description' => 'This theme has <font color="red">6 color</font> options.',
         'Styles' => array(

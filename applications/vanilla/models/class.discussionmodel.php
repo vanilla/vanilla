@@ -633,14 +633,6 @@ class DiscussionModel extends Gdn_Model {
             $Where = [];
         }
 
-        // A kludge to allow selective expanding of associated records (e.g. categories, users).
-        if (isset($Where['expand'])) {
-            $expand = boolval($Where['expand']);
-            unset($Where['expand']);
-        } else {
-            $expand = true;
-        }
-
         $Sql = $this->SQL;
 
         // Determine category watching
@@ -727,10 +719,8 @@ class DiscussionModel extends Gdn_Model {
         }
 
         // Join in the users.
-        if ($expand) {
-            Gdn::userModel()->joinUsers($Data, ['FirstUserID', 'LastUserID']);
-            CategoryModel::joinCategories($Data);
-        }
+        Gdn::userModel()->joinUsers($Data, ['FirstUserID', 'LastUserID']);
+        CategoryModel::joinCategories($Data);
 
         if (c('Vanilla.Views.Denormalize', false)) {
             $this->addDenormalizedViews($Data);

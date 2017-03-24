@@ -88,7 +88,14 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideTrustedDomainConfigs
      */
     public function testIsTrustedDomainConfig($url, $expected) {
-        saveToConfig('Garden.TrustedDomains', "foo.com\n https://bar.com\nhttps://baz.com/entry/*", false);
+        $trustedDomains = [
+            '*.foo.com',
+            ' https://bar.com',
+            'https://baz.com/entry/*',
+            'example.*',
+            'domain.com'
+        ];
+        saveToConfig('Garden.TrustedDomains', implode("\n", $trustedDomains), false);
 
         $r = isTrustedDomain($url);
         $this->assertSame($expected, $r);
@@ -101,12 +108,15 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
      */
     public function provideTrustedDomainConfigs() {
         $r = [
-            'domain url' => ['http://foo.com', true],
-            'domain domain' => ['foo.com', true],
+            'domain url' => ['http://domain.com', true],
+            'domain domain' => ['domain.com', true],
+            'wildcard domain 1' => ['www.foo.com', true],
+            'wildcard domain 2' => ['https://www.foo.com', true],
+            'wildcard domain 3' => ['example.evildomain.com', false],
             'scheme mismatch' => ['http://bar.com', false],
             'path mismatch' => ['https://bar.com/another', false],
             'wildcard path 1' => ['https://baz.com/entry', true],
-            'wildcard path 2' => ['https://baz.com/entry/signin', true],
+            'wildcard path 2' => ['https://baz.com/entry/signin', true]
         ];
 
         return $r;

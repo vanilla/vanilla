@@ -430,7 +430,9 @@ class Addon {
 
                 foreach ($namespaceClasses as $classRow) {
                     $className = $classRow['name'];
-                    $classes[strtolower($className)] = [
+                    // It is possible, in the same file, to have multiple classes with the same name
+                    // but with different namespaces...
+                    $classes[strtolower($className)][] = [
                         'namespace' => $namespace,
                         'className' => $className,
                         'path' => $path,
@@ -1155,8 +1157,12 @@ class Addon {
         $classInfo = self::parseFullyQualifiedClass($fqClassName);
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
-            $path = $this->path($this->classes[$key]['path'], $relative);
-            return $path;
+            foreach($this->classes[$key] as $classData) {
+                if ($classInfo['namespace'] === $classData['namespace']) {
+                    $path = $this->path($classData['path'], $relative);
+                    return $path;
+                }
+            }
         }
         return '';
     }

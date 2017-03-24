@@ -95,7 +95,7 @@ class Dispatcher {
             } else {
                 $response = $this->makeResponse(new NotFoundException($request->getPath()));
                 // This is temporary. Only use internally.
-                $response->setMetaItem('noMatch', true);
+                $response->setMeta('noMatch', true);
             }
         }
 

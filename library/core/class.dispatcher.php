@@ -225,7 +225,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // This is temporary. We will eventually just have the new dispatcher.
         $response = $this->dispatcher->dispatch($request);
 
-        if ($response->getMetaItem('noMatch')) { // don't go using noMatch in other code!
+        if ($response->getMeta('noMatch')) { // don't go using noMatch in other code!
             // Analyze the request AFTER checking for update mode.
             $routeArgs = $this->analyzeRequest($request);
             $this->fireEvent('AfterAnalyzeRequest');

@@ -64,6 +64,7 @@ class DashboardHooks extends Gdn_Plugin {
 
             $Sender->removeJsFile('jquery.popup.js');
             $Sender->addJsFile('vendors/jquery.checkall.min.js', 'dashboard');
+            $Sender->addJsFile('buttongroup.js', 'dashboard');
             $Sender->addJsFile('dashboard.js', 'dashboard');
             $Sender->addJsFile('jquery.expander.js');
             $Sender->addJsFile('settings.js', 'dashboard');

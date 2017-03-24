@@ -1,6 +1,14 @@
-
+/**
+ *
+ */
 var DashboardModal = (function() {
 
+    /**
+     *
+     * @param $trigger
+     * @param settings
+     * @constructor
+     */
     var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
@@ -16,6 +24,9 @@ var DashboardModal = (function() {
         this.start();
     };
 
+    /**
+     *
+     */
     DashboardModal.prototype = {
 
         activeModal: undefined,
@@ -110,6 +121,7 @@ var DashboardModal = (function() {
                 $('#' + self.id).modal('hide');
             });
         },
+
 
         handleConfirm: function() {
             var self = this;

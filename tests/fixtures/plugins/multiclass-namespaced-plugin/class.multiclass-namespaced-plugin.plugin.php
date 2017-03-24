@@ -17,17 +17,37 @@ namespace Deeply\Nested\Namespaced\Fixture {
         }
     }
 
-    class MultiClassPluginHelper {}
+    class MultiClassNamespacedPluginSwarmClass {}
+}
+
+namespace Deeply\Nested\NamespacedFixture {
+    class MultiClassNamespacedPluginSwarmClass {}
+}
+
+namespace Deeply\NestedNamespacedFixture {
+    class MultiClassNamespacedPluginSwarmClass {}
+}
+
+namespace DeeplyNestedNamespacedFixture {
+    class MultiClassNamespacedPluginSwarmClass {}
+}
+
+namespace DeeplyNested\NamespacedFixture {
+    class MultiClassNamespacedPluginSwarmClass {}
+}
+
+namespace Deeply\NestedNamespaced\Fixture {
+    class MultiClassNamespacedPluginSwarmClass {}
 }
 
 namespace Deeply\Nested\Namespaced {
-    class MultiClassPluginHelper {}
+    class MultiClassNamespacedPluginSwarmClass {}
 }
 
 namespace Deeply\Nested {
-    class MultiClassPluginHelper {}
+    class MultiClassNamespacedPluginSwarmClass {}
 }
 
 namespace Deeply {
-    class MultiClassPluginHelper {}
+    class MultiClassNamespacedPluginSwarmClass {}
 }

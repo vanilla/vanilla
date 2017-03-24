@@ -692,7 +692,7 @@ var DashboardModal = (function() {
      * This uses the ace vendor component to wire up our code editors. We currently use the code editor
      * in the Custom CSS plugin and in the Pockets plugin.
      *
-     * Selector: `js-code-input`
+     * Selector: `.js-code-input`
      */
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
@@ -743,9 +743,9 @@ var DashboardModal = (function() {
     };
 
     /**
-     * Uses the handy init function to add the appropriate data and classes to elements that should
-     * be rich text editors. We could simply add the `js-code-input` class to our elements and
-     * add the appropriate data attributes, but this keeps our markup clean.
+     * Uses the handy codeInput.init function to add the appropriate data and classes to elements that should
+     * be rich text editors. You can initialize elements here or simply add the `js-code-input` CSS class and
+     * the appropriate data attributes to the textarea markup.
      *
      * @param element - The scope of the function.
      */
@@ -760,7 +760,7 @@ var DashboardModal = (function() {
     }
 
     /**
-     *
+     * Styles and adds syntax hilighting to code blocks.
      *
      * @param element - The scope of the function.
      */
@@ -774,6 +774,7 @@ var DashboardModal = (function() {
     }
 
     /**
+     * Add a CSS class to the navbar based on it scroll position.
      *
      * @param element - The scope of the function.
      */
@@ -800,6 +801,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Start fluidfixed on the dashboard panel navigation.
+     *
+     * @param element - The scope of the function.
+     */
     function fluidFixedInit(element) {
         // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
@@ -808,7 +814,7 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
      * Selector: `.js-drop`
@@ -850,8 +856,8 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Un-collapses a group if one of its links is active. Note that the collapse javascript is
-     * contained in ../vendors/bootstrap/collapse.js
+     * Un-collapses a group if one of its links is active. Note that the functionality for the collapse
+     * javascript is contained in ../vendors/bootstrap/collapse.js
      *
      * @param element - The scope of the function.
      */
@@ -864,9 +870,13 @@ var DashboardModal = (function() {
     }
 
     /**
-     *
+     * Copies the text from an element to the clipboard. Displays a tooltip on success. Set the
+     * clipboardTarget data attribute to indicate the text that should be copied. Set the successText
+     * attribute to the message to display on success.
      *
      * Selector: `.btn-copy`
+     * Attributes: `data-clipboard-target="#text_to_copy"`
+     *             `data-success-text="Copied!"`
      */
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
@@ -1021,7 +1031,7 @@ var DashboardModal = (function() {
     }
 
     /**
-     *
+     * Starts the foggy functionality.
      *
      * Selector: `.js-foggy`
      * Attribute: `data-is-foggy={true|false}`
@@ -1112,6 +1122,12 @@ var DashboardModal = (function() {
     /**
      * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
      * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-preview`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     function readUrl(input) {
         if (input.files && input.files[0]) {
@@ -1130,6 +1146,13 @@ var DashboardModal = (function() {
 
     /**
      * Adds a preview of the uploaded, not-yet-saved image.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-upload`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('change', '.js-image-upload', function() {
         $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
@@ -1139,6 +1162,15 @@ var DashboardModal = (function() {
 
     /**
      * Removes the preview image and clears the file name from the input.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-remove-image-preview`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview`
+     *            `.js-image-upload`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('click', '.js-remove-image-preview', function(e) {
         e.preventDefault();
@@ -1174,10 +1206,107 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * File Upload filename preview.
+     * There's a rendering function for this in Gdn_Form: `fileUpload()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selector: `.js-file-upload`
+     */
+    $(document).on('change', '.js-file-upload', function() {
+        var filename = $(this).val();
+        if (filename.substring(3, 11) === 'fakepath') {
+            filename = filename.substring(12);
+        }
+        if (filename) {
+            $(this).parent().find('.file-upload-choose').html(filename);
+        }
+    });
+
+    // Modal handling
+
+    /**
+     * Start regular modal.
+     *
+     * Selector: `.js-modal`
+     */
+    $(document).on('click', '.js-modal', function(e) {
+        e.preventDefault();
+        DashboardModal.activeModal = new DashboardModal($(this), {});
+    });
+
+    /**
+     * Start confirm modal.
+     *
+     * Selector: `.js-modal-confirm`
+     * Attribute: `data-follow-link:true` - Follows the link on confirm, otherwise stays on the page.
+     */
+    $(document).on('click', '.js-modal-confirm', function(e) {
+        e.preventDefault();
+        var followLink = $(this).data('followLink') === 'true';
+
+        DashboardModal.activeModal = new DashboardModal($(this), {
+            httpmethod: 'post',
+            modalType: 'confirm',
+            followLink: followLink // no ajax
+        });
+    });
+
+    /**
+     * Close active modal.
+     *
+     * Selector: `.js-modal-close`
+     */
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
+        }
+    });
+
+    // Foggy handling
+
+    /**
+     * Disables inputs and adds a foggy CSS class to the target to make the target look foggy.
+     */
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop('disabled')) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop('disabled', true);
+            }
+        });
+    });
+
+    /**
+     * Enables inputs and removes the foggy CSS class.
+     */
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop('disabled', false);
+            }
+        });
+    });
+
     // Navigation preferences saving
 
     /**
      * Saves the panel navigation collapse preferences.
+     *
+     * Selector: `.js-save-pref-collapse`
      */
     $(document).on('click', '.js-save-pref-collapse', function() {
         var key = $(this).data('key');
@@ -1200,6 +1329,10 @@ var DashboardModal = (function() {
 
     /**
      * Saves the preference for the landing page for a top-level section.
+     *
+     * Selector: `.js-save-pref-section-landing-page`
+     * Attributes: `data-link-path="/path/to/settingspage"`
+     *             `data-section="Moderation"`
      */
     $(document).on('click', '.js-save-pref-section-landing-page', function() {
         var url = $(this).data('linkPath');
@@ -1222,6 +1355,9 @@ var DashboardModal = (function() {
 
     /**
      * Saves the preference for the dashboard landing page.
+     *
+     * Selector: `.js-save-pref-dashboard-landing-page`
+     * Attribute: `data-section="Moderation"`
      */
     $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
         var section = $(this).data('section');
@@ -1237,89 +1373,6 @@ var DashboardModal = (function() {
             url: gdn.url('dashboard/userpreferencedashboardlandingpage'),
             data: ajaxData,
             dataType: 'json'
-        });
-    });
-
-    // File Upload filename preview
-
-    /**
-     *
-     */
-    $(document).on('change', '.js-file-upload', function() {
-        var filename = $(this).val();
-        if (filename.substring(3, 11) === 'fakepath') {
-            filename = filename.substring(12);
-        }
-        if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
-        }
-    });
-
-    // Modal handling
-
-    $(document).on('click', '.js-modal', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
-    });
-
-    $(document).on('click', '.js-modal-confirm', function(e) {
-        e.preventDefault();
-        if ($(this).data('followLink') === 'true') {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'get',
-                modalType: 'confirm',
-                followLink: true // no ajax
-            });
-        } else {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'post',
-                modalType: 'confirm'
-            });
-        }
-    });
-
-    $(document).on('click', '.js-modal-close', function() {
-        if (typeof(DashboardModal.activeModal) === 'object') {
-            $('#' + DashboardModal.activeModal.id).modal('hide');
-        }
-    });
-
-    $(document).on('click', '.js-upload-email-image-button', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            afterSuccess: emailStyles.reloadImage
-        });
-    });
-
-    // Foggy handling
-
-    $(document).on('foggyOn', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'true');
-        $target.data('isFoggy', 'true');
-        $target.addClass('foggy');
-
-        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
-        $target.find(':input').each(function() {
-            if ($(this).prop('disabled')) {
-                $(this).data('foggy-disabled', 'true');
-            } else {
-                $(this).prop('disabled', true);
-            }
-        });
-    });
-
-    $(document).on('foggyOff', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'false');
-        $target.data('isFoggy', 'false');
-        $target.removeClass('foggy');
-
-        // Be careful not to enable fields that should be disabled.
-        $target.find(':input').each(function() {
-            if (!$(this).data('foggy-disabled')) {
-                $(this).prop('disabled', false);
-            }
         });
     });
 })(jQuery);

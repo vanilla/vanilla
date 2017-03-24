@@ -102,13 +102,19 @@ class CommentsApiController extends AbstractApiController {
      * @return array
      */
     public function delete($id) {
-        $this->permission();
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Delete a comment.');
         $out = $this->schema([], 'out');
 
-        $result = $out->validate([]);
-        return $result;
+        $comment = $this->commentByID($id);
+        if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
+            $discussion = $this->discussionByID($comment['CommentID']);
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
+        }
+        $this->commentModel->deleteID($id);
+
+        return [];
     }
 
     /**
@@ -155,7 +161,14 @@ class CommentsApiController extends AbstractApiController {
         $in = $this->idParamSchema()->setDescription('Get a comment.');
         $out = $this->schema($this->commentSchema(), 'out');
 
-        $result = $out->validate([]);
+        $comment = $this->commentByID($id);
+        if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
+            $discussion = $this->discussionByID($comment['CommentID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
+        }
+
+        $this->formatField($comment, 'Body', $comment['Format']);
+        $result = $out->validate($comment);
         return $result;
     }
 
@@ -166,12 +179,18 @@ class CommentsApiController extends AbstractApiController {
      * @return array
      */
     public function get_edit($id) {
-        $this->permission();
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a comment for editing.');
         $out = $this->schema(Schema::parse(['commentID', 'body', 'format'])->add($this->fullSchema()), 'out');
 
-        $result = $out->validate([]);
+        $comment = $this->commentByID($id);
+        if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
+            $discussion = $this->discussionByID($comment['CommentID']);
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
+        }
+
+        $result = $out->validate($comment);
         return $result;
     }
 
@@ -208,12 +227,26 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
-            'insertUserID:i?' => 'Filter by author.',
             'expand:b?' => 'Expand associated records.'
         ], 'in')->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
-        $result = $out->validate([]);
+        $query = $in->validate($query);
+        $discussion = $this->discussionByID($query['discussionID']);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->commentModel->getDefaultLimit());
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View.', $discussion['CategoryID']);
+        $rows = $this->commentModel->getByDiscussion(
+            $query['discussionID'],
+            $limit,
+            $offset)->resultArray();
+        if ($query['expand']) {
+            $this->userModel->expandUsers($rows, ['InsertUserID']);
+        }
+        foreach ($rows as &$currentRow) {
+            $this->formatField($currentRow, 'Body', $currentRow['Format']);
+        }
+
+        $result = $out->validate($rows);
         return $result;
     }
 
@@ -224,13 +257,29 @@ class CommentsApiController extends AbstractApiController {
      * @param array $body The request body.
      * @return array
      */
-    public function patch($id, $body) {
-        $this->permission();
+    public function patch($id, array $body) {
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->commentPostSchema('in')->setDescription('Update a comment.');
         $out = $this->commentSchema('out');
 
-        $result = $out->validate([]);
+        $body = $in->validate($body);
+        $data = $this->caseScheme->convertArrayKeys($body);
+        $data['CommentID'] = $id;
+        $row = $this->commentByID($id);
+        if ($row['InsertUserID'] !== $this->getSession()->UserID) {
+            $discussion = $this->discussionByID($row['CommentID']);
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
+        }
+        if ($row['DiscussionID'] !== $data['DiscussionID']) {
+            $discussion = $this->discussionByID($data['DiscussionID']);
+            $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
+        }
+        $this->commentModel->save($data);
+        $row = $this->commentByID($id);
+
+        $this->formatField($row, 'Body', $row['Format']);
+        $result = $out->validate($row);
         return $result;
     }
 
@@ -238,15 +287,27 @@ class CommentsApiController extends AbstractApiController {
      * Add a comment.
      *
      * @param array $body The request body.
+     * @throws ServerException if the comment could not be created.
      * @return Data
      */
-    public function post($body) {
-        $this->permission();
+    public function post(array $body) {
+        $this->permission('Garden.SignIn.Allow');
 
         $in = $this->commentPostSchema('in')->setDescription('Add a comment.');
         $out = $this->commentSchema('out');
 
-        $result = $out->validate([]);
+        $body = $in->validate($body);
+        $data = $this->caseScheme->convertArrayKeys($body);
+        $discussion = $this->discussionByID($data['DiscussionID']);
+        $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
+        $id = $this->commentModel->save($data);
+        if (!$id) {
+            throw new ServerException('Unable to insert comment.', 500);
+        }
+        $row = $this->commentByID($id);
+
+        $this->formatField($row, 'Body', $row['Format']);
+        $result = $out->validate($row);
         return new Data($result, 201);
     }
 }

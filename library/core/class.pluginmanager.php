@@ -905,14 +905,14 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         ${$VariableName} = array();
 
         foreach ($Lines as $Line) {
-            $Line = trim($Line);
-            if ($InfoBuffer && substr($Line, -1) == ';') {
+            $TrimmedLine = trim($Line);
+            if ($InfoBuffer && substr($TrimmedLine, -1) == ';') {
                 $PluginInfoString .= $Line;
                 $ClassBuffer = true;
                 $InfoBuffer = false;
             }
 
-            if (stringBeginsWith($Line, $ParseVariableName)) {
+            if (stringBeginsWith($TrimmedLine, $ParseVariableName)) {
                 $InfoBuffer = true;
             }
 
@@ -920,8 +920,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $PluginInfoString .= $Line;
             }
 
-            if ($ClassBuffer && strtolower(substr($Line, 0, 6)) == 'class ') {
-                $Parts = explode(' ', $Line);
+            if ($ClassBuffer && strtolower(substr($TrimmedLine, 0, 6)) == 'class ') {
+                $Parts = explode(' ', $TrimmedLine);
                 if (count($Parts) > 2) {
                     $ClassName = $Parts[1];
                 }

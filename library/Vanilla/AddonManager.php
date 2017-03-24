@@ -251,15 +251,19 @@ class AddonManager {
 
         if ($namespacePattern === '' && $classNameStartWithWilcard) {
             $namespacePattern = '*';
+            $namespaceHasWildcard = true;
         } else if ($namespacePattern === '\\') {
             $namespacePattern = '';
+            $namespaceHasWildcard = false;
         } else if ($namespacePattern === '*\\') {
-            $namespacePattern = '*';
+            $namespacePattern = '.+';
+            $namespaceHasWildcard = true;
+        } else {
+            $namespaceHasWildcard = strpos($namespacePattern, '*') !== false;
         }
-        $namespaceHasWildcard = strpos($namespacePattern, '*') !== false;
 
         $fnPatternToRegex = function($pattern) {
-            return str_replace('\\*', '.*?', preg_quote($pattern));
+            return str_replace(['\\*', '\.\+'], ['.*?', '.+?'], preg_quote($pattern));
         };
         $namespaceRegex = '/^'.$fnPatternToRegex($namespacePattern).'$/i';
         $classNameRegex = '/^'.$fnPatternToRegex($classNamePattern).'$/i';

@@ -1,16 +1,14 @@
 <?php
-use Garden\Schema\Schema;
-
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
+use Garden\Schema\Schema;
 use Garden\Web\Data;
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\ServerException;
-use Vanilla\Exception\PermissionException;
 use Vanilla\Utility\CapitalCaseScheme;
 
 /**
@@ -139,7 +137,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @throws NotFoundException if the discussion could not be found.
      * @return array
      */
-    public function get($id, array $query) {
+    public function get($id) {
         $this->permission();
 
         $in = $this->idParamSchema()->setDescription('Get a discussion.');
@@ -243,7 +241,6 @@ class DiscussionsApiController extends AbstractApiController {
      * @param int $id The ID of the discussion.
      * @param array $body The request body.
      * @throws NotFoundException if unable to find the discussion.
-     * @throws ServerException if unable to find the discussion.
      * @return array
      */
     public function patch($id, array $body) {
@@ -276,7 +273,6 @@ class DiscussionsApiController extends AbstractApiController {
      *
      * @param array $body The request body.
      * @throws ServerException if the discussion could not be created.
-     * @throws ServerException if the newly-created discussion could not be found.
      * @return Data
      */
     public function post(array $body) {

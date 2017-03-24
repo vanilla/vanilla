@@ -178,7 +178,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->addCall('addRoute', ['route' => new \Garden\Container\Callback(function () {
         return new \Garden\Web\PreflightRoute('/api/v2', true);
     })])
-    ->addCall('setAllowedOrigins', ['isTrustedUrl'])
+    ->addCall('setAllowedOrigins', ['isTrustedDomain'])
 
     ->rule('@api-v2-route')
     ->setClass(\Garden\Web\ResourceRoute::class)

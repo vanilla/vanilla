@@ -184,7 +184,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $classes = $addon->getClasses();
         $this->assertArrayHasKey($classKey, $classes);
 
-        $subpath = $classes[$classKey]['path'];
+        $subpath = reset($classes[$classKey])['path'];
         // Kludge: Check for the UserPhoto() function.
         $fileContents = file_get_contents($addon->path($subpath));
         if (preg_match('`function userPhoto`i', $fileContents)) {
@@ -299,7 +299,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         unset($info['Require'], $oldInfoArray['RequiredApplications'], $oldInfoArray['RequiredPlugins']);
 
         // Namespaced plugins were not supported.
-        if (strpos('\\\\', $oldInfoArray['ClassName']) !== false && $info['ClassName'] === '') {
+        if (strpos($info['ClassName'], '\\') !== false) {
             unset($info['ClassName'], $oldInfoArray['ClassName']);
         }
 

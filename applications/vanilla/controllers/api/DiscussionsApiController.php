@@ -50,24 +50,6 @@ class DiscussionsApiController extends AbstractApiController {
     }
 
     /**
-     * Verify the current user's permission in a category.
-     *
-     * @param string $permission The permission string.
-     * @param int $categoryID The discussion row.
-     * @throws PermissionException if the current user does not have the permission on the discussion.
-     */
-    public function categoryPermission($permission, $categoryID) {
-        $hasPermission = $this->userModel->getCategoryViewPermission(
-            $this->getSession()->UserID,
-            $categoryID,
-            $permission
-        );
-        if ($hasPermission !== true) {
-            throw new PermissionException($permission);
-        }
-    }
-
-    /**
      * Delete a discussion.
      *
      * @param int $id The ID of the discussion.
@@ -81,7 +63,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
         }
         $this->discussionModel->deleteID($id);
 
@@ -168,7 +150,7 @@ class DiscussionsApiController extends AbstractApiController {
             throw new NotFoundException('Discussion');
         }
 
-        $this->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
         $this->formatField($row, 'Body', $row['Format']);
         $result = $out->validate($row);
@@ -191,7 +173,7 @@ class DiscussionsApiController extends AbstractApiController {
         $row = $this->discussionByID($id);
 
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
 
         $result = $out->validate($row);
@@ -241,7 +223,7 @@ class DiscussionsApiController extends AbstractApiController {
         list($offset, $limit) = offsetLimit("p{$query['page']}", $this->discussionModel->getDefaultLimit());
 
         if (array_key_exists('categoryID', $where)) {
-            $this->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
 
         $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
@@ -276,10 +258,10 @@ class DiscussionsApiController extends AbstractApiController {
         $data = $this->caseScheme->convertArrayKeys($body);
         $data['DiscussionID'] = $id;
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $this->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
         if ($row['CategoryID'] !== $body['categoryID']) {
-            $this->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
         }
 
         $this->discussionModel->save($data);
@@ -304,7 +286,7 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema($this->discussionSchema(), 'out');
 
         $body = $in->validate($body);
-        $this->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
 
         $data = $this->caseScheme->convertArrayKeys($body);
         $id = $this->discussionModel->save($data);
@@ -336,7 +318,7 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema(['announce:b' => 'The current announce value.'], 'out');
 
         $row = $this->discussionByID($id);
-        $this->categoryPermission('Vanilla.Discussions.Announce', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Announce', $row['CategoryID']);
 
         $body = $in->validate($body);
         $this->discussionModel->setField($row['DiscussionID'], 'Announce', $body['announce']);
@@ -362,7 +344,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $row = $this->discussionByID($id);
-        $this->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
         $this->discussionModel->bookmark($id, $this->getSession()->UserID, $body['bookmarked']);
 
         $result = $this->discussionByID($id);
@@ -384,7 +366,7 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema(['closed:b' => 'The current close value.'], 'out');
 
         $row = $this->discussionByID($id);
-        $this->categoryPermission('Vanilla.Discussions.Close', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Close', $row['CategoryID']);
 
         $body = $in->validate($body);
         $this->discussionModel->setField($row['DiscussionID'], 'Closed', $body['closed']);
@@ -408,7 +390,7 @@ class DiscussionsApiController extends AbstractApiController {
         $out = $this->schema(['sink:b' => 'The current sink value.'], 'out');
 
         $row = $this->discussionByID($id);
-        $this->categoryPermission('Vanilla.Discussions.Sink', $row['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.Sink', $row['CategoryID']);
 
         $body = $in->validate($body);
         $this->discussionModel->setField($row['DiscussionID'], 'Sink', $body['sink']);

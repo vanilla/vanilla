@@ -81,6 +81,7 @@ module.exports = function (grunt) {
               , 'jquery-icheck/icheck.min.js'
               , 'moment/min/moment.min.js'
               , 'tether/dist/js/tether.min.js'
+              , 'tether/dist/js/tether.js'
               , 'tether-drop/dist/js/drop.min.js'
               , 'jquery-checkall/dist/jquery.checkall.min.js'
             ],
@@ -220,6 +221,7 @@ module.exports = function (grunt) {
           'js/vendors/ace/*.js',
           'js/colorpicker.js',
           'js/cropimage.js',
+          'js/buttonGroup.js',
           'js/jquery.tablejenga.js',
           'js/jquery.fluidfixed.js',
           '../../js/library/jquery.expander.js',

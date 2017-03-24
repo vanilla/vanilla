@@ -223,7 +223,6 @@ class DiscussionsApiController extends AbstractApiController {
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
-
         $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
@@ -231,6 +230,7 @@ class DiscussionsApiController extends AbstractApiController {
         foreach ($rows as &$currentRow) {
             $this->formatField($currentRow, 'Body', $currentRow['Format']);
         }
+
         $result = $out->validate($rows);
         return $result;
     }
@@ -257,8 +257,8 @@ class DiscussionsApiController extends AbstractApiController {
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
-        if ($row['CategoryID'] !== $body['categoryID']) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
+        if ($row['CategoryID'] !== $data['CategoryID']) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $data['CategoryID']);
         }
 
         $this->discussionModel->save($data);

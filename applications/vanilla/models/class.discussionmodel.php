@@ -1645,7 +1645,7 @@ class DiscussionModel extends Gdn_Model {
      * @param int $DiscussionID Unique ID of discussion to get.
      * @param string $DataSetType One of the **DATASET_TYPE_*** constants.
      * @param array $Options An array of extra options for the query.
-     * @return object SQL result.
+     * @return mixed SQL result.
      */
     public function getID($DiscussionID, $DataSetType = DATASET_TYPE_OBJECT, $Options = []) {
         $Session = Gdn::session();

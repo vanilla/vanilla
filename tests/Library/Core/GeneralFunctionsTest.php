@@ -58,6 +58,7 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
      */
     public function provideUrlMatchTests() {
         $r = [
+            'empty pattern' => ['', 'http://example.com', false],
             'equals' => ['foo.com', 'http://foo.com', true],
             'equals 2' => ['foo.com', 'http://foo.com/', true],
             'wildcard path' => ['foo.com/bar/*', 'http://foo.com/bar', true],
@@ -74,6 +75,40 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
             'bad substring domain' => ['*.foo.com', 'http://xssfoo.com', false],
             'bad substring domain 2' => ['foo.com', 'http://xssfoo.com', false],
         ];
+        return $r;
+    }
+
+    /**
+     * Test some {@link isTrustedDomain()} from the config.
+     *
+     * Note that since isTrustedDomain caches a copy of the trusted domains this unit test might fail if it isn't the only one.
+     *
+     * @param string $url The URL to test.
+     * @param bool $expected The expected result from {@link isTrustedDomain()}.
+     * @dataProvider provideTrustedDomainConfigs
+     */
+    public function testIsTrustedDomainConfig($url, $expected) {
+        saveToConfig('Garden.TrustedDomains', "foo.com\n https://bar.com\nhttps://baz.com/entry/*", false);
+
+        $r = isTrustedDomain($url);
+        $this->assertSame($expected, $r);
+    }
+
+    /**
+     * Provide tests for {@link testIsTrustedDomainConfig()}.
+     *
+     * @return array Returns a data provider.
+     */
+    public function provideTrustedDomainConfigs() {
+        $r = [
+            'domain url' => ['http://foo.com', true],
+            'domain domain' => ['foo.com', true],
+            'scheme mismatch' => ['http://bar.com', false],
+            'path mismatch' => ['https://bar.com/another', false],
+            'wildcard path 1' => ['https://baz.com/entry', true],
+            'wildcard path 2' => ['https://baz.com/entry/signin', true],
+        ];
+
         return $r;
     }
 }

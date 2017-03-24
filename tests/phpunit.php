@@ -1,6 +1,7 @@
 <?php
 
 use Vanilla\Addon;
+use Vanilla\InjectableInterface;
 
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');

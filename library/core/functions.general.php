@@ -3532,6 +3532,11 @@ if (!function_exists('trustedDomains')) {
 
         $trustedDomains = array_merge($trustedDomains, $configuredDomains);
 
+        if (!c('Garden.Installed')) {
+            // Bail out here because we don't have a database yet.
+            return $trustedDomains;
+        }
+
         // Build a collection of authentication provider URLs.
         $authProviderModel = new Gdn_AuthenticationProviderModel();
         $providers = $authProviderModel->getProviders();
@@ -3697,32 +3702,45 @@ if (!function_exists('isSafeUrl')) {
 
 if (!function_exists('isTrustedDomain')) {
     /**
-     * Check the provided domain name to determine if it is a trusted domain.
+     * Check to see if a URL or domain name is in a trusted domain.
      *
-     * @param string $domain Domain name to compare against our list of trusted domains.
+     * @param string $url The URL or domain name to check.
      * @return bool True if verified as a trusted domain.  False if unable to verify domain.
      */
-    function isTrustedDomain($domain) {
-        static $trustedDomains = null;
+    function isTrustedDomain($url) {
+        static $trusted = null;
 
-        if (empty($domain)) {
+        if (empty($url)) {
             return false;
         }
 
-        // If we haven't already compiled an array of trusted domains, grab them.
-        if (!is_array($trustedDomains)) {
-            $trustedDomains = trustedDomains();
+        // Short circuit on our own domain.
+        if (urlMatch(Gdn::request()->host(), $url)) {
+            return true;
         }
 
-        /**
-         * Iterate through each of our trusted domains.
-         * Chop off any whitespace from the trusted domain and prepare it for regex.
-         * See if the current trusted domain matches fully against the domain we're
-         *   testing or if it matches its end (e.g. domain.tld should match domain.tld and sub.domain.tld)
-         */
-        foreach ($trustedDomains as $trustedDomain) {
-            $trustedDomain = preg_quote(trim($trustedDomain));
-            if (preg_match("/(^|\.){$trustedDomain}$/i", $domain)) {
+        // If we haven't already compiled an array of trusted domains, grab them.
+        if ($trusted === null) {
+            $trusted = [];
+            $trustedDomains = trustedDomains();
+            foreach ($trustedDomains as $domain) {
+                // Store the trusted domain by its host name.
+                if (strpos($domain, '//') === false) {
+                    $domain = '//'.$domain;
+                }
+                $host = preg_replace('`^(\*?\.)`', '', parse_url($domain, PHP_URL_HOST));
+                $trusted[$host] = $domain;
+            }
+        }
+
+        // Make sure the domain.
+        if (strpos($url, '//') === false) {
+            $url = '//'.$url;
+        }
+
+        // Check the URL against all domains by host part.
+        for ($host = parse_url($url, PHP_URL_HOST); !empty($host); $host = ltrim(strstr($host, '.'), '.')) {
+            if (isset($trusted[$host]) && urlMatch($trusted[$host], $url)) {
                 return true;
             }
         }
@@ -3929,6 +3947,9 @@ if (!function_exists('urlMatch')) {
      * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
      */
     function urlMatch($pattern, $url) {
+        if (empty($pattern)) {
+            return false;
+        }
         $urlParts = parse_url($url);
         $patternParts = parse_url($pattern);
 

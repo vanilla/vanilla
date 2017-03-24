@@ -557,19 +557,26 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
                 'API\DiscussionsController' => false,
                 'VanillaAPI\DiscussionsController' => true,
             ],
-            '*\*Controller' => [
-                'DiscussionsController' => true,
-                'Vanilla\DiscussionsController' => true,
-                'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true,
-                'VanillaAPI\DiscussionsController' => true,
-            ],
             '*Controller' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
                 'Vanilla\API\DiscussionsController' => true,
                 'API\DiscussionsController' => true,
                 'VanillaAPI\DiscussionsController' => true,
+            ],
+            '*\*Controller' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
+            ],
+            '\*Controller' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => false,
+                'Vanilla\API\DiscussionsController' => false,
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => false,
             ],
             '*' => [
                 'DiscussionsController' => true,

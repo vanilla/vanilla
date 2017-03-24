@@ -1193,7 +1193,8 @@ class Addon {
             $namespace = '';
             $className = $fqClassName;
         } else {
-            list($namespace, $className) = str_split($fqClassName, $lastNamespaceSeparatorPos+1);
+            $namespace = substr($fqClassName, 0, $lastNamespaceSeparatorPos+1);
+            $className = substr($fqClassName, $lastNamespaceSeparatorPos+1);
         }
 
         return [

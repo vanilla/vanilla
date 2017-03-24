@@ -81,7 +81,6 @@ module.exports = function (grunt) {
               , 'jquery-icheck/icheck.min.js'
               , 'moment/min/moment.min.js'
               , 'tether/dist/js/tether.min.js'
-              , 'tether/dist/js/tether.js'
               , 'tether-drop/dist/js/drop.min.js'
               , 'jquery-checkall/dist/jquery.checkall.min.js'
             ],

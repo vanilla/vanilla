@@ -3727,7 +3727,7 @@ if (!function_exists('isTrustedDomain')) {
                 // Store the trusted domain by its host name.
                 if (strpos($domain, '//') === false) {
                     $domain = '//'.$domain;
-        }
+                }
                 $host = preg_replace('`^(\*?\.)`', '', parse_url($domain, PHP_URL_HOST));
                 $trusted[$host] = $domain;
             }

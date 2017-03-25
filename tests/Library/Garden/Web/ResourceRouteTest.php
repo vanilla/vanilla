@@ -165,15 +165,6 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Controllers can publicize methods with isPublic().
-     */
-    public function testIsPublic() {
-        $route = $this->createRoute();
-
-        $this->assertNotNull($route->match(new Request('/discussions/i-am-public')));
-    }
-
-    /**
      * A path parameter should be filled with the remaining path.
      *
      * @param string $path A request path.

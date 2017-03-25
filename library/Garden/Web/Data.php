@@ -170,7 +170,7 @@ class Data implements \JsonSerializable {
      * @return mixed Returns the header value or {@link $default}.
      */
     public function getHeader($name, $default = null) {
-        return $this->getMetaItem($this->headerKey($name), $default);
+        return $this->getMeta($this->headerKey($name), $default);
     }
 
     /**
@@ -181,7 +181,7 @@ class Data implements \JsonSerializable {
      * @return $this
      */
     public function setHeader($name, $value) {
-        $this->setMetaItem($this->headerKey($name), $value);
+        $this->setMeta($this->headerKey($name), $value);
         return $this;
     }
 
@@ -257,7 +257,7 @@ class Data implements \JsonSerializable {
         http_response_code($this->getStatus());
 
         if (!$this->hasHeader('Content-Type')) {
-        header('Content-Type: application/json; charset=utf-8', true);
+            header('Content-Type: application/json; charset=utf-8', true);
         }
         foreach ($this->getHeaders() as $name => $value) {
             foreach ((array)$value as $line) {
@@ -268,7 +268,7 @@ class Data implements \JsonSerializable {
         if (is_string($this->data) || $this->data === null) {
             echo $this->data;
         } else {
-        echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
+            echo json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR);
         }
     }
 }

@@ -43,7 +43,7 @@ if (!defined('APPLICATION_VERSION')) {
 require PATH_CONF . '/constants.php';
 
 // Set up the dependency injection container.
-$dic = new \Garden\Container\Container();
+$dic = $GLOBALS['dic'] = new \Garden\Container\Container();
 Gdn::setContainer($dic);
 
 $dic->setInstance('Garden\Container\Container', $dic)
@@ -95,6 +95,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Gdn_ThemeManager')
     ->setShared(true)
     ->addAlias('ThemeManager')
+
+    // Logger
+    ->rule(\Vanilla\Logger::class)
+    ->setShared(true)
+    ->addAlias(\Psr\Log\LoggerInterface::class)
+
+    ->rule(\Psr\Log\LoggerAwareInterface::class)
+    ->addCall('setLogger')
 
     // EventManager
     ->rule(\Garden\EventManager::class)

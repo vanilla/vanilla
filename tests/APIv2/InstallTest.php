@@ -9,7 +9,13 @@ namespace VanillaTests\APIv2;
 
 use VanillaTests\TestInstallModel;
 
+/**
+ * Test basic Vanilla installation.
+ */
 class InstallTest extends \PHPUnit_Framework_TestCase {
+    /**
+     * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
+     */
     public function testInstall() {
         global $dic;
 
@@ -17,8 +23,11 @@ class InstallTest extends \PHPUnit_Framework_TestCase {
         $installer = $dic->get(TestInstallModel::class);
 
         $installer->uninstall();
-        $installer->install([
+        $result = $installer->install([
             'site' => ['title' => __METHOD__]
         ]);
+
+        $this->assertArrayHasKey('version', $result);
+        $this->assertGreaterThan(0, $result['adminUserID']);
     }
 }

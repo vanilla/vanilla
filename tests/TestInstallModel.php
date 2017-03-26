@@ -15,17 +15,65 @@ use Vanilla\Models\InstallModel;
  * A Vanilla installer that handles uninstalling.
  */
 class TestInstallModel extends InstallModel {
+    /**
+     * @var string The URL of the site.
+     */
     private $baseUrl;
 
+    /**
+     * @var string The database name.
+     */
     private $dbName;
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
         parent::__construct($config, $addonModel, $container);
+
+        $this->config->Data = [];
+        $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
+        $this->config->load($this->getConfigPath(), 'Configuration', true);
 
         $this->setBaseUrl($_ENV['baseurl']);
     }
 
-    public function install($data) {
+    /**
+     * Get the path to the config file for direct access.
+     *
+     * @return string Returns the path to the database.
+     */
+    public function getConfigPath() {
+        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
+        $path = PATH_ROOT."/conf/$host.php";
+        return $path;
+    }
+
+    /**
+     * Get the base URL of the site.
+     *
+     * @return mixed Returns the baseUrl.
+     */
+    public function getBaseUrl() {
+        return $this->baseUrl;
+    }
+
+    /**
+     * Set the base URL of the site.
+     *
+     * @param mixed $baseUrl The new URL.
+     * @return $this
+     */
+    public function setBaseUrl($baseUrl) {
+        $this->baseUrl = $baseUrl;
+        $this->config->defaultPath($this->getConfigPath());
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function install(array $data) {
         $data = array_replace_recursive([
             'database' => $this->getDbInfo(),
             'site' => [
@@ -40,7 +88,21 @@ class TestInstallModel extends InstallModel {
 
         $this->createDatabase($data['database']);
 
-        parent::install($data);
+        return parent::install($data);
+    }
+
+    /**
+     * Get an array with database connection information.
+     *
+     * @return array Returns a database connection information array.
+     */
+    private function getDbInfo() {
+        return [
+            'host' => 'localhost',
+            'name' => $this->getDbName(),
+            'user' => $this->getDbUser(),
+            'password' => $this->getDbPassword()
+        ];
     }
 
     /**
@@ -64,34 +126,13 @@ class TestInstallModel extends InstallModel {
     }
 
     /**
-     * Set the dbName.
+     * Set the database name.
      *
-     * @param mixed $dbName
+     * @param string $dbName The new database name.
      * @return $this
      */
     public function setDbName($dbName) {
         $this->dbName = $dbName;
-        return $this;
-    }
-
-    /**
-     * Get the baseUrl.
-     *
-     * @return mixed Returns the baseUrl.
-     */
-    public function getBaseUrl() {
-        return $this->baseUrl;
-    }
-
-    /**
-     * Set the baseUrl.
-     *
-     * @param mixed $baseUrl
-     * @return $this
-     */
-    public function setBaseUrl($baseUrl) {
-        $this->baseUrl = $baseUrl;
-        $this->config->defaultPath($this->getConfigPath());
         return $this;
     }
 
@@ -127,7 +168,7 @@ class TestInstallModel extends InstallModel {
     }
 
     /**
-     * @return bool
+     * Uninstall the application.
      */
     public function uninstall() {
         // Delete the database.
@@ -145,25 +186,5 @@ class TestInstallModel extends InstallModel {
         // Reset the config to defaults.
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
-
-        return true;
-    }
-
-    /**
-     * Get the path to the config file for direct access.
-     *
-     * @return string Returns the path to the database.
-     */
-    public function getConfigPath() {
-        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
-        $path = PATH_ROOT."/conf/$host.php";
-        return $path;
-    }
-
-    private function getDbInfo() {
-        return ['host' => 'localhost',
-            'name' => $this->getDbName(),
-            'user' => $this->getDbUser(),
-            'password' => $this->getDbPassword()];
     }
 }

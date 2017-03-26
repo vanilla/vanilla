@@ -23,6 +23,13 @@ class InstallModel {
 
     protected $container;
 
+    /**
+     * InstallModel constructor.
+     *
+     * @param \Gdn_Configuration $config The configuration dependency used to load/save configuration information.
+     * @param AddonModel $addonModel The addon model dependency used to enable installation addons.
+     * @param ContainerInterface $container The container used to create additional dependencies once they are enabled.
+     */
     public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
         $this->config = $config;
         $this->addonModel = $addonModel;
@@ -30,9 +37,12 @@ class InstallModel {
     }
 
     /**
-     * @param $data
+     * Install Vanilla.
+     *
+     * @param array $data Database installation information.
+     * @see InstallModel::getSchema()
      */
-    public function install($data) {
+    public function install(array $data) {
         $data = $this->validate($data);
 
         // Copy the .htaccess file.
@@ -94,7 +104,7 @@ class InstallModel {
 
         $result = [
             'version' => APPLICATION_VERSION,
-            'adminUserID' => $adminUserID
+            'adminUserID' => empty($adminUserID) ? null : (int)$adminUserID
         ];
 
         return $result;
@@ -221,9 +231,15 @@ class InstallModel {
         return $data;
     }
 
-    private function validateDatabaseConnection($db) {
+    /**
+     * Check to see if the database connection information can connect to an actual database.
+     *
+     * @param array $dbInfo The database connection information.
+     * @throws ValidationException Throws an exception if the database connection fails.
+     */
+    private function validateDatabaseConnection(array $dbInfo) {
         try {
-            $this->createPDO($db);
+            $this->createPDO($dbInfo);
         } catch (\PDOException $Exception) {
             $validation = new Validation();
             switch ($Exception->getCode()) {
@@ -294,7 +310,9 @@ class InstallModel {
     }
 
     /**
-     * @return Schema
+     * Get the schema for installation.
+     *
+     * @return Schema Returns the install schema.
      */
     public function getSchema() {
         $sch = Schema::parse([
@@ -319,7 +337,9 @@ class InstallModel {
     }
 
     /**
-     * @param $info
+     * Create a PDO connection to the database.
+     *
+     * @param array $info Database connection information.
      */
     protected function createPDO(array $info) {
         $pdo = new PDO(

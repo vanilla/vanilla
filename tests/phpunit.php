@@ -64,7 +64,6 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addCall('defaultPath', [PATH_ROOT.'/conf/vanilla.test'])
     ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
-    ->addCall('load', [PATH_ROOT.'/conf/vanilla.test', 'Configuration', true])
     ->addAlias('Config')
 
     // AddonManager

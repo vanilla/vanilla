@@ -745,7 +745,16 @@ class CommentModel extends VanillaModel {
             ->CountComments;
     }
 
+    /**
+     * @deprecated since 2.4
+     *
+     * @param $DiscussionID
+     * @param null $UserID
+     * @return int
+     */
     public function getUnreadOffset($DiscussionID, $UserID = null) {
+        deprecated(__METHOD__);
+
         if ($UserID == null) {
             $UserID = Gdn::session()->UserID;
         }

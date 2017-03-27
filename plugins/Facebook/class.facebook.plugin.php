@@ -586,6 +586,8 @@ class FacebookPlugin extends Gdn_Plugin {
         $Info = curl_getinfo($C);
         if (strpos(val('content_type', $Info, ''), '/javascript') !== false) {
             $Tokens = json_decode($Contents, true);
+        } else if (strpos(val('content_type', $Info, ''), '/json') !== false) {
+            $Tokens = json_decode($Contents, true);
         } else {
             parse_str($Contents, $Tokens);
         }

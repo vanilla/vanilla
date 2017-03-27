@@ -322,20 +322,44 @@
 })(jQuery, window, document);
 
 /**
+ * This class handles the content parsing and rendering of two different types of modals:
+ *
+ * Regular modals that ajax-in the content from an endpoint.
+ * Confirm modals that don't ajax-in the content.
  *
  */
 var DashboardModal = (function() {
 
     /**
+     * The settings we can configure when starting the DashboardModal.
      *
-     * @param $trigger
-     * @param settings
+     * These can be added when initializing the DashboardModal via javascript,
+     * or by using data attributes.
+     *
+     * @typedef {Object} DashboardModalSettings
+     * @property {string} httpmethod The HTTP method for the confirm modal. Either 'get' or 'post'. 'post' will automatically add the TransientKey to the request.
+     * @property {function} afterSuccess Function gets called on ajax success when handling a modal.
+     * @property {boolean} reloadPageOnSave Whether to reload the page after the modal closes after ajax success. Default true.
+     * @property {boolean} followLink Whether to follow a link when the confirm modal is accepted rather than simply closing the modal.
+     * @property {string} cssClass A CSS class to add to the modal dialog.
+     * @property {string} title The modal title.
+     * @property {string} footer The modal footer.
+     * @property {string} body The modal body.
+     * @property {string} closeIcon The svg close icon from the dashboard symbol map.
+     * @property {string} modalType The modal type. Defaults to 'regular'. Other options are 'confirm' or 'noheader'
+     */
+
+    /**
+     * Initialize our dashboard modal.
+     *
+     * @param {jQuery} $trigger The element we clicked to trigger the modal.
+     * @param {DashboardModalSettings} settings The modal settings.
      * @constructor
      */
     var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
-        this.addToDom();
+        this.addModalToDom();
 
         this.settings = {};
         this.defaultContent.closeIcon = dashboardSymbol('close');
@@ -347,21 +371,32 @@ var DashboardModal = (function() {
         this.start();
     };
 
-    /**
-     *
-     */
+
     DashboardModal.prototype = {
 
+        /**
+         * The current active modal in the page.
+         */
         activeModal: undefined,
 
+        /**
+         * The default settings.
+         */
         defaultSettings: {
             httpmethod: 'get',
             afterSuccess: function(json, sender) {},
-            reloadPageOnSave: true
+            reloadPageOnSave: true,
+            modalType: 'regular'
         },
 
+        /**
+         * The generated id for the modal.
+         */
         id: '',
 
+        /**
+         * The default content for the modal.
+         */
         defaultContent: {
             cssClass: '',
             title: '',
@@ -374,10 +409,19 @@ var DashboardModal = (function() {
             }
         },
 
+        /**
+         * The url to fetch the modal content from.
+         */
         target: '',
 
+        /**
+         * The jQuery trigger object that is clicked to activate the modal.
+         */
         trigger: {},
 
+        /**
+         * The default modal template for all modals.
+         */
         modalHtml: ' \
         <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
@@ -394,6 +438,9 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * A modal with no separate header and footer.
+         */
         modalHtmlNoHeader: ' \
         <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
             <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
@@ -405,30 +452,41 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * The modal shell that we add to the DOM on initialization. Content eventually is added to the modal.
+         */
         modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
-        start: function($trigger, settings) {
+        /**
+         * Shows, gives focus to, and renders the modal.
+         */
+        start: function() {
             $('#' + this.id).modal('show').focus();
             if (this.settings.modalType === 'confirm') {
-                this.addConfirmContent();
+                this.renderConfirmModal();
             } else {
-                this.addContent();
+                this.renderModal();
             }
         },
 
-        load: function() {
-            this.handleForm();
-        },
-
-        addToDom: function() {
+        /**
+         * Adds the modal to the DOM.
+         */
+        addModalToDom: function() {
             $('body').append(this.modalShell.replace('{id}', this.id));
         },
 
+        /**
+         * Adds the needed data attributes to the modal trigger.
+         */
         setupTrigger: function($trigger) {
             $trigger.attr('data-target', '#' + this.id);
             $trigger.attr('data-modal-id', this.id);
         },
 
+        /**
+         * Adds event listeners to the modal.
+         */
         addEventListeners: function() {
             var self = this;
             $('#' + self.id).on('shown.bs.modal', function() {
@@ -445,67 +503,10 @@ var DashboardModal = (function() {
             });
         },
 
-
-        handleConfirm: function() {
-            var self = this;
-
-            // Refresh the page.
-            if (self.settings.followLink) {
-                document.location.replace(self.target);
-            } else {
-                // request the target via ajax
-                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-                if (self.settings.httpmethod === 'post') {
-                    ajaxData.TransientKey = gdn.definition('TransientKey');
-                }
-
-                $.ajax({
-                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                    url: self.target,
-                    data: ajaxData,
-                    dataType: 'json',
-                    error: function(xhr) {
-                        gdn.informError(xhr);
-                        $('#' + self.id).modal('hide');
-                    },
-                    success: function(json) {
-                        gdn.inform(json);
-                        gdn.processTargets(json.Targets);
-                        if (json.RedirectUrl) {
-                            setTimeout(function() {
-                                document.location.replace(json.RedirectUrl);
-                            }, 300);
-                        } else {
-                            $('#' + self.id).modal('hide');
-                            self.afterConfirmSuccess();
-                        }
-                    }
-                });
-            }
-        },
-
-        // Default is to remove the closest item with the class 'js-modal-item'
-        afterConfirmSuccess: function() {
-            var found = false;
-            if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                var $remove;
-                if (this.settings.removeSelector) {
-                    $remove = $(this.settings.removeSelector)
-                } else {
-                    $remove = this.trigger.closest('.js-modal-item');
-                }
-                found = $remove.length !== 0;
-                $remove.remove();
-            }
-
-            // Refresh the page.
-            if (!found) {
-                document.location.replace(window.location.href);
-            }
-        },
-
-        confirmContent: function() {
-            // Replace language definitions
+        /**
+         * Gets the default content for a confirm modal.
+         */
+        getDefaultConfirmContent: function() {
             var confirmHeading = gdn.definition('ConfirmHeading', 'Confirm');
             var confirmText = gdn.definition('ConfirmText', 'Are you sure you want to do that?');
             var ok = gdn.definition('Okay', 'Okay');
@@ -522,12 +523,45 @@ var DashboardModal = (function() {
             };
         },
 
-        addConfirmContent: function() {
+        /**
+         * Adds confirm content to the modal shell.
+         */
+        renderConfirmModal: function() {
             var self = this;
-            $('#' + self.id).htmlTrigger(self.replaceHtml(self.confirmContent()));
+            $('#' + self.id).htmlTrigger(self.addContentToTemplate(self.getDefaultConfirmContent()));
         },
 
-        replaceHtml: function(parsedContent) {
+        /**
+         * Makes an ajax call to the target and adds the page content to the modal shell.
+         */
+        renderModal: function() {
+            var self = this;
+            var ajaxData = {
+                'DeliveryType' : 'VIEW',
+                'DeliveryMethod' : 'JSON'
+            };
+
+            $.ajax({
+                method: 'GET',
+                url: self.target,
+                data: ajaxData,
+                dataType: 'json',
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                },
+                success: function(json) {
+                    var body = json.Data;
+                    var content = self.parseBody(body);
+                    $('#' + self.id).htmlTrigger(self.addContentToTemplate(content));
+                }
+            });
+        },
+
+        /**
+         * Replaces curly-braced variables in the templates with the parsedContent.
+         */
+        addContentToTemplate: function(parsedContent) {
 
             // Copy the defaults into the content array
             var content = {};
@@ -556,73 +590,16 @@ var DashboardModal = (function() {
             return html;
         },
 
-        addContent: function() {
-            var self = this;
-            var ajaxData = {
-                'DeliveryType' : 'VIEW',
-                'DeliveryMethod' : 'JSON'
-            };
 
-            $.ajax({
-                method: 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    var body = json.Data;
-                    var content = self.parseBody(body);
-                    $('#' + self.id).htmlTrigger(self.replaceHtml(content));
-                }
-            });
-        },
-
-        // Add any error messages to popup form or close modal on form save.
-        handleForm: function(element) {
-            var self = this;
-
-            $('form', element).ajaxForm({
-                data: {
-                    'DeliveryType': 'VIEW',
-                    'DeliveryMethod': 'JSON'
-                },
-                dataType: 'json',
-                success: function(json, sender) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-
-                    if (json.FormSaved === true) {
-                        self.afterFormSuccess(json, sender, json.RedirectUrl);
-                        $('#' + self.id).modal('hide');
-                    } else {
-                        var body = json.Data;
-                        var content = self.parseBody(body);
-                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
-                        $('#' + self.id + ' .modal-body').scrollTop(0);
-                    }
-                },
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                }
-            });
-        },
-
-        // Respect redirectUrl after form saves and redirect.
-        afterFormSuccess: function(json, sender, redirectUrl) {
-            this.settings.afterSuccess(json, sender);
-            if (redirectUrl) {
-                setTimeout(function() {
-                    document.location.replace(redirectUrl);
-                }, 300);
-            } else if (this.settings.reloadPageOnSave) {
-                document.location.replace(window.location.href);
-            }
-        },
-
+        /**
+         * Parses a page to find the title, footer, form and body elements.
+         *
+         * If there's a form in the page, removes the opening and closing form tags.
+         * These get readded later, wrapping around the content and footer.
+         *
+         * The title is the page's h1 element, the footer is the contents of the first `.Buttons`,
+         * `.form-footer` or `.js-modal-footer` element, if one exists on the page.
+         */
         parseBody: function(body) {
             var title = '';
             var footer = '';
@@ -669,6 +646,97 @@ var DashboardModal = (function() {
                     close: formCloseTag
                 }
             };
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleForm: function(element) {
+            var self = this;
+
+            $('form', element).ajaxForm({
+                data: {
+                    'DeliveryType': 'VIEW',
+                    'DeliveryMethod': 'JSON'
+                },
+                dataType: 'json',
+                success: function(json, sender) {
+                    self.settings.afterSuccess(json, sender);
+                    gdn.inform(json);
+                    gdn.processTargets(json.Targets);
+
+                    if (json.FormSaved === true) {
+                        self.handleSuccess(json);
+                    } else {
+                        var body = json.Data;
+                        var content = self.parseBody(body);
+                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                        $('#' + self.id + ' .modal-body').scrollTop(0);
+                    }
+                },
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                }
+            });
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleConfirm: function() {
+            var self = this;
+
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
+                }
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json, sender) {
+                        self.settings.afterSuccess(json, sender);
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        self.handleSuccess(json);
+                    }
+                });
+            }
+        },
+
+        /**
+         * Handles the ajax success. If there's a RedirectUrl set, then redirect. Reload the page if there
+         * are no Targets set AND reloadPageOnSave is true.
+         *
+         * @param json
+         */
+        handleSuccess: function(json) {
+            if (json.RedirectUrl) {
+                setTimeout(function() {
+                    document.location.replace(json.RedirectUrl);
+                }, 300);
+            } else {
+                $('#' + this.id).modal('hide');
+
+                // We'll only reload if there are no targets set. If there are targets set, we can
+                // assume that the page doesn't need to be reloaded, since we'll ajax remove/edit
+                // the page.
+                if (this.settings.reloadPageOnSave && (json.Targets.length === 0)) {
+                    document.location.replace(window.location.href);
+                }
+            }
         }
     };
 
@@ -1008,7 +1076,7 @@ var DashboardModal = (function() {
      */
     function modalInit() {
         if (typeof(DashboardModal.activeModal) === 'object') {
-            DashboardModal.activeModal.load();
+            DashboardModal.activeModal.handleForm();
         }
     }
 

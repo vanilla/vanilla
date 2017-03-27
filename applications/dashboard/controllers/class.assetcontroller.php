@@ -13,12 +13,15 @@
  */
 class AssetController extends DashboardController {
     /**
-     * Delete an image from config.
+     * Delete an image from config. Will attempt to remove any element with the an id that is the slugified
+     * config concatinated with '-preview-wrapper'.
      *
      * @param string $config The config value to delete.
      * @throws Gdn_UserException
      */
     public function deleteConfigImage($config = '') {
+        $imageWrapperId = slugify($config).'-preview-wrapper';
+
         if (!Gdn::request()->isAuthenticatedPostBack()) {
             throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }
@@ -35,8 +38,11 @@ class AssetController extends DashboardController {
             if ($upload->delete(c($config))) {
                 // Fore extra safety, ensure an image has been deleted before removing from config.
                 removeFromConfig($config);
+                $this->informMessage(t('Image deleted.'));
+                $this->jsonTarget('#'.$imageWrapperId, '', 'Remove');
+            } else {
+                $this->informMessage(t('Error deleting image.'));
             }
-            $this->informMessage(t('Image deleted.'));
         }
 
         $this->render('blank', 'utility', 'dashboard');

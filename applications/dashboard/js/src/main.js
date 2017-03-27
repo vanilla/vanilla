@@ -330,7 +330,7 @@
      */
     function modalInit() {
         if (typeof(DashboardModal.activeModal) === 'object') {
-            DashboardModal.activeModal.load();
+            DashboardModal.activeModal.handleForm();
         }
     }
 

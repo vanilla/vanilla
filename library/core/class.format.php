@@ -1039,7 +1039,7 @@ class Gdn_Format {
      *
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
-     * @param bool $collapse Collapse block tags in a sequence into a single newline replacement?
+     * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
      * @return string
      * @since 2.1
      */

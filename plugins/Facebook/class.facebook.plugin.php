@@ -358,10 +358,8 @@ class FacebookPlugin extends Gdn_Plugin {
 
         $Row = getRecord($RecordType, $ID, true);
         if ($Row) {
-            $Message = sliceParagraph(Gdn_Format::plainText($Row['Body'], $Row['Format']), 160);
-
             if ($this->accessToken() && $Sender->Request->isPostBack()) {
-                $R = $this->api('/me/feed', array('link' => $Row['ShareUrl'], 'message' => $Message));
+                $R = $this->api('/me/feed', array('link' => $Row['ShareUrl']));
 
                 $Sender->setJson('R', $R);
                 $Sender->informMessage(t('Thanks for sharing!'));
@@ -369,8 +367,6 @@ class FacebookPlugin extends Gdn_Plugin {
                 $Get = array(
                     'app_id' => c('Plugins.Facebook.ApplicationID'),
                     'link' => $Row['ShareUrl'],
-                    'name' => Gdn_Format::plainText($Row['Name'], 'Text'),
-                    'description' => $Message,
                 );
 
                 // Do not redirect if we are in a popup (It will close itself :D)

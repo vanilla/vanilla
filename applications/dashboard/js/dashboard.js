@@ -321,9 +321,17 @@
 
 })(jQuery, window, document);
 
-
+/**
+ *
+ */
 var DashboardModal = (function() {
 
+    /**
+     *
+     * @param $trigger
+     * @param settings
+     * @constructor
+     */
     var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
@@ -339,6 +347,9 @@ var DashboardModal = (function() {
         this.start();
     };
 
+    /**
+     *
+     */
     DashboardModal.prototype = {
 
         activeModal: undefined,
@@ -433,6 +444,7 @@ var DashboardModal = (function() {
                 $('#' + self.id).modal('hide');
             });
         },
+
 
         handleConfirm: function() {
             var self = this;
@@ -676,6 +688,12 @@ var DashboardModal = (function() {
 
 (function($) {
 
+    /**
+     * This uses the ace vendor component to wire up our code editors. We currently use the code editor
+     * in the Custom CSS plugin and in the Pockets plugin.
+     *
+     * Selector: `.js-code-input`
+     */
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
@@ -685,18 +703,17 @@ var DashboardModal = (function() {
         },
 
         // Adds the 'js-code-input' class to a form and the mode and height data attributes.
-        init: function(textarea, mode, height) {
-            if (!textarea.length) {
+        init: function($textarea, mode, height) {
+            if (!$textarea.length) {
                 return;
             }
-            textarea.addClass('js-code-input');
-            textarea.data('code-input', {'mode': mode, 'height': height});
+            $textarea.addClass('js-code-input');
+            $textarea.data('code-input', {'mode': mode, 'height': height});
         },
 
-        //
-        makeAceTextArea: function (textarea) {
-            var mode = textarea.data('code-input').mode;
-            var height = textarea.data('code-input').height;
+        makeAceTextArea: function ($textarea) {
+            var mode = $textarea.data('code-input').mode;
+            var height = $textarea.data('code-input').height;
             var modes = ['html', 'css'];
 
             if (modes.indexOf(mode) === -1) {
@@ -707,9 +724,9 @@ var DashboardModal = (function() {
             }
 
             // Add the ace input before the actual textarea and hide the textarea.
-            var formID = textarea.attr('id');
-            textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
-            textarea.hide();
+            var formID = $textarea.attr('id');
+            $textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
+            $textarea.hide();
 
             var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
@@ -718,23 +735,20 @@ var DashboardModal = (function() {
             editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.
-            editor.getSession().setValue(textarea.val());
+            editor.getSession().setValue($textarea.val());
             editor.getSession().on('change', function () {
-                textarea.val(editor.getSession().getValue());
+                $textarea.val(editor.getSession().getValue());
             });
         }
     };
 
-    function prettyPrintInit(element) {
-        // Pretty print
-        $('#Pockets td:nth-child(4)', element).each(function () {
-            var html = $(this).html();
-            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
-        });
-        $('pre', element).addClass('prettyprint lang-html');
-        prettyPrint();
-    }
-
+    /**
+     * Uses the handy codeInput.init function to add the appropriate data and classes to elements that should
+     * be rich text editors. You can initialize elements here or simply add the `js-code-input` CSS class and
+     * the appropriate data attributes to the textarea markup.
+     *
+     * @param element - The scope of the function.
+     */
     function aceInit(element) {
         // Editor classes
         codeInput.init($('.js-pocket-body', element), 'html', 300);
@@ -745,7 +759,25 @@ var DashboardModal = (function() {
         codeInput.start(element);
     }
 
+    /**
+     * Styles and adds syntax hilighting to code blocks.
+     *
+     * @param element - The scope of the function.
+     */
+    function prettyPrintInit(element) {
+        $('#Pockets td:nth-child(4)', element).each(function () {
+            var html = $(this).html();
+            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
+        });
+        $('pre', element).addClass('prettyprint lang-html');
+        prettyPrint();
+    }
 
+    /**
+     * Add a CSS class to the navbar based on it scroll position.
+     *
+     * @param element - The scope of the function.
+     */
     function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
 
@@ -769,6 +801,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Start fluidfixed on the dashboard panel navigation.
+     *
+     * @param element - The scope of the function.
+     */
     function fluidFixedInit(element) {
         // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
@@ -777,10 +814,13 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
-     * @param element The context
+     * Selector: `.js-drop`
+     * Attribute: `data-content-id="id_of_element"`
+     *
+     * @param element - The scope of the function.
      */
     function dropInit(element) {
         $('.js-drop', element).each(function() {
@@ -816,9 +856,10 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Un-collapses a group if one of its links is active.
+     * Un-collapses a group if one of its links is active. Note that the functionality for the collapse
+     * javascript is contained in ../vendors/bootstrap/collapse.js
      *
-     * @param element
+     * @param element - The scope of the function.
      */
     function collapseInit(element) {
         var $active = $('.js-nav-collapsible a.active', element);
@@ -828,6 +869,15 @@ var DashboardModal = (function() {
         $('a[href=#' + $collapsible.attr('id') + ']').removeClass('collapsed');
     }
 
+    /**
+     * Copies the text from an element to the clipboard. Displays a tooltip on success. Set the
+     * clipboardTarget data attribute to indicate the text that should be copied. Set the successText
+     * attribute to the message to display on success.
+     *
+     * Selector: `.btn-copy`
+     * Attributes: `data-clipboard-target="#text_to_copy"`
+     *             `data-success-text="Copied!"`
+     */
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
 
@@ -849,6 +899,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * This handles the drawer/hamburger menu functionality of the panel navigation on small screen sizes.
+     *
+     * @param element - The scope of the function.
+     */
     function drawerInit(element) {
 
         // Selectors
@@ -890,6 +945,12 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Transforms all checkboxes or radios (with the exception of those in the ignore list)
+     * into style-able checkboxes and radios.
+     *
+     * @param element - The scope of the function.
+     */
     function icheckInit(element) {
         var ignores = [
             '.label-selector-input',
@@ -920,6 +981,12 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Starts expander functionality (aka "show more") for feed descriptions on the homepage and
+     * for toaster messages.
+     *
+     * @param element - The scope of the function.
+     */
     function expanderInit(element) {
         $('.FeedDescription', element).expander({
             slicePoint: 65,
@@ -936,12 +1003,22 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Shows any active modal. This is needed for form errors.
+     */
     function modalInit() {
         if (typeof(DashboardModal.activeModal) === 'object') {
             DashboardModal.activeModal.load();
         }
     }
 
+    /**
+     * Starts tablejenga on elements with the `.js-tj` class.
+     *
+     * Selector: `.js-tj`
+     *
+     * @param element - The scope of the function.
+     */
     function responsiveTablesInit(element) {
         var containerSelector = '#main-row .main';
 
@@ -953,6 +1030,14 @@ var DashboardModal = (function() {
         $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
+    /**
+     * Starts the foggy functionality.
+     *
+     * Selector: `.js-foggy`
+     * Attribute: `data-is-foggy={true|false}`
+     *
+     * @param element - The scope of the function.
+     */
     function foggyInit(element) {
         var $foggy = $('.js-foggy', element);
         if ($foggy.data('isFoggy')) {
@@ -965,7 +1050,10 @@ var DashboardModal = (function() {
      * The trigger must have a `js-check-all` css class applied to it. It manages input checkboxes
      * with the `js-check-me` css class applied.
      *
-     * @param element The scope of the function.
+     * Selectors: `.js-check-all` for the "Check all" checkbox.
+     *            `.js-check-me` for the child checkboxes.
+     *
+     * @param element - The scope of the function.
      */
     function checkallInit(element) {
         $('.js-check-all', element).checkall({
@@ -974,10 +1062,14 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
-     * close to the bottom of the page.
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up
+     * if it gets too close to the bottom of the page. Note that the actual dropdown javascript
+     * functionality is contained in ../vendors/bootstrap/dropdown.js This function just changes whether the
+     * dropdown opens up or opens down.
      *
-     * @param element The scope of the function.
+     * Selector: `.dropdown`
+     *
+     * @param element - The scope of the function.
      */
     function dropDownInit(element) {
         $('.dropdown', element).each(function() {
@@ -994,110 +1086,20 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * If a btn-group gets too long for the window width, this will transform it into a dropdown-filter.
+     *
+     * Selector: `.btn-group`
+     *
+     * @param element - The scope of the function.
+     */
     function buttonGroupInit(element) {
-
-        /**
-         * Transforms a button group into a dropdown-filter.
-         *
-         * @param $buttonGroup
-         */
-        var transformButtonGroup = function(buttonGroup) {
-            var elem = document.createElement('div');
-            $(elem).addClass('dropdown');
-            $(elem).addClass('dropdown-filter');
-
-            var items = $(buttonGroup).html();
-            var title = gdn.definition('Filter');
-            var list = document.createElement('div');
-            var id = Math.random().toString(36).substr(2, 9);
-
-
-            $(list).addClass('dropdown-menu');
-            $(list).attr('aria-labelledby', id);
-            $(list).html(items);
-
-            $('.btn', list).each(function() {
-                $(this).removeClass('btn');
-                $(this).removeClass('btn-secondary');
-                $(this).addClass('dropdown-item');
-
-                if ($(this).hasClass('active')) {
-                    title = $(this).html();
-                }
-            });
-
-            $(elem).prepend(
-                '<button ' +
-                'id="' + id + '" ' +
-                'type="button" ' +
-                'class="btn btn-secondary dropdown-toggle" ' +
-                'data-toggle="dropdown" ' +
-                'aria-haspopup="true" ' +
-                'aria-expanded="false"' +
-                '>' +
-                title +
-                '</button>'
-            );
-
-            $(elem).append($(list));
-
-            return elem;
-        };
-
-        var showButtonGroup = function(buttonGroup, dropdown) {
-            $(buttonGroup).show();
-            $(dropdown).hide();
-        };
-
-        var showDropdown = function(buttonGroup, dropdown) {
-            $(buttonGroup).hide();
-            $(dropdown).show();
-        };
-
-        /**
-         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
-         * or btn-group, and then shows/hides the appropriate one.
-         *
-         * @param element The scope of the function
-         */
-        var checkWidth = function(element) {
-            $('.btn-group', element).each(function() {
-                var self = this;
-                var maxWidth = $(self).data('maxWidth');
-                var container = $(self).data('containerSelector');
-
-                if (!container && !maxWidth) {
-                    maxWidth = $(window).width();
-                }
-
-                if (container) {
-                    maxWidth = $(container).width();
-                }
-
-                if (!self.width) {
-                    self.width = $(self).width();
-                }
-
-                if (!self.dropdown) {
-                    self.dropdown = transformButtonGroup(self);
-                    $(self).after(self.dropdown);
-                }
-
-                if (self.width <= maxWidth) {
-                    showButtonGroup(self, self.dropdown);
-                } else {
-                    showDropdown(self, self.dropdown);
-                }
-            });
-        };
-
-        checkWidth(element);
-
-        $(window).resize(function() {
-            checkWidth(document);
-        });
+        buttonGroup(element);
     }
 
+    /**
+     * Run through all our javascript functionality and start everything up.
+     */
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -1120,6 +1122,12 @@ var DashboardModal = (function() {
     /**
      * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
      * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-preview`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     function readUrl(input) {
         if (input.files && input.files[0]) {
@@ -1138,6 +1146,13 @@ var DashboardModal = (function() {
 
     /**
      * Adds a preview of the uploaded, not-yet-saved image.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-upload`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('change', '.js-image-upload', function() {
         $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
@@ -1147,6 +1162,15 @@ var DashboardModal = (function() {
 
     /**
      * Removes the preview image and clears the file name from the input.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-remove-image-preview`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview`
+     *            `.js-image-upload`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('click', '.js-remove-image-preview', function(e) {
         e.preventDefault();
@@ -1160,6 +1184,9 @@ var DashboardModal = (function() {
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is expanded.
+     */
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -1168,6 +1195,9 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is collapsed.
+     */
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -1176,6 +1206,108 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * File Upload filename preview.
+     * There's a rendering function for this in Gdn_Form: `fileUpload()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selector: `.js-file-upload`
+     */
+    $(document).on('change', '.js-file-upload', function() {
+        var filename = $(this).val();
+        if (filename.substring(3, 11) === 'fakepath') {
+            filename = filename.substring(12);
+        }
+        if (filename) {
+            $(this).parent().find('.file-upload-choose').html(filename);
+        }
+    });
+
+    // Modal handling
+
+    /**
+     * Start regular modal.
+     *
+     * Selector: `.js-modal`
+     */
+    $(document).on('click', '.js-modal', function(e) {
+        e.preventDefault();
+        DashboardModal.activeModal = new DashboardModal($(this), {});
+    });
+
+    /**
+     * Start confirm modal.
+     *
+     * Selector: `.js-modal-confirm`
+     * Attribute: `data-follow-link:true` - Follows the link on confirm, otherwise stays on the page.
+     */
+    $(document).on('click', '.js-modal-confirm', function(e) {
+        e.preventDefault();
+        var followLink = $(this).data('followLink') === 'true';
+
+        DashboardModal.activeModal = new DashboardModal($(this), {
+            httpmethod: 'post',
+            modalType: 'confirm',
+            followLink: followLink // no ajax
+        });
+    });
+
+    /**
+     * Close active modal.
+     *
+     * Selector: `.js-modal-close`
+     */
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
+        }
+    });
+
+    // Foggy handling
+
+    /**
+     * Disables inputs and adds a foggy CSS class to the target to make the target look foggy.
+     */
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop('disabled')) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop('disabled', true);
+            }
+        });
+    });
+
+    /**
+     * Enables inputs and removes the foggy CSS class.
+     */
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop('disabled', false);
+            }
+        });
+    });
+
+    // Navigation preferences saving
+
+    /**
+     * Saves the panel navigation collapse preferences.
+     *
+     * Selector: `.js-save-pref-collapse`
+     */
     $(document).on('click', '.js-save-pref-collapse', function() {
         var key = $(this).data('key');
         var collapsed = !$(this).hasClass('collapsed');
@@ -1195,6 +1327,13 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the landing page for a top-level section.
+     *
+     * Selector: `.js-save-pref-section-landing-page`
+     * Attributes: `data-link-path="/path/to/settingspage"`
+     *             `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-section-landing-page', function() {
         var url = $(this).data('linkPath');
         var section = $(this).data('section');
@@ -1214,6 +1353,12 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the dashboard landing page.
+     *
+     * Selector: `.js-save-pref-dashboard-landing-page`
+     * Attribute: `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
         var section = $(this).data('section');
 
@@ -1230,83 +1375,16 @@ var DashboardModal = (function() {
             dataType: 'json'
         });
     });
-
-    $(document).on('change', '.js-file-upload', function() {
-        var filename = $(this).val();
-        if (filename.substring(3, 11) === 'fakepath') {
-            filename = filename.substring(12);
-        }
-        if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
-        }
-    });
-
-    $(document).on('click', '.js-modal', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
-    });
-
-    $(document).on('click', '.js-modal-confirm', function(e) {
-        e.preventDefault();
-        if ($(this).data('followLink') === 'true') {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'get',
-                modalType: 'confirm',
-                followLink: true // no ajax
-            });
-        } else {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'post',
-                modalType: 'confirm'
-            });
-        }
-    });
-
-    // Get new banner image.
-    $(document).on('click', '.js-upload-email-image-button', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            afterSuccess: emailStyles.reloadImage
-        });
-    });
-
-    $(document).on('click', '.js-modal-close', function() {
-        if (typeof(DashboardModal.activeModal) === 'object') {
-            $('#' + DashboardModal.activeModal.id).modal('hide');
-        }
-    });
-
-    $(document).on('foggyOn', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'true');
-        $target.data('isFoggy', 'true');
-        $target.addClass('foggy');
-
-        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
-        $target.find(':input').each(function() {
-            if ($(this).prop('disabled')) {
-                $(this).data('foggy-disabled', 'true');
-            } else {
-                $(this).prop('disabled', true);
-            }
-        });
-    });
-
-    $(document).on('foggyOff', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'false');
-        $target.data('isFoggy', 'false');
-        $target.removeClass('foggy');
-
-        // Be careful not to enable fields that should be disabled.
-        $target.find(':input').each(function() {
-            if (!$(this).data('foggy-disabled')) {
-                $(this).prop('disabled', false);
-            }
-        });
-    });
 })(jQuery);
 
+/**
+ * Returns an HTML string to render a svg icon.
+ *
+ * @param {string} name - The icon name.
+ * @param {string} alt - The alt text for the icon.
+ * @param {string} cssClass - The css class to apply to the svg.
+ * @returns {string} The HTML for the svg icon.
+ */
 var dashboardSymbol =  function(name, alt, cssClass) {
     if (alt) {
         alt = 'alt="' + alt + '" ';

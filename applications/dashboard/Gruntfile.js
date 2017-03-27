@@ -220,6 +220,7 @@ module.exports = function (grunt) {
           'js/vendors/ace/*.js',
           'js/colorpicker.js',
           'js/cropimage.js',
+          'js/buttonGroup.js',
           'js/jquery.tablejenga.js',
           'js/jquery.fluidfixed.js',
           '../../js/library/jquery.expander.js',

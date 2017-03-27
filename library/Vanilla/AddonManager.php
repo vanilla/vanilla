@@ -235,7 +235,7 @@ class AddonManager {
      *
      *
      * @param $pattern
-     * @param $collection
+     * @param $collection Must match the structure of $autoloadClasses (Only 'className' is required)
      * @return array
      */
     protected function findPatternInClassCollection($pattern, $collection) {

@@ -1039,10 +1039,11 @@ class Gdn_Format {
      *
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
+     * @param bool $collapse Collapse block tags in a sequence into a single newline replacement?
      * @return string
      * @since 2.1
      */
-    public static function plainText($Body, $Format = 'Html') {
+    public static function plainText($Body, $Format = 'Html', $collapse = false) {
         $Result = Gdn_Format::to($Body, $Format);
         $Result = Gdn_Format::replaceSpoilers($Result);
 
@@ -1054,8 +1055,12 @@ class Gdn_Format {
             // Fix lists.
             $Result = Gdn_Format::replaceListItems($Result);
 
-            $Allblocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
-            $Result = preg_replace('`</'.$Allblocks.'>`', "\n\n", $Result);
+            $AllBlocks = '(?:div|table|dl|pre|blockquote|address|p|h[1-6]|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+            $pattern = "</{$AllBlocks}>";
+            if ($collapse) {
+                $pattern = "((\s+)?{$pattern})+";
+            }
+            $Result = preg_replace("`{$pattern}`", "\n\n", $Result);
 
             // TODO: Fix hard returns within pre blocks.
 

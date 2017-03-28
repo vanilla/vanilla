@@ -147,7 +147,7 @@ class NavModule extends Gdn_Module {
 	 * @throws Exception
 	 */
 	public function toString() {
-	    $this->fireAs(get_called_class())->fireEvent('render');
+		$this->fireAs(get_called_class())->fireEvent('render');
 		return parent::toString();
-    }
+	}
 }

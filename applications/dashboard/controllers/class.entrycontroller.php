@@ -944,25 +944,31 @@ class EntryController extends Gdn_Controller {
     public function signOut($TransientKey = "", $Override = "0") {
         $this->checkOverride('SignOut', $this->target(), $TransientKey);
 
-        if (Gdn::session()->validateTransientKey($TransientKey) || $this->Form->isPostBack()) {
+        if (Gdn::session()->validateTransientKey($TransientKey)) {
             $User = Gdn::session()->User;
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("BeforeSignOut");
 
             // Sign the user right out.
-            Gdn::session()->End();
+            Gdn::session()->end();
             $this->setData('SignedOut', true);
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("SignOut");
 
             $this->_setRedirect();
-        } elseif (!Gdn::session()->isValid())
+        } elseif (!Gdn::session()->isValid()) {
             $this->_setRedirect();
+        }
+
+        $target = url($this->target(), true);
+        if (!isTrustedDomain($target)) {
+            $target = Gdn::router()->getDestination('DefaultController');
+        }
 
         $this->setData('Override', $Override);
-        $this->setData('Target', $this->target());
+        $this->setData('Target', $target);
         $this->Leaving = false;
         $this->render();
     }

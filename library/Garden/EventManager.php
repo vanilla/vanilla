@@ -252,8 +252,8 @@ class EventManager {
     /**
      * Fire a deprecated event.
      *
-     * This method is the same as {@link EventManager::fire()} except will fire an additional "eventManager_fireDeprecated"
-     * event if any handlers exist. The purpose is to allow applications to refactor events and support old event handlers.
+     * This method is the same as {@link EventManager::fire()} except will trigger an *E_USER_DEPRECATED* notice if there
+     * are any event handlers.
      *
      * @param string $event The name of the event.
      * @param mixed ...$args Any arguments to pass along to the event handlers.
@@ -261,8 +261,7 @@ class EventManager {
      */
     public function fireDeprecated($event, ...$args) {
         if ($this->hasHandler($event)) {
-            $this->fire('eventManager_fireDeprecated', $this, $event, $args);
-
+            trigger_error("The $event event is deprecated.", E_USER_DEPRECATED);
             return $this->fire($event, ...$args);
         }
         return [];

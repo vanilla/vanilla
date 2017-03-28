@@ -101,7 +101,7 @@ echo $this->Form->errors();
                     );
                     ?>
                     </p>
-                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
+                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line. All subdomains are allowed if none is specified.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap">

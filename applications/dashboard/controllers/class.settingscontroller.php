@@ -127,6 +127,7 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($addonName, $addon->getInfo(), 'applications', false, $filter, $action);
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     public function enableApplication($addonName, $filter) {
@@ -158,6 +159,7 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($addonName, $addon->getInfo(), 'applications', true, $filter, $action);
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     private function handleAddonToggle($addonName, $addonInfo, $type, $isEnabled, $filter = '', $action = '') {
@@ -175,8 +177,6 @@ class SettingsController extends DashboardController {
                 $this->jsonTarget('#'.Gdn_Format::url($addonName).'-addon', $row, 'ReplaceWith');
             }
         }
-
-        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -249,6 +249,43 @@ class SettingsController extends DashboardController {
             }
         }
         $this->render();
+    }
+
+    /**
+     * Reload the panel navigation. Updates the panel navigation (the content of the div with the
+     * class '.js-panel-nav') in the page with the navigation for one or more sections in the
+     * Dashboard Nav Module. For instance, I could replace the panel nav with the moderation section nav
+     * by calling reloadPanelNavigation('Moderation').
+     *
+     * @param String|array $sections The section or sections to update the panel nav with.
+     * @param String $activeUrl The highlight url for the panel nav.
+     * @throws Exception
+     */
+    public function reloadPanelNavigation($sections = '', $activeUrl = '') {
+        $dashboardNavModule = DashboardNavModule::getDashboardNav();
+
+        // Coerce into an array
+        if ($sections !== '' && gettype($sections) === 'string') {
+            $sections = [$sections];
+        }
+
+        if ($sections !== '') {
+            $dashboardNavModule->setCurrentSections($sections);
+        }
+
+        if ($activeUrl !== '') {
+            $dashboardNavModule->setHighlightRoute($activeUrl);
+        }
+
+        // Get our plugin nav items the new way.
+        $dashboardNavModule->fireEvent('init');
+
+        // Get our plugin nav items the old way.
+        $navAdapter = new NestedCollectionAdapter($dashboardNavModule);
+        $this->EventArguments['SideMenu'] = $navAdapter;
+        $this->fireEvent('GetAppSettingsMenuItems');
+
+        $this->jsonTarget('.js-panel-nav', $dashboardNavModule->toString());
     }
 
     /**
@@ -1159,7 +1196,7 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($addonName, $addonInfo, 'locales', true);
-
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     public function disableLocale($addonName, $addonInfo) {
@@ -1172,6 +1209,7 @@ class SettingsController extends DashboardController {
         $this->informMessage(sprintf(t('%s Disabled.'), val('Name', $addonInfo, t('Locale'))));
 
         $this->handleAddonToggle($addonName, $addonInfo, 'locales', false);
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -1244,6 +1282,8 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($pluginName, $addon->getInfo(), 'plugins', false, $filter, $action);
+        $this->reloadPanelNavigation('Settings', '/dashboard/settings/plugins');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     public function enablePlugin($pluginName, $filter = 'all') {
@@ -1276,6 +1316,8 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($pluginName, $addon->getInfo(), 'plugins', true, $filter, $action);
+        $this->reloadPanelNavigation('Settings', '/dashboard/settings/plugins');
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**

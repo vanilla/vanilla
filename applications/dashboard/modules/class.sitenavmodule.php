@@ -75,7 +75,7 @@ class SiteNavModule extends NavModule {
             'modifiers' => $modifiers,
             'disabled' => $disabled
         ];
-        self::$sectionItems[strtolower($section)][self::LINKS_INDEX][$key] = $args;
+        static::$sectionItems[strtolower($section)][static::LINKS_INDEX][$key] = $args;
         return $this;
     }
 
@@ -116,7 +116,7 @@ class SiteNavModule extends NavModule {
             'sort' => $sort,
             'modifiers' => $modifiers
         ];
-        self::$sectionItems[strtolower($section)][self::GROUPS_INDEX][] = $args;
+        static::$sectionItems[strtolower($section)][static::GROUPS_INDEX][] = $args;
         return $this;
     }
 
@@ -149,7 +149,7 @@ class SiteNavModule extends NavModule {
      * @return $this
      */
     public function addLink($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
-        $this->addLinkToSection(self::SECTION_DEFAULT, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
+        $this->addLinkToSection(static::SECTION_DEFAULT, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
 
@@ -181,7 +181,7 @@ class SiteNavModule extends NavModule {
      * @return $this
      */
     public function addGroup($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
-        $this->addGroupToSection(self::SECTION_DEFAULT, $text, $key, $cssClass, $sort, $modifiers);
+        $this->addGroupToSection(static::SECTION_DEFAULT, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
 
@@ -213,7 +213,7 @@ class SiteNavModule extends NavModule {
      * @return $this
      */
     public function addLinkToGlobals($text, $url, $key = '', $cssClass = '', $sort = [], $modifiers = [], $disabled = false) {
-        $this->addLinkToSection(self::SECTION_GLOBAL, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
+        $this->addLinkToSection(static::SECTION_GLOBAL, $text, $url, $key, $cssClass, $sort, $modifiers, $disabled);
         return $this;
     }
 
@@ -245,7 +245,7 @@ class SiteNavModule extends NavModule {
      * @return $this
      */
     public function addGroupToGlobals($text = '', $key = '', $cssClass = '', $sort = [], $modifiers = []) {
-        $this->addGroupToSection(self::SECTION_GLOBAL, $text, $key, $cssClass, $sort, $modifiers);
+        $this->addGroupToSection(static::SECTION_GLOBAL, $text, $key, $cssClass, $sort, $modifiers);
         return $this;
     }
 
@@ -273,8 +273,8 @@ class SiteNavModule extends NavModule {
      */
     public function prepare() {
 
-        if (!self::$initStaticFired) {
-            self::$initStaticFired = true;
+        if (!static::$initStaticFired) {
+            static::$initStaticFired = true;
             $this->fireEvent('init');
         }
 
@@ -282,21 +282,21 @@ class SiteNavModule extends NavModule {
             $currentSections = Gdn_Theme::section('', 'get');
             $currentSections = array_map('strtolower', $currentSections);
 
-            $customMenuKeys = array_intersect(array_keys(self::$sectionItems), $currentSections);
+            $customMenuKeys = array_intersect(array_keys(static::$sectionItems), $currentSections);
             $hasCustomMenu = !empty($customMenuKeys);
 
             if (!$hasCustomMenu) {
-                $currentSections = [self::SECTION_DEFAULT];
+                $currentSections = [static::SECTION_DEFAULT];
             }
 
             // Add global items
-            $currentSections[] = self::SECTION_GLOBAL;
+            $currentSections[] = static::SECTION_GLOBAL;
         } else {
             $currentSections = array_map('strtolower', $this->currentSections);
         }
 
         foreach ($currentSections as $currentSection) {
-            if ($section = val(strtolower($currentSection), self::$sectionItems)) {
+            if ($section = val(strtolower($currentSection), static::$sectionItems)) {
                 $this->addSectionItems($section);
             }
         }
@@ -307,7 +307,7 @@ class SiteNavModule extends NavModule {
      * @param array $section
      */
     public function addSectionItems($section) {
-        if ($groups = val(self::GROUPS_INDEX, $section)) {
+        if ($groups = val(static::GROUPS_INDEX, $section)) {
             foreach ($groups as $group) {
                 parent::addGroup(
                     $group['text'],
@@ -319,7 +319,7 @@ class SiteNavModule extends NavModule {
             }
         }
 
-        if ($links = val(self::LINKS_INDEX, $section)) {
+        if ($links = val(static::LINKS_INDEX, $section)) {
             foreach ($links as $link) {
                 parent::addLink(
                     $link['text'],
@@ -340,7 +340,7 @@ class SiteNavModule extends NavModule {
      * @param string $key The key of the item to remove, separated by dots.
      */
     public function removeItem($key) {
-        foreach (self::$sectionItems as &$section) {
+        foreach (static::$sectionItems as &$section) {
             unset($section['links'][$key]);
         }
     }

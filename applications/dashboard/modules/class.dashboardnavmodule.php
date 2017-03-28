@@ -14,6 +14,8 @@
 class DashboardNavModule extends SiteNavModule {
 
     const ACTIVE_SECTION_DEFAULT = 'Settings';
+    const SECTION_DEFAULT = 'Settings';
+
 
     public $view = 'nav-dashboard';
 

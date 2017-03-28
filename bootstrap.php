@@ -116,6 +116,14 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('ThemeManager')
 
+    // Logger
+    ->rule(\Vanilla\Logger::class)
+    ->setShared(true)
+    ->addAlias(\Psr\Log\LoggerInterface::class)
+
+    ->rule(\Psr\Log\LoggerAwareInterface::class)
+    ->addCall('setLogger')
+
     // EventManager
     ->rule(\Garden\EventManager::class)
     ->setShared(true)

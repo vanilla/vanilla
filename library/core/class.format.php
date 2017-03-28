@@ -1483,7 +1483,7 @@ EOT;
             $url = $matches[4];
             $domain = parse_url($url, PHP_URL_HOST);
             if (!isTrustedDomain($domain)) {
-                return url('/home/leaving?target='.$url).'" class="Popup';
+                return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
             }
         }
 
@@ -1531,7 +1531,7 @@ EOT;
             // This is a plaintext url we're converting into an anchor.
             $domain = parse_url($url, PHP_URL_HOST);
             if (!isTrustedDomain($domain)) {
-                return '<a href="'.url('/home/leaving?target='.$url).'" class="Popup">'.$text.'</a>'.$punc;
+                return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
             }
         }
 

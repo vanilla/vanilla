@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Exception\PermissionException;
+
 /**
  * Manages discussions data.
  */
@@ -87,6 +89,27 @@ class DiscussionModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Discussion');
+    }
+
+    /**
+     * Verify the current user has a permission in a category.
+     *
+     * @param string|array $permission The permission slug(s) to check (e.g. Vanilla.Discussions.View).
+     * @param int $categoryID The category's numeric ID.
+     * @throws PermissionException if the current user does not have the permission in the category.
+     */
+    public function categoryPermission($permission, $categoryID) {
+        $category = CategoryModel::categories($categoryID);
+        if ($category) {
+            $id = $category['PermissionCategoryID'];
+        } else {
+            $id = -1;
+        }
+        $permissions = (array)$permission;
+
+        if (!Gdn::session()->getPermissions()->hasAny($permissions, $id)) {
+            throw new PermissionException($permissions);
+        }
     }
 
     /**

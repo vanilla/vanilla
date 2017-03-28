@@ -221,8 +221,8 @@ class EventManager {
      * Fire an event.
      *
      * @param string $event The name of the event.
-     * @param array $args Any arguments to pass along to the event handlers.
-     * @return mixed Returns the result of the last event handler.
+     * @param mixed ...$args Any arguments to pass along to the event handlers.
+     * @return array Returns the result of the event handlers where each handler's result is an item in the array.
      */
     public function fire($event, ...$args) {
         $handlers = $this->getHandlers($event);
@@ -247,6 +247,24 @@ class EventManager {
         }
 
         return $result;
+    }
+
+    /**
+     * Fire a deprecated event.
+     *
+     * This method is the same as {@link EventManager::fire()} except will trigger an *E_USER_DEPRECATED* notice if there
+     * are any event handlers.
+     *
+     * @param string $event The name of the event.
+     * @param mixed ...$args Any arguments to pass along to the event handlers.
+     * @return array Returns the result of the event handlers.
+     */
+    public function fireDeprecated($event, ...$args) {
+        if ($this->hasHandler($event)) {
+            trigger_error("The $event event is deprecated.", E_USER_DEPRECATED);
+            return $this->fire($event, ...$args);
+        }
+        return [];
     }
 
     /**

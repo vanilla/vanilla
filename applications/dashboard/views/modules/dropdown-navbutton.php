@@ -1,7 +1,12 @@
+<?php
+/** @var DropdownModule $dropdown */
+$dropdown = $this;
+$trigger = $dropdown->getTrigger();
+?>
 
-<div class="ButtonGroup <?php echo val('cssClass', $this); ?>">
+<div class="ButtonGroup <?php echo $dropdown->getCssClass(); ?>">
     <ul class="Dropdown MenuItems">
-        <?php foreach (val('items', $this) as $item) {
+        <?php foreach ($dropdown->getItems() as $item) {
             if (val('type', $item) == 'group') { ?>
                 <li role="presentation" class="dropdown-header <?php echo val('cssClass', $item); ?>">
                     <?php if (val('icon', $item)) {
@@ -25,10 +30,10 @@
             <?php }
         } ?>
     </ul>
-    <a href="#" class="NavButton Handle <?php echo val('cssClass', val('trigger', $this)); ?>">
-        <span><?php echo val('text', val('trigger', $this)); ?></span>
-        <?php if (val('icon', val('trigger', $this))) {
-            echo icon(val('icon', val('trigger', $this)));
+    <a href="#" class="NavButton Handle <?php echo val('cssClass', $trigger); ?>">
+        <span><?php echo val('text', $trigger); ?></span>
+        <?php if (val('icon', $trigger)) {
+            echo icon(val('icon', $trigger));
         } ?>
     </a>
 </div>

@@ -27,25 +27,21 @@
  * If you have a group with the key of 'key2', you can add to this group by
  * setting the key of a new item to 'key2.newItemKey'.
  * The sort property can also be an integer, indicating the item's position in the menu.
- *
- *
- * Here is an example nav creation:
- *
- *
- *
- * Which results in a nav:
- *
- *
- *
  */
 class NavModule extends Gdn_Module {
 
 	use NestedCollection;
 
 	/**
-	 * @var string A potential CSS class of the nav wrapper container.
+	 * @var string CSS class for the nav wrapper container.
 	 */
-	public $cssClass;
+	private $cssClass;
+
+
+	/**
+	 * @var string CSS prefix for a dropdown item.
+	 */
+	private $dropdownCssClassPrefix = 'nav-dropdown';
 
 	/**
 	 *
@@ -56,16 +52,47 @@ class NavModule extends Gdn_Module {
 	public function __construct($cssClass = '', $useCssPrefix = true) {
 		parent::__construct();
 
-		$this->flatten = false;
-		$this->useCssPrefix = $useCssPrefix;
+		$this->setFlatten(false);
+		$this->useCssPrefix($useCssPrefix);
 		$this->cssClass = $cssClass;
 
 		if ($useCssPrefix) {
-			$this->headerCssClassPrefix = 'nav-header';
-			$this->linkCssClassPrefix = 'nav-link';
-			$this->dropdownCssClassPrefix = 'nav-dropdown';
-			$this->dividerCssClassPrefix = 'divider';
+			$this->setHeaderCssClassPrefix('nav-header');
+			$this->setLinkCssClassPrefix('nav-link');
+			$this->setDividerCssClassPrefix('divider');
 		}
+	}
+
+	/**
+	 * @return string CSS prefix for a dropdown item.
+	 */
+	public function getDropdownCssClassPrefix() {
+		return $this->dropdownCssClassPrefix;
+	}
+
+	/**
+	 * @param string $dropdownCssClassPrefix CSS prefix for a dropdown item.
+	 * @return NavModule $this The calling object.
+	 */
+	public function setDropdownCssClassPrefix($dropdownCssClassPrefix) {
+		$this->dropdownCssClassPrefix = $dropdownCssClassPrefix;
+		return $this;
+	}
+
+	/**
+	 * @return string CSS class for the nav wrapper container.
+	 */
+	public function getCssClass() {
+		return $this->cssClass;
+	}
+
+	/**
+	 * @param string $cssClass CSS class for the nav wrapper container.
+	 * @return NavModule $this The calling object.
+	 */
+	public function setCssClass($cssClass) {
+		$this->cssClass = $cssClass;
+		return $this;
 	}
 
 	/**
@@ -99,7 +126,7 @@ class NavModule extends Gdn_Module {
 	 */
 	public function addDropdown($dropdown, $key = '', $cssClass = '', $sort = array()) {
 		if (is_a($dropdown, 'DropdownModule')) {
-			$dropdown->tag = 'li';
+			$dropdown->setTag('li');
 			$dropdown->prepare();
 			$dropdownItem['type'] = 'dropdown';
 			if ($key) {
@@ -115,8 +142,12 @@ class NavModule extends Gdn_Module {
 		return $this;
 	}
 
+	/**
+	 * @return string
+	 * @throws Exception
+	 */
 	public function toString() {
 	    $this->fireAs(get_called_class())->fireEvent('render');
-        return parent::toString();
+		return parent::toString();
     }
 }

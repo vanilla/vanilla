@@ -14,12 +14,12 @@ trait NestedCollection {
     /**
      * @var string The css class to add to active items and groups.
      */
-    public $activeCssClass = 'active';
+    private $activeCssClass = 'active';
 
     /**
      * @var array List of items to sort.
      */
-    public $items = [];
+    private $items = [];
 
     /**
      * @var int Index number to start the item* key-generation with.
@@ -29,22 +29,22 @@ trait NestedCollection {
     /**
      * @var bool Whether to use CSS prefixes on the generated CSS classes for the items.
      */
-    public $useCssPrefix = false;
+    private $useCssPrefix = false;
 
     /**
      * @var string CSS prefix for a header item.
      */
-    public $headerCssClassPrefix = 'header';
+    private $headerCssClassPrefix = 'header';
 
     /**
      * @var string CSS prefix for a link item.
      */
-    public $linkCssClassPrefix = 'link';
+    private $linkCssClassPrefix = 'link';
 
     /**
      * @var string CSS prefix for a divider item.
      */
-    public $dividerCssClassPrefix = 'divider';
+    private $dividerCssClassPrefix = 'divider';
 
     /**
      * @var bool Whether to flatten the list (as with a dropdown menu) or allow nesting (as with a nav).
@@ -69,13 +69,97 @@ trait NestedCollection {
     /**
      * @var array The item modifiers allowed to be passed in the modifiers array.
      */
-    protected $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes', 'listItemCssClasses'];
+    private $allowedItemModifiers = ['popinRel', 'icon', 'badge', 'rel', 'description', 'attributes', 'listItemCssClasses'];
 
     /**
      * @param boolean $forceDivider Whether to separate groups with a <hr> element. Only supported for flattened lists.
+     * @return $this
      */
     public function setForceDivider($forceDivider) {
         $this->forceDivider = $forceDivider;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getActiveCssClass() {
+        return $this->activeCssClass;
+    }
+
+    /**
+     * @param string $activeCssClass
+     * @return $this
+     */
+    public function setActiveCssClass($activeCssClass) {
+        $this->activeCssClass = $activeCssClass;
+        return $this;
+    }
+
+    /**
+     * @param boolean $useCssPrefix
+     * @return $this
+     */
+    public function useCssPrefix($useCssPrefix) {
+        $this->useCssPrefix = $useCssPrefix;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHeaderCssClassPrefix() {
+        return $this->headerCssClassPrefix;
+    }
+
+    /**
+     * @param string $headerCssClassPrefix
+     * @return $this
+     */
+    public function setHeaderCssClassPrefix($headerCssClassPrefix) {
+        $this->headerCssClassPrefix = $headerCssClassPrefix;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLinkCssClassPrefix() {
+        return $this->linkCssClassPrefix;
+    }
+
+    /**
+     * @param string $linkCssClassPrefix
+     * @return $this
+     */
+    public function setLinkCssClassPrefix($linkCssClassPrefix) {
+        $this->linkCssClassPrefix = $linkCssClassPrefix;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDividerCssClassPrefix() {
+        return $this->dividerCssClassPrefix;
+    }
+
+    /**
+     * @param string $dividerCssClassPrefix
+     * @return $this
+     */
+    public function setDividerCssClassPrefix($dividerCssClassPrefix) {
+        $this->dividerCssClassPrefix = $dividerCssClassPrefix;
+        return $this;
+    }
+
+    /**
+     * @param boolean $flatten
+     * @return $this
+     */
+    public function setFlatten($flatten) {
+        $this->flatten = $flatten;
+        return $this;
     }
 
     /**
@@ -91,6 +175,22 @@ trait NestedCollection {
      */
     public function setHighlightRoute($highlightRoute) {
         $this->highlightRoute = $highlightRoute;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getItems() {
+        return $this->items;
+    }
+
+    /**
+     * @param array $items
+     * @return $this
+     */
+    public function setItems($items) {
+        $this->items = $items;
         return $this;
     }
 
@@ -299,7 +399,7 @@ trait NestedCollection {
      * @param array $item The item to modify.
      * @param array $modifiers The modifiers to add to the item.
      */
-    public function addItemModifiers(&$item, $modifiers) {
+    private function addItemModifiers(&$item, $modifiers) {
         $modifiers = array_intersect_key($modifiers, array_flip($this->allowedItemModifiers));
         foreach ($modifiers as $attribute => $value) {
             $item[$attribute] = $value;
@@ -311,7 +411,7 @@ trait NestedCollection {
      *
      * @param array $item The item to generate and add a key for.
      */
-    protected function touchKey(&$item) {
+    private function touchKey(&$item) {
         if (!val('key', $item)) {
             $item['key'] = 'item'.$this->keyNumber;
             $this->keyNumber = $this->keyNumber + 1;
@@ -325,7 +425,7 @@ trait NestedCollection {
      * @param array $item The item to add to the array.
      * @throws Exception
      */
-    protected function addItem($type, $item) {
+    private function addItem($type, $item) {
         $this->touchKey($item);
         if (!is_array(val('key', $item))) {
             $item['key'] = explode('.', val('key', $item));
@@ -402,7 +502,7 @@ trait NestedCollection {
      * @param array $item The item to generate CSS class for.
      * @return string The generated CSS class.
      */
-    protected function buildCssClass($prefix, $item) {
+    private function buildCssClass($prefix, $item) {
         $result = '';
         if ($prefix) {
             $prefix .= '-';
@@ -427,7 +527,7 @@ trait NestedCollection {
      * @param array $item The item to check.
      * @return bool Whether the current request url matches an item's link url.
      */
-    protected function isActive($item) {
+    private function isActive($item) {
         if (empty($this->highlightRoute)) {
             $highlightRoute = Gdn_Url::request(true);
         } else {
@@ -441,7 +541,7 @@ trait NestedCollection {
      *
      * @param array $items The items to sort.
      */
-    protected function sortItems(&$items) {
+    private function sortItems(&$items) {
         foreach($items as &$item) {
             if (val('items', $item)) {
                 $this->sortItems($item['items']);
@@ -472,7 +572,7 @@ trait NestedCollection {
      * @param int $depth The current recursive depth used to prevent infinite recursion.
      * @return number
      */
-    protected function sortItemsOrder($item, $items, $depth = 0) {
+    private function sortItemsOrder($item, $items, $depth = 0) {
         $default_sort = val('_sort', $item, 100);
 
         // Check to see if a custom sort has been specified.
@@ -523,7 +623,7 @@ trait NestedCollection {
      *
      * @param array $items The item list to parse.
      */
-    protected function prepareData(&$items) {
+    private function prepareData(&$items) {
         foreach($items as $key => &$item) {
             unset($item['_sort'], $item['key']);
             $subItems = false;
@@ -594,7 +694,7 @@ trait NestedCollection {
      * @param array $items The item list to flatten.
      * @return array The flattened items list.
      */
-    protected function flattenArray($items) {
+    private function flattenArray($items) {
         $newItems = [];
         $itemslength = sizeof($items);
         $index = 0;

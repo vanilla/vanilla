@@ -75,7 +75,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                     <div class="btn-group">
                         <?php
                         $editAttrs = ['aria-label' => t('Edit'), 'title' => t('Edit')];
-                        $deleteAttrs = ['aria-label' => t('Delete'), 'title' => t('Delete'), 'data-remove-selector' => '.js-message-'.$Message->MessageID];
+                        $deleteAttrs = ['aria-label' => t('Delete'), 'title' => t('Delete')];
                         echo anchor(dashboardSymbol('edit'), '/dashboard/message/edit/'.$Message->MessageID, 'js-modal btn btn-icon', $editAttrs);
                         echo anchor(dashboardSymbol('delete'), '/dashboard/message/delete/'.$Message->MessageID, 'js-modal-confirm btn btn-icon', $deleteAttrs);
                         ?>

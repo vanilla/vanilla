@@ -75,7 +75,7 @@ class DropdownModule extends Gdn_Module {
     /**
      * @var string The id value of the trigger.
      */
-    public $triggerId;
+    private $triggerId;
 
     /**
      * @var array Collection of attributes for the dropdown menu trigger.
@@ -84,7 +84,7 @@ class DropdownModule extends Gdn_Module {
      * - **cssClass**: string - CSS class for the trigger.
      * - **icon**: string - Icon for the trigger.
      */
-    public $trigger = array('type' => 'button',
+    private $trigger = array('type' => 'button',
                             'text' => '',
                             'cssClass' => '',
                             'icon' => 'caret-down');
@@ -97,17 +97,17 @@ class DropdownModule extends Gdn_Module {
     /**
      * @var string A potential CSS class of the dropdown menu wrapper container.
      */
-    public $cssClass;
+    private $cssClass;
 
     /**
      * @var string A potential CSS class of the list <ul> block.
      */
-    public $listCssClass = '';
+    private $listCssClass = '';
 
     /**
      * @var string The dropdown menu wrapper container element tag.
      */
-    public $tag = 'div';
+    private $tag = 'div';
 
     /**
      * Constructor.
@@ -133,6 +133,83 @@ class DropdownModule extends Gdn_Module {
             $this->linkCssClassPrefix = 'dropdown-menu-link';
             $this->dividerCssClassPrefix = 'divider';
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getTrigger() {
+       return $this->trigger;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTriggerId() {
+        return $this->triggerId;
+    }
+
+    /**
+     * @param string $triggerId
+     */
+    public function setTriggerId($triggerId) {
+        $this->triggerId = $triggerId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTriggerTypes() {
+        return $this->triggerTypes;
+    }
+
+    /**
+     * @param array $triggerTypes
+     */
+    public function setTriggerTypes($triggerTypes) {
+        $this->triggerTypes = $triggerTypes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCssClass() {
+        return $this->cssClass;
+    }
+
+    /**
+     * @param string $cssClass
+     */
+    public function setCssClass($cssClass) {
+        $this->cssClass = $cssClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getListCssClass() {
+        return $this->listCssClass;
+    }
+
+    /**
+     * @param string $listCssClass
+     */
+    public function setListCssClass($listCssClass) {
+        $this->listCssClass = $listCssClass;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTag() {
+        return $this->tag;
+    }
+
+    /**
+     * @param string $tag
+     */
+    public function setTag($tag) {
+        $this->tag = $tag;
     }
 
     /**

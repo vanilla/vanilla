@@ -715,8 +715,7 @@ class DiscussionModel extends VanillaModel {
      * and Vanilla.Discussions.SortDirection.
      * Events: BeforeGet, AfterAddColumns.
      *
-     * @since 2.0.0
-     * @access public
+     * @deprecated since 2.4, reason: doesn't scale
      *
      * @param int $Offset Number of discussions to skip.
      * @param int $Limit Max number of discussions to return.
@@ -725,6 +724,8 @@ class DiscussionModel extends VanillaModel {
      * @return Gdn_DataSet SQL result.
      */
     public function getUnread($Offset = '0', $Limit = '', $Wheres = '', $AdditionalFields = null) {
+        deprecated(__METHOD__);
+
         if ($Limit == '') {
             $Limit = Gdn::config('Vanilla.Discussions.PerPage', 50);
         }

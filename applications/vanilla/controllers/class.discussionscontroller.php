@@ -200,6 +200,8 @@ class DiscussionsController extends VanillaController {
      * @deprecated since 2.3
      */
     public function unread($Page = '0') {
+        deprecated(__METHOD__);
+
         if (!Gdn::session()->isValid()) {
             redirect('/discussions/index', 302);
         }

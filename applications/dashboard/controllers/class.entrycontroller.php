@@ -2029,6 +2029,10 @@ class EntryController extends Gdn_Controller {
             }
         }
 
+        if (!isTrustedDomain(url($Target, true))) {
+            $Target = url(Gdn::router()->getDestination('DefaultController'));
+        }
+
         return $Target;
     }
 }

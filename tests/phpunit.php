@@ -1,6 +1,7 @@
 <?php
 
 use Vanilla\Addon;
+use Vanilla\InjectableInterface;
 
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
@@ -42,12 +43,69 @@ if (!defined('APPLICATION_VERSION')) {
 require PATH_CONF . '/constants.php';
 
 // Set up the dependency injection container.
-$dic = new \Garden\Container\Container();
+$dic = $GLOBALS['dic'] = new \Garden\Container\Container();
 Gdn::setContainer($dic);
 
 $dic->setInstance('Garden\Container\Container', $dic)
     ->rule('Interop\Container\ContainerInterface')
     ->setAliasOf('Garden\Container\Container')
+
+    ->rule(InjectableInterface::class)
+    ->addCall('setDependencies')
+
+    // Cache
+    ->rule('Gdn_Cache')
+    ->setShared(true)
+    ->setFactory(['Gdn_Cache', 'initialize'])
+    ->addAlias('Cache')
+
+    // Configuration
+    ->rule('Gdn_Configuration')
+    ->setShared(true)
+    ->addCall('defaultPath', [PATH_ROOT.'/conf/vanilla.test'])
+    ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
+    ->addAlias('Config')
+
+    // AddonManager
+    ->rule(Vanilla\AddonManager::class)
+    ->setShared(true)
+    ->setConstructorArgs([
+        [
+            Addon::TYPE_ADDON => ['/applications', '/plugins'],
+            Addon::TYPE_THEME => '/themes',
+            Addon::TYPE_LOCALE => '/locales'
+        ],
+        PATH_CACHE
+    ])
+    ->addAlias('AddonManager')
+    ->addCall('registerAutoloader')
+
+    // ApplicationManager
+    ->rule('Gdn_ApplicationManager')
+    ->setShared(true)
+    ->addAlias('ApplicationManager')
+
+    // PluginManager
+    ->rule('Gdn_PluginManager')
+    ->setShared(true)
+    ->addAlias('PluginManager')
+
+    // ThemeManager
+    ->rule('Gdn_ThemeManager')
+    ->setShared(true)
+    ->addAlias('ThemeManager')
+
+    // Logger
+    ->rule(\Vanilla\Logger::class)
+    ->setShared(true)
+    ->addAlias(\Psr\Log\LoggerInterface::class)
+
+    ->rule(\Psr\Log\LoggerAwareInterface::class)
+    ->addCall('setLogger')
+
+    // EventManager
+    ->rule(\Garden\EventManager::class)
+    ->setShared(true)
 
     ->rule(InjectableInterface::class)
     ->addCall('setDependencies')
@@ -67,38 +125,42 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setShared(true)
     ->addAlias('Gdn_MySQLDriver')
     ->addAlias('MySQLDriver')
-    ->addAlias(Gdn::AliasSqlDriver);
+    ->addAlias(Gdn::AliasSqlDriver)
+
+    ->rule(Gdn::AliasLocale)
+    ->setClass(\VanillaTests\Fixtures\Locale::class)
+
+    ->rule('Gdn_Session')
+    ->setShared(true)
+    ->addAlias('Session')
+
+    ->rule(Gdn::AliasAuthenticator)
+    ->setClass('Gdn_Auth')
+    ->setShared(true)
+
+    ->rule('Gdn_Router')
+    ->addAlias(Gdn::AliasRouter)
+    ->setShared(true)
+
+    ->rule('Gdn_Dispatcher')
+    ->setShared(true)
+    ->addAlias(Gdn::AliasDispatcher)
+
+    ->rule(\Garden\Web\Dispatcher::class)
+    ->setShared(true)
+    ->addCall('addRoute', ['route' => new \Garden\Container\Reference('@api-v2-route'), 'api-v2'])
+
+    ->rule('@api-v2-route')
+    ->setClass(\Garden\Web\ResourceRoute::class)
+    ->setConstructorArgs(['/api/v2/', '%sApiController'])
+
+    ->rule(\Garden\ClassLocator::class)
+    ->setClass(\Vanilla\VanillaClassLocator::class)
+
+    ->rule(Gdn_Plugin::class)
+    ->setShared(true)
+    ->addCall('setAddonFromManager')
 ;
-
-// Install the configuration handler.
-Gdn::factoryInstall(Gdn::AliasConfig, 'Gdn_Configuration');
-
-// AddonManager
-Gdn::factoryInstall(
-    Gdn::AliasAddonManager,
-    '\\Vanilla\\AddonManager',
-    '',
-    Gdn::FactorySingleton,
-    [
-        [
-            Addon::TYPE_ADDON => ['/applications', '/plugins'],
-            Addon::TYPE_THEME => '/themes',
-            Addon::TYPE_LOCALE => '/locales'
-        ],
-        __DIR__.'/cache'
-    ]
-);
-// This is for satisfying dependencies.
-Gdn::factoryInstall('\\Vanilla\\AddonManager', '\\Vanilla\\AddonManager', '', Gdn::FactorySingleton, Gdn::addonManager());
-
-// Install a bogus locale because the "Locale" alias of Gdn clashes with a built in Locale object.
-Gdn::factoryInstall(Gdn::AliasLocale, '\VanillaTests\Fixtures\Locale');
-
-// ThemeManager
-Gdn::factoryInstall(Gdn::AliasThemeManager, 'Gdn_ThemeManager');
-
-// Session
-Gdn::factoryInstall(Gdn::AliasSession, 'Gdn_Session');
 
 // Clear the test cache.
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');

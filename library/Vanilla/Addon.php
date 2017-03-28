@@ -1071,8 +1071,8 @@ class Addon {
         try {
             // Include the plugin file.
             if ($className = $this->getPluginClass()) {
-                list($_, $path) = $this->classes[$className];
-                include $this->path($path);
+                list($_, $path) = $this->classes[strtolower($className)];
+                include_once $this->path($path);
             }
 
             // Include the configuration file.
@@ -1081,8 +1081,10 @@ class Addon {
             }
 
             // Include locale files.
-            foreach ($this->getTranslationPaths() as $path) {
-                include $this->path($path);
+            foreach ($this->getTranslationPaths() as $paths) {
+                foreach ($paths as $path) {
+                    include $this->path($path);
+                }
             }
             return true;
         } catch (\Throwable $ex) {

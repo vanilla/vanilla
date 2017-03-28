@@ -783,7 +783,6 @@ class Gdn_Form extends Gdn_Pluggable {
 
         if ($this->getValue($fieldName) && $removeUrl) {
             $removeText = val('RemoveText', $options, t('Remove'));
-            $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
             if (val('RemoveConfirmText', $options, false)) {
                 $removeAttributes['data-body'] = val('RemoveConfirmText', $options);
             }

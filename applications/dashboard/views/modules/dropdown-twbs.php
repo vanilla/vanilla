@@ -1,10 +1,15 @@
-<div class="dropdown <?php echo val('cssClass', $this); ?>">
-    <?php $trigger = val('trigger', $this); ?>
-    <<?php echo val('type', $trigger); ?> class="dropdown-toggle <?php echo val('cssClass', $trigger); ?>" id="<?php echo val('triggerId', $this); ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?php echo attribute(val('attributes', $trigger)); ?>>
+<?php
+/** @var DropdownModule $dropdown */
+$dropdown = $this;
+$trigger = $dropdown->getTrigger();
+?>
+
+<div class="dropdown <?php echo $dropdown->getCssClass() ?>">
+    <<?php echo val('type', $trigger); ?> class="dropdown-toggle <?php echo val('cssClass', $trigger); ?>" id="<?php echo $dropdown->getTriggerId(); ?>" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <?php echo attribute(val('attributes', $trigger)); ?>>
         <?php echo val('text', $trigger); ?>
     </<?php echo val('type', $trigger); ?>>
-    <div class="dropdown-menu <?php echo val('listCssClass', $this); ?>" role="menu" aria-labelledby="<?php echo val('triggerId', $this); ?>">
-        <?php foreach (val('items', $this) as $item) {
+    <div class="dropdown-menu <?php echo $dropdown->getListCssClass(); ?>" role="menu" aria-labelledby="<?php echo $dropdown->getTriggerId(); ?>">
+        <?php foreach($dropdown->getItems() as $item) {
             if (val('type', $item) == 'group') { ?>
                 <div class="dropdown-header" <?php echo attribute(val('attributes', $item, [])) ?>>
                     <?php if (val('icon', $item)) {

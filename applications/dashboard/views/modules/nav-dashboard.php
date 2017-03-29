@@ -1,5 +1,7 @@
 <?php
-$items = val('items', $this);
+/** @var NavModule $nav */
+$nav = $this;
+$items = $nav->getItems();
 if (!function_exists('renderDashboardNav')) {
     function renderDashboardNav($items) {
         foreach ($items as $item) {

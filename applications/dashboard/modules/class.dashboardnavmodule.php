@@ -9,25 +9,38 @@
  */
 
 /**
- * Module for a list of links.
+ * Renders the dashboard nav.
+ *
+ * Handles the manipulation of the Dashboard sections, which are the top-level nav items appearing in the dashboard nav bar.
+ * Handles implementing the user preferences for the section landing page and the collapse state of the panel nav.
+ *
+ * Rendering this module will render only the side nav. The section menu needs to be rendered manually using the
+ * `getSectionsInfo()` function.
  */
 class DashboardNavModule extends SiteNavModule {
 
+    /** @var string The active section if the theme section we're in doesn't match any section in the dashboard. */
     const ACTIVE_SECTION_DEFAULT = 'Settings';
+
+    /** @var string The default section when adding items to the navigation. */
     const SECTION_DEFAULT = 'Settings';
 
-
+    /**  @var string The view for the panel navigation. */
     public $view = 'nav-dashboard';
 
-    /**
-     * @var DashboardNavModule The dashboard nav instance.
-     */
-    protected static $dashboardNav;
+    /** @var DashboardNavModule The dashboard nav instance. */
+    private static $dashboardNav;
 
     /**
-     * @var array The section info for the dashboard's main nav.
+     * The section info for the dashboard's main nav.
+     *
+     * A user must have one of the permissions in the permission list of a section in order to see that section.
+     * The default landing page for the section will be the first page in the url list that the user has permission to view.
+     * A section can declare itself as 'empty' which means that no panel nav will render for that section.
+     *
+     * @var array
      */
-    protected static $sectionsInfo = [
+    private static $sectionsInfo = [
         'DashboardHome' => [
             'permission' => [
                 'Garden.Settings.View',
@@ -77,21 +90,18 @@ class DashboardNavModule extends SiteNavModule {
         ]
     ];
 
-    protected static $altSectionsInfo = [
-//        'Tutorials' => [
-//            'section' => 'Tutorials',
-//            'title' => 'Help',
-//            'description' => '',
-//            'url' => '/dashboard/settings/gettingstarted'
-//        ]
-    ];
-
+    /**
+     * DashboardNavModule constructor.
+     * @param string $cssClass The CSS class for the panel nav wrapper.
+     * @param bool $useCssPrefix Whether to use CSS prefixes for the items in the panel nav.
+     */
     public function __construct($cssClass = '', $useCssPrefix = true) {
-//        self::$altSectionsInfo['Tutorials']['title'] = dashboardSymbol('question-mark');
         parent::__construct($cssClass, $useCssPrefix);
     }
 
     /**
+     * Gets the instance of the dashboard nav module.
+     *
      * @return DashboardNavModule
      */
     public static function getDashboardNav() {
@@ -102,24 +112,22 @@ class DashboardNavModule extends SiteNavModule {
     }
 
     /**
-     * Check user permissions, translate our translate-ables. Returns an array of the main sections
-     * ready to be put into a view.
+     * Compiles our section info and filters it according to a user's permissions. Info is properly sanitized
+     * to be rendered in a view.
      *
      * @return array The sections to display in the main dashboard nav.
+     * @throws Exception
      */
-    public function getSectionsInfo($alt = false) {
-
-
-        if (!self::$initStaticFired) {
-            self::$initStaticFired = true;
+    public function getSectionsInfo() {
+        if (!self::isInitStaticFired()) {
+            self::setInitStaticFired(true);
             $this->fireEvent('init');
         }
 
         $this->handleUserPreferencesSectionLandingPage();
-
-        $sections = $alt ? self::$altSectionsInfo : self::$sectionsInfo;
-
         $session = Gdn::session();
+
+        $sections = self::$sectionsInfo;
 
         foreach ($sections as $key => &$section) {
             if (val('permission', $section) && !$session->checkPermission(val('permission', $section), false)) {
@@ -137,7 +145,7 @@ class DashboardNavModule extends SiteNavModule {
     /**
      * Retrieves or resolves the default url for a section link depending on the sessioned user's permissions.
      *
-     * @param $sectionKey The section to get the url for
+     * @param string $sectionKey The section to get the url for
      * @return string The url associated with the passed section key
      */
     public function getUrlForSection($sectionKey) {
@@ -156,22 +164,31 @@ class DashboardNavModule extends SiteNavModule {
         return val('url', $section, '/');
     }
 
+    /**
+     * Checks the current theme section against the dashboard sections to find which one is active.
+     * If the current theme section doesn't match one of our sections, return the default active section.
+     *
+     * @return string The active section.
+     */
     private function getActiveSection() {
-        $allSections = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
         $currentSections = Gdn_Theme::section('', 'get');
         foreach ($currentSections as $currentSection) {
-            if (array_key_exists($currentSection, $allSections )) {
+            if (array_key_exists($currentSection, self::$sectionsInfo)) {
                 return $currentSection;
             }
         }
         return self::ACTIVE_SECTION_DEFAULT;
     }
 
+    /**
+     * Check to see if a section is active.
+     *
+     * @param string $section The section to check whether it's active.
+     * @return bool Whether the section is the active section.
+     */
     private function isActiveSection($section) {
-
-        $allSectionsInfo = array_merge(self::$sectionsInfo, self::$altSectionsInfo);
         $allSections = [];
-        foreach ($allSectionsInfo as $sectionInfo) {
+        foreach (self::$sectionsInfo as $sectionInfo) {
             $allSections[] = $sectionInfo['section'];
         }
 
@@ -195,12 +212,17 @@ class DashboardNavModule extends SiteNavModule {
         return false;
     }
 
+    /**
+     * Handle the panel navigation collapsing preferences for the user.
+     * Checks to see if any nav items have been collapsed by the user and adds data to collapse
+     * those items in the nav view.
+     */
     private function handleUserPreferencesNav() {
         if ($session = Gdn::session()) {
             $collapsed = $session->getPreference('DashboardNav.Collapsed', []);
             $section = $this->getActiveSection();
-
-            foreach($this->items as &$item) {
+            $items = $this->getItems();
+            foreach($items as &$item) {
                 if (array_key_exists(val('headerCssClass', $item), $collapsed)) {
                     $item['collapsed'] = 'collapsed';
                     $item['ariaExpanded'] = 'false';
@@ -216,9 +238,15 @@ class DashboardNavModule extends SiteNavModule {
                     }
                 }
             }
+            $this->setItems($items);
         }
     }
 
+    /**
+     * Handle the section landing page preferences for the user. This is the page that appears when the
+     * user clicks on a top-level nav item. Changes the url for the section items according to what is
+     * set in user preferences.
+     */
     private function handleUserPreferencesSectionLandingPage() {
         if ($session = Gdn::session()) {
             $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
@@ -234,7 +262,7 @@ class DashboardNavModule extends SiteNavModule {
     /**
      * Adds a section to the sections info array to output in the dashboard.
      *
-     * @param $section
+     * @param array $section An array that contains at least the following keys: 'title', 'description', 'url', 'section'.
      */
     public function registerSection($section) {
         $requiredArrayKeys = ['title', 'description', 'url', 'section'];
@@ -248,26 +276,41 @@ class DashboardNavModule extends SiteNavModule {
         self::$sectionsInfo[$section['section']] = $section;
     }
 
+    /**
+     * Clear all items for sections that have declared themselves as 'empty'.
+     */
     public function handleEmpty() {
         $section = $this->getActiveSection();
         $section = val($section, self::$sectionsInfo);
         if (val('empty', $section) === true) {
-            $this->items = [];
+            $this->setItems([]);
         }
     }
 
+    /**
+     * Prepares the nav for rendering.
+     *
+     * @return bool Whether the panel nav is cleared for rendering.
+     */
     public function prepare() {
-        parent::prepare();
+        $prepared = parent::prepare();
         $this->handleEmpty();
         $this->handleUserPreferencesNav();
-        return true;
+        return $prepared;
     }
 
+    /**
+     * Render the panel nav.
+     *
+     * @return string The panel nav HTML.
+     * @throws Exception
+     */
     public function toString() {
-        if (!self::$initStaticFired) {
-            self::$initStaticFired = true;
+        if (!self::isInitStaticFired()) {
+            self::setInitStaticFired(true);
             $this->fireEvent('init');
         }
+
         $this->fireAs(get_called_class())->fireEvent('render');
         return parent::toString();
     }

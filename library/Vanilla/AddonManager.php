@@ -69,6 +69,17 @@ class AddonManager {
 
     /**
      * @var array A list of autoload classes based on enabled addons.
+     *
+     *  Structure:
+     *  $autoloadClasses = [
+     *      strtolower($className) => [ // classKey
+     *          $namespace => [
+     *              'className' => $className,
+     *              'path' => $path, // class' relative path from its addon
+     *              'addon' => $addon, // class' addon
+     *          ]
+     *      ],
+     *  ];
      */
     private $autoloadClasses = [];
 
@@ -133,7 +144,7 @@ class AddonManager {
         if (isset($this->autoloadClasses[$classKey])) {
             foreach ($this->autoloadClasses[$classKey] as $namespace => $classData) {
                 if ($suppliedClassInfo['namespace'] === $namespace) {
-                    include_once $classData['filePath'];
+                    include_once $classData['addon']->path($classData['path']);
                 }
             }
         }
@@ -178,8 +189,8 @@ class AddonManager {
                 /* @var Addon $addon */
                 $classes = $addon->getClasses();
                 if (isset($classes[$classKey])) {
-                    foreach ($classes[$classKey] as $classInfo) {
-                        if ($classInfo['namespace'] === $lookupClassInfo['namespace']) {
+                    foreach ($classes[$classKey] as $namespace => $classInfo) {
+                        if ($namespace === $lookupClassInfo['namespace']) {
                             return $addon;
                         }
                     }
@@ -190,58 +201,102 @@ class AddonManager {
     }
 
     /**
-     * Find the classes match a glob style pattern.
+     * Find classes that match a glob style pattern.
      *
-     * @param string $pattern The pattern to match.
-     * @param bool $searchAll Whether to search all classes or just the started ones.
+     * Pattern guideline:
+     *  findClasses('*'), // Returns everything
+     *  findClasses('\*'), // Returns anything that is not namespaced
+     *  findClasses('*\*'), // Returns anything that is namespaced
+     *  findClasses('*Plugin'), // Returns everything that ends with "Plugin"
+     *  findClasses('\*Plugin'), // Returns anything that is not namespaced and that ends with "Plugin"
+     *  findClasses('*\*Plugin'), // Returns anything that is namespaced and that ends with "Plugin"
+     *  ...
+     *  You can see "\" as "not namespaced" or "in the global namespace". Same thing.
+     *
+     * @param string $classPattern The class pattern to match.
+     * @param bool $searchAll Whether to search all classes or just the started ones. Using this will be way slower!
      * @return array Returns an array of fully qualified class names.
      */
-    public function findClasses($pattern, $searchAll = false) {
-        $fn = function ($name) use ($pattern) {
-            return $this->matchClass($pattern, $name);
-        };
-
-        $result = [];
+    public function findClasses($classPattern, $searchAll = false) {
+        $foundClasses = [];
         if ($searchAll === false) {
-            foreach ($this->autoloadClasses as $classKey => $classesEntry) {
-                foreach($classesEntry as $namespace => $classData) {
-                    if ($fn($namespace.$classKey)) {
-                        $result[] = $namespace.$classData['className'];
-                    }
-                }
-            }
+            $foundClasses = $this->findPatternInClassCollection($classPattern, $this->autoloadClasses);
         } else {
-            foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
-                /* @var Addon $addon */
-
-                $classes = [];
-                foreach ($addon->getClasses() as $classesInfo) {
-                    foreach ($classesInfo as $classInfo) {
-                        $classes[] = $classInfo['namespace'].$classInfo['className'];
-
-                    }
-                }
-                $result = array_merge($result, array_filter($classes, $fn));
+            foreach($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
+                $addonClasses = $addon->getClasses();
+                $foundClasses = array_merge($foundClasses, $this->findPatternInClassCollection($classPattern, $addonClasses));
             }
         }
 
-        return $result;
+        return $foundClasses;
     }
 
     /**
-     * Match a class name against a pattern.
      *
-     * @param string $pattern A glob style pattern.
-     * @param string $class The class to match.
+     *
+     * @param $pattern
+     * @param $collection Must match the structure of $autoloadClasses (Only 'className' is required)
+     * @return array
      */
-    protected function matchClass($pattern, $class) {
-        $class = '\\'.ltrim($class, '\\');
+    protected function findPatternInClassCollection($pattern, $collection) {
+        $foundClasses = [];
 
-        $regex = str_replace(['\\*\\', '*', '\\'], ['(\\.+\\|\\)', '.*', '\\\\'], '\\'.ltrim($pattern, '\\'));
-        $regex = "`^$regex$`i";
+        $patterns = Addon::parseFullyQualifiedClass($pattern);
+        $namespacePattern = $patterns['namespace'];
+        $classNamePattern = $patterns['className'];
 
-        $r = preg_match($regex, $class);
-        return (bool)$r;
+        $classNameWildcardPos = strpos($classNamePattern, '*');
+        $classNameHasWildcard = $classNameWildcardPos !== false;
+        $classNameStartWithWilcard = $classNameWildcardPos === 0;
+
+        if ($namespacePattern === '' && $classNameStartWithWilcard) {
+            $namespacePattern = '*';
+            $namespaceHasWildcard = true;
+        } else if ($namespacePattern === '\\') {
+            $namespacePattern = '';
+            $namespaceHasWildcard = false;
+        } else if ($namespacePattern === '*\\') {
+            $namespacePattern = '.+';
+            $namespaceHasWildcard = true;
+        } else {
+            $namespaceHasWildcard = strpos($namespacePattern, '*') !== false;
+        }
+
+        $fnPatternToRegex = function($pattern) {
+            return str_replace(['\\*', '\.\+'], ['.*?', '.+?'], preg_quote($pattern));
+        };
+        $namespaceRegex = '/^'.$fnPatternToRegex($namespacePattern).'$/i';
+        $classNameRegex = '/^'.$fnPatternToRegex($classNamePattern).'$/i';
+
+        // Add classes that matches the namespacePattern to $foundClasses
+        // Assume that the data is coming from $fnIterateOnClasses
+        $fnMatchNamespace = function($classesData) use
+            (&$foundClasses, $namespacePattern, $namespaceHasWildcard, $namespaceRegex) {
+            foreach ($classesData as $namespace => $classData) {
+                if ($namespaceHasWildcard && preg_match($namespaceRegex, $namespace) === 1) {
+                    $foundClasses[] = $namespace.$classData['className'];
+                } else if ($namespacePattern === $namespace) {
+                    $foundClasses[] = $namespace.$classData['className'];
+                }
+            }
+        };
+
+        // Iterate on a collection of classesInfo and check if the classKey matches!
+        if ($classNameHasWildcard) {
+            foreach ($collection as $classKey => $classesData) {
+                if (preg_match($classNameRegex, $classKey) === 1) {
+                    $fnMatchNamespace($classesData);
+                }
+            }
+        } else {
+            $classKey = strtolower($classNamePattern);
+            if (isset($collection[$classKey])) {
+                $fnMatchNamespace($collection[$classKey]);
+            }
+
+        }
+
+        return $foundClasses;
     }
 
     /**
@@ -848,41 +903,26 @@ class AddonManager {
         // Add the addon's classes to the autoload list.
         $classes = $addon->getClasses();
         foreach ($classes as $classKey => $classesInfo) {
-            foreach ($classesInfo as $classInfo) {
-                $subpath = $classInfo['path'];
-                $namespace = $classInfo['namespace'];
-                $className = $classInfo['className'];
+            foreach ($classesInfo as $namespace => $classInfo) {
+                $classInfo['addon'] = $addon;
 
                 if (isset($this->autoloadClasses[$classKey])) {
                     $orderedByPriority = [];
                     $addonAdded = false;
                     foreach($this->autoloadClasses[$classKey] as $loadedClassNamespace => $loadedClassData) {
-                        $loadedClassAddon = $loadedClassData['addon'];
-                        if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
-                            $orderedByPriority[$namespace] = [
-                                'filePath' => $addon->path($subpath),
-                                'className' => $className,
-                                'addon' => $addon,
-                            ];
+                        if (!$addonAdded && $addon->getPriority() < $loadedClassData['addon']->getPriority()) {
+                            $orderedByPriority[$namespace] = $classInfo;
                             $addonAdded = true;
                         }
                         $orderedByPriority[$loadedClassNamespace] = $loadedClassData;
                     }
                     // Make sure we add the addon hes last after the priority check!
                     if (!$addonAdded) {
-                        $orderedByPriority[$namespace] = [
-                            'filePath' => $addon->path($subpath),
-                            'className' => $className,
-                            'addon' => $addon,
-                        ];
+                        $orderedByPriority[$namespace] = $classInfo;
                     }
                     $this->autoloadClasses[$classKey] = $orderedByPriority;
                 } else {
-                    $this->autoloadClasses[$classKey][$namespace] = [
-                        'filePath' => $addon->path($subpath),
-                        'className' => $className,
-                        'addon' => $addon,
-                    ];
+                    $this->autoloadClasses[$classKey][$namespace] = $classInfo;
                 }
             }
         }

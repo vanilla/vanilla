@@ -39,6 +39,16 @@ class Addon {
 
     /**
      * @var array An array of classes.
+     *
+     *  Structure:
+     *  $classes = [
+     *      strtolower($className) => [ // classKey
+     *          $namespace => [
+     *              'className' => $className,
+     *              'path' => $path,
+     *          ]
+     *      ],
+     *  ];
      */
     private $classes = [];
 
@@ -432,8 +442,7 @@ class Addon {
                     $className = $classRow['name'];
                     // It is possible, in the same file, to have multiple classes with the same name
                     // but with different namespaces...
-                    $classes[strtolower($className)][] = [
-                        'namespace' => $namespace,
+                    $classes[strtolower($className)][$namespace] = [
                         'className' => $className,
                         'path' => $path,
                     ];
@@ -1157,8 +1166,8 @@ class Addon {
         $classInfo = self::parseFullyQualifiedClass($fqClassName);
         $key = strtolower($classInfo['className']);
         if (array_key_exists($key, $this->classes)) {
-            foreach($this->classes[$key] as $classData) {
-                if ($classInfo['namespace'] === $classData['namespace']) {
+            foreach($this->classes[$key] as $namespace => $classData) {
+                if ($classInfo['namespace'] === $namespace) {
                     $path = $this->path($classData['path'], $relative);
                     return $path;
                 }

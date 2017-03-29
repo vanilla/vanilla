@@ -16,7 +16,7 @@ if (strtolower($tagType) == 'all' || strtolower($tagType) == 'tags') {
     echo heading(t($this->data('Title')));
 }
 
-$enabled = c('Vanilla.Tagging.EnableUI', true);
+$enabled = c('Vanilla.Tagging.UI.Enabled', true);
 ?>
 <div class="form-group">
     <div class="label-wrap-wide">

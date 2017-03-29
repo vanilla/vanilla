@@ -665,7 +665,7 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     $configs = [
         'Vanilla.Tagging.CategorySearch'    => 'Plugins.Tagging.CategorySearch',
         'Vanilla.Tagging.DisableInline'     => 'Plugins.Tagging.DisableInline',
-        'Vanilla.Tagging.EnableUI'          => 'EnabledPlugins.Tagging',
+        'Vanilla.Tagging.UI.Enabled'        => 'EnabledPlugins.Tagging',
         'Vanilla.Tagging.Max'               => 'Plugin.Tagging.Max', // Missing s is not a typo
         'Vanilla.Tagging.Required'          => 'Plugins.Tagging.Required',
         'Vanilla.Tagging.ShowLimit'         => 'Plugins.Tagging.ShowLimit',

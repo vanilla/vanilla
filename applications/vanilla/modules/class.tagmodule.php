@@ -157,7 +157,7 @@ class TagModule extends Gdn_Module {
      * @return string
      */
     public function inlineDisplay() {
-        if (!c('Vanilla.Tagging.EnableUI')) {
+        if (!c('Vanilla.Tagging.UI.Enabled')) {
             return;
         }
 
@@ -203,7 +203,7 @@ endforeach; ?>
      * @return string
      */
     public function toString() {
-        if (!c('Vanilla.Tagging.EnableUI')) {
+        if (!c('Vanilla.Tagging.UI.Enabled')) {
             return;
         }
 

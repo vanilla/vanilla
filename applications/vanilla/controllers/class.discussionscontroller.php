@@ -692,7 +692,7 @@ class DiscussionsController extends VanillaController {
      * Add the discussions/tagged/{TAG} endpoint.
      */
     public function tagged() {
-        if (!c('Vanilla.Tagging.EnableUI')) {
+        if (!c('Vanilla.Tagging.UI.Enabled')) {
             throw new Exception('Not found', 404);
         }
 

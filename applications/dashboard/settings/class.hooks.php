@@ -356,8 +356,8 @@ class DashboardHooks extends Gdn_Plugin {
         $form = $Sender->Form;
 
         if ($form->authenticatedPostBack()) {
-            $formValue = (bool)$form->getFormValue('Vanilla.Tagging.EnableUI');
-            saveToConfig('Vanilla.Tagging.EnableUI', $formValue);
+            $formValue = (bool)$form->getFormValue('Vanilla.Tagging.UI.Enabled');
+            saveToConfig('Vanilla.Tagging.UI.Enabled', $formValue);
         }
 
         // Get all tag types

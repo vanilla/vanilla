@@ -966,7 +966,7 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Manages the Vanilla.Tagging.EnableUI setting.
+     * Manages the Vanilla.Tagging.UI.Enabled setting.
      *
      * @param String $value Either 'true' or 'false', whether to enable tagging.
      * @throws Exception
@@ -978,7 +978,7 @@ class SettingsController extends DashboardController {
         }
         $value = strtolower($value);
         if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
-            saveToConfig('Vanilla.Tagging.EnableUI', $value === 'true');
+            saveToConfig('Vanilla.Tagging.UI.Enabled', $value === 'true');
             if ($value === 'true') {
                 $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
                 $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
@@ -1877,7 +1877,7 @@ class SettingsController extends DashboardController {
             $message = t('The theme with key %s could not be found and will not be started.');
             $this->Form->addError(sprintf($message, $enabledThemeKey));
         }
-        
+
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);

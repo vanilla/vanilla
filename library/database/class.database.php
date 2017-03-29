@@ -271,10 +271,7 @@ class Gdn_Database {
             }
         }
         if (strpos($dsn, 'charset=') === false) {
-            if (substr($dsn, -1) !== ';') {
-                $dsn .= ';';
-            }
-            $dsn .= 'charset='.c('Database.CharacterEncoding', 'utf8mb4');
+            $dsn .= rtrim($dsn, ';').';charset='.c('Database.CharacterEncoding', 'utf8mb4');
         }
 
         if (array_key_exists('Slave', $config)) {

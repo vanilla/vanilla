@@ -379,8 +379,7 @@ class DashboardHooks extends Gdn_Plugin {
             $Type = '';
         }
 
-        // This type doesn't actually exist, but it will represent the
-        // blank types in the column.
+        // This type doesn't actually exist, but it will represent the blank types in the column.
         if (strtolower($Type) == 'tags') {
             $queryType = '';
         }
@@ -392,18 +391,14 @@ class DashboardHooks extends Gdn_Plugin {
         $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
 
         // Store type for view
-        $TagType = (!empty($Type))
-            ? $Type
-            : 'All';
+        $TagType = !empty($Type) ? $Type : 'All';
         $Sender->setData('_TagType', $TagType);
 
         // Store tag types
         $Sender->setData('_TagTypes', $TagTypes);
 
         // Determine if new tags can be added for the current type.
-        $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag'])
-            ? 1
-            : 0;
+        $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag']) ? 1 : 0;
         $CanAddTags &= CheckPermission('Vanilla.Tagging.Add');
 
         $Sender->setData('_CanAddTags', $CanAddTags);
@@ -421,12 +416,10 @@ class DashboardHooks extends Gdn_Plugin {
             $SQL->like('Name', $Search, 'right');
         }
 
-        // Make sure search uses its own search type, so results appear
-        // in their own tab.
+        // Make sure search uses its own search type, so results appear in their own tab.
         $Sender->Form->Action = url('/settings/tagging/?type='.$TagType);
 
-        // Search results pagination will mess up a bit, so don't provide a type
-        // in the count.
+        // Search results pagination will mess up a bit, so don't provide a type in the count.
         $RecordCountWhere = array('Type' => $queryType);
         if ($queryType === false) {
             $RecordCountWhere = [];
@@ -436,25 +429,25 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         $Sender->setData('RecordCount', $SQL->getCount('Tag', $RecordCountWhere));
-
-
         $Sender->render('tagging');
     }
 
     /**
+     * Add the tags endpoint to the settingsController
      *
+     * @param SettingsController $Sender
+     * @param string $action
      *
-     * @param $Sender
-     * @return mixed
-     * @throws Exception
      */
     public function settingsController_tags_create($Sender, $action) {
         $Sender->permission('Garden.Settings.Manage');
+
         switch($action) {
             case 'delete':
                 $TagID = val(1, $Sender->RequestArgs);
                 $TagModel = new TagModel();
                 $Tag = $TagModel->getID($TagID, DATASET_TYPE_ARRAY);
+
                 if ($Sender->Form->authenticatedPostBack()) {
                     // Delete tag & tag relations.
                     $SQL = Gdn::sql();
@@ -515,9 +508,7 @@ class DashboardHooks extends Gdn_Plugin {
                 // Add types if allowed to add tags for it, and not '' or 'tags', which
                 // are the same.
                 $TagType = Gdn::request()->get('type');
-                if (strtolower($TagType) != 'tags'
-                    && $TagModel->canAddTagForType($TagType)
-                ) {
+                if (strtolower($TagType) != 'tags' && $TagModel->canAddTagForType($TagType)) {
                     $Sender->Form->addHidden('Type', $TagType, true);
                 }
 

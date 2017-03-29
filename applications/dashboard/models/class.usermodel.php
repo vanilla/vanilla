@@ -2376,7 +2376,13 @@ class UserModel extends Gdn_Model {
             $RoleID = $this->SQL->getWhere('Role', ['Name' => $Keywords])->value('RoleID');
         }
 
+        $this->EventArguments['Keywords'] =& $Keywords;
+        $this->EventArguments['RankID'] =& $rankID;
+        $this->fireEvent('BeforeUserQuery');
+
         $this->userQuery();
+
+        $this->fireEvent('AfterUserQuery');
 
         if (isset($Where)) {
             $this->SQL->where($Where);

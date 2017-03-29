@@ -21,12 +21,42 @@ class VanillaClassLocator extends ClassLocator {
     private $eventManager;
 
     /**
+     * @var EventManager
+     */
+    private $addonManager;
+
+    /**
      * VanillaClassLocator constructor.
      *
      * @param EventManager $eventManager
+     * @param AddonManager $addonManager
      */
-    public function __construct(EventManager $eventManager) {
+    public function __construct(EventManager $eventManager, AddonManager $addonManager) {
         $this->eventManager = $eventManager;
+        $this->addonManager = $addonManager;
+    }
+
+    /**
+     * Find a class with a given name.
+     *
+     * @param string $name The name to lookup.
+     * @return string Returns the name of the class found or **null** if the class isn't found.
+     */
+    public function findClass($name) {
+        $class = parent::findClass($name);
+
+        if ($class === null) {
+            if (strpos('\\') !== 0) {
+                $name = '*'.$name;
+            }
+
+            $classes = $this->addonManager->findClasses($name);
+            if ($classes) {
+                $class = reset($classes);
+            }
+        }
+
+        return $class;
     }
 
     /**

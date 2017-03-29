@@ -145,7 +145,7 @@ class DashboardNavModule extends SiteNavModule {
     /**
      * Retrieves or resolves the default url for a section link depending on the sessioned user's permissions.
      *
-     * @param $sectionKey string The section to get the url for
+     * @param string $sectionKey The section to get the url for
      * @return string The url associated with the passed section key
      */
     public function getUrlForSection($sectionKey) {

@@ -152,9 +152,6 @@ class Gdn_Database {
         try {
             $PDO = new PDO(strtolower($this->Engine).':'.$Dsn, $User, $Password, $this->ConnectionOptions);
             $PDO->setAttribute(PDO::ATTR_EMULATE_PREPARES, 0);
-
-            $encoding = c('Database.CharacterEncoding', 'utf8mb4');
-            $PDO->query("set names '{$encoding}'");
             $PDO->query("set time_zone = '+0:0'");
 
             // We only throw exceptions during connect
@@ -272,6 +269,12 @@ class Gdn_Database {
                     $dsn = sprintf('host=%s;port=%s;dbname=%s;', $host, $port, $dbname);
                 }
             }
+        }
+        if (strpos($dsn, 'charset=') === false) {
+            if (substr($dsn, -1) !== ';') {
+                $dsn .= ';';
+            }
+            $dsn .= 'charset='.c('Database.CharacterEncoding', 'utf8mb4');
         }
 
         if (array_key_exists('Slave', $config)) {

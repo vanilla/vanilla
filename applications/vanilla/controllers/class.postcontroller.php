@@ -429,154 +429,140 @@ class PostController extends VanillaController {
         $this->Discussion = $Discussion = $this->DiscussionModel->getID($DiscussionID);
 
         // Is this an embedded comment being posted to a discussion that doesn't exist yet?
-        $vanilla_type = $this->Form->getFormValue('vanilla_type', '');
-        $vanilla_url = $this->Form->getFormValue('vanilla_url', '');
-        $vanilla_category_id = $this->Form->getFormValue('vanilla_category_id', '');
-        $Attributes = array('ForeignUrl' => $vanilla_url);
-        $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
-        $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
+        if (c('Garden.Embed.Allow')) {
+            $vanilla_type = $this->Form->getFormValue('vanilla_type', '');
+            $vanilla_url = $this->Form->getFormValue('vanilla_url', '');
+            $vanilla_category_id = $this->Form->getFormValue('vanilla_category_id', '');
+            $Attributes = array('ForeignUrl' => $vanilla_url);
+            $vanilla_identifier = $this->Form->getFormValue('vanilla_identifier', '');
+            $isEmbeddedComments = $vanilla_url != '' && $vanilla_identifier != '';
 
-        // Only allow vanilla identifiers of 32 chars or less - md5 if larger
-        if (strlen($vanilla_identifier) > 32) {
-            $Attributes['vanilla_identifier'] = $vanilla_identifier;
-            $vanilla_identifier = md5($vanilla_identifier);
-        }
-
-        if (!$Discussion && $isEmbeddedComments) {
-            $Discussion = $Discussion = $this->DiscussionModel->getForeignID($vanilla_identifier, $vanilla_type);
-
-            if ($Discussion) {
-                $this->DiscussionID = $DiscussionID = $Discussion->DiscussionID;
-                $this->Form->setValue('DiscussionID', $DiscussionID);
+            // Only allow vanilla identifiers of 32 chars or less - md5 if larger
+            if (strlen($vanilla_identifier) > 32) {
+                $Attributes['vanilla_identifier'] = $vanilla_identifier;
+                $vanilla_identifier = md5($vanilla_identifier);
             }
-        }
 
-        // If so, create it!
-        if (!$Discussion && $isEmbeddedComments) {
-            // Add these values back to the form if they exist!
-            $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
-            $this->Form->addHidden('vanilla_type', $vanilla_type);
-            $this->Form->addHidden('vanilla_url', $vanilla_url);
-            $this->Form->addHidden('vanilla_category_id', $vanilla_category_id);
+            // If so, create it!
+            if (!$Discussion && $isEmbeddedComments) {
+                // Add these values back to the form if they exist!
+                $this->Form->addHidden('vanilla_identifier', $vanilla_identifier);
+                $this->Form->addHidden('vanilla_type', $vanilla_type);
+                $this->Form->addHidden('vanilla_url', $vanilla_url);
+                $this->Form->addHidden('vanilla_category_id', $vanilla_category_id);
 
-            $PageInfo = fetchPageInfo($vanilla_url);
+                $PageInfo = fetchPageInfo($vanilla_url);
 
-            if (!($Title = $this->Form->getFormValue('Name'))) {
-                $Title = val('Title', $PageInfo, '');
-                if ($Title == '') {
-                    $Title = t('Undefined discussion subject.');
-                    if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
-                        $Title .= ' '.t('Page timed out.');
+                if (!($Title = $this->Form->getFormValue('Name'))) {
+                    $Title = val('Title', $PageInfo, '');
+                    if ($Title == '') {
+                        $Title = t('Undefined discussion subject.');
+                        if (!empty($PageInfo['Exception']) && $PageInfo['Exception'] === "Couldn't connect to host.") {
+                            $Title .= ' '.t('Page timed out.');
+                        }
+
                     }
-
                 }
-            }
 
-            $Description = val('Description', $PageInfo, '');
-            $Images = val('Images', $PageInfo, array());
-            $LinkText = t('EmbededDiscussionLinkText', 'Read the full story here');
+                $Description = val('Description', $PageInfo, '');
+                $Images = val('Images', $PageInfo, array());
+                $LinkText = t('EmbededDiscussionLinkText', 'Read the full story here');
 
-            if (!$Description && count($Images) == 0) {
-                $Body = formatString(
-                    '<p><a href="{Url}">{LinkText}</a></p>',
-                    array('Url' => $vanilla_url, 'LinkText' => $LinkText)
+                if (!$Description && count($Images) == 0) {
+                    $Body = formatString(
+                        '<p><a href="{Url}">{LinkText}</a></p>',
+                        array('Url' => $vanilla_url, 'LinkText' => $LinkText)
+                    );
+                } else {
+                    $Body = formatString('
+                <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
+                   <p>{Excerpt}</p>
+                   <p><a href="{Url}">{LinkText}</a></p>
+                   <div class="ClearFix"></div>
+                </div>', array(
+                        'Title' => $Title,
+                        'Excerpt' => $Description,
+                        'Image' => (count($Images) > 0 ? img(val(0, $Images), array('class' => 'LeftAlign')) : ''),
+                        'Url' => $vanilla_url,
+                        'LinkText' => $LinkText
+                    ));
+                }
+
+                if ($Body == '') {
+                    $Body = $vanilla_url;
+                }
+                if ($Body == '') {
+                    $Body = t('Undefined discussion body.');
+                }
+
+                // Validate the CategoryID for inserting.
+                $Category = CategoryModel::categories($vanilla_category_id);
+                if (!$Category) {
+                    $vanilla_category_id = c('Vanilla.Embed.DefaultCategoryID', 0);
+                    if ($vanilla_category_id <= 0) {
+                        // No default category defined, so grab the first non-root category and use that.
+                        $vanilla_category_id = $this->DiscussionModel
+                            ->SQL
+                            ->select('CategoryID')
+                            ->from('Category')
+                            ->where('CategoryID >', 0)
+                            ->get()
+                            ->firstRow()
+                            ->CategoryID;
+                        // No categories in the db? default to 0
+                        if (!$vanilla_category_id) {
+                            $vanilla_category_id = 0;
+                        }
+                    }
+                } else {
+                    $vanilla_category_id = $Category['CategoryID'];
+                }
+
+                $EmbedUserID = c('Garden.Embed.UserID');
+                if ($EmbedUserID) {
+                    $EmbedUser = Gdn::userModel()->getID($EmbedUserID);
+                }
+                if (!$EmbedUserID || !$EmbedUser) {
+                    $EmbedUserID = Gdn::userModel()->getSystemUserID();
+                }
+
+                $EmbeddedDiscussionData = array(
+                    'InsertUserID' => $EmbedUserID,
+                    'DateInserted' => Gdn_Format::toDateTime(),
+                    'DateUpdated' => Gdn_Format::toDateTime(),
+                    'CategoryID' => $vanilla_category_id,
+                    'ForeignID' => $vanilla_identifier,
+                    'Type' => $vanilla_type,
+                    'Name' => $Title,
+                    'Body' => $Body,
+                    'Format' => 'Html',
+                    'Attributes' => dbencode($Attributes)
                 );
-            } else {
-                $Body = formatString('
-            <div class="EmbeddedContent">{Image}<strong>{Title}</strong>
-               <p>{Excerpt}</p>
-               <p><a href="{Url}">{LinkText}</a></p>
-               <div class="ClearFix"></div>
-            </div>', array(
-                    'Title' => $Title,
-                    'Excerpt' => $Description,
-                    'Image' => (count($Images) > 0 ? img(val(0, $Images), array('class' => 'LeftAlign')) : ''),
-                    'Url' => $vanilla_url,
-                    'LinkText' => $LinkText
-                ));
-            }
-
-            if ($Body == '') {
-                $Body = $vanilla_url;
-            }
-            if ($Body == '') {
-                $Body = t('Undefined discussion body.');
-            }
-
-            // Validate the CategoryID for inserting.
-            $Category = CategoryModel::categories($vanilla_category_id);
-            if (!$Category) {
-                $vanilla_category_id = c('Vanilla.Embed.DefaultCategoryID', 0);
-                if ($vanilla_category_id <= 0) {
-                    // No default category defined, so grab the first non-root category and use that.
-                    $vanilla_category_id = $this->DiscussionModel
-                        ->SQL
-                        ->select('CategoryID')
-                        ->from('Category')
-                        ->where('CategoryID >', 0)
-                        ->get()
-                        ->firstRow()
-                        ->CategoryID;
-                    // No categories in the db? default to 0
-                    if (!$vanilla_category_id) {
-                        $vanilla_category_id = 0;
+                $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
+                $this->fireEvent('BeforeEmbedDiscussion');
+                $DiscussionID = $this->DiscussionModel->SQL->insert(
+                    'Discussion',
+                    $EmbeddedDiscussionData
+                );
+                $ValidationResults = $this->DiscussionModel->validationResults();
+                if (count($ValidationResults) == 0 && $DiscussionID > 0) {
+                    $this->Form->addHidden('DiscussionID', $DiscussionID); // Put this in the form so reposts won't cause new discussions.
+                    $this->Form->setFormValue('DiscussionID', $DiscussionID); // Put this in the form values so it is used when saving comments.
+                    $this->setJson('DiscussionID', $DiscussionID);
+                    $this->Discussion = $Discussion = $this->DiscussionModel->getID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => false));
+                    // Update the category discussion count
+                    if ($vanilla_category_id > 0) {
+                        $this->DiscussionModel->updateDiscussionCount($vanilla_category_id, $DiscussionID);
                     }
+
                 }
-            } else {
-                $vanilla_category_id = $Category['CategoryID'];
             }
 
-            $EmbedUserID = c('Garden.Embed.UserID');
-            if ($EmbedUserID) {
-                $EmbedUser = Gdn::userModel()->getID($EmbedUserID);
-            }
-            if (!$EmbedUserID || !$EmbedUser) {
-                $EmbedUserID = Gdn::userModel()->getSystemUserID();
-            }
-
-            $EmbeddedDiscussionData = array(
-                'InsertUserID' => $EmbedUserID,
-                'DateInserted' => Gdn_Format::toDateTime(),
-                'DateUpdated' => Gdn_Format::toDateTime(),
-                'CategoryID' => $vanilla_category_id,
-                'ForeignID' => $vanilla_identifier,
-                'Type' => $vanilla_type,
-                'Name' => $Title,
-                'Body' => $Body,
-                'Format' => 'Html',
-                'Attributes' => dbencode($Attributes)
-            );
-            $this->EventArguments['Discussion'] =& $EmbeddedDiscussionData;
-            $this->fireEvent('BeforeEmbedDiscussion');
-            $DiscussionID = $this->DiscussionModel->SQL->insert(
-                'Discussion',
-                $EmbeddedDiscussionData
-            );
-            $ValidationResults = $this->DiscussionModel->validationResults();
-            if (count($ValidationResults) == 0 && $DiscussionID > 0) {
-                $this->Form->addHidden('DiscussionID', $DiscussionID); // Put this in the form so reposts won't cause new discussions.
-                $this->Form->setFormValue('DiscussionID', $DiscussionID); // Put this in the form values so it is used when saving comments.
-                $this->setJson('DiscussionID', $DiscussionID);
-                $this->Discussion = $Discussion = $this->DiscussionModel->getID($DiscussionID, DATASET_TYPE_OBJECT, array('Slave' => false));
-                // Update the category discussion count
-                if ($vanilla_category_id > 0) {
-                    $this->DiscussionModel->updateDiscussionCount($vanilla_category_id, $DiscussionID);
-                }
-
-            }
-        }
-
-        // If no discussion was found, error out
-        if (!$Discussion) {
-            $this->Form->addError(t('Failed to find discussion for commenting.'));
-        }
-
-        /**
-         * Special care is taken for embedded comments.  Since we don't currently use an advanced editor for these
-         * comments, we may need to apply certain filters and fixes to the data to maintain its intended display
-         * with the input format (e.g. maintaining newlines).
-         */
-        if ($isEmbeddedComments) {
+            /*
+             * Special care is taken for embedded comments.  Since we don't currently use an advanced editor for these
+             * comments, we may need to apply certain filters and fixes to the data to maintain its intended display
+             * with the input format (e.g. maintaining newlines).
+             */
             $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
 
             switch ($inputFormatter) {
@@ -587,6 +573,11 @@ class PostController extends VanillaController {
                     );
                     break;
             }
+        }
+
+        // If no discussion was found, error out
+        if (!$Discussion) {
+            $this->Form->addError(t('Failed to find discussion for commenting.'));
         }
 
         // Setup head

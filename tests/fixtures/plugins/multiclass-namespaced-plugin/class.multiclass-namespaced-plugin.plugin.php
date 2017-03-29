@@ -16,6 +16,7 @@ namespace Deeply\Nested\Namespaced\Fixture {
             echo __CLASS__.' is loaded!';
         }
     }
+
     class MultiClassNamespacedPluginSwarmClass {}
 }
 

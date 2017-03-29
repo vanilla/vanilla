@@ -17,12 +17,29 @@ use VanillaTests\Library\Garden\ClassLocatorTest;
 class VanillaClassLocatorTest extends ClassLocatorTest {
 
     public function testFindMethodWithOverride() {
+        $root = '/tests/fixtures';
+
         $container = new Container();
-        $container->setInstance(ContainerInterface::class, $container)
+        $container
+            ->setInstance(ContainerInterface::class, $container)
             ->defaultRule()
             ->setShared(true)
+
+            // EventManager
             ->rule(EventManager::class)
-            ->addCall('bindClass', [BasicEventHandlers::class]);
+            ->addCall('bindClass', [BasicEventHandlers::class])
+
+            // AddonManager
+            ->rule(\Vanilla\AddonManager::class)
+            ->setConstructorArgs([
+                [
+                    \Vanilla\Addon::TYPE_ADDON => "$root/empty",
+                    \Vanilla\Addon::TYPE_THEME => "$root/empty",
+                    \Vanilla\Addon::TYPE_LOCALE => "$root/empty"
+                ],
+                PATH_ROOT.'/tests/cache/am/empty-manager'
+            ])
+        ;
 
         $vanillaClassLocator = $container->get(VanillaClassLocator::class);
         $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), 'someEndpoint');

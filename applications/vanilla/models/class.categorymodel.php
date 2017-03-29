@@ -1060,6 +1060,7 @@ class CategoryModel extends Gdn_Model {
         }
 
         $countDiscussions = val('CountDiscussions', $category, 0);
+        $countDiscussions++;
 
         // setField will update these values in the DB, as well as the cache.
         self::instance()->setField($categoryID, [

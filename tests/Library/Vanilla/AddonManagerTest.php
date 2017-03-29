@@ -493,70 +493,104 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
      * @param string $pattern The pattern to test.
      * @param string $class The class name to match.
      * @param bool $expected Whether the match should pass or fail.
-     * @dataProvider provideMatchClassTests
+     * @dataProvider provideFindPatternInClassCollectionTests
      */
-    public function testMatchClass($pattern, $class, $expected) {
+    public function testFindPatternInClassCollection($pattern, $fqClassName, $expected) {
         $am = new TestAddonManager();
 
-        $r = $am->matchClass($pattern, $class);
-        $this->assertSame($expected, $r);
+        $classInfo = Addon::parseFullyQualifiedClass($fqClassName);
+        $results = $am->findPatternInClassCollection($pattern, [
+            strtolower($classInfo['className']) => [
+                $classInfo['namespace'] => $classInfo
+            ]
+        ]);
+
+        return $expected === (count($results) === 1);
     }
 
     /**
-     * Provide tests for {@link testMatchClass()}.
+     * Provide tests for {@link testFindPatternInClassCollection()}.
      *
      * @return array Returns a data provider array.
      */
-    public function provideMatchClassTests() {
+    public function provideFindPatternInClassCollectionTests() {
         $data = [
             '*\DiscussionsController' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
             ],
             'discussionsController' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => false,
                 'Vanilla\API\DiscussionsController' => false,
-                'API\DiscussionsController' => false
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => false,
             ],
             '*\api\DiscussionsController' => [
                 'DiscussionsController' => false,
                 'Vanilla\DiscussionsController' => false,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => false,
+            ],
+            '*api\DiscussionsController' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => false,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
             ],
             'Vanilla\*\DiscussionsController' => [
                 'DiscussionsController' => false,
-                'Vanilla\DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => false,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => false
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => false,
             ],
-            '*\*Controller' => [
-                'DiscussionsController' => true,
+            'Vanilla*\DiscussionsController' => [
+                'DiscussionsController' => false,
                 'Vanilla\DiscussionsController' => true,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => true,
             ],
             '*Controller' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
+            ],
+            '*\*Controller' => [
+                'DiscussionsController' => false,
+                'Vanilla\DiscussionsController' => true,
+                'Vanilla\API\DiscussionsController' => true,
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
+            ],
+            '\*Controller' => [
+                'DiscussionsController' => true,
+                'Vanilla\DiscussionsController' => false,
+                'Vanilla\API\DiscussionsController' => false,
+                'API\DiscussionsController' => false,
+                'VanillaAPI\DiscussionsController' => false,
             ],
             '*' => [
                 'DiscussionsController' => true,
                 'Vanilla\DiscussionsController' => true,
                 'Vanilla\API\DiscussionsController' => true,
-                'API\DiscussionsController' => true
+                'API\DiscussionsController' => true,
+                'VanillaAPI\DiscussionsController' => true,
             ],
         ];
 
         $r = [];
         foreach ($data as $pattern => $rows) {
-            foreach ($rows as $class => $expected) {
-                $r["$pattern $class"] = [$pattern, $class, $expected];
+            foreach ($rows as $fqClassName => $expected) {
+                $r["$pattern $fqClassName"] = [$pattern, $fqClassName, $expected];
             }
         }
         return $r;

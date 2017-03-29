@@ -25,7 +25,7 @@ class TestAddonManager extends AddonManager {
         parent::__construct($scanDirs, $cacheDir);
     }
 
-    public function matchClass($pattern, $class) {
-        return parent::matchClass($pattern, $class);
+    public function findPatternInClassCollection($pattern, $collection) {
+        return parent::findPatternInClassCollection($pattern, $collection);
     }
 }

@@ -1929,6 +1929,9 @@ class UserModel extends Gdn_Model {
             $this->Validation->unapplyRule('RoleID', 'OneOrMoreArrayItemRequired');
         }
 
+        $this->Validation->addRule('UsernameBlacklist', 'function:validateAgainstUsernameBlacklist');
+        $this->Validation->applyRule('Name', 'UsernameBlacklist');
+
         // Make sure that checkbox values are saved as the appropriate value.
         if (array_key_exists('ShowEmail', $FormPostValues)) {
             $FormPostValues['ShowEmail'] = forceBool($FormPostValues['ShowEmail'], '0', '1', '0');
@@ -3001,6 +3004,66 @@ class UserModel extends Gdn_Model {
         }
 
         return true;
+    }
+
+
+    /**
+     * Returns a list of lowercase, blacklisted usernames. Currently profileController endpoints,
+     * in core or in plugins, are blacklisted.
+     */
+    public static function getUsernameBlacklist() {
+        $pluginEndpoints = [
+            'addons',
+            'applyrank',
+            'avatar',
+            'card',
+            'comments',
+            'deletenote',
+            'discussions',
+            'facebookconnect',
+            'following',
+            'githubconnect',
+            'hubsso',
+            'ignore',
+            'jsconnect',
+            'linkedinconnect',
+            'note',
+            'notes',
+            'online',
+            'pegaconnect',
+            'picture',
+            'quotes',
+            'reactions',
+            'removepicture',
+            'removewarning',
+            'reversewarning',
+            'salesforceconnect',
+            'setlocale',
+            'signature',
+            'thumbnail',
+            'twitterconnect',
+            'usercard',
+            'username',
+            'viewnote',
+            'warn',
+            'warnings',
+            'whosonline',
+            'zendeskconnect'
+        ];
+
+        $profileControllerEndpoints = [];
+
+        // Get public methods on ProfileController
+        $reflection = new ReflectionClass('ProfileController');
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            if ($method->class == $reflection->getName()) {
+                $profileControllerEndpoints[] = $method->name;
+            }
+        }
+
+        $profileControllerEndpoints = array_map(function($str) { return strtolower($str); }, $profileControllerEndpoints);
+        $endpoints = array_merge($profileControllerEndpoints, $pluginEndpoints);
+        return $endpoints;
     }
 
     /**

@@ -52,12 +52,5 @@ echo $this->Form->errors();
                 ?>
             </div>
         </li>
-        <li class="form-group">
-            <div class="input-wrap no-label">
-                <?php
-                echo $this->Form->checkBox('SocialSharing', 'Enable automatic Social Share.');
-                ?>
-            </div>
-        </li>
     </ul>
 <?php echo $this->Form->close('Save');

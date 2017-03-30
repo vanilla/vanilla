@@ -10,12 +10,12 @@
  * An associative array of information about this application.
  */
 $ThemeInfo['mobile'] = array(
-    'Name'        => 'Basic Mobile',
+    'Name' => 'Basic Mobile',
     'Description' => "A simplified theme made to target mobile browsers.",
-    'Version'     => '1.1.4',
-    'Author'      => "Mark O'Sullivan",
+    'Version' => '1.1.4',
+    'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl'   => 'http://vanillaforums.com',
-    'IsMobile'    => true,
-    'Hidden'      => false,
+    'AuthorUrl' => 'http://vanillaforums.com',
+    'IsMobile' => true,
+    'Hidden' => false,
 );

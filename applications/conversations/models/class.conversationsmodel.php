@@ -18,7 +18,7 @@ abstract class ConversationsModel extends Gdn_Model {
     /**
      * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
      */
-    protected $floodControlStorageObject;
+    protected $floodGate;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -28,7 +28,7 @@ abstract class ConversationsModel extends Gdn_Model {
      */
     public function __construct($Name = '') {
         parent::__construct($Name);
-        $this->floodControlStorageObject = FloodControlHelper::configure($this, $this->Name);
+        $this->floodGate = FloodControlHelper::configure($this, $this->Name);
     }
 
     /**

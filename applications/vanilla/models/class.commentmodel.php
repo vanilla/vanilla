@@ -36,7 +36,7 @@ class CommentModel extends Gdn_Model {
     /**
      * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
      */
-    protected $floodControlStorageObject;
+    protected $floodGate;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -46,7 +46,7 @@ class CommentModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Comment');
-        $this->floodControlStorageObject = FloodControlHelper::configure($this, 'Comment');
+        $this->floodGate = FloodControlHelper::configure($this, 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');
     }
@@ -855,7 +855,7 @@ class CommentModel extends Gdn_Model {
                 $this->setFloodControlEnabled(false);
             }
 
-            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodControlStorageObject);
+            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodGate);
 
             // If the post is new and it validates, check for spam
             if (!$Insert || !$isUserSpamming) {

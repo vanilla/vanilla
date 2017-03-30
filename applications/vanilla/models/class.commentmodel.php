@@ -32,6 +32,11 @@ class CommentModel extends VanillaModel {
     public $pageCache;
 
     /**
+     * @var CommentModel $instance;
+     */
+    private static $instance;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @since 2.0.0
@@ -41,6 +46,18 @@ class CommentModel extends VanillaModel {
         parent::__construct('Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');
+    }
+
+    /**
+     * The shared instance of this object.
+     *
+     * @return CommentModel Returns the instance.
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new CommentModel();
+        }
+        return self::$instance;
     }
 
     /**
@@ -967,37 +984,7 @@ class CommentModel extends VanillaModel {
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
-                $Category = CategoryModel::categories($Discussion->CategoryID);
-
-                if ($Category) {
-                    $CountComments = val('CountComments', $Category, 0) + 1;
-
-                    if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
-                        $CountComments = $this->SQL
-                            ->select('CountComments', 'sum', 'CountComments')
-                            ->from('Discussion')
-                            ->where('CategoryID', $Discussion->CategoryID)
-                            ->get()
-                            ->firstRow()
-                            ->CountComments;
-                    }
-                }
-                $CategoryModel = new CategoryModel();
-
-                $CategoryModel->setField($Discussion->CategoryID, array(
-                    'LastDiscussionID' => $DiscussionID,
-                    'LastCommentID' => $CommentID,
-                    'CountComments' => $CountComments,
-                    'LastDateInserted' => $Fields['DateInserted']
-                ));
-
-                // Update the cache.
-                $CategoryCache = array(
-                    'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
-                    'LastUserID' => $Fields['InsertUserID'],
-                    'LastUrl' => DiscussionUrl($Discussion).'#latest'
-                );
-                CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
+                CategoryModel::instance()->incrementLastComment($Fields);
             }
 
             // Prepare the notification queue.
@@ -1374,11 +1361,14 @@ class CommentModel extends VanillaModel {
         $this->UpdateUser($Comment['InsertUserID']);
 
         // Update the category.
-        $Category = CategoryModel::categories(val('CategoryID', $Discussion));
+        $categoryID = val('CategoryID', $Discussion);
+        $Category = CategoryModel::categories($categoryID);
         if ($Category && $Category['LastCommentID'] == $CommentID) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->SetRecentPost($Category['CategoryID']);
         }
+        // Decrement CountAllComments for category and its parents.
+        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT);
 
         // Clear the page cache.
         $this->RemovePageCache($Comment['DiscussionID']);

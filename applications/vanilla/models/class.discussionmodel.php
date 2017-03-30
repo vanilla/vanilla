@@ -83,7 +83,7 @@ class DiscussionModel extends Gdn_Model {
     /**
      * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
      */
-    protected $floodControlStorageObject;
+    protected $floodGate;
 
     /**
      * Class constructor. Defines the related database table name.
@@ -93,7 +93,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Discussion');
-        $this->floodControlStorageObject = FloodControlHelper::configure($this, 'Discussion');
+        $this->floodGate = FloodControlHelper::configure($this, 'Discussion');
     }
 
     /**
@@ -1908,7 +1908,7 @@ class DiscussionModel extends Gdn_Model {
                 $this->setFloodControlEnabled(false);
             }
 
-            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodControlStorageObject);
+            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodGate);
 
             // If the post is new and it validates, make sure the user isn't spamming
             if (!$Insert || !$isUserSpamming) {

@@ -11,7 +11,9 @@
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends VanillaModel {
+class CommentModel extends Gdn_Model {
+
+    use \Vanilla\FloodControlTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -32,6 +34,11 @@ class CommentModel extends VanillaModel {
     public $pageCache;
 
     /**
+     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     */
+    protected $floodGate;
+
+    /**
      * Class constructor. Defines the related database table name.
      *
      * @since 2.0.0
@@ -39,6 +46,7 @@ class CommentModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Comment');
+        $this->floodGate = FloodControlHelper::configure($this, 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');
     }
@@ -814,8 +822,6 @@ class CommentModel extends VanillaModel {
      * @since 2.0.0
      */
     public function save($FormPostValues, $Settings = false) {
-        $Session = Gdn::session();
-
         // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -852,8 +858,16 @@ class CommentModel extends VanillaModel {
 
         // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
+            // Backward compatible check for flood control
+            if (!val('SpamCheck', $this, true)) {
+                deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
+                $this->setFloodControlEnabled(false);
+            }
+
+            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodGate);
+
             // If the post is new and it validates, check for spam
-            if (!$Insert || !$this->CheckForSpam('Comment')) {
+            if (!$Insert || !$isUserSpamming) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 unset($Fields[$this->PrimaryKey]);
 

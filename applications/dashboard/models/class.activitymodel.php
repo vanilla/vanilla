@@ -13,6 +13,8 @@
  */
 class ActivityModel extends Gdn_Model {
 
+    use \Vanilla\FloodControlTrait;
+
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
 
@@ -1103,6 +1105,11 @@ class ActivityModel extends Gdn_Model {
                 $Comment['ActivityID'] = $CommentActivityID;
             }
 
+            $storageObject = FloodControlHelper::configure($this, 'ActivityComment');
+            if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
+                return false;
+            }
+
             // Check for spam.
             $Spam = SpamModel::isSpam('ActivityComment', $Comment);
             if ($Spam) {
@@ -1476,6 +1483,11 @@ class ActivityModel extends Gdn_Model {
         $ActivityID = val('ActivityID', $Activity);
         if (!$ActivityID) {
             if (!$Delete) {
+                $storageObject = FloodControlHelper::configure($this, 'Activity');
+                if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
+                    return false;
+                }
+
                 $this->addInsertFields($Activity);
                 touchValue('DateUpdated', $Activity, $Activity['DateInserted']);
 

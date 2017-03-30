@@ -53,6 +53,34 @@ echo heading(t('Flood Control'));
                 <?php echo t('minute(s)'); ?>
             </td>
         </tr>
+        <tr>
+            <td>
+                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamCount', $SpamCount); ?>
+                <?php echo t('activity(ies)'); ?>
+            </td>
+            <td class="Alt">
+                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamTime', $SpamTime); ?>
+                <?php echo t('seconds'); ?>
+            </td>
+            <td>
+                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamLock', $SpamLock); ?>
+                <?php echo t('minute(s)'); ?>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamCount', $SpamCount); ?>
+                <?php echo t('activity\'s comment(s)'); ?>
+            </td>
+            <td class="Alt">
+                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamTime', $SpamTime); ?>
+                <?php echo t('seconds'); ?>
+            </td>
+            <td>
+                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamLock', $SpamLock); ?>
+                <?php echo t('minute(s)'); ?>
+            </td>
+        </tr>
 
         <?php if ($ConversationsEnabled): ?>
 

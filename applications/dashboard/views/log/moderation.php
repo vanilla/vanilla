@@ -31,7 +31,7 @@ echo heading($this->data('Title'));
 <?php
 echo '<div id="LogTable">';
 include dirname(__FILE__).'/table.php';
-echo '</div id="LogTable">';
+echo '</div>';
 ?>
 <?php
 $this->addDefinition('ExpandText', t('more'));

@@ -2279,10 +2279,7 @@ class DiscussionModel extends VanillaModel {
      * @deprecated
      */
     public function incrementNewDiscussion($discussion) {
-        trigger_error(
-            'DiscussionModel::incrementNewDiscussion is deprecated. Use CategoryModel::incrementLastDiscussion instead.',
-            E_USER_DEPRECATED
-        );
+        deprecated('DiscussionModel::incrementNewDiscussion', 'CategoryModel::incrementLastDiscussion');
 
         CategoryModel::instance()->incrementLastDiscussion($discussion);
     }

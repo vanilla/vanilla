@@ -70,6 +70,11 @@ class DiscussionModel extends VanillaModel {
     protected static $allowedFilters = [];
 
     /**
+     * @var DiscussionModel $instance;
+     */
+    private static $instance;
+
+    /**
      * @var string The sort key of the order by we apply in the query.
      */
     protected $sort = '';
@@ -87,6 +92,18 @@ class DiscussionModel extends VanillaModel {
      */
     public function __construct() {
         parent::__construct('Discussion');
+    }
+
+    /**
+     * The shared instance of this object.
+     *
+     * @return DiscussionModel Returns the instance.
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new DiscussionModel();
+        }
+        return self::$instance;
     }
 
     /**
@@ -1992,25 +2009,15 @@ class DiscussionModel extends VanillaModel {
                     $DiscussionID = $this->SQL->insert($this->Name, $Fields);
                     $Fields['DiscussionID'] = $DiscussionID;
 
-                    // Update the cache.
-                    if ($DiscussionID && Gdn::cache()->activeEnabled()) {
-                        $CategoryCache = [
-                            'LastDiscussionID' => $DiscussionID,
-                            'LastCommentID' => null,
-                            'LastTitle' => Gdn_Format::text($Fields['Name']), // kluge so JoinUsers doesn't wipe this out.
-                            'LastUserID' => $Fields['InsertUserID'],
-                            'LastDateInserted' => $Fields['DateInserted'],
-                            'LastUrl' => DiscussionUrl($Fields)
-                        ];
-                        CategoryModel::setCache($Fields['CategoryID'], $CategoryCache);
+                    // Update cached last post info for a category.
+                    CategoryModel::updateLastPost($Fields);
 
-                        // Clear the cache if necessary.
-                        if (val('Announce', $Fields)) {
-                            Gdn::cache()->remove($this->getAnnouncementCacheKey(val('CategoryID', $Fields)));
+                    // Clear the cache if necessary.
+                    if (val('Announce', $Fields)) {
+                        Gdn::cache()->remove($this->getAnnouncementCacheKey(val('CategoryID', $Fields)));
 
-                            if (val('Announce', $Fields) == 1) {
-                                Gdn::cache()->remove($this->getAnnouncementCacheKey());
-                            }
+                        if (val('Announce', $Fields) == 1) {
+                            Gdn::cache()->remove($this->getAnnouncementCacheKey());
                         }
                     }
 
@@ -2113,7 +2120,7 @@ class DiscussionModel extends VanillaModel {
 
                 // Update discussion counter for affected categories.
                 if ($Insert || $StoredCategoryID) {
-                    $this->incrementNewDiscussion($Discussion);
+                    CategoryModel::instance()->incrementLastDiscussion($Discussion);
                 }
 
                 if ($StoredCategoryID) {
@@ -2267,38 +2274,14 @@ class DiscussionModel extends VanillaModel {
     }
 
     /**
-     * @param int|array|stdClass $Discussion The discussion ID or discussion.
+     * @param int|array|stdClass $discussion The discussion ID or discussion.
      * @throws Exception
+     * @deprecated
      */
-    public function incrementNewDiscussion($Discussion) {
-        if (is_numeric($Discussion)) {
-            $Discussion = $this->getID($Discussion);
-        }
+    public function incrementNewDiscussion($discussion) {
+        deprecated('DiscussionModel::incrementNewDiscussion', 'CategoryModel::incrementLastDiscussion');
 
-        if (!$Discussion) {
-            return;
-        }
-
-        $this->SQL->update('Category')
-            ->set('CountDiscussions', 'CountDiscussions + 1', false)
-            ->set('LastDiscussionID', val('DiscussionID', $Discussion))
-            ->set('LastCommentID', null)
-            ->set('LastDateInserted', val('DateInserted', $Discussion))
-            ->where('CategoryID', val('CategoryID', $Discussion))
-            ->put();
-
-        $Category = CategoryModel::categories(val('CategoryID', $Discussion));
-        if ($Category) {
-            CategoryModel::setCache($Category['CategoryID'], [
-                'CountDiscussions' => $Category['CountDiscussions'] + 1,
-                'LastDiscussionID' => val('DiscussionID', $Discussion),
-                'LastCommentID' => null,
-                'LastDateInserted' => val('DateInserted', $Discussion),
-                'LastTitle' => Gdn_Format::text(val('Name', $Discussion, t('No Title'))),
-                'LastUserID' => val('InsertUserID', $Discussion),
-                'LastDiscussionUserID' => val('InsertUserID', $Discussion),
-                'LastUrl' => DiscussionUrl($Discussion, false, '//').'#latest']);
-        }
+        CategoryModel::instance()->incrementLastDiscussion($discussion);
     }
 
     /**
@@ -2674,8 +2657,9 @@ class DiscussionModel extends VanillaModel {
 
         // Log all of the comment deletes.
         $Comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
+        $totalComments = count($Comments);
 
-        if (count($Comments) > 0 && count($Comments) < 50) {
+        if ($totalComments > 0 && $totalComments < 50) {
             // A smaller number of comments should just be stored with the record.
             $Data['_Data']['Comment'] = $Comments;
             LogModel::insert($Log, 'Discussion', $Data, $LogOptions);
@@ -2693,6 +2677,14 @@ class DiscussionModel extends VanillaModel {
 
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
         $this->updateDiscussionCount($CategoryID);
+
+        // Decrement CountAllDiscussions for category and its parents.
+        CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_DISCUSSION);
+
+        // Decrement CountAllDiscussions for category and its parents.
+        if ($totalComments > 0) {
+            CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_COMMENT, $totalComments);
+        }
 
         // Get the user's discussion count.
         $this->updateUserDiscussionCount($UserID);

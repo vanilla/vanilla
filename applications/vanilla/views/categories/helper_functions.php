@@ -177,21 +177,21 @@ if (!function_exists('writeListItem')):
                         <span class="MItem DiscussionCount">
                             <?php echo sprintf(
                                 PluralTranslate(
-                                    val('CountDiscussions', $category),
+                                    val('CountAllDiscussions', $category),
                                     '%s discussion html',
                                     '%s discussions html',
                                     t('%s discussion'),
                                     t('%s discussions')
-                                ), BigPlural(val('CountDiscussions', $category), '%s discussion')) ?>
+                                ), BigPlural(val('CountAllDiscussions', $category), '%s discussion')) ?>
                         </span>
                         <span class="MItem CommentCount">
                             <?php echo sprintf(
                                 PluralTranslate(
-                                    val('CountComments', $category), '%s comment html',
+                                    val('CountAllComments', $category), '%s comment html',
                                     '%s comments html',
                                     t('%s comment'),
                                     t('%s comments')
-                                ), BigPlural(val('CountComments', $category), '%s comment')); ?>
+                                ), BigPlural(val('CountAllComments', $category), '%s comment')); ?>
                         </span>
 
                         <?php if (val('LastTitle', $category) != '') : ?>

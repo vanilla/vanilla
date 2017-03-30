@@ -22,12 +22,17 @@ $SQL = Gdn::database()->sql();
 $Construct = Gdn::database()->Structure();
 $Px = $Construct->DatabasePrefix();
 
+$captureOnly = Gdn::database()->structure()->CaptureOnly;
+
 $Construct->table('Category');
 $CategoryExists = $Construct->TableExists();
 $CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
+
+$CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
+$CountAllCommentsExists = $Construct->columnExists('CountAllComments');
 
 $Construct->PrimaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true, 'key')
@@ -421,6 +426,15 @@ if (!$LastDiscussionIDExists) {
         ->join('Comment cm', 'c.LastCommentID = cm.CommentID')
         ->set('c.LastDiscussionID', 'cm.DiscussionID', false, false)
         ->put();
+}
+
+if (!$captureOnly) {
+    if (!$CountAllDiscussionsExists) {
+        CategoryModel::instance()->counts('CountAllDiscussions');
+    }
+    if (!$CountAllCommentsExists) {
+        CategoryModel::instance()->counts('CountAllComments');
+    }
 }
 
 // Add stub content

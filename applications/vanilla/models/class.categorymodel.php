@@ -1045,7 +1045,7 @@ class CategoryModel extends Gdn_Model {
      */
     public function incrementLastDiscussion($discussion) {
         // Lookup the discussion record, if necessary. We need at least a discussion to continue.
-        if (is_numeric($discussion)) {
+        if (filter_var($discussion, FILTER_VALIDATE_INT)) {
             $discussion = DiscussionModel::instance()->getID($discussion);
         }
         if (!$discussion) {
@@ -1087,7 +1087,7 @@ class CategoryModel extends Gdn_Model {
      * @param int|array|object $comment A comment ID or array representing a comment.
      */
     public function incrementLastComment($comment) {
-        if (is_numeric($comment)) {
+        if (filter_var($comment, FILTER_VALIDATE_INT)) {
             $comment = CommentModel::instance()->getID($comment);
         }
         if (!$comment) {

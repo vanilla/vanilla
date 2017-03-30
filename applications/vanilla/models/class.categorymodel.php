@@ -1045,7 +1045,7 @@ class CategoryModel extends Gdn_Model {
      */
     public function incrementLastDiscussion($discussion) {
         // Lookup the discussion record, if necessary. We need at least a discussion to continue.
-        if (filter_var($discussion, FILTER_VALIDATE_INT)) {
+        if (filter_var($discussion, FILTER_VALIDATE_INT) !== false) {
             $discussion = DiscussionModel::instance()->getID($discussion);
         }
         if (!$discussion) {
@@ -1087,7 +1087,7 @@ class CategoryModel extends Gdn_Model {
      * @param int|array|object $comment A comment ID or array representing a comment.
      */
     public function incrementLastComment($comment) {
-        if (filter_var($comment, FILTER_VALIDATE_INT)) {
+        if (filter_var($comment, FILTER_VALIDATE_INT) !== false) {
             $comment = CommentModel::instance()->getID($comment);
         }
         if (!$comment) {

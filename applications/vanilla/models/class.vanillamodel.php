@@ -27,7 +27,6 @@ abstract class VanillaModel extends Gdn_Model {
      */
     public function __construct($Name = '') {
         parent::__construct($Name);
-        deprecated(__CLASS__, 'Use the FloodControlTrait instead.');
     }
 
     /**

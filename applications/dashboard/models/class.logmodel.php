@@ -199,7 +199,7 @@ class LogModel extends Gdn_Pluggable {
         static $TinyDiff = null;
 
         if ($TinyDiff === null) {
-            require_once(dirname(__FILE__).'/tiny_diff.php');
+            require_once(__DIR__.'/tiny_diff.php');
             $TinyDiff = new Tiny_diff();
         }
 

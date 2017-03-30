@@ -1,5 +1,4 @@
-<?php if (!defined('APPLICATION')) exit(); ?>
-<?php
+<?php if (!defined('APPLICATION')) exit();
 echo heading($this->data('Title'), t('Add Ban Rule'), '/dashboard/settings/bans/add', 'btn btn-primary js-modal');
 $help = t('You can ban IP addresses, email addresses and usernames.');
 $help .= ' '.t('Specify a partial or full match when creating a ban.');
@@ -17,7 +16,7 @@ if (empty($this->data('Bans', []))) {
     echo hero($title, $body);
 } else {
     echo '<div id="BansTable">';
-    include dirname(__FILE__).'/banstable.php';
+    include __DIR__.'/banstable.php';
     echo '</div>';
 }
 

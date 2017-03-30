@@ -30,7 +30,7 @@ class VanillaSearchModel extends Gdn_Model {
             $this->_DiscussionModel = $Value;
         }
         if ($this->_DiscussionModel === false) {
-            require_once(dirname(__FILE__).DS.'class.discussionmodel.php');
+            require_once(__DIR__.DS.'class.discussionmodel.php');
             $this->_DiscussionModel = new DiscussionModel();
         }
         return $this->_DiscussionModel;

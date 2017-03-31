@@ -279,12 +279,8 @@ class SetupController extends DashboardController {
                 $ApplicationInfo = array();
                 include(CombinePaths(array(PATH_APPLICATIONS.DS.'dashboard'.DS.'settings'.DS.'about.php')));
 
-                // Detect Internet connection for CDNs
-                $Disconnected = !(bool)@fsockopen('ajax.googleapis.com', 80);
-
                 saveToConfig(array(
                     'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, array()), 'Undefined'),
-                    'Garden.Cdns.Disable' => $Disconnected,
                     'Garden.CanProcessImages' => function_exists('gd_info'),
                     'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                     'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.

@@ -1726,12 +1726,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                     $this->addJsFile('custom.js'); // only to non-admin pages.
                 }
 
-                $Cdns = array();
-                if (!c('Garden.Cdns.Disable', false)) {
-                    $Cdns = array(
-                        'jquery.js' => "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"
-                    );
-                }
+                $Cdns = [];
 
                 // And now search for/add all JS files.
                 $this->EventArguments['Cdns'] = &$Cdns;

@@ -1641,6 +1641,9 @@ EOT;
                     $Markdown->addAllFlavor();
                 }
 
+                // Format mentions early since @_name_ would be transformed to @<em>name</em>
+                $Mixed = Gdn_Format::mentions($Mixed);
+
                 $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
                 $Mixed = Gdn_Format::processHTML($Mixed);

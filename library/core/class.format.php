@@ -1657,7 +1657,7 @@ EOT;
      * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
      *
      * @param string $html An unparsed HTML string.
-     * @param string $mentions Wether we do mentions or not.
+     * @param bool $mentions Whether mentions are processed or not.
      * @return string The formatted HTML string.
      */
     protected static function processHTML($html, $mentions = true) {

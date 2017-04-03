@@ -157,7 +157,7 @@ class TagModule extends Gdn_Module {
      * @return string
      */
     public function inlineDisplay() {
-        if (!c('Vanilla.Tagging.UI.Enabled')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 
@@ -198,12 +198,12 @@ endforeach; ?>
     }
 
     /**
-     *
+     * Render the module.
      *
      * @return string
      */
     public function toString() {
-        if (!c('Vanilla.Tagging.UI.Enabled')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 

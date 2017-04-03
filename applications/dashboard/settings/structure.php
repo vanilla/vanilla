@@ -663,14 +663,14 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
     // Update the configurations.
     $configNotFound = Gdn::config()->NotFound;
     $configs = [
-        'Vanilla.Tagging.CategorySearch'    => 'Plugins.Tagging.CategorySearch',
-        'Vanilla.Tagging.DisableInline'     => 'Plugins.Tagging.DisableInline',
-        'Vanilla.Tagging.UI.Enabled'        => 'EnabledPlugins.Tagging',
-        'Vanilla.Tagging.Max'               => 'Plugin.Tagging.Max', // Missing s is not a typo
-        'Vanilla.Tagging.Required'          => 'Plugins.Tagging.Required',
-        'Vanilla.Tagging.ShowLimit'         => 'Plugins.Tagging.ShowLimit',
-        'Vanilla.Tagging.StringTags'        => 'Plugins.Tagging.StringTags',
-        'Vanilla.Tagging.UseCategories'     => 'Plugins.Tagging.UseCategories',
+        'Vanilla.Tagging.CategorySearch' => 'Plugins.Tagging.CategorySearch',
+        'Vanilla.Tagging.DisableInline' => 'Plugins.Tagging.DisableInline',
+        'Tagging.Discussions.Enabled' => 'EnabledPlugins.Tagging',
+        'Vanilla.Tagging.Max' => 'Plugin.Tagging.Max', // Missing s is not a typo
+        'Vanilla.Tagging.Required' => 'Plugins.Tagging.Required',
+        'Vanilla.Tagging.ShowLimit' => 'Plugins.Tagging.ShowLimit',
+        'Vanilla.Tagging.StringTags' => 'Plugins.Tagging.StringTags',
+        'Vanilla.Tagging.UseCategories' => 'Plugins.Tagging.UseCategories',
     ];
     foreach ($configs as $newConfig => $oldConfig) {
         if (Gdn::config()->find($oldConfig, false) !== $configNotFound) {

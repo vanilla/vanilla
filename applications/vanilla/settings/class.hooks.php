@@ -308,7 +308,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param Gdn_Controller $Sender
      */
     public function postController_afterDiscussionFormOptions_handler($Sender) {
-        if (!c('Vanilla.Tagging.UI.Enabled')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 

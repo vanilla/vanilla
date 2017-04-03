@@ -72,11 +72,6 @@ class AddonManager {
      */
     private $autoloadClasses = [];
 
-    /**
-     * @var array A backup of same-named classes from the autoloader.
-     */
-    private $autoloadClassesBak = [];
-
     /// Methods ///
 
     /**
@@ -129,14 +124,18 @@ class AddonManager {
     /**
      *  Attempt to load undefined class based on the addons that are enabled.
      *
-     * @param string $class The name of the class to load.
+     * @param string $fqClassName Fully qualified class name to load.
      */
-    public function autoload($class) {
-        $classKey = strtolower($class);
+    public function autoload($fqClassName) {
+        $suppliedClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+        $classKey = strtolower($suppliedClassInfo['className']);
 
         if (isset($this->autoloadClasses[$classKey])) {
-            list($path, $_) = $this->autoloadClasses[$classKey];
-            include_once $path;
+            foreach ($this->autoloadClasses[$classKey] as $namespace => $classData) {
+                if ($suppliedClassInfo['namespace'] === $namespace) {
+                    include_once $classData['filePath'];
+                }
+            }
         }
     }
 
@@ -159,27 +158,31 @@ class AddonManager {
     public function unregisterAutoloader() {
         return spl_autoload_unregister([$this, 'autoload']);
     }
-
     /**
-     * Lookup an addon by class name.
+     * Lookup an addon by fully qualified class name.
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
      *
-     * @param string $class The class name.
+     * @param string $fqClassName Fully qualified class name.
      * @param bool $searchAll Whether or not to search all addons or just the enabled ones.
      * @return Addon|null Returns an {@link Addon} object or **null** if one isn't found.
      */
-    public function lookupByClassname($class, $searchAll = false) {
-        $classKey = strtolower($class);
+    public function lookupByClassname($fqClassName, $searchAll = false) {
+        $lookupClassInfo = Addon::parseFullyQualifiedClass($fqClassName);
+        $classKey = strtolower($lookupClassInfo['className']);
 
         if (isset($this->autoloadClasses[$classKey])) {
-            list($_, $addon) = $this->autoloadClasses[$classKey];
-            return $addon;
+            return reset($this->autoloadClasses[$classKey])['addon'];
         } elseif ($searchAll) {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
                 /* @var Addon $addon */
-                if (isset($addon->getClasses()[$classKey])) {
-                    return $addon;
+                $classes = $addon->getClasses();
+                if (isset($classes[$classKey])) {
+                    foreach ($classes[$classKey] as $classInfo) {
+                        if ($classInfo['namespace'] === $lookupClassInfo['namespace']) {
+                            return $addon;
+                        }
+                    }
                 }
             }
         }
@@ -191,7 +194,7 @@ class AddonManager {
      *
      * @param string $pattern The pattern to match.
      * @param bool $searchAll Whether to search all classes or just the started ones.
-     * @return array Returns an array of class names.
+     * @return array Returns an array of fully qualified class names.
      */
     public function findClasses($pattern, $searchAll = false) {
         $fn = function ($name) use ($pattern) {
@@ -200,17 +203,24 @@ class AddonManager {
 
         $result = [];
         if ($searchAll === false) {
-            /* @var Addon $addon */
-            foreach ($this->autoloadClasses as $classKey => list($path, $addon)) {
-                if ($fn($classKey)) {
-                    $result[] = $addon->getClasses()[$classKey][0];
+            foreach ($this->autoloadClasses as $classKey => $classesEntry) {
+                foreach($classesEntry as $namespace => $classData) {
+                    if ($fn($namespace.$classKey)) {
+                        $result[] = $namespace.$classData['className'];
+                    }
                 }
             }
         } else {
             foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
                 /* @var Addon $addon */
-                $classes = array_column($addon->getClasses(), 0);
 
+                $classes = [];
+                foreach ($addon->getClasses() as $classesInfo) {
+                    foreach ($classesInfo as $classInfo) {
+                        $classes[] = $classInfo['namespace'].$classInfo['className'];
+
+                    }
+                }
                 $result = array_merge($result, array_filter($classes, $fn));
             }
         }
@@ -836,20 +846,44 @@ class AddonManager {
         }
 
         // Add the addon's classes to the autoload list.
-        foreach ($addon->getClasses() as $classKey => $row) {
-            list($_, $subpath) = $row;
+        $classes = $addon->getClasses();
+        foreach ($classes as $classKey => $classesInfo) {
+            foreach ($classesInfo as $classInfo) {
+                $subpath = $classInfo['path'];
+                $namespace = $classInfo['namespace'];
+                $className = $classInfo['className'];
 
-            if (isset($this->autoloadClasses[$classKey])) {
-                // There is already a class registered here. Only override if higher priority.
-                if ($this->autoloadClasses[$classKey][1]->getPriority() < $addon->getPriority()) {
-                    $bak = $this->autoloadClasses[$classKey];
-                    $this->autoloadClasses[$classKey] = [$addon->path($subpath), $addon];
+                if (isset($this->autoloadClasses[$classKey])) {
+                    $orderedByPriority = [];
+                    $addonAdded = false;
+                    foreach($this->autoloadClasses[$classKey] as $loadedClassNamespace => $loadedClassData) {
+                        $loadedClassAddon = $loadedClassData['addon'];
+                        if (!$addonAdded && $addon->getPriority() < $loadedClassAddon->getPriority()) {
+                            $orderedByPriority[$namespace] = [
+                                'filePath' => $addon->path($subpath),
+                                'className' => $className,
+                                'addon' => $addon,
+                            ];
+                            $addonAdded = true;
+                        }
+                        $orderedByPriority[$loadedClassNamespace] = $loadedClassData;
+                    }
+                    // Make sure we add the addon hes last after the priority check!
+                    if (!$addonAdded) {
+                        $orderedByPriority[$namespace] = [
+                            'filePath' => $addon->path($subpath),
+                            'className' => $className,
+                            'addon' => $addon,
+                        ];
+                    }
+                    $this->autoloadClasses[$classKey] = $orderedByPriority;
                 } else {
-                    $bak = [$addon->path($subpath), $addon];
+                    $this->autoloadClasses[$classKey][$namespace] = [
+                        'filePath' => $addon->path($subpath),
+                        'className' => $className,
+                        'addon' => $addon,
+                    ];
                 }
-                $this->autoloadClassesBak[$classKey][] = $bak;
-            } else {
-                $this->autoloadClasses[$classKey] = [$addon->path($subpath), $addon];
             }
         }
     }
@@ -868,23 +902,12 @@ class AddonManager {
         unset($this->enabled[$addon->getType().'/'.$addon->getKey()]);
 
         // Remove all of the addon's classes from the autoloader.
-        foreach ($addon->getClasses() as $classKey => $row) {
-//            list($class, $subpath) = $row;
-            unset($this->autoloadClasses[$classKey]);
-
-            // See if there is another class that can be registered in place.
-            if (!empty($this->autoloadClassesBak[$classKey])) {
-                foreach ($this->autoloadClassesBak[$classKey] as $i => $rowBak) {
-                    list($path, $addon) = $rowBak;
-                    /* @var Addon $maxAddon */
-                    if (!isset($maxAddon) || $maxAddon->getPriority() < $addon->getPriority()) {
-                        $maxAddon = $addon;
-                        $maxIndex = $i;
+        foreach ($addon->getClasses() as $classKey => $classInfo) {
+            if (isset($this->autoloadClasses[$classKey])) {
+                foreach($this->autoloadClasses[$classKey] as $namespace => $classData) {
+                    if ($classData['namespace'] === $namespace) {
+                        unset($this->autoloadClasses[$classKey][$namespace]);
                     }
-                }
-                if (isset($maxIndex)) {
-                    $this->autoloadClasses[$classKey] = $this->autoloadClassesBak[$classKey][$maxIndex];
-                    unset($this->autoloadClassesBak[$classKey][$maxIndex]);
                 }
             }
         }

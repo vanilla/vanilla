@@ -50,18 +50,16 @@ class ConversationsHooks implements Gdn_IPlugin {
             $sql = $Sender->SQL;
             $sql
                 ->from('UserConversation as uc')
-                    ->join('Conversation as c', 'c.ConversationID = uc.ConversationID')
+                ->join('Conversation as c', 'c.ConversationID = uc.ConversationID')
                 ->where(['c.InsertUserID' => $UserID])
                 ->orWhere(['c.UpdateUserID' => $UserID])
-                ->delete()
-            ;
+                ->delete();
             $sql
                 ->from('ConversationMessage as cm')
-                    ->join('Conversation as c', 'c.ConversationID = cm.ConversationID')
+                ->join('Conversation as c', 'c.ConversationID = cm.ConversationID')
                 ->where(['c.InsertUserID' => $UserID])
                 ->orWhere(['c.UpdateUserID' => $UserID])
-                ->delete()
-            ;
+                ->delete();
 
             $Sender->SQL->delete('Conversation', array('InsertUserID' => $UserID));
             $Sender->SQL->delete('Conversation', array('UpdateUserID' => $UserID));

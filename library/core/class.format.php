@@ -1646,7 +1646,7 @@ EOT;
 
                 $Mixed = $Markdown->transform($Mixed);
                 $Mixed = $Formatter->format($Mixed);
-                $Mixed = Gdn_Format::processHTML($Mixed);
+                $Mixed = Gdn_Format::processHTML($Mixed, false);
                 return $Mixed;
             }
         }
@@ -1657,13 +1657,16 @@ EOT;
      * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
      *
      * @param string $html An unparsed HTML string.
+     * @param string $mentions Wether we do mentions or not
      * @return string The formatted HTML string.
      */
-    protected static function processHTML($html) {
+    protected static function processHTML($html, $mentions = true) {
         // Fire a filter event here first so that it doesn't have to deal with the other formatters.
         $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
         $html = Gdn_Format::links($html);
-        $html = Gdn_Format::mentions($html);
+        if ($mentions) {
+            $html = Gdn_Format::mentions($html);
+        }
         $html = Emoji::instance()->translateToHtml($html);
         $html = Gdn_Format::legacySpoilers($html);
         return $html;

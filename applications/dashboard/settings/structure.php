@@ -654,6 +654,33 @@ if (!$FullNameColumnExists) {
         ->set();
 }
 
+// Tag moved from plugins to core.
+$Construct->table('Permission');
+if ($Construct->columnExists('Plugins.Tagging.Add')) {
+    // Rename the permission column.
+    $Construct->renameColumn('Plugins.Tagging.Add', 'Vanilla.Tagging.Add');
+
+    // Update the configurations.
+    $configNotFound = Gdn::config()->NotFound;
+    $configs = [
+        'Vanilla.Tagging.CategorySearch'    => 'Plugins.Tagging.CategorySearch',
+        'Vanilla.Tagging.DisableInline'     => 'Plugins.Tagging.DisableInline',
+        'Vanilla.Tagging.UI.Enabled'        => 'EnabledPlugins.Tagging',
+        'Vanilla.Tagging.Max'               => 'Plugin.Tagging.Max', // Missing s is not a typo
+        'Vanilla.Tagging.Required'          => 'Plugins.Tagging.Required',
+        'Vanilla.Tagging.ShowLimit'         => 'Plugins.Tagging.ShowLimit',
+        'Vanilla.Tagging.StringTags'        => 'Plugins.Tagging.StringTags',
+        'Vanilla.Tagging.UseCategories'     => 'Plugins.Tagging.UseCategories',
+    ];
+    foreach ($configs as $newConfig => $oldConfig) {
+        if (Gdn::config()->find($oldConfig, false) !== $configNotFound) {
+            touchConfig($newConfig, c($oldConfig));
+        }
+    }
+} else if (!$Construct->columnExists('Vanilla.Tagging.Add')) {
+    $PermissionModel->define(['Vanilla.Tagging.Add' => 'Garden.Profiles.Edit']);
+}
+
 $Construct->table('Log')
     ->primaryKey('LogID')
     ->column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), false, 'index')

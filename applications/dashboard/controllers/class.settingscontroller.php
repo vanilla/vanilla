@@ -966,6 +966,34 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Manages the Vanilla.Tagging.UI.Enabled setting.
+     *
+     * @param String $value Either 'true' or 'false', whether to enable tagging.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function enableTagging($value) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        $value = strtolower($value);
+        if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            saveToConfig('Vanilla.Tagging.UI.Enabled', $value === 'true');
+            if ($value === 'true') {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
+                $this->informMessage(sprintf(t('%s enabled.'), t('Tagging')));
+            } else {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                $this->jsonTarget('.js-foggy', 'foggyOn', 'Trigger');
+                $this->informMessage(sprintf(t('%s disabled.'), t('Tagging')));
+            }
+            $this->jsonTarget("#enable-tagging-toggle", $newToggle);
+        }
+        $this->render('blank', 'utility');
+    }
+
+    /**
      * Endpoint for retrieving current email image url.
      */
     public function emailImageUrl() {
@@ -1849,7 +1877,7 @@ class SettingsController extends DashboardController {
             $message = t('The theme with key %s could not be found and will not be started.');
             $this->Form->addError(sprintf($message, $enabledThemeKey));
         }
-        
+
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);

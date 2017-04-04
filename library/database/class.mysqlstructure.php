@@ -572,7 +572,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $Comment = "-- Existing: $ExistingColumnDef, New: $ColumnDef";
 
                 if ($ExistingColumnDef !== $ColumnDef) {
-                    if (strcasecmp($ExistingColumn->Type, 'varchar') === 0&& strcasecmp($Column->Type, 'varchar') === 0
+                    if (strcasecmp($ExistingColumn->Type, 'varchar') === 0 && strcasecmp($Column->Type, 'varchar') === 0
                             && $ExistingColumn->Length > $Column->Length) {
 
                         $charLength = $this->executeQuery("select max(char_length(`$ColumnName`)) as MaxLength from `$Px{$this->_TableName}`;")

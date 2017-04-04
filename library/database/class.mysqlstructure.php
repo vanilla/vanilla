@@ -575,7 +575,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                     if (strcasecmp($ExistingColumn->Type, 'varchar') === 0 && strcasecmp($Column->Type, 'varchar') === 0
                             && $ExistingColumn->Length > $Column->Length) {
 
-                        $charLength = $this->executeQuery("select max(char_length(`$ColumnName`)) as MaxLength from `$Px{$this->_TableName}`;")
+                        $charLength = $this->Database->query("select max(char_length(`$ColumnName`)) as MaxLength from `$Px{$this->_TableName}`;")
                             ->firstRow(DATASET_TYPE_ARRAY);
 
                         if ($charLength['MaxLength'] > $Column->Length) {

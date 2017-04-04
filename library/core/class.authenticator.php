@@ -64,6 +64,9 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /** @var array  */
     public $_DataHooks = array();
 
+    /** @var string */
+    public $Token;
+
     /**
      * Returns the unique id assigned to the user in the database.
      *
@@ -272,24 +275,21 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      *
      *
      * @return array|bool|stdClass
-     * @throws Exception
      */
     public function getToken() {
-        $Provider = $this->getProvider();
-        if (is_null($this->Token)) {
-            $UserID = Gdn::authenticator()->getIdentity();
-            $UserAuthenticationData = Gdn::sql()->select('uat.*')
-                ->from('UserAuthenticationToken uat')
-                ->join('UserAuthentication ua', 'ua.ForeignUserKey = uat.ForeignUserKey')
-                ->where('ua.UserID', $UserID)
-                ->where('ua.ProviderKey', $Provider['AuthenticationKey'])
-                ->limit(1)
-                ->get();
+        $uatModel = new UserAuthenticationTokenModel();
+        $provider = $this->getProvider();
 
-            if ($UserAuthenticationData->numRows()) {
-                $this->Token = $UserAuthenticationData->firstRow(DATASET_TYPE_ARRAY);
-            } else {
+        if (is_null($this->Token)) {
+            $token = $uatModel->getByAuth(
+                Gdn::authenticator()->getIdentity(),
+                $provider['AuthenticationKey']
+            );
+
+            if ($token === false) {
                 return false;
+            } else {
+                $this->Token = $token;
             }
         }
 
@@ -331,7 +331,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     public function createToken($TokenType, $ProviderKey, $UserKey = null, $Authorized = false) {
         $TokenKey = implode('.', array('token', $ProviderKey, time(), mt_rand(0, 100000)));
         $TokenSecret = sha1(md5(implode('.', array($TokenKey, mt_rand(0, 100000)))));
-        $Timestamp = time();
+        $uatModel = new UserAuthenticationTokenModel();
 
         $Lifetime = Gdn::config('Garden.Authenticators.handshake.TokenLifetime', 60);
         if ($Lifetime == 0 && $TokenType == 'request') {
@@ -353,9 +353,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
         }
 
         try {
-            Gdn::sql()
-                ->set('Timestamp', 'NOW()', false)
-                ->insert('UserAuthenticationToken', $InsertArray);
+            $uatModel->insert($InsertArray);
 
             if ($TokenType == 'access' && !is_null($UserKey)) {
                 $this->deleteToken($ProviderKey, $UserKey, 'request');
@@ -374,60 +372,45 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @return bool
      */
     public function authorizeToken($TokenKey) {
+        $uatModel = new UserAuthenticationTokenModel();
+        $result = true;
         try {
-            Gdn::database()->sql()->update('UserAuthenticationToken uat')
-                ->set('Authorized', 1)
-                ->where('Token', $TokenKey)
-                ->put();
+            $uatModel->update(['Authorized' => 1], ['Token' => $TokenKey]);
         } catch (Exception $e) {
-            return false;
+            $result = false;
         }
-        return true;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $ProviderKey
-     * @param $UserKey
-     * @param null $TokenType
+     * @param $providerKey
+     * @param $userKey
+     * @param null $tokenType
      * @return array|bool|stdClass
      */
-    public function lookupToken($ProviderKey, $UserKey, $TokenType = null) {
-
-        $TokenData = Gdn::database()->sql()
-            ->select('uat.*')
-            ->from('UserAuthenticationToken uat')
-            ->where('uat.ForeignUserKey', $UserKey)
-            ->where('uat.ProviderKey', $ProviderKey)
-            ->beginWhereGroup()
-            ->where('(uat.Timestamp + uat.Lifetime) >=', 'NOW()', true, false)
-            ->orWhere('uat.Lifetime', 0)
-            ->endWhereGroup()
-            ->get()
-            ->firstRow(DATASET_TYPE_ARRAY);
-
-        if ($TokenData && (is_null($TokenType) || strtolower($TokenType) == strtolower($TokenData['TokenType']))) {
-            return $TokenData;
-        }
-
-        return false;
+    public function lookupToken($providerKey, $userKey, $tokenType = null) {
+        deprecated(self::class.'::'.__METHOD__, 'UserAuthenticationTokenModel::lookup');
+        $uatModel = new UserAuthenticationTokenModel();
+        $result = $uatModel->lookup($providerKey, $userKey, $tokenType);
+        return $result;
     }
 
     /**
+     * Remove a record from the UserAuthenticationToken table.
      *
-     *
-     * @param $ProviderKey
-     * @param $UserKey
-     * @param $TokenType
+     * @param string $providerKey
+     * @param string $userKey
+     * @param string $tokenType
      */
-    public function deleteToken($ProviderKey, $UserKey, $TokenType) {
-        Gdn::database()->sql()
-            ->from('UserAuthenticationToken')
-            ->where('ProviderKey', $ProviderKey)
-            ->where('ForeignUserKey', $UserKey)
-            ->where('TokenType', $TokenType)
-            ->delete();
+    public function deleteToken($providerKey, $userKey, $tokenType) {
+        $uatModel = new UserAuthenticationTokenModel();
+        $uatModel->delete([
+            'ProviderKey' => $providerKey,
+            'ForeignUserKey' => $userKey,
+            'TokenType' => $tokenType
+        ]);
     }
 
     /**

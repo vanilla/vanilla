@@ -749,16 +749,21 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Token
+     * @param $token
      * @return null|OAuthToken
      */
-    public function getOAuthToken($Token) {
-        $Row = Gdn::sql()->getWhere('UserAuthenticationToken', array('Token' => $Token, 'ProviderKey' => self::ProviderKey))->firstRow(DATASET_TYPE_ARRAY);
-        if ($Row) {
-            return new OAuthToken($Row['Token'], $Row['TokenSecret']);
-        } else {
-            return null;
+    public function getOAuthToken($token) {
+        $uatModel = new UserAuthenticationTokenModel();
+        $result = null;
+        $row = $uatModel->getWhere([
+            'Token' => $token,
+            'ProviderKey' => self::ProviderKey
+        ])->firstRow(DATASET_TYPE_ARRAY);
+
+        if ($row) {
+            $result = new OAuthToken($row['Token'], $row['TokenSecret']);
         }
+        return $result;
     }
 
     /**
@@ -801,38 +806,46 @@ class TwitterPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Token
-     * @param null $Secret
-     * @param string $Type
+     * @param $token
+     * @param null $secret
+     * @param string $type
      */
-    public function setOAuthToken($Token, $Secret = null, $Type = 'request') {
-        if (is_a($Token, 'OAuthToken')) {
-            $Secret = $Token->secret;
-            $Token = $Token->key;
+    public function setOAuthToken($token, $secret = null, $type = 'request') {
+        $uatModel = new UserAuthenticationTokenModel();
+
+        if (is_a($token, 'OAuthToken')) {
+            $secret = $token->secret;
+            $token = $token->key;
         }
 
         // Insert the token.
-        $Data = array(
-            'Token' => $Token,
+        $data = [
+            'Token' => $token,
             'ProviderKey' => self::ProviderKey,
-            'TokenSecret' => $Secret,
-            'TokenType' => $Type,
+            'TokenSecret' => $secret,
+            'TokenType' => $type,
             'Authorized' => false,
-            'Lifetime' => 60 * 5);
-        Gdn::sql()->options('Ignore', true)->insert('UserAuthenticationToken', $Data);
+            'Lifetime' => 60 * 5
+        ];
+        $uatModel->insert($data);
     }
 
     /**
      *
      *
-     * @param $Token
+     * @param $token
      */
-    public function deleteOAuthToken($Token) {
-        if (is_a($Token, 'OAuthToken')) {
-            $Token = $Token->key;
+    public function deleteOAuthToken($token) {
+        $uatModel = new UserAuthenticationTokenModel();
+
+        if (is_a($token, 'OAuthToken')) {
+            $token = $token->key;
         }
 
-        Gdn::sql()->delete('UserAuthenticationToken', array('Token' => $Token, 'ProviderKey' => self::ProviderKey));
+        $uatModel->delete([
+            'Token' => $token,
+            'ProviderKey' => self::ProviderKey
+        ]);
     }
 
     /**

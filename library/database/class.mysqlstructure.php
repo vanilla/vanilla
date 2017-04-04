@@ -585,7 +585,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                             Logger::event(
                                 'structure_integrity',
                                 Logger::ALERT,
-                                "Cannot modify {tableName}'s column {column} because it has a value of {maxVarcharLength,number} and the new length is {newLength,number} threshold.",
+                                "Cannot modify {tableName}'s column {column} because it has a value that is {maxVarcharLength,number} and the new length is {newLength,number}.",
                                 [
                                     'tableName' => $this->tableName(),
                                     'column' => $ColumnName,

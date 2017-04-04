@@ -572,6 +572,32 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $Comment = "-- Existing: $ExistingColumnDef, New: $ColumnDef";
 
                 if ($ExistingColumnDef !== $ColumnDef) {
+                    if (strcasecmp($ExistingColumn->Type, 'varchar') === 0&& strcasecmp($Column->Type, 'varchar') === 0
+                            && $ExistingColumn->Length > $Column->Length) {
+
+                        $charLength = $this->executeQuery("select max(char_length(`$ColumnName`)) as MaxLength from `$Px{$this->_TableName}`;")
+                            ->firstRow(DATASET_TYPE_ARRAY);
+
+                        if ($charLength['MaxLength'] > $Column->Length) {
+                            $this->addIssue("The table's column was not altered because it contains a varchar of length {$charLength['MaxLength']}.", $Comment);
+
+                            // Log an event to be captured and analysed later.
+                            Logger::event(
+                                'structure_integrity',
+                                Logger::ALERT,
+                                "Cannot modify {tableName}'s column {column} because it has a value of {maxVarcharLength,number} and the new length it {rowThreshold,number} threshold.",
+                                [
+                                    'tableName' => $this->tableName(),
+                                    'column' => $ColumnName,
+                                    'maxVarcharLength' => $charLength['MaxLength'],
+                                    'newLength' => $Column->Length,
+                                    'oldLength' => $ExistingColumn->Length,
+                                ]
+                            );
+                            continue;
+                        }
+                    }
+
                     // The existing & new column types do not match, so modify the column.
                     $ChangeSql = "$Comment\nchange `{$ExistingColumn->Name}` $ColumnDef";
                     $AlterSql[] = $ChangeSql;

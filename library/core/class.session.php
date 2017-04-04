@@ -425,8 +425,6 @@ class Gdn_Session {
         $this->UserID = $UserID !== false ? $UserID : Gdn::authenticator()->getIdentity();
         $this->User = false;
 
-        $this->ensureTransientKey();
-
         // Now retrieve user information
         if ($this->UserID > 0) {
             // Instantiate a UserModel to get session info
@@ -470,6 +468,9 @@ class Gdn_Session {
                 }
             }
         }
+
+        $this->ensureTransientKey();
+
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
             $guestPermissions = $UserModel->getPermissions(0);

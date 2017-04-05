@@ -224,7 +224,14 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         // Allow global translation of TagHint
-        $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+        if (c('Tagging.Discussions.Enabled')) {
+            $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
+            $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
+            $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
+            $Sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
+        }
+
+
 
         // Add symbols.
         if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
@@ -538,6 +545,53 @@ class DashboardHooks extends Gdn_Plugin {
                 $Sender->render('tags');
             break;
         }
+    }
+
+    /**
+     * Add the tag endpoint to the discussionController
+     *
+     * @param DiscussionController $sender
+     * @param int $discussionID
+     * @throws Exception
+     *
+     */
+    public function discussionController_tag_create($sender, $discussionID, $origin) {
+        if (!c('Tagging.Discussions.Enabled')) {
+            throw new Exception('Not found', 404);
+        }
+
+        if (!filter_var($discussionID, FILTER_VALIDATE_INT)) {
+            return;
+        }
+
+        $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            return;
+        }
+
+        $sender->title('Add Tags');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $rawFormTags = $sender->Form->getFormValue('Tags');
+            $formTags = TagModel::splitTags($rawFormTags);
+
+            if (!$formTags) {
+                $sender->Form->addError('@'.t('No tags provided.'));
+            } else {
+                // If we're associating with categories
+                $categoryID = 0;
+                if (c('Vanilla.Tagging.CategorySearch', false)) {
+                    $categoryID = val('CategoryID', $discussion, 0);
+                }
+
+                // Save the tags to the db.
+                TagModel::instance()->saveDiscussion($discussionID, $formTags, 'Tag', $categoryID);
+
+                $sender->informMessage(t('The tags have been added to the discussion.'));
+            }
+        }
+
+        $sender->render('tag', 'discussion', 'vanilla');
     }
 
     /**

@@ -338,6 +338,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
         $canMove = $canEdit && $session->checkPermission('Garden.Moderation.Manage');
         $canRefetch = $canEdit && valr('Attributes.ForeignUrl', $discussion);
         $canDismiss = c('Vanilla.Discussions.Dismiss', 1) && $discussion->Announce == '1' && $discussion->Dismissed != '1' && $session->isValid();
+        $canTag = c('Tagging.Discussions.Enabled') && checkPermission('Vanilla.Tagging.Add') && in_array(strtolower($sender->ControllerName), ['discussionscontroller', 'categoriescontroller']) ;
 
         if ($canEdit && $timeLeft) {
             $timeLeft = ' ('.Gdn_Format::seconds($timeLeft).')';
@@ -350,6 +351,7 @@ if (!function_exists('getDiscussionOptionsDropdown')):
             ->addLinkIf($canClose, t($discussion->Closed ? 'Reopen' : 'Close'), '/discussion/close?discussionid='.$discussionID.'&close='.(int)!$discussion->Closed, 'close', 'CloseDiscussion Hijack')
             ->addLinkIf($canRefetch, t('Refetch Page'), '/discussion/refetchpageinfo.json?discussionid='.$discussionID, 'refetch', 'RefetchPage Hijack')
             ->addLinkIf($canMove, t('Move'), '/moderation/confirmdiscussionmoves?discussionid='.$discussionID, 'move', 'MoveDiscussion Popup')
+            ->addLinkIf($canTag, t('Tag'), '/discussion/tag?discussionid='.$discussionID, 'tag', 'TagDiscussion Popup')
             ->addLinkIf($canDelete, t('Delete Discussion'), '/discussion/delete?discussionid='.$discussionID.'&target='.$categoryUrl, 'delete', 'DeleteDiscussion Popup');
 
         // DEPRECATED

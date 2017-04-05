@@ -501,6 +501,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $existingColumns = array_change_key_case($this->existingColumns());
         $columns = array_change_key_case($this->_Columns);
         $AlterSql = array();
+        $InvalidAlterSqlCount = 0;
 
         // 1. Remove any unnecessary columns if this is an explicit modification
         if ($Explicit) {
@@ -569,11 +570,46 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
                 $ExistingColumnDef = $this->_defineColumn($ExistingColumn);
                 $ColumnDef = $this->_defineColumn($Column);
-                $Comment = "-- Existing: $ExistingColumnDef, New: $ColumnDef";
+                $Comment = "-- [Existing: $ExistingColumnDef, New: $ColumnDef]";
 
                 if ($ExistingColumnDef !== $ColumnDef) {
+
                     // The existing & new column types do not match, so modify the column.
                     $ChangeSql = "$Comment\nchange `{$ExistingColumn->Name}` $ColumnDef";
+
+                    if (strcasecmp($ExistingColumn->Type, 'varchar') === 0 && strcasecmp($Column->Type, 'varchar') === 0
+                            && $ExistingColumn->Length > $Column->Length) {
+
+                        $charLength = $this->Database->query("select max(char_length(`$ColumnName`)) as MaxLength from `$Px{$this->_TableName}`;")
+                            ->firstRow(DATASET_TYPE_ARRAY);
+
+                        if ($charLength['MaxLength'] > $Column->Length) {
+                            if ($this->CaptureOnly) {
+                                $ChangeSql = str_replace($Comment."\n", $Comment."\n-- [Integrity Error: The column contains data ({$charLength['MaxLength']} characters) that would be truncated]\n-- ", $ChangeSql);
+                                $InvalidAlterSqlCount++;
+                            } else {
+                                $this->addIssue("The table's column was not altered because it contains a varchar of length {$charLength['MaxLength']}.", $Comment);
+
+                                // Log an event to be captured and analysed later.
+                                Logger::event(
+                                    'structure_integrity',
+                                    Logger::ALERT,
+                                    "Cannot modify {tableName}'s column {column} because it has a value that is {maxVarcharLength,number} characters long and the new length is {newLength,number}.",
+                                    [
+                                        'tableName' => $this->tableName(),
+                                        'column' => $ColumnName,
+                                        'maxVarcharLength' => $charLength['MaxLength'],
+                                        'newLength' => $Column->Length,
+                                        'oldLength' => $ExistingColumn->Length,
+                                    ]
+                                );
+
+                                // Skip adding the column to the query.
+                                continue;
+                            }
+                        }
+                    }
+
                     $AlterSql[] = $ChangeSql;
 
                     // Check for a modification from an enum to an int.
@@ -611,8 +647,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             $AlterSql[] = "convert to $charsetSql";
         }
 
-        if (count($AlterSql) > 0) {
-            if (!$this->executeQuery($AlterSqlPrefix.implode(",\n", $AlterSql), true)) {
+        if (count($AlterSql)) {
+            $BuiltQuery = $AlterSqlPrefix.implode(",\n", $AlterSql);
+            if (count($AlterSql) === $InvalidAlterSqlCount) {
+                $BuiltQuery = '-- '.$BuiltQuery;
+            }
+            if (!$this->executeQuery($BuiltQuery, true)) {
                 throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }

@@ -258,7 +258,7 @@ $Construct->table('UserAuthenticationNonce')
 
 $Construct->table('UserAuthenticationToken')
     ->column('Token', 'varchar(128)', false, 'primary')
-    ->column('ProviderKey', 'varchar(64)', false, 'primary')
+    ->column('ProviderKey', 'varchar(50)', false, 'primary')
     ->column('ForeignUserKey', 'varchar(100)', true)
     ->column('TokenSecret', 'varchar(64)', false)
     ->column('TokenType', array('request', 'access'), false)

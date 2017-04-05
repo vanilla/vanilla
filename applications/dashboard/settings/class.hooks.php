@@ -579,9 +579,9 @@ class DashboardHooks extends Gdn_Plugin {
                 $sender->Form->addError('@'.t('No tags provided.'));
             } else {
                 // If we're associating with categories
-                $categoryID = 0;
+                $categoryID = -1;
                 if (c('Vanilla.Tagging.CategorySearch', false)) {
-                    $categoryID = val('CategoryID', $discussion, 0);
+                    $categoryID = val('CategoryID', $discussion, -1);
                 }
 
                 // Save the tags to the db.

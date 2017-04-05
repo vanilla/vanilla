@@ -809,25 +809,34 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $token
      * @param null $secret
      * @param string $type
+     * @return bool
      */
     public function setOAuthToken($token, $secret = null, $type = 'request') {
         $uatModel = new UserAuthenticationTokenModel();
+        $result = false;
 
         if (is_a($token, 'OAuthToken')) {
             $secret = $token->secret;
             $token = $token->key;
         }
 
-        // Insert the token.
-        $data = [
-            'Token' => $token,
-            'ProviderKey' => self::ProviderKey,
+        $set = [
             'TokenSecret' => $secret,
             'TokenType' => $type,
-            'Authorized' => false,
+            'Authorized' => 0,
             'Lifetime' => 60 * 5
         ];
-        $uatModel->insert($data);
+        $where = [
+            'Token' => $token,
+            'ProviderKey' => self::ProviderKey
+        ];
+        $row = $uatModel->getWhere($where, '', '', 1)->firstRow();
+
+        if ($row === false) {
+            $result = $uatModel->insert(array_merge($set, $where));
+        }
+
+        return $result;
     }
 
     /**

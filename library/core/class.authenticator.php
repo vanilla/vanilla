@@ -344,7 +344,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             'TokenType' => $TokenType,
             'ProviderKey' => $ProviderKey,
             'Lifetime' => $Lifetime,
-            'Authorized' => $Authorized,
+            'Authorized' => ($Authorized ? 1 : 0),
             'ForeignUserKey' => null
         );
 

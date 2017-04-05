@@ -22,6 +22,7 @@ class UserAuthenticationTokenModel extends Gdn_Model {
      */
     public function insert($fields) {
         $this->prune();
+
         return parent::insert($fields);
     }
 

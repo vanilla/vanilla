@@ -777,6 +777,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * @param int $categoryID
+     * @param array $options
+     * @return array
+     */
+    public function getTree($categoryID, array $options = []) {
+        $result = $this->collection->getTree($categoryID, $options);
+        return $result;
+    }
+
+    /**
      * @param int|string $id The parent category ID or slug.
      * @param int|null $offset Offset results by given value.
      * @param int|null $limit Total number of results should not exceed this value.

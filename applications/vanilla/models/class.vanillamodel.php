@@ -50,7 +50,7 @@ abstract class VanillaModel extends Gdn_Model {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
         }
 
-        $storageObject = FloodControlHelper::configure($this, $type);
+        $storageObject = FloodControlHelper::configure($this, 'Vanilla', $type);
         $isUserSpamming = $this->isUserSpamming($session->User->UserID, $storageObject);
 
         return $isUserSpamming;

@@ -27,7 +27,7 @@ echo heading(t('Flood Control'));
         <tbody>
         <tr>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamCount', $SpamCount); ?>
+                <?php echo c('Vanilla.Discussion.SpamCount'). $this->Form->DropDown('Vanilla.Discussion.SpamCount', $SpamCount); ?>
                 <?php echo t('discussion(s)'); ?>
             </td>
             <td class="Alt">

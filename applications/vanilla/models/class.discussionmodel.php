@@ -98,7 +98,7 @@ class DiscussionModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Discussion');
-        $this->floodGate = FloodControlHelper::configure($this, 'Discussion');
+        $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Discussion');
     }
 
     /**

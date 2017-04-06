@@ -1105,7 +1105,7 @@ class ActivityModel extends Gdn_Model {
                 $Comment['ActivityID'] = $CommentActivityID;
             }
 
-            $storageObject = FloodControlHelper::configure($this, 'ActivityComment');
+            $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'ActivityComment');
             if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
                 return false;
             }
@@ -1483,7 +1483,7 @@ class ActivityModel extends Gdn_Model {
         $ActivityID = val('ActivityID', $Activity);
         if (!$ActivityID) {
             if (!$Delete) {
-                $storageObject = FloodControlHelper::configure($this, 'Activity');
+                $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'Activity');
                 if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
                     return false;
                 }

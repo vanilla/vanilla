@@ -16,7 +16,7 @@ if (strtolower($tagType) == 'all' || strtolower($tagType) == 'tags') {
     echo heading(t($this->data('Title')));
 }
 
-$enabled = c('Tagging.Discussions.Enabled', true);
+$enabled = c('Tagging.Discussions.Enabled');
 ?>
 <div class="form-group">
     <div class="label-wrap-wide">

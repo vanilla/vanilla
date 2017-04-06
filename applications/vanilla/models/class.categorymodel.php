@@ -263,6 +263,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the maximum number of available pages when viewing a list of categories.
+     *
+     * @return int
+     */
+    public function getMaxPages() {
+        $maxPages = (int)c('Vanilla.Categories.MaxPages') ?: 100;
+        return $maxPages;
+    }
+
+    /**
      * Get the display type for the root category.
      *
      * @return string

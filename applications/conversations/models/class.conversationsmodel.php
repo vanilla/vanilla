@@ -28,7 +28,7 @@ abstract class ConversationsModel extends Gdn_Model {
      */
     public function __construct($Name = '') {
         parent::__construct($Name);
-        $this->floodGate = FloodControlHelper::configure($this, $this->Name);
+        $this->floodGate = FloodControlHelper::configure($this, 'Conversations', $this->Name);
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class ConversationsModel extends Gdn_Model {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
         }
 
-        $storageObject = FloodControlHelper::configure($this, $type);
+        $storageObject = FloodControlHelper::configure($this, 'Conversations', $type);
         return $this->isUserSpamming($session->User->UserID, $storageObject);
     }
 

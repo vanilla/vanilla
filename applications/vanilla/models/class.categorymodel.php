@@ -787,6 +787,8 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get a category tree.
+     *
      * @param int $categoryID
      * @param array $options
      * @return array
@@ -3176,6 +3178,44 @@ SQL;
         }
 
         self::instance()->clearCache();
+    }
+
+    /**
+     * Search for categories by name.
+     *
+     * @param string $name The whole or partial category name to search for.
+     * @param bool $expandParent Expand the parent category record.
+     * @param int|null $limit Limit the total number of results.
+     * @param int|null $offset Offset the results.
+     * @return array
+     */
+    public function searchByName($name, $expandParent = false, $limit = null, $offset = null) {
+        if ($limit !== null && filter_var($limit, FILTER_VALIDATE_INT) === false) {
+            $limit = null;
+        }
+        if ($offset !== null && filter_var($offset, FILTER_VALIDATE_INT) === false) {
+            $offset = null;
+        }
+
+        $query = $this->SQL
+            ->from('Category c')
+            ->like('Name', $name);
+        if ($limit !== null) {
+            $offset = ($offset === null ? false : $offset);
+            $query->limit($limit, $offset);
+        }
+
+        $result = $query->get()->resultArray();
+        foreach ($result as &$category) {
+            self::calculate($category);
+            self::calculateUser($category);
+
+            if ($expandParent) {
+                $category['Parent'] = static::categories($category['ParentCategoryID']);
+            }
+        }
+
+        return $result;
     }
 
     /**

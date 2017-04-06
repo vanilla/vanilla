@@ -12,7 +12,7 @@ use Garden\Web\Exception\ServerException;
 /**
  * API Controller for the `/categories` resource.
  */
-class CategoriesAPIController extends AbstractApiController {
+class CategoriesApiController extends AbstractApiController {
 
     /** @var CategoryModel */
     private $categoryModel;
@@ -21,7 +21,7 @@ class CategoriesAPIController extends AbstractApiController {
     private $categorySchema;
 
     /**
-     * CommentsApiController constructor.
+     * CategoriessApiController constructor.
      *
      * @param CategoryModel $categoryModel
      */
@@ -77,6 +77,43 @@ class CategoriesAPIController extends AbstractApiController {
             'countAllDiscussions:i' => 'Total of all discussions in a category and its children.',
             'countAllComments:i' => 'Total of all comments in a category and its children.'
         ]);
+    }
+
+    /**
+     * Search categories.
+     *
+     * @param array $query The query string.
+     * @return array
+     */
+    public function get_search(array $query) {
+        $this->permission('Garden.SignIn.Allow');
+
+        $in = $this->schema([
+            'query:s' => 'Category name filter.',
+            'page:i?' => [
+                'description' => 'Page number.',
+                'default' => 1,
+                'minimum' => 1,
+                'maximum' => $this->categoryModel->getMaxPages()
+            ],
+            'expand:b?' => [
+                'default' => false,
+                'description' => 'Expand with the parent record.'
+            ]
+        ]);
+        $query = $in->validate($query);
+        $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
+
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        $rows = $this->categoryModel->searchByName(
+            $query['query'],
+            $query['expand'],
+            $limit,
+            $offset
+        );
+
+        $result = $out->validate($rows);
+        return $result;
     }
 
     /**
@@ -143,5 +180,22 @@ class CategoriesAPIController extends AbstractApiController {
             ]))
         ]));
         return $schema;
+    }
+
+    /**
+     * Get a category schema with an additional field for a parent record.
+     *
+     * @param bool $expand
+     * @return Schema
+     */
+    public function schemaWithParent($expand = false) {
+        $attributes = ['parentCategoryID:i' => 'Parent category ID.'];
+        if ($expand) {
+            $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlCode', 'url'])
+                ->add($this->fullSchema());
+        }
+        $schema = $this->fullSchema();
+        $result = $schema->merge(Schema::parse($attributes));
+        return $result;
     }
 }

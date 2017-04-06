@@ -349,7 +349,6 @@ class DashboardHooks extends Gdn_Plugin {
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
         $Sender->title('Tagging');
         $Sender->setHighlightRoute('settings/tagging');
-        $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
         $SQL = Gdn::sql();
 
         /** @var Gdn_Form $form */

@@ -209,7 +209,9 @@ class ConversationMessageModel extends ConversationsModel {
         $this->fireEvent('BeforeSaveValidation');
 
         // Determine if spam check should be skipped.
-        $this->setFloodControlEnabled(empty($Options['NewConversation']));
+        if (!$Session->User->Admin && !$Session->checkPermission('Garden.Moderation.Manage')) {
+            $this->setFloodControlEnabled(empty($Options['NewConversation']));
+        }
 
         // Validate the form posted values
         $MessageID = false;

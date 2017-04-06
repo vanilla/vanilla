@@ -51,7 +51,7 @@ class CommentModel extends Gdn_Model {
      */
     public function __construct() {
         parent::__construct('Comment');
-        $this->floodGate = FloodControlHelper::configure($this, 'Comment');
+        $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');
     }

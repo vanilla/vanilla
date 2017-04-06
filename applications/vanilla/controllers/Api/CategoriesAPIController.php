@@ -91,7 +91,7 @@ class CategoriesAPIController extends AbstractApiController {
         $in = $this->schema([
             'parentCategoryID:i?' => 'Parent category ID.',
             'parentCategoryCode:s?' => 'Parent category URL code.',
-            'depth:i?' => [
+            'maxDepth:i?' => [
                 'description' => '',
                 'default' => 2
             ],
@@ -99,22 +99,30 @@ class CategoriesAPIController extends AbstractApiController {
                 'description' => 'Page number.',
                 'default' => 1,
                 'minimum' => 1,
-                'maximum' => 100
+                'maximum' => $this->categoryModel->getMaxPages()
             ],
         ], 'in')->setDescription('List categories.');
         $out = $this->schema([':a' => $this->schemaWithChildren()], 'out');
 
         $query = $in->validate($query);
         if (array_key_exists('parentCategoryID', $query)) {
-            $parentID = $query['parentCategoryID'];
+            $parent = $this->category($query['parentCategoryID']);
         } elseif (array_key_exists('parentCategoryCode', $query)) {
             $parent = $this->category($query['parentCategoryCode']);
-            $parentID = $parent['CategoryID'];
         } else {
-            $parentID = null;
+            $parent = $this->category(-1);
         }
 
-        $categories = $this->categoryModel->getTree($parentID);
+        if ($parent['DisplayAs'] === 'Flat') {
+            list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+            $categories = $this->categoryModel->getTreeAsFlat(
+                $parent['CategoryID'],
+                $offset,
+                $limit
+            );
+        } else {
+            $categories = $this->categoryModel->getTree($parent['CategoryID'], ['maxdepth' => $query['maxDepth']]);
+        }
 
         return $out->validate($categories);
     }
@@ -126,8 +134,13 @@ class CategoriesAPIController extends AbstractApiController {
      */
     public function schemaWithChildren() {
         $schema = $this->fullSchema();
+
         $schema->merge(Schema::parse([
-            'children:a?' => $this->fullSchema()
+            'depth:i',
+            'children:a?' => $this->fullSchema()->merge(Schema::parse([
+                'depth:i',
+                'children:a'
+            ]))
         ]));
         return $schema;
     }

@@ -561,12 +561,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if (!filter_var($discussionID, FILTER_VALIDATE_INT)) {
-            return;
+            throw NotFoundException('Discussion');
         }
 
         $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$discussion) {
-            return;
+            throw NotFoundException('Discussion');
         }
 
         $sender->title('Add Tags');

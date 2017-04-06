@@ -89,7 +89,7 @@ $enabled = c('Tagging.Discussions.Enabled');
                     ->addLink(t('Delete'), "/settings/tags/delete/{$tag['TagID']}", 'delete', 'js-modal-confirm');
             }
             ?>
-            <div class="plank-wrapper">
+            <div id="Tag_<?php echo val('TagID', $tag) ?>" class="plank-wrapper">
                 <div class="plank">
                     <div class="plank-title">
                         <?php echo anchor(htmlspecialchars($displayName), '/discussions/tagged/'.val('Name', $tag), 'reverse-link'); ?>

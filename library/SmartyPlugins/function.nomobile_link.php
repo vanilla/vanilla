@@ -20,6 +20,6 @@ function smarty_function_nomobile_link($Params, &$Smarty) {
     return Gdn_Theme::link('profile/nomobile',
         val('text', $Params, t("Full Site")),
         val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)),
-        ['Class' => 'js-hijack']
+        ['class' => 'js-hijack']
     );
 }

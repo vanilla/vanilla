@@ -1948,7 +1948,7 @@ EOT;
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string Sanitized HTML.
      */
     public static function text($mixed, $addBreaks = true) {
         if (!is_string($mixed)) {
@@ -1977,13 +1977,17 @@ EOT;
      * Process as plain text + our magic formatting.
      *
      * @param string $Str
-     * @return string
+     * @return string Sanitized HTML.
      * @since 2.1
      */
     public static function textEx($Str) {
         $Str = self::text($Str);
         $Str = Gdn_Format::processHTML($Str);
-        return $Str;
+
+        // Always filter as the last step.
+        $Sanitized = Gdn_Format::htmlFilter($Str);
+
+        return $Sanitized;
     }
 
     /**

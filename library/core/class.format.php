@@ -869,35 +869,22 @@ class Gdn_Format {
      * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string HTML
+     * @return string Sanitized HTML.
      */
     public static function html($Mixed) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Html');
         } else {
-            if (self::isHtml($Mixed)) {
-                // Purify HTML
-                $Mixed = Gdn_Format::htmlFilter($Mixed);
-
-                // nl2br
-                if (c('Garden.Format.ReplaceNewlines', true)) {
-                    $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
-                    $Mixed = fixNl2Br($Mixed);
-                }
-
-                $Result = Gdn_Format::processHTML($Mixed);
-            } else {
-                // The text does not contain HTML and does not have to be purified.
-                // This is an optimization because purifying is very slow and memory intense.
-                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
-                if (c('Garden.Format.ReplaceNewlines', true)) {
-                    $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
-                    $Result = fixNl2Br($Result);
-                }
-                $Result = Gdn_Format::processHTML($Result);
+            if (c('Garden.Format.ReplaceNewlines', true)) {
+                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+                $Mixed = fixNl2Br($Mixed);
             }
+            $Mixed = Gdn_Format::processHTML($Mixed);
 
-            return $Result;
+            // Always filter as the last step.
+            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            return $Sanitized;
         }
     }
 
@@ -907,7 +894,7 @@ class Gdn_Format {
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string HTML
+     * @return string Sanitized HTML.
      */
     public static function htmlFilter($Mixed) {
         if (!is_string($Mixed)) {
@@ -932,6 +919,8 @@ class Gdn_Format {
                 // Do HTML filtering before our special changes.
                 $Result = $Formatter->format($Mixed);
             } else {
+                // The text does not contain HTML and does not have to be purified.
+                // This is an optimization because purifying is very slow and memory intense.
                 $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             }
 
@@ -1049,7 +1038,7 @@ class Gdn_Format {
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
      * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
-     * @return string
+     * @return string Sanitized HTML.
      * @since 2.1
      */
     public static function plainText($Body, $Format = 'Html', $collapse = false) {
@@ -1076,7 +1065,12 @@ class Gdn_Format {
             $Result = strip_tags($Result);
         }
 
-        return trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+        $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+
+        // Always filter as the last step.
+        $Sanitized = Gdn_Format::htmlFilter($Result);
+
+        return $Sanitized;
     }
 
     /**

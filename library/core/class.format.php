@@ -263,10 +263,10 @@ class Gdn_Format {
     }
 
     /**
-     * Takes a mixed variable.
+     * Format BBCode into HTML.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string Sanitized HTML.
      */
     public static function bbCode($Mixed) {
         if (!is_string($Mixed)) {

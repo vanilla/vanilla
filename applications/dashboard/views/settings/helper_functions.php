@@ -161,7 +161,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
         $attr['aria-label'] = sprintf(t('Settings for %s'), $screenName);
         $attr['data-reload-page-on-save'] = false;
 
-        $media->addButton(dashboardSymbol('settings'), $settingsUrl, $attr);
+        $media->addButton(dashboardSymbol('settings'), url($settingsUrl), $attr);
     }
 
     // Toggle

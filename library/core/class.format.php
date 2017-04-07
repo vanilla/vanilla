@@ -1620,35 +1620,37 @@ EOT;
     }
 
     /**
-     * Format a string using Markdown syntax. Also purifies the output HTML.
+     * Format a string using Markdown syntax.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true
-     * @return string
+     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true.
+     * @return string Sanitized HTML.
      */
     public static function markdown($Mixed, $Flavored = true) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Markdown');
         } else {
-            $Formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($Formatter)) {
-                return Gdn_Format::display($Mixed);
-            } else {
-                $Markdown = new MarkdownVanilla();
+            $Markdown = new MarkdownVanilla();
 
-                // Add Vanilla customizations.
-                if ($Flavored) {
-                    $Markdown->addAllFlavor();
-                }
-
-                // Format mentions early since @_name_ would be transformed to @<em>name</em>
-                $Mixed = Gdn_Format::mentions($Mixed);
-
-                $Mixed = $Markdown->transform($Mixed);
-                $Mixed = $Formatter->format($Mixed);
-                $Mixed = Gdn_Format::processHTML($Mixed, false);
-                return $Mixed;
+            // Vanilla-flavored Markdown.
+            if ($Flavored) {
+                $Markdown->addAllFlavor();
             }
+
+            // Format mentions prior to Markdown parsing.
+            // Avoids `@_name_` transformed to `@<em>name</em>`.
+            $Mixed = Gdn_Format::mentions($Mixed);
+
+            // Markdown parsing.
+            $Mixed = $Markdown->transform($Mixed);
+
+            // Vanilla magic formatting.
+            $Mixed = Gdn_Format::processHTML($Mixed);
+
+            // Always filter as the last step.
+            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            return $Sanitized;
         }
     }
 

@@ -292,7 +292,6 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false), 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
 
-
             ->addGroup(t('Appearance'), 'appearance', '', -1)
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Branding'), '/dashboard/settings/branding', 'appearance.banner', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
@@ -301,24 +300,27 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
-            ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
 
+            ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
 
             ->addGroup(t('Discussions'), 'forum', '', ['after' => 'users'])
-                ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
+
             ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
+
             ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'reputation'])
-                ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
 
             ->addGroup(t('Site Settings'), 'site-settings', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'site-settings.locales', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
+
             ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
             ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'forum-data.import', '', $sort);
     }

@@ -29,14 +29,14 @@ class VanillaSettingsController extends Gdn_Controller {
     public $OtherCategories;
 
     /**
-     * Advanced settings.
+     * Posting settings.
      *
      * Allows setting configuration values via form elements.
      *
      * @since 2.0.0
      * @access public
      */
-    public function advanced() {
+    public function posting() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -103,9 +103,9 @@ class VanillaSettingsController extends Gdn_Controller {
 
         }
 
-        $this->setHighlightRoute('vanilla/settings/advanced');
+        $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');
-        $this->title(t('Advanced Forum Settings'));
+        $this->title(t('Posting'));
 
         // Render default view (settings/advanced.php)
         $this->render();

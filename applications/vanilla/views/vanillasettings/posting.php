@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"), 'settings/tutorials/category-management-and-advanced-settings'));
 ?>
-<h1><?php echo t('Advanced'); ?></h1>
+<h1><?php echo t('Posting Settings'); ?></h1>
 <?php
 /** @var Gdn_Form $form */
 $form = $this->Form;

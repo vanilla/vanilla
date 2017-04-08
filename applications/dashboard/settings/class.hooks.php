@@ -315,7 +315,7 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
 
-            ->addGroup(t('Site Settings'), 'site-settings', '', ['after' => 'reputation'])
+            ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
             ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'site-settings.locales', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)

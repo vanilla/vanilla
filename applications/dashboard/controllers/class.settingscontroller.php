@@ -459,15 +459,15 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Banner management screen.
+     * Branding management screen.
      *
      * @since 2.0.0
      * @access public
      */
-    public function banner() {
+    public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->setHighlightRoute('dashboard/settings/banner');
-        $this->title(t('Banner'));
+        $this->setHighlightRoute('dashboard/settings/branding');
+        $this->title(t('Branding'));
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.HomepageTitle' => [

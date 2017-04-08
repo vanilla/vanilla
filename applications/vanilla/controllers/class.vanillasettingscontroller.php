@@ -52,9 +52,7 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
-            'Garden.Format.WarnLeaving',
             'Garden.Format.DisableUrlEmbeds',
-            'Garden.TrustedDomains'
         ));
 
         // Set the model on the form.
@@ -62,13 +60,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
-            // Format trusted domains as a string
-            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
-            if (is_array($TrustedDomains)) {
-                $TrustedDomains = implode("\n", $TrustedDomains);
-            }
 
-            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
 
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
@@ -84,33 +76,24 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
 
-            // Format the trusted domains as an array based on newlines & spaces
-            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
-            $TrustedDomains = array_unique(array_filter($TrustedDomains));
-            $TrustedDomains = implode("\n", $TrustedDomains);
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
-            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
-
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved !== false) {
                 $this->informMessage(t("Your changes have been saved."));
             }
-
-            // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
-
         }
 
         $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');
         $this->title(t('Posting'));
 
-        // Render default view (settings/advanced.php)
+        // Render default view (settings/posting.php)
         $this->render();
     }
 
+    /**
+     *
+     */
     public function archive() {
         // Check permission
         $this->permission('Garden.Settings.Manage');

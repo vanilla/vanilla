@@ -715,6 +715,59 @@ class SettingsController extends DashboardController {
     }
 
     /**
+     * Security settings management screen.
+     *
+     * @since 2.4
+     * @access public
+     */
+    public function security() {
+        $this->permission('Garden.Settings.Manage');
+        $this->setHighlightRoute('dashboard/settings/security');
+        $this->title(t('Security'));
+
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Garden.TrustedDomains',
+            'Garden.Format.WarnLeaving',
+        ));
+
+        // Set the model on the form.
+        $this->Form->setModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($this->Form->authenticatedPostBack() === false) {
+            // Format trusted domains as a string
+            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
+            if (is_array($TrustedDomains)) {
+                $TrustedDomains = implode("\n", $TrustedDomains);
+            }
+
+            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+
+            // Apply the config settings to the form.
+            $this->Form->setData($ConfigurationModel->Data);
+        } else {
+            // Format the trusted domains as an array based on newlines & spaces
+            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
+            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
+            $TrustedDomains = array_unique(array_filter($TrustedDomains));
+            $TrustedDomains = implode("\n", $TrustedDomains);
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
+
+            if ($this->Form->save() !== false) {
+                $this->informMessage(t("Your settings have been saved."));
+            }
+
+            // Reformat array as string so it displays properly in the form
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+        }
+
+        $this->render();
+    }
+
+    /**
      * Outgoing Email management screen.
      *
      * @since 2.0.0

@@ -294,7 +294,7 @@ class DashboardHooks extends Gdn_Plugin {
 
             ->addGroup(t('Appearance'), 'appearance', '', -1)
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Branding'), '/dashboard/settings/branding', 'appearance.banner', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Layout'), '/dashboard/settings/layout', 'appearance.layout', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
             ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)

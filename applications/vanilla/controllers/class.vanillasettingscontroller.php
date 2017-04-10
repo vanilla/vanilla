@@ -92,6 +92,13 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
+     * Backwards compatibility. Remove after 2.5.
+     */
+    public function advanced() {
+        redirect('/vanillasettings/posting');
+    }
+
+    /**
      *
      */
     public function archive() {

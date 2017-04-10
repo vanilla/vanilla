@@ -606,12 +606,12 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Homepage management screen.
+     * Layout management screen.
      *
      * @since 2.0.0
      * @access public
      */
-    public function homepage() {
+    public function layout() {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
@@ -766,6 +766,23 @@ class SettingsController extends DashboardController {
 
         $this->render();
     }
+
+    /**
+     * Backwards compatibility. Remove after 2.5.
+     */
+    public function homepage() {
+        redirect('/settings/layout');
+    }
+
+    /**
+     * Backwards compatibility. Remove after 2.5.
+     */
+    public function banner() {
+        redirect('/settings/branding');
+    }
+
+
+
 
     /**
      * Outgoing Email management screen.

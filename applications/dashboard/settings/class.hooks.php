@@ -311,9 +311,9 @@ class DashboardHooks extends Gdn_Plugin {
             ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
 
             ->addGroup(t('Connections'), 'connect', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Social Connect', 'Social Media'), '/social/manage', 'connect.social', '', $sort)
 
             ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'connect'])
-            ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
 

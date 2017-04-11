@@ -112,21 +112,43 @@ echo $form->errors();
         </li>
         <li class="form-group">
             <div class="label-wrap">
-            <?php echo $form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
+                <?php echo $this->Form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
                 <div class="info">
                     <p>
-                    <?php
-                    echo t(
-                        'You can specify a whitelist of trusted domains.',
-                        'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for redirects and embedding.'
-                    );
-                    ?>
+                        <?php
+                        echo t(
+                            'You can specify a whitelist of trusted domains.',
+                            'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for redirects.'
+                        );
+                        ?>
                     </p>
-                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line. Use * for wildcard matches.'); ?></p>
+                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line.'); ?></p>
                 </div>
             </div>
             <div class="input-wrap">
-            <?php echo $form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
+                <?php echo $this->Form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
+            </div>
+        </li>
+        <li class="form-group">
+            <?php echo $this->Form->toggle('Garden.HTML.SanitizeEmbeds', 'Allow Images from Embeddable Domains Only.'); ?>
+        </li>
+        <li class="form-group">
+            <div class="label-wrap">
+                <?php echo $this->Form->label('Embeddable Domains', 'Garden.EmbeddableDomains'); ?>
+                <div class="info">
+                    <p>
+                        <?php
+                        echo t(
+                            'You can specify a whitelist of trusted domains.',
+                            'You can specify a whitelist of trusted domains (ex. yourdomain.com) that are safe for embedding.'
+                        );
+                        ?>
+                    </p>
+                    <p><strong><?php echo t('Note'); ?>:</strong> <?php echo t('Specify one domain per line.'); ?></p>
+                </div>
+            </div>
+            <div class="input-wrap">
+                <?php echo $this->Form->textBox('Garden.EmbeddableDomains', ['MultiLine' => true]); ?>
             </div>
         </li>
     </ul>

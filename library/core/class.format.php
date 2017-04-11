@@ -1669,6 +1669,9 @@ EOT;
         }
         $html = Emoji::instance()->translateToHtml($html);
         $html = Gdn_Format::legacySpoilers($html);
+        if (c('Garden.HTML.SanitizeEmbeds', false)) {
+            $html = Gdn_Format::sanitizeImages($html);
+        }
         return $html;
     }
 
@@ -1797,6 +1800,38 @@ EOT;
 
             return $Mixed;
         }
+    }
+
+    /**
+     * Optionally replace any embedded images from untrusted sites with links to the image.
+     *
+     * @param string $html String from which you might want to strip out untrusted images.
+     * @return string The string with images replaced by links.
+     */
+    public static function sanitizeImages($html) {
+        preg_match_all('/\<img\s+src\s*=\s*[\"\'](.*?)[\"\'].*\>/', $html, $matches, PREG_SET_ORDER);
+        // If no images are found in the HTML, pass the HTML to the renderer as is.
+        if (!$matches) {
+            return $html;
+        }
+
+        foreach ($matches as $image)  {
+            $imageUrl = (isset($image[1])) ? parse_url($image[1]) : null;
+            $stripImage = true;
+
+            // If the host of the image source is a trusted domain and not from the CDN, strip this image
+            $embeddableDomains = embeddableDomains();
+            if (in_array(val('host', $imageUrl), $embeddableDomains)) {
+                $stripImage = false;
+            }
+
+            // Replace the image embed tag with a link to the image.
+            if ($stripImage) {
+                $imageName = trim(substr(val('path', $imageUrl), strrpos(val('path', $imageUrl), '/')), '/');
+                $html = str_replace($image[0], '<a href="'.$image[1].'">'.$imageName.'</a>', $html);
+            }
+        }
+        return $html;
     }
 
    /**

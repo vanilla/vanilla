@@ -54,7 +54,9 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MinLength',
             'Garden.Format.WarnLeaving',
             'Garden.Format.DisableUrlEmbeds',
-            'Garden.TrustedDomains'
+            'Garden.TrustedDomains',
+            'Garden.EmbeddableDomains',
+            'Garden.HTML.SanitizeEmbeds'
         ));
 
         // Set the model on the form.
@@ -68,7 +70,11 @@ class VanillaSettingsController extends Gdn_Controller {
                 $TrustedDomains = implode("\n", $TrustedDomains);
             }
 
-            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+            // Format trusted domains as a string
+            $embeddableDomains = val('Garden.EmbeddableDomains', $ConfigurationModel->Data);
+            if (is_array($embeddableDomains)) {
+                $embeddableDomains = implode("\n", $embeddableDomains);
+            }
 
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
@@ -91,6 +97,13 @@ class VanillaSettingsController extends Gdn_Controller {
             $TrustedDomains = implode("\n", $TrustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
             $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
+
+            // Format the embeddable domains as an array based on newlines & spaces
+            $embeddableDomains = $this->Form->getValue('Garden.EmbeddableDomains');
+            $embeddableDomains = explodeTrim("\n", $embeddableDomains);
+            $embeddableDomains = array_unique(array_filter($embeddableDomains));
+            $embeddableDomains = implode("\n", $embeddableDomains);
+            $this->Form->setFormValue('Garden.EmbeddableDomains', $embeddableDomains);
 
             // Save new settings
             $Saved = $this->Form->save();

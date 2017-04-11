@@ -796,6 +796,34 @@ if (!function_exists('deprecated')) {
     }
 }
 
+
+if (!function_exists('embeddableDomains')) {
+    /**
+     * Get a white-list of arrays from which you will display embedded objects in user content.
+     *
+     * @return array Array of trusted domains including any domains used in SSO
+     * @throws Exception
+     */
+    function embeddableDomains() {
+        $embeddableDomains = [Gdn::request()->host()];
+        $configuredDomains = c('Garden.EmbeddableDomains', []);
+        if (!is_array($configuredDomains)) {
+            $configuredDomains = is_string($configuredDomains) ? explode("\n", $configuredDomains) : [];
+        }
+        $configuredDomains = array_filter($configuredDomains);
+
+        $embeddableDomains = array_merge($embeddableDomains, $configuredDomains);
+
+        Gdn::pluginManager()->EventArguments['EmbeddableDomains'] = &$embeddableDomains;
+        Gdn::pluginManager()->fireAs('EntryController')->fireEvent('BeforeTargetReturn');
+
+        return array_unique($embeddableDomains);
+
+        return $embeddableDomains;
+    }
+}
+
+
 if (!function_exists('explodeTrim')) {
     /**
      * Split a string by a string and do some trimming to clean up faulty user input.

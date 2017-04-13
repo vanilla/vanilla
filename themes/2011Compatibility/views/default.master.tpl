@@ -29,7 +29,7 @@
         <div id="Panel">{asset name="Panel"}</div>
     </div>
     <div id="Foot">
-        <div><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
+        <div class="PoweredByVanilla-wrap"><a href="{vanillaurl}"><span>Powered by Vanilla</span></a></div>
         {asset name="Foot"}
     </div>
 </div>

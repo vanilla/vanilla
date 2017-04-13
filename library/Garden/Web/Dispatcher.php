@@ -188,11 +188,11 @@ class Dispatcher {
 
         if ($this->allowedOrigins === '*') {
             return '*';
+        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
+            return $origin;
         } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
             return $origin;
         } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
-            return $origin;
-        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
             return $origin;
         }
         return '';

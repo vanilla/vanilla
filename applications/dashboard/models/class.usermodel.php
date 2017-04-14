@@ -1311,6 +1311,20 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Get the user authentication row by user ID.
+     *
+     * @param int $userID The ID of the user to get the authentication for.
+     * @param string $provider The key of the provider.
+     * @return array|false Returns the authentication row or **false** if there isn't one.
+     */
+    public function getAuthenticationByUser($userID, $provider) {
+        return $this->SQL->getWhere(
+            'UserAuthentication',
+            ['UserID' => $userID, 'ProviderKey' => $provider]
+        )->firstRow(DATASET_TYPE_ARRAY);
+    }
+
+    /**
      *
      *
      * @param array|bool $Like

@@ -27,7 +27,7 @@ addons:
 install:
   - composer self-update
   - composer install -o
-  - composer require phpunit/phpunit ~5
+  - composer require phpunit/phpunit ~5.7
   - tests/travis/nginx/install-nginx.sh
 
 script:

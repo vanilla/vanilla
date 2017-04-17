@@ -156,12 +156,6 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $settingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, '') : '';
     $settingsPopupClass = val('UsePopupSettings', $addonInfo, true) ? ' js-modal' : '';
 
-    decho([
-        'settingsURL' => $settingsUrl,
-        'webroot' => Gdn::request()->webRoot(),
-        'final URL' => url($settingsUrl),
-    ]);
-
     if ($settingsUrl != '') {
         $attr['class'] = 'btn btn-icon-border'.$settingsPopupClass;
         $attr['aria-label'] = sprintf(t('Settings for %s'), $screenName);

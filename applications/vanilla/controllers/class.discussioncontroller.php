@@ -275,6 +275,8 @@ class DiscussionController extends VanillaController {
             }
         }
 
+        $this->fireEvent('AfterFetchAttachmentViews');
+
         $this->render();
     }
 

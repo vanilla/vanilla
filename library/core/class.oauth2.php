@@ -229,7 +229,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return $this Return this object for chaining purposes.
      */
-    public function setRequestProfileParams($params = []) {
+    public function setRequestProfileParams(array $params) {
         $this->requestProfileParams = $params;
         return $this;
     }

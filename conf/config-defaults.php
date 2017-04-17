@@ -10,9 +10,9 @@ $Configuration['EnabledPlugins']['stubcontent']                = true;
 $Configuration['EnabledApplications']['Dashboard']             = 'dashboard';
 
 $Configuration['Database']['Engine']                           = 'MySQL';
-$Configuration['Database']['Host']                             = 'dbhost';
-$Configuration['Database']['Name']                             = 'dbname';
-$Configuration['Database']['User']                             = 'dbuser';
+$Configuration['Database']['Host']                             = 'Test1';
+$Configuration['Database']['Name']                             = 'Test2';
+$Configuration['Database']['User']                             = 'Test3';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
                                                                     // We do not use the constants here to be able to throw a

@@ -437,6 +437,7 @@ class DiscussionModel extends Gdn_Model {
 
         $this->EventArguments['OrderFields'] = &$orderBy;
         $this->EventArguments['Wheres'] = &$Wheres;
+        $this->EventArguments['Sql'] =& $Sql;
         $this->fireEvent('BeforeGet'); // @see 'BeforeGetCount' for consistency in results vs. counts
 
         $IncludeAnnouncements = false;

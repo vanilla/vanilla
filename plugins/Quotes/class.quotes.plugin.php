@@ -83,7 +83,7 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     public function profileController_quotes_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title(t("Quotes Settings"));
+        $Sender->title(t("Quote Settings"));
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {

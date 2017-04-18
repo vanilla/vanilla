@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\AddonManager;
 use VanillaTests\TestInstallModel;
 
 /**
@@ -18,6 +19,8 @@ class InstallTest extends \PHPUnit_Framework_TestCase {
      */
     public function testInstall() {
         global $dic;
+
+        $dic->setInstance(AddonManager::class, null);
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);

@@ -20,7 +20,6 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
     public static function setUpBeforeClass() {
         $api = new APIv0();
 
-        $api->uninstall();
         $api->install(get_called_class());
         self::$api = $api;
 

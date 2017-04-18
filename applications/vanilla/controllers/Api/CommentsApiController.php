@@ -234,11 +234,12 @@ class CommentsApiController extends AbstractApiController {
         $query = $in->validate($query);
         $discussion = $this->discussionByID($query['discussionID']);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $this->commentModel->getDefaultLimit());
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View.', $discussion['CategoryID']);
+        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         $rows = $this->commentModel->getByDiscussion(
             $query['discussionID'],
             $limit,
-            $offset)->resultArray();
+            $offset
+        )->resultArray();
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }

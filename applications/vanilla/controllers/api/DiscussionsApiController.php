@@ -122,11 +122,13 @@ class DiscussionsApiController extends AbstractApiController {
             'discussionID:i' => 'The ID of the discussion.',
             'name:s' => 'The title of the discussion.',
             'body:s' => 'The body of the discussion.',
-            'format:s' => 'The output format of the discussion.',
             'categoryID:i' => 'The category the discussion is in.',
             'dateInserted:dt' => 'When the discussion was created.',
             'insertUserID:i' => 'The user that created the discussion.',
-            'insertUser?' => $this->getUserFragmentSchema()
+            'insertUser?' => $this->getUserFragmentSchema(),
+            'announce:b' => 'Whether or not the discussion has been announced (pinned).',
+            'closed:b' => 'Whether the discussion is closed or open.',
+            'countComments:i' => 'The number of comments on the discussion.'
         ]);
     }
 
@@ -150,9 +152,17 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->formatField($row, 'Body', $row['Format']);
-        $result = $out->validate($row);
+        $this->massageRow($row);
+        $rows = [$row];
+        $this->userModel->expandUsers($rows, ['InsertUserID']);
+
+        $result = $out->validate($rows[0]);
         return $result;
+    }
+
+    public function massageRow(&$row) {
+        $row['Announce'] = (bool)$row['Announce'];
+        $this->formatField($row, 'Body', $row['Format']);
     }
 
     /**
@@ -201,7 +211,7 @@ class DiscussionsApiController extends AbstractApiController {
      * @return array
      */
     public function index(array $query) {
-        $this->permission('Garden.SignIn.Allow');
+        $this->permission();
 
         $in = $this->schema([
             'categoryID:i?' => 'Filter by a category.',
@@ -211,6 +221,12 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
+            'pageSize:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->discussionModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 100
+            ],
             'insertUserID:i?' => 'Filter by author.',
             'expand:b?' => 'Expand associated records.'
         ], 'in')->setDescription('List discussions.');
@@ -218,7 +234,8 @@ class DiscussionsApiController extends AbstractApiController {
 
         $query = $in->validate($query);
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->discussionModel->getDefaultLimit());
+        $where['Announce'] = 'all';
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
@@ -228,10 +245,10 @@ class DiscussionsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->formatField($currentRow, 'Body', $currentRow['Format']);
+            $this->massageRow($currentRow);
         }
 
-        $result = $out->validate($rows);
+        $result = $out->validate($rows, true);
         return $result;
     }
 

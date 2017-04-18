@@ -618,7 +618,7 @@ class AddonManager {
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return bool Returns
      */
-    public function isEnabled($key, $type) {
+    public function isEnabled($key, $type = Addon::TYPE_ADDON) {
         if ($type === Addon::TYPE_ADDON) {
             $key = strtolower($key);
         }

@@ -46,7 +46,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     protected $requestAccessTokenParams = [];
 
     /** @var array optional additional get params to be passed in the request for profile */
-    protected $profileRequestParams = [];
+    protected $requestProfileParams = [];
 
     /** @var  @var string optional set the settings view */
     protected $settingsView;
@@ -208,9 +208,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
 
     /**
-     * Set additional params to be added to the post array in the accessToken request.
+     * Set additional params to be to be merged with the default parameters
+     * in the access token request.
      *
-     * @param string $params.
+     * @param array $params Params to add to the access token request.
+     *
      * @return $this Return this object for chaining purposes.
      */
     public function setRequestAccessTokenParams($params) {
@@ -220,13 +222,15 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
 
     /**
-     * Set additional params to be added to the get string in the getProfile request.
+     * Set additional params to be to be merged with the default parameters
+     * in the getProfile request.
      *
-     * @param string $params.
+     * @param array $params Params to add to the get profile request.
+     *
      * @return $this Return this object for chaining purposes.
      */
-    public function setGetProfileParams($params) {
-        $this->getProfileParams = $params;
+    public function setRequestProfileParams(array $params) {
+        $this->requestProfileParams = $params;
         return $this;
     }
 
@@ -380,7 +384,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
-        $sender->render('settings', '', 'plugins/'.$view);
+        $sender->render('settings', '', $view);
     }
 
 
@@ -687,7 +691,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $defaultParams = array(
             'access_token' => $this->accessToken()
         );
-        $requestParams = array_merge($defaultParams, $this->profileRequestParams);
+        $requestParams = array_merge($defaultParams, $this->requestProfileParams);
 
         // Request the profile from the Authentication Provider
         $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());

@@ -113,6 +113,9 @@ class NewDiscussionModule extends Gdn_Module {
 
             if (isset($Category)) {
                 $Url .= '/'.rawurlencode(val('UrlCode', $Category));
+            } elseif (!val('Global', $Type, true)) {
+                unset($DiscussionTypes[$Key]);
+                continue;
             }
 
             // Present a signin redirect for a $PrivilegedGuest.

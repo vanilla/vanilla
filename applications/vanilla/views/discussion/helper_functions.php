@@ -97,7 +97,8 @@ if (!function_exists('writeComment')) :
 
         // First comment template event
         $Sender->fireEvent('BeforeCommentDisplay'); ?>
-        <li class="<?php echo $CssClass; ?>" id="<?php echo 'Comment_'.$Comment->CommentID; ?>">
+        <li class="<?php echo $CssClass; ?>">
+            <span id="<?php echo 'Comment_'.$Comment->CommentID; ?>" class="anchor"/>
             <div class="Comment">
 
                 <?php

@@ -22,7 +22,7 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
      */
     public function formatField(array &$row, $field, $format) {
         if (array_key_exists($field, $row)) {
-            $row[$field] = Gdn_Format::to($row[$field], $format);
+            $row[$field] = Gdn_Format::to($row[$field], $format) ?: '<!-- empty -->';
         }
     }
 

@@ -508,7 +508,7 @@ class DiscussionModel extends Gdn_Model {
      * @inheritdoc
      */
     public function getDefaultLimit() {
-        return Gdn::config('Vanilla.Discussions.PerPage', 50);
+        return (int)Gdn::config('Vanilla.Discussions.PerPage', 50);
     }
 
     /**
@@ -657,6 +657,11 @@ class DiscussionModel extends Gdn_Model {
         }
 
         $Sql = $this->SQL;
+
+        if (isset($Where['CategoryID'])) {
+            $Where['d.CategoryID'] = $Where['CategoryID'];
+            unset($Where['CategoryID']);
+        }
 
         // Determine category watching
         if ($this->Watching && !isset($Where['d.CategoryID'])) {

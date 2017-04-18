@@ -1074,6 +1074,13 @@ class UserModel extends Gdn_Model {
                         }
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
+                    } else {
+                        $user = [
+                            'userID' => 0,
+                            'name' => 'unknown',
+                            'email' => 'unknown@example.com'
+                        ];
+                        $user['photoUrl'] = self::getDefaultAvatarUrl($user);
                     }
                 }
 

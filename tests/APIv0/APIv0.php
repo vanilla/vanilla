@@ -182,7 +182,7 @@ class APIv0 extends HttpClient {
         touch($configPath);
         chmod($configPath, 0777);
         $apiKey = sha1(openssl_random_pseudo_bytes(16));
-        $this->saveToConfigDirect(['Test.APIKey' => $apiKey]);
+        $this->saveToConfigDirect(['Test.APIKey' => $apiKey, 'Debug' => true]);
         self::setAPIKey($apiKey);
 
 

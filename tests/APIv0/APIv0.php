@@ -215,6 +215,7 @@ class APIv0 extends HttpClient {
 
         // Get some configuration information.
         $this->saveToConfig([]);
+        $this->saveToConfigDirect(['Debug' => false]);
 
         $this->bootstrap();
     }

@@ -746,8 +746,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controllerName = $routeArgs['controller'];
         $controller = $this->createController($controllerName, $request, $routeArgs);
 
+        // Look for an init method.
+        $pathArgs = $routeArgs['pathArgs'];
+        list($initCallback, $pathArgs) = $this->findControllerInit($controller, $pathArgs);
+
         // Find the method to call.
-        list($controllerMethod, $pathArgs) = $this->findControllerMethod($controller, $routeArgs['pathArgs']);
+        list($controllerMethod, $pathArgs) = $this->findControllerMethod($controller, $pathArgs);
         if (!$controllerMethod) {
             // The controller method was not found.
             return $this->dispatchNotFound('method_notfound', $request);
@@ -759,6 +763,16 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $controller->ResolvedPath = ($routeArgs['addon'] ? $routeArgs['addon']->getKey().'/' : '').
             strtolower(stringEndsWith($controllerName, 'Controller', true, true)).'/'.
             strtolower($controllerMethod);
+
+        // If the controller has an init method, now is the time to call it.
+        if ($initCallback) {
+            try {
+                call_user_func($initCallback);
+            } catch (Exception $ex) {
+                $controller->renderException($ex);
+                exit();
+            }
+        }
 
         $reflectionArguments = $request->get();
         $this->EventArguments['Arguments'] = &$reflectionArguments;
@@ -861,5 +875,36 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         $this->fireEvent('AfterControllerInit');
 
         return $controller;
+    }
+
+    /**
+     * Find the init method on a controller (if any) and return a callback to call it.
+     *
+     * This method simply looks to see if there is a method named "init" on the passed object.
+     * If found, it will augment {@link $pathArgs} with the ones required to call init.
+     *
+     * @param object $controller The controller to search.
+     * @param array $pathArgs The current path arguments.
+     * @return array Returns an array in the form `[callable|null, $pathArgs]`.
+     */
+    public function findControllerInit($controller, $pathArgs) {
+        if (!method_exists($controller, 'init')) {
+            return [null, $pathArgs];
+        }
+
+        $method = new ReflectionMethod($controller, 'init');
+        $count = count($method->getParameters());
+
+        $methodArgs = array_slice($pathArgs, 0, $count);
+        $pathArgs = array_slice($pathArgs, $count);
+        if (count($methodArgs) < $count) {
+            $methodArgs = array_merge($methodArgs, array_fill(0, $count - count($methodArgs), null));
+        }
+
+        $callback = function () use ($controller, $methodArgs) {
+            call_user_func_array([$controller, 'init'], $methodArgs);
+        };
+
+        return [$callback, $pathArgs];
     }
 }

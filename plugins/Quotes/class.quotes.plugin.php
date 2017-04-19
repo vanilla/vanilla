@@ -152,6 +152,8 @@ class QuotesPlugin extends Gdn_Plugin {
 
         $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
         $Sender->addDefinition('QuotesFolding', $QuoteFolding);
+        $Sender->addDefinition('&laquo; hide previous quotes', t('&laquo; hide previous quotes'));
+        $Sender->addDefinition('&raquo; show previous quotes', t('&raquo; show previous quotes'));
     }
 
     /**

@@ -200,7 +200,7 @@ try {
         throw new Exception('There was an error decoding the config data.', 400);
     }
 
-    if ($data === ['DELETE']) {
+    if (!empty($_GET['deleteConfig'])) {
         $config->deleteConfig();
         $data = [];
     } else {

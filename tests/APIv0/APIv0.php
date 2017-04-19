@@ -177,17 +177,12 @@ class APIv0 extends HttpClient {
     public function install($title = '') {
         $this->createDatabase();
 
-        if (file_exists(getcwd().'/conf/config.php')) {
-            throw new \Exception("A default configuration file was generated. bootstrap.before.php ma not be working properly.");
-        }
-
-
         // Touch the config file because hhvm runs as root and we don't want the config file to have those permissions.
         $configPath = $this->getConfigPath();
         touch($configPath);
         chmod($configPath, 0777);
         $apiKey = sha1(openssl_random_pseudo_bytes(16));
-        $this->saveToConfigDirect([
+        $this->saveToConfig([
             'Garden.Errors.StackTrace' => true,
             'Test.APIKey' => $apiKey,
         ]);
@@ -208,13 +203,9 @@ class APIv0 extends HttpClient {
         ];
 
         $r = $this->post('/dashboard/setup.json', $post);
-
         if (!$r['Installed']) {
-            throw new \Exception("Vanilla did not install");
+            throw new \Exception("Vanilla did not install.");
         }
-
-        // Get some configuration information.
-        $config = $this->saveToConfig([]);
 
         $this->bootstrap();
     }
@@ -372,44 +363,27 @@ class APIv0 extends HttpClient {
      * This is necessary because HHVM runs as root and takes over the config file and so it can only be edited in an
      * API context.
      *
-     * @param array $values The values to save or the string `['DELETE']` to delete the config.
+     * @param array $values The values to save to the config.
+     * @return array
      */
     public function saveToConfig(array $values) {
         $r = $this->post(
             '/cgi-bin/saveconfig.php',
             $values,
-            [
-                'Content-Type: application/json;charset=utf-8',
-                'Authorization: token '.self::getApiKey()
-            ]
+            ['Content-Type: application/json;charset=utf-8']
         );
         $this->config = $r->getBody();
         return $this->config;
     }
 
     /**
-     * Save some config values.
-     *
-     * This saves the values directly via filesystem access.
-     *
-     * @param array $values An array of config keys and values where the keys are a dot-seperated array.
+     * Delete the config via API.
      */
-    public function saveToConfigDirect(array $values) {
-        $config = $this->loadConfigDirect();
-        foreach ($values as $key => $value) {
-            setvalr($key, $config, $value);
-        }
+    public function deleteConfig() {
+        $this->post('/cgi-bin/saveconfig.php?deleteConfig=true');
 
-        $path = $this->getConfigPath();
-
-        $dir = dirname($path);
-
-        $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
-            '$Configuration = '.var_export($config, true).";\n";
-        $r = file_put_contents($path, $str);
-
-        if ($r) {
-            $this->config = $config;
+        if (file_exists($this->getConfigPath())) {
+            throw new \Exception('Delete config did not work!');
         }
     }
 
@@ -438,7 +412,7 @@ class APIv0 extends HttpClient {
         $pdo = $this->getPDO();
 
         // Delete the config file.
-        $this->saveToConfig(['DELETE']);
+        $this->deleteConfig();
 
         // Delete the database.
         $dbname = $this->getDbName();

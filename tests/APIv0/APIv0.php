@@ -183,8 +183,8 @@ class APIv0 extends HttpClient {
         chmod($configPath, 0777);
         $apiKey = sha1(openssl_random_pseudo_bytes(16));
         $this->saveToConfigDirect([
+            'Garden.Errors.StackTrace' => true,
             'Test.APIKey' => $apiKey,
-            'Debug' => true,
         ]);
         self::setAPIKey($apiKey);
 
@@ -208,8 +208,7 @@ class APIv0 extends HttpClient {
             throw new \Exception("Vanilla did not install.\n Response: ".$r->getBody()."\n\n");
         }
 
-        // Turn off the debug flag.
-        $this->saveToConfig(['Debug' => false]);
+        $this->saveToConfig([]);
 
         $this->bootstrap();
     }

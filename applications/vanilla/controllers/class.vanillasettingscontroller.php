@@ -92,10 +92,12 @@ class VanillaSettingsController extends Gdn_Controller {
     }
 
     /**
-     * Backwards compatibility. Remove after 2.5.
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use VanillaSettingsController::posting instead.
      */
     public function advanced() {
-        redirect('/vanillasettings/posting');
+        redirect('/vanilla/settings/posting');
     }
 
     /**

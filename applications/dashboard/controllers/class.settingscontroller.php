@@ -615,7 +615,7 @@ class SettingsController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->setHighlightRoute('dashboard/settings/homepage');
+        $this->setHighlightRoute('dashboard/settings/layout');
         $this->title(t('Homepage'));
 
         $CurrentRoute = val('Destination', Gdn::router()->getRoute('DefaultController'), '');
@@ -768,14 +768,18 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Backwards compatibility. Remove after 2.5.
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use SettingsController::layout instead.
      */
     public function homepage() {
         redirect('/settings/layout');
     }
 
     /**
-     * Backwards compatibility. Remove after 2.5.
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
      */
     public function banner() {
         redirect('/settings/branding');

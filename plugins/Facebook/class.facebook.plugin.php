@@ -5,12 +5,11 @@
  * @package Facebook
  */
 
-// Define the plugin:
-$PluginInfo['Facebook'] = array(
+$PluginInfo['Facebook'] = [
     'Name' => 'Facebook Social Connect',
-    'Description' => 'Users may sign into your site using their Facebook account.',
+    'Description' => 'Users may sign into your site using their Facebook account and optionally share forum content there.',
     'Version' => '1.2.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
+    'RequiredApplications' => ['Vanilla' => '2.2'],
     'RequiredTheme' => false,
     'RequiredPlugins' => false,
     'MobileFriendly' => true,
@@ -24,7 +23,7 @@ $PluginInfo['Facebook'] = array(
     'SocialConnect' => true,
     'RequiresRegistration' => true,
     'Icon' => 'facebook_social_connect.png'
-);
+];
 
 /**
  * Class FacebookPlugin
@@ -43,7 +42,7 @@ class FacebookPlugin extends Gdn_Plugin {
     protected $_RedirectUri = null;
 
     /**
-     *
+     * Retrieve an access token from the session.
      *
      * @return bool|mixed|null
      */
@@ -64,7 +63,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Redirect current user to the authorization URI.
      *
      * @param bool $Query
      */
@@ -74,11 +73,12 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Send a request to Facebook's API.
      *
-     *
-     * @param $Path
+     * @param string $Path
      * @param bool $Post
-     * @return mixed
+     *
+     * @return string|array Response from the API.
      * @throws Gdn_UserException
      */
     public function api($Path, $Post = false) {
@@ -133,8 +133,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Facebook button to normal signin page.
      *
      * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function entryController_signIn_handler($Sender, $Args) {
         if (!$this->socialSignIn()) {
@@ -155,7 +157,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add 'Facebook' option to the row.
+     * Add 'Facebook' option to the reactions row under posts.
+     *
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_afterReactions_handler($Sender, $Args) {
         if (!$this->socialReactions()) {
@@ -167,7 +172,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Output Quote link.
+     * Output Quote link to share via Facebook.
+     *
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     protected function addReactButton($Sender, $Args) {
         echo anchor(
@@ -178,10 +186,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Facebook button to MeModule.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_signInIcons_handler($Sender, $Args) {
         if (!$this->socialSignIn()) {
@@ -192,10 +200,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Facebook button to GuestModule.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_beforeSignInButton_handler($Sender, $Args) {
         if (!$this->socialSignIn()) {
@@ -206,9 +214,9 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Facebook button to default mobile theme.
      *
-     *
-     * @param $Sender
+     * @param Gdn_Controller $Sender
      */
     public function base_beforeSignInLink_handler($Sender) {
         if (!$this->socialSignIn()) {
@@ -221,10 +229,10 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Make this available as an SSO method to users.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_getConnections_handler($Sender, $Args) {
         $Profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $Args);
@@ -242,11 +250,13 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Endpoint to share via Facebook.
      *
      * @param PostController $Sender
-     * @param type $RecordType
-     * @param type $ID
-     * @throws type
+     * @param string $RecordType
+     * @param int $ID
+     *
+     * @throws Gdn_UserException
      */
     public function postController_facebook_create($Sender, $RecordType, $ID) {
         if (!$this->socialReactions()) {
@@ -280,12 +290,14 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint to handle connecting user to Facebook.
      *
      * @param ProfileController $Sender
-     * @param type $UserReference
-     * @param type $Username
-     * @param type $Code
+     * @param mixed $UserReference
+     * @param string $Username
+     * @param string|bool $Code
+     *
+     * @throws Gdn_UserException
      */
     public function profileController_FacebookConnect_create($Sender, $UserReference, $Username, $Code = false) {
         $transientKey = Gdn::request()->get('state');
@@ -325,7 +337,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Build-A-Button.
      *
      * @return string
      */
@@ -336,7 +348,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint for configuring this addon.
      *
      * @param $Sender
      * @param $Args
@@ -370,6 +382,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Standard SSO hook into Vanilla to handle authentication & user info transfer.
      *
      * @param Gdn_Controller $Sender
      * @param array $Args
@@ -454,11 +467,12 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Retrieve a Facebook access token.
      *
-     *
-     * @param $Code
-     * @param $RedirectUri
+     * @param string $Code
+     * @param string $RedirectUri
      * @param bool $ThrowError
+     *
      * @return mixed
      * @throws Gdn_UserException
      */
@@ -492,35 +506,29 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         $AccessToken = val('access_token', $Tokens);
-//      $Expires = val('expires', $Tokens, null);
         return $AccessToken;
     }
 
     /**
-     *
+     * Get users' Facebook profile data.
      *
      * @param $AccessToken
      * @return mixed
      */
     public function getProfile($AccessToken) {
         $Url = "https://graph.facebook.com/me?access_token=$AccessToken&fields=name,id,email";
-//      $C = curl_init();
-//      curl_setopt($C, CURLOPT_RETURNTRANSFER, true);
-//      curl_setopt($C, CURLOPT_SSL_VERIFYPEER, false);
-//      curl_setopt($C, CURLOPT_URL, $Url);
-//      $Contents = curl_exec($C);
-//      $Contents = ProxyRequest($Url);
         $Contents = file_get_contents($Url);
         $Profile = json_decode($Contents, true);
         return $Profile;
     }
 
     /**
-     *
+     * Where to send authorization request.
      *
      * @param bool $Query
      * @param bool $RedirectUri
-     * @return string
+     *
+     * @return string URL.
      */
     public function authorizeUri($Query = false, $RedirectUri = false) {
         $AppID = c('Plugins.Facebook.ApplicationID');
@@ -556,10 +564,11 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Figure out where to send user after auth step.
      *
      * @param null $NewValue
-     * @return null|string
+     *
+     * @return null|string URL.
      */
     public function redirectUri($NewValue = null) {
         if ($NewValue !== null) {
@@ -592,16 +601,16 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get the URL for connection page.
      *
-     *
-     * @return string
+     * @return string URL.
      */
     public static function profileConnecUrl() {
         return url(userUrl(Gdn::session()->User, false, 'facebookconnect'), true);
     }
 
     /**
-     *
+     * Whether this plugin is setup with enough info to function.
      *
      * @return bool
      */
@@ -617,7 +626,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Whether social signin is enabled.
      *
      * @return bool
      */
@@ -625,12 +634,17 @@ class FacebookPlugin extends Gdn_Plugin {
         return c('Plugins.Facebook.SocialSignIn', true) && $this->isConfigured();
     }
 
+    /**
+     * Whether social reactions is enabled.
+     *
+     * @return bool
+     */
     public function socialReactions() {
         return c('Plugins.Facebook.SocialReactions', true) && $this->isConfigured();
     }
 
     /**
-     *
+     * Run once on enable.
      *
      * @throws Gdn_UserException
      */
@@ -648,7 +662,7 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Run on utility/update.
      */
     public function structure() {
         // Save the facebook provider type.
@@ -659,78 +673,4 @@ class FacebookPlugin extends Gdn_Plugin {
             true
         );
     }
-
-
-//   public function OnDisable() {
-//		$this->_Disable();
-//   }
-
-//   protected function _CreateProviderModel() {
-//      $Key = 'k'.sha1(implode('.',array(
-//         'vanillaconnect',
-//         'key',
-//         microtime(true),
-//         RandomString(16),
-//         Gdn::session()->User->Name
-//      )));
-//
-//      $Secret = 's'.sha1(implode('.',array(
-//         'vanillaconnect',
-//         'secret',
-//         md5(microtime(true)),
-//         RandomString(16),
-//         Gdn::session()->User->Name
-//      )));
-//
-//      $ProviderModel = new Gdn_AuthenticationProviderModel();
-//      $ProviderModel->insert($Provider = array(
-//         'AuthenticationKey'           => $Key,
-//         'AuthenticationSchemeAlias'   => 'handshake',
-//         'URL'                         => 'Enter your site url',
-//         'AssociationSecret'           => $Secret,
-//         'AssociationHashMethod'       => 'HMAC-SHA1'
-//      ));
-//
-//      return $Provider;
-//   }
-//
-//   public function AuthenticationController_DisableAuthenticatorHandshake_handler($Sender) {
-//      $this->_Disable();
-//   }
-//
-//   private function _Disable() {
-//      RemoveFromConfig('Plugins.VanillaConnect.Enabled');
-//		RemoveFromConfig('Garden.SignIn.Popup');
-//		RemoveFromConfig('Garden.Authenticator.DefaultScheme');
-//		RemoveFromConfig('Garden.Authenticators.handshake.Name');
-//      RemoveFromConfig('Garden.Authenticators.handshake.CookieName');
-//      RemoveFromConfig('Garden.Authenticators.handshake.TokenLifetime');
-//   }
-//
-//   public function AuthenticationController_EnableAuthenticatorHandshake_handler($Sender) {
-//      $this->_Enable();
-//   }
-//
-//	private function _Enable($FullEnable = TRUE) {
-//		saveToConfig('Garden.SignIn.Popup', false);
-//		saveToConfig('Garden.Authenticators.handshake.Name', 'VanillaConnect');
-//      saveToConfig('Garden.Authenticators.handshake.CookieName', 'VanillaHandshake');
-//      saveToConfig('Garden.Authenticators.handshake.TokenLifetime', 0);
-//
-//      if ($FullEnable) {
-//         saveToConfig('Garden.Authenticator.DefaultScheme', 'handshake');
-//         saveToConfig('Plugins.VanillaConnect.Enabled', true);
-//      }
-//
-//      // Create a provider key/secret pair if needed
-//      $SQL = Gdn::database()->sql();
-//      $Provider = $SQL->select('uap.*')
-//         ->from('UserAuthenticationProvider uap')
-//         ->where('uap.AuthenticationSchemeAlias', 'handshake')
-//         ->get()
-//         ->firstRow(DATASET_TYPE_ARRAY);
-//
-//      if (!$Provider)
-//         $this->_CreateProviderModel();
-//	}
 }

@@ -7,12 +7,11 @@
  * @package GooglePlus
  */
 
-// Define the plugin:
-$PluginInfo['GooglePlus'] = array(
+$PluginInfo['GooglePlus'] = [
     'Name' => 'Google+ Social Connect',
     'Description' => 'Users may sign into your site using their Google Plus account.',
     'Version' => '1.1.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
+    'RequiredApplications' => ['Vanilla' => '2.2'],
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
@@ -23,7 +22,7 @@ $PluginInfo['GooglePlus'] = array(
     'SocialConnect' => true,
     'RequiresRegistration' => false,
     'Icon' => 'google_social_connect.png'
-);
+];
 
 /**
  * Class GooglePlusPlugin
@@ -40,7 +39,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     protected $_AccessToken = null;
 
     /**
-     *
+     * Get current access token.
      *
      * @param bool $NewValue
      * @return bool|mixed|null
@@ -62,10 +61,11 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Send request to the Twitter API.
      *
-     *
-     * @param $Path
+     * @param string $Path
      * @param array $Post
+     *
      * @return mixed
      * @throws Gdn_UserException
      */
@@ -83,9 +83,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Retrieve where to send the user for authorization.
      *
      * @param array $State
+     *
      * @return string
      */
     public function authorizeUri($State = array()) {
@@ -105,9 +106,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Get an access token from Google.
      *
      * @param $Code
+     *
      * @return mixed
      * @throws Gdn_UserException
      */
@@ -127,7 +129,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Whether this addon has enough configuration to work.
      *
      * @return bool
      */
@@ -146,25 +148,25 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Whether social sharing is enabled.
      *
-     *
-     * @return mixed
+     * @return bool
      */
     public function socialSharing() {
         return c('Plugins.GooglePlus.SocialSharing', true);
     }
 
     /**
+     * Whether social reactions are enabled.
      *
-     *
-     * @return mixed
+     * @return bool
      */
     public function socialReactions() {
         return c('Plugins.GooglePlus.SocialReactions', true);
     }
 
     /**
-     *
+     * Send a cURL request.
      *
      * @param $Url
      * @param string $Method
@@ -208,14 +210,14 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Run once on enable.
      */
     public function setup() {
         $this->structure();
     }
 
     /**
-     *
+     * Gimme button!
      *
      * @param string $type
      * @return string
@@ -229,7 +231,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Run on utility/update.
      */
     public function structure() {
         if (Gdn::sql()->getWhere('UserAuthenticationProvider', array('AuthenticationSchemeAlias' => 'Google+'))->firstRow()) {
@@ -248,8 +250,8 @@ class GooglePlusPlugin extends Gdn_Plugin {
     /**
      * Calculate the final sign in and register urls for google+.
      *
-     * @param object $sender Not used.
-     * @param array $args Contains the provider and
+     * @param authenticationProviderModel $sender Not used.
+     * @param array $args Contains the provider and data.
      */
     public function authenticationProviderModel_calculateGooglePlus_handler($sender, $args) {
         $provider =& $args['Provider'];
@@ -260,30 +262,27 @@ class GooglePlusPlugin extends Gdn_Plugin {
         }
 
         $provider['SignInUrlFinal'] = $this->authorizeUri(array('target' => $target));
-//      $provider['RegisterUrlFinal'] = static::getRegisterUrl($provider, $target);
     }
 
     /**
      * Add 'Google+' option to the row.
+     *
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_AfterReactions_handler($Sender, $Args) {
         if (!$this->socialReactions()) {
             return;
         }
         echo Gdn_Theme::bulletItem('Share');
-//      if ($this->AccessToken()) {
-//         $Url = url("post/twitter/{$Args['RecordType']}?id={$Args['RecordID']}", true);
-//         $CssClass = 'ReactButton Hijack';
-//      } else {
         $Url = url("post/googleplus/{$Args['RecordType']}?id={$Args['RecordID']}", true);
         $CssClass = 'ReactButton PopupWindow';
-//      }
 
         echo ' '.anchor(sprite('ReactGooglePlus', 'ReactSprite', t('Share on Google+')), $Url, $CssClass).' ';
     }
 
     /**
-     *
+     * Generic SSO hook into Vanilla for authorizing via Google+ and pass user info.
      *
      * @param EntryController $Sender
      * @param array $Args
@@ -331,10 +330,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Google+ option to MeModule.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_signInIcons_handler($Sender, $Args) {
         if (!$this->isDefault()) {
@@ -343,10 +342,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Google+ option to GuestModule.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_beforeSignInButton_handler($Sender, $Args) {
         if (!$this->isConfigured()) {
@@ -358,10 +357,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Google+ to the list of available providers.
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_getConnections_handler($Sender, $Args) {
         $GPlus = valr('User.Attributes.'.self::ProviderKey, $Args);
@@ -382,11 +381,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint for authenticating with Google+.
      *
      * @param EntryController $Sender
-     * @param string $Code
-     * @param string $State
+     * @param string|bool $Code
+     * @param string|bool $State
+     *
      * @throws Gdn_UserException
      */
     public function entryController_googlePlus_create($Sender, $Code = false, $State = false) {
@@ -450,9 +450,10 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Add Google+ as option to the normal signin page.
      *
      * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function entryController_signIn_handler($Sender, $Args) {
         if (!$this->isConfigured()) {
@@ -473,7 +474,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Override the sign in if Google+ is the default sign-in method.
+     * Override the sign in if Google+ is the default signin method.
      *
      * @param EntryController $Sender
      * @param array $Args
@@ -485,12 +486,12 @@ class GooglePlusPlugin extends Gdn_Plugin {
 
         $Url = $this->authorizeUri(array('target' => $Args['Target']));
         $Args['DefaultProvider']['SignInUrl'] = $Url;
-
-//      redirect($Url);
     }
 
     /**
+     * Endpoint to share to Google+.
      *
+     * I'm sure someone out there does this. Somewhere. Probably alone.
      *
      * @param PostController $Sender
      * @param type $RecordType
@@ -514,7 +515,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Endpoint to comnfigure this addon.
      *
      * @param $Sender
      * @param $Args

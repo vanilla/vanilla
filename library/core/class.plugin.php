@@ -361,8 +361,8 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @return boolean Status of plugin's 2nd level activation
      */
     public function isEnabled() {
-        $PluginName = $this->GetPluginIndex();
-        $EnabledKey = "Plugins.{$PluginName}.Enabled";
+        $PluginName = $this->getPluginIndex();
+        $EnabledKey = "EnabledPlugins.{$PluginName}";
         return (bool)c($EnabledKey, false);
     }
 

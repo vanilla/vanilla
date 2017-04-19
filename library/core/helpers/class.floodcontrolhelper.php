@@ -60,7 +60,7 @@ class FloodControlHelper {
 
             if ($session->getAttribute('Time'.$type.'SpamCheck')) {
                 // Remove old attribute used in the conversationModel
-                Gdn::userModel()->setAttribute('Time'.$type.'SpamCheck', null);
+                Gdn::userModel()->saveAttribute($session->UserID, 'Time'.$type.'SpamCheck', null);
             }
         }
 

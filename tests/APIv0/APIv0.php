@@ -182,12 +182,11 @@ class APIv0 extends HttpClient {
         touch($configPath);
         chmod($configPath, 0777);
         $apiKey = sha1(openssl_random_pseudo_bytes(16));
-        $this->saveToConfigDirect(['Test.APIKey' => $apiKey]);
+        $this->saveToConfigDirect([
+            'Garden.Errors.StackTrace' => true,
+            'Test.APIKey' => $apiKey,
+        ]);
         self::setAPIKey($apiKey);
-
-
-//        $dir = dirname($configPath);
-//        passthru("ls -lah $dir");
 
         // Install Vanilla via cURL.
         $post = [
@@ -200,17 +199,16 @@ class APIv0 extends HttpClient {
             'Name' => 'travis',
             'Password' => 'travis',
             'PasswordMatch' => 'travis',
-            'HtaccessAction' => 'skip'
+            'HtaccessAction' => 'skip',
         ];
 
         $r = $this->post('/dashboard/setup.json', $post);
 
         if (!$r['Installed']) {
-            throw new \Exception("Vanilla did not install");
+            throw new \Exception("Vanilla did not install.\n Response: ".$r->getBody()."\n\n");
         }
 
-        // Get some configuration information.
-        $config = $this->saveToConfig([]);
+        $this->saveToConfig([]);
 
         $this->bootstrap();
     }

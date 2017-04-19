@@ -19,7 +19,6 @@ if (isset($_SERVER['NODE_SLUG'])) {
    }
 }
 
-// Use a config specific to the site.
-$configPath = PATH_ROOT."/conf/$slug.php";
-
-define('PATH_CONF_DEFAULT', $configPath);
+// Use a config and cache specific to the site.
+define('PATH_CONF_DEFAULT', PATH_ROOT."/conf/$slug.php");
+define('PATH_CACHE', PATH_ROOT."/cache/$slug/");

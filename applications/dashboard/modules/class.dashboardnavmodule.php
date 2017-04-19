@@ -86,7 +86,7 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'Settings',
             'title' => 'Settings',
             'description' => 'Configuration & Addons',
-            'url' => '/dashboard/settings/banner'
+            'url' => '/dashboard/settings/branding'
         ]
     ];
 

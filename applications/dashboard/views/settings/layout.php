@@ -38,7 +38,7 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
 }
 
 ?>
-    <h1><?php echo t('Homepage'); ?></h1>
+    <h1><?php echo t('Layout'); ?></h1>
     <script>
         jQuery(document).ready(function($) {
 
@@ -69,11 +69,12 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
     $links .= '</ul>';
     helpAsset(t('Need More Help?'), $links);
     ?>
-    <div class="padded-top">
-        <?php printf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true)) ?>
-    </div>
 
     <div class="Homepage">
+        <?php echo subheading(
+            t('Homepage'),
+            sprintf(t('Use the content at this url as your homepage.', 'Choose the page people should see when they visit: <strong style="white-space: nowrap;">%s</strong>'), url('/', true))
+        ); ?>
         <div class="HomeOptions label-selector">
             <?php
             // Only show the vanilla pages if Vanilla is enabled
@@ -92,27 +93,29 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
             ?>
         </div>
         <?php if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)): ?>
+
+        <?php
+        echo subheading(t('Discussions'), t('Choose the preferred layout for lists of discussions.'));
+        echo $this->data('DiscussionsAlert', '');
+        ?>
+        <div class="LayoutOptions DiscussionsLayout label-selector">
             <?php
-            echo subheading(t('Discussions Layout'), t('Choose the preferred layout for the discussions page.'));
-            echo $this->data('DiscussionsAlert', '');
+            echo WriteHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
+            echo WriteHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
             ?>
-            <div class="LayoutOptions DiscussionsLayout label-selector">
-                <?php
-                echo WriteHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
-                echo WriteHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
-                ?>
-            </div>
+        </div>
+        <?php
+        echo subheading(t('Categories'), t('Choose the preferred layout for lists of categories.'));
+        echo $this->data('CategoriesAlert', '');
+        ?>
+        <div class="LayoutOptions CategoriesLayout label-selector">
             <?php
-            echo subheading(t('Categories Layout'), t('Choose the preferred layout for the categories page.'));
-            echo $this->data('CategoriesAlert', '');
+            echo WriteHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
+            echo WriteHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
+            echo WriteHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
             ?>
-            <div class="LayoutOptions CategoriesLayout label-selector">
-                <?php
-                echo WriteHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
-                echo WriteHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
-                echo WriteHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
-                ?>
-            </div>
+        </div>
+
         <?php endif; ?>
     </div>
 

@@ -177,6 +177,11 @@ class APIv0 extends HttpClient {
     public function install($title = '') {
         $this->createDatabase();
 
+        if (file_exists(getcwd().'/conf/config.php')) {
+            throw new \Exception("A default configuration file was generated. bootstrap.before.php ma not be working properly.");
+        }
+
+
         // Touch the config file because hhvm runs as root and we don't want the config file to have those permissions.
         $configPath = $this->getConfigPath();
         touch($configPath);

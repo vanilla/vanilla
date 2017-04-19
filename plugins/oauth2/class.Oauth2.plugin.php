@@ -27,15 +27,10 @@ $PluginInfo['oauth2'] = array(
 
 class OAuth2Plugin extends Gdn_OAuth2 {
     /**
-     * @var string Sets the settings view in the dashboard.
-     */
-    protected $settingsView = 'settings/oauth2';
-
-
-    /**
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
      */
     public function __construct() {
         $this->setProviderKey('oauth2');
+        $this->settingsView = 'plugins/settings/oauth2';
     }
 }

@@ -254,6 +254,7 @@ class DiscussionModel extends Gdn_Model {
                     ->update('Discussion')
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->where('DateLastComment', null)
+                    ->orWhere('DateLastComment','0000-00-00 00:00:00')
                     ->put();
                 break;
             case 'LastCommentUserID':

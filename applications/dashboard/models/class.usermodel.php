@@ -1071,7 +1071,7 @@ class UserModel extends Gdn_Model {
                             $photoBase = changeBasename($photo, 'n%s');
                             $photo = Gdn_Upload::url($photoBase);
                         }
-                        if (!is_string($photo)) {
+                        if (empty($photo)) {
                             $photo = UserModel::getDefaultAvatarUrl($user);
                         }
                         setValue('Photo', $user, $photo);

@@ -165,6 +165,8 @@ class Dispatcher {
             if ($request->hasHeader('Access-Control-Request-Headers')) {
                 $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
             }
+
+            $response->setHeader('Access-Control-Max-Age', strtotime('1 hour'));
         }
     }
 

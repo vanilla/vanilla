@@ -94,10 +94,10 @@ class SimpleConfig {
      */
     public function deleteConfig() {
         $path = $this->getConfigPath();
-        if (!file_exists($path)) {
-            return;
-        } elseif (!unlink($path)) {
-            throw new \Exception('Could not delete config.', 500);
+        if (file_exists($path)) {
+            if (!unlink($path)) {
+                throw new \Exception('Could not delete config.', 500);
+            }
         }
     }
 
@@ -200,7 +200,7 @@ try {
         throw new Exception('There was an error decoding the config data.', 400);
     }
 
-    if ($data === ['DELETE']) {
+    if (!empty($_GET['deleteConfig'])) {
         $config->deleteConfig();
         $data = [];
     } else {

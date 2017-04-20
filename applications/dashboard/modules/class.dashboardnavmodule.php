@@ -249,7 +249,7 @@ class DashboardNavModule extends SiteNavModule {
      */
     private function handleUserPreferencesSectionLandingPage() {
         if ($session = Gdn::session()) {
-            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages', []);
 
             foreach (self::$sectionsInfo as $key => $section) {
                 if (array_key_exists($key, $landingPages)) {

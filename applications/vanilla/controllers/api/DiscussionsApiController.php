@@ -309,6 +309,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         $this->formatField($row, 'Body', $row['Format']);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
         $result = $out->validate($row);
         return new Data($result, 201);
     }
@@ -333,7 +334,8 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Announce', $row['CategoryID']);
 
         $body = $in->validate($body);
-        $this->discussionModel->setField($row['DiscussionID'], 'Announce', $body['announce']);
+        $announce = intval($body['announce']);
+        $this->discussionModel->setField($row['DiscussionID'], 'Announce', $announce);
 
         $result = $this->discussionByID($id);
         return $out->validate($result);
@@ -356,8 +358,9 @@ class DiscussionsApiController extends AbstractApiController {
 
         $body = $in->validate($body);
         $row = $this->discussionByID($id);
+        $bookmarked = intval($body['bookmarked']);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
-        $this->discussionModel->bookmark($id, $this->getSession()->UserID, $body['bookmarked']);
+        $this->discussionModel->bookmark($id, $this->getSession()->UserID, $bookmarked);
 
         $result = $this->discussionByID($id);
         return $out->validate($result);
@@ -381,7 +384,8 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Close', $row['CategoryID']);
 
         $body = $in->validate($body);
-        $this->discussionModel->setField($row['DiscussionID'], 'Closed', $body['closed']);
+        $closed = intval($body['closed']);
+        $this->discussionModel->setField($row['DiscussionID'], 'Closed', $closed);
 
         $result = $this->discussionByID($id);
         return $out->validate($result);
@@ -405,9 +409,11 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Sink', $row['CategoryID']);
 
         $body = $in->validate($body);
-        $this->discussionModel->setField($row['DiscussionID'], 'Sink', $body['sink']);
+        $sink = intval($body['sink']);
+        $this->discussionModel->setField($row['DiscussionID'], 'Sink', $sink);
 
         $result = $this->discussionByID($id);
+        $this->userModel->expandUsers($result, ['InsertUserID']);
         return $out->validate($result);
     }
 }

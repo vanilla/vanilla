@@ -1897,7 +1897,9 @@ if (!function_exists('isTimestamp')) {
 
 if (!function_exists('isUrl')) {
     /**
-     * Determine whether or not a string is a url in the form http://, https://, or //.
+     * Determine whether or not a string is a url.
+     *
+     * Valid urls must begin with http://, https://, // or data:image.
      *
      * @param string $Str The string to check.
      * @return bool
@@ -1911,6 +1913,9 @@ if (!function_exists('isUrl')) {
             return true;
         }
         if (preg_match('`^https?://`i', $Str)) {
+            return true;
+        }
+        if (substr(strtolower($Str), 0, 10) == 'data:image') {
             return true;
         }
         return false;

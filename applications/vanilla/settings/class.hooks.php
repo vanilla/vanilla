@@ -355,7 +355,6 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param object $Sender DashboardController.
      */
     public function base_render_before($Sender) {
-        $Session = Gdn::session();
         if ($Sender->Menu) {
             $Sender->Menu->addLink('Discussions', t('Discussions'), '/discussions', false, array('Standard' => true));
         }

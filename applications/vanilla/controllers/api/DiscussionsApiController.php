@@ -153,10 +153,9 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
         $this->massageRow($row);
-        $rows = [$row];
-        $this->userModel->expandUsers($rows, ['InsertUserID']);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
 
-        $result = $out->validate($rows[0]);
+        $result = $out->validate($row);
         return $result;
     }
 

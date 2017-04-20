@@ -1043,9 +1043,11 @@ class UserModel extends Gdn_Model {
             return;
         }
 
-        // Inject those user records.
+        reset($rows);
+        $single = is_string(key($rows));
+
         $users = [];
-        foreach ($rows as &$row) {
+        $populate = function(array &$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
                 $id = val($key, $row);
@@ -1066,12 +1068,13 @@ class UserModel extends Gdn_Model {
                         // Make sure all user records have a valid photo.
                         $photo = val('Photo', $user);
                         if ($photo && !isUrl($photo)) {
-                            $photo = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-                            setValue('Photo', $user, $photo);
-                        } elseif (!$photo) {
-                            $photo = UserModel::getDefaultAvatarUrl($user);
-                            setValue('Photo', $user, $photo);
+                            $photoBase = changeBasename($photo, 'n%s');
+                            $photo = Gdn_Upload::url($photoBase);
                         }
+                        if (!is_string($photo)) {
+                            $photo = UserModel::getDefaultAvatarUrl($user);
+                        }
+                        setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
                     } else {
@@ -1085,6 +1088,15 @@ class UserModel extends Gdn_Model {
                 }
 
                 setValue($destination, $row, $user);
+            }
+        };
+
+        // Inject those user records.
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
             }
         }
     }

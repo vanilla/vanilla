@@ -221,17 +221,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
      * @return string
      */
     protected function makeCodeSpan($code) {
-        if ($this->code_span_content_func) {
-            $code = call_user_func($this->code_span_content_func, $code);
-        } else {
-            $code = htmlspecialchars(trim($code), ENT_NOQUOTES);
-        }
-
-        # Vanilla: add 2 lines below to do <pre><code> if there are newlines in the code.
-        if (strpos($code, "\n")) {
-            return $this->hashPart("<pre><code>$code</code></pre>");
-        } else {
-            return $this->hashPart("<code>$code</code>");
-        }
+        $code = str_replace(["\r", "\n"], ' ', $code);
+        return parent::makeCodeSpan($code);
     }
 }

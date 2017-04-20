@@ -1484,7 +1484,7 @@ class ActivityModel extends Gdn_Model {
         if (!$ActivityID) {
             if (!$Delete) {
                 $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'Activity');
-                if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
+                if ($this->isUserSpamming(Gdn::session()->UserID, $storageObject)) {
                     return false;
                 }
 

@@ -20,6 +20,7 @@ class InstallTest extends \PHPUnit_Framework_TestCase {
     public function testInstall() {
         global $dic;
 
+        // The container can be polluted by APIv0::bootstrap();
         $dic->setInstance(AddonManager::class, null);
 
         /* @var TestInstallModel $installer */

@@ -1068,12 +1068,13 @@ class UserModel extends Gdn_Model {
                         // Make sure all user records have a valid photo.
                         $photo = val('Photo', $user);
                         if ($photo && !isUrl($photo)) {
-                            $photo = Gdn_Upload::url(changeBasename($photo, 'n%s'));
-                            setValue('Photo', $user, $photo);
-                        } elseif (!$photo) {
-                            $photo = UserModel::getDefaultAvatarUrl($user);
-                            setValue('Photo', $user, $photo);
+                            $photoBase = changeBasename($photo, 'n%s');
+                            $photo = Gdn_Upload::url($photoBase);
                         }
+                        if (!is_string($photo)) {
+                            $photo = UserModel::getDefaultAvatarUrl($user);
+                        }
+                        setValue('Photo', $user, $photo);
                         // Add an alias to Photo. Currently only used in API calls.
                         setValue('PhotoUrl', $user, $photo);
                     } else {

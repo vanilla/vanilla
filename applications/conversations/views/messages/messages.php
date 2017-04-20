@@ -43,8 +43,10 @@ foreach ($Messages as $Message) {
             <div class="Message">
                 <?php
                 $this->fireEvent('BeforeConversationMessageBody');
-                echo Gdn_Format::to($Message->Body, $Format);
                 $this->EventArguments['Message'] = &$Message;
+                $Message->FormatBody = Gdn_Format::to($Message->Body, $Format);
+                $this->fireEvent('AfterConversationMessageBodyFormat');
+                echo $Message->FormatBody;
                 $this->fireEvent('AfterConversationMessageBody');
                 ?>
             </div>

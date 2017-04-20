@@ -1043,9 +1043,11 @@ class UserModel extends Gdn_Model {
             return;
         }
 
-        // Inject those user records.
+        reset($rows);
+        $single = is_string(key($rows));
+
         $users = [];
-        foreach ($rows as &$row) {
+        $populate = function(array &$row) use ($users, $columns) {
             foreach ($columns as $key) {
                 $destination = stringEndsWith($key, 'ID', true, true);
                 $id = val($key, $row);
@@ -1085,6 +1087,15 @@ class UserModel extends Gdn_Model {
                 }
 
                 setValue($destination, $row, $user);
+            }
+        };
+
+        // Inject those user records.
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
             }
         }
     }

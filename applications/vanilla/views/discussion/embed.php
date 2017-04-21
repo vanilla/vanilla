@@ -23,6 +23,7 @@ if (!function_exists('WriteComment'))
     <ul class="DataList MessageList Comments">
         <?php
         if ($HasCommentData) {
+            $this->EventArguments['Discussion'] = $Discussion;
             $this->fireEvent('BeforeCommentsRender');
             $CurrentOffset = $this->Offset;
             foreach ($Comments as $Comment) {

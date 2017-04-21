@@ -237,6 +237,10 @@ class CategoriesController extends VanillaController {
         } else {
             $Category = CategoryModel::categories($CategoryIdentifier);
 
+            if (!empty($Category)) {
+                $this->EventArguments['Category'] = &$Category;
+                $this->fireEvent('CategoryFound');
+            }
             if (empty($Category)) {
                 throw notFoundException();
             }

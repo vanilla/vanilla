@@ -28,7 +28,11 @@ if ($this->Data !== FALSE) {
 
                 echo '<li class="ClearFix '.$CssClass.'">';
 
-                $CountText = '<span class="Aside"><span class="Count">'.BigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
+                if ($Category->CountAllDiscussions > 0) {
+                    $CountText = '<span class="Aside"><span class="Count">'.bigPlural($Category->CountAllDiscussions, '%s discussion').'</span></span>';
+                } else {
+                    $CountText = '';
+                }
 
                 if ($Category->DisplayAs === 'Heading') {
                     echo $CountText.' '.htmlspecialchars($Category->Name);

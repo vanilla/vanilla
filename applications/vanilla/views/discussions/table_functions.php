@@ -17,9 +17,11 @@ if (!function_exists('WriteDiscussionHeading')) :
             <td class="BigCount CountReplies">
                 <div class="Wrap"><?php echo t('Replies'); ?></div>
             </td>
+<?php if (C('Garden.Analytics.Enabled', true)) { ?>
             <td class="BigCount CountViews">
                 <div class="Wrap"><?php echo t('Views'); ?></div>
             </td>
+<?php } ?>
             <td class="BlockColumn BlockColumn-User LastUser">
                 <div class="Wrap"><?php echo t('Most Recent Comment', 'Most Recent'); ?></div>
             </td>
@@ -130,6 +132,7 @@ if (!function_exists('writeDiscussionRow')) :
                     ?>
                 </div>
             </td>
+<?php if (C('Garden.Analytics.Enabled', true)) { ?>
             <td class="BigCount CountViews">
                 <div class="Wrap">
                     <?php
@@ -141,6 +144,7 @@ if (!function_exists('writeDiscussionRow')) :
                     ?>
                 </div>
             </td>
+<?php } ?>
             <td class="BlockColumn BlockColumn-User LastUser">
                 <div class="Block Wrap">
                     <?php

@@ -96,6 +96,12 @@ class CategoriesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
             ],
+            'pageSize:i?' => [
+                'description' => 'The number of items per page.',
+                'default' => $this->categoryModel->getDefaultLimit(),
+                'minimum' => 1,
+                'maximum' => 200
+            ],
             'expand:b?' => [
                 'default' => false,
                 'description' => 'Expand with the parent record.'
@@ -104,7 +110,7 @@ class CategoriesApiController extends AbstractApiController {
         $query = $in->validate($query);
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $this->categoryModel->getDefaultLimit());
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
             $query['expand'],
@@ -112,8 +118,19 @@ class CategoriesApiController extends AbstractApiController {
             $offset
         );
 
+        foreach ($rows as &$row) {
+            $this->massageRow($row);
+        }
+
         $result = $out->validate($rows);
         return $result;
+    }
+
+    public function massageRow(&$row) {
+        if ($row['ParentCategoryID'] <= 0) {
+            $row['ParentCategoryID'] = null;
+        }
+        $row['Description'] = $row['Description'] ?: '';
     }
 
     /**
@@ -189,7 +206,7 @@ class CategoriesApiController extends AbstractApiController {
      * @return Schema
      */
     public function schemaWithParent($expand = false) {
-        $attributes = ['parentCategoryID:i' => 'Parent category ID.'];
+        $attributes = ['parentCategoryID:i|n' => 'Parent category ID.'];
         if ($expand) {
             $attributes['parent:o?'] = Schema::parse(['categoryID', 'name', 'urlCode', 'url'])
                 ->add($this->fullSchema());

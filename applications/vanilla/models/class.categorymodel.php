@@ -661,7 +661,7 @@ class CategoryModel extends Gdn_Model {
         if (is_numeric($category)) {
             $category = static::categories($category);
         }
-        
+
         $permissionCategoryID = val('PermissionCategoryID', $category, -1);
 
         $result = Gdn::session()->checkPermission($permission, $fullMatch, 'Category', $permissionCategoryID)
@@ -3199,7 +3199,8 @@ SQL;
 
         $query = $this->SQL
             ->from('Category c')
-            ->like('Name', $name);
+            ->like('Name', $name)
+            ->orderBy('Name');
         if ($limit !== null) {
             $offset = ($offset === null ? false : $offset);
             $query->limit($limit, $offset);
@@ -3211,7 +3212,13 @@ SQL;
             self::calculateUser($category);
 
             if ($expandParent) {
-                $category['Parent'] = static::categories($category['ParentCategoryID']);
+                if ($category['ParentCategoryID'] > 0) {
+                    $parent = static::categories($category['ParentCategoryID']);
+                    self::calculate($category);
+                    $category['Parent'] = $parent;
+//                } else {
+//                    $parent = null;
+                }
             }
         }
 

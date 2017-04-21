@@ -168,6 +168,7 @@ class CommentsApiController extends AbstractApiController {
         }
 
         $this->formatField($comment, 'Body', $comment['Format']);
+        $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
     }
@@ -284,6 +285,7 @@ class CommentsApiController extends AbstractApiController {
         }
         $this->commentModel->save($data);
         $row = $this->commentByID($id);
+        $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $this->formatField($row, 'Body', $row['Format']);
         $result = $out->validate($row);

@@ -4078,7 +4078,7 @@ if (!function_exists('TagUrl')) {
     function tagUrl($Row, $Page = '', $WithDomain = false) {
         static $UseCategories;
         if (!isset($UseCategories)) {
-            $UseCategories = c('Plugins.Tagging.UseCategories');
+            $UseCategories = c('Vanilla.Tagging.UseCategories');
         }
 
         // Add the p before a numeric page.

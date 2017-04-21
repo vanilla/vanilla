@@ -30,6 +30,9 @@
         <testsuite name="APIv0">
             <directory suffix="Test.php">./tests/APIv0</directory>
         </testsuite>
+        <testsuite name="APIv2">
+            <directory suffix="Test.php">./tests/APIv2</directory>
+        </testsuite>
     </testsuites>
 
     <filter>

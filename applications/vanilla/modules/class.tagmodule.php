@@ -28,7 +28,7 @@ class TagModule extends Gdn_Module {
         $this->_TagData = false;
         $this->ParentID = null;
         $this->ParentType = 'Global';
-        $this->CategorySearch = c('Plugins.Tagging.CategorySearch', false);
+        $this->CategorySearch = c('Vanilla.Tagging.CategorySearch', false);
     }
 
     /**
@@ -157,7 +157,7 @@ class TagModule extends Gdn_Module {
      * @return string
      */
     public function inlineDisplay() {
-        if (!c('EnabledPlugins.Tagging')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 
@@ -198,12 +198,12 @@ endforeach; ?>
     }
 
     /**
-     *
+     * Render the module.
      *
      * @return string
      */
     public function toString() {
-        if (!c('EnabledPlugins.Tagging')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 

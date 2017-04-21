@@ -7,7 +7,6 @@
 
 namespace Garden\Web;
 
-
 use Garden\Web\Exception\NotFoundException;
 use Garden\Web\Exception\Pass;
 
@@ -17,6 +16,11 @@ class Dispatcher {
      * @var Route[]
      */
     private $routes;
+
+    /**
+     * @var string|array|callable
+     */
+    private $allowedOrigins;
 
     /**
      * Add a route to the routes list.
@@ -99,6 +103,8 @@ class Dispatcher {
             }
         }
 
+        $this->addAccessControl($response, $request);
+
         return $response;
     }
 
@@ -124,7 +130,7 @@ class Dispatcher {
     private function makeResponse($raw, $ob = '') {
         if ($raw instanceof Data) {
             $result = $raw;
-        } elseif (is_array($raw)) {
+        } elseif (is_array($raw) || is_string($raw)) {
             // This is an array of response data.
             $result = new Data($raw);
         } elseif ($raw instanceof \Exception) {
@@ -134,10 +140,87 @@ class Dispatcher {
             $result = new Data((array)$raw->jsonSerialize());
         } elseif (!empty($ob)) {
             $result = new Data($ob);
+        } elseif ($raw === null) {
+            $result = new Data(null);
         } else {
             $result = new Data(['message' => 'Could not encode the response.', 'status' => 500], 500);
         }
 
         return $result;
+    }
+
+    /**
+     * Add access control headers to the response.
+     *
+     * @param Data $response The current response being dispatched.
+     * @param RequestInterface $request The current request.
+     */
+    private function addAccessControl(Data $response, RequestInterface $request) {
+        if (!$response->hasHeader('Access-Control-Allow-Origin') && $allowOrigin = $this->allowOrigin($request)) {
+            $response->setHeader('Access-Control-Allow-Origin', $allowOrigin);
+
+            if ($request->hasHeader('Access-Control-Request-Method')) {
+                $response->setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            }
+            if ($request->hasHeader('Access-Control-Request-Headers')) {
+                $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+            }
+        }
+    }
+
+    /**
+     * Return the allow origin for the given host.
+     *
+     * @param RequestInterface $request The request to check.
+     * @return string Returns a value valid for a **Access-Control-Allow-Origin** header or an empty string if the origin isn't allowed.
+     */
+    private function allowOrigin(RequestInterface $request) {
+        $origin = $request->getHeader('Origin');
+        if (empty($origin)) {
+            return '';
+        }
+        $host = parse_url($origin, PHP_URL_HOST);
+        if (strcasecmp($host, $request->getHost()) === 0) {
+            // Same origin, no need for header.
+            return '';
+        }
+        $hostAndScheme = parse_url($origin, PHP_URL_SCHEME).'://'.$host;
+
+        if ($this->allowedOrigins === '*') {
+            return '*';
+        } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
+            return $origin;
+        } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
+            return $origin;
+        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
+            return $origin;
+        }
+        return '';
+    }
+
+    /**
+     * Get the allowedOrigins.
+     *
+     * @return array|callable|string Returns the allowedOrigins.
+     */
+    public function getAllowedOrigins() {
+        return $this->allowedOrigins;
+    }
+
+    /**
+     * Set the allowed origins for CORS requests.
+     *
+     * This can be one of the following:
+     *
+     * - **string**. Either a single host name or "*" for all hosts.
+     * - **array**. An array of host names that are allowed.
+     * - **callable**. A function that returns **true** or **false** when an origin is passed in.
+     *
+     * @param array|callable|string $origins The allowed origins.
+     * @return $this
+     */
+    public function setAllowedOrigins($origins) {
+        $this->allowedOrigins = $origins;
+        return $this;
     }
 }

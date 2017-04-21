@@ -28,7 +28,7 @@ install:
   - composer self-update
   - composer install -o
   - composer require phpunit/phpunit ~5
-  - tests/travis/nginx/install-nginx.sh
+  - tests/travis/setup.sh
 
 script:
   - tests/travis/php-lint.sh ./applications

@@ -16,7 +16,6 @@ class LogModel extends Gdn_Pluggable {
     private static $instance = null;
     private $recalcIDs = [
         'Discussion' => [],
-        'Category' => [],
     ];
     private static $transactionID = null;
 
@@ -199,7 +198,7 @@ class LogModel extends Gdn_Pluggable {
         static $TinyDiff = null;
 
         if ($TinyDiff === null) {
-            require_once(dirname(__FILE__).'/tiny_diff.php');
+            require_once(__DIR__.'/tiny_diff.php');
             $TinyDiff = new Tiny_diff();
         }
 
@@ -570,26 +569,19 @@ class LogModel extends Gdn_Pluggable {
      * Recalculate a record after a log operation.
      */
     public function recalculate() {
-        if ($CategoryIDs = val('Category', $this->recalcIDs)) {
-            foreach ($CategoryIDs as $categoryID => $counts) {
-                Gdn::sql()
-                    ->update('Category')
-                    ->set('CountDiscussions', 'CountDiscussions + '.val('CountDiscussions', $counts, 0), false, false)
-                    ->set('CountComments', 'CountComments + '.val('CountComments', $counts, 0), false, false)
-                    ->where('CategoryID', $categoryID)
-                    ->put();
+        $categoryModel = CategoryModel::instance();
+        $commentModel = CommentModel::instance();
+
+        if ($discussionIDs = val('Discussion', $this->recalcIDs)) {
+            foreach ($discussionIDs as $discussionID => $tmp) {
+                $commentModel->updateCommentCount($discussionID);
+                $categoryModel->incrementLastDiscussion($discussionID);
             }
-            $this->recalcIDs['Category'] = [];
         }
 
-        if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {
-            $In = implode(',', array_keys($DiscussionIDs));
-
-            if (!empty($In)) {
-                $Px = Gdn::database()->DatabasePrefix;
-                $Sql = "update {$Px}Discussion d set d.CountComments = (select coalesce(count(c.CommentID), 0) + 1 from {$Px}Comment c where c.DiscussionID = d.DiscussionID) where d.DiscussionID in ($In)";
-                Gdn::database()->query($Sql);
-                $this->recalcIDs['Discussion'] = [];
+        if ($commentIDs = val('Comment', $this->recalcIDs)) {
+            foreach ($commentIDs as $commentID => $tmp) {
+                $categoryModel->incrementLastComment($commentID);
             }
         }
 
@@ -826,27 +818,10 @@ class LogModel extends Gdn_Pluggable {
                     switch ($Log['RecordType']) {
                         case 'Discussion':
                             $this->recalcIDs['Discussion'][$ID] = true;
-
-                            if (empty($this->recalcIDs['Category'][$Log['CategoryID']])) {
-                                $this->recalcIDs['Category'][$Log['CategoryID']] = [
-                                    'CountDiscussions' => 1,
-                                    'CountComments' => 0,
-                                ];
-                            } else {
-                                $this->recalcIDs['Category'][$Log['CategoryID']]['CountDiscussions']++;
-                            }
                             break;
                         case 'Comment':
                             $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
-
-                            if (empty($this->recalcIDs['Category'][$Log['ParentRecordID']])) {
-                                $this->recalcIDs['Category'][$Log['ParentRecordID']] = [
-                                    'CountDiscussions' => 0,
-                                    'CountComments' => 1,
-                                ];
-                            } else {
-                                $this->recalcIDs['Category'][$Log['ParentRecordID']]['CountComments']++;
-                            }
+                            $this->recalcIDs['Comment'][$ID] = true;
                             break;
                     }
 

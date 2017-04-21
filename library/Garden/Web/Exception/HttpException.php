@@ -155,8 +155,8 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
     public function jsonSerialize() {
         $context = [];
         foreach ($this->context as $key => $value) {
-            if (!(strpos($key, 'HTTP_') === 0)) {
-                $context[$key = $value];
+            if (strpos($key, 'HTTP_') !== 0) {
+                $context[$key] = $value;
             }
         }
 

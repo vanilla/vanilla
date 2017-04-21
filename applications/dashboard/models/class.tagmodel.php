@@ -24,7 +24,7 @@ class TagModel extends Gdn_Model {
      */
     public function __construct($Name = '') {
         parent::__construct('Tag');
-        $this->StringTags = c('Plugins.Tagging.StringTags');
+        $this->StringTags = c('Vanilla.Tagging.StringTags');
     }
 
     /**
@@ -106,7 +106,7 @@ class TagModel extends Gdn_Model {
 
             return $ToID;
         } else {
-            if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
+            if (Gdn::session()->checkPermission('Vanilla.Tagging.Add')) {
                 // Tag-type tags (i.e., user generated tags) are saved with no type.
                 if (strtolower(val('Type', $FormPostValues)) == 'tag') {
                     $FormPostValues['Type'] = '';
@@ -442,7 +442,7 @@ class TagModel extends Gdn_Model {
         }
 
         // Add any remaining tags that need to be added.
-        if (Gdn::session()->checkPermission('Plugins.Tagging.Add')) {
+        if (Gdn::session()->checkPermission('Vanilla.Tagging.Add')) {
             foreach ($new_tags as $name => $full_name) {
                 $new_tag = array(
                     'Name' => trim(str_replace(' ', '-', strtolower($name)), '-'),

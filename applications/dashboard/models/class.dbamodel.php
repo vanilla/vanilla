@@ -106,7 +106,7 @@ class DBAModel extends Gdn_Model {
 
         $Result = "update :_$ParentTable p
                   set p.$ParentColumnName = (
-                     select $Aggregate(c.$ChildColumnName)
+                     select coalesce($Aggregate(c.$ChildColumnName), 0)
                      from :_$ChildTable c
                      where p.$ParentJoinColumn = c.$ChildJoinColumn)";
 

@@ -2,25 +2,24 @@
 /**
  * Quotes Plugin.
  *
- *  @author Tim Gunter <tim@vanillaforums.com>
+ * @author Tim Gunter <tim@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
 
-// Define the plugin:
-$PluginInfo['Quotes'] = array(
+$PluginInfo['Quotes'] = [
     'Name' => 'Quotes',
     'Description' => "Adds an option to each comment for users to easily quote each other.",
     'Version' => '1.9',
     'MobileFriendly' => true,
-    'RequiredApplications' => array('Vanilla' => '2.1'),
+    'RequiredApplications' => ['Vanilla' => '2.1'],
     'HasLocale' => true,
     'Author' => "Tim Gunter",
     'AuthorEmail' => 'tim@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
     'Icon' => 'quotes.png'
-);
+];
 
 /**
  * This plugin allows users to quote comments for reference in their own comments
@@ -41,7 +40,7 @@ class QuotesPlugin extends Gdn_Plugin {
     public $HandleRenderQuotes = true;
 
     /**
-     *
+     * Set some properties we always need.
      */
     public function __construct() {
         parent::__construct();
@@ -57,9 +56,9 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add "Quote Settings" to edit profile menu.
      *
-     *
-     * @param $Sender
+     * @param profileController $Sender
      */
     public function profileController_afterAddSideMenu_handler($Sender) {
         if (!Gdn::session()->checkPermission('Garden.SignIn.Allow')) {
@@ -70,20 +69,20 @@ class QuotesPlugin extends Gdn_Plugin {
         $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup QuoteSettingsLink'));
         } else {
-            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup QuoteSettingsLink'));
         }
     }
 
     /**
+     * Endpoint for managing personal quote settings from edit profile menu.
      *
-     *
-     * @param $Sender
+     * @param profileController $Sender
      */
     public function profileController_quotes_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title(t("Quotes Settings"));
+        $Sender->title(t("Quote Settings"));
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {
@@ -136,9 +135,9 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Set user's quote folding preference in the page for Javascript access.
      *
-     *
-     * @param $Sender
+     * @param discussionController $Sender
      */
     public function discussionController_beforeDiscussionRender_handler($Sender) {
         if (!Gdn::session()->isValid()) {
@@ -155,7 +154,9 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Re-dispatch for requests to our embedded controller.
      *
+     * This is the old and busted way of doing controllers in addons. Use a native controller instead.
      *
      * @param $Sender
      * @throws Exception
@@ -165,7 +166,9 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add getquote endpoint to our embedded controller.
      *
+     * Old and busted method.
      *
      * @param $Sender
      */
@@ -174,9 +177,9 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Retrieve text of a quote.
      *
-     *
-     * @param $Sender
+     * @param discussionController $Sender
      * @param $Selector
      * @param bool $Format
      */
@@ -201,35 +204,28 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add Javascript to discussion pages.
      *
-     *
-     * @param $Sender
+     * @param discussionController $Sender
      */
     public function discussionController_render_before($Sender) {
-        $this->prepareController($Sender);
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     */
-    public function postController_render_before($Sender) {
-        $this->prepareController($Sender);
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     */
-    protected function PrepareController($Sender) {
-        //if (!$this->HandleRenderQuotes) return;
         $Sender->addJsFile('quotes.js', 'plugins/Quotes');
     }
 
     /**
-     * Add 'Quote' option to Discussion.
+     * Add Javascript to post pages.
+     *
+     * @param postController $Sender
+     */
+    public function postController_render_before($Sender) {
+        $Sender->addJsFile('quotes.js', 'plugins/Quotes');
+    }
+
+    /**
+     * Add 'Quote' option to discussion via the reactions row after each post.
+     *
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     public function base_AfterFlag_handler($Sender, $Args) {
         $this->addQuoteButton($Sender, $Args);
@@ -237,20 +233,22 @@ class QuotesPlugin extends Gdn_Plugin {
 
     /**
      * Output Quote link.
+     *
+     * @param Gdn_Controller $Sender
+     * @param array $Args
      */
     protected function addQuoteButton($Sender, $Args) {
-
         // There are some case were Discussion is not set as an event argument so we use the sender data instead.
         $discussion = $Sender->data('Discussion');
         if (!$discussion) {
             return;
         }
 
-        $session = Gdn::session();
-        if (!$session->UserID) {
+        if (!Gdn::session()->UserID) {
             return;
         }
-        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
+
+        if (!Gdn::session()->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
@@ -268,6 +266,11 @@ class QuotesPlugin extends Gdn_Plugin {
         echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$Object->DiscussionID}/{$ObjectID}", true), 'ReactButton Quote Visible').' ';
     }
 
+    /**
+     * Build quotes in a post.
+     *
+     * @param discussionController $Sender
+     */
     public function discussionController_beforeDiscussionDisplay_handler($Sender) {
         $this->RenderQuotes($Sender);
     }
@@ -294,6 +297,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
+        /** @var string|null $ValidateUsernameRegex */
         static $ValidateUsernameRegex = null;
 
         if (is_null($ValidateUsernameRegex)) {
@@ -317,6 +321,8 @@ class QuotesPlugin extends Gdn_Plugin {
 //            $Object->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Object->Body);
 //            $Object->Body = str_ireplace('</blockquote>','</p></div></blockquote>',$Object->Body);
 //            break;
+
+            // WHY IS BBCODE PARSING DONE FOR MARKDOWN?
             case 'Markdown':
                 // BBCode quotes with authors
                 $Object->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Object->Body);
@@ -337,10 +343,10 @@ class QuotesPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Get HTML reference to the quote author.
      *
-     *
-     * @param $Matches
-     * @return string
+     * @param array $Matches
+     * @return string HTML.
      */
     protected function quoteAuthorCallback($Matches) {
         $Attribution = t('%s said:');
@@ -352,9 +358,9 @@ BLOCKQUOTE;
     }
 
     /**
+     * Quote endpoint.
      *
-     *
-     * @param $Sender
+     * @param postController $Sender
      */
     public function postController_quote_create($Sender) {
         if (sizeof($Sender->RequestArgs) < 2) {
@@ -367,9 +373,9 @@ BLOCKQUOTE;
     }
 
     /**
+     * Format quotes on the posting page.
      *
-     *
-     * @param $Sender
+     * @param postController $Sender
      */
     public function postController_BeforeCommentRender_handler($Sender) {
         if ($Sender->data('Plugin.Quotes.QuoteSource')) {
@@ -389,11 +395,11 @@ BLOCKQUOTE;
     }
 
     /**
+     * Format the quote.
      *
-     *
-     * @param $Type
-     * @param $ID
-     * @param $QuoteData
+     * @param string $Type
+     * @param int $ID
+     * @param array $QuoteData
      * @param bool $Format
      */
     protected function formatQuote($Type, $ID, &$QuoteData, $Format = false) {
@@ -527,16 +533,10 @@ BLOCKQUOTE;
     }
 
     /**
-     * No setup.
-     */
-    public function setup() {
-    }
-
-    /**
+     * Extra parsing for Markdown.
      *
-     *
-     * @param $Text
-     * @return mixed
+     * @param string $Text
+     * @return string
      */
     protected static function _stripMarkdownQuotes($Text) {
         $Text = preg_replace('/
@@ -554,10 +554,10 @@ BLOCKQUOTE;
     }
 
     /**
+     * Remove mentions from quotes so we don't generate notifications.
      *
-     *
-     * @param $Text
-     * @return mixed
+     * @param string $Text
+     * @return string
      */
     protected static function _stripMentions($Text) {
         $Text = preg_replace(

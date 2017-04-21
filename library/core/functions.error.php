@@ -472,7 +472,9 @@ if (!function_exists('formatErrorException')) {
                 break;
         }
 
-        return formatPHPErrorLog($exception->getMessage(), $errorType, $exception->getFile(), $exception->getLine());
+        $stackTrace = c('Garden.Errors.StackTrace') ? $exception->getTrace() : null;
+
+        return formatPHPErrorLog($exception->getMessage(), $errorType, $exception->getFile(), $exception->getLine(), $stackTrace);
     }
 }
 
@@ -503,7 +505,9 @@ if (!function_exists('formatException')) {
         }
         $errorMessage .= PHP_EOL . '  thrown';
 
-        return formatPHPErrorLog($errorMessage, $errorType, $exception->getFile(), $exception->getLine());
+        $stackTrace = c('Garden.Errors.StackTrace') ? $exception->getTrace() : null;
+
+        return formatPHPErrorLog($errorMessage, $errorType, $exception->getFile(), $exception->getLine(), $stackTrace);
     }
 }
 
@@ -516,9 +520,10 @@ if (!function_exists('formatPHPErrorLog')) {
      * @param string $errorType Optional error type such as "PHP Fatal error" or "PHP Notice".  It will be prefixed to the $errorMsg
      * @param string $file Optional file path where the error occured
      * @param string $line Optional line number where the error occured
+     * @param array $stackTrace Optional stack trace of the error
      * @return string The formatted error message
      */
-    function formatPHPErrorLog($errorMsg, $errorType = null, $file = null, $line = null) {
+    function formatPHPErrorLog($errorMsg, $errorType = null, $file = null, $line = null, $stackTrace = null) {
         $formattedMessage = $errorMsg;
         if ($errorType) {
             $formattedMessage = sprintf('%s:  %s', $errorType, $errorMsg);
@@ -530,7 +535,52 @@ if (!function_exists('formatPHPErrorLog')) {
             $formattedMessage = sprintf('%s in %s', $formattedMessage, $file, $line);
         }
 
+        if ($stackTrace) {
+            $formattedMessage .= formatStackTrace($stackTrace)."\n";
+        }
+
         return $formattedMessage;
+    }
+}
+
+if (!function_exists('formatStackTrace')) {
+    /**
+     * Format a stack trace.
+     *
+     * @param array $stackTrace
+     * @return string The formatted stack trace
+     */
+    function formatStackTrace($stackTrace) {
+        $formattedStackTrace = [
+            "\nStacktrace [".rtrim(PATH_ROOT, '/')."/]:"
+        ];
+
+        if (is_array($stackTrace) && count($stackTrace)) {
+            foreach($stackTrace as &$trace) {
+                if (!isset($trace['file'])) {
+                    continue;
+                }
+
+                $relativePath = ltrim(str_replace(PATH_ROOT, null, $trace['file']), '/');
+                $buffer = '- '.$relativePath.':'.$trace['line'];
+
+                if (isset($trace['function'])) {
+                    $buffer .= ' in ';
+                    if ($trace['class']) {
+                        $buffer .= $trace['class'].$trace['type'];
+                    }
+                    $buffer .= $trace['function'].'()';
+                }
+
+                $formattedStackTrace[] = $buffer;
+            }
+        }
+
+        if (count($formattedStackTrace) === 1) {
+            $formattedStackTrace[] = '(empty)';
+        }
+
+        return implode("\n", $formattedStackTrace);
     }
 }
 

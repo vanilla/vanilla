@@ -692,7 +692,7 @@ class DiscussionsController extends VanillaController {
      * Add the discussions/tagged/{TAG} endpoint.
      */
     public function tagged() {
-        if (!c('EnabledPlugins.Tagging')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             throw new Exception('Not found', 404);
         }
 
@@ -701,7 +701,7 @@ class DiscussionsController extends VanillaController {
         $Args = $this->RequestArgs;
         $Get = array_change_key_case($this->Request->get());
 
-        if ($UseCategories = c('Plugins.Tagging.UseCategories')) {
+        if ($UseCategories = c('Vanilla.Tagging.UseCategories')) {
             // The url is in the form /category/tag/p1
             $CategoryCode = val(0, $Args);
             $Tag = val(1, $Args);

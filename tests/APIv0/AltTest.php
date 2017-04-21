@@ -54,7 +54,7 @@ class AltTest extends \PHPUnit_Framework_TestCase {
                 'Host' => 'localhost',
                 'Name' => $api->getDbName(),
                 'User' => $api->getDbUser(),
-                'Password' => $api->getDbPassword()
+                'Password' => $api->getDbPassword(),
             ],
             'EnabledApplications' => [
                 'Vanilla' => 'vanilla',
@@ -66,21 +66,21 @@ class AltTest extends \PHPUnit_Framework_TestCase {
                 'Facebook' => true,
                 'Twitter' => true,
                 'Akismet' => true,
-                'StopForumSpam' => true
+                'StopForumSpam' => true,
             ],
             'Garden' => [
-                'Installed' => null, // important
+                'Installed' => null, // Important to bypass the redirect to /dashboard/setup. False would not do here.
                 'Title' => get_called_class(),
                 'Domain' => parse_url($api->getBaseUrl(), PHP_URL_HOST),
                 'Cookie' => [
                     'Salt' => '',
                     'Name' => 'vf_'.strtolower(get_called_class()).'_ENDTX',
-                    'Domain' => ''
+                    'Domain' => '',
                 ],
                 'Email' => [
                     'SupportAddress' => 'noreply@vanilla.test',
                     'SupportName' => get_called_class()
-                ]
+                ],
             ]
         ];
 

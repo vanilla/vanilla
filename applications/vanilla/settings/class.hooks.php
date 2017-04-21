@@ -21,7 +21,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function dbaController_countJobs_handler($Sender) {
         $Counts = [
             'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
-            'Category' => ['CountDiscussions', 'CountComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
+            'Category' => ['CountDiscussions', 'CountAllDiscussions', 'CountComments', 'CountAllComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
             'Tag' => ['table' => 'Tag', 'column' => 'CountDiscussions'],
         ];
 
@@ -185,7 +185,7 @@ class VanillaHooks implements Gdn_IPlugin {
     public function discussionController_afterDiscussionBody_handler($Sender) {
         /*  */
         // Allow disabling of inline tags.
-        if (!c('Plugins.Tagging.DisableInline', false)) {
+        if (!c('Vanilla.Tagging.DisableInline', false)) {
             if (!property_exists($Sender->EventArguments['Object'], 'CommentID')) {
                 $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
 
@@ -213,14 +213,14 @@ class VanillaHooks implements Gdn_IPlugin {
 
         // Set some tagging requirements.
         $TagsString = trim(strtolower(valr('FormPostValues.Tags', $Args, '')));
-        if (stringIsNullOrEmpty($TagsString) && c('Plugins.Tagging.Required')) {
+        if (stringIsNullOrEmpty($TagsString) && c('Vanilla.Tagging.Required')) {
             $Sender->Validation->addValidationResult('Tags', 'You must specify at least one tag.');
         } else {
             // Break apart our tags and lowercase them all for comparisons.
             $Tags = TagModel::splitTags($TagsString);
             $Tags = array_map('strtolower', $Tags);
             $reservedTags = array_map('strtolower', $reservedTags);
-            $maxTags = c('Plugin.Tagging.Max', 5);
+            $maxTags = c('Vanilla.Tagging.Max', 5);
 
             // Validate our tags.
             if ($reservedTags = array_intersect($Tags, $reservedTags)) {
@@ -249,7 +249,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $FormTags = TagModel::splitTags($RawFormTags);
 
         // If we're associating with categories
-        $CategorySearch = c('Plugins.Tagging.CategorySearch', false);
+        $CategorySearch = c('Vanilla.Tagging.CategorySearch', false);
         if ($CategorySearch) {
             $CategoryID = val('CategoryID', $FormPostValues, false);
         }
@@ -308,14 +308,14 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param Gdn_Controller $Sender
      */
     public function postController_afterDiscussionFormOptions_handler($Sender) {
-        if (!c('EnabledPlugins.Tagging')) {
+        if (!c('Tagging.Discussions.Enabled')) {
             return;
         }
 
         if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
-            $Tags = $TagModel->getWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', c('Plugins.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
+            $Tags = $TagModel->getWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
             $TagsHtml = (count($Tags)) ? '' : t('No tags have been created yet.');
             $Tags = Gdn_DataSet::index($Tags, 'FullName');
             ksort($Tags);
@@ -362,9 +362,9 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param PostController $Sender
      */
     public function postController_render_before($Sender) {
-        $Sender->addDefinition('PluginsTaggingAdd', Gdn::session()->checkPermission('Plugins.Tagging.Add'));
-        $Sender->addDefinition('PluginsTaggingSearchUrl', Gdn::request()->Url('plugin/tagsearch'));
-        $Sender->addDefinition('MaxTagsAllowed', c('Plugin.Tagging.Max', 5));
+        $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
+        $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
+        $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.
         $TagModel = TagModel::instance();
@@ -1003,9 +1003,9 @@ class VanillaHooks implements Gdn_IPlugin {
         $sort = -1; // Ensure these items go before any plugin items.
 
         $sender->addLinkIf('Garden.Community.Manage', t('Categories'), '/vanilla/settings/categories', 'forum.manage-categories', 'nav-manage-categories', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Advanced'), '/vanilla/settings/advanced', 'forum.advanced', 'nav-forum-advanced', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Posting'), '/vanilla/settings/posting', 'forum.posting', 'nav-forum-posting', $sort)
             ->addLinkIf(c('Vanilla.Archive.Date', false) &&  Gdn::session()->checkPermission('Garden.Settings.Manage'), t('Archive Discussions'), '/vanilla/settings/archive', 'forum.archive', 'nav-forum-archive', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Embed'), 'embed/forum', 'forum.embed-site', 'nav-embed nav-embed-site', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Embedding'), 'embed/forum', 'site-settings.embed-site', 'nav-embed nav-embed-site', $sort)
             ->addLinkToSectionIf('Garden.Settings.Manage', 'Moderation', t('Flood Control'), '/vanilla/settings/floodcontrol', 'moderation.flood-control', 'nav-flood-control', $sort);
     }
 
@@ -1033,6 +1033,14 @@ class VanillaHooks implements Gdn_IPlugin {
                 $discussionModel->updateUserDiscussionCount($recordUserID, true);
                 break;
         }
+    }
+
+    /**
+     * @deprecated Request /tags/search instead
+     */
+    public function pluginController_tagsearch_create() {
+        $query = http_build_query(Gdn::request()->getQuery());
+        redirect(url('/tags/search'.($query ? '?'.$query : null)), 301);
     }
 
     /**

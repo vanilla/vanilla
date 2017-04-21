@@ -17,14 +17,11 @@ if (!file_exists($dir)) {
     mkdir($dir);
 }
 
-$files = glob(__DIR__."/travis/cgi-bin/*.php");
+$files = glob(__DIR__."/travis/templates/vanilla/cgi-bin/*.php");
 foreach ($files as $file) {
     $dest = $dir.'/'.basename($file);
     $r = copy($file, $dest);
 }
-
-
-
 
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries

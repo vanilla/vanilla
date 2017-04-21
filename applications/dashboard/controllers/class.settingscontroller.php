@@ -459,15 +459,15 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Banner management screen.
+     * Branding management screen.
      *
      * @since 2.0.0
      * @access public
      */
-    public function banner() {
+    public function branding() {
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);
-        $this->setHighlightRoute('dashboard/settings/banner');
-        $this->title(t('Banner'));
+        $this->setHighlightRoute('dashboard/settings/branding');
+        $this->title(t('Branding'));
         $configurationModule = new ConfigurationModule($this);
         $configurationModule->initialize([
             'Garden.HomepageTitle' => [
@@ -606,16 +606,16 @@ class SettingsController extends DashboardController {
     }
 
     /**
-     * Homepage management screen.
+     * Layout management screen.
      *
      * @since 2.0.0
      * @access public
      */
-    public function homepage() {
+    public function layout() {
         $this->permission('Garden.Settings.Manage');
 
         // Page setup
-        $this->setHighlightRoute('dashboard/settings/homepage');
+        $this->setHighlightRoute('dashboard/settings/layout');
         $this->title(t('Homepage'));
 
         $CurrentRoute = val('Destination', Gdn::router()->getRoute('DefaultController'), '');
@@ -713,6 +713,80 @@ class SettingsController extends DashboardController {
 
         $this->render();
     }
+
+    /**
+     * Security settings management screen.
+     *
+     * @since 2.4
+     * @access public
+     */
+    public function security() {
+        $this->permission('Garden.Settings.Manage');
+        $this->setHighlightRoute('dashboard/settings/security');
+        $this->title(t('Security'));
+
+        $Validation = new Gdn_Validation();
+        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
+        $ConfigurationModel->setField(array(
+            'Garden.TrustedDomains',
+            'Garden.Format.WarnLeaving',
+        ));
+
+        // Set the model on the form.
+        $this->Form->setModel($ConfigurationModel);
+
+        // If seeing the form for the first time...
+        if ($this->Form->authenticatedPostBack() === false) {
+            // Format trusted domains as a string
+            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
+            if (is_array($TrustedDomains)) {
+                $TrustedDomains = implode("\n", $TrustedDomains);
+            }
+
+            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
+
+            // Apply the config settings to the form.
+            $this->Form->setData($ConfigurationModel->Data);
+        } else {
+            // Format the trusted domains as an array based on newlines & spaces
+            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
+            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
+            $TrustedDomains = array_unique(array_filter($TrustedDomains));
+            $TrustedDomains = implode("\n", $TrustedDomains);
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
+
+            if ($this->Form->save() !== false) {
+                $this->informMessage(t("Your settings have been saved."));
+            }
+
+            // Reformat array as string so it displays properly in the form
+            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+        }
+
+        $this->render();
+    }
+
+    /**
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use SettingsController::layout instead.
+     */
+    public function homepage() {
+        redirect('/settings/layout');
+    }
+
+    /**
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
+     */
+    public function banner() {
+        redirect('/settings/branding');
+    }
+
+
+
 
     /**
      * Outgoing Email management screen.
@@ -963,6 +1037,34 @@ class SettingsController extends DashboardController {
             }
         }
         $this->render('Blank', 'Utility');
+    }
+
+    /**
+     * Manages the Tagging.Discussions.Enabled setting.
+     *
+     * @param String $value Either 'true' or 'false', whether to enable tagging.
+     * @throws Exception
+     * @throws Gdn_UserException
+     */
+    public function enableTagging($value) {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+        $value = strtolower($value);
+        if (Gdn::session()->checkPermission('Garden.Community.Manage')) {
+            saveToConfig('Tagging.Discussions.Enabled', $value === 'true');
+            if ($value === 'true') {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/false', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
+                $this->jsonTarget('.js-foggy', 'foggyOff', 'Trigger');
+                $this->informMessage(sprintf(t('%s enabled.'), t('Tagging')));
+            } else {
+                $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/settings/enabletagging/true', 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
+                $this->jsonTarget('.js-foggy', 'foggyOn', 'Trigger');
+                $this->informMessage(sprintf(t('%s disabled.'), t('Tagging')));
+            }
+            $this->jsonTarget("#enable-tagging-toggle", $newToggle);
+        }
+        $this->render('blank', 'utility');
     }
 
     /**
@@ -1849,7 +1951,7 @@ class SettingsController extends DashboardController {
             $message = t('The theme with key %s could not be found and will not be started.');
             $this->Form->addError(sprintf($message, $enabledThemeKey));
         }
-        
+
         $this->setData('EnabledThemeInfo', $ThemeInfo);
         $this->setData('EnabledThemeFolder', val('Folder', $ThemeInfo));
         $this->setData('EnabledTheme', $ThemeInfo);

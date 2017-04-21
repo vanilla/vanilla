@@ -46,10 +46,23 @@ class ConversationsHooks implements Gdn_IPlugin {
 
         $DeleteMethod = val('DeleteMethod', $Options, 'delete');
         if ($DeleteMethod == 'delete') {
+            /** @var Gdn_SQLDriver $sql */
+            $sql = $Sender->SQL;
+            $sql
+                ->from('UserConversation as uc')
+                ->join('Conversation as c', 'c.ConversationID = uc.ConversationID')
+                ->where(['c.InsertUserID' => $UserID])
+                ->orWhere(['c.UpdateUserID' => $UserID])
+                ->delete();
+            $sql
+                ->from('ConversationMessage as cm')
+                ->join('Conversation as c', 'c.ConversationID = cm.ConversationID')
+                ->where(['c.InsertUserID' => $UserID])
+                ->orWhere(['c.UpdateUserID' => $UserID])
+                ->delete();
+
             $Sender->SQL->delete('Conversation', array('InsertUserID' => $UserID));
             $Sender->SQL->delete('Conversation', array('UpdateUserID' => $UserID));
-            $Sender->SQL->delete('UserConversation', array('UserID' => $UserID));
-            $Sender->SQL->delete('ConversationMessage', array('InsertUserID' => $UserID));
         } elseif ($DeleteMethod == 'wipe') {
             $Sender->SQL->update('ConversationMessage')
                 ->set('Body', t('The user and all related content has been deleted.'))

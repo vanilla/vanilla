@@ -395,7 +395,7 @@ class FlaggingPlugin extends Gdn_Plugin {
             ->column('InsertName', 'varchar(64)')
             ->column('AuthorID', 'int(11)')
             ->column('AuthorName', 'varchar(64)')
-            ->column('ForeignURL', 'varchar(255)', false, 'key')
+            ->column('ForeignURL', 'varchar(191)', false, 'key')
             ->column('ForeignID', 'int(11)')
             ->column('ForeignType', 'varchar(32)')
             ->column('Comment', 'text')

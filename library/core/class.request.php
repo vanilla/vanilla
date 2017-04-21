@@ -326,6 +326,41 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
+     * Get a header value.
+     *
+     * @param string $header The name of the header.
+     * @param mixed $default The default value if the header does not exist.
+     * @return mixed Returns the header value or {@link $default}.
+     */
+    public function getHeader($header, $default = null) {
+        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), $default);
+    }
+
+    /**
+     * Checks if a header exists by the given case-insensitive name.
+     *
+     * @param string $header Case-insensitive header name.
+     * @return bool Returns **true** if the header exists or **false** otherwise.
+     */
+    public function hasHeader($header) {
+        return $this->getHeader($header, null) !== null;
+    }
+
+    /**
+     * Normalize a header name into a header key.
+     *
+     * @param string $name The name of the header.
+     * @return string Returns a string in the form **HTTP_***.
+     */
+    private function headerKey($name) {
+        $key = strtoupper(str_replace('-', '_', $name));
+        if ($key !== 'CONTENT_TYPE') {
+            $key = 'HTTP_'.$key;
+        }
+        return $key;
+    }
+
+    /**
      * Get the host and port, but only if the port is not the standard port for the request scheme.
      *
      * @return string
@@ -496,12 +531,11 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Search one of the currently attached data arrays for the requested argument and return its value
-     * or $Default if not found.
+     * Search one of the currently attached data arrays for the requested argument and return its value.
      *
-     * @param $paramType Which request argument array to query for this value. One of the self::INPUT_* constants
-     * @param $key Name of the request argument to retrieve.
-     * @param $default Value to return if argument not found.
+     * @param string $paramType Which request argument array to query for this value. One of the **INPUT_*** constants.
+     * @param string $key Name of the request argument to retrieve.
+     * @param mixed $default Value to return if argument not found.
      * @return mixed
      */
     public function getValueFrom($paramType, $key, $default = false) {

@@ -29,14 +29,14 @@ class VanillaSettingsController extends Gdn_Controller {
     public $OtherCategories;
 
     /**
-     * Advanced settings.
+     * Posting settings.
      *
      * Allows setting configuration values via form elements.
      *
      * @since 2.0.0
      * @access public
      */
-    public function advanced() {
+    public function posting() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
 
@@ -52,9 +52,7 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
-            'Garden.Format.WarnLeaving',
             'Garden.Format.DisableUrlEmbeds',
-            'Garden.TrustedDomains'
         ));
 
         // Set the model on the form.
@@ -62,13 +60,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         // If seeing the form for the first time...
         if ($this->Form->authenticatedPostBack() === false) {
-            // Format trusted domains as a string
-            $TrustedDomains = val('Garden.TrustedDomains', $ConfigurationModel->Data);
-            if (is_array($TrustedDomains)) {
-                $TrustedDomains = implode("\n", $TrustedDomains);
-            }
 
-            $ConfigurationModel->Data['Garden.TrustedDomains'] = $TrustedDomains;
 
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
@@ -84,33 +76,33 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.MaxLength', 'Integer');
 
-            // Format the trusted domains as an array based on newlines & spaces
-            $TrustedDomains = $this->Form->getValue('Garden.TrustedDomains');
-            $TrustedDomains = explodeTrim("\n", $TrustedDomains);
-            $TrustedDomains = array_unique(array_filter($TrustedDomains));
-            $TrustedDomains = implode("\n", $TrustedDomains);
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
-            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
-
             // Save new settings
             $Saved = $this->Form->save();
             if ($Saved !== false) {
                 $this->informMessage(t("Your changes have been saved."));
             }
-
-            // Reformat array as string so it displays properly in the form
-            $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
-
         }
 
-        $this->setHighlightRoute('vanilla/settings/advanced');
+        $this->setHighlightRoute('vanilla/settings/posting');
         $this->addJsFile('settings.js');
-        $this->title(t('Advanced Forum Settings'));
+        $this->title(t('Posting'));
 
-        // Render default view (settings/advanced.php)
+        // Render default view (settings/posting.php)
         $this->render();
     }
 
+    /**
+     * Backwards compatibility.
+     *
+     * @deprecated 2.4 Legacy redirect. Use VanillaSettingsController::posting instead.
+     */
+    public function advanced() {
+        redirect('/vanilla/settings/posting');
+    }
+
+    /**
+     *
+     */
     public function archive() {
         // Check permission
         $this->permission('Garden.Settings.Manage');
@@ -242,7 +234,13 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Discussion.SpamLock',
             'Vanilla.Comment.SpamCount',
             'Vanilla.Comment.SpamTime',
-            'Vanilla.Comment.SpamLock'
+            'Vanilla.Comment.SpamLock',
+            'Vanilla.Activity.SpamCount',
+            'Vanilla.Activity.SpamTime',
+            'Vanilla.Activity.SpamLock',
+            'Vanilla.ActivityComment.SpamCount',
+            'Vanilla.ActivityComment.SpamTime',
+            'Vanilla.ActivityComment.SpamLock',
         );
         if ($IsConversationsEnabled) {
             $ConfigurationFields = array_merge(
@@ -285,6 +283,19 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
 
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Integer');
+
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Integer');
 
             if ($IsConversationsEnabled) {
                 $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
@@ -750,7 +761,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         $this->addJsFile('categoryfilter.js', 'vanilla');
-        
+
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);

@@ -50,6 +50,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         if (is_array($Attributes)) {
             $Row = array_merge($Attributes, $Row);
         }
+        $Row['KeyMap'] = self::getKeyMap($Attributes);
         unset($Row['Attributes']);
     }
 
@@ -161,6 +162,26 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         }
 
         return false;
+    }
+
+    /**
+     * Loop through the provider and extract into an array any keys that start with $mapKey
+     *
+     * @param array $provider The array of all the values stored in a row of AuthenticationProvider table
+     * @param string $mapKey The prefix of keys that are to be returned as an array.
+     * @return array
+     */
+    public static function getKeyMap($provider = [], $mapKey = 'ProfileKeys') {
+        $map = [];
+        foreach ($provider as $providerKey => $value) {
+            if (stringBeginsWith($providerKey, $mapKey, false)) {
+                $subArrayKey = str_replace($mapKey, '', $providerKey);
+                if ($subArrayKey) {
+                    $map[$value]= $subArrayKey;
+                }
+            }
+        }
+        return $map;
     }
 
     /**

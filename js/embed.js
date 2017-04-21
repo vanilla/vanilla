@@ -231,7 +231,7 @@ window.vanilla.embed = function(host) {
         var result = '';
 
         if (embed_type == 'comments') {
-            result = '//' + host + '/discussion/embed/'
+            result = '//' + host + path + '/discussion/embed/'
             + '&vanilla_identifier=' + encodeURIComponent(foreign_id)
             + '&vanilla_url=' + encodeURIComponent(foreign_url);
 

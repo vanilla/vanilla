@@ -3199,6 +3199,8 @@ SQL;
 
         $query = $this->SQL
             ->from('Category c')
+            ->where('CategoryID >', 0)
+            ->where('DisplayAs <>', 'Heading')
             ->like('Name', $name)
             ->orderBy('Name');
         if ($limit !== null) {
@@ -3206,9 +3208,14 @@ SQL;
             $query->limit($limit, $offset);
         }
 
-        $result = $query->get()->resultArray();
-        foreach ($result as &$category) {
+        $categories = $query->get()->resultArray();
+        $result = [];
+        foreach ($categories as $category) {
             self::calculate($category);
+            if ($category['DisplayAs'] === 'Heading') {
+                continue;
+            }
+
             self::calculateUser($category);
 
             if ($expandParent) {
@@ -3220,6 +3227,8 @@ SQL;
 //                    $parent = null;
                 }
             }
+
+            $result[] = $category;
         }
 
         return $result;

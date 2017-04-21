@@ -86,7 +86,7 @@ class DashboardNavModule extends SiteNavModule {
             'section' => 'Settings',
             'title' => 'Settings',
             'description' => 'Configuration & Addons',
-            'url' => '/dashboard/settings/banner'
+            'url' => '/dashboard/settings/branding'
         ]
     ];
 
@@ -249,7 +249,7 @@ class DashboardNavModule extends SiteNavModule {
      */
     private function handleUserPreferencesSectionLandingPage() {
         if ($session = Gdn::session()) {
-            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages');
+            $landingPages = $session->getPreference('DashboardNav.SectionLandingPages', []);
 
             foreach (self::$sectionsInfo as $key => $section) {
                 if (array_key_exists($key, $landingPages)) {

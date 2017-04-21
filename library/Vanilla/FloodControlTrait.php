@@ -169,16 +169,12 @@ trait FloodControlTrait {
 
         $isSpamming = false;
         $countSpamCheck = $storageObject->get($userPostCountKey, 0);
-        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, date('Y-m-d H:i:s'));
-        $dateSpamCheckTime = strtotime($dateSpamCheck);
-        if (!$dateSpamCheckTime) {
-            $dateSpamCheckTime = time();
-        }
-        $secondsSinceSpamCheck = time() - $dateSpamCheckTime;
+        $dateSpamCheck = $storageObject->get($userLastDateCheckedKey, null);
+        $secondsSinceSpamCheck = time() - (int)strtotime($dateSpamCheck);
 
         // Apply a spam lock if necessary
         $attributes = [];
-        if ($secondsSinceSpamCheck < $this->lockTime && $countSpamCheck >= $this->postCountThreshold) {
+        if ($dateSpamCheck !== null && $secondsSinceSpamCheck < $this->lockTime && $countSpamCheck >= $this->postCountThreshold) {
             $isSpamming = true;
             // Update the 'waiting period' every time they try to post again
             $attributes[$userLastDateCheckedKey] = date('Y-m-d H:i:s');

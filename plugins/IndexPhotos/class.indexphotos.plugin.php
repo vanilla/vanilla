@@ -7,28 +7,30 @@
  * @package IndexPhotos
  */
 
-$PluginInfo['IndexPhotos'] = array(
+$PluginInfo['IndexPhotos'] = [
     'Name' => 'Discussion Photos',
     'Description' => "Displays photo and name of the user who started each discussion in discussion listings on modern layouts. Note that this plugin will not have any affect when table layouts are enabled.",
     'Version' => '1.2.2',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
+    'RequiredApplications' => ['Vanilla' => '2.1'],
     'RegisterPermissions' => false,
     'MobileFriendly' => true,
     'Icon' => 'discussion_photos.png',
     'Author' => "Lincoln Russell",
     'AuthorEmail' => 'lincolnwebs@gmail.com',
     'AuthorUrl' => 'http://lincolnwebs.com'
-);
+];
 
 /**
  * Class IndexPhotosPlugin
+ *
+ * @todo Just make this a core option on the Avatars page.
  */
 class IndexPhotosPlugin extends Gdn_Plugin {
 
     /**
+     * We need extra styling on the discussion list view.
      *
-     *
-     * @param $Sender
+     * @param assetModel $Sender
      */
     public function assetModel_styleCss_handler($Sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
@@ -37,7 +39,10 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Add OP name to start of discussion meta.
+     * Add OP name to start of discussion meta on discussions pages.
+     *
+     * @param discussionsController $Sender
+     * @param array $Args
      */
     public function discussionsController_afterDiscussionLabels_handler($Sender, $Args) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
@@ -48,10 +53,10 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     }
 
     /**
+     * Add OP name to start of discussion meta on categories pages
      *
-     *
-     * @param $Sender
-     * @param $Args
+     * @param categoriesController $Sender
+     * @param array $Args
      */
     public function categoriesController_afterDiscussionLabels_handler($Sender, $Args) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
@@ -62,7 +67,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Trigger on All Discussions.
+     * Show user photos on discussions pages.
+     *
+     * @param discussionsController $Sender
      */
     public function discussionsController_beforeDiscussionContent_handler($Sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
@@ -71,7 +78,9 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Trigger on Categories.
+     * Show user photos on categories pages.
+     *
+     * @param categoriesController $Sender
      */
     public function categoriesController_beforeDiscussionContent_handler($Sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {

@@ -1086,10 +1086,7 @@ class CategoryModel extends Gdn_Model {
 
         // setField will update these values in the DB, as well as the cache.
         self::instance()->setField($categoryID, [
-            'LastDiscussionID' => $discussionID,
-            'LastCommentID' => null,
             'CountDiscussions' => $countDiscussions,
-            'LastDateInserted' => val('DateInserted', $discussion),
             'LastCategoryID' => $categoryID
         ]);
 
@@ -1167,7 +1164,7 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
-     * Update the cached latest post info for a category.
+     * Update the latest post info for a category and its ancestors.
      *
      * @param int|array|object $discussion
      * @param int|array|object $comment
@@ -1189,24 +1186,31 @@ class CategoryModel extends Gdn_Model {
         }
 
         // Discussion-related field values.
-        $categoryCache = [
-            'LastCommentID' => null,
-            'LastDateInserted' => val('DateInserted', $discussion),
-            'LastDiscussionID' => $discussionID,
+        $cache = [
             'LastDiscussionUserID' => val('InsertUserID', $discussion),
             'LastTitle' => Gdn_Format::text(val('Name', $discussion, t('No Title'))),
             'LastUrl' => discussionUrl($discussion, false, '//').'#latest',
             'LastUserID' => val('InsertUserID', $discussion)
         ];
+        $db = [
+            'LastCommentID' => null,
+            'LastDateInserted' => val('DateInserted', $discussion),
+            'LastDiscussionID' => $discussionID
+        ];
 
         // If we have a valid comment, override some of the last post field info with its values.
         if ($comment) {
-            $categoryCache['LastCommentID'] = val('CommentID', $comment);
-            $categoryCache['LastDateInserted'] = val('DateInserted', $comment);
-            $categoryCache['LastUserID'] = val('InsertUserID', $comment);
+            $db['LastCommentID'] = val('CommentID', $comment);
+            $db['LastDateInserted'] = val('DateInserted', $comment);
+            $cache['LastUserID'] = val('InsertUserID', $comment);
         }
 
-        CategoryModel::setCache($categoryID, $categoryCache);
+        $categories = self::instance()->collection->getAncestors($categoryID, true);
+        foreach ($categories as $row) {
+            $currentCategoryID = val('CategoryID', $row);
+            self::instance()->setField($currentCategoryID, $db);
+            CategoryModel::setCache($currentCategoryID, $cache);
+        }
     }
 
     /**

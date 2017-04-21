@@ -224,7 +224,14 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         // Allow global translation of TagHint
-        $Sender->addDefinition("TagHint", t("TagHint", "Start to type..."));
+        if (c('Tagging.Discussions.Enabled')) {
+            $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
+            $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
+            $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
+            $Sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
+        }
+
+
 
         // Add symbols.
         if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
@@ -285,33 +292,38 @@ class DashboardHooks extends Gdn_Plugin {
             ->addLinkToSectionIf($session->checkPermission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false), 'Moderation', t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation-queue', '', $sort, ['popinRel' => '/dashboard/log/count/moderate'], false)
             ->addLinkToSectionIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'], false), 'Moderation', t('Change Log'), '/dashboard/log/edits', 'moderation.change-log', '', $sort)
 
-
             ->addGroup(t('Appearance'), 'appearance', '', -1)
-            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Banner'), '/dashboard/settings/banner', 'appearance.banner', '', $sort)
-            ->addLinkIf('Garden.Settings.Manage', t('Homepage'), '/dashboard/settings/homepage', 'appearance.homepage', '', $sort)
+            ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Community.Manage'], false), t('Branding'), '/dashboard/settings/branding', 'appearance.banner', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Layout'), '/dashboard/settings/layout', 'appearance.layout', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Themes'), '/dashboard/settings/themes', 'appearance.themes', '', $sort)
             ->addLinkIf($hasThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Theme Options'), '/dashboard/settings/themeoptions', 'appearance.theme-options', '', $sort)
             ->addLinkIf($hasMobileThemeOptions && $session->checkPermission('Garden.Settings.Manage'), t('Mobile Theme Options'), '/dashboard/settings/mobilethemeoptions', 'appearance.mobile-theme-options', '', $sort)
             ->addLinkIf('Garden.Community.Manage', t('Avatars'), '/dashboard/settings/avatars', 'appearance.avatars', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Email'), '/dashboard/settings/emailstyles', 'appearance.email', '', $sort)
-            ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
 
+            ->addGroup(t('Membership'), 'users', '', ['after' => 'appearance'])
             ->addLinkIf($session->checkPermission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false), t('Roles & Permissions'), '/dashboard/role', 'users.roles', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Registration'), '/dashboard/settings/registration', 'users.registration', '', $sort)
 
-            ->addGroup(t('Forum Settings'), 'forum', '', ['after' => 'users'])
-                ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
-            ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
-            ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'reputation'])
-                ->addLinkIf('Garden.Settings.Manage', t('Social Connect'), '/social/manage', 'add-ons.social', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
-                ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'add-ons.locales', '', $sort)
+            ->addGroup(t('Discussions'), 'forum', '', ['after' => 'users'])
+            ->addLinkIf('Garden.Settings.Manage', t('Tagging'), 'settings/tagging', 'forum.tagging', $sort)
 
-            ->addGroup(t('Site Settings'), 'site-settings', '', ['after' => 'reputation'])
+            ->addGroup(t('Reputation'), 'reputation', '', ['after' => 'forum'])
+
+            ->addGroup(t('Connections'), 'connect', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Social Connect', 'Social Media'), '/social/manage', 'connect.social', '', $sort)
+
+            ->addGroup(t('Addons'), 'add-ons', '', ['after' => 'connect'])
+            ->addLinkIf('Garden.Settings.Manage', t('Plugins'), '/dashboard/settings/plugins', 'add-ons.plugins', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Applications'), '/dashboard/settings/applications', 'add-ons.applications', '', $sort)
+
+            ->addGroup(t('Technical'), 'site-settings', '', ['after' => 'reputation'])
+            ->addLinkIf('Garden.Settings.Manage', t('Locales'), '/dashboard/settings/locales', 'site-settings.locales', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Outgoing Email'), '/dashboard/settings/email', 'site-settings.email', '', $sort)
+            ->addLinkIf('Garden.Settings.Manage', t('Security'), '/dashboard/settings/security', 'site-settings.security', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Routes'), '/dashboard/routes', 'site-settings.routes', '', $sort)
             ->addLinkIf('Garden.Settings.Manage', t('Statistics'), '/dashboard/statistics', 'site-settings.statistics', '', $sort)
+
             ->addGroupIf('Garden.Settings.Manage', t('Forum Data'), 'forum-data', '', ['after' => 'site-settings'])
             ->addLinkIf('Garden.Settings.Manage', t('Import'), '/dashboard/import', 'forum-data.import', '', $sort);
     }
@@ -349,7 +361,6 @@ class DashboardHooks extends Gdn_Plugin {
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
         $Sender->title('Tagging');
         $Sender->setHighlightRoute('settings/tagging');
-        $Sender->addJSFile('tagadmin.js', 'plugins/Tagging');
         $SQL = Gdn::sql();
 
         /** @var Gdn_Form $form */
@@ -491,6 +502,7 @@ class DashboardHooks extends Gdn_Plugin {
 
                     if ($Sender->Form->Save()) {
                         $Sender->informMessage(t('Your changes have been saved.'));
+                        $Sender->RedirectUrl = url('/settings/tagging');
                     }
                 }
 
@@ -532,12 +544,60 @@ class DashboardHooks extends Gdn_Plugin {
                     $Saved = $Sender->Form->save();
                     if ($Saved) {
                         $Sender->informMessage(t('Your changes have been saved.'));
+                        $Sender->RedirectUrl = url('/settings/tagging');
                     }
                 }
 
                 $Sender->render('tags');
             break;
         }
+    }
+
+    /**
+     * Add the tag endpoint to the discussionController
+     *
+     * @param DiscussionController $sender
+     * @param int $discussionID
+     * @throws Exception
+     *
+     */
+    public function discussionController_tag_create($sender, $discussionID, $origin) {
+        if (!c('Tagging.Discussions.Enabled')) {
+            throw new Exception('Not found', 404);
+        }
+
+        if (!filter_var($discussionID, FILTER_VALIDATE_INT)) {
+            throw NotFoundException('Discussion');
+        }
+
+        $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
+        if (!$discussion) {
+            throw NotFoundException('Discussion');
+        }
+
+        $sender->title('Add Tags');
+
+        if ($sender->Form->authenticatedPostBack()) {
+            $rawFormTags = $sender->Form->getFormValue('Tags');
+            $formTags = TagModel::splitTags($rawFormTags);
+
+            if (!$formTags) {
+                $sender->Form->addError('@'.t('No tags provided.'));
+            } else {
+                // If we're associating with categories
+                $categoryID = -1;
+                if (c('Vanilla.Tagging.CategorySearch', false)) {
+                    $categoryID = val('CategoryID', $discussion, -1);
+                }
+
+                // Save the tags to the db.
+                TagModel::instance()->saveDiscussion($discussionID, $formTags, 'Tag', $categoryID);
+
+                $sender->informMessage(t('The tags have been added to the discussion.'));
+            }
+        }
+
+        $sender->render('tag', 'discussion', 'vanilla');
     }
 
     /**

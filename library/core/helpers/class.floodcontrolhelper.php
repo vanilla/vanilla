@@ -13,11 +13,12 @@
 class FloodControlHelper {
     /**
      * @param \Vanilla\FloodControlTrait $instance
+     * @param string $configScope Scope under with the configurations are sets ('Vanilla', 'Conversations').
      * @param string $type Type of record that will be used to configure to trait.
      *
      * @return \Vanilla\CacheInterface
      */
-    public static function configure($instance, $type) {
+    public static function configure($instance, $configScope, $type) {
         $session = Gdn::session();
 
         // The CheckSpam and SpamCheck attributes are deprecated and should be removed in 2018.
@@ -59,14 +60,14 @@ class FloodControlHelper {
 
             if ($session->getAttribute('Time'.$type.'SpamCheck')) {
                 // Remove old attribute used in the conversationModel
-                Gdn::userModel()->setAttribute('Time'.$type.'SpamCheck', null);
+                Gdn::userModel()->saveAttribute($session->UserID, 'Time'.$type.'SpamCheck', null);
             }
         }
 
         $instance
-            ->setPostCountThreshold(c('Vanilla.'.$type.'.SpamCount', 1))
-            ->setTimeSpan(c('Vanilla.'.$type.'.SpamTime', 60))
-            ->setLockTime(c('Vanilla.'.$type.'.SpamLock', 60))
+            ->setPostCountThreshold(c($configScope.'.'.$type.'.SpamCount', 2))
+            ->setTimeSpan(c($configScope.'.'.$type.'.SpamTime', 60))
+            ->setLockTime(c($configScope.'.'.$type.'.SpamLock', 60))
             ->setKeyCurrentPostCount($keyPostCount)
             ->setKeyLastDateChecked($keyLastDateChecked)
         ;

@@ -16,7 +16,7 @@ if (strtolower($tagType) == 'all' || strtolower($tagType) == 'tags') {
     echo heading(t($this->data('Title')));
 }
 
-$enabled = c('Tagging.Discussions.Enabled', true);
+$enabled = c('Tagging.Discussions.Enabled');
 ?>
 <div class="form-group">
     <div class="label-wrap-wide">
@@ -89,7 +89,7 @@ $enabled = c('Tagging.Discussions.Enabled', true);
                     ->addLink(t('Delete'), "/settings/tags/delete/{$tag['TagID']}", 'delete', 'js-modal-confirm');
             }
             ?>
-            <div class="plank-wrapper">
+            <div id="Tag_<?php echo val('TagID', $tag) ?>" class="plank-wrapper">
                 <div class="plank">
                     <div class="plank-title">
                         <?php echo anchor(htmlspecialchars($displayName), '/discussions/tagged/'.val('Name', $tag), 'reverse-link'); ?>

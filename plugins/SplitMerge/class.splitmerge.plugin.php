@@ -7,8 +7,7 @@
  * @package SplitMerge
  */
 
-// Define the plugin:
-$PluginInfo['SplitMerge'] = array(
+$PluginInfo['SplitMerge'] = [
     'Name' => 'Split / Merge',
     'Description' => 'Allows moderators with discussion edit permission to split & merge discussions.',
     'Version' => '1.2',
@@ -17,7 +16,7 @@ $PluginInfo['SplitMerge'] = array(
     'AuthorEmail' => 'mark@vanillaforums.com',
     'AuthorUrl' => 'http://www.vanillaforums.com',
     'Icon' => 'split-merge.png'
-);
+];
 
 /**
  * Class SplitMergePlugin
@@ -26,6 +25,8 @@ class SplitMergePlugin extends Gdn_Plugin {
 
     /**
      * Add "split" action link.
+     *
+     * @param Gdn_Controller $Sender
      */
     public function base_beforeCheckComments_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
@@ -37,6 +38,8 @@ class SplitMergePlugin extends Gdn_Plugin {
 
     /**
      * Add "merge" action link.
+     *
+     * @param Gdn_Controller $Sender
      */
     public function base_beforeCheckDiscussions_handler($Sender) {
         $ActionMessage = &$Sender->EventArguments['ActionMessage'];
@@ -47,6 +50,8 @@ class SplitMergePlugin extends Gdn_Plugin {
 
     /**
      * Add a method to the ModerationController to handle splitting comments out to a new discussion.
+     *
+     * @param moderationController $Sender
      */
     public function moderationController_splitComments_create($Sender) {
         $Session = Gdn::session();
@@ -144,7 +149,9 @@ class SplitMergePlugin extends Gdn_Plugin {
     /**
      * Add a method to the ModerationController to handle merging discussions.
      *
-     * @param Gdn_Controller $Sender
+     * @param moderationController $Sender
+     *
+     * @throws Gdn_UserException
      */
     public function moderationController_mergeDiscussions_create($Sender) {
         $Session = Gdn::session();
@@ -265,7 +272,7 @@ class SplitMergePlugin extends Gdn_Plugin {
     }
 
     /**
-     *
+     * Run once on enable.
      */
     public function setup() {
         saveToConfig('Vanilla.AdminCheckboxes.Use', true);

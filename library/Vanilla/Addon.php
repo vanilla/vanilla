@@ -1080,7 +1080,7 @@ class Addon {
             // Include the plugin file.
             if ($className = $this->getPluginClass()) {
                 $classInfo = self::parseFullyQualifiedClass($className);
-                include_once $this->path($this->classes[strtolower($classInfo['className'])]['path']);
+                include_once $this->path($this->classes[strtolower($classInfo['className'])][0]['path']);
             }
 
             // Include the configuration file.

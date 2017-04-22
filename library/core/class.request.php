@@ -724,6 +724,11 @@ class Gdn_Request implements RequestInterface {
             $scheme = 'https';
         }
 
+        // Amazon CloudFront terminated SSL
+        if (isset($_SERVER['CLOUDFRONT_FORWARDED_PROTO']) && strtolower($_SERVER['CLOUDFRONT_FORWARDED_PROTO']) == 'https') {
+            $scheme = 'https';
+        }
+
         // Varnish
         $originalProto = val('HTTP_X_ORIGINALLY_FORWARDED_PROTO', $_SERVER, null);
         if (!is_null($originalProto)) {

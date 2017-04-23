@@ -8,6 +8,8 @@
  * @since 2.0
  */
 
+use Vanilla\Exception\PermissionException;
+
 /**
  * Manages discussions data.
  */
@@ -111,6 +113,27 @@ class DiscussionModel extends Gdn_Model {
             self::$instance = new DiscussionModel();
         }
         return self::$instance;
+    }
+
+    /**
+     * Verify the current user has a permission in a category.
+     *
+     * @param string|array $permission The permission slug(s) to check (e.g. Vanilla.Discussions.View).
+     * @param int $categoryID The category's numeric ID.
+     * @throws PermissionException if the current user does not have the permission in the category.
+     */
+    public function categoryPermission($permission, $categoryID) {
+        $category = CategoryModel::categories($categoryID);
+        if ($category) {
+            $id = $category['PermissionCategoryID'];
+        } else {
+            $id = -1;
+        }
+        $permissions = (array)$permission;
+
+        if (!Gdn::session()->getPermissions()->hasAny($permissions, $id)) {
+            throw new PermissionException($permissions);
+        }
     }
 
     /**
@@ -482,6 +505,13 @@ class DiscussionModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getDefaultLimit() {
+        return Gdn::config('Vanilla.Discussions.PerPage', 50);
+    }
+
+    /**
      * Get a list of the most recent discussions.
      *
      * @param array|false $Where The where condition of the get.
@@ -575,6 +605,15 @@ class DiscussionModel extends Gdn_Model {
             }
         }
         return $wheres;
+    }
+
+    /**
+     * Get the maximum number of discussion pages.
+     *
+     * @return int
+     */
+    public function getMaxPages() {
+        return (int)c('Vanilla.Discussions.MaxPages');
     }
 
     /**
@@ -1629,7 +1668,7 @@ class DiscussionModel extends Gdn_Model {
      * @param int $DiscussionID Unique ID of discussion to get.
      * @param string $DataSetType One of the **DATASET_TYPE_*** constants.
      * @param array $Options An array of extra options for the query.
-     * @return object SQL result.
+     * @return mixed SQL result.
      */
     public function getID($DiscussionID, $DataSetType = DATASET_TYPE_OBJECT, $Options = []) {
         $Session = Gdn::session();

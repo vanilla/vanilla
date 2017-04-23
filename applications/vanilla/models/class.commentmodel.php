@@ -343,6 +343,13 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getDefaultLimit() {
+        return c('Vanilla.Comments.PerPage', 30);
+    }
+
+    /**
      * Set the order of the comments or return current order.
      *
      * Getter/setter for $this->_OrderBy.

@@ -217,6 +217,15 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
+     * Get the default page size limit.
+     *
+     * @return int
+     */
+    public function getDefaultLimit() {
+        return 30;
+    }
+
+    /**
      * Remove one or more fields from the filter field array.
      *
      * @param string|array $field One or more field names to remove.

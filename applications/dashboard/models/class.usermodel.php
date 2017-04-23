@@ -1032,6 +1032,57 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Add multi-dimensional user data to an array.
+     *
+     * @param array $rows Results we need to associate user data with.
+     * @param array $columns Database columns containing UserIDs to get data for.
+     */
+    public function expandUsers(array &$rows, array $columns) {
+        // How are we supposed to lookup users by column if we don't have any columns?
+        if (count($columns) === 0) {
+            return;
+        }
+
+        // Inject those user records.
+        $users = [];
+        foreach ($rows as &$row) {
+            foreach ($columns as $key) {
+                $destination = stringEndsWith($key, 'ID', true, true);
+                $id = val($key, $row);
+                $user = null;
+                if (is_numeric($id)) {
+                    // Keep a running collection of queried users. Non-existing users are null.
+                    if (!array_key_exists($id, $users)) {
+                        $user = $this->getID($id, DATASET_TYPE_ARRAY);
+                        if (!$user) {
+                            $user = null;
+                        }
+                        $users[$id] = $user;
+                    }
+
+                    // Massage the data, before injecting it into the results.
+                    $user = $users[$id];
+                    if ($user) {
+                        // Make sure all user records have a valid photo.
+                        $photo = val('Photo', $user);
+                        if ($photo && !isUrl($photo)) {
+                            $photo = Gdn_Upload::url(changeBasename($photo, 'n%s'));
+                            setValue('Photo', $user, $photo);
+                        } elseif (!$photo) {
+                            $photo = UserModel::getDefaultAvatarUrl($user);
+                            setValue('Photo', $user, $photo);
+                        }
+                        // Add an alias to Photo. Currently only used in API calls.
+                        setValue('PhotoUrl', $user, $photo);
+                    }
+                }
+
+                setValue($destination, $row, $user);
+            }
+        }
+    }
+
+    /**
      * Returns the url to the default avatar for a user.
      *
      * @param array $user The user to get the default avatar for.

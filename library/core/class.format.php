@@ -263,10 +263,10 @@ class Gdn_Format {
     }
 
     /**
-     * Takes a mixed variable.
+     * Format BBCode into HTML.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string Sanitized HTML.
      */
     public static function bbCode($Mixed) {
         if (!is_string($Mixed)) {
@@ -275,77 +275,79 @@ class Gdn_Format {
             // See if there is a custom BBCode formatter.
             $BBCodeFormatter = Gdn::factory('BBCodeFormatter');
             if (is_object($BBCodeFormatter)) {
-                $Result = $BBCodeFormatter->format($Mixed);
-                $Result = Gdn_Format::processHTML($Result);
+                // Standard BBCode parsing.
+                $Mixed = $BBCodeFormatter->format($Mixed);
 
-                return $Result;
+                // Vanilla magic parsing.
+                $Mixed = Gdn_Format::processHTML($Mixed);
+
+                // Always filter as the last step.
+                $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+                return $Sanitized;
             }
 
-            $Formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($Formatter)) {
-                return Gdn_Format::display($Mixed);
-            } else {
-                try {
-                    $Mixed2 = $Mixed;
+            // Fallback to minimalist BBCode parsing.
+            try {
+                $Mixed2 = $Mixed;
+                // Deal with edge cases / pre-processing.
+                $Mixed2 = str_replace("\r\n", "\n", $Mixed2);
+                $Mixed2 = preg_replace_callback(
+                    "#\[noparse\](.*?)\[/noparse\]#si",
+                    function($m) {
+                        return str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), htmlspecialchars($m[1]));
+                    },
+                    $Mixed2
+                );
+                $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
+                $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
+                $Mixed2 = preg_replace_callback(
+                    "#\\n?\[code\](.*?)\[/code\]\\n?#si",
+                    function($m) {
+                        $str = htmlspecialchars(trim($m[1], "\n"));
+                        return '<pre>'.str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), $str).'</pre>';
+                    },
+                    $Mixed2
+                );
+                $Mixed2 = str_replace("\n", "<br />", $Mixed2);
 
-                    $Mixed2 = str_replace("\r\n", "\n", $Mixed2);
+                // Basic BBCode tags.
+                $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si", '<b>\\1</b>', $Mixed2);
+                $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si", '<i>\\1</i>', $Mixed2);
+                $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $Mixed2);
+                $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si", '<s>\\1</s>', $Mixed2);
+                $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si", '<s>\\1</s>', $Mixed2);
+                $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $Mixed2);
+                $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $Mixed2);
+                $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $Mixed2);
+                $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $Mixed2);
+                $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\1</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si", '\\1', $Mixed2);
+                $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\3</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si", '\\2', $Mixed2);
+                $Mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si", '<img src="\\1" border="0" />', $Mixed2);
+                $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si", '\\1', $Mixed2);
+                $Mixed2 = preg_replace("#\[img=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/img\]#si", '<img src=\\1" border="0" alt="\\3" />', $Mixed2);
+                $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si", '\\2', $Mixed2);
+                $Mixed2 = preg_replace("#\[thread\]([\d]+)\[/thread\]#si", '<a href="/discussion/\\1">/discussion/\\1</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[thread=[\"']?([\d]+)[\"']?\](.*?)\[/thread\]#si", '<a href="/discussion/\\1">\\2</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[post\]([\d]+)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">/discussion/comment/\\1</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[post=[\"']?([\d]+)[\"']?\](.*?)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">\\2</a>', $Mixed2);
+                $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si", '<font size="\\1">', $Mixed2);
+                $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si", '<font face="\\1">', $Mixed2);
+                $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si", '<font color="\\1">', $Mixed2);
+                $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</font>", $Mixed2);
+                $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
+                $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
+                $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
 
-                    $Mixed2 = preg_replace_callback(
-                        "#\[noparse\](.*?)\[/noparse\]#si",
-                        function($m) {
-                            return str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), htmlspecialchars($m[1]));
-                        },
-                        $Mixed2
-                    );
+                // Always filter as the last step.
+                $Sanitized = Gdn_Format::htmlFilter($Mixed2);
 
-                    $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
-                    $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
+                return $Sanitized;
 
-                    $Mixed2 = preg_replace_callback(
-                        "#\\n?\[code\](.*?)\[/code\]\\n?#si",
-                        function($m) {
-                            $str = htmlspecialchars(trim($m[1], "\n"));
-                            return '<pre>'.str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), $str).'</pre>';
-                        },
-                        $Mixed2
-                    );
-
-                    $Mixed2 = str_replace("\n", "<br />", $Mixed2);
-
-                    $Mixed2 = preg_replace("#\[b\](.*?)\[/b\]#si", '<b>\\1</b>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[i\](.*?)\[/i\]#si", '<i>\\1</i>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si", '<s>\\1</s>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si", '<s>\\1</s>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url\]((https?|ftp):\/\/.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\1</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url\](.*?)\[/url\]#si", '\\1', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/url\]#si", '<a rel="nofollow" href="\\1">\\3</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[url=[\"']?(.*?)[\"']?\](.*?)\[/url\]#si", '\\2', $Mixed2);
-                    $Mixed2 = preg_replace("#\[img\]((https?|ftp):\/\/.*?)\[/img\]#si", '<img src="\\1" border="0" />', $Mixed2);
-                    $Mixed2 = preg_replace("#\[img\](.*?)\[/img\]#si", '\\1', $Mixed2);
-                    $Mixed2 = preg_replace("#\[img=[\"']?((https?|ftp):\/\/.*?)[\"']?\](.*?)\[/img\]#si", '<img src=\\1" border="0" alt="\\3" />', $Mixed2);
-                    $Mixed2 = preg_replace("#\[img=[\"']?(.*?)[\"']?\](.*?)\[/img\]#si", '\\2', $Mixed2);
-                    $Mixed2 = preg_replace("#\[thread\]([\d]+)\[/thread\]#si", '<a href="/discussion/\\1">/discussion/\\1</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[thread=[\"']?([\d]+)[\"']?\](.*?)\[/thread\]#si", '<a href="/discussion/\\1">\\2</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[post\]([\d]+)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">/discussion/comment/\\1</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[post=[\"']?([\d]+)[\"']?\](.*?)\[/post\]#si", '<a href="/discussion/comment/\\1#Comment_\\1">\\2</a>', $Mixed2);
-                    $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si", '<font size="\\1">', $Mixed2);
-                    $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si", '<font face="\\1">', $Mixed2);
-                    $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si", '<font color="\\1">', $Mixed2);
-                    $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</font>", $Mixed2);
-                    $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
-                    $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
-                    $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
-
-                    $Result = Gdn_Format::html($Mixed2);
-                    return $Result;
-                } catch (Exception $Ex) {
-                    return self::display($Mixed);
-                }
+            } catch (Exception $Ex) {
+                return self::display($Mixed);
             }
         }
     }
@@ -867,35 +869,22 @@ class Gdn_Format {
      * Does "magic" formatting of links, mentions, link embeds, emoji, & linebreaks.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string HTML
+     * @return string Sanitized HTML.
      */
     public static function html($Mixed) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Html');
         } else {
-            if (self::isHtml($Mixed)) {
-                // Purify HTML
-                $Mixed = Gdn_Format::htmlFilter($Mixed);
-
-                // nl2br
-                if (c('Garden.Format.ReplaceNewlines', true)) {
-                    $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
-                    $Mixed = fixNl2Br($Mixed);
-                }
-
-                $Result = Gdn_Format::processHTML($Mixed);
-            } else {
-                // The text does not contain HTML and does not have to be purified.
-                // This is an optimization because purifying is very slow and memory intense.
-                $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
-                if (c('Garden.Format.ReplaceNewlines', true)) {
-                    $Result = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Result);
-                    $Result = fixNl2Br($Result);
-                }
-                $Result = Gdn_Format::processHTML($Result);
+            if (c('Garden.Format.ReplaceNewlines', true)) {
+                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+                $Mixed = fixNl2Br($Mixed);
             }
+            $Mixed = Gdn_Format::processHTML($Mixed);
 
-            return $Result;
+            // Always filter as the last step.
+            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            return $Sanitized;
         }
     }
 
@@ -905,7 +894,7 @@ class Gdn_Format {
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @return string HTML
+     * @return string Sanitized HTML.
      */
     public static function htmlFilter($Mixed) {
         if (!is_string($Mixed)) {
@@ -930,6 +919,8 @@ class Gdn_Format {
                 // Do HTML filtering before our special changes.
                 $Result = $Formatter->format($Mixed);
             } else {
+                // The text does not contain HTML and does not have to be purified.
+                // This is an optimization because purifying is very slow and memory intense.
                 $Result = htmlspecialchars($Mixed, ENT_NOQUOTES, 'UTF-8');
             }
 
@@ -1047,7 +1038,7 @@ class Gdn_Format {
      * @param string $Body The text to format.
      * @param string $Format The current format of the text.
      * @param bool $collapse Treat a group of closing block tags as one when replacing with newlines.
-     * @return string
+     * @return string Sanitized HTML.
      * @since 2.1
      */
     public static function plainText($Body, $Format = 'Html', $collapse = false) {
@@ -1074,7 +1065,12 @@ class Gdn_Format {
             $Result = strip_tags($Result);
         }
 
-        return trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+        $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
+
+        // Always filter as the last step.
+        $Sanitized = Gdn_Format::htmlFilter($Result);
+
+        return $Sanitized;
     }
 
     /**
@@ -1620,35 +1616,37 @@ EOT;
     }
 
     /**
-     * Format a string using Markdown syntax. Also purifies the output HTML.
+     * Format a string using Markdown syntax.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true
-     * @return string
+     * @param boolean $Flavored Optional. Parse with Vanilla-flavored settings? Default true.
+     * @return string Sanitized HTML.
      */
     public static function markdown($Mixed, $Flavored = true) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Markdown');
         } else {
-            $Formatter = Gdn::factory('HtmlFormatter');
-            if (is_null($Formatter)) {
-                return Gdn_Format::display($Mixed);
-            } else {
-                $Markdown = new MarkdownVanilla();
+            $Markdown = new MarkdownVanilla();
 
-                // Add Vanilla customizations.
-                if ($Flavored) {
-                    $Markdown->addAllFlavor();
-                }
-
-                // Format mentions early since @_name_ would be transformed to @<em>name</em>
-                $Mixed = Gdn_Format::mentions($Mixed);
-
-                $Mixed = $Markdown->transform($Mixed);
-                $Mixed = $Formatter->format($Mixed);
-                $Mixed = Gdn_Format::processHTML($Mixed, false);
-                return $Mixed;
+            // Vanilla-flavored Markdown.
+            if ($Flavored) {
+                $Markdown->addAllFlavor();
             }
+
+            // Format mentions prior to Markdown parsing.
+            // Avoids `@_name_` transformed to `@<em>name</em>`.
+            $Mixed = Gdn_Format::mentions($Mixed);
+
+            // Markdown parsing.
+            $Mixed = $Markdown->transform($Mixed);
+
+            // Vanilla magic formatting.
+            $Mixed = Gdn_Format::processHTML($Mixed);
+
+            // Always filter as the last step.
+            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            return $Sanitized;
         }
     }
 
@@ -1950,7 +1948,7 @@ EOT;
      * Takes a mixed variable, formats it for display on the screen as plain text.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
-     * @return string
+     * @return string Sanitized HTML.
      */
     public static function text($mixed, $addBreaks = true) {
         if (!is_string($mixed)) {
@@ -1979,13 +1977,17 @@ EOT;
      * Process as plain text + our magic formatting.
      *
      * @param string $Str
-     * @return string
+     * @return string Sanitized HTML.
      * @since 2.1
      */
     public static function textEx($Str) {
         $Str = self::text($Str);
         $Str = Gdn_Format::processHTML($Str);
-        return $Str;
+
+        // Always filter as the last step.
+        $Sanitized = Gdn_Format::htmlFilter($Str);
+
+        return $Sanitized;
     }
 
     /**

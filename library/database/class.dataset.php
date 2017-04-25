@@ -43,7 +43,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     protected $_EOF = false;
 
     /**
-     * @var object Contains a PDOStatement object returned by a PDO query. FALSE by default.
+     * @var PDOStatement Contains a PDOStatement object returned by a PDO query. FALSE by default.
      * This property is assigned by the database driver object when a query is
      * executed in $Database->Query().
      */
@@ -191,7 +191,12 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
             return;
         }
 
-        $Result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+        // Calling fetchAll on insert/update/delete queries will raise an error!
+        if (preg_match('/^(insert|update|delete)/', trim(strtolower($this->_PDOStatement->queryString))) !== 1) {
+            $Result = $this->_PDOStatement->fetchAll($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
+        } else {
+            $this->_Result = $Result;
+        }
 
 //		$this->_PDOStatement->setFetchMode($this->_DatasetType == DATASET_TYPE_ARRAY ? PDO::FETCH_ASSOC : PDO::FETCH_OBJ);
 //      while($Row = $this->_PDOStatement->fetch()) {

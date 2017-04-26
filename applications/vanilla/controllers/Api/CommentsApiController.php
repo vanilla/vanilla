@@ -163,11 +163,11 @@ class CommentsApiController extends AbstractApiController {
 
         $comment = $this->commentByID($id);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment['CommentID']);
+            $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->formatField($comment, 'Body', $comment['Format']);
+        $this->massageRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
@@ -251,11 +251,25 @@ class CommentsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->formatField($currentRow, 'Body', $currentRow['Format']);
+            $this->massageRow($currentRow);
         }
 
         $result = $out->validate($rows);
         return $result;
+    }
+
+    /**
+     * Prepare data for output.
+     *
+     * @param array $row
+     */
+    public function massageRow(array &$row) {
+        $this->formatField($row, 'Body', $row['Format']);
+
+        if (!is_array($row['Attributes'])) {
+            $attributes = dbdecode($row['Attributes']);
+            $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        }
     }
 
     /**

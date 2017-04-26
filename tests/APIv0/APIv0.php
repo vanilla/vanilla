@@ -569,6 +569,12 @@ class APIv0 extends HttpClient {
     }
 
     public function terminate() {
+        $dic = Gdn::getContainer();
+
+        // Cleanup to prevent corruption of other tests
+        $dic->setInstance(AddonManager::class, null);
+        $dic->setInstance(Gdn::AliasDatabase, null);
+
         spl_autoload_unregister([Gdn::addonManager(), 'autoload']);
     }
 }

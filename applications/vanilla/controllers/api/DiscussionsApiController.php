@@ -162,6 +162,11 @@ class DiscussionsApiController extends AbstractApiController {
     public function massageRow(&$row) {
         $row['Announce'] = (bool)$row['Announce'];
         $this->formatField($row, 'Body', $row['Format']);
+
+        if (!is_array($row['Attributes'])) {
+            $attributes = dbdecode($row['Attributes']);
+            $row['Attributes'] = is_array($attributes) ? $attributes : [];
+        }
     }
 
     /**

@@ -19,14 +19,29 @@ use Vanilla\AddonManager;
  */
 class Gdn_Dispatcher extends Gdn_Pluggable {
 
-    /** Block condition. */
+    /** Can never be blocked. */
     const BLOCK_NEVER = 0;
 
-    /** Block condition. */
+    /** Can be blocked in certain cases but should not be blocked by lack of permissions. */
     const BLOCK_PERMISSION = 1;
 
-    /** Block condition. */
+    /** Free to be blocked. */
     const BLOCK_ANY = 2;
+
+    /** @var array List of exceptions not to block */
+    private $blockExceptions = [
+        '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
+        '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
+        '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
+        '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
+        '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
+        '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
+        '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
+        '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
+        '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
+    ];
 
     /** @var string The name of the controller to be dispatched. */
     public $ControllerName;
@@ -594,22 +609,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $canBlock = self::BLOCK_ANY;
 
-        $blockExceptions = array(
-            '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^home\/error(\/.*)?/' => self::BLOCK_NEVER,
-            '/^home\/leave(\/.*)?/' => self::BLOCK_NEVER,
-            '/^plugin(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^sso(\/.*)?$/' => self::BLOCK_NEVER,
-            '/^discussions\/getcommentcounts/' => self::BLOCK_NEVER,
-            '/^entry(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^user\/usernameavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^user\/emailavailable(\/.*)?$/' => self::BLOCK_PERMISSION,
-            '/^home\/termsofservice(\/.*)?$/' => self::BLOCK_PERMISSION
-        );
-
-        $this->EventArguments['BlockExceptions'] = &$blockExceptions;
-        $this->fireEvent('BeforeBlockDetect');
+        $blockExceptions = $this->getBlockExceptions();
 
         $PathRequest = $request->path();
         foreach ($blockExceptions as $BlockException => $BlockLevel) {
@@ -631,6 +631,23 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         return $canBlock;
+    }
+
+    /**
+     * Return the list of paths that potentially cannot be blocked.
+     *
+     * @return array
+     */
+    public function getBlockExceptions() {
+        static $eventTriggered = false;
+
+        if (!$eventTriggered) {
+            $this->EventArguments['BlockExceptions'] = &$this->blockExceptions;
+            $this->fireEvent('BeforeBlockDetect');
+            $eventTriggered = true;
+        }
+
+        return $this->blockExceptions;
     }
 
     /**

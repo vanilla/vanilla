@@ -128,7 +128,8 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUser?' => $this->getUserFragmentSchema(),
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'closed:b' => 'Whether the discussion is closed or open.',
-            'countComments:i' => 'The number of comments on the discussion.'
+            'countComments:i' => 'The number of comments on the discussion.',
+            'url:s?' => 'The full URL to the discussion.'
         ]);
     }
 
@@ -161,6 +162,7 @@ class DiscussionsApiController extends AbstractApiController {
 
     public function massageRow(&$row) {
         $row['Announce'] = (bool)$row['Announce'];
+        $row['Url'] = discussionUrl($row);
         $this->formatField($row, 'Body', $row['Format']);
 
         if (!is_array($row['Attributes'])) {
@@ -180,9 +182,10 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'url'])->add($this->fullSchema()), 'out');
 
         $row = $this->discussionByID($id);
+        $row['Url'] = discussionUrl($row);
 
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
@@ -285,7 +288,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->save($data);
 
         $result = $this->discussionByID($id);
-        $this->formatField($result, 'Body', $result['Format']);
+        $this->massageRow($result);
         return $out->validate($result);
     }
 
@@ -313,8 +316,8 @@ class DiscussionsApiController extends AbstractApiController {
         }
 
         $row = $this->discussionByID($id);
-        $this->formatField($row, 'Body', $row['Format']);
         $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->massageRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
     }

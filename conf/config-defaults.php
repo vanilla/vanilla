@@ -89,7 +89,7 @@ $Configuration['Garden']['AddonUrl'] = 'https://open.vanillaforums.com/addons';
 $Configuration['Garden']['VanillaUrl'] = 'https://open.vanillaforums.com';
 
 // File handling.
-$Configuration['Garden']['CanProcessImages'] = true;
+$Configuration['Garden']['CanProcessImages'] = false;
 $Configuration['Garden']['Upload']['MaxFileSize'] = '50M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions'] = ['txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'log', 'rar', '7z'];
 $Configuration['Garden']['Profile']['MaxHeight'] = 1200;

@@ -28,6 +28,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
     /** Free to be blocked. */
     const BLOCK_ANY = 2;
 
+    /** @var array List of exceptions not to block */
     private $blockExceptions = [
         '/^utility(\/.*)?$/' => self::BLOCK_NEVER,
         '/^asset(\/.*)?$/' => self::BLOCK_NEVER,
@@ -608,7 +609,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
         $canBlock = self::BLOCK_ANY;
 
-        $blockExceptions = getBlockPermissions();
+        $blockExceptions = $this->getBlockExceptions();
 
         $PathRequest = $request->path();
         foreach ($blockExceptions as $BlockException => $BlockLevel) {
@@ -632,7 +633,12 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         return $canBlock;
     }
 
-    public function getBlockPermissions() {
+    /**
+     * Return the list of paths that potentially cannot be blocked.
+     *
+     * @return array
+     */
+    public function getBlockExceptions() {
         static $eventTriggered = false;
 
         if (!$eventTriggered) {

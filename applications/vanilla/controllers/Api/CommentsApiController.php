@@ -145,7 +145,8 @@ class CommentsApiController extends AbstractApiController {
             'format:s' => 'The output format of the comment.',
             'dateInserted:dt' => 'When the comment was created.',
             'insertUserID:i' => 'The user that created the comment.',
-            'insertUser?' => $this->getUserFragmentSchema()
+            'insertUser?' => $this->getUserFragmentSchema(),
+            'url:s?' => 'The full URL to the comment.'
         ]);
     }
 
@@ -183,11 +184,12 @@ class CommentsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a comment for editing.');
-        $out = $this->schema(Schema::parse(['commentID', 'body', 'format'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['commentID', 'body', 'format', 'url'])->add($this->fullSchema()), 'out');
 
         $comment = $this->commentByID($id);
+        $comment['Url'] = commentUrl($comment);
         if ($comment['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($comment['CommentID']);
+            $discussion = $this->discussionByID($comment['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
         }
 
@@ -265,6 +267,7 @@ class CommentsApiController extends AbstractApiController {
      */
     public function massageRow(array &$row) {
         $this->formatField($row, 'Body', $row['Format']);
+        $row['Url'] = commentUrl($row);
 
         if (!is_array($row['Attributes'])) {
             $attributes = dbdecode($row['Attributes']);
@@ -290,7 +293,7 @@ class CommentsApiController extends AbstractApiController {
         $data['CommentID'] = $id;
         $row = $this->commentByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
-            $discussion = $this->discussionByID($row['CommentID']);
+            $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
         }
         if ($row['DiscussionID'] !== $data['DiscussionID']) {
@@ -300,8 +303,8 @@ class CommentsApiController extends AbstractApiController {
         $this->commentModel->save($data);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
+        $this->massageRow($row);
 
-        $this->formatField($row, 'Body', $row['Format']);
         $result = $out->validate($row);
         return $result;
     }
@@ -328,7 +331,7 @@ class CommentsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->formatField($row, 'Body', $row['Format']);
+        $this->massageRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);

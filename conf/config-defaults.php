@@ -33,7 +33,7 @@ $Configuration['Garden']['Locale'] = 'en';
 $Configuration['Garden']['LocaleCodeset'] = 'UTF8';
 
 // Site specifics.
-$Configuration['Garden']['Installed'] = true; // Has Garden been installed yet? This blocks setup when true.
+$Configuration['Garden']['Installed'] = false; // Has Garden been installed yet? This blocks setup when true.
 $Configuration['Garden']['Title'] = 'Vanilla';
 $Configuration['Garden']['Domain'] = '';
 $Configuration['Garden']['WebRoot'] = false; // You can set this value if you are using htaccess to direct into the application, but the correct webroot isn't being recognized.

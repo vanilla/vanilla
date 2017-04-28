@@ -5317,7 +5317,7 @@ div.token-input-dropdown {
   border: 1px solid #aaa;
   border-top-width: 0;
   cursor: default;
-  z-index: 1;
+  z-index: 1001;
   padding: 0 3px;
 }
 

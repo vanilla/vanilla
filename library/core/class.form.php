@@ -591,7 +591,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param bool $reverse Whether to reverse the representation of the toggle (positive value is on, neg value is off).
      * @return string And HTML-formatted form field for a toggle.
      */
-    public function toggle($fieldName, $label, $attributes = [], $info = '', $reverse = false) {
+    public function toggle($fieldName, $label = '', $attributes = [], $info = '', $reverse = false) {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {

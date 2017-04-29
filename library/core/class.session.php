@@ -150,6 +150,7 @@ class Gdn_Session {
         }
 
         if ($this->UserID) {
+            Gdn::userModel()->saveAttribute($this->UserID, 'TransientKey', null);
             Logger::event('session_end', Logger::INFO, 'Session ended for {username}.');
         }
 

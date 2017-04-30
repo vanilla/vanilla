@@ -574,6 +574,20 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Merge the named parameters from another SQL object with this one.
+     *
+     * This method is here to support some inner select optimizations. We intentionally try and leave parameters protected
+     * as much as possible to support future changes.
+     *
+     * @param Gdn_SQLDriver $sql The query to merge the parameters from.
+     * @return $this
+     */
+    public function mergeParameters(Gdn_SQLDriver $sql) {
+        $this->_NamedParameters = array_replace($this->_NamedParameters, $sql->_NamedParameters);
+        return $this;
+    }
+
+    /**
      * Returns a string of comma delimited table names to select from.
      *
      * @param mixed $Tables The name of a table (or an array of table names) to be added in the from
@@ -1179,7 +1193,7 @@ abstract class Gdn_SQLDriver {
 
         // Add the table prefix to any table specifications in the clause
         // echo '<div>'.$TableName.' ---> '.$this->EscapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
-        if ($this->Database->DatabasePrefix) {
+        if ($this->Database->DatabasePrefix && $TableName[0] !== '(') {
             $TableName = $this->mapAliases($TableName);
 
             //$Aliases = array_keys($this->_AliasMap);

@@ -323,6 +323,55 @@ class Gdn_Model extends Gdn_Pluggable {
         }
     }
 
+    /**
+     * Strip database prefixes off a where clause.
+     *
+     * This method is mainly for backwards compatibility with model methods that demand a database prefix.
+     *
+     * @param array|false $where The where to strip.
+     * @return array Returns a where array without database prefixes.
+     */
+    protected function stripWherePrefixes($where) {
+        if (empty($where)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ((array)$where as $key => $value) {
+            $parts = explode('.', $key);
+            $key =  $parts[count($parts) === 1 ? 0 : 1];
+            $result[$key] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Split a where array into where values and options.
+     *
+     * Some model methods don't have an options parameter so their options are carried in the where clause.
+     * This method splits those options out
+     *
+     * @param array|false $where The where clause.
+     * @param array $options An array of option keys to default values.
+     * @return array Returns an array in the form `[$where, $options]`.
+     */
+    protected function splitWhere($where, array $options) {
+        if (empty($where)) {
+            return [[], $options];
+        }
+
+        $result = [];
+        foreach ($where as $key => $value) {
+            if (array_key_exists($key, $options)) {
+                $options[$key] = $value;
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return [$result, $options];
+    }
+
 
     /**
      *

@@ -236,6 +236,7 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
+            'after:dt?' => 'Get only comments after this date.',
             'expand:b?' => 'Expand associated records.'
         ], 'in')->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
@@ -244,11 +245,22 @@ class CommentsApiController extends AbstractApiController {
         $discussion = $this->discussionByID($query['discussionID']);
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
-        $rows = $this->commentModel->getByDiscussion(
-            $query['discussionID'],
+
+        // Build up the where clause.
+        $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
+
+        if (isset($query['after'])) {
+            $where['dateInserted >'] = $query['after'];
+        }
+
+        $rows = $this->commentModel->getWhere(
+            $where,
+            'DateInserted',
+            'asc',
             $limit,
             $offset
         )->resultArray();
+
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }

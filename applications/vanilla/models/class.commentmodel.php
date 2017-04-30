@@ -164,6 +164,60 @@ class CommentModel extends Gdn_Model {
     }
 
     /**
+     * Select from the comment table, filling in default options where appropriate.
+     *
+     * @param array $where The where clause.
+     * @param string|array $orderFields The columns to order by.
+     * @param string $orderDirection The direction to order by.
+     * @param int $limit The database limit.
+     * @param int $offset The database offset.
+     * @return Gdn_SQLDriver Returns SQL driver filled in with the select settings.
+     */
+    private function select($where = [], $orderFields = '', $orderDirection = 'asc', $limit = 0, $offset = 0) {
+        $orderFields = $orderFields ?: $this->_OrderBy[0];
+        $orderDirection = $orderDirection ?: val(0, $this->_OrderBy, 'asc');
+        $limit = $limit ?: $this->getDefaultLimit();
+
+        $sql = (clone $this->SQL)->reset();
+
+        $sql->select('CommentID')
+            ->from($this->Name)
+            ->where($where)
+            ->limit($limit, $offset)
+            ->orderBy($orderFields, $orderDirection);
+
+        return $sql;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWhere($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $where = $this->stripWherePrefixes($where);
+        list($where, $options) = $this->splitWhere($where, ['joinUsers' => true]);
+
+        // Build up an inner select of comments to force late-loading.
+        $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset);
+
+        // Add the inner select's parameters to the outer select.
+        $this->SQL->mergeParameters($innerSelect);
+
+        $innerSelectSql = $innerSelect->getSelect();
+        $result = $this->SQL
+            ->from($this->Name.' c')
+            ->join("($innerSelectSql) c2", "c.CommentID = c2.CommentID")
+            ->get();
+
+        if ($options['joinUsers']) {
+            Gdn::userModel()->joinUsers($result, array('InsertUserID', 'UpdateUserID'));
+        }
+
+        $this->setCalculatedFields($result);
+
+        return $result;
+    }
+
+    /**
      * Get comments for a discussion.
      *
      * @param int $DiscussionID Which discussion to get comment from.

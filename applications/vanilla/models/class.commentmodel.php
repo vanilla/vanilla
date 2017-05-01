@@ -178,7 +178,8 @@ class CommentModel extends Gdn_Model {
         $orderDirection = $orderDirection ?: val(0, $this->_OrderBy, 'asc');
         $limit = $limit ?: $this->getDefaultLimit();
 
-        $sql = (clone $this->SQL)->reset();
+        $sql = clone $this->SQL;
+        $sql->reset();
 
         $sql->select('CommentID')
             ->from($this->Name)

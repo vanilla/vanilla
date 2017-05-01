@@ -228,7 +228,7 @@ class DiscussionsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
-            'pageSize:i?' => [
+            'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => $this->discussionModel->getDefaultLimit(),
                 'minimum' => 1,
@@ -242,7 +242,7 @@ class DiscussionsApiController extends AbstractApiController {
         $query = $in->validate($query);
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         $where['Announce'] = 'all';
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
 
         if (array_key_exists('categoryID', $where)) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);

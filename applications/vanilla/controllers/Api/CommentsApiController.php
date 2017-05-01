@@ -230,7 +230,7 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->discussionModel->getMaxPages()
             ],
-            'pageSize:i?' => [
+            'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => $this->commentModel->getDefaultLimit(),
                 'minimum' => 1,
@@ -243,7 +243,7 @@ class CommentsApiController extends AbstractApiController {
 
         $query = $in->validate($query);
         $discussion = $this->discussionByID($query['discussionID']);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
         // Build up the where clause.

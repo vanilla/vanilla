@@ -96,7 +96,7 @@ class CategoriesApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => $this->categoryModel->getMaxPages()
             ],
-            'pageSize:i?' => [
+            'limit:i?' => [
                 'description' => 'The number of items per page.',
                 'default' => $this->categoryModel->getDefaultLimit(),
                 'minimum' => 1,
@@ -110,7 +110,7 @@ class CategoriesApiController extends AbstractApiController {
         $query = $in->validate($query);
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
 
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['pageSize']);
+        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(
             $query['query'],
             $query['expand'],

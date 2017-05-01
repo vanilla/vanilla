@@ -1012,6 +1012,12 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->Menu->Sort = Gdn::config('Garden.Menu.Sort');
         }
         $this->FireEvent('Initialize');
+
+        /*
+         * Add custom.js file (Mainly used by themes).
+         * We will have to unset it in renderMaster() if style.css is not present.
+         */
+        $this->addJsFile('custom.js');
     }
 
     /**
@@ -1674,9 +1680,16 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $ETag = AssetModel::eTag();
                 $ThemeType = isMobile() ? 'mobile' : 'desktop';
 
+                $hasStyleCSS = false;
+
                 // And now search for/add all css files.
                 foreach ($this->_CssFiles as $CssInfo) {
                     $CssFile = $CssInfo['FileName'];
+
+                    if ($CssFile === 'style.css') {
+                        $hasStyleCSS = true;
+                    }
+
                     if (!array_key_exists('Options', $CssInfo) || !is_array($CssInfo['Options'])) {
                         $CssInfo['Options'] = array();
                     }
@@ -1721,9 +1734,8 @@ class Gdn_Controller extends Gdn_Pluggable {
                     }
                 }
 
-                // Add a custom js file.
-                if (arrayHasValue($this->_CssFiles, 'style.css')) {
-                    $this->addJsFile('custom.js'); // only to non-admin pages.
+                if (!$hasStyleCSS) {
+                    $this->removeJsFile('custom.js');
                 }
 
                 $Cdns = [];

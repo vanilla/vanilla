@@ -6,10 +6,6 @@ use Vanilla\InjectableInterface;
 // Define some constants to help with testing.
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
-define('DS', '/');
-
-// Autoload all of the classes.
-require PATH_ROOT.'/vendor/autoload.php';
 
 // Copy the cgi-bin files.
 $dir = PATH_ROOT.'/cgi-bin';
@@ -25,19 +21,8 @@ foreach ($files as $file) {
 
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
-// ===========================================================================
-
-// Path to the primary configuration file.
-if (!defined('PATH_CONF')) {
-    define('PATH_CONF', PATH_ROOT.'/conf');
-}
-
-if (!defined('APPLICATION_VERSION')) {
-    define('APPLICATION_VERSION', '2.2.101.7');
-}
-
-// Loads the constants
-require PATH_CONF . '/constants.php';
+// ===========================================================================.
+require PATH_ROOT.'/environment.php';
 
 // Set up the dependency injection container.
 $dic = $GLOBALS['dic'] = new \Garden\Container\Container();

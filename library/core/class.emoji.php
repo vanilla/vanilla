@@ -484,9 +484,11 @@ class Emoji {
         $basename = basename($filename, $ext);
         $src = asset($emoji_path);
 
+        $attributes = [$src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext];
+        $attributes = array_map('htmlspecialchars', $attributes);
         $img = str_replace(
-            array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
-            array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
+            ['%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'],
+            $attributes,
             $this->format
         );
 

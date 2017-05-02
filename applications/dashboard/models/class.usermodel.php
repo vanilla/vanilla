@@ -1750,26 +1750,32 @@ class UserModel extends Gdn_Model {
      */
     public function getSystemUserID() {
         $SystemUserID = c('Garden.SystemUserID');
-        if ($SystemUserID) {
-            return $SystemUserID;
+        if (!$SystemUserID) {
+            $SystemUser = $this->SQL
+                ->select('UserID')
+                ->from('User u')
+                ->where('u.Name', 'System')
+                ->get()->firstRow(DATASET_TYPE_ARRAY);
+            if($SystemUser) {
+                $SystemUserID = $SystemUser['UserID'];
+            } else {
+                $SystemUser = [
+                    'Name' => t('System'),
+                    'Photo' => asset('/applications/dashboard/design/images/usericon.png', true),
+                    'Password' => randomString('20'),
+                    'HashMethod' => 'Random',
+                    'Email' => 'system@example.com',
+                    'DateInserted' => Gdn_Format::toDateTime(),
+                    'Admin' => '2'
+                ];
+
+                $this->EventArguments['SystemUser'] = &$SystemUser;
+                $this->fireEvent('BeforeSystemUser');
+
+                $SystemUserID = $this->SQL->insert($this->Name, $SystemUser);
+            }
+            saveToConfig('Garden.SystemUserID', $SystemUserID);
         }
-
-        $SystemUser = [
-            'Name' => t('System'),
-            'Photo' => asset('/applications/dashboard/design/images/usericon.png', true),
-            'Password' => randomString('20'),
-            'HashMethod' => 'Random',
-            'Email' => 'system@example.com',
-            'DateInserted' => Gdn_Format::toDateTime(),
-            'Admin' => '2'
-        ];
-
-        $this->EventArguments['SystemUser'] = &$SystemUser;
-        $this->fireEvent('BeforeSystemUser');
-
-        $SystemUserID = $this->SQL->insert($this->Name, $SystemUser);
-
-        saveToConfig('Garden.SystemUserID', $SystemUserID);
         return $SystemUserID;
     }
 

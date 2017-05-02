@@ -15,49 +15,6 @@ if (!defined('APPLICATION')) exit();
  * @since 2.0
  */
 
-/**
- * Bootstrap Before
- *
- * This file gives developers the opportunity to hook into Garden before any
- * real work has been done. Nothing has been included yet, aside from this file.
- * No Garden features are available yet.
- */
-if (file_exists(PATH_ROOT.'/conf/bootstrap.before.php')) {
-    require_once PATH_ROOT.'/conf/bootstrap.before.php';
-}
-
-/**
- * Define Core Constants
- *
- * Garden depends on the presence of a certain base set of defines that allow it
- * to be aware of its own place within the system. These are conditionally
- * defined here, in case they've already been set by a zealous bootstrap.before.
- */
-
-// Path to the primary configuration file.
-if (!defined('PATH_CONF')) {
-    define('PATH_CONF', PATH_ROOT.'/conf');
-}
-
-// Include default constants if none were defined elsewhere.
-if (!defined('VANILLA_CONSTANTS')) {
-    include PATH_CONF.'/constants.php';
-} else {
-    deprecated("Defining your own VANILLA_CONSTANTS is deprecated.");
-}
-
-// Make sure a default time zone is set.
-// Do NOT edit this. See config `Garden.GuestTimeZone`.
-date_default_timezone_set('UTC');
-
-// Make sure the mb_* functions are utf8.
-if (function_exists('mb_internal_encoding')) {
-    mb_internal_encoding('UTF-8');
-}
-
-// Include the core autoloader.
-require_once __DIR__.'/vendor/autoload.php';
-
 // Guard against broken cache files.
 if (!class_exists('Gdn')) {
     // Throwing an exception here would result in a white screen for the user.

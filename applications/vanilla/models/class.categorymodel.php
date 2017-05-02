@@ -2336,8 +2336,6 @@ class CategoryModel extends Gdn_Model {
         if ($rebuild) {
             $this->rebuildTree(true);
         }
-
-        self::clearCache();
     }
 
     /**

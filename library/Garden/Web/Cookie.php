@@ -63,6 +63,17 @@ class Cookie {
     }
 
     /**
+     * Calculate a cookie's expiration time.
+     *
+     * @param int $expire
+     * @return int
+     */
+    public function calculateExpiry($expire) {
+        $result = $expire > self::EXPIRE_THRESHOLD ? $expire : time() + $expire;
+        return $result;
+    }
+
+    /**
      * Get a cookie value.
      *
      * This method returns the current value of the cookie which will be the set value, the initial value from the request.
@@ -72,7 +83,7 @@ class Cookie {
      * @return null
      */
     public function get($name, $default = null) {
-        return isset($this->cookies[$name]) ? $this->cookies[$name][0] : $default;
+        return isset($this->cookies[$name]) ? $this->cookies[$name] : $default;
     }
 
     /**
@@ -85,11 +96,12 @@ class Cookie {
      * - A unix timestamp.
      * - A number of seconds to expire from now if less than 20 years.
      * - A value of zero will expire at the end of the browser session.
+     * @param bool $secure Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client.
      * @param bool $httpOnly Whether or not the cookie should be httpOnly.
      * @return $this
      */
-    public function set($name, $value, $expire = 0, $httpOnly = true) {
-        $this->setCookie($name, $value, $expire, $this->path, $this->domain, $httpOnly);
+    public function set($name, $value, $expire = 0, $secure = false, $httpOnly = true) {
+        $this->setCookie($name, $value, $expire, $this->path, $this->domain, $secure, $httpOnly);
         return $this;
     }
 
@@ -125,7 +137,7 @@ class Cookie {
             $this->cookies[$name] = $value;
             $this->sets[$name] = [
                 $value,
-                $expire > self::EXPIRE_THRESHOLD ? $expire : time() + $expire,
+                $this->calculateExpiry($expire),
                 $path === null ? $this->path : $path,
                 $domain === null ? $this->domain : $domain,
                 $secure,
@@ -162,7 +174,7 @@ class Cookie {
     /**
      * Flush cookie delete headers.
      */
-    private function makeDeleteCookieCalls() {
+    public function makeDeleteCookieCalls() {
         $deletes = array_diff_key($this->inCookies, $this->cookies);
 
         $expire = time() - 3600;
@@ -176,7 +188,7 @@ class Cookie {
     /**
      * Flush set-cookie headers.
      */
-    private function makeNewCookieCalls() {
+    public function makeNewCookieCalls() {
         if ($this->flushAll) {
             $sets = $this->sets;
         } else {

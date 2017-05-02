@@ -1,7 +1,12 @@
 <?php
 /**
  * Bare minimum setup of the environment to use Vanilla's classes.
+ *
+ * @author Alexandre (DaazKu) Chouinard <alexandre.c@vanillaforums.com>
+ * @copyright 2009-2017 Vanilla Forums Inc.
+ * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  */
+
 if (PHP_VERSION_ID < 50600) {
     die('Vanilla requires PHP 5.6 or greater.');
 }
@@ -59,5 +64,5 @@ if (function_exists('mb_internal_encoding')) {
 
 // Include the core autoloader.
 if (@!include_once(__DIR__.'/vendor/autoload.php')) {
-    die("Could not find the autoloader. Did you forget to run 'composer install' in ".__DIR__." ?\n");
+    die("Could not find the autoloader. Did you forget to run 'composer install' in '".__DIR__."' ?\n");
 }

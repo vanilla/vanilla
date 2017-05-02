@@ -7,9 +7,6 @@ use Vanilla\InjectableInterface;
 define('APPLICATION', 'Vanilla Tests');
 define('PATH_ROOT', realpath(__DIR__.'/..'));
 
-// Autoload all of the classes.
-require PATH_ROOT.'/envsetup.php';
-
 // Copy the cgi-bin files.
 $dir = PATH_ROOT.'/cgi-bin';
 if (!file_exists($dir)) {
@@ -24,7 +21,9 @@ foreach ($files as $file) {
 
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
-// ===========================================================================
+// ===========================================================================.
+require PATH_ROOT.'/envsetup.php';
+
 // Set up the dependency injection container.
 $dic = $GLOBALS['dic'] = new \Garden\Container\Container();
 Gdn::setContainer($dic);

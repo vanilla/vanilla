@@ -89,6 +89,21 @@ class AddonCacheController extends DashboardController {
                 t('The addon cache is outdated.').$actions,
                 ['CssClass' => 'Dismissable', 'id' => 'CheckSummary']
             );
+
+            if (debug()) {
+                Logger::event(
+                    'addoncache_outdated',
+                    Logger::INFO,
+                    'Addon cache outdated',
+                    [
+                        'type' => $type,
+                        'new' => $new,
+                        'invalid' => $invalid,
+                        'current' => array_keys($current),
+                        'cached' => array_keys($cached)
+                    ]
+                );
+            }
         }
 
         $this->deliveryMethod(DELIVERY_METHOD_JSON);

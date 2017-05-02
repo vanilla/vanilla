@@ -22,7 +22,7 @@ foreach ($files as $file) {
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
 // ===========================================================================.
-require PATH_ROOT.'/envsetup.php';
+require PATH_ROOT.'/environment.php';
 
 // Set up the dependency injection container.
 $dic = $GLOBALS['dic'] = new \Garden\Container\Container();

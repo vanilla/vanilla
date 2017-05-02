@@ -15,8 +15,8 @@ ini_set('track_errors', 1);
 
 ob_start();
 
-// Minimal setup needed to use most of Vanilla's framework.
-require_once(__DIR__.'/envsetup.php');
+// Minimal environment needed to use most of Vanilla's framework.
+require_once(__DIR__.'/environment.php');
 
 // Require the bootstrap to configure the application.
 require_once(__DIR__.'/bootstrap.php');

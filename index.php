@@ -16,10 +16,10 @@ ini_set('track_errors', 1);
 ob_start();
 
 // Minimal setup needed to use most of Vanilla's framework.
-require_once(PATH_ROOT.'/envsetup.php');
+require_once(__DIR__.'/envsetup.php');
 
 // Require the bootstrap to configure the application.
-require_once(PATH_ROOT.'/bootstrap.php');
+require_once(__DIR__.'/bootstrap.php');
 
 // Create and configure the dispatcher.
 $dispatcher = Gdn::dispatcher();

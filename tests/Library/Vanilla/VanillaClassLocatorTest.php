@@ -25,7 +25,7 @@ class VanillaClassLocatorTest extends ClassLocatorTest {
             ->addCall('bindClass', [BasicEventHandlers::class]);
 
         $vanillaClassLocator = $container->get(VanillaClassLocator::class);
-        $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), 'someEndpoint');
+        $handler = $vanillaClassLocator->findMethod($container->get(SomeController::class), 'someEndpoint_method');
 
         $this->assertTrue(is_callable($handler));
 

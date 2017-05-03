@@ -42,8 +42,22 @@ class APIv0 extends HttpClient {
     public function __construct() {
         parent::__construct();
         $this
-            ->setBaseUrl($_ENV['baseurl'])
+            ->setBaseUrl(getenv('baseurl'))
             ->setThrowExceptions(true);
+    }
+
+    /**
+     * Get the host of the database for direct access.
+     *
+     * @return string Returns the host of the database.
+     */
+    public function getDbHost() {
+        if (getenv('dbhost')) {
+            $dbHost = getenv('dbhost');
+        } else {
+            $dbHost = 'localhost';
+        }
+        return $dbHost;
     }
 
     /**
@@ -54,8 +68,8 @@ class APIv0 extends HttpClient {
     public function getDbName() {
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-        if (isset($_ENV['dbname'])) {
-            $dbname = $_ENV['dbname'];
+        if (getenv('dbname')) {
+            $dbname = getenv('dbname');
         } else {
             $dbname = preg_replace('`[^a-z]`i', '_', $host);
         }
@@ -68,7 +82,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return $_ENV['dbuser'];
+        return getenv('dbuser');
     }
 
     /**
@@ -77,7 +91,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return $_ENV['dbpass'];
+        return getenv('dbpass');
     }
 
     /**
@@ -116,7 +130,7 @@ class APIv0 extends HttpClient {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
             ];
-            $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
+            $pdo = new PDO('mysql:host='.$this->getDbHost(), $this->getDbUser(), $this->getDbPassword(), $options);
 
             $dbname = $this->getDbName();
             $r = $pdo->query("show databases like '$dbname'", PDO::FETCH_COLUMN, 0);
@@ -190,7 +204,7 @@ class APIv0 extends HttpClient {
 
         // Install Vanilla via cURL.
         $post = [
-            'Database-dot-Host' => 'localhost',
+            'Database-dot-Host' => $this->getDbHost(),
             'Database-dot-Name' => $this->getDbName(),
             'Database-dot-User' => $this->getDbUser(),
             'Database-dot-Password' => $this->getDbPassword(),

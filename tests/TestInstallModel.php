@@ -35,7 +35,7 @@ class TestInstallModel extends InstallModel {
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
         $this->config->load($this->getConfigPath(), 'Configuration', true);
 
-        $this->setBaseUrl(getenv('baseurl'));
+        $this->setBaseUrl(getenv('UNITTEST_BASEURL'));
     }
 
     /**
@@ -112,7 +112,7 @@ class TestInstallModel extends InstallModel {
      */
     public function getDbHost() {
         if (empty($this->dbHost)) {
-            if ($dbHost = getenv('dbhost')) {
+            if ($dbHost = getenv('UNITTEST_DB_HOST')) {
                 $this->dbHost = $dbHost;
             } else {
                 $this->dbHost = 'localhost';
@@ -130,8 +130,8 @@ class TestInstallModel extends InstallModel {
         if (empty($this->dbName)) {
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-            if (getenv('dbname')) {
-                $dbname = getenv('dbname');
+            if (getenv('UNITTEST_DB_NAME')) {
+                $dbname = getenv('UNITTEST_DB_NAME');
             } else {
                 $dbname = preg_replace('`[^a-z]`i', '_', $host);
             }
@@ -158,7 +158,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return getenv('dbuser');
+        return getenv('UNITTEST_DB_USER');
     }
 
     /**
@@ -167,7 +167,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return getenv('dbpass');
+        return getenv('UNITTEST_DB_PASSWORD');
     }
 
     /**

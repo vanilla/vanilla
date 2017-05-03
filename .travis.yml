@@ -27,12 +27,7 @@ addons:
 install:
   - composer self-update
   - composer install -o
-  - |
-    if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
-      composer require phpunit/phpunit ~6
-    else
-      composer require phpunit/phpunit ~5.7
-    fi
+  - composer require phpunit/phpunit ~5
   - tests/travis/setup.sh
 
 script:

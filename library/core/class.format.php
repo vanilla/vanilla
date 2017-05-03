@@ -1633,7 +1633,9 @@ EOT;
              * also runs code blocks through htmlspecialchars. Here, the callback is modified to only return the block
              * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
              */
-            $Markdown->code_block_content_func = function($block) { return $block; };
+            $codeCallback = function($block) { return $block; };
+            $Markdown->code_block_content_func = $codeCallback;
+            $Markdown->code_span_content_func = $codeCallback;
 
             // Vanilla-flavored Markdown.
             if ($Flavored) {

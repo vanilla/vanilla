@@ -876,7 +876,7 @@ class Gdn_Format {
             return self::to($Mixed, 'Html');
         } else {
             if (c('Garden.Format.ReplaceNewlines', true)) {
-                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
+                $Mixed = preg_replace("/(?!<code[^>]*?>)(\015\012|\015|\012)(?![^<]*?<\/code>)/", "<br />", $Mixed);
                 $Mixed = fixNl2Br($Mixed);
             }
             $Mixed = Gdn_Format::processHTML($Mixed);

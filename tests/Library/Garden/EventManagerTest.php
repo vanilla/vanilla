@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends \PHPUnit_Framework_TestCase {
+class EventManagerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Creates an {@link AddonManager} against Vanilla.
@@ -67,11 +67,14 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
 
             try {
                 $pm->registerPlugin($class);
-            } catch (\PHPUnit_Framework_Error_Notice $ex) {
+            } catch (\PHPUnit\Framework\Error_Notice $ex) {
                 // This is okay.
                 continue;
             }
         }
+
+        // No exception so we are cool!
+        $this->assertTrue(true);
     }
 
     /**
@@ -333,7 +336,7 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
+     * @expectedException PHPUnit\Framework\Error\Notice
      */
     public function testMaxPriority() {
         $em = new EventManager();

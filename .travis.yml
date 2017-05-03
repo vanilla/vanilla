@@ -28,10 +28,10 @@ install:
   - composer self-update
   - composer install -o
   - |
-    if [[ ${TRAVIS_PHP_VERSION:0:2} == "5." ]]; then
-      composer require phpunit/phpunit ~5.7
-    else
+    if [[ ${TRAVIS_PHP_VERSION:0:2} == "7." ]]; then
       composer require phpunit/phpunit ~6
+    else
+      composer require phpunit/phpunit ~5.7
     fi
   - tests/travis/setup.sh
 

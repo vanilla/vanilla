@@ -5,76 +5,81 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\Library\Vanilla;
-
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
-use Psr\Log\Test\LoggerInterfaceTest;
-use Vanilla\Logger;
-
-class LoggerTest extends LoggerInterfaceTest {
-    /**
-     * @var TestLogger $logger;
-     */
-    private $logger;
-
-    protected function setUp() {
-        $this->logger = new TestLogger();
+namespace {
+    # Shim for psr/log not being compatible with phpunit 6+ yet.
+    if (!class_exists('\PHPUnit_Framework_TestCase')) {
+        class PHPUnit_Framework_TestCase extends \PHPUnit\Framework\TestCase {}
     }
+}
 
-    public function testBasicLogging() {
-        $logger = new TestLogger();
+namespace VanillaTests\Library\Vanilla {
+    use Psr\Log\Test\LoggerInterfaceTest;
+    use Vanilla\Logger;
 
-        $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
-    }
+    class LoggerTest extends LoggerInterfaceTest {
+        /**
+         * @var TestLogger $logger ;
+         */
+        private $logger;
 
-    public function testLowPriority() {
-        $logger = new TestLogger(null, Logger::INFO);
+        protected function setUp() {
+            $this->logger = new TestLogger();
+        }
 
-        $this->assertNotLog($logger, Logger::DEBUG, 'Hello world', ['bar']);
-    }
+        public function testBasicLogging() {
+            $logger = new TestLogger();
 
-    public function testTwoLoggers() {
-        $logger1 = new TestLogger();
-        $logger2 = new TestLogger($logger1->parent);
-        $loggers = [$logger1, $logger2];
-
-        foreach ($loggers as $logger) {
             $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
         }
-    }
 
-    protected function assertLog(TestLogger $logger, $level, $message, $context) {
-        $logger->parent->log($level, $message, $context);
-        list($lastLevel, $lastMessage, $lastContext) = $logger->last;
-        $this->assertSame($level, $lastLevel);
-        $this->assertSame($message, $lastMessage);
-        $this->assertSame($context, $lastContext);
-    }
+        public function testLowPriority() {
+            $logger = new TestLogger(null, Logger::INFO);
 
-    protected function assertNotLog(TestLogger $logger, $level, $message, $context) {
-        $logger->parent->log($level, $message, $context);
-        list($lastLevel, $lastMessage, $lastContext) = $logger->last;
-        $this->assertNotSame($level, $lastLevel);
-        $this->assertNotSame($message, $lastMessage);
-        $this->assertNotSame($context, $lastContext);
-    }
+            $this->assertNotLog($logger, Logger::DEBUG, 'Hello world', ['bar']);
+        }
 
-    /**
-     * @return \Psr\Log\Test\LoggerInterface
-     */
-    function getLogger() {
-        return $this->logger->parent;
-    }
+        public function testTwoLoggers() {
+            $logger1 = new TestLogger();
+            $logger2 = new TestLogger($logger1->parent);
+            $loggers = [$logger1, $logger2];
 
-    /**
-     * This must return the log messages in order with a simple formatting: "<LOG LEVEL> <MESSAGE>"
-     *
-     * Example ->error('Foo') would yield "error Foo"
-     *
-     * @return string[]
-     */
-    function getLogs() {
-        return $this->logger->logs;
+            foreach ($loggers as $logger) {
+                $this->assertLog($logger, Logger::DEBUG, 'Hello world', ['foo']);
+            }
+        }
+
+        protected function assertLog(TestLogger $logger, $level, $message, $context) {
+            $logger->parent->log($level, $message, $context);
+            list($lastLevel, $lastMessage, $lastContext) = $logger->last;
+            $this->assertSame($level, $lastLevel);
+            $this->assertSame($message, $lastMessage);
+            $this->assertSame($context, $lastContext);
+        }
+
+        protected function assertNotLog(TestLogger $logger, $level, $message, $context) {
+            $logger->parent->log($level, $message, $context);
+            list($lastLevel, $lastMessage, $lastContext) = $logger->last;
+            $this->assertNotSame($level, $lastLevel);
+            $this->assertNotSame($message, $lastMessage);
+            $this->assertNotSame($context, $lastContext);
+        }
+
+        /**
+         * @return \Psr\Log\Test\LoggerInterface
+         */
+        function getLogger() {
+            return $this->logger->parent;
+        }
+
+        /**
+         * This must return the log messages in order with a simple formatting: "<LOG LEVEL> <MESSAGE>"
+         *
+         * Example ->error('Foo') would yield "error Foo"
+         *
+         * @return string[]
+         */
+        function getLogs() {
+            return $this->logger->logs;
+        }
     }
 }

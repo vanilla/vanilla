@@ -1375,7 +1375,10 @@ class EditorPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $Sender
      */
     public function settingsController_addEditCategory_handler($Sender) {
-        $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
+        // Only put the checkbox on edit. On creation the default value will be used.
+        if ($Sender->data('CategoryID')) {
+            $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
+        }
     }
 
     /**

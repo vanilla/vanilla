@@ -65,11 +65,20 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
             // Register the plugin. This will give a warning when there's overlap.
             require_once $path; // needed because no autoloader registered
 
-            try {
-                $pm->registerPlugin($class);
-            } catch (\PHPUnit\Framework\Error_Notice $ex) {
-                // This is okay.
-                continue;
+            if (class_exists('\PHPUnit_Framework_Error_Notice')) {
+                try {
+                    $pm->registerPlugin($class);
+                } catch (\PHPUnit_Framework_Error_Notice $ex) {
+                    // This is okay.
+                    continue;
+                }
+            } else {
+                try {
+                    $pm->registerPlugin($class);
+                } catch (\PHPUnit\Framework\Error\Notice $ex) {
+                    // This is okay.
+                    continue;
+                }
             }
         }
 
@@ -336,9 +345,14 @@ class EventManagerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
      *
-     * @expectedException PHPUnit\Framework\Error\Notice
      */
     public function testMaxPriority() {
+        if (class_exists('\PHPUnit_Framework_Error_Notice')) {
+            $this->expectException(\PHPUnit_Framework_Error_Notice::class);
+        } else {
+            $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+        }
+
         $em = new EventManager();
 
         $arr = [];

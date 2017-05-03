@@ -89,10 +89,14 @@ class DbEncodeDecodeTest extends \PHPUnit\Framework\TestCase {
      * Make sure we have a bad string for {@link dbdecode()}.
      *
      * @param string $str The bad string to decode.
-     * @expectedException \PHPUnit\Framework\Error\Error
      * @dataProvider provideBadDbDecodeStrings
      */
     public function testBadDbDecodeString($str) {
+        if (class_exists('\PHPUnit_Framework_Error')) {
+            $this->expectException(\PHPUnit_Framework_Error::class);
+        } else {
+            $this->expectException(\PHPUnit\Framework\Error\Error::class);
+        }
         $decoded = unserialize($str);
     }
 

@@ -63,6 +63,6 @@ if (function_exists('mb_internal_encoding')) {
 }
 
 // Include the core autoloader.
-if (@!include_once(__DIR__.'/vendor/autoload.php')) {
+if (!include_once(__DIR__.'/vendor/autoload.php')) {
     die("Could not find the autoloader. Did you forget to run 'composer install' in '".__DIR__."' ?\n");
 }

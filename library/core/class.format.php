@@ -1642,10 +1642,6 @@ EOT;
                 $Markdown->addAllFlavor();
             }
 
-            // Format mentions prior to Markdown parsing.
-            // Avoids `@_name_` transformed to `@<em>name</em>`.
-            $Mixed = Gdn_Format::mentions($Mixed);
-
             // Markdown parsing.
             $Mixed = $Markdown->transform($Mixed);
 

@@ -278,11 +278,11 @@ class Gdn_Format {
                 // Standard BBCode parsing.
                 $Mixed = $BBCodeFormatter->format($Mixed);
 
-                // Vanilla magic parsing.
-                $Mixed = Gdn_Format::processHTML($Mixed);
-
-                // Always filter as the last step.
+                // Always filter after basic parsing.
                 $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+                // Vanilla magic parsing.
+                $Sanitized = Gdn_Format::processHTML($Sanitized);
 
                 return $Sanitized;
             }
@@ -341,8 +341,11 @@ class Gdn_Format {
                 $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
                 $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
 
-                // Always filter as the last step.
+                // Always filter after basic parsing.
                 $Sanitized = Gdn_Format::htmlFilter($Mixed2);
+
+                // Vanilla magic parsing.
+                $Sanitized = Gdn_Format::processHTML($Sanitized);
 
                 return $Sanitized;
 
@@ -879,10 +882,12 @@ class Gdn_Format {
                 $Mixed = preg_replace("/(?!<code[^>]*?>)(\015\012|\015|\012)(?![^<]*?<\/code>)/", "<br />", $Mixed);
                 $Mixed = fixNl2Br($Mixed);
             }
-            $Mixed = Gdn_Format::processHTML($Mixed);
 
-            // Always filter as the last step.
+            // Always filter after basic parsing.
             $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Vanilla magic parsing.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
 
             return $Sanitized;
         }
@@ -1067,8 +1072,10 @@ class Gdn_Format {
 
         $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
 
-        // Always filter as the last step.
+        // Always filter after basic parsing.
         $Sanitized = Gdn_Format::htmlFilter($Result);
+
+        // No magic `processHTML()` for plain text.
 
         return $Sanitized;
     }
@@ -1649,33 +1656,45 @@ EOT;
             // Markdown parsing.
             $Mixed = $Markdown->transform($Mixed);
 
-            // Vanilla magic formatting.
-            $Mixed = Gdn_Format::processHTML($Mixed);
-
-            // Always filter as the last step.
+            // Always filter after basic parsing.
             $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Vanilla magic parsing.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
 
             return $Sanitized;
         }
     }
 
     /**
-     * Performs replacing operations on a HTML string. Usually for formatting posts.
-     * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
+     * Do Vanilla's "magic" text processing.
+     *
+     * Runs an HTML string through our custom links, mentions, emoji and spoilers formatters.
+     * Any thing done here is AFTER security filtering and must be extremely careful.
+     * This should always be done LAST, after any other input formatters.
      *
      * @param string $html An unparsed HTML string.
      * @param bool $mentions Whether mentions are processed or not.
      * @return string The formatted HTML string.
      */
     protected static function processHTML($html, $mentions = true) {
-        // Fire a filter event here first so that it doesn't have to deal with the other formatters.
+        // Do event first so it doesn't have to deal with the other formatters.
         $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
+
+        // Embed & auto-links.
         $html = Gdn_Format::links($html);
+
+        // Mentions.
         if ($mentions) {
             $html = Gdn_Format::mentions($html);
         }
+
+        // Emoji.
         $html = Emoji::instance()->translateToHtml($html);
+
+        // Old Spoiler plugin markup handling.
         $html = Gdn_Format::legacySpoilers($html);
+
         return $html;
     }
 
@@ -1990,11 +2009,14 @@ EOT;
      * @since 2.1
      */
     public static function textEx($Str) {
+        // Basic text parsing.
         $Str = self::text($Str);
-        $Str = Gdn_Format::processHTML($Str);
 
-        // Always filter as the last step.
+        // Always filter after basic parsing.
         $Sanitized = Gdn_Format::htmlFilter($Str);
+
+        // Vanilla magic parsing. (this is the "Ex"tra)
+        $Sanitized = Gdn_Format::processHTML($Sanitized);
 
         return $Sanitized;
     }
@@ -2276,11 +2298,13 @@ EOT;
                 return self::display($Mixed);
             }
 
-            // HTML filter first
-            $Mixed = $Formatter->format($Mixed);
-            // Links
-            $Mixed = Gdn_Format::processHTML($Mixed);
-            return $Mixed;
+            // Always filter after basic parsing.
+            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Vanilla magic formatting.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
+
+            return $Sanitized;
         }
     }
 }

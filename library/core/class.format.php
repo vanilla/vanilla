@@ -878,13 +878,15 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Html');
         } else {
-            if (c('Garden.Format.ReplaceNewlines', true)) {
-                $Mixed = preg_replace("/(?!<code[^>]*?>)(\015\012|\015|\012)(?![^<]*?<\/code>)/", "<br />", $Mixed);
-                $Mixed = fixNl2Br($Mixed);
-            }
 
-            // Always filter after basic parsing.
+            // Always filter - in this case, no basic parsing is needed because we're already in HTML.
             $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Fix newlines in code blocks.
+            if (c('Garden.Format.ReplaceNewlines', true)) {
+                $Sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $Sanitized);
+                $Sanitized = fixNl2Br($Sanitized);
+            }
 
             // Vanilla magic parsing.
             $Sanitized = Gdn_Format::processHTML($Sanitized);
@@ -1648,10 +1650,6 @@ EOT;
             if ($Flavored) {
                 $Markdown->addAllFlavor();
             }
-
-            // Format mentions prior to Markdown parsing.
-            // Avoids `@_name_` transformed to `@<em>name</em>`.
-            $Mixed = Gdn_Format::mentions($Mixed);
 
             // Markdown parsing.
             $Mixed = $Markdown->transform($Mixed);

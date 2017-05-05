@@ -114,9 +114,8 @@ class APIv0 extends HttpClient {
             $options = [
                 PDO::ATTR_PERSISTENT => false,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
             ];
-            $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
+            $pdo = new PDO("mysql:host=localhost;charset=utf8mb4", $this->getDbUser(), $this->getDbPassword(), $options);
 
             $dbname = $this->getDbName();
             $r = $pdo->query("show databases like '$dbname'", PDO::FETCH_COLUMN, 0);

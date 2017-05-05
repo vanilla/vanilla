@@ -346,7 +346,7 @@ class InstallModel {
             $this->getDatabaseDsn($info),
             $info['user'],
             $info['password'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
+            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_PERSISTENT => false]
         );
 
         return $pdo;

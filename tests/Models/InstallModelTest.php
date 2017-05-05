@@ -5,9 +5,11 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Model;
 
+use Garden\Container\Container;
 use Vanilla\AddonManager;
+use VanillaTests\Bootstrap;
 use VanillaTests\TestInstallModel;
 
 /**
@@ -18,7 +20,10 @@ class InstallTest extends \PHPUnit\Framework\TestCase {
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */
     public function testInstall() {
-        global $dic;
+        $bootstrap = new Bootstrap();
+        $dic = new Container();
+        $bootstrap->run($dic);
+
 
         /* @var TestInstallModel $installer */
         $installer = $dic->get(TestInstallModel::class);

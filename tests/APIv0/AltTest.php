@@ -28,6 +28,8 @@ class AltTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test an alternate install method.
+     *
+     * @large
      */
     public function testAltInstall() {
         $this->api()->uninstall();

@@ -16,7 +16,7 @@ if (!defined('APPLICATION')) {
     define('APPLICATION', 'Vanilla');
 }
 if (!defined('APPLICATION_VERSION')) {
-    define('APPLICATION_VERSION', '2.4.200');
+    define('APPLICATION_VERSION', '2.4.201');
 }
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);

@@ -9,15 +9,6 @@
 
 use Garden\Container\Container;
 
-$PluginInfo['HtmLawed'] = [
-    'Description' => 'Adapts HtmLawed to work with Vanilla.',
-    'Version' => '1.2',
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com/profile/todd',
-    'Hidden' => true
-];
-
 /**
  * Class HTMLawedPlugin
  */

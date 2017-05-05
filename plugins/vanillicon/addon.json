@@ -1,0 +1,21 @@
+{
+    "name": "Vanillicon",
+    "description": "Provides fun default user icons from vanillicon.com.",
+    "version": "2.1.0",
+    "mobileFriendly": true,
+    "settingsUrl": "/settings/vanillicon",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "vanillicon.png",
+    "key": "vanillicon",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

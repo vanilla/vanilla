@@ -5,26 +5,6 @@
  * @package Flagging
  */
 
-// Define the plugin:
-$PluginInfo['Flagging'] = array(
-    'Name' => 'Flagging',
-    'Description' => 'Allows users to report content that violates forum rules.',
-    'Version' => '1.1.1',
-    'RequiredApplications' => false,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'SettingsUrl' => '/dashboard/plugin/flagging',
-    'UsePopupSettings' => false,
-    'SettingsPermission' => 'Garden.Moderation.Manage',
-    'HasLocale' => true,
-    'MobileFriendly' => true,
-    'RegisterPermissions' => array('Plugins.Flagging.Notify'),
-    'Icon' => 'flagging.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class FlaggingPlugin extends Gdn_Plugin {
 
     /**

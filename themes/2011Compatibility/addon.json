@@ -1,0 +1,28 @@
+{
+    "name": "2011 Compatibility",
+    "description": "In 2012 Vanilla went to great lengths to simplify their core theme. This theme is a compatibility layer for themes that were extended from the old 2011 version.",
+    "version": "1",
+    "hidden": false,
+    "options": {
+        "description": "This theme has <font color=\"red\">6 color</font> options.",
+        "styles": {
+            "vanilla Terminal": "%s_terminal",
+            "vanilla Grey": "%s_grey",
+            "vanilla Big City": "%s_bigcity",
+            "vanilla Poppy": "%s_poppy",
+            "vanilla Lemon Sea": "%s_lemonsea",
+            "vanilla Blue": "%s"
+        }
+    },
+    "archived": true,
+    "key": "2011Compatibility",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ]
+}

@@ -1,0 +1,24 @@
+{
+    "name": "Flagging",
+    "description": "Allows users to report content that violates forum rules.",
+    "version": "1.1.1",
+    "requiredTheme": false,
+    "settingsUrl": "/dashboard/plugin/flagging",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Moderation.Manage",
+    "hasLocale": true,
+    "mobileFriendly": true,
+    "registerPermissions": [
+        "Plugins.Flagging.Notify"
+    ],
+    "icon": "flagging.png",
+    "key": "flagging",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

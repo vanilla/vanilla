@@ -1,0 +1,21 @@
+{
+    "name": "Syntax Prettifier",
+    "description": "Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.",
+    "version": "1.2.3",
+    "mobileFriendly": true,
+    "settingsUrl": "/dashboard/settings/googleprettify",
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "google-prettify.png",
+    "key": "googleprettify",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

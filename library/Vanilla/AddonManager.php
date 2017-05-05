@@ -81,25 +81,27 @@ class AddonManager {
      * Applications and plugins are treated as the same so pass their directories as an array with the
      * **Addon::TYPE_ADDON** key.
      *
-     * @param string $cacheDir The path to the cache.
+     * @param null|string $cacheDir The path to the cache.
      */
-    public function __construct(array $scanDirs, $cacheDir) {
-        $this->setCacheDir($cacheDir);
-
-        // Make sure the cache directories exist.
+    public function __construct(array $scanDirs, $cacheDir = null) {
         $r = true;
-        if (!file_exists($cacheDir)) {
-            $r &= mkdir($cacheDir, 0755, true);
+        if ($cacheDir !== null) {
+            $this->setCacheDir($cacheDir);
+
+            // Make sure the cache directories exist.
+            if (!file_exists($cacheDir)) {
+                $r = mkdir($cacheDir, 0755, true);
+            }
         }
 
         $types = [Addon::TYPE_ADDON, Addon::TYPE_LOCALE, Addon::TYPE_THEME];
         $scanDirs += array_fill_keys($types, []);
 
         foreach ($types as $type) {
-            if (!$this->typeUsesMultiCaching($type)) {
+            if ($this->cacheDir !== null && !$this->typeUsesMultiCaching($type)) {
                 $dir = "$cacheDir/$type";
                 if (!file_exists($dir)) {
-                    $r &= mkdir($dir, 0755);
+                    $r = $r && mkdir($dir, 0755);
                 }
             }
 
@@ -279,15 +281,14 @@ class AddonManager {
      */
     private function ensureMultiCache() {
         if (!isset($this->multiCache)) {
-            if (!empty($this->cacheDir)) {
+            $cachePath = null;
+            if ($this->cacheDir) {
                 $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
-                if (is_readable($cachePath)) {
-                    $this->multiCache = require $cachePath;
-                } else {
-                    $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
-                }
+            }
+            if ($cachePath !== null && is_readable($cachePath)) {
+                $this->multiCache = require $cachePath;
             } else {
-                $this->multiCache = [];
+                $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
             }
         }
     }
@@ -321,15 +322,15 @@ class AddonManager {
 
         if ($saveCache) {
             if ($this->typeUsesMultiCaching($type)) {
-                static::saveArrayCache($path = "{$this->cacheDir}/$type.php", $addons);
+                $this->saveArrayCache("$type.php", $addons);
             } else {
                 // Each of these addons must be cached separately.
                 foreach ($addons as $addon) {
                     $key = $addon->getKey();
-                    static::saveArrayCache("{$this->cacheDir}/$type/$key.php", $addon);
+                    $this->saveArrayCache("$type/$key.php", $addon);
                 }
                 // Save a index of the addon names.
-                static::saveArrayCache("{$this->cacheDir}/$type-index.php", $addonDirs);
+                $this->saveArrayCache("$type-index.php", $addonDirs);
             }
         }
         return $addons;
@@ -358,12 +359,14 @@ class AddonManager {
     /**
      * Cache an array.
      *
-     * @param string $path The path to save the array to.
+     * @param string $path Relative path path to save the array to.
      * @param string $array The array to save.
      */
-    private static function saveArrayCache($path, $array) {
-        $varString = '<?php return '.var_export($array, true).";\n";
-        static::filePutContents($path, $varString);
+    private function saveArrayCache($path, $array) {
+        if ($this->cacheDir !== null) {
+            $varString = '<?php return '.var_export($array, true).";\n";
+            $this->filePutContents($this->cacheDir.'/'.$path, $varString);
+        }
     }
 
     /**
@@ -376,7 +379,7 @@ class AddonManager {
      * @category Filesystem Functions
      * @see http://php.net/file_put_contents
      */
-    private static function filePutContents($filename, $data, $mode = 0644) {
+    private function filePutContents($filename, $data, $mode = 0644) {
         $temp = tempnam(dirname($filename), 'atomic');
 
         if (!($fp = @fopen($temp, 'wb'))) {
@@ -417,13 +420,14 @@ class AddonManager {
      */
     private function getSingleIndex($type) {
         if (!isset($this->singleIndex[$type])) {
-            $cachePath = $this->cacheDir."/$type-index.php";
+            $cachePath = "$type-index.php";
 
-            if (is_readable($cachePath)) {
-                $this->singleIndex[$type] = require $cachePath;
+            if ($this->cacheDir !== null && is_readable("$this->cacheDir/$cachePath")) {
+                $this->singleIndex[$type] = require "$this->cacheDir/$cachePath";
             } else {
                 $addonDirs = $this->scanAddonDirs($type);
-                static::saveArrayCache($cachePath, $addonDirs);
+
+                $this->saveArrayCache($cachePath, $addonDirs);
 
                 $this->singleIndex[$type] = $addonDirs;
             }
@@ -443,8 +447,14 @@ class AddonManager {
         if (isset($index[$key])) {
             unset($index[$key]);
 
-            $cachePath = $this->cacheDir."/$type-index.php";
-            static::saveArrayCache($cachePath, $index);
+            $cachePath = null;
+            if ($this->cacheDir !== null) {
+                $cachePath = $this->cacheDir."/$type-index.php";
+            }
+            if ($cachePath !== null) {
+                $this->saveArrayCache($cachePath, $index);
+            }
+
             $this->singleIndex[$type] = $index;
             return true;
         }
@@ -484,7 +494,7 @@ class AddonManager {
         }
         // Cache the addon's information.
         if (!empty($this->cacheDir)) {
-            static::saveArrayCache("{$this->cacheDir}/$type/$key.php", $addon);
+            $this->saveArrayCache("$type/$key.php", $addon);
         }
         $this->singleCache[$type][$key] = $addon;
         return $addon === false ? null : $addon;
@@ -997,14 +1007,17 @@ class AddonManager {
      * @return bool Returns **true** if the files were removed or **false** otherwise.
      */
     public function clearCache() {
-        $r = true;
+        if ($this->cacheDir === null) {
+            return true;
+        }
 
+        $r = true;
         $paths = array_merge(
             glob("{$this->cacheDir}/*.php", GLOB_NOSORT),
             glob("{$this->cacheDir}/*/*.php", GLOB_NOSORT)
         );
         foreach ($paths as $path) {
-            $r &= unlink($path);
+            $r = $r && unlink($path);
         }
 
         return $r;
@@ -1013,7 +1026,7 @@ class AddonManager {
     /**
      * Get the cacheDir.
      *
-     * @return string Returns the cacheDir.
+     * @return null|string Returns the cacheDir.
      */
     public function getCacheDir() {
         return $this->cacheDir;
@@ -1022,15 +1035,14 @@ class AddonManager {
     /**
      * Set the cacheDir.
      *
-     * @param string $cacheDir The cache directory to set. If this doesn't include **PATH_ROOT** then it will be
+     * @param null|string $cacheDir The cache directory to set. If this doesn't include **PATH_ROOT** then it will be
      * prepended.
      * @return AddonManager Returns `$this` for fluent calls.
      */
     public function setCacheDir($cacheDir) {
-        if (strpos($cacheDir, PATH_ROOT) !== 0) {
+        if ($cacheDir !== null && strpos($cacheDir, PATH_ROOT) !== 0) {
             $cacheDir = PATH_ROOT.$cacheDir;
         }
-
         $this->cacheDir = $cacheDir;
         return $this;
     }

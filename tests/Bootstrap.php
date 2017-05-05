@@ -75,6 +75,7 @@ class Bootstrap {
             ->rule(\Gdn_Configuration::class)
             ->setShared(true)
             ->addCall('defaultPath', [$this->getConfigPath()])
+            ->addCall('autoSave', [false])
             ->addCall('load', [PATH_ROOT.'/conf/config-defaults.php'])
             ->addAlias('Config')
 
@@ -201,6 +202,22 @@ class Bootstrap {
     }
 
     /**
+     * Clean up a container and remove its global references.
+     *
+     * @param Container $container The container to clean up.
+     */
+    public static function cleanup(Container $container) {
+        $container->clearInstances();
+
+        if ($GLOBALS['dic'] === $container) {
+            unset($GLOBALS['dic']);
+        }
+        if (Gdn::getContainer() === $container) {
+            Gdn::setContainer(null);
+        }
+    }
+
+    /**
      * Get the baseUrl.
      *
      * @return mixed Returns the baseUrl.
@@ -218,9 +235,9 @@ class Bootstrap {
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
         $path = parse_url($this->getBaseUrl(), PHP_URL_PATH);
         if ($path) {
-            $path = '-'.str_replace('/', '-', $path);
+            $path = '-'.ltrim(str_replace('/', '-', $path), '-');
         }
 
-        return PATH_ROOT."/conf/'.{$host}{$path}.php";
+        return PATH_ROOT."/conf/{$host}{$path}.php";
     }
 }

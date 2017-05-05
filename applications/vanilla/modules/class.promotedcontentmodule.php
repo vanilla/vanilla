@@ -603,7 +603,7 @@ class PromotedContentModule extends Gdn_Module {
             $user = Gdn::userModel()->getID($userID);
             $roleModel = new RoleModel();
             $roles = $roleModel->GetByUserID($userID)->resultArray();
-            $roleNames = '';
+            $roleNames = [];
             foreach ($roles as $role) {
                 $roleNames[] = val('Name', $role);
             }

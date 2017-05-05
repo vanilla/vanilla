@@ -502,16 +502,16 @@
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.4",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "ecde4d921fb940db633b22e96f3305efe16bf954"
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/ecde4d921fb940db633b22e96f3305efe16bf954",
-                "reference": "ecde4d921fb940db633b22e96f3305efe16bf954",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/b718c9b4c1040643620922b3ac988dadc38f3b87",
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87",
                 "shasum": ""
             },
             "require": {
@@ -535,7 +535,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-04-02T18:06:23+00:00"
+            "time": "2017-05-05T17:46:16+00:00"
         },
         {
             "name": "vanilla/garden-http",

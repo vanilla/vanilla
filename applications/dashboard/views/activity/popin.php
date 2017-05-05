@@ -36,6 +36,6 @@
             ?>
         </li>
     <?php else: ?>
-        <li class="Item Empty Center"><?php echo t('Notifications will appear here.', sprintf(t('You do not have any %s yet.'), t('notifications'))); ?></li>
+        <li class="Item Empty Center"><?php echo t('Notifications will appear here.', t('You do not have any notifications yet.')); ?></li>
     <?php endif; ?>
 </ul>

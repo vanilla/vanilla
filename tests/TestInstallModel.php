@@ -155,6 +155,7 @@ class TestInstallModel extends InstallModel {
 
         $dbname = $this->getDbName();
         $pdo->query("create database if not exists `$dbname`");
+        $pdo->query("use `$dbname`");
     }
 
     /**

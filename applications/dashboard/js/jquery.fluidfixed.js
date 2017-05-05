@@ -97,7 +97,7 @@
              */
 
             var containerOuterHeight = vars.containerHeight + vars.offsetTop + vars.offsetBottom;
-            var fixObject = containerOuterHeight < vars.documentHeight;
+            var fixObject = containerOuterHeight < vars.documentHeight && containerOuterHeight < vars.windowHeight;
 
             var handleScroll = fixObject
                 && containerOuterHeight > vars.windowHeight // Element height is higher than the window height

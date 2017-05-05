@@ -16,6 +16,9 @@ use Garden\Container\Container;
  * Allow a class to test against
  */
 trait SiteTestTrait {
+    /**
+     * @var Container
+     */
     private static $container;
 
     protected static function createContainer() {
@@ -41,6 +44,13 @@ trait SiteTestTrait {
         ]);
     }
 
+    public static function teardownAfterClass() {
+        Bootstrap::cleanup(self::container());
+    }
+
+    /**
+     * @return Container
+     */
     protected static function container() {
         return self::$container;
     }

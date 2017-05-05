@@ -51,7 +51,7 @@ if (!defined('PATH_CONF')) {
 }
 
 // Include default constants.
-include PATH_CONF.'/constants.php';
+require_once PATH_CONF.'/constants.php';
 
 // Make sure a default time zone is set.
 // Do NOT edit this. See config `Garden.GuestTimeZone`.
@@ -63,6 +63,6 @@ if (function_exists('mb_internal_encoding')) {
 }
 
 // Include the core autoloader.
-if (!include __DIR__.'/vendor/autoload.php') {
+if (!include_once __DIR__.'/vendor/autoload.php') {
     die("Could not find the autoloader. Did you forget to run 'composer install' in '".__DIR__."' ?\n");
 }

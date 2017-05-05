@@ -395,16 +395,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.6",
+            "version": "v3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a"
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/093e416ad096355149e265ea2e4cc1f9ee40ab1a",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/acec26fcf7f3031e094e910b94b002fa53d4e4d6",
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6",
                 "shasum": ""
             },
             "require": {
@@ -446,7 +446,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-07T16:47:02+00:00"
+            "time": "2017-05-01T14:55:58+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -502,21 +502,21 @@
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.3.4",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592"
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/d5af47a643d6fc872ec6d57e35b2583793c8a592",
-                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/b718c9b4c1040643620922b3ac988dadc38f3b87",
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87",
                 "shasum": ""
             },
             "require": {
                 "container-interop/container-interop": "^1.1",
-                "php": ">=5.4.0"
+                "php": ">=5.6.0"
             },
             "type": "library",
             "autoload": {
@@ -535,7 +535,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-02-05T15:17:17+00:00"
+            "time": "2017-05-05T17:46:16+00:00"
         },
         {
             "name": "vanilla/garden-http",
@@ -668,16 +668,16 @@
         },
         {
             "name": "vanilla/htmlawed",
-            "version": "v2.1.22",
+            "version": "v2.2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/htmlawed.git",
-                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817"
+                "reference": "b311030c617579790028d65f6d0967ce9351d991"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/685c88e3b6799ed82c3a8b50d59d536e16b72817",
-                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/b311030c617579790028d65f6d0967ce9351d991",
+                "reference": "b311030c617579790028d65f6d0967ce9351d991",
                 "shasum": ""
             },
             "require": {
@@ -703,7 +703,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2016-04-14T21:27:05+00:00"
+            "time": "2017-04-20T17:18:55+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",

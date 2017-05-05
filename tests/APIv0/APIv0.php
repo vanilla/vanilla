@@ -107,24 +107,21 @@ class APIv0 extends HttpClient {
      *
      * @return \PDO Returns a connection to the database.
      */
-    public function getPDO() {
+    public function getPDO($db = true) {
         static $pdo;
 
         if (!$pdo) {
             $options = [
                 PDO::ATTR_PERSISTENT => false,
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ];
-            $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
-
-            $dbname = $this->getDbName();
-            $r = $pdo->query("show databases like '$dbname'", PDO::FETCH_COLUMN, 0);
-            $dbnames = $r->fetchColumn(0);
-
-            if (!empty($dbnames)) {
-                $pdo->query("use `$dbname`");
+            $dsn = "mysql:host=localhost;charset=utf8mb4";
+            if ($db) {
+                $dbname = $this->getDbName();
+                $dsn .= ";dbname=$dbname";
             }
+
+            $pdo = new PDO($dsn, $this->getDbUser(), $this->getDbPassword(), $options);
         }
 
         return $pdo;
@@ -409,7 +406,7 @@ class APIv0 extends HttpClient {
      * @throws \Exception Throws an exception if the config file cannot be deleted.
      */
     public function uninstall() {
-        $pdo = $this->getPDO();
+        $pdo = $this->getPDO(false);
 
         // Delete the config file.
         $this->deleteConfig();
@@ -537,7 +534,7 @@ class APIv0 extends HttpClient {
 
     public function createDatabase() {
         // Create the database for Vanilla.
-        $pdo = $this->getPDO();
+        $pdo = $this->getPDO(false);
         $dbname = $this->getDbName();
         $pdo->query("create database `$dbname`");
         $pdo->query("use `$dbname`");

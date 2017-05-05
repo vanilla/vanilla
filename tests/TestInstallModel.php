@@ -28,26 +28,16 @@ class TestInstallModel extends InstallModel {
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
+    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container, \Gdn_Request $request) {
         parent::__construct($config, $addonModel, $container);
 
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
-        $this->config->load($this->getConfigPath(), 'Configuration', true);
+        $this->config->load($config->defaultPath(), 'Configuration', true);
 
-        $this->setBaseUrl($_ENV['baseurl']);
+        $this->setBaseUrl($request->url('/'));
     }
 
-    /**
-     * Get the path to the config file for direct access.
-     *
-     * @return string Returns the path to the database.
-     */
-    public function getConfigPath() {
-        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
-        $path = PATH_ROOT."/conf/$host.php";
-        return $path;
-    }
 
     /**
      * Get the base URL of the site.
@@ -66,7 +56,7 @@ class TestInstallModel extends InstallModel {
      */
     public function setBaseUrl($baseUrl) {
         $this->baseUrl = $baseUrl;
-        $this->config->defaultPath($this->getConfigPath());
+//        $this->config->defaultPath($this->getConfigPath());
         return $this;
     }
 
@@ -165,6 +155,7 @@ class TestInstallModel extends InstallModel {
 
         $dbname = $this->getDbName();
         $pdo->query("create database if not exists `$dbname`");
+        $pdo->query("use `$dbname`");
     }
 
     /**
@@ -186,5 +177,8 @@ class TestInstallModel extends InstallModel {
         // Reset the config to defaults.
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
+
+        // Clear all database related objects from the container.
+
     }
 }

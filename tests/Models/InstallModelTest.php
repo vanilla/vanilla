@@ -5,7 +5,7 @@
  * @license GPLv2
  */
 
-namespace VanillaTests\APIv2;
+namespace VanillaTests\Model;
 
 use Garden\Container\Container;
 use Vanilla\AddonManager;
@@ -15,7 +15,7 @@ use VanillaTests\TestInstallModel;
 /**
  * Test basic Vanilla installation.
  */
-class InstallTest extends \PHPUnit_Framework_TestCase {
+class InstallModelTest extends \PHPUnit_Framework_TestCase {
     /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */

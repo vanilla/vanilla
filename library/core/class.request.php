@@ -329,11 +329,10 @@ class Gdn_Request implements RequestInterface {
      * Get a header value.
      *
      * @param string $header The name of the header.
-     * @param mixed $default The default value if the header does not exist.
-     * @return mixed Returns the header value or {@link $default}.
+     * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header, $default = null) {
-        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), $default);
+    public function getHeader($header) {
+        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), '');
     }
 
     /**
@@ -343,7 +342,7 @@ class Gdn_Request implements RequestInterface {
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
     public function hasHeader($header) {
-        return $this->getHeader($header, null) !== null;
+        return !empty($this->getHeader($header));
     }
 
     /**

@@ -476,8 +476,12 @@ class CategoryModel extends Gdn_Model {
             $ParentID = $Cat['ParentCategoryID'];
 
             if (isset($Data[$ParentID]) && $ParentID != $Key) {
-                $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
-                $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+                if (isset($Cat['CountAllDiscussions'])) {
+                    $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
+                }
+                if (isset($Cat['CountAllComments'])) {
+                    $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+                }
                 if (empty($Data[$ParentID]['ChildIDs'])) {
                     $Data[$ParentID]['ChildIDs'] = [];
                 }

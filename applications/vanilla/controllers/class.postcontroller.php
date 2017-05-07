@@ -28,6 +28,15 @@ class PostController extends VanillaController {
     /** @var bool Whether or not to show the category dropdown. */
     public $ShowCategorySelector = true;
 
+    /** @var int */
+    public $CategoryID = 0;
+
+    /** @var null|array */
+    public $Category = null;
+
+    /** @var null|array */
+    public $Context = null;
+
     /**
      * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
      *

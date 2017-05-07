@@ -1877,13 +1877,15 @@ class DiscussionModel extends Gdn_Model {
         $this->defineSchema();
 
         // Add & apply any extra validation rules:
-        $this->Validation->applyRule('Body', 'Required');
-        $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
-        $this->Validation->applyRule('Body', 'MeAction');
-        $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
-        if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
-            $this->Validation->setSchemaProperty('Body', 'Length', $MaxCommentLength);
-            $this->Validation->applyRule('Body', 'Length');
+        if (array_key_exists('Body', $FormPostValues)) {
+            $this->Validation->applyRule('Body', 'Required');
+            $this->Validation->addRule('MeAction', 'function:ValidateMeAction');
+            $this->Validation->applyRule('Body', 'MeAction');
+            $MaxCommentLength = Gdn::config('Vanilla.Comment.MaxLength');
+            if (is_numeric($MaxCommentLength) && $MaxCommentLength > 0) {
+                $this->Validation->setSchemaProperty('Body', 'Length', $MaxCommentLength);
+                $this->Validation->applyRule('Body', 'Length');
+            }
         }
 
         // Validate category permissions.

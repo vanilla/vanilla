@@ -65,7 +65,7 @@ class DiscussionsApiController extends AbstractApiController {
         }
         $this->discussionModel->deleteID($id);
 
-        return [];
+        return null;
     }
 
     /**
@@ -182,7 +182,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a discussion for editing.');
-        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'url'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['discussionID', 'name', 'body', 'format', 'categoryID'])->add($this->fullSchema()), 'out');
 
         $row = $this->discussionByID($id);
         $row['Url'] = discussionUrl($row);
@@ -248,7 +248,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $where['categoryID']);
         }
         $rows = $this->discussionModel->getWhereRecent($where, $limit, $offset)->resultArray();
-        if ($query['expand']) {
+        if (!empty($query['expand'])) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
@@ -273,7 +273,7 @@ class DiscussionsApiController extends AbstractApiController {
         $in = $this->discussionPostSchema('in')->setDescription('Update a discussion.');
         $out = $this->schema($this->discussionSchema(), 'out');
 
-        $body = $in->validate($body);
+        $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
         $data = $this->caseScheme->convertArrayKeys($body);
@@ -281,7 +281,7 @@ class DiscussionsApiController extends AbstractApiController {
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
-        if ($row['CategoryID'] !== $data['CategoryID']) {
+        if (array_key_exists('CategoryID', $data) && $row['CategoryID'] !== $data['CategoryID']) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $data['CategoryID']);
         }
 

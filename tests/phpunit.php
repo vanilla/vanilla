@@ -33,3 +33,5 @@ $bootstrap->run(new Container());
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+
+require_once PATH_LIBRARY_CORE.'/functions.render.php';

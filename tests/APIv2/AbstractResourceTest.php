@@ -9,6 +9,9 @@ namespace VanillaTests\APIv2;
 
 
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
+    /**
+     * The number of rows create when testing index endpoints.
+     */
     const INDEX_ROWS = 4;
 
     /**
@@ -57,6 +60,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test GET /resource/<id>.
      */
     public function testGet() {
         $row = $this->testPost();
@@ -73,7 +77,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test record creation.
+     * Test POST /resource.
      *
      * @return array Returns the new record.
      */
@@ -95,7 +99,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test record updating.
+     * Test PATCH /resource/<id> with a full record overwrite.
      */
     public function testPatchFull() {
         $row = $this->testGetEdit();
@@ -114,6 +118,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test GET /resource/<id>/edit.
      */
     public function testGetEdit() {
         $row = $this->testPost();
@@ -133,7 +138,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      * Modify the row for update requests.
      *
      * @param array $row The row to modify.
-     * @return array
+     * @return array Returns the modified row.
      */
     protected function modifyRow(array $row) {
         $newRow = [];
@@ -156,7 +161,25 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * Test sparse record updating.
+     * The GET /resource/<id>/edit endpoint should have the same fields as that patch fields.
+     *
+     * This test helps to ensure that fields are added to the test as the endpoint is updated.
+     */
+    public function testGetEditFields() {
+        $row = $this->testGetEdit();
+
+        unset($row[$this->pk]);
+        $rowFields = array_keys($row);
+        sort($rowFields);
+
+        $patchFields = $this->patchFields;
+        sort($patchFields);
+
+        $this->assertEquals($patchFields, $rowFields);
+    }
+
+    /**
+     * Test PATCH /resource/<id> with a a single field update.
      *
      * Patch endpoints should be able to update every field on its own.
      *
@@ -179,7 +202,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
-     * A record should be able to be deleted (by the admin).
+     * Test DELETE /resource/<id>.
      */
     public function testDelete() {
         $row = $this->testPost();
@@ -200,6 +223,14 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->fail("Something odd happened while deleting a {$this->singular}.");
     }
 
+    /**
+     * Test GET /resource.
+     *
+     * The base class test can only test a minimum of functionality. Subclasses can make additional assertions on the
+     * return value of this method.
+     *
+     * @return array Returns the fetched data.
+     */
     public function testIndex() {
         // Insert a few rows.
         $rows = [];

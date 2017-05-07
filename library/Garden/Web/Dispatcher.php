@@ -78,9 +78,12 @@ class Dispatcher {
                     // Hold the action in case another route succeeds.
                     $ex = $action;
                 } elseif ($action !== null) {
-                    ob_start();
-                    $actionResponse = $action();
-                    $ob = ob_get_clean();
+                    try {
+                        ob_start();
+                        $actionResponse = $action();
+                    } finally {
+                        $ob = ob_get_clean();
+                    }
                     $response = $this->makeResponse($actionResponse, $ob);
                     break;
                 }

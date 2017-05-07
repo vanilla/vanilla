@@ -11,62 +11,92 @@ namespace VanillaTests\APIv2;
 abstract class AbstractResourceTest extends AbstractAPIv2Test {
     const INDEX_ROWS = 4;
 
-    protected $folder = '/resources';
+    /**
+     * @var string The resource route.
+     */
+    protected $baseUrl = '/resources';
+    /**
+     * @var string The singular name of the resource.
+     */
     protected $singular = '';
+    /**
+     * @var array A record that can be posted to the endpoint.
+     */
     protected $record = ['body' => 'Hello world!', 'format' => 'markdown'];
-    protected $patchFields = ['body', 'format'];
+    /**
+     * @var string[] An array of field names that are okay to send to patch endpoints.
+     */
+    protected $patchFields;
+    /**
+     * @var string The name of the primary key of the resource.
+     */
     protected $pk = '';
 
+    /**
+     * AbstractResourceTest constructor.
+     *
+     * Subclasses can override properties and then call this constructor to set defaults.
+     *
+     * @param null $name Required by PHPUnit.
+     * @param array $data Required by PHPUnit.
+     * @param string $dataName Required by PHPUnit.
+     */
     public function __construct($name = null, array $data = [], $dataName = '') {
         parent::__construct($name, $data, $dataName);
 
         if (empty($this->singluar)) {
-            $this->singular = rtrim(ltrim($this->folder, '/'), 's');
+            $this->singular = rtrim(ltrim($this->baseUrl, '/'), 's');
         }
         if (empty($this->pk)) {
             $this->pk = $this->singular.'ID';
         }
+
+        if ($this->patchFields === null) {
+            $this->patchFields = array_keys($this->record);
+        }
     }
 
     /**
-     * @param array $row
-     * @depends testPost
      */
-    public function testGet(array $row) {
+    public function testGet() {
+        $row = $this->testPost();
+
         $r = $this->api()->get(
-            "{$this->folder}/{$row[$this->pk]}"
+            "{$this->baseUrl}/{$row[$this->pk]}"
         );
 
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual($row, $r->getBody());
+        $this->assertCamelCase($r->getBody());
+
+        return $r->getBody();
     }
 
     /**
-     * @param array $row
-     * @depends testPost
      */
-    public function testGetEdit(array $row) {
+    public function testGetEdit() {
+        $row = $this->testPost();
+
         $r = $this->api()->get(
-            "{$this->folder}/{$row[$this->pk]}/edit"
+            "{$this->baseUrl}/{$row[$this->pk]}/edit"
         );
 
         $this->assertEquals(200, $r->getStatusCode());
         $this->assertRowsEqual(arrayTranslate($this->record, ['name', 'body', 'format']), $r->getBody());
+        $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
     }
 
     /**
      * Test record updating.
-     *
-     * @param array $row The row to update.
-     * @depends testGetEdit
      */
-    public function testPatchFull(array $row) {
+    public function testPatchFull() {
+        $row = $this->testGetEdit();
         $newRow = $this->modifyRow($row);
 
         $r = $this->api()->patch(
-            "{$this->folder}/{$row[$this->pk]}",
+            "{$this->baseUrl}/{$row[$this->pk]}",
             $newRow
         );
 
@@ -106,26 +136,30 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     /**
      * Test sparse record updating.
      *
-     * @param array $row The row to update.
-     * @depends testGetEdit
+     * Patch endpoints should be able to update every field on its own.
+     *
+     * @param string $field The name of the field to patch.
+     * @dataProvider providePatchFields
      */
-    public function testPatchSparse(array $row) {
-        $newRow = $this->modifyRow($row);
+    public function testPatchSparse($field) {
+        $row = $this->testGetEdit();
+        $patchRow = $this->modifyRow($row);
 
-        foreach ($this->patchFields as $field) {
-            $r = $this->api()->patch(
-                "{$this->folder}/{$row[$this->pk]}",
-                [$field => $newRow[$field]]
-            );
+        $r = $this->api()->patch(
+            "{$this->baseUrl}/{$row[$this->pk]}",
+            [$field => $patchRow[$field]]
+        );
 
-            $this->assertEquals(200, $r->getStatusCode());
+        $this->assertEquals(200, $r->getStatusCode());
 
-            if ($field === 'body') {
-                $this->assertSame(\Gdn_Format::to($newRow['body'], $newRow['format']), $r['body']);
-            } elseif ($field !== 'format') {
-                $this->assertSame($newRow[$field], $r[$field]);
-            }
-        }
+        $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
+        $this->assertSame($patchRow[$field], $newRow[$field]);
+//
+//        if ($field === 'body') {
+//            $this->assertSame(\Gdn_Format::to($patchRow['body'], $row['format']), $r['body']);
+//        } elseif ($field !== 'format') {
+//            $this->assertSame($patchRow[$field], $r[$field]);
+//        }
     }
 
     /**
@@ -135,13 +169,13 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $row = $this->testPost();
 
         $r = $this->api()->delete(
-            "{$this->folder}/{$row[$this->pk]}"
+            "{$this->baseUrl}/{$row[$this->pk]}"
         );
 
         $this->assertEquals(204, $r->getStatusCode());
 
         try {
-            $this->api()->get("{$this->folder}/{$row[$this->pk]}");
+            $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}");
             $this->fail("The {$this->singular} did not get deleted.");
         } catch (\Exception $ex) {
             $this->assertEquals(404, $ex->getCode());
@@ -157,7 +191,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
      */
     public function testPost() {
         $result = $this->api()->post(
-            $this->folder,
+            $this->baseUrl,
             $this->record
         );
 
@@ -179,7 +213,7 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
             $rows[] = $this->testPost();
         }
 
-        $r = $this->api()->get($this->folder);
+        $r = $this->api()->get($this->baseUrl);
         $this->assertEquals(200, $r->getStatusCode());
 
         $dbRows = $r->getBody();
@@ -191,5 +225,18 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
         // There's not much we can really test here so just return and let subclasses do some more assertions.
         return [$rows, $dbRows];
+    }
+
+    /**
+     * Provide the patch fields in a way that can be consumed as a data provider.
+     *
+     * @return array Returns a data provider array.
+     */
+    public function providePatchFields() {
+        $r = [];
+        foreach ($this->patchFields as $field) {
+            $r[$field] = [$field];
+        }
+        return $r;
     }
 }

@@ -40,10 +40,12 @@
 
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">applications/conversations</directory>
+            <directory suffix=".php">applications/dashboard</directory>
+            <directory suffix=".php">applications/vanilla</directory>
+
             <directory suffix=".php">library</directory>
-            <exclude>
-                <directory suffix=".php">library/vendors</directory>
-            </exclude>
+
         </whitelist>
     </filter>
 </phpunit>

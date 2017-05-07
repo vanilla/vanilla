@@ -17,7 +17,7 @@ use PDO;
  * Handles installing Vanilla.
  */
 class InstallModel {
-    const DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
+    protected static $DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
 
     protected $config;
 
@@ -88,7 +88,7 @@ class InstallModel {
         ]);
 
         // Run through the addons.
-        $data += ['addons' => static::DEFAULT_ADDONS];
+        $data += ['addons' => static::$DEFAULT_ADDONS];
 
         foreach ($data['addons'] as $addonKey) {
             $addon = $this->addonModel->getAddonManager()->lookupAddon($addonKey);

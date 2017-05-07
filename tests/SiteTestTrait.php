@@ -28,7 +28,7 @@ trait SiteTestTrait {
     /**
      * @var array The addons to install.
      */
-    protected static $addons = InstallModel::DEFAULT_ADDONS;
+    protected static $addons = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
 
     /**
      * Create the container for the site.

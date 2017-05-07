@@ -166,8 +166,8 @@ class EventManager {
             foreach ($handlers as $key => $handler) {
                 if (($handler instanceof LazyEventHandler && strcasecmp($handler->class, $className) === 0)
                     || (is_array($handler) && (
-                        (is_string($handler[0] && strcasecmp($handler, $className) === 0))
-                        || (is_object($handler[0] && is_a($handler[0], $className)))))) {
+                        (is_string($handler[0]) && strcasecmp($handler[0], $className) === 0)
+                        || (is_object($handler[0]) && is_a($handler[0], $className))))) {
                     unset($this->handlers[$event][$key]);
                 }
             }

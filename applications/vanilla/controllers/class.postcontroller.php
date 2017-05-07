@@ -140,9 +140,6 @@ class PostController extends VanillaController {
                 // Get all our subcategories to add to the category if we are in a Header or Categories category.
                 $this->Context = CategoryModel::getSubtree($this->CategoryID);
             }
-        } else {
-            $this->CategoryID = 0;
-            $this->Category = null;
         }
 
         $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;

@@ -78,7 +78,12 @@ class TestInstallModel extends InstallModel {
 
         $this->createDatabase($data['database']);
 
-        return parent::install($data);
+        $result = parent::install($data);
+
+        // Flush the config.
+        $this->config->shutdown();
+
+        return $result;
     }
 
     /**

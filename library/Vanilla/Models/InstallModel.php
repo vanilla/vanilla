@@ -17,6 +17,8 @@ use PDO;
  * Handles installing Vanilla.
  */
 class InstallModel {
+    const DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
+
     protected $config;
 
     protected $addonModel;
@@ -85,12 +87,13 @@ class InstallModel {
             'Password' => $data['admin']['password']
         ]);
 
-        // Run through the default addons.
-        $data += ['addons' => ['vanilla', 'conversations']];
+        // Run through the addons.
+        $data += ['addons' => static::DEFAULT_ADDONS];
 
         foreach ($data['addons'] as $addonKey) {
             $addon = $this->addonModel->getAddonManager()->lookupAddon($addonKey);
-            $this->addonModel->enable($addon);
+            // TODO: Once we are using this addon model we can remove the force and tweak the config defaults.
+            $this->addonModel->enable($addon, ['force' => true]);
         }
 
         // Now that all of the addons are are enabled we should set the default roles.

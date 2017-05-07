@@ -7,9 +7,14 @@
 
 namespace VanillaTests\APIv2;
 
-
+/**
+ * Test the /api/v2/discussions endpoints.
+ */
 class DiscussionsTest extends AbstractResourceTest {
 
+    /**
+     * {@inheritdoc}
+     */
     public function __construct($name = null, array $data = [], $dataName = '') {
         $this->baseUrl = '/discussions';
         $this->record += ['categoryID' => 1, 'name' => __CLASS__];

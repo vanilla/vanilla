@@ -73,19 +73,25 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
     }
 
     /**
+     * Test record creation.
+     *
+     * @return array Returns the new record.
      */
-    public function testGetEdit() {
-        $row = $this->testPost();
-
-        $r = $this->api()->get(
-            "{$this->baseUrl}/{$row[$this->pk]}/edit"
+    public function testPost() {
+        $result = $this->api()->post(
+            $this->baseUrl,
+            $this->record
         );
 
-        $this->assertEquals(200, $r->getStatusCode());
-        $this->assertRowsEqual(arrayTranslate($this->record, ['name', 'body', 'format']), $r->getBody());
-        $this->assertCamelCase($r->getBody());
+        $this->assertEquals(201, $result->getStatusCode());
 
-        return $r->getBody();
+        $body = $result->getBody();
+        $this->assertTrue(is_int($body[$this->pk]));
+        $this->assertTrue($body[$this->pk] > 0);
+
+        $this->assertRowsEqual($this->record, $body, true);
+
+        return $body;
     }
 
     /**
@@ -103,6 +109,22 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
         $this->assertEquals(200, $r->getStatusCode());
 
         $this->assertRowsEqual($newRow, $r->getBody(), true);
+
+        return $r->getBody();
+    }
+
+    /**
+     */
+    public function testGetEdit() {
+        $row = $this->testPost();
+
+        $r = $this->api()->get(
+            "{$this->baseUrl}/{$row[$this->pk]}/edit"
+        );
+
+        $this->assertEquals(200, $r->getStatusCode());
+        $this->assertRowsEqual(arrayTranslate($this->record, ['name', 'body', 'format']), $r->getBody());
+        $this->assertCamelCase($r->getBody());
 
         return $r->getBody();
     }
@@ -154,12 +176,6 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
 
         $newRow = $this->api()->get("{$this->baseUrl}/{$row[$this->pk]}/edit");
         $this->assertSame($patchRow[$field], $newRow[$field]);
-//
-//        if ($field === 'body') {
-//            $this->assertSame(\Gdn_Format::to($patchRow['body'], $row['format']), $r['body']);
-//        } elseif ($field !== 'format') {
-//            $this->assertSame($patchRow[$field], $r[$field]);
-//        }
     }
 
     /**
@@ -182,28 +198,6 @@ abstract class AbstractResourceTest extends AbstractAPIv2Test {
             return;
         }
         $this->fail("Something odd happened while deleting a {$this->singular}.");
-    }
-
-    /**
-     * Test record creation.
-     *
-     * @return array Returns the new record.
-     */
-    public function testPost() {
-        $result = $this->api()->post(
-            $this->baseUrl,
-            $this->record
-        );
-
-        $this->assertEquals(201, $result->getStatusCode());
-
-        $body = $result->getBody();
-        $this->assertTrue(is_int($body[$this->pk]));
-        $this->assertTrue($body[$this->pk] > 0);
-
-        $this->assertRowsEqual($this->record, $body, true);
-
-        return $body;
     }
 
     public function testIndex() {

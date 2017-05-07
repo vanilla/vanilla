@@ -7,6 +7,7 @@
 
 namespace VanillaTests\APIv2;
 
+use Vanilla\Utility\CamelCaseScheme;
 use VanillaTests\InternalClient;
 use VanillaTests\SiteTestTrait;
 
@@ -58,5 +59,26 @@ abstract class AbstractAPIv2Test extends \PHPUnit_Framework_TestCase {
         }
 
         $this->assertEquals($expected, $actualSparse);
+    }
+
+    /**
+     * Assert that an array has camel case keys which is required for API  v2.
+     *
+     * @param array $array The array to check.
+     * @param string $path The current path for recursive calls.
+     */
+    public function assertCamelCase(array $array, $path = '') {
+        $camel = new CamelCaseScheme();
+
+        foreach ($array as $key => $value) {
+            $fullKey = trim($path.'/'.$key, '/');
+            if (!is_numeric($key) && !$camel->valid($key)) {
+                $this->fail("The $fullKey key is not camel case.");
+            }
+
+            if (is_array($value)) {
+                $this->assertCamelCase($value, $fullKey);
+            }
+        }
     }
 }

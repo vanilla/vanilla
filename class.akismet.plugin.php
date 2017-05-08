@@ -4,19 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['Akismet'] = [
-    'Name' => 'Akismet',
-    'Description' => 'Adds Akismet spam filtering to all posts by unverified users and applicant registrations.',
-    'Version' => '1.2',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'SettingsUrl' => '/settings/akismet',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'akismet.png',
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd'
-];
-
 /**
  * Class AkismetPlugin
  */

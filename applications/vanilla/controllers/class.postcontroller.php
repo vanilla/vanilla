@@ -563,15 +563,17 @@ class PostController extends VanillaController {
              * comments, we may need to apply certain filters and fixes to the data to maintain its intended display
              * with the input format (e.g. maintaining newlines).
              */
-            $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
+            if ($isEmbeddedComments) {
+                $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
 
-            switch ($inputFormatter) {
-                case 'Wysiwyg':
-                    $this->Form->setFormValue(
-                        'Body',
-                        nl2br($this->Form->getFormValue('Body'))
-                    );
-                    break;
+                switch ($inputFormatter) {
+                    case 'Wysiwyg':
+                        $this->Form->setFormValue(
+                            'Body',
+                            nl2br($this->Form->getFormValue('Body'))
+                        );
+                        break;
+                }
             }
         }
 

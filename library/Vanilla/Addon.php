@@ -145,6 +145,7 @@ class Addon {
                 throw new \Exception("The addon at $subdir has an empty info array.");
             }
 
+            // Kludge that sets oldType until we unify applications and plugins into addon.
             $baseDir = explode('/', ltrim($subdir, '/'))[0];
             if (in_array($baseDir, ['applications', 'plugins'])) {
                 $info['oldType'] = substr($baseDir, 0, -1);

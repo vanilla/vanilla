@@ -80,7 +80,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function structure() {
         // Make sure we have the OAuth2 provider.
-        $provider = $this->provider();
+        $provider = $this->provider($providerKey);
         if (!val('AuthenticationKey', $provider)) {
             $model = new Gdn_AuthenticationProviderModel();
             $provider = [
@@ -292,8 +292,17 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
-        $sender->registerCallback("entryController_{$this->providerKey}_create", [$this, 'entryEndpoint']);
-        $sender->registerCallback("settingsController_{$this->providerKey}_create", [$this, 'settingsEndpoint']);
+        if (!is_array($this->providerKey)) {
+            $providerKeys = [$this->providerKey];
+        } else {
+            $providerKeys = $this->providerKey;
+        }
+
+        foreach ($providerKeys as $providerKey) {
+            $sender->registerCallback("entryController_{$providerKey}_create", [$this, 'entryEndpoint']);
+            $sender->registerCallback("settingsController_{$providerKey}_create", [$this, 'settingsEndpoint']);
+        }
+
     }
 
     /** ------------------- Settings Related Methods --------------------- */
@@ -327,18 +336,19 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function settingsEndpoint($sender, $args) {
         $sender->permission('Garden.Settings.Manage');
         $model = new Gdn_AuthenticationProviderModel();
-
+        $provider = Gdn_AuthenticationProviderModel::getProviderByKey($sender->RequestMethod);
+        $this->providerKey = val('AuthenticationKey', $provider);
         /* @var Gdn_Form $form */
         $form = new Gdn_Form();
         $form->setModel($model);
         $sender->Form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
-            $provider = $this->provider();
+//            $provider = $this->provider();
             $form->setData($provider);
         } else {
 
-            $form->setFormValue('AuthenticationKey', $this->getProviderKey());
+            $form->setFormValue('AuthenticationKey', $this->providerKey);
 
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
@@ -381,7 +391,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
-        $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
+        $redirectUrls = Gdn::request()->url('/entry/'. $this->providerKey, true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
         $sender->render('settings', '', $view);
@@ -398,8 +408,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return string Endpoint of the provider.
      */
-    public function authorizeUri($state = []) {
-        $provider = $this->provider();
+    public function authorizeUri($providerKey, $state = []) {
+        $provider = $this->provider($providerKey);
 
         $uri = val('AuthorizeUrl', $provider);
 
@@ -776,10 +786,13 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function signInButton($type = 'button') {
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $url = $this->authorizeUri(['target' => $target]);
-        $providerName = val('Name', $this->provider);
-        $linkLabel = sprintf(t('Sign in with %s'), $providerName);
-        $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
+        $result = '';
+        foreach ($this->provider as $provider) {
+            $url = $this->authorizeUri(['target' => $target]);
+            $providerName = val('Name', $provider);
+            $linkLabel = sprintf(t('Sign in with %s'), $providerName);
+            $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
+        }
         return $result;
     }
 

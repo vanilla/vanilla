@@ -30,7 +30,9 @@ class OAuth2Plugin extends Gdn_OAuth2 {
      * Set the key for saving OAuth settings in GDN_UserAuthenticationProvider
      */
     public function __construct() {
-        $this->setProviderKey('oauth2');
+        $providers = Gdn_AuthenticationProviderModel::getWhereStatic(['AuthenticationSchemeAlias' => 'oauth2']);
+        $providerKeys = array_column($providers, 'AuthenticationKey');
+        $this->setProviderKey($providerKeys);
         $this->settingsView = 'plugins/settings/oauth2';
     }
 }

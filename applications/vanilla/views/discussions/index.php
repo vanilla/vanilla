@@ -14,7 +14,7 @@ $this->fireEvent('AfterPageTitle');
 
 $subtreeView = $this->fetchViewLocation('subtree', 'categories', 'vanilla', false);
 if ($subtreeView) {
-    // This use on subtree is deprecated.
+    // This use of subtree is deprecated.
     include $subtreeView;
 } elseif (isset($this->CategoryModel) && $this->CategoryModel instanceof CategoryModel) {
     $childCategories = $this->data('CategoryTree', []);

@@ -214,7 +214,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
             $SearchPluginInfo = $this->scanPluginFile($PluginFile);
 
-            if ($SearchPluginInfo === false) {
+            if (empty($SearchPluginInfo)) {
                 continue;
             }
 
@@ -931,7 +931,9 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         }
         unset($Lines);
-        if ($PluginInfoString != '') {
+        if (empty($PluginInfoString)) {
+            return null;
+        } else {
             eval($PluginInfoString);
         }
 

@@ -881,11 +881,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     }
 
     /**
+     * Return the plugin's information.
      *
-     *
-     * @param $PluginFile
+     * @param string $PluginFile
      * @param null $VariableName
-     * @return null|void
+     * @return array|null Return the plugin's information or null
      */
     public function scanPluginFile($PluginFile, $VariableName = null) {
         // Find the $PluginInfo array
@@ -949,10 +949,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             touchValue('Folder', $var, $name);
 
             return $var;
-        } elseif ($VariableName !== null) {
-            if (isset($var)) {
-                return $var;
-            }
         }
 
         return null;

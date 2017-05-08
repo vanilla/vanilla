@@ -61,7 +61,7 @@ class Gdn_ApplicationManager {
                 $applicationName = $info['name'];
 
                 $directories = explode(DS, $addon->getSubdir());
-                $info['folder'] = $directories[count($directories) - 1];
+                $info['Folder'] = $directories[count($directories) - 1];
 
                 $applications[$applicationName] = $info;
             }

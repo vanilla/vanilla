@@ -2114,6 +2114,9 @@ if (!function_exists('jsonEncodeChecked')) {
         $errorMessage = null;
 
         switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                // Do absolutely nothing since all went well!
+                break;
             case JSON_ERROR_UTF8:
                 $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
                 break;

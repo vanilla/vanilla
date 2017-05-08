@@ -164,7 +164,7 @@ class EventManager {
     public function unbindClass($class) {
         foreach ($this->handlers as $event => $handlers) {
             foreach ($handlers as $key => $handler) {
-                if ($handler instanceof LazyEventHandler && strcasecmp($handler->class, $class) === 0) {
+                if ($handler instanceof LazyEventHandler && is_string($class) && strcasecmp($handler->class, $class) === 0) {
                     unset($this->handlers[$event][$key]);
                     continue;
                 }

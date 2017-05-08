@@ -1,0 +1,19 @@
+{
+    "name": "Stub Content",
+    "description": "This plugin adds stub content to new forums.",
+    "version": "1.0",
+    "mobileFriendly": true,
+    "requiredTheme": false,
+    "hasLocale": false,
+    "registerPermissions": false,
+    "icon": "stubcontent-plugin.png",
+    "key": "stubcontent",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

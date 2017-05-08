@@ -4,24 +4,6 @@
  * @license GNU GPLv2
  */
 
-$PluginInfo['Pockets'] = [
-    'Name' => 'Pockets',
-    'Description' => 'Administrators may add raw HTML to various places on the site. This plugin is very powerful, but can easily break your site if you make a mistake.',
-    'Version' => '1.3',
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.org/profile/todd',
-    'RequiredApplications' => ['Vanilla' => '2.4'],
-    'RegisterPermissions' => ['Plugins.Pockets.Manage' => 'Garden.Settings.Manage', 'Garden.NoAds.Allow'],
-    'SettingsUrl' => '/settings/pockets',
-    'UsePopupSettings' => false,
-    'SettingsPermission' => 'Plugins.Pockets.Manage',
-    'MobileFriendly' => true,
-    'HasLocale' => true,
-    'License' => 'GNU GPLv2',
-    'Icon' => 'pocket.png'
-];
-
 /**
  * Class PocketsPlugin
  */

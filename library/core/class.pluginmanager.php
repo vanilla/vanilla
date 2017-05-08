@@ -214,7 +214,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
             $SearchPluginInfo = $this->scanPluginFile($PluginFile);
 
-            if ($SearchPluginInfo === false) {
+            if ($SearchPluginInfo === null) {
                 continue;
             }
 
@@ -902,7 +902,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         $ParseVariableName = '$'.$VariableName;
-        ${$VariableName} = array();
 
         foreach ($Lines as $Line) {
             $TrimmedLine = trim($Line);
@@ -936,8 +935,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         // Define the folder name and assign the class name for the newly added item.
-        $var = ${$VariableName};
-        if (isset($var) && is_array($var)) {
+        $var = isset(${$VariableName}) ? ${$VariableName} : null;
+        if (is_array($var)) {
             reset($var);
             $name = key($var);
             $var = current($var);

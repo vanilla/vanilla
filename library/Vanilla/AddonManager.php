@@ -160,6 +160,16 @@ class AddonManager {
     public function unregisterAutoloader() {
         return spl_autoload_unregister([$this, 'autoload']);
     }
+
+    /**
+     * Return the addons scan directories
+     *
+     * @return array
+     */
+    public function getScanDirs() {
+        return $this->scanDirs;
+    }
+
     /**
      * Lookup an addon by fully qualified class name.
      *

@@ -930,9 +930,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         }
         unset($Lines);
-        if ($PluginInfoString != '') {
-            eval($PluginInfoString);
+
+        // Return early!
+        if (empty($PluginInfoString)) {
+            return null;
         }
+
+        eval($PluginInfoString);
 
         // Define the folder name and assign the class name for the newly added item.
         $var = isset(${$VariableName}) ? ${$VariableName} : null;

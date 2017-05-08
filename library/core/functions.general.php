@@ -2106,8 +2106,6 @@ if (!function_exists('jsonEncodeChecked')) {
      * @throws Exception
      */
     function jsonEncodeChecked($value, $options = null) {
-        $advanced = (PHP_VERSION_ID >= 50500);
-
         if ($options === null) {
             $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
         }
@@ -2115,27 +2113,21 @@ if (!function_exists('jsonEncodeChecked')) {
         $encoded = json_encode($value, $options);
         $errorMessage = null;
 
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            if ($advanced) {
-                switch (json_last_error()) {
-                    case JSON_ERROR_UTF8:
-                        $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                        break;
-                    case JSON_ERROR_RECURSION:
-                        $errorMessage = 'One or more recursive references in the value to be encoded.';
-                        break;
-                    case JSON_ERROR_INF_OR_NAN:
-                        $errorMessage = 'One or more NAN or INF values in the value to be encoded';
-                        break;
-                    case JSON_ERROR_UNSUPPORTED_TYPE:
-                        $errorMessage = 'A value of a type that cannot be encoded was given.';
-                        break;
-                    default:
-                        $errorMessage = 'An unknown error has occurred.';
-                }
-            } else {
+        switch (json_last_error()) {
+            case JSON_ERROR_UTF8:
+                $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            case JSON_ERROR_RECURSION:
+                $errorMessage = 'One or more recursive references in the value to be encoded.';
+                break;
+            case JSON_ERROR_INF_OR_NAN:
+                $errorMessage = 'One or more NAN or INF values in the value to be encoded';
+                break;
+            case JSON_ERROR_UNSUPPORTED_TYPE:
+                $errorMessage = 'A value of a type that cannot be encoded was given.';
+                break;
+            default:
                 $errorMessage = 'An unknown error has occurred.';
-            }
         }
 
         if ($errorMessage !== null) {

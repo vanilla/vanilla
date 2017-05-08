@@ -1,0 +1,21 @@
+{
+    "allowDisable": false,
+    "description": "Vanilla is the sweetest discussion forum on the web.",
+    "version": "2.4.201",
+    "setupController": "setup",
+    "url": "https://open.vanillaforums.com",
+    "license": "GPL v2",
+    "hidden": true,
+    "icon": "vanilla.png",
+    "key": "vanilla",
+    "type": "addon",
+    "priority": 10,
+    "name": "Vanilla",
+    "authors": [
+        {
+            "name": "Vanilla Staff",
+            "email": "support@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com"
+        }
+    ]
+}

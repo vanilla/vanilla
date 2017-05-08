@@ -48,35 +48,25 @@ class Gdn_ApplicationManager {
      */
     public function availableApplications() {
         if (!is_array($this->availableApplications)) {
-            $ApplicationInfo = array();
+            $applications = [];
 
-            $AppFolders = Gdn_FileSystem::folders(PATH_APPLICATIONS); // Get an array of all application folders
-            // Now look for about files within them.
-            $ApplicationAboutFiles = Gdn_FileSystem::findAll(PATH_APPLICATIONS, 'settings'.DS.'about.php', $AppFolders);
-            // Include them all right here and fill the application info array
-            $ApplicationCount = count($ApplicationAboutFiles);
-            for ($i = 0; $i < $ApplicationCount; ++$i) {
-                include($ApplicationAboutFiles[$i]);
-
-                // Define the folder name for the newly added item
-                foreach ($ApplicationInfo as $ApplicationName => $Info) {
-                    if (array_key_exists('Folder', $ApplicationInfo[$ApplicationName]) === false) {
-                        $Folder = substr($ApplicationAboutFiles[$i], strlen(PATH_APPLICATIONS));
-                        if (substr($Folder, 0, 1) == DS) {
-                            $Folder = substr($Folder, 1);
-                        }
-
-                        $Folder = substr($Folder, 0, strpos($Folder, DS));
-                        $ApplicationInfo[$ApplicationName]['Folder'] = $Folder;
-                    }
+            $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
+            foreach ($addons as $addon) {
+                /* @var Addon $addon */
+                if ($addon->getInfoValue('oldType') !== 'application') {
+                    continue;
                 }
-            }
-            // Add all of the indexes to the applications.
-            foreach ($ApplicationInfo as $Index => &$Info) {
-                $Info['Index'] = $Index;
+                $info = $addon->getInfo();
+
+                $applicationName = $info['name'];
+
+                $directories = explode(DS, $addon->getSubdir());
+                $info['folder'] = $directories[count($directories) - 1];
+
+                $applications[$applicationName] = $info;
             }
 
-            $this->availableApplications = $ApplicationInfo;
+            $this->availableApplications = $applications;
         }
 
         return $this->availableApplications;
@@ -305,7 +295,7 @@ class Gdn_ApplicationManager {
         } catch (Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }
-        
+
         // 2. Disable it
         removeFromConfig("EnabledApplications.{$applicationName}");
 

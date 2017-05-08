@@ -17,10 +17,10 @@
         <ini name="memory_limit" value="-1"/>
         <ini name="date.timezone" value="America/Montreal"/>
 
-        <env name="UNITTEST_BASEURL" value="http://vanilla.test:8080" />
-        <env name="UNITTEST_DB_NAME" value="vanilla_test"/>
-        <env name="UNITTEST_DB_USER" value="travis" />
-        <env name="UNITTEST_DB_PASSWORD" value="" />
+        <env name="TEST_BASEURL" value="http://vanilla.test:8080" />
+        <env name="TEST_DB_NAME" value="vanilla_test"/>
+        <env name="TEST_DB_USER" value="travis" />
+        <env name="TEST_DB_PASSWORD" value="" />
     </php>
 
     <testsuites>

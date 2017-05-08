@@ -42,7 +42,7 @@ class APIv0 extends HttpClient {
     public function __construct() {
         parent::__construct();
         $this
-            ->setBaseUrl(getenv('UNITTEST_BASEURL'))
+            ->setBaseUrl(getenv('TEST_BASEURL'))
             ->setThrowExceptions(true);
     }
 
@@ -52,8 +52,8 @@ class APIv0 extends HttpClient {
      * @return string Returns the host of the database.
      */
     public function getDbHost() {
-        if (getenv('UNITTEST_DB_HOST')) {
-            $dbHost = getenv('UNITTEST_DB_HOST');
+        if (getenv('TEST_DB_HOST')) {
+            $dbHost = getenv('TEST_DB_HOST');
         } else {
             $dbHost = 'localhost';
         }
@@ -68,8 +68,8 @@ class APIv0 extends HttpClient {
     public function getDbName() {
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-        if (getenv('UNITTEST_DB_NAME')) {
-            $dbname = getenv('UNITTEST_DB_NAME');
+        if (getenv('TEST_DB_NAME')) {
+            $dbname = getenv('TEST_DB_NAME');
         } else {
             $dbname = preg_replace('`[^a-z]`i', '_', $host);
         }
@@ -82,7 +82,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return getenv('UNITTEST_DB_USER');
+        return getenv('TEST_DB_USER');
     }
 
     /**
@@ -91,7 +91,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return getenv('UNITTEST_DB_PASSWORD');
+        return getenv('TEST_DB_PASSWORD');
     }
 
     /**

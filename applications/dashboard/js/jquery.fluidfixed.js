@@ -111,21 +111,22 @@
                     // off unless we set the margin-top to the minMargin.
                     $(element).css('margin-top', vars.minMargin);
                 }
+
+                if (handleScroll) {
+                    // Case 3: The element needs to be fixed and we have to calculate its position on scroll.
+                    var $element = $(element); // Cache element before scroll.
+                    killThreadIds[vars.id] = false;
+                    scrollHandler($element, vars);
+                } else {
+                    // Case 2: The element only needs to be fixed, no position calculations necessary.
+                    $(element).css('margin-top', 0);
+                    killThreadIds[vars.id] = true;
+                    $(window).off("scroll." + vars.id); // IE
+                }
+
             } else {
                 // Case 1: The element doesn't need to be fixed, reinstate its original position property.
                 $(element).css('position', vars.position);
-            }
-
-            if (handleScroll) {
-                // Case 3: The element needs to be fixed and we have to calculate its position on scroll.
-                var $element = $(element); // Cache element before scroll.
-                killThreadIds[vars.id] = false;
-                scrollHandler($element, vars);
-            } else {
-                // Case 2: The element only needs to be fixed, no position calculations necessary.
-                $(element).css('margin-top', 0);
-                killThreadIds[vars.id] = true;
-                $(window).off("scroll." + vars.id); // IE
             }
         };
 

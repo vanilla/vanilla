@@ -43,11 +43,40 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     public $VanillaID;
 
     /**
-     * Plugin setup.
+     * VanillaStatsPlugin constructor.
      */
     public function __construct() {
         $this->AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $this->VanillaID = Gdn::installationID();
+    }
+
+    /**
+     * Plugin setup.
+     */
+    public function setup() {
+        $this->structure();
+    }
+
+    /**
+     * Ran on utility/update
+     */
+    public function structure() {
+        // Add the new indexes
+
+        Gdn::database()->structure()
+            ->table('Discussion')
+            ->column('CountViews', 'int', '1', ['index.ActiveDiscussion'])
+            ->column('CountComments', 'int', '0', ['index.ActiveDiscussion'])
+            ->column('CountBookmarks', 'int', null, ['index.ActiveDiscussion'])
+            ->set();
+
+        // Ideally we should add "InsertUserID" to the already existing "DateInserted" index
+        // but there is no way to do that!
+        Gdn::database()->structure()
+            ->table('Comment')
+            ->column('DateInserted', 'datetime', null, ['index.ActiveUser'])
+            ->column('InsertUserID', 'int', true, ['index.ActiveUser'])
+            ->set();
     }
 
     /**
@@ -182,15 +211,15 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->limit(5, 0)
             ->get());
 
-        // Load the most active users during this date range
+        // Load the most active users during this date range.
+        // User data is fetched in the view.
         $Sender->setData('UserData', $UserModel->SQL
-            ->select('u.UserID, u.Name, u.DateLastActive')
-            ->select('c.CommentID', 'count', 'CountComments')
-            ->from('User u')
-            ->join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
-            ->groupBy('u.UserID, u.Name')
-            ->where('c.DateInserted >=', $range['from'])
-            ->where('c.DateInserted <=', $range['to'])
+            ->select('InsertUserID as UserID')
+            ->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->where('DateInserted >=', $range['from'])
+            ->where('DateInserted <=', $range['to'])
+            ->groupBy('InsertUserID')
             ->orderBy('CountComments', 'desc')
             ->limit(5, 0)
             ->get());

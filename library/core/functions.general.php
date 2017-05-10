@@ -3209,7 +3209,8 @@ if (!function_exists('setAppCookie')) {
         }
 
         // Create the cookie.
-        safeCookie($Key, $Value, $Expire, '/', $Domain, null, true);
+        $path = c('Garden.Cookie.Path', '/');
+        safeCookie($Key, $Value, $Expire, $path, $Domain, null, true);
         $_COOKIE[$Key] = $Value;
     }
 }

@@ -2804,6 +2804,33 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the most recent post info for a group of categories.
+     *
+     * @param array $categoryIDs
+     * @return array
+     */
+    public function getAggregateRecentPost(array $categoryIDs) {
+        $result = [
+            'LastCommentID' => null,
+            'LastDiscussionID' => null
+        ];
+
+        $discussion = $this->SQL->getWhere(
+            'Discussion',
+            ['CategoryID' => $categoryIDs],
+            'DateLastComment',
+            'desc',
+        1)->firstRow(DATASET_TYPE_ARRAY);
+
+        if (is_array($discussion)) {
+            $result['LastCommentID'] = $discussion['LastCommentID'];
+            $result['LastDiscussionID'] = $discussion['DiscussionID'];
+        }
+
+        return $result;
+    }
+
+    /**
      *
      *
      * @param $CategoryID

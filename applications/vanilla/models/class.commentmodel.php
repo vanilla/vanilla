@@ -881,10 +881,8 @@ class CommentModel extends Gdn_Model {
                 $this->setFloodControlEnabled(false);
             }
 
-            $isUserSpamming = $this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate);
-
             // If the post is new and it validates, check for spam
-            if (!$Insert || !$isUserSpamming) {
+            if (!$Insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 unset($Fields[$this->PrimaryKey]);
 

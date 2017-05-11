@@ -2890,7 +2890,11 @@ class CategoryModel extends Gdn_Model {
             foreach ($ancestors as $row) {
                 // If this ancestor already has a newer discussion, stop.
                 if ($lastInserted < strtotime($row['LastDateInserted'])) {
-                    break;
+                    // Make sure this latest discussion is even valid.
+                    $lastDiscussion = DiscussionModel::instance()->getID($row['LastDiscussionID']);
+                    if ($lastDiscussion) {
+                        break;
+                    }
                 }
                 $currentCategoryID = val('CategoryID', $row);
                 self::instance()->setField($currentCategoryID, $db);

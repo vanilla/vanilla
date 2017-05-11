@@ -153,13 +153,13 @@ trait FloodControlTrait {
     }
 
     /**
-     * Check is a user is spamming
+     * Check is a user is spamming and add a validation result.
      *
      * @param int $userID
      * @param CacheInterface $storageObject object in which we will store the floodcontrol data.
      * @return bool True if the user is spamming, false otherwise.
      */
-    public function isUserSpamming($userID, CacheInterface $storageObject) {
+    public function checkUserSpamming($userID, CacheInterface $storageObject) {
         if (!$this->isFloodControlEnabled()) {
             return false;
         }

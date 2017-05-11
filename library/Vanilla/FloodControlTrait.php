@@ -153,7 +153,7 @@ trait FloodControlTrait {
     }
 
     /**
-     * Check is a user is spamming and add a validation result.
+     * Check if a user is spamming, based on the last call to this function and add a validation result.
      *
      * @param int $userID
      * @param CacheInterface $storageObject object in which we will store the floodcontrol data.

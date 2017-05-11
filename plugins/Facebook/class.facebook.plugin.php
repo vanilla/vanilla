@@ -532,7 +532,7 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function authorizeUri($Query = false, $RedirectUri = false) {
         $AppID = c('Plugins.Facebook.ApplicationID');
-        $FBScope = c('Plugins.Facebook.Scope', 'email,publish_actions');
+        $FBScope = c('Plugins.Facebook.Scope', 'email');
 
         if (is_array($FBScope)) {
             $Scopes = implode(',', $FBScope);

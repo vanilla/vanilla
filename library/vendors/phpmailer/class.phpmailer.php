@@ -590,52 +590,6 @@ class PHPMailer {
   }
 
   /**
-   * Sends mail using the $Sendmail program.
-   * @param string $header The message headers
-   * @param string $body The message body
-   * @access protected
-   * @return bool
-   */
-  protected function SendmailSend($header, $body) {
-    if ($this->Sender != '') {
-      $sendmail = sprintf("%s -oi -f %s -t", escapeshellcmd($this->Sendmail), escapeshellarg($this->Sender));
-    } else {
-      $sendmail = sprintf("%s -oi -t", escapeshellcmd($this->Sendmail));
-    }
-    if ($this->SingleTo === true) {
-      foreach ($this->SingleToArray as $key => $val) {
-        if(!@$mail = popen($sendmail, 'w')) {
-          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
-        }
-        fputs($mail, "To: " . $val . "\n");
-        fputs($mail, $header);
-        fputs($mail, $body);
-        $result = pclose($mail);
-        // implement call back function if it exists
-        $isSent = ($result == 0) ? 1 : 0;
-        $this->doCallback($isSent,$val,$this->cc,$this->bcc,$this->Subject,$body);
-        if($result != 0) {
-          throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
-        }
-      }
-    } else {
-      if(!@$mail = popen($sendmail, 'w')) {
-        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
-      }
-      fputs($mail, $header);
-      fputs($mail, $body);
-      $result = pclose($mail);
-      // implement call back function if it exists
-      $isSent = ($result == 0) ? 1 : 0;
-      $this->doCallback($isSent,$this->to,$this->cc,$this->bcc,$this->Subject,$body);
-      if($result != 0) {
-        throw new phpmailerException($this->Lang('execute') . $this->Sendmail, self::STOP_SERVER);
-      }
-    }
-    return true;
-  }
-
-  /**
    * Sends mail using the PHP mail() function.
    * @param string $header The message headers
    * @param string $body The message body
@@ -1327,7 +1281,7 @@ class PHPMailer {
   public function TextLine($value) {
     return $value . $this->LE;
   }
-  
+
   public function ThrowExceptions($NewValue = NULL) {
      if ($NewValue !== NULL)
         $this->exceptions = $NewValue;
@@ -1775,46 +1729,6 @@ class PHPMailer {
   }
 
   /**
-   * Adds an embedded attachment.  This can include images, sounds, and
-   * just about any other document.  Make sure to set the $type to an
-   * image type.  For JPEG images use "image/jpeg" and for GIF images
-   * use "image/gif".
-   * @param string $path Path to the attachment.
-   * @param string $cid Content ID of the attachment.  Use this to identify
-   *        the Id for accessing the image in an HTML form.
-   * @param string $name Overrides the attachment name.
-   * @param string $encoding File encoding (see $Encoding).
-   * @param string $type File extension (MIME) type.
-   * @return bool
-   */
-  public function AddEmbeddedImage($path, $cid, $name = '', $encoding = 'base64', $type = 'application/octet-stream') {
-
-    if ( !@is_file($path) ) {
-      $this->SetError($this->Lang('file_access') . $path);
-      return false;
-    }
-
-    $filename = basename($path);
-    if ( $name == '' ) {
-      $name = $filename;
-    }
-
-    // Append to $attachment array
-    $this->attachment[] = array(
-      0 => $path,
-      1 => $filename,
-      2 => $name,
-      3 => $encoding,
-      4 => $type,
-      5 => false,  // isStringAttachment
-      6 => 'inline',
-      7 => $cid
-    );
-
-    return true;
-  }
-
-  /**
    * Returns true if an inline attachment is present.
    * @access public
    * @return bool
@@ -1872,7 +1786,7 @@ class PHPMailer {
   public function ClearReplyTos() {
     $this->ReplyTo = array();
   }
-  
+
   public function CountRecipients() {
      return count($this->to) + count($this->cc) + count($this->bcc);
   }
@@ -2004,142 +1918,6 @@ class PHPMailer {
    */
   public function AddCustomHeader($custom_header) {
     $this->CustomHeader[] = explode(':', $custom_header, 2);
-  }
-
-  /**
-   * Evaluates the message and returns modifications for inline images and backgrounds
-   * @access public
-   * @return $message
-   */
-  public function MsgHTML($message, $basedir = '') {
-    preg_match_all("/(src|background)=\"(.*)\"/Ui", $message, $images);
-    if(isset($images[2])) {
-      foreach($images[2] as $i => $url) {
-        // do not change urls for absolute images (thanks to corvuscorax)
-        if (!preg_match('#^[A-z]+://#',$url)) {
-          $filename = basename($url);
-          $directory = dirname($url);
-          ($directory == '.')?$directory='':'';
-          $cid = 'cid:' . md5($filename);
-          $ext = pathinfo($filename, PATHINFO_EXTENSION);
-          $mimeType  = self::_mime_types($ext);
-          if ( strlen($basedir) > 1 && substr($basedir,-1) != '/') { $basedir .= '/'; }
-          if ( strlen($directory) > 1 && substr($directory,-1) != '/') { $directory .= '/'; }
-          if ( $this->AddEmbeddedImage($basedir.$directory.$filename, md5($filename), $filename, 'base64',$mimeType) ) {
-            $message = preg_replace("/".$images[1][$i]."=\"".preg_quote($url, '/')."\"/Ui", $images[1][$i]."=\"".$cid."\"", $message);
-          }
-        }
-      }
-    }
-    $this->IsHTML(true);
-    $this->Body = $message;
-    $textMsg = trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/s','',$message)));
-    if (!empty($textMsg) && empty($this->AltBody)) {
-      $this->AltBody = html_entity_decode($textMsg);
-    }
-    if (empty($this->AltBody)) {
-      $this->AltBody = 'To view this email message, open it in a program that understands HTML!' . "\n\n";
-    }
-  }
-
-  /**
-   * Gets the MIME type of the embedded or inline image
-   * @param string File extension
-   * @access public
-   * @return string MIME type of ext
-   * @static
-   */
-  public static function _mime_types($ext = '') {
-    $mimes = array(
-      'hqx'   =>  'application/mac-binhex40',
-      'cpt'   =>  'application/mac-compactpro',
-      'doc'   =>  'application/msword',
-      'bin'   =>  'application/macbinary',
-      'dms'   =>  'application/octet-stream',
-      'lha'   =>  'application/octet-stream',
-      'lzh'   =>  'application/octet-stream',
-      'exe'   =>  'application/octet-stream',
-      'class' =>  'application/octet-stream',
-      'psd'   =>  'application/octet-stream',
-      'so'    =>  'application/octet-stream',
-      'sea'   =>  'application/octet-stream',
-      'dll'   =>  'application/octet-stream',
-      'oda'   =>  'application/oda',
-      'pdf'   =>  'application/pdf',
-      'ai'    =>  'application/postscript',
-      'eps'   =>  'application/postscript',
-      'ps'    =>  'application/postscript',
-      'smi'   =>  'application/smil',
-      'smil'  =>  'application/smil',
-      'mif'   =>  'application/vnd.mif',
-      'xls'   =>  'application/vnd.ms-excel',
-      'ppt'   =>  'application/vnd.ms-powerpoint',
-      'wbxml' =>  'application/vnd.wap.wbxml',
-      'wmlc'  =>  'application/vnd.wap.wmlc',
-      'dcr'   =>  'application/x-director',
-      'dir'   =>  'application/x-director',
-      'dxr'   =>  'application/x-director',
-      'dvi'   =>  'application/x-dvi',
-      'gtar'  =>  'application/x-gtar',
-      'php'   =>  'application/x-httpd-php',
-      'php4'  =>  'application/x-httpd-php',
-      'php3'  =>  'application/x-httpd-php',
-      'phtml' =>  'application/x-httpd-php',
-      'phps'  =>  'application/x-httpd-php-source',
-      'js'    =>  'application/x-javascript',
-      'swf'   =>  'application/x-shockwave-flash',
-      'sit'   =>  'application/x-stuffit',
-      'tar'   =>  'application/x-tar',
-      'tgz'   =>  'application/x-tar',
-      'xhtml' =>  'application/xhtml+xml',
-      'xht'   =>  'application/xhtml+xml',
-      'zip'   =>  'application/zip',
-      'mid'   =>  'audio/midi',
-      'midi'  =>  'audio/midi',
-      'mpga'  =>  'audio/mpeg',
-      'mp2'   =>  'audio/mpeg',
-      'mp3'   =>  'audio/mpeg',
-      'aif'   =>  'audio/x-aiff',
-      'aiff'  =>  'audio/x-aiff',
-      'aifc'  =>  'audio/x-aiff',
-      'ram'   =>  'audio/x-pn-realaudio',
-      'rm'    =>  'audio/x-pn-realaudio',
-      'rpm'   =>  'audio/x-pn-realaudio-plugin',
-      'ra'    =>  'audio/x-realaudio',
-      'rv'    =>  'video/vnd.rn-realvideo',
-      'wav'   =>  'audio/x-wav',
-      'bmp'   =>  'image/bmp',
-      'gif'   =>  'image/gif',
-      'jpeg'  =>  'image/jpeg',
-      'jpg'   =>  'image/jpeg',
-      'jpe'   =>  'image/jpeg',
-      'png'   =>  'image/png',
-      'tiff'  =>  'image/tiff',
-      'tif'   =>  'image/tiff',
-      'css'   =>  'text/css',
-      'html'  =>  'text/html',
-      'htm'   =>  'text/html',
-      'shtml' =>  'text/html',
-      'txt'   =>  'text/plain',
-      'text'  =>  'text/plain',
-      'log'   =>  'text/plain',
-      'rtx'   =>  'text/richtext',
-      'rtf'   =>  'text/rtf',
-      'xml'   =>  'text/xml',
-      'xsl'   =>  'text/xml',
-      'mpeg'  =>  'video/mpeg',
-      'mpg'   =>  'video/mpeg',
-      'mpe'   =>  'video/mpeg',
-      'qt'    =>  'video/quicktime',
-      'mov'   =>  'video/quicktime',
-      'avi'   =>  'video/x-msvideo',
-      'movie' =>  'video/x-sgi-movie',
-      'doc'   =>  'application/msword',
-      'word'  =>  'application/msword',
-      'xl'    =>  'application/excel',
-      'eml'   =>  'message/rfc822'
-    );
-    return (!isset($mimes[strtolower($ext)])) ? 'application/octet-stream' : $mimes[strtolower($ext)];
   }
 
   /**
@@ -2320,6 +2098,550 @@ class PHPMailer {
       call_user_func_array($this->action_function,$params);
     }
   }
+
+    #######################################################################################################
+    # PATCH from PHP MAILER 5.22
+    #######################################################################################################
+
+    #
+    # Modified
+    #
+
+    /**
+     * Create a message body from an HTML string.
+     * Automatically inlines images and creates a plain-text version by converting the HTML,
+     * overwriting any existing values in Body and AltBody.
+     * Do not source $message content from user input!
+     * $basedir is prepended when handling relative URLs, e.g. <img src="/images/a.png"> and must not be empty
+     * will look for an image file in $basedir/images/a.png and convert it to inline.
+     * If you don't provide a $basedir, relative paths will be left untouched (and thus probably break in email)
+     * If you don't want to apply these transformations to your HTML, just set Body and AltBody directly.
+     * @access public
+     * @param string $message HTML message string
+     * @param string $basedir Absolute path to a base directory to prepend to relative paths to images
+     * @param boolean|callable $advanced Whether to use the internal HTML to text converter
+     *    or your own custom converter @see PHPMailer::html2text()
+     * @return string $message The transformed message Body
+     */
+### OLD DEFINITION
+#   public function MsgHTML($message, $basedir = '')
+### NEW DEFINITION
+    public function msgHTML($message, $basedir = '', $advanced = false)
+    {
+        preg_match_all('/(src|background)=["\'](.*)["\']/Ui', $message, $images);
+        if (array_key_exists(2, $images)) {
+            if (strlen($basedir) > 1 && substr($basedir, -1) != '/') {
+                // Ensure $basedir has a trailing /
+                $basedir .= '/';
+            }
+            foreach ($images[2] as $imgindex => $url) {
+                // Convert data URIs into embedded images
+                if (preg_match('#^data:(image[^;,]*)(;base64)?,#', $url, $match)) {
+                    $data = substr($url, strpos($url, ','));
+                    if ($match[2]) {
+                        $data = base64_decode($data);
+                    } else {
+                        $data = rawurldecode($data);
+                    }
+                    $cid = md5($url) . '@phpmailer.0'; // RFC2392 S 2
+                    if ($this->addStringEmbeddedImage($data, $cid, 'embed' . $imgindex, 'base64', $match[1])) {
+                        $message = str_replace(
+                            $images[0][$imgindex],
+                            $images[1][$imgindex] . '="cid:' . $cid . '"',
+                            $message
+                        );
+                    }
+                    continue;
+                }
+                if (
+                    // Only process relative URLs if a basedir is provided (i.e. no absolute local paths)
+                    !empty($basedir)
+                    // Ignore URLs containing parent dir traversal (..)
+                    && (strpos($url, '..') === false)
+                    // Do not change urls that are already inline images
+                    && substr($url, 0, 4) !== 'cid:'
+                    // Do not change absolute URLs, including anonymous protocol
+                    && !preg_match('#^[a-z][a-z0-9+.-]*:?//#i', $url)
+                ) {
+                    $filename = basename($url);
+                    $directory = dirname($url);
+                    if ($directory == '.') {
+                        $directory = '';
+                    }
+                    $cid = md5($url) . '@phpmailer.0'; // RFC2392 S 2
+                    if (strlen($directory) > 1 && substr($directory, -1) != '/') {
+                        $directory .= '/';
+                    }
+                    if ($this->addEmbeddedImage(
+                        $basedir . $directory . $filename,
+                        $cid,
+                        $filename,
+                        'base64',
+                        self::_mime_types((string)self::mb_pathinfo($filename, PATHINFO_EXTENSION))
+                    )
+                    ) {
+                        $message = preg_replace(
+                            '/' . $images[1][$imgindex] . '=["\']' . preg_quote($url, '/') . '["\']/Ui',
+                            $images[1][$imgindex] . '="cid:' . $cid . '"',
+                            $message
+                        );
+                    }
+                }
+            }
+        }
+        $this->isHTML(true);
+        // Convert all message body line breaks to CRLF, makes quoted-printable encoding work much better
+        $this->Body = $this->normalizeBreaks($message);
+        $this->AltBody = $this->normalizeBreaks($this->html2text($message, $advanced));
+        if (!$this->alternativeExists()) {
+            $this->AltBody = 'To view this email message, open it in a program that understands HTML!' .
+                self::CRLF . self::CRLF;
+        }
+        return $this->Body;
+    }
+
+    /**
+     * Add an embedded (inline) attachment from a file.
+     * This can include images, sounds, and just about any other document type.
+     * These differ from 'regular' attachments in that they are intended to be
+     * displayed inline with the message, not just attached for download.
+     * This is used in HTML messages that embed the images
+     * the HTML refers to using the $cid value.
+     * Never use a user-supplied path to a file!
+     * @param string $path Path to the attachment.
+     * @param string $cid Content ID of the attachment; Use this to reference
+     *        the content when using an embedded image in HTML.
+     * @param string $name Overrides the attachment name.
+     * @param string $encoding File encoding (see $Encoding).
+     * @param string $type File MIME type.
+     * @param string $disposition Disposition to use
+     * @return boolean True on successfully adding an attachment
+     */
+### OLD DEFINITION
+#   public function addEmbeddedImage($path, $cid, $name = '', $encoding = 'base64', $type = 'application/octet-stream')
+### NEW DEFINITION
+    public function addEmbeddedImage($path, $cid, $name = '', $encoding = 'base64', $type = '', $disposition = 'inline')
+    {
+        if (!@is_file($path)) {
+            $this->setError($this->lang('file_access') . $path);
+            return false;
+        }
+        // If a MIME type is not specified, try to work it out from the file name
+        if ($type == '') {
+            $type = self::filenameToType($path);
+        }
+        $filename = basename($path);
+        if ($name == '') {
+            $name = $filename;
+        }
+        // Append to $attachment array
+        $this->attachment[] = array(
+            0 => $path,
+            1 => $filename,
+            2 => $name,
+            3 => $encoding,
+            4 => $type,
+            5 => false, // isStringAttachment
+            6 => $disposition,
+            7 => $cid
+        );
+        return true;
+    }
+
+    /**
+     * Get the MIME type for a file extension.
+     * @param string $ext File extension
+     * @access public
+     * @return string MIME type of file.
+     * @static
+     */
+    public static function _mime_types($ext = '')
+    {
+        $mimes = array(
+            'xl'    => 'application/excel',
+            'js'    => 'application/javascript',
+            'hqx'   => 'application/mac-binhex40',
+            'cpt'   => 'application/mac-compactpro',
+            'bin'   => 'application/macbinary',
+            'doc'   => 'application/msword',
+            'word'  => 'application/msword',
+            'xlsx'  => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'xltx'  => 'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+            'potx'  => 'application/vnd.openxmlformats-officedocument.presentationml.template',
+            'ppsx'  => 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+            'pptx'  => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'sldx'  => 'application/vnd.openxmlformats-officedocument.presentationml.slide',
+            'docx'  => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'dotx'  => 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+            'xlam'  => 'application/vnd.ms-excel.addin.macroEnabled.12',
+            'xlsb'  => 'application/vnd.ms-excel.sheet.binary.macroEnabled.12',
+            'class' => 'application/octet-stream',
+            'dll'   => 'application/octet-stream',
+            'dms'   => 'application/octet-stream',
+            'exe'   => 'application/octet-stream',
+            'lha'   => 'application/octet-stream',
+            'lzh'   => 'application/octet-stream',
+            'psd'   => 'application/octet-stream',
+            'sea'   => 'application/octet-stream',
+            'so'    => 'application/octet-stream',
+            'oda'   => 'application/oda',
+            'pdf'   => 'application/pdf',
+            'ai'    => 'application/postscript',
+            'eps'   => 'application/postscript',
+            'ps'    => 'application/postscript',
+            'smi'   => 'application/smil',
+            'smil'  => 'application/smil',
+            'mif'   => 'application/vnd.mif',
+            'xls'   => 'application/vnd.ms-excel',
+            'ppt'   => 'application/vnd.ms-powerpoint',
+            'wbxml' => 'application/vnd.wap.wbxml',
+            'wmlc'  => 'application/vnd.wap.wmlc',
+            'dcr'   => 'application/x-director',
+            'dir'   => 'application/x-director',
+            'dxr'   => 'application/x-director',
+            'dvi'   => 'application/x-dvi',
+            'gtar'  => 'application/x-gtar',
+            'php3'  => 'application/x-httpd-php',
+            'php4'  => 'application/x-httpd-php',
+            'php'   => 'application/x-httpd-php',
+            'phtml' => 'application/x-httpd-php',
+            'phps'  => 'application/x-httpd-php-source',
+            'swf'   => 'application/x-shockwave-flash',
+            'sit'   => 'application/x-stuffit',
+            'tar'   => 'application/x-tar',
+            'tgz'   => 'application/x-tar',
+            'xht'   => 'application/xhtml+xml',
+            'xhtml' => 'application/xhtml+xml',
+            'zip'   => 'application/zip',
+            'mid'   => 'audio/midi',
+            'midi'  => 'audio/midi',
+            'mp2'   => 'audio/mpeg',
+            'mp3'   => 'audio/mpeg',
+            'mpga'  => 'audio/mpeg',
+            'aif'   => 'audio/x-aiff',
+            'aifc'  => 'audio/x-aiff',
+            'aiff'  => 'audio/x-aiff',
+            'ram'   => 'audio/x-pn-realaudio',
+            'rm'    => 'audio/x-pn-realaudio',
+            'rpm'   => 'audio/x-pn-realaudio-plugin',
+            'ra'    => 'audio/x-realaudio',
+            'wav'   => 'audio/x-wav',
+            'bmp'   => 'image/bmp',
+            'gif'   => 'image/gif',
+            'jpeg'  => 'image/jpeg',
+            'jpe'   => 'image/jpeg',
+            'jpg'   => 'image/jpeg',
+            'png'   => 'image/png',
+            'tiff'  => 'image/tiff',
+            'tif'   => 'image/tiff',
+            'eml'   => 'message/rfc822',
+            'css'   => 'text/css',
+            'html'  => 'text/html',
+            'htm'   => 'text/html',
+            'shtml' => 'text/html',
+            'log'   => 'text/plain',
+            'text'  => 'text/plain',
+            'txt'   => 'text/plain',
+            'rtx'   => 'text/richtext',
+            'rtf'   => 'text/rtf',
+            'vcf'   => 'text/vcard',
+            'vcard' => 'text/vcard',
+            'xml'   => 'text/xml',
+            'xsl'   => 'text/xml',
+            'mpeg'  => 'video/mpeg',
+            'mpe'   => 'video/mpeg',
+            'mpg'   => 'video/mpeg',
+            'mov'   => 'video/quicktime',
+            'qt'    => 'video/quicktime',
+            'rv'    => 'video/vnd.rn-realvideo',
+            'avi'   => 'video/x-msvideo',
+            'movie' => 'video/x-sgi-movie'
+        );
+        if (array_key_exists(strtolower($ext), $mimes)) {
+            return $mimes[strtolower($ext)];
+        }
+        return 'application/octet-stream';
+    }
+
+    /**
+     * Send mail using the $Sendmail program.
+     * @param string $header The message headers
+     * @param string $body The message body
+     * @see PHPMailer::$Sendmail
+     * @throws phpmailerException
+     * @access protected
+     * @return boolean
+     */
+    protected function sendmailSend($header, $body)
+    {
+        // CVE-2016-10033, CVE-2016-10045: Don't pass -f if characters will be escaped.
+        if (!empty($this->Sender) and self::isShellSafe($this->Sender)) {
+            if ($this->Mailer == 'qmail') {
+                $sendmailFmt = '%s -f%s';
+            } else {
+                $sendmailFmt = '%s -oi -f%s -t';
+            }
+        } else {
+            if ($this->Mailer == 'qmail') {
+                $sendmailFmt = '%s';
+            } else {
+                $sendmailFmt = '%s -oi -t';
+            }
+        }
+        // TODO: If possible, this should be changed to escapeshellarg.  Needs thorough testing.
+        $sendmail = sprintf($sendmailFmt, escapeshellcmd($this->Sendmail), $this->Sender);
+        if ($this->SingleTo) {
+            foreach ($this->SingleToArray as $toAddr) {
+                if (!@$mail = popen($sendmail, 'w')) {
+                    throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+                }
+                fputs($mail, 'To: ' . $toAddr . "\n");
+                fputs($mail, $header);
+                fputs($mail, $body);
+                $result = pclose($mail);
+                #########################
+                // No need to update this
+                #########################
+                $this->doCallback(
+                    ($result == 0),
+                    array($toAddr),
+                    $this->cc,
+                    $this->bcc,
+                    $this->Subject,
+                    $body,
+                    $this->From
+                );
+                if ($result != 0) {
+                    throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+                }
+            }
+        } else {
+            if (!@$mail = popen($sendmail, 'w')) {
+                throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+            }
+            fputs($mail, $header);
+            fputs($mail, $body);
+            $result = pclose($mail);
+            #########################
+            // No need to update this
+            #########################
+            $this->doCallback(
+                ($result == 0),
+                $this->to,
+                $this->cc,
+                $this->bcc,
+                $this->Subject,
+                $body,
+                $this->From
+            );
+            if ($result != 0) {
+                throw new phpmailerException($this->lang('execute') . $this->Sendmail, self::STOP_CRITICAL);
+            }
+        }
+        return true;
+    }
+
+    #
+    # Added
+    #
+
+    /**
+     * SMTP RFC standard line ending.
+     */
+    const CRLF = "\r\n";
+
+    /**
+     * Normalize line breaks in a string.
+     * Converts UNIX LF, Mac CR and Windows CRLF line breaks into a single line break format.
+     * Defaults to CRLF (for message bodies) and preserves consecutive breaks.
+     * @param string $text
+     * @param string $breaktype What kind of line break to use, defaults to CRLF
+     * @return string
+     * @access public
+     * @static
+     */
+    public static function normalizeBreaks($text, $breaktype = "\r\n")
+    {
+        return preg_replace('/(\r\n|\r|\n)/ms', $breaktype, $text);
+    }
+
+    /**
+     * Check if this message has an alternative body set.
+     * @return boolean
+     */
+    public function alternativeExists()
+    {
+        return !empty($this->AltBody);
+    }
+
+    /**
+     * Map a file name to a MIME type.
+     * Defaults to 'application/octet-stream', i.e.. arbitrary binary data.
+     * @param string $filename A file name or full path, does not need to exist as a file
+     * @return string
+     * @static
+     */
+    public static function filenameToType($filename)
+    {
+        // In case the path is a URL, strip any query string before getting extension
+        $qpos = strpos($filename, '?');
+        if (false !== $qpos) {
+            $filename = substr($filename, 0, $qpos);
+        }
+        $pathinfo = self::mb_pathinfo($filename);
+        return self::_mime_types($pathinfo['extension']);
+    }
+
+    /**
+     * Multi-byte-safe pathinfo replacement.
+     * Drop-in replacement for pathinfo(), but multibyte-safe, cross-platform-safe, old-version-safe.
+     * Works similarly to the one in PHP >= 5.2.0
+     * @link http://www.php.net/manual/en/function.pathinfo.php#107461
+     * @param string $path A filename or path, does not need to exist as a file
+     * @param integer|string $options Either a PATHINFO_* constant,
+     *      or a string name to return only the specified piece, allows 'filename' to work on PHP < 5.2
+     * @return string|array
+     * @static
+     */
+    public static function mb_pathinfo($path, $options = null)
+    {
+        $ret = array('dirname' => '', 'basename' => '', 'extension' => '', 'filename' => '');
+        $pathinfo = array();
+        if (preg_match('%^(.*?)[\\\\/]*(([^/\\\\]*?)(\.([^\.\\\\/]+?)|))[\\\\/\.]*$%im', $path, $pathinfo)) {
+            if (array_key_exists(1, $pathinfo)) {
+                $ret['dirname'] = $pathinfo[1];
+            }
+            if (array_key_exists(2, $pathinfo)) {
+                $ret['basename'] = $pathinfo[2];
+            }
+            if (array_key_exists(5, $pathinfo)) {
+                $ret['extension'] = $pathinfo[5];
+            }
+            if (array_key_exists(3, $pathinfo)) {
+                $ret['filename'] = $pathinfo[3];
+            }
+        }
+        switch ($options) {
+            case PATHINFO_DIRNAME:
+            case 'dirname':
+                return $ret['dirname'];
+            case PATHINFO_BASENAME:
+            case 'basename':
+                return $ret['basename'];
+            case PATHINFO_EXTENSION:
+            case 'extension':
+                return $ret['extension'];
+            case PATHINFO_FILENAME:
+            case 'filename':
+                return $ret['filename'];
+            default:
+                return $ret;
+        }
+    }
+
+    /**
+     * Add an embedded stringified attachment.
+     * This can include images, sounds, and just about any other document type.
+     * Be sure to set the $type to an image type for images:
+     * JPEG images use 'image/jpeg', GIF uses 'image/gif', PNG uses 'image/png'.
+     * @param string $string The attachment binary data.
+     * @param string $cid Content ID of the attachment; Use this to reference
+     *        the content when using an embedded image in HTML.
+     * @param string $name
+     * @param string $encoding File encoding (see $Encoding).
+     * @param string $type MIME type.
+     * @param string $disposition Disposition to use
+     * @return boolean True on successfully adding an attachment
+     */
+    public function addStringEmbeddedImage(
+        $string,
+        $cid,
+        $name = '',
+        $encoding = 'base64',
+        $type = '',
+        $disposition = 'inline'
+    ) {
+        // If a MIME type is not specified, try to work it out from the name
+        if ($type == '' and !empty($name)) {
+            $type = self::filenameToType($name);
+        }
+        // Append to $attachment array
+        $this->attachment[] = array(
+            0 => $string,
+            1 => $name,
+            2 => $name,
+            3 => $encoding,
+            4 => $type,
+            5 => true, // isStringAttachment
+            6 => $disposition,
+            7 => $cid
+        );
+        return true;
+    }
+
+      /**
+     * Convert an HTML string into plain text.
+     * This is used by msgHTML().
+     * Note - older versions of this function used a bundled advanced converter
+     * which was been removed for license reasons in #232.
+     * Example usage:
+     * <code>
+     * // Use default conversion
+     * $plain = $mail->html2text($html);
+     * // Use your own custom converter
+     * $plain = $mail->html2text($html, function($html) {
+     *     $converter = new MyHtml2text($html);
+     *     return $converter->get_text();
+     * });
+     * </code>
+     * @param string $html The HTML text to convert
+     * @param boolean|callable $advanced Any boolean value to use the internal converter,
+     *   or provide your own callable for custom conversion.
+     * @return string
+     */
+    public function html2text($html, $advanced = false)
+    {
+        if (is_callable($advanced)) {
+            return call_user_func($advanced, $html);
+        }
+        return html_entity_decode(
+            trim(strip_tags(preg_replace('/<(head|title|style|script)[^>]*>.*?<\/\\1>/si', '', $html))),
+            ENT_QUOTES,
+            $this->CharSet
+        );
+    }
+
+    /**
+     * Fix CVE-2016-10033 and CVE-2016-10045 by disallowing potentially unsafe shell characters.
+     *
+     * Note that escapeshellarg and escapeshellcmd are inadequate for our purposes, especially on Windows.
+     * @param string $string The string to be validated
+     * @see https://github.com/PHPMailer/PHPMailer/issues/924 CVE-2016-10045 bug report
+     * @access protected
+     * @return boolean
+     */
+    protected static function isShellSafe($string)
+    {
+        // Future-proof
+        if (escapeshellcmd($string) !== $string or !in_array(escapeshellarg($string), array("'$string'", "\"$string\""))) {
+            return false;
+        }
+        $length = strlen($string);
+        for ($i = 0; $i < $length; $i++) {
+            $c = $string[$i];
+            // All other characters have a special meaning in at least one common shell, including = and +.
+            // Full stop (.) has a special meaning in cmd.exe, but its impact should be negligible here.
+            // Note that this does permit non-Latin alphanumeric characters based on the current locale.
+            if (!ctype_alnum($c) && strpos('@_-.', $c) === false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    #######################################################################################################
+    # END PATCH
+    #######################################################################################################
 }
 
 class phpmailerException extends Exception {

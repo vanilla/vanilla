@@ -179,7 +179,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
 
     $url = '/settings/'.$addonType.'/'.$action.'/'.$addonName;
 
-    $media->setToggle(strtolower($addonName), $isEnabled, $url, $label);
+    $media->setToggle(slugify($addonName), $isEnabled, $url, $label);
 
     // Meta
 

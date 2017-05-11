@@ -1142,7 +1142,7 @@ class Gdn_Request implements RequestInterface {
     private function decodePost($post, $server, $inputFile = 'php://input') {
         $contentType = !isset($server['CONTENT_TYPE']) ? 'application/x-www-form-urlencoded' : $server['CONTENT_TYPE'];
 
-        if (stripos($contentType, 'json') !== false) {
+        if (stripos($contentType, 'application/json') !== false || stripos($contentType, 'text/plain') !== false) {
             // Decode the JSON from the content type.
             $result = json_decode(file_get_contents($inputFile), true);
 

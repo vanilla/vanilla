@@ -58,7 +58,7 @@ class ProfileOptionsModule extends Gdn_Module {
 
         foreach($profileOptions as $option) {
             if (val('Text', $option) && val('Url', $option)) {
-                $this->profileOptionsDropdown->addLink(val('Text', $option), val('Url', $option), slugify(val('Text', $option)), val('CssClass', $option, ''));
+                $this->profileOptionsDropdown->addLink(val('Text', $option), val('Url', $option), strtolower(val('Text', $option)), val('CssClass', $option, ''));
             }
         }
 

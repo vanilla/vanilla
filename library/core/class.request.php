@@ -14,11 +14,12 @@
  * Represents a Request to the application, typically from the browser but potentially generated internally, in a format
  * that can be accessed directly by the Dispatcher.
  *
- * @method string requestURI($URI = NULL) Get/Set the Request URI (REQUEST_URI).
- * @method string requestScript($ScriptName = NULL) Get/Set the Request ScriptName (SCRIPT_NAME).
- * @method string requestMethod($Method = NULL) Get/Set the Request Method (REQUEST_METHOD).
- * @method string requestHost($URI = NULL) Get/Set the Request Host (HTTP_HOST).
- * @method string requestFolder($URI = NULL) Get/Set the Request script's Folder.
+ * @method string requestURI($uri = null) Get/Set the Request URI (REQUEST_URI).
+ * @method string requestScript($scriptName = null) Get/Set the Request ScriptName (SCRIPT_NAME).
+ * @method string requestMethod($method = null) Get/Set the Request Method (REQUEST_METHOD).
+ * @method string requestHost($uri = null) Get/Set the Request Host (SERVER_NAME).
+ * @method string requestAddress($ip = null) Get/Set the Request IP address (first existing of HTTP_X_ORIGINALLY_FORWARDED_FOR,
+ *                HTTP_X_CLUSTER_CLIENT_IP, HTTP_CLIENT_IP, HTTP_X_FORWARDED_FOR, REMOTE_ADDR).
  */
 class Gdn_Request {
 
@@ -109,7 +110,7 @@ class Gdn_Request {
 
     /**
      * Accessor method for unparsed request environment data, such as the REQUEST_URI, SCRIPT_NAME,
-     * HTTP_HOST and REQUEST_METHOD keys in $_SERVER.
+     * SERVER_NAME and REQUEST_METHOD keys in $_SERVER.
      *
      * A second argument can be supplied, which causes the value of the specified key to be changed
      * to that of the second parameter itself.
@@ -117,7 +118,7 @@ class Gdn_Request {
      * Currently recognized keys (and their relation to $_SERVER) are:
      *  - URI      -> REQUEST_URI
      *  - SCRIPT   -> SCRIPT_NAME
-     *  - HOST     -> HTTP_HOST
+     *  - HOST     -> SERVER_NAME
      *  - METHOD   -> REQUEST_METHOD
      *  - FOLDER   -> none. this is extracted from SCRIPT_NAME and only available after _ParseRequest()
      *  - SCHEME   -> none. this is derived from 'HTTPS' and 'X-Forwarded-Proto'
@@ -412,13 +413,7 @@ class Gdn_Request {
         $this->_environmentElement('ConfigWebRoot', Gdn::config('Garden.WebRoot'));
         $this->_environmentElement('ConfigStripUrls', Gdn::config('Garden.StripWebRoot', false));
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_HOST'])) {
-            $host = $_SERVER['HTTP_X_FORWARDED_HOST'];
-        } elseif (isset($_SERVER['HTTP_HOST'])) {
-            $host = $_SERVER['HTTP_HOST'];
-        } else {
-            $host = val('SERVER_NAME', $_SERVER);
-        }
+        $host = val('SERVER_NAME', $_SERVER);
 
         // The host can have the port passed in, remove it here if it exists
         $hostParts = explode(':', $host, 2);

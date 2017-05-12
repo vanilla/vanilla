@@ -898,3 +898,14 @@ touchFolder(PATH_CACHE.'/Smarty/compile');
 // Lock the current database character Encoding
 saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
 saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
+
+
+// For Touch Icon
+if (c('Plugins.TouchIcon.Uploaded')) {
+    saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
+    removeFromConfig('Plugins.TouchIcon.Uploaded');
+}
+
+Gdn::Router()->SetRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
+
+

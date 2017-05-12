@@ -623,4 +623,17 @@ class UtilityController extends DashboardController {
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }
+
+
+    /**
+     * Redirect to touch icon.
+     *
+     * @since 1.0
+     * @access public
+     */
+    public function UtilityController_ShowTouchIcon($Sender) {
+        $redirect = $this->getIconUrl();
+        redirect($redirect, 302);
+        exit();
+    }
 }

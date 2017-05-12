@@ -276,7 +276,11 @@ if (!class_exists('HeadModule', false)) {
                 $this->_FavIconSet = true;
                 $this->addTag(
                     'link',
-                    array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
+                    [
+                        'rel' => 'shortcut icon',
+                        'href' => $HRef,
+                        'type' => 'image/x-icon'
+                    ],
                     null,
                     'favicon'
                 );
@@ -292,16 +296,17 @@ if (!class_exists('HeadModule', false)) {
             // $value = Gdn_Upload::url($value);
 
 
-            //$Configuration['Garden']['TouchIcon'] = 'banner/touchicon_06b7a0dcd10fea25.png';
-//            if (!$this->_TouchIconSet) {
-//                $this->_TouchIconSet = true;
-//                $this->addTag(
-//                    'link',
-//                    array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
-//                    null,
-//                    'favicon'
-//                );
-//            }
+            $Configuration['Garden']['TouchIcon'] = 'banner/touchicon_06b7a0dcd10fea25.png';
+            if (!$this->_TouchIconSet) {
+                $this->_TouchIconSet = true;
+                $this->addTag(
+                    'link',
+                    [
+                        'rel' => 'apple-touch-icon-precomposed',
+                        'href' => $HRef
+                    ]
+                );
+            }
         }
 
 

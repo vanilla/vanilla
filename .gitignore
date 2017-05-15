@@ -68,3 +68,4 @@ npm-debug.log
 !/build/package-exclude.txt
 /tests/cache/
 /cgi-bin/
+phpunit.xml

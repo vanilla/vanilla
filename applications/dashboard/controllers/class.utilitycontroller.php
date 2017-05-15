@@ -624,15 +624,14 @@ class UtilityController extends DashboardController {
         $this->render();
     }
 
-
     /**
      * Redirect to touch icon.
      *
      * @since 1.0
      * @access public
      */
-    public function UtilityController_ShowTouchIcon($Sender) {
-        $redirect = $this->getIconUrl();
+    public function showTouchIcon() {
+        $redirect = Gdn_Upload::url(c('Garden.TouchIcon'));
         redirect($redirect, 302);
         exit();
     }

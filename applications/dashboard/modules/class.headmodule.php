@@ -293,10 +293,6 @@ if (!class_exists('HeadModule', false)) {
          * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
          */
         public function setTouchIcon($HRef) {
-            // $value = Gdn_Upload::url($value);
-
-
-            $Configuration['Garden']['TouchIcon'] = 'banner/touchicon_06b7a0dcd10fea25.png';
             if (!$this->_TouchIconSet) {
                 $this->_TouchIconSet = true;
                 $this->addTag(

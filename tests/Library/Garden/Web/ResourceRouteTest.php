@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
+class ResourceRouteTest extends \PHPUnit\Framework\TestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */
@@ -225,10 +225,14 @@ class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
     /**
      * Test that correct casing on method names is enforced.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     public function testMethodCaseSensitivity() {
-//        post_noMap($query, $body, $data)
+        if (class_exists('\PHPUnit_Framework_Error_Notice')) {
+            $this->expectException(\PHPUnit_Framework_Error_Notice::class);
+        } else {
+            $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+        }
+
         $route = $this->createRoute();
         $request = new Request('/discussions/nomap/1/a/b/c', 'POST');
 

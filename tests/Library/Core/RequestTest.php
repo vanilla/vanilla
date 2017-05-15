@@ -11,7 +11,7 @@ use Gdn_Request;
 /**
  * Test the {@link Gdn_Request} class.
  */
-class RequestTest extends \PHPUnit_Framework_TestCase {
+class RequestTest extends \PHPUnit\Framework\TestCase {
 
     public function provideUrls() {
         return [

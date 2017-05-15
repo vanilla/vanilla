@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends \PHPUnit_Framework_TestCase {
+class EventManagerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Creates an {@link AddonManager} against Vanilla.
@@ -65,13 +65,25 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
             // Register the plugin. This will give a warning when there's overlap.
             require_once $path; // needed because no autoloader registered
 
-            try {
-                $pm->registerPlugin($class);
-            } catch (\PHPUnit_Framework_Error_Notice $ex) {
-                // This is okay.
-                continue;
+            if (class_exists('\PHPUnit_Framework_Error_Notice')) {
+                try {
+                    $pm->registerPlugin($class);
+                } catch (\PHPUnit_Framework_Error_Notice $ex) {
+                    // This is okay.
+                    continue;
+                }
+            } else {
+                try {
+                    $pm->registerPlugin($class);
+                } catch (\PHPUnit\Framework\Error\Notice $ex) {
+                    // This is okay.
+                    continue;
+                }
             }
         }
+
+        // No exception so we are cool!
+        $this->assertTrue(true);
     }
 
     /**
@@ -333,9 +345,14 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
     /**
      * Make sure an event with higher than max priority just goes down to max priority.
      *
-     * @expectedException \PHPUnit_Framework_Error_Notice
      */
     public function testMaxPriority() {
+        if (class_exists('\PHPUnit_Framework_Error_Notice')) {
+            $this->expectException(\PHPUnit_Framework_Error_Notice::class);
+        } else {
+            $this->expectException(\PHPUnit\Framework\Error\Notice::class);
+        }
+
         $em = new EventManager();
 
         $arr = [];

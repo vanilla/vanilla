@@ -10,7 +10,7 @@ namespace VanillaTests\Library\Core;
 /**
  * Test some of the functions in functions.render.php.
  */
-class RenderFunctionsTest extends \PHPUnit_Framework_TestCase {
+class RenderFunctionsTest extends \PHPUnit\Framework\TestCase {
     /**
      * Make sure the render functions are included.
      */
@@ -45,7 +45,7 @@ class RenderFunctionsTest extends \PHPUnit_Framework_TestCase {
             'FirstUserID' => 234,
             'FirstName' => 'Barry'
         ];
-        
+
         $user = userBuilder($userRow, ['First', 'Insert']);
         $this->assertSame(234, $user->UserID);
         $this->assertSame('Barry', $user->Name);

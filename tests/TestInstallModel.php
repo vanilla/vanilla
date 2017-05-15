@@ -35,7 +35,7 @@ class TestInstallModel extends InstallModel {
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
         $this->config->load($this->getConfigPath(), 'Configuration', true);
 
-        $this->setBaseUrl($_ENV['baseurl']);
+        $this->setBaseUrl(getenv('TEST_BASEURL'));
     }
 
     /**
@@ -98,11 +98,27 @@ class TestInstallModel extends InstallModel {
      */
     private function getDbInfo() {
         return [
-            'host' => 'localhost',
+            'host' => $this->getDbHost(),
             'name' => $this->getDbName(),
             'user' => $this->getDbUser(),
             'password' => $this->getDbPassword()
         ];
+    }
+
+    /**
+     * Get the dbHost.
+     *
+     * @return mixed Returns the dbName.
+     */
+    public function getDbHost() {
+        if (empty($this->dbHost)) {
+            if ($dbHost = getenv('TEST_DB_HOST')) {
+                $this->dbHost = $dbHost;
+            } else {
+                $this->dbHost = 'localhost';
+            }
+        }
+        return $this->dbHost;
     }
 
     /**
@@ -114,8 +130,8 @@ class TestInstallModel extends InstallModel {
         if (empty($this->dbName)) {
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-            if (isset($_ENV['dbname'])) {
-                $dbname = $_ENV['dbname'];
+            if (getenv('TEST_DB_NAME')) {
+                $dbname = getenv('TEST_DB_NAME');
             } else {
                 $dbname = preg_replace('`[^a-z]`i', '_', $host);
             }
@@ -142,7 +158,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return $_ENV['dbuser'];
+        return getenv('TEST_DB_USER');
     }
 
     /**
@@ -151,7 +167,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return $_ENV['dbpass'];
+        return getenv('TEST_DB_PASSWORD');
     }
 
     /**

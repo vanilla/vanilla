@@ -21,7 +21,8 @@ $PluginInfo['Twitter'] = [
     'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
-    'Icon' => 'twitter_social_connect.png'
+    'Icon' => 'twitter_social_connect.png',
+    'DocumentationUrl' => 'http://docs.vanillaforums.com/help/addons/social/twitter/',
 ];
 
 /**

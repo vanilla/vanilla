@@ -53,7 +53,7 @@ class AltTest extends \PHPUnit_Framework_TestCase {
 
         $config = [
             'Database' => [
-                'Host' => 'localhost',
+                'Host' => $api->getDbHost(),
                 'Name' => $api->getDbName(),
                 'User' => $api->getDbUser(),
                 'Password' => $api->getDbPassword(),

@@ -197,9 +197,8 @@ class ConversationsHooks implements Gdn_IPlugin {
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'structure.php');
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');
 
-        $ApplicationInfo = array();
-        include(combinePaths(array(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'about.php')));
-        $Version = val('Version', val('Conversations', $ApplicationInfo, array()), 'Undefined');
-        saveToConfig('Conversations.Version', $Version);
+        // Set current Conversations.Version
+        $appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'conversations'.DS.'addon.json'), true);
+        saveToConfig('Conversations.Version', val('version', $appInfo, 'Undefined'));
     }
 }

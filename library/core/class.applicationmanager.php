@@ -244,13 +244,14 @@ class Gdn_ApplicationManager {
         // Add the application to the $EnabledApplications array in conf/applications.php
         $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), array());
         $applicationName = $ApplicationInfo['name'];
+        $applicationKey = $ApplicationInfo['key'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
         if ($ApplicationFolder == '') {
             throw new Exception(t('The application folder was not properly defined.'));
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        $this->addonManager->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
+        $this->addonManager->startAddonsByKey([$applicationKey], \Vanilla\Addon::TYPE_ADDON);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';

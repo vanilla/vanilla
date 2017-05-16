@@ -49,22 +49,16 @@ class Gdn_ApplicationManager {
     public function availableApplications() {
         if (!is_array($this->availableApplications)) {
             $applications = [];
-
             $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
+
             foreach ($addons as $addon) {
                 /* @var Addon $addon */
                 if ($addon->getInfoValue('oldType') !== 'application') {
                     continue;
                 }
-                $info = $addon->getInfo();
 
-                $applicationName = $info['name'];
-
-                $directories = explode(DS, $addon->getSubdir());
-                $info['Folder'] = $directories[count($directories) - 1];
-                $info['Index'] = $info['name'];
-
-                $applications[$applicationName] = $info;
+                $info = $this->calcOldInfoArray($addon);
+                $applications[$info['Index']] = $info;
             }
 
             $this->availableApplications = $applications;
@@ -80,26 +74,37 @@ class Gdn_ApplicationManager {
      */
     public function enabledApplications() {
         if (!is_array($this->enabledApplications)) {
+            $applications = [];
             $addons = $this->addonManager->getEnabled();
+
             foreach ($addons as $addon) {
                 /* @var Addon $addon */
                 if ($addon->getInfoValue('oldType') !== 'application') {
                     continue;
                 }
-                $info = $addon->getInfo();
 
-                $applicationName = $info['name'];
-
-                $directories = explode(DS, $addon->getSubdir());
-                $info['Folder'] = $directories[count($directories) - 1];
-                $info['Index'] = $info['name'];
-
-                $applications[$applicationName] = $info;
+                $info = $this->calcOldInfoArray($addon);
+                $applications[$info['Index']] = $info;
             }
+
             $this->enabledApplications = $applications;
         }
 
         return $this->enabledApplications;
+    }
+
+    /**
+     * Calculate old application's info.
+     *
+     * @param Addon $addon
+     * @return array the old information.
+     */
+    private function calcOldInfoArray(Addon $addon) {
+        $info = Gdn_pluginManager::calcOldInfoArray($addon);
+        $directories = explode(DS, $addon->getSubdir());
+        $info['Folder'] = $directories[count($directories) - 1];
+
+        return $info;
     }
 
     /**
@@ -216,7 +221,7 @@ class Gdn_ApplicationManager {
     public function enableApplication($applicationName) {
         $this->testApplication($applicationName);
         $ApplicationInfo = ArrayValueI($applicationName, $this->availableApplications(), array());
-        $applicationName = $ApplicationInfo['name'];
+        $applicationName = $ApplicationInfo['Index'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
 
         saveToConfig('EnabledApplications'.'.'.$applicationName, $ApplicationFolder);
@@ -243,15 +248,14 @@ class Gdn_ApplicationManager {
     public function testApplication($applicationName) {
         // Add the application to the $EnabledApplications array in conf/applications.php
         $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), array());
-        $applicationName = $ApplicationInfo['name'];
-        $applicationKey = $ApplicationInfo['key'];
+        $applicationName = $ApplicationInfo['Index'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
         if ($ApplicationFolder == '') {
             throw new Exception(t('The application folder was not properly defined.'));
         }
 
         // Hook directly into the autoloader and force it to load the newly tested application
-        $this->addonManager->startAddonsByKey([$applicationKey], \Vanilla\Addon::TYPE_ADDON);
+        $this->addonManager->startAddonsByKey([$applicationName], \Vanilla\Addon::TYPE_ADDON);
 
         // Call the application's setup method
         $hooks = $applicationName.'Hooks';

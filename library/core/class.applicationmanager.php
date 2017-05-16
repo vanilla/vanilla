@@ -62,6 +62,7 @@ class Gdn_ApplicationManager {
 
                 $directories = explode(DS, $addon->getSubdir());
                 $info['Folder'] = $directories[count($directories) - 1];
+                $info['Index'] = $info['name'];
 
                 $applications[$applicationName] = $info;
             }
@@ -79,22 +80,23 @@ class Gdn_ApplicationManager {
      */
     public function enabledApplications() {
         if (!is_array($this->enabledApplications)) {
-            $EnabledApplications = Gdn::config('EnabledApplications', array('Dashboard' => 'dashboard'));
-            // Add some information about the applications to the array.
-            foreach ($EnabledApplications as $Name => $Folder) {
-                $EnabledApplications[$Name] = array('Folder' => $Folder);
-                //$EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
-                $EnabledApplications[$Name]['Version'] = '';
-                $EnabledApplications[$Name]['Index'] = $Name;
-                // Get the application version from it's about file.
-                $AboutPath = PATH_APPLICATIONS.'/'.strtolower($Name).'/settings/about.php';
-                if (file_exists($AboutPath)) {
-                    $ApplicationInfo = array();
-                    include $AboutPath;
-                    $EnabledApplications[$Name]['Version'] = GetValueR("$Name.Version", $ApplicationInfo, '');
+            $addons = $this->addonManager->getEnabled();
+            foreach ($addons as $addon) {
+                /* @var Addon $addon */
+                if ($addon->getInfoValue('oldType') !== 'application') {
+                    continue;
                 }
+                $info = $addon->getInfo();
+
+                $applicationName = $info['name'];
+
+                $directories = explode(DS, $addon->getSubdir());
+                $info['Folder'] = $directories[count($directories) - 1];
+                $info['Index'] = $info['name'];
+
+                $applications[$applicationName] = $info;
             }
-            $this->enabledApplications = $EnabledApplications;
+            $this->enabledApplications = $applications;
         }
 
         return $this->enabledApplications;
@@ -214,7 +216,7 @@ class Gdn_ApplicationManager {
     public function enableApplication($applicationName) {
         $this->testApplication($applicationName);
         $ApplicationInfo = ArrayValueI($applicationName, $this->availableApplications(), array());
-        $applicationName = $ApplicationInfo['Index'];
+        $applicationName = $ApplicationInfo['name'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
 
         saveToConfig('EnabledApplications'.'.'.$applicationName, $ApplicationFolder);
@@ -241,7 +243,7 @@ class Gdn_ApplicationManager {
     public function testApplication($applicationName) {
         // Add the application to the $EnabledApplications array in conf/applications.php
         $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), array());
-        $applicationName = $ApplicationInfo['Index'];
+        $applicationName = $ApplicationInfo['name'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
         if ($ApplicationFolder == '') {
             throw new Exception(t('The application folder was not properly defined.'));

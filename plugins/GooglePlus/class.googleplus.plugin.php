@@ -21,7 +21,8 @@ $PluginInfo['GooglePlus'] = [
     'Hidden' => false,
     'SocialConnect' => true,
     'RequiresRegistration' => false,
-    'Icon' => 'google_social_connect.png'
+    'Icon' => 'google_social_connect.png',
+    'DocumentationUrl' => 'http://docs.vanillaforums.com/help/addons/social/googleplus/',
 ];
 
 /**

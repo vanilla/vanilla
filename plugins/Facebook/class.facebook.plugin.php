@@ -22,7 +22,8 @@ $PluginInfo['Facebook'] = [
     'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
-    'Icon' => 'facebook_social_connect.png'
+    'Icon' => 'facebook_social_connect.png',
+    'DocumentationUrl' => 'http://docs.vanillaforums.com/help/addons/social/facebook/',
 ];
 
 /**

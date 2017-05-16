@@ -1134,3 +1134,48 @@ label[id^=iCheck] {
     background-color: $white;
   }
 }
+
+
+// Spoiler Toggle
+//
+// Spoilers hide content until you click on them. Usually these are reserved for the front-end,
+// but we also use them for sensitive information in the dashboard, like the Access Token.
+//
+// Here's how to build an anchor toggle.
+//
+// .spoiler-visible - On state.
+//
+// Markup:
+// <div class="spoiler {{modifier_class}}">
+//   <button class="btn btn-primary spoiler-trigger">
+//      Your spoiler message here
+//   </button>
+//   <div class="spoiler-content">
+//      Darth Vader is Luke's father! 😲
+//   </div>
+// </div>
+//
+// Styleguide 5.10.3
+
+.spoiler-trigger {
+  width: 100%;
+}
+
+.spoiler-content {
+  display: none;
+}
+
+.spoiler {
+  position: relative;
+  min-height: 2.2rem;
+
+  &.spoiler-visible {
+    .spoiler-trigger {
+      display: none !important;
+    }
+
+    .spoiler-content {
+      display: block;
+    }
+  }
+}

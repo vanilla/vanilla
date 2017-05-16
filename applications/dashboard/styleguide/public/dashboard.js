@@ -8336,7 +8336,6 @@ function log() {
 }));
 
 
-// This file contains javascript that is specific to the /profile controller.
 $(document).on('contentLoad', function(e) {
     // Reveals spoiler
     $(e.target).on('click', '.spoiler-trigger', function(e) {
@@ -9094,7 +9093,6 @@ var DashboardModal = (function() {
 
 })();
 
-// This file contains javascript that is specific to the /profile controller.
 $(document).on('contentLoad', function(e) {
     // Reveals spoiler
     $(e.target).on('click', '.spoiler-trigger', function(e) {

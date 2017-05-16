@@ -1773,6 +1773,17 @@ class Gdn_Controller extends Gdn_Pluggable {
                 $this->Head->setFavIcon(Gdn_Upload::url($Favicon));
             }
 
+            $touchIcon = c('Garden.TouchIcon');
+            if ($touchIcon) {
+                $this->Head->setTouchIcon(Gdn_Upload::url($touchIcon));
+            }
+
+            // Add address bar color.
+            $mobileAddressBarColor = c('Garden.MobileAddressBarColor');
+            if (!empty($mobileAddressBarColor)) {
+                $this->Head->setMobileAddressBarColor($mobileAddressBarColor);
+            }
+
             // Make sure the head module gets passed into the assets collection.
             $this->addModule('Head');
         }

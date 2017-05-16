@@ -5688,6 +5688,117 @@ $(document).on('contentLoad', function(e) {
 });
 
 /**
+ * If a btn-group gets too long for the window width, this will transform it into a dropdown-filter.
+ *
+ * Selector: `.btn-group`
+ *
+ * @param element - The scope of the function.
+ */
+var buttonGroup = function(element) {
+
+    /**
+     * Transforms a button group into a dropdown-filter.
+     *
+     * @param $buttonGroup
+     */
+    var transformButtonGroup = function(buttonGroup) {
+        var elem = document.createElement('div');
+        $(elem).addClass('dropdown');
+        $(elem).addClass('dropdown-filter');
+
+        var items = $(buttonGroup).html();
+        var title = gdn.definition('Filter');
+        var list = document.createElement('div');
+        var id = Math.random().toString(36).substr(2, 9);
+
+
+        $(list).addClass('dropdown-menu');
+        $(list).attr('aria-labelledby', id);
+        $(list).html(items);
+
+        $('.btn', list).each(function() {
+            $(this).removeClass('btn');
+            $(this).removeClass('btn-secondary');
+            $(this).addClass('dropdown-item');
+
+            if ($(this).hasClass('active')) {
+                title = $(this).html();
+            }
+        });
+
+        $(elem).prepend(
+            '<button ' +
+            'id="' + id + '" ' +
+            'type="button" ' +
+            'class="btn btn-secondary dropdown-toggle" ' +
+            'data-toggle="dropdown" ' +
+            'aria-haspopup="true" ' +
+            'aria-expanded="false"' +
+            '>' +
+            title +
+            '</button>'
+        );
+
+        $(elem).append($(list));
+
+        return elem;
+    };
+
+    var showButtonGroup = function(buttonGroup, dropdown) {
+        $(buttonGroup).show();
+        $(dropdown).hide();
+    };
+
+    var showDropdown = function(buttonGroup, dropdown) {
+        $(buttonGroup).hide();
+        $(dropdown).show();
+    };
+
+    /**
+     * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
+     * or btn-group, and then shows/hides the appropriate one.
+     *
+     * @param element The scope of the function.
+     */
+    var checkWidth = function(element) {
+        $('.btn-group', element).each(function() {
+            var self = this;
+            var maxWidth = $(self).data('maxWidth');
+            var container = $(self).data('containerSelector');
+
+            if (!container && !maxWidth) {
+                maxWidth = $(window).width();
+            }
+
+            if (container) {
+                maxWidth = $(container).width();
+            }
+
+            if (!self.width) {
+                self.width = $(self).width();
+            }
+
+            if (!self.dropdown) {
+                self.dropdown = transformButtonGroup(self);
+                $(self).after(self.dropdown);
+            }
+
+            if (self.width <= maxWidth) {
+                showButtonGroup(self, self.dropdown);
+            } else {
+                showDropdown(self, self.dropdown);
+            }
+        });
+    };
+
+    checkWidth(element);
+
+    $(window).resize(function() {
+        checkWidth(document);
+    });
+};
+
+/**
  * Makes tables collapsible by setting meta data on a main column. The meta label is based on the column heading and
  * the meta body is the cell content.
  *
@@ -5953,17 +6064,42 @@ $(document).on('contentLoad', function(e) {
 })(jQuery);
 
 /**
- * Makes a fluid fixed item that, if taller than the window height, will scroll up when the user scrolls up
+ * Makes a fluidfixed item that, if taller than the window height, will scroll up when the user scrolls up
  * and scroll down when the user scrolls down.
  */
+
 (function($) {
+    /**
+     * Start fluidfixed on an element. To do so, use $('js-fluidfixed').fluidfixed();
+     *
+     * As options, it accepts two properties:
+     * offsetTop: The offset from the top of the window that it will stop at when scrolling up.
+     * offsetBottom: The offset from the bottom of the window that it will stop at when scrolling down.
+     *
+     * If not passed, the offsetTop will default to the offset of the fluidfixed element to the top of the window.
+     * This is likely what you want, but you can customize it. However, you'll probably want to define your
+     * offsetBottom. It defaults to 30px.
+     *
+     * @param {{offsetTop: {(undefined|number)}, offsetBottom: {(undefined|number)}}} options
+     */
     $.fn.fluidfixed = function(options) {
 
+        /**
+         *
+         * @type {Array}
+         */
+        var killThreadIds = [];
+
+        /**
+         * Resets the variables.
+         *
+         * @param {FluidFixedSettings} vars
+         */
         var reset = function(vars) {
             vars.windowHeight = undefined;
             vars.containerHeight = undefined;
             vars.documentHeight = undefined;
-            vars.maxMarginDiff = undefined;
+            vars.minMargin = undefined;
             vars.upstartMargin = 0;
             vars.downstartMargin = 0;
             vars.upstart = 0;
@@ -5971,11 +6107,16 @@ $(document).on('contentLoad', function(e) {
             vars.lastMarginTop = 0;
         };
 
+        /**
+         * Prints out the variables.
+         *
+         * @param {FluidFixedSettings} vars
+         */
         var debug = function(vars) {
             console.log('windowHeight    : ' + vars.windowHeight);
             console.log('documentHeight  : ' + vars.documentHeight);
             console.log('containerHeight : ' + vars.containerHeight);
-            console.log('maxMarginDiff   : ' + vars.maxMarginDiff);
+            console.log('minMargin       : ' + vars.minMargin);
             console.log('upstartMargin   : ' + vars.upstartMargin);
             console.log('downstartMargin : ' + vars.downstartMargin);
             console.log('upstart         : ' + vars.upstart);
@@ -5983,12 +6124,17 @@ $(document).on('contentLoad', function(e) {
         };
 
 
+        /**
+         *
+         * @param element
+         * @param {FluidFixedSettings} vars
+         */
         var start = function(element, vars) {
 
+            // First, calculate the offsets and heights.
+
             if (vars.containerHeight == undefined) {
-                var px = $(element).css('margin-top');
-                var margin = parseInt(px.substring(0, px.length - 2));
-                vars.containerHeight = $(element).outerHeight(true) - margin;
+                vars.containerHeight = $(element).outerHeight(true);
             }
 
             if (vars.documentHeight == undefined) {
@@ -5999,42 +6145,64 @@ $(document).on('contentLoad', function(e) {
                 vars.windowHeight = $(window).height();
             }
 
-            if (vars.maxMarginDiff == undefined) {
-                // The max negative margin on the container
-                vars.maxMarginDiff = - (vars.containerHeight + vars.offsetTop + vars.offsetBottom - vars.windowHeight);
+            if (vars.minMargin == undefined) {
+                // The lowest negative margin on the container.
+                vars.minMargin = - (vars.containerHeight + vars.offsetTop + vars.offsetBottom - vars.windowHeight);
             }
 
-            // Page height is higher than the element height
-            var fixObject = (vars.containerHeight + vars.offsetTop + vars.offsetBottom) < vars.documentHeight;
+            /**
+             * We have 3 cases to check here:
+             *
+             * 1. The fluidfixed element is higher than the page height, so we don't need to do anything.
+             * 2. The fluidfixed element height is shorter than the window height, so we can just set
+             *    the fluidfixed element's position to fixed.
+             * 3. The fluidfixed element height is higher than the window height, so we need to set the
+             *    fluidfixed element's position to fixed and calculate the position by adjusting the margin
+             *    when scrolling.
+             */
+
+            var containerOuterHeight = vars.containerHeight + vars.offsetTop + vars.offsetBottom;
+            var fixObject = containerOuterHeight < vars.documentHeight && containerOuterHeight < vars.windowHeight;
 
             var handleScroll = fixObject
-                && vars.containerHeight + vars.offsetTop + vars.offsetBottom > vars.windowHeight // Element height is higher than the viewport height
-                && vars.documentHeight > vars.windowHeight; // Page height is higher than viewport height
+                && containerOuterHeight > vars.windowHeight // Element height is higher than the window height
+                && vars.documentHeight > vars.windowHeight; // Page height is higher than window height
 
             if (fixObject) {
                 $(element).css('position', 'fixed');
 
-                if ((vars.st + vars.containerHeight + vars.offsetTop + vars.offsetBottom) > vars.documentHeight) {
-                    // We're going to extend past the page bottom.
-                    $(element).css('margin-top', vars.maxMarginDiff);
+                if ((vars.scrollTop + containerOuterHeight) > vars.documentHeight) {
+                    // We're loading the page near the bottom of the document, the fluidfixed element will be cut
+                    // off unless we set the margin-top to the minMargin.
+                    $(element).css('margin-top', vars.minMargin);
                 }
-            } else {
-                $(element).css('position', vars.position);
-            }
 
-            if (handleScroll) {
-                var $element = $(element); // Cache element before scroll.
-                killThreadIds[vars.id] = false;
-                scrollHandler($element, vars);
+                if (handleScroll) {
+                    // Case 3: The element needs to be fixed and we have to calculate its position on scroll.
+                    var $element = $(element); // Cache element before scroll.
+                    killThreadIds[vars.id] = false;
+                    scrollHandler($element, vars);
+                } else {
+                    // Case 2: The element only needs to be fixed, no position calculations necessary.
+                    $(element).css('margin-top', 0);
+                    killThreadIds[vars.id] = true;
+                    $(window).off("scroll." + vars.id); // IE
+                }
+
             } else {
-                $(element).css('margin-top', 0);
-                killThreadIds[vars.id] = true;
-                $(window).off("scroll." + vars.id); // IE
+                // Case 1: The element doesn't need to be fixed, reinstate its original position property.
+                $(element).css('position', vars.position);
             }
         };
 
-        // Detect request animation frame
-        var scroll = function($element, vars) {
+        /**
+         * Detect request animation frame.
+         *
+         * @param {jQuery} $element
+         * @param {FluidFixedSettings} vars
+         * @returns {*|Function}
+         */
+        var getRequestAnimationFrame = function($element, vars) {
             return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
@@ -6042,44 +6210,71 @@ $(document).on('contentLoad', function(e) {
             window.oRequestAnimationFrame ||
             // IE Fallback
             function() { $(window).on("scroll." + vars.id, $.proxy(onScroll, null, $element, vars)); };
-        }
+        };
 
+        /**
+         * Starts an infinite loop using the requestAnimationFrame which lets us execute code on the
+         * next available screen repaint, rather than trying to calculate the position when the browser's
+         * not ready for it.
+         *
+         * @param {jQuery} $element
+         * @param {FluidFixedSettings} vars
+         * @returns {boolean}
+         */
         var scrollHandler = function($element, vars) {
             if (killThreadIds[vars.id]) {
+                // We've been interrupted. Kill the loop.
                 return false;
             }
             if (vars.lastScrollTop == window.pageYOffset) {
-                scroll($element, vars)($.proxy(scrollHandler, null, $element, vars));
+                // We're not scrolling.
+                getRequestAnimationFrame($element, vars)($.proxy(scrollHandler, null, $element, vars));
                 return false;
             } else {
+                // We're scrolling, let's party.
                 onScroll($element, vars);
-                scroll($element, vars)($.proxy(scrollHandler, null, $element, vars));
+                getRequestAnimationFrame($element, vars)($.proxy(scrollHandler, null, $element, vars));
             }
         };
 
+        /**
+         * Checks to see whether we're scrolling up or down by comparing the current scroll position with the last
+         * calculated scroll position, then handles the positioning.
+         *
+         * @param {jQuery} $element
+         * @param {FluidFixedSettings} vars
+         */
         var onScroll = function($element, vars) {
-            vars.st = window.pageYOffset;
-            if (vars.st > vars.lastScrollTop) {
+            vars.scrollTop = window.pageYOffset;
+            if (vars.scrollTop > vars.lastScrollTop) {
                 // downscroll
                 handleDownScroll($element, vars);
-            } else if (vars.st < vars.lastScrollTop) {
+            } else if (vars.scrollTop < vars.lastScrollTop) {
                 //upscroll
                 handleUpScroll($element, vars);
             }
-            vars.lastScrollTop = vars.st;
-        }
+            vars.lastScrollTop = vars.scrollTop;
+        };
 
+        /**
+         * Calculates our and applies our downscroll position. Works by incrementally adding a negative margin
+         * to the fluidfixed element.
+         *
+         * @param {jQuery} $element
+         * @param {FluidFixedSettings} vars
+         */
         var handleDownScroll = function($element, vars) {
             vars.upstart = 0;
             vars.upstartMargin = 0;
 
-            if (vars.downstart != 0 && vars.lastMarginTop == vars.maxMarginDiff) {
-                // checkout early
+            if (vars.downstart != 0 && vars.lastMarginTop == vars.minMargin) {
+                // We're scrolling down and the margin is already at the min margin, we can't decrease the
+                // margin anymore, so checkout early.
                 return;
             }
 
             if (vars.downstart == 0) {
-                vars.downstart = vars.st;
+                vars.downstart = vars.scrollTop;
             }
 
             if (vars.downstartMargin == 0) {
@@ -6087,28 +6282,36 @@ $(document).on('contentLoad', function(e) {
                 vars.downstartMargin = parseInt(px.substring(0, px.length - 2));
             }
 
-            var margin = Math.max((vars.downstartMargin + vars.downstart - vars.st), vars.maxMarginDiff);
+            var margin = Math.max((vars.downstartMargin + vars.downstart - vars.scrollTop), vars.minMargin);
 
-            if (vars.st > vars.offsetTop) {
+            if (vars.scrollTop > vars.offsetTop) {
                 vars.lastMarginTop = margin;
                 $element.css('margin-top', margin + 'px');
             } else {
-                vars.lastMarginTop = - (vars.st);
-                $element.css('margin-top', - (vars.st) + 'px');
+                vars.lastMarginTop = - (vars.scrollTop);
+                $element.css('margin-top', - (vars.scrollTop) + 'px');
             }
         };
 
+        /**
+         * Calculates our and applies our upscroll position. Works by incrementally removing the negative margin
+         * on the fluidfixed element.
+         *
+         * @param {jQuery} $element
+         * @param {FluidFixedSettings} vars
+         */
         var handleUpScroll = function($element, vars) {
             vars.downstart = 0;
             vars.downstartMargin = 0;
 
             if (vars.upstart != 0 && vars.lastMarginTop == 0) {
-                // checkout early
+                // We're scrolling up and the margin is already 0. We can't increase the margin any further,
+                // so check out early.
                 return;
             }
 
             if (vars.upstart == 0) {
-                vars.upstart = vars.st;
+                vars.upstart = vars.scrollTop;
             }
 
             if (vars.upstartMargin == 0) {
@@ -6116,13 +6319,14 @@ $(document).on('contentLoad', function(e) {
                 vars.upstartMargin = parseInt(px.substring(0, px.length - 2));
             }
 
-            var margin = Math.min((vars.upstartMargin - vars.st + vars.upstart), 0);
+            var margin = Math.min((vars.upstartMargin - vars.scrollTop + vars.upstart), 0);
             vars.lastMarginTop = margin;
             $element.css('margin-top', margin + 'px');
-        }
+        };
 
-        var killThreadIds = [];
-
+        /**
+         * Initializes the settings for each fluidfixed element and starts the whole operation.
+         */
         this.each(function() {
             var self = this;
 
@@ -6134,7 +6338,7 @@ $(document).on('contentLoad', function(e) {
             }
 
             if (settings.offsetBottom === undefined) {
-                settings.offsetBottom = 0;
+                settings.offsetBottom = 30;
             }
 
             var position = 'static';
@@ -6143,6 +6347,30 @@ $(document).on('contentLoad', function(e) {
                 position = $(this).css('position');
             }
 
+            /**
+             * The variables we pass around for each fluidfixed object.
+             *
+             * @typedef {Object} FluidFixedSettings
+             * @property {string} id - A unique ID generated for the fluidfixed element used to kill the scroll listener if necessary. This has nothing to do with the id property on an HTML element.
+             * @property {number} offsetTop - The offset between the top of the window and the top of the container when scrolling up (set to offset of container by default).
+             * @property {number} offsetBottom - The offset between the bottom of the window and the bottom of the container when scrolling down (set to 30 by default).
+             * @property {(number|undefined)} windowHeight - The window height.
+             * @property {(number|undefined)} containerHeight - The height of the fluidfixed element.
+             * @property {(number|undefined)} documentHeight - The height of the document/page.
+             * @property {(number|undefined)} minMargin - The lowest the negative margin can get when we're scrolling down.
+             * @property {number} upstartMargin - The margin on the container when we start scrolling up.
+             * @property {number} downstartMargin - The margin on the container when we start scrolling down.
+             * @property {number} upstart - The offset of the container when we start scrolling up.
+             * @property {number} downstart - The offset of the container when we start scrolling down.
+             * @property {number} lastMarginTop - The last calculated margin-top.
+             * @property {number} lastScrollTop - The last calcuated window offset, used to find whether we're scrolling up or down.
+             * @property {number} scrollTop - The current window offset.
+             * @property {string} position - The old CSS position property to revert to if fluidfixed is detached from the element, defaults to 'static'.
+             */
+
+            /**
+             * @type {FluidFixedSettings}
+             */
             var vars = {
                 id: Math.random().toString(36).substr(2, 9),
                 offsetTop: settings.offsetTop,
@@ -6150,38 +6378,52 @@ $(document).on('contentLoad', function(e) {
                 windowHeight: undefined,
                 containerHeight: undefined,
                 documentHeight: undefined,
-                maxMarginDiff: undefined,
+                minMargin: undefined,
                 upstartMargin: 0,
                 downstartMargin: 0,
                 upstart: 0,
                 downstart: 0,
                 lastMarginTop: 0,
                 lastScrollTop: window.pageYOffset,
-                st: window.pageYOffset,
+                scrollTop: window.pageYOffset,
                 position: position
             };
 
+            /**
+             * Kills the fluidfixed functionality of a fluidfixed element.
+             */
+            $(self).on('detach.FluidFixed', function() {
+                $(self).css('position', vars.position);
+                $(self).css('margin-top', 0);
+                killThreadIds[vars.id] = true;
+                $(window).off("scroll." + vars.id); // IE
+            });
+
+            /**
+             * Resets and recalculates the fluidfixed element position when the `reset.FluidFixed` event is triggered.
+             */
             $(self).on('reset.FluidFixed', function() {
                 reset(vars);
                 start(self, vars);
             });
 
+            /**
+             * Resets and recalculates the fluidfixed element position when the window is resized.
+             */
             $(window).resize(function() {
                 reset(vars);
                 start(self, vars);
-            });
-
-            $(self).on('detach.FluidFixed', function() {
-                $(self).css('position', 'initial');
-                $(self).css('margin-top', 0);
-                killThreadIds[vars.id] = true;
-                $(window).off("scroll." + vars.id); // IE
             });
 
             start(self, vars);
         });
     };
 
+    /**
+     * The properties that need to exist in the options being passed in initialization.
+     *
+     * @type {{offsetTop: {(undefined|number)}, offsetBottom: {(undefined|number)}}}
+     */
     $.fn.fluidfixed.defaults = {
         offsetTop: undefined,
         offsetBottom: undefined
@@ -8417,13 +8659,45 @@ function log() {
 
 })(jQuery, window, document);
 
-
+/**
+ * This class handles the content parsing and rendering of two different types of modals:
+ *
+ * Regular modals that ajax-in the content from an endpoint.
+ * Confirm modals that don't ajax-in the content.
+ *
+ */
 var DashboardModal = (function() {
 
+    /**
+     * The settings we can configure when starting the DashboardModal.
+     *
+     * These can be added when initializing the DashboardModal via javascript,
+     * or by using data attributes.
+     *
+     * @typedef {Object} DashboardModalSettings
+     * @property {string} httpmethod The HTTP method for the confirm modal. Either 'get' or 'post'. 'post' will automatically add the TransientKey to the request.
+     * @property {function} afterSuccess Function gets called on ajax success when handling a modal.
+     * @property {boolean} reloadPageOnSave Whether to reload the page after the modal closes after ajax success. Default true.
+     * @property {boolean} followLink Whether to follow a link when the confirm modal is accepted rather than simply closing the modal.
+     * @property {string} cssClass A CSS class to add to the modal dialog.
+     * @property {string} title The modal title.
+     * @property {string} footer The modal footer.
+     * @property {string} body The modal body.
+     * @property {string} closeIcon The svg close icon from the dashboard symbol map.
+     * @property {string} modalType The modal type. Defaults to 'regular'. Other options are 'confirm' or 'noheader'
+     */
+
+    /**
+     * Initialize our dashboard modal.
+     *
+     * @param {jQuery} $trigger The element we clicked to trigger the modal.
+     * @param {DashboardModalSettings} settings The modal settings.
+     * @constructor
+     */
     var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
-        this.addToDom();
+        this.addModalToDom();
 
         this.settings = {};
         this.defaultContent.closeIcon = dashboardSymbol('close');
@@ -8435,18 +8709,32 @@ var DashboardModal = (function() {
         this.start();
     };
 
+
     DashboardModal.prototype = {
 
+        /**
+         * The current active modal in the page.
+         */
         activeModal: undefined,
 
+        /**
+         * The default settings.
+         */
         defaultSettings: {
             httpmethod: 'get',
             afterSuccess: function(json, sender) {},
-            reloadPageOnSave: true
+            reloadPageOnSave: true,
+            modalType: 'regular'
         },
 
+        /**
+         * The generated id for the modal.
+         */
         id: '',
 
+        /**
+         * The default content for the modal.
+         */
         defaultContent: {
             cssClass: '',
             title: '',
@@ -8459,10 +8747,19 @@ var DashboardModal = (function() {
             }
         },
 
+        /**
+         * The url to fetch the modal content from.
+         */
         target: '',
 
+        /**
+         * The jQuery trigger object that is clicked to activate the modal.
+         */
         trigger: {},
 
+        /**
+         * The default modal template for all modals.
+         */
         modalHtml: ' \
         <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
@@ -8479,6 +8776,9 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * A modal with no separate header and footer.
+         */
         modalHtmlNoHeader: ' \
         <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
             <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
@@ -8490,30 +8790,41 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * The modal shell that we add to the DOM on initialization. Content eventually is added to the modal.
+         */
         modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
-        start: function($trigger, settings) {
+        /**
+         * Shows, gives focus to, and renders the modal.
+         */
+        start: function() {
             $('#' + this.id).modal('show').focus();
             if (this.settings.modalType === 'confirm') {
-                this.addConfirmContent();
+                this.renderConfirmModal();
             } else {
-                this.addContent();
+                this.renderModal();
             }
         },
 
-        load: function() {
-            this.handleForm();
-        },
-
-        addToDom: function() {
+        /**
+         * Adds the modal to the DOM.
+         */
+        addModalToDom: function() {
             $('body').append(this.modalShell.replace('{id}', this.id));
         },
 
+        /**
+         * Adds the needed data attributes to the modal trigger.
+         */
         setupTrigger: function($trigger) {
             $trigger.attr('data-target', '#' + this.id);
             $trigger.attr('data-modal-id', this.id);
         },
 
+        /**
+         * Adds event listeners to the modal.
+         */
         addEventListeners: function() {
             var self = this;
             $('#' + self.id).on('shown.bs.modal', function() {
@@ -8530,66 +8841,10 @@ var DashboardModal = (function() {
             });
         },
 
-        handleConfirm: function() {
-            var self = this;
-
-            // Refresh the page.
-            if (self.settings.followLink) {
-                document.location.replace(self.target);
-            } else {
-                // request the target via ajax
-                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-                if (self.settings.httpmethod === 'post') {
-                    ajaxData.TransientKey = gdn.definition('TransientKey');
-                }
-
-                $.ajax({
-                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                    url: self.target,
-                    data: ajaxData,
-                    dataType: 'json',
-                    error: function(xhr) {
-                        gdn.informError(xhr);
-                        $('#' + self.id).modal('hide');
-                    },
-                    success: function(json) {
-                        gdn.inform(json);
-                        gdn.processTargets(json.Targets);
-                        if (json.RedirectUrl) {
-                            setTimeout(function() {
-                                document.location.replace(json.RedirectUrl);
-                            }, 300);
-                        } else {
-                            $('#' + self.id).modal('hide');
-                            self.afterConfirmSuccess();
-                        }
-                    }
-                });
-            }
-        },
-
-        // Default is to remove the closest item with the class 'js-modal-item'
-        afterConfirmSuccess: function() {
-            var found = false;
-            if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                var $remove;
-                if (this.settings.removeSelector) {
-                    $remove = $(this.settings.removeSelector)
-                } else {
-                    $remove = this.trigger.closest('.js-modal-item');
-                }
-                found = $remove.length !== 0;
-                $remove.remove();
-            }
-
-            // Refresh the page.
-            if (!found) {
-                document.location.replace(window.location.href);
-            }
-        },
-
-        confirmContent: function() {
-            // Replace language definitions
+        /**
+         * Gets the default content for a confirm modal.
+         */
+        getDefaultConfirmContent: function() {
             var confirmHeading = gdn.definition('ConfirmHeading', 'Confirm');
             var confirmText = gdn.definition('ConfirmText', 'Are you sure you want to do that?');
             var ok = gdn.definition('Okay', 'Okay');
@@ -8606,12 +8861,45 @@ var DashboardModal = (function() {
             };
         },
 
-        addConfirmContent: function() {
+        /**
+         * Adds confirm content to the modal shell.
+         */
+        renderConfirmModal: function() {
             var self = this;
-            $('#' + self.id).htmlTrigger(self.replaceHtml(self.confirmContent()));
+            $('#' + self.id).htmlTrigger(self.addContentToTemplate(self.getDefaultConfirmContent()));
         },
 
-        replaceHtml: function(parsedContent) {
+        /**
+         * Makes an ajax call to the target and adds the page content to the modal shell.
+         */
+        renderModal: function() {
+            var self = this;
+            var ajaxData = {
+                'DeliveryType' : 'VIEW',
+                'DeliveryMethod' : 'JSON'
+            };
+
+            $.ajax({
+                method: 'GET',
+                url: self.target,
+                data: ajaxData,
+                dataType: 'json',
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                },
+                success: function(json) {
+                    var body = json.Data;
+                    var content = self.parseBody(body);
+                    $('#' + self.id).htmlTrigger(self.addContentToTemplate(content));
+                }
+            });
+        },
+
+        /**
+         * Replaces curly-braced variables in the templates with the parsedContent.
+         */
+        addContentToTemplate: function(parsedContent) {
 
             // Copy the defaults into the content array
             var content = {};
@@ -8640,73 +8928,16 @@ var DashboardModal = (function() {
             return html;
         },
 
-        addContent: function() {
-            var self = this;
-            var ajaxData = {
-                'DeliveryType' : 'VIEW',
-                'DeliveryMethod' : 'JSON'
-            };
 
-            $.ajax({
-                method: 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    var body = json.Data;
-                    var content = self.parseBody(body);
-                    $('#' + self.id).htmlTrigger(self.replaceHtml(content));
-                }
-            });
-        },
-
-        // Add any error messages to popup form or close modal on form save.
-        handleForm: function(element) {
-            var self = this;
-
-            $('form', element).ajaxForm({
-                data: {
-                    'DeliveryType': 'VIEW',
-                    'DeliveryMethod': 'JSON'
-                },
-                dataType: 'json',
-                success: function(json, sender) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-
-                    if (json.FormSaved === true) {
-                        self.afterFormSuccess(json, sender, json.RedirectUrl);
-                        $('#' + self.id).modal('hide');
-                    } else {
-                        var body = json.Data;
-                        var content = self.parseBody(body);
-                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
-                        $('#' + self.id + ' .modal-body').scrollTop(0);
-                    }
-                },
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                }
-            });
-        },
-
-        // Respect redirectUrl after form saves and redirect.
-        afterFormSuccess: function(json, sender, redirectUrl) {
-            this.settings.afterSuccess(json, sender);
-            if (redirectUrl) {
-                setTimeout(function() {
-                    document.location.replace(redirectUrl);
-                }, 300);
-            } else if (this.settings.reloadPageOnSave) {
-                document.location.replace(window.location.href);
-            }
-        },
-
+        /**
+         * Parses a page to find the title, footer, form and body elements.
+         *
+         * If there's a form in the page, removes the opening and closing form tags.
+         * These get readded later, wrapping around the content and footer.
+         *
+         * The title is the page's h1 element, the footer is the contents of the first `.Buttons`,
+         * `.form-footer` or `.js-modal-footer` element, if one exists on the page.
+         */
         parseBody: function(body) {
             var title = '';
             var footer = '';
@@ -8720,7 +8951,11 @@ var DashboardModal = (function() {
             // Pull out the H1 block from the view to add to the modal title
             if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
-                $title.remove();
+                if ($elem.find('.header-block').length !== 0) {
+                    $elem.find('.header-block').remove();
+                } else {
+                    $title.remove();
+                }
                 body = $elem.html();
             }
 
@@ -8749,6 +8984,97 @@ var DashboardModal = (function() {
                     close: formCloseTag
                 }
             };
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleForm: function(element) {
+            var self = this;
+
+            $('form', element).ajaxForm({
+                data: {
+                    'DeliveryType': 'VIEW',
+                    'DeliveryMethod': 'JSON'
+                },
+                dataType: 'json',
+                success: function(json, sender) {
+                    self.settings.afterSuccess(json, sender);
+                    gdn.inform(json);
+                    gdn.processTargets(json.Targets);
+
+                    if (json.FormSaved === true) {
+                        self.handleSuccess(json);
+                    } else {
+                        var body = json.Data;
+                        var content = self.parseBody(body);
+                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                        $('#' + self.id + ' .modal-body').scrollTop(0);
+                    }
+                },
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                }
+            });
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleConfirm: function() {
+            var self = this;
+
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
+                }
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json, sender) {
+                        self.settings.afterSuccess(json, sender);
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        self.handleSuccess(json);
+                    }
+                });
+            }
+        },
+
+        /**
+         * Handles the ajax success. If there's a RedirectUrl set, then redirect. Reload the page if there
+         * are no Targets set AND reloadPageOnSave is true.
+         *
+         * @param json
+         */
+        handleSuccess: function(json) {
+            if (json.RedirectUrl) {
+                setTimeout(function() {
+                    document.location.replace(json.RedirectUrl);
+                }, 300);
+            } else {
+                $('#' + this.id).modal('hide');
+
+                // We'll only reload if there are no targets set. If there are targets set, we can
+                // assume that the page doesn't need to be reloaded, since we'll ajax remove/edit
+                // the page.
+                if (this.settings.reloadPageOnSave && (json.Targets.length === 0)) {
+                    document.location.replace(window.location.href);
+                }
+            }
         }
     };
 
@@ -8768,6 +9094,12 @@ var DashboardModal = (function() {
 
 (function($) {
 
+    /**
+     * This uses the ace vendor component to wire up our code editors. We currently use the code editor
+     * in the Custom CSS plugin and in the Pockets plugin.
+     *
+     * Selector: `.js-code-input`
+     */
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
@@ -8777,18 +9109,17 @@ var DashboardModal = (function() {
         },
 
         // Adds the 'js-code-input' class to a form and the mode and height data attributes.
-        init: function(textarea, mode, height) {
-            if (!textarea.length) {
+        init: function($textarea, mode, height) {
+            if (!$textarea.length) {
                 return;
             }
-            textarea.addClass('js-code-input');
-            textarea.data('code-input', {'mode': mode, 'height': height});
+            $textarea.addClass('js-code-input');
+            $textarea.data('code-input', {'mode': mode, 'height': height});
         },
 
-        //
-        makeAceTextArea: function (textarea) {
-            var mode = textarea.data('code-input').mode;
-            var height = textarea.data('code-input').height;
+        makeAceTextArea: function ($textarea) {
+            var mode = $textarea.data('code-input').mode;
+            var height = $textarea.data('code-input').height;
             var modes = ['html', 'css'];
 
             if (modes.indexOf(mode) === -1) {
@@ -8799,9 +9130,9 @@ var DashboardModal = (function() {
             }
 
             // Add the ace input before the actual textarea and hide the textarea.
-            var formID = textarea.attr('id');
-            textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
-            textarea.hide();
+            var formID = $textarea.attr('id');
+            $textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
+            $textarea.hide();
 
             var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
@@ -8810,23 +9141,20 @@ var DashboardModal = (function() {
             editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.
-            editor.getSession().setValue(textarea.val());
+            editor.getSession().setValue($textarea.val());
             editor.getSession().on('change', function () {
-                textarea.val(editor.getSession().getValue());
+                $textarea.val(editor.getSession().getValue());
             });
         }
     };
 
-    function prettyPrintInit(element) {
-        // Pretty print
-        $('#Pockets td:nth-child(4)', element).each(function () {
-            var html = $(this).html();
-            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
-        });
-        $('pre', element).addClass('prettyprint lang-html');
-        prettyPrint();
-    }
-
+    /**
+     * Uses the handy codeInput.init function to add the appropriate data and classes to elements that should
+     * be rich text editors. You can initialize elements here or simply add the `js-code-input` CSS class and
+     * the appropriate data attributes to the textarea markup.
+     *
+     * @param element - The scope of the function.
+     */
     function aceInit(element) {
         // Editor classes
         codeInput.init($('.js-pocket-body', element), 'html', 300);
@@ -8837,7 +9165,25 @@ var DashboardModal = (function() {
         codeInput.start(element);
     }
 
+    /**
+     * Styles and adds syntax hilighting to code blocks.
+     *
+     * @param element - The scope of the function.
+     */
+    function prettyPrintInit(element) {
+        $('#Pockets td:nth-child(4)', element).each(function () {
+            var html = $(this).html();
+            $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
+        });
+        $('pre', element).addClass('prettyprint lang-html');
+        prettyPrint();
+    }
 
+    /**
+     * Add a CSS class to the navbar based on it scroll position.
+     *
+     * @param element - The scope of the function.
+     */
     function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
 
@@ -8861,6 +9207,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Start fluidfixed on the dashboard panel navigation.
+     *
+     * @param element - The scope of the function.
+     */
     function fluidFixedInit(element) {
         // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
@@ -8869,10 +9220,13 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Initialized drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
      * must specify the html content it will reveal when it is clicked.
      *
-     * @param element The context
+     * Selector: `.js-drop`
+     * Attribute: `data-content-id="id_of_element"`
+     *
+     * @param element - The scope of the function.
      */
     function dropInit(element) {
         $('.js-drop', element).each(function() {
@@ -8908,9 +9262,10 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Un-collapses a group if one of its links is active.
+     * Un-collapses a group if one of its links is active. Note that the functionality for the collapse
+     * javascript is contained in ../vendors/bootstrap/collapse.js
      *
-     * @param element
+     * @param element - The scope of the function.
      */
     function collapseInit(element) {
         var $active = $('.js-nav-collapsible a.active', element);
@@ -8920,6 +9275,15 @@ var DashboardModal = (function() {
         $('a[href=#' + $collapsible.attr('id') + ']').removeClass('collapsed');
     }
 
+    /**
+     * Copies the text from an element to the clipboard. Displays a tooltip on success. Set the
+     * clipboardTarget data attribute to indicate the text that should be copied. Set the successText
+     * attribute to the message to display on success.
+     *
+     * Selector: `.btn-copy`
+     * Attributes: `data-clipboard-target="#text_to_copy"`
+     *             `data-success-text="Copied!"`
+     */
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
 
@@ -8941,6 +9305,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * This handles the drawer/hamburger menu functionality of the panel navigation on small screen sizes.
+     *
+     * @param element - The scope of the function.
+     */
     function drawerInit(element) {
 
         // Selectors
@@ -8982,6 +9351,12 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Transforms all checkboxes or radios (with the exception of those in the ignore list)
+     * into style-able checkboxes and radios.
+     *
+     * @param element - The scope of the function.
+     */
     function icheckInit(element) {
         var ignores = [
             '.label-selector-input',
@@ -9012,6 +9387,12 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Starts expander functionality (aka "show more") for feed descriptions on the homepage and
+     * for toaster messages.
+     *
+     * @param element - The scope of the function.
+     */
     function expanderInit(element) {
         $('.FeedDescription', element).expander({
             slicePoint: 65,
@@ -9028,12 +9409,22 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Shows any active modal. This is needed for form errors.
+     */
     function modalInit() {
         if (typeof(DashboardModal.activeModal) === 'object') {
-            DashboardModal.activeModal.load();
+            DashboardModal.activeModal.handleForm();
         }
     }
 
+    /**
+     * Starts tablejenga on elements with the `.js-tj` class.
+     *
+     * Selector: `.js-tj`
+     *
+     * @param element - The scope of the function.
+     */
     function responsiveTablesInit(element) {
         var containerSelector = '#main-row .main';
 
@@ -9045,6 +9436,14 @@ var DashboardModal = (function() {
         $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
+    /**
+     * Starts the foggy functionality.
+     *
+     * Selector: `.js-foggy`
+     * Attribute: `data-is-foggy={true|false}`
+     *
+     * @param element - The scope of the function.
+     */
     function foggyInit(element) {
         var $foggy = $('.js-foggy', element);
         if ($foggy.data('isFoggy')) {
@@ -9057,7 +9456,10 @@ var DashboardModal = (function() {
      * The trigger must have a `js-check-all` css class applied to it. It manages input checkboxes
      * with the `js-check-me` css class applied.
      *
-     * @param element The scope of the function.
+     * Selectors: `.js-check-all` for the "Check all" checkbox.
+     *            `.js-check-me` for the child checkboxes.
+     *
+     * @param element - The scope of the function.
      */
     function checkallInit(element) {
         $('.js-check-all', element).checkall({
@@ -9066,10 +9468,14 @@ var DashboardModal = (function() {
     }
 
     /**
-     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up if it gets too
-     * close to the bottom of the page.
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up
+     * if it gets too close to the bottom of the page. Note that the actual dropdown javascript
+     * functionality is contained in ../vendors/bootstrap/dropdown.js This function just changes whether the
+     * dropdown opens up or opens down.
      *
-     * @param element The scope of the function.
+     * Selector: `.dropdown`
+     *
+     * @param element - The scope of the function.
      */
     function dropDownInit(element) {
         $('.dropdown', element).each(function() {
@@ -9086,110 +9492,20 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * If a btn-group gets too long for the window width, this will transform it into a dropdown-filter.
+     *
+     * Selector: `.btn-group`
+     *
+     * @param element - The scope of the function.
+     */
     function buttonGroupInit(element) {
-
-        /**
-         * Transforms a button group into a dropdown-filter.
-         *
-         * @param $buttonGroup
-         */
-        var transformButtonGroup = function(buttonGroup) {
-            var elem = document.createElement('div');
-            $(elem).addClass('dropdown');
-            $(elem).addClass('dropdown-filter');
-
-            var items = $(buttonGroup).html();
-            var title = gdn.definition('Filter');
-            var list = document.createElement('div');
-            var id = Math.random().toString(36).substr(2, 9);
-
-
-            $(list).addClass('dropdown-menu');
-            $(list).attr('aria-labelledby', id);
-            $(list).html(items);
-
-            $('.btn', list).each(function() {
-                $(this).removeClass('btn');
-                $(this).removeClass('btn-secondary');
-                $(this).addClass('dropdown-item');
-
-                if ($(this).hasClass('active')) {
-                    title = $(this).html();
-                }
-            });
-
-            $(elem).prepend(
-                '<button ' +
-                'id="' + id + '" ' +
-                'type="button" ' +
-                'class="btn btn-secondary dropdown-toggle" ' +
-                'data-toggle="dropdown" ' +
-                'aria-haspopup="true" ' +
-                'aria-expanded="false"' +
-                '>' +
-                title +
-                '</button>'
-            );
-
-            $(elem).append($(list));
-
-            return elem;
-        };
-
-        var showButtonGroup = function(buttonGroup, dropdown) {
-            $(buttonGroup).show();
-            $(dropdown).hide();
-        };
-
-        var showDropdown = function(buttonGroup, dropdown) {
-            $(buttonGroup).hide();
-            $(dropdown).show();
-        };
-
-        /**
-         * Generates an equivalent dropdown to the btn-group. Calculates widths to see whether we show the dropdown
-         * or btn-group, and then shows/hides the appropriate one.
-         *
-         * @param element The scope of the function
-         */
-        var checkWidth = function(element) {
-            $('.btn-group', element).each(function() {
-                var self = this;
-                var maxWidth = $(self).data('maxWidth');
-                var container = $(self).data('containerSelector');
-
-                if (!container && !maxWidth) {
-                    maxWidth = $(window).width();
-                }
-
-                if (container) {
-                    maxWidth = $(container).width();
-                }
-
-                if (!self.width) {
-                    self.width = $(self).width();
-                }
-
-                if (!self.dropdown) {
-                    self.dropdown = transformButtonGroup(self);
-                    $(self).after(self.dropdown);
-                }
-
-                if (self.width <= maxWidth) {
-                    showButtonGroup(self, self.dropdown);
-                } else {
-                    showDropdown(self, self.dropdown);
-                }
-            });
-        };
-
-        checkWidth(element);
-
-        $(window).resize(function() {
-            checkWidth(document);
-        });
+        buttonGroup(element);
     }
 
+    /**
+     * Run through all our javascript functionality and start everything up.
+     */
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
@@ -9212,6 +9528,12 @@ var DashboardModal = (function() {
     /**
      * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
      * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-preview`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     function readUrl(input) {
         if (input.files && input.files[0]) {
@@ -9230,6 +9552,13 @@ var DashboardModal = (function() {
 
     /**
      * Adds a preview of the uploaded, not-yet-saved image.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-upload`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('change', '.js-image-upload', function() {
         $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
@@ -9239,6 +9568,15 @@ var DashboardModal = (function() {
 
     /**
      * Removes the preview image and clears the file name from the input.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-remove-image-preview`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview`
+     *            `.js-image-upload`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('click', '.js-remove-image-preview', function(e) {
         e.preventDefault();
@@ -9252,6 +9590,9 @@ var DashboardModal = (function() {
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is expanded.
+     */
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -9260,6 +9601,9 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is collapsed.
+     */
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -9268,6 +9612,108 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * File Upload filename preview.
+     * There's a rendering function for this in Gdn_Form: `fileUpload()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selector: `.js-file-upload`
+     */
+    $(document).on('change', '.js-file-upload', function() {
+        var filename = $(this).val();
+        if (filename.substring(3, 11) === 'fakepath') {
+            filename = filename.substring(12);
+        }
+        if (filename) {
+            $(this).parent().find('.file-upload-choose').html(filename);
+        }
+    });
+
+    // Modal handling
+
+    /**
+     * Start regular modal.
+     *
+     * Selector: `.js-modal`
+     */
+    $(document).on('click', '.js-modal', function(e) {
+        e.preventDefault();
+        DashboardModal.activeModal = new DashboardModal($(this), {});
+    });
+
+    /**
+     * Start confirm modal.
+     *
+     * Selector: `.js-modal-confirm`
+     * Attribute: `data-follow-link:true` - Follows the link on confirm, otherwise stays on the page.
+     */
+    $(document).on('click', '.js-modal-confirm', function(e) {
+        e.preventDefault();
+        var followLink = $(this).data('followLink') === 'true';
+
+        DashboardModal.activeModal = new DashboardModal($(this), {
+            httpmethod: 'post',
+            modalType: 'confirm',
+            followLink: followLink // no ajax
+        });
+    });
+
+    /**
+     * Close active modal.
+     *
+     * Selector: `.js-modal-close`
+     */
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
+        }
+    });
+
+    // Foggy handling
+
+    /**
+     * Disables inputs and adds a foggy CSS class to the target to make the target look foggy.
+     */
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop('disabled')) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop('disabled', true);
+            }
+        });
+    });
+
+    /**
+     * Enables inputs and removes the foggy CSS class.
+     */
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop('disabled', false);
+            }
+        });
+    });
+
+    // Navigation preferences saving
+
+    /**
+     * Saves the panel navigation collapse preferences.
+     *
+     * Selector: `.js-save-pref-collapse`
+     */
     $(document).on('click', '.js-save-pref-collapse', function() {
         var key = $(this).data('key');
         var collapsed = !$(this).hasClass('collapsed');
@@ -9287,6 +9733,13 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the landing page for a top-level section.
+     *
+     * Selector: `.js-save-pref-section-landing-page`
+     * Attributes: `data-link-path="/path/to/settingspage"`
+     *             `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-section-landing-page', function() {
         var url = $(this).data('linkPath');
         var section = $(this).data('section');
@@ -9306,6 +9759,12 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the dashboard landing page.
+     *
+     * Selector: `.js-save-pref-dashboard-landing-page`
+     * Attribute: `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
         var section = $(this).data('section');
 
@@ -9322,83 +9781,16 @@ var DashboardModal = (function() {
             dataType: 'json'
         });
     });
-
-    $(document).on('change', '.js-file-upload', function() {
-        var filename = $(this).val();
-        if (filename.substring(3, 11) === 'fakepath') {
-            filename = filename.substring(12);
-        }
-        if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
-        }
-    });
-
-    $(document).on('click', '.js-modal', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
-    });
-
-    $(document).on('click', '.js-modal-confirm', function(e) {
-        e.preventDefault();
-        if ($(this).data('followLink') === 'true') {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'get',
-                modalType: 'confirm',
-                followLink: true // no ajax
-            });
-        } else {
-            DashboardModal.activeModal = new DashboardModal($(this), {
-                httpmethod: 'post',
-                modalType: 'confirm'
-            });
-        }
-    });
-
-    // Get new banner image.
-    $(document).on('click', '.js-upload-email-image-button', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            afterSuccess: emailStyles.reloadImage
-        });
-    });
-
-    $(document).on('click', '.js-modal-close', function() {
-        if (typeof(DashboardModal.activeModal) === 'object') {
-            $('#' + DashboardModal.activeModal.id).modal('hide');
-        }
-    });
-
-    $(document).on('foggyOn', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'true');
-        $target.data('isFoggy', 'true');
-        $target.addClass('foggy');
-
-        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
-        $target.find(':input').each(function() {
-            if ($(this).prop('disabled')) {
-                $(this).data('foggy-disabled', 'true');
-            } else {
-                $(this).prop('disabled', true);
-            }
-        });
-    });
-
-    $(document).on('foggyOff', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'false');
-        $target.data('isFoggy', 'false');
-        $target.removeClass('foggy');
-
-        // Be careful not to enable fields that should be disabled.
-        $target.find(':input').each(function() {
-            if (!$(this).data('foggy-disabled')) {
-                $(this).prop('disabled', false);
-            }
-        });
-    });
 })(jQuery);
 
+/**
+ * Returns an HTML string to render a svg icon.
+ *
+ * @param {string} name - The icon name.
+ * @param {string} alt - The alt text for the icon.
+ * @param {string} cssClass - The css class to apply to the svg.
+ * @returns {string} The HTML for the svg icon.
+ */
 var dashboardSymbol =  function(name, alt, cssClass) {
     if (alt) {
         alt = 'alt="' + alt + '" ';

@@ -7596,6 +7596,27 @@ label[id^=iCheck] {
   background-color: #fff;
 }
 
+.spoiler-trigger {
+  width: 100%;
+}
+
+.spoiler-content {
+  display: none;
+}
+
+.spoiler {
+  position: relative;
+  min-height: 2.2rem;
+}
+
+.spoiler.spoiler-visible .spoiler-trigger {
+  display: none !important;
+}
+
+.spoiler.spoiler-visible .spoiler-content {
+  display: block;
+}
+
 .hero {
   display: -webkit-box;
   display: -ms-flexbox;

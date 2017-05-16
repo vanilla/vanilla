@@ -1780,7 +1780,7 @@ class Gdn_Controller extends Gdn_Pluggable {
 
             // Add address bar color.
             $mobileAddressBarColor = c('Garden.MobileAddressBarColor');
-            if (!empty($mobileAddressBarColor) && $mobileAddressBarColor != '') {
+            if (!empty($mobileAddressBarColor)) {
                 $this->Head->setMobileAddressBarColor($mobileAddressBarColor);
             }
 

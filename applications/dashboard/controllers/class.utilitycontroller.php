@@ -631,8 +631,12 @@ class UtilityController extends DashboardController {
      * @access public
      */
     public function showTouchIcon() {
-        $redirect = Gdn_Upload::url(c('Garden.TouchIcon'));
-        redirect($redirect, 302);
-        exit();
+        $icon = c('Garden.TouchIcon');
+
+        if (!empty($icon)) {
+            redirect(Gdn_Upload::url($icon), 302);
+        } else {
+            throw new Exception('Touch icon not found.', 404);
+        }
     }
 }

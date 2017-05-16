@@ -906,6 +906,4 @@ if (c('Plugins.TouchIcon.Uploaded')) {
     removeFromConfig('Plugins.TouchIcon.Uploaded');
 }
 
-Gdn::Router()->SetRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');
-
-
+Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

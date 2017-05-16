@@ -290,22 +290,20 @@ if (!class_exists('HeadModule', false)) {
         /**
          * Sets the touch icon
          *
-         * @param string The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
+         * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
          */
-        public function setTouchIcon($HRef) {
+        public function setTouchIcon($href) {
             if (!$this->_TouchIconSet) {
                 $this->_TouchIconSet = true;
                 $this->addTag(
                     'link',
                     [
                         'rel' => 'apple-touch-icon-precomposed',
-                        'href' => $HRef
+                        'href' => $href
                     ]
                 );
             }
         }
-
-
 
         /**
          * Sets browser address bar colour.

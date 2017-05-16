@@ -310,7 +310,7 @@ if (!class_exists('HeadModule', false)) {
          *
          * @param string meta tags for various browsers
          */
-        public function setMobileAddressBarColor($mobileAddressBarColor, $iosAddressBarColor) {
+        public function setMobileAddressBarColor($mobileAddressBarColor) {
             if (!$this->_MobileAddressBarColorSet && $mobileAddressBarColor) {
                 $this->_MobileAddressBarColorSet = true;
                 $this->addTag(

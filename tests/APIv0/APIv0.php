@@ -47,6 +47,16 @@ class APIv0 extends HttpClient {
     }
 
     /**
+     * Get the host of the database.
+     *
+     * @return string
+     */
+    public function getDbHost() {
+        $host = isset($_ENV['dbhost']) ? $_ENV['dbhost'] : 'localhost';
+        return $host;
+    }
+
+    /**
      * Get the name of the database for direct access.
      *
      * @return string Returns the name of the database.
@@ -116,7 +126,8 @@ class APIv0 extends HttpClient {
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
             ];
-            $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
+            $host = $this->getDbHost();
+            $pdo = new PDO("mysql:host={$host}", $this->getDbUser(), $this->getDbPassword(), $options);
 
             $dbname = $this->getDbName();
             $r = $pdo->query("show databases like '$dbname'", PDO::FETCH_COLUMN, 0);
@@ -190,7 +201,7 @@ class APIv0 extends HttpClient {
 
         // Install Vanilla via cURL.
         $post = [
-            'Database-dot-Host' => 'localhost',
+            'Database-dot-Host' => $this->getDbHost(),
             'Database-dot-Name' => $this->getDbName(),
             'Database-dot-User' => $this->getDbUser(),
             'Database-dot-Password' => $this->getDbPassword(),

@@ -28,6 +28,15 @@ class PostController extends VanillaController {
     /** @var bool Whether or not to show the category dropdown. */
     public $ShowCategorySelector = true;
 
+    /** @var int */
+    public $CategoryID = 0;
+
+    /** @var null|array */
+    public $Category = null;
+
+    /** @var null|array */
+    public $Context = null;
+
     /**
      * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
      *
@@ -131,9 +140,6 @@ class PostController extends VanillaController {
                 // Get all our subcategories to add to the category if we are in a Header or Categories category.
                 $this->Context = CategoryModel::getSubtree($this->CategoryID);
             }
-        } else {
-            $this->CategoryID = 0;
-            $this->Category = null;
         }
 
         $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;

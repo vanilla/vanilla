@@ -548,7 +548,7 @@ class ConversationModel extends ConversationsModel {
         $ConversationID = false;
         if ($this->validate($formPostValues)
             && $MessageModel->validate($formPostValues)
-            && !$this->isUserSpamming(Gdn::session()->UserID, $this->floodGate)
+            && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)
         ) {
             $Fields = $this->Validation->validationFields(); // All fields on the form that relate to the schema
 

@@ -10,7 +10,7 @@ jQuery(document).ready(function($) {
         });
 
         // profile/discussions paging
-        $('.Section-Profile .MorePager').morepager({
+        $('.Section-Profile .Discussions .MorePager').morepager({
             pagerInContainer: true,
             afterPageLoaded: function() {
                 $(document).trigger('DiscussionPagingComplete');

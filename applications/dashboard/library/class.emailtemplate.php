@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -16,101 +15,86 @@
  */
 class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 
-    /**
-     * Delimiter for plaintext email.
-     */
+    /** Delimiter for plaintext email. */
     const PLAINTEXT_START = '<!-- //TEXT VERSION FOLLOWS//';
 
-    /**
-     * Default email colors.
-     */
+    /** Default email colors. */
     const DEFAULT_TEXT_COLOR = '#333333';
     const DEFAULT_BACKGROUND_COLOR = '#eeeeee';
     const DEFAULT_CONTAINER_BACKGROUND_COLOR = '#ffffff';
     const DEFAULT_BUTTON_BACKGROUND_COLOR = '#38abe3'; // Vanilla blue
     const DEFAULT_BUTTON_TEXT_COLOR = '#ffffff';
 
-    /**
-     * @var string The HTML formatted email title.
-     */
+
+    // Component properties
+
+    /** @var string The HTML formatted email title. */
     protected $title;
 
-    /**
-     * @var string The HTML formatted email lead (sub-title, appears under title).
-     */
+    /**  @var string The HTML formatted email lead (sub-title, appears under title). */
     protected $lead;
 
-    /**
-     * @var string The HTML formatted email message (the body of the email).
-     */
+    /** @var string The HTML formatted email message (the body of the email). */
     protected $message;
 
     /**
      * @var array An array representing a footer with the following keys:
-     * 'text' => The HTML-formatted footer text.
-     * 'textColor' => The hex color code of the footer text, must include the leading '#'.
-     * 'backgroundColor' => The hex color code of the footer background, must include the leading '#'.
+     *  'text' => The HTML-formatted footer text.
+     *  'textColor' => The hex color code of the footer text, must include the leading '#'.
+     *  'backgroundColor' => The hex color code of the footer background, must include the leading '#'.
      */
     protected $footer;
 
     /**
      * @var array An array representing a button with the following keys:
-     * 'url' => The href value of the button.
-     * 'text' => The button text.
-     * 'textColor' => The hex color code of the button text, must include the leading '#'.
-     * 'backgroundColor' => The hex color code of the button background, must include the leading '#'.
+     *  'url' => The href value of the button.
+     *  'text' => The button text.
+     *  'textColor' => The hex color code of the button text, must include the leading '#'.
+     *  'backgroundColor' => The hex color code of the button background, must include the leading '#'.
      */
     protected $button;
 
     /**
      * @var array An array representing an image with the following keys:
-     * 'source' => The image source url.
-     * 'link' => The href value of the image wrapper.
-     * 'alt' => The alt value of the image tag.
+     *  'source' => The image source url.
+     *  'link' => The href value of the image wrapper.
+     *  'alt' => The alt value of the image tag.
      */
     protected $image;
 
-    /**
-     * @var string The path to the email view.
-     */
+    /** @var string The path to the email view. */
     protected $view;
 
-    /**
-     * @var bool Whether to render in plaintext.
-     */
+    /** @var bool Whether to render in plaintext. */
     protected $plaintext = false;
 
-    // Colors
-    /**
-     * @var string The hex color code of the text, must include the leading '#'.
-     */
+
+    // Color properties
+
+    /** @var string The hex color code of the text, must include the leading '#'.*/
     protected $textColor = self::DEFAULT_TEXT_COLOR;
 
-    /**
-     * @var string The hex color code of the background, must include the leading '#'.
-     */
+    /** @var string The hex color code of the background, must include the leading '#'. */
     protected $backgroundColor = self::DEFAULT_BACKGROUND_COLOR;
 
-    /**
-     * @var string The hex color code of the container background, must include the leading '#'.
-     */
+    /** @var string The hex color code of the container background, must include the leading '#'. */
     protected $containerBackgroundColor = self::DEFAULT_CONTAINER_BACKGROUND_COLOR;
 
-    /**
-     * @var string The default hex color code of the button text, must include the leading '#'.
-     */
+    /**@var string The default hex color code of the button text, must include the leading '#'. */
     protected $defaultButtonTextColor = self::DEFAULT_BUTTON_TEXT_COLOR;
 
-    /**
-     * @var string The default hex color code of the button background, must include the leading '#'.
-     */
+    /** @var string The default hex color code of the button background, must include the leading '#'. */
     protected $defaultButtonBackgroundColor = self::DEFAULT_BUTTON_BACKGROUND_COLOR;
 
+
     /**
+     * Template initial setup.
+     *
      * @param string $message HTML formatted email message (the body of the email).
      * @param string $title HTML formatted email title.
      * @param string $lead HTML formatted email lead (sub-title, appears under title).
      * @param string $view
+     *
      * @throws Exception
      */
     function __construct($message = '', $title = '', $lead = '', $view = 'email-basic') {
@@ -164,6 +148,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @param string $html The HTML to filter.
      * @param bool $convertNewlines Whether to convert new lines to html br tags.
      * @param bool $filter Whether to escape HTML or not.
+     *
      * @return string The filtered HTML string.
      */
     protected function formatContent($html, $convertNewlines = false, $filter = false) {
@@ -179,9 +164,12 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set which application view to use.
+     *
      * @param string $view The view name.
      * @param string $controllerName The controller name for the view.
      * @param string $applicationFolder The application folder for the view.
+     *
      * @return EmailTemplate $this The calling object.
      * @throws Exception
      */
@@ -191,6 +179,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the current email title.
+     *
      * @return string The HTML formatted email title.
      */
     public function getTitle() {
@@ -198,7 +188,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set the current email title.
+     *
      * @param string $title The HTML formatted email title.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setTitle($title) {
@@ -207,6 +200,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the current email sub-title.
+     *
      * @return string The HTML formatted email lead (sub-title, appears under title).
      */
     public function getLead() {
@@ -214,7 +209,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set the current email sub-title.
+     *
      * @param string $lead The HTML formatted email lead (sub-title, appears under title).
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setLead($lead) {
@@ -223,6 +221,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the main body of the email.
+     *
      * @return string The HTML formatted email message (the body of the email).
      */
     public function getMessage() {
@@ -230,9 +230,12 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set the main body of the email.
+     *
      * @param string $message The HTML formatted email message (the body of the email).
      * @param bool $convertNewlines Whether to convert new lines to html br tags.
      * @param bool $filter Whether to filter HTML or not.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setMessage($message, $convertNewlines = false, $filter = false) {
@@ -241,6 +244,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the HTML footer.
+     *
      * @return string The HTML formatted email footer.
      */
     public function getFooter() {
@@ -248,7 +253,9 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
-     * Sets the footer. The footer background and text colors default to the button background and text colors.
+     * Sets the HTML footer.
+     *
+     * The footer background and text colors default to the button background and text colors.
      *
      * @param string $text The HTML formatted email footer text.
      * @param string $textColor The hex color code of the footer text, must include the leading '#'.
@@ -269,6 +276,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the main text color.
+     *
      * @return string The hex color code of the text.
      */
     public function getTextColor() {
@@ -276,7 +285,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set the main text color. Chainable.
+     *
      * @param string $color The hex color code of the text, must include the leading '#'.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setTextColor($color) {
@@ -285,6 +297,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @return string The hex color code of the background.
      */
     public function getBackgroundColor() {
@@ -292,7 +306,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @param string $color The hex color code of the background, must include the leading '#'.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setBackgroundColor($color) {
@@ -301,6 +318,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @return string The hex color code of the container background.
      */
     public function getContainerBackgroundColor() {
@@ -308,7 +327,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @param string $color The hex color code of the container background, must include the leading '#'.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setContainerBackgroundColor($color) {
@@ -317,6 +339,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @return string The default hex color code of the button text, must include the leading '#'.
      */
     public function getDefaultButtonTextColor() {
@@ -325,6 +349,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 
     /**
      * Sets the default color for the button text.
+     *
      * The text color of the EmailTemplate's button property can be overridden by setting $button['textColor']
      *
      * @param string $color The default hex color code of the button text, must include the leading '#'.
@@ -336,6 +361,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @return string The default hex color code of the button background, must include the leading '#'.
      */
     public function getDefaultButtonBackgroundColor() {
@@ -344,6 +371,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 
     /**
      * Sets the default color for the button background.
+     *
      * The background color of the EmailTemplate's button property can be overridden by setting $button['backgroundColor']
      *
      * @param string $color The default hex color code of the button background, must include the leading '#'.
@@ -355,6 +383,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Get the `plaintext` property.
+     *
      * @return bool Whether to render in plaintext.
      */
     public function isPlaintext() {
@@ -362,6 +392,8 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     * Set the `plaintext` property.
+     *
      * @param bool $plainText Whether to render in plaintext.
      */
     public function setPlaintext($plainText) {
@@ -393,6 +425,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
 
     /**
      * Remove the button.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function removeButton() {
@@ -401,10 +434,12 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
+     *
+     *
      * @return array An array representing an image with the following keys:
-     * 'source' => The image source url.
-     * 'link' => The href value of the image wrapper.
-     * 'alt' => The alt value of the image tag.
+     *  'source' => The image source url.
+     *  'link' => The href value of the image wrapper.
+     *  'alt' => The alt value of the image tag.
      */
     public function getImage() {
         return $this->image;
@@ -416,6 +451,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @param string $sourceUrl The image source url.
      * @param string $linkUrl  The href value of the image wrapper.
      * @param string $alt The alt value of the img tag.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setImage($sourceUrl = '', $linkUrl = '', $alt = '') {
@@ -429,10 +465,13 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
-     * Set the image property using an array with the following keys:
-     * 'source' => The image source url.
-     * 'link' => The href value of the image wrapper.
-     * 'alt' => The alt value of the img tag.
+     * Set the image properties.
+     *
+     * @param array $image Uses the following keys:
+     *  'source' => The image source url.
+     *  'link' => The href value of the image wrapper.
+     *  'alt' => The alt value of the img tag.
+     *
      * @return EmailTemplate $this The calling object.
      */
     public function setImageArray($image) {
@@ -441,10 +480,13 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     }
 
     /**
-     * Copies the email object to an array. A simple (array) typecast won't work,
-     * since the properties are protected and as such, add unwanted information to the array keys.
+     * Copies the email object to an array.
+     *
+     * A simple (array) typecast won't work since the properties are protected
+     * and, as such, add unwanted information to the array keys.
      *
      * @param EmailTemplate $email The email object.
+     *
      * @return array Copy of email object in an array format for output.
      */
     protected function objectToArray($email) {
@@ -498,6 +540,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
         $controller = new Gdn_Controller();
         $controller->setData('email', $this->objectToArray($this));
         $email = $controller->fetchView($this->view);
+
         // Append plaintext version
         $email .= self::PLAINTEXT_START.$this->plainTextEmail();
         return $email;

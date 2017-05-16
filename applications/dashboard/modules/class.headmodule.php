@@ -42,6 +42,12 @@ if (!class_exists('HeadModule', false)) {
         /** @var bool  */
         private $_FavIconSet = false;
 
+        /** @var bool  */
+        private $_TouchIconSet = false;
+
+        /** @var bool  */
+        private $_MobileAddressBarColorSet = false;
+
         /**
          *
          *
@@ -270,9 +276,49 @@ if (!class_exists('HeadModule', false)) {
                 $this->_FavIconSet = true;
                 $this->addTag(
                     'link',
-                    array('rel' => 'shortcut icon', 'href' => $HRef, 'type' => 'image/x-icon'),
+                    [
+                        'rel' => 'shortcut icon',
+                        'href' => $HRef,
+                        'type' => 'image/x-icon'
+                    ],
                     null,
                     'favicon'
+                );
+            }
+        }
+
+        /**
+         * Sets the touch icon
+         *
+         * @param string $href The location of the fav icon relative to the web root. ie. /themes/default/images/layout.css
+         */
+        public function setTouchIcon($href) {
+            if (!$this->_TouchIconSet) {
+                $this->_TouchIconSet = true;
+                $this->addTag(
+                    'link',
+                    [
+                        'rel' => 'apple-touch-icon-precomposed',
+                        'href' => $href
+                    ]
+                );
+            }
+        }
+
+        /**
+         * Sets browser address bar colour.
+         *
+         * @param string meta tags for various browsers
+         */
+        public function setMobileAddressBarColor($mobileAddressBarColor, $iosAddressBarColor) {
+            if (!$this->_MobileAddressBarColorSet && $mobileAddressBarColor) {
+                $this->_MobileAddressBarColorSet = true;
+                $this->addTag(
+                    'meta',
+                    [
+                        'name' => 'theme-color',
+                        'content' => $mobileAddressBarColor,
+                    ]
                 );
             }
         }

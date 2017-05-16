@@ -159,10 +159,6 @@ jQuery(document).ready(function($) {
 
         setInterval(setHeight, 300);
 
-        if (isEmbeddedComments === false) {
-            remotePostMessage('scrollto:0', '*');
-        }
-
         // Simulate a page unload when popups are opened (so they are scrolled into view).
         $('body').bind('popupReveal', function() {
             remotePostMessage('scrollto:' + $('div.Popup').offset().top, '*');
@@ -217,6 +213,8 @@ jQuery(document).ready(function($) {
                     }
                 }
                 return;
+            } else {
+                remotePostMessage('scrollto:0', '*');
             }
         });
     }

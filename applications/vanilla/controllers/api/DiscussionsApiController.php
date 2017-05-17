@@ -128,6 +128,7 @@ class DiscussionsApiController extends AbstractApiController {
             'insertUser?' => $this->getUserFragmentSchema(),
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'closed:b' => 'Whether the discussion is closed or open.',
+            'sink:b' => 'Whether or not the discussion has been sunk.',
             'countComments:i' => 'The number of comments on the discussion.',
             'url:s?' => 'The full URL to the discussion.'
         ]);

@@ -114,7 +114,7 @@ class CommentsApiController extends AbstractApiController {
         }
         $this->commentModel->deleteID($id);
 
-        return [];
+        return null;
     }
 
     /**
@@ -184,7 +184,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission('Garden.SignIn.Allow');
 
         $in = $this->idParamSchema()->setDescription('Get a comment for editing.');
-        $out = $this->schema(Schema::parse(['commentID', 'body', 'format', 'url'])->add($this->fullSchema()), 'out');
+        $out = $this->schema(Schema::parse(['commentID', 'discussionID', 'body', 'format'])->add($this->fullSchema()), 'out');
 
         $comment = $this->commentByID($id);
         $comment['Url'] = commentUrl($comment);
@@ -237,7 +237,10 @@ class CommentsApiController extends AbstractApiController {
                 'maximum' => 100
             ],
             'after:dt?' => 'Get only comments after this date.',
-            'expand:b?' => 'Expand associated records.'
+            'expand:b?' => [
+                'description' => 'Expand associated records.',
+                'default' => false
+            ]
         ], 'in')->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
@@ -300,7 +303,7 @@ class CommentsApiController extends AbstractApiController {
         $in = $this->commentPostSchema('in')->setDescription('Update a comment.');
         $out = $this->commentSchema('out');
 
-        $body = $in->validate($body);
+        $body = $in->validate($body, true);
         $data = $this->caseScheme->convertArrayKeys($body);
         $data['CommentID'] = $id;
         $row = $this->commentByID($id);
@@ -308,9 +311,13 @@ class CommentsApiController extends AbstractApiController {
             $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
         }
-        if ($row['DiscussionID'] !== $data['DiscussionID']) {
+        if (array_key_exists('DiscussionID', $data) && $row['DiscussionID'] !== $data['DiscussionID']) {
             $discussion = $this->discussionByID($data['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
+        }
+        // Body is a required field in CommentModel::save.
+        if (!array_key_exists('Body', $data)) {
+            $data['Body'] = $row['Body'];
         }
         $this->commentModel->save($data);
         $row = $this->commentByID($id);

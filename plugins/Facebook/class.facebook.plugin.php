@@ -5,26 +5,6 @@
  * @package Facebook
  */
 
-$PluginInfo['Facebook'] = [
-    'Name' => 'Facebook Social Connect',
-    'Description' => 'Users may sign into your site using their Facebook account and optionally share forum content there.',
-    'Version' => '1.2.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/dashboard/social/facebook',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'HasLocale' => true,
-    'RegisterPermissions' => false,
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'SocialConnect' => true,
-    'RequiresRegistration' => true,
-    'Icon' => 'facebook_social_connect.png'
-];
-
 /**
  * Class FacebookPlugin
  */

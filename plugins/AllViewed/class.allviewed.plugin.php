@@ -9,18 +9,6 @@
  * @package AllViewed
  */
 
-$PluginInfo['AllViewed'] = array(
-    'Name' => 'All Viewed',
-    'Description' => 'Allows users to mark all discussions as viewed and mark category viewed.',
-    'Version' => '2.2',
-    'Author' => "Lincoln Russell, Oliver Chung",
-    'AuthorEmail' => 'lincoln@vanillaforums.com, shoat@cs.washington.edu',
-    'AuthorUrl' => 'http://lincolnwebs.com',
-    'License' => 'GNU GPLv2',
-    'MobileFriendly' => true,
-    'Icon' => 'all-viewed.png'
-);
-
 /**
  * Allows users to mark all discussions as viewed and mark category viewed.
  *

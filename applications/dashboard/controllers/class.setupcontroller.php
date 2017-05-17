@@ -276,8 +276,7 @@ class SetupController extends DashboardController {
                 }
 
                 // Assign some extra settings to the configuration file if everything succeeded.
-                $ApplicationInfo = array();
-                include(CombinePaths(array(PATH_APPLICATIONS.DS.'dashboard'.DS.'settings'.DS.'about.php')));
+                $ApplicationInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'dashboard'.DS.'addon.json'), true);
 
                 saveToConfig(array(
                     'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, array()), 'Undefined'),

@@ -1,0 +1,17 @@
+{
+    "name": "Gravatar",
+    "description": "Implements Gravatar avatars for all users who have not uploaded their own custom profile picture & icon.",
+    "version": "1.5",
+    "settingsUrl": "/settings/gravatar",
+    "icon": "gravatar.png",
+    "mobileFriendly": true,
+    "key": "gravatar",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

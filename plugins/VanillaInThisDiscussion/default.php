@@ -7,19 +7,6 @@
  * @package InThisDiscussion
  */
 
-// Define the plugin:
-$PluginInfo['VanillaInThisDiscussion'] = array(
-    'Name' => 'In This Discussion',
-    'Description' => "Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.",
-    'Version' => '1',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://markosullivan.ca',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'SettingsUrl' => '/settings/inthisdiscussion',
-    'Icon' => 'in-this-discussion.png'
-);
-
 /**
  * Class VanillaInThisDiscussionPlugin
  */

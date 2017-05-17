@@ -1,0 +1,19 @@
+{
+    "description": "An improvement upon existing private messaging tools, Conversations allows multiple users to take part in private conversations.",
+    "version": "2.4.201",
+    "setupController": "setup",
+    "url": "https://open.vanillaforums.com",
+    "license": "GNU GPL v2",
+    "icon": "conversations.png",
+    "key": "conversations",
+    "type": "addon",
+    "priority": 10,
+    "name": "Conversations",
+    "authors": [
+        {
+            "name": "Vanilla Staff",
+            "email": "support@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com"
+        }
+    ]
+}

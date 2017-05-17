@@ -196,9 +196,5 @@ class ConversationsHooks implements Gdn_IPlugin {
         $Validation = new Gdn_Validation(); // This is going to be needed by structure.php to validate permission names
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'structure.php');
         include(PATH_APPLICATIONS.DS.'conversations'.DS.'settings'.DS.'stub.php');
-
-        // Set current Conversations.Version
-        $appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'conversations'.DS.'addon.json'), true);
-        saveToConfig('Conversations.Version', val('version', $appInfo, 'Undefined'));
     }
 }

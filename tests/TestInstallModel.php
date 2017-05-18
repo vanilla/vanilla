@@ -30,7 +30,7 @@ class TestInstallModel extends InstallModel {
      */
     public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
         parent::__construct($config, $addonModel, $container);
-        $this->setBaseUrl($_ENV['baseurl']);
+        $this->setBaseUrl(getenv('TEST_BASEURL'));
 
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
@@ -110,8 +110,14 @@ class TestInstallModel extends InstallModel {
      * @return string
      */
     public function getDbHost() {
-        $host = isset($_ENV['dbhost']) ? $_ENV['dbhost'] : 'localhost';
-        return $host;
+        if (empty($this->dbHost)) {
+            if ($dbHost = getenv('TEST_DB_HOST')) {
+                $this->dbHost = $dbHost;
+            } else {
+                $this->dbHost = 'localhost';
+            }
+        }
+        return $this->dbHost;
     }
 
     /**
@@ -123,8 +129,8 @@ class TestInstallModel extends InstallModel {
         if (empty($this->dbName)) {
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-            if (isset($_ENV['dbname'])) {
-                $dbname = $_ENV['dbname'];
+            if (getenv('TEST_DB_NAME')) {
+                $dbname = getenv('TEST_DB_NAME');
             } else {
                 $dbname = preg_replace('`[^a-z]`i', '_', $host);
             }
@@ -151,7 +157,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return $_ENV['dbuser'];
+        return getenv('TEST_DB_USER');
     }
 
     /**
@@ -160,7 +166,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return $_ENV['dbpass'];
+        return getenv('TEST_DB_PASSWORD');
     }
 
     /**

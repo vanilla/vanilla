@@ -2,7 +2,7 @@
 /**
  * GooglePrettify Plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package GooglePrettify
  */
@@ -16,7 +16,7 @@ $PluginInfo['GooglePrettify'] = array(
     'MobileFriendly' => true,
     'Author' => 'Todd Burry',
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SettingsUrl' => '/dashboard/settings/googleprettify',
     'SettingsPermission' => 'Garden.Settings.Manage',
     'Icon' => 'google-prettify.png'

@@ -3,7 +3,7 @@
  * Quotes Plugin.
  *
  *  @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Quotes
  */
@@ -83,7 +83,7 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     public function profileController_quotes_create($Sender) {
         $Sender->permission('Garden.SignIn.Allow');
-        $Sender->title(t("Quotes Settings"));
+        $Sender->title(t("Quote Settings"));
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {
@@ -239,16 +239,27 @@ class QuotesPlugin extends Gdn_Plugin {
      * Output Quote link.
      */
     protected function addQuoteButton($Sender, $Args) {
-        if (!Gdn::session()->UserID || !checkPermission('Vanilla.Comments.Add')) {
+
+        // There are some case were Discussion is not set as an event argument so we use the sender data instead.
+        $discussion = $Sender->data('Discussion');
+        if (!$discussion) {
+            return;
+        }
+
+        $session = Gdn::session();
+        if (!$session->UserID) {
+            return;
+        }
+        if (!$session->checkPermission('Vanilla.Comments.Add', false, 'Category', $discussion->PermissionCategoryID)) {
             return;
         }
 
         if (isset($Args['Comment'])) {
             $Object = $Args['Comment'];
-            $ObjectID = 'Comment_'.$Args['Comment']->CommentID;
-        } elseif (isset($Args['Discussion'])) {
-            $Object = $Args['Discussion'];
-            $ObjectID = 'Discussion_'.$Args['Discussion']->DiscussionID;
+            $ObjectID = 'Comment_'.$Object->CommentID;
+        } elseif ($discussion) {
+            $Object = $discussion;
+            $ObjectID = 'Discussion_'.$Object->DiscussionID;
         } else {
             return;
         }
@@ -319,6 +330,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
             case 'Display':
             case 'Text':
+            case 'TextEx':
             default:
                 break;
         }
@@ -454,7 +466,7 @@ BLOCKQUOTE;
                 case 'BBCode':
                     $Author = htmlspecialchars($Data->InsertName);
                     if ($ID) {
-                        $IDString = ';'.htmlspecialchars($ID);
+                        $IDString = ';'.($Type === 'comment' ? 'c' : 'd').'-'.htmlspecialchars($ID);
                     }
 
                     $QuoteBody = $Data->Body;
@@ -471,6 +483,7 @@ BQ;
                 case 'Markdown':
                 case 'Display':
                 case 'Text':
+                case 'TextEx':
                     $QuoteBody = $Data->Body;
                     $insertName = $Data->InsertName;
                     if (strpos($insertName, ' ') !== false) {

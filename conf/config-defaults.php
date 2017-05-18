@@ -5,6 +5,8 @@
 // values for configuration settings.
 $Configuration = array();
 
+$Configuration['EnabledPlugins']['stubcontent']                = true;
+
 $Configuration['EnabledApplications']['Dashboard']             = 'dashboard';
 
 $Configuration['Database']['Engine']                           = 'MySQL';
@@ -13,13 +15,15 @@ $Configuration['Database']['Name']                             = 'dbname';
 $Configuration['Database']['User']                             = 'dbuser';
 $Configuration['Database']['Password']                         = '';
 $Configuration['Database']['ConnectionOptions']                = array(
-                                                                  12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
-                                                                  1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
-                                                                  1002  => "set names 'utf8'; set time_zone = '+0:0';" // PDO::MYSQL_ATTR_INIT_COMMAND is missing in PHP 5.3, so I use the actual value "1002" instead
-                                                               );
-$Configuration['Database']['CharacterEncoding'] = 'utf8';
+                                                                    // We do not use the constants here to be able to throw a
+                                                                    // graceful error message in the setupController if you did not
+                                                                    // install the needed requirement
+                                                                    12    => FALSE, //PDO::ATTR_PERSISTENT => FALSE,
+                                                                    1000  => TRUE, // PDO::MYSQL_ATTR_USE_BUFFERED_QUERY is missing in some php installations
+                                                                );
+$Configuration['Database']['CharacterEncoding'] = 'utf8mb4';
 $Configuration['Database']['DatabasePrefix']                    = 'GDN_';
-$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8_unicode_ci';
+$Configuration['Database']['ExtendedProperties']['Collate']     = 'utf8mb4_unicode_ci';
 
 $Configuration['Cache']['Enabled']                              = TRUE;
 $Configuration['Cache']['Method']                               = 'dirtycache';
@@ -69,22 +73,18 @@ $Configuration['Garden']['Email']['SmtpSecurity']               = ''; // ssl/tls
 $Configuration['Garden']['Email']['MimeType']                   = 'text/plain';
 $Configuration['Garden']['Email']['SupportName']                = 'Support';
 $Configuration['Garden']['Email']['SupportAddress']             = '';
-$Configuration['Garden']['UpdateCheckUrl']                      = 'http://vanillaforums.org/addons/update';
-$Configuration['Garden']['AddonUrl']                            = 'http://vanillaforums.org/addons';
+$Configuration['Garden']['UpdateCheckUrl']                      = 'https://open.vanillaforums.com/addons/update';
+$Configuration['Garden']['AddonUrl']                            = 'https://open.vanillaforums.com/addons';
 $Configuration['Garden']['CanProcessImages']                    = FALSE;
 $Configuration['Garden']['Installed']                           = FALSE; // Has Garden been installed yet?
 $Configuration['Garden']['Forms']['HoneypotName']               = 'hpt';
 $Configuration['Garden']['Upload']['MaxFileSize']               = '50M';
 $Configuration['Garden']['Upload']['AllowedFileExtensions']     = array('txt', 'jpg', 'jpeg', 'gif', 'png', 'bmp', 'tiff', 'ico', 'zip', 'gz', 'tar.gz', 'tgz', 'psd', 'ai', 'fla', 'pdf', 'doc', 'xls', 'ppt', 'docx', 'xlsx', 'log', 'rar', '7z');
-$Configuration['Garden']['Picture']['MaxHeight']                = 1000;
-$Configuration['Garden']['Picture']['MaxWidth']                 = 600;
-$Configuration['Garden']['Profile']['MaxHeight']                = 1000;
-$Configuration['Garden']['Profile']['MaxWidth']                 = 250;
-//$Configuration['Garden']['Preview']['MaxHeight']                = 100;
-//$Configuration['Garden']['Preview']['MaxWidth']                 = 75;
-$Configuration['Garden']['Thumbnail']['Size']                   = 40;
+$Configuration['Garden']['Profile']['MaxHeight']                = 1200;
+$Configuration['Garden']['Profile']['MaxWidth']                 = 800;
+$Configuration['Garden']['Thumbnail']['Size']                   = 120;
+$Configuration['Garden']['Password']['MinLength']               = 6;
 $Configuration['Garden']['Menu']['Sort']                        = array('Dashboard', 'Discussions', 'Questions', 'Activity', 'Applicants', 'Conversations', 'User');
-//$Configuration['Garden']['DashboardMenu']['Sort']               = array('Dashboard', 'Appearance', 'Banner', 'Themes', 'Theme Options', 'Custom Theme', 'Messages', 'Custom Domain', 'Users', 'Roles & Permissions', 'Registration', 'Applicants', 'Authentication', 'Forum', 'Forum Settings', 'Categories', 'Tagging', 'Voting', 'Spam', 'Flagging', 'Flagged Content', 'Media', 'Signatures', 'Add-ons', 'Addons', 'Plugins', 'Applications', '&lt;Embed&t; Vanilla', 'Locales', 'Site Settings', 'Import');
 $Configuration['Garden']['InputFormatter']                      = 'Markdown'; // Html, BBCode, Markdown, Text
 $Configuration['Garden']['Html']['AllowedElements']             = "a, abbr, acronym, address, area, audio, b, bdi, bdo, big, blockquote, br, caption, center, cite, code, col, colgroup, dd, del, details, dfn, div, dl, dt, em, figure, figcaption, font, h1, h2, h3, h4, h5, h6, hgroup, hr, i, img, ins, kbd, li, map, mark, menu, meter, ol, p, pre, q, s, samp, small, span, strike, strong, sub, sup, summary, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video, wbr";
 $Configuration['Garden']['Search']['Mode']                      = 'boolean'; // matchboolean, match, boolean, like
@@ -93,7 +93,7 @@ $Configuration['Garden']['MobileTheme']                         = 'mobile';
 $Configuration['Garden']['Profile']['Public']                   = TRUE;
 $Configuration['Garden']['Profile']['ShowAbout']                = TRUE;
 $Configuration['Garden']['Roles']['Manage']                     = TRUE;
-$Configuration['Garden']['VanillaUrl']                          = 'http://vanillaforums.org';
+$Configuration['Garden']['VanillaUrl']                          = 'https://open.vanillaforums.com';
 $Configuration['Garden']['AllowSSL']                            = TRUE;
 $Configuration['Garden']['PrivateCommunity']                    = FALSE;
 $Configuration['Garden']['EditContentTimeout']                  = 3600; // -1 means no timeout. 0 means immediate timeout. > 0 is in seconds. 60 * 60 = 3600 (aka 1hr)
@@ -105,7 +105,7 @@ $Configuration['Garden']['Modules']['ShowRecentUserModule']     = FALSE;
 $Configuration['Garden']['Embed']['CommentsPerPage']            = 50;
 $Configuration['Garden']['Embed']['SortComments']               = 'desc';
 $Configuration['Garden']['Embed']['PageToForum']                = TRUE;
-$Configuration['Garden']['BannedPhoto']                         = 'https://cd8ba0b44a15c10065fd-24461f391e20b7336331d5789078af53.ssl.cf1.rackcdn.com/images/banned_large.png';
+$Configuration['Garden']['BannedPhoto']                         = 'https://images.v-cdn.net/banned_large.png';
 
 
 // Formatting

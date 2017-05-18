@@ -3,7 +3,7 @@
  * Database Structure tools
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -69,7 +69,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         }
 
         $this->databasePrefix($this->Database->DatabasePrefix);
-        $this->setAlterTableThreshold(c('Database.AlterTableThreshold', 0));
+
+        if (inMaintenanceMode()) {
+            $alterTableThreshold = 0;
+        } else {
+            $alterTableThreshold = c('Database.AlterTableThreshold', 0);
+        }
+        $this->setAlterTableThreshold($alterTableThreshold);
 
         $this->reset();
     }
@@ -171,6 +177,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      * * Any other value: Nulls are not allowed, and the specified value will be used as the default.
      * @param string $KeyType What type of key is this column on the table? Options
      * are primary, key, and FALSE (not a key).
+     * @return $this
      */
     public function column($Name, $Type, $NullDefault = false, $KeyType = false) {
         if (is_null($NullDefault) || $NullDefault === true) {
@@ -518,6 +525,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             return $this->_TableName;
         }
 
+        $this->reset();
         $this->_TableName = $Name;
         if ($CharacterEncoding == '') {
             $CharacterEncoding = Gdn::config('Database.CharacterEncoding', '');

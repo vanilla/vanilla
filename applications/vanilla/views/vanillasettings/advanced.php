@@ -3,12 +3,33 @@ helpAsset(t('Need More Help?'), anchor(t("Video tutorial on advanced settings"),
 ?>
 <h1><?php echo t('Advanced'); ?></h1>
 <?php
-echo $this->Form->open();
-echo $this->Form->errors();
+/** @var Gdn_Form $form */
+$form = $this->Form;
+echo $form->open();
+echo $form->errors();
 ?>
     <ul>
         <li class="form-group">
-            <?php echo $this->Form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments.'); ?>
+            <?php
+            $checkboxDesc = 'Checkboxes allow admins to perform batch actions on a number of discussions or comments at the same time.';
+            echo $form->toggle('Vanilla.AdminCheckboxes.Use', 'Enable checkboxes on discussions and comments', [], $checkboxDesc);
+            ?>
+        </li>
+        <li class="form-group">
+            <?php
+            $embedsLabel = 'Enable link embeds in discussions and comments';
+            $embedsDesc = 'Allow links to be tranformed into embedded representations in discussions and comments. ';
+            $embedsDesc .= 'For example, a YouTube link will transform into an embedded video.';
+            echo $form->toggle('Garden.Format.DisableUrlEmbeds', $embedsLabel, [], $embedsDesc, true);
+            ?>
+        </li>
+        <li class="form-group">
+            <?php
+            $leavingLabel = 'Warn users if a link in a post will cause them to leave the forum';
+            $leavingDesc = 'Alert users if they click a link in a post that will lead them away from the forum. ';
+            $leavingDesc .= 'Users will not be warned when following links that match a Trusted Domain.';
+            echo $form->toggle('Garden.Format.WarnLeaving', $leavingLabel, [], $leavingDesc);
+            ?>
         </li>
         <li class="form-group">
             <?php
@@ -17,7 +38,7 @@ echo $this->Form->errors();
             ?>
             <div class="label-wrap">
             <?php
-            echo $this->Form->label('Maximum Category Display Depth', 'Vanilla.Categories.MaxDisplayDepth');
+            echo $form->label('Maximum Category Display Depth', 'Vanilla.Categories.MaxDisplayDepth');
             echo wrap(
                 t('CategoryMaxDisplayDepth.Notes', 'Nested categories deeper than this depth will be placed in a comma-delimited list.'),
                 'div',
@@ -26,7 +47,7 @@ echo $this->Form->errors();
             ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
+            <?php echo $form->DropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -35,18 +56,18 @@ echo $this->Form->errors();
             $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
             ?>
             <div class="label-wrap">
-            <?php echo $this->Form->label('Discussions per Page', 'Vanilla.Discussions.PerPage'); ?>
+            <?php echo $form->label('Discussions per Page', 'Vanilla.Discussions.PerPage'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
+            <?php echo $form->DropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="label-wrap">
-            <?php echo $this->Form->label('Comments per Page', 'Vanilla.Comments.PerPage'); ?>
+            <?php echo $form->label('Comments per Page', 'Vanilla.Comments.PerPage'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
+            <?php echo $form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -63,35 +84,35 @@ echo $this->Form->errors();
             $Fields = array('TextField' => 'Text', 'ValueField' => 'Code'); ?>
             <div class="label-wrap">
             <?php
-            echo $this->Form->label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
+            echo $form->label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
             echo wrap(t('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'info'));
             ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
+            <?php echo $form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="label-wrap">
-            <?php echo $this->Form->label('Max Comment Length', 'Vanilla.Comment.MaxLength'); ?>
+            <?php echo $form->label('Max Comment Length', 'Vanilla.Comment.MaxLength'); ?>
             <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput')); ?>
+            <?php echo $form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput')); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="label-wrap">
-            <?php echo $this->Form->label('Min Comment Length', 'Vanilla.Comment.MinLength'); ?>
+            <?php echo $form->label('Min Comment Length', 'Vanilla.Comment.MinLength'); ?>
             <div class="info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput')); ?>
+            <?php echo $form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput')); ?>
             </div>
         </li>
         <li class="form-group">
             <div class="label-wrap">
-            <?php echo $this->Form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
+            <?php echo $form->label('Trusted Domains', 'Garden.TrustedDomains'); ?>
                 <div class="info">
                     <p>
                     <?php
@@ -105,8 +126,8 @@ echo $this->Form->errors();
                 </div>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
+            <?php echo $form->textBox('Garden.TrustedDomains', ['MultiLine' => true]); ?>
             </div>
         </li>
     </ul>
-<?php echo $this->Form->close('Save'); ?>
+<?php echo $form->close('Save'); ?>

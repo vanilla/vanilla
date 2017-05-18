@@ -3,10 +3,16 @@ echo heading(t('Manage Categories'), t('Add Category'), 'vanilla/settings/addcat
 writeCategoryBreadcrumbs($this->data('Ancestors', []));
 ?>
 
-<div class="toolbar"><?php if ($this->data('UsePagination', false) === true) {
-    PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']);
-} ?></div>
-
-<div class="dd tree tree-categories" data-parent-id="<?php echo $this->data('ParentID', -1); ?>"><?php
-    writeCategoryTree($this->data('Categories', []), 0, $this->data('AllowSorting', true));
+<div class="toolbar">
+    <?php
+    $filterOptions['hideContainerSelector'] = '.js-categories-list';
+    echo categoryFilterBox($filterOptions);
+    if ($this->data('UsePagination', false) === true) {
+        PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']);
+    }
+    ?>
+</div>
+<div class="js-category-filter-container padded-top"></div>
+<div class="js-nestable js-categories-list nestable padded-top" data-parent-id="<?php echo $this->data('ParentID', -1); ?>"><?php
+    writeCategoryTree($this->data('Categories', []), $this->data('AllowSorting', true));
 ?></div>

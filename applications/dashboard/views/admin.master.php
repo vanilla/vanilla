@@ -6,7 +6,7 @@ $this->fireAs('dashboard')->fireEvent('render');
 <html lang="<?php echo htmlspecialchars(Gdn::locale()->Locale); ?>">
 <head>
     <?php $this->renderAsset('Head'); ?>
-    <!-- Robots should not see the dashboard, but tell them not to index it just in case. -->
+    <?php // Robots should not see the dashboard, but tell them not to index it just in case. ?>
     <meta name="robots" content="noindex,nofollow">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -85,7 +85,12 @@ Gdn_Theme::assetEnd();
             <?php
             if (Gdn::session()->isValid()) {
                 $photo = '<img src="'.userPhotoUrl($user).'">';
-                echo '<div class="navbar-profile js-card-user">'.$photo.' <span class="icon icon-caret-down"></span></div>';
+                $attr = [
+                    'class' => 'navbar-profile js-drop',
+                    'data-content-id' => 'cardUserContent',
+                    'id' => 'cardUserTrigger'
+                ];
+                echo wrap($photo.' <span class="icon icon-caret-down"></span>', 'div', $attr);
             }
             ?>
         </div>
@@ -93,9 +98,14 @@ Gdn_Theme::assetEnd();
     <div class="main-row pusher<?php echo $this->data('IsWidePage') ? ' main-row-wide' : ''; ?>" id="main-row">
         <div class="panel panel-left js-drawer">
             <div class="panel-nav panel-content-wrapper">
-                <div id="panel-nav" class="js-fluid-fixed panel-content">
+                <div class="js-fluid-fixed panel-content">
                     <?php echo anchor($title.' '.dashboardSymbol('external-link', 'icon-16'), '/', 'title'); ?>
-                    <?php echo $dashboardNav; ?>
+                    <div id="panel-nav" class="js-panel-nav">
+                        <?php echo $dashboardNav; ?>
+                    </div>
+                    <aside class="drawer-only">
+                        <?php $this->renderAsset('DashboardUserDropDown'); ?>
+                    </aside>
                 </div>
             </div>
         </div>
@@ -120,15 +130,18 @@ Gdn_Theme::assetEnd();
                 </div>
                 <div class="footer-nav nav">
                     <?php
+                    $showVanillaVersion = true;
+                    $this->EventArguments['ShowVanillaVersion'] = &$showVanillaVersion;
                     $this->fireAs('dashboard')->fireEvent('footerNav');
-                    ?>
+                    if ($showVanillaVersion) : ?>
                     <div class="vanilla-version footer-nav-item nav-item"><?php echo t('Version').' '.APPLICATION_VERSION ?></div>
+                    <?php endif; ?>
                 </div>
             </footer>
         </div>
     </div>
 </div>
-<aside aria-hidden="true" class="hidden js-dashboard-user-dropdown">
+<aside id="cardUserContent" aria-hidden="true" class="hidden">
     <?php $this->renderAsset('DashboardUserDropDown'); ?>
 </aside>
 <?php $this->fireEvent('AfterBody'); ?>

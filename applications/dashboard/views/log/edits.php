@@ -19,8 +19,8 @@ echo $this->Form->open();
 <?php
 
 echo '<div id="LogTable">';
-include dirname(__FILE__).'/table.php';
-echo '</div id="LogTable">';
+include __DIR__.'/table.php';
+echo '</div>';
 ?>
 <?php
 

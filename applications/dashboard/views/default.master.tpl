@@ -11,13 +11,15 @@
 
             <div class="SiteSearch">{searchbox}</div>
             <ul class="SiteMenu">
-                <!-- {dashboard_link} -->
+                {* {dashboard_link} *}
                 {discussions_link}
                 {activity_link}
-                <!-- {inbox_link} -->
+                {* {inbox_link} *}
                 {custom_menu}
-                <!-- {profile_link}
-               {signinout_link}  -->
+                {*
+                {profile_link}
+                {signinout_link}
+                *}
             </ul>
         </div>
     </div>

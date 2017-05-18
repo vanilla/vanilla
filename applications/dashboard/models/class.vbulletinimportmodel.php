@@ -2,7 +2,7 @@
 /**
  * vBulletin import model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0.18
@@ -77,9 +77,9 @@ class vBulletinImportModel extends Gdn_Model {
         }
 
         // Get sizes
-        $ProfileHeight = c('Garden.Profile.MaxHeight', 1000);
-        $ProfileWidth = c('Garden.Profile.MaxWidth', 250);
-        $ThumbSize = c('Garden.Thumbnail.Size', 40);
+        $ProfileHeight = c('Garden.Profile.MaxHeight');
+        $ProfileWidth = c('Garden.Profile.MaxWidth');
+        $ThumbSize = c('Garden.Thumbnail.Size');
 
         // Temporarily set maximum quality
         saveToConfig('Garden.UploadImage.Quality', 100, false);

@@ -4,11 +4,13 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
  */
+
+use Vanilla\Permissions;
 
 /**
  * Handles user information throughout a session. This class is a singleton.
@@ -29,14 +31,14 @@ class Gdn_Session {
     /** @var object Attributes of the current user. */
     protected $_Attributes;
 
-    /** @var object Permissions of the current user. */
-    protected $_Permissions;
-
     /** @var object Preferences of the current user. */
     protected $_Preferences;
 
     /** @var object The current user's transient key. */
     protected $_TransientKey;
+
+    /** @var Permissions */
+    private $permissions;
 
     /**
      * @var DateTimeZone The current timezone of the user.
@@ -50,9 +52,10 @@ class Gdn_Session {
         $this->UserID = 0;
         $this->User = false;
         $this->_Attributes = array();
-        $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
+
+        $this->permissions = new Permissions();
     }
 
 
@@ -62,7 +65,8 @@ class Gdn_Session {
      * @param array $perms The permissions to add.
      */
     public function addPermissions($perms) {
-        $this->_Permissions = PermissionModel::addPermissions($this->_Permissions, $perms);
+        $newPermissions = new Permissions($perms);
+        $this->permissions->merge($newPermissions);
     }
 
     /**
@@ -95,7 +99,7 @@ class Gdn_Session {
              * assigned to their role.
              */
             for ($i = 0; $i <= $currentPermissionRank; $i++) {
-                if ($this->checkPermission($permissionsRanked[$i])) {
+                if ($this->permissions->has($permissionsRanked[$i])) {
                     return true;
                 }
             }
@@ -103,72 +107,35 @@ class Gdn_Session {
         }
 
         // Check to see if the user has at least the given permission.
-        return $this->checkPermission($permission);
+        return $this->permissions->has($permission);
     }
 
     /**
-     * Checks the currently authenticated user's permissions for the specified
-     * permission. Returns a boolean value indicating if the action is
-     * permitted.
+     * Checks the currently authenticated user's permissions for the specified permission.
      *
-     * @param mixed $Permission The permission (or array of permissions) to check.
-     * @param int $JunctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
-     * @param bool $FullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required. If false, the user only needs one of the specified permissions.
-     * @param string $JunctionTable The name of the junction table for a junction permission.
-     * @param in $JunctionID The ID of the junction permission.
-     * * @return boolean
+     * Returns a boolean value indicating if the action is permitted.
+     *
+     * @param string|array $permission The permission (or array of permissions) to check.
+     * @param bool $fullMatch If $Permission is an array, $FullMatch indicates if all permissions specified are required.
+     * If false, the user only needs one of the specified permissions.
+     * @param string $junctionTable The name of the junction table for a junction permission.
+     * @param int|string $junctionID The JunctionID associated with $Permission (ie. A discussion category identifier).
+     * @return boolean Returns **true** if the user has permission or **false** otherwise.
      */
-    public function checkPermission($Permission, $FullMatch = true, $JunctionTable = '', $JunctionID = '') {
-        if (is_object($this->User)) {
-            if ($this->User->Banned || GetValue('Deleted', $this->User)) {
-                return false;
-            } elseif ($this->User->Admin) {
-                return true;
-            }
+    public function checkPermission($permission, $fullMatch = true, $junctionTable = '', $junctionID = '') {
+        if ($junctionID === 'any' || $junctionID === '' || empty($junctionTable) ||
+            c("Garden.Permissions.Disabled.{$junctionTable}")) {
+            $junctionID = null;
         }
 
-        // Allow wildcard permission checks (e.g. 'any' Category)
-        if ($JunctionID == 'any') {
-            $JunctionID = '';
-        }
-
-        $Permissions = $this->getPermissions();
-        if ($JunctionTable && !c('Garden.Permissions.Disabled.'.$JunctionTable)) {
-            // Junction permission ($Permissions[PermissionName] = array(JunctionIDs))
-            if (is_array($Permission)) {
-                $Pass = false;
-                foreach ($Permission as $PermissionName) {
-                    if ($this->checkPermission($PermissionName, false, $JunctionTable, $JunctionID)) {
-                        if (!$FullMatch) {
-                            return true;
-                        }
-                        $Pass = true;
-                    } else {
-                        if ($FullMatch) {
-                            return false;
-                        }
-                    }
-                }
-                return $Pass;
+        if (is_array($permission)) {
+            if ($fullMatch) {
+                return $this->permissions->hasAll($permission, $junctionID);
             } else {
-                if ($JunctionID !== '') {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && in_array($JunctionID, $Permissions[$Permission]);
-                } else {
-                    $Result = array_key_exists($Permission, $Permissions)
-                        && is_array($Permissions[$Permission])
-                        && count($Permissions[$Permission]);
-                }
-                return $Result;
+                return $this->permissions->hasAny($permission, $junctionID);
             }
         } else {
-            // Non-junction permission ($Permissions = array(PermissionNames))
-            if (is_array($Permission)) {
-                return arrayInArray($Permission, $Permissions, $FullMatch);
-            } else {
-                return in_array($Permission, $Permissions) || array_key_exists($Permission, $Permissions);
-            }
+            return $this->permissions->has($permission, $junctionID);
         }
     }
 
@@ -196,20 +163,27 @@ class Gdn_Session {
         $this->UserID = 0;
         $this->User = false;
         $this->_Attributes = array();
-        $this->_Permissions = array();
         $this->_Preferences = array();
         $this->_TransientKey = false;
         $this->timeZone = null;
     }
 
     /**
-     * Returns all "allowed" permissions for the authenticated user in a
-     * one-dimensional array of permission names.
+     * Returns the current user's permissions.
+     *
+     * @return Permissions Returns a {@link Permissions} object with the permissions for the current user.
+     */
+    public function getPermissions() {
+        return $this->permissions;
+    }
+
+    /**
+     * Returns all "allowed" permissions for the authenticated user in a one-dimensional array of permission names.
      *
      * @return array
      */
-    public function getPermissions() {
-        return is_array($this->_Permissions) ? $this->_Permissions : array();
+    public function getPermissionsArray() {
+        return $this->permissions->getPermissions();
     }
 
     /**
@@ -351,23 +325,20 @@ class Gdn_Session {
     public function setPermission($PermissionName, $Value = null) {
         if (is_string($PermissionName)) {
             if ($Value === null || $Value === true) {
-                $this->_Permissions[] = $PermissionName;
+                $this->permissions->overwrite($PermissionName, true);
             } elseif ($Value === false) {
-                $Index = array_search($PermissionName, $this->_Permissions);
-                if ($Index !== false) {
-                    unset($this->_Permissions[$Index]);
-                }
+                $this->permissions->overwrite($PermissionName, false);
             } elseif (is_array($Value)) {
-                $this->_Permissions[$PermissionName] = $Value;
+                $this->permissions->overwrite($PermissionName, $Value);
             }
         } elseif (is_array($PermissionName)) {
             if (array_key_exists(0, $PermissionName)) {
                 foreach ($PermissionName as $Name) {
-                    $this->setPermission($Name);
+                    $this->permissions->set($Name, true);
                 }
             } else {
                 foreach ($PermissionName as $Name => $Value) {
-                    $this->setPermission($Name, $Value);
+                    $this->permissions->set($Name, $Value);
                 }
             }
         }
@@ -448,10 +419,13 @@ class Gdn_Session {
         if (!c('Garden.Installed', false)) {
             return;
         }
+
         // Retrieve the authenticated UserID from the Authenticator module.
         $UserModel = Gdn::authenticator()->getUserModel();
         $this->UserID = $UserID !== false ? $UserID : Gdn::authenticator()->getIdentity();
         $this->User = false;
+
+        $this->ensureTransientKey();
 
         // Now retrieve user information
         if ($this->UserID > 0) {
@@ -468,14 +442,19 @@ class Gdn_Session {
                 $UserModel->EventArguments['User'] =& $this->User;
                 $UserModel->fireEvent('AfterGetSession');
 
-                $this->_Permissions = $this->User->Permissions;
+                $this->permissions->setPermissions($this->User->Permissions);
+
+                // Set permission overrides.
+                $this->permissions->setAdmin($this->User->Admin);
+                if (!empty($this->User->Deleted)) {
+                    $this->permissions->addBan(Permissions::BAN_DELETED, ['msg' => t('Your account has been deleted.')]);
+                }
+                if (!empty($this->User->Banned)) {
+                    $this->permissions->addBan(Permissions::BAN_BANNED, ['msg' => t('You are banned.')]);
+                }
+
                 $this->_Preferences = $this->User->Preferences;
                 $this->_Attributes = $this->User->Attributes;
-                $this->_TransientKey = is_array($this->_Attributes) ? val('TransientKey', $this->_Attributes) : false;
-
-                if ($this->_TransientKey === false) {
-                    $this->_TransientKey = $UserModel->setTransientKey($this->UserID);
-                }
 
                 // Save any visit-level information.
                 if ($SetIdentity) {
@@ -485,19 +464,16 @@ class Gdn_Session {
             } else {
                 $this->UserID = 0;
                 $this->User = false;
-                $this->_TransientKey = getAppCookie('tk');
 
                 if ($SetIdentity) {
                     Gdn::authenticator()->setIdentity(null);
                 }
             }
-        } else {
-            // Grab the transient key from the cookie. This doesn't always get set but we'll try it here anyway.
-            $this->_TransientKey = getAppCookie('tk');
         }
         // Load guest permissions if necessary
         if ($this->UserID == 0) {
-            $this->_Permissions = $UserModel->definePermissions(0, false);
+            $guestPermissions = $UserModel->getPermissions(0);
+            $this->permissions->setPermissions($guestPermissions->getPermissions());
         }
     }
 
@@ -545,34 +521,114 @@ class Gdn_Session {
     }
 
     /**
+     * Make sure the transient key matches whats in the user's cookie or create a new one.
      *
-     *
-     * @return bool|object|string
+     * @return string
      */
     public function ensureTransientKey() {
-        if (!$this->_TransientKey) {
-            // Generate a transient key in the browser.
-            $tk = betterRandomString(16, 'Aa0');
-            setAppCookie('tk', $tk);
-            $this->_TransientKey = $tk;
+        $cookieString = getAppCookie('tk');
+        $reset = false;
+
+        if ($cookieString === null) {
+            $reset = true;
+        } else {
+            $cookie = $this->decodeTKCookie($cookieString);
+            if ($cookie === false) {
+                $reset = true;
+            } else {
+                $payload = $this->generateTKPayload(
+                    $cookie['TransientKey'],
+                    $cookie['UserID'],
+                    $cookie['Timestamp']
+                );
+
+                $userInvalid = ($cookie['UserID'] != $this->UserID);
+                $signatureInvalid = $this->generateTKSignature($payload) !== $cookie['Signature'];
+                if ($userInvalid || $signatureInvalid) {
+                    $reset = true;
+                } elseif ($this->transientKey() !== $cookie['TransientKey']) {
+                    $this->transientKey($cookie['TransientKey'], false);
+                }
+            }
         }
-        return $this->_TransientKey;
+
+        if ($reset) {
+            return $this->transientKey(betterRandomString(16, 'Aa0'));
+        } else {
+            return $this->transientKey();
+        }
+    }
+
+    /**
+     * Break down a transient key cookie string into its individual elements.
+     *
+     * @param string $tkCookie
+     * @return array|bool
+     */
+    protected function decodeTKCookie($tkCookie) {
+        if (!is_string($tkCookie)) {
+            return false;
+        }
+
+        $elements = explode(':', $tkCookie);
+
+        if (count($elements) !== 4) {
+            return false;
+        }
+
+        return [
+            'TransientKey' => $elements[0],
+            'UserID' => $elements[1],
+            'Timestamp' => $elements[2],
+            'Signature' => $elements[3]
+        ];
+    }
+
+    /**
+     * Generate the cookie payload value for a transient key.
+     *
+     * @param string $tk
+     * @param int|null $userID
+     * @param int|null $timestamp
+     * @return string
+     */
+    protected function generateTKPayload($tk, $userID = null, $timestamp = null) {
+        $userID = $userID ?: $this->UserID;
+
+        $timestamp = $timestamp ?: time();
+
+        return "{$tk}:{$userID}:{$timestamp}";
+    }
+
+    /**
+     * Generate a signature for a transient key cookie payload value.
+     *
+     * @param string $payload
+     * @return string
+     */
+    protected function generateTKSignature($payload) {
+        return hash_hmac(c('Garden.Cookie.HashMethod'), $payload, c('Garden.Cookie.Salt'));
     }
 
     /**
      * Returns the transient key for the authenticated user.
      *
+     * @param string|null $newKey
+     * @param bool $updateCookie Update the browser cookie when changing the transient key?
      * @return string
      */
-    public function transientKey($NewKey = null) {
-        if (!is_null($NewKey)) {
-            $this->_TransientKey = Gdn::authenticator()->getUserModel()->setTransientKey($this->UserID, $NewKey);
+    public function transientKey($newKey = null, $updateCookie = true) {
+        if (is_string($newKey)) {
+            if ($updateCookie) {
+                $payload = $this->generateTKPayload($newKey);
+                $signature = $this->generateTKSignature($payload);
+                setAppCookie('tk', "{$payload}:{$signature}");
+            }
+
+            $this->_TransientKey = $newKey;
         }
 
-//      if ($this->_TransientKey)
         return $this->_TransientKey;
-//      else
-//         return RandomString(12); // Postbacks will never be authenticated if transientkey is not defined.
     }
 
     /**

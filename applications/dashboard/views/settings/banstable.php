@@ -40,7 +40,7 @@ PagerModule::write(array('Sender' => $this, 'Limit' => 20, 'CurrentRecords' => c
                     <div class="btn-group">
                     <?php
                     echo anchor(dashboardSymbol('edit'), "/dashboard/settings/bans/edit?id={$Row['BanID']}", 'js-modal btn btn-icon', ['aria-label' => t('Edit'), 'title' => t('Edit')]);
-                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'js-modal-confirm js-hijack btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
+                    echo anchor(dashboardSymbol('delete'), "/dashboard/settings/bans/delete?id={$Row['BanID']}", 'js-modal-confirm btn btn-icon', ['aria-label' => t('Delete'), 'title' => t('Delete')]);
                     ?>
                     </div>
                 </td>

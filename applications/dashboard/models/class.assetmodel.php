@@ -4,7 +4,7 @@
  *
  * Use the AssetModel_StyleCss_Handler event to include CSS files in your plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -53,120 +53,6 @@ class AssetModel extends Gdn_Model {
             $options = ['Css' => $options];
         }
         $this->_CssFiles[] = [$filename, $folder, $options];
-    }
-
-    /**
-     * Serve all CSS files.
-     *
-     * @param $themeType
-     * @param $filename
-     * @throws Exception
-     */
-    public function serveCss($themeType, $filename) {
-        // Split the filename into filename and etag.
-        if (preg_match('`([\w-]+?)-(\w+).css$`', $filename, $matches)) {
-            $basename = $matches[1];
-            $eTag = $matches[2];
-        } else {
-            throw notFoundException();
-        }
-
-        $basename = strtolower($basename);
-
-        $this->EventArguments['Basename'] = $basename;
-        $this->EventArguments['ETag'] = $eTag;
-        $this->fireEvent('BeforeServeCss');
-
-        if (function_exists('header_remove')) {
-            header_remove('Set-Cookie');
-        }
-
-        // Get list of anchor files
-        $anchors = $this->getAnchors();
-
-        safeHeader("Content-Type: text/css");
-        $anchorFileName = "{$basename}.css";
-        if (!in_array($anchorFileName, $anchors)) {
-            safeHeader("HTTP/1.0 404", true, 404);
-
-            echo "/* Could not find {$basename}/{$eTag} */";
-            die();
-        }
-
-        $requestETags = val('HTTP_IF_NONE_MATCH', $_SERVER);
-        $requestETags = explode(',', $requestETags);
-        foreach ($requestETags as $requestETag) {
-            if ($requestETag == $eTag) {
-                safeHeader("HTTP/1.0 304", true, 304);
-                die();
-            }
-        }
-
-        safeHeader("Cache-Control:public, max-age=14400");
-
-        $currentETag = self::eTag();
-        safeHeader("ETag: $currentETag");
-
-        $cachePath = PATH_CACHE.'/css/'.CLIENT_NAME.'-'.$themeType.'-'."{$basename}-{$currentETag}.css";
-
-        if (!Debug() && file_exists($cachePath)) {
-            readfile($cachePath);
-            die();
-        }
-
-        // Include minify...
-        set_include_path(PATH_LIBRARY."/vendors/Minify/lib".PATH_SEPARATOR.get_include_path());
-        require_once PATH_LIBRARY."/vendors/Minify/lib/Minify/CSS.php";
-
-        ob_start();
-        echo "/* CSS generated for etag: $currentETag.\n *\n";
-
-        $notFound = [];
-        $paths = $this->getCssFiles($themeType, $basename, $eTag, $notFound);
-
-        // First, do a pass through the files to generate some information.
-        foreach ($paths as $info) {
-            list($path, $urlPath) = $info;
-
-            echo " * $urlPath\n";
-        }
-
-        // Echo the paths that weren't found to help debugging.
-        foreach ($notFound as $info) {
-            list($filename, $folder) = $info;
-
-            echo " * $folder/$filename NOT FOUND.\n";
-        }
-
-        echo " */\n\n";
-
-        // Now that we have all of the paths we want to serve them.
-        foreach ($paths as $info) {
-            list($path, $urlPath, $options) = $info;
-
-            echo "/* File: $urlPath */\n";
-
-            $css = val('Css', $options);
-            if (!$css) {
-                $css = file_get_contents($path);
-            }
-
-            $css = Minify_CSS::minify($css, [
-                'preserveComments' => true,
-                'prependRelativePath' => $this->UrlPrefix.asset(dirname($urlPath).'/'),
-                'currentDir' => dirname($path),
-                'minify' => true
-            ]);
-            echo $css;
-            echo "\n\n";
-        }
-
-        // Create a cached copy of the file.
-        $css = ob_get_flush();
-        if (!file_exists(dirname($cachePath))) {
-            mkdir(dirname($cachePath), 0775, true);
-        }
-        file_put_contents($cachePath, $css);
     }
 
     /**
@@ -541,37 +427,44 @@ class AssetModel extends Gdn_Model {
     }
 
     /**
-     * Get list of defined view handlers
+     * Get list of defined view handlers.
      *
-     * @staticvar array $handlers
-     * @param boolean $fresh
-     * @return array
+     * This method no longer really works due to factory changes.
+     *
+     * @return array Returns an array keyed by view handler.
+     * @deprecated
      */
-    public static function viewHandlers($fresh = false) {
-        static $handlers = null;
-        if (is_null($handlers) || $fresh) {
-            $factories = Gdn::factory()->search('viewhandler.*');
-            $handlers = array_change_key_case($factories);
+    public static function viewHandlers() {
+        deprecated('AssetModel::viewHandlers()');
+
+        $exts = static::viewExtensions();
+        $result = [];
+        foreach ($exts as $ext) {
+            if ($ext !== 'php') {
+                $result["ViewHandler.$ext"] = [];
+            }
         }
 
-        return $handlers;
+        return $result;
     }
 
     /**
-     * Get list of allowed view extensions
+     * Get list of allowed view extensions.
      *
-     * @param boolean $fresh
-     * @return array list of extensions
+     * @return array Returns an array of file extensions.
      */
-    public static function viewExtensions($fresh = false) {
-        $handlers = self::viewHandlers($fresh);
+    public static function viewExtensions() {
+        // This is a kludge where all known extensions are included.
+        $knownExts = ['tpl', 'mustache'];
 
-        $extensions = ['php'];
-        foreach ($handlers as $handlerTag => $handlerDef) {
-            $extension = explode('.', $handlerTag);
-            $extensions[] = array_pop($extension);
+        $result = ['php'];
+        foreach ($knownExts as $ext) {
+            $handler = "ViewHandler.$ext";
+            if (Gdn::factory()->exists($handler)) {
+                $result[] = $ext;
+            }
         }
-        return $extensions;
+        return $result;
     }
     /**
      * Get the path to a view.

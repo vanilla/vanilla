@@ -2,7 +2,7 @@
 /**
  * Managing site statistic reporting.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -20,6 +20,7 @@ class StatisticsController extends DashboardController {
      * Output available info.
      */
     public function info() {
+        $this->permission('Garden.Settings.Manage');
         $this->setData('FirstDate', Gdn::statistics()->firstDate());
         $this->render();
     }
@@ -131,6 +132,7 @@ class StatisticsController extends DashboardController {
      * @access public
      */
     public function verify() {
+        $this->permission('Garden.Settings.Manage');
         $CredentialsValid = Gdn::statistics()->validateCredentials();
         $this->setData('StatisticsVerified', $CredentialsValid);
         $this->render();

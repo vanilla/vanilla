@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -9,7 +9,11 @@ namespace VanillaTests\APIv0;
 
 use Garden\Http\HttpClient;
 use Garden\Http\HttpResponse;
+use Gdn;
 use PDO;
+use Vanilla\Addon;
+use Vanilla\AddonManager;
+use VanillaTests\TestDatabase;
 
 /**
  * The API client for Vanilla's API version 0.
@@ -110,7 +114,7 @@ class APIv0 extends HttpClient {
             $options = [
                 PDO::ATTR_PERSISTENT => false,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8'"
+                PDO::MYSQL_ATTR_INIT_COMMAND  => "set names 'utf8mb4'"
             ];
             $pdo = new PDO("mysql:host=localhost", $this->getDbUser(), $this->getDbPassword(), $options);
 
@@ -127,26 +131,23 @@ class APIv0 extends HttpClient {
     }
 
     /**
-     * Get the transient key for a user.
+     * Generate a cookie for the user's transient key.
      *
-     * @param int $userID The ID of the user to get the transient key for.
-     * @return string Returns the transient key for the user.
+     * @param int $userID
+     * @param string $tk
+     * @return string
      */
-    public function getTK($userID) {
-        $user = $this->queryOne("select * from GDN_User where UserID = :userID", ['userID' => $userID]);
-        if (empty($user)) {
-            return '';
-        }
-        $attributes = (array)dbdecode($user['Attributes']);
-        if (empty($attributes['TransientKey'])) {
-            $attributes['TransientKey'] = randomString(20);
-            $r = $this->query(
-                "update GDN_User set Attributes = :attributes where UserID = :userID",
-                ['attributes' => dbencode($attributes), 'userID' => $userID],
-                true
-            );
-        }
-        return val('TransientKey', $attributes, '');
+    private function generateTKCookie($userID, $tk) {
+        $timestamp = time();
+
+        $payload = "{$tk}:{$userID}:{$timestamp}";
+        $signature = hash_hmac(
+            $this->getConfig('Garden.Cookie.HashMethod', 'md5'),
+            $payload,
+            $this->getConfig('Garden.Cookie.Salt')
+        );
+
+        return "{$payload}:{$signature}";
     }
 
     /**
@@ -210,6 +211,8 @@ class APIv0 extends HttpClient {
 
         // Get some configuration information.
         $config = $this->saveToConfig([]);
+
+        $this->bootstrap();
     }
 
     /**
@@ -237,7 +240,11 @@ class APIv0 extends HttpClient {
         // Add the cookie of the calling user.
         if ($user = $this->getUser()) {
             $cookieName = $this->getConfig('Garden.Cookie.Name', 'Vanilla');
-            $cookieArray = [$cookieName => $this->vanillaCookieString($user['UserID'])];
+
+            $cookieArray = [
+                $cookieName => $this->vanillaCookieString($user['UserID']),
+                "{$cookieName}-tk" => $this->generateTKCookie($user['UserID'], $user['tk'])
+            ];
 
             $request->setHeader('Cookie', static::cookieEncode($cookieArray));
 
@@ -540,11 +547,11 @@ class APIv0 extends HttpClient {
             $user = $this->queryUserKey($user, true);
         }
 
-        if (empty($user['tk'])) {
-            $user['tk'] = $this->getTK($user['UserID']);
-        }
-
-        $partialUser = ['UserID' => $user['UserID'], 'Name' => $user['Name'], 'tk' => $user['tk']];
+        $partialUser = [
+            'UserID' => $user['UserID'],
+            'Name' => $user['Name'],
+            'tk' => substr(md5(time()), 0, 16)
+        ];
 
         $this->user = $partialUser;
         return $this;
@@ -556,5 +563,34 @@ class APIv0 extends HttpClient {
         $dbname = $this->getDbName();
         $pdo->query("create database `$dbname`");
         $pdo->query("use `$dbname`");
+    }
+
+    /**
+     * Bootstrap some of the internal objects with this connection.
+     */
+    public function bootstrap() {
+        $dic = Gdn::getContainer();
+
+        // Make the core applications available.
+        $adm = new AddonManager(
+            [
+                Addon::TYPE_ADDON => ['/applications', '/plugins'],
+                Addon::TYPE_THEME => '/themes',
+                Addon::TYPE_LOCALE => '/locales'
+            ],
+            PATH_ROOT.'/tests/cache/APIv0/vanilla-manager'
+        );
+        $adm->startAddonsByKey(['dashboard' => true, 'vanilla' => true, 'conversations' => true], Addon::TYPE_ADDON);
+        spl_autoload_register([$adm, 'autoload']);
+
+        $db = new TestDatabase($this->getPDO());
+
+        $dic->setInstance(AddonManager::class, $adm)
+            ->setInstance(Gdn::AliasDatabase, $db)
+            ->setInstance(Gdn::AliasUserModel, new \UserModel());
+    }
+
+    public function terminate() {
+        spl_autoload_unregister([Gdn::addonManager(), 'autoload']);
     }
 }

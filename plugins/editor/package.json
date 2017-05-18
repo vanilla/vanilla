@@ -3,16 +3,16 @@
   "private": true,
   "devDependencies": {
     "bower": "*",
-    "wiredep": "1.4.x",
-    "grunt": "0.4.x",
-    "grunt-cli": "0.1.x",
-    "load-grunt-tasks": "0.4.x",
-    "time-grunt": "0.3.x",
-    "grunt-sass": "^1.0.0",
-    "grunt-contrib-watch": "0.6.x",
-    "grunt-contrib-imagemin": "0.7.x",
-    "grunt-wiredep": "1.7.x",
-    "grunt-autoprefixer": "0.7.x"
+    "wiredep": "4.0.x",
+    "grunt": "1.0.x",
+    "grunt-cli": "1.2.x",
+    "load-grunt-tasks": "3.5.x",
+    "time-grunt": "1.4.x",
+    "grunt-sass": "^2.0.0",
+    "grunt-contrib-watch": "1.0.x",
+    "grunt-contrib-imagemin": "1.0.x",
+    "grunt-wiredep": "3.0.x",
+    "grunt-autoprefixer": "3.0.x"
   },
   "engines": {
     "node": ">=0.10.0"

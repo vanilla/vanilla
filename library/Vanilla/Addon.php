@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
@@ -205,14 +205,15 @@ class Addon {
      * Perform a glob from this addon's subdirectory.
      *
      * @param string $pattern The pattern to glob.
+     * @param string $dirs Just directories.
      * @return array Returns an array of root-relative paths.
      * @see glob()
      */
-    private function glob($pattern) {
+    private function glob($pattern, $dirs = false) {
         $px = $this->path();
         $fullPattern = $px.$pattern;
         $strlen = strlen($px);
-        $paths = glob($fullPattern, GLOB_NOSORT);
+        $paths = glob($fullPattern, GLOB_NOSORT | ($dirs ? GLOB_ONLYDIR : 0));
         if (!is_array($paths)) {
             return [];
         }
@@ -269,12 +270,12 @@ class Addon {
             $array = $PluginInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_PLUGIN;
-            $this->special['oldType'] = 'plugin';
+            $oldType = 'plugin';
         } elseif (!empty($ApplicationInfo) && is_array($ApplicationInfo)) {
             $array = $ApplicationInfo;
             $type = static::TYPE_ADDON;
             $priority = static::PRIORITY_APPLICATION;
-            $this->special['oldType'] = 'application';
+            $oldType = 'application';
         } elseif (!empty($ThemeInfo) && is_array($ThemeInfo)) {
             $array = $ThemeInfo;
             $type = static::TYPE_THEME;
@@ -301,6 +302,10 @@ class Addon {
         $info['type'] = $type;
         if (empty($info['priority'])) {
             $info['priority'] = $priority;
+        }
+
+        if (isset($oldType)) {
+            $info['oldType'] = $oldType;
         }
 
         // Convert the author.
@@ -444,23 +449,62 @@ class Addon {
         return $classes;
     }
 
+    /**
+     * Scan the addon for potential class paths.
+     *
+     * @return \Traversable Returns a list of paths to PHP files.
+     */
     private function scanClassPaths() {
-        $globs = [
-            '/*.php',
-            '/controllers/*.php',
-            '/library/*.php',
-            '/models/*.php',
-            '/modules/*.php',
+        $dirs = [
+            '',
+            '/controllers',
+            '/Controllers',
+            '/library',
+            '/src',
+            '/models',
+            '/Models',
+            '/modules',
+            '/Modules',
             '/settings/class.hooks.php'
         ];
 
-        $result = [];
-        foreach ($globs as $glob) {
-            $paths = $this->glob($glob);
-            $result = array_merge($result, $paths);
+        foreach ($dirs as $dir) {
+            foreach ($this->scanDirPhp($dir) as $path) {
+                yield $path;
+            }
+        }
+    }
+
+    /**
+     * Recursively scan a directory for PHP files.
+     *
+     * @param string $dir The path to the directory to scan.
+     * @return \Traversable Returns a list of paths to PHP files.
+     */
+    private function scanDirPhp($dir) {
+        if (substr($dir, -4) === '.php') {
+            if (file_exists($this->path($dir, Addon::PATH_FULL))) {
+                yield $dir;
+            }
+            return;
         }
 
-        return $result;
+        // Get the php files in the directory.
+        foreach ($this->glob("$dir/*.php") as $path) {
+            yield $path;
+        }
+
+        // Don't recursively scan the root of an addon.
+        if (empty($dir)) {
+            return;
+        }
+
+        // Get all of the php files from subdirectories.
+        foreach ($this->glob("$dir/*", true) as $subdir) {
+            foreach ($this->scanDirPhp($subdir) as $path) {
+                yield $path;
+            }
+        }
     }
 
     /**
@@ -624,6 +668,10 @@ class Addon {
      */
     public function check($trigger = false) {
         $issues = [];
+        if (!isset($this->info['Issues'])) {
+            $this->info['Issues'] = &$issues;
+        }
+
 
         $rawKey = $this->getKey();
         $subdir = basename($this->getSubdir());
@@ -678,7 +726,21 @@ class Addon {
             $issues['multiple-plugins'] = "The addon should have at most one plugin class ($plugins).";
         }
 
-        if ($trigger && $count = count($issues)) {
+        if ($trigger) {
+            $this->triggerIssues();
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Trigger the plugin's issues
+     *
+     * @return Addon Returns $this for fluent calls.
+     */
+    protected function triggerIssues() {
+        $issues = val('Issues', $this->info, []);
+        if ($count = count($issues)) {
             $subdir = $this->getSubdir();
 
             trigger_error("The addon in $subdir has $count issues.", E_USER_NOTICE);
@@ -687,7 +749,7 @@ class Addon {
             }
         }
 
-        return $issues;
+        return $this;
     }
 
     /**
@@ -714,7 +776,8 @@ class Addon {
             ->setInfo($array['info'])
             ->setClasses($array['classes'])
             ->setTranslationPaths($array['translations'])
-            ->setSpecialArray(empty($array['special']) ? [] : $array['special']);
+            ->setSpecialArray(empty($array['special']) ? [] : $array['special'])
+            ->triggerIssues();
 
         return $addon;
     }
@@ -920,7 +983,7 @@ class Addon {
         return function (Addon $addon) use ($where) {
             foreach ($where as $key => $value) {
                 if ($key === 'oldType') {
-                    $valid = isset($addon->special['oldType']) && $addon->special['oldType'] === $value;
+                    $valid = isset($addon->info['oldType']) && $addon->info['oldType'] === $value;
                 } elseif ($value === null) {
                     $valid = !isset($addon->info[$key]);
                 } else {
@@ -1008,8 +1071,8 @@ class Addon {
         try {
             // Include the plugin file.
             if ($className = $this->getPluginClass()) {
-                list($_, $path) = $this->classes[$className];
-                include $this->path($path);
+                list($_, $path) = $this->classes[strtolower($className)];
+                include_once $this->path($path);
             }
 
             // Include the configuration file.
@@ -1018,8 +1081,10 @@ class Addon {
             }
 
             // Include locale files.
-            foreach ($this->getTranslationPaths() as $path) {
-                include $this->path($path);
+            foreach ($this->getTranslationPaths() as $paths) {
+                foreach ($paths as $path) {
+                    include $this->path($path);
+                }
             }
             return true;
         } catch (\Throwable $ex) {

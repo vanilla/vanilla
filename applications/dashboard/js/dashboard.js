@@ -321,13 +321,45 @@
 
 })(jQuery, window, document);
 
-
+/**
+ * This class handles the content parsing and rendering of two different types of modals:
+ *
+ * Regular modals that ajax-in the content from an endpoint.
+ * Confirm modals that don't ajax-in the content.
+ *
+ */
 var DashboardModal = (function() {
 
+    /**
+     * The settings we can configure when starting the DashboardModal.
+     *
+     * These can be added when initializing the DashboardModal via javascript,
+     * or by using data attributes.
+     *
+     * @typedef {Object} DashboardModalSettings
+     * @property {string} httpmethod The HTTP method for the confirm modal. Either 'get' or 'post'. 'post' will automatically add the TransientKey to the request.
+     * @property {function} afterSuccess Function gets called on ajax success when handling a modal.
+     * @property {boolean} reloadPageOnSave Whether to reload the page after the modal closes after ajax success. Default true.
+     * @property {boolean} followLink Whether to follow a link when the confirm modal is accepted rather than simply closing the modal.
+     * @property {string} cssClass A CSS class to add to the modal dialog.
+     * @property {string} title The modal title.
+     * @property {string} footer The modal footer.
+     * @property {string} body The modal body.
+     * @property {string} closeIcon The svg close icon from the dashboard symbol map.
+     * @property {string} modalType The modal type. Defaults to 'regular'. Other options are 'confirm' or 'noheader'
+     */
+
+    /**
+     * Initialize our dashboard modal.
+     *
+     * @param {jQuery} $trigger The element we clicked to trigger the modal.
+     * @param {DashboardModalSettings} settings The modal settings.
+     * @constructor
+     */
     var DashboardModal = function($trigger, settings) {
         this.id = Math.random().toString(36).substr(2, 9);
         this.setupTrigger($trigger);
-        this.addToDom();
+        this.addModalToDom();
 
         this.settings = {};
         this.defaultContent.closeIcon = dashboardSymbol('close');
@@ -339,18 +371,32 @@ var DashboardModal = (function() {
         this.start();
     };
 
+
     DashboardModal.prototype = {
 
+        /**
+         * The current active modal in the page.
+         */
         activeModal: undefined,
 
+        /**
+         * The default settings.
+         */
         defaultSettings: {
             httpmethod: 'get',
             afterSuccess: function(json, sender) {},
-            reloadPageOnSave: true
+            reloadPageOnSave: true,
+            modalType: 'regular'
         },
 
+        /**
+         * The generated id for the modal.
+         */
         id: '',
 
+        /**
+         * The default content for the modal.
+         */
         defaultContent: {
             cssClass: '',
             title: '',
@@ -363,10 +409,19 @@ var DashboardModal = (function() {
             }
         },
 
+        /**
+         * The url to fetch the modal content from.
+         */
         target: '',
 
+        /**
+         * The jQuery trigger object that is clicked to activate the modal.
+         */
         trigger: {},
 
+        /**
+         * The default modal template for all modals.
+         */
         modalHtml: ' \
         <div class="modal-dialog {cssClass}" role="document"> \
             <div class="modal-content"> \
@@ -383,6 +438,9 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * A modal with no separate header and footer.
+         */
         modalHtmlNoHeader: ' \
         <div class="modal-dialog modal-no-header {cssClass}" role="document"> \
             <h4 id="modalTitle" class="modal-title hidden">{title}</h4> \
@@ -394,30 +452,41 @@ var DashboardModal = (function() {
             </div> \
         </div>',
 
+        /**
+         * The modal shell that we add to the DOM on initialization. Content eventually is added to the modal.
+         */
         modalShell: '<div class="modal fade" id="{id}" tabindex="-1" role="dialog" aria-hidden="false" aria-labelledby="modalTitle"></div>',
 
-        start: function($trigger, settings) {
+        /**
+         * Shows, gives focus to, and renders the modal.
+         */
+        start: function() {
             $('#' + this.id).modal('show').focus();
             if (this.settings.modalType === 'confirm') {
-                this.addConfirmContent();
+                this.renderConfirmModal();
             } else {
-                this.addContent();
+                this.renderModal();
             }
         },
 
-        load: function() {
-            this.handleForm();
-        },
-
-        addToDom: function() {
+        /**
+         * Adds the modal to the DOM.
+         */
+        addModalToDom: function() {
             $('body').append(this.modalShell.replace('{id}', this.id));
         },
 
+        /**
+         * Adds the needed data attributes to the modal trigger.
+         */
         setupTrigger: function($trigger) {
             $trigger.attr('data-target', '#' + this.id);
             $trigger.attr('data-modal-id', this.id);
         },
 
+        /**
+         * Adds event listeners to the modal.
+         */
         addEventListeners: function() {
             var self = this;
             $('#' + self.id).on('shown.bs.modal', function() {
@@ -434,66 +503,10 @@ var DashboardModal = (function() {
             });
         },
 
-        handleConfirm: function() {
-            var self = this;
-
-            // Refresh the page.
-            if (self.settings.followLink) {
-                document.location.replace(self.target);
-            } else {
-                // request the target via ajax
-                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
-                if (self.settings.httpmethod === 'post') {
-                    ajaxData.TransientKey = gdn.definition('TransientKey');
-                }
-
-                $.ajax({
-                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
-                    url: self.target,
-                    data: ajaxData,
-                    dataType: 'json',
-                    error: function(xhr) {
-                        gdn.informError(xhr);
-                        $('#' + self.id).modal('hide');
-                    },
-                    success: function(json) {
-                        gdn.inform(json);
-                        gdn.processTargets(json.Targets);
-                        if (json.RedirectUrl) {
-                            setTimeout(function() {
-                                document.location.replace(json.RedirectUrl);
-                            }, 300);
-                        } else {
-                            $('#' + self.id).modal('hide');
-                            self.afterConfirmSuccess();
-                        }
-                    }
-                });
-            }
-        },
-
-        // Default is to remove the closest item with the class 'js-modal-item'
-        afterConfirmSuccess: function() {
-            var found = false;
-            if (!this.settings.confirmaction || this.settings.confirmaction === 'delete') {
-                var $remove;
-                if (this.settings.removeSelector) {
-                    $remove = $(this.settings.removeSelector)
-                } else {
-                    $remove = this.trigger.closest('.js-modal-item');
-                }
-                found = $remove.length !== 0;
-                $remove.remove();
-            }
-
-            // Refresh the page.
-            if (!found) {
-                document.location.replace(window.location.href);
-            }
-        },
-
-        confirmContent: function() {
-            // Replace language definitions
+        /**
+         * Gets the default content for a confirm modal.
+         */
+        getDefaultConfirmContent: function() {
             var confirmHeading = gdn.definition('ConfirmHeading', 'Confirm');
             var confirmText = gdn.definition('ConfirmText', 'Are you sure you want to do that?');
             var ok = gdn.definition('Okay', 'Okay');
@@ -510,12 +523,45 @@ var DashboardModal = (function() {
             };
         },
 
-        addConfirmContent: function() {
+        /**
+         * Adds confirm content to the modal shell.
+         */
+        renderConfirmModal: function() {
             var self = this;
-            $('#' + self.id).htmlTrigger(self.replaceHtml(self.confirmContent()));
+            $('#' + self.id).htmlTrigger(self.addContentToTemplate(self.getDefaultConfirmContent()));
         },
 
-        replaceHtml: function(parsedContent) {
+        /**
+         * Makes an ajax call to the target and adds the page content to the modal shell.
+         */
+        renderModal: function() {
+            var self = this;
+            var ajaxData = {
+                'DeliveryType' : 'VIEW',
+                'DeliveryMethod' : 'JSON'
+            };
+
+            $.ajax({
+                method: 'GET',
+                url: self.target,
+                data: ajaxData,
+                dataType: 'json',
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                },
+                success: function(json) {
+                    var body = json.Data;
+                    var content = self.parseBody(body);
+                    $('#' + self.id).htmlTrigger(self.addContentToTemplate(content));
+                }
+            });
+        },
+
+        /**
+         * Replaces curly-braced variables in the templates with the parsedContent.
+         */
+        addContentToTemplate: function(parsedContent) {
 
             // Copy the defaults into the content array
             var content = {};
@@ -544,73 +590,16 @@ var DashboardModal = (function() {
             return html;
         },
 
-        addContent: function() {
-            var self = this;
-            var ajaxData = {
-                'DeliveryType' : 'VIEW',
-                'DeliveryMethod' : 'JSON'
-            };
 
-            $.ajax({
-                method: 'GET',
-                url: self.target,
-                data: ajaxData,
-                dataType: 'json',
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                },
-                success: function(json) {
-                    var body = json.Data;
-                    var content = self.parseBody(body);
-                    $('#' + self.id).htmlTrigger(self.replaceHtml(content));
-                }
-            });
-        },
-
-        // Add any error messages to popup form or close modal on form save.
-        handleForm: function(element) {
-            var self = this;
-
-            $('form', element).ajaxForm({
-                data: {
-                    'DeliveryType': 'VIEW',
-                    'DeliveryMethod': 'JSON'
-                },
-                dataType: 'json',
-                success: function(json, sender) {
-                    gdn.inform(json);
-                    gdn.processTargets(json.Targets);
-
-                    if (json.FormSaved === true) {
-                        self.afterFormSuccess(json, sender, json.RedirectUrl);
-                        $('#' + self.id).modal('hide');
-                    } else {
-                        var body = json.Data;
-                        var content = self.parseBody(body);
-                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
-                        $('#' + self.id + ' .modal-body').scrollTop(0);
-                    }
-                },
-                error: function(xhr) {
-                    gdn.informError(xhr);
-                    $('#' + self.id).modal('hide');
-                }
-            });
-        },
-
-        // Respect redirectUrl after form saves and redirect.
-        afterFormSuccess: function(json, sender, redirectUrl) {
-            this.settings.afterSuccess(json, sender);
-            if (redirectUrl) {
-                setTimeout(function() {
-                    document.location.replace(redirectUrl);
-                }, 300);
-            } else if (this.settings.reloadPageOnSave) {
-                document.location.replace(window.location.href);
-            }
-        },
-
+        /**
+         * Parses a page to find the title, footer, form and body elements.
+         *
+         * If there's a form in the page, removes the opening and closing form tags.
+         * These get readded later, wrapping around the content and footer.
+         *
+         * The title is the page's h1 element, the footer is the contents of the first `.Buttons`,
+         * `.form-footer` or `.js-modal-footer` element, if one exists on the page.
+         */
         parseBody: function(body) {
             var title = '';
             var footer = '';
@@ -624,7 +613,11 @@ var DashboardModal = (function() {
             // Pull out the H1 block from the view to add to the modal title
             if (this.settings.modalType !== 'noheader' && $title.length !== 0) {
                 title = $title.html();
-                $title.remove();
+                if ($elem.find('.header-block').length !== 0) {
+                    $elem.find('.header-block').remove();
+                } else {
+                    $title.remove();
+                }
                 body = $elem.html();
             }
 
@@ -653,6 +646,97 @@ var DashboardModal = (function() {
                     close: formCloseTag
                 }
             };
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleForm: function(element) {
+            var self = this;
+
+            $('form', element).ajaxForm({
+                data: {
+                    'DeliveryType': 'VIEW',
+                    'DeliveryMethod': 'JSON'
+                },
+                dataType: 'json',
+                success: function(json, sender) {
+                    self.settings.afterSuccess(json, sender);
+                    gdn.inform(json);
+                    gdn.processTargets(json.Targets);
+
+                    if (json.FormSaved === true) {
+                        self.handleSuccess(json);
+                    } else {
+                        var body = json.Data;
+                        var content = self.parseBody(body);
+                        $('#' + self.id + ' .modal-body').htmlTrigger(content.body);
+                        $('#' + self.id + ' .modal-body').scrollTop(0);
+                    }
+                },
+                error: function(xhr) {
+                    gdn.informError(xhr);
+                    $('#' + self.id).modal('hide');
+                }
+            });
+        },
+
+        /**
+         * Handles the submitting of and the response of a form in a modal.
+         */
+        handleConfirm: function() {
+            var self = this;
+
+            // Refresh the page.
+            if (self.settings.followLink) {
+                document.location.replace(self.target);
+            } else {
+                // request the target via ajax
+                var ajaxData = {'DeliveryType' : 'VIEW', 'DeliveryMethod' : 'JSON'};
+                if (self.settings.httpmethod === 'post') {
+                    ajaxData.TransientKey = gdn.definition('TransientKey');
+                }
+
+                $.ajax({
+                    method: (self.settings.httpmethod === 'post') ? 'POST' : 'GET',
+                    url: self.target,
+                    data: ajaxData,
+                    dataType: 'json',
+                    error: function(xhr) {
+                        gdn.informError(xhr);
+                        $('#' + self.id).modal('hide');
+                    },
+                    success: function(json, sender) {
+                        self.settings.afterSuccess(json, sender);
+                        gdn.inform(json);
+                        gdn.processTargets(json.Targets);
+                        self.handleSuccess(json);
+                    }
+                });
+            }
+        },
+
+        /**
+         * Handles the ajax success. If there's a RedirectUrl set, then redirect. Reload the page if there
+         * are no Targets set AND reloadPageOnSave is true.
+         *
+         * @param json
+         */
+        handleSuccess: function(json) {
+            if (json.RedirectUrl) {
+                setTimeout(function() {
+                    document.location.replace(json.RedirectUrl);
+                }, 300);
+            } else {
+                $('#' + this.id).modal('hide');
+
+                // We'll only reload if there are no targets set. If there are targets set, we can
+                // assume that the page doesn't need to be reloaded, since we'll ajax remove/edit
+                // the page.
+                if (this.settings.reloadPageOnSave && (json.Targets.length === 0)) {
+                    document.location.replace(window.location.href);
+                }
+            }
         }
     };
 
@@ -672,6 +756,12 @@ var DashboardModal = (function() {
 
 (function($) {
 
+    /**
+     * This uses the ace vendor component to wire up our code editors. We currently use the code editor
+     * in the Custom CSS plugin and in the Pockets plugin.
+     *
+     * Selector: `.js-code-input`
+     */
     var codeInput = {
         // Replaces any textarea with the 'js-code-input' class with an code editor.
         start: function(element) {
@@ -681,18 +771,17 @@ var DashboardModal = (function() {
         },
 
         // Adds the 'js-code-input' class to a form and the mode and height data attributes.
-        init: function(textarea, mode, height) {
-            if (!textarea.length) {
+        init: function($textarea, mode, height) {
+            if (!$textarea.length) {
                 return;
             }
-            textarea.addClass('js-code-input');
-            textarea.data('code-input', {'mode': mode, 'height': height});
+            $textarea.addClass('js-code-input');
+            $textarea.data('code-input', {'mode': mode, 'height': height});
         },
 
-        //
-        makeAceTextArea: function (textarea) {
-            var mode = textarea.data('code-input').mode;
-            var height = textarea.data('code-input').height;
+        makeAceTextArea: function ($textarea) {
+            var mode = $textarea.data('code-input').mode;
+            var height = $textarea.data('code-input').height;
             var modes = ['html', 'css'];
 
             if (modes.indexOf(mode) === -1) {
@@ -703,25 +792,47 @@ var DashboardModal = (function() {
             }
 
             // Add the ace input before the actual textarea and hide the textarea.
-            var formID = textarea.attr('id');
-            textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
-            textarea.hide();
+            var formID = $textarea.attr('id');
+            $textarea.before('<div id="editor-' + formID + '" style="height: ' + height + 'px;"></div>');
+            $textarea.hide();
 
             var editor = ace.edit('editor-' + formID);
             editor.$blockScrolling = Infinity;
             editor.getSession().setMode('ace/mode/' + mode);
+            editor.getSession().setUseWorker(false);
             editor.setTheme('ace/theme/clouds');
 
             // Set the textarea value on the ace input and update the textarea when the ace input is updated.
-            editor.getSession().setValue(textarea.val());
+            editor.getSession().setValue($textarea.val());
             editor.getSession().on('change', function () {
-                textarea.val(editor.getSession().getValue());
+                $textarea.val(editor.getSession().getValue());
             });
         }
     };
 
+    /**
+     * Uses the handy codeInput.init function to add the appropriate data and classes to elements that should
+     * be rich text editors. You can initialize elements here or simply add the `js-code-input` CSS class and
+     * the appropriate data attributes to the textarea markup.
+     *
+     * @param element - The scope of the function.
+     */
+    function aceInit(element) {
+        // Editor classes
+        codeInput.init($('.js-pocket-body', element), 'html', 300);
+
+        // Don't let our code editor go taller than the window length. Makes for weird scrolling.
+        codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
+        codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
+        codeInput.start(element);
+    }
+
+    /**
+     * Styles and adds syntax hilighting to code blocks.
+     *
+     * @param element - The scope of the function.
+     */
     function prettyPrintInit(element) {
-        // Pretty print
         $('#Pockets td:nth-child(4)', element).each(function () {
             var html = $(this).html();
             $(this).html('<pre class="prettyprint lang-html" style="white-space: pre-wrap;">' + html + '</pre>');
@@ -730,16 +841,11 @@ var DashboardModal = (function() {
         prettyPrint();
     }
 
-    function aceInit(element) {
-        // Editor classes
-        codeInput.init($('.pockets #Form_Body', element), 'html', 200);
-        // Don't let our code editor go taller than the window length. Makes for weird scrolling.
-        codeInput.init($('#Form_CustomHtml', element), 'html', $(window).height() - 100);
-        codeInput.init($('#Form_CustomCSS', element), 'css', $(window).height() - 100);
-        codeInput.start(element);
-    }
-
-
+    /**
+     * Add a CSS class to the navbar based on it scroll position.
+     *
+     * @param element - The scope of the function.
+     */
     function navbarHeightInit(element) {
         var $navbar = $('.js-navbar', element);
 
@@ -763,6 +869,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Start fluidfixed on the dashboard panel navigation.
+     *
+     * @param element - The scope of the function.
+     */
     function fluidFixedInit(element) {
         // margin-bottom on panel nav h4 is 9px, padding-bottom on .panel-left is 72px
         $('.js-fluid-fixed', element).fluidfixed({
@@ -770,11 +881,34 @@ var DashboardModal = (function() {
         });
     }
 
-    function userDropDownInit(element) {
-        var html = $('.js-dashboard-user-dropdown').html();
-        if ($('.js-navbar .js-card-user', element).length !== 0) {
+    /**
+     * Initialize drop.js on any element with the class 'js-drop'. The element must have their id attribute set and
+     * must specify the html content it will reveal when it is clicked.
+     *
+     * Selector: `.js-drop`
+     * Attribute: `data-content-id="id_of_element"`
+     *
+     * @param element - The scope of the function.
+     */
+    function dropInit(element) {
+        $('.js-drop', element).each(function() {
+            var $trigger = $(this);
+            var contentSelector = $trigger.data('contentId');
+            var triggerSelector = $trigger.attr('id');
+            var html = $('#' + contentSelector).html();
+
+            if (triggerSelector === undefined) {
+                console.error('Drop trigger must be unique and have an id attribute set.');
+                return;
+            }
+
+            if (html === undefined) {
+                console.error('The drop content needs to be configured properly with the correct id attribute.');
+                return;
+            }
+
             new Drop({
-                target: document.querySelector('.js-navbar .js-card-user', element),
+                target: document.querySelector('#' + triggerSelector),
                 content: html,
                 constrainToWindow: true,
                 remove: true,
@@ -783,14 +917,17 @@ var DashboardModal = (function() {
                     targetAttachment: 'bottom right',
                     offset: '-10 0'
                 }
+            }).on('open', function() {
+                $(this.content).trigger('contentLoad');
             });
-        }
+        });
     }
 
     /**
-     * Un-collapses a group if one of its links is active.
+     * Un-collapses a group if one of its links is active. Note that the functionality for the collapse
+     * javascript is contained in ../vendors/bootstrap/collapse.js
      *
-     * @param element
+     * @param element - The scope of the function.
      */
     function collapseInit(element) {
         var $active = $('.js-nav-collapsible a.active', element);
@@ -800,6 +937,15 @@ var DashboardModal = (function() {
         $('a[href=#' + $collapsible.attr('id') + ']').removeClass('collapsed');
     }
 
+    /**
+     * Copies the text from an element to the clipboard. Displays a tooltip on success. Set the
+     * clipboardTarget data attribute to indicate the text that should be copied. Set the successText
+     * attribute to the message to display on success.
+     *
+     * Selector: `.btn-copy`
+     * Attributes: `data-clipboard-target="#text_to_copy"`
+     *             `data-success-text="Copied!"`
+     */
     function clipboardInit() {
         var clipboard = new Clipboard('.btn-copy');
 
@@ -821,6 +967,11 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * This handles the drawer/hamburger menu functionality of the panel navigation on small screen sizes.
+     *
+     * @param element - The scope of the function.
+     */
     function drawerInit(element) {
 
         // Selectors
@@ -862,8 +1013,27 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Transforms all checkboxes or radios (with the exception of those in the ignore list)
+     * into style-able checkboxes and radios.
+     *
+     * @param element - The scope of the function.
+     */
     function icheckInit(element) {
-        var selector = 'input:not(.label-selector-input):not(.toggle-input):not(.avatar-delete-input):not(.jcrop-keymgr)';
+        var ignores = [
+            '.label-selector-input',
+            '.toggle-input',
+            '.avatar-delete-input',
+            '.jcrop-keymgr',
+            '.checkbox-painted-wrapper input',
+            '.radio-painted-wrapper input'
+        ];
+
+        var selector = 'input';
+
+        ignores.forEach(function(element) {
+            selector += ':not(' + element + ')';
+        });
 
         $(selector, element).iCheck({
             aria: true
@@ -879,6 +1049,12 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Starts expander functionality (aka "show more") for feed descriptions on the homepage and
+     * for toaster messages.
+     *
+     * @param element - The scope of the function.
+     */
     function expanderInit(element) {
         $('.FeedDescription', element).expander({
             slicePoint: 65,
@@ -895,12 +1071,22 @@ var DashboardModal = (function() {
         });
     }
 
+    /**
+     * Shows any active modal. This is needed for form errors.
+     */
     function modalInit() {
         if (typeof(DashboardModal.activeModal) === 'object') {
-            DashboardModal.activeModal.load();
+            DashboardModal.activeModal.handleForm();
         }
     }
 
+    /**
+     * Starts tablejenga on elements with the `.js-tj` class.
+     *
+     * Selector: `.js-tj`
+     *
+     * @param element - The scope of the function.
+     */
     function responsiveTablesInit(element) {
         var containerSelector = '#main-row .main';
 
@@ -912,6 +1098,14 @@ var DashboardModal = (function() {
         $('.js-tj', element).tablejenga({container: containerSelector});
     }
 
+    /**
+     * Starts the foggy functionality.
+     *
+     * Selector: `.js-foggy`
+     * Attribute: `data-is-foggy={true|false}`
+     *
+     * @param element - The scope of the function.
+     */
     function foggyInit(element) {
         var $foggy = $('.js-foggy', element);
         if ($foggy.data('isFoggy')) {
@@ -919,13 +1113,68 @@ var DashboardModal = (function() {
         }
     }
 
+    /**
+     * Initializes the check-all jquery plugin. Adds 'select all' functionality to checkboxes.
+     * The trigger must have a `js-check-all` css class applied to it. It manages input checkboxes
+     * with the `js-check-me` css class applied.
+     *
+     * Selectors: `.js-check-all` for the "Check all" checkbox.
+     *            `.js-check-me` for the child checkboxes.
+     *
+     * @param element - The scope of the function.
+     */
+    function checkallInit(element) {
+        $('.js-check-all', element).checkall({
+            target: '.js-check-me'
+        });
+    }
+
+    /**
+     * Makes sure our dropdowns don't extend past the document height by making the dropdown drop up
+     * if it gets too close to the bottom of the page. Note that the actual dropdown javascript
+     * functionality is contained in ../vendors/bootstrap/dropdown.js This function just changes whether the
+     * dropdown opens up or opens down.
+     *
+     * Selector: `.dropdown`
+     *
+     * @param element - The scope of the function.
+     */
+    function dropDownInit(element) {
+        $('.dropdown', element).each(function() {
+            var $dropdown = $(this);
+            var offset = $dropdown.offset();
+            var menuHeight = $('.dropdown-menu', $dropdown).height();
+            var toggleHeight = $('.dropdown-toggle', $dropdown).height();
+            var documentHeight = $(document).height();
+            var padding = 6;
+
+            if (menuHeight + toggleHeight + offset.top + padding >= documentHeight) {
+                $dropdown.addClass('dropup');
+            }
+        });
+    }
+
+    /**
+     * If a btn-group gets too long for the window width, this will transform it into a dropdown-filter.
+     *
+     * Selector: `.btn-group`
+     *
+     * @param element - The scope of the function.
+     */
+    function buttonGroupInit(element) {
+        buttonGroup(element);
+    }
+
+    /**
+     * Run through all our javascript functionality and start everything up.
+     */
     $(document).on('contentLoad', function(e) {
         prettyPrintInit(e.target); // prettifies <pre> blocks
         aceInit(e.target); // code editor
         collapseInit(e.target); // panel nav collapsing
         navbarHeightInit(e.target); // navbar height settings
         fluidFixedInit(e.target); // panel and scroll settings
-        userDropDownInit(e.target); // navbar 'me' dropdown
+        dropInit(e.target); // navbar 'me' dropdown
         modalInit(); // modals (aka popups)
         clipboardInit(); // copy elements to the clipboard
         drawerInit(e.target); // responsive hamburger menu nav
@@ -933,19 +1182,30 @@ var DashboardModal = (function() {
         expanderInit(e.target); // truncates text and adds link to expand
         responsiveTablesInit(e.target); // makes tables responsive
         foggyInit(e.target); // makes settings blurred out
+        checkallInit(e.target); // handles 'select all' type checkboxes
+        dropDownInit(e.target); // makes sure our dropdowns open in the right direction
+        buttonGroupInit(e.target); // changes button groups that get too long into selects
     });
 
     /**
      * Adapted from http://stackoverflow.com/questions/4459379/preview-an-image-before-it-is-uploaded
      * Sets a image preview url for a uploaded files, not yet saved to the the server.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-preview`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     function readUrl(input) {
         if (input.files && input.files[0]) {
             var $preview = $(input).parents('.js-image-preview-form-group').find('.js-image-preview-new .js-image-preview');
             var reader = new FileReader();
             reader.onload = function (e) {
-                $preview.attr('src', e.target.result);
-            }
+                if (e.target.result.startsWith('data:image')) {
+                    $preview.attr('src', e.target.result);
+                }
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }
@@ -954,6 +1214,13 @@ var DashboardModal = (function() {
 
     /**
      * Adds a preview of the uploaded, not-yet-saved image.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-image-upload`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('change', '.js-image-upload', function() {
         $(this).parents('.js-image-preview-form-group').find('.js-image-preview-new').removeClass('hidden');
@@ -963,6 +1230,15 @@ var DashboardModal = (function() {
 
     /**
      * Removes the preview image and clears the file name from the input.
+     * There's a rendering function for this in Gdn_Form: `imageUploadPreview()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selectors: `.js-remove-image-preview`
+     *            `.js-image-preview-old`
+     *            `.js-image-preview-new`
+     *            `.js-image-preview`
+     *            `.js-image-upload`
+     *            `.js-image-preview-form-group`
      */
     $(document).on('click', '.js-remove-image-preview', function(e) {
         e.preventDefault();
@@ -972,9 +1248,13 @@ var DashboardModal = (function() {
         var $input = $parent.find('.js-image-upload');
         var $inputFileName = $parent.find('.file-upload-choose');
         $input.val('');
+        $input.removeAttr('value');
         $inputFileName.html($inputFileName.data('placeholder'));
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is expanded.
+     */
     $(document).on('shown.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -983,6 +1263,9 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * Reset the panel javascript when the panel navigation is collapsed.
+     */
     $(document).on('hidden.bs.collapse', function() {
         if ($('.main-container').hasClass('drawer-show')) {
             $('.js-drawer').trigger('drawer.show');
@@ -991,6 +1274,108 @@ var DashboardModal = (function() {
         }
     });
 
+    /**
+     * File Upload filename preview.
+     * There's a rendering function for this in Gdn_Form: `fileUpload()`.
+     * You'll probably want to use it to generate the markup for this.
+     *
+     * Selector: `.js-file-upload`
+     */
+    $(document).on('change', '.js-file-upload', function() {
+        var filename = $(this).val();
+        if (filename.substring(3, 11) === 'fakepath') {
+            filename = filename.substring(12);
+        }
+        if (filename) {
+            $(this).parent().find('.file-upload-choose').html(filename);
+        }
+    });
+
+    // Modal handling
+
+    /**
+     * Start regular modal.
+     *
+     * Selector: `.js-modal`
+     */
+    $(document).on('click', '.js-modal', function(e) {
+        e.preventDefault();
+        DashboardModal.activeModal = new DashboardModal($(this), {});
+    });
+
+    /**
+     * Start confirm modal.
+     *
+     * Selector: `.js-modal-confirm`
+     * Attribute: `data-follow-link:true` - Follows the link on confirm, otherwise stays on the page.
+     */
+    $(document).on('click', '.js-modal-confirm', function(e) {
+        e.preventDefault();
+        var followLink = $(this).data('followLink') === 'true';
+
+        DashboardModal.activeModal = new DashboardModal($(this), {
+            httpmethod: 'post',
+            modalType: 'confirm',
+            followLink: followLink // no ajax
+        });
+    });
+
+    /**
+     * Close active modal.
+     *
+     * Selector: `.js-modal-close`
+     */
+    $(document).on('click', '.js-modal-close', function() {
+        if (typeof(DashboardModal.activeModal) === 'object') {
+            $('#' + DashboardModal.activeModal.id).modal('hide');
+        }
+    });
+
+    // Foggy handling
+
+    /**
+     * Disables inputs and adds a foggy CSS class to the target to make the target look foggy.
+     */
+    $(document).on('foggyOn', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'true');
+        $target.data('isFoggy', 'true');
+        $target.addClass('foggy');
+
+        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
+        $target.find(':input').each(function() {
+            if ($(this).prop('disabled')) {
+                $(this).data('foggy-disabled', 'true');
+            } else {
+                $(this).prop('disabled', true);
+            }
+        });
+    });
+
+    /**
+     * Enables inputs and removes the foggy CSS class.
+     */
+    $(document).on('foggyOff', function(e) {
+        var $target = $(e.target);
+        $target.attr('aria-hidden', 'false');
+        $target.data('isFoggy', 'false');
+        $target.removeClass('foggy');
+
+        // Be careful not to enable fields that should be disabled.
+        $target.find(':input').each(function() {
+            if (!$(this).data('foggy-disabled')) {
+                $(this).prop('disabled', false);
+            }
+        });
+    });
+
+    // Navigation preferences saving
+
+    /**
+     * Saves the panel navigation collapse preferences.
+     *
+     * Selector: `.js-save-pref-collapse`
+     */
     $(document).on('click', '.js-save-pref-collapse', function() {
         var key = $(this).data('key');
         var collapsed = !$(this).hasClass('collapsed');
@@ -1010,6 +1395,13 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the landing page for a top-level section.
+     *
+     * Selector: `.js-save-pref-section-landing-page`
+     * Attributes: `data-link-path="/path/to/settingspage"`
+     *             `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-section-landing-page', function() {
         var url = $(this).data('linkPath');
         var section = $(this).data('section');
@@ -1029,6 +1421,12 @@ var DashboardModal = (function() {
         });
     });
 
+    /**
+     * Saves the preference for the dashboard landing page.
+     *
+     * Selector: `.js-save-pref-dashboard-landing-page`
+     * Attribute: `data-section="Moderation"`
+     */
     $(document).on('click', '.js-save-pref-dashboard-landing-page', function() {
         var section = $(this).data('section');
 
@@ -1045,85 +1443,16 @@ var DashboardModal = (function() {
             dataType: 'json'
         });
     });
-
-    $(document).on('change', '.js-file-upload', function() {
-        var filename = $(this).val();
-        if (filename.substring(3, 11) === 'fakepath') {
-            filename = filename.substring(12);
-        }
-        if (filename) {
-            $(this).parent().find('.file-upload-choose').html(filename);
-        }
-    });
-
-    $(document).on('click', '.js-modal', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {});
-    });
-
-    $(document).on('click', '.js-modal-confirm.js-hijack', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'post',
-            modalType: 'confirm'
-        });
-    });
-
-    $(document).on('click', '.js-modal-confirm:not(.js-hijack)', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            httpmethod: 'get',
-            modalType: 'confirm',
-            followLink: true // no ajax
-        });
-    });
-
-    // Get new banner image.
-    $(document).on('click', '.js-upload-email-image-button', function(e) {
-        e.preventDefault();
-        DashboardModal.activeModal = new DashboardModal($(this), {
-            afterSuccess: emailStyles.reloadImage
-        });
-    });
-
-    $(document).on('click', '.js-modal-close', function() {
-        if (typeof(DashboardModal.activeModal) === 'object') {
-            $('#' + DashboardModal.activeModal.id).modal('hide');
-        }
-    });
-
-    $(document).on('foggyOn', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'true');
-        $target.data('isFoggy', 'true');
-        $target.addClass('foggy');
-
-        // Make sure we mark already-disabled fields so as not to mistakenly mark them as enabled on foggyOff.
-        $target.find(':input').each(function() {
-            if ($(this).prop("disabled")) {
-                $(this).data('foggy-disabled', 'true');
-            } else {
-                $(this).prop("disabled", true);
-            }
-        });
-    });
-
-    $(document).on('foggyOff', function(e) {
-        var $target = $(e.target);
-        $target.attr('aria-hidden', 'false');
-        $target.data('isFoggy', 'false');
-        $target.removeClass('foggy');
-
-        // Be careful not to enable fields that should be disabled.
-        $target.find(':input').each(function() {
-            if (!$(this).data('foggy-disabled')) {
-                $(this).prop("disabled", false);
-            }
-        });
-    });
-
 })(jQuery);
 
+/**
+ * Returns an HTML string to render a svg icon.
+ *
+ * @param {string} name - The icon name.
+ * @param {string} alt - The alt text for the icon.
+ * @param {string} cssClass - The css class to apply to the svg.
+ * @returns {string} The HTML for the svg icon.
+ */
 var dashboardSymbol =  function(name, alt, cssClass) {
     if (alt) {
         alt = 'alt="' + alt + '" ';

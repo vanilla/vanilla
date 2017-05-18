@@ -2,7 +2,7 @@
 /**
  * Contains useful functions for cleaning up the database.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.1
@@ -14,7 +14,10 @@
 class LogModel extends Gdn_Pluggable {
 
     private static $instance = null;
-    private $recalcIDs = ['Discussion' => []];
+    private $recalcIDs = [
+        'Discussion' => [],
+        'Category' => [],
+    ];
     private static $transactionID = null;
 
     /**
@@ -67,8 +70,12 @@ class LogModel extends Gdn_Pluggable {
     public function formatContent($Log) {
         $Data = $Log['Data'];
 
-       // TODO: Check for a custom log type handler.
+        $Result = '';
+        $this->EventArguments['Log'] = $Log;
+        $this->EventArguments['Result'] = &$Result;
+        $this->fireEvent('FormatContent');
 
+        if ($Result === '') {
         switch ($Log['RecordType']) {
             case 'Activity':
                 $Result = $this->formatKey('Story', $Data);
@@ -87,7 +94,7 @@ class LogModel extends Gdn_Pluggable {
                 break;
             case 'Registration':
             case 'User':
-                $Result = $this->formatRecord(['Email', 'Name'], $Data);
+                    $Result = $this->formatRecord(['Email', 'Name', 'RecordIPAddress' => 'IP Address'], $Data);
                 if ($DiscoveryText = val('DiscoveryText', $Data)) {
                     $Result .= '<br /><b>'.t('Why do you want to join?').'</b><br />'.Gdn_Format::display($DiscoveryText);
                 }
@@ -95,9 +102,9 @@ class LogModel extends Gdn_Pluggable {
                     $Result .= "<br />".t('Banned');
                 }
                 break;
-            default:
-                $Result = '';
+            }
         }
+
         return $Result;
     }
    
@@ -192,7 +199,7 @@ class LogModel extends Gdn_Pluggable {
         static $TinyDiff = null;
 
         if ($TinyDiff === null) {
-            require_once(dirname(__FILE__).'/tiny_diff.php');
+            require_once(__DIR__.'/tiny_diff.php');
             $TinyDiff = new Tiny_diff();
         }
       
@@ -572,6 +579,18 @@ class LogModel extends Gdn_Pluggable {
      * Recalculate a record after a log operation.
      */
     public function recalculate() {
+        if ($CategoryIDs = val('Category', $this->recalcIDs)) {
+            foreach ($CategoryIDs as $categoryID => $counts) {
+                Gdn::sql()
+                    ->update('Category')
+                    ->set('CountDiscussions', 'CountDiscussions + '.val('CountDiscussions', $counts, 0), false, false)
+                    ->set('CountComments', 'CountComments + '.val('CountComments', $counts, 0), false, false)
+                    ->where('CategoryID', $categoryID)
+                    ->put();
+            }
+            $this->recalcIDs['Category'] = [];
+        }
+
         if ($DiscussionIDs = val('Discussion', $this->recalcIDs)) {
             $In = implode(',', array_keys($DiscussionIDs));
       
@@ -787,6 +806,17 @@ class LogModel extends Gdn_Pluggable {
                         throw new Exception(Gdn::userModel()->Validation->resultsText());
                     } else {
                         Gdn::userModel()->sendWelcomeEmail($ID, '', 'Register');
+
+                        // If this record has a Source and a SourceID, it has an SSO mapping that needs to be created.
+                        $source = val('Source', $Data);
+                        $sourceID = val('SourceID', $Data);
+                        if ($source && $sourceID) {
+                            Gdn::userModel()->saveAuthentication([
+                                'UserID' => $ID,
+                                'Provider' => $source,
+                                'UniqueID' => $sourceID
+                            ]);
+                    }
                     }
                 } else {
                     $ID = Gdn::sql()
@@ -801,16 +831,32 @@ class LogModel extends Gdn_Pluggable {
                         Gdn::userModel()->setField($ID, 'Banned', 0);
                     }
                
-                    // Keep track of a discussion ID so that its count can be recalculated.
-                    if ($Log['Operation'] != 'Edit') {
+                    // Keep track of discussions and categories so that their counts can be recalculated.
                         switch ($Log['RecordType']) {
                             case 'Discussion':
                                 $this->recalcIDs['Discussion'][$ID] = true;
+
+                            if (empty($this->recalcIDs['Category'][$Log['CategoryID']])) {
+                                $this->recalcIDs['Category'][$Log['CategoryID']] = [
+                                    'CountDiscussions' => 1,
+                                    'CountComments' => 0,
+                                ];
+                            } else {
+                                $this->recalcIDs['Category'][$Log['CategoryID']]['CountDiscussions']++;
+                            }
                                 break;
                             case 'Comment':
                                 $this->recalcIDs['Discussion'][$Log['ParentRecordID']] = true;
+
+                            if (empty($this->recalcIDs['Category'][$Log['ParentRecordID']])) {
+                                $this->recalcIDs['Category'][$Log['ParentRecordID']] = [
+                                    'CountDiscussions' => 0,
+                                    'CountComments' => 1,
+                                ];
+                            } else {
+                                $this->recalcIDs['Category'][$Log['ParentRecordID']]['CountComments']++;
+                            }
                                 break;
-                        }
                     }
 
                     if ($Log['Operation'] == 'Pending') {

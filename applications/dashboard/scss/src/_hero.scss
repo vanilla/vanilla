@@ -1,0 +1,54 @@
+// The Hero
+//
+// Styleguide 16.
+
+// The Hero
+//
+// This little component is good for empty pages and large callouts. It gets used mostly for empty page messages,
+// but also appears in the (currently hidden) "Help and Tutorials" section.
+//
+// PHP rendering helper: `hero()` function in `functions.render`
+//
+// Markup:
+// <div class="hero">
+//   <div class="hero-content">
+//     <div class="hero-title">I'm a hero!</div>
+//     <div class="hero-body">Click the button if you're a hero too.</div>
+//     <button class="btn btn-secondary">Hero Button</button>
+//   </div>
+//   <div class="hero-media-wrapper">
+//     <img src="./public/resources/images/baby-seal.jpg">
+//   </div>
+// </div>
+//
+// Styleguide 16.1.
+
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ($spacer * 2) $spacer;
+
+  > * {
+    flex-grow: 1;
+  }
+
+  .hero-content {
+    padding: 0 $spacer * 6 0 $spacer * 4;
+    font-size: $font-size-tables;
+    text-align: center;
+    flex-shrink: 1;
+  }
+
+  .hero-title {
+    @extend .h2;
+  }
+
+  .hero-media-wrapper {
+    flex-shrink: 0;
+  }
+
+  .btn {
+    margin-top: $spacer * 2;
+  }
+}

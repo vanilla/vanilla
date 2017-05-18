@@ -8,7 +8,7 @@
 // icons, we make use of svg's use element, which clones the map svg into the shadow DOM.
 // Learn more: http://tympanus.net/codrops/2015/07/16/styling-svg-use-content-css/
 //
-// PHP rendering function: `dashboardSymbol(iconSlug, alt, cssClass);`
+// PHP rendering function: `dashboardSymbol(iconSlug, [cssClass, alt]);`
 //
 // .icon-text - Same color and size as default body text.
 // .icon-9 - 9 pixel icon.

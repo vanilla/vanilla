@@ -48,7 +48,7 @@ if (!count($this->FlaggedItems)) {
                     $flaggedBy .= '<div class="FlaggedReason">'.Gdn_Format::text($Flag['Comment']).'</div>';
                 }
                 $options = anchor(t('Take Action'), $Flag['ForeignURL'], 'btn btn-primary');
-                $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm js-hijack', ['data-body' => t('Are you sure you want to dismiss this flag?')]);
+                $options .= anchor(t('Dismiss'), 'plugin/flagging/dismiss/'.$Flag['EncodedURL'], 'btn btn-primary js-modal-confirm', ['data-body' => t('Are you sure you want to dismiss this flag?')]);
                 ?>
                 <tr>
                     <td class="FlaggedType"><?php echo $type; ?></td>

@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 /**
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package BitterSweet Theme
  * @since 2.1
@@ -12,5 +12,6 @@ $ThemeInfo['bittersweet'] = array(
     'Version' => '1.1',
     'Author' => "Mark O'Sullivan",
     'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://markosullivan.ca'
+    'AuthorUrl' => 'http://markosullivan.ca',
+    'Hidden' => false,
 );

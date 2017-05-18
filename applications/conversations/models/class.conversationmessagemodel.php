@@ -2,7 +2,7 @@
 /**
  * Conversation message model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -209,11 +209,13 @@ class ConversationMessageModel extends ConversationsModel {
         $this->fireEvent('BeforeSaveValidation');
 
         // Determine if spam check should be skipped.
-        $SkipSpamCheck = (!empty($Options['NewConversation']));
+        if (!$Session->User->Admin && !$Session->checkPermission('Garden.Moderation.Manage')) {
+            $this->setFloodControlEnabled(empty($Options['NewConversation']));
+        }
 
         // Validate the form posted values
         $MessageID = false;
-        if ($this->validate($FormPostValues) && !$this->checkForSpam('ConversationMessage', $SkipSpamCheck)) {
+        if ($this->validate($FormPostValues) && !$this->isUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
             $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             touchValue('Format', $Fields, c('Garden.InputFormatter', 'Html'));
 
@@ -400,12 +402,12 @@ class ConversationMessageModel extends ConversationsModel {
     public function validate($FormPostValues, $Insert = false) {
         $valid = parent::validate($FormPostValues, $Insert);
 
-        if (!checkPermission('Garden.Moderation.Manage') && c('Conversations.MaxRecipients')) {
-            $max = c('Conversations.MaxRecipients');
-            if (isset($FormPostValues['RecipientUserID']) && count($FormPostValues['RecipientUserID']) > $max) {
+        $maxRecipients = ConversationModel::getMaxRecipients();
+        if ($maxRecipients) {
+            if (isset($FormPostValues['RecipientUserID']) && count($FormPostValues['RecipientUserID']) > $maxRecipients) {
                 $this->Validation->addValidationResult(
                     'To',
-                    plural($max, "You are limited to %s recipient.", "You are limited to %s recipients.")
+                    plural($maxRecipients, "You are limited to %s recipient.", "You are limited to %s recipients.")
                 );
                 $valid = false;
             }

@@ -1,0 +1,21 @@
+comment:
+    -
+        tag: "sample-rules-thanks"
+        parent: "sample-rules"
+        author: "user2"
+        body: |
+            Thanks for these @"{parent.Name}", I'll make sure everyone follows the rules!
+            
+    -
+        tag: "tips-and-tricks-thanks"
+        parent: "tips-and-tricks"
+        author: "user3"
+        body: |
+            Wow, I didn't know about some of these, thanks!
+            
+    -
+        tag: "great-discussion-thanks"
+        parent: "starting-a-great-discussion"
+        author: "user1"
+        body: |
+            Great stuff @"{parent.Name}", thank you for posting these helpful tips!

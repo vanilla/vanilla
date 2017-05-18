@@ -4,4 +4,4 @@
  * vBulletin into their Vanilla equivalent pages.
  */
 
-include_once dirname(__FILE__).'/showthread.php';
+include_once __DIR__.'/showthread.php';

@@ -2,7 +2,7 @@
 /**
  * InThisDiscussion plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package InThisDiscussion
  */
@@ -33,7 +33,7 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
     public function settingsController_inThisDiscussion_create($Sender) {
         $Sender->permission('Garden.Settings.Manage');
         $Sender->setData('Title', t('In This Discussion Settings'));
-        $Sender->addSideMenu('dashboard/settings/plugins');
+        $Sender->setHighlightRoute('dashboard/settings/plugins');
 
         $Conf = new ConfigurationModule($Sender);
         $Conf->initialize(array(

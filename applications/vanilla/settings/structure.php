@@ -4,7 +4,7 @@
  *
  * Called by VanillaHooks::Setup() to update database upon enabling app.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @since 2.0
  * @package Vanilla
@@ -22,12 +22,17 @@ $SQL = Gdn::database()->sql();
 $Construct = Gdn::database()->Structure();
 $Px = $Construct->DatabasePrefix();
 
+$captureOnly = Gdn::database()->structure()->CaptureOnly;
+
 $Construct->table('Category');
 $CategoryExists = $Construct->TableExists();
 $CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 
 $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
+
+$CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
+$CountAllCommentsExists = $Construct->columnExists('CountAllComments');
 
 $Construct->PrimaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true, 'key')
@@ -36,10 +41,14 @@ $Construct->PrimaryKey('CategoryID')
     ->column('Depth', 'int', '0')
     ->column('CountCategories', 'int', '0')
     ->column('CountDiscussions', 'int', '0')
+    ->column('CountAllDiscussions', 'int', '0')
     ->column('CountComments', 'int', '0')
+    ->column('CountAllComments', 'int', '0')
+    ->column('LastCategoryID', 'int', '0')
     ->column('DateMarkedRead', 'datetime', null)
     ->column('AllowDiscussions', 'tinyint', '1')
     ->column('Archived', 'tinyint(1)', '0')
+    ->column('CanDelete', 'tinyint', '1')
     ->column('Name', 'varchar(255)')
     ->column('UrlCode', 'varchar(255)', true)
     ->column('Description', 'varchar(500)', true)
@@ -417,6 +426,15 @@ if (!$LastDiscussionIDExists) {
         ->join('Comment cm', 'c.LastCommentID = cm.CommentID')
         ->set('c.LastDiscussionID', 'cm.DiscussionID', false, false)
         ->put();
+}
+
+if (!$captureOnly) {
+    if (!$CountAllDiscussionsExists) {
+        CategoryModel::instance()->counts('CountAllDiscussions');
+    }
+    if (!$CountAllCommentsExists) {
+        CategoryModel::instance()->counts('CountAllComments');
+    }
 }
 
 // Add stub content

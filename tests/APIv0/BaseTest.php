@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license Proprietary
  */
 
@@ -29,6 +29,10 @@ abstract class BaseTest extends \PHPUnit_Framework_TestCase {
         if (empty($data['Discussions'])) {
             throw new \Exception("The discussion stub content is missing.", 500);
         }
+    }
+
+    public static function tearDownAfterClass() {
+        self::$api->terminate();
     }
 
     /**

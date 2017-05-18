@@ -3,7 +3,7 @@
  * VanillaStats Plugin
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package VanillaStats
  */
@@ -130,11 +130,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         if (!Gdn_Statistics::checkIsEnabled() && Gdn_Statistics::checkIsLocalhost()) {
             $sender->render('dashboardlocalhost', '', 'plugins/VanillaStats');
         } else {
-            $sender->addCssFile('picker.css', 'plugins/VanillaStats');
             $sender->addCssFile('vendors/c3.min.css', 'plugins/VanillaStats');
-
             $sender->addJsFile('vanillastats.js', 'plugins/VanillaStats');
-            $sender->addJsFile('picker.js', 'plugins/VanillaStats');
             $sender->addJsFile('d3.min.js');
             $sender->addJsFile('c3.min.js');
 
@@ -166,7 +163,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
         $Sender->fireEvent('DefineAdminPermissions');
         $Sender->permission($Sender->RequiredAdminPermissions, '', false);
-        $Sender->addSideMenu('dashboard/settings');
+        $Sender->setHighlightRoute('dashboard/settings');
 
         $range = Gdn::request()->getValue('range');
         $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));

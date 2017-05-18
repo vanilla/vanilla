@@ -1,0 +1,31 @@
+user:
+    -
+        tag: "vanilla-user"
+        name: "Vanilla Forums"
+        nick: "Vanilla"
+        role: "administrator"
+        email: "vanilla@stub.vanillacommunity.com"
+        photo: "https://images.v-cdn.net/stubcontent/vanilla_avatar.jpg"
+    -
+        tag: "user1"
+        name: "Karen A. Thomas"
+        nick: "Karen"
+        role: "administrator"
+        email: "karen@stub.vanillacommunity.com"
+        photo: "https://images.v-cdn.net/stubcontent/avatar_01.png"
+        
+    -
+        tag: "user2"
+        name: "Victorine Courtois"
+        nick: "Victorine"
+        role: "moderator"
+        email: "victorine@stub.vanillacommunity.com"
+        photo: "https://images.v-cdn.net/stubcontent/avatar_02.png"
+        
+    -
+        tag: "user3"
+        name: "Alex Powell"
+        nick: "Alex"
+        role: "member"
+        email: "alex@stub.vanillacommunity.com"
+        photo: "https://images.v-cdn.net/stubcontent/avatar_03.png"

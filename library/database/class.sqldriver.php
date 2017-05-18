@@ -9,7 +9,7 @@
  * CodeIgniter (http://www.codeigniter.com). My hat is off to them.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -842,13 +842,16 @@ abstract class Gdn_SQLDriver {
      * Returns an update statement for the specified table with the provided
      * $Data.
      *
-     * @param array $Tables The names of the tables to updated data in.
-     * @param array $Data An associative array of FieldName => Value pairs that should be inserted
+     * @param array $tables The names of the tables to updated data in.
+     * @param array $data An associative array of FieldName => Value pairs that should be inserted
      * $Table.
-     * @param mixed $Where A where clause (or array containing multiple where clauses) to be applied
+     * @param mixed $where A where clause (or array containing multiple where clauses) to be applied
+     * @param mixed $orderBy A collection of order by statements.
+     * @param mixed $limit The number of records to limit the query to.
      * to the where portion of the update statement.
+     * @return string
      */
-    public function getUpdate($Tables, $Data, $Where) {
+    public function getUpdate($tables, $data, $where, $orderBy = null, $limit = null) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetUpdate'), E_USER_ERROR);
     }
 
@@ -1622,14 +1625,15 @@ abstract class Gdn_SQLDriver {
     }
 
     public function query($Sql, $Type = 'select') {
-        $QueryOptions = array('Type' => $Type, 'Slave' => GetValue('Slave', $this->_Options, null));
+        $QueryOptions = array('Type' => $Type, 'Slave' => val('Slave', $this->_Options, null));
 
         switch ($Type) {
             case 'insert':
                 $ReturnType = 'ID';
                 break;
             case 'update':
-                $ReturnType = null;
+            case 'delete':
+                $ReturnType = '';
                 break;
             default:
                 $ReturnType = 'DataSet';

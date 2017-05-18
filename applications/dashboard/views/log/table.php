@@ -86,7 +86,7 @@ include $this->fetchViewLocation('helper_functions');
                     <?php echo t($RecordLabel); ?>
                 </td>
                 <td class="DateCell">
-                    <?php echo Gdn_Format::date($Row['DateInserted'], '%e %b %Y'); ?>
+                    <?php echo Gdn_Format::date($Row['DateInserted'], '%a %e %b %Y %r %Z'); ?>
                 </td>
                 <td class="PostedByCell"><?php
                     $RecordUser = Gdn::userModel()->getID($Row['RecordUserID'], DATASET_TYPE_ARRAY);

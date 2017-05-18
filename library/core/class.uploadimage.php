@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -304,7 +304,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             copy($Source, $TargetPath);
         }
 
-        // Allow a plugin to move the file to a differnt location.
+        // Allow a plugin to move the file to a different location.
         $Sender = new stdClass();
         $Sender->EventArguments = array();
         $Sender->EventArguments['Path'] = $TargetPath;
@@ -312,6 +312,8 @@ class Gdn_UploadImage extends Gdn_Upload {
         $Parsed['Width'] = $Width;
         $Parsed['Height'] = $Height;
         $Sender->EventArguments['Parsed'] =& $Parsed;
+        $Sender->EventArguments['Options'] = $Options;
+        $Sender->EventArguments['OriginalFilename'] = val('OriginalFilename', $Options);
         $Sender->Returns = array();
         Gdn::pluginManager()->callEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
         return $Sender->EventArguments['Parsed'];

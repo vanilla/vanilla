@@ -2,7 +2,7 @@
 /**
  * Activity Model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -12,6 +12,8 @@
  * Activity data management.
  */
 class ActivityModel extends Gdn_Model {
+
+    use \Vanilla\FloodControlTrait;
 
     /** Activity notification level: Everyone. */
     const NOTIFY_PUBLIC = -1;
@@ -62,7 +64,11 @@ class ActivityModel extends Gdn_Model {
     */
     public function __construct() {
         parent::__construct('Activity');
-        $this->setPruneAfter('-2 months');
+        try {
+            $this->setPruneAfter(c('Garden.PruneActivityAfter', '2 months'));
+        } catch (Exception $ex) {
+            $this->setPruneAfter('2 months');
+        }
     }
 
    /**
@@ -1098,6 +1104,11 @@ class ActivityModel extends Gdn_Model {
                 Gdn::controller()->json('CommentActivityID', $CommentActivityID);
                 $Comment['ActivityID'] = $CommentActivityID;
             }
+
+            $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'ActivityComment');
+            if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
+                return false;
+            }
             Gdn::Controller()->Json('Activity', $CommentActivityID);
 
            // Check for spam.
@@ -1336,7 +1347,7 @@ class ActivityModel extends Gdn_Model {
 
         $this->EventArguments['Preference'] = $Preference;
         $this->EventArguments['Options'] = $Options;
-        $this->EventArguments['Data'] = $Data;
+        $this->EventArguments['Data'] = &$Data;
         $this->fireEvent('BeforeCheckPreference');
         if (!empty($Preference)) {
             list($Popup, $Email) = self::notificationPreference($Preference, $Data['NotifyUserID'], 'both');
@@ -1476,6 +1487,11 @@ class ActivityModel extends Gdn_Model {
         $ActivityID = val('ActivityID', $Activity);
         if (!$ActivityID) {
             if (!$Delete) {
+                $storageObject = FloodControlHelper::configure($this, 'Vanilla', 'Activity');
+                if ($this->isUserSpamming(Gdn::session()->User->UserID, $storageObject)) {
+                    return false;
+                }
+
                 $this->addInsertFields($Activity);
                 touchValue('DateUpdated', $Activity, $Activity['DateInserted']);
 
@@ -1743,7 +1759,17 @@ class ActivityModel extends Gdn_Model {
         if (!$this->pruneAfter) {
             return null;
         } else {
-            return new \DateTime($this->pruneAfter, new DateTimeZone('UTC'));
+            $tz = new \DateTimeZone('UTC');
+            $now = new DateTime('now', $tz);
+            $test = new DateTime($this->pruneAfter, $tz);
+
+            $interval = $test->diff($now);
+
+            if ($interval->invert === 1) {
+                return $now->add($interval);
+            } else {
+                return $test;
+            }
         }
     }
 
@@ -1760,9 +1786,6 @@ class ActivityModel extends Gdn_Model {
             $testTime = strtotime($pruneAfter, $now);
             if ($testTime === false) {
                 throw new InvalidArgumentException('Invalid timespan value for "prune after".', 400);
-            }
-            if ($testTime >= $now) {
-                throw new InvalidArgumentException('You must specify a timespan in the past for "prune after".', 400);
             }
         }
 

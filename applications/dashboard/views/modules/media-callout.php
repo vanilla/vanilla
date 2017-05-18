@@ -13,7 +13,7 @@
         <?php } ?>
         <div class="media-heading">
             <h3 class="media-title theme-name">
-                <?php echo $this->getTitleUrl() != '' ? anchor($this->getTitle(), $this->getTitleUrl()) : $this->getTitle(); ?>
+                <?php echo $this->getTitleUrl() != '' ? anchor(htmlspecialchars($this->getTitle()), $this->getTitleUrl()) : htmlspecialchars($this->getTitle()); ?>
             </h3>
             <?php if ($this->getMeta()) { ?>
                 <div class="info">

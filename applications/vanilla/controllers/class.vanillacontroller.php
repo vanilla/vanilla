@@ -2,7 +2,7 @@
 /**
  * Vanilla controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -40,5 +40,20 @@ class VanillaController extends Gdn_Controller {
         $this->addModule('SignedInModule');
 
         parent::initialize();
+    }
+
+    /**
+     * Check a category level permission.
+     *
+     * @param int|array|object $category The category to check the permission for.
+     * @param string|array $permission The permission(s) to check.
+     * @param bool $fullMatch Whether or not several permissions should be a full match.
+     */
+    protected function categoryPermission($category, $permission, $fullMatch = true) {
+        if (!CategoryModel::checkPermission($category, $permission, $fullMatch)) {
+            $categoryID = is_numeric($category) ? $category : val('CategoryID', $category);
+
+            $this->permission($permission, $fullMatch, 'Category', $categoryID);
+        }
     }
 }

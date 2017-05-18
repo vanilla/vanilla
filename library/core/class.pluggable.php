@@ -3,7 +3,7 @@
  * Gdn_Pluggable
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -19,7 +19,7 @@
  *
  * @abstract
  */
-abstract class Gdn_Pluggable extends Gdn_SliceProvider {
+abstract class Gdn_Pluggable {
 
     /**
      * @var string The name of the class that has been instantiated. Typically this will be
@@ -158,6 +158,17 @@ abstract class Gdn_Pluggable extends Gdn_SliceProvider {
     public function __call($MethodName, $Arguments) {
         // Define a return variable.
         $Return = false;
+
+        // We removed the SliceProvider class, which Pluggable previously extended.
+        // If any of these methods are called, send out an error.
+        $sliceProviderMethods = ['enableSlicing', 'slice', 'addSliceAsset', 'renderSliceConfig'];
+
+        if (in_array($MethodName, $sliceProviderMethods)) {
+            $message = 'Slicing has been removed from Gdn_Pluggable.';
+            $message .= ' Try using the functionality provided by "js-form" instead.';
+            throw new Exception($message);
+        }
+
 
         // Was this method declared, or called?
         if (substr($MethodName, 0, 1) == 'x') {

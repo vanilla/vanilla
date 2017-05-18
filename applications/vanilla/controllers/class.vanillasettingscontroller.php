@@ -2,7 +2,7 @@
 /**
  * Settings controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -19,11 +19,14 @@ class VanillaSettingsController extends Gdn_Controller {
     /** @var CategoryModel */
     public $CategoryModel;
 
+    /** @var object The current category, if available. */
+    public $Category;
+
     /** @var Gdn_Form */
     public $Form;
 
-    /** @var bool */
-    public $ShowCustomPoints = false;
+    /** @var array An array of category records. */
+    public $OtherCategories;
 
     /**
      * Advanced settings.
@@ -49,6 +52,8 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.AdminCheckboxes.Use',
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
+            'Garden.Format.WarnLeaving',
+            'Garden.Format.DisableUrlEmbeds',
             'Garden.TrustedDomains'
         ));
 
@@ -85,6 +90,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $TrustedDomains = array_unique(array_filter($TrustedDomains));
             $TrustedDomains = implode("\n", $TrustedDomains);
             $this->Form->setFormValue('Garden.TrustedDomains', $TrustedDomains);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', $this->Form->getValue('Garden.Format.DisableUrlEmbeds') !== '1');
 
             // Save new settings
             $Saved = $this->Form->save();
@@ -236,7 +242,13 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Discussion.SpamLock',
             'Vanilla.Comment.SpamCount',
             'Vanilla.Comment.SpamTime',
-            'Vanilla.Comment.SpamLock'
+            'Vanilla.Comment.SpamLock',
+            'Vanilla.Activity.SpamCount',
+            'Vanilla.Activity.SpamTime',
+            'Vanilla.Activity.SpamLock',
+            'Vanilla.ActivityComment.SpamCount',
+            'Vanilla.ActivityComment.SpamTime',
+            'Vanilla.ActivityComment.SpamLock',
         );
         if ($IsConversationsEnabled) {
             $ConfigurationFields = array_merge(
@@ -279,6 +291,19 @@ class VanillaSettingsController extends Gdn_Controller {
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Comment.SpamLock', 'Integer');
 
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.Activity.SpamLock', 'Integer');
+
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamCount', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamTime', 'Integer');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Required');
+            $ConfigurationModel->Validation->applyRule('Vanilla.ActivityComment.SpamLock', 'Integer');
 
             if ($IsConversationsEnabled) {
                 $ConfigurationModel->Validation->applyRule('Conversations.Conversation.SpamCount', 'Required');
@@ -343,12 +368,13 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
             // Enforces tinyint values on boolean fields to comply with strict mode
-            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
-            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
-            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions', null), '0', '1', '0'));
+            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived', null), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads', null), '1', '1', '0'));
 
             $upload = new Gdn_Upload();
-            $tmpImage = $upload->validateUpload('PhotoUpload', false);
+            $tmpImage = $upload->validateUpload('Photo_New', false);
+
             if ($tmpImage) {
                 // Generate the target image name
                 $targetImage = $upload->generateTargetName(PATH_UPLOADS);
@@ -446,7 +472,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $CategoryID Unique ID of the category to be deleted.
+     * @param int|bool $CategoryID Unique ID of the category to be deleted.
      */
     public function deleteCategory($CategoryID = false) {
         // Check permission
@@ -460,6 +486,10 @@ class VanillaSettingsController extends Gdn_Controller {
         // Get category data
         $this->Category = $this->CategoryModel->getID($CategoryID);
 
+        // Block deleting special categories.
+        if (!val('CanDelete', $this->Category, true)) {
+            $this->Form->addError('The specified category cannot be deleted.');
+        }
 
         if (!$this->Category) {
             $this->Form->addError('The specified category could not be found.');
@@ -469,57 +499,56 @@ class VanillaSettingsController extends Gdn_Controller {
 
             // Get a list of categories other than this one that can act as a replacement
             $this->OtherCategories = $this->CategoryModel->getWhere(
-                array(
+                [
                     'CategoryID <>' => $CategoryID,
                     'AllowDiscussions' => $this->Category->AllowDiscussions, // Don't allow a category with discussion to be the replacement for one without discussions (or vice versa)
                     'CategoryID >' => 0
-                ),
+                ],
                 'Sort'
             );
 
-            if (!$this->Form->authenticatedPostBack()) {
-                $this->Form->setFormValue('DeleteDiscussions', '1'); // Checked by default
-            } else {
-                $ReplacementCategoryID = $this->Form->getValue('ReplacementCategoryID');
-                $ReplacementCategory = $this->CategoryModel->getID($ReplacementCategoryID);
-                // Error if:
-                // 1. The category being deleted is the last remaining category that
-                // allows discussions.
-                if ($this->Category->AllowDiscussions == '1'
-                    && $this->OtherCategories->numRows() == 0
-                ) {
+            // Get the list of sub-categories
+            $subcategories = $this->CategoryModel->getSubtree($CategoryID, false);
+            $this->setData('Subcategories', $subcategories);
+            // Number of discussions contained in the subcategories
+            $discussionModel = new DiscussionModel();
+            $categoryIDs = array_merge([$CategoryID], array_column($subcategories, 'CategoryID'));
+            $this->setData('DiscussionsCount', $discussionModel->getCountForCategory($categoryIDs));
+
+            if ($this->Form->authenticatedPostBack()) {
+                // Error if the category being deleted is the last remaining category that allows discussions.
+                if ($this->Category->AllowDiscussions == '1' && $this->OtherCategories->numRows() == 0) {
                     $this->Form->addError('You cannot remove the only remaining category that allows discussions');
-                }
+                } else {
+                    $newCategoryID = 0;
+                    $contentAction = $this->Form->getFormValue('ContentAction', false);
 
-                /*
-                // 2. The category being deleted allows discussions, and it contains
-                // discussions, and there is no replacement category specified.
-                if ($this->Form->errorCount() == 0
-                   && $this->Category->AllowDiscussions == '1'
-                   && $this->Category->CountDiscussions > 0
-                   && ($ReplacementCategory == FALSE || $ReplacementCategory->AllowDiscussions != '1'))
-                   $this->Form->addError('You must select a replacement category in order to remove this category.');
-                */
-
-                // 3. The category being deleted does not allow discussions, and it
-                // does contain other categories, and there are replacement parent
-                // categories available, and one is not selected.
-                /*
-                if ($this->Category->AllowDiscussions == '0'
-                   && $this->OtherCategories->numRows() > 0
-                   && !$ReplacementCategory) {
-                   if ($this->CategoryModel->getWhere(array('ParentCategoryID' => $CategoryID))->numRows() > 0)
-                      $this->Form->addError('You must select a replacement category in order to remove this category.');
+                    switch($contentAction) {
+                        case 'move':
+                            $newCategoryID = $this->Form->getFormValue('ReplacementCategoryID');
+                            if (!$newCategoryID) {
+                                $this->Form->addError('Replacement category is required.');
+                            }
+                            break;
+                        case 'delete':
+                            if (!$this->Form->getFormValue('ConfirmDelete', false)) {
+                                $this->Form->addError('You must confirm the deletion.');
+                            }
+                            break;
+                        default:
+                            $this->Form->addError('Something went wrong.');
+                            break;
+                    }
                 }
-                */
 
                 if ($this->Form->errorCount() == 0) {
                     // Go ahead and delete the category
                     try {
-                        $this->CategoryModel->delete($this->Category, $this->Form->getValue('ReplacementCategoryID'));
+                        $this->CategoryModel->deleteAndReplace($this->Category, $newCategoryID);
                     } catch (Exception $ex) {
                         $this->Form->addError($ex);
                     }
+
                     if ($this->Form->errorCount() == 0) {
                         $this->RedirectUrl = url('vanilla/settings/categories');
                         $this->informMessage(t('Deleting category...'));
@@ -639,7 +668,7 @@ class VanillaSettingsController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack()) {
             $this->setupDiscussionTypes($this->Category);
             $Upload = new Gdn_Upload();
-            $TmpImage = $Upload->validateUpload('PhotoUpload', false);
+            $TmpImage = $Upload->validateUpload('Photo_New', false);
             if ($TmpImage) {
                 // Generate the target image name
                 $TargetImage = $Upload->generateTargetName(PATH_UPLOADS);
@@ -657,7 +686,7 @@ class VanillaSettingsController extends Gdn_Controller {
             // Enforces tinyint values on boolean fields to comply with strict mode
             $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
             $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
-            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
 
             if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');
@@ -739,6 +768,8 @@ class VanillaSettingsController extends Gdn_Controller {
             $categories = $collection->getTree($parentID, ['maxdepth' => 10, 'collapsecategories' => true]);
         }
 
+        $this->addJsFile('categoryfilter.js', 'vanilla');
+
         $this->setData('ParentID', $parentID);
         $this->setData('Categories', $categories);
         $this->setData('_Limit', $perPage);
@@ -801,6 +832,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function manageCategories() {
+        deprecated('categories');
 
         // Check permission
         $this->permission(['Garden.Community.Manage', 'Garden.Settings.Manage'], false);

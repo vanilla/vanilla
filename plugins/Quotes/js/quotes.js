@@ -83,7 +83,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
                 .addClass('QuoteFolded')
                 .hide()
                 .before(
-                    '<div><a href="" class="QuoteFolding">' +
+                    '<div class="QuoteFoldingWrapper"><a href="" class="QuoteFolding">' +
                     gdn.definition('&raquo; show previous quotes') +
                     '</a></div>'
                 );

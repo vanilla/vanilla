@@ -138,6 +138,19 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
 
     $media->setImage($iconPath);
 
+    // IsConfigured badge
+
+    $badges = [];
+
+    if (isset($addonInfo['Configured'])) {
+        $badges[] = [
+            'text' => $addonInfo['Configured'] ? t('Configured') : t('Not Configured'),
+            'cssClass' => $addonInfo['Configured'] ? 'badge-success' : 'badge-warning',
+        ];
+    }
+
+    $media->addOption('badges', $badges);
+
     // Settings button
 
     $settingsUrl = $isEnabled ? val('SettingsUrl', $addonInfo, '') : '';
@@ -148,7 +161,7 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
         $attr['aria-label'] = sprintf(t('Settings for %s'), $screenName);
         $attr['data-reload-page-on-save'] = false;
 
-        $media->addButton(dashboardSymbol('settings'), $settingsUrl, $attr);
+        $media->addButton(dashboardSymbol('settings'), url($settingsUrl), $attr);
     }
 
     // Toggle

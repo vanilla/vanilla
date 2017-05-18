@@ -1,11 +1,13 @@
 <?php
 /**
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 
 namespace Vanilla;
+
+use Garden\EventManager;
 
 /**
  * A class to manage all of the addons in the application.
@@ -14,7 +16,7 @@ namespace Vanilla;
  * be started which makes them available to the application. When an addon is started it can do the following:
  *
  * - Any classes the addon has declared are available via the {@link AddonManager::autoload()} method.
- * - The addon can declare a class ending in "Plugin" and its events will be registered (TODO).
+ * - The addon can declare a class ending in "Plugin" and its events will be registered.
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
 class AddonManager {
@@ -139,6 +141,26 @@ class AddonManager {
     }
 
     /**
+     * Register the autoloader for addons managed through this class.
+     *
+     * @param bool $throw This parameter specifies whether **spl_autoload_register()** should throw exceptions when the autoload_function cannot be registered.
+     * @param bool $prepend If true, **spl_autoload_register()** will prepend the autoloader on the autoload queue instead of appending it.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function registerAutoloader($throw = true, $prepend = false) {
+        return spl_autoload_register([$this, 'autoload'], $throw, $prepend);
+    }
+
+    /**
+     * Unregister the autoloader registered with {@link AddonManager::registerAutoloader()}.
+     *
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    public function unregisterAutoloader() {
+        return spl_autoload_unregister([$this, 'autoload']);
+    }
+
+    /**
      * Lookup an addon by class name.
      *
      * This method should only be used with enabled addons as searching through all addons takes a performance hit.
@@ -165,9 +187,58 @@ class AddonManager {
     }
 
     /**
+     * Find the classes match a glob style pattern.
+     *
+     * @param string $pattern The pattern to match.
+     * @param bool $searchAll Whether to search all classes or just the started ones.
+     * @return array Returns an array of class names.
+     */
+    public function findClasses($pattern, $searchAll = false) {
+        $fn = function ($name) use ($pattern) {
+            return $this->matchClass($pattern, $name);
+        };
+
+        $result = [];
+        if ($searchAll === false) {
+            /* @var Addon $addon */
+            foreach ($this->autoloadClasses as $classKey => list($path, $addon)) {
+                if ($fn($classKey)) {
+                    $result[] = $addon->getClasses()[$classKey][0];
+                }
+            }
+        } else {
+            foreach ($this->lookupAllByType(Addon::TYPE_ADDON) as $addon) {
+                /* @var Addon $addon */
+                $classes = array_column($addon->getClasses(), 0);
+
+                $result = array_merge($result, array_filter($classes, $fn));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Match a class name against a pattern.
+     *
+     * @param string $pattern A glob style pattern.
+     * @param string $class The class to match.
+     */
+    protected function matchClass($pattern, $class) {
+        $class = '\\'.ltrim($class, '\\');
+
+        $regex = str_replace(['\\*\\', '*', '\\'], ['(\\.+\\|\\)', '.*', '\\\\'], '\\'.ltrim($pattern, '\\'));
+        $regex = "`^$regex$`i";
+
+        $r = preg_match($regex, $class);
+        return (bool)$r;
+    }
+
+    /**
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
+     * @return array
      */
     public function lookupAllByType($type) {
         if ($this->typeUsesMultiCaching($type)) {
@@ -546,28 +617,45 @@ class AddonManager {
     }
 
     /**
-     * Check the enabled dependants of an addon.
+     * Check the enabled dependents of an addon.
      *
-     * Addons should always check their dependants before being disabled. This check does not consider dependants that
+     * Addons should always check their dependents before being disabled. This check does not consider dependents that
+     * are not enabled.
+     *
+     * @deprecated Use checkDependents instead.
+     * @param Addon $addon The addon to check.
+     * @param bool $throw Whether or not to throw an exception or just return **false** if the check fails.
+     * @return bool Returns **true** if the addon a
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
+     */
+    public function checkDependants(Addon $addon, $throw = false) {
+        trigger_error('checkDependants is deprecated. Use checkDependents instead.', E_USER_DEPRECATED);
+        return $this->checkDependents($addon, $throw);
+    }
+
+    /**
+     * Check the enabled dependents of an addon.
+     *
+     * Addons should always check their dependents before being disabled. This check does not consider dependents that
      * are not enabled.
      *
      * @param Addon $addon The addon to check.
      * @param bool $throw Whether or not to throw an exception or just return **false** if the check fails.
      * @return bool Returns **true** if the addon a
-     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependants.
+     * @throws \Exception Throws an exception if {@link $throw} is **true** and there are enabled dependents.
      */
-    public function checkDependants(Addon $addon, $throw = false) {
-        $dependants = $this->lookupDependants($addon);
+    public function checkDependents(Addon $addon, $throw = false) {
+        $dependents = $this->lookupDependents($addon);
 
-        if (empty($dependants)) {
+        if (empty($dependents)) {
             return true;
         } elseif (!$throw) {
             return false;
         } else {
             $names = [];
-            /* @var Addon $dependant */
-            foreach ($dependants as $dependant) {
-                $names[] = $dependant->getName();
+            /* @var Addon $dependent */
+            foreach ($dependents as $dependent) {
+                $names[] = $dependent->getName();
             }
             $msg = sprintf(
                 'The following addons depend on %1$s: %2$s.',
@@ -581,10 +669,22 @@ class AddonManager {
     /**
      * Get all of the enabled addons that depend on a given addon.
      *
+     * @deprecated Use lookupDependents instead.
      * @param Addon $addon The addon to check the requirements.
      * @return array Returns an array of {@link Addon} objects.
      */
     public function lookupDependants(Addon $addon) {
+        trigger_error('lookupDependants is deprecated. Use lookupDependents instead.', E_USER_DEPRECATED);
+        return $this->lookupDependents($addon);
+    }
+
+    /**
+     * Get all of the enabled addons that depend on a given addon.
+     *
+     * @param Addon $addon The addon to check the requirements.
+     * @return array Returns an array of {@link Addon} objects.
+     */
+    public function lookupDependents(Addon $addon) {
         $result = [];
         foreach ($this->getEnabled() as $enabledKey => $enabledAddon) {
             /* @var Addon $enabledAddon */
@@ -929,5 +1029,48 @@ class AddonManager {
             }
         }
         return $result;
+    }
+
+    /**
+     * Bind the events of all of the addon plugin classes managed by this class.
+     *
+     * This method also includes the plugin classes that haven't been included yet.
+     *
+     * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     */
+    public function bindAllEvents(EventManager $eventManager) {
+        $enabled = $this->getEnabled();
+
+        foreach ($enabled as $addon) {
+            /* @var \Vanilla\Addon $addon */
+            if ($pluginClass = $addon->getPluginClass()) {
+                // Include the plugin here, rather than wait for it to hit the autoloader. This way is much faster.
+                include_once $addon->getClassPath($pluginClass);
+
+                $this->bindAddonEvents($addon, $eventManager);
+            }
+        }
+    }
+
+    /**
+     * Bind the events for an addon's plugin class (if any).
+     *
+     * If the addon doesn't have a plugin then nothing will happen.
+     *
+     * @param Addon $addon The addon to bind.
+     * @param EventManager $eventManager The event manager to bind the plugin classes to.
+     */
+    public function bindAddonEvents(Addon $addon, EventManager $eventManager) {
+        // Check that the addon has a plugin.
+        if (!($pluginClass = $addon->getPluginClass())) {
+            return;
+        }
+
+        // Only register the plugin if it implements the Gdn_IPlugin interface.
+        if (is_a($pluginClass, 'Gdn_IPlugin', true)) {
+            $eventManager->bindClass($pluginClass, $addon->getPriority());
+        } else {
+            trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
+        }
     }
 }

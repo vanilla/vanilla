@@ -57,14 +57,31 @@
                     <?php
                     if (count($this->data('Users')) > 1) {
                         echo '<div class="CheckBoxCell">';
-                        echo $this->Form->CheckBox('SelectAll', t('All'));
+                        echo wrap(
+                            $this->Form->checkBox(
+                                'SelectAll',
+                                t('All'),
+                                ['display' => 'after', 'class' => 'js-check-all checkbox checkbox-inline']
+                            ).' '.t('All'),
+                            'span',
+                            ['class' => 'checkbox-painted-wrapper']
+                        );
+
                         echo '</div>';
                     }
 
                     foreach ($this->data('Users') as $User) {
                         $RecordUser = Gdn::userModel()->getID($User['UserID'], DATASET_TYPE_ARRAY);
                         echo '<div class="CheckBoxCell">';
-                        echo $this->Form->CheckBox('UserID[]', htmlspecialchars($User['Name']), array('value' => $User['UserID'], 'class' => 'checkbox checkbox-inline'));
+                        echo wrap(
+                            $this->Form->checkBox(
+                                'UserID[]',
+                                htmlspecialchars($User['Name']),
+                                ['value' => $User['UserID'], 'display' => 'after', 'class' => 'js-check-me checkbox checkbox-inline']
+                            ).' '.htmlspecialchars($User['Name']),
+                            'span',
+                            ['class' => 'checkbox-painted-wrapper']
+                        );
                         echo ' <span class="Count">'.plural($RecordUser['CountDiscussions'] + $RecordUser['CountComments'], '%s post', '%s posts').'</span>';
 
                         echo '</div>';

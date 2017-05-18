@@ -4,7 +4,7 @@
  *
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Lincoln Russell <lincoln@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -355,20 +355,33 @@ class Gdn_Form extends Gdn_Pluggable {
 
     /**
      * Builds a color-picker form element. Accepts three-character hex values with or without the leading '#',
-     * but the saved value will be coerced into a six-character hex code with the leading '#'.
-     * The hex value to be saved is the value of the input with the color-picker-value class.
+     * but the saved value will be coerced into a six-character hex code with the leading '#'. Also accepts
+     * 'transparent', 'initial' or 'inherit'. Can be configured to accept an empty string if $options['AllowEmpty']
+     * is set to true. The hex value to be saved is the value of the input with the color-picker-value class.
      *
      * @param string $fieldName Name of the field being posted with this input.
+     * @param array $options Currently supports a key of 'AllowEmpty' which signifies whether to accept empty
+     * values for the color picker
      * @return string The form element for a color picker.
      */
-    public function color($fieldName) {
+    public function color($fieldName, $options = []) {
+
+        $allowEmpty = val('AllowEmpty', $options, false);
+
         Gdn::controller()->addJsFile('colorpicker.js');
 
         $valueAttributes['class'] = 'js-color-picker-value color-picker-value Hidden';
         $textAttributes['class'] = 'js-color-picker-text color-picker-text';
         $colorAttributes['class'] = 'js-color-picker-color color-picker-color';
 
-        return '<div id="'.$this->escapeFieldName($fieldName).'" class="js-color-picker color-picker input-group">'
+        // Default starting color for color input. Color inputs require one, Chrome will throw a warning if one
+        // doesn't exist. The javascript will override this.
+        $colorAttributes['value'] = '#ffffff';
+
+        $cssClass = 'js-color-picker color-picker input-group';
+        $dataAttribute = $allowEmpty ? 'data-allow-empty="true"' : 'data-allow-empty="false"';
+
+        return '<div id="'.$this->escapeFieldName($fieldName).'" class="'.$cssClass.'" '.$dataAttribute.'>'
         .$this->input($fieldName, 'text', $valueAttributes)
         .$this->input($fieldName.'-text', 'text', $textAttributes)
         .'<span class="js-color-picker-preview color-picker-preview"></span>'
@@ -575,9 +588,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $label The label for the field.
      * @param array $attributes The attributes for the checkbox input.
      * @param string $info The label description.
+     * @param bool $reverse Whether to reverse the representation of the toggle (positive value is on, neg value is off).
      * @return string And HTML-formatted form field for a toggle.
      */
-    public function toggle($fieldName, $label, $attributes = [], $info = '') {
+    public function toggle($fieldName, $label, $attributes = [], $info = '', $reverse = false) {
         $value = arrayValueI('value', $attributes, true);
         $attributes['value'] = $value;
         if (stringEndsWith($fieldName, '[]')) {
@@ -590,6 +604,14 @@ class Gdn_Form extends Gdn_Pluggable {
             }
         } else {
             if ($this->getValue($fieldName) == $value) {
+                $attributes['checked'] = 'checked';
+            }
+        }
+
+        if ($reverse) {
+            if ($attributes['checked'] === 'checked') {
+                unset($attributes['checked']);
+            } else {
                 $attributes['checked'] = 'checked';
             }
         }
@@ -651,9 +673,10 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $url The url to show the search results.
      * @param array $textBoxAttributes The attributes for the text box. Placeholders go here.
      * @param string $searchInfo The info to add under the search box, usually a result count.
+     * @param array $wrapperAttributes The attributes to add to the search wrapper div.
      * @return string The rendered search field.
      */
-    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '') {
+    public function searchInput($field, $url, $textBoxAttributes = [], $searchInfo = '', $wrapperAttributes = []) {
         $clear = '';
         $searchTermFound = false;
         $searchKeys = ['search', 'keywords'];
@@ -676,8 +699,12 @@ class Gdn_Form extends Gdn_Pluggable {
             $searchInfo = '<div class="info search-info">'.$searchInfo.'</div>';
         }
 
+        $wrapperAttributes['class'] = val('class', $wrapperAttributes, '');
+        $wrapperAttributes['class'] .= ' search-wrap input-wrap';
+        $wrapperAttributesString = attribute($wrapperAttributes);
+
         return '
-            <div class="search-wrap input-wrap" role="search">
+            <div '.$wrapperAttributesString.' role="search">
                 <div class="search-icon-wrap search-icon-search-wrap">'.dashboardSymbol('search').'</div>'.
                 $this->textBox($field, $textBoxAttributes).
                 $this->button('Go', ['class' => 'search-submit']).
@@ -732,37 +759,34 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $fieldName The form field name for the input.
      * @param string $label The label.
      * @param string $labelDescription The label description.
-     * @param string $currentImageUrl The url to the current image.
      * @param string $removeUrl The endpoint to remove the image.
-     * @param string $removeText The text for the remove image anchor, defaults to t('Remove').
-     * @param string $removeConfirmText The text for the confirm modal, defaults to t('Are you sure you want to do that?').
-     * @param string $tag The tag for the form-group. Defaults to li, but you may want a div or something.
-     * @param array $attributes The attributes to pass to the file upload function.
+     * @param array $options An array of options with the following keys:
+     *      'CurrentImage' (string) The current image to preview.
+     *      'RemoveText' (string) The text for the remove image anchor, defaults to t('Remove').
+     *      'RemoveConfirmText' (string) The text for the confirm modal, defaults to t('Are you sure you want to do that?').
+     *      'Tag' (string) The tag for the form-group. Defaults to li, but you may want a div or something.
+     * @param array $attributes The html attributes to pass to the file upload function.
      * @return string
+
      */
-    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $currentImageUrl = '',
-                                       $removeUrl = '', $removeText = '', $removeConfirmText = '', $tag = 'li',
-                                       $attributes = []) {
+    public function imageUploadPreview($fieldName, $label = '', $labelDescription = '', $removeUrl = '', $options = [], $attributes = []) {
 
         $imageWrapperId = slugify($fieldName).'-preview-wrapper';
 
         // Compile the data for our current image and current image removal.
+        $currentImage = val('CurrentImage', $options, '');
+        if ($currentImage === '') {
+            $currentImage = $this->currentImage($fieldName);
+        }
         $removeAttributes = [];
         $removeCurrentImage = '';
-        $currentImage = '';
 
-        if ($currentImageUrl) {
-            $currentImage = wrap(img(Gdn_Upload::url($currentImageUrl)), 'div');
-            if ($removeUrl) {
-                if (!$removeText) {
-                    $removeText = t('Remove');
-                }
-                $removeAttributes['data-remove-selector'] = '#'.$imageWrapperId;
-                if ($removeConfirmText) {
-                    $removeAttributes['data-body'] = $removeConfirmText;
-                }
-                $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm js-hijack', $removeAttributes), 'div');
+        if ($this->getValue($fieldName) && $removeUrl) {
+            $removeText = val('RemoveText', $options, t('Remove'));
+            if (val('RemoveConfirmText', $options, false)) {
+                $removeAttributes['data-body'] = val('RemoveConfirmText', $options);
             }
+            $removeCurrentImage = wrap(anchor($removeText, $removeUrl, 'js-modal-confirm', $removeAttributes), 'div');
         }
 
         if ($label) {
@@ -787,9 +811,11 @@ class Gdn_Form extends Gdn_Pluggable {
                 </div>
             </div>';
 
-        $attributes['class'] .= 'js-image-upload';
-        $input = $this->fileUploadWrap($fieldName, $attributes);
+        $class = val('class', $attributes, '');
+        $attributes['class'] = trim($class.' js-image-upload');
+        $input = $this->imageUploadWrap($fieldName, $attributes);
 
+        $tag = val('Tag', $options, 'li');
         return '<'.$tag.' class="form-group js-image-preview-form-group">'.$label.$input.'</'.$tag.'>';
     }
 
@@ -1144,14 +1170,21 @@ class Gdn_Form extends Gdn_Pluggable {
                 // Check to see if there is a row corresponding to this area.
                 if (array_key_exists($RowName.'.'.$ColumnName, $Data)) {
                     $CheckBox = $Data[$RowName.'.'.$ColumnName];
-                    $Attributes = array('value' => $CheckBox['PostValue']);
+                    $Attributes = [
+                        'value' => $CheckBox['PostValue'],
+                        'display' => 'after'
+                    ];
                     if ($CheckBox['Value']) {
                         $Attributes['checked'] = 'checked';
                     }
 //               $Attributes['id'] = "{$GroupName}_{$FieldName}_{$CheckCount}";
                     $CheckCount++;
 
-                    $Result .= $this->checkBox($FieldName.'[]', '', $Attributes);
+                    $Result .= wrap(
+                        $this->checkBox($FieldName.'[]', $RowName.'.'.$ColumnName, $Attributes),
+                        'div',
+                        ['class' => 'checkbox-painted-wrapper']
+                    );
                 } else {
                     $Result .= ' ';
                 }
@@ -1172,12 +1205,23 @@ class Gdn_Form extends Gdn_Pluggable {
      */
     public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
         $Return = "</div>\n</form>";
+
         if ($Xhtml != '') {
             $Return = $Xhtml.$Return;
         }
 
+        $formFooter = val('FormFooter', $Attributes, false);
+
+        if ($formFooter) {
+            unset($Attributes['FormFooter']);
+        }
+
         if ($ButtonCode != '') {
-            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$this->button($ButtonCode, $Attributes).'</div>'.$Return;
+            $ButtonCode = $this->button($ButtonCode, $Attributes);
+        }
+
+        if ($formFooter || $ButtonCode) {
+            $Return = '<div class="'.$this->getStyle('form-footer').'">'.$formFooter.$ButtonCode.'</div>'.$Return;
         }
 
         return $Return;
@@ -1187,20 +1231,20 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns the current image in a field.
      * This is meant to be used with image uploads so that users can see the current value.
      *
-     * @param type $FieldName
-     * @param type $Attributes
-     * @since 2.1
+     * @param string $fieldName
+     * @param array $attributes
+     * @return string
      */
-    public function currentImage($FieldName, $Attributes = array()) {
-        $Result = $this->hidden($FieldName);
+    public function currentImage($fieldName, $attributes = array()) {
+        $result = $this->hidden($fieldName);
 
-        $Value = $this->getValue($FieldName);
-        if ($Value) {
-            touchValue('class', $Attributes, 'CurrentImage');
-            $Result .= img(Gdn_Upload::url($Value), $Attributes);
+        $value = $this->getValue($fieldName);
+        if ($value) {
+            touchValue('class', $attributes, 'CurrentImage');
+            $result .= img(Gdn_Upload::url($value), $attributes);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -2692,10 +2736,12 @@ PASSWORDMETER;
     }
 
     /**
-     * Save an image from a field and delete any old image that's been uploaded.
+     * Save an image from a field.
      *
      * @param string $Field The name of the field. The image will be uploaded with the _New extension while the current image will be just the field name.
      * @param array $Options
+     *  - CurrentImage: Current image to clean if the save is successful
+     * @return bool
      */
     public function saveImage($Field, $Options = array()) {
         $Upload = new Gdn_UploadImage();
@@ -2752,13 +2798,14 @@ PASSWORDMETER;
             $Parsed = $Upload->saveImageAs($TmpName, $Name, val('Height', $Options, ''), val('Width', $Options, ''), $Options);
             trace($Parsed, 'Saved Image');
 
-            $Current = $this->getFormValue($Field);
-            if ($Current && val('DeleteOriginal', $Options, true)) {
-                // Delete the current image.
-                trace("Deleting original image: $Current.");
-                if ($Current) {
-                    $Upload->delete($Current);
-                }
+            if (val('DeleteOriginal', $Options, false)) {
+                deprecated('Option DeleteOriginal', 'CurrentImage');
+            }
+
+            $currentImage = val('CurrentImage', $Options, false);
+            if ($currentImage) {
+                trace("Deleting original image: $currentImage.");
+                $Upload->delete($currentImage);
             }
 
             // Set the current value.

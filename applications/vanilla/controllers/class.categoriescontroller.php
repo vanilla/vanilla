@@ -2,7 +2,7 @@
 /**
  * Categories controller
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -173,6 +173,40 @@ class CategoriesController extends VanillaController {
     }
 
     /**
+     * Endpoint that returns a flattened list of children categories in JSON format. Collapses the categories,
+     * so we only retrieve the child categories that are not nested under a nested or flat category.
+     * Includes the category options that appear in the category settings dropdown in the response.
+     *
+     * @param int $parentID The ID of the parent to retrieve categories under.
+     */
+    public function getFlattenedChildren($parentID = -1) {
+        $options = ['maxdepth' => 10, 'collapsecategories' => true];
+        $categories = $this->CategoryModel->getChildTree($parentID, $options);
+        $categories = $this->CategoryModel->flattenTree($categories);
+
+        foreach ($categories as &$category) {
+            $category['Options'] = $this->getOptions($category);
+        }
+
+        $this->setData('Categories', $categories);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
+        $this->render('blank', 'utility', 'dashboard');
+    }
+
+    /**
+     * Returns an array representation of the dropdown object, ready to add to a data array.
+     *
+     * @param array|object $category The category to retrieve the dropdown options for.
+     * @return array
+     */
+    private function getOptions($category) {
+        $cdd = CategoryModel::getCategoryDropdown($category);
+        return $cdd->toArray();
+    }
+
+
+    /**
      * Show all discussions in a particular category.
      *
      * @since 2.0.0
@@ -207,6 +241,10 @@ class CategoriesController extends VanillaController {
                 throw notFoundException();
             }
             $Category = (object)$Category;
+
+            // Check permission
+            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
+
             Gdn_Theme::section($Category->CssClass);
 
             // Load the breadcrumbs.
@@ -286,6 +324,7 @@ class CategoriesController extends VanillaController {
             $this->addModule('DiscussionFilterModule');
             $this->addModule('CategoriesModule');
             $this->addModule('BookmarkedModule');
+            $this->addModule('TagModule');
 
             // Get a DiscussionModel
             $DiscussionModel = new DiscussionModel();
@@ -301,8 +340,8 @@ class CategoriesController extends VanillaController {
             $Wheres = array('d.CategoryID' => $CategoryIDs);
             $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
 
-            // Check permission
-            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
+            // Check permission.
+            $this->categoryPermission($Category, 'Vanilla.Discussions.View');
 
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);
@@ -454,6 +493,7 @@ class CategoriesController extends VanillaController {
         $this->addModule('DiscussionFilterModule');
         $this->addModule('BookmarkedModule');
         $this->addModule($CategoryFollowToggleModule);
+        $this->addModule('TagModule');
 
         $this->canonicalUrl(url('/categories', true));
 

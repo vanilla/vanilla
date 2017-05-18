@@ -112,7 +112,10 @@
 .control-panel {
   font-size: to-rem(12);
   color: $grey-light-text;
-  margin-bottom: $spacer * 2;
+
+  .panel & {
+    margin-bottom: $spacer * 2;
+  }
 
   .control-panel-list-item {
     line-height: to-rem(18);
@@ -154,6 +157,11 @@
     max-width: to-rem(102);
     font-style: italic;
     @extend .truncate;
+  }
+
+  select {
+    height: to-rem(30);
+    width: 100%;
   }
 }
 

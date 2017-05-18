@@ -81,8 +81,8 @@ module.exports = function (grunt) {
               , 'jquery-icheck/icheck.min.js'
               , 'moment/min/moment.min.js'
               , 'tether/dist/js/tether.min.js'
-              , 'tether/dist/js/tether.min.js'
               , 'tether-drop/dist/js/drop.min.js'
+              , 'jquery-checkall/dist/jquery.checkall.min.js'
             ],
             dest: 'js/vendors'
           },
@@ -114,7 +114,7 @@ module.exports = function (grunt) {
             cwd: 'bower_components',
             src: [
               'google-code-prettify/src/prettify.css'
-              , 'color-themes-for-google-code-prettify/themes/tomorrow.css'
+              , 'color-themes-for-google-code-prettify/dist/themes/tomorrow.css'
             ],
             dest: 'design/vendors'
           },
@@ -211,6 +211,7 @@ module.exports = function (grunt) {
       styleguide: {
         src: ([]).concat([
           'js/vendors/tether.js',
+          'js/vendors/jquery.checkall.min.js',
           'js/vendors/icheck.min.js',
           'js/vendors/clipboard.min.js',
           'js/vendors/drop.min.js',
@@ -219,6 +220,7 @@ module.exports = function (grunt) {
           'js/vendors/ace/*.js',
           'js/colorpicker.js',
           'js/cropimage.js',
+          'js/buttonGroup.js',
           'js/jquery.tablejenga.js',
           'js/jquery.fluidfixed.js',
           '../../js/library/jquery.expander.js',

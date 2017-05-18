@@ -2,7 +2,7 @@
 /**
  * General functions
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -1739,6 +1739,19 @@ if (!function_exists('inArrayI')) {
     }
 }
 
+if (!function_exists('inMaintenanceMode')) {
+    /**
+     * Determine if the site is in maintenance mode.
+     *
+     * @return bool
+     */
+    function inMaintenanceMode() {
+        $updateMode = c('Garden.UpdateMode');
+
+        return (bool)$updateMode;
+    }
+}
+
 if (!function_exists('inSubArray')) {
     /**
      * Loop through {@link $Haystack} looking for subarrays that contain {@link $Needle}.
@@ -2136,6 +2149,37 @@ if (!function_exists('jsonEncodeChecked')) {
         }
 
         return $encoded;
+    }
+}
+
+if (!function_exists('jsonFilter')) {
+    /**
+     * Prepare data for json_encode.
+     *
+     * @param mixed $value
+     */
+    function jsonFilter(&$value) {
+        $fn = function (&$value, $key = '', $parentKey = '') use (&$fn) {
+            if (is_array($value)) {
+                array_walk($value, function(&$childValue, $childKey) use ($fn, $key) {
+                    $fn($childValue, $childKey, $key);
+                });
+            } elseif ($value instanceof \DateTimeInterface) {
+                $value = $value->format(\DateTime::RFC3339);
+            } elseif (is_string($value)) {
+                // Only attempt to unpack as an IP address if this field or its parent matches the IP field naming scheme.
+                $isIPField = (stringEndsWith($key, 'IPAddress', true) || stringEndsWith($parentKey, 'IPAddresses', true));
+                if ($isIPField && ($ip = ipDecode($value)) !== null) {
+                    $value = $ip;
+                }
+            }
+        };
+
+        if (is_array($value)) {
+            array_walk($value, $fn);
+        } else {
+            $fn($value);
+        }
     }
 }
 
@@ -3013,12 +3057,13 @@ if (!function_exists('safeGlob')) {
     /**
      * A version of {@link glob()} that always returns an array.
      *
-     * @param string $Pattern The glob pattern.
+     * @param string        $Pattern    The glob pattern.
      * @param array[string] $Extensions An array of file extensions to whitelist.
+     *
      * @return array[string] Returns an array of paths that match the glob.
      */
     function safeGlob($Pattern, $Extensions = array()) {
-        $Result = glob($Pattern);
+        $Result = glob($Pattern, GLOB_NOSORT);
         if (!is_array($Result)) {
             $Result = array();
         }
@@ -3096,7 +3141,7 @@ if (!function_exists('safeRedirect')) {
                 'url' => $Destination
             ]);
 
-            redirect(url("/home/leaving?Target=".urlencode($Destination)));
+            redirect("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }
@@ -3106,7 +3151,7 @@ if (!function_exists('safeUnlink')) {
      * A version of {@link unlink()} that won't raise a warning.
      *
      * @param string $filename Path to the file.
-     * @return Returns TRUE on success or FALSE on failure.
+     * @return bool TRUE on success or FALSE on failure.
      */
     function safeUnlink($filename) {
         try {
@@ -3487,6 +3532,11 @@ if (!function_exists('trustedDomains')) {
 
         $trustedDomains = array_merge($trustedDomains, $configuredDomains);
 
+        if (!c('Garden.Installed')) {
+            // Bail out here because we don't have a database yet.
+            return $trustedDomains;
+        }
+
         // Build a collection of authentication provider URLs.
         $authProviderModel = new Gdn_AuthenticationProviderModel();
         $providers = $authProviderModel->getProviders();
@@ -3652,32 +3702,45 @@ if (!function_exists('isSafeUrl')) {
 
 if (!function_exists('isTrustedDomain')) {
     /**
-     * Check the provided domain name to determine if it is a trusted domain.
+     * Check to see if a URL or domain name is in a trusted domain.
      *
-     * @param string $domain Domain name to compare against our list of trusted domains.
+     * @param string $url The URL or domain name to check.
      * @return bool True if verified as a trusted domain.  False if unable to verify domain.
      */
-    function isTrustedDomain($domain) {
-        static $trustedDomains = null;
+    function isTrustedDomain($url) {
+        static $trusted = null;
 
-        if (empty($domain)) {
+        if (empty($url)) {
             return false;
         }
 
-        // If we haven't already compiled an array of trusted domains, grab them.
-        if (!is_array($trustedDomains)) {
-            $trustedDomains = trustedDomains();
+        // Short circuit on our own domain.
+        if (urlMatch(Gdn::request()->host(), $url)) {
+            return true;
         }
 
-        /**
-         * Iterate through each of our trusted domains.
-         * Chop off any whitespace from the trusted domain and prepare it for regex.
-         * See if the current trusted domain matches fully against the domain we're
-         *   testing or if it matches its end (e.g. domain.tld should match domain.tld and sub.domain.tld)
-         */
-        foreach ($trustedDomains as $trustedDomain) {
-            $trustedDomain = preg_quote(trim($trustedDomain));
-            if (preg_match("/(^|\.){$trustedDomain}$/i", $domain)) {
+        // If we haven't already compiled an array of trusted domains, grab them.
+        if ($trusted === null) {
+            $trusted = [];
+            $trustedDomains = trustedDomains();
+            foreach ($trustedDomains as $domain) {
+                // Store the trusted domain by its host name.
+                if (strpos($domain, '//') === false) {
+                    $domain = '//'.$domain;
+                }
+                $host = preg_replace('`^(\*?\.)`', '', parse_url($domain, PHP_URL_HOST));
+                $trusted[$host] = $domain;
+            }
+        }
+
+        // Make sure the domain.
+        if (strpos($url, '//') === false) {
+            $url = '//'.$url;
+        }
+
+        // Check the URL against all domains by host part.
+        for ($host = parse_url($url, PHP_URL_HOST); !empty($host); $host = ltrim(strstr($host, '.'), '.')) {
+            if (isset($trusted[$host]) && urlMatch($trusted[$host], $url)) {
                 return true;
             }
         }
@@ -3884,6 +3947,9 @@ if (!function_exists('urlMatch')) {
      * @return bool Returns **true** if {@link $url} matches against {@link $pattern} or **false** otherwise.
      */
     function urlMatch($pattern, $url) {
+        if (empty($pattern)) {
+            return false;
+        }
         $urlParts = parse_url($url);
         $patternParts = parse_url($pattern);
 
@@ -3996,5 +4062,67 @@ if (!function_exists('ipDecodeRecursive')) {
             }
         });
         return $input;
+    }
+}
+
+if (!function_exists('TagUrl')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @param string $Page
+     * @param mixed $WithDomain
+     * @see url() for $WithDomain docs.
+     * @return string
+     */
+    function tagUrl($Row, $Page = '', $WithDomain = false) {
+        static $UseCategories;
+        if (!isset($UseCategories)) {
+            $UseCategories = c('Plugins.Tagging.UseCategories');
+        }
+
+        // Add the p before a numeric page.
+        if (is_numeric($Page)) {
+            if ($Page > 1) {
+                $Page = 'p'.$Page;
+            } else {
+                $Page = '';
+            }
+        }
+        if ($Page) {
+            $Page = '/'.$Page;
+        }
+
+        $Tag = rawurlencode(val('Name', $Row));
+
+        if ($UseCategories) {
+            $Category = CategoryModel::categories($Row['CategoryID']);
+            if ($Category && $Category['CategoryID'] > 0) {
+                $Category = rawurlencode(val('UrlCode', $Category, 'x'));
+            } else {
+                $Category = 'x';
+            }
+            $Result = "/discussions/tagged/$Category/$Tag{$Page}";
+        } else {
+            $Result = "/discussions/tagged/$Tag{$Page}";
+        }
+
+        return url($Result, $WithDomain);
+    }
+}
+
+if (!function_exists('TagFullName')) {
+    /**
+     *
+     *
+     * @param $Row
+     * @return mixed
+     */
+    function tagFullName($Row) {
+        $Result = val('FullName', $Row);
+        if (!$Result) {
+            $Result = val('Name', $Row);
+        }
+        return $Result;
     }
 }

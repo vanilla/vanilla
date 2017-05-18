@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -21,6 +21,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     const ACTION_ENABLE = 1;
 
     const ACTION_DISABLE = 2;
+
+    const DEFAULT_DESKTOP_THEME = 'default';
+    const DEFAULT_MOBILE_THEME = 'mobile';
 
     /** @var array An array of search paths for themes and their files. */
     private $themeSearchPaths = null;
@@ -38,6 +41,12 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @var bool Whether or not the request object can be accessed.
      */
     private $hasRequest = true;
+
+    /** @var array The layout options for a category list. */
+    private $allowedCategoriesLayouts = ['table', 'modern', 'mixed'];
+
+    /** @var array The layout options for a discussions list. */
+    private $allowedDiscussionsLayouts = ['table', 'modern'];
 
     /**
      * @var AddonManager
@@ -321,6 +330,16 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Sets the layout for the theme preview without saving the config values.
+     *
+     * @param string $themeName The name of the theme.
+     */
+    private function preparePreview($themeName) {
+        $themeInfo = $this->getThemeInfo($themeName);
+        $this->setLayout($themeInfo, false);
+    }
+
+    /**
      *
      *
      * @return mixed
@@ -330,12 +349,14 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             if ($this->hasMobilePreview()) {
                 return $this->getMobilePreview();
             }
-            return c('Garden.MobileTheme', 'default');
+            return $this->getEnabledMobileThemeKey();
         } else {
             if ($this->hasPreview()) {
-                return $this->getPreview();
+                $preview = $this->getPreview();
+                $this->preparePreview($preview);
+                return $preview;
             }
-            return c('Garden.Theme', 'default');
+            return $this->getEnabledDesktopThemeKey();
         }
     }
 
@@ -346,9 +367,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      */
     public function desktopTheme() {
         if ($this->hasPreview()) {
-            return $this->getPreview();
+            $preview = $this->getPreview();
+            $this->preparePreview($preview);
+            return $preview;
         }
-        return c('Garden.Theme', 'default');
+        return $this->getEnabledDesktopThemeKey();
     }
 
     /**
@@ -360,9 +383,9 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($this->currentTheme() == 'default') {
             throw new Gdn_UserException(T('You cannot disable the default theme.'));
         }
-        $oldTheme = $this->enabledTheme();
+        $oldTheme = $this->getEnabledDesktopThemeKey();
         RemoveFromConfig('Garden.Theme');
-        $newTheme = $this->enabledTheme();
+        $newTheme = $this->getEnabledDesktopThemeKey();
 
         if ($oldTheme != $newTheme) {
             $this->themeHook($oldTheme, self::ACTION_DISABLE, true);
@@ -414,13 +437,42 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Retrieves the key for the current desktop theme.
      *
-     *
-     * @return Gdn_Config|mixed
+     * @return string
      */
     public function enabledTheme() {
-        $ThemeName = Gdn::config('Garden.Theme', 'default');
-        return $ThemeName;
+        deprecated('enabledTheme', 'getEnabledDesktopThemeKey', 'March 2017');
+        return $this->getEnabledDesktopThemeKey();
+    }
+
+    /**
+     * Retrieves the key for the current desktop theme.
+     *
+     * @return string
+     */
+    public function getEnabledDesktopThemeKey() {
+        $themeName = Gdn::config('Garden.Theme');
+        // Does it actually exist?
+        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+            return self::DEFAULT_DESKTOP_THEME;
+        }
+        return $themeName;
+    }
+
+
+    /**
+     * Retrieves the key for the current mobile theme.
+     *
+     * @return string
+     */
+    public function getEnabledMobileThemeKey() {
+        $themeName = Gdn::config('Garden.MobileTheme');
+        // Does it actually exist?
+        if ($themeName && (Gdn::addonManager()->lookupTheme($themeName) === null)) {
+            return self::DEFAULT_MOBILE_THEME;
+        }
+        return $themeName;
     }
 
     /**
@@ -430,7 +482,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return array|mixed
      */
     public function enabledThemeInfo($ReturnInSourceFormat = false) {
-        $EnabledThemeName = $this->enabledTheme();
+        $EnabledThemeName = $this->getEnabledDesktopThemeKey();
         $ThemeInfo = $this->getThemeInfo($EnabledThemeName);
 
         if ($ThemeInfo === false) {
@@ -471,10 +523,41 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     }
 
     /**
+     * Set the layout config settings based on a theme's specifications.
+     *
+     * @param array $themeInfo A theme info array retrieved from `getThemeInfo()`.
+     * @param bool $save Whether to save the layout to config.
+     */
+    private function setLayout($themeInfo, $save = true) {
+        if ($layout = val('Layout', $themeInfo, false)) {
+            $discussionsLayout = strtolower(val('Discussions', $layout, ''));
+            $categoriesLayout = strtolower(val('Categories', $layout, ''));
+            if ($discussionsLayout && in_array($discussionsLayout, $this->allowedDiscussionsLayouts)) {
+                saveToConfig('Vanilla.Discussions.Layout', $discussionsLayout, $save);
+            }
+            if ($categoriesLayout && in_array($categoriesLayout, $this->allowedCategoriesLayouts)) {
+                saveToConfig('Vanilla.Categories.Layout', $categoriesLayout, $save);
+            }
+        }
+    }
+
+    /**
+     * Checks if a theme has theme options.
+     *
+     * @param $themeKey The key value of the theme we're checking.
+     * @return bool Whether the given theme has theme options.
+     */
+    public function hasThemeOptions($themeKey) {
+        $themeInfo = $this->getThemeInfo($themeKey);
+        $options = val('Options', $themeInfo, []);
+        return !empty($options);
+    }
+
+    /**
      *
      *
      * @param $ThemeName
-     * @param bool $IsMobile
+     * @param bool $IsMobile Whether to enable the theme as the mobile theme or not.
      * @return bool
      * @throws Exception
      */
@@ -486,33 +569,18 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         $ThemeInfo = $this->getThemeInfo($ThemeName);
         $ThemeFolder = val('Folder', $ThemeInfo, '');
 
-        $oldTheme = $IsMobile ? c('Garden.MobileTheme', 'mobile') : c('Garden.Theme', 'default');
+        $oldTheme = $IsMobile ? c('Garden.MobileTheme', self::DEFAULT_MOBILE_THEME) : c('Garden.Theme', self::DEFAULT_DESKTOP_THEME);
 
         if ($ThemeFolder == '') {
             throw new Exception(t('The theme folder was not properly defined.'));
         } else {
-            $Options = valr("{$ThemeName}.Options", $this->AvailableThemes());
-            if ($Options) {
-                if ($IsMobile) {
-                    saveToConfig(array(
-                        'Garden.MobileTheme' => $ThemeName,
-                        'Garden.MobileThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
-                    ));
-                } else {
-                    saveToConfig(array(
-                        'Garden.Theme' => $ThemeName,
-                        'Garden.ThemeOptions.Name' => valr("{$ThemeName}.Name", $this->availableThemes(), $ThemeFolder)
-                    ));
-                }
+            if ($IsMobile) {
+                saveToConfig('Garden.MobileTheme', $ThemeName);
             } else {
-                if ($IsMobile) {
-                    saveToConfig('Garden.MobileTheme', $ThemeName);
-                    removeFromConfig('Garden.MobileThemeOptions');
-                } else {
-                    saveToConfig('Garden.Theme', $ThemeName);
-                    removeFromConfig('Garden.ThemeOptions');
-                }
+                saveToConfig('Garden.Theme', $ThemeName);
             }
+
+            $this->setLayout($ThemeInfo);
         }
 
         if ($oldTheme !== $ThemeName) {
@@ -565,7 +633,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         if ($this->hasMobilePreview()) {
             return $this->getMobilePreview();
         }
-        return c('Garden.MobileTheme', 'default');
+        return $this->getEnabledMobileThemeKey();
     }
 
     /**

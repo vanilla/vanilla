@@ -113,7 +113,7 @@
         <p>If you are a user of this website, you can report this message to a website administrator.</p>
 
         <p>If you are an administrator of this website, you can get help at the <a
-                href="http://vanillaforums.org/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
+                href="https://open.vanillaforums.com/discussions/" target="_blank">Vanilla Community Forums</a>.</p>
     </div>
     <div id="MoreInformation">
         <h2>Additional information for support personnel:</h2>

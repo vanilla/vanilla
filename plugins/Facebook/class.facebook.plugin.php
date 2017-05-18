@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Facebook
  */
@@ -20,8 +20,7 @@ $PluginInfo['Facebook'] = array(
     'RegisterPermissions' => false,
     'Author' => "Todd Burry",
     'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.org/profile/todd',
-    'Hidden' => true,
+    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
     'SocialConnect' => true,
     'RequiresRegistration' => true,
     'Icon' => 'facebook_social_connect.png'
@@ -168,117 +167,14 @@ class FacebookPlugin extends Gdn_Plugin {
     }
 
     /**
-     *
-     *
-     * @param $Sender
-     * @param $Args
-     */
-    public function base_discussionFormOptions_handler($Sender, $Args) {
-        if (!$this->socialSharing()) {
-            return;
-        }
-
-        if (!$this->accessToken()) {
-            return;
-        }
-
-        $Options =& $Args['Options'];
-
-        $Options .= ' <li>'.
-            $Sender->Form->checkBox('ShareFacebook', '@'.Sprite('ReactFacebook', 'ReactSprite'), array('value' => '1', 'title' => sprintf(t('Share to %s.'), 'Facebook'))).
-            '</li> ';
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     * @param $Args
-     */
-    public function discussionController_afterBodyField_handler($Sender, $Args) {
-        if (!$this->socialSharing()) {
-            return;
-        }
-
-        if (!$this->accessToken()) {
-            return;
-        }
-
-        echo ' '.
-            $Sender->Form->checkBox('ShareFacebook', '@'.Sprite('ReactFacebook', 'ReactSprite'), array('value' => '1', 'title' => sprintf(t('Share to %s.'), 'Facebook'))).
-            ' ';
-    }
-
-    public function discussionModel_afterSaveDiscussion_handler($Sender, $Args) {
-        if (!$this->socialSharing()) {
-            return;
-        }
-
-        if (!$this->accessToken()) {
-            return;
-        }
-
-        $ShareFacebook = valr('FormPostValues.ShareFacebook', $Args);
-
-        if ($ShareFacebook) {
-            $Url = DiscussionUrl($Args['Fields'], '', true);
-
-            if ($this->AccessToken()) {
-                $R = $this->API('/me/feed', array('link' => $Url));
-            }
-        }
-    }
-
-    /**
-     *
-     *
-     * @param $Sender
-     * @param $Args
-     * @throws Gdn_UserException
-     */
-    public function commentModel_afterSaveComment_handler($Sender, $Args) {
-        if (!$this->socialSharing()) {
-            return;
-        }
-
-        if (!$this->accessToken()) {
-            return;
-        }
-
-        $ShareFacebook = valr('FormPostValues.ShareFacebook', $Args);
-
-        if ($ShareFacebook) {
-            $Row = $Args['FormPostValues'];
-
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->getID(val('DiscussionID', $Row));
-            if (!$Discussion) {
-                die('no discussion');
-            }
-
-            $Url = DiscussionUrl($Discussion, '', true);
-            $Message = SliceParagraph(Gdn_Format::plainText($Row['Body'], $Row['Format']), 160);
-
-            if ($this->accessToken()) {
-                $R = $this->api('/me/feed', array(
-                    'link' => $Url,
-                    'message' => $Message
-                ));
-            }
-        }
-    }
-
-    /**
      * Output Quote link.
      */
     protected function addReactButton($Sender, $Args) {
-        if ($this->accessToken()) {
-            $CssClass = 'ReactButton Hijack';
-        } else {
-            $CssClass = 'ReactButton PopupWindow';
-        }
-
-        echo ' '.anchor(sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')), url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", true), $CssClass).' ';
+        echo anchor(
+            sprite('ReactFacebook', 'Sprite ReactSprite', t('Share on Facebook')),
+            url("post/facebook/{$Args['RecordType']}?id={$Args['RecordID']}", true),
+            'ReactButton PopupWindow')
+        ;
     }
 
     /**
@@ -359,10 +255,8 @@ class FacebookPlugin extends Gdn_Plugin {
 
         $Row = getRecord($RecordType, $ID, true);
         if ($Row) {
-            $Message = sliceParagraph(Gdn_Format::plainText($Row['Body'], $Row['Format']), 160);
-
             if ($this->accessToken() && $Sender->Request->isPostBack()) {
-                $R = $this->api('/me/feed', array('link' => $Row['ShareUrl'], 'message' => $Message));
+                $R = $this->api('/me/feed', array('link' => $Row['ShareUrl']));
 
                 $Sender->setJson('R', $R);
                 $Sender->informMessage(t('Thanks for sharing!'));
@@ -370,8 +264,6 @@ class FacebookPlugin extends Gdn_Plugin {
                 $Get = array(
                     'app_id' => c('Plugins.Facebook.ApplicationID'),
                     'link' => $Row['ShareUrl'],
-                    'name' => Gdn_Format::plainText($Row['Name'], 'Text'),
-                    'description' => $Message,
                 );
 
                 // Do not redirect if we are in a popup (It will close itself :D)
@@ -396,6 +288,11 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param type $Code
      */
     public function profileController_FacebookConnect_create($Sender, $UserReference, $Username, $Code = false) {
+        $transientKey = Gdn::request()->get('state');
+        if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
+            throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
+        }
+
         $Sender->permission('Garden.SignIn.Allow');
 
         $Sender->getUserInfo($UserReference, $Username, '', true);
@@ -453,7 +350,6 @@ class FacebookPlugin extends Gdn_Plugin {
                 'Plugins.Facebook.UseFacebookNames' => $Sender->Form->getFormValue('UseFacebookNames'),
                 'Plugins.Facebook.SocialSignIn' => $Sender->Form->getFormValue('SocialSignIn'),
                 'Plugins.Facebook.SocialReactions' => $Sender->Form->getFormValue('SocialReactions'),
-                'Plugins.Facebook.SocialSharing' => $Sender->Form->getFormValue('SocialSharing'),
                 'Garden.Registration.SendConnectEmail' => $Sender->Form->getFormValue('SendConnectEmail'));
 
             saveToConfig($Settings);
@@ -466,10 +362,9 @@ class FacebookPlugin extends Gdn_Plugin {
             $Sender->Form->setValue('SendConnectEmail', c('Garden.Registration.SendConnectEmail', false));
             $Sender->Form->setValue('SocialSignIn', c('Plugins.Facebook.SocialSignIn', true));
             $Sender->Form->setValue('SocialReactions', $this->socialReactions());
-            $Sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
-        $Sender->addSideMenu('dashboard/social');
+        $Sender->setHighlightRoute('dashboard/social');
         $Sender->setData('Title', t('Facebook Settings'));
         $Sender->render('Settings', '', 'plugins/Facebook');
     }
@@ -586,6 +481,8 @@ class FacebookPlugin extends Gdn_Plugin {
         $Info = curl_getinfo($C);
         if (strpos(val('content_type', $Info, ''), '/javascript') !== false) {
             $Tokens = json_decode($Contents, true);
+        } else if (strpos(val('content_type', $Info, ''), '/json') !== false) {
+            $Tokens = json_decode($Contents, true);
         } else {
             parse_str($Contents, $Tokens);
         }
@@ -643,9 +540,13 @@ class FacebookPlugin extends Gdn_Plugin {
             $RedirectUri .= '&'.$Query;
         }
 
-        $RedirectUri = urlencode($RedirectUri);
-
-        $SigninHref = "https://graph.facebook.com/oauth/authorize?client_id=$AppID&redirect_uri=$RedirectUri&scope=$Scopes";
+        $authQuery = http_build_query([
+            'client_id' => $AppID,
+            'redirect_uri' => $RedirectUri,
+            'scope' => $Scopes,
+            'state' => Gdn::session()->transientKey()
+        ]);
+        $SigninHref = "https://graph.facebook.com/oauth/authorize?{$authQuery}";
 
         if ($Query) {
             $SigninHref .= '&'.$Query;
@@ -722,15 +623,6 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function socialSignIn() {
         return c('Plugins.Facebook.SocialSignIn', true) && $this->isConfigured();
-    }
-
-    /**
-     *
-     *
-     * @return bool
-     */
-    public function socialSharing() {
-        return c('Plugins.Facebook.SocialSharing', true) && $this->isConfigured();
     }
 
     public function socialReactions() {

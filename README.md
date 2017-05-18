@@ -1,7 +1,7 @@
 _Vanilla uses Composer!
-You cannot clone this repo right into a web directory - it requires a build step. [Learn more](http://vanillaforums.org/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](http://vanillaforums.org/addon/vanilla-core) instead_.
+You cannot clone this repo right into a web directory - it requires a build step. [Learn more](https://open.vanillaforums.com/discussion/31083/vanilla-now-uses-compose) or just [download the latest stable build](https://open.vanillaforums.com/addon/vanilla-core) instead_.
 
-![Vanilla](http://cdn.vanillaforums.com/vanilla-black-logo-400.svg)
+![Vanilla](http://images.v-cdn.net/vanilla-black-logo-400.svg)
 
 [![Build Status](https://api.travis-ci.org/vanilla/vanilla.svg?branch=master)](https://travis-ci.org/vanilla/vanilla)
 [![PR Stats](http://issuestats.com/github/vanilla/vanilla/badge/pr?style=flat-square)](http://issuestats.com/github/vanilla/vanilla)
@@ -28,19 +28,19 @@ can build a custom-tailored environment that meets your community's particular n
 
 Vanilla is free, open source software distributed under the GNU GPL2.
 We accept and encourage contributions from our community and sometimes give hugs in return.
-You can join us on the [Vanilla Community Forums](http://vanillaforums.org/discussions) to be part of that discussion.
+You can join us on the [Vanilla Community Forums](https://open.vanillaforums.com/discussions) to be part of that discussion.
 
-The latest stable release is always [listed here](http://vanillaforums.org/addon/vanilla-core). Currently, it is the `release/2.3` branch.
+The latest stable release is always [listed here](https://open.vanillaforums.com/addon/vanilla-core). Currently, it is the `release/2.3` branch.
 
-New plugins and themes can be listed in the [Official Addon Directory](http://vanillaforums.org/addon/).
+New plugins and themes can be listed in the [Official Addon Directory](https://open.vanillaforums.com/addon/).
 We encourage addon developers to release their code under the GPL as well, but do not require it.
 
 ## Cloud Solution
 
-Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](http://vanillaforums.com)
+Vanilla Forums provides an official cloud hosting solution at [vanillaforums.com](https://vanillaforums.com)
 with a 1-click install, automatic upgrades, amazing professional support, incredible scalability,
 integration assistance, theming and migration services, and exclusive features. For the very best Vanilla forum experience,
-you can skip the rest of this technical stuff and [go there directly](http://vanillaforums.com/plans).
+you can skip the rest of this technical stuff and [go there directly](https://vanillaforums.com/plans).
 
 If you professionally run a large community or enterprise forum, our cloud solution will make the best technical and economic sense by far.
 
@@ -48,18 +48,18 @@ If you professionally run a large community or enterprise forum, our cloud solut
 
 We strongly recommend:
 
-*  **PHP 5.6** or **7.0**.
+*  **PHP 7.0** or higher.
 *  MySQL 5.6 or higher (or Percona/MariaDB equivalent).
 
-If your server is not running PHP 5.6 or higher, **you must address this immediately**. All lower versions of PHP are no longer updated and are potentially unsafe. We will remove support for them soon.
+If your server is not running PHP 7.0 or higher, **you should address this soon**. While PHP 5.6 will receive security patches thru 2018, Vanilla may end support for it prior to that.
 
 Our _minimum_ requirements are now:
 
-* PHP 5.4 or newer with `--enable-mbstring` and the pdo_mysql module enabled.
-* If you intend to [Migrate to Vanilla](#migrating-to-vanilla) you will _also_ need PHP with `--with-mysqli`.
+* PHP 5.6 or newer.
+* PHP extensions mbstring (`--enable-mbstring`), cURL (`--with-curl`), and PDO (on by default).
+* To [import into Vanilla](#migrating-to-vanilla) you need MySQLi (`--with-mysqli`).
+* To use our social plugins you need [OpenSSL](http://php.net/manual/en/openssl.installation.php).
 * MySQL 5.0 or newer (or Percona/MariaDB equivalent).
-
-To use our social plugins, PHP's [OpenSSL support](http://php.net/manual/en/openssl.installation.php) must be enabled.
 
 Vanilla ships with a `.htaccess` file required for Apache support. Using nginx or IIS may require additional configuration.
 
@@ -73,7 +73,7 @@ by default for all smartphones & tablets. Heck, it even works on the PlayStation
 
 Vanilla is built to be simple, and its installation is no exception.
 
-* Upload Vanilla's [pre-built version](https://vanillaforums.org/addon/vanilla-core) to your server.
+* Upload Vanilla's [pre-built version](https://open.vanillaforums.com/addon/vanilla-core) to your server.
 * Confirm the cache, conf, and uploads folders are writable by PHP.
 * Navigate to that folder in your web browser.
 * Follow the instructions on screen.
@@ -82,10 +82,17 @@ Vanilla is built to be simple, and its installation is no exception.
 
 Follow these steps to upgrade Vanilla when a new stable release is announced.
 
+Please consider using maintenance mode before running database updates if your database is very large (millions of users or discussions).
+
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
-* Go to `yourforum.com/utility/update` to force any updates needed.
-* If it fails, try it a second times by refreshing the page.
+* Delete all files in `/cache`.
+* Go to `yourforum.com/utility/upgrade` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second times by refreshing the page.
+* If any "Deleted Files" are listed on the upgrade page, manually delete the listed files.
+
+If your forum still uses URLs including `?p=`:
+
+Support for this URL structure is ending after 2.3 in favor of "pretty" URLs so it's time to make the switch. First, confirm your server is setup to handle rewrites. On Apache, using the `.htaccess` file provided will accomplish this. Additional setup is required on nginx and other platforms. Test whether it is working by visiting `/discussions` - if you see a discussions list (rather than a 404), it is likely setup correctly. Then, open `conf/config.php` and find the line with `$Configuration['Garden']['RewriteUrls'] = false;` and **delete the entire line**. Your site should immediately switch to "pretty" URL paths instead of using the 'p' parameter. If there is a problem, re-add the line to your config and do further troubleshooting.
 
 To upgrade from **2.1 or earlier**:
 
@@ -97,7 +104,7 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 ## Migrating to Vanilla
 
-* Get [Vanilla Porter](http://vanillaforums.org/addon/porter-core) and verify it supports your platform.
+* Get [Vanilla Porter](https://open.vanillaforums.com/addon/porter-core) and verify it supports your platform.
 * Read the Advanced Uses notes on that page.
 * Upload it to your current server.
 * Navigate to the file in your web browser & run it.
@@ -107,15 +114,15 @@ To upgrade from Vanilla **1.0** requires a full migration (see next section). Th
 
 * [Troubleshooting upgrades & installs](http://docs.vanillaforums.com/developers/troubleshooting/)
 * [Official documentation](http://docs.vanillaforums.com)
-* [Vanilla community forums](http://vanillaforums.org/discussions)
-* [Official cloud hosting with professional support & migration services](http://vanillaforums.com/plans)
+* [Vanilla community forums](https://open.vanillaforums.com/discussions)
+* [Official cloud hosting with professional support & migration services](https://vanillaforums.com/plans)
 
 ## Contributing
 
 * Troubleshoot issues you run into on the community forum so everyone can help & reference it later.
-* Got an idea or suggestion? Use the [forum](http://vanillaforums.org/discussions) to discuss it.
+* Got an idea or suggestion? Use the [forum](https://open.vanillaforums.com/discussions) to discuss it.
 * File detailed [issues](https://github.com/vanilla/vanilla/issues) on GitHub (version number, what you did, and actual vs expected outcomes).
-* Sign the [Contributors' Agreement](http://vanillaforums.org/contributors) to send us code.
+* Sign the [Contributors' Agreement](https://open.vanillaforums.com/contributors) to send us code.
 * Use pull requests against the `master` branch.
 * Keep our to-do list fresh by reviewing our open issues for resolved or duplicated items.
 
@@ -142,7 +149,7 @@ We'll work on releasing an updated version as quickly as possible.
 Please do not email non-security issues; use the [issue tracker](https://github.com/vanilla/vanilla/issues) instead.
 
 ## Legal Stuff
-Copyright &copy; 2008-2016 Vanilla Forums Inc.
+Copyright &copy; 2009-2017 Vanilla Forums Inc.
 
 Vanilla Forums is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation, either version 2 of the License, or (at your option) any later version.
@@ -154,4 +161,4 @@ Contact Vanilla Forums Inc. at support [at] vanillaforums [dot] com
 
 ## Bonk!
 
-Just kidding, everything's awesome. ![dance](http://cdn.vanillaforums.com/dance.gif)
+Just kidding, everything's awesome. ![dance](http://images.v-cdn.net/dance.gif)

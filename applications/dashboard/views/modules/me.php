@@ -59,51 +59,39 @@ if ($Session->isValid()):
     }
 
     // Profile Settings & Logout
-    echo '<span class="ToggleFlyout">';
-    $CDashboard = $DashboardCount > 0 ? wrap($DashboardCount, 'span class="Alert"') : '';
-    echo anchor(sprite('SpOptions', 'Sprite Sprite16').Wrap(t('Account Options'), 'em').$CDashboard, '/profile/edit', 'MeButton FlyoutButton', array('title' => t('Account Options')));
-    echo sprite('SpFlyoutHandle', 'Arrow');
-    echo '<div class="Flyout MenuItems">';
-    echo '<ul>';
-    // echo wrap(Wrap(t('My Account'), 'strong'), 'li');
-    // echo wrap('<hr />', 'li');
-    if (hasEditProfile(Gdn::session()->UserID)) {
-        echo wrap(Anchor(sprite('SpEditProfile').' '.t('Edit Profile'), 'profile/edit', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-editprofile'));
-    } else {
-        echo wrap(Anchor(sprite('SpEditProfile').' '.t('Preferences'), 'profile/preferences', 'EditProfileLink'), 'li', array('class' => 'EditProfileWrap link-preferences'));
-    }
+    $dropdown = new DropdownModule();
+    $dropdown->setData('DashboardCount', $DashboardCount);
+    $triggerIcon = '<span class="Sprite Sprite16 SpOptions"></span>';
+    $triggerTitle = t('Account Options');
+    $dropdown->setTrigger(wrap($triggerTitle, 'em'), 'anchor', 'MeButton FlyoutButton', $triggerIcon, '/profile/edit', ['title' => $triggerTitle]);
+    $editModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-editprofile'];
+    $preferencesModifiers['listItemCssClasses'] = ['EditProfileWrap', 'link-preferences'];
 
-    if ($Session->checkPermission(array('Garden.Settings.View', 'Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Garden.Users.Approve', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
-        echo wrap('<hr />', 'li');
-        $CApplicant = $ApplicantCount > 0 ? ' '.Wrap($ApplicantCount, 'span class="Alert"') : '';
-        $CSpam = ''; //$SpamCount > 0 ? ' '.Wrap($SpamCount, 'span class="Alert"') : '';
-        $CModeration = $ModerationCount > 0 ? ' '.Wrap($ModerationCount, 'span class="Alert"') : '';
+    $dropdown->addLinkIf(hasEditProfile(Gdn::session()->UserID), t('Edit Profile'), '/profile/edit', 'profile.edit', '', [], $editModifiers);
+    $dropdown->addLinkIf(!hasEditProfile(Gdn::session()->UserID), t('Preferences'), '/profile/preferences', 'profile.preferences', '', [], $preferencesModifiers);
 
-        if ($Session->checkPermission('Garden.Users.Approve')) {
-            echo wrap(Anchor(sprite('SpApplicants').' '.t('Applicants').$CApplicant, '/dashboard/user/applicants'), 'li', array('class' => 'link-applicants'));
-        }
+    $applicantModifiers = $ApplicantCount > 0 ? ['badge' => $ApplicantCount] : [];
+    $applicantModifiers['listItemCssClasses'] = ['link-applicants'];
+    $modModifiers = $ModerationCount > 0 ? ['badge' => $ModerationCount] : [];
+    $modModifiers['listItemCssClasses'] = ['link-moderation'];
+    $spamModifiers['listItemCssClasses'] = ['link-spam'];
+    $dashboardModifiers['listItemCssClasses'] = ['link-dashboard'];
+    $signoutModifiers['listItemCssClasses'] = ['link-signout', 'SignInOutWrap', 'SignOutWrap'];
 
-        if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
-            echo wrap(Anchor(sprite('SpSpam').' '.t('Spam Queue').$CSpam, '/dashboard/log/spam'), 'li', array('class' => 'link-spam'));
-        }
+    $spamPermission = $Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
+    $modPermission = $Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
+    $dashboardPermission = $Session->checkPermission(['Garden.Settings.View', 'Garden.Settings.Manage'], false);
 
-        if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
-            echo wrap(Anchor(sprite('SpMod').' '.t('Moderation Queue').$CModeration, '/dashboard/log/moderation'), 'li', array('class' => 'link-moderation'));
-        }
+    $dropdown->addLinkIf('Garden.Users.Approve', t('Applicants'), '/dashboard/user/applicants', 'moderation.applicants', '', [], $applicantModifiers);
+    $dropdown->addLinkIf($spamPermission, t('Spam Queue'), '/dashboard/log/spam', 'moderation.spam', '', [], $spamModifiers);
+    $dropdown->addLinkIf($modPermission, t('Moderation Queue'), '/dashboard/log/moderation', 'moderation.moderation', '', [], $modModifiers);
+    $dropdown->addLinkIf($dashboardPermission, t('Dashboard'), '/dashboard/settings', 'dashboard.dashboard', '', [], $dashboardModifiers);
 
-        if ($Session->checkPermission(array('Garden.Settings.View', 'Garden.Settings.Manage'), false)) {
-            echo wrap(Anchor(sprite('SpDashboard').' '.t('Dashboard'), '/dashboard/settings'), 'li', array('class' => 'link-dashboard'));
-        }
-    }
+    $dropdown->addLink(t('Sign Out'), SignOutUrl(), 'entry.signout', '', [], $signoutModifiers);
 
+    $this->EventArguments['Dropdown'] = &$dropdown;
     $this->fireEvent('FlyoutMenu');
-    echo wrap('<hr />'.anchor(sprite('SpSignOut').' '.t('Sign Out'), SignOutUrl()), 'li', array('class' => 'SignInOutWrap SignOutWrap link-signout'));
-    echo '</ul>';
-    echo '</div>';
-    echo '</span>';
-
-    // Sign Out
-    // echo anchor(sprite('SpSignOut', 'Sprite16').Wrap(t('Sign Out'), 'em'), SignOutUrl(), 'MeButton', array('title' => t('Sign Out')));
+    echo $dropdown;
 
     echo '</div>';
     echo '</div>';

@@ -3,7 +3,7 @@
  * Gdn_Configuration & Gdn_ConfigurationSource
  *
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0
@@ -58,6 +58,12 @@ class Gdn_Configuration extends Gdn_Pluggable {
     /** @var string The default top level group for new configs. */
     protected $defaultGroup = 'Configuration';
 
+    /** @var null The sort flag to use with ksort. */
+    private $sortFlag = null;
+
+    /** @var array Format option overrides. */
+    private $formatOptions = [];
+
     /**
      * Initialize a new instance of the {@link Gdn_Configuration} class.
      *
@@ -74,6 +80,46 @@ class Gdn_Configuration extends Gdn_Pluggable {
         } else {
             $this->defaultPath = PATH_CONF.'/config.php';
         }
+    }
+
+    /**
+     * Set a format option to be used by the Gdn_Configuration::format function.
+     *
+     * @param string $formatOption The option in $allowedOptions that you want to update.
+     * @param string|bool $value The value of the option you want to update.
+     */
+    public function setFormatOption($formatOption, $value) {
+        $allowedOptions = ['VariableName', 'WrapPHP', 'SafePHP', 'Headings', 'ByLine', 'FormatStyle'];
+
+        if (in_array($formatOption, $allowedOptions)) {
+            $this->formatOptions[$formatOption] = $value;
+        }
+    }
+
+    /**
+     * Getter for formatOptions.
+     */
+    public function getFormatOptions() {
+        return $this->formatOptions;
+    }
+
+    /**
+     * Set the sort flag to be used with ksort.
+     *
+     * @link http://php.net/manual/en/function.ksort.php
+     * @param int $sortFlag As defined in php standard definitions
+     * @return Gdn_Configuration $this
+     */
+    public function setSortFlag($sortFlag) {
+        $this->sortFlag = $sortFlag;
+        return $this;
+    }
+
+    /**
+     * @return null|int The sort flag to be used with ksort.
+     */
+    public function getSortFlag() {
+        return $this->sortFlag;
     }
 
     /**
@@ -710,7 +756,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         }
 
         $Data = &$this->Data;
-        ksort($Data);
+        ksort($Data, $this->getSortFlag());
 
         // Check for the case when the configuration is the group.
         if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
@@ -1363,7 +1409,9 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
 
                 $Group = $this->Group;
                 $Data = &$this->Settings;
-                ksort($Data);
+                if ($this->Configuration) {
+                    ksort($Data, $this->Configuration->getSortFlag());
+                }
 
                 // Check for the case when the configuration is the group.
                 if (is_array($Data) && count($Data) == 1 && array_key_exists($Group, $Data)) {
@@ -1390,12 +1438,18 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
                     }
                 }
 
-                // Write config data to string format, ready for saving
-                $FileContents = Gdn_Configuration::format($Data, array(
+                $options = [
                     'VariableName' => $Group,
                     'WrapPHP' => true,
                     'ByLine' => true
-                ));
+                ];
+
+                if ($this->Configuration) {
+                    $options = array_merge($options, $this->Configuration->getFormatOptions());
+                }
+
+                // Write config data to string format, ready for saving
+                $FileContents = Gdn_Configuration::format($Data, $options);
 
                 if ($FileContents === false) {
                     trigger_error(errorMessage('Failed to define configuration file contents.', 'Configuration', 'Save'), E_USER_ERROR);

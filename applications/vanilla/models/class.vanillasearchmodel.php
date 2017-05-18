@@ -2,7 +2,7 @@
 /**
  * Vanilla Search model
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -30,7 +30,7 @@ class VanillaSearchModel extends Gdn_Model {
             $this->_DiscussionModel = $Value;
         }
         if ($this->_DiscussionModel === false) {
-            require_once(dirname(__FILE__).DS.'class.discussionmodel.php');
+            require_once(__DIR__.DS.'class.discussionmodel.php');
             $this->_DiscussionModel = new DiscussionModel();
         }
         return $this->_DiscussionModel;
@@ -48,7 +48,7 @@ class VanillaSearchModel extends Gdn_Model {
     public function discussionSql($SearchModel, $AddMatch = true) {
         // Get permission and limit search categories if necessary.
         if ($AddMatch) {
-            $Perms = CategoryModel::CategoryWatch();
+            $Perms = CategoryModel::CategoryWatch(false);
 
             if ($Perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $Perms);
@@ -92,7 +92,7 @@ class VanillaSearchModel extends Gdn_Model {
     public function commentSql($SearchModel, $AddMatch = true) {
         if ($AddMatch) {
             // Get permission and limit search categories if necessary.
-            $Perms = CategoryModel::CategoryWatch();
+            $Perms = CategoryModel::CategoryWatch(false);
             if ($Perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $Perms);
             }

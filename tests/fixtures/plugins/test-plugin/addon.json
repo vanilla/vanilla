@@ -1,0 +1,24 @@
+{
+	"name": "Test Plugin",
+	"description": "This is a test plugin with an addon.json file.",
+	"version": "1.0.0",
+	"mobileFriendly": true,
+	"settingsUrl": "/settings/test",
+	"key": "test-plugin",
+	"type": "addon",
+	"priority": 100,
+	"oldType": "plugin",
+	"authors": {
+		"0": {
+			"name": "John Smith",
+			"email": "name@example.com",
+			"homepage": "http://example.com/john-smith"
+		}
+	},
+	"require": {
+		"vanilla": ">=2.1"
+	},
+	"Issues": {},
+	"keyRaw": "QnA",
+	"license": "GPLv2"
+}

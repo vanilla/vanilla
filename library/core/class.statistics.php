@@ -5,7 +5,7 @@
  * @author Mark O'Sullivan <markm@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
  * @author Tim Gunter <tim@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.0.17
@@ -770,7 +770,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
                 // Admins see a helpful notice
                 if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
                     $Warning = sprite('Sliders', 'InformSprite');
-                    $Warning .= T('Your config.php file is not writable.<br/> Find out <a href="http://vanillaforums.org/docs/vanillastatistics">how to fix this &raquo;</a>');
+                    $Warning .= t('Your config.php file is not writable.');
                     Gdn::controller()->informMessage($Warning, array('CssClass' => 'HasSprite'));
                 }
                 return;

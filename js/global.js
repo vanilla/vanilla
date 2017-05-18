@@ -717,6 +717,11 @@ jQuery(document).ready(function($) {
     };
     $('.Popin, .js-popin').popin();
 
+    // Make poplist items with a rel attribute clickable.
+    $(document).on('click', '.PopList .Item[rel]', function() {
+        window.location.href = $(this).attr('rel');
+    });
+
     var hijackClick = function(e) {
         var $elem = $(this);
         var $parent = $(this).closest('.Item');
@@ -764,7 +769,7 @@ jQuery(document).ready(function($) {
 
         return false;
     };
-    $(document).delegate('.Hijack', 'click', hijackClick);
+    $(document).delegate('.Hijack, .js-hijack', 'click', hijackClick);
 
 
     // Activate ToggleFlyout and ButtonGroup menus
@@ -913,7 +918,7 @@ jQuery(document).ready(function($) {
         gdn.stats();
 
     // If a dismissable InformMessage close button is clicked, hide it.
-    $(document).delegate('div.InformWrapper.Dismissable a.Close', 'click', function() {
+    $(document).delegate('div.InformWrapper.Dismissable a.Close, div.InformWrapper .js-inform-close', 'click', function() {
         $(this).parents('div.InformWrapper').fadeOut('fast', function() {
             $(this).remove();
         });
@@ -1685,6 +1690,19 @@ jQuery(document).ready(function($) {
                                     "q": query,
                                     "limit": server_limit
                                 }, function(data) {
+                                    if (Array.isArray(data)) {
+                                        data.forEach(function(result) {
+                                            if (typeof result === "object" && typeof result.name === "string") {
+                                                // Convert special characters to safely insert into template.
+                                                result.name = result.name.replace(/&/g, "&amp;")
+                                                    .replace(/</g, "&lt;")
+                                                    .replace(/>/g, "&gt;")
+                                                    .replace(/"/g, "&quot;")
+                                                    .replace(/'/g, "&apos;");
+                                            }
+                                        });
+                                    }
+
                                     callback(data);
 
                                     // If data is empty, cache the results to prevent
@@ -1713,7 +1731,6 @@ jQuery(document).ready(function($) {
                     // Note, in contenteditable mode (iframe for us), the value
                     // is surrounded by span tags.
                     before_insert: function(value, $li) {
-
                         // It's better to use the value provided, as it may have
                         // html tags around it, depending on mode. Using the
                         // regular expression avoids the need to check what mode
@@ -1726,7 +1743,7 @@ jQuery(document).ready(function($) {
 
                         // Check if there are any whitespaces, and if so, add
                         // quotation marks around the whole name.
-                        var requires_quotation = /\s/g.test(username);
+                        var requires_quotation = /[^\w-]/.test(username);
 
                         // Check if there are already quotation marks around
                         // the string--double or single.

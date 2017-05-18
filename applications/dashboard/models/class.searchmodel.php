@@ -2,7 +2,7 @@
 /**
  * Search model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -180,8 +180,12 @@ class SearchModel extends Gdn_Model {
             }
 
             switch ($Value['RecordType']) {
+                case 'Comment':
+                    $Comment = arrayTranslate($Value, ['PrimaryID' => 'CommentID', 'CategoryID']);
+                    $Result[$Key]['Url'] = commentUrl($Comment);
+                    break;
                 case 'Discussion':
-                    $Discussion = arrayTranslate($Value, array('PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID'));
+                    $Discussion = arrayTranslate($Value, ['PrimaryID' => 'DiscussionID', 'Title' => 'Name', 'CategoryID']);
                     $Result[$Key]['Url'] = discussionUrl($Discussion, 1);
                     break;
             }

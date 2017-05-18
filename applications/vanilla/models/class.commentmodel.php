@@ -2,7 +2,7 @@
 /**
  * Comment model
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -11,7 +11,9 @@
 /**
  * Manages discussion comments data.
  */
-class CommentModel extends VanillaModel {
+class CommentModel extends Gdn_Model {
+
+    use \Vanilla\FloodControlTrait;
 
     /** Threshold. */
     const COMMENT_THRESHOLD_SMALL = 1000;
@@ -31,6 +33,16 @@ class CommentModel extends VanillaModel {
     /** @var bool */
     public $pageCache;
 
+    /**
+     * @var \Vanilla\CacheInterface Object used to store the FloodControl data.
+     */
+    protected $floodGate;
+
+    /**
+     * @var CommentModel $instance;
+     */
+    private static $instance;
+
    /**
     * Class constructor. Defines the related database table name.
     *
@@ -39,8 +51,21 @@ class CommentModel extends VanillaModel {
     */
     public function __construct() {
         parent::__construct('Comment');
+        $this->floodGate = FloodControlHelper::configure($this, 'Vanilla', 'Comment');
         $this->pageCache = Gdn::cache()->activeEnabled() && c('Properties.CommentModel.pageCache', false);
         $this->fireEvent('AfterConstruct');
+    }
+
+    /**
+     * The shared instance of this object.
+     *
+     * @return CommentModel Returns the instance.
+     */
+    public static function instance() {
+        if (self::$instance === null) {
+            self::$instance = new CommentModel();
+        }
+        return self::$instance;
     }
 
     /**
@@ -745,7 +770,16 @@ class CommentModel extends VanillaModel {
          ->CountComments;
     }
 
+    /**
+     * @deprecated since 2.4
+     *
+     * @param $DiscussionID
+     * @param null $UserID
+     * @return int
+     */
     public function getUnreadOffset($DiscussionID, $UserID = null) {
+        deprecated(__METHOD__);
+
         if ($UserID == null) {
             $UserID = Gdn::session()->UserID;
         }
@@ -805,8 +839,6 @@ class CommentModel extends VanillaModel {
      * @since 2.0.0
     */
     public function save($FormPostValues, $Settings = false) {
-        $Session = Gdn::session();
-
        // Define the primary key in this model's table.
         $this->defineSchema();
 
@@ -843,8 +875,16 @@ class CommentModel extends VanillaModel {
 
        // Validate the form posted values
         if ($this->validate($FormPostValues, $Insert)) {
+            // Backward compatible check for flood control
+            if (!val('SpamCheck', $this, true)) {
+                deprecated('DiscussionModel->SpamCheck attribute', 'FloodControlTrait->setFloodControlEnabled()');
+                $this->setFloodControlEnabled(false);
+            }
+
+            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodGate);
+
            // If the post is new and it validates, check for spam
-            if (!$Insert || !$this->CheckForSpam('Comment')) {
+            if (!$Insert || !$isUserSpamming) {
                 $Fields = $this->Validation->SchemaValidationFields();
                 unset($Fields[$this->PrimaryKey]);
 
@@ -969,37 +1009,7 @@ class CommentModel extends VanillaModel {
         if ($Insert) {
             // UPDATE COUNT AND LAST COMMENT ON CATEGORY TABLE
             if ($Discussion->CategoryID > 0) {
-                $Category = CategoryModel::categories($Discussion->CategoryID);
-
-                if ($Category) {
-                    $CountComments = val('CountComments', $Category, 0) + 1;
-
-                    if ($CountComments < self::COMMENT_THRESHOLD_SMALL || ($CountComments < self::COMMENT_THRESHOLD_LARGE && $CountComments % self::COUNT_RECALC_MOD == 0)) {
-                        $CountComments = $this->SQL
-                            ->select('CountComments', 'sum', 'CountComments')
-                            ->from('Discussion')
-                            ->where('CategoryID', $Discussion->CategoryID)
-                            ->get()
-                            ->firstRow()
-                         ->CountComments;
-                    }
-                }
-                $CategoryModel = new CategoryModel();
-
-                $CategoryModel->setField($Discussion->CategoryID, array(
-                    'LastDiscussionID' => $DiscussionID,
-                    'LastCommentID' => $CommentID,
-                    'CountComments' => $CountComments,
-                    'LastDateInserted' => $Fields['DateInserted']
-                ));
-
-            // Update the cache.
-                    $CategoryCache = array(
-                    'LastTitle' => $Discussion->Name, // kluge so JoinUsers doesn't wipe this out.
-                    'LastUserID' => $Fields['InsertUserID'],
-                    'LastUrl' => DiscussionUrl($Discussion).'#latest'
-                    );
-                    CategoryModel::SetCache($Discussion->CategoryID, $CategoryCache);
+                CategoryModel::instance()->incrementLastComment($Fields);
                 }
 
             // Prepare the notification queue.
@@ -1376,11 +1386,14 @@ class CommentModel extends VanillaModel {
         $this->UpdateUser($Comment['InsertUserID']);
 
        // Update the category.
-        $Category = CategoryModel::categories(val('CategoryID', $Discussion));
+        $categoryID = val('CategoryID', $Discussion);
+        $Category = CategoryModel::categories($categoryID);
         if ($Category && $Category['LastCommentID'] == $CommentID) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->SetRecentPost($Category['CategoryID']);
         }
+        // Decrement CountAllComments for category and its parents.
+        CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT);
 
        // Clear the page cache.
         $this->RemovePageCache($Comment['DiscussionID']);

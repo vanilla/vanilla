@@ -1,10 +1,9 @@
 language: php
 
 php:
-    - 5.4
-    - 5.5
     - 5.6
     - 7.0
+    - 7.1
     - hhvm
 
 sudo: false
@@ -28,6 +27,7 @@ addons:
 install:
   - composer self-update
   - composer install -o
+  - composer require phpunit/phpunit ~5
   - tests/travis/nginx/install-nginx.sh
 
 script:
@@ -36,6 +36,6 @@ script:
   - tests/travis/php-lint.sh ./library
   - tests/travis/php-lint.sh ./plugins
   - tests/travis/php-lint.sh ./themes
-  - phpunit -c phpunit.xml.dist
+  - ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
   - cat /tmp/error.log
   - cat /tmp/access.log

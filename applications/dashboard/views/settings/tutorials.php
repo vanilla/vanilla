@@ -17,17 +17,12 @@ if (isset($Tutorials[$CurrentTutorialCode])) {
     <a class="header-menu-item" href="<?php echo url('/dashboard/settings/gettingstarted'); ?>"><?php echo t('Getting Started'); ?></a>
     <a class="header-menu-item active" role="heading" aria-level="1" href="<?php echo url('/dashboard/settings/tutorials'); ?>"><?php echo t('Help &amp; Tutorials'); ?></a>
 </div>
-<div class="hero">
-    <div class="hero-content">
-        <div class="hero-title"><?php echo $CurrentTutorial['Name']; ?></div>
-        <div class="hero-body"><?php echo $CurrentTutorial['Description']; ?></div>
-    </div>
-    <div class="hero-media-wrapper">
-        <iframe wmode="transparent"
-                src="//player.vimeo.com/video/<?php echo $CurrentTutorial['VideoID']; ?>?title=0&byline=0&portrait=0&color=D0D9E0"
-                width="700" height="394?wmode=transparent" frameborder="0"></iframe>
-    </div>
-</div>
+<?php
+$currentTutorialIframe = '<iframe wmode="transparent" src="//player.vimeo.com/video/'
+    .$CurrentTutorial['VideoID']
+    .'?title=0&byline=0&portrait=0&color=D0D9E0" width="700" height="394?wmode=transparent" frameborder="0"></iframe>';
+echo hero($CurrentTutorial['Name'], $CurrentTutorial['Description'], [], $currentTutorialIframe);
+?>
 <div class="video-sections">
     <div class="video-section">
         <div class="video-section-heading"><?php echo t('Other Tutorials'); ?></div>

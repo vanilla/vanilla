@@ -4,7 +4,7 @@
  * DO NOT USE THIS FILE IN PRODUCTION.
  *
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license GPLv2
  */
 

@@ -2,7 +2,7 @@
 /**
  * Manages individual user profiles.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -84,7 +84,6 @@ class ProfileController extends Gdn_Controller {
 
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');
-        $this->addCssFile('cropimage.css');
         $this->addModule('GuestModule');
         parent::initialize();
 
@@ -254,6 +253,10 @@ class ProfileController extends Gdn_Controller {
         $Column = 'Count'.ucfirst($Column);
         if (!$UserID) {
             $UserID = Gdn::session()->UserID;
+        }
+
+        if ($UserID !== Gdn::session()->UserID) {
+            $this->permission('Garden.Settings.Manage');
         }
 
         $Count = $this->UserModel->profileCount($UserID, $Column);
@@ -488,9 +491,12 @@ class ProfileController extends Gdn_Controller {
 
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
-        } else {
-            return Gdn::dispatcher()->dispatch(userUrl($this->User, '', 'discussions'));
+        } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
+            safeRedirect(userUrl($this->User, '', 'discussions'));
         }
+
+        // Garden.Profile.ShowActivities is false and the user is expecting an xml or json response, so render blank.
+        $this->render('blank', 'utility', 'dashboard');
     }
 
     /**
@@ -535,6 +541,10 @@ class ProfileController extends Gdn_Controller {
      * - 1: Unset the force cookie and use the user agent to determine the theme.
      */
     public function noMobile($type = 'desktop') {
+        if (!Gdn::request()->isAuthenticatedPostBack(true)) {
+            throw new Exception('Requires POST', 405);
+        }
+
         $type = strtolower($type);
 
         if ($type == '1') {
@@ -558,7 +568,8 @@ class ProfileController extends Gdn_Controller {
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
 
-        redirect("/", 302);
+        $this->RedirectUrl = url('/');
+        $this->render('Blank', 'Utility', 'Dashboard');
     }
 
     /**
@@ -757,7 +768,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->isUploadedAvatar($avatar)) {
             // Get the image source so we can manipulate it in the crop module.
             $upload = new Gdn_UploadImage();
-            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            $thumbnailSize = c('Garden.Thumbnail.Size');
             $basename = changeBasename($avatar, "p%s");
             $source = $upload->copyLocal($basename);
 
@@ -791,7 +802,7 @@ class ProfileController extends Gdn_Controller {
             }
             if ($this->Form->errorCount() == 0) {
                 if ($newAvatar !== false) {
-                    $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+                    $thumbnailSize = c('Garden.Thumbnail.Size');
                     // Update crop properties.
                     $basename = changeBasename($newAvatar, "p%s");
                     $source = $upload->copyLocal($basename);
@@ -874,12 +885,12 @@ class ProfileController extends Gdn_Controller {
             $parts = Gdn_UploadImage::saveImageAs(
                 $source,
                 self::AVATAR_FOLDER."/$subdir/p$imageBaseName",
-                c('Garden.Profile.MaxHeight', 1000),
-                c('Garden.Profile.MaxWidth', 250),
+                c('Garden.Profile.MaxHeight'),
+                c('Garden.Profile.MaxWidth'),
                 array('SaveGif' => c('Garden.Thumbnail.SaveGif'))
             );
 
-            $thumbnailSize = c('Garden.Thumbnail.Size', 40);
+            $thumbnailSize = c('Garden.Thumbnail.Size');
 
             // Save the thumbnail size image.
             Gdn_UploadImage::saveImageAs(

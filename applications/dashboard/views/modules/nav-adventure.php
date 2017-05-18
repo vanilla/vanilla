@@ -1,6 +1,9 @@
 <?php
+/** @var NavModule $nav */
+$nav = $this;
+
 echo '<div class="nav nav-adventure" role="navigation">';
-$items = val('items', $this);
+$items = $nav->getItems();
 if (!function_exists('renderAdventureNav')) {
     function renderAdventureNav($items) {
         foreach ($items as $item) {

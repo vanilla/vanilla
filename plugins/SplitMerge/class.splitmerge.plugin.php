@@ -2,7 +2,7 @@
 /**
  * SplitMerge plugin.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package SplitMerge
  */
@@ -138,7 +138,7 @@ class SplitMergePlugin extends Gdn_Plugin {
             $Sender->Form->setValue('CategoryID', val('CategoryID', $Discussion));
         }
 
-        $Sender->render($this->getView('splitcomments.php'));
+        $Sender->render($Sender->fetchViewLocation('splitcomments', '', 'plugins/SplitMerge'));
     }
 
     /**

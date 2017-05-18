@@ -4,7 +4,7 @@
  *
  * @author Dane MacMillan <dane@vanillaforums.com>
  * @author Todd Burry <todd@vanillaforums.com>
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Core
  * @since 2.2
@@ -482,9 +482,11 @@ class Emoji {
         $basename = basename($filename, $ext);
         $src = asset($emoji_path);
 
+        $attributes = [$src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext];
+        $attributes = array_map('htmlspecialchars', $attributes);
         $img = str_replace(
-            array('%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'),
-            array($src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext),
+            ['%1$s', '%2$s', '{src}', '{name}', '{dir}', '{filename}', '{basename}', '{ext}'],
+            $attributes,
             $this->format
         );
 

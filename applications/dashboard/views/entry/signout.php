@@ -13,7 +13,7 @@ $Session = Gdn::session();
 
             <?php if ($Session->isValid()) { ?>
                 <p id="SignoutWrap">
-                    <script language="javascript">
+                    <script>
                         jQuery(document).ready(function($) {
                             var url = $('#SignoutLink').attr('href');
                             if (url) {

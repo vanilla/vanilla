@@ -1,5 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
 
+/** @var ConfigurationModule $Sf */
 $Sf = $this->ConfigurationModule;
 /* @var Gdn_Form $Form */
 $Form = $Sf->Form();
@@ -11,7 +12,7 @@ if ($Sf->RenderAll) {
     }
 }
 
-$Options = array();
+$Options = [];
 if ($Sf->HasFiles()) {
     $Options['enctype'] = 'multipart/form-data';
 }
@@ -24,10 +25,12 @@ echo $Form->errors();
 
     foreach ($Sf->Schema() as $Row) {
 
-        if (val('no-grid', $Row['Options'])) {
-            echo "<li>\n  ";
-        } else {
-            echo "<li class=\"form-group\">\n  ";
+        if ((strtolower($Row['Control'])) !== 'imageupload') {
+            if (val('no-grid', $Row['Options'])) {
+                echo "<li>\n  ";
+            } else {
+                echo "<li class=\"form-group\">\n  ";
+            }
         }
 
         $LabelCode = $Sf->LabelCode($Row);
@@ -59,7 +62,7 @@ echo $Form->errors();
                 echo '</div>';
                 break;
             case 'toggle':
-                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options']);
+                echo $Form->toggle($Row['Name'], t($LabelCode), $Row['Options'], $Description);
                 break;
             case 'dropdown':
                 echo '<div class="label-wrap">';
@@ -71,12 +74,17 @@ echo $Form->errors();
                 echo '</div>';
                 break;
             case 'imageupload':
+                $removeUrl = 'asset/deleteconfigimage/'.urlencode($Row['Name']);
+                echo $Form->imageUploadPreview($Row['Name'], $LabelCode, $Description, $removeUrl, $Row['Options']);
+                break;
+            case 'color':
                 echo '<div class="label-wrap">';
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;
-                echo wrap($Form->currentImage($Row['Name'], $Row['Options']), 'div', ['class' => 'image-wrap-label']);
                 echo '</div>';
-                echo $Form->ImageUploadWrap($Row['Name'], $Row['Options']);
+                echo '<div class="input-wrap">';
+                echo $Form->color($Row['Name'], $Row['Options']);
+                echo '</div>';
                 break;
             case 'radiolist':
                 echo '<div class="label-wrap">';
@@ -110,4 +118,4 @@ echo $Form->errors();
     }
     ?>
 </ul>
-<?php echo $Form->close('Save'); ?>
+<?php echo $Form->close('Save', '', $Sf->controller()->data('FormFooter', [])); ?>

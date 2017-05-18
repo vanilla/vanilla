@@ -1,6 +1,6 @@
 <?php
 /**
- * @copyright 2009-2014 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GPLv2
  */
 

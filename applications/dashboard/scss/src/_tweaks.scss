@@ -27,10 +27,6 @@
   }
 }
 
-.crop-label {
-  display: none;
-}
-
 .main .content .control-panel {
   display: none;
 }
@@ -39,10 +35,6 @@
   .main .content .control-panel {
     display: block;
   }
-}
-
-.filter-date {
-  min-width: to-rem(184);
 }
 
 table,
@@ -64,9 +56,18 @@ ul {
   margin-bottom: 0;
 }
 
+.drop-enabled {
+  @extend .active;
+}
+
 // TODO: I don't know where to put this yet.
 .main {
   background-color: $white;
   border-left: $border-width solid $border-color;
   border-right: $border-width solid $border-color;
+}
+
+// Makes room for the collapse button when it exists on the categories page.
+.nestable-collapse ~ .nestable-content > .plank-title {
+  padding-left: to-rem(39);
 }

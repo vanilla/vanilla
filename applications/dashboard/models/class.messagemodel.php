@@ -2,7 +2,7 @@
 /**
  * Message model.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -203,7 +203,7 @@ class MessageModel extends Gdn_Model {
         $Result = array_filter($Result, function($Message) use ($Session, $category) {
             $visible = MessageModel::inCategory(val('CategoryID', $category, null), val('CategoryID', $Message), val('IncludeSubcategories', $Message));
             if ($category !== null) {
-                $visible = $visible && $Session->checkPermission('Vanilla.Discussions.View', true, 'Category', $category['PermissionCategoryID']);
+                $visible = $visible && CategoryModel::checkPermission($category, 'Vanilla.Discussions.View');
             }
             return $visible;
         });

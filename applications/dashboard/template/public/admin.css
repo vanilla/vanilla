@@ -1,6 +1,7 @@
 @charset "UTF-8";
 .fade {
   opacity: 0;
+  -webkit-transition: opacity .15s linear;
   transition: opacity .15s linear;
 }
 
@@ -20,12 +21,15 @@
   position: relative;
   height: 0;
   overflow: hidden;
+  -webkit-transition-timing-function: ease;
   transition-timing-function: ease;
+  -webkit-transition-duration: .35s;
   transition-duration: .35s;
+  -webkit-transition-property: height;
   transition-property: height;
 }
 
-.icon-vanillicon:before, .icheckbox.checked {
+.icon-vanillicon:before, .icheckbox.checked, .checkbox-painted-wrapper input:checked + label {
   display: inline-block;
   min-width: 1em;
   font-family: "vanillicon";
@@ -919,6 +923,68 @@
   content: "\f1b9";
 }
 
+.icon, .btn-icon, .bookmark, .search-wrap .search-icon-wrap,
+.icon svg, .btn-icon svg, .bookmark svg, .search-wrap .search-icon-wrap svg {
+  vertical-align: middle;
+  display: inline-block;
+  fill: currentColor;
+}
+
+.icon-9,
+.icon-9 svg {
+  height: 0.5625rem;
+  width: 0.5625rem;
+}
+
+.icon-10,
+.icon-10 svg {
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.icon-11,
+.icon-11 svg {
+  height: 0.6875rem;
+  width: 0.6875rem;
+}
+
+.icon-12,
+.icon-12 svg {
+  height: 0.75rem;
+  width: 0.75rem;
+}
+
+.icon-16,
+.icon-16 svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.icon-24,
+.icon-24 svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.icon-30,
+.icon-30 svg {
+  height: 1.875rem;
+  width: 1.875rem;
+}
+
+.icon-48,
+.icon-48 svg {
+  height: 3rem;
+  width: 3rem;
+}
+
+.icon-text {
+  width: 0.875rem;
+  height: 0.875rem;
+  color: #555a62;
+  vertical-align: middle;
+}
+
 /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
 html {
   font-family: sans-serif;
@@ -1032,7 +1098,6 @@ figure {
 }
 
 hr {
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
   height: 0;
 }
@@ -1093,7 +1158,6 @@ input {
 
 input[type="checkbox"],
 input[type="radio"] {
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
   padding: 0;
 }
@@ -1105,7 +1169,6 @@ input[type="number"]::-webkit-outer-spin-button {
 
 input[type="search"] {
   -webkit-appearance: textfield;
-  -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 
@@ -1464,19 +1527,20 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse, .nav-tabs .nav-link.active:focus, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:focus, .nav-tabs
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse, .nav-tabs select.nav-link:focus, .nav-tabs .nav-link.drop-enabled, .nav-tabs .nav-link.active:focus, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:focus, .nav-tabs
 .file-upload input:focus ~ .nav-link.file-upload-browse:focus,
 .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:focus, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-choose:focus,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:focus, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse:focus,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:hover, .nav-tabs
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:focus, .nav-tabs select.nav-link:focus, .nav-tabs
+select.nav-link.form-control:focus, .nav-tabs select.nav-link.ac_input:focus, .nav-tabs .nav-link.drop-enabled:focus, .nav-tabs .nav-link.active:hover, .nav-tabs .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-choose:hover, .nav-tabs
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .nav-tabs input:focus ~ .nav-link.file-upload-browse:hover, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .nav-tabs input:hover ~ .nav-link.file-upload-choose:hover, .nav-tabs
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-tabs input:hover ~ .nav-link.file-upload-browse:hover, .nav-tabs select.nav-link:hover:focus, .nav-tabs .nav-link.drop-enabled:hover,
 .nav-tabs .nav-item.open .nav-link,
 .nav-tabs .nav-item.open .nav-link:focus,
 .nav-tabs .nav-item.open .nav-link:hover {
@@ -1511,19 +1575,20 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse, .nav-pills .nav-link.active:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:focus, .nav-pills
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse, .nav-pills select.nav-link:focus, .nav-pills .nav-link.drop-enabled, .nav-pills .nav-link.active:focus, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:focus, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:focus, .nav-pills
 .file-upload input:focus ~ .nav-link.file-upload-browse:focus,
 .file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:focus, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-choose:focus,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:focus, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse:focus,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:focus, .nav-pills .nav-link.active:hover, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:hover, .nav-pills
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:focus, .nav-pills select.nav-link:focus, .nav-pills
+select.nav-link.form-control:focus, .nav-pills select.nav-link.ac_input:focus, .nav-pills .nav-link.drop-enabled:focus, .nav-pills .nav-link.active:hover, .nav-pills .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .nav-pills input:focus ~ .nav-link.file-upload-choose:hover, .nav-pills
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .nav-pills input:focus ~ .nav-link.file-upload-browse:hover, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .nav-pills input:hover ~ .nav-link.file-upload-choose:hover, .nav-pills
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:hover,
+.file-upload .nav-pills input:hover ~ .nav-link.file-upload-browse:hover, .nav-pills select.nav-link:hover:focus, .nav-pills .nav-link.drop-enabled:hover,
 .nav-pills .nav-item.open .nav-link,
 .nav-pills .nav-item.open .nav-link:focus,
 .nav-pills .nav-item.open .nav-link:hover {
@@ -1549,7 +1614,7 @@ a.text-danger:focus, a.text-danger:hover {
 .tab-content > .active, .file-upload .tab-content > input:focus ~ .file-upload-choose,
 .file-upload .tab-content > input:focus ~ .file-upload-browse,
 .file-upload .tab-content > input:hover ~ .file-upload-choose,
-.file-upload .tab-content > input:hover ~ .file-upload-browse {
+.file-upload .tab-content > input:hover ~ .file-upload-browse, .tab-content > select:focus, .tab-content > .drop-enabled {
   display: block;
 }
 
@@ -1557,97 +1622,6 @@ a.text-danger:focus, a.text-danger:hover {
   margin-top: -1px;
   border-top-right-radius: 0;
   border-top-left-radius: 0;
-}
-
-.alert, .CasualMessage, .InfoMessage, .WarningMessage, .AlertMessage, div.Messages.Errors {
-  padding: 15px;
-  margin-bottom: 0.75rem;
-  border: 0.0625rem solid transparent;
-  border-radius: 0;
-}
-
-.alert > p, .CasualMessage > p, .InfoMessage > p, .WarningMessage > p, .AlertMessage > p, div.Messages.Errors > p,
-.alert > ul, .CasualMessage > ul, .InfoMessage > ul, .WarningMessage > ul, .AlertMessage > ul, div.Messages.Errors > ul {
-  margin-bottom: 0;
-}
-
-.alert > p + p, .CasualMessage > p + p, .InfoMessage > p + p, .WarningMessage > p + p, .AlertMessage > p + p, div.Messages.Errors > p + p {
-  margin-top: 5px;
-}
-
-.alert-heading {
-  color: inherit;
-}
-
-.alert-link {
-  font-weight: bold;
-}
-
-.alert-dismissible {
-  padding-right: 35px;
-}
-
-.alert-dismissible .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  color: inherit;
-}
-
-.alert-success, .CasualMessage {
-  background-color: #6bc573;
-  border-color: #6bc573;
-  color: #fff;
-}
-
-.alert-success hr, .CasualMessage hr {
-  border-top-color: #59be62;
-}
-
-.alert-success .alert-link, .CasualMessage .alert-link {
-  color: #e6e6e6;
-}
-
-.alert-info, .InfoMessage {
-  background-color: #a1b8c6;
-  border-color: #a1b8c6;
-  color: #fff;
-}
-
-.alert-info hr, .InfoMessage hr {
-  border-top-color: #91acbc;
-}
-
-.alert-info .alert-link, .InfoMessage .alert-link {
-  color: #e6e6e6;
-}
-
-.alert-warning, .WarningMessage, .AlertMessage {
-  background-color: #faae42;
-  border-color: #faae42;
-  color: #fff;
-}
-
-.alert-warning hr, .WarningMessage hr, .AlertMessage hr {
-  border-top-color: #f9a329;
-}
-
-.alert-warning .alert-link, .WarningMessage .alert-link, .AlertMessage .alert-link {
-  color: #e6e6e6;
-}
-
-.alert-danger, div.Messages.Errors {
-  background-color: #fa2e1f;
-  border-color: #fa2e1f;
-  color: #fff;
-}
-
-.alert-danger hr, div.Messages.Errors hr {
-  border-top-color: #f91706;
-}
-
-.alert-danger .alert-link, div.Messages.Errors .alert-link {
-  color: #e6e6e6;
 }
 
 .tooltip {
@@ -1829,7 +1803,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse,
 .file-upload .ac_results input:hover ~ li.file-upload-browse, .ac_results
-.file-upload input:hover ~ li.file-upload-browse, .ac_results li.active, .dropdown-item.active:focus, .file-upload input:focus ~ .dropdown-item.file-upload-choose:focus, .file-upload .ac_results input:focus ~ li.file-upload-choose:focus, .ac_results .file-upload input:focus ~ li.file-upload-choose:focus,
+.file-upload input:hover ~ li.file-upload-browse, select.dropdown-item:focus, .dropdown-item.drop-enabled, .ac_results li.drop-enabled, .ac_results li.active, .dropdown-item.active:focus, .file-upload input:focus ~ .dropdown-item.file-upload-choose:focus, .file-upload .ac_results input:focus ~ li.file-upload-choose:focus, .ac_results .file-upload input:focus ~ li.file-upload-choose:focus,
 .file-upload input:focus ~ .dropdown-item.file-upload-browse:focus,
 .file-upload .ac_results input:focus ~ li.file-upload-browse:focus, .ac_results
 .file-upload input:focus ~ li.file-upload-browse:focus,
@@ -1838,7 +1812,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose:focus,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse:focus,
 .file-upload .ac_results input:hover ~ li.file-upload-browse:focus, .ac_results
-.file-upload input:hover ~ li.file-upload-browse:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .file-upload input:focus ~ .dropdown-item.file-upload-choose:hover, .file-upload .ac_results input:focus ~ li.file-upload-choose:hover, .ac_results .file-upload input:focus ~ li.file-upload-choose:hover,
+.file-upload input:hover ~ li.file-upload-browse:focus, select.dropdown-item:focus, .dropdown-item.drop-enabled:focus, .ac_results li.drop-enabled:focus, .ac_results li.active:focus, .dropdown-item.active:hover, .file-upload input:focus ~ .dropdown-item.file-upload-choose:hover, .file-upload .ac_results input:focus ~ li.file-upload-choose:hover, .ac_results .file-upload input:focus ~ li.file-upload-choose:hover,
 .file-upload input:focus ~ .dropdown-item.file-upload-browse:hover,
 .file-upload .ac_results input:focus ~ li.file-upload-browse:hover, .ac_results
 .file-upload input:focus ~ li.file-upload-browse:hover,
@@ -1847,7 +1821,7 @@ a.text-danger:focus, a.text-danger:hover {
 .file-upload input:hover ~ li.file-upload-choose:hover,
 .file-upload input:hover ~ .dropdown-item.file-upload-browse:hover,
 .file-upload .ac_results input:hover ~ li.file-upload-browse:hover, .ac_results
-.file-upload input:hover ~ li.file-upload-browse:hover, .ac_results li.active:hover {
+.file-upload input:hover ~ li.file-upload-browse:hover, select.dropdown-item:hover:focus, .dropdown-item.drop-enabled:hover, .ac_results li.drop-enabled:hover, .ac_results li.active:hover {
   color: #fff;
   text-decoration: none;
   background-color: #0291db;
@@ -1997,13 +1971,13 @@ button.list-group-item:hover {
 .list-group-item.active, .file-upload input:focus ~ .list-group-item.file-upload-choose,
 .file-upload input:focus ~ .list-group-item.file-upload-browse,
 .file-upload input:hover ~ .list-group-item.file-upload-choose,
-.file-upload input:hover ~ .list-group-item.file-upload-browse, .list-group-item.active:focus, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus,
+.file-upload input:hover ~ .list-group-item.file-upload-browse, select.list-group-item:focus, .list-group-item.drop-enabled, .list-group-item.active:focus, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus, .list-group-item.active:hover, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus, select.list-group-item:focus, .list-group-item.drop-enabled:focus, .list-group-item.active:hover, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover, select.list-group-item:hover:focus, .list-group-item.drop-enabled:hover {
   z-index: 2;
   color: #fff;
   background-color: #0291db;
@@ -2013,50 +1987,54 @@ button.list-group-item:hover {
 .list-group-item.active .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading, select.list-group-item:focus .list-group-item-heading, .list-group-item.drop-enabled .list-group-item-heading,
 .list-group-item.active .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > small, select.list-group-item:focus .list-group-item-heading > small, .list-group-item.drop-enabled .list-group-item-heading > small,
 .list-group-item.active .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-heading > .small, select.list-group-item:focus .list-group-item-heading > .small, .list-group-item.drop-enabled .list-group-item-heading > .small, .list-group-item.active:focus .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading, select.list-group-item:focus .list-group-item-heading,
+select.list-group-item.form-control:focus .list-group-item-heading, select.list-group-item.ac_input:focus .list-group-item-heading, .list-group-item.drop-enabled:focus .list-group-item-heading,
 .list-group-item.active:focus .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > small, select.list-group-item:focus .list-group-item-heading > small,
+select.list-group-item.form-control:focus .list-group-item-heading > small, select.list-group-item.ac_input:focus .list-group-item-heading > small, .list-group-item.drop-enabled:focus .list-group-item-heading > small,
 .list-group-item.active:focus .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-heading > .small, select.list-group-item:focus .list-group-item-heading > .small,
+select.list-group-item.form-control:focus .list-group-item-heading > .small, select.list-group-item.ac_input:focus .list-group-item-heading > .small, .list-group-item.drop-enabled:focus .list-group-item-heading > .small, .list-group-item.active:hover .list-group-item-heading, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading, select.list-group-item:hover:focus .list-group-item-heading, .list-group-item.drop-enabled:hover .list-group-item-heading,
 .list-group-item.active:hover .list-group-item-heading > small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > small, select.list-group-item:hover:focus .list-group-item-heading > small, .list-group-item.drop-enabled:hover .list-group-item-heading > small,
 .list-group-item.active:hover .list-group-item-heading > .small, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-heading > .small,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-heading > .small, select.list-group-item:hover:focus .list-group-item-heading > .small, .list-group-item.drop-enabled:hover .list-group-item-heading > .small {
   color: inherit;
 }
 
 .list-group-item.active .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse .list-group-item-text, select.list-group-item:focus .list-group-item-text, .list-group-item.drop-enabled .list-group-item-text, .list-group-item.active:focus .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:focus .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:focus .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
+.file-upload input:hover ~ .list-group-item.file-upload-browse:focus .list-group-item-text, select.list-group-item:focus .list-group-item-text,
+select.list-group-item.form-control:focus .list-group-item-text, select.list-group-item.ac_input:focus .list-group-item-text, .list-group-item.drop-enabled:focus .list-group-item-text, .list-group-item.active:hover .list-group-item-text, .file-upload input:focus ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
 .file-upload input:focus ~ .list-group-item.file-upload-browse:hover .list-group-item-text,
 .file-upload input:hover ~ .list-group-item.file-upload-choose:hover .list-group-item-text,
-.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-text {
+.file-upload input:hover ~ .list-group-item.file-upload-browse:hover .list-group-item-text, select.list-group-item:hover:focus .list-group-item-text, .list-group-item.drop-enabled:hover .list-group-item-text {
   color: #abe2fe;
 }
 
@@ -2085,28 +2063,31 @@ button.list-group-item-success:hover {
 a.list-group-item-success.active, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse, a.list-group-item-success.active:focus, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse, a.list-group-item-success.drop-enabled, a.list-group-item-success.active:focus, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:focus, a.list-group-item-success.active:hover, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:focus, a.list-group-item-success.drop-enabled:focus, a.list-group-item-success.active:hover, .file-upload input:focus ~ a.list-group-item-success.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-success.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-success.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-success.file-upload-browse:hover, a.list-group-item-success.drop-enabled:hover,
 button.list-group-item-success.active,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-browse,
+button.list-group-item-success.drop-enabled,
 button.list-group-item-success.active:focus,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-browse:focus,
+button.list-group-item-success.drop-enabled:focus,
 button.list-group-item-success.active:hover,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-success.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-success.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-success.file-upload-browse:hover,
+button.list-group-item-success.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2137,28 +2118,31 @@ button.list-group-item-info:hover {
 a.list-group-item-info.active, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse, a.list-group-item-info.active:focus, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse, a.list-group-item-info.drop-enabled, a.list-group-item-info.active:focus, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:focus, a.list-group-item-info.active:hover, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:focus, a.list-group-item-info.drop-enabled:focus, a.list-group-item-info.active:hover, .file-upload input:focus ~ a.list-group-item-info.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-info.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-info.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-info.file-upload-browse:hover, a.list-group-item-info.drop-enabled:hover,
 button.list-group-item-info.active,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-browse,
+button.list-group-item-info.drop-enabled,
 button.list-group-item-info.active:focus,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-browse:focus,
+button.list-group-item-info.drop-enabled:focus,
 button.list-group-item-info.active:hover,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-info.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-info.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-info.file-upload-browse:hover,
+button.list-group-item-info.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2189,28 +2173,31 @@ button.list-group-item-warning:hover {
 a.list-group-item-warning.active, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse, a.list-group-item-warning.active:focus, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse, a.list-group-item-warning.drop-enabled, a.list-group-item-warning.active:focus, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:focus, a.list-group-item-warning.active:hover, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:focus, a.list-group-item-warning.drop-enabled:focus, a.list-group-item-warning.active:hover, .file-upload input:focus ~ a.list-group-item-warning.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-warning.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-warning.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-warning.file-upload-browse:hover, a.list-group-item-warning.drop-enabled:hover,
 button.list-group-item-warning.active,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-browse,
+button.list-group-item-warning.drop-enabled,
 button.list-group-item-warning.active:focus,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:focus,
+button.list-group-item-warning.drop-enabled:focus,
 button.list-group-item-warning.active:hover,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-warning.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-warning.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-warning.file-upload-browse:hover,
+button.list-group-item-warning.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2241,28 +2228,31 @@ button.list-group-item-danger:hover {
 a.list-group-item-danger.active, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse, a.list-group-item-danger.active:focus, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:focus,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse, a.list-group-item-danger.drop-enabled, a.list-group-item-danger.active:focus, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:focus,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:focus,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:focus, a.list-group-item-danger.active:hover, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:focus, a.list-group-item-danger.drop-enabled:focus, a.list-group-item-danger.active:hover, .file-upload input:focus ~ a.list-group-item-danger.file-upload-choose:hover,
 .file-upload input:focus ~ a.list-group-item-danger.file-upload-browse:hover,
 .file-upload input:hover ~ a.list-group-item-danger.file-upload-choose:hover,
-.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:hover,
+.file-upload input:hover ~ a.list-group-item-danger.file-upload-browse:hover, a.list-group-item-danger.drop-enabled:hover,
 button.list-group-item-danger.active,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-browse,
+button.list-group-item-danger.drop-enabled,
 button.list-group-item-danger.active:focus,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:focus,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:focus,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:focus,
+button.list-group-item-danger.drop-enabled:focus,
 button.list-group-item-danger.active:hover,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-choose:hover,
 .file-upload input:focus ~ button.list-group-item-danger.file-upload-browse:hover,
 .file-upload input:hover ~ button.list-group-item-danger.file-upload-choose:hover,
-.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:hover {
+.file-upload input:hover ~ button.list-group-item-danger.file-upload-browse:hover,
+button.list-group-item-danger.drop-enabled:hover {
   color: #fff;
   background-color: #fff;
   border-color: #fff;
@@ -2676,7 +2666,8 @@ input[type="checkbox"].disabled {
 }
 
 .row, .footer, .form-group, .label-selector, .media-addon,
-.media-callout {
+.media-callout, .plank-container-grid {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -2685,7 +2676,7 @@ input[type="checkbox"].disabled {
   margin-right: -1.125rem;
 }
 
-.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
+.col-xs-1, .col-xs-2, .col-xs-3, .col-xs-4, .col-xs-5, .col-xs-6, .col-xs-7, .col-xs-8, .col-xs-9, .col-xs-10, .col-xs-11, .col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left, .plank-container-grid .plank-wrapper, .col-xs-13, .col-xs-14, .col-xs-15, .col-xs-16, .col-xs-17, .col-xs-18, .col-xs-19, .col-xs-20, .col-xs-21, .col-xs-22, .col-xs-23, .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap, .col-sm-1, .col-sm-2, .col-sm-3, .col-sm-4, .col-sm-5, .col-sm-6, .col-sm-7, .col-sm-8, .col-sm-9, .col-sm-10, .col-sm-11, .col-sm-12, .col-sm-13, .col-sm-14, .col-sm-15, .col-sm-16, .col-sm-17, .col-sm-18, .col-sm-19, .col-sm-20, .col-sm-21, .col-sm-22, .col-sm-23, .col-sm-24, .col-md-1, .col-md-2, .col-md-3, .col-md-4, .col-md-5, .col-md-6, .col-md-7, .col-md-8, .col-md-9, .col-md-10, .col-md-11, .col-md-12, .col-md-13, .col-md-14, .col-md-15, .col-md-16, .col-md-17, .col-md-18, .col-md-19, .col-md-20, .col-md-21, .col-md-22, .col-md-23, .col-md-24, .col-lg-1, .col-lg-2, .col-lg-3, .col-lg-4, .col-lg-5, .col-lg-6, .col-lg-7, .col-lg-8, .col-lg-9, .col-lg-10, .col-lg-11, .col-lg-12, .col-lg-13, .col-lg-14, .col-lg-15, .col-lg-16, .col-lg-17, .col-lg-18, .col-lg-19, .col-lg-20, .col-lg-21, .col-lg-22, .col-lg-23, .col-lg-24, .col-xl-1, .col-xl-2, .col-xl-3, .col-xl-4, .col-xl-5, .col-xl-6, .col-xl-7, .col-xl-8, .col-xl-9, .col-xl-10, .col-xl-11, .col-xl-12, .col-xl-13, .col-xl-14, .col-xl-15, .col-xl-16, .col-xl-17, .col-xl-18, .col-xl-19, .col-xl-20, .col-xl-21, .col-xl-22, .col-xl-23, .col-xl-24 {
   position: relative;
   min-height: 1px;
   padding-left: 1.125rem;
@@ -2693,121 +2684,145 @@ input[type="checkbox"].disabled {
 }
 
 .col-xs-1 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 4.1666666667%;
   flex: 0 0 4.1666666667%;
 }
 
 .col-xs-2 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 8.3333333333%;
   flex: 0 0 8.3333333333%;
 }
 
 .col-xs-3 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 12.5%;
   flex: 0 0 12.5%;
 }
 
 .col-xs-4 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 16.6666666667%;
   flex: 0 0 16.6666666667%;
 }
 
 .col-xs-5 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 20.8333333333%;
   flex: 0 0 20.8333333333%;
 }
 
 .col-xs-6 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 25%;
   flex: 0 0 25%;
 }
 
 .col-xs-7 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 29.1666666667%;
   flex: 0 0 29.1666666667%;
 }
 
 .col-xs-8 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 33.3333333333%;
   flex: 0 0 33.3333333333%;
 }
 
 .col-xs-9 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 37.5%;
   flex: 0 0 37.5%;
 }
 
 .col-xs-10 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 41.6666666667%;
   flex: 0 0 41.6666666667%;
 }
 
 .col-xs-11 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 45.8333333333%;
   flex: 0 0 45.8333333333%;
 }
 
-.col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left {
+.col-xs-12, .form-group > .label-wrap-wide, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .modal .media-callout .media-left, .plank-container-grid .plank-wrapper {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 50%;
   flex: 0 0 50%;
 }
 
 .col-xs-13 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 54.1666666667%;
   flex: 0 0 54.1666666667%;
 }
 
 .col-xs-14 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 58.3333333333%;
   flex: 0 0 58.3333333333%;
 }
 
 .col-xs-15 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 62.5%;
   flex: 0 0 62.5%;
 }
 
 .col-xs-16 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 66.6666666667%;
   flex: 0 0 66.6666666667%;
 }
 
 .col-xs-17 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 70.8333333333%;
   flex: 0 0 70.8333333333%;
 }
 
 .col-xs-18 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 75%;
   flex: 0 0 75%;
 }
 
 .col-xs-19 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 79.1666666667%;
   flex: 0 0 79.1666666667%;
 }
 
 .col-xs-20 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 83.3333333333%;
   flex: 0 0 83.3333333333%;
 }
 
 .col-xs-21 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 87.5%;
   flex: 0 0 87.5%;
 }
 
 .col-xs-22 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 91.6666666667%;
   flex: 0 0 91.6666666667%;
 }
 
 .col-xs-23 {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 95.8333333333%;
   flex: 0 0 95.8333333333%;
 }
 
 .col-xs-24, .form-group > .input-wrap, .form-group > .color-picker, .form-group > .label-wrap {
+  -webkit-box-flex: 0;
   -ms-flex: 0 0 100%;
   flex: 0 0 100%;
 }
@@ -3114,98 +3129,122 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 544px) {
   .col-sm-1 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 4.1666666667%;
     flex: 0 0 4.1666666667%;
   }
   .col-sm-2 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 8.3333333333%;
     flex: 0 0 8.3333333333%;
   }
   .col-sm-3 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 12.5%;
     flex: 0 0 12.5%;
   }
   .col-sm-4 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
   .col-sm-5 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
   .col-sm-6 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
   .col-sm-7 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-sm-8, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left {
+  .col-sm-8, .Homepage .label-selector-item, .label-selector-item, .media-callout .media-left, .plank-container-grid .plank-wrapper {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
   .col-sm-9 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 37.5%;
     flex: 0 0 37.5%;
   }
   .col-sm-10, .form-group > .label-wrap, .form-group > .label-wrap-wide {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
   .col-sm-11 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 45.8333333333%;
     flex: 0 0 45.8333333333%;
   }
   .col-sm-12 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
   .col-sm-13 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 54.1666666667%;
     flex: 0 0 54.1666666667%;
   }
   .col-sm-14, .form-group > .input-wrap, .form-group > .color-picker {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 58.3333333333%;
     flex: 0 0 58.3333333333%;
   }
   .col-sm-15 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
   .col-sm-16 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
   .col-sm-17 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 70.8333333333%;
     flex: 0 0 70.8333333333%;
   }
   .col-sm-18 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 75%;
     flex: 0 0 75%;
   }
   .col-sm-19 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 79.1666666667%;
     flex: 0 0 79.1666666667%;
   }
   .col-sm-20 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 83.3333333333%;
     flex: 0 0 83.3333333333%;
   }
   .col-sm-21 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 87.5%;
     flex: 0 0 87.5%;
   }
   .col-sm-22 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 91.6666666667%;
     flex: 0 0 91.6666666667%;
   }
   .col-sm-23 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 95.8333333333%;
     flex: 0 0 95.8333333333%;
   }
   .col-sm-24 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
   }
@@ -3438,98 +3477,122 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 768px) {
   .col-md-1 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 4.1666666667%;
     flex: 0 0 4.1666666667%;
   }
   .col-md-2 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 8.3333333333%;
     flex: 0 0 8.3333333333%;
   }
   .col-md-3 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 12.5%;
     flex: 0 0 12.5%;
   }
   .col-md-4 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
   .col-md-5 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
   .col-md-6 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
   .col-md-7 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
   .col-md-8 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
   .col-md-9 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 37.5%;
     flex: 0 0 37.5%;
   }
   .col-md-10 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
   .col-md-11 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 45.8333333333%;
     flex: 0 0 45.8333333333%;
   }
   .col-md-12 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
   .col-md-13 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 54.1666666667%;
     flex: 0 0 54.1666666667%;
   }
   .col-md-14 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 58.3333333333%;
     flex: 0 0 58.3333333333%;
   }
   .col-md-15 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
   .col-md-16 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
   .col-md-17 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 70.8333333333%;
     flex: 0 0 70.8333333333%;
   }
   .col-md-18 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 75%;
     flex: 0 0 75%;
   }
   .col-md-19 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 79.1666666667%;
     flex: 0 0 79.1666666667%;
   }
   .col-md-20 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 83.3333333333%;
     flex: 0 0 83.3333333333%;
   }
   .col-md-21 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 87.5%;
     flex: 0 0 87.5%;
   }
   .col-md-22 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 91.6666666667%;
     flex: 0 0 91.6666666667%;
   }
   .col-md-23 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 95.8333333333%;
     flex: 0 0 95.8333333333%;
   }
   .col-md-24 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
   }
@@ -3762,98 +3825,122 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 992px) {
   .col-lg-1 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 4.1666666667%;
     flex: 0 0 4.1666666667%;
   }
   .col-lg-2 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 8.3333333333%;
     flex: 0 0 8.3333333333%;
   }
   .col-lg-3 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 12.5%;
     flex: 0 0 12.5%;
   }
   .col-lg-4 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
   .col-lg-5 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
   .col-lg-6 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
   .col-lg-7 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
   .col-lg-8, .label-selector-item, .media-callout .media-left {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
   .col-lg-9 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 37.5%;
     flex: 0 0 37.5%;
   }
   .col-lg-10 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
   .col-lg-11 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 45.8333333333%;
     flex: 0 0 45.8333333333%;
   }
-  .col-lg-12, .Homepage .label-selector-item {
+  .col-lg-12, .Homepage .label-selector-item, .plank-container-grid .plank-wrapper {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
   .col-lg-13 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 54.1666666667%;
     flex: 0 0 54.1666666667%;
   }
   .col-lg-14 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 58.3333333333%;
     flex: 0 0 58.3333333333%;
   }
   .col-lg-15 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
   .col-lg-16 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
   .col-lg-17 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 70.8333333333%;
     flex: 0 0 70.8333333333%;
   }
   .col-lg-18 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 75%;
     flex: 0 0 75%;
   }
   .col-lg-19 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 79.1666666667%;
     flex: 0 0 79.1666666667%;
   }
   .col-lg-20 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 83.3333333333%;
     flex: 0 0 83.3333333333%;
   }
   .col-lg-21 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 87.5%;
     flex: 0 0 87.5%;
   }
   .col-lg-22 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 91.6666666667%;
     flex: 0 0 91.6666666667%;
   }
   .col-lg-23 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 95.8333333333%;
     flex: 0 0 95.8333333333%;
   }
   .col-lg-24 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
   }
@@ -4086,98 +4173,122 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 1200px) {
   .col-xl-1 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 4.1666666667%;
     flex: 0 0 4.1666666667%;
   }
   .col-xl-2 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 8.3333333333%;
     flex: 0 0 8.3333333333%;
   }
   .col-xl-3 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 12.5%;
     flex: 0 0 12.5%;
   }
   .col-xl-4 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 16.6666666667%;
     flex: 0 0 16.6666666667%;
   }
   .col-xl-5 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 20.8333333333%;
     flex: 0 0 20.8333333333%;
   }
   .col-xl-6, .label-selector-item, .media-callout .media-left {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 25%;
     flex: 0 0 25%;
   }
   .col-xl-7 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 29.1666666667%;
     flex: 0 0 29.1666666667%;
   }
-  .col-xl-8, .Homepage .label-selector-item {
+  .col-xl-8, .Homepage .label-selector-item, .plank-container-grid .plank-wrapper {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 33.3333333333%;
     flex: 0 0 33.3333333333%;
   }
   .col-xl-9 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 37.5%;
     flex: 0 0 37.5%;
   }
   .col-xl-10 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 41.6666666667%;
     flex: 0 0 41.6666666667%;
   }
   .col-xl-11 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 45.8333333333%;
     flex: 0 0 45.8333333333%;
   }
   .col-xl-12 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 50%;
     flex: 0 0 50%;
   }
   .col-xl-13 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 54.1666666667%;
     flex: 0 0 54.1666666667%;
   }
   .col-xl-14 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 58.3333333333%;
     flex: 0 0 58.3333333333%;
   }
   .col-xl-15 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 62.5%;
     flex: 0 0 62.5%;
   }
   .col-xl-16 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 66.6666666667%;
     flex: 0 0 66.6666666667%;
   }
   .col-xl-17 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 70.8333333333%;
     flex: 0 0 70.8333333333%;
   }
   .col-xl-18 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 75%;
     flex: 0 0 75%;
   }
   .col-xl-19 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 79.1666666667%;
     flex: 0 0 79.1666666667%;
   }
   .col-xl-20 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 83.3333333333%;
     flex: 0 0 83.3333333333%;
   }
   .col-xl-21 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 87.5%;
     flex: 0 0 87.5%;
   }
   .col-xl-22 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 91.6666666667%;
     flex: 0 0 91.6666666667%;
   }
   .col-xl-23 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 95.8333333333%;
     flex: 0 0 95.8333333333%;
   }
   .col-xl-24 {
+    -webkit-box-flex: 0;
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
   }
@@ -4409,21 +4520,25 @@ input[type="checkbox"].disabled {
 }
 
 .col-xs-first {
+  -webkit-box-ordinal-group: 0;
   -ms-flex-order: -1;
   order: -1;
 }
 
 .col-xs-last {
+  -webkit-box-ordinal-group: 2;
   -ms-flex-order: 1;
   order: 1;
 }
 
 @media (min-width: 544px) {
   .col-sm-first {
+    -webkit-box-ordinal-group: 0;
     -ms-flex-order: -1;
     order: -1;
   }
   .col-sm-last {
+    -webkit-box-ordinal-group: 2;
     -ms-flex-order: 1;
     order: 1;
   }
@@ -4431,10 +4546,12 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 768px) {
   .col-md-first {
+    -webkit-box-ordinal-group: 0;
     -ms-flex-order: -1;
     order: -1;
   }
   .col-md-last {
+    -webkit-box-ordinal-group: 2;
     -ms-flex-order: 1;
     order: 1;
   }
@@ -4442,10 +4559,12 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 992px) {
   .col-lg-first {
+    -webkit-box-ordinal-group: 0;
     -ms-flex-order: -1;
     order: -1;
   }
   .col-lg-last {
+    -webkit-box-ordinal-group: 2;
     -ms-flex-order: 1;
     order: 1;
   }
@@ -4453,40 +4572,48 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 1200px) {
   .col-xl-first {
+    -webkit-box-ordinal-group: 0;
     -ms-flex-order: -1;
     order: -1;
   }
   .col-xl-last {
+    -webkit-box-ordinal-group: 2;
     -ms-flex-order: 1;
     order: 1;
   }
 }
 
 .row-xs-top {
+  -webkit-box-align: start;
   -ms-flex-align: start;
   align-items: flex-start;
 }
 
 .row-xs-center {
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
 
 .row-xs-bottom {
+  -webkit-box-align: end;
   -ms-flex-align: end;
   align-items: flex-end;
 }
 
 @media (min-width: 544px) {
   .row-sm-top {
+    -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
   }
   .row-sm-center {
+    -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
   }
   .row-sm-bottom {
+    -webkit-box-align: end;
     -ms-flex-align: end;
     align-items: flex-end;
   }
@@ -4494,14 +4621,17 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 768px) {
   .row-md-top {
+    -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
   }
   .row-md-center {
+    -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
   }
   .row-md-bottom {
+    -webkit-box-align: end;
     -ms-flex-align: end;
     align-items: flex-end;
   }
@@ -4509,14 +4639,17 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 992px) {
   .row-lg-top {
+    -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
   }
   .row-lg-center {
+    -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
   }
   .row-lg-bottom {
+    -webkit-box-align: end;
     -ms-flex-align: end;
     align-items: flex-end;
   }
@@ -4524,14 +4657,17 @@ input[type="checkbox"].disabled {
 
 @media (min-width: 1200px) {
   .row-xl-top {
+    -webkit-box-align: start;
     -ms-flex-align: start;
     align-items: flex-start;
   }
   .row-xl-center {
+    -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
   }
   .row-xl-bottom {
+    -webkit-box-align: end;
     -ms-flex-align: end;
     align-items: flex-end;
   }
@@ -4613,14 +4749,12 @@ input[type="checkbox"].disabled {
 }
 
 html {
-  -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
 *,
 *::before,
 *::after {
-  -moz-box-sizing: inherit;
   box-sizing: inherit;
 }
 
@@ -4812,7 +4946,6 @@ legend {
 }
 
 input[type="search"] {
-  -moz-box-sizing: inherit;
   box-sizing: inherit;
   -webkit-appearance: none;
 }
@@ -4825,14 +4958,128 @@ output {
   display: none !important;
 }
 
-.toolbar-stats > *:not(.nav-stats):not(.analytics-panel-metrics) {
+.alert, .CasualMessage, .InfoMessage, .WarningMessage, .AlertMessage, div.Messages.Errors {
+  padding: 15px;
+  border: 0.0625rem solid transparent;
+}
+
+.alert > p, .CasualMessage > p, .InfoMessage > p, .WarningMessage > p, .AlertMessage > p, div.Messages.Errors > p,
+.alert > ul, .CasualMessage > ul, .InfoMessage > ul, .WarningMessage > ul, .AlertMessage > ul, div.Messages.Errors > ul {
+  margin-bottom: 0;
+}
+
+.alert > p + p, .CasualMessage > p + p, .InfoMessage > p + p, .WarningMessage > p + p, .AlertMessage > p + p, div.Messages.Errors > p + p {
+  margin-top: 5px;
+}
+
+.alert-success, .CasualMessage {
+  background-color: #6bc573;
+  border-color: #6bc573;
+  color: #fff;
+}
+
+.alert-success hr, .CasualMessage hr {
+  border-top-color: #59be62;
+}
+
+.alert-success .alert-link, .CasualMessage .alert-link {
+  color: #e6e6e6;
+}
+
+.alert-info, .InfoMessage {
+  background-color: #a1b8c6;
+  border-color: #a1b8c6;
+  color: #fff;
+}
+
+.alert-info hr, .InfoMessage hr {
+  border-top-color: #91acbc;
+}
+
+.alert-info .alert-link, .InfoMessage .alert-link {
+  color: #e6e6e6;
+}
+
+.alert-warning, .WarningMessage, .AlertMessage {
+  background-color: #faae42;
+  border-color: #faae42;
+  color: #fff;
+}
+
+.alert-warning hr, .WarningMessage hr, .AlertMessage hr {
+  border-top-color: #f9a329;
+}
+
+.alert-warning .alert-link, .WarningMessage .alert-link, .AlertMessage .alert-link {
+  color: #e6e6e6;
+}
+
+.alert-danger, div.Messages.Errors {
+  background-color: #fa2e1f;
+  border-color: #fa2e1f;
+  color: #fff;
+}
+
+.alert-danger hr, div.Messages.Errors hr {
+  border-top-color: #f91706;
+}
+
+.alert-danger .alert-link, div.Messages.Errors .alert-link {
+  color: #e6e6e6;
+}
+
+.toolbar-stats {
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.toolbar-stats > * {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-slot {
   margin-top: 2.25rem;
 }
 
-.toolbar > .nav-stats, .toolbar > .analytics-panel-metrics {
-  margin-right: 0;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
+@media (max-width: 991px) {
+  .toolbar-stats .toolbar-stats-slot {
+    margin-top: 1.125rem;
+  }
+}
+
+.toolbar-stats .toolbar-stats-date-picker {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  margin-top: 1.125rem;
+}
+
+@media (max-width: 991px) {
+  .toolbar-stats .toolbar-stats-date-picker {
+    margin-top: 0;
+  }
+}
+
+.toolbar-stats .toolbar-stats-date-picker > * {
+  margin-top: 1.125rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date {
+  padding-left: 0.5625rem;
+  padding-right: 0.5625rem;
+  min-width: 14.25rem;
+}
+
+.toolbar-stats .toolbar-stats-date-picker .filter-date:after {
+  right: 1.125rem;
 }
 
 .analytics-panel,
@@ -4860,26 +5107,9 @@ output {
   top: 0;
 }
 
-.bookmark svg {
-  transition: -webkit-transform .1s;
-  transition: transform .1s;
-  fill: #949aa2;
-  width: 1.125rem;
-}
-
-.bookmark:hover svg, .bookmark:focus svg {
-  -webkit-transform: rotate(30deg);
-  transform: rotate(30deg);
-}
-
 .bookmarked svg {
   -webkit-transform: rotate(30deg);
   transform: rotate(30deg);
-}
-
-.bookmarked:hover svg, .bookmarked:focus svg {
-  -webkit-transform: rotate(0deg);
-  transform: rotate(0deg);
 }
 
 .analytics-widget-move {
@@ -4904,20 +5134,19 @@ output {
 }
 
 .analytics-panel-metrics {
-  display: -ms-flexbox;
-  display: flex;
+  display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
   padding-left: 1.125rem;
   padding-right: 1.125rem;
-  border-top: 0.0625rem solid #e7e8e9;
+  border-bottom: 0.0625rem solid #e7e8e9;
   overflow: hidden;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
   padding: 0.5625rem 0 1.125rem;
-  border-top-color: #ededed;
 }
 
 .analytics-panel-metrics .metric-value {
@@ -4949,6 +5178,78 @@ output {
   height: 1px !important;
 }
 
+.toolbar .filter-category {
+  display: none;
+}
+
+.toolbar .filter-category svg {
+  -webkit-transform: scale(0.75);
+          transform: scale(0.75);
+}
+
+@media (max-width: 991px) {
+  .toolbar .filter-category {
+    display: block;
+  }
+}
+
+.table-summary-cell-position-change svg {
+  margin-top: -4px;
+}
+
+.rise .table-summary-cell-position-change svg {
+  color: #6bc573;
+}
+
+.fall .table-summary-cell-position-change svg {
+  color: #fa2e1f;
+}
+
+.bigcrumbs {
+  display: block;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
+}
+
+.bigcrumbs .crumb {
+  position: relative;
+  display: inline-block;
+  padding: 6px 24px 6px 12px;
+  line-height: 24px;
+  color: #555a62;
+}
+
+.bigcrumbs .crumb:hover {
+  color: #0291db;
+}
+
+.bigcrumbs .crumb:before, .bigcrumbs .crumb:after {
+  position: absolute;
+  display: block;
+  top: -1px;
+  bottom: -1px;
+  right: -12px;
+  width: 0;
+  border: solid 12px transparent;
+  border-top-width: 19px;
+  border-bottom-width: 19px;
+  border-left-color: #e7e8e9;
+  content: '';
+}
+
+.bigcrumbs .crumb:after {
+  right: -11px;
+  border-left-color: #fff;
+  content: '';
+}
+
+.bigcrumbs .crumb:last-child:before, .bigcrumbs .crumb:last-child:after {
+  display: none;
+}
+
 input[type="submit"],
 input[type="reset"],
 input[type="button"],
@@ -4961,9 +5262,7 @@ button {
   overflow: visible;
   padding: 0;
   -webkit-appearance: button;
-  /* for input */
   -webkit-user-select: none;
-  /* for button */
   -moz-user-select: none;
   -ms-user-select: none;
 }
@@ -5006,9 +5305,9 @@ button::-moz-focus-inner {
 
 .btn:active, .file-upload-browse:active, .Button:active, .btn.active, .active.file-upload-browse,
 .file-upload input:focus ~ .file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse, .file-upload input:focus ~ .btn.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
+.file-upload input:hover ~ .file-upload-browse, select.file-upload-browse:focus, .file-upload-browse.drop-enabled, .file-upload input:focus ~ .btn.file-upload-choose, .file-upload input:focus ~ .file-upload-choose.Button,
 .file-upload input:hover ~ .btn.file-upload-choose,
-.file-upload input:hover ~ .file-upload-choose.Button, .active.Button {
+.file-upload input:hover ~ .file-upload-choose.Button, select.btn:focus, select.Button:focus, .btn.drop-enabled, .drop-enabled.Button, .active.Button {
   background-image: none;
   outline: 0;
 }
@@ -5022,15 +5321,11 @@ button::-moz-focus-inner {
   border-color: #ededed;
 }
 
-.btn.disabled svg, .disabled.file-upload-browse svg, .disabled.Button svg, .btn.disabled:hover svg, .disabled.file-upload-browse:hover svg, .disabled.Button:hover svg, .btn:disabled svg, .file-upload-browse:disabled svg, .Button:disabled svg, .btn:disabled:hover svg, .file-upload-browse:disabled:hover svg, .Button:disabled:hover svg {
-  fill: #ededed;
-}
-
 .btn + .btn, .file-upload-browse + .btn, .Button + .btn, .btn + .file-upload-browse, .file-upload-browse + .file-upload-browse, .Button + .file-upload-browse, .btn + .Button, .file-upload-browse + .Button, .Button + .Button {
   margin-left: 0.5625rem;
 }
 
-.btn-icon + .btn-icon, .search-wrap .search-icon-wrap + .btn-icon, .search-wrap .btn-icon + .search-icon-wrap, .search-wrap .search-icon-wrap + .search-icon-wrap {
+.btn-icon + .btn-icon, .bookmark + .btn-icon, .search-wrap .search-icon-wrap + .btn-icon, .btn-icon + .bookmark, .bookmark + .bookmark, .search-wrap .search-icon-wrap + .bookmark, .search-wrap .btn-icon + .search-icon-wrap, .search-wrap .bookmark + .search-icon-wrap, .search-wrap .search-icon-wrap + .search-icon-wrap {
   margin-left: 0;
 }
 
@@ -5068,7 +5363,7 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ .btn-primary.file-upload-choose,
 .file-upload input:hover ~ .file-upload-choose.Button,
 .file-upload input:hover ~ .btn-primary.file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse.Button, .active.Button,
+.file-upload input:hover ~ .file-upload-browse.Button, select.btn-primary:focus, select.Button:focus, .btn-primary.drop-enabled, .drop-enabled.Button, .active.Button,
 .open > .btn-primary.dropdown-toggle,
 .open > .dropdown-toggle.Button {
   color: #fff;
@@ -5107,8 +5402,8 @@ fieldset[disabled] a.Button {
 
 .btn-secondary:active, .file-upload-browse:active, .btn-secondary.active, .active.file-upload-browse,
 .file-upload input:focus ~ .file-upload-browse,
-.file-upload input:hover ~ .file-upload-browse, .file-upload input:focus ~ .btn-secondary.file-upload-choose,
-.file-upload input:hover ~ .btn-secondary.file-upload-choose,
+.file-upload input:hover ~ .file-upload-browse, select.file-upload-browse:focus, .file-upload-browse.drop-enabled, .file-upload input:focus ~ .btn-secondary.file-upload-choose,
+.file-upload input:hover ~ .btn-secondary.file-upload-choose, select.btn-secondary:focus, .btn-secondary.drop-enabled,
 .open > .btn-secondary.dropdown-toggle,
 .open > .dropdown-toggle.file-upload-browse {
   color: #fff;
@@ -5125,14 +5420,17 @@ fieldset[disabled] a.Button {
   background-color: #fff;
 }
 
-.btn-link, .btn-icon, .search-wrap .search-icon-wrap {
+.btn-link, .btn-icon, .bookmark, .search-wrap .search-icon-wrap {
   font-weight: normal;
   color: #0291db;
   border-radius: 0;
   border-width: 0;
 }
 
-.btn-link, .btn-icon, .search-wrap .search-icon-wrap, .btn-link:active, .btn-icon:active, .search-wrap .search-icon-wrap:active, .btn-link.active, .active.btn-icon, .file-upload input:focus ~ .btn-icon.file-upload-choose, .file-upload .search-wrap input:focus ~ .file-upload-choose.search-icon-wrap, .search-wrap .file-upload input:focus ~ .file-upload-choose.search-icon-wrap,
+.btn-link, .btn-icon, .bookmark, .search-wrap .search-icon-wrap, .btn-link:active, .btn-icon:active, .bookmark:active, .search-wrap .search-icon-wrap:active, .btn-link.active, .active.btn-icon, .active.bookmark, .file-upload input:focus ~ .bookmark.file-upload-choose,
+.file-upload input:focus ~ .bookmark.file-upload-browse,
+.file-upload input:hover ~ .bookmark.file-upload-choose,
+.file-upload input:hover ~ .bookmark.file-upload-browse, select.bookmark:focus, .bookmark.drop-enabled, .file-upload input:focus ~ .btn-icon.file-upload-choose, .file-upload .search-wrap input:focus ~ .file-upload-choose.search-icon-wrap, .search-wrap .file-upload input:focus ~ .file-upload-choose.search-icon-wrap,
 .file-upload input:focus ~ .btn-icon.file-upload-browse,
 .file-upload .search-wrap input:focus ~ .file-upload-browse.search-icon-wrap, .search-wrap
 .file-upload input:focus ~ .file-upload-browse.search-icon-wrap,
@@ -5141,58 +5439,70 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ .file-upload-choose.search-icon-wrap,
 .file-upload input:hover ~ .btn-icon.file-upload-browse,
 .file-upload .search-wrap input:hover ~ .file-upload-browse.search-icon-wrap, .search-wrap
-.file-upload input:hover ~ .file-upload-browse.search-icon-wrap, .search-wrap .active.search-icon-wrap, .file-upload input:focus ~ .btn-link.file-upload-choose,
+.file-upload input:hover ~ .file-upload-browse.search-icon-wrap, select.btn-icon:focus, .search-wrap select.search-icon-wrap:focus, .search-wrap .active.search-icon-wrap, .search-wrap .search-icon-wrap.drop-enabled, .btn-icon.drop-enabled, .file-upload input:focus ~ .btn-link.file-upload-choose,
 .file-upload input:focus ~ .btn-link.file-upload-browse,
 .file-upload input:hover ~ .btn-link.file-upload-choose,
-.file-upload input:hover ~ .btn-link.file-upload-browse, .btn-link:disabled, .btn-icon:disabled, .search-wrap .search-icon-wrap:disabled {
+.file-upload input:hover ~ .btn-link.file-upload-browse, select.btn-link:focus, .btn-link.drop-enabled, .btn-link:disabled, .btn-icon:disabled, .bookmark:disabled, .search-wrap .search-icon-wrap:disabled {
   background-color: transparent;
 }
 
-.btn-link, .btn-icon, .search-wrap .search-icon-wrap, .btn-link:focus, .btn-icon:focus, .search-wrap .search-icon-wrap:focus, .btn-link:active, .btn-icon:active, .search-wrap .search-icon-wrap:active {
+.btn-link, .btn-icon, .bookmark, .search-wrap .search-icon-wrap, .btn-link:focus, .btn-icon:focus, .bookmark:focus, .search-wrap .search-icon-wrap:focus, .btn-link:active, .btn-icon:active, .bookmark:active, .search-wrap .search-icon-wrap:active {
   border-color: transparent;
 }
 
-.btn-link:hover, .btn-icon:hover, .search-wrap .search-icon-wrap:hover {
+.btn-link:hover, .btn-icon:hover, .bookmark:hover, .search-wrap .search-icon-wrap:hover {
   border-color: transparent;
 }
 
-.btn-link:focus, .btn-icon:focus, .search-wrap .search-icon-wrap:focus, .btn-link:hover, .btn-icon:hover, .search-wrap .search-icon-wrap:hover {
+.btn-link:focus, .btn-icon:focus, .bookmark:focus, .search-wrap .search-icon-wrap:focus, .btn-link:hover, .btn-icon:hover, .bookmark:hover, .search-wrap .search-icon-wrap:hover {
   color: #015f8f;
   text-decoration: underline;
   background-color: transparent;
 }
 
-.btn-link:disabled:focus, .btn-icon:disabled:focus, .search-wrap .search-icon-wrap:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .search-wrap .search-icon-wrap:disabled:hover {
+.btn-link:disabled:focus, .btn-icon:disabled:focus, .bookmark:disabled:focus, .search-wrap .search-icon-wrap:disabled:focus, .btn-link:disabled:hover, .btn-icon:disabled:hover, .bookmark:disabled:hover, .search-wrap .search-icon-wrap:disabled:hover {
   color: #ededed;
   text-decoration: none;
 }
 
-.btn-icon, .search-wrap .search-icon-wrap {
+.btn-icon, .bookmark, .search-wrap .search-icon-wrap {
   padding: 0.1875rem;
   margin: 0;
   margin-left: 1rem;
   font-size: 0.75rem;
   line-height: 1;
   border-width: 0;
+  color: #555a62;
 }
 
-.btn-icon:first-child, .search-wrap .search-icon-wrap:first-child {
+.btn-icon:first-child, .bookmark:first-child, .search-wrap .search-icon-wrap:first-child {
   margin-left: 0;
 }
 
-.btn-icon svg, .search-wrap .search-icon-wrap svg {
-  fill: #555a62;
-  opacity: 0.7;
+.btn-icon svg, .bookmark svg, .search-wrap .search-icon-wrap svg {
   height: 1.5rem;
   width: 1.5rem;
 }
 
-.btn-icon:hover svg, .search-wrap .search-icon-wrap:hover svg {
+.btn-icon:hover, .bookmark:hover, .search-wrap .search-icon-wrap:hover {
+  color: #555a62;
   opacity: 1;
 }
 
-.btn-icon.disabled, .search-wrap .disabled.search-icon-wrap {
-  border: none;
+.btn-icon.disabled, .disabled.bookmark, .search-wrap .disabled.search-icon-wrap {
+  border: 0;
+}
+
+.btn-icon.btn-icon-sm svg, .bookmark svg, .search-wrap .btn-icon-sm.search-icon-wrap svg, .search-wrap .search-icon-wrap.bookmark svg {
+  height: 1.125rem;
+  width: 1.125rem;
+}
+
+a.btn-icon, a.bookmark, .search-wrap a.search-icon-wrap,
+button.btn-icon,
+button.bookmark,
+.search-wrap button.search-icon-wrap {
+  opacity: .7;
 }
 
 .btn-icon-border {
@@ -5201,6 +5511,8 @@ fieldset[disabled] a.Button {
   border-color: #ccc;
   padding: 0.1875rem 0.375rem;
   margin: 0 0 0 .5rem;
+  color: #555a62;
+  opacity: .7;
 }
 
 .btn-icon-border:hover {
@@ -5219,7 +5531,7 @@ fieldset[disabled] a.Button {
 .btn-icon-border:active, .btn-icon-border.active, .file-upload input:focus ~ .btn-icon-border.file-upload-choose,
 .file-upload input:focus ~ .btn-icon-border.file-upload-browse,
 .file-upload input:hover ~ .btn-icon-border.file-upload-choose,
-.file-upload input:hover ~ .btn-icon-border.file-upload-browse,
+.file-upload input:hover ~ .btn-icon-border.file-upload-browse, select.btn-icon-border:focus, .btn-icon-border.drop-enabled,
 .open > .btn-icon-border.dropdown-toggle {
   color: #555a62;
   background-color: #ddf3ff;
@@ -5236,8 +5548,6 @@ fieldset[disabled] a.Button {
 }
 
 .btn-icon-border svg {
-  fill: #555a62;
-  opacity: 0.7;
   height: 1.75rem;
   width: 1.75rem;
 }
@@ -5249,19 +5559,21 @@ fieldset[disabled] a.Button {
 .btn-group {
   font-size: 0;
   position: relative;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
 
 .btn-group > .btn:focus, .btn-group > .file-upload-browse:focus, .btn-group > .Button:focus, .btn-group > .btn:active, .btn-group > .file-upload-browse:active, .btn-group > .Button:active, .btn-group > .btn.active, .btn-group > .active.file-upload-browse,
 .file-upload .btn-group > input:focus ~ .file-upload-browse,
-.file-upload .btn-group > input:hover ~ .file-upload-browse, .file-upload .btn-group > input:focus ~ .btn.file-upload-choose, .file-upload .btn-group > input:focus ~ .file-upload-choose.Button,
+.file-upload .btn-group > input:hover ~ .file-upload-browse, .btn-group > select.file-upload-browse:focus, .btn-group > .file-upload-browse.drop-enabled, .file-upload .btn-group > input:focus ~ .btn.file-upload-choose, .file-upload .btn-group > input:focus ~ .file-upload-choose.Button,
 .file-upload .btn-group > input:hover ~ .btn.file-upload-choose,
-.file-upload .btn-group > input:hover ~ .file-upload-choose.Button, .btn-group > .active.Button {
+.file-upload .btn-group > input:hover ~ .file-upload-choose.Button, .btn-group > select.btn:focus, .btn-group > select.Button:focus, .btn-group > .btn.drop-enabled, .btn-group > .drop-enabled.Button, .btn-group > .active.Button {
   z-index: 2;
 }
 
@@ -5291,7 +5603,7 @@ fieldset[disabled] a.Button {
   margin-left: -0.0625rem;
 }
 
-.btn-group .btn-icon + .btn-icon, .btn-group .search-wrap .search-icon-wrap + .btn-icon, .search-wrap .btn-group .search-icon-wrap + .btn-icon, .btn-group .search-wrap .btn-icon + .search-icon-wrap, .search-wrap .btn-group .btn-icon + .search-icon-wrap, .btn-group .search-wrap .search-icon-wrap + .search-icon-wrap, .search-wrap .btn-group .search-icon-wrap + .search-icon-wrap {
+.btn-group .btn-icon + .btn-icon, .btn-group .bookmark + .btn-icon, .btn-group .search-wrap .search-icon-wrap + .btn-icon, .search-wrap .btn-group .search-icon-wrap + .btn-icon, .btn-group .btn-icon + .bookmark, .btn-group .bookmark + .bookmark, .btn-group .search-wrap .search-icon-wrap + .bookmark, .search-wrap .btn-group .search-icon-wrap + .bookmark, .btn-group .search-wrap .btn-icon + .search-icon-wrap, .search-wrap .btn-group .btn-icon + .search-icon-wrap, .btn-group .search-wrap .bookmark + .search-icon-wrap, .search-wrap .btn-group .bookmark + .search-icon-wrap, .btn-group .search-wrap .search-icon-wrap + .search-icon-wrap, .search-wrap .btn-group .search-icon-wrap + .search-icon-wrap {
   margin-left: 0.375rem;
 }
 
@@ -5329,7 +5641,7 @@ fieldset[disabled] a.Button {
 .btn-sm-rounded:active, .btn-sm-rounded.active, .file-upload input:focus ~ .btn-sm-rounded.file-upload-choose,
 .file-upload input:focus ~ .btn-sm-rounded.file-upload-browse,
 .file-upload input:hover ~ .btn-sm-rounded.file-upload-choose,
-.file-upload input:hover ~ .btn-sm-rounded.file-upload-browse,
+.file-upload input:hover ~ .btn-sm-rounded.file-upload-browse, select.btn-sm-rounded:focus, .btn-sm-rounded.drop-enabled,
 .open > .btn-sm-rounded.dropdown-toggle {
   color: #fff;
   background-color: #0291db;
@@ -5354,40 +5666,36 @@ fieldset[disabled] a.Button {
   font-size: 0.625rem;
   line-height: 0.875rem;
   border-radius: 0.625rem;
-  color: #d2f0fe;
+  color: #ceeeff;
   background-color: #0291db;
-  border-color: #d2f0fe;
+  border-color: #ceeeff;
 }
 
 .btn-navbar svg {
   margin-top: -0.125rem;
 }
 
-.btn-navbar svg {
-  fill: #fff;
-}
-
 .btn-navbar:hover {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
+  color: #ceeeff;
+  background-color: #1db1fd;
+  border-color: #ceeeff;
 }
 
 .btn-navbar:focus, .btn-navbar.focus {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
+  color: #ceeeff;
+  background-color: #1db1fd;
+  border-color: #ceeeff;
   outline: 0;
 }
 
 .btn-navbar:active, .btn-navbar.active, .file-upload input:focus ~ .btn-navbar.file-upload-choose,
 .file-upload input:focus ~ .btn-navbar.file-upload-browse,
 .file-upload input:hover ~ .btn-navbar.file-upload-choose,
-.file-upload input:hover ~ .btn-navbar.file-upload-browse,
+.file-upload input:hover ~ .btn-navbar.file-upload-browse, select.btn-navbar:focus, .btn-navbar.drop-enabled,
 .open > .btn-navbar.dropdown-toggle {
-  color: #d2f0fe;
-  background-color: #0cb0f8;
-  border-color: #d2f0fe;
+  color: #ceeeff;
+  background-color: #1db1fd;
+  border-color: #ceeeff;
   background-image: none;
 }
 
@@ -5416,7 +5724,7 @@ fieldset[disabled] a.Button {
   background-color: #f8f9fc;
 }
 
-.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .search-wrap .search-icon-wrap, .search-wrap .card .list-group-item .search-icon-wrap {
+.card .list-group-item .icon, .card .list-group-item .btn-icon, .card .list-group-item .bookmark, .card .list-group-item .search-wrap .search-icon-wrap, .search-wrap .card .list-group-item .search-icon-wrap {
   position: absolute;
   right: 1rem;
   top: 1rem;
@@ -5458,8 +5766,33 @@ fieldset[disabled] a.Button {
 }
 
 .card .media {
+  -webkit-box-align: start;
   -ms-flex-align: start;
   align-items: flex-start;
+}
+
+.panel-nav .card {
+  display: block;
+  padding: 0;
+  margin-top: 0.5625rem;
+  background: 0;
+  border: 0;
+  border-top: 1px dotted rgba(0, 0, 0, 0.0875);
+}
+
+.panel-nav .card .card-block {
+  padding-left: 0;
+}
+
+.panel-nav .card .btn.btn-sm-rounded, .panel-nav .card .btn-sm-rounded.file-upload-browse, .panel-nav .card .btn-sm-rounded.Button {
+  min-width: 3.75rem;
+  padding: .0625rem .5rem;
+  font-size: 0.5625rem;
+}
+
+.panel-nav .card .btn.btn-sm-rounded svg, .panel-nav .card .btn-sm-rounded.file-upload-browse svg, .panel-nav .card .btn-sm-rounded.Button svg {
+  position: relative;
+  width: 0.5625rem;
 }
 
 .card-footer {
@@ -5524,11 +5857,7 @@ fieldset[disabled] a.Button {
 .Section-Analytics .c3-line,
 .Section-DashboardHome .c3-line {
   stroke: rgba(25, 25, 25, 0.2) !important;
-}
-
-.Section-Analytics .c3-event-rect:hover,
-.Section-DashboardHome .c3-event-rect:hover {
-  fill: red;
+  stroke-width: 2;
 }
 
 .Section-Analytics .c3-xgrid,
@@ -5538,11 +5867,6 @@ fieldset[disabled] a.Button {
   stroke-dasharray: 0;
   stroke: rgba(85, 89, 97, 0.12);
   stroke-width: 1;
-}
-
-.Section-Analytics .c3-line,
-.Section-DashboardHome .c3-line {
-  stroke-width: 2;
 }
 
 .Section-Analytics .c3-tooltip .name span,
@@ -5610,6 +5934,8 @@ fieldset[disabled] a.Button {
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse,
+select.nav-stats-pageviews:focus,
+.nav-stats-pageviews.drop-enabled,
 .nav-stats-pageviews:hover {
   color: #f15854;
 }
@@ -5618,7 +5944,7 @@ fieldset[disabled] a.Button {
 .nav-stats-pageviews.active .c3-circle, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-circle, select.nav-stats-pageviews:focus .c3-circle, .nav-stats-pageviews.drop-enabled .c3-circle,
 .nav-stats-pageviews:hover .c3-circle {
   fill: #f15854 !important;
 }
@@ -5627,7 +5953,7 @@ fieldset[disabled] a.Button {
 .nav-stats-pageviews.active .c3-line, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-line, select.nav-stats-pageviews:focus .c3-line, .nav-stats-pageviews.drop-enabled .c3-line,
 .nav-stats-pageviews:hover .c3-line {
   stroke: #f15854 !important;
 }
@@ -5636,7 +5962,7 @@ fieldset[disabled] a.Button {
 .nav-stats-pageviews.active .c3-area, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-area, select.nav-stats-pageviews:focus .c3-area, .nav-stats-pageviews.drop-enabled .c3-area,
 .nav-stats-pageviews:hover .c3-area {
   fill: #f15854 !important;
   opacity: 0.15 !important;
@@ -5646,7 +5972,7 @@ fieldset[disabled] a.Button {
 .nav-stats-pageviews.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-xgrid-focus, select.nav-stats-pageviews:focus .c3-xgrid-focus, .nav-stats-pageviews.drop-enabled .c3-xgrid-focus,
 .nav-stats-pageviews:hover .c3-xgrid-focus {
   stroke: #f15854 !important;
 }
@@ -5655,9 +5981,9 @@ fieldset[disabled] a.Button {
 .nav-stats-pageviews.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-pageviews.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-pageviews.file-upload-browse .c3-event-rect:hover, select.nav-stats-pageviews:focus .c3-event-rect:hover, .nav-stats-pageviews.drop-enabled .c3-event-rect:hover,
 .nav-stats-pageviews:hover .c3-event-rect:hover {
-  fill-opacity: 0.1 !important;
+  fill-opacity: .1 !important;
   fill: #f15854 !important;
 }
 
@@ -5667,6 +5993,8 @@ fieldset[disabled] a.Button {
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-browse,
+select.nav-stats-comments:focus,
+.nav-stats-comments.drop-enabled,
 .nav-stats-comments:hover {
   color: #60bd68;
 }
@@ -5675,7 +6003,7 @@ fieldset[disabled] a.Button {
 .nav-stats-comments.active .c3-circle, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-circle, select.nav-stats-comments:focus .c3-circle, .nav-stats-comments.drop-enabled .c3-circle,
 .nav-stats-comments:hover .c3-circle {
   fill: #60bd68 !important;
 }
@@ -5684,7 +6012,7 @@ fieldset[disabled] a.Button {
 .nav-stats-comments.active .c3-line, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-line, select.nav-stats-comments:focus .c3-line, .nav-stats-comments.drop-enabled .c3-line,
 .nav-stats-comments:hover .c3-line {
   stroke: #60bd68 !important;
 }
@@ -5693,7 +6021,7 @@ fieldset[disabled] a.Button {
 .nav-stats-comments.active .c3-area, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-area, select.nav-stats-comments:focus .c3-area, .nav-stats-comments.drop-enabled .c3-area,
 .nav-stats-comments:hover .c3-area {
   fill: #60bd68 !important;
   opacity: 0.15 !important;
@@ -5703,7 +6031,7 @@ fieldset[disabled] a.Button {
 .nav-stats-comments.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-xgrid-focus, select.nav-stats-comments:focus .c3-xgrid-focus, .nav-stats-comments.drop-enabled .c3-xgrid-focus,
 .nav-stats-comments:hover .c3-xgrid-focus {
   stroke: #60bd68 !important;
 }
@@ -5712,9 +6040,9 @@ fieldset[disabled] a.Button {
 .nav-stats-comments.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-comments.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-comments.file-upload-browse .c3-event-rect:hover, select.nav-stats-comments:focus .c3-event-rect:hover, .nav-stats-comments.drop-enabled .c3-event-rect:hover,
 .nav-stats-comments:hover .c3-event-rect:hover {
-  fill-opacity: 0.1 !important;
+  fill-opacity: .1 !important;
   fill: #60bd68 !important;
 }
 
@@ -5724,6 +6052,8 @@ fieldset[disabled] a.Button {
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-browse,
+select.nav-stats-discussions:focus,
+.nav-stats-discussions.drop-enabled,
 .nav-stats-discussions:hover {
   color: #faa43a;
 }
@@ -5732,7 +6062,7 @@ fieldset[disabled] a.Button {
 .nav-stats-discussions.active .c3-circle, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-circle, select.nav-stats-discussions:focus .c3-circle, .nav-stats-discussions.drop-enabled .c3-circle,
 .nav-stats-discussions:hover .c3-circle {
   fill: #faa43a !important;
 }
@@ -5741,7 +6071,7 @@ fieldset[disabled] a.Button {
 .nav-stats-discussions.active .c3-line, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-line, select.nav-stats-discussions:focus .c3-line, .nav-stats-discussions.drop-enabled .c3-line,
 .nav-stats-discussions:hover .c3-line {
   stroke: #faa43a !important;
 }
@@ -5750,7 +6080,7 @@ fieldset[disabled] a.Button {
 .nav-stats-discussions.active .c3-area, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-area, select.nav-stats-discussions:focus .c3-area, .nav-stats-discussions.drop-enabled .c3-area,
 .nav-stats-discussions:hover .c3-area {
   fill: #faa43a !important;
   opacity: 0.15 !important;
@@ -5760,7 +6090,7 @@ fieldset[disabled] a.Button {
 .nav-stats-discussions.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-xgrid-focus, select.nav-stats-discussions:focus .c3-xgrid-focus, .nav-stats-discussions.drop-enabled .c3-xgrid-focus,
 .nav-stats-discussions:hover .c3-xgrid-focus {
   stroke: #faa43a !important;
 }
@@ -5769,9 +6099,9 @@ fieldset[disabled] a.Button {
 .nav-stats-discussions.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-discussions.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-discussions.file-upload-browse .c3-event-rect:hover, select.nav-stats-discussions:focus .c3-event-rect:hover, .nav-stats-discussions.drop-enabled .c3-event-rect:hover,
 .nav-stats-discussions:hover .c3-event-rect:hover {
-  fill-opacity: 0.1 !important;
+  fill-opacity: .1 !important;
   fill: #faa43a !important;
 }
 
@@ -5781,6 +6111,8 @@ fieldset[disabled] a.Button {
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose,
 .file-upload input:hover ~ .nav-stats-users.file-upload-browse,
+select.nav-stats-users:focus,
+.nav-stats-users.drop-enabled,
 .nav-stats-users:hover {
   color: #57c1c2;
 }
@@ -5789,7 +6121,7 @@ fieldset[disabled] a.Button {
 .nav-stats-users.active .c3-circle, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-circle,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-circle,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-circle,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-circle,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-circle, select.nav-stats-users:focus .c3-circle, .nav-stats-users.drop-enabled .c3-circle,
 .nav-stats-users:hover .c3-circle {
   fill: #57c1c2 !important;
 }
@@ -5798,7 +6130,7 @@ fieldset[disabled] a.Button {
 .nav-stats-users.active .c3-line, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-line,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-line,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-line,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-line,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-line, select.nav-stats-users:focus .c3-line, .nav-stats-users.drop-enabled .c3-line,
 .nav-stats-users:hover .c3-line {
   stroke: #57c1c2 !important;
 }
@@ -5807,7 +6139,7 @@ fieldset[disabled] a.Button {
 .nav-stats-users.active .c3-area, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-area,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-area,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-area,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-area,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-area, select.nav-stats-users:focus .c3-area, .nav-stats-users.drop-enabled .c3-area,
 .nav-stats-users:hover .c3-area {
   fill: #57c1c2 !important;
   opacity: 0.15 !important;
@@ -5817,7 +6149,7 @@ fieldset[disabled] a.Button {
 .nav-stats-users.active .c3-xgrid-focus, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-xgrid-focus,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-xgrid-focus, select.nav-stats-users:focus .c3-xgrid-focus, .nav-stats-users.drop-enabled .c3-xgrid-focus,
 .nav-stats-users:hover .c3-xgrid-focus {
   stroke: #57c1c2 !important;
 }
@@ -5826,9 +6158,9 @@ fieldset[disabled] a.Button {
 .nav-stats-users.active .c3-event-rect:hover, .file-upload input:focus ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
 .file-upload input:focus ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover,
 .file-upload input:hover ~ .nav-stats-users.file-upload-choose .c3-event-rect:hover,
-.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover,
+.file-upload input:hover ~ .nav-stats-users.file-upload-browse .c3-event-rect:hover, select.nav-stats-users:focus .c3-event-rect:hover, .nav-stats-users.drop-enabled .c3-event-rect:hover,
 .nav-stats-users:hover .c3-event-rect:hover {
-  fill-opacity: 0.1 !important;
+  fill-opacity: .1 !important;
   fill: #57c1c2 !important;
 }
 
@@ -5867,6 +6199,7 @@ fieldset[disabled] a.Button {
   position: absolute;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-box-align: stretch;
   -ms-flex-align: stretch;
   align-items: stretch;
   width: 17.375rem;
@@ -5876,7 +6209,6 @@ fieldset[disabled] a.Button {
   margin-top: 0.0625rem;
   top: 100px;
   left: 20px;
-  /* Calendars */
 }
 
 @media (min-width: 564px) {
@@ -5887,9 +6219,6 @@ fieldset[disabled] a.Button {
 
 .daterangepicker.dropdown-menu, .daterangepicker.ac_results {
   padding: 0.5625rem;
-}
-
-.daterangepicker.dropdown-menu, .daterangepicker.ac_results {
   max-width: none;
   z-index: 3001;
 }
@@ -5905,29 +6234,34 @@ fieldset[disabled] a.Button {
 }
 
 .daterangepicker .calendar.single .calendar-table {
-  border: none;
+  border: 0;
 }
 
-.daterangepicker .calendar th, .daterangepicker .calendar td {
+.daterangepicker .calendar th,
+.daterangepicker .calendar td {
   white-space: nowrap;
   text-align: center;
   min-width: 32px;
 }
 
-.daterangepicker .calendar th.prev.available, .daterangepicker .calendar td.prev.available {
+.daterangepicker .calendar th.prev.available,
+.daterangepicker .calendar td.prev.available {
   text-align: left;
 }
 
-.daterangepicker .calendar th.prev.available:before, .daterangepicker .calendar td.prev.available:before {
+.daterangepicker .calendar th.prev.available::before,
+.daterangepicker .calendar td.prev.available::before {
   display: inline-block;
   content: url(data:image/svg+xml,%3Csvg%20width%3D%2224px%22%20height%3D%2224px%22%20viewBox%3D%220%200%2024%2024%22%20version%3D%221.1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%3E%0A%20%20%20%20%3Cg%20id%3D%22Styles%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20opacity%3D%220.7%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Pager_Chevron_Left%22%20fill%3D%22%23555A62%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cpolygon%20id%3D%22Combined-Shape%22%20transform%3D%22translate%2812.268293%2C%2012.000000%29%20scale%28-1%2C%201%29%20translate%28-12.268293%2C%20-12.000000%29%20%22%20points%3D%2214.902439%2011.7804878%207%2019.6829268%208.31707317%2021%2016.6585366%2012.6585366%2017.5365854%2011.7804878%208.75609756%203%207.43902439%204.31707317%22%3E%3C/polygon%3E%0A%20%20%20%20%20%20%20%20%3C/g%3E%0A%20%20%20%20%3C/g%3E%0A%3C/svg%3E);
 }
 
-.daterangepicker .calendar th.next.available, .daterangepicker .calendar td.next.available {
+.daterangepicker .calendar th.next.available,
+.daterangepicker .calendar td.next.available {
   text-align: right;
 }
 
-.daterangepicker .calendar th.next.available:before, .daterangepicker .calendar td.next.available:before {
+.daterangepicker .calendar th.next.available::before,
+.daterangepicker .calendar td.next.available::before {
   display: inline-block;
   content: url(data:image/svg+xml,%3Csvg%20width%3D%2224px%22%20height%3D%2224px%22%20viewBox%3D%220%200%2024%2024%22%20version%3D%221.1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20xmlns%3Axlink%3D%22http%3A//www.w3.org/1999/xlink%22%3E%0A%20%20%20%20%3Cg%20id%3D%22Styles%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%20opacity%3D%220.7%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Pager_Chevron_Right%22%20fill%3D%22%23555A62%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cpolygon%20id%3D%22Combined-Shape%22%20points%3D%2214.902439%2011.7804878%207%2019.6829268%208.31707317%2021%2016.6585366%2012.6585366%2017.5365854%2011.7804878%208.75609756%203%207.43902439%204.31707317%22%3E%3C/polygon%3E%0A%20%20%20%20%20%20%20%20%3C/g%3E%0A%20%20%20%20%3C/g%3E%0A%3C/svg%3E);
 }
@@ -5944,7 +6278,8 @@ fieldset[disabled] a.Button {
   margin: 0;
 }
 
-.daterangepicker td, .daterangepicker th {
+.daterangepicker td,
+.daterangepicker th {
   text-align: center;
   width: 1.125rem;
   height: 1.125rem;
@@ -5954,7 +6289,8 @@ fieldset[disabled] a.Button {
   cursor: pointer;
 }
 
-.daterangepicker td.week, .daterangepicker th.week {
+.daterangepicker td.week,
+.daterangepicker th.week {
   font-size: 80%;
   color: #ccc;
 }
@@ -5976,12 +6312,12 @@ fieldset[disabled] a.Button {
   border-radius: 0.125rem 0 0 0.125rem;
 }
 
-.daterangepicker td.end-date {
-  border-radius: 0 0.125rem 0.125rem 0;
-}
-
 .daterangepicker td.start-date.end-date {
   border-radius: 0.125rem;
+}
+
+.daterangepicker td.end-date {
+  border-radius: 0 0.125rem 0.125rem 0;
 }
 
 .daterangepicker td.active, .daterangepicker .file-upload input:focus ~ td.file-upload-choose, .file-upload .daterangepicker input:focus ~ td.file-upload-choose, .daterangepicker
@@ -5990,13 +6326,13 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ td.file-upload-choose,
 .file-upload .daterangepicker input:hover ~ td.file-upload-choose, .daterangepicker
 .file-upload input:hover ~ td.file-upload-browse,
-.file-upload .daterangepicker input:hover ~ td.file-upload-browse, .daterangepicker td.active:hover, .daterangepicker .file-upload input:focus ~ td.file-upload-choose:hover, .file-upload .daterangepicker input:focus ~ td.file-upload-choose:hover, .daterangepicker
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse, .daterangepicker td.drop-enabled, .daterangepicker td.active:hover, .daterangepicker .file-upload input:focus ~ td.file-upload-choose:hover, .file-upload .daterangepicker input:focus ~ td.file-upload-choose:hover, .daterangepicker
 .file-upload input:focus ~ td.file-upload-browse:hover,
 .file-upload .daterangepicker input:focus ~ td.file-upload-browse:hover, .daterangepicker
 .file-upload input:hover ~ td.file-upload-choose:hover,
 .file-upload .daterangepicker input:hover ~ td.file-upload-choose:hover, .daterangepicker
 .file-upload input:hover ~ td.file-upload-browse:hover,
-.file-upload .daterangepicker input:hover ~ td.file-upload-browse:hover {
+.file-upload .daterangepicker input:hover ~ td.file-upload-browse:hover, .daterangepicker td.drop-enabled:hover {
   background-color: #0291db;
   border-color: transparent;
   color: #fff;
@@ -6007,7 +6343,8 @@ fieldset[disabled] a.Button {
   padding-bottom: 0.28125rem;
 }
 
-.daterangepicker td.disabled, .daterangepicker option.disabled {
+.daterangepicker td.disabled,
+.daterangepicker option.disabled {
   color: #999;
   cursor: not-allowed;
   text-decoration: line-through;
@@ -6041,7 +6378,7 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ .input-mini.file-upload-choose,
 .file-upload .daterangepicker input:hover ~ .input-mini.file-upload-choose, .daterangepicker
 .file-upload input:hover ~ .input-mini.file-upload-browse,
-.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse {
+.file-upload .daterangepicker input:hover ~ .input-mini.file-upload-browse, .daterangepicker select.input-mini:focus, .daterangepicker .input-mini.drop-enabled {
   border: 0.0625rem solid #08c;
   border-radius: 0.125rem;
 }
@@ -6074,11 +6411,37 @@ fieldset[disabled] a.Button {
   cursor: not-allowed;
 }
 
+.filter-date {
+  position: relative;
+  min-width: 13.125rem;
+}
+
+.filter-date::after {
+  position: absolute;
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  right: 9px;
+  top: 9px;
+  -webkit-transform: scale(1.5);
+          transform: scale(1.5);
+  opacity: .7;
+  content: url(data:image/svg+xml,%3Csvg%20width%3D%2217px%22%20height%3D%2217px%22%20viewBox%3D%220%200%2017%2017%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%0A%20%20%20%20%3Cg%20id%3D%22-Styles%22%20stroke%3D%22none%22%20stroke-width%3D%221%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%0A%20%20%20%20%20%20%20%20%3Cg%20id%3D%22Calendar%22%20fill%3D%22%23555A62%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M12.7528056%2C4.25811336%20L12.7528056%2C3.5504246%20C12.7528056%2C3.2519202%2012.5010049%2C3%2012.2026422%2C3%20L11.4166944%2C3%20C11.1183317%2C3%2010.866531%2C3.2519202%2010.866531%2C3.5504246%20L10.866531%2C4.25811336%20L6.19749183%2C4.25811336%20L6.19749183%2C3.5504246%20C6.19749183%2C3.2519202%205.94569118%2C3%205.64732843%2C3%20L4.86138072%2C3%20C4.56301797%2C3%204.31121732%2C3.2519202%204.31121732%2C3.5504246%20L4.31121732%2C4.25811336%20L2.97514869%2C4.25811336%20C2.44100163%2C4.25811336%202%2C4.69785798%202%2C5.23372502%20L2%2C14.0243883%20C2%2C14.558789%202.43953595%2C15%202.97514869%2C15%20L14.0248513%2C15%20C14.5589984%2C15%2015%2C14.5602554%2015%2C14.0243883%20L15%2C5.23372502%20C15%2C4.69785798%2014.5604641%2C4.25811336%2014.026317%2C4.25811336%20L12.7528056%2C4.25811336%20Z%20M11.4487271%2C3.59703004%20L12.1720752%2C3.59703004%20L12.1720752%2C4.55661776%20L12.1720752%2C5.32691466%20L11.4487271%2C5.32691466%20L11.4487271%2C4.55661776%20L11.4487271%2C3.59703004%20L11.4487271%2C3.59703004%20Z%20M4.8934134%2C3.59703004%20L5.61676144%2C3.59703004%20L5.61676144%2C4.55661776%20L5.61676144%2C5.32691466%20L4.8934134%2C5.32691466%20L4.8934134%2C4.55661776%20L4.8934134%2C3.59703004%20L4.8934134%2C3.59703004%20Z%20M4.3272549%2C4.84056459%20L4.3272549%2C5.3589413%20C4.3272549%2C5.6574457%204.57905556%2C5.9093659%204.8774183%2C5.9093659%20L5.66336601%2C5.9093659%20C5.96172876%2C5.9093659%206.21352941%2C5.6574457%206.21352941%2C5.3589413%20L6.21352941%2C4.84056459%20L10.8665523%2C4.84056459%20L10.8665523%2C5.3589413%20C10.8665523%2C5.6574457%2011.1183529%2C5.9093659%2011.4167157%2C5.9093659%20L12.2026634%2C5.9093659%20C12.5010261%2C5.9093659%2012.7528268%2C5.6574457%2012.7528268%2C5.3589413%20L12.7528268%2C4.84056459%20L14.0423546%2C4.84056459%20C14.2621225%2C4.84056459%2014.4353284%2C5.01385271%2014.4353284%2C5.23372502%20L14.4353284%2C6.43134547%20L2.59819118%2C6.43134547%20L2.59819118%2C5.23372502%20C2.59819118%2C5.01238632%202.77137582%2C4.84056459%202.99116503%2C4.84056459%20L4.3272549%2C4.84056459%20Z%20M2.99116503%2C14.4174796%20C2.77139706%2C14.4174796%202.59819118%2C14.265274%202.59819118%2C14.0721517%20L2.59819118%2C7.01235157%20L14.4192908%2C7.01235157%20L14.4192908%2C14.0721517%20C14.4192696%2C14.265274%2014.246085%2C14.4174796%2014.026317%2C14.4174796%20L2.99116503%2C14.4174796%20Z%20M5.15266728%2C8.83119751%20C5.15266728%2C9.11607082%205.02819831%2C9.34289157%204.87192037%2C9.34289157%20L3.934126%2C9.34289157%20C3.77782693%2C9.34289157%203.65337908%2C9.11603232%203.65337908%2C8.83119751%20C3.65337908%2C8.5463242%203.77784805%2C8.31950345%203.934126%2C8.31950345%20L4.87189925%2C8.31950345%20C5.02676205%2C8.29047717%205.15266728%2C8.54636269%205.15266728%2C8.83119751%20L5.15266728%2C8.83119751%20Z%20M7.87145159%2C8.83119751%20C7.87145159%2C9.11607082%207.74698087%2C9.34289157%207.59070073%2C9.34289157%20L6.65291426%2C9.34289157%20C6.496613%2C9.34289157%206.3721634%2C9.11603232%206.3721634%2C8.83119751%20C6.3721634%2C8.5463242%206.49663412%2C8.31950345%206.65291426%2C8.31950345%20L7.59070073%2C8.31950345%20C7.73107616%2C8.29047717%207.87145159%2C8.54636269%207.87145159%2C8.83119751%20L7.87145159%2C8.83119751%20Z%20M10.575664%2C8.83119751%20C10.575664%2C9.11607082%2010.4512144%2C9.34289157%2010.2949131%2C9.34289157%20L9.35712668%2C9.34289157%20C9.20082542%2C9.34289157%209.07637582%2C9.11603232%209.07637582%2C8.83119751%20C9.07637582%2C8.5463242%209.20084654%2C8.31950345%209.35712668%2C8.31950345%20L10.2949131%2C8.31950345%20C10.449757%2C8.29047717%2010.575664%2C8.54636269%2010.575664%2C8.83119751%20L10.575664%2C8.83119751%20Z%20M13.011576%2C9.34289157%20L12.0753847%2C9.34289157%20C11.9193528%2C9.34289157%2011.7951176%2C9.11603232%2011.7951176%2C8.83119751%20C11.7951176%2C8.5463242%2011.9193739%2C8.31950345%2012.0753847%2C8.31950345%20L13.011576%2C8.31950345%20C13.1676079%2C8.29047717%2013.291843%2C8.54636269%2013.291843%2C8.83119751%20C13.291843%2C9.11607082%2013.1675868%2C9.34289157%2013.011576%2C9.34289157%20Z%20M5.16120915%2C10.765069%20C5.16120915%2C11.0505694%205.03603105%2C11.2778895%204.87886275%2C11.2778895%20L3.93572549%2C11.2778895%20C3.77853595%2C11.2778895%203.65337908%2C11.0505309%203.65337908%2C10.765069%20C3.65337908%2C10.4795686%203.77855719%2C10.2522485%203.93572549%2C10.2522485%20L4.8788415%2C10.2522485%20C5.0345866%2C10.2522485%205.16120915%2C10.4795686%205.16120915%2C10.765069%20L5.16120915%2C10.765069%20Z%20M7.87997222%2C10.765069%20C7.87997222%2C11.0505694%207.75479412%2C11.2778895%207.59762582%2C11.2778895%20L6.6545098%2C11.2778895%20C6.49732026%2C11.2778895%206.3721634%2C11.0505309%206.3721634%2C10.765069%20C6.3721634%2C10.4795686%206.4973415%2C10.2522485%206.6545098%2C10.2522485%20L7.59762582%2C10.2522485%20C7.73879902%2C10.2522485%207.87997222%2C10.4795686%207.87997222%2C10.765069%20L7.87997222%2C10.765069%20Z%20M10.5841846%2C10.765069%20C10.5841846%2C11.0505694%2010.4590278%2C11.2778895%2010.3018382%2C11.2778895%20L9.35872222%2C11.2778895%20C9.20153268%2C11.2778895%209.07637582%2C11.0505309%209.07637582%2C10.765069%20C9.07637582%2C10.4795686%209.20155392%2C10.2522485%209.35872222%2C10.2522485%20L10.3018382%2C10.2522485%20C10.4575621%2C10.2522485%2010.5841846%2C10.4795686%2010.5841846%2C10.765069%20L10.5841846%2C10.765069%20Z%20M13.3029477%2C10.765069%20C13.3029477%2C11.0505694%2013.1777696%2C11.2778895%2013.0206013%2C11.2778895%20L12.0774641%2C11.2778895%20C11.9202745%2C11.2778895%2011.7951176%2C11.0505309%2011.7951176%2C10.765069%20C11.7951176%2C10.4795686%2011.9202958%2C10.2522485%2012.0774641%2C10.2522485%20L13.0206013%2C10.2522485%20C13.1777908%2C10.2522485%2013.3029477%2C10.4795686%2013.3029477%2C10.765069%20L13.3029477%2C10.765069%20Z%20M5.16120915%2C12.7161392%20C5.16120915%2C13.0008264%205.03603105%2C13.227499%204.87886275%2C13.227499%20L3.93572549%2C13.227499%20C3.77853595%2C13.227499%203.65337908%2C13.0008264%203.65337908%2C12.7161392%20C3.65337908%2C12.431452%203.77855719%2C12.2047794%203.93572549%2C12.2047794%20L4.8788415%2C12.2047794%20C5.0345866%2C12.1731176%205.16120915%2C12.4024447%205.16120915%2C12.7161392%20L5.16120915%2C12.7161392%20Z%20M7.87997222%2C12.7161392%20C7.87997222%2C13.0008264%207.75479412%2C13.227499%207.59762582%2C13.227499%20L6.6545098%2C13.227499%20C6.49732026%2C13.227499%206.3721634%2C13.0008264%206.3721634%2C12.7161392%20C6.3721634%2C12.431452%206.4973415%2C12.2047794%206.6545098%2C12.2047794%20L7.59762582%2C12.2047794%20C7.73879902%2C12.1731176%207.87997222%2C12.4024447%207.87997222%2C12.7161392%20L7.87997222%2C12.7161392%20Z%20M10.5841846%2C12.7161392%20C10.5841846%2C13.0008264%2010.4590278%2C13.227499%2010.3018382%2C13.227499%20L9.35872222%2C13.227499%20C9.20153268%2C13.227499%209.07637582%2C13.0008264%209.07637582%2C12.7161392%20C9.07637582%2C12.431452%209.20155392%2C12.2047794%209.35872222%2C12.2047794%20L10.3018382%2C12.2047794%20C10.4575621%2C12.1731176%2010.5841846%2C12.4024447%2010.5841846%2C12.7161392%20L10.5841846%2C12.7161392%20Z%20M13.3029477%2C12.7161392%20C13.3029477%2C13.0008264%2013.1777696%2C13.227499%2013.0206013%2C13.227499%20L12.0774641%2C13.227499%20C11.9202745%2C13.227499%2011.7951176%2C13.0008264%2011.7951176%2C12.7161392%20C11.7951176%2C12.431452%2011.9202958%2C12.2047794%2012.0774641%2C12.2047794%20L13.0206013%2C12.2047794%20C13.1777908%2C12.1731176%2013.3029477%2C12.4024447%2013.3029477%2C12.7161392%20L13.3029477%2C12.7161392%20Z%22%20id%3D%22Shape-Copy-14%22%3E%3C%2Fpath%3E%0A%20%20%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%20%20%3C%2Fg%3E%0A%3C%2Fsvg%3E);
+}
+
+.filter-date .form-control, .filter-date .ac_input {
+  padding-right: 36px;
+}
+
 .ranges {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
@@ -6110,15 +6473,19 @@ fieldset[disabled] a.Button {
 .file-upload input:hover ~ li.file-upload-choose,
 .file-upload .ranges input:hover ~ li.file-upload-choose, .ranges
 .file-upload input:hover ~ li.file-upload-browse,
-.file-upload .ranges input:hover ~ li.file-upload-browse {
+.file-upload .ranges input:hover ~ li.file-upload-browse, .ranges li.drop-enabled {
   color: #0291db;
 }
 
 .ranges .range_inputs {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: start;
   -ms-flex-pack: start;
   justify-content: flex-start;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
   -ms-flex-direction: row-reverse;
   flex-direction: row-reverse;
 }
@@ -6135,11 +6502,11 @@ fieldset[disabled] a.Button {
   padding: 0.375rem 0;
 }
 
-.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .search-wrap .search-icon-wrap, .search-wrap .dropdown-menu .search-icon-wrap, .ac_results .search-wrap .search-icon-wrap, .search-wrap .ac_results .search-icon-wrap {
+.dropdown-menu .icon, .ac_results .icon, .dropdown-menu .btn-icon, .ac_results .btn-icon, .dropdown-menu .bookmark, .ac_results .bookmark, .dropdown-menu .search-wrap .search-icon-wrap, .search-wrap .dropdown-menu .search-icon-wrap, .ac_results .search-wrap .search-icon-wrap, .search-wrap .ac_results .search-icon-wrap {
   margin-right: 0.28125rem;
 }
 
-.dropdown-menu svg.icon, .ac_results svg.icon, .dropdown-menu svg.btn-icon, .ac_results svg.btn-icon, .dropdown-menu .search-wrap svg.search-icon-wrap, .search-wrap .dropdown-menu svg.search-icon-wrap, .ac_results .search-wrap svg.search-icon-wrap, .search-wrap .ac_results svg.search-icon-wrap {
+.dropdown-menu svg.icon, .ac_results svg.icon, .dropdown-menu svg.btn-icon, .ac_results svg.btn-icon, .dropdown-menu svg.bookmark, .ac_results svg.bookmark, .dropdown-menu .search-wrap svg.search-icon-wrap, .search-wrap .dropdown-menu svg.search-icon-wrap, .ac_results .search-wrap svg.search-icon-wrap, .search-wrap .ac_results svg.search-icon-wrap {
   margin-top: -0.125rem;
 }
 
@@ -6147,11 +6514,31 @@ fieldset[disabled] a.Button {
   color: #cbcdd2;
 }
 
+.dropup .dropdown-toggle::after {
+  border-top: .375em solid;
+  border-bottom: 0;
+}
+
+.dropdown-filter .btn, .dropdown-filter .file-upload-browse, .dropdown-filter .Button {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  min-width: 120px;
+}
+
 .footer {
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   padding-left: 1.125rem;
@@ -6197,12 +6584,12 @@ fieldset[disabled] a.Button {
 
 .footer-logo-powered {
   position: relative;
+  top: -.5rem;
   display: block;
 }
 
 .footer-logo {
-  padding-top: .375rem;
-  padding-bottom: .375rem;
+  padding-top: .5rem;
   opacity: .3;
 }
 
@@ -6232,19 +6619,13 @@ form ol li {
   list-style: none;
 }
 
-.row-padding-left, .form-group > .no-grid, .form-group .input-wrap-right {
-  padding-left: 1.125rem;
-}
-
-.row-padding-right, .form-group > .no-grid, .form-group .input-wrap-right {
-  padding-right: 1.125rem;
-}
-
 .form-group {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   padding-top: 1rem;
@@ -6253,14 +6634,20 @@ form ol li {
   border-bottom: 0.0625rem dotted #e7e8e9;
 }
 
-.form-group:first-child {
-  border-top: 0.0625rem solid #e7e8e9;
-  margin-top: -0.0625rem;
+.form-group > .no-grid {
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
 }
 
 .form-group > .label-wrap-wide {
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
+}
+
+.form-group .input-wrap-right {
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
 }
 
 @media (max-width: 543px) {
@@ -6291,8 +6678,10 @@ label,
 }
 
 .form-footer {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: end;
   -ms-flex-pack: end;
   justify-content: flex-end;
   padding: 1.125rem 0;
@@ -6325,11 +6714,12 @@ label,
 }
 
 .input-wrap-multiple {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
 
-.input-wrap-multiple > *:last-child {
+.input-wrap-multiple > *:not(:first-child) {
   margin-left: 0.5625rem;
 }
 
@@ -6350,6 +6740,7 @@ label,
   background-color: #fff;
   border-radius: 1.125rem;
   border: 0.0625rem solid #949aa2;
+  -webkit-transition: background .4s;
   transition: background .4s;
   cursor: pointer;
 }
@@ -6365,6 +6756,7 @@ label,
   border: 0.0625rem solid #949aa2;
   background-color: #fff;
   outline: 0;
+  -webkit-transition: left .4s;
   transition: left .4s;
   cursor: pointer;
 }
@@ -6383,6 +6775,7 @@ label,
 .toggle-wrap-sm .toggle-wrap-active .toggle-wrap .toggle-slider,
 .toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after {
   left: 1.3125rem;
+  -webkit-transition: left .4s;
   transition: left .4s;
 }
 
@@ -6407,6 +6800,7 @@ label,
   background-color: #fff;
   border-radius: 0.75rem;
   border: 0.0625rem solid #949aa2;
+  -webkit-transition: background .4s;
   transition: background .4s;
   cursor: pointer;
 }
@@ -6422,6 +6816,7 @@ label,
   border: 0.0625rem solid #949aa2;
   background-color: #fff;
   outline: 0;
+  -webkit-transition: left .4s;
   transition: left .4s;
   cursor: pointer;
 }
@@ -6439,6 +6834,7 @@ label,
 .toggle-wrap-sm .toggle-slider-active, .table-data .toggle-wrap .toggle-slider-active, .toggle-wrap .InProgress .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap .InProgress .toggle-wrap-sm input[type="checkbox"] + label::after,
 .toggle-wrap .toggle-wrap-active .toggle-wrap-sm .toggle-slider, .toggle-wrap-sm .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-active .toggle-wrap-sm input[type="checkbox"] + label::after, .toggle-wrap-sm .InProgress .toggle-slider, .table-data .toggle-wrap .InProgress .toggle-slider, .toggle-wrap-sm .InProgress .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .InProgress input[type="checkbox"] + label::after, .table-data .toggle-wrap .InProgress input[type="checkbox"] + label::after, .toggle-wrap-sm .toggle-wrap-active .toggle-slider, .table-data .toggle-wrap .toggle-wrap-active .toggle-slider, .toggle-wrap-sm .toggle-wrap-active .toggle-wrap input[type="checkbox"] + label::after, .toggle-wrap .toggle-wrap-sm .toggle-wrap-active input[type="checkbox"] + label::after, .table-data .toggle-wrap .toggle-wrap-active input[type="checkbox"] + label::after {
   left: 0.875rem;
+  -webkit-transition: left .4s;
   transition: left .4s;
 }
 
@@ -6468,6 +6864,10 @@ label,
   padding: 0;
 }
 
+.color-picker-color:disabled {
+  opacity: 0;
+}
+
 .color-picker-preview {
   position: absolute;
   top: 0.28125rem;
@@ -6490,6 +6890,10 @@ label,
 .file-upload input {
   margin: 0;
   filter: alpha(opacity=0);
+  opacity: 0;
+}
+
+.file-upload input:disabled, .file-upload input.disabled {
   opacity: 0;
 }
 
@@ -6520,6 +6924,11 @@ label,
   outline: none;
 }
 
+.file-upload input:disabled ~ .file-upload-choose,
+.file-upload input.disabled ~ .file-upload-choose {
+  background-color: #f4f6fb;
+}
+
 select,
 select.form-control,
 select.ac_input {
@@ -6531,9 +6940,9 @@ select.ac_input {
   color: #949aa2;
   vertical-align: middle;
   background-color: #fff;
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
   background-repeat: no-repeat;
   background-position: right .75rem center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAUCAMAAACzvE1FAAAADFBMVEUzMzMzMzMzMzMzMzMKAG/3AAAAA3RSTlMAf4C/aSLHAAAAPElEQVR42q3NMQ4AIAgEQTn//2cLdRKppSGzBYwzVXvznNWs8C58CiussPJj8h6NwgorrKRdTvuV9v16Afn0AYFOB7aYAAAAAElFTkSuQmCC);
   background-image: none \9;
   background-size: 8px 10px;
   border: 0.0625rem solid #ccc;
@@ -6548,8 +6957,19 @@ select.ac_input::-ms-expand {
   opacity: 0;
 }
 
+select:focus,
+select.form-control:focus,
+select.ac_input:focus {
+  border-color: #66afe9;
+  outline: none;
+}
+
 select + select {
   margin-left: 0.5625rem;
+}
+
+.label-selector {
+  margin-bottom: 0.5625rem;
 }
 
 .label-selector,
@@ -6579,9 +6999,11 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose,
 .file-upload .label-selector input:hover ~ .file-upload-choose, .label-selector
 .file-upload input:hover ~ .file-upload-browse,
-.file-upload .label-selector input:hover ~ .file-upload-browse,
+.file-upload .label-selector input:hover ~ .file-upload-browse, .label-selector select:focus, .label-selector .drop-enabled,
 .label-selector input[type=radio]:checked ~ label,
-.label-selector input[type=radio]:checked ~ label {
+.label-selector input[type=radio]:checked ~ label,
+.label-selector input[type=checkbox]:checked ~ label,
+.label-selector input[type=checkbox]:checked ~ label {
   cursor: default;
 }
 
@@ -6591,9 +7013,11 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay, .label-selector select:focus .overlay, .label-selector .drop-enabled .overlay,
 .label-selector input[type=radio]:checked ~ label .overlay,
-.label-selector input[type=radio]:checked ~ label .overlay {
+.label-selector input[type=radio]:checked ~ label .overlay,
+.label-selector input[type=checkbox]:checked ~ label .overlay,
+.label-selector input[type=checkbox]:checked ~ label .overlay {
   opacity: 1;
   background-color: rgba(255, 255, 255, 0.7);
 }
@@ -6604,9 +7028,11 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay > .buttons,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .buttons, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay > .buttons,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .buttons, .label-selector select:focus .overlay > .buttons, .label-selector .drop-enabled .overlay > .buttons,
 .label-selector input[type=radio]:checked ~ label .overlay > .buttons,
-.label-selector input[type=radio]:checked ~ label .overlay > .buttons {
+.label-selector input[type=radio]:checked ~ label .overlay > .buttons,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .buttons,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .buttons {
   display: none;
 }
 
@@ -6616,9 +7042,11 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .overlay > .selected,
 .file-upload .label-selector input:hover ~ .file-upload-choose .overlay > .selected, .label-selector
 .file-upload input:hover ~ .file-upload-browse .overlay > .selected,
-.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected,
+.file-upload .label-selector input:hover ~ .file-upload-browse .overlay > .selected, .label-selector select:focus .overlay > .selected, .label-selector .drop-enabled .overlay > .selected,
 .label-selector input[type=radio]:checked ~ label .overlay > .selected,
-.label-selector input[type=radio]:checked ~ label .overlay > .selected {
+.label-selector input[type=radio]:checked ~ label .overlay > .selected,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .selected,
+.label-selector input[type=checkbox]:checked ~ label .overlay > .selected {
   display: block;
 }
 
@@ -6628,9 +7056,11 @@ select + select {
 .file-upload input:hover ~ .file-upload-choose .label-selector-image,
 .file-upload .label-selector input:hover ~ .file-upload-choose .label-selector-image, .label-selector
 .file-upload input:hover ~ .file-upload-browse .label-selector-image,
-.file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image,
+.file-upload .label-selector input:hover ~ .file-upload-browse .label-selector-image, .label-selector select:focus .label-selector-image, .label-selector .drop-enabled .label-selector-image,
 .label-selector input[type=radio]:checked ~ label .label-selector-image,
-.label-selector input[type=radio]:checked ~ label .label-selector-image {
+.label-selector input[type=radio]:checked ~ label .label-selector-image,
+.label-selector input[type=checkbox]:checked ~ label .label-selector-image,
+.label-selector input[type=checkbox]:checked ~ label .label-selector-image {
   opacity: .5;
 }
 
@@ -6644,12 +7074,16 @@ select + select {
   font-weight: 500;
 }
 
-.label-selector .title a:hover {
-  text-decoration: none;
+.label-selector .title a {
+  color: #555a62;
 }
 
-.label-selector .title a:hover svg {
-  fill: #0291db;
+.label-selector .title a:hover {
+  color: #0291db;
+}
+
+.label-selector .title a:hover {
+  text-decoration: none;
 }
 
 .label-selector .image-wrap {
@@ -6677,21 +7111,23 @@ select + select {
 
 .label-selector .selected {
   display: none;
+  color: #6bc573;
 }
 
 .label-selector .selected svg {
   display: block;
   width: 84px;
-  fill: #6bc573;
 }
 
 .label-selector .overlay {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   position: absolute;
-  display: flex;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
   bottom: 0;
@@ -6703,11 +7139,13 @@ select + select {
   background-color: #0291db;
   opacity: 0;
   overflow: hidden;
+  -webkit-transition: all .1s;
   transition: all .1s;
   text-align: center;
 }
 
 .label-selector .buttons {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -6715,8 +7153,10 @@ select + select {
   margin-left: 0;
   margin-right: 0;
   padding: 0.5625rem;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
 }
@@ -6742,11 +7182,14 @@ select + select {
 
 .label-selector .label-selector-corner-link svg {
   display: block;
-  fill: #fff;
 }
 
-.label-selector .label-selector-corner-link a:hover svg {
-  fill: #0cb0f8;
+.label-selector .label-selector-corner-link a {
+  color: #fff;
+}
+
+.label-selector .label-selector-corner-link a:hover {
+  color: #04a8fd;
 }
 
 .theme-wrap {
@@ -6758,10 +7201,13 @@ select + select {
   position: absolute;
   top: 0;
   left: 0;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   width: 100%;
@@ -6792,6 +7238,7 @@ select + select {
   position: relative;
   overflow: hidden;
   margin-bottom: 0.5625rem;
+  color: rgba(85, 90, 98, 0.27);
 }
 
 .mobile-theme-wrap .mobile-frame {
@@ -6800,8 +7247,8 @@ select + select {
 }
 
 .mobile-theme-wrap svg {
+  max-width: 100%;
   display: block;
-  fill: rgba(85, 90, 98, 0.27);
 }
 
 .mobile-theme-wrap .image-wrap {
@@ -6842,13 +7289,13 @@ select + select {
 
 .btn-overlay:hover {
   color: #fff;
-  background-color: #0cb0f8;
+  background-color: #04a8fd;
   border-color: #fff;
 }
 
 .btn-overlay:focus, .btn-overlay.focus {
   color: #fff;
-  background-color: #0cb0f8;
+  background-color: #04a8fd;
   border-color: #fff;
   outline: 0;
 }
@@ -6856,10 +7303,10 @@ select + select {
 .btn-overlay:active, .btn-overlay.active, .file-upload input:focus ~ .btn-overlay.file-upload-choose,
 .file-upload input:focus ~ .btn-overlay.file-upload-browse,
 .file-upload input:hover ~ .btn-overlay.file-upload-choose,
-.file-upload input:hover ~ .btn-overlay.file-upload-browse,
+.file-upload input:hover ~ .btn-overlay.file-upload-browse, select.btn-overlay:focus, .btn-overlay.drop-enabled,
 .open > .btn-overlay.dropdown-toggle {
   color: #fff;
-  background-color: #0cb0f8;
+  background-color: #04a8fd;
   border-color: #fff;
   background-image: none;
 }
@@ -6904,10 +7351,6 @@ select + select {
   left: 0;
 }
 
-.search-wrap .search-icon-search-wrap svg {
-  opacity: 1;
-}
-
 .search-wrap .search-info {
   margin-top: 0.28125rem;
   font-style: italic;
@@ -6943,10 +7386,13 @@ select + select {
 }
 
 .text-input-button {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -6984,12 +7430,22 @@ select + select {
   margin-top: 0;
 }
 
+.radio input[type="radio"],
+.radio-inline input[type="radio"],
+.checkbox input[type="checkbox"],
+.checkbox-inline input[type="checkbox"] {
+  position: relative;
+  margin-top: initial;
+  margin-left: initial;
+}
+
 .icheck-label {
   padding-left: 0;
 }
 
 .iradio,
 .icheckbox {
+  background-color: #fff;
   display: inline-block;
   width: 1.125rem;
   height: 1.125rem;
@@ -7067,68 +7523,113 @@ label[id^=iCheck] {
   padding-left: 0;
 }
 
-.icon, .btn-icon, .search-wrap .search-icon-wrap,
-.icon svg, .btn-icon svg, .search-wrap .search-icon-wrap svg {
-  vertical-align: middle;
+.checkbox-painted-wrapper,
+.radio-painted-wrapper {
+  position: relative;
+}
+
+.checkbox-painted-wrapper label,
+.radio-painted-wrapper label {
+  padding-left: 0;
+  font: "0/0" a;
+  color: transparent;
+  text-shadow: none;
+  background-color: transparent;
+  border: 0;
+  background-color: #fff;
   display: inline-block;
-}
-
-.icon-9,
-.icon-9 svg {
-  height: 0.5625rem;
-  width: 0.5625rem;
-}
-
-.icon-10,
-.icon-10 svg {
-  height: 0.625rem;
-  width: 0.625rem;
-}
-
-.icon-11,
-.icon-11 svg {
-  height: 0.6875rem;
-  width: 0.6875rem;
-}
-
-.icon-12,
-.icon-12 svg {
-  height: 0.75rem;
-  width: 0.75rem;
-}
-
-.icon-16,
-.icon-16 svg {
-  height: 1rem;
-  width: 1rem;
-}
-
-.icon-24,
-.icon-24 svg {
-  height: 1.5rem;
-  width: 1.5rem;
-}
-
-.icon-30,
-.icon-30 svg {
-  height: 1.875rem;
-  width: 1.875rem;
-}
-
-.icon-48,
-.icon-48 svg {
-  height: 3rem;
-  width: 3rem;
-}
-
-.icon-text {
-  width: 0.875rem;
-  height: 0.875rem;
-  fill: #555a62;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-right: 0.28125rem;
   vertical-align: middle;
+  border: 0.0625rem solid #e7e8e9;
+  margin-right: 0;
+}
+
+.checkbox-painted-wrapper label:hover, .checkbox-painted-wrapper label:focus,
+.radio-painted-wrapper label:hover,
+.radio-painted-wrapper label:focus {
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.checkbox-painted-wrapper label:hover::before, .checkbox-painted-wrapper label:focus::before,
+.radio-painted-wrapper label:hover::before,
+.radio-painted-wrapper label:focus::before {
+  display: block;
+  color: #fff;
+}
+
+.checkbox-painted-wrapper input[type="radio"],
+.checkbox-painted-wrapper input[type="checkbox"],
+.radio-painted-wrapper input[type="radio"],
+.radio-painted-wrapper input[type="checkbox"] {
+  margin-left: -9999px;
+  position: absolute;
+}
+
+.checkbox-painted-wrapper input:checked + label {
+  font-size: 0.75rem;
+  text-align: center;
+  background-color: #0291db;
+  border-color: #0291db;
+}
+
+.checkbox-painted-wrapper input:checked + label::before {
+  display: block;
+  margin-top: 0.125rem;
+  color: #fff;
+  content: "\f171";
+}
+
+.radio-painted-wrapper label {
+  border-radius: 0.5625rem;
+}
+
+.radio-painted-wrapper input:checked + label {
+  border: 0.25rem solid #0291db;
+  border-radius: 0.5625rem;
+  background-color: #fff;
+}
+
+.hero {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  padding: 2.25rem 1.125rem;
+}
+
+.hero > * {
+  -webkit-box-flex: 1;
+      -ms-flex-positive: 1;
+          flex-grow: 1;
+}
+
+.hero .hero-content {
+  padding: 0 6.75rem 0 4.5rem;
+  font-size: 0.8125rem;
+  text-align: center;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
+}
+
+.hero .hero-media-wrapper {
+  -ms-flex-negative: 0;
+      flex-shrink: 0;
+}
+
+.hero .btn, .hero .file-upload-browse, .hero .Button {
+  margin-top: 2.25rem;
 }
 
 .media {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
@@ -7157,6 +7658,7 @@ label[id^=iCheck] {
 }
 
 .media .media-body {
+  -webkit-box-flex: 1;
   -ms-flex: 1;
   flex: 1;
 }
@@ -7167,8 +7669,10 @@ label[id^=iCheck] {
 }
 
 .media-addon .media-image-wrap {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   position: relative;
@@ -7218,6 +7722,14 @@ label[id^=iCheck] {
   .media-addon .media-image-wrap img {
     width: 3.9375rem;
   }
+  }
+
+.media-addon .media-body {
+  max-width: 540px;
+}
+
+.media-addon .media-right {
+  margin-left: auto;
 }
 
 .media-addon,
@@ -7230,9 +7742,11 @@ label[id^=iCheck] {
 .media-callout .media-title {
   font-weight: 500;
   margin-bottom: 0.28125rem;
+  margin-top: 0;
 }
 
 .media-options {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
@@ -7247,8 +7761,11 @@ label[id^=iCheck] {
 
 @media (max-width: 991px) {
   .media-options {
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: reverse;
     -ms-flex-direction: column-reverse;
     flex-direction: column-reverse;
+    -webkit-box-align: center;
     -ms-flex-align: center;
     align-items: center;
     -ms-flex-item-align: start;
@@ -7283,13 +7800,18 @@ label[id^=iCheck] {
   padding-left: 0;
 }
 
-.media-callout.media-callout-grey-bg {
-  background-color: #f4f6fb;
+.media-callout .media-title {
+  font-weight: 400;
+  margin-bottom: 0.5625rem;
 }
 
 .media-callout .media-left img {
   display: block;
   width: 100%;
+}
+
+.media-callout.media-callout-grey-bg {
+  background-color: #f4f6fb;
 }
 
 .media-callout .media-image-wrap {
@@ -7314,12 +7836,15 @@ label[id^=iCheck] {
 }
 
 .media-sm {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: start;
   -ms-flex-pack: start;
   justify-content: flex-start;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
 }
 
 .media-sm .media-left {
@@ -7376,6 +7901,7 @@ label[id^=iCheck] {
 
 .media-sm .media-title a {
   color: #555a62;
+  -webkit-transition: color 200ms;
   transition: color 200ms;
 }
 
@@ -7456,6 +7982,7 @@ label[id^=iCheck] {
   right: 0;
   bottom: 0;
   left: 0;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   padding: 0 0.5625rem;
@@ -7466,6 +7993,7 @@ label[id^=iCheck] {
 }
 
 .modal.fade .modal-dialog {
+  -webkit-transition: opacity .2s ease-out;
   transition: opacity .2s ease-out;
   -webkit-transform: none;
   transform: none;
@@ -7516,15 +8044,18 @@ label[id^=iCheck] {
   display: block;
   width: 100%;
   height: 1rem;
-  box-shadow: inset 0px -0.75rem 0.75rem 0px white;
+  box-shadow: inset 0 -0.75rem 0.75rem 0 white;
   content: '';
 }
 
 .modal-header {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   border-bottom: 0.0625rem solid #e5e5e5;
@@ -7539,13 +8070,7 @@ label[id^=iCheck] {
   padding: 0;
 }
 
-.modal-close:hover svg {
-  opacity: 1;
-}
-
 .modal-close svg {
-  fill: #555a62;
-  opacity: 0.7;
   height: 1.75rem;
 }
 
@@ -7623,13 +8148,16 @@ button.close {
 
 .nav-adventure .nav-link {
   position: relative;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   justify-items: flex-start;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   padding: 1.125rem 1.125rem;
   color: #555a62;
+  -webkit-transition: background-color .1s;
   transition: background-color .1s;
 }
 
@@ -7638,8 +8166,6 @@ button.close {
 }
 
 .nav-adventure .nav-link svg {
-  fill: #555a62;
-  opacity: .7;
   display: block;
   height: 1.5rem;
 }
@@ -7655,10 +8181,13 @@ button.close {
 .nav-adventure .nav-item-icon {
   -ms-flex-negative: 0;
   flex-shrink: 0;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   width: 2.25rem;
@@ -7673,23 +8202,29 @@ button.close {
 }
 
 .nav-stats, .analytics-panel-metrics {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
 }
 
 .nav-stats-item, .analytics-panel-metrics .analytics-widget-metric {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   line-height: 1;
-  padding: 1.125rem 1.125rem 0;
+  padding: 0.5625rem 1.125rem 0;
   color: rgba(25, 25, 25, 0.2);
 }
 
@@ -7733,7 +8268,7 @@ button.close {
   margin-right: .25rem;
   margin-left: .25rem;
   vertical-align: middle;
-  content: "";
+  content: '';
   border-top: 0.375em solid;
   border-right: 0.375em solid transparent;
   border-left: 0.375em solid transparent;
@@ -7743,6 +8278,7 @@ button.close {
   tranform: rotate(0deg);
   margin-left: -1rem;
   margin-right: .5rem;
+  -webkit-transition: all .1s ease-out;
   transition: all .1s ease-out;
 }
 
@@ -7773,10 +8309,6 @@ button.close {
   margin-bottom: 1.125rem;
 }
 
-.panel-nav svg {
-  fill: #949aa2;
-}
-
 .panel-nav .badge {
   font-size: 0.6875rem;
 }
@@ -7802,7 +8334,7 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse {
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus, .panel-nav .nav-link.drop-enabled {
   border-radius: 0.125rem 0 0 0.125rem;
 }
 
@@ -7812,13 +8344,13 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav .nav-link.active:hover, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover, .panel-nav
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse, .panel-nav select.nav-link:focus, .panel-nav .nav-link.drop-enabled, .panel-nav .nav-link.active:hover, .panel-nav .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .panel-nav input:focus ~ .nav-link.file-upload-choose:hover, .panel-nav
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .panel-nav input:focus ~ .nav-link.file-upload-browse:hover, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .panel-nav input:hover ~ .nav-link.file-upload-choose:hover, .panel-nav
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover {
+.file-upload .panel-nav input:hover ~ .nav-link.file-upload-browse:hover, .panel-nav select.nav-link:hover:focus, .panel-nav .nav-link.drop-enabled:hover {
   color: #fff;
   background-color: #0291db;
 }
@@ -7835,13 +8367,15 @@ button.close {
 .nav-link, .nav-link.active, .file-upload input:focus ~ .nav-link.file-upload-choose,
 .file-upload input:focus ~ .nav-link.file-upload-browse,
 .file-upload input:hover ~ .nav-link.file-upload-choose,
-.file-upload input:hover ~ .nav-link.file-upload-browse, .nav-link:active, .nav-link.hover, .nav-link:hover {
+.file-upload input:hover ~ .nav-link.file-upload-browse, select.nav-link:focus, .nav-link.drop-enabled, .nav-link:active, .nav-link.hover, .nav-link:hover {
   cursor: pointer;
 }
 
 .navbar {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   -ms-flex-pack: distribute;
@@ -7897,14 +8431,14 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar .nav-link.active:hover, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover, .navbar
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse, .navbar select.nav-link:focus, .navbar .nav-link.drop-enabled, .navbar .nav-link.active:hover, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover, .navbar
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover,
 .file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover {
-  background-color: #0cb0f8;
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover, .navbar select.nav-link:hover:focus, .navbar .nav-link.drop-enabled:hover {
+  background-color: #04a8fd;
 }
 
 .navbar .nav-link.active > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose > *, .navbar
@@ -7913,29 +8447,29 @@ button.close {
 .file-upload input:hover ~ .nav-link.file-upload-choose > *,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse > *,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse > *, .navbar .nav-link.active:hover > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover > *, .navbar
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse > *, .navbar select.nav-link:focus > *, .navbar .nav-link.drop-enabled > *, .navbar .nav-link.active:hover > *, .navbar .file-upload input:focus ~ .nav-link.file-upload-choose:hover > *, .file-upload .navbar input:focus ~ .nav-link.file-upload-choose:hover > *, .navbar
 .file-upload input:focus ~ .nav-link.file-upload-browse:hover > *,
 .file-upload .navbar input:focus ~ .nav-link.file-upload-browse:hover > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-choose:hover > *,
 .file-upload .navbar input:hover ~ .nav-link.file-upload-choose:hover > *, .navbar
 .file-upload input:hover ~ .nav-link.file-upload-browse:hover > *,
-.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover > * {
+.file-upload .navbar input:hover ~ .nav-link.file-upload-browse:hover > *, .navbar select.nav-link:hover:focus > *, .navbar .nav-link.drop-enabled:hover > * {
   color: #fff;
 }
 
 .navbar .nav-link.hover, .navbar .nav-link:hover {
-  background-color: #0cb0f8;
+  background-color: #04a8fd;
 }
 
 .navbar .nav-link-description {
   font-size: 0.6875rem;
   line-height: 1.3333333333;
-  color: #d2f0fe;
+  color: #ceeeff;
 }
 
 .navbar .nav-link-heading {
   line-height: 1.3333333333;
-  color: #d2f0fe;
+  color: #ceeeff;
 }
 
 .navbar.navbar-short .nav-link {
@@ -7965,14 +8499,18 @@ button.close {
 
 @media (max-width: 991px) {
   .navbar {
+    -webkit-box-pack: start;
     -ms-flex-pack: start;
     justify-content: flex-start;
   }
   .navbar .nav {
+    display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
+    -webkit-box-flex: 1;
     -ms-flex-positive: 1;
     flex-grow: 1;
+    -webkit-box-pack: justify;
     -ms-flex-pack: justify;
     justify-content: space-between;
   }
@@ -7997,6 +8535,8 @@ button.close {
 .drawer-toggle {
   color: #fff;
   font-size: 1.125rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 .drawer-toggle:hover, .drawer-toggle:active, .drawer-toggle:focus {
@@ -8006,15 +8546,18 @@ button.close {
 }
 
 .drawer-toggle:hover, .drawer-toggle:active {
-  background-color: #0cb0f8;
+  background-color: #04a8fd;
 }
 
 .navbar-memenu,
 .navbar-brand {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
   min-width: 15rem;
@@ -8025,14 +8568,14 @@ button.close {
 }
 
 .navbar-profile .icon-caret-down {
-  border-top-color: #d2f0fe;
+  border-top-color: #ceeeff;
   display: inline-block;
   width: 0;
   height: 0;
   margin-right: .25rem;
   margin-left: .25rem;
   vertical-align: middle;
-  content: "";
+  content: '';
   border-top: 0.375em solid;
   border-right: 0.375em solid transparent;
   border-left: 0.375em solid transparent;
@@ -8040,11 +8583,11 @@ button.close {
 
 .nav-icons {
   margin-right: 1.125rem;
+  color: #fff;
 }
 
 .nav-icons svg {
   display: block;
-  fill: #fff;
   height: 1.9583333333rem;
 }
 
@@ -8055,6 +8598,70 @@ button.close {
 
 .nav-icons .nav-link {
   min-width: inherit;
+}
+
+.nestable-list,
+.nestable-list ul,
+.nestable-list ol,
+.nestable-dragel,
+.nestable-dragel ul,
+.nestable-dragel ol {
+  padding-left: 0;
+}
+
+.nestable-list li,
+.nestable-dragel li {
+  list-style: none;
+}
+
+.nestable-item .nestable-item,
+.nestable-item .nestable-placeholder {
+  margin-left: 1.875rem;
+}
+
+.nestable-item,
+.nestable-empty,
+.nestable-placeholder {
+  display: block;
+  position: relative;
+  margin: 0 0 0.375rem;
+  padding: 0;
+}
+
+.nestable-empty,
+.nestable-placeholder {
+  background: #f1faff;
+  border: 0.0625rem dashed #0291db;
+  cursor: grabbing;
+}
+
+.nestable-collapse {
+  position: absolute;
+  display: block;
+  width: 1.25rem;
+  height: 2.25rem;
+  left: 2.25rem;
+}
+
+.nestable-handle {
+  position: absolute;
+  display: block;
+  width: 2.25rem;
+  height: 2.25rem;
+  cursor: move;
+  cursor: grab;
+}
+
+.nestable-dragel {
+  position: absolute;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: .8;
+  cursor: grabbing;
+}
+
+.nestable-content {
+  margin-bottom: 0.375rem;
 }
 
 .help {
@@ -8100,6 +8707,9 @@ button.close {
 .control-panel {
   font-size: 0.75rem;
   color: #727d83;
+}
+
+.panel .control-panel {
   margin-bottom: 2.25rem;
 }
 
@@ -8153,6 +8763,11 @@ button.close {
   font-style: italic;
 }
 
+.control-panel select {
+  height: 1.875rem;
+  width: 100%;
+}
+
 .btn-control-panel {
   padding: 0.125rem 0.75rem;
   font-size: 0.6875rem;
@@ -8179,7 +8794,7 @@ button.close {
 .btn-control-panel:active, .btn-control-panel.active, .file-upload input:focus ~ .btn-control-panel.file-upload-choose,
 .file-upload input:focus ~ .btn-control-panel.file-upload-browse,
 .file-upload input:hover ~ .btn-control-panel.file-upload-choose,
-.file-upload input:hover ~ .btn-control-panel.file-upload-browse,
+.file-upload input:hover ~ .btn-control-panel.file-upload-browse, select.btn-control-panel:focus, .btn-control-panel.drop-enabled,
 .open > .btn-control-panel.dropdown-toggle {
   color: #fff;
   background-color: #0291db;
@@ -8195,10 +8810,71 @@ button.close {
   background-color: #fff;
 }
 
-.main-row pre.prettyprint {
+.plank {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-bottom: 0.375rem;
+  min-height: 2.25rem;
+  background-color: #fbfcfc;
   border: 0.0625rem solid #e7e8e9;
+  border-radius: 2px;
+}
+
+.plank svg {
+  height: 1rem;
+}
+
+.plank-title {
+  padding: 0 0.5625rem;
+}
+
+.plank-options {
+  color: #949aa2;
+  margin-left: auto;
+  margin-top: -0.0625rem;
+  margin-bottom: -0.0625rem;
+}
+
+.plank-options .dropdown-toggle {
+  padding: 0.375rem 0.625rem;
+  line-height: 1.375rem;
+}
+
+.plank-icon {
+  color: #949aa2;
+}
+
+.plank-icon:hover {
+  fill: rgba(85, 90, 98, 0.6);
+}
+
+.plank-container-grid {
+  padding: 1.125rem 0.9375rem;
+}
+
+.plank-container-grid .plank-wrapper {
+  padding-left: 0.1875rem;
+  padding-right: 0.1875rem;
+}
+
+.main-row pre.prettyprint {
+  padding: 0.5625rem;
+  font-size: 0.75rem;
+  border: 0.0625rem solid #e7e8e9 !important;
   border-radius: 0.125rem;
   background-color: transparent;
+}
+
+.input-wrap pre.prettyprint, .color-picker pre.prettyprint {
+  min-height: 2.25rem;
+  padding-top: .40625rem;
+  padding-bottom: .40625rem;
+  line-height: 24px;
+  background-color: #f4f6fb;
 }
 
 .main-container {
@@ -8210,7 +8886,7 @@ button.close {
   position: fixed;
   width: 100%;
   height: 3.75rem;
-  z-index: 1005;
+  z-index: 1010;
 }
 
 .navbar.navbar-short {
@@ -8224,8 +8900,10 @@ button.close {
 }
 
 .main-row {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
   margin-top: 3.75rem;
@@ -8241,12 +8919,17 @@ button.close {
 
 .main {
   position: relative;
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
+  -webkit-box-ordinal-group: 3;
   -ms-flex-order: 2;
   order: 2;
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
   min-height: 100vh;
@@ -8259,6 +8942,7 @@ button.close {
 }
 
 .main .content {
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
   padding-bottom: 7.5rem;
@@ -8287,6 +8971,7 @@ button.close {
 
 .panel-right {
   padding-right: 1.125rem;
+  -webkit-box-ordinal-group: 4;
   -ms-flex-order: 3;
   order: 3;
 }
@@ -8312,7 +8997,7 @@ button.close {
   transform: translate3d(222px, 0, 0);
 }
 
-.drawer-show .main:after {
+.drawer-show .main::after {
   position: absolute;
     display: block;
     width: 100%;
@@ -8326,6 +9011,14 @@ button.close {
 
 .drawer-toggle {
   display: none;
+}
+
+.drawer-only {
+  display: none;
+}
+
+.drawer-show .drawer-only {
+  display: block;
 }
 
 @media (max-width: 991px) {
@@ -8364,6 +9057,7 @@ button.close {
 }
 
 .table-data td.options .btn-group {
+  -webkit-box-pack: end;
   -ms-flex-pack: end;
   justify-content: flex-end;
 }
@@ -8449,25 +9143,38 @@ button.close {
   padding-right: 1.125rem;
 }
 
-.tj-meta {
+.tj-meta,
+.table-meta {
   margin-top: 0.5625rem;
 }
 
-.tj-meta .table-meta-item {
+.tj-meta + .tj-meta,
+.table-meta + .tj-meta, .tj-meta +
+.table-meta,
+.table-meta +
+.table-meta {
+  margin-top: 0;
+}
+
+.tj-meta .table-meta-item,
+.table-meta .table-meta-item {
   font-size: 0.75rem;
 }
 
-.tj-meta .table-meta-item-label {
+.tj-meta .table-meta-item-label,
+.table-meta .table-meta-item-label {
   font-weight: 500;
 }
 
-.tj-meta .table-meta-item-label a {
+.tj-meta .table-meta-item-label a,
+.table-meta .table-meta-item-label a {
   color: #555a62;
   pointer-events: none;
   cursor: default;
 }
 
-.tj-meta .media-sm {
+.tj-meta .media-sm,
+.table-meta .media-sm {
   display: inline-block;
 }
 
@@ -8476,7 +9183,13 @@ button.close {
 .tj-meta .media-sm .FeedItem .FeedDescription, .FeedItem
 .tj-meta .media-sm .FeedDescription,
 .tj-meta .media-sm .FeedItem .Date, .FeedItem
-.tj-meta .media-sm .Date {
+.tj-meta .media-sm .Date,
+.table-meta .media-sm .media-left,
+.table-meta .media-sm .info,
+.table-meta .media-sm .FeedItem .FeedDescription, .FeedItem
+.table-meta .media-sm .FeedDescription,
+.table-meta .media-sm .FeedItem .Date, .FeedItem
+.table-meta .media-sm .Date {
   display: none;
 }
 
@@ -8486,6 +9199,8 @@ button.close {
 
 .table-checkbox-grid .checkbox {
   margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .table-checkbox-grid th {
@@ -8502,7 +9217,7 @@ button.close {
 
 .table-checkbox-grid thead td {
   text-align: center;
-  padding: 0.5625rem 0.5625rem;
+  padding: 0.5625rem;
   border: 1px solid #eee;
   border-top: 1px solid #ddd;
   text-transform: uppercase;
@@ -8560,15 +9275,18 @@ button.close {
 }
 
 .summaries {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
 .summaries > * {
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
   max-width: 50%;
@@ -8611,8 +9329,8 @@ button.close {
   border-bottom: 0.0625rem solid #ddd;
 }
 
-.table-summary thead th:first-child,
-.table-summary thead td:first-child {
+.table-summary thead th .table-summary-cell-main,
+.table-summary thead td .table-summary-cell-main {
   width: 100%;
   min-width: 7.5rem;
 }
@@ -8635,7 +9353,7 @@ button.close {
   background: #333;
   border: 0.0625rem solid #000;
   opacity: .9;
-  box-shadow: inset 0px 0px 1px 0px rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 0 1px 0 rgba(255, 255, 255, 0.72);
   border-radius: 0.125rem;
 }
 
@@ -8682,10 +9400,18 @@ button.close {
 }
 
 .toolbar {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
+  -webkit-box-align: start;
   -ms-flex-align: start;
   align-items: flex-start;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding-top: 0.5625rem;
@@ -8695,10 +9421,13 @@ button.close {
 
 .toolbar > * {
   margin-top: 0.5625rem;
-  margin-right: 1.125rem;
+  padding-right: 1.125rem;
+  -ms-flex-negative: 2;
+      flex-shrink: 2;
 }
 
 .toolbar .toolbar-buttons {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: nowrap;
@@ -8715,8 +9444,10 @@ button.close {
 }
 
 .toolbar .toolbar-main {
-  -ms-flex-positive: 1;
-  flex-grow: 1;
+  -ms-flex-preferred-size: 30.875rem;
+      flex-basis: 30.875rem;
+  -ms-flex-negative: 1;
+      flex-shrink: 1;
 }
 
 .pager-count {
@@ -8731,89 +9462,77 @@ button.close {
 }
 
 .pager {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
   -ms-flex-wrap: nowrap;
   flex-wrap: nowrap;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
-}
-
-.hero {
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-align: center;
-  align-items: center;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  padding: 2.25rem 1.125rem;
-}
-
-.hero > * {
-  -ms-flex-positive: 1;
-  flex-grow: 1;
-}
-
-.hero .label-selector {
-  margin-left: 0;
-  margin-right: 0;
-}
-
-.hero .hero-content {
-  padding: 0 6.75rem 0 4.5rem;
-  font-size: 0.8125rem;
-  text-align: center;
-  -ms-flex-negative: 1;
-  flex-shrink: 1;
-}
-
-.hero .tagline {
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.hero .vanilla-logo {
-  width: 6.75rem;
-  height: 4.5rem;
-}
-
-.hero .btn, .hero .file-upload-browse, .hero .Button {
-  margin-top: 2.25rem;
-}
-
-.hero .hero-media-wrapper {
-  -ms-flex-negative: 0;
-  flex-shrink: 0;
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
 }
 
 .video-section-heading {
+  display: block;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
   padding: 1.125rem 0;
   font-weight: 500;
 }
 
-.video.label-selector-item .video-title {
+.Section-Tutorials .label-selector {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.Section-Tutorials .hero .label-selector-item {
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 100%;
+          flex: 0 0 100%;
+}
+
+.Section-Tutorials .tagline {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.Section-Tutorials .vanilla-logo {
+  width: 6.75rem;
+  height: 4.5rem;
+}
+
+.Section-Tutorials .video.label-selector-item a {
+  color: #fff;
+}
+
+.Section-Tutorials .video.label-selector-item .video-title {
   font-size: 0.75rem;
   text-align: left;
 }
 
-.video.label-selector-item .overlay {
+.Section-Tutorials .video.label-selector-item .overlay {
   background-color: rgba(0, 0, 0, 0.75);
 }
 
-.video.label-selector-item.current .overlay {
+.Section-Tutorials .video.label-selector-item.current .overlay {
   height: 100%;
 }
 
-.video.label-selector-item svg {
-  fill: #fff;
+.Section-Tutorials .video.label-selector-item svg {
   width: 40%;
 }
 
-.video-section .info, .video-section .FeedItem .FeedDescription, .FeedItem .video-section .FeedDescription, .video-section .FeedItem .Date, .FeedItem .video-section .Date {
+.Section-Tutorials .video-section .info, .Section-Tutorials .video-section .FeedItem .FeedDescription, .FeedItem .Section-Tutorials .video-section .FeedDescription, .Section-Tutorials .video-section .FeedItem .Date, .FeedItem .Section-Tutorials .video-section .Date {
   padding-top: 1.125rem;
 }
 
-.video-section:first-child .video-section-heading {
+.Section-Tutorials .video-section:first-child .video-section-heading {
   border-top: 0.0625rem solid #f6f9fb;
 }
 
@@ -8822,10 +9541,13 @@ button.close {
 }
 
 .category-url-code {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: start;
   -ms-flex-pack: start;
   justify-content: flex-start;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -8843,10 +9565,6 @@ button.close {
   margin-right: 0;
 }
 
-.crop-label {
-  display: none;
-}
-
 .main .content .control-panel {
   display: none;
 }
@@ -8855,10 +9573,6 @@ button.close {
   .main .content .control-panel {
     display: block;
   }
-}
-
-.filter-date {
-  min-width: 11.5rem;
 }
 
 table h2, table .analytics-widget-header .title, .analytics-widget-header table .title,
@@ -8873,6 +9587,7 @@ form .title {
 }
 
 body {
+  -webkit-transition: all 250ms;
   transition: all 250ms;
 }
 
@@ -8884,6 +9599,10 @@ ul {
   background-color: #fff;
   border-left: 0.0625rem solid #e7e8e9;
   border-right: 0.0625rem solid #e7e8e9;
+}
+
+.nestable-collapse ~ .nestable-content > .plank-title {
+  padding-left: 2.4375rem;
 }
 
 h1, .h1,
@@ -8943,7 +9662,7 @@ pre {
   white-space: pre-wrap;
 }
 
-.full-border, .video-section-heading, .heading-h1-block, .content > h1, .header-block, .header-menu, .subheading-border, .subheading-block {
+.full-border {
   display: block;
   margin-left: -1.125rem;
   margin-right: -1.125rem;
@@ -8952,20 +9671,31 @@ pre {
   border-bottom: 0.0625rem solid #e7e8e9;
 }
 
-.heading-h1-block, .content > h1 {
+.content > h1 {
+  display: block;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
+  font-size: 1.125rem;
+  margin-bottom: 0;
   padding-bottom: 1.125rem;
 }
 
-.heading-h1, .heading-h1-block, .content > h1, .header-block h1 {
-  font-size: 1.125rem;
-  margin-bottom: 0;
-}
-
 .header-block {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
   padding-top: 0.5625rem;
@@ -8976,9 +9706,11 @@ pre {
 .header-block h1 {
   margin: 0;
   padding: 0.5625rem 0;
+  font-size: 1.125rem;
 }
 
 .title-block {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
 }
@@ -8995,15 +9727,23 @@ pre {
   width: 1.125rem;
 }
 
-.btn-return:hover svg {
-  fill: #0291db;
+.btn-return:hover {
+  color: #0291db;
 }
 
 .header-menu {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-bottom: 0.0625rem solid #e7e8e9;
+  -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -9026,7 +9766,7 @@ pre {
 .file-upload input:hover ~ .header-menu-item.file-upload-choose,
 .file-upload .header-menu input:hover ~ .header-menu-item.file-upload-choose, .header-menu
 .file-upload input:hover ~ .header-menu-item.file-upload-browse,
-.file-upload .header-menu input:hover ~ .header-menu-item.file-upload-browse {
+.file-upload .header-menu input:hover ~ .header-menu-item.file-upload-browse, .header-menu select.header-menu-item:focus, .header-menu .header-menu-item.drop-enabled {
   border-bottom-color: #0291db;
   color: #0291db;
 }
@@ -9035,21 +9775,33 @@ pre {
   color: #0291db;
 }
 
-.subheading-border {
+.subheading {
+  display: block;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-top: 0.0625rem solid #e7e8e9;
   margin-top: -0.0625rem;
   padding-top: 1.125rem;
-  padding-bottom: 1.125rem;
+  padding-bottom: 0.5625rem;
   margin-bottom: 0;
-  font-size: 0.875rem;
+  font-size: 1rem;
   line-height: 1.5;
   font-weight: 500;
   border-top: 0.0625rem solid #e7e8e9;
 }
 
 .subheading-block {
+  display: block;
+  margin-left: -1.125rem;
+  margin-right: -1.125rem;
+  padding-left: 1.125rem;
+  padding-right: 1.125rem;
+  border-top: 0.0625rem solid #e7e8e9;
   margin-top: -0.0625rem;
   padding-top: 1.125rem;
-  padding-bottom: 1.125rem;
+  padding-bottom: 0.5625rem;
   border-top: 0.0625rem solid #e7e8e9;
 }
 
@@ -9071,7 +9823,7 @@ pre {
   border-style: solid;
   border-color: #f5296d;
   border-right-color: transparent;
-  border-width: 0.5625rem 0.5625rem;
+  border-width: 0.5625rem;
   text-transform: uppercase;
 }
 
@@ -9088,6 +9840,66 @@ pre {
 
 .btn-group .badge {
   margin-top: -0.125rem;
+}
+
+.badge.badge-outline {
+  background-color: transparent;
+  color: rgba(0, 0, 0, 0.3275);
+  border: 0.0625rem solid rgba(0, 0, 0, 0.25);
+}
+
+.badge-primary {
+  background-color: #0291db;
+}
+
+.badge-primary.badge-outline {
+  color: #0291db;
+  border-color: #0291db;
+}
+
+.badge-secondary {
+  background-color: #f5296d;
+}
+
+.badge-secondary.badge-outline {
+  color: #f5296d;
+  border-color: #f5296d;
+}
+
+.badge-success {
+  background-color: #6bc573;
+}
+
+.badge-success.badge-outline {
+  color: #6bc573;
+  border-color: #6bc573;
+}
+
+.badge-info {
+  background-color: #a1b8c6;
+}
+
+.badge-info.badge-outline {
+  color: #a1b8c6;
+  border-color: #a1b8c6;
+}
+
+.badge-warning {
+  background-color: #faae42;
+}
+
+.badge-warning.badge-outline {
+  color: #faae42;
+  border-color: #faae42;
+}
+
+.badge-danger {
+  background-color: #fa2e1f;
+}
+
+.badge-danger.badge-outline {
+  color: #fa2e1f;
+  border-color: #fa2e1f;
 }
 
 .text-primary {
@@ -9119,11 +9931,11 @@ pre {
   padding: 0 .25rem;
 }
 
-.reverse-link, .label-selector .title a, .FeedItem h2 a, .FeedItem .analytics-widget-header .title a, .analytics-widget-header .FeedItem .title a {
+.reverse-link {
   color: #555a62;
 }
 
-.reverse-link:hover, .label-selector .title a:hover, .FeedItem h2 a:hover, .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .FeedItem .title a:hover {
+.reverse-link:hover {
   color: #0291db;
 }
 
@@ -9169,6 +9981,40 @@ strong,
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.Section-Error,
+.Section-Utility {
+  padding: 100px;
+  margin: 0;
+  background: url("images/eyes.png") 30px 30px no-repeat #fff;
+}
+
+@media (max-width: 991px) {
+  .Section-Error,
+  .Section-Utility {
+    padding: 10%;
+  }
+}
+
+.Section-Error {
+  background: url("images/error.png") 30px 30px no-repeat #fff;
+}
+
+.SplashInfo {
+  max-width: 800px;
+  color: #555a62;
+  font-size: 0.875rem;
+}
+
+.SplashInfo h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.SplashInfo h2, .SplashInfo .analytics-widget-header .title, .analytics-widget-header .SplashInfo .title {
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 
 .Section-Dashboard.Message.index {
@@ -9349,6 +10195,14 @@ strong,
   line-height: 1.3333333333;
 }
 
+.FeedItem h2 a, .FeedItem .analytics-widget-header .title a, .analytics-widget-header .FeedItem .title a {
+  color: #555a62;
+}
+
+.FeedItem h2 a:hover, .FeedItem .analytics-widget-header .title a:hover, .analytics-widget-header .FeedItem .title a:hover {
+  color: #0291db;
+}
+
 .FeedItem .FeedDescription {
   margin-bottom: -0.125rem;
   font-weight: 300;
@@ -9361,6 +10215,10 @@ strong,
 .FeedItem .FeedDescription p {
   margin-bottom: 0;
   display: inline-block;
+}
+
+.FeedItem .FeedDescription img {
+  display: none;
 }
 
 .FeedItem .FeedDescription .details p {
@@ -9452,180 +10310,6 @@ strong,
 
 .InformMessages .Messages.Errors li {
   list-style: none;
-}
-
-.dd {
-  color: #555a62;
-  padding: 0 0 18px;
-  position: relative;
-  fill: #555a62;
-}
-
-.dd * {
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-}
-
-.dd-list {
-  position: relative;
-}
-
-.dd-list .dd-list {
-  padding-left: 30px;
-}
-
-.dd-item,
-.dd-empty,
-.dd-placeholder {
-  display: block;
-  position: relative;
-  margin: 0;
-  padding: 0;
-  min-height: 2.25rem;
-}
-
-.dd-item > button {
-  border: 0;
-  background: none;
-  position: absolute;
-  top: 0;
-  left: 30px;
-  padding: 10px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.dd-item > button:active, .dd-item > button:hover {
-  color: #0291db;
-  fill: #0291db;
-}
-
-.dd-item .options {
-  position: absolute;
-  top: 0;
-  right: 0;
-  fill: rgba(85, 90, 98, 0.6);
-}
-
-.dd-item .options .dropdown-toggle {
-  padding: 0.375rem 0.625rem;
-  line-height: 1.375rem;
-}
-
-.dd-item .options svg {
-  height: 1rem;
-}
-
-.dd-handle {
-  padding: 0.625rem;
-  position: absolute;
-  margin: 0;
-  left: 0;
-  top: 0;
-  cursor: move;
-  cursor: -moz-grab;
-  cursor: grab;
-  line-height: 1;
-  fill: #e7e8e9;
-}
-
-.dd-handle:hover {
-  fill: rgba(85, 90, 98, 0.6);
-}
-
-.dd-content {
-  display: block;
-  border: solid 1px #e7e8e9;
-  background: #fdfdff;
-  border-radius: 2px;
-  padding: 6px 9px 6px 60px;
-  margin: 3px 0;
-  line-height: 22px;
-}
-
-.dd-dragel {
-  position: absolute;
-  pointer-events: none;
-  z-index: 9999;
-  margin-top: 0;
-  margin-left: 0;
-  opacity: .8;
-  cursor: -moz-grabbing;
-  cursor: grabbing;
-}
-
-.dd-dragel > .dd-item > .dd-handle {
-  fill: #555a62;
-}
-
-.dd-placeholder,
-.dd-empty {
-  margin: 3px 0;
-  padding: 0;
-  background: #f1faff;
-  border: 1px dashed #0291db;
-  min-height: 2.25rem;
-  border-radius: 2px;
-  cursor: -moz-grabbing;
-  cursor: grabbing;
-}
-
-.bigcrumbs {
-  border-bottom: solid 1px #e7e8e9;
-  fill: #555a62;
-  padding-left: 6px;
-}
-
-.bigcrumbs .crumb {
-  display: inline-block;
-  line-height: 24px;
-  padding: 6px 24px 6px 12px;
-  position: relative;
-  fill: #555a62;
-  color: #555a62;
-}
-
-.bigcrumbs .crumb:hover {
-  fill: #0291db;
-  color: #0291db;
-}
-
-.bigcrumbs .crumb:before, .bigcrumbs .crumb:after {
-  content: '';
-  display: block;
-  position: absolute;
-  top: -1px;
-  bottom: -1px;
-  right: -12px;
-  width: 0;
-  border: solid 12px transparent;
-  border-top-width: 19px;
-  border-bottom-width: 19px;
-  border-left-color: #e7e8e9;
-}
-
-.bigcrumbs .crumb:after {
-  content: '';
-  border-left-color: #fff;
-  right: -11px;
-}
-
-.bigcrumbs .crumb:before {
-  content: '';
-}
-
-.bigcrumbs .crumb:last-child:before, .bigcrumbs .crumb:last-child:after {
-  display: none;
-}
-
-.bigcrumbs .icon-root {
-  padding: 0 8px;
-  margin-bottom: 4px;
-}
-
-.heading-bar .actions {
-  float: right;
-  padding: 6px 18px 0 0;
 }
 
 .jcrop-holder {
@@ -9825,10 +10509,13 @@ img.jcrop-preview {
 }
 
 .flex {
+  display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -webkit-box-pack: justify;
   -ms-flex-pack: justify;
   justify-content: space-between;
+  -webkit-box-align: center;
   -ms-flex-align: center;
   align-items: center;
 }
@@ -9852,6 +10539,7 @@ img.jcrop-preview {
 }
 
 .grow {
+  -webkit-box-flex: 1;
   -ms-flex-positive: 1;
   flex-grow: 1;
 }
@@ -9862,6 +10550,7 @@ img.jcrop-preview {
 }
 
 .no-grow {
+  -webkit-box-flex: 0;
   -ms-flex-positive: 0;
   flex-grow: 0;
 }
@@ -9881,5 +10570,28 @@ img.jcrop-preview {
 
 .progress {
   background: url("images/progress.gif") center center no-repeat;
+}
+
+.foggy {
+  position: relative;
+  -webkit-filter: blur(2px);
+}
+
+.foggy input {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+}
+
+.foggy::before {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: .5;
+  background-color: #fff;
+  z-index: 1;
+  content: '';
 }
 /*# sourceMappingURL=admin.css.map */

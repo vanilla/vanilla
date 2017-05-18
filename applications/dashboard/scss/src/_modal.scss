@@ -65,9 +65,10 @@
 
 // Modal Confirm
 //
-// This modal navigates to the url if the user confirms and cancels the navigation if the user declines. It's often
-// paired with `.js-hijack` to delete content at the given endpoint. By default, the confirm modal has the `.modal-sm`
-// class attached to it, but this can be overridden.
+// This modal navigates to the url if the user confirms and cancels the navigation if the user declines.
+// If the confirm is to direct the user to a new page (rather than ajax-style processing content at an endpoint),
+// add the attribute: `data-follow-link: true`. By default, the confirm modal has the `.modal-sm` class
+// attached to it, but this can be overridden.
 //
 // Markup:
 // <a href="#" class="js-modal" data-modal-type="confirm">
@@ -218,7 +219,6 @@
   position: relative;
   max-height: calc(94vh - (2 * #{$header-block-height}));
   overflow-y: auto;
-
   padding: 0 $modal-inner-padding;
 
   .modal-confirm & {
@@ -268,6 +268,7 @@
     transform: none;
     opacity: 0;
   }
+
   &.in .modal-dialog {
     transform: none;
     -webkit-filter: none;
@@ -312,7 +313,7 @@
     display: block;
     width: 100%;
     height: 1rem;
-    box-shadow: inset 0px -.75rem .75rem 0px rgba(255,255,255,1);
+    box-shadow: inset 0 -.75rem .75rem 0 rgba(255,255,255,1);
     content: '';
   }
 }
@@ -362,22 +363,28 @@ button.close {
   ol {
     margin-left: 15px;
   }
+
   ul li {
     list-style: disc inside;
   }
+
   ol li {
     list-style: decimal inside;
   }
+
   ul ul,
   ol ul {
     margin-left: 30px;
+
     li {
       list-style: circle inside;
     }
   }
+
   ol ol,
   ul ol {
     margin-left: 15px;
+
     li {
       list-style: lower-latin inside;
     }

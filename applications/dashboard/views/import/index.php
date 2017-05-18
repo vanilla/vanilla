@@ -2,7 +2,7 @@
 
 $links = '<ul>';
 $links .= '<li>'.anchor(t('Importing to Vanilla'), 'http://docs.vanillaforums.com/developers/importing/').'</li>';
-$links .= '<li>'.anchor(t('The Vanilla 2 Exporter'), 'http://vanillaforums.org/addon/porter-core').'</li>';
+$links .= '<li>'.anchor(t('The Vanilla 2 Exporter'), 'https://open.vanillaforums.com/addon/porter-core').'</li>';
 $links .= '</ul>';
 
 helpAsset(t('Need More Help?'), $links);

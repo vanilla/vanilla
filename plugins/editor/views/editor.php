@@ -3,15 +3,11 @@
 $format = strtolower($this->data('_EditorInputFormat'));
 $html_toolbar = ''; // for regular text
 
-$css_upload_class = ($this->data('_canUpload'))
-   ? 'editor-uploads'
-   : 'editor-uploads-disabled';
-
 $css_ismobile_class = (IsMobile())
    ? 'editor-mobile'
    : 'editor-desktop';
 
-$html_toolbar = '<div class="editor editor-format-'.$format.' '.$css_upload_class.' '.$css_ismobile_class.'">';
+$html_toolbar = '<div class="editor editor-format-'.$format.' '.$css_ismobile_class.'">';
 $html_arrow_down = '<span class="icon icon-caret-down"></span>';
 $editor_file_input_name = $this->data('_editorFileInputName');
 
@@ -70,21 +66,40 @@ foreach ($this->data('_EditorToolbar') as $button) {
                , 'div', array('class' => 'editor-dropdown editor-dropdown-image'));
             break;
 
-         case 'upload':
+         case 'fileupload':
+            $accept = $this->data('Accept', '');
             $html_toolbar .= wrap(
-               wrap($html_arrow_down, 'span', $button['attr']).''.
-               '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
-                     <div id="drop-cue-dropdown" class="drop-section file-drop">
-                        '.t('Drop image/file').'
+                wrap($html_arrow_down, 'span', $button['attr']).''.
+                '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
+                     <div class="file-title">'.t('Attach a file').' 
+                        <span class="js-can-drop info">'.t('you can also drag-and-drop').'</span>
                      </div>
-                     <div class="drop-section file-input">
-                        <span class="file-or">'.t('or').'</span> <input type="file" name="'.$editor_file_input_name.'[]" multiple />
+                     <div class="dd-separator" role="presentation"></div>
+                     <div class="file-input">
+                        <input type="file" name="'.$editor_file_input_name.'[]" multiple data-upload-type="file" accept="'.$accept.'" />
                      </div>
-                     <div class="drop-section image-input" title="'.t('Paste the URL of an image to quickly embed it.').'">
+                  </div>'
+                , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
+            break;
+
+         case 'imageupload':
+            $accept = $this->data('AcceptImage', '');
+            $html_toolbar .= wrap(
+                wrap($html_arrow_down, 'span', $button['attr']).''.
+                '<div class="editor-insert-dialog Flyout MenuItems editor-file-image">
+                     <div class="file-title">'.t('Insert an image').' 
+                        <span class="js-can-drop info">'.t('you can also drag-and-drop').'</span>
+                     </div>
+                     <div class="dd-separator" role="presentation"></div>
+                     <div class="file-input">
+                        <input type="file" name="'.$editor_file_input_name.'[]" multiple data-upload-type="image" accept="'.$accept.'" />
+                     </div>
+                     <div class="dd-separator" role="presentation"></div>
+                     <div class="image-input" title="'.t('Paste the URL of an image to quickly embed it.').'">
                         <input class="InputBox editor-input-image" placeholder="'.t('Image URL').'" />
                      </div>
                   </div>'
-               , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
+                , 'div', array('class' => 'editor-dropdown editor-dropdown-upload'));
             break;
 
          case 'color':

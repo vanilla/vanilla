@@ -2,7 +2,7 @@
 /**
  * Messages controller.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Conversations
  * @since 2.0
@@ -60,12 +60,16 @@ class MessagesController extends ConversationsController {
         $this->permission('Conversations.Conversations.Add');
         $this->Form->setModel($this->ConversationModel);
 
-        // Set recipient limit
-        if (!checkPermission('Garden.Moderation.Manage') && c('Conversations.MaxRecipients')) {
-            $this->addDefinition('MaxRecipients', c('Conversations.MaxRecipients'));
-            $this->setData('MaxRecipients', c('Conversations.MaxRecipients'));
+        // Detect our recipient limit.
+        $maxRecipients = ConversationModel::getMaxRecipients();
+
+        // Set recipient limit for the frontend.
+        if ($maxRecipients) {
+            $this->addDefinition('MaxRecipients', $maxRecipients);
+            $this->setData('MaxRecipients', $maxRecipients);
         }
 
+        // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
             $RecipientUserIDs = array();
             $To = explode(',', $this->Form->getFormValue('To', ''));
@@ -88,7 +92,7 @@ class MessagesController extends ConversationsController {
                         "You are limited to %s recipient.",
                         "You are limited to %s recipients."
                     ),
-                    c('Conversations.MaxRecipients')
+                    $maxRecipients
                 ));
             }
 

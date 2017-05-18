@@ -1,47 +1,101 @@
 <?php
+/**
+ *
+ */
 
-function writeCategoryTree($categories, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
-
-    echo "$i<ol class=\"dd-list tree-list list-reset\">\n";
+/**
+ * @param array $categories
+ * @param int $indent
+ * @param bool $allowSorting
+ */
+function writeCategoryTree($categories, $allowSorting = true) {
+    echo "<ol class=\"js-nestable-list nestable-list\">\n";
 
     foreach ($categories as $category) {
-        writeCategoryItem($category, $indent + 1, $allowSorting);
+        writeCategoryItem($category, $allowSorting);
     }
-    echo "$i</ol>\n";
+    echo "</ol>\n";
 }
 
-function writeCategoryItem($category, $indent = 0, $allowSorting = true) {
-    $i = str_repeat('  ', $indent);
+/**
+ * Returns the HTML for a category filter input box for the dashboard.
+ *
+ * @param array $options
+ * @return string
+ */
+function categoryFilterBox(array $options = []) {
+    $form = new Gdn_Form('');
 
-    echo "$i<li class=\"dd-item tree-item\" data-id=\"{$category['CategoryID']}\">\n$i";
-    if ($allowSorting) {
-        echo "$i  <div class=\"dd-handle tree-handle\">".symbol('handle', t('Drag'))."</div>";
+    $containerSelector = isset($options['containerSelector']) ? $options['containerSelector'] : '.js-category-filter-container';
+    $cssClass = isset($options['cssClass']) ? $options['cssClass'] : 'form-control';
+    $useSearchInput = isset($options['useSearchInput']) ? $options['useSearchInput'] : true;
+    $hideContainerSelector = isset($options['hideContainerSelector']) ? $options['hideContainerSelector'] : '';
+    $limit = isset($options['limit']) ? $options['limit'] : 300;
+    $parentID = isset($options['parentID']) ? $options['parentID'] : Gdn::controller()->data('ParentID', -1);
+
+    $attr = [
+        'class' => 'js-category-filter-input '.$cssClass,
+        'placeholder' => t('Search'),
+        'data-category-id' => $parentID,
+        'data-limit' => $limit,
+        'data-container' => $containerSelector
+    ];
+
+    if ($hideContainerSelector) {
+        $attr['data-hide-container'] = $hideContainerSelector;
     }
-    echo "<div class=\"dd-content tree-content\">";
+
+    if ($useSearchInput) {
+        return $form->searchInput('', '', $attr, '', ['class' => 'toolbar-main']);
+    }
+
+    return $form->input('', '', $attr);
+}
+
+/**
+ *
+ *
+ * @param array $category
+ * @param int $indent
+ * @param bool $allowSorting
+ */
+function writeCategoryItem($category, $allowSorting = true) {
+    $categoryID = $category['CategoryID'];
+    $handle = $allowSorting ? '<div class="js-nestable-handle nestable-handle"></div>' : '';
+    $icon = $allowSorting ? '<div class="btn btn-icon plank-icon">'.symbol('handle', t('Drag')).'</div>' : '';
+    $categoryName = htmlspecialchars($category['Name']);
 
     if (in_array($category['DisplayAs'], ['Categories', 'Flat'])) {
-        echo anchor(
-            htmlspecialchars($category['Name']),
-            '/vanilla/settings/categories?parent='.urlencode($category['UrlCode'])
-        );
-    } else {
-        echo htmlspecialchars($category['Name']);
+        $url = '/vanilla/settings/categories?parent='.urlencode($category['UrlCode']);
+        $categoryName = anchor($categoryName, $url);
     }
-
-    echo "\n$i  <div class=\"options\">";
-    writeCategoryOptions($category);
-    echo "</div>";
-
-    echo "</div>\n";
-
-    if (!empty($category['Children'])) {
-        writeCategoryTree($category['Children'], $indent + 1);
-    }
-
-    echo "$i</li>\n";
+    ?>
+    <li class="js-nestable-item js-category-item nestable-item" data-id="<?php echo $categoryID; ?>">
+        <?php echo $handle; ?>
+        <div class="nestable-content plank">
+            <?php echo $icon; ?>
+            <div class="plank-title">
+                <?php echo $categoryName; ?>
+            </div>
+            <div class="plank-options">
+                <?php writeCategoryOptions($category); ?>
+            </div>
+        </div>
+        <?php
+        if (!empty($category['Children'])) :
+            writeCategoryTree($category['Children'], $allowSorting);
+        endif;
+        ?>
+    </li>
+    <?php
 }
 
+/**
+ *
+ *
+ * @param string $displayAs
+ * @return string
+ */
 function displayAsSymbol($displayAs) {
     switch (strtolower($displayAs)) {
         case 'heading':
@@ -56,6 +110,13 @@ function displayAsSymbol($displayAs) {
     }
 }
 
+/**
+ *
+ *
+ * @param $name
+ * @param string $alt
+ * @return string
+ */
 function symbol($name, $alt = '') {
     if (!empty($alt)) {
         $alt = 'alt="'.htmlspecialchars($alt).'" ';
@@ -68,54 +129,23 @@ EOT;
     return $r;
 }
 
+/**
+ *
+ *
+ * @param array $category
+ */
 function writeCategoryOptions($category) {
-    $cdd = new DropdownModule('', '', 'dropdown-category-options', 'dropdown-menu-right');
-    $cdd->setTrigger(displayAsSymbol($category['DisplayAs']), 'button', 'btn');
-    $cdd->setView('dropdown-twbs');
-    $cdd->setForceDivider(true);
-
-    $cdd->addGroup('', 'edit')
-        ->addLink(t('View'), $category['Url'], 'edit.view')
-        ->addLink(t('Edit'), "/vanilla/settings/editcategory?categoryid={$category['CategoryID']}", 'edit.edit');
-
-    $cdd->addGroup(t('Display as'), 'displayas');
-
-    foreach (CategoryModel::getDisplayAsOptions() as $displayAs => $label) {
-        $cssClass = strcasecmp($displayAs, $category['DisplayAs']) === 0 ? 'selected': '';
-
-        $icon = displayAsSymbol($displayAs);
-
-        $cdd->addLink(
-            t($label),
-            '#',
-            'displayas.'.strtolower($displayAs),
-            'js-displayas '.$cssClass,
-            [],
-            ['icon' => $icon, 'attributes' => ['data-displayas' => strtolower($displayAs)]],
-            false
-        );
-    }
-
-    $cdd->addGroup('', 'actions')
-        ->addLink(
-            t('Add Subcategory'),
-            "/vanilla/settings/addcategory?parent={$category['CategoryID']}",
-            'actions.add'
-        );
-
-    $cdd->addGroup('', 'delete')
-        ->addLink(
-            t('Delete'),
-            "/vanilla/settings/deletecategory?categoryid={$category['CategoryID']}",
-            'delete.delete',
-            'js-modal'
-        );
-
+    $cdd = CategoryModel::getCategoryDropdown($category);
     echo $cdd->toString();
 }
 
+/**
+ *
+ *
+ * @param array $ancestors
+ */
 function writeCategoryBreadcrumbs($ancestors) {
-    echo '<div class="bigcrumbs full-border">';
+    echo '<div class="bigcrumbs">';
 
     writeCategoryBreadcrumb(
         t('Home'),
@@ -139,6 +169,13 @@ function writeCategoryBreadcrumbs($ancestors) {
     echo '</div>';
 }
 
+/**
+ *
+ *
+ * @param string $text
+ * @param string $uri
+ * @param string $cssClass
+ */
 function writeCategoryBreadcrumb($text, $uri, $cssClass = '') {
     echo anchor($text, $uri, trim('crumb '.$cssClass));
 }

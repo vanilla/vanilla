@@ -4,26 +4,39 @@
  *
  * This is the expected construction for the color picker (can be built using Gdn_Form's color() method):
  *
- * <div class="js-color-picker color-picker input-group">
+ * <div class="js-color-picker color-picker input-group" data-allow-empty="false">
  *     <input type="text" class="js-color-picker-value color-picker-value InputBox Hidden">
  *     <input type="text" class="js-color-picker-text color-picker-text InputBox">
  *     <span class="js-color-picker-preview color-picker-preview"></span>
  *     <input type="color" class="js-color-picker-color color-picker-color">
  * </div>
+ *
+ * You can set whether or not to allow empty values usings the data-allow-empty attribute.
  */
 
 /**
- * @type {{start: Function, isHex: Function, normalizeHex: Function}}
+ * @type {{start: Function, isValid: Function, isHex: Function, normalizeHex: Function}}
  */
 var colorPicker = {
+
     /**
      * Starts the color picker javascript
      */
     start: function($input) {
+        var allowEmpty = false;
+
+        if ($input.data('allowEmpty') === true) {
+            allowEmpty = true;
+        }
+
         if ($input.find('.js-color-picker-value').val()) {
             var color = $input.find('.js-color-picker-value').val();
             $input.find('.js-color-picker-text').val(color);
             $input.find('.js-color-picker-preview').css('background-color', color);
+        } else {
+            // Empty value
+            $input.find('.js-color-picker-text').val('');
+            $input.find('.js-color-picker-preview').css('background-color', 'transparent');
         }
 
         // Selecting based on picker
@@ -36,11 +49,23 @@ var colorPicker = {
 
         // Selecting based on text
         $input.find('.js-color-picker-text').on('input', function () {
-            if (colorPicker.isHex($(this).val())) {
+            var candidateColor = $(this).val();
+            var color;
+
+            if (colorPicker.isHex(candidateColor)) {
                 color = colorPicker.normalizeHex($(this).val());
-                $input.find('.js-color-picker-color').val(color);
-                $input.find('.js-color-picker-preview').css('background-color', color);
-                $input.find('.js-color-picker-value').val(color);
+                $input.find('.js-color-picker-color').val(color); // set color picker value
+            } else if (colorPicker.isValidNonColor(candidateColor)) {
+                color = $(this).val()
+            } else if (allowEmpty && candidateColor === '') {
+                // The text field is empty. Set preview to tranparent and value to empty.
+                $input.find('.js-color-picker-preview').css('background-color', 'transparent');
+                $input.find('.js-color-picker-value').val('');
+            }
+
+            if (color !== undefined) {
+                $input.find('.js-color-picker-preview').css('background-color', color); // set preview color
+                $input.find('.js-color-picker-value').val(color); // set value
             }
         });
 
@@ -52,9 +77,23 @@ var colorPicker = {
     },
 
     /**
+     * Tests whether the color value is in the valid values list below.
+     *
+     * @param string The string to test.
+     * @returns {boolean} Whether the value is in the valid values list.
+     */
+    isValidNonColor: function(string) {
+        var validValues = ['transparent', 'inherit', 'initial'];
+        if (validValues.indexOf(string.toLowerCase()) > -1) {
+            return true;
+        }
+        return false;
+    },
+
+    /**
      * Tests whether we have a valid six or three-character hex code, with or without the opening hash.
      *
-     * @param string The hex code to test.
+     * @param string The string to test.
      * @returns {boolean} Whether the hex code is valid.
      */
     isHex: function(string) {

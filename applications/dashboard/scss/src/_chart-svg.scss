@@ -15,7 +15,7 @@ $chart-12: #234eba;
 $chart-13: #009ea5;
 $chart-14: #957a99;
 
-$chart-bg-opacity: 0.15;
+$chart-bg-opacity: .15;
 
 @mixin chart-variant($color) {
 
@@ -37,7 +37,7 @@ $chart-bg-opacity: 0.15;
   }
 
   .c3-event-rect:hover {
-    fill-opacity: 0.1 !important;
+    fill-opacity: .1 !important;
     fill: $color !important;
   }
 
@@ -57,25 +57,21 @@ $chart-bg-opacity: 0.15;
       text {
         text-anchor: middle !important;
       }
+
       line {
         display: none;
       }
     }
 
-    text{
+    text {
       font-size: $font-size-base;
       font-weight: 500;
       color: $grey-dark;
     }
-
-    tspan {
-      //fill: $white;
-      //background-color: $white;
-    }
   }
 
   .c3-axis-x {
-    text{
+    text {
       font-size: $font-size-sm;
       transform: translate(0,($spacer / 2));
     }
@@ -92,26 +88,15 @@ $chart-bg-opacity: 0.15;
   }
 
   .c3-line {
-    stroke: rgba(25, 25, 25, 0.2) !important;
-  }
-
-  .c3-event-rect:hover {
-    fill: red;
-  }
-
-  .c3-grid line {
-
+    stroke: rgba(25,25,25,.2) !important;
+    stroke-width: 2;
   }
 
   .c3-xgrid,
   .c3-ygrid {
     stroke-dasharray: 0;
-    stroke: rgba(85,89,97,0.12);
+    stroke: rgba(85,89,97,.12);
     stroke-width: 1;
-  }
-
-  .c3-line {
-    stroke-width: 2;
   }
 
   .c3-tooltip .name span {

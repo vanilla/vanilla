@@ -2,7 +2,7 @@
 /**
  * Perform miscellaneous operations for Dashboard.
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Dashboard
  * @since 2.0
@@ -12,6 +12,9 @@
  * Handles /utility endpoint.
  */
 class UtilityController extends DashboardController {
+
+    /** A flag used to indicate the site was put into maintenance mode in an automated fashion. */
+    const MAINTENANCE_AUTO = 2;
 
     /** @var array Models to automatically instantiate. */
     public $Uses = array('Form');
@@ -38,7 +41,6 @@ class UtilityController extends DashboardController {
      */
     public function initialize() {
         parent::initialize();
-        Gdn_Theme::section('Dashboard');
         set_time_limit(0); // Is this even doing anything?
     }
 
@@ -103,18 +105,46 @@ class UtilityController extends DashboardController {
      * @param string $TransientKey A unique transient key to authenticate that the user intended to perform this action.
      */
     public function set($UserPropertyColumn = '', $Name = '', $Value = '', $TransientKey = '') {
+        deprecated('set', '', 'February 2017');
+
+        $whiteList = [];
+
+        if (c('Garden.Profile.ShowActivities', true)) {
+            $whiteList = array_merge($whiteList, [
+                'Email.WallComment',
+                'Email.ActivityComment',
+                'Popup.WallComment',
+                'Popup.ActivityComment'
+            ]);
+        }
+
         $this->_DeliveryType = DELIVERY_TYPE_BOOL;
         $Session = Gdn::session();
         $Success = false;
-        if (in_array($UserPropertyColumn, array('preference', 'attribute'))
-            && $Name != ''
-            && $Value != ''
-            && $Session->UserID > 0
-            && $Session->validateTransientKey($TransientKey)
-        ) {
-            $UserModel = Gdn::factory("UserModel");
-            $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
-            $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
+
+        // Get index of whitelisted name
+        $index = array_search(strtolower($Name), array_map('strtolower', $whiteList));
+
+        if (!empty($whiteList) && $index !== false) {
+
+            // Force name to have casing present in whitelist
+            $Name = $whiteList[$index];
+
+            // Force value
+            if ($Value != '1') {
+                $Value = '0';
+            }
+
+            if (in_array($UserPropertyColumn, array('preference', 'attribute'))
+                && $Name != ''
+                && $Value != ''
+                && $Session->UserID > 0
+                && $Session->validateTransientKey($TransientKey)
+            ) {
+                $UserModel = Gdn::factory("UserModel");
+                $Method = $UserPropertyColumn == 'preference' ? 'SavePreference' : 'SaveAttribute';
+                $Success = $UserModel->$Method($Session->UserID, $Name, $Value) ? 'TRUE' : 'FALSE';
+            }
         }
 
         if (!$Success) {
@@ -277,18 +307,62 @@ class UtilityController extends DashboardController {
 
         $this->fireEvent('AfterUpdate');
 
+        if ($this->deliveryType() === DELIVERY_TYPE_DATA) {
+            // Make sure that we do not disclose anything too sensitive here!
+            $this->Data = array_filter($this->Data, function($key) {
+                return in_array(strtolower($key), ['success', 'error']);
+            }, ARRAY_FILTER_USE_KEY);
+        }
+
         $this->MasterView = 'empty';
         $this->CssClass = 'Home';
-        $this->render();
+        Gdn_Theme::section('Utility');
+        $this->render('update', 'utility', 'dashboard');
     }
 
     /**
-     * Because people try this a lot and get confused.
+     * Loads the files from resources/deletedfiles.txt into an array and returns it.
+     * Returns null if the deletedfiles.txt file is not found.
+     *
+     * @return array|null
+     */
+    private function loadDeleted() {
+        $deletedFilesPath = PATH_ROOT.'/resources/upgrade/deletedfiles.txt';
+        $deletedFiles = file($deletedFilesPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        return $deletedFiles;
+    }
+
+
+    /**
+     * Checks if any deleted files exist in the vanilla file structure. Saves an array of the existing deleted files
+     * to the data array.
+     */
+    private function checkDeleted() {
+        $deletedFiles = $this->loadDeleted();
+        $okFiles = ['.htaccess'];
+
+        $existingFiles = [];
+        if ($deletedFiles !== null) {
+            foreach ($deletedFiles as $file) {
+                if (file_exists(PATH_ROOT.DS.$file) && !in_array($file, $okFiles)) {
+                    $file = htmlspecialchars($file);
+                    $existingFiles[] = $file;
+                }
+            }
+            $this->setData('DeletedFiles', $existingFiles);
+        }
+    }
+
+    /**
+     * A special endpoint for users upgrading their Vanilla installation.
+     * Adds a special check for deleted files that may still exist post-upgrade.
      *
      * @since 2.0.18
      * @access public
      */
     public function upgrade() {
+        $this->permission('Garden.Settings.Manage');
+        $this->checkDeleted();
         $this->update();
     }
 
@@ -304,7 +378,7 @@ class UtilityController extends DashboardController {
         $this->CssClass = 'Home';
 
         $this->fireEvent('Alive');
-
+        Gdn_Theme::section('Utility');
         $this->render();
     }
 
@@ -361,6 +435,7 @@ class UtilityController extends DashboardController {
         $this->setData('time_s', $time);
         $this->setData('valid', $valid);
         $this->title('Ping');
+        Gdn_Theme::section('Utility');
 
         $this->render();
     }
@@ -492,7 +567,7 @@ class UtilityController extends DashboardController {
             $feedFormat = 'normal';
         }
 
-        echo file_get_contents("http://vanillaforums.org/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
+        echo file_get_contents("https://open.vanillaforums.com/vforg/home/getfeed/{$type}/{$length}/{$feedFormat}/?DeliveryType=VIEW");
         $this->deliveryType(DELIVERY_TYPE_NONE);
         $this->render();
     }
@@ -514,6 +589,38 @@ class UtilityController extends DashboardController {
         $this->addCssFile('vanillicon.css', 'static');
 
         $this->setData('_NoPanel', true);
+        $this->render();
+    }
+
+    /**
+     * Toggle whether or not the site is in maintenance mode.
+     *
+     * @param int $updateMode
+     */
+    public function maintenance($updateMode = 0) {
+        $this->permission('Garden.Settings.Manage');
+        $currentMode = c('Garden.UpdateMode');
+
+        /**
+         * If $updateMode is equal to self::MAINTENANCE_AUTO, it assumed this action was performed via an automated
+         * process.  A bit flag is added to the current value, so the original setting is restored, once maintenance
+         * mode is disabled through this endpoint.
+         */
+        if ($updateMode == self::MAINTENANCE_AUTO) {
+            // Apply the is-auto flag to the current maintenance setting, so the original setting can be retrieved.
+            $updateMode = ($currentMode | $updateMode);
+        } elseif ($updateMode == 0 && ($currentMode & self::MAINTENANCE_AUTO)) {
+            // If the is-auto flag is set, restore the original UpdateMode value.
+            $updateMode = ($currentMode & ~self::MAINTENANCE_AUTO);
+        } else {
+            $updateMode = (bool)$updateMode;
+        }
+
+        // Save the new setting and output the result.
+        saveToConfig('Garden.UpdateMode', $updateMode);
+        $this->setData(['UpdateMode' => $updateMode]);
+        $this->deliveryType(DELIVERY_TYPE_DATA);
+        $this->deliveryMethod(DELIVERY_METHOD_JSON);
         $this->render();
     }
 }

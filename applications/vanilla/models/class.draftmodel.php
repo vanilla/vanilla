@@ -2,7 +2,7 @@
 /**
  * Draft model
  *
- * @copyright 2009-2016 Vanilla Forums Inc.
+ * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
  * @package Vanilla
  * @since 2.0
@@ -11,7 +11,7 @@
 /**
  * Manages unpublished drafts of comments and discussions.
  */
-class DraftModel extends VanillaModel {
+class DraftModel extends Gdn_Model {
 
     /**
      * Class constructor. Defines the related database table name.
@@ -147,8 +147,8 @@ class DraftModel extends VanillaModel {
         }
 
         // Get the DraftID from the form so we know if we are inserting or updating.
-        $DraftID = val('DraftID', $formPostValues, '');
-        $Insert = $DraftID == '' ? true : false;
+        $DraftID = (int) val('DraftID', $formPostValues, 0);
+        $Insert = $DraftID === 0 ? true : false;
 
         if (!$DraftID) {
             unset($formPostValues['DraftID']);
@@ -161,7 +161,7 @@ class DraftModel extends VanillaModel {
 
         if ($Insert) {
             // If no categoryid is defined, grab the first available.
-            if (val('CategoryID', $formPostValues) === false) {
+            if (!is_numeric(val('CategoryID', $formPostValues, false))) {
                 $formPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
             }
 

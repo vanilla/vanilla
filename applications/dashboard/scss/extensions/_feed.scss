@@ -33,7 +33,7 @@
     line-height: $line-height-lg;
 
     a {
-      @extend .reverse-link;
+      @include reverse-link();
     }
   }
 
@@ -49,6 +49,10 @@
     p {
       margin-bottom: 0;
       display: inline-block;
+    }
+
+    img {
+      display: none;
     }
 
     .details p {

@@ -149,11 +149,15 @@ class Addon {
             list($addonParentFolder, $addonFolder) = explode('/', ltrim($subdir, '/'));
             if (in_array($addonParentFolder, ['applications', 'plugins'])) {
                 $info['oldType'] = substr($addonParentFolder, 0, -1);
-            }
 
-            // Kludge that sets keyRaw until we use key everywhere.
-            if ($addonFolder !== $info['key']) {
-                $info['keyRaw'] = $addonFolder;
+                // Kludge that sets keyRaw until we use key everywhere.
+                if ($info['oldType'] === 'application') {
+                    $info['keyRaw'] = $info['name'];
+                } else {
+                    if ($addonFolder !== strtolower($info['key'])) {
+                        $info['keyRaw'] = $addonFolder;
+                    }
+                }
             }
 
             return $info;

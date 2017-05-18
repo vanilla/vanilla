@@ -36,7 +36,7 @@ class NestedCollectionAdapter {
         if ($permission === false) {
             $permission = true;
         }
-        $key = slugify($group) . '.' . slugify($text);
+        $key = NavModule::textToKey($group.'.'.$text);
         $cssClass = val('class', $attributes, '');
         $this->siteNavModule->addLinkIf($permission, $text, $url, $key, $cssClass, [], $attributes);
         return $this;
@@ -55,7 +55,7 @@ class NestedCollectionAdapter {
         if ($permission === false) {
             $permission = true;
         }
-        $this->siteNavModule->addGroupIf($permission, $text, slugify($group), val('class', $attributes), '', $attributes);
+        $this->siteNavModule->addGroupIf($permission, $text, NavModule::textToKey($group), val('class', $attributes), '', $attributes);
         return $this;
     }
 

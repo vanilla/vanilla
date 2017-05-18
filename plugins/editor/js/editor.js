@@ -365,7 +365,7 @@
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
-                    var parentEl = $(e.target).parent();
+                    var parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
                     $('.editor-insert-dialog').each(function(i, el) {

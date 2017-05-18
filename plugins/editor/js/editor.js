@@ -1608,8 +1608,10 @@
                                             // after the insertion, and insert a break, because that will set the
                                             // caret to after the latest insertion.
                                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 

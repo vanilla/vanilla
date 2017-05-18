@@ -87,9 +87,10 @@ class CategoriesTest extends AbstractResourceTest {
     /**
      * Update a category row.
      *
+     * @param string $field The name of the field to patch.
      * @requires function CategoriesApiController::patch
      */
-    public function testPatchSparse() {
+    public function testPatchSparse($field) {
         $this->fail('Remove placeholder for CategoriesApiController::patch sparse test');
     }
 

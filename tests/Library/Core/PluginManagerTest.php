@@ -13,7 +13,7 @@ use Gdn_PluginManager;
 /**
  * Test the {@link Gdn_PluginManager} class.
  */
-class PluginManagerTest extends \PHPUnit_Framework_Testcase {
+class PluginManagerTest extends \PHPUnit\Framework\TestCase {
     /**
      * Test a basic usage of {@link Gdn_PluginManager::registerCallback}.
      */

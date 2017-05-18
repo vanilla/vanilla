@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\Container;
 /**
  * Tests for the {@link EventManager} class.
  */
-class EventManagerTest extends \PHPUnit_Framework_TestCase {
+class EventManagerTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Creates an {@link AddonManager} against Vanilla.
@@ -72,6 +72,9 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
                 continue;
             }
         }
+
+        // No exception so we are cool!
+        $this->assertTrue(true);
     }
 
     /**

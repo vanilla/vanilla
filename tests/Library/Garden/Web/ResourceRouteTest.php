@@ -16,7 +16,7 @@ use VanillaTests\Fixtures\Request;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class ResourceRouteTest extends \PHPUnit_Framework_TestCase {
+class ResourceRouteTest extends \PHPUnit\Framework\TestCase {
     /**
      * Create a new {@link ResourceRoute} initialized for testing with fixtures.
      */

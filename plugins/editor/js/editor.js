@@ -1690,6 +1690,13 @@
                                                 code.appendChild(selectedNodes);
                                                 range.insertNode(pre);
                                                 composer.selection.selectNode(code);
+
+                                                if ($(composer.element.lastChild).hasClass('CodeBlock')) {
+                                                    var bookmark = composer.selection.getBookmark();
+                                                    composer.selection.setAfter(composer.element.lastChild);
+                                                    composer.commands.exec("insertHTML", "<p><br></p>");
+                                                    composer.selection.setBookmark(bookmark);
+                                                }
                                             }
                                         },
                                         state: function(composer) {

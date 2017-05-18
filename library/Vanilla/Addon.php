@@ -154,7 +154,7 @@ class Addon {
                 if ($info['oldType'] === 'application') {
                     $info['keyRaw'] = $info['name'];
                 } else {
-                    if ($addonFolder !== strtolower($info['key'])) {
+                    if ($addonFolder !== $info['key']) {
                         $info['keyRaw'] = $addonFolder;
                     }
                 }

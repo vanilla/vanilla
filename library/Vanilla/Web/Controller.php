@@ -9,12 +9,16 @@ namespace Vanilla\Web;
 
 use Garden\EventManager;
 use Garden\Schema\Schema;
+use Garden\Schema\Validation;
+use Garden\Schema\ValidationException;
 use Garden\Web\Exception\ForbiddenException;
 use Garden\Web\Exception\HttpException;
 use Gdn_Session as SessionInterface;
 use Gdn_Locale as LocaleInterface;
+use Gdn_Validation as DataValidation;
 use Vanilla\Exception\PermissionException;
 use Vanilla\InjectableInterface;
+use Vanilla\Utility\CamelCaseScheme;
 
 /**
  * The controller base class.
@@ -182,5 +186,35 @@ abstract class Controller implements InjectableInterface {
     public function setLocale($locale) {
         $this->locale = $locale;
         return $this;
+    }
+
+    /**
+     * Given a model, analyze its validation property and return failures.
+     *
+     * @param object $model The model to analyze the Validation property of.
+     * @param bool $throw If errors are found, should an exception be thrown?
+     * @throws ValidationException if errors are detected and $throw is true.
+     * @return Validation
+     */
+    public function validateModel($model, $throw = true) {
+        $validation = new Validation();
+        $caseScheme = new CamelCaseScheme();
+
+        if (property_exists($model, 'Validation') && $model->Validation instanceof DataValidation) {
+            $results = $model->Validation->results();
+            $results = $caseScheme->convertArrayKeys($results);
+            foreach ($results as $field => $errors) {
+                foreach ($errors as $error) {
+                    $message = trim(sprintf(T($error), T($field)), '.').'.';
+                    $validation->addError($field, $message);
+                }
+            }
+        }
+
+        if ($throw && $validation->getErrorCount() > 0 ) {
+            throw new ValidationException($validation);
+        }
+
+        return $validation;
     }
 }

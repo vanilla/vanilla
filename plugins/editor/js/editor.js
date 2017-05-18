@@ -1634,8 +1634,10 @@
                                         exec: function(composer, command) {
                                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Quote", REG_EXP);
                                             if ($(composer.element.lastChild).hasClass('Quote')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 

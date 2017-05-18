@@ -549,24 +549,20 @@ class ProfileController extends Gdn_Controller {
 
         if ($type == '1') {
             Gdn_CookieIdentity::deleteCookie('X-UA-Device-Force');
-            redirect("/", 302);
-        }
-        if (in_array($type, array('mobile', 'desktop', 'tablet', 'app'))) {
-            $type = $type;
         } else {
-            $type = 'desktop';
-        }
+            if (in_array($type, array('mobile', 'desktop', 'tablet', 'app'))) {
+                $type = $type;
+            } else {
+                $type = 'desktop';
+            }
 
-        if ($type == '1') {
-            // Allow mobile again
-            Gdn_CookieIdentity::deleteCookie('VanillaNoMobile');
-        } else {
             // Set 48-hour "no mobile" cookie
             $Expiration = time() + 172800;
             $Path = c('Garden.Cookie.Path');
             $Domain = c('Garden.Cookie.Domain');
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
+
 
         $this->RedirectUrl = url('/');
         $this->render('Blank', 'Utility', 'Dashboard');

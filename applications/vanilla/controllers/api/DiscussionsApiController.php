@@ -126,6 +126,7 @@ class DiscussionsApiController extends AbstractApiController {
             'dateInserted:dt' => 'When the discussion was created.',
             'insertUserID:i' => 'The user that created the discussion.',
             'insertUser?' => $this->getUserFragmentSchema(),
+            'bookmarked:b' => 'Whether or no tthe discussion is bookmarked by the current user.',
             'announce:b' => 'Whether or not the discussion has been announced (pinned).',
             'closed:b' => 'Whether the discussion is closed or open.',
             'sink:b' => 'Whether or not the discussion has been sunk.',
@@ -163,6 +164,7 @@ class DiscussionsApiController extends AbstractApiController {
 
     public function massageRow(&$row) {
         $row['Announce'] = (bool)$row['Announce'];
+        $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
         $this->formatField($row, 'Body', $row['Format']);
 

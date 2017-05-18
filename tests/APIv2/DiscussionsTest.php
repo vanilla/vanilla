@@ -28,6 +28,7 @@ class DiscussionsTest extends AbstractResourceTest {
     public function providePutFields() {
         $fields = [
             'announce' => ['announce', true],
+            'bookmark' => ['bookmark', true, 'bookmarked'],
             'close' => ['close', true, 'closed'],
             'sink' => ['sink', true]
         ];

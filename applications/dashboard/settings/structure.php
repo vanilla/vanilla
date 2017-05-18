@@ -691,7 +691,7 @@ $Construct->Table('Queue')
    ->Column('DateStatus', 'datetime', true)
    ->Column('StatusUserID', 'int', true)
    ->Column('Attributes', 'text', true)
-   ->Column('ForeignID', 'varchar(255)', true, 'unique')
+   ->Column('ForeignID', 'varchar(191)', true, 'unique')
    ->Set($Explicit, $Drop);
 
 $Construct->table('Regarding')

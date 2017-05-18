@@ -2087,6 +2087,10 @@ class UserModel extends Gdn_Model {
                         }
                     }
 
+                    if (array_key_exists('Preferences', $Fields) && !is_string($Fields['Preferences'])) {
+                        $Fields['Preferences'] = dbencode($Fields['Preferences']);
+                    }
+
                     if (array_key_exists('Attributes', $Fields) && !is_string($Fields['Attributes'])) {
                         $Fields['Attributes'] = dbencode($Fields['Attributes']);
                     }

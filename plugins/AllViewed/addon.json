@@ -1,0 +1,21 @@
+{
+    "name": "All Viewed",
+    "description": "Allows users to mark all discussions as viewed and mark category viewed.",
+    "version": "2.2",
+    "license": "GNU GPLv2",
+    "mobileFriendly": true,
+    "icon": "all-viewed.png",
+    "key": "allviewed",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        },
+        {
+            "name": "Oliver Chung",
+            "email": "shoat@cs.washington.edu"
+        }
+    ]
+}

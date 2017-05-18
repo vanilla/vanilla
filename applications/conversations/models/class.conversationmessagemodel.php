@@ -215,7 +215,7 @@ class ConversationMessageModel extends ConversationsModel {
 
         // Validate the form posted values
         $MessageID = false;
-        if ($this->validate($FormPostValues) && !$this->isUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
+        if ($this->validate($FormPostValues) && !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
             $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
             touchValue('Format', $Fields, c('Garden.InputFormatter', 'Html'));
 

@@ -1,0 +1,16 @@
+{
+    "name": "Split / Merge",
+    "description": "Allows moderators with discussion edit permission to split & merge discussions.",
+    "version": "1.2",
+    "hasLocale": true,
+    "icon": "split-merge.png",
+    "key": "splitmerge",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

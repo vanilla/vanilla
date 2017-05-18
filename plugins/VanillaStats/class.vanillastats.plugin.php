@@ -8,18 +8,6 @@
  * @package VanillaStats
  */
 
-$PluginInfo['VanillaStats'] = array(
-    'Name' => 'Vanilla Statistics',
-    'Description' => 'Adds helpful graphs and information about activity on your forum over time (new users, discussions, comments, and pageviews).',
-    'Version' => '2.0.7',
-    'MobileFriendly' => true,
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'Icon' => 'vanilla_stats.png',
-    'Author' => "Vanilla Staff",
-    'AuthorEmail' => 'support@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * This plugin tracks pageviews on the forum and reports them to the central Vanilla
  * Analytics System.

@@ -471,4 +471,99 @@ class EventManagerTest extends \PHPUnit_Framework_TestCase {
         $r = $em->fire('e');
         $this->assertEmpty($r);
     }
+
+    /**
+     * Test unbinding a class from the event manager by instance.
+     */
+    public function testUnbindClassInstance() {
+        $em = new EventManager();
+
+        $handlers = new BasicEventHandlers();
+        $em->bindClass($handlers);
+
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass($handlers);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
+
+    /**
+     * Test unbinding a class from the event manager by instance.
+     */
+    public function testUnbindClassInstanceName() {
+        $em = new EventManager();
+
+        $handlers = new BasicEventHandlers();
+        $em->bindClass($handlers);
+
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass(BasicEventHandlers::class);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
+
+    /**
+     * Test unbinding a class from the event manager by class name.
+     */
+    public function testUnbindClassName() {
+        $em = new EventManager(new Container());
+
+        $em->bindClass(BasicEventHandlers::class);
+
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass(BasicEventHandlers::class);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
+
+    /**
+     * Test unbinding a class from the event manager by class name after the handlers have been fetched..
+     */
+    public function testUnbindClassExpanded() {
+        $em = new EventManager(new Container());
+
+        $em->bindClass(BasicEventHandlers::class);
+
+        $this->assertNotEmpty($em->getHandlers('foo'));
+
+        $em->unbindClass(BasicEventHandlers::class);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
+
+    /**
+     * If multiple instances are bound then I should not unbind both.
+     */
+    public function testUnbindClassInstanceMultiple() {
+        $em = new EventManager();
+
+        $handlers = new BasicEventHandlers();
+        $em->bindClass($handlers);
+        $handlers2 = new BasicEventHandlers();
+        $em->bindClass($handlers2);
+
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass($handlers);
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass($handlers2);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
+
+    /**
+     * If multiple instances are bound then I should not unbind both.
+     */
+    public function testUnbindClassInstanceMultipleByName() {
+        $em = new EventManager();
+
+        $handlers = new BasicEventHandlers();
+        $em->bindClass($handlers);
+        $handlers2 = new BasicEventHandlers();
+        $em->bindClass($handlers2);
+
+        $this->assertTrue($em->hasHandler('foo'));
+
+        $em->unbindClass(BasicEventHandlers::class);
+        $this->assertFalse($em->hasHandler('foo'));
+    }
 }

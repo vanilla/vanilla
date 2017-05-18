@@ -41,7 +41,7 @@ abstract class VanillaModel extends Gdn_Model {
      * @return bool Whether spam check is positive (TRUE = spammer).
      */
     public function checkForSpam($type) {
-        deprecated(__CLASS__.' '.__METHOD__, 'FloodControlTrait::isUserSpamming()');
+        deprecated(__CLASS__.' '.__METHOD__, 'FloodControlTrait::checkUserSpamming()');
 
         $session = Gdn::session();
 
@@ -51,7 +51,7 @@ abstract class VanillaModel extends Gdn_Model {
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Vanilla', $type);
-        $isUserSpamming = $this->isUserSpamming($session->User->UserID, $storageObject);
+        $isUserSpamming = $this->checkUserSpamming($session->User->UserID, $storageObject);
 
         return $isUserSpamming;
     }

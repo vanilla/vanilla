@@ -1,0 +1,16 @@
+{
+    "name": "reCAPTCHA Support",
+    "description": "Add recaptcha validation to signups.",
+    "version": "0.1",
+    "mobileFriendly": true,
+    "icon": "recaptcha_support.png",
+    "key": "recaptcha",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ]
+}

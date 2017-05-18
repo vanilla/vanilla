@@ -7,21 +7,6 @@
  * @package GooglePrettify
  */
 
-// Define the plugin:
-$PluginInfo['GooglePrettify'] = array(
-    'Name' => 'Syntax Prettifier',
-    'Description' => 'Adds pretty syntax highlighting to code in discussions and tab support to the comment box. This is a great addon for communities that support programmers and designers.',
-    'Version' => '1.2.3',
-    'RequiredApplications' => array('Vanilla' => '2.0.18'),
-    'MobileFriendly' => true,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'SettingsUrl' => '/dashboard/settings/googleprettify',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Icon' => 'google-prettify.png'
-);
-
 // Changelog
 // v1.1 Add Tabby, docs/cleanup  -Lincoln, Aug 2012
 
@@ -184,7 +169,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
                 'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
         ));
 
-        
+
         $Sender->setData('Title', t('Syntax Prettifier Settings'));
         $Cf->renderAll();
     }

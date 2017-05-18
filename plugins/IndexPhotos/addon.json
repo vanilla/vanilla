@@ -1,0 +1,20 @@
+{
+    "name": "Discussion Photos",
+    "description": "Displays photo and name of the user who started each discussion in discussion listings on modern layouts. Note that this plugin will not have any affect when table layouts are enabled.",
+    "version": "1.2.2",
+    "registerPermissions": false,
+    "mobileFriendly": true,
+    "icon": "discussion_photos.png",
+    "key": "indexphotos",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincolnwebs@gmail.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

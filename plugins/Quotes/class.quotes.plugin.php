@@ -8,19 +8,6 @@
  * @package Quotes
  */
 
-$PluginInfo['Quotes'] = [
-    'Name' => 'Quotes',
-    'Description' => "Adds an option to each comment for users to easily quote each other.",
-    'Version' => '1.9',
-    'MobileFriendly' => true,
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'HasLocale' => true,
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'quotes.png'
-];
-
 /**
  * This plugin allows users to quote comments for reference in their own comments
  * within a discussion.

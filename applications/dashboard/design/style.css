@@ -5317,7 +5317,7 @@ div.token-input-dropdown {
   border: 1px solid #aaa;
   border-top-width: 0;
   cursor: default;
-  z-index: 1;
+  z-index: 1001;
   padding: 0 3px;
 }
 
@@ -5439,19 +5439,19 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 /**
  * Text formatting alignment
  */
-.AlignLeft {
+.AlignLeft, .bbcode_left {
   float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
 
-.AlignCenter {
+.AlignCenter, .bbcode_center {
   margin: 0 auto;
   display: block;
   text-align: center;
 }
 
-.AlignRight {
+.AlignRight, .bbcode_right {
   float: right;
   margin: 0 0 10px 10px;
   text-align: right;

@@ -146,9 +146,14 @@ class Addon {
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.
-            $baseDir = explode('/', ltrim($subdir, '/'))[0];
-            if (in_array($baseDir, ['applications', 'plugins'])) {
-                $info['oldType'] = substr($baseDir, 0, -1);
+            list($addonParentFolder, $addonFolder) = explode('/', ltrim($subdir, '/'));
+            if (in_array($addonParentFolder, ['applications', 'plugins'])) {
+                $info['oldType'] = substr($addonParentFolder, 0, -1);
+            }
+
+            // Kludge that sets keyRaw until we use key everywhere.
+            if ($addonFolder !== $info['key']) {
+                $info['keyRaw'] = $addonFolder;
             }
 
             return $info;

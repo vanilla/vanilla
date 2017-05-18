@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
+    "hash": "e3dd7281a6d118b8183b7b5b29d06fd6",
     "content-hash": "d78de5241092d2a68acb3bb94a013d25",
     "packages": [
         {
@@ -47,7 +48,7 @@
                 "favicon",
                 "ico"
             ],
-            "time": "2016-09-27T22:00:56+00:00"
+            "time": "2016-09-27 22:00:56"
         },
         {
             "name": "container-interop/container-interop",
@@ -78,7 +79,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
-            "time": "2017-02-14T19:40:03+00:00"
+            "time": "2017-02-14 19:40:03"
         },
         {
             "name": "michelf/php-markdown",
@@ -129,7 +130,7 @@
             "keywords": [
                 "markdown"
             ],
-            "time": "2016-10-29T18:58:20+00:00"
+            "time": "2016-10-29 18:58:20"
         },
         {
             "name": "pclzip/pclzip",
@@ -166,7 +167,7 @@
                 "php",
                 "zip"
             ],
-            "time": "2014-06-05T11:42:24+00:00"
+            "time": "2014-06-05 11:42:24"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -242,7 +243,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2017-03-15T19:32:56+00:00"
+            "time": "2017-03-15 19:32:56"
         },
         {
             "name": "psr/container",
@@ -291,7 +292,7 @@
                 "container-interop",
                 "psr"
             ],
-            "time": "2017-02-14T16:28:37+00:00"
+            "time": "2017-02-14 16:28:37"
         },
         {
             "name": "psr/log",
@@ -338,7 +339,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2016-10-10T12:19:37+00:00"
+            "time": "2016-10-10 12:19:37"
         },
         {
             "name": "smarty/smarty",
@@ -391,20 +392,20 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2016-12-14T21:57:25+00:00"
+            "time": "2016-12-14 21:57:25"
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.6",
+            "version": "v3.2.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a"
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/093e416ad096355149e265ea2e4cc1f9ee40ab1a",
-                "reference": "093e416ad096355149e265ea2e4cc1f9ee40ab1a",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/acec26fcf7f3031e094e910b94b002fa53d4e4d6",
+                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6",
                 "shasum": ""
             },
             "require": {
@@ -446,7 +447,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-03-07T16:47:02+00:00"
+            "time": "2017-05-01 14:55:58"
         },
         {
             "name": "tburry/pquery",
@@ -498,25 +499,25 @@
                 "ganon",
                 "php"
             ],
-            "time": "2016-01-14T20:55:00+00:00"
+            "time": "2016-01-14 20:55:00"
         },
         {
             "name": "vanilla/garden-container",
-            "version": "v1.3.4",
+            "version": "v1.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-container.git",
-                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592"
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/d5af47a643d6fc872ec6d57e35b2583793c8a592",
-                "reference": "d5af47a643d6fc872ec6d57e35b2583793c8a592",
+                "url": "https://api.github.com/repos/vanilla/garden-container/zipball/b718c9b4c1040643620922b3ac988dadc38f3b87",
+                "reference": "b718c9b4c1040643620922b3ac988dadc38f3b87",
                 "shasum": ""
             },
             "require": {
                 "container-interop/container-interop": "^1.1",
-                "php": ">=5.4.0"
+                "php": ">=5.6.0"
             },
             "type": "library",
             "autoload": {
@@ -535,7 +536,7 @@
                 }
             ],
             "description": "A dependency injection container.",
-            "time": "2017-02-05T15:17:17+00:00"
+            "time": "2017-05-05 17:46:16"
         },
         {
             "name": "vanilla/garden-http",
@@ -575,7 +576,7 @@
                 }
             ],
             "description": "An unbloated HTTP client library for building RESTful API clients.",
-            "time": "2016-03-25T22:29:23+00:00"
+            "time": "2016-03-25 22:29:23"
         },
         {
             "name": "vanilla/garden-password",
@@ -628,7 +629,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2016-10-21T20:47:48+00:00"
+            "time": "2016-10-21 20:47:48"
         },
         {
             "name": "vanilla/garden-schema",
@@ -664,20 +665,20 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-03-17T18:00:12+00:00"
+            "time": "2017-03-17 18:00:12"
         },
         {
             "name": "vanilla/htmlawed",
-            "version": "v2.1.22",
+            "version": "v2.2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/htmlawed.git",
-                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817"
+                "reference": "d7c49fa7bfa3006973616141f35c67999fdc5132"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/685c88e3b6799ed82c3a8b50d59d536e16b72817",
-                "reference": "685c88e3b6799ed82c3a8b50d59d536e16b72817",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/d7c49fa7bfa3006973616141f35c67999fdc5132",
+                "reference": "d7c49fa7bfa3006973616141f35c67999fdc5132",
                 "shasum": ""
             },
             "require": {
@@ -703,7 +704,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2016-04-14T21:27:05+00:00"
+            "time": "2017-05-17 18:14:43"
         },
         {
             "name": "vanilla/legacy-oauth",
@@ -748,7 +749,7 @@
                 }
             ],
             "description": "Provides a way to include OAuth v1 via composer",
-            "time": "2017-02-27T16:22:28+00:00"
+            "time": "2017-02-27 16:22:28"
         },
         {
             "name": "vanilla/legacy-passwords",
@@ -801,7 +802,7 @@
                 "vanilla",
                 "vanilla forums"
             ],
-            "time": "2017-01-24T20:17:02+00:00"
+            "time": "2017-01-24 20:17:02"
         },
         {
             "name": "vanilla/nbbc",
@@ -837,7 +838,7 @@
                 }
             ],
             "description": "A composer-compatible fork of the NBBC BBCode parsing library.",
-            "time": "2016-04-26T18:19:47+00:00"
+            "time": "2016-04-26 18:19:47"
         }
     ],
     "packages-dev": [],

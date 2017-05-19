@@ -753,6 +753,10 @@ var vanillaStats = (function() {
     };
 
     VanillaStats.prototype.getSummaries = function(container) {
+        if (gdn.definition('DashboardSummaries')) {
+            return;
+        }
+
         var rangeFrom = this.getRange("from");
         var rangeTo = this.getRange("to");
         var dateRange = {

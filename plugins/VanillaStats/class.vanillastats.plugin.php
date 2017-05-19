@@ -141,6 +141,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->addDefinition('ExpandText', t('more'));
             $sender->addDefinition('CollapseText', t('less'));
 
+            $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
+            $sender->addDefinition('DashboardSummaries', c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled));
+
             // Render the custom dashboard view
             $sender->render('dashboard', '', 'plugins/VanillaStats');
         }
@@ -151,6 +154,60 @@ class VanillaStatsPlugin extends Gdn_Plugin {
      * period. This gets ajaxed into the dashboard homepage as date ranges are defined.
      */
     public function settingsController_dashboardSummaries_create($Sender) {
+        $DiscussionData = [];
+        $UserData = [];
+        $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
+
+        if (c('Garden.Analytics.DashboardSummaries', $isVanillaAnalyticEnabled)) {
+            $range = Gdn::request()->getValue('range');
+            $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));
+            $range['from'] = date('Y-m-d H:i:s', strtotime($range['from']));
+
+            $UserModel = new UserModel();
+
+            // Load the most active discussions during this date range
+            $DiscussionData = $UserModel->SQL
+                ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
+                ->from('Discussion d')
+                ->where('d.DateLastComment >=', $range['from'])
+                ->where('d.DateLastComment <=', $range['to'])
+                ->orderBy('d.CountViews', 'desc')
+                ->orderBy('d.CountComments', 'desc')
+                ->orderBy('d.CountBookmarks', 'desc')
+                ->limit(5, 0)
+                ->get();
+
+            // Load the most active users during this date range.
+            // User data is fetched in the view.
+            // This query is made as is for performance reasons.
+            $InnerQuery = $UserModel->SQL
+                ->select('CommentID')
+                ->from('Comment')
+                ->where('DateInserted >=', $range['from'])
+                ->where('DateInserted <=', $range['to'])
+                ->getSelect();
+
+            // Create a copy because namedParameters are passed by references.
+            $namedParameters = array_merge([], $UserModel->SQL->namedParameters());
+            $UserModel->SQL->reset();
+
+            $Query = $UserModel->SQL
+                ->select('InsertUserID as UserID')
+                ->select('CommentID', 'count', 'CountComments')
+                ->from('Comment')
+                ->whereIn('CommentID', [$InnerQuery], false)
+                ->groupBy('InsertUserID')
+                ->orderBy('CountComments', 'desc')
+                ->limit(5, 0)
+                ->getSelect();
+
+            $Query = $UserModel->SQL->applyParameters($Query, $namedParameters);
+            $UserData = $UserModel->SQL->query($Query);
+        }
+
+        $Sender->setData('DiscussionData', $DiscussionData);
+        $Sender->setData('UserData', $UserData);
+
         // Load javascript & css, check permissions, and load side menu for this page.
         $Sender->addJsFile('settings.js');
         $Sender->title(t('Dashboard Summaries'));
@@ -164,52 +221,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->fireEvent('DefineAdminPermissions');
         $Sender->permission($Sender->RequiredAdminPermissions, '', false);
         $Sender->setHighlightRoute('dashboard/settings');
-
-        $range = Gdn::request()->getValue('range');
-        $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));
-        $range['from'] = date('Y-m-d H:i:s', strtotime($range['from']));
-
-        $UserModel = new UserModel();
-
-        // Load the most active discussions during this date range
-        $DiscussionData = $UserModel->SQL
-            ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
-            ->from('Discussion d')
-            ->where('d.DateLastComment >=', $range['from'])
-            ->where('d.DateLastComment <=', $range['to'])
-            ->orderBy('d.CountViews', 'desc')
-            ->orderBy('d.CountComments', 'desc')
-            ->orderBy('d.CountBookmarks', 'desc')
-            ->limit(5, 0)
-            ->get();
-        $Sender->setData('DiscussionData', $DiscussionData);
-
-        // Load the most active users during this date range.
-        // User data is fetched in the view.
-        // This query is made as is for performance reasons.
-        $InnerQuery = $UserModel->SQL
-            ->select('CommentID')
-            ->from('Comment')
-            ->where('DateInserted >=', $range['from'])
-            ->where('DateInserted <=', $range['to'])
-            ->getSelect();
-
-        // Create a copy because namedParameters are passed by references.
-        $namedParameters = array_merge([], $UserModel->SQL->namedParameters());
-        $UserModel->SQL->reset();
-
-        $Query = $UserModel->SQL
-            ->select('InsertUserID as UserID')
-            ->select('CommentID', 'count', 'CountComments')
-            ->from('Comment')
-            ->whereIn('CommentID', [$InnerQuery], false)
-            ->groupBy('InsertUserID')
-            ->orderBy('CountComments', 'desc')
-            ->limit(5, 0)
-            ->getSelect();
-
-        $Query = $UserModel->SQL->applyParameters($Query, $namedParameters);
-        $Sender->setData('UserData', $UserModel->SQL->query($Query));
 
         // Render the custom dashboard view
         $Sender->render('dashboardsummaries', '', 'plugins/VanillaStats');

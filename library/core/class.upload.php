@@ -168,6 +168,10 @@ class Gdn_Upload extends Gdn_Pluggable {
         $Name = str_replace('\\', '/', $Name);
         $PathUploads = str_replace('\\', '/', PATH_UPLOADS);
 
+        if (c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+            $Name = preg_replace("/^http:/i", "https:", $Name);
+        }
+
         if (preg_match('`^https?://`', $Name)) {
             $Result = array('Name' => $Name, 'Type' => 'external', 'SaveName' => $Name, 'SaveFormat' => '%s', 'Url' => $Name,);
             return $Result;
@@ -334,9 +338,15 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @param $Name
      * @return mixed
      */
-    public static function url($Name) {
-        $Parsed = self::parse($Name);
-        return $Parsed['Url'];
+    public static function url($name) {
+        $parsed = self::parse($name);
+        $url = $parsed['Url'];
+
+        if (c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+            $url = preg_replace("/^http:/i", "https:", $url);
+        }
+
+        return $url;
     }
 
     /**

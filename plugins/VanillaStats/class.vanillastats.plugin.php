@@ -51,35 +51,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     }
 
     /**
-     * Plugin setup.
-     */
-    public function setup() {
-        $this->structure();
-    }
-
-    /**
-     * Ran on utility/update
-     */
-    public function structure() {
-        // Add the new indexes
-
-        Gdn::database()->structure()
-            ->table('Discussion')
-            ->column('CountViews', 'int', '1', ['index.ActiveDiscussion'])
-            ->column('CountComments', 'int', '0', ['index.ActiveDiscussion'])
-            ->column('CountBookmarks', 'int', null, ['index.ActiveDiscussion'])
-            ->set();
-
-        // Ideally we should add "InsertUserID" to the already existing "DateInserted" index
-        // but there is no way to do that!
-        Gdn::database()->structure()
-            ->table('Comment')
-            ->column('DateInserted', 'datetime', null, ['index.ActiveUser'])
-            ->column('InsertUserID', 'int', true, ['index.ActiveUser'])
-            ->set();
-    }
-
-    /**
      * Override the default dashboard page with the new stats one.
      */
     public function gdn_dispatcher_beforeDispatch_handler($Sender) {
@@ -198,9 +169,10 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));
         $range['from'] = date('Y-m-d H:i:s', strtotime($range['from']));
 
-        // Load the most active discussions during this date range
         $UserModel = new UserModel();
-        $Sender->setData('DiscussionData', $UserModel->SQL
+
+        // Load the most active discussions during this date range
+        $DiscussionData = $UserModel->SQL
             ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
             ->from('Discussion d')
             ->where('d.DateLastComment >=', $range['from'])
@@ -209,20 +181,35 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             ->orderBy('d.CountComments', 'desc')
             ->orderBy('d.CountBookmarks', 'desc')
             ->limit(5, 0)
-            ->get());
+            ->get();
+        $Sender->setData('DiscussionData', $DiscussionData);
 
         // Load the most active users during this date range.
         // User data is fetched in the view.
-        $Sender->setData('UserData', $UserModel->SQL
-            ->select('InsertUserID as UserID')
-            ->select('CommentID', 'count', 'CountComments')
+        // This query is made as is for performance reasons.
+        $InnerQuery = $UserModel->SQL
+            ->select('CommentID')
             ->from('Comment')
             ->where('DateInserted >=', $range['from'])
             ->where('DateInserted <=', $range['to'])
+            ->getSelect();
+
+        // Create a copy because namedParameters are passed by references.
+        $namedParameters = array_merge([], $UserModel->SQL->namedParameters());
+        $UserModel->SQL->reset();
+
+        $Query = $UserModel->SQL
+            ->select('InsertUserID as UserID')
+            ->select('CommentID', 'count', 'CountComments')
+            ->from('Comment')
+            ->whereIn('CommentID', [$InnerQuery], false)
             ->groupBy('InsertUserID')
             ->orderBy('CountComments', 'desc')
             ->limit(5, 0)
-            ->get());
+            ->getSelect();
+
+        $Query = $UserModel->SQL->applyParameters($Query, $namedParameters);
+        $Sender->setData('UserData', $UserModel->SQL->query($Query));
 
         // Render the custom dashboard view
         $Sender->render('dashboardsummaries', '', 'plugins/VanillaStats');

@@ -59,7 +59,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function __construct($providerKey, $accessToken = false) {
         $this->providerKey = $providerKey;
-        $this->provider = $this->provider();
+        $this->provider = $this->provider($providerKey);
         if ($accessToken) {
             // We passed in a connection
             $this->accessToken = $accessToken;
@@ -265,12 +265,23 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return array Stored provider data (secret, client_id, etc.).
      */
-    public function provider() {
-        if (!$this->provider) {
-            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($this->providerKey);
+    public function provider($providerKey = null) {
+        if ($providerKey) {
+            $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
         }
 
         return $this->provider;
+    }
+
+
+    public function getAllProviderKeys() {
+        $allProviders = Gdn::sql()->getWhere('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => 'oauth2'])->resultArray();
+        return array_column($allProviders, 'AuthenticationKey');
+    }
+
+
+    public function getAllProviders() {
+        return Gdn::sql()->getWhere('UserAuthenticationProvider', ['AuthenticationSchemeAlias' => 'oauth2'])->resultArray();
     }
 
 
@@ -279,7 +290,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return string Provider key.
      */
-    public function getProviderKey() {
+    public function getProviderKey($providerKey = null) {
+        if (!$this->providerKey && $providerKey) {
+            // Check if it is a valid provider key.
+            $provider = Gdn_AuthenticationProviderModel::getProviderByKey($providerKey);
+            $this->providerKey = val('AuthenticationKey', $provider);
+        }
         return $this->providerKey;
     }
 
@@ -292,13 +308,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param $sender
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
-        if (!is_array($this->providerKey)) {
-            $providerKeys = [$this->providerKey];
-        } else {
-            $providerKeys = $this->providerKey;
-        }
-
-        foreach ($providerKeys as $providerKey) {
+        $allProviderKeys = $this->getAllProviderKeys();
+        foreach ($allProviderKeys as $providerKey) {
             $sender->registerCallback("entryController_{$providerKey}_create", [$this, 'entryEndpoint']);
             $sender->registerCallback("settingsController_{$providerKey}_create", [$this, 'settingsEndpoint']);
         }
@@ -327,16 +338,55 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     }
 
 
+    public function settingsController_oauth2_create($sender, $args) {
+
+        switch (strtolower(val(0, $args))) {
+            case 'addedit':
+                $this->settings_addEdit($sender, $args);
+                break;
+            case 'delete':
+                $this->settings_delete($sender, $args);
+                break;
+            default:
+                $this->settings_index($sender, $args);
+                break;
+        }
+    }
+
+
+
+    public function settings_index($sender, $args) {
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
+            'Garden.Registration.AutoConnect',
+            'Garden.SignIn.Popup'
+        ]);
+        $sender->Form->setModel($configurationModel);
+        if ($sender->Form->authenticatedPostback()) {
+            if ($sender->Form->save() !== false) {
+                $sender->informMessage(t('Your settings have been saved.'));
+            }
+        } else {
+            $sender->Form->setData($configurationModel->Data);
+        }
+
+        $view = $this->settingsView;
+        $providers = $this->getAllProviders();
+        $sender->setData('Providers', $providers);
+        $sender->render('settings', '', $view);
+    }
+
     /**
      * Create a controller to deal with plugin settings in dashboard.
      *
      * @param Gdn_Controller $sender.
      * @param Gdn_Controller $args.
      */
-    public function settingsEndpoint($sender, $args) {
+    protected function settings_addEdit($sender, $Args) {
         $sender->permission('Garden.Settings.Manage');
         $model = new Gdn_AuthenticationProviderModel();
-        $provider = Gdn_AuthenticationProviderModel::getProviderByKey($sender->RequestMethod);
+        $provider = Gdn_AuthenticationProviderModel::getProviderByKey($sender->Request->get('connectionKey'));
         $this->providerKey = val('AuthenticationKey', $provider);
         /* @var Gdn_Form $form */
         $form = new Gdn_Form();
@@ -344,17 +394,18 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $sender->Form = $form;
 
         if (!$form->AuthenticatedPostBack()) {
-//            $provider = $this->provider();
             $form->setData($provider);
         } else {
-
-            $form->setFormValue('AuthenticationKey', $this->providerKey);
-
+            $form->setFormValue('AuthenticationSchemeAlias', 'oauth2');
+            $sender->Form->validateRule('Name', 'ValidateName', 'You must provide a Name containing only letters, numbers, spaces, and underscores.');
+            $sender->Form->validateRule('AuthenticationKey', 'ValidateSlug', 'You must provide a Connection Key containing only letters, numbers, and underscores.');
             $sender->Form->validateRule('AssociationKey', 'ValidateRequired', 'You must provide a unique AccountID.');
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
-
+            if (!$sender->Form->getFormValue('IsDefault')) {
+                $sender->Form->setFormValue('IsDefault', 0);
+            }
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
             $baseUrl = (val('scheme', $baseUrlParts) && val('host', $baseUrlParts)) ? val('scheme', $baseUrlParts).'://'.val('host', $baseUrlParts) : null;
@@ -369,6 +420,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // Set up the form.
         $formFields = [
+            'Name' => ['LabelCode' => 'Name', 'Description' => 'Enter the Name of this connection. This name will appear on the button if you have multiple methods of connection.'],
+            'AuthenticationKey' => ['LabelCode' => 'Connection Key', 'Description' => 'Enter the unique key that will be used to access this connection. This value will appear in the connection URL.'],
             'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Enter the unique ID of the authentication application.'],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
             'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
@@ -387,17 +440,31 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
         }
 
-        $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
-
         // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
         $redirectUrls = Gdn::request()->url('/entry/'. $this->providerKey, true, true);
         $sender->setData('redirectUrls', $redirectUrls);
 
-        $sender->render('settings', '', $view);
+        $sender->render('settings_addedit', '','plugins/oauth2');
     }
 
 
+
+    /**
+     *
+     *
+     * @param $sender
+     * @param $args
+     */
+    public function settings_delete($sender, $args) {
+        $connectionKey = $sender->Request->get('connectionKey');
+        if ($sender->Form->authenticatedPostBack()) {
+            $model = new Gdn_AuthenticationProviderModel();
+            $model->delete(['AuthenticationKey' => $connectionKey]);
+            $sender->RedirectUrl = url('/settings/oauth2');
+            $sender->render('Blank', 'Utility', 'Dashboard');
+        }
+    }
 
     /** ------------------- Connection Related Methods --------------------- */
 
@@ -413,7 +480,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $uri = val('AuthorizeUrl', $provider);
 
-        $redirect_uri = '/entry/'.$this->getProviderKey();
+        $redirect_uri = '/entry/'.val('AuthenticationKey', $provider);
 
         $defaultParams = [
             'response_type' => 'code',
@@ -515,9 +582,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             throw new Gdn_UserException($error);
         }
 
+        $this->provider = Gdn_AuthenticationProviderModel::getProviderByKey($sender->RequestMethod);
+        $this->providerKey = val('AuthenticationKey', $this->provider);
+
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
 
-        $response = $this->requestAccessToken($code);
+        $response = $this->requestAccessToken($code, $this->providerKey);
         if (!$response) {
             throw new Gdn_UserException('The OAuth server did not return a valid response.');
         }
@@ -590,10 +660,10 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param Gdn_Controller $args.
      */
     public function base_connectData_handler($sender, $args) {
-        if (val(0, $args) != $this->getProviderKey()) {
+        if (!$this->provider(val(0, $args))) {
             return;
         }
-
+        $this->providerKey = val('AuthenticationKey', $this->provider);
         // Retrieve the profile that was saved to the session in the entry controller.
         $savedProfile = Gdn::session()->stash($this->getProviderKey(), '', false);
         if (Gdn::session()->stash($this->getProviderKey(), '', false)) {
@@ -643,14 +713,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return mixed Result of the API call to the provider, usually JSON.
      */
-    public function requestAccessToken($code) {
-        $provider = $this->provider();
+    public function requestAccessToken($code, $providerKey = null) {
+        $provider = $this->provider($providerKey);
         $uri = val('TokenUrl', $provider);
 
         $defaultParams = [
             'code' => $code,
             'client_id' => val('AssociationKey', $provider),
-            'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
+            'redirect_uri' => url('/entry/'. $this->getProviderKey($providerKey), true),
             'client_secret' => val('AssociationSecret', $provider),
             'grant_type' => 'authorization_code',
             'scope' => val('AcceptedScope', $provider)
@@ -671,9 +741,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return array Profile array transformed by child class or as is.
      */
-    public function translateProfileResults($rawProfile = []) {
-        $provider = $this->provider();
-        $email = val('ProfileKeyEmail', $provider, 'email');
+    public function translateProfileResults($rawProfile = [], $providerKey = null) {
+        $provider = $this->provider($providerKey);
         $translatedKeys = [
             val('ProfileKeyEmail', $provider, 'email') => 'Email',
             val('ProfileKeyPhoto', $provider, 'picture') => 'Photo',
@@ -695,8 +764,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return array User profile from provider.
      */
-    public function getProfile() {
-        $provider = $this->provider();
+    public function getProfile($providerKey = null) {
+        $provider = $this->provider($providerKey);
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
         $defaultParams = array(
             'access_token' => $this->accessToken()
@@ -729,11 +798,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     public function entryController_overrideSignIn_handler($sender, $args) {
         $provider = $args['DefaultProvider'];
-        if (val('AuthenticationSchemeAlias', $provider) != $this->getProviderKey() || !$this->isConfigured()) {
+        if (!$this->isConfigured()) {
             return;
         }
 
-        $url = $this->authorizeUri(array('target' => $args['Target']));
+        $url = $this->authorizeUri(val('AuthenticationKey', $this->provider), ['target' => $args['Target']]);
         $args['DefaultProvider']['SignInUrl'] = $url;
     }
 
@@ -745,11 +814,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @param Gdn_Controller $args.
      */
     public function base_beforeSignInButton_handler($sender, $args) {
-        if (!$this->isConfigured() || $this->isDefault()) {
-            return;
+//        if ($this->isDefault()) {
+//            return;
+//        }
+        $allProviderKeys = $this->getAllProviderKeys();
+        foreach ($allProviderKeys as $providerKey) {
+            echo ' '.$this->signInButton($providerKey, 'icon').' ';
         }
 
-        echo ' '.$this->signInButton('icon').' ';
     }
 
 
@@ -762,17 +834,12 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * @return mixed|bool Return null if not configured
      */
     public function entryController_signIn_handler($sender, $args) {
-        if (!$this->isConfigured()) {
-            return;
-        }
         if (isset($sender->Data['Methods'])) {
             // Add the sign in button method to the controller.
-            $method = [
-                'Name' => $this->getProviderKey(),
-                'SignInHtml' => $this->signInButton()
-            ];
-
-            $sender->Data['Methods'][] = $method;
+            $allProviderKeys = $this->getAllProviderKeys();
+            foreach ($allProviderKeys as $providerKey) {
+                $sender->Data['Methods'][] = ['Name' => $providerKey, 'SignInHtml' => $this->signInButton($providerKey)];
+            }
         }
     }
 
@@ -784,18 +851,15 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      *
      * @return string Resulting HTML element (button).
      */
-    public function signInButton($type = 'button') {
+    public function signInButton($providerKey, $type = 'button') {
+        $provider = $this->provider($providerKey);
         $target = Gdn::request()->post('Target', Gdn::request()->get('Target', url('', '/')));
-        $result = '';
-        foreach ($this->provider as $provider) {
-            $url = $this->authorizeUri(['target' => $target]);
-            $providerName = val('Name', $provider);
-            $linkLabel = sprintf(t('Sign in with %s'), $providerName);
-            $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default', 'title' => $linkLabel]);
-        }
+        $url = $this->authorizeUri($providerKey, ['target' => $target]);
+        $providerName = val('Name', $provider);
+        $linkLabel = sprintf(t('Sign in with %s'), $providerName);
+        $result = socialSignInButton($providerName, $url, $type, ['rel' => 'nofollow', 'class' => 'default SocialIcon-OAuth2 SocialIcon-'.$providerKey, 'title' => $linkLabel]);
         return $result;
     }
-
 
     /**
      * Insert css file for generic styling of signin button/icon.
@@ -840,5 +904,51 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $data
             );
         }
+    }
+}
+
+if (!function_exists('ValidateName')) {
+    function validateName($value) {
+        $minlength = 3;
+        $maxlength = 20;
+        $regex = "/[A-zÀ-ÿ\s\d-_]{{$minlength},{$maxlength}}$/";
+        return (preg_match($regex, trim($value)) === 1);
+    }
+}
+
+if (!function_exists('ValidateNameExists')) {
+    function validateName($value) {
+        $exists = Gdn::sql()->getWhere('UserAuthenticationProvider', ['Name' => $value, 'Active' => 1])->resultArray();
+        if ($exists) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
+if (!function_exists('ValidateSlug')) {
+    function validateSlug($value) {
+        $minlength = 3;
+        $maxlength = 20;
+        $regex = "/\S[A-z-_\d]{{$minlength},{$maxlength}}$/";
+        return preg_match($regex, trim($value)) === 1;
+    }
+}
+
+if (!function_exists('ValidateSlugExists')) {
+    function validateName($value) {
+        $minlength = 3;
+        $maxlength = 20;
+        $regex = "/[A-zÀ-ÿ\s\d-_]{{$minlength},{$maxlength}}$/";
+        if (preg_match($regex, trim($value)) !== 1) {
+            return false;
+        }
+        $exists = Gdn::sql()->getWhere('UserAuthenticationProvider', ['Name' => $value, 'Active' => 1])->resultArray();
+        if ($exists) {
+            return false;
+        }
+
+        return true;
     }
 }

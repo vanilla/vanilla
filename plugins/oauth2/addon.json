@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "settingsUrl": "/settings/oauth2",
     "settingsPermission": "Garden.Settings.Manage",
+    "usePopupSettings": false,
     "mobileFriendly": true,
     "icon": "oauth2.png",
     "key": "oauth2",

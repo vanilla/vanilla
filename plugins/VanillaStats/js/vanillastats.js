@@ -753,7 +753,7 @@ var vanillaStats = (function() {
     };
 
     VanillaStats.prototype.getSummaries = function(container) {
-        if (gdn.definition('DashboardSummaries')) {
+        if (!gdn.getMeta('DashboardSummaries', true)) {
             return;
         }
 

@@ -1563,6 +1563,9 @@ class SettingsController extends DashboardController {
             $this->ExistingRoleInvitations = arrayCombine($InvitationRoleIDs, $InvitationCounts);
             $ConfigurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
+            // Define InviteExpiration based on the postback values
+            $this->InviteExpiration = $this->Form->getValue('Garden.Registration.InviteExpiration');
+
             // Event hook
             $this->EventArguments['ConfigurationModel'] = &$ConfigurationModel;
             $this->fireEvent('BeforeRegistrationUpdate');

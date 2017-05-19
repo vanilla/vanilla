@@ -184,7 +184,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $toDateTime = new DateTime($range['to']);
             $dateDiff = date_diff($toDateTime, new DateTime($range['from']));
             if ($rowCountEstimate >= 10000000 && $dateDiff->format('%a') > 90) {
-                $range['from'] = ($toDateTime->sub(new DateInterval('P3M')))->format(MYSQL_DATE_FORMAT);
+                $range['from'] = $toDateTime->sub(new DateInterval('P3M'))->format(MYSQL_DATE_FORMAT);
                 $Sender->setData('UserDataRangeClamped', true);
             } else {
                 $Sender->setData('UserDataRangeClamped', false);

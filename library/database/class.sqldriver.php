@@ -1653,19 +1653,21 @@ abstract class Gdn_SQLDriver {
             $QueryOptions['CacheOptions'] = $this->_CacheOptions;
         }
 
+        $parameters = $this->calculateParameters($this->_NamedParameters);
+
         try {
             if ($this->CaptureModifications && strtolower($Type) != 'select') {
                 if (!property_exists($this->Database, 'CapturedSql')) {
                     $this->Database->CapturedSql = array();
                 }
-                $Sql2 = $this->applyParameters($Sql, $this->_NamedParameters);
+                $Sql2 = $this->applyParameters($Sql, $parameters);
 
                 $this->Database->CapturedSql[] = $Sql2;
                 $this->reset();
                 return true;
             }
 
-            $Result = $this->Database->query($Sql, $this->_NamedParameters, $QueryOptions);
+            $Result = $this->Database->query($Sql, $parameters, $QueryOptions);
         } catch (Exception $Ex) {
             $this->reset();
             throw $Ex;
@@ -1673,6 +1675,31 @@ abstract class Gdn_SQLDriver {
         $this->reset();
 
         return $Result;
+    }
+
+    /**
+     * Do anything necessary to coerce parameter values into something appropriate for the database.
+     *
+     * @param array $parameters The parameters to calculate.
+     * @return array New parameters
+     */
+    protected function calculateParameters($parameters) {
+        $dtZone = new DateTimeZone('UTC');
+
+        $result = [];
+        foreach ($parameters as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $dt = new DateTime('@'.$value->getTimestamp());
+                $dt->setTimezone($dtZone);
+                $value = $dt->format(MYSQL_DATE_FORMAT);
+            } elseif (is_bool($value)) {
+                $value = (int)$value;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     public function quoteIdentifier($String) {

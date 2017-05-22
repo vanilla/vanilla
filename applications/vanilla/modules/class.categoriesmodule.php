@@ -19,6 +19,14 @@ class CategoriesModule extends Gdn_Module {
     /** @var int Inclusive. */
     public $endDepth;
 
+    /** @var bool Whether or not to collapse categories that contain other categories. */
+    public $collapseCategories = true;
+
+    /**
+     * @var int|null The ID of the root category.
+     */
+    public $root = null;
+
     public function __construct($Sender = '') {
         parent::__construct($Sender);
         $this->_ApplicationFolder = 'vanilla';
@@ -41,20 +49,18 @@ class CategoriesModule extends Gdn_Module {
         }
 
         $categoryModel = new CategoryModel();
-        $Categories = $categoryModel->setJoinUserCategory(true)->getChildTree(null);
-        $Categories = CategoryModel::flattenTree($Categories);
-        $Categories2 = $Categories;
+        $categories = $categoryModel
+            ->setJoinUserCategory(true)
+            ->getChildTree($this->root, ['collapseCategories' => $this->collapseCategories]);
+        $categories = CategoryModel::flattenTree($categories);
 
-        // Filter out the categories we aren't watching.
-        foreach ($Categories2 as $i => $Category) {
-            if (!$Category['PermsDiscussionsView'] || !$Category['Following']) {
-                unset($Categories[$i]);
-            }
-        }
+        $categories = array_filter($categories, function ($category) {
+            return val('PermsDiscussionsView', $category) && val('Following', $category);
+        });
 
-        $Data = new Gdn_DataSet($Categories, DATASET_TYPE_ARRAY);
-        $Data->datasetType(DATASET_TYPE_OBJECT);
-        $this->Data = $Data;
+        $data = new Gdn_DataSet($categories, DATASET_TYPE_ARRAY);
+        $data->datasetType(DATASET_TYPE_OBJECT);
+        $this->Data = $data;
     }
 
     public function filterDepth(&$Categories, $startDepth, $endDepth) {

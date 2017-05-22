@@ -700,8 +700,11 @@ class CategoryModel extends Gdn_Model {
     public function getChildTree($id, $options = []) {
         $category = $this->getOne($id);
 
+        $options = array_change_key_case($options ?: []) + [
+            'collapsecategories' => true
+        ];
+
         $tree = $this->collection->getTree((int)val('CategoryID', $category), $options);
-        self::filterChildren($tree);
         return $tree;
     }
 

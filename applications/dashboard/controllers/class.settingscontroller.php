@@ -1563,15 +1563,14 @@ class SettingsController extends DashboardController {
             $this->ExistingRoleInvitations = arrayCombine($InvitationRoleIDs, $InvitationCounts);
             $ConfigurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
-            // Define InviteExpiration based on the postback values
-            $this->InviteExpiration = $this->Form->getValue('Garden.Registration.InviteExpiration');
-
             // Event hook
             $this->EventArguments['ConfigurationModel'] = &$ConfigurationModel;
             $this->fireEvent('BeforeRegistrationUpdate');
 
             // Save!
             if ($this->Form->save() !== false) {
+                // Get the updated Expiration Length
+                $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));
                 if ($RedirectUrl != '') {
                     $this->RedirectUrl = $RedirectUrl;

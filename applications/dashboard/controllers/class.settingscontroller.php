@@ -1569,6 +1569,8 @@ class SettingsController extends DashboardController {
 
             // Save!
             if ($this->Form->save() !== false) {
+                // Get the updated Expiration Length
+                $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));
                 if ($RedirectUrl != '') {
                     $this->RedirectUrl = $RedirectUrl;

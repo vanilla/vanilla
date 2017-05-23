@@ -486,8 +486,12 @@ class CategoryModel extends Gdn_Model {
             $ParentID = $Cat['ParentCategoryID'];
 
             if (isset($Data[$ParentID]) && $ParentID != $Key) {
-                $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
-                $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+                if (isset($Cat['CountAllDiscussions'])) {
+                    $Data[$ParentID]['CountAllDiscussions'] += $Cat['CountAllDiscussions'];
+                }
+                if (isset($Cat['CountAllComments'])) {
+                    $Data[$ParentID]['CountAllComments'] += $Cat['CountAllComments'];
+                }
                 if (empty($Data[$ParentID]['ChildIDs'])) {
                     $Data[$ParentID]['ChildIDs'] = [];
                 }
@@ -706,8 +710,11 @@ class CategoryModel extends Gdn_Model {
     public function getChildTree($id, $options = []) {
         $category = $this->getOne($id);
 
+        $options = array_change_key_case($options ?: []) + [
+            'collapsecategories' => true
+        ];
+
         $tree = $this->collection->getTree((int)val('CategoryID', $category), $options);
-        self::filterChildren($tree);
         return $tree;
     }
 
@@ -2556,8 +2563,8 @@ class CategoryModel extends Gdn_Model {
             $this->Validation->applyRule('UrlCode', 'UrlStringRelaxed');
 
             // Url slugs cannot be the name of a CategoriesController method or fully numeric.
-            $this->Validation->addRule('CategorySlug', 'regex:/^(?!(all|archives|discussions|index|table|[0-9]+)$).*/');
-            $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric or the name of an internal method.');
+            $this->Validation->addRule('CategorySlug', 'function:validateCategoryUrlCode');
+            $this->Validation->applyRule('UrlCode', 'CategorySlug', 'Url code cannot be numeric, contain spaces or be the name of an internal method.');
 
             // Make sure that the UrlCode is unique among categories.
             $this->SQL->select('CategoryID')

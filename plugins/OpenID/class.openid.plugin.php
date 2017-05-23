@@ -7,24 +7,6 @@
  * @package OpenID
  */
 
-// Define the plugin:
-$PluginInfo['OpenID'] = array(
-    'Name' => 'OpenID',
-    'Description' => 'Allows users to sign in with OpenID. Must be enabled before using &lsquo;Google Sign In&rsquo; and &lsquo;Steam&rsquo; plugins.',
-    'Version' => '1.2.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/settings/openid',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'SocialConnect' => true,
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'Icon' => 'open-id.png'
-);
-
-// 0.2 - Remove redundant enable toggle (2012-03-08 Lincoln)
-
 /**
  * Class OpenIDPlugin
  */
@@ -316,7 +298,7 @@ class OpenIDPlugin extends Gdn_Plugin {
             'Plugins.OpenID.DisableSignIn' => array('Control' => 'Toggle', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
         ));
 
-        
+
         $Sender->setData('Title', sprintf(t('%s Settings'), t('OpenID')));
         $Sender->ConfigurationModule = $Conf;
         $Conf->renderAll();

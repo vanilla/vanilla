@@ -1,0 +1,19 @@
+{
+    "name": "Stop Forum Spam",
+    "description": "Got spammer problems? This integrates the spammer blacklist from stopforumspam.com to mitigate the issue.",
+    "version": "1.0.1",
+    "settingsUrl": "/settings/stopforumspam",
+    "icon": "stop_forum_spam.png",
+    "key": "stopforumspam",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.0.18"
+    }
+}

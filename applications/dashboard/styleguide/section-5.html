@@ -726,6 +726,45 @@ If this is the case, render your checkboxes this way. No javascript necessary!</
 </div></div>
                                     </div>
                                 </section>
+                                <section class="kss-depth-3">
+                                    <div class="kss-component">
+                                        <div class="kss-component-description row full-border">
+                                            <h3 class="kss-title" id="5-10-3">
+                                            <span class="kss-ref badge pull-right">5-10-3</span> Spoiler Toggle
+                                            </h3>
+                                                <div class="kss-box padded"><p>Spoilers hide content until you click on them. Usually these are reserved for the front-end,
+but we also use them for sensitive information in the dashboard, like the Access Token.</p>
+<p>Here&#39;s how to build an anchor toggle.</p>
+</div>
+                                                <pre class="prettyprint lang-html padded-bottom" style="background-color: #fff">&lt;div class=&quot;spoiler [modifier class]&quot;&gt;
+  &lt;button class=&quot;btn btn-primary spoiler-trigger&quot;&gt;
+     Your spoiler message here
+  &lt;/button&gt;
+  &lt;div class=&quot;spoiler-content&quot;&gt;
+     Darth Vader is Luke&#x27;s father! 😲
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+                                                </div> <!-- end kss-component-description -->
+                                                <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">Default styling</span></div>
+                                                <div class="kss-example padded-bottom"><div class="spoiler [modifier class]">
+  <button class="btn btn-primary spoiler-trigger">
+     Your spoiler message here
+  </button>
+  <div class="spoiler-content">
+     Darth Vader is Luke's father! 😲
+  </div>
+</div></div>
+                                                    <div class="kss-example-heading-wrap padded-top"><span class="italic kss-example-heading">On state.</span> <span class="pull-right"><code>.spoiler-visible</code></span></div>
+                                                    <div class="kss-example padded-bottom"><div class="spoiler spoiler-visible">
+  <button class="btn btn-primary spoiler-trigger">
+     Your spoiler message here
+  </button>
+  <div class="spoiler-content">
+     Darth Vader is Luke's father! 😲
+  </div>
+</div></div>
+                                    </div>
+                                </section>
                 </div>
                 <div class="footer">
                     <div class="footer-logo logo-wrap">

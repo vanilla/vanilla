@@ -5,19 +5,6 @@
  * @package Debugger
  */
 
-// Define the plugin:
-$PluginInfo['Debugger'] = array(
-    'Description' => 'The debugger plugin displays database queries, their benchmarks, and page processing benchmarks at the bottom of each screen of the application.',
-    'Version' => '1.1.1',
-    'RegisterPermissions' => array('Plugins.Debugger.View', 'Plugins.Debugger.Manage'), // Permissions that should be added to the application. These will be prefixed with "Plugins.PluginName."
-    'PluginUrl' => 'https://open.vanillaforums.com/addons/debugger',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://markosullivan.ca',
-    'MobileFriendly' => true,
-    'Icon' => 'debugger.png'
-);
-
 /**
  * Class DebuggerPlugin
  */

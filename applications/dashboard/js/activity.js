@@ -154,12 +154,4 @@ jQuery(document).ready(function($) {
         }
         return false;
     });
-
-    // Set up paging
-    if ($.morepager)
-        $('.MorePager').not('.Message .MorePager').morepager({
-            pageContainerSelector: 'ul.DataList:first',
-            pagerInContainer: true
-        });
-
 });

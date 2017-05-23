@@ -8,22 +8,6 @@
  * @package ProfileExtender
  */
 
-$PluginInfo['ProfileExtender'] = array(
-    'Name' => 'Profile Extender',
-    'Description' => 'Add fields (like status, location, or gamer tags) to profiles and registration.',
-    'Version' => '3.0.2',
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'MobileFriendly' => true,
-    //'RegisterPermissions' => array('Plugins.ProfileExtender.Add'),
-    'SettingsUrl' => '/dashboard/settings/profileextender',
-    'UsePopupSettings' => false,
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincoln@vanillaforums.com',
-    'AuthorUrl' => 'http://lincolnwebs.com',
-    'Icon' => 'profile-extender.png'
-);
-
 /**
  * Plugin to add additional fields to user profiles.
  *

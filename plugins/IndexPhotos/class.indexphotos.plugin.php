@@ -7,19 +7,6 @@
  * @package IndexPhotos
  */
 
-$PluginInfo['IndexPhotos'] = [
-    'Name' => 'Discussion Photos',
-    'Description' => "Displays photo and name of the user who started each discussion in discussion listings on modern layouts. Note that this plugin will not have any affect when table layouts are enabled.",
-    'Version' => '1.2.2',
-    'RequiredApplications' => ['Vanilla' => '2.1'],
-    'RegisterPermissions' => false,
-    'MobileFriendly' => true,
-    'Icon' => 'discussion_photos.png',
-    'Author' => "Lincoln Russell",
-    'AuthorEmail' => 'lincolnwebs@gmail.com',
-    'AuthorUrl' => 'http://lincolnwebs.com'
-];
-
 /**
  * Class IndexPhotosPlugin
  *

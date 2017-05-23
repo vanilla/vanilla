@@ -1,0 +1,22 @@
+{
+    "name": "OAuth2 SSO",
+    "className": "OAuth2Plugin",
+    "description": "Connect to an authentication provider to allow users to log on using SSO.",
+    "version": "1.0.0",
+    "settingsUrl": "/settings/oauth2",
+    "settingsPermission": "Garden.Settings.Manage",
+    "mobileFriendly": true,
+    "icon": "oauth2.png",
+    "key": "oauth2",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Patrick Kelly",
+            "email": "patrick.k@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

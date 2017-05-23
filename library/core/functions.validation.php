@@ -74,6 +74,35 @@ if (!function_exists('ValidateRequired')) {
     }
 }
 
+if (!function_exists('validateCategoryUrlCode')) {
+    /**
+     * Validate a category URL code.
+     *
+     * @param string $urlCode
+     * @return bool
+     */
+    function validateCategoryUrlCode($urlCode) {
+        $reservedSlugs = ['all', 'archives', 'discussions', 'index', 'table'];
+
+        // Does it contain spaces?
+        if (strpos($urlCode, ' ') !== false) {
+            return false;
+        }
+
+        // Is it only numbers?
+        if (preg_match('/^[0-9]+$/', $urlCode)) {
+            return false;
+        }
+
+        // Is it a reserved slug?
+        if (in_array($urlCode, $reservedSlugs)) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
 if (!function_exists('ValidateMeAction')) {
     /**
      * Validate that a string is a valid "me" action.

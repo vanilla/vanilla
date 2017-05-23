@@ -7,23 +7,6 @@
  * @package GooglePlus
  */
 
-$PluginInfo['GooglePlus'] = [
-    'Name' => 'Google+ Social Connect',
-    'Description' => 'Users may sign into your site using their Google Plus account.',
-    'Version' => '1.1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'MobileFriendly' => true,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'SettingsUrl' => '/dashboard/social/googleplus',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Hidden' => false,
-    'SocialConnect' => true,
-    'RequiresRegistration' => false,
-    'Icon' => 'google_social_connect.png'
-];
-
 /**
  * Class GooglePlusPlugin
  */

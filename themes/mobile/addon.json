@@ -1,0 +1,17 @@
+{
+    "name": "Basic Mobile",
+    "description": "A simplified theme made to target mobile browsers.",
+    "version": "1.1.4",
+    "isMobile": true,
+    "hidden": false,
+    "key": "mobile",
+    "type": "theme",
+    "priority": 1000,
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

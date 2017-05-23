@@ -548,7 +548,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Sign the user in.
-            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
             Gdn::userModel()->fireEvent('AfterSignIn');
 
             // Send them on their way.
@@ -635,7 +635,7 @@ class EntryController extends Gdn_Controller {
                             ]);
 
                             // Sign the user in.
-                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                             Gdn::userModel()->fireEvent('AfterSignIn');
                             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                             $this->render();
@@ -765,7 +765,7 @@ class EntryController extends Gdn_Controller {
                     $this->Form->setFormValue('UserSelect', false);
 
                     // Sign in as the new user.
-                    Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                    Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                     Gdn::userModel()->fireEvent('AfterSignIn');
 
                     // Send the welcome email.
@@ -877,7 +877,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 // Sign the user in.
-                Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', true));
+                Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                 Gdn::userModel()->fireEvent('AfterSignIn');
 
                 // Move along.

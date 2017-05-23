@@ -116,7 +116,7 @@ class HomeController extends Gdn_Controller {
      */
     public function leaving($target = '') {
         $this->setData('Target', $target);
-        $this->title('Leaving');
+        $this->title(t('Leaving'));
         $this->removeCssFile('admin.css');
         $this->addCssFile('style.css');
         $this->addCssFile('vanillicon.css', 'static');

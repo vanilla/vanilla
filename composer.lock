@@ -668,16 +668,16 @@
         },
         {
             "name": "vanilla/htmlawed",
-            "version": "v2.2.0.1",
+            "version": "v2.2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/htmlawed.git",
-                "reference": "b311030c617579790028d65f6d0967ce9351d991"
+                "reference": "d7c49fa7bfa3006973616141f35c67999fdc5132"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/b311030c617579790028d65f6d0967ce9351d991",
-                "reference": "b311030c617579790028d65f6d0967ce9351d991",
+                "url": "https://api.github.com/repos/vanilla/htmlawed/zipball/d7c49fa7bfa3006973616141f35c67999fdc5132",
+                "reference": "d7c49fa7bfa3006973616141f35c67999fdc5132",
                 "shasum": ""
             },
             "require": {
@@ -703,7 +703,7 @@
                 }
             ],
             "description": "A composer wrapper for the htmLawed library to purify & filter HTML. Tested with PHPUnit and PhantomJS!",
-            "time": "2017-04-20T17:18:55+00:00"
+            "time": "2017-05-17T18:14:43+00:00"
         },
         {
             "name": "vanilla/legacy-oauth",

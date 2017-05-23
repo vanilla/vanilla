@@ -8,22 +8,6 @@
  * @package editor
  */
 
-$PluginInfo['editor'] = array(
-   'Name' => 'Advanced Editor',
-   'Description' => 'Enables advanced editing of posts in several formats, including WYSIWYG, simple HTML, Markdown, and BBCode.',
-   'Version' => '1.8.1',
-   'Author' => "Dane MacMillan",
-   'AuthorUrl' => 'https://open.vanillaforums.com/profile/dane',
-   'RequiredApplications' => array('Vanilla' => '>=2.2'),
-   'MobileFriendly' => true,
-   'RegisterPermissions' => array(
-      'Plugins.Attachments.Upload.Allow' => 'Garden.Profiles.Edit'
-   ),
-   'SettingsUrl' => '/settings/editor',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Icon' => 'advanced-editor.png'
-);
-
 /**
  * Class EditorPlugin
  */

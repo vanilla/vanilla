@@ -441,7 +441,5 @@ if (!$captureOnly) {
 include(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'stub.php');
 
 // Set current Vanilla.Version
-$ApplicationInfo = array();
-include(CombinePaths(array(PATH_APPLICATIONS.DS.'vanilla'.DS.'settings'.DS.'about.php')));
-$Version = val('Version', val('Vanilla', $ApplicationInfo, array()), 'Undefined');
-saveToConfig('Vanilla.Version', $Version);
+$appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'vanilla'.DS.'addon.json'), true);
+saveToConfig('Vanilla.Version', val('version', $appInfo, 'Undefined'));

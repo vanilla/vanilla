@@ -11,6 +11,7 @@
     "icon": "twitter_social_connect.png",
     "key": "twitter",
     "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/social/twitter/",
     "authors": [
         {
             "name": "Todd Burry",

@@ -14,6 +14,23 @@ abstract class AbstractApiController extends \Vanilla\Web\Controller {
     private $userFragmentSchema;
 
     /**
+     * Filter unwanted values from an array (particularly empty values from request parameters).
+     *
+     * @param array $values
+     * @return array
+     */
+    public function filterValues(array $values) {
+        $result = array_filter($values, function($val) {
+            $valid = true;
+            if ($val === '') {
+                $valid = false;
+            }
+            return $valid;
+        });
+        return $result;
+    }
+
+    /**
      * Format a specific field.
      *
      * @param array $row An array representing a database row.

@@ -397,8 +397,8 @@ class CategoryCollection {
      * @param int $parentID The ID of the parent category.
      * @param array $options An array of options to affect the fetching.
      *
-     * - maxdepth: The maximum depth of the tree.
-     * - collapsed: Stop when looking at a category of a certain type.
+     * - maxDepth: The maximum depth of the tree.
+     * - collapseCategories: Stop when looking at a categories that contain categories.
      * - permission: The permission to use when looking at the tree.
      * @return array
      */

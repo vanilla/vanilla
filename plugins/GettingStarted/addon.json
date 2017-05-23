@@ -1,0 +1,15 @@
+{
+    "name": "Getting Started",
+    "description": "Adds a welcome message to the dashboard showing new administrators things they can do to get started using their forum. Checks off each item as it is completed.",
+    "version": "1",
+    "hidden": true,
+    "key": "gettingstarted",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://vanillaforums.com"
+        }
+    ]
+}

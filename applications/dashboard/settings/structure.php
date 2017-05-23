@@ -843,14 +843,14 @@ if (!$captureOnly && $AllIPAddressesExists) {
 
             // Every X records (determined by $resetBatch), clear out the AllIPAddresses field for processed users.
             if (count($processedUsers) > 0 && (count($processedUsers) % $resetBatch) === 0) {
-                $this->SQL->update('User')->set('AllIPAddresses', null)->whereIn('UserID', $processedUsers)
+                $SQL->update('User')->set('AllIPAddresses', null)->whereIn('UserID', $processedUsers)
                     ->limit(count($processedUsers))->put();
             }
         }
 
         // Any stragglers that need to be wiped out?
         if (count($processedUsers) > 0) {
-            $this->SQL->update('User')->set('AllIPAddresses', null)->where('UserID', $processedUsers)->limit(count($processedUsers))->put();
+            $SQL->update('User')->set('AllIPAddresses', null)->where('UserID', $processedUsers)->limit(count($processedUsers))->put();
         }
 
         // Query the next batch of users with IP data needing to be migrated.
@@ -898,3 +898,12 @@ touchFolder(PATH_CACHE.'/Smarty/compile');
 // Lock the current database character Encoding
 saveToConfig('Database.CharacterEncoding', c('Database.CharacterEncoding'));
 saveToConfig('Database.ExtendedProperties.Collate', c('Database.ExtendedProperties.Collate'));
+
+
+// For Touch Icon
+if (c('Plugins.TouchIcon.Uploaded')) {
+    saveToConfig('Garden.TouchIcon', 'TouchIcon/apple-touch-icon.png');
+    removeFromConfig('Plugins.TouchIcon.Uploaded');
+}
+
+Gdn::router()->setRoute('apple-touch-icon.png', 'utility/showtouchicon', 'Internal');

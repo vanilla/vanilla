@@ -204,6 +204,7 @@ module.exports = function (grunt) {
           'js/src/lithe.js',
           'js/src/lithe.drawer.js',
           'js/src/modal.dashboard.js',
+          'js/spoiler.js',
           'js/src/main.js'
         ])
         , dest: 'js/dashboard.js'
@@ -226,6 +227,7 @@ module.exports = function (grunt) {
           '../../js/library/jquery.expander.js',
           '../../js/library/jquery.gardencheckboxgrid.js',
           '../../js/library/jquery.form.js',
+          'js/spoiler.js',
           'js/dashboard.js'
         ])
         , dest: 'template/public/dashboard.js'

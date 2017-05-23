@@ -87,7 +87,7 @@ Please consider using maintenance mode before running database updates if your d
 * Backup your database, `.htaccess` and `conf/config.php` file somewhere safe.
 * Upload the new release's files so they overwrite the old ones.
 * Delete all files in `/cache`.
-* Go to `yourforum.com/utility/upgrade` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second times by refreshing the page.
+* Go to `yourforum.com/utility/update` to run any database updates needed. (404? See next paragraph.) If it fails, try it a second times by refreshing the page.
 * If any "Deleted Files" are listed on the upgrade page, manually delete the listed files.
 
 If your forum still uses URLs including `?p=`:

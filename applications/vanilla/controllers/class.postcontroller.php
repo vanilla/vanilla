@@ -28,6 +28,15 @@ class PostController extends VanillaController {
     /** @var bool Whether or not to show the category dropdown. */
     public $ShowCategorySelector = true;
 
+    /** @var int */
+    public $CategoryID = 0;
+
+    /** @var null|array */
+    public $Category = null;
+
+    /** @var null|array */
+    public $Context = null;
+
     /**
      * General "post" form, allows posting of any kind of form. Attach to PostController_AfterFormCollection_Handler.
      *
@@ -131,9 +140,6 @@ class PostController extends VanillaController {
                 // Get all our subcategories to add to the category if we are in a Header or Categories category.
                 $this->Context = CategoryModel::getSubtree($this->CategoryID);
             }
-        } else {
-            $this->CategoryID = 0;
-            $this->Category = null;
         }
 
         $CategoryData = $this->ShowCategorySelector ? CategoryModel::categories() : false;
@@ -563,15 +569,17 @@ class PostController extends VanillaController {
              * comments, we may need to apply certain filters and fixes to the data to maintain its intended display
              * with the input format (e.g. maintaining newlines).
              */
-            $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
+            if ($isEmbeddedComments) {
+                $inputFormatter = $this->Form->getFormValue('Format', c('Garden.InputFormatter'));
 
-            switch ($inputFormatter) {
-                case 'Wysiwyg':
-                    $this->Form->setFormValue(
-                        'Body',
-                        nl2br($this->Form->getFormValue('Body'))
-                    );
-                    break;
+                switch ($inputFormatter) {
+                    case 'Wysiwyg':
+                        $this->Form->setFormValue(
+                            'Body',
+                            nl2br($this->Form->getFormValue('Body'))
+                        );
+                        break;
+                }
             }
         }
 

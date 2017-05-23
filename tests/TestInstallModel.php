@@ -30,12 +30,11 @@ class TestInstallModel extends InstallModel {
      */
     public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container, \Gdn_Request $request) {
         parent::__construct($config, $addonModel, $container);
+        $this->setBaseUrl($request->url('/'));
 
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
         $this->config->load($config->defaultPath(), 'Configuration', true);
-
-        $this->setBaseUrl($request->url('/'));
     }
 
 
@@ -93,11 +92,21 @@ class TestInstallModel extends InstallModel {
      */
     private function getDbInfo() {
         return [
-            'host' => 'localhost',
+            'host' => $this->getDbHost(),
             'name' => $this->getDbName(),
             'user' => $this->getDbUser(),
             'password' => $this->getDbPassword()
         ];
+    }
+
+    /**
+     * Get the database host.
+     *
+     * @return string
+     */
+    public function getDbHost() {
+        $host = isset($_ENV['dbhost']) ? $_ENV['dbhost'] : 'localhost';
+        return $host;
     }
 
     /**

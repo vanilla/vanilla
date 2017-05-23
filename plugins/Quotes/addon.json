@@ -1,0 +1,20 @@
+{
+    "name": "Quotes",
+    "description": "Adds an option to each comment for users to easily quote each other.",
+    "version": "1.9",
+    "mobileFriendly": true,
+    "hasLocale": true,
+    "icon": "quotes.png",
+    "key": "quotes",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Tim Gunter",
+            "email": "tim@vanillaforums.com",
+            "homepage": "http://www.vanillaforums.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

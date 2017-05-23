@@ -1,0 +1,22 @@
+{
+    "name": "Profile Extender",
+    "description": "Add fields (like status, location, or gamer tags) to profiles and registration.",
+    "version": "3.0.2",
+    "mobileFriendly": true,
+    "settingsUrl": "/dashboard/settings/profileextender",
+    "usePopupSettings": false,
+    "settingsPermission": "Garden.Settings.Manage",
+    "icon": "profile-extender.png",
+    "key": "profileextender",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Lincoln Russell",
+            "email": "lincoln@vanillaforums.com",
+            "homepage": "http://lincolnwebs.com"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.1"
+    }
+}

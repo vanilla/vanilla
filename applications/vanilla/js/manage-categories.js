@@ -43,8 +43,14 @@ jQuery(document).ready(function ($) {
     $("#Form_Name").keyup(function (event) {
         if ($('#Form_CodeIsDefined').val() == '0') {
             $('#UrlCode').show();
-            var val = $(this).val().replace(/[ \/\\&.?;,<>'"]+/g, '-');
-            val = val.replace(/\-+/g, '-').toLowerCase();
+            var val = $(this).val();
+            // A slug can't consist only of numbers.
+            if (val.match(/^[0-9]+$/)) {
+                val = '';
+            } else {
+                val = val.replace(/[ \/\\&.?;,<>'"]+/g, '-');
+                val = val.replace(/\-+/g, '-').toLowerCase();
+            }
             $("#Form_UrlCode").val(val);
             $("#UrlCode span").text(val);
         }

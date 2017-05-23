@@ -8,21 +8,6 @@
  * @package vanillicon
  */
 
-// Define the plugin:
-$PluginInfo['vanillicon'] = array(
-   'Name' => 'Vanillicon',
-   'Description' => "Provides fun default user icons from vanillicon.com.",
-   'Version' => '2.1.0',
-   'RequiredApplications' => array('Vanilla' => '2.0.18'),
-   'Author' => 'Todd Burry',
-   'AuthorEmail' => 'todd@vanillaforums.com',
-   'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-   'MobileFriendly' => true,
-   'SettingsUrl' => '/settings/vanillicon',
-   'SettingsPermission' => 'Garden.Settings.Manage',
-   'Icon' => 'vanillicon.png'
-);
-
 /**
  * Class VanilliconPlugin
  */

@@ -7,17 +7,6 @@
  * @package SplitMerge
  */
 
-$PluginInfo['SplitMerge'] = [
-    'Name' => 'Split / Merge',
-    'Description' => 'Allows moderators with discussion edit permission to split & merge discussions.',
-    'Version' => '1.2',
-    'HasLocale' => true,
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com',
-    'Icon' => 'split-merge.png'
-];
-
 /**
  * Class SplitMergePlugin
  */

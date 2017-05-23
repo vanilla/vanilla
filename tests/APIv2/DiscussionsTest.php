@@ -21,4 +21,17 @@ class DiscussionsTest extends AbstractResourceTest {
 
         parent::__construct($name, $data, $dataName);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function providePutFields() {
+        $fields = [
+            'announce' => ['announce', true],
+            'bookmark' => ['bookmark', true, 'bookmarked'],
+            'close' => ['close', true, 'closed'],
+            'sink' => ['sink', true]
+        ];
+        return $fields;
+    }
 }

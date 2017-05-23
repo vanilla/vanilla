@@ -144,6 +144,22 @@ class Addon {
             if (empty($info)) {
                 throw new \Exception("The addon at $subdir has an empty info array.");
             }
+
+            // Kludge that sets oldType until we unify applications and plugins into addon.
+            list($addonParentFolder, $addonFolder) = explode('/', ltrim($subdir, '/'));
+            if (in_array($addonParentFolder, ['applications', 'plugins'])) {
+                $info['oldType'] = substr($addonParentFolder, 0, -1);
+
+                // Kludge that sets keyRaw until we use key everywhere.
+                if ($info['oldType'] === 'application') {
+                    $info['keyRaw'] = $info['name'];
+                } else {
+                    if ($addonFolder !== $info['key']) {
+                        $info['keyRaw'] = $addonFolder;
+                    }
+                }
+            }
+
             return $info;
         }
 
@@ -265,6 +281,8 @@ class Addon {
             return null;
         }
 
+        $oldType = null;
+
         // See which info array is defined.
         if (!empty($PluginInfo) && is_array($PluginInfo)) {
             $array = $PluginInfo;
@@ -300,12 +318,21 @@ class Addon {
 
         $info['key'] = $key;
         $info['type'] = $type;
+
+        $oldInfo = reset($array);
+        $key = key($array);
+
+
         if (empty($info['priority'])) {
             $info['priority'] = $priority;
         }
 
         if (isset($oldType)) {
             $info['oldType'] = $oldType;
+
+            if ($oldType === 'application' && empty($info['name'])) {
+                $info['name'] = $key;
+            }
         }
 
         // Convert the author.

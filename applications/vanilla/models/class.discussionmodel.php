@@ -2690,6 +2690,9 @@ class DiscussionModel extends Gdn_Model {
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
         $this->updateDiscussionCount($CategoryID);
 
+        // Update the last post info for the category and its parents.
+        CategoryModel::instance()->refreshAggregateRecentPost($CategoryID, true);
+
         // Decrement CountAllDiscussions for category and its parents.
         CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_DISCUSSION);
 

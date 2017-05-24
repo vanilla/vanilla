@@ -168,7 +168,7 @@ class Gdn_Upload extends Gdn_Pluggable {
         $Name = str_replace('\\', '/', $Name);
         $PathUploads = str_replace('\\', '/', PATH_UPLOADS);
 
-        if (c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+        if (c('Garden.AllowSSL', c('Garden.ForceSSL', 'false'))) {
             $Name = preg_replace("/^http:/i", "https:", $Name);
         }
 
@@ -342,7 +342,7 @@ class Gdn_Upload extends Gdn_Pluggable {
         $parsed = self::parse($name);
         $url = $parsed['Url'];
 
-        if (c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+        if (c('Garden.AllowSSL', c('Garden.ForceSSL', 'false'))) {
             $url = preg_replace("/^http:/i", "https:", $url);
         }
 

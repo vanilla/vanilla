@@ -469,7 +469,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             $Return = $Value;
         }
 
-        if (c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+        if (c('Garden.AllowSSL', c('Garden.ForceSSL', 'false'))) {
             $Return = preg_replace("/^http:/i", "https:", $Return);
         }
 

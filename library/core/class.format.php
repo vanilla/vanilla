@@ -278,13 +278,10 @@ class Gdn_Format {
                 // Standard BBCode parsing.
                 $Mixed = $BBCodeFormatter->format($Mixed);
 
-                // Always filter after basic parsing.
-                $Sanitized = Gdn_Format::htmlFilter($Mixed);
-
                 // Vanilla magic parsing.
-                $Sanitized = Gdn_Format::processHTML($Sanitized);
+                $Mixed = Gdn_Format::processHTML($Mixed);
 
-                return $Sanitized;
+                return $Mixed;
             }
 
             // Fallback to minimalist BBCode parsing.

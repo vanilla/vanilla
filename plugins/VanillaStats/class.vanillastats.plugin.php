@@ -177,13 +177,10 @@ class VanillaStatsPlugin extends Gdn_Plugin {
                 ->limit(5, 0)
                 ->get();
 
-            $Structure = Gdn::structure()->table('Comment');
-
-            // If row count > than 10M and range is greater than 3 months.
-            $rowCountEstimate = $Structure->getRowCountEstimate('Comment');
+            // If the date range is greater than 90 days clamp it.
             $toDateTime = new DateTime($range['to']);
             $dateDiff = date_diff($toDateTime, new DateTime($range['from']));
-            if ($rowCountEstimate >= 10000000 && $dateDiff->format('%a') > 90) {
+            if ($dateDiff->format('%a') > 90) {
                 $range['from'] = $toDateTime->sub(new DateInterval('P3M'))->format(MYSQL_DATE_FORMAT);
                 $Sender->setData('UserDataRangeClamped', true);
             } else {
@@ -191,7 +188,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             }
 
             // Load the most active users during the date range.
-            $UserModel->SQL
+            $UserData = $UserModel->SQL
                 ->select('InsertUserID as UserID')
                 ->select('CommentID', 'count', 'CountComments')
                 ->from('Comment')
@@ -199,27 +196,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
                 ->where('DateInserted <=', $range['to'])
                 ->groupBy('InsertUserID')
                 ->orderBy('CountComments', 'desc')
-                ->limit(5, 0);
-
-            // We need to help the MySQL optimiser in some weird cases.
-            $Indexes = $Structure->indexSqlDb();
-            if (isset($Indexes['IX_Comment_DateInserted'])) {
-                $UserModel->SQL->from('Comment2');
-            }
-
-            // Make a copy before calling reset();
-            $NamedParameters = array_merge([], $UserModel->SQL->namedParameters());
-            $Query = $UserModel->SQL->getSelect();
-            $UserModel->SQL->reset();
-
-            // Force index usage. The MySQL optimizer can sometime, depending on the data structure,
-            // use FK_Comment_InsertUserID instead of IX_Comment_DateInserted which is way slower on large DateInserted range.
-            if (isset($Indexes['IX_Comment_DateInserted'])) {
-                $Query = preg_replace('/(\nfrom .+Comment.+?)(,.+Comment2.+)(\nwhere)/', "$1\nforce index (IX_Comment_DateInserted)$3", $Query);
-            }
-
-            $Query = $UserModel->SQL->applyParameters($Query, $NamedParameters);
-            $UserData = $UserModel->SQL->query($Query);
+                ->limit(5, 0)
+                ->get();
         }
 
         $Sender->setData('DiscussionData', $DiscussionData);

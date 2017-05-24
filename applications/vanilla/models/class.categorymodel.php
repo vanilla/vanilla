@@ -1193,24 +1193,8 @@ class CategoryModel extends Gdn_Model {
         }
 
         // Discussion-related field values.
-        $cache = [
-            'LastDiscussionUserID' => val('InsertUserID', $discussion),
-            'LastTitle' => Gdn_Format::text(val('Name', $discussion, t('No Title'))),
-            'LastUrl' => discussionUrl($discussion, false, '//').'#latest',
-            'LastUserID' => val('InsertUserID', $discussion)
-        ];
-        $db = [
-            'LastCommentID' => null,
-            'LastDateInserted' => val('DateInserted', $discussion),
-            'LastDiscussionID' => $discussionID
-        ];
-
-        // If we have a valid comment, override some of the last post field info with its values.
-        if ($comment) {
-            $db['LastCommentID'] = val('CommentID', $comment);
-            $db['LastDateInserted'] = val('DateInserted', $comment);
-            $cache['LastUserID'] = val('InsertUserID', $comment);
-        }
+        $cache = static::postCacheFields($discussion, $comment);
+        $db = static::postDBFields($discussion, $comment);
 
         $categories = self::instance()->collection->getAncestors($categoryID, true);
         foreach ($categories as $row) {
@@ -1218,6 +1202,66 @@ class CategoryModel extends Gdn_Model {
             self::instance()->setField($currentCategoryID, $db);
             CategoryModel::setCache($currentCategoryID, $cache);
         }
+    }
+
+    /**
+     * Build the cached category fields related to recent posts.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function postCacheFields($discussion, $comment = null) {
+        $result = [
+            'LastDiscussionUserID' => null,
+            'LastTitle' => null,
+            'LastUrl' => null,
+            'LastUserID' => null
+        ];
+
+        if ($discussion) {
+            // Discussion-related field values.
+            $result['LastDiscussionUserID'] = val('InsertUserID', $discussion);
+            $result['LastTitle'] = Gdn_Format::text(val('Name', $discussion, t('No Title')));
+            $result['LastUrl'] = discussionUrl($discussion, false, '//') . '#latest';
+            $result['LastUserID'] = val('InsertUserID', $discussion);
+
+            // If we have a valid comment, override some of the last post field info with its values.
+            if ($comment) {
+                $result['LastUserID'] = val('InsertUserID', $comment);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Build the database category fields related to recent posts.
+     *
+     * @param array|object $discussion
+     * @param array|object $comment
+     * @return array
+     */
+    private static function postDBFields($discussion, $comment = null) {
+        $result = [
+            'LastCommentID' => null,
+            'LastDateInserted' => null,
+            'LastDiscussionID' => null
+        ];
+
+        if ($discussion) {
+            $result['LastCommentID'] = null;
+            $result['LastDateInserted'] = val('DateInserted', $discussion);
+            $result['LastDiscussionID'] = val('DiscussionID', $discussion);
+
+            // If we have a valid comment, override some of the last post field info with its values.
+            if ($comment) {
+                $result['LastCommentID'] = val('CommentID', $comment);
+                $result['LastDateInserted'] = val('DateInserted', $comment);
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -2826,6 +2870,66 @@ class CategoryModel extends Gdn_Model {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Set the most recent post info for a category, based on itself and all its children.
+     *
+     * @param int $categoryID
+     * @param bool $updateAncestors
+     */
+    public function refreshAggregateRecentPost($categoryID, $updateAncestors = false) {
+        $categories = CategoryModel::getSubtree($categoryID, true);
+        $categoryIDs = array_column($categories, 'CategoryID');
+
+        $discussion = $this->SQL->getWhere(
+            'Discussion',
+            ['CategoryID' => $categoryIDs],
+            'DateLastComment',
+            'desc',
+        1)->firstRow(DATASET_TYPE_ARRAY);
+        $comment = null;
+
+        if (is_array($discussion)) {
+            $comment = CommentModel::instance()->getID($discussion['LastCommentID']);
+            $this->setField($categoryID, 'LastCategoryID', $discussion['CategoryID']);
+        }
+
+        $db = static::postDBFields($discussion, $comment);
+        $cache = static::postCacheFields($discussion, $comment);
+        $this->setField($categoryID, $db);
+        static::setCache($categoryID, $cache);
+
+        if ($updateAncestors) {
+            // Grab this category's ancestors, pop this category off the end and reverse order for traversal.
+            $ancestors = self::instance()->collection->getAncestors($categoryID, true);
+            array_pop($ancestors);
+            $ancestors = array_reverse($ancestors);
+            $lastInserted = strtotime($db['LastDateInserted']) ?: 0;
+            if (is_array($discussion) && array_key_exists('CategoryID', $discussion)) {
+                $lastCategoryID = $discussion['CategoryID'];
+            } else {
+                $lastCategoryID = false;
+            }
+
+            foreach ($ancestors as $row) {
+                // If this ancestor already has a newer discussion, stop.
+                if ($lastInserted < strtotime($row['LastDateInserted'])) {
+                    // Make sure this latest discussion is even valid.
+                    $lastDiscussion = DiscussionModel::instance()->getID($row['LastDiscussionID']);
+                    if ($lastDiscussion) {
+                        break;
+                    }
+                }
+                $currentCategoryID = val('CategoryID', $row);
+                self::instance()->setField($currentCategoryID, $db);
+                CategoryModel::setCache($currentCategoryID, $cache);
+
+                if ($lastCategoryID) {
+                    self::instance()->setField($currentCategoryID, 'LastCategoryID', $lastCategoryID);
+                }
+            }
+        }
     }
 
     /**

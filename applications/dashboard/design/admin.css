@@ -7804,6 +7804,13 @@ label[id^=iCheck] {
   }
 }
 
+.documentationLink {
+  display: inline-block;
+  position: relative;
+  vertical-align: 1px;
+  margin-left: 1px;
+}
+
 .media-right {
   padding-left: 1.125rem;
 }

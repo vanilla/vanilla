@@ -32,7 +32,7 @@ if ($addonType === 'applications') {
     $pathHelp = sprintf(
         t('PluginHelp'),
         '<code>'.PATH_PLUGINS.'</code>'
-    );
+    ). '<br/><br/>' . Anchor(t('Addon Documentation'), 'http://docs.vanillaforums.com/help/addons/', '', ["target" => "_blank"]);
     $getMore = wrap(Anchor(t('Get More Plugins').' <span class="icon icon-external-link"></span>', $addonUrl), 'li');
     $availableAddons = $this->AvailablePlugins;
     $enabledAddons = $this->EnabledPlugins;

@@ -22,6 +22,9 @@ class MediaItemModule extends Gdn_Module {
     /** @var string The url for the media item title if it's an anchor. */
     private $titleUrl = '';
 
+    /** @var string The url for documentation on the plugin. */
+    private $documentationUrl = '';
+
     /** @var string The description for the media item. */
     private $description = '';
 
@@ -160,6 +163,26 @@ class MediaItemModule extends Gdn_Module {
      */
     public function setTitleUrl($titleUrl) {
         $this->titleUrl = $titleUrl;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDocumentationLink() {
+        $docLink = "";
+        if (!empty($this->documentationUrl)) {
+            $docLink = anchor("<svg alt=\"" . t('page') . "\" class=\"icon icon-12 icon-page\" viewBox=\"0 0 5 6\"><use xlink:href=\"#page\"></use></svg>", $this->documentationUrl, 'documentationLink', ['target' => '_blank', 'title' => $this->title . ' ' . t('Documentation')]);
+        }
+        return $docLink;
+    }
+
+    /**
+     * @param string $documentationUrl Url for documentation
+     * @return MediaItemModule $this
+     */
+    public function setDocumentationUrl($documentationUrl) {
+        $this->documentationUrl = $documentationUrl;
         return $this;
     }
 

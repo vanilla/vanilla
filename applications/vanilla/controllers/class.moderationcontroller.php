@@ -447,14 +447,25 @@ class ModerationController extends VanillaController {
             }
 
             // Update recent posts and counts on all affected categories.
-            foreach ($AffectedCategories as $CategoryID => $Counts) {
-                $CategoryModel->SetRecentPost($CategoryID);
-                $CategoryModel->SQL
-                    ->update('Category')
-                    ->set('CountDiscussions', 'CountDiscussions'.($Counts[0] < 0 ? ' - ' : ' + ').abs($Counts[0]), false)
-                    ->set('CountComments', 'CountComments'.($Counts[1] < 0 ? ' - ' : ' + ').abs($Counts[1]), false)
-                    ->where('CategoryID', $CategoryID)
-                    ->put();
+            foreach ($AffectedCategories as $categoryID => $counts) {
+                $CategoryModel->refreshAggregateRecentPost($categoryID, true);
+
+                // Prepare to adjust post counts for this category and its ancestors.
+                list($discussionOffset, $commentOffset) = $counts;
+
+                // Offset the discussion count for this category and its parents.
+                if ($discussionOffset < 0) {
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
+                } else {
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_DISCUSSION, $discussionOffset);
+                }
+
+                // Offset the comment count for this category and its parents.
+                if ($commentOffset < 0) {
+                    CategoryModel::decrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
+                } else {
+                    CategoryModel::incrementAggregateCount($categoryID, CategoryModel::AGGREGATE_COMMENT, $commentOffset);
+                }
             }
 
             // Clear selections.

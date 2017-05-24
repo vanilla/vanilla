@@ -340,13 +340,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      */
     public static function url($name) {
         $parsed = self::parse($name);
-        $url = $parsed['Url'];
-
-        if (c('Garden.AllowSSL', c('Garden.ForceSSL', 'false'))) {
-            $url = preg_replace("/^http:/i", "https:", $url);
-        }
-
-        return $url;
+        return $parsed['Url'];
     }
 
     /**

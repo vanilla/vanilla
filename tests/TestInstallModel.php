@@ -111,11 +111,7 @@ class TestInstallModel extends InstallModel {
      */
     public function getDbHost() {
         if (empty($this->dbHost)) {
-            if ($dbHost = getenv('TEST_DB_HOST')) {
-                $this->dbHost = $dbHost;
-            } else {
-                $this->dbHost = 'localhost';
-            }
+            $this->dbHost = getenv('TEST_DB_HOST') ?: 'localhost';
         }
         return $this->dbHost;
     }

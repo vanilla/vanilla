@@ -1464,7 +1464,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Add schemes to to urls.
-        if (!c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+        if (!c('Garden.AllowSSL') && c('Garden.ForceSSL')) {
             $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::request()->scheme());
         }
 

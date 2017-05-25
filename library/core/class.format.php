@@ -279,7 +279,15 @@ class Gdn_Format {
                 $Mixed = $BBCodeFormatter->format($Mixed);
 
                 // Always filter after basic parsing.
-                $Sanitized = Gdn_Format::htmlFilter($Mixed);
+                // Add htmLawed-compatible specification updates.
+                $options = [
+                    'spec' => [
+                        'span' => [
+                            'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
+                        ]
+                    ]
+                ];
+                $Sanitized = Gdn_Format::htmlFilter($Mixed, $options);
 
                 // Vanilla magic parsing.
                 $Sanitized = Gdn_Format::processHTML($Sanitized);
@@ -901,7 +909,7 @@ class Gdn_Format {
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param array $options An array of filter options.
+     * @param array $options An array of filter options. These will also be passed through to the formatter.
      *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
      */
@@ -929,7 +937,7 @@ class Gdn_Format {
                 }
 
                 // Do HTML filtering before our special changes.
-                $Result = $Formatter->format($Mixed);
+                $Result = $Formatter->format($Mixed, $options);
             } else {
                 // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.

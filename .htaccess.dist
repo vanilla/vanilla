@@ -21,17 +21,17 @@
 
     # Prevent access to any php script but /index.php
     RewriteCond %{REQUEST_URI} !^/index.php$
-    RewriteRule ^(.+\.php)$ index.php [QSA,E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
+    RewriteRule ^(.+\.php)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
     # Redirect any non existing file/directory to /index.php
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^(.*)$ index.php [QSA,E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
+    RewriteRule ^(.*)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
     # Add the proper X_REWRITE server variable for rewritten requests.
     RewriteCond %{ENV:REDIRECT_X_REWRITE} .+
     RewriteCond %{ENV:REDIRECT_X_PATH_INFO} (.+)
-    RewriteRule ^index\.php - [QSA,E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]
+    RewriteRule ^index\.php - [E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]
 </IfModule>
 
 <IfModule mod_headers.c>

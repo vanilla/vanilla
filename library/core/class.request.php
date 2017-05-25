@@ -1415,8 +1415,9 @@ class Gdn_Request implements RequestInterface {
     public function url($path = '', $withDomain = false, $ssl = null) {
         static $allowSSL = null;
         if ($allowSSL === null) {
-            $allowSSL = c('Garden.AllowSSL', false);
+            $allowSSL = c('Garden.AllowSSL', c('Garden.ForceSSL'));
         }
+
         static $rewrite = null;
         if ($rewrite === null) {
             $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
@@ -1424,7 +1425,7 @@ class Gdn_Request implements RequestInterface {
 
         if (!$allowSSL) {
             $ssl = null;
-        } elseif ($withDomain === 'https') {
+        } elseif ($withDomain === 'https' || c('Garden.ForceSSL')) {
             $ssl = true;
             $withDomain = true;
         }

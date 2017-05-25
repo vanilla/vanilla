@@ -12,7 +12,7 @@ use Gdn_DataSet;
 /**
  * Test the {@link Gdn_DataSet} class.
  */
-class DataSetTest extends \PHPUnit_Framework_TestCase {
+class DataSetTest extends \PHPUnit\Framework\TestCase {
     /**
      * A basic test of newing up a dataset.
      */

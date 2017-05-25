@@ -14,7 +14,7 @@ use PDO;
 /**
  * Tests an alternate install method.
  */
-class AltTest extends \PHPUnit_Framework_TestCase {
+class AltTest extends \PHPUnit\Framework\TestCase {
     /** @var APIv0  $api */
     protected static $api;
 

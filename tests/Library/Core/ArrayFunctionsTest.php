@@ -10,7 +10,7 @@ namespace VanillaTests\Library\Core;
 /**
  * Test array functions.
  */
-class ArrayFunctionsTest extends \PHPUnit_Framework_TestCase {
+class ArrayFunctionsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test {@link flattenArray()}.

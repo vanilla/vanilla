@@ -37,3 +37,6 @@ $dispatcher = Gdn::dispatcher();
 // Process the request.
 $dispatcher->start();
 $dispatcher->dispatch();
+
+echo '<pre>';
+print_r($_SERVER);

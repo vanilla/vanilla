@@ -19,7 +19,9 @@
     # RewriteRule ^tests/.* - [L,R=403] # Already covered by .htaccess
     RewriteRule ^vendor/.* - [L,R=403]
 
-    # Prevent access to any php script but /index.php
+    # Prevent access to any php script by redirecting the request to /index.php
+    # You can add an exceptions by adding another RewriteCond after this one.
+    # Example: RewriteCond %{REQUEST_URI} !^/yourscriptname.php$
     RewriteCond %{REQUEST_URI} !^/index.php$
     RewriteRule ^(.+\.php)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 

@@ -875,7 +875,7 @@ body { background: transparent !important; }
             }
 
             // Set the canonical url to have the proper page title.
-            $this->canonicalUrl(discussionUrl($Discussion, pageNumber($this->Offset, $Limit)));
+            $this->canonicalUrl(url(discussionUrl($Discussion, pageNumber($this->Offset, $Limit)), true));
 
             // Load the comments.
             $CurrentOrderBy = $this->CommentModel->orderBy();

@@ -414,7 +414,7 @@ class CategoriesController extends VanillaController {
             $this->fireEvent('AfterBuildPager');
 
             // Set the canonical Url.
-            $this->canonicalUrl(categoryUrl($Category, pageNumber($Offset, $Limit)));
+            $this->canonicalUrl(url(categoryUrl($Category, pageNumber($Offset, $Limit)), true));
 
             // Change the controller name so that it knows to grab the discussion views
             $this->ControllerName = 'DiscussionsController';

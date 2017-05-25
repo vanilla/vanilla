@@ -2,9 +2,15 @@
 !/applications/conversations/
 !/applications/dashboard/
 !/applications/vanilla/
+/build/*
+!/build/.htaccess
+!/build/build.xml
+!/build/package-include.txt
+!/build/package-exclude.txt
 /cache/*
-!/cache/.gitkeep
+!/cache/.htaccess
 /conf/*
+!/conf/.htaccess
 !/conf/config-defaults.php
 !/conf/constants.php
 !/conf/readme.txt
@@ -55,7 +61,7 @@ _notes
 */_archive/*
 ~*
 composer-local.json
-.htaccess
+/.htaccess
 .project
 .settings
 .buildpath
@@ -65,10 +71,6 @@ composer-local.json
 node_modules/
 bower_components/
 npm-debug.log
-/build/*
-!/build/build.xml
-!/build/package-include.txt
-!/build/package-exclude.txt
 /tests/cache/
 /cgi-bin/
 phpunit.xml

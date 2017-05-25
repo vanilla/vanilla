@@ -55,6 +55,7 @@ _notes
 */_archive/*
 ~*
 composer-local.json
+.htaccess
 .project
 .settings
 .buildpath

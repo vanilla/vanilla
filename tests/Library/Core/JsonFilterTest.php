@@ -11,7 +11,7 @@ use DateTime;
 /**
  * Test the jsonFilter function.
  */
-class JsonFilterTest extends \PHPUnit_Framework_TestCase {
+class JsonFilterTest extends \PHPUnit\Framework\TestCase {
 
     public function testJsonFilterDateTime() {
         $date = new DateTime('now', new \DateTimeZone('UTC'));

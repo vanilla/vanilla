@@ -909,7 +909,8 @@ class Gdn_Format {
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
-     * @param array $options An array of options to pass to the formatter.
+     * @param array $options An array of filter options. These will also be passed through to the formatter.
+     *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
      */
     public static function htmlFilter($Mixed, $options = []) {
@@ -925,12 +926,15 @@ class Gdn_Format {
                 }
 
                 // Allow the code tag to keep all enclosed HTML encoded.
-                $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
-                    $Result = "<code{$Matches[1]}>".
-                        htmlspecialchars($Matches[2]).
-                        '</code>';
-                    return $Result;
-                }, $Mixed);
+                $codeBlockEntities = val('codeBlockEntities', $options, true);
+                if ($codeBlockEntities) {
+                    $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
+                        $Result = "<code{$Matches[1]}>" .
+                            htmlspecialchars($Matches[2]) .
+                            '</code>';
+                        return $Result;
+                    }, $Mixed);
+                }
 
                 // Do HTML filtering before our special changes.
                 $Result = $Formatter->format($Mixed, $options);
@@ -2306,7 +2310,9 @@ EOT;
             }
 
             // Always filter after basic parsing.
-            $Sanitized = Gdn_Format::htmlFilter($Mixed);
+            // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
+            $filterOptions = ['codeBlockEntities' => false];
+            $Sanitized = Gdn_Format::htmlFilter($Mixed, $filterOptions);
 
             // Vanilla magic formatting.
             $Sanitized = Gdn_Format::processHTML($Sanitized);

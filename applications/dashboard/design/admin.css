@@ -8708,13 +8708,15 @@ button.close {
   margin-bottom: 0.5625rem;
   border-bottom: 0.0625rem dotted #ededed;
   letter-spacing: 0.0625rem;
-  font-size: 1.125rem;
-  font-weight: 100;
+  font-size: 0.875rem;
+  font-weight: 500;
   text-transform: uppercase;
 }
 
 .help a {
   color: #0291db;
+  font-size: 0.8125rem;
+  font-weight: 500;
   border-bottom: 0.0625rem dotted #0291db;
 }
 

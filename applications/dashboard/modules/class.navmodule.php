@@ -158,6 +158,7 @@ class NavModule extends Gdn_Module {
      * @return string
      */
 	public static function textToKey($text) {
+	    $text = strip_tags($text);
 	    $text = strtolower(trim($text));
 	    $text = str_replace(' ', '-', $text);
 	    $text = preg_replace('/-+/', '-', $text);

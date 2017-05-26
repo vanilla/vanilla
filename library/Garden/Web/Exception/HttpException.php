@@ -160,10 +160,10 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
             }
         }
 
-        $result = [
+        $result = array_replace($context, [
             'message' => $this->getMessage(),
             'status' => $this->getCode()
-        ] + $context;
+        ]);
 
         return $result;
     }

@@ -224,7 +224,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
             $spec = [];
             $allowedClasses = implode('|', $this->allowedClasses);
             foreach ($this->classedElements as $tag) {
-                if (!is_array($spec[$tag])) {
+                if (!array_key_exists($tag, $spec) || !is_array($spec[$tag])) {
                     $spec[$tag] = [];
                 }
                 if (!array_key_exists('class', $spec[$tag])) {

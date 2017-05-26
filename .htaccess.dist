@@ -4,33 +4,45 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    ####
     # Certain hosts may require the following line.
     # If vanilla is in a subfolder then you need to specify it after the /.
     # (ex. You put Vanilla in /forum so change the next line to: RewriteBase /forum)
-    # RewriteBase /
+    ####
+    #RewriteBase /
 
+    ####
     # Deny access to certain directories that SHOULD not be exposed.
+    ####
     RewriteRule ^\.git - [L,R=403]
-    # RewriteRule ^build/.* - [L,R=403] # Already covered by .htaccess
+    #RewriteRule ^build/.* - [L,R=403] # Already covered by .htaccess
     RewriteRule ^cache/.* - [L,R=403]
     RewriteRule ^cgi-bin/.* - [L,R=403]
     RewriteRule ^uploads/import/.* - [L,R=403]
-    # RewriteRule ^conf/.* - [L,R=403] # Already covered by .htaccess
-    # RewriteRule ^tests/.* - [L,R=403] # Already covered by .htaccess
+    #RewriteRule ^conf/.* - [L,R=403] # Already covered by .htaccess
+    #RewriteRule ^tests/.* - [L,R=403] # Already covered by .htaccess
     RewriteRule ^vendor/.* - [L,R=403]
 
+    ####
     # Prevent access to any php script by redirecting the request to /index.php
     # You can add an exceptions by adding another RewriteCond after this one.
     # Example: RewriteCond %{REQUEST_URI} !^/yourscriptname.php$
+    # You can comment out this section if it causes you problems.
+    # This is just a nice to have for security purposes.
+    ####
     RewriteCond %{REQUEST_URI} !^/index.php$
     RewriteRule ^(.+\.php)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
+    ####
     # Redirect any non existing file/directory to /index.php
+    ####
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)$ index.php [E=X_REWRITE:1,E=X_PATH_INFO:/$1,L]
 
+    ####
     # Add the proper X_REWRITE server variable for rewritten requests.
+    ####
     RewriteCond %{ENV:REDIRECT_X_REWRITE} .+
     RewriteCond %{ENV:REDIRECT_X_PATH_INFO} (.+)
     RewriteRule ^index\.php - [E=X_REWRITE:1,E=!REDIRECT_X_REWRITE,E=X_PATH_INFO:%1,E=!REDIRECT_X_PATH_INFO,L]

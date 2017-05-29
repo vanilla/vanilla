@@ -37,5 +37,6 @@ script:
   - tests/travis/php-lint.sh ./plugins
   - tests/travis/php-lint.sh ./themes
   - ./vendor/bin/phpunit -c phpunit.xml.dist --coverage-clover=coverage.clover
+  - ls -lah ./conf
   - cat /tmp/error.log
   - cat /tmp/access.log

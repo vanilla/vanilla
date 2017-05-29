@@ -26,30 +26,46 @@ class AssetController extends DashboardController {
     }
 
     /**
-     * Delete an image from config.
+     * Delete an image from config. Will attempt to remove any element with the an id that is the slugified
+     * config concatenated with '-preview-wrapper'.
      *
      * @param string $config The config value to delete.
      * @throws Gdn_UserException
      */
     public function deleteConfigImage($config = '') {
-        if (!Gdn::request()->isAuthenticatedPostBack()) {
-            throw new Gdn_UserException('The CSRF token is invalid.', 403);
-        }
+        Gdn::request()->isAuthenticatedPostBack(true);
         $this->permission('Garden.Settings.Manage');
 
         if (!$config) {
             return;
         }
 
+        $validated = false;
+        $deleted = false;
         $config = urldecode($config);
+        $imagePath = c($config, false);
 
-        if (c($config, false) !== false) {
+        if ($imagePath) {
+            $ext = pathinfo($imagePath, PATHINFO_EXTENSION);
+            if (in_array($ext, ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'])) {
+                $validated = true;
+            }
+        }
+
+        if ($validated) {
             $upload = new Gdn_UploadImage();
-            if ($upload->delete(c($config))) {
-                // Fore extra safety, ensure an image has been deleted before removing from config.
+            if ($upload->delete($imagePath)) {
+                // For extra safety, ensure an image has been deleted before removing from config.
                 removeFromConfig($config);
+                $deleted = true;
+                $this->informMessage(t('Image deleted.'));
+                $this->jsonTarget('#'.slugify($config).'-preview-wrapper', '', 'Remove');
             }
             $this->informMessage(t('Image deleted.'));
+        }
+
+        if (!$deleted) {
+            $this->informMessage(t('Error deleting image.'));
         }
 
         $this->render('blank', 'utility', 'dashboard');

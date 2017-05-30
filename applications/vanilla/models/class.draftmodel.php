@@ -159,13 +159,10 @@ class DraftModel extends Gdn_Model {
             unset($formPostValues['DiscussionID']);
         }
 
-        if ($Insert) {
-            // If no categoryid is defined, grab the first available.
-            if (!is_numeric(val('CategoryID', $formPostValues, false))) {
-                $formPostValues['CategoryID'] = $this->SQL->get('Category', '', '', 1)->firstRow()->CategoryID;
-            }
-
+        if (array_key_exists('CategoryID', $formPostValues) && filter_var($formPostValues['CategoryID'], FILTER_VALIDATE_INT) === false) {
+            unset($formPostValues['CategoryID']);
         }
+
         // Add the update fields because this table's default sort is by DateUpdated (see $this->get()).
         $this->addInsertFields($formPostValues);
         $this->addUpdateFields($formPostValues);

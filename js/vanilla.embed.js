@@ -396,9 +396,26 @@
         var result = func.apply(this, data.args);
     };
 
+    embed.getOffsetFromDocument = embed.fn.getOffsetFromDocument = function(elem) { // crossbrowser version
+        var box = elem.getBoundingClientRect();
+
+        var body = document.body;
+        var docEl = document.documentElement;
+
+        var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+        var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+        var clientTop = docEl.clientTop || body.clientTop || 0;
+        var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+        var top  = box.top +  scrollTop - clientTop;
+        var left = box.left + scrollLeft - clientLeft;
+
+        return { top: Math.round(top), left: Math.round(left) };
+    };
+
     embed.scrollTo = embed.fn.scrollTo = function(top) {
-        console.log('scrollTo: ' + top);
-        window.scrollTo(0, this.iframe.offsetTop + top);
+        window.scrollTo(0, this.getOffsetFromDocument(this.iframe).top + top);
     };
 
     embed.setLocation = embed.fn.setLocation = function(path) {

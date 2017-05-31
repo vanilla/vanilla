@@ -13,7 +13,7 @@ use Vanilla\Addon;
 /**
  * Tests of the {@link Addon::checkVersion()} method.
  */
-class CheckVersionTest extends \PHPUnit_Framework_TestCase {
+class CheckVersionTest extends \PHPUnit\Framework\TestCase {
     /**
      * Check exact version matching.
      */

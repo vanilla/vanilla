@@ -11,7 +11,7 @@ use DateTime;
 use DateTimeZone;
 
 
-class DateTimeTest extends \PHPUnit_Framework_TestCase{
+class DateTimeTest extends \PHPUnit\Framework\TestCase{
 
     /**
      * Test that different named timezones in the same place produce equivalent dates.

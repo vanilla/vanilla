@@ -15,7 +15,7 @@ use VanillaTests\TestInstallModel;
 /**
  * Test basic Vanilla installation.
  */
-class InstallModelTest extends \PHPUnit_Framework_TestCase {
+class InstallTest extends \PHPUnit\Framework\TestCase {
     /**
      * Test installing Vanilla with the {@link \Vanilla\Models\InstallModel}.
      */

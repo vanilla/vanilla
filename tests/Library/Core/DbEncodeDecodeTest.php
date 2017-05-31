@@ -10,7 +10,7 @@ namespace VanillaTests\Library\Core;
 /**
  * Test some of the global functions that operate (or mostly operate) on arrays.
  */
-class DbEncodeDecodeTest extends \PHPUnit_Framework_TestCase {
+class DbEncodeDecodeTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test encoding/decoding an array.

@@ -676,9 +676,15 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
             // Enforces tinyint values on boolean fields to comply with strict mode
-            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
-            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
-            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
+            if ($this->Form->getFormValue('HideAllDiscussions', null) !== null) {
+                $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            }
+            if ($this->Form->getFormValue('Archived', null) !== null) {
+                $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
+            }
+            if ($this->Form->getFormValue('AllowFileUploads', null) !== null) {
+                $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
+            }
 
             if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');

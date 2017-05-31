@@ -133,10 +133,16 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * Filter provided HTML through htmlLawed and return the result.
      *
      * @param string $html String of HTML to filter.
+     * @param array $options An array of options. The "spec" key is used for extra HTML specifications.
      * @return string Returns the filtered HTML.
      */
-    public function format($html) {
+    public function format($html, $options = []) {
         $attributes = c('Garden.Html.BlockedAttributes', 'on*, target');
+
+        $specOverrides = val('spec', $options, []);
+        if (!is_array($specOverrides)) {
+            $specOverrides = [];
+        }
 
         $config = [
             'anti_link_spam' => ['`.`', ''],
@@ -193,13 +199,10 @@ class HtmLawedPlugin extends Gdn_Plugin {
             'Status' => 1
         ];
 
-        $spec = 'object=-classid-type, -codebase; embed=type(oneof=application/x-shockwave-flash); ';
-
-        // Define elements allowed to have a `class`.
-        $spec .= implode(',', $this->classedElements);
-
-        // Whitelist classes we allow.
-        $spec .= '=class(oneof='.implode('|', $this->allowedClasses).'); ';
+        $spec = $this->spec();
+        if (is_array($specOverrides) && !empty($specOverrides)) {
+            $spec = array_merge_recursive($spec, $specOverrides);
+        }
 
         return Htmlawed::filter($html, $config, $spec);
     }
@@ -208,6 +211,29 @@ class HtmLawedPlugin extends Gdn_Plugin {
      * No setup.
      */
     public function setup() {
+    }
+
+    /**
+     * Grab the default htmLawed spec.
+     *
+     * @return array
+     */
+    private function spec() {
+        static $spec;
+        if ($spec === null) {
+            $spec = [];
+            $allowedClasses = implode('|', $this->allowedClasses);
+            foreach ($this->classedElements as $tag) {
+                if (!array_key_exists($tag, $spec) || !is_array($spec[$tag])) {
+                    $spec[$tag] = [];
+                }
+                if (!array_key_exists('class', $spec[$tag])) {
+                    $spec[$tag]['class'] = [];
+                }
+                $spec[$tag]['class']['oneof'] = $allowedClasses;
+            }
+        }
+        return $spec;
     }
 
     /**

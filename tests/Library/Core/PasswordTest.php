@@ -12,7 +12,7 @@ use Gdn_PasswordHash;
 /**
  * Test the the {@link Gdn_PasswordHash} class.
  */
-class PasswordTest extends \PHPUnit_Framework_TestCase {
+class PasswordTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Make sure an empty password fails.

@@ -42,7 +42,7 @@ class APIv0 extends HttpClient {
     public function __construct() {
         parent::__construct();
         $this
-            ->setBaseUrl($_ENV['baseurl'])
+            ->setBaseUrl(getenv('TEST_BASEURL'))
             ->setThrowExceptions(true);
     }
 
@@ -52,8 +52,12 @@ class APIv0 extends HttpClient {
      * @return string
      */
     public function getDbHost() {
-        $host = isset($_ENV['dbhost']) ? $_ENV['dbhost'] : 'localhost';
-        return $host;
+        if (getenv('TEST_DB_HOST')) {
+            $dbHost = getenv('TEST_DB_HOST');
+        } else {
+            $dbHost = 'localhost';
+        }
+        return $dbHost;
     }
 
     /**
@@ -64,8 +68,8 @@ class APIv0 extends HttpClient {
     public function getDbName() {
         $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-        if (isset($_ENV['dbname'])) {
-            $dbname = $_ENV['dbname'];
+        if (getenv('TEST_DB_NAME')) {
+            $dbname = getenv('TEST_DB_NAME');
         } else {
             $dbname = preg_replace('`[^a-z]`i', '_', $host);
         }
@@ -78,7 +82,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return $_ENV['dbuser'];
+        return getenv('TEST_DB_USER');
     }
 
     /**
@@ -87,7 +91,7 @@ class APIv0 extends HttpClient {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return $_ENV['dbpass'];
+        return getenv('TEST_DB_PASSWORD');
     }
 
     /**
@@ -125,11 +129,10 @@ class APIv0 extends HttpClient {
                 PDO::ATTR_PERSISTENT => false,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             ];
-            $host = $this->getDbHost();
-            $dsn = "mysql:host={$host};charset=utf8mb4";
+            $dsn = "mysql:host=".$this->getDbHost().";charset=utf8mb4";
             if ($db) {
                 $dbname = $this->getDbName();
-                $dsn .= ";dbname={$dbname}";
+                $dsn .= ";dbname=$dbname";
             }
 
             $pdo = new PDO($dsn, $this->getDbUser(), $this->getDbPassword(), $options);

@@ -57,7 +57,10 @@ window.vanilla.embed = function(host) {
             if ((typeof e.data) === 'string') {
                 var message = e.data.split(':');
                 var frame = document.getElementById('vanilla' + id);
-                if (!frame || frame.contentWindow != e.source) {
+
+                // Unload event's source is undefined
+                var isUnload = message[0] == 'unload';
+                if (!frame || (!isUnload && frame.contentWindow != e.source)) {
                     return;
                 }
                 processMessage(message);
@@ -158,8 +161,9 @@ window.vanilla.embed = function(host) {
                 }
             }
         } else if (message[0] == 'unload') {
-            if (window.attachEvent || scrollPosition('vanilla' + id) < 0)
+            if (window.attachEvent || scrollPosition('vanilla' + id) < 0) {
                 document.getElementById('vanilla' + id).scrollIntoView(true);
+            }
 
             iframe.style.visibility = "hidden";
 

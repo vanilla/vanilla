@@ -1308,6 +1308,11 @@ jQuery(document).ready(function($) {
         }
     });
 
+    // If we are not inside an iframe, focus the email input on the signin page.
+    if ($('#Form_User_SignIn').length && window.top.location === window.location) {
+        $('#Form_Email').focus();
+    }
+
     // Convert date fields to datepickers
     if ($.fn.datepicker) {
         $('input.DatePicker').datepicker({

@@ -2983,10 +2983,14 @@ PASSWORDMETER;
 
             $Description .= $image;
 
+            $LabelOptions = [];
+            if (arrayValueI('id', $Row['Options'])) {
+                $LabelOptions['for'] = arrayValueI('id', $Row['Options']);
+            }
             if ($Description) {
-                $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name'], $LabelOptions).$Description, 'div', ['class' => 'label-wrap']);
             } else {
-                $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name'], $LabelOptions), 'div', ['class' => 'label-wrap']);
             }
 
             switch (strtolower($Row['Control'])) {

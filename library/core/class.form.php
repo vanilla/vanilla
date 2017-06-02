@@ -2956,6 +2956,8 @@ PASSWORDMETER;
                 $Row['Options'] = array();
             }
 
+            touchValue('Control', $Row, 'TextBox');
+
             if (strtolower($Row['Control']) == 'callback') {
                 $ItemWrap = '';
             } else {
@@ -2986,8 +2988,6 @@ PASSWORDMETER;
             } else {
                 $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
             }
-
-            touchValue('Control', $Row, 'TextBox');
 
             switch (strtolower($Row['Control'])) {
                 case 'categorydropdown':

@@ -3004,8 +3004,7 @@ PASSWORDMETER;
                         .wrap($this->checkBox($Row['Name'], $LabelCode, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'toggle':
-                    $Result .= $Description
-                        .$this->toggle($Row['Name'], $LabelCode, $Row['Options']);
+                    $Result .= $this->toggle($Row['Name'], $LabelCode, $Row['Options'], $Description);
                     break;
                 case 'dropdown':
                     $Row['Options']['Wrap'] = true;

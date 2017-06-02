@@ -2961,7 +2961,8 @@ PASSWORDMETER;
             if (strtolower($Row['Control']) == 'callback') {
                 $ItemWrap = '';
             } else {
-                $ItemWrap = val('ItemWrap', $Options, array('<li class="' . $this->getStyle('form-group') . "\">\n", "\n</li>\n"));
+                $DefaultWrap = array('<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n");
+                $ItemWrap = val('ItemWrap', $Row, val('ItemWrap', $Options, $DefaultWrap));
             }
 
             $Result .= $ItemWrap[0];

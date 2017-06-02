@@ -167,6 +167,9 @@ class OpenIDPlugin extends Gdn_Plugin {
         if ($Session->Stash('OpenID', '', false) || $OpenID->validate()) {
             $Attr = $OpenID->getAttributes();
 
+            // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+            saveToConfig('Garden.Registration.AutoConnect', false, false);
+
             $Form = $Sender->Form; //new Gdn_Form();
             $ID = $OpenID->identity;
             $Form->setFormValue('UniqueID', $ID);

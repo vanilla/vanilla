@@ -12,7 +12,7 @@
     #RewriteBase /
 
     ####
-    # Deny access to certain directories that SHOULD not be exposed.
+    # Deny access to certain directories that SHOULD NOT be exposed.
     ####
     RewriteRule (^|/)\.git - [L,R=403]
     #RewriteRule ^build/ - [L,R=403] # Already covered by .htaccess

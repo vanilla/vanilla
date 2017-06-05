@@ -416,6 +416,9 @@ class FacebookPlugin extends Gdn_Plugin {
             }
         }
 
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
+
         $Form = $Sender->Form; //new Gdn_Form();
         $ID = val('id', $Profile);
         $Form->setFormValue('UniqueID', $ID);

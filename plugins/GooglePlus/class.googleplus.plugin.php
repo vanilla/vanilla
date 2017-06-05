@@ -280,6 +280,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $AccessToken = val('AccessToken', $GooglePlus);
         $Profile = val('Profile', $GooglePlus);
 
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
+
         $Form = $Sender->Form;
         $Form->setFormValue('UniqueID', val('id', $Profile));
         $Form->setFormValue('Provider', self::ProviderKey);

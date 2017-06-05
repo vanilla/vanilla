@@ -63,6 +63,18 @@ class PostController extends VanillaController {
     }
 
     /**
+     * Filters fields out based on a list of field names.
+     *
+     * @param array $fields The form fields to filter.
+     * @param array $filters An array of field names to filter out.
+     * @return array The filtered fields.
+     */
+    private function filterFormValues(array $fields, array $filters) {
+        $result = array_diff_key($fields, array_flip($filters));
+        return $result;
+    }
+
+    /**
      * Get available announcement options for discussions.
      *
      * @since 2.1
@@ -220,6 +232,8 @@ class PostController extends VanillaController {
         } elseif ($this->Form->authenticatedPostBack()) { // Form was submitted
             // Save as a draft?
             $FormValues = $this->Form->formValues();
+            $filters = ['Score'];
+            $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->DiscussionModel->filterForm($FormValues);
             $this->deliveryType(Gdn::request()->getValue('DeliveryType', $this->_DeliveryType));
             if ($DraftID == 0) {
@@ -642,6 +656,8 @@ class PostController extends VanillaController {
         if ($this->Form->authenticatedPostBack()) {
             // Save as a draft?
             $FormValues = $this->Form->formValues();
+            $filters = ['Score'];
+            $FormValues = $this->filterFormValues($FormValues, $filters);
             $FormValues = $this->CommentModel->filterForm($FormValues);
 
             if (!$Editing) {

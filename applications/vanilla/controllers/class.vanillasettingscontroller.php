@@ -65,6 +65,10 @@ class VanillaSettingsController extends Gdn_Controller {
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
         } else {
+            // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
+            $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
+
             // Define some validation rules for the fields being saved
             $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');

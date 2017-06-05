@@ -623,6 +623,9 @@ class TwitterPlugin extends Gdn_Plugin {
             }
         }
 
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
+
         $ID = val('id', $Profile);
         $Form->setFormValue('UniqueID', $ID);
         $Form->setFormValue('Provider', self::ProviderKey);

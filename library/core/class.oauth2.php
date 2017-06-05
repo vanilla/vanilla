@@ -559,7 +559,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 // for future requests, if not, store the access_token.
                 $attributes = [
                     'RefreshToken' => val('refresh_token', $response),
-                    'AccessToken' => val('access_token', $response, val('access_token', $response)),
+                    'AccessToken' => val('access_token', $response, val('refresh_token', $response)),
                     'Profile' => $profile
                 ];
 

@@ -675,7 +675,7 @@ class UserController extends DashboardController {
                 // Do not re-validate or change the username if disabled or exactly the same.
                 $nameUnchanged = ($User['Name'] === $this->Form->getValue('Name'));
                 if (!$CanEditUsername || $nameUnchanged) {
-                    $this->Form->removeFormValue("Name");
+                    $this->Form->setFormValue('Name', $User['Name']);
                 }
 
                 // Allow mods to confirm/unconfirm emails

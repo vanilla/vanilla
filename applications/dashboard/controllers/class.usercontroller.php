@@ -746,7 +746,7 @@ class UserController extends DashboardController {
                     $this->informMessage(t('Your changes have been saved.'));
                 } else {
                     // We unset the form value on save when username is not edited or user can't edit this field.
-                    // On error we need to reset the field to the original value otherwise the field is empty.
+                    // On error we need to reset the field to the original value otherwise the field is empty
                     if (!is_null($restoreName)) {
                         $this->Form->setFormValue("Name", $restoreName);
                     }
@@ -1037,7 +1037,7 @@ class UserController extends DashboardController {
      *
      *
      * @param bool $UserID
-     * @throws Exceptio
+     * @throws Exception
      * @throws Gdn_UserException
      */
     public function sso($UserID = false) {

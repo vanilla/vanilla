@@ -674,8 +674,10 @@ class UserController extends DashboardController {
             if ($this->Form->authenticatedPostBack(true)) {
                 // Do not re-validate or change the username if disabled or exactly the same.
                 $nameUnchanged = ($User['Name'] === $this->Form->getValue('Name'));
+                $restoreName = null;
                 if (!$CanEditUsername || $nameUnchanged) {
-                    $this->Form->setFormValue('Name', $User['Name']);
+                    $this->Form->removeFormValue("Name");
+                    $restoreName = $User['Name'];
                 }
 
                 // Allow mods to confirm/unconfirm emails
@@ -742,6 +744,12 @@ class UserController extends DashboardController {
                     }
 
                     $this->informMessage(t('Your changes have been saved.'));
+                } else {
+                    // We unset the form value on save when username is not edited or user can't edit this field.
+                    // On error we need to reset the field to the original value otherwise the field is empty
+                    if (!is_null($restoreName)) {
+                        $this->Form->setFormValue("Name", $restoreName);
+                    }
                 }
 
                 $UserRoleData = $UserNewRoles;

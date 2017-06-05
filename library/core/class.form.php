@@ -2956,10 +2956,13 @@ PASSWORDMETER;
                 $Row['Options'] = array();
             }
 
+            touchValue('Control', $Row, 'TextBox');
+
             if (strtolower($Row['Control']) == 'callback') {
                 $ItemWrap = '';
             } else {
-                $ItemWrap = val('ItemWrap', $Options, array('<li class="' . $this->getStyle('form-group') . "\">\n", "\n</li>\n"));
+                $DefaultWrap = array('<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n");
+                $ItemWrap = val('ItemWrap', $Row, val('ItemWrap', $Options, $DefaultWrap));
             }
 
             $Result .= $ItemWrap[0];
@@ -2981,13 +2984,15 @@ PASSWORDMETER;
 
             $Description .= $image;
 
-            if ($Description) {
-                $labelWrap = wrap($this->label($LabelCode, $Row['Name']).$Description, 'div', ['class' => 'label-wrap']);
-            } else {
-                $labelWrap = wrap($this->label($LabelCode, $Row['Name']), 'div', ['class' => 'label-wrap']);
+            $LabelOptions = [];
+            if (arrayValueI('id', $Row['Options'])) {
+                $LabelOptions['for'] = arrayValueI('id', $Row['Options']);
             }
-
-            touchValue('Control', $Row, 'TextBox');
+            if ($Description) {
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name'], $LabelOptions).$Description, 'div', ['class' => 'label-wrap']);
+            } else {
+                $labelWrap = wrap($this->label($LabelCode, $Row['Name'], $LabelOptions), 'div', ['class' => 'label-wrap']);
+            }
 
             switch (strtolower($Row['Control'])) {
                 case 'categorydropdown':
@@ -3000,8 +3005,7 @@ PASSWORDMETER;
                         .wrap($this->checkBox($Row['Name'], $LabelCode, $Row['Options']), 'div', ['class' => 'input-wrap']);
                     break;
                 case 'toggle':
-                    $Result .= $Description
-                        .$this->toggle($Row['Name'], $LabelCode, $Row['Options']);
+                    $Result .= $this->toggle($Row['Name'], $LabelCode, $Row['Options'], $Description);
                     break;
                 case 'dropdown':
                     $Row['Options']['Wrap'] = true;

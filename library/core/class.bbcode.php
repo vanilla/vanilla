@@ -386,7 +386,7 @@ class BBCode extends Gdn_Pluggable {
                 'mode' => Nbbc::BBCODE_MODE_ENHANCED,
                 'plain_end' => "\n",
                 'plain_start' => "\n<b>Code:</b>\n",
-                'template' => "\n<pre>{\$_content/v}\n</pre>\n"
+                'template' => "\n<pre><code>{\$_content/v}\n</code></pre>\n"
             ]);
 
             $nbbc->addRule('hr', [

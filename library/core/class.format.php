@@ -1393,7 +1393,7 @@ EOT;
             case 'Vimeo':
                 $id = $matches[1];
                 return <<<EOT
-<iframe src="//player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="https://player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1420,7 +1420,7 @@ EOT;
             case 'Vine':
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="//vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="https://platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
                 break;
@@ -1428,32 +1428,32 @@ EOT;
             case 'Instagram':
                 return <<<EOT
 <div class="instagram-video VideoWrap">
-   <iframe src="//instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+   <iframe src="https://instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
                 break;
 
             case 'Pinterest':
                 return <<<EOT
-<a data-pin-do="embedPin" href="//pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
+<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
                 break;
 
             case 'Getty':
                 return <<<EOT
-<iframe src="//embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
+<iframe src="https://embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
 EOT;
                 break;
 
             case 'Twitch':
                 return <<<EOT
-<iframe src="http://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
+<iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
                 break;
 
             case 'Hitbox':
                 return <<<EOT
-<iframe src="http://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
+<iframe src="https://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1474,7 +1474,7 @@ EOT;
                 }
 
                 return <<<EOT
-<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
+<script charset="ISO-8859-1" src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
         }
 

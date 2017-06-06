@@ -252,6 +252,7 @@ $Construct->table('User')
 
 $Construct->table('Draft')
     ->PrimaryKey('DraftID')
+    ->column('Type', 'varchar(10)', true, 'index')
     ->column('DiscussionID', 'int', true, 'key')
     ->column('CategoryID', 'int', true, 'key')
     ->column('InsertUserID', 'int', false, 'key')
@@ -265,6 +266,7 @@ $Construct->table('Draft')
     ->column('Format', 'varchar(20)', true)
     ->column('DateInserted', 'datetime')
     ->column('DateUpdated', 'datetime', true)
+    ->column('Attributes', 'text', true)
     ->set($Explicit, $Drop);
 
 // Insert some activity types

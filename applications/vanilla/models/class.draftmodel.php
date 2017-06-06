@@ -180,6 +180,11 @@ class DraftModel extends Gdn_Model {
             unset($formPostValues['Sink']);
         }
 
+        // Prep and fire event
+        $this->EventArguments['FormPostValues'] = &$FormPostValues;
+        $this->EventArguments['DraftID'] = $DraftID;
+        $this->fireEvent('BeforeSaveDraft');
+
         // Validate the form posted values
         if ($this->validate($formPostValues, $Insert)) {
             $Fields = $this->Validation->schemaValidationFields(); // All fields on the form that relate to the schema
@@ -196,6 +201,11 @@ class DraftModel extends Gdn_Model {
                 $DraftID = $this->SQL->insert($this->Name, $Fields);
                 $this->UpdateUser($Session->UserID);
             }
+
+            // Fire an event that the draft was saved
+            $this->EventArguments['Fields'] = $Fields;
+            $this->EventArguments['DraftID'] = $DraftID; // Pass updated draft ID
+            $this->fireEvent('AfterSaveDraft');
         }
 
         return $DraftID;

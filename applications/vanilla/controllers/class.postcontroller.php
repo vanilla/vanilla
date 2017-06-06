@@ -188,7 +188,7 @@ class PostController extends VanillaController {
             $this->title(t('New Discussion'));
         }
 
-        touchValue('Type', $this->Data, 'Discussion');
+        touchValue('Type', $this->Data, val('Type', $this->Draft, 'Discussion'));
 
         if (!$UseCategories || $this->ShowCategorySelector) {
             // See if we should fill the CategoryID value.

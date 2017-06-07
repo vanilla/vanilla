@@ -1,0 +1,15 @@
+{
+    "key": "heroimage",
+    "name": "Hero Image",
+    "description": "A plugin to add a hero image upload per category. Supports a default, inheritence from parents and overrides.",
+    "version": "1.0.0",
+    "icon": "hero_image.png",
+    "author": [
+        {
+            "name": "Adam Charron",
+            "email": "adam.c@vanillaforums.com"
+        }
+    ],
+    "license": "proprietary",
+    "type": "addon"
+}

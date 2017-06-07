@@ -117,7 +117,7 @@ class HeroImagePlugin extends Gdn_Plugin {
     /**
      * Endpoints for deleting the extra category image from the category
      *
-     * @param VanillaSettingsController $sender    The controller for the settings page.
+     * @param VanillaSettingsController $sender     The controller for the settings page.
      * @param string                    $categoryID The id of the category being loaded (comes from url param)
      *
      * @return void

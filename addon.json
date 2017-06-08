@@ -2,8 +2,10 @@
     "key": "heroimage",
     "name": "Hero Image",
     "description": "A plugin to add a hero image upload per category. Supports a default, inheritence from parents and overrides.",
-    "version": "1.0.0",
+    "version": "1.0",
     "icon": "hero_image.png",
+    "settingsUrl": "/settings/heroimage",
+    "settingsPermission": "Garden.Settings.Manage",
     "author": [
         {
             "name": "Adam Charron",

@@ -1,16 +1,19 @@
-<?php if (!defined('APPLICATION')) exit;
+<?php
 
 /**
  * Hero Image Plugin.
  *
  * @author    Adam Charron <adam.c@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license   Proprietary
- * @since     1.0.0
+ * @license   Proprietary http://vanillaforums.com
+ * @since     1.0
+ */
+
+/**
+ * Hero Image Plugin.
  */
 class HeroImagePlugin extends Gdn_Plugin {
 
-    const DB_COLUMN_NAME = "HeroImage";
     const DEFAULT_CONFIG_KEY = "Garden.HeroImage";
     const SETTINGS_URL = 'settings/heroimage';
 
@@ -31,7 +34,7 @@ class HeroImagePlugin extends Gdn_Plugin {
     public function structure() {
         Gdn::structure()
             ->table('Category')
-            ->column(self::DB_COLUMN_NAME, 'varchar(255)', true)
+            ->column("HeroImage", 'varchar(255)', true)
             ->set();
     }
 
@@ -52,7 +55,7 @@ class HeroImagePlugin extends Gdn_Plugin {
             $category = CategoryModel::instance()->getID($categoryID);
         }
 
-        $slug = val(self::DB_COLUMN_NAME, $category);
+        $slug = val("HeroImage", $category);
 
         if (!$slug) {
             $parentID = val('ParentCategoryID', $category);
@@ -91,7 +94,7 @@ class HeroImagePlugin extends Gdn_Plugin {
                     $tmpImage,
                     $imageBaseName
                 );
-                $sender->Form->setFormValue(self::DB_COLUMN_NAME, $parts['SaveName']);
+                $sender->Form->setFormValue("HeroImage", $parts['SaveName']);
             }
         }
     }
@@ -106,7 +109,7 @@ class HeroImagePlugin extends Gdn_Plugin {
      */
     public function vanillaSettingsController_afterCategorySettings_handler($sender) {
         echo $sender->Form->imageUploadPreview(
-            self::DB_COLUMN_NAME,
+            "HeroImage",
             t('Hero Image'),
             t('The hero image displayed at the top of each page.'),
             'vanilla/settings/deleteheroimage/'.$sender->Category->CategoryID
@@ -117,8 +120,8 @@ class HeroImagePlugin extends Gdn_Plugin {
     /**
      * Endpoints for deleting the extra category image from the category
      *
-     * @param VanillaSettingsController $sender    The controller for the settings page.
-     * @param string                    $categoryID The id of the category being loaded (comes from url param)
+     * @param VanillaSettingsController $sender The controller for the settings page.
+     * @param string $categoryID The id of the category being loaded (comes from url param)
      *
      * @return void
      */
@@ -129,7 +132,7 @@ class HeroImagePlugin extends Gdn_Plugin {
         if ($categoryID && Gdn::request()->isAuthenticatedPostBack(true)) {
             // Do removal, set message
             $categoryModel = CategoryModel::instance();
-            $categoryModel->setField($categoryID, self::DB_COLUMN_NAME, null);
+            $categoryModel->setField($categoryID, "HeroImage", null);
             $sender->informMessage(t('Hero image was successfully deleted.'));
         }
 
@@ -161,18 +164,6 @@ class HeroImagePlugin extends Gdn_Plugin {
         ]);
         $sender->setData('ConfigurationModule', $configurationModule);
         $configurationModule->renderAll();
-    }
-
-    /**
-     * Adds "Media" menu option to the Forum menu on the dashboard.
-     *
-     * @param Gdn_Controller $sender Any Gdn Controller - targettings Settings and VanillaSettings
-     *
-     * @return void
-     */
-    public function base_getAppSettingsMenuItems_handler($sender) {
-        $menu = $sender->EventArguments['SideMenu'];
-        $menu->addLink('Appearance', t('Hero Images'), self::SETTINGS_URL, 'Garden.Settings.Manage');
     }
 
     /**

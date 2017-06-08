@@ -609,8 +609,10 @@ if (!function_exists('validateMinTextLength')) {
 
         if ($Diff <= 0) {
             return true;
+        } else if ($Diff == 1) {
+            return sprintf(T('ValidateMinLengthSingular'), T($field->Name), $Diff);
         } else {
-            return sprintf(T('ValidateMinLength'), T($field->Name), $Diff);
+            return sprintf(T('ValidateMinLengthPlural'), T($field->Name), $Diff);
         }
     }
 }

@@ -5583,8 +5583,15 @@ wysihtml5.dom.replaceWithChildNodes = function(node) {
                     this._unset(iframeDocument, "cookie", "", true);
                 }
 
-                this.loaded = true;
+                // Bubble up right click events to close dropdowns
+                iframeDocument.addEventListener("contextmenu", function(e) {
+                    var event = document.createEvent('HTMLEvents');
+                    event.initEvent('closedropdowns', true, false);
+                    parent.dispatchEvent(event);
+                });
 
+
+                this.loaded = true;
                 // Trigger the callback
                 setTimeout(function() {
                     that.callback(that);

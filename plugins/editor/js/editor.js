@@ -357,6 +357,10 @@
                 editorDropdownsClose();
             });
 
+            $(window).on('contextmenu closedropdowns', function() {
+                editorDropdownsClose();
+            });
+
             $(document).on('click touchstart', '.editor-dropdown', function(e) {
                 e.stopPropagation();
             });

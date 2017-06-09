@@ -46,6 +46,9 @@ class UserModel extends Gdn_Model {
     /** Seconds between login attempts. */
     const LOGIN_RATE = 1;
 
+    /** Timeout for SSO */
+    const SSO_TIMEOUT = 1200;
+    
     /** @var */
     public $SessionColumns;
 
@@ -657,7 +660,7 @@ class UserModel extends Gdn_Model {
 
         $Provider = Gdn_AuthenticationProviderModel::getProviderByKey($ClientID);
 
-        if (!filter_var($Timestamp, FILTER_VALIDATE_INT) || abs($Timestamp - time()) > 20 * 60) {
+        if (!filter_var($Timestamp, FILTER_VALIDATE_INT) || abs($Timestamp - time()) > self::SSO_TIMEOUT) {
             $this->Validation->addValidationResult('sso', 'The timestamp is invalid.');
             return false;
         }

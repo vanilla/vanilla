@@ -14,16 +14,16 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
 <table class="PreferenceGroup">
     <thead>
     <tr>
-        <td style="border: none;">&nbsp;</td>
-        <td class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Discussions'); ?></td>
-        <td class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Comments'); ?></td>
+        <th style="border: none;">&nbsp;</th>
+        <th class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Discussions'); ?></th>
+        <th class="TopHeading" colspan="<?php echo $span; ?>"><?php echo t('Comments'); ?></th>
     </tr>
     <tr>
-        <td style="text-align: left;"><?php echo t('Category'); ?></td>
-        <td class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></td>
-        <td class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></td>
-        <td class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></td>
-        <td class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></td>
+        <th style="text-align: left;"><?php echo t('Category'); ?></th>
+        <th class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></th>
+        <th class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></th>
+        <th class="PrefCheckBox BottomHeading<?php echo $emailClass; ?>"><?php echo t('Email'); ?></th>
+        <th class="PrefCheckBox BottomHeading"><?php echo t('Popup'); ?></th>
     </tr>
     </thead>
     <tbody>

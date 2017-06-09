@@ -657,6 +657,11 @@ class UserModel extends Gdn_Model {
 
         $Provider = Gdn_AuthenticationProviderModel::getProviderByKey($ClientID);
 
+        if (!filter_var($Timestamp, FILTER_VALIDATE_INT) || abs($Timestamp - time()) > 20 * 60) {
+            $this->Validation->addValidationResult('sso', 'The timestamp is invalid.');
+            return false;
+        }
+
         if (!$Provider) {
             $this->Validation->addValidationResult('sso', "Unknown SSO Provider: $ClientID");
             return false;

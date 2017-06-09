@@ -4,12 +4,13 @@
         width: 500px;
     }
 
-    thead td {
+    table.PreferenceGroup th {
         vertical-align: bottom;
         text-align: center;
     }
 
     table.PreferenceGroup thead .TopHeading {
+        text-align: center;
         border-bottom: none;
     }
 
@@ -17,7 +18,7 @@
         border-top: none;
     }
 
-    td.PrefCheckBox {
+    th.PrefCheckBox, td.PrefCheckBox {
         width: 50px;
         text-align: center;
     }
@@ -46,14 +47,14 @@
                 <thead>
                 <tr>
                     <?php
-                    echo wrap(t('Notification'), 'td', array('style' => 'text-align: left'));
+                    echo wrap(t('Notification'), 'th', array('style' => 'text-align: left'));
 
                     $PreferenceTypes = $this->data("PreferenceTypes.{$PreferenceGroup}");
                     foreach ($PreferenceTypes as $PreferenceType) {
                         if ($PreferenceType === 'Email' && c('Garden.Email.Disabled')) {
                             continue;
                         }
-                        echo wrap(t($PreferenceType), 'td', array('class' => 'PrefCheckBox'));
+                        echo wrap(t($PreferenceType), 'th', array('class' => 'PrefCheckBox'));
                     }
                     ?>
                 </tr>

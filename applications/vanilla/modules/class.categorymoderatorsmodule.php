@@ -26,14 +26,14 @@ class CategoryModeratorsModule extends Gdn_Module {
     /**
      * Load the data for this module.
      *
-     * @param array|null $category
+     * @param array|object|null $category
      */
     protected function getData($category = null) {
-        $moderators = $this->data('Moderators', null);
+        $data = $this->data('Moderators', null);
 
         // Only attempt to fetch data if we do not already have it.
-        if ($moderators === null) {
-            $moderators = false;
+        if ($data === null) {
+            $data = false;
 
             // If we received a category, try to use it. If not, try to pull one from the current controller.
             if ($category === null) {
@@ -44,17 +44,19 @@ class CategoryModeratorsModule extends Gdn_Module {
             }
 
             // Moderators are fetched via the PermissionCategoryID property. Make sure we have it.
-            if (is_array($category) && array_key_exists('PermissionCategoryID', $category)) {
+            $hasPermissionCategoryID = val('PermissionCategoryID', $category) !== false;
+            if ($hasPermissionCategoryID) {
                 // CategoryModel::joinModerators expects an array of category records.
                 $category = [$category];
                 CategoryModel::joinModerators($category);
-                if (array_key_exists('Moderators', $category[0]) && count($category[0]['Moderators']) > 0) {
+                $moderators = val('Moderators', $category[0]);
+                if (is_array($moderators) && count($moderators) > 0) {
                     // Success. Stash the moderators.
-                    $moderators = $category[0]['Moderators'];
+                    $data = $moderators;
                 }
             }
 
-            $this->setData('Moderators', $moderators);
+            $this->setData('Moderators', $data);
         }
     }
 

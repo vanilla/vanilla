@@ -572,7 +572,7 @@ class CategoriesController extends VanillaController {
                 );
             }
         }
-        // $this->setData('Discussions', $Discussions); 
+        $this->setData('Discussions', $Discussions); 
         
         // Add modules
         $this->addModule('NewDiscussionModule');

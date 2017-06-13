@@ -42,12 +42,18 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /** @var string  */
     public $VanillaID;
 
+    /** @var bool */
+    private $dashboardSummariesEnabled;
+
     /**
      * VanillaStatsPlugin constructor.
      */
     public function __construct() {
         $this->AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $this->VanillaID = Gdn::installationID();
+
+        $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
+        $this->dashboardSummariesEnabled = c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled);
     }
 
     /**
@@ -141,8 +147,7 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->addDefinition('ExpandText', t('more'));
             $sender->addDefinition('CollapseText', t('less'));
 
-            $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
-            $sender->addDefinition('DashboardSummaries', c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled));
+            $sender->addDefinition('DashboardSummaries', $this->dashboardSummariesEnabled);
 
             // Render the custom dashboard view
             $sender->render('dashboard', '', 'plugins/VanillaStats');
@@ -156,9 +161,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     public function settingsController_dashboardSummaries_create($Sender) {
         $DiscussionData = [];
         $UserData = [];
-        $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
 
-        if (c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled)) {
+        if ($this->dashboardSummariesEnabled) {
             $range = Gdn::request()->getValue('range');
             $range['to'] = date(MYSQL_DATE_FORMAT, strtotime($range['to']));
             $range['from'] = date(MYSQL_DATE_FORMAT, strtotime($range['from']));

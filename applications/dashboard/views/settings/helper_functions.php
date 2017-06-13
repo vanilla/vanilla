@@ -121,9 +121,10 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $screenName = Gdn_Format::display(val('Name', $addonInfo, $addonName));
     $description = Gdn_Format::html(t(val('Name', $addonInfo, $addonName).' Description', val('Description', $addonInfo, '')));
     $id = Gdn_Format::url($addonName).'-addon';
-
+    $documentationUrl = val('DocumentationUrl', $addonInfo, '');
     $media = new MediaItemModule($screenName, '', $description, 'li', ['id' => $id]);
     $media->setView('media-addon');
+    $media->setDocumentationUrl($documentationUrl);
 
     // Icon
 

@@ -1927,10 +1927,8 @@ class DiscussionModel extends Gdn_Model {
                 $this->setFloodControlEnabled(false);
             }
 
-            $isUserSpamming = $this->isUserSpamming(Gdn::session()->UserID, $this->floodGate);
-
             // If the post is new and it validates, make sure the user isn't spamming
-            if (!$Insert || !$isUserSpamming) {
+            if (!$Insert || !$this->checkUserSpamming(Gdn::session()->UserID, $this->floodGate)) {
                 // Get all fields on the form that relate to the schema
                 $Fields = $this->Validation->schemaValidationFields();
 
@@ -2691,6 +2689,9 @@ class DiscussionModel extends Gdn_Model {
 
         $this->SQL->delete('UserDiscussion', ['DiscussionID' => $discussionID]);
         $this->updateDiscussionCount($CategoryID);
+
+        // Update the last post info for the category and its parents.
+        CategoryModel::instance()->refreshAggregateRecentPost($CategoryID, true);
 
         // Decrement CountAllDiscussions for category and its parents.
         CategoryModel::decrementAggregateCount($CategoryID, CategoryModel::AGGREGATE_DISCUSSION);

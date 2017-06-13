@@ -35,13 +35,15 @@
     margin-bottom: $spacer / 2;
     border-bottom: $border-width dotted $grey-dark-border;
     letter-spacing: to-rem(1);
-    font-size: $font-size-h2;
-    font-weight: 100;
+    font-size: $font-size-base;
+    font-weight: $font-weight-helvetica-medium;
     text-transform: uppercase;
   }
 
   a {
     color: $brand-primary;
+    font-size: to-rem(13);
+    font-weight: $font-weight-helvetica-medium;
     border-bottom: $border-width dotted $brand-primary;
 
     &,

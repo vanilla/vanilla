@@ -619,7 +619,18 @@ class Gdn {
      *
      * @param \Garden\Container\Container $container
      */
-    public static function setContainer(\Garden\Container\Container $container) {
+    public static function setContainer(\Garden\Container\Container $container = null) {
         self::$container = $container;
+
+        /**
+         * Reset all of the cached objects that are fetched from the container.
+         */
+        self::$_Config = null;
+        self::$_Factory = null;
+        self::$_FactoryOverwrite = true;
+        self::$_Locale = null;
+        self::$_Request = null;
+        self::$_PluginManager = null;
+        self::$_Session = null;
     }
 }

@@ -574,6 +574,20 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
+     * Merge the named parameters from another SQL object with this one.
+     *
+     * This method is here to support some inner select optimizations. We intentionally try and leave parameters protected
+     * as much as possible to support future changes.
+     *
+     * @param Gdn_SQLDriver $sql The query to merge the parameters from.
+     * @return $this
+     */
+    public function mergeParameters(Gdn_SQLDriver $sql) {
+        $this->_NamedParameters = array_replace($this->_NamedParameters, $sql->_NamedParameters);
+        return $this;
+    }
+
+    /**
      * Returns a string of comma delimited table names to select from.
      *
      * @param mixed $Tables The name of a table (or an array of table names) to be added in the from
@@ -1179,7 +1193,7 @@ abstract class Gdn_SQLDriver {
 
         // Add the table prefix to any table specifications in the clause
         // echo '<div>'.$TableName.' ---> '.$this->EscapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
-        if ($this->Database->DatabasePrefix) {
+        if ($this->Database->DatabasePrefix && $TableName[0] !== '(') {
             $TableName = $this->mapAliases($TableName);
 
             //$Aliases = array_keys($this->_AliasMap);
@@ -1653,19 +1667,21 @@ abstract class Gdn_SQLDriver {
             $QueryOptions['CacheOptions'] = $this->_CacheOptions;
         }
 
+        $parameters = $this->calculateParameters($this->_NamedParameters);
+
         try {
             if ($this->CaptureModifications && strtolower($Type) != 'select') {
                 if (!property_exists($this->Database, 'CapturedSql')) {
                     $this->Database->CapturedSql = array();
                 }
-                $Sql2 = $this->applyParameters($Sql, $this->_NamedParameters);
+                $Sql2 = $this->applyParameters($Sql, $parameters);
 
                 $this->Database->CapturedSql[] = $Sql2;
                 $this->reset();
                 return true;
             }
 
-            $Result = $this->Database->query($Sql, $this->_NamedParameters, $QueryOptions);
+            $Result = $this->Database->query($Sql, $parameters, $QueryOptions);
         } catch (Exception $Ex) {
             $this->reset();
             throw $Ex;
@@ -1673,6 +1689,31 @@ abstract class Gdn_SQLDriver {
         $this->reset();
 
         return $Result;
+    }
+
+    /**
+     * Do anything necessary to coerce parameter values into something appropriate for the database.
+     *
+     * @param array $parameters The parameters to calculate.
+     * @return array New parameters
+     */
+    protected function calculateParameters($parameters) {
+        $dtZone = new DateTimeZone('UTC');
+
+        $result = [];
+        foreach ($parameters as $key => $value) {
+            if ($value instanceof \DateTimeInterface) {
+                $dt = new DateTime('@'.$value->getTimestamp());
+                $dt->setTimezone($dtZone);
+                $value = $dt->format(MYSQL_DATE_FORMAT);
+            } elseif (is_bool($value)) {
+                $value = (int)$value;
+            }
+
+            $result[$key] = $value;
+        }
+
+        return $result;
     }
 
     public function quoteIdentifier($String) {

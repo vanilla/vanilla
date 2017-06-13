@@ -8,20 +8,6 @@
  * @package ButtonBar
  */
 
-$PluginInfo['ButtonBar'] = array(
-    'Name' => 'Button Bar',
-    'Description' => 'Adds several simple buttons above comment boxes, allowing additional formatting.',
-    'Version' => '1.8.0',
-    'MobileFriendly' => true,
-    'RequiredApplications' => array('Vanilla' => '2.1'),
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'Icon' => 'button_bar.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 class ButtonBarPlugin extends Gdn_Plugin {
 
     /** @var array  */

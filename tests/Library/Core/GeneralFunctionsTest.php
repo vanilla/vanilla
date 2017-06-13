@@ -8,7 +8,7 @@
 namespace VanillaTests\Library\Core;
 
 
-class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
+class GeneralFunctionsTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Test {@link urlMatch()}.
@@ -30,15 +30,13 @@ class GeneralFunctionsTest extends \PHPUnit_Framework_TestCase {
      * @dataProvider provideJsonEncodeCheckedTests
      */
     public function testJsonEncodeChecked($data, $expectException) {
-        if ($expectException && PHP_VERSION_ID < 50500) {
-            if (version_compare(\PHPUnit_Runner_Version::id(), '5.0', '<')) {
-                $this->setExpectedException('Exception');
-            } else {
-                $this->expectException('Exception');
-            }
+        if ($expectException) {
+            $this->expectException('Exception');
         }
 
-        jsonEncodeChecked($data);
+        $encodedData = jsonEncodeChecked($data);
+
+        $this->assertNotFalse($encodedData);
     }
 
     /**

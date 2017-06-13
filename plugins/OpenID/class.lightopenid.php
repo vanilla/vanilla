@@ -146,6 +146,7 @@ class LightOpenID {
     protected function request_curl($url, $method = 'GET', $params = array()) {
         $params = http_build_query($params, '', '&');
         $curl = curl_init($url.($method == 'GET' && $params ? '?'.$params : ''));
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -192,7 +193,13 @@ class LightOpenID {
         }
 
         if (curl_errno($curl)) {
-            throw new ErrorException(curl_error($curl), curl_errno($curl));
+            Logger::log(Logger::ERROR, 'lightopenid error', [
+                'location' => __METHOD__.':'.__LINE__,
+                'message' => 'Curl request failed.',
+                'cURLError' => curl_error($curl),
+                'cURLErrorNo' => curl_errno($curl),
+            ]);
+            throw new ErrorException('Request error.');
         }
 
         return $response;
@@ -200,7 +207,11 @@ class LightOpenID {
 
     protected function request_streams($url, $method = 'GET', $params = array()) {
         if (!$this->hostExists($url)) {
-            throw new ErrorException('Invalid request.');
+            Logger::log(Logger::ERROR, 'lightopenid error', [
+                'location' => __METHOD__.':'.__LINE__,
+                'message' => 'Host "'.$url.'" not found',
+            ]);
+            throw new ErrorException('Request error.');
         }
 
         $params = http_build_query($params, '', '&');
@@ -288,10 +299,21 @@ class LightOpenID {
     }
 
     protected function request($url, $method = 'GET', $params = array()) {
+        $timeStart = microtime();
         if (function_exists('curl_init') && !ini_get('safe_mode')) {
-            return $this->request_curl($url, $method, $params);
+            $result = $this->request_curl($url, $method, $params);
+        } else {
+            $result = $this->request_streams($url, $method, $params);
         }
-        return $this->request_streams($url, $method, $params);
+        $timeDiff = microtime() - $timeStart;
+
+        // Make sure every request takes at least .5 second.
+        // This nullify brute forcing
+        if ($timeDiff < 500) {
+            usleep($timeDiff);
+        }
+
+        return $result;
     }
 
     protected function build_url($url, $parts) {

@@ -459,6 +459,13 @@ class Gdn_Session {
                     $UserModel->updateVisit($this->UserID);
                 }
 
+                /**
+                 * This checks ensures TK cookies aren't set for API calls, but are set for normal users where
+                 * $SetIdentity may be false on subsequent page loads after logging in.
+                 */
+                if ($SetIdentity || $UserID === false) {
+                    $this->ensureTransientKey();
+                }
             } else {
                 $this->UserID = 0;
                 $this->User = false;
@@ -468,8 +475,6 @@ class Gdn_Session {
                 }
             }
         }
-
-        $this->ensureTransientKey();
 
         // Load guest permissions if necessary
         if ($this->UserID == 0) {

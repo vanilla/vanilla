@@ -4,21 +4,6 @@
  * @license Proprietary
  */
 
-$PluginInfo['oauth2'] = array(
-    'Name' => 'OAuth2 SSO',
-    'ClassName' => "OAuth2Plugin",
-    'Description' => 'Connect to an authentication provider to allow users to log on using SSO.',
-    'Version' => '1.0.0',
-    'RequiredApplications' => array('Vanilla' => '2.2'),
-    'SettingsUrl' => '/settings/oauth2',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'MobileFriendly' => true,
-    'Icon' => 'oauth2.png',
-    'Author' => "Patrick Kelly",
-    'AuthorEmail' => 'patrick.k@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * Class OAuth2Plugin
  *

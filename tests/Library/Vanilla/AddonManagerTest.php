@@ -16,7 +16,7 @@ use Vanilla\Addon;
 use VanillaTests\Fixtures\TestAddonManager;
 
 
-class AddonManagerTest extends \PHPUnit_Framework_TestCase {
+class AddonManagerTest extends \PHPUnit\Framework\TestCase {
 
     private static $types = [Addon::TYPE_ADDON, Addon::TYPE_THEME, Addon::TYPE_LOCALE];
 
@@ -34,8 +34,11 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         $manager = $this->createTestManager();
 
         foreach (static::$types as $type) {
-            $addons = $manager->scan($type, true);
+            $manager->scan($type, true);
         }
+
+        // No exception so we are cool!
+        $this->assertTrue(true);
     }
 
     /**
@@ -66,6 +69,9 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         foreach (static::$types as $type) {
             $addons = $manager->scan($type, true);
         }
+
+        // No exception so we are cool!
+        $this->assertTrue(true);
     }
 
     /**
@@ -175,6 +181,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
 
         // Themes do not have a class
         if (empty($class)) {
+            $this->assertTrue(true);
             return;
         }
 
@@ -188,7 +195,7 @@ class AddonManagerTest extends \PHPUnit_Framework_TestCase {
         // Kludge: Check for the UserPhoto() function.
         $fileContents = file_get_contents($addon->path($subpath));
         if (preg_match('`function userPhoto`i', $fileContents)) {
-            $this->markTestSkipped("We can't test classes with redeclarations.");
+            $this->markTestSkipped("We can't test classes that redeclare userPhoto().");
             return;
         }
 

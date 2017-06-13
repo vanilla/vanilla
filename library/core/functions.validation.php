@@ -74,6 +74,35 @@ if (!function_exists('ValidateRequired')) {
     }
 }
 
+if (!function_exists('validateCategoryUrlCode')) {
+    /**
+     * Validate a category URL code.
+     *
+     * @param string $urlCode
+     * @return bool
+     */
+    function validateCategoryUrlCode($urlCode) {
+        $reservedSlugs = ['all', 'archives', 'discussions', 'index', 'table'];
+
+        // Does it contain spaces?
+        if (strpos($urlCode, ' ') !== false) {
+            return false;
+        }
+
+        // Is it only numbers?
+        if (preg_match('/^[0-9]+$/', $urlCode)) {
+            return false;
+        }
+
+        // Is it a reserved slug?
+        if (in_array($urlCode, $reservedSlugs)) {
+            return false;
+        }
+
+        return true;
+    }
+}
+
 if (!function_exists('ValidateMeAction')) {
     /**
      * Validate that a string is a valid "me" action.
@@ -247,6 +276,21 @@ if (!function_exists('validateUsername')) {
             $value,
             "/^({$ValidateUsernameRegex})?$/siu"
         );
+    }
+}
+
+if (!function_exists('validateAgainstUsernameBlacklist')) {
+    /**
+     * Validate that a string is not a blacklisted username.
+     *
+     * @param mixed $value The value to validate.
+     * @return bool|string Returns an error string if the strtolower-ed username is in the blacklist and true otherwise.
+     */
+    function validateAgainstUsernameBlacklist($value) {
+        if (in_array(strtolower($value), UserModel::getUsernameBlacklist())) {
+            return t('Username is reserved. Please choose a different username.');
+        }
+        return true;
     }
 }
 
@@ -565,8 +609,10 @@ if (!function_exists('validateMinTextLength')) {
 
         if ($Diff <= 0) {
             return true;
+        } else if ($Diff == 1) {
+            return sprintf(T('ValidateMinLengthSingular'), T($field->Name), $Diff);
         } else {
-            return sprintf(T('ValidateMinLength'), T($field->Name), $Diff);
+            return sprintf(T('ValidateMinLengthPlural'), T($field->Name), $Diff);
         }
     }
 }

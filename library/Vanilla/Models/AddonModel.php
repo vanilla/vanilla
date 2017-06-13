@@ -190,7 +190,9 @@ class AddonModel implements LoggerAwareInterface {
         // Look for a setup method.
         $called = $this->callPluginMethod($addon, 'setup');
 
-        if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($structure, get_included_files()))) {
+        // @TODO This if is a kludge because Vanilla's core applications are inconsistent.
+        // Once the InstallModel is in use this code can be cleaned up by manual structure inclusion in addons.
+        if (($structure = $addon->getSpecial('structure')) && (!$called || !in_array($addon->path($structure, Addon::PATH_FULL), get_included_files())) || $addon->getKey() === 'dashboard') {
             $this->logger->info(
                 "Executing structure for {addonKey}.",
                 ['event' => 'addon_structure', 'addonKey' => $addon->getKey(), 'structureType' => 'file']

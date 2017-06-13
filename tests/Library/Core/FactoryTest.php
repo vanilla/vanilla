@@ -12,7 +12,7 @@ use VanillaTests\Fixtures\Tuple;
 /**
  * Tests for the {@link Gdn_Factory}.
  */
-class FactoryTest extends \PHPUnit_Framework_TestCase {
+class FactoryTest extends \PHPUnit\Framework\TestCase {
     const TUPLE = 'VanillaTests\Fixtures\Tuple';
 
     /**

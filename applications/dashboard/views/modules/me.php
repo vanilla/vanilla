@@ -6,6 +6,7 @@ if ($this->CssClass)
     $CssClass .= ' '.$this->CssClass;
 
 $DashboardCount = 0;
+$ModerationCount = 0;
 // Spam & Moderation Queue
 if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
     $LogModel = new LogModel();

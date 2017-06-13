@@ -278,11 +278,19 @@ class Gdn_Format {
                 // Standard BBCode parsing.
                 $Mixed = $BBCodeFormatter->format($Mixed);
 
-                // Vanilla magic parsing.
-                $Mixed = Gdn_Format::processHTML($Mixed);
+                // Always filter after basic parsing.
+                // Add htmLawed-compatible specification updates.
+                $options = [
+                    'spec' => [
+                        'span' => [
+                            'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
+                        ]
+                    ]
+                ];
+                $Sanitized = Gdn_Format::htmlFilter($Mixed, $options);
 
-                // Always filter as the last step.
-                $Sanitized = Gdn_Format::htmlFilter($Mixed);
+                // Vanilla magic parsing.
+                $Sanitized = Gdn_Format::processHTML($Sanitized);
 
                 return $Sanitized;
             }
@@ -341,8 +349,11 @@ class Gdn_Format {
                 $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
                 $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
 
-                // Always filter as the last step.
+                // Always filter after basic parsing.
                 $Sanitized = Gdn_Format::htmlFilter($Mixed2);
+
+                // Vanilla magic parsing.
+                $Sanitized = Gdn_Format::processHTML($Sanitized);
 
                 return $Sanitized;
 
@@ -875,14 +886,18 @@ class Gdn_Format {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'Html');
         } else {
-            if (c('Garden.Format.ReplaceNewlines', true)) {
-                $Mixed = preg_replace("/(\015\012)|(\015)|(\012)/", "<br />", $Mixed);
-                $Mixed = fixNl2Br($Mixed);
-            }
-            $Mixed = Gdn_Format::processHTML($Mixed);
 
-            // Always filter as the last step.
+            // Always filter - in this case, no basic parsing is needed because we're already in HTML.
             $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Fix newlines in code blocks.
+            if (c('Garden.Format.ReplaceNewlines', true)) {
+                $Sanitized = preg_replace("/(?!<code[^>]*?>)(\015\012|\012|\015)(?![^<]*?<\/code>)/", "<br />", $Sanitized);
+                $Sanitized = fixNl2Br($Sanitized);
+            }
+
+            // Vanilla magic parsing.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
 
             return $Sanitized;
         }
@@ -894,9 +909,11 @@ class Gdn_Format {
      * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
      *
      * @param mixed $Mixed An object, array, or string to be formatted.
+     * @param array $options An array of filter options. These will also be passed through to the formatter.
+     *              - codeBlockEntities: Encode the contents of code blocks? Defaults to true.
      * @return string Sanitized HTML.
      */
-    public static function htmlFilter($Mixed) {
+    public static function htmlFilter($Mixed, $options = []) {
         if (!is_string($Mixed)) {
             return self::to($Mixed, 'HtmlFilter');
         } else {
@@ -909,15 +926,18 @@ class Gdn_Format {
                 }
 
                 // Allow the code tag to keep all enclosed HTML encoded.
-                $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
-                    $Result = "<code{$Matches[1]}>".
-                        htmlspecialchars($Matches[2]).
-                        '</code>';
-                    return $Result;
-                }, $Mixed);
+                $codeBlockEntities = val('codeBlockEntities', $options, true);
+                if ($codeBlockEntities) {
+                    $Mixed = preg_replace_callback('`<code([^>]*)>(.+?)<\/code>`si', function ($Matches) {
+                        $Result = "<code{$Matches[1]}>" .
+                            htmlspecialchars($Matches[2]) .
+                            '</code>';
+                        return $Result;
+                    }, $Mixed);
+                }
 
                 // Do HTML filtering before our special changes.
-                $Result = $Formatter->format($Mixed);
+                $Result = $Formatter->format($Mixed, $options);
             } else {
                 // The text does not contain HTML and does not have to be purified.
                 // This is an optimization because purifying is very slow and memory intense.
@@ -1067,8 +1087,10 @@ class Gdn_Format {
 
         $Result = trim(html_entity_decode($Result, ENT_QUOTES, 'UTF-8'));
 
-        // Always filter as the last step.
+        // Always filter after basic parsing.
         $Sanitized = Gdn_Format::htmlFilter($Result);
+
+        // No magic `processHTML()` for plain text.
 
         return $Sanitized;
     }
@@ -1371,7 +1393,7 @@ EOT;
             case 'Vimeo':
                 $id = $matches[1];
                 return <<<EOT
-<iframe src="//player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="https://player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1398,7 +1420,7 @@ EOT;
             case 'Vine':
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="//vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="https://platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
                 break;
@@ -1406,32 +1428,32 @@ EOT;
             case 'Instagram':
                 return <<<EOT
 <div class="instagram-video VideoWrap">
-   <iframe src="//instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+   <iframe src="https://instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
                 break;
 
             case 'Pinterest':
                 return <<<EOT
-<a data-pin-do="embedPin" href="//pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
+<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
                 break;
 
             case 'Getty':
                 return <<<EOT
-<iframe src="//embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
+<iframe src="https://embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
 EOT;
                 break;
 
             case 'Twitch':
                 return <<<EOT
-<iframe src="http://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
+<iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
                 break;
 
             case 'Hitbox':
                 return <<<EOT
-<iframe src="http://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
+<iframe src="https://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1452,7 +1474,7 @@ EOT;
                 }
 
                 return <<<EOT
-<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
+<script charset="ISO-8859-1" src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
         }
 
@@ -1628,45 +1650,62 @@ EOT;
         } else {
             $Markdown = new MarkdownVanilla();
 
+            /**
+             * By default, code blocks have their contents run through htmlspecialchars. Gdn_Format::htmlFilter
+             * also runs code blocks through htmlspecialchars. Here, the callback is modified to only return the block
+             * contents. The block will still be passed through htmlspecialchars, further down in Gdn_Format::htmlFilter.
+             */
+            $codeCallback = function($block) { return $block; };
+            $Markdown->code_block_content_func = $codeCallback;
+            $Markdown->code_span_content_func = $codeCallback;
+
             // Vanilla-flavored Markdown.
             if ($Flavored) {
                 $Markdown->addAllFlavor();
             }
 
-            // Format mentions prior to Markdown parsing.
-            // Avoids `@_name_` transformed to `@<em>name</em>`.
-            $Mixed = Gdn_Format::mentions($Mixed);
-
             // Markdown parsing.
             $Mixed = $Markdown->transform($Mixed);
 
-            // Vanilla magic formatting.
-            $Mixed = Gdn_Format::processHTML($Mixed);
-
-            // Always filter as the last step.
+            // Always filter after basic parsing.
             $Sanitized = Gdn_Format::htmlFilter($Mixed);
+
+            // Vanilla magic parsing.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
 
             return $Sanitized;
         }
     }
 
     /**
-     * Performs replacing operations on a HTML string. Usually for formatting posts.
-     * Runs an HTML string through the links, mentions, emoji and spoilers formatters.
+     * Do Vanilla's "magic" text processing.
+     *
+     * Runs an HTML string through our custom links, mentions, emoji and spoilers formatters.
+     * Any thing done here is AFTER security filtering and must be extremely careful.
+     * This should always be done LAST, after any other input formatters.
      *
      * @param string $html An unparsed HTML string.
      * @param bool $mentions Whether mentions are processed or not.
      * @return string The formatted HTML string.
      */
     protected static function processHTML($html, $mentions = true) {
-        // Fire a filter event here first so that it doesn't have to deal with the other formatters.
+        // Do event first so it doesn't have to deal with the other formatters.
         $html = self::getEventManager()->fireFilter('format_filterHtml', $html);
+
+        // Embed & auto-links.
         $html = Gdn_Format::links($html);
+
+        // Mentions.
         if ($mentions) {
             $html = Gdn_Format::mentions($html);
         }
+
+        // Emoji.
         $html = Emoji::instance()->translateToHtml($html);
+
+        // Old Spoiler plugin markup handling.
         $html = Gdn_Format::legacySpoilers($html);
+
         return $html;
     }
 
@@ -1981,11 +2020,14 @@ EOT;
      * @since 2.1
      */
     public static function textEx($Str) {
+        // Basic text parsing.
         $Str = self::text($Str);
-        $Str = Gdn_Format::processHTML($Str);
 
-        // Always filter as the last step.
+        // Always filter after basic parsing.
         $Sanitized = Gdn_Format::htmlFilter($Str);
+
+        // Vanilla magic parsing. (this is the "Ex"tra)
+        $Sanitized = Gdn_Format::processHTML($Sanitized);
 
         return $Sanitized;
     }
@@ -2267,11 +2309,15 @@ EOT;
                 return self::display($Mixed);
             }
 
-            // HTML filter first
-            $Mixed = $Formatter->format($Mixed);
-            // Links
-            $Mixed = Gdn_Format::processHTML($Mixed);
-            return $Mixed;
+            // Always filter after basic parsing.
+            // Wysiwyg is already formatted HTML. Don't try to doubly encode its code blocks.
+            $filterOptions = ['codeBlockEntities' => false];
+            $Sanitized = Gdn_Format::htmlFilter($Mixed, $filterOptions);
+
+            // Vanilla magic formatting.
+            $Sanitized = Gdn_Format::processHTML($Sanitized);
+
+            return $Sanitized;
         }
     }
 }

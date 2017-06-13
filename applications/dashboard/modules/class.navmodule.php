@@ -150,4 +150,18 @@ class NavModule extends Gdn_Module {
 		$this->fireAs(get_called_class())->fireEvent('render');
 		return parent::toString();
 	}
+
+    /**
+     * Convert some text to a key.
+     *
+     * @param $text
+     * @return string
+     */
+	public static function textToKey($text) {
+	    $text = strip_tags($text);
+	    $text = strtolower(trim($text));
+	    $text = str_replace(' ', '-', $text);
+	    $text = preg_replace('/-+/', '-', $text);
+	    return $text;
+    }
 }

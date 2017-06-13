@@ -28,26 +28,16 @@ class TestInstallModel extends InstallModel {
     /**
      * {@inheritdoc}
      */
-    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container) {
+    public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container, \Gdn_Request $request) {
         parent::__construct($config, $addonModel, $container);
 
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
-        $this->config->load($this->getConfigPath(), 'Configuration', true);
+        $this->config->load($config->defaultPath(), 'Configuration', true);
 
-        $this->setBaseUrl($_ENV['baseurl']);
+        $this->setBaseUrl($request->url('/'));
     }
 
-    /**
-     * Get the path to the config file for direct access.
-     *
-     * @return string Returns the path to the database.
-     */
-    public function getConfigPath() {
-        $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
-        $path = PATH_ROOT."/conf/$host.php";
-        return $path;
-    }
 
     /**
      * Get the base URL of the site.
@@ -66,7 +56,7 @@ class TestInstallModel extends InstallModel {
      */
     public function setBaseUrl($baseUrl) {
         $this->baseUrl = $baseUrl;
-        $this->config->defaultPath($this->getConfigPath());
+//        $this->config->defaultPath($this->getConfigPath());
         return $this;
     }
 
@@ -98,11 +88,23 @@ class TestInstallModel extends InstallModel {
      */
     private function getDbInfo() {
         return [
-            'host' => 'localhost',
+            'host' => $this->getDbHost(),
             'name' => $this->getDbName(),
             'user' => $this->getDbUser(),
             'password' => $this->getDbPassword()
         ];
+    }
+
+    /**
+     * Get the database host.
+     *
+     * @return string
+     */
+    public function getDbHost() {
+        if (empty($this->dbHost)) {
+            $this->dbHost = getenv('TEST_DB_HOST') ?: 'localhost';
+        }
+        return $this->dbHost;
     }
 
     /**
@@ -114,8 +116,8 @@ class TestInstallModel extends InstallModel {
         if (empty($this->dbName)) {
             $host = parse_url($this->getBaseUrl(), PHP_URL_HOST);
 
-            if (isset($_ENV['dbname'])) {
-                $dbname = $_ENV['dbname'];
+            if (getenv('TEST_DB_NAME')) {
+                $dbname = getenv('TEST_DB_NAME');
             } else {
                 $dbname = preg_replace('`[^a-z]`i', '_', $host);
             }
@@ -142,7 +144,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a username.
      */
     public function getDbUser() {
-        return $_ENV['dbuser'];
+        return getenv('TEST_DB_USER');
     }
 
     /**
@@ -151,7 +153,7 @@ class TestInstallModel extends InstallModel {
      * @return string Returns a password.
      */
     public function getDbPassword() {
-        return $_ENV['dbpass'];
+        return getenv('TEST_DB_PASSWORD');
     }
 
     /**
@@ -165,6 +167,7 @@ class TestInstallModel extends InstallModel {
 
         $dbname = $this->getDbName();
         $pdo->query("create database if not exists `$dbname`");
+        $pdo->query("use `$dbname`");
     }
 
     /**
@@ -186,5 +189,8 @@ class TestInstallModel extends InstallModel {
         // Reset the config to defaults.
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
+
+        // Clear all database related objects from the container.
+
     }
 }

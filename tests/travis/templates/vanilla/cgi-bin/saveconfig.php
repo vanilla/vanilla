@@ -21,8 +21,56 @@ ob_start();
 class SimpleConfig {
     public $pathRoot;
 
+    /**
+     * SimpleConfig constructor.
+     */
     public function __construct() {
         $this->pathRoot = realpath(__DIR__.'/..');
+    }
+
+    /**
+     * A safe version of {@link file_put_contents()} that also clears op caches.
+     *
+     * @param string $path The path to save to.
+     * @param string $contents The contents of the file.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    private function filePutContents($path, $contents) {
+        $tmpPath = tempnam(dirname($path), 'config');
+        $r = false;
+        if (file_put_contents($tmpPath, $contents) !== false) {
+            chmod($tmpPath, 0664);
+            $r = rename($tmpPath, $path);
+        }
+
+        $this->flushPathCache($path);
+        return $r;
+    }
+
+    /**
+     * Delete a file and flush its op cache.
+     *
+     * @param string $path The file to delete.
+     * @return bool Returns **true** on success or **false** on failure.
+     */
+    private function unlink($path) {
+        $r = unlink($path);
+        $this->flushPathCache($path);
+        return $r;
+    }
+
+    /**
+     * Flush the op cache for a file.
+     *
+     * @param string $path The location of the file to flush.
+     */
+    private function flushPathCache($path) {
+        if (function_exists('apc_delete_file')) {
+            // This fixes a bug with some configurations of apc.
+            @apc_delete_file($path);
+        } elseif (function_exists('opcache_invalidate')) {
+            @opcache_invalidate($path);
+        }
     }
 
     public function getConfigPath() {
@@ -81,10 +129,12 @@ class SimpleConfig {
 
         $str = "<?php if (!defined('APPLICATION')) exit();\n\n".
             '$Configuration = '.var_export($config, true).";\n";
-        $r = file_put_contents($path, $str);
+        $r = $this->filePutContents($path, $str);
         if ($r === false) {
             throw new Exception("Could not save: $path", 500);
         }
+
+        return $config;
     }
 
     /**
@@ -95,7 +145,7 @@ class SimpleConfig {
     public function deleteConfig() {
         $path = $this->getConfigPath();
         if (file_exists($path)) {
-            if (!unlink($path)) {
+            if (!$this->unlink($path)) {
                 throw new \Exception('Could not delete config.', 500);
             }
         }
@@ -204,14 +254,18 @@ try {
         $config->deleteConfig();
         $data = [];
     } else {
-        $config->saveToConfig($data);
+        $saved = $config->saveToConfig($data);
         $data = $config->loadConfig();
+
+//        if ($saved != $data) {
+//            throw new \Exception("The data did not save properly.", 500);
+//        }
     }
 
     echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 } catch (Exception $ex) {
     ob_end_clean();
-    http_response_code($ex->getCode());
+    http_response_code($ex->getCode() >= 400 ? $ex->getCode() : 500);
     die(json_encode([
         'message' => $ex->getMessage(),
         'code' => $ex->getCode()

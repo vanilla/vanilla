@@ -65,6 +65,10 @@ class VanillaSettingsController extends Gdn_Controller {
             // Apply the config settings to the form.
             $this->Form->setData($ConfigurationModel->Data);
         } else {
+            // This is a "reverse" field on the form. Disabling URL embeds is associated with a toggle that enables them.
+            $disableUrlEmbeds = $this->Form->getFormValue('Garden.Format.DisableUrlEmbeds', true);
+            $this->Form->setFormValue('Garden.Format.DisableUrlEmbeds', !$disableUrlEmbeds);
+
             // Define some validation rules for the fields being saved
             $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Required');
             $ConfigurationModel->Validation->applyRule('Vanilla.Categories.MaxDisplayDepth', 'Integer');
@@ -360,9 +364,9 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
             // Enforces tinyint values on boolean fields to comply with strict mode
-            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
-            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
-            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
+            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions', null), '0', '1', '0'));
+            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived', null), '0', '1', '0'));
+            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads', null), '1', '1', '0'));
 
             $upload = new Gdn_Upload();
             $tmpImage = $upload->validateUpload('Photo_New', false);
@@ -676,9 +680,15 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->Form->setFormValue('CustomPoints', (bool)$this->Form->getFormValue('CustomPoints'));
 
             // Enforces tinyint values on boolean fields to comply with strict mode
-            $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
-            $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
-            $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
+            if ($this->Form->getFormValue('HideAllDiscussions', null) !== null) {
+                $this->Form->setFormValue('HideAllDiscussions', forceBool($this->Form->getFormValue('HideAllDiscussions'), '0', '1', '0'));
+            }
+            if ($this->Form->getFormValue('Archived', null) !== null) {
+                $this->Form->setFormValue('Archived', forceBool($this->Form->getFormValue('Archived'), '0', '1', '0'));
+            }
+            if ($this->Form->getFormValue('AllowFileUploads', null) !== null) {
+                $this->Form->setFormValue('AllowFileUploads', forceBool($this->Form->getFormValue('AllowFileUploads'), '1', '1', '0'));
+            }
 
             if ($parentDisplay === 'Flat' && $this->Form->getFormValue('DisplayAs') === 'Heading') {
                 $this->Form->addError('Cannot display as a heading when your parent category is displayed flat.', 'DisplayAs');

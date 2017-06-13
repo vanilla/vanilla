@@ -10,7 +10,7 @@ $links .= wrap(anchor(t('Theming Overview'), 'http://docs.vanillaforums.com/them
 $links .= wrap(anchor(t('Quick-Start Guide to Creating Themes for Vanilla'), 'http://docs.vanillaforums.com/theming/quickstart/'), 'li');
 $links .= '</ul>';
 
-helpAsset(sprintf(t('About %s'), t('Themes')), sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>'));
+helpAsset(sprintf(t('About %s'), t('Themes')), sprintf(t('ThemeHelp'), '<code style="word-wrap: break-word;">'.PATH_THEMES.'</code>').'<br/><br/>'.anchor(t('Theming Documentation'), 'http://docs.vanillaforums.com/developer/theming/', '', ["target" => "_blank"]));
 helpAsset(t('About Theme Preview'), t('Not getting what you expect when you preview your theme?').' '
     .t('Theme preview is limited to displaying the theme\'s template and css.').' '
     .t('Overridden views or themehooks can have unintended side effects and are not previewed.'));

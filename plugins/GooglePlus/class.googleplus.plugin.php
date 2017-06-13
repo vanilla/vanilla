@@ -7,23 +7,6 @@
  * @package GooglePlus
  */
 
-$PluginInfo['GooglePlus'] = [
-    'Name' => 'Google+ Social Connect',
-    'Description' => 'Users may sign into your site using their Google Plus account.',
-    'Version' => '1.1.0',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'MobileFriendly' => true,
-    'Author' => 'Todd Burry',
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'SettingsUrl' => '/dashboard/social/googleplus',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'Hidden' => false,
-    'SocialConnect' => true,
-    'RequiresRegistration' => false,
-    'Icon' => 'google_social_connect.png'
-];
-
 /**
  * Class GooglePlusPlugin
  */
@@ -296,6 +279,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $GooglePlus = Gdn::session()->stash(self::ProviderKey, '', false);
         $AccessToken = val('AccessToken', $GooglePlus);
         $Profile = val('Profile', $GooglePlus);
+
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
 
         $Form = $Sender->Form;
         $Form->setFormValue('UniqueID', val('id', $Profile));

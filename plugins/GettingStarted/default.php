@@ -7,17 +7,6 @@
  * @package GettingStarted
  */
 
-// Define the plugin:
-$PluginInfo['GettingStarted'] = array(
-    'Name' => 'Getting Started',
-    'Description' => 'Adds a welcome message to the dashboard showing new administrators things they can do to get started using their forum. Checks off each item as it is completed.',
-    'Version' => '1',
-    'Author' => "Mark O'Sullivan",
-    'AuthorEmail' => 'mark@vanillaforums.com',
-    'AuthorUrl' => 'http://vanillaforums.com',
-    'Hidden' => true
-);
-
 /**
  * Class GettingStartedPlugin
  *

@@ -7,23 +7,6 @@
  * @package Twitter
  */
 
-$PluginInfo['Twitter'] = [
-    'Name' => 'Twitter Social Connect',
-    'Description' => 'Users may sign into your site using their Twitter account.',
-    'Version' => '1.1.10',
-    'RequiredApplications' => ['Vanilla' => '2.2'],
-    'MobileFriendly' => true,
-    'SettingsUrl' => '/dashboard/social/twitter',
-    'SettingsPermission' => 'Garden.Settings.Manage',
-    'HasLocale' => true,
-    'Author' => "Todd Burry",
-    'AuthorEmail' => 'todd@vanillaforums.com',
-    'AuthorUrl' => 'https://open.vanillaforums.com/profile/todd',
-    'SocialConnect' => true,
-    'RequiresRegistration' => true,
-    'Icon' => 'twitter_social_connect.png'
-];
-
 /**
  * Class TwitterPlugin
  */
@@ -596,6 +579,9 @@ class TwitterPlugin extends Gdn_Plugin {
             }
         }
 
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
+
         $ID = val('id', $Profile);
         $Form->setFormValue('UniqueID', $ID);
         $Form->setFormValue('Provider', self::ProviderKey);
@@ -953,7 +939,8 @@ class TwitterPlugin extends Gdn_Plugin {
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
             array('AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
-            array('AuthenticationKey' => self::ProviderKey)
+            array('AuthenticationKey' => self::ProviderKey),
+            true
         );
     }
 }

@@ -7596,6 +7596,27 @@ label[id^=iCheck] {
   background-color: #fff;
 }
 
+.spoiler-trigger {
+  width: 100%;
+}
+
+.spoiler-content {
+  display: none;
+}
+
+.spoiler {
+  position: relative;
+  min-height: 2.2rem;
+}
+
+.spoiler.spoiler-visible .spoiler-trigger {
+  display: none !important;
+}
+
+.spoiler.spoiler-visible .spoiler-content {
+  display: block;
+}
+
 .hero {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -7781,6 +7802,13 @@ label[id^=iCheck] {
   .media-options > *:not(:last-child) {
     margin-top: 0.5625rem;
   }
+}
+
+.documentationLink {
+  display: inline-block;
+  position: relative;
+  vertical-align: 1px;
+  margin-left: 1px;
 }
 
 .media-right {
@@ -8680,13 +8708,15 @@ button.close {
   margin-bottom: 0.5625rem;
   border-bottom: 0.0625rem dotted #ededed;
   letter-spacing: 0.0625rem;
-  font-size: 1.125rem;
-  font-weight: 100;
+  font-size: 0.875rem;
+  font-weight: 500;
   text-transform: uppercase;
 }
 
 .help a {
   color: #0291db;
+  font-size: 0.8125rem;
+  font-weight: 500;
   border-bottom: 0.0625rem dotted #0291db;
 }
 

@@ -7,23 +7,6 @@
 
 use Symfony\Component\Yaml\Yaml;
 
-// Define the plugin:
-$PluginInfo['stubcontent'] = array(
-    'Name' => 'Stub Content',
-    'Description' => "This plugin adds stub content to new forums.",
-    'Version' => '1.0',
-    'MobileFriendly' => true,
-    'RequiredApplications' => false,
-    'RequiredTheme' => false,
-    'RequiredPlugins' => false,
-    'HasLocale' => false,
-    'RegisterPermissions' => false,
-    'Icon' => 'stubcontent-plugin.png',
-    'Author' => "Tim Gunter",
-    'AuthorEmail' => 'tim@vanillaforums.com',
-    'AuthorUrl' => 'http://www.vanillaforums.com'
-);
-
 /**
  * Stub Content Plugin
  *

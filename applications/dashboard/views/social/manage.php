@@ -2,7 +2,7 @@
 <?php
 echo heading(t('Social Connect Addons'));
 $desc = t('Here is a list of all your social addons.',
-    "Here's a list of all your social addons. You can enable, disable, and configure them from this page.");
+    "Here's a list of all your social addons. You can enable, disable, and configure them from this page." . '<br/><br/>'.anchor(t('Social Connect Documentation'), 'http://docs.vanillaforums.com/help/addons/social/', '', ["target" => "_blank"]));
 helpAsset(t("What's This?"), $desc);
 ?>
 <?php require_once($this->fetchViewLocation('helper_functions', 'settings', 'dashboard')); ?>

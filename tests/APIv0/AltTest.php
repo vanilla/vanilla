@@ -14,7 +14,7 @@ use PDO;
 /**
  * Tests an alternate install method.
  */
-class AltTest extends \PHPUnit_Framework_TestCase {
+class AltTest extends \PHPUnit\Framework\TestCase {
     /** @var APIv0  $api */
     protected static $api;
 
@@ -28,6 +28,8 @@ class AltTest extends \PHPUnit_Framework_TestCase {
 
     /**
      * Test an alternate install method.
+     *
+     * @large
      */
     public function testAltInstall() {
         $this->api()->uninstall();
@@ -51,7 +53,7 @@ class AltTest extends \PHPUnit_Framework_TestCase {
 
         $config = [
             'Database' => [
-                'Host' => 'localhost',
+                'Host' => $api->getDbHost(),
                 'Name' => $api->getDbName(),
                 'User' => $api->getDbUser(),
                 'Password' => $api->getDbPassword(),

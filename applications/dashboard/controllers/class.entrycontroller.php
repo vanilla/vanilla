@@ -548,7 +548,7 @@ class EntryController extends Gdn_Controller {
             }
 
             // Sign the user in.
-            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
             Gdn::userModel()->fireEvent('AfterSignIn');
 
             // Send them on their way.
@@ -635,7 +635,7 @@ class EntryController extends Gdn_Controller {
                             ]);
 
                             // Sign the user in.
-                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                            Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                             Gdn::userModel()->fireEvent('AfterSignIn');
                             $this->_setRedirect(Gdn::request()->get('display') === 'popup');
                             $this->render();
@@ -765,7 +765,7 @@ class EntryController extends Gdn_Controller {
                     $this->Form->setFormValue('UserSelect', false);
 
                     // Sign in as the new user.
-                    Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', true));
+                    Gdn::session()->start($UserID, true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                     Gdn::userModel()->fireEvent('AfterSignIn');
 
                     // Send the welcome email.
@@ -877,7 +877,7 @@ class EntryController extends Gdn_Controller {
                 }
 
                 // Sign the user in.
-                Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', true));
+                Gdn::session()->start($this->Form->getFormValue('UserID'), true, (bool)$this->Form->getFormValue('RememberMe', c('Garden.SSO.RememberMe', true)));
                 Gdn::userModel()->fireEvent('AfterSignIn');
 
                 // Move along.
@@ -960,25 +960,31 @@ class EntryController extends Gdn_Controller {
     public function signOut($TransientKey = "", $Override = "0") {
         $this->checkOverride('SignOut', $this->target(), $TransientKey);
 
-        if (Gdn::session()->validateTransientKey($TransientKey) || $this->Form->isPostBack()) {
+        if (Gdn::session()->validateTransientKey($TransientKey)) {
             $User = Gdn::session()->User;
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("BeforeSignOut");
 
             // Sign the user right out.
-            Gdn::session()->End();
+            Gdn::session()->end();
             $this->setData('SignedOut', true);
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("SignOut");
 
             $this->_setRedirect();
-        } elseif (!Gdn::session()->isValid())
+        } elseif (!Gdn::session()->isValid()) {
             $this->_setRedirect();
+        }
+
+        $target = url($this->target(), true);
+        if (!isTrustedDomain($target)) {
+            $target = Gdn::router()->getDestination('DefaultController');
+        }
 
         $this->setData('Override', $Override);
-        $this->setData('Target', $this->target());
+        $this->setData('Target', $target);
         $this->Leaving = false;
         $this->render();
     }
@@ -2037,6 +2043,10 @@ class EntryController extends Gdn_Controller {
             if (preg_match('`^/entry/signin`i', $Target)) {
                 $Target = '/';
             }
+        }
+
+        if (!isTrustedDomain(url($Target, true))) {
+            $Target = url(Gdn::router()->getDestination('DefaultController'));
         }
 
         return $Target;

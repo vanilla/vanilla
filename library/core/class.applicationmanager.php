@@ -48,35 +48,20 @@ class Gdn_ApplicationManager {
      */
     public function availableApplications() {
         if (!is_array($this->availableApplications)) {
-            $ApplicationInfo = array();
+            $applications = [];
+            $addons = $this->addonManager->lookupAllByType(Addon::TYPE_ADDON);
 
-            $AppFolders = Gdn_FileSystem::folders(PATH_APPLICATIONS); // Get an array of all application folders
-            // Now look for about files within them.
-            $ApplicationAboutFiles = Gdn_FileSystem::findAll(PATH_APPLICATIONS, 'settings'.DS.'about.php', $AppFolders);
-            // Include them all right here and fill the application info array
-            $ApplicationCount = count($ApplicationAboutFiles);
-            for ($i = 0; $i < $ApplicationCount; ++$i) {
-                include($ApplicationAboutFiles[$i]);
-
-                // Define the folder name for the newly added item
-                foreach ($ApplicationInfo as $ApplicationName => $Info) {
-                    if (array_key_exists('Folder', $ApplicationInfo[$ApplicationName]) === false) {
-                        $Folder = substr($ApplicationAboutFiles[$i], strlen(PATH_APPLICATIONS));
-                        if (substr($Folder, 0, 1) == DS) {
-                            $Folder = substr($Folder, 1);
-                        }
-
-                        $Folder = substr($Folder, 0, strpos($Folder, DS));
-                        $ApplicationInfo[$ApplicationName]['Folder'] = $Folder;
-                    }
+            foreach ($addons as $addon) {
+                /* @var Addon $addon */
+                if ($addon->getInfoValue('oldType') !== 'application') {
+                    continue;
                 }
-            }
-            // Add all of the indexes to the applications.
-            foreach ($ApplicationInfo as $Index => &$Info) {
-                $Info['Index'] = $Index;
+
+                $info = $this->calcOldInfoArray($addon);
+                $applications[$info['Index']] = $info;
             }
 
-            $this->availableApplications = $ApplicationInfo;
+            $this->availableApplications = $applications;
         }
 
         return $this->availableApplications;
@@ -89,25 +74,40 @@ class Gdn_ApplicationManager {
      */
     public function enabledApplications() {
         if (!is_array($this->enabledApplications)) {
-            $EnabledApplications = Gdn::config('EnabledApplications', array('Dashboard' => 'dashboard'));
-            // Add some information about the applications to the array.
-            foreach ($EnabledApplications as $Name => $Folder) {
-                $EnabledApplications[$Name] = array('Folder' => $Folder);
-                //$EnabledApplications[$Name]['Version'] = Gdn::Config($Name.'.Version', '');
-                $EnabledApplications[$Name]['Version'] = '';
-                $EnabledApplications[$Name]['Index'] = $Name;
-                // Get the application version from it's about file.
-                $AboutPath = PATH_APPLICATIONS.'/'.strtolower($Name).'/settings/about.php';
-                if (file_exists($AboutPath)) {
-                    $ApplicationInfo = array();
-                    include $AboutPath;
-                    $EnabledApplications[$Name]['Version'] = GetValueR("$Name.Version", $ApplicationInfo, '');
+            $applications = [];
+            $addons = $this->addonManager->getEnabled();
+
+            foreach ($addons as $addon) {
+                /* @var Addon $addon */
+                if ($addon->getInfoValue('oldType') !== 'application') {
+                    continue;
                 }
+
+                $info = $this->calcOldInfoArray($addon);
+                $applications[$info['Index']] = $info;
             }
-            $this->enabledApplications = $EnabledApplications;
+
+            $this->enabledApplications = $applications;
         }
 
         return $this->enabledApplications;
+    }
+
+    /**
+     * Calculate old application's info.
+     *
+     * @param Addon $addon
+     * @return array the old information.
+     */
+    private function calcOldInfoArray(Addon $addon) {
+        $info = Gdn_pluginManager::calcOldInfoArray($addon);
+        $directories = explode(DS, $addon->getSubdir());
+        $info['Folder'] = $directories[count($directories) - 1];
+
+        // $ApplicationInfo[INDEX] is converted to $info['Name'] = 'Index'
+        $info['Index'] = $info['Name'];
+
+        return $info;
     }
 
     /**
@@ -305,7 +305,7 @@ class Gdn_ApplicationManager {
         } catch (Exception $ex) {
             throw new Gdn_UserException($ex->getMessage(), $ex->getCode());
         }
-        
+
         // 2. Disable it
         removeFromConfig("EnabledApplications.{$applicationName}");
 

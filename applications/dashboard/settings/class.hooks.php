@@ -615,7 +615,8 @@ class DashboardHooks extends Gdn_Plugin {
         if ($SSO = Gdn::request()->get('sso')) {
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
-            $IsApi = preg_match('`\.json$`i', Gdn::request()->path());
+            $deliveryMethod = $Sender->getDeliveryMethod(Gdn::request());
+            $IsApi = $deliveryMethod === DELIVERY_METHOD_JSON;
 
             $UserID = false;
             try {
@@ -641,6 +642,14 @@ class DashboardHooks extends Gdn_Plugin {
                 }
                 Gdn::userModel()->Validation->reset();
             }
+
+            // Let's redirect to the same url but without the sso parameter to be sure there will be
+            // no leak via the Referer field.
+            $deliveryType = $Sender->getDeliveryType($deliveryMethod);
+            if (!$IsApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
+                $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
+                redirectUrl($url);
+            }
         }
         $this->checkAccessToken();
     }
@@ -649,14 +658,15 @@ class DashboardHooks extends Gdn_Plugin {
      * Check the access token.
      */
     private function checkAccessToken() {
-        if (empty($_SERVER['HTTP_AUTHORIZATION']) ||
-            !stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
-            !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)
+        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
+           ((empty($_SERVER['HTTP_AUTHORIZATION']) || !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)) &&
+                empty($_GET['access_token'])
+           )
         ) {
             return;
         }
 
-        $token = $m[1];
+        $token = empty($_GET['access_token']) ? $m[1] : $_GET['access_token'];
         if ($token) {
             $model = new AccessTokenModel();
 

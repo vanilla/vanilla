@@ -1,0 +1,27 @@
+{
+    "name": "Facebook Social Connect",
+    "description": "Users may sign into your site using their Facebook account and optionally share forum content there.",
+    "version": "1.2.0",
+    "requiredTheme": false,
+    "mobileFriendly": true,
+    "settingsUrl": "/dashboard/social/facebook",
+    "settingsPermission": "Garden.Settings.Manage",
+    "hasLocale": true,
+    "registerPermissions": false,
+    "socialConnect": true,
+    "requiresRegistration": true,
+    "icon": "facebook_social_connect.png",
+    "key": "facebook",
+    "type": "addon",
+    "documentationUrl": "http://docs.vanillaforums.com/help/addons/social/facebook/",
+    "authors": [
+        {
+            "name": "Todd Burry",
+            "email": "todd@vanillaforums.com",
+            "homepage": "https://open.vanillaforums.com/profile/todd"
+        }
+    ],
+    "require": {
+        "vanilla": ">=2.2"
+    }
+}

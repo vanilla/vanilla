@@ -518,12 +518,35 @@ class SettingsController extends DashboardController {
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('favicon'))
                 ]
             ],
+
+
+            'Garden.TouchIcon' => [
+                'LabelCode' => t('Touch Icon'),
+                'Control' => 'imageupload',
+                'Size' => '152x152',
+                'OutputType' => 'png',
+                'Prefix' => 'favicon-152-',
+                'Crop' => true,
+                'Description' => t('TouchIconDescription', "The touch icon appears when you bookmark a website on the homescreen of an Apple device. These are usually 152 pixels. Apple adds rounded corners and lighting effect automatically."),
+                'Options' => [
+                    'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('Touch Icon'))
+                ]
+            ],
+
             'Garden.ShareImage' => [
                 'LabelCode' => t('Share Image'),
                 'Control' => 'imageupload',
                 'Description' => t('ShareImageDescription', "When someone shares a link from your site we try and grab an image from the page. If there isn't an image on the page then we'll use this image instead. The image should be at least 50&times;50, but we recommend 200&times;200."),
                 'Options' => [
                     'RemoveConfirmText' => sprintf(t('Are you sure you want to delete your %s?'), t('share image'))
+                ]
+            ],
+            'Garden.MobileAddressBarColor' => [
+                'LabelCode' => t('Mobile Address Bar Color'),
+                'Control' => 'color',
+                'Description' => t('AddressBarColorDescription', 'Some browsers support a color for the address bar. Mobile only.'),
+                'Options' => [
+                    'AllowEmpty' => true,
                 ]
             ]
         ]);
@@ -1546,6 +1569,8 @@ class SettingsController extends DashboardController {
 
             // Save!
             if ($this->Form->save() !== false) {
+                // Get the updated Expiration Length
+                $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));
                 if ($RedirectUrl != '') {
                     $this->RedirectUrl = $RedirectUrl;

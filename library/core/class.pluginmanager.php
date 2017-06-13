@@ -214,7 +214,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
             $SearchPluginInfo = $this->scanPluginFile($PluginFile);
 
-            if ($SearchPluginInfo === false) {
+            if (empty($SearchPluginInfo)) {
                 continue;
             }
 
@@ -881,11 +881,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
     }
 
     /**
+     * Return the plugin's information.
      *
-     *
-     * @param $PluginFile
+     * @param string $PluginFile
      * @param null $VariableName
-     * @return null|void
+     * @return array|null Return the plugin's information or null
      */
     public function scanPluginFile($PluginFile, $VariableName = null) {
         // Find the $PluginInfo array
@@ -902,7 +902,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         }
 
         $ParseVariableName = '$'.$VariableName;
-        ${$VariableName} = array();
 
         foreach ($Lines as $Line) {
             $TrimmedLine = trim($Line);
@@ -931,13 +930,19 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         }
         unset($Lines);
-        if ($PluginInfoString != '') {
+
+        // Return early!
+        if (empty($PluginInfoString)) {
+            return null;
+        } else {
             eval($PluginInfoString);
         }
 
+        eval($PluginInfoString);
+
         // Define the folder name and assign the class name for the newly added item.
-        $var = ${$VariableName};
-        if (isset($var) && is_array($var)) {
+        $var = !empty(${$VariableName}) ? ${$VariableName} : null;
+        if (is_array($var)) {
             reset($var);
             $name = key($var);
             $var = current($var);
@@ -950,10 +955,6 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             touchValue('Folder', $var, $name);
 
             return $var;
-        } elseif ($VariableName !== null) {
-            if (isset($var)) {
-                return $var;
-            }
         }
 
         return null;

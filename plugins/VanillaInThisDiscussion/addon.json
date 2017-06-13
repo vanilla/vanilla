@@ -1,0 +1,17 @@
+{
+    "name": "In This Discussion",
+    "description": "Adds a list of users taking part in the discussion to the side panel of the discussion page in Vanilla.",
+    "version": "1",
+    "settingsPermission": "Garden.Settings.Manage",
+    "settingsUrl": "/settings/inthisdiscussion",
+    "icon": "in-this-discussion.png",
+    "key": "vanillainthisdiscussion",
+    "type": "addon",
+    "authors": [
+        {
+            "name": "Mark O'Sullivan",
+            "email": "mark@vanillaforums.com",
+            "homepage": "http://markosullivan.ca"
+        }
+    ]
+}

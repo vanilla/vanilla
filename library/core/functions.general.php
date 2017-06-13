@@ -2106,48 +2106,33 @@ if (!function_exists('jsonEncodeChecked')) {
      * @throws Exception
      */
     function jsonEncodeChecked($value, $options = null) {
-        $advanced = (PHP_VERSION_ID >= 50500);
-
-        if ($options === null) {
-            if ($advanced) {
-                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR;
-            } else {
-                $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
-            }
+         if ($options === null) {
+            $options = JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES;
         }
-
         $encoded = json_encode($value, $options);
         $errorMessage = null;
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            if ($advanced) {
-                if ($encoded === false) {
-                    switch (json_last_error()) {
-                        case JSON_ERROR_UTF8:
-                            $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
-                            break;
-                        case JSON_ERROR_RECURSION:
-                            $errorMessage = 'One or more recursive references in the value to be encoded.';
-                            break;
-                        case JSON_ERROR_INF_OR_NAN:
-                            $errorMessage = 'One or more NAN or INF values in the value to be encoded';
-                            break;
-                        case JSON_ERROR_UNSUPPORTED_TYPE:
-                            $errorMessage = 'A value of a type that cannot be encoded was given.';
-                            break;
-                        default:
-                            $errorMessage = 'An unknown error has occurred.';
-                    }
-                }
-            } else {
+        switch (json_last_error()) {
+            case JSON_ERROR_NONE:
+                // Do absolutely nothing since all went well!
+                break;
+            case JSON_ERROR_UTF8:
+                $errorMessage = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+                break;
+            case JSON_ERROR_RECURSION:
+                $errorMessage = 'One or more recursive references in the value to be encoded.';
+                break;
+            case JSON_ERROR_INF_OR_NAN:
+                $errorMessage = 'One or more NAN or INF values in the value to be encoded';
+                break;
+            case JSON_ERROR_UNSUPPORTED_TYPE:
+                $errorMessage = 'A value of a type that cannot be encoded was given.';
+                break;
+            default:
                 $errorMessage = 'An unknown error has occurred.';
-            }
         }
-
         if ($errorMessage !== null) {
             throw new Exception("JSON encoding error: {$errorMessage}", 500);
         }
-
         return $encoded;
     }
 }
@@ -3209,7 +3194,8 @@ if (!function_exists('setAppCookie')) {
         }
 
         // Create the cookie.
-        safeCookie($Key, $Value, $Expire, '/', $Domain, null, true);
+        $path = c('Garden.Cookie.Path', '/');
+        safeCookie($Key, $Value, $Expire, $path, $Domain, null, true);
         $_COOKIE[$Key] = $Value;
     }
 }

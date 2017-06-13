@@ -63,6 +63,8 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test registering a user with the basic method.
+     *
+     * @large
      */
     public function testRegisterBasic() {
         $this->api()->saveToConfig([
@@ -102,6 +104,8 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test adding an admin user.
+     *
+     * @large
      */
     public function testAddAdminUser() {
         $system = $this->api()->querySystemUser(true);
@@ -141,6 +145,8 @@ class SmokeTest extends BaseTest {
 
     /**
      * Test that a category with restricted permissions can be created.
+     *
+     * @large
      */
     public function testCreateRestrictedCategory() {
         $r = $this->api()->post('/vanilla/settings/addcategory.json', [
@@ -177,6 +183,7 @@ class SmokeTest extends BaseTest {
      * @param array $user The user to test against.
      * @depends testAddAdminUser
      * @depends testRegisterBasic
+     * @large
      */
     public function testSetPhoto($admin, $user) {
         $this->api()->setUser($admin);
@@ -197,6 +204,7 @@ class SmokeTest extends BaseTest {
      * @depends testRegisterBasic
      * @expectedException \Exception
      * @expectedExceptionMessage Invalid photo URL.
+     * @large
      */
     public function testSetInvalidPhoto($admin, $user) {
         $this->api()->setUser($admin);
@@ -213,6 +221,7 @@ class SmokeTest extends BaseTest {
      *
      * @param array $user The user to test against.
      * @depends testRegisterBasic
+     * @large
      */
     public function testSetPhotoPermission($user) {
         $this->api()->setUser($user);
@@ -232,6 +241,7 @@ class SmokeTest extends BaseTest {
      *
      * @param array $user The user to test against.
      * @depends testRegisterBasic
+     * @large
      */
     public function testSetPhotoPermissionLocal($user) {
         $this->api()->setUser($user);
@@ -252,6 +262,7 @@ class SmokeTest extends BaseTest {
      * Test that the APIv0 can actually send a correctly formatted user cookie.
      *
      * @depends testRegisterBasic
+     * @large
      */
     public function testUserCookie() {
         $testUser = $this->getTestUser();
@@ -266,6 +277,7 @@ class SmokeTest extends BaseTest {
      * Test posting a discussion.
      *
      * @depends testRegisterBasic
+     * @large
      */
     public function testPostDiscussion() {
         $api = $this->api();
@@ -292,6 +304,7 @@ class SmokeTest extends BaseTest {
      *
      * @throws \Exception Throws an exception when there are no discussions.
      * @depends testPostDiscussion
+     * @large
      */
     public function testPostComment() {
         $this->api()->setUser($this->getTestUser());
@@ -325,6 +338,7 @@ class SmokeTest extends BaseTest {
      * @depends testCreateRestrictedCategory
      * @expectedException \Exception
      * @expectedExceptionMessage You do not have permission to post in this category.
+     * @large
      */
     public function testPostRestrictedDiscussion() {
         $categoryID = $this->getRestrictedCategoryID();
@@ -354,6 +368,7 @@ class SmokeTest extends BaseTest {
      * @depends testCreateRestrictedCategory
      * @expectedException \Exception
      * @expectedExceptionMessage You don't have permission to do that.
+     * @large
      */
     public function testViewRestrictedCategory() {
         $categoryID = $this->getRestrictedCategoryID();

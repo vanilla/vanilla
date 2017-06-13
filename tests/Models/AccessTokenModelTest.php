@@ -2,17 +2,20 @@
 /**
  * @author Todd Burry <todd@vanillaforums.com>
  * @copyright 2009-2017 Vanilla Forums Inc.
- * @license Proprietary
+ * @license GPLv2
  */
 
-namespace VanillaTests\APIv0;
+namespace VanillaTests\Models;
 
 use AccessTokenModel;
+use VanillaTests\SiteTestTrait;
 
 /**
  * Test the {@link AccessTokenModel}.
  */
-class AccessTokenModelTest extends BaseTest {
+class AccessTokenModelTest extends \PHPUnit_Framework_TestCase {
+    use SiteTestTrait;
+
     /**
      * A newly issued token should verify.
      */

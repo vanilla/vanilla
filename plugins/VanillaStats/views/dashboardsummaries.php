@@ -2,7 +2,7 @@
 
 $titleSuffix = '';
 if ($this->data('UserDataRangeClamped')) {
-    $titleSuffix = '<span class="form-control-sm">*'.t('Summary clamped to 90 days.').'</span>';
+    $titleSuffix = '<span class="form-control-sm">*'.t('Summary limited to 90 days.').'</span>';
 }
 
 $userBoard = new TableSummaryModule(t('Active Users').$titleSuffix);

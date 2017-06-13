@@ -49,6 +49,7 @@
 *vanillaforums*
 *.kpf
 .DS_Store
+.htaccess
 Thumbs.db
 *.swp
 _notes

@@ -15,12 +15,9 @@
     # Deny access to certain directories that SHOULD NOT be exposed.
     ####
     RewriteRule (^|/)\.git - [L,R=403]
-    #RewriteRule ^build/ - [L,R=403] # Already covered by .htaccess
     RewriteRule ^cache/ - [L,R=403]
     RewriteRule ^cgi-bin/ - [L,R=403]
     RewriteRule ^uploads/import/ - [L,R=403]
-    #RewriteRule ^conf/ - [L,R=403] # Already covered by .htaccess
-    #RewriteRule ^tests/ - [L,R=403] # Already covered by .htaccess
     RewriteRule ^vendor/ - [L,R=403]
 
     ####

@@ -1,8 +1,8 @@
 <?php if (!defined('APPLICATION')) exit();
 
 $titleSuffix = '';
-if ($this->data('UserDataRangeClamped')) {
-    $titleSuffix = '<span class="form-control-sm">*'.t('Summary limited to 90 days.').'</span>';
+if ($this->data('UserRangeWarning')) {
+    $titleSuffix = '<span class="text-warning form-control-sm">'.$this->data('UserRangeWarning').'</span>';
 }
 
 $userBoard = new TableSummaryModule(t('Active Users').$titleSuffix);

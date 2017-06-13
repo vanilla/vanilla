@@ -36,6 +36,9 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**  */
     const RESOLUTION_MONTH = 'month';
 
+    /** Upper limit on date ranges for user record querying. */
+    const USER_MAX_DAYS = 90;
+
     /** @var mixed  */
     public $AnalyticsServer;
 
@@ -54,10 +57,14 @@ class VanillaStatsPlugin extends Gdn_Plugin {
 
         $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
         $this->dashboardSummariesEnabled = c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled);
+
+        parent::__construct();
     }
 
     /**
      * Override the default dashboard page with the new stats one.
+     *
+     * @param Gdn_Dispatcher $Sender
      */
     public function gdn_dispatcher_beforeDispatch_handler($Sender) {
         $Enabled = c('Garden.Analytics.Enabled', true);
@@ -157,6 +164,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**
      * A view containing most active discussions & users during a specific time
      * period. This gets ajaxed into the dashboard homepage as date ranges are defined.
+     *
+     * @param SettingsController $Sender
      */
     public function settingsController_dashboardSummaries_create($Sender) {
         $DiscussionData = [];
@@ -181,14 +190,21 @@ class VanillaStatsPlugin extends Gdn_Plugin {
                 ->limit(5, 0)
                 ->get();
 
-            // If the date range is greater than 90 days clamp it.
+            // If the date range is greater than 90 days, limit it.
             $toDateTime = new DateTime($range['to']);
             $dateDiff = date_diff($toDateTime, new DateTime($range['from']));
-            if ($dateDiff->format('%a') > 90) {
-                $range['from'] = $toDateTime->sub(new DateInterval('P3M'))->format(MYSQL_DATE_FORMAT);
-                $Sender->setData('UserDataRangeClamped', true);
-            } else {
-                $Sender->setData('UserDataRangeClamped', false);
+            $daysInRange = intval($dateDiff->format('%a'));
+            if ($daysInRange > self::USER_MAX_DAYS) {
+                $toDate = $toDateTime->format('m/d/Y');
+                $subInterval = new DateInterval('P'.self::USER_MAX_DAYS.'D');
+                $range['from'] = $toDateTime->sub($subInterval)->format(MYSQL_DATE_FORMAT);
+                $fromDate = $toDateTime->format('m/d/Y');
+                $userRangeWarning = sprintf(
+                    t('Data limited to %s - %s'),
+                    $fromDate,
+                    $toDate
+                );
+                $Sender->setData('UserRangeWarning', $userRangeWarning);
             }
 
             // Load the most active users during the date range.

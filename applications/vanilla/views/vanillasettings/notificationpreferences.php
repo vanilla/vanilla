@@ -12,6 +12,9 @@ $span = (c('Garden.Email.Disabled')) ? '1' : '2';
     ?>
 </div>
 <table class="PreferenceGroup">
+    <colgroup></colgroup>
+    <colgroup span="2"></colgroup>
+    <colgroup span="2"></colgroup>
     <thead>
     <tr>
         <th scope="col" style="border: none;">&nbsp;</th>

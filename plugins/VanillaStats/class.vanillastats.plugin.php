@@ -24,22 +24,35 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**  */
     const RESOLUTION_MONTH = 'month';
 
+    /** Upper limit on date ranges for user record querying. */
+    const USER_MAX_DAYS = 90;
+
     /** @var mixed  */
     public $AnalyticsServer;
 
     /** @var string  */
     public $VanillaID;
 
+    /** @var bool */
+    private $dashboardSummariesEnabled;
+
     /**
-     * Plugin setup.
+     * VanillaStatsPlugin constructor.
      */
     public function __construct() {
         $this->AnalyticsServer = c('Garden.Analytics.Remote', 'analytics.vanillaforums.com');
         $this->VanillaID = Gdn::installationID();
+
+        $isVanillaAnalyticEnabled = Gdn::addonManager()->isEnabled('vanillaanalytics', Vanilla\Addon::TYPE_ADDON);
+        $this->dashboardSummariesEnabled = c('Garden.Analytics.DashboardSummaries', !$isVanillaAnalyticEnabled);
+
+        parent::__construct();
     }
 
     /**
      * Override the default dashboard page with the new stats one.
+     *
+     * @param Gdn_Dispatcher $Sender
      */
     public function gdn_dispatcher_beforeDispatch_handler($Sender) {
         $Enabled = c('Garden.Analytics.Enabled', true);
@@ -129,6 +142,8 @@ class VanillaStatsPlugin extends Gdn_Plugin {
             $sender->addDefinition('ExpandText', t('more'));
             $sender->addDefinition('CollapseText', t('less'));
 
+            $sender->addDefinition('DashboardSummaries', $this->dashboardSummariesEnabled);
+
             // Render the custom dashboard view
             $sender->render('dashboard', '', 'plugins/VanillaStats');
         }
@@ -137,8 +152,65 @@ class VanillaStatsPlugin extends Gdn_Plugin {
     /**
      * A view containing most active discussions & users during a specific time
      * period. This gets ajaxed into the dashboard homepage as date ranges are defined.
+     *
+     * @param SettingsController $Sender
      */
     public function settingsController_dashboardSummaries_create($Sender) {
+        $DiscussionData = [];
+        $UserData = [];
+
+        if ($this->dashboardSummariesEnabled) {
+            $range = Gdn::request()->getValue('range');
+            $range['to'] = date(MYSQL_DATE_FORMAT, strtotime($range['to']));
+            $range['from'] = date(MYSQL_DATE_FORMAT, strtotime($range['from']));
+
+            $UserModel = new UserModel();
+
+            // Load the most active discussions during this date range
+            $DiscussionData = $UserModel->SQL
+                ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
+                ->from('Discussion d')
+                ->where('d.DateLastComment >=', $range['from'])
+                ->where('d.DateLastComment <=', $range['to'])
+                ->orderBy('d.CountViews', 'desc')
+                ->orderBy('d.CountComments', 'desc')
+                ->orderBy('d.CountBookmarks', 'desc')
+                ->limit(5, 0)
+                ->get();
+
+            // If the date range is greater than 90 days, limit it.
+            $toDateTime = new DateTime($range['to']);
+            $dateDiff = date_diff($toDateTime, new DateTime($range['from']));
+            $daysInRange = intval($dateDiff->format('%a'));
+            if ($daysInRange > self::USER_MAX_DAYS) {
+                $toDate = $toDateTime->format('m/d/Y');
+                $subInterval = new DateInterval('P'.self::USER_MAX_DAYS.'D');
+                $range['from'] = $toDateTime->sub($subInterval)->format(MYSQL_DATE_FORMAT);
+                $fromDate = $toDateTime->format('m/d/Y');
+                $userRangeWarning = sprintf(
+                    t('Data limited to %s - %s'),
+                    $fromDate,
+                    $toDate
+                );
+                $Sender->setData('UserRangeWarning', $userRangeWarning);
+            }
+
+            // Load the most active users during the date range.
+            $UserData = $UserModel->SQL
+                ->select('InsertUserID as UserID')
+                ->select('CommentID', 'count', 'CountComments')
+                ->from('Comment')
+                ->where('DateInserted >=', $range['from'])
+                ->where('DateInserted <=', $range['to'])
+                ->groupBy('InsertUserID')
+                ->orderBy('CountComments', 'desc')
+                ->limit(5, 0)
+                ->get();
+        }
+
+        $Sender->setData('DiscussionData', $DiscussionData);
+        $Sender->setData('UserData', $UserData);
+
         // Load javascript & css, check permissions, and load side menu for this page.
         $Sender->addJsFile('settings.js');
         $Sender->title(t('Dashboard Summaries'));
@@ -152,36 +224,6 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         $Sender->fireEvent('DefineAdminPermissions');
         $Sender->permission($Sender->RequiredAdminPermissions, '', false);
         $Sender->setHighlightRoute('dashboard/settings');
-
-        $range = Gdn::request()->getValue('range');
-        $range['to'] = date('Y-m-d H:i:s', strtotime($range['to']));
-        $range['from'] = date('Y-m-d H:i:s', strtotime($range['from']));
-
-        // Load the most active discussions during this date range
-        $UserModel = new UserModel();
-        $Sender->setData('DiscussionData', $UserModel->SQL
-            ->select('d.DiscussionID, d.Name, d.CountBookmarks, d.CountViews, d.CountComments, d.CategoryID, d.DateInserted')
-            ->from('Discussion d')
-            ->where('d.DateLastComment >=', $range['from'])
-            ->where('d.DateLastComment <=', $range['to'])
-            ->orderBy('d.CountViews', 'desc')
-            ->orderBy('d.CountComments', 'desc')
-            ->orderBy('d.CountBookmarks', 'desc')
-            ->limit(5, 0)
-            ->get());
-
-        // Load the most active users during this date range
-        $Sender->setData('UserData', $UserModel->SQL
-            ->select('u.UserID, u.Name, u.DateLastActive')
-            ->select('c.CommentID', 'count', 'CountComments')
-            ->from('User u')
-            ->join('Comment c', 'u.UserID = c.InsertUserID', 'inner')
-            ->groupBy('u.UserID, u.Name')
-            ->where('c.DateInserted >=', $range['from'])
-            ->where('c.DateInserted <=', $range['to'])
-            ->orderBy('CountComments', 'desc')
-            ->limit(5, 0)
-            ->get());
 
         // Render the custom dashboard view
         $Sender->render('dashboardsummaries', '', 'plugins/VanillaStats');

@@ -1196,6 +1196,87 @@ class Gdn_Format {
             return self::to($mixed, 'Links');
         }
 
+        $linksCallback = function($matches) {
+            static $inTag = 0;
+            static $inAnchor = false;
+
+            $inOut = $matches[1];
+            $tag = strtolower($matches[2]);
+
+            if ($inOut == '<') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = true;
+                }
+            } elseif ($inOut == '</') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = false;
+                }
+            } elseif ($matches[3]) {
+                $inTag--;
+            }
+
+            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
+                // This is a the href url value in an anchor tag.
+                $url = $matches[4];
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
+                }
+            }
+
+            if (!isset($matches[4]) || $inTag || $inAnchor) {
+                return $matches[0];
+            }
+
+            $url = $matches[4];
+
+            $embeddedResult = self::embedReplacement($url);
+            if ($embeddedResult !== '') {
+                return $embeddedResult;
+            }
+
+            // Unformatted links
+            if (!self::$FormatLinks) {
+                return $url;
+            }
+
+            // Strip punctuation off of the end of the url.
+            $punc = '';
+
+            // Special case where &nbsp; is right after an url and is not part of it!
+            // This can happen in WYSIWYG format if the url is the last text of the body.
+            while (stringEndsWith($url, '&nbsp;')) {
+                $url = substr($url, 0, -6);
+                $punc .= '&nbsp;';
+            }
+
+            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+                $url = $matches[1];
+                $punc = $matches[2].$punc;
+            }
+
+            // Get human-readable text from url.
+            $text = $url;
+            if (strpos($text, '%') !== false) {
+                $text = rawurldecode($text);
+                $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+            }
+
+            $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+
+            if (c('Garden.Format.WarnLeaving', false)) {
+                // This is a plaintext url we're converting into an anchor.
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
+                }
+            }
+
+            return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
+        };
+
         if (unicodeRegexSupport()) {
             $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
@@ -1204,7 +1285,7 @@ class Gdn_Format {
 
         $mixed = Gdn_Format::replaceButProtectCodeBlocks(
             $regex,
-            ['Gdn_Format', 'linksCallback'],
+            $linksCallback,
             $mixed,
             true
         );
@@ -1484,10 +1565,12 @@ EOT;
     /**
      * Replaces text or anchor urls with either their embed code, or sanitized and wrapped in an anchor.
      *
+     * @deprecated
      * @param $matches
-     * @return string The anchor or embed code for the url.
+     * @return string|void The anchor or embed code for the url.
      */
     public static function linksCallback($matches) {
+        deprecated('Gdn_Format::linksCallback');
         static $inTag = 0;
         static $inAnchor = false;
 

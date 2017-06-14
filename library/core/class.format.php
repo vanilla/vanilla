@@ -1229,6 +1229,10 @@ class Gdn_Format {
             if (!isset($matches[4]) || $inTag || $inAnchor) {
                 return $matches[0];
             }
+            // We are not in a tag and what we matched starts with //
+            if (preg_match('#^//#', $matches[4])) {
+                return $matches[0];
+            }
 
             $url = $matches[4];
 
@@ -1278,9 +1282,9 @@ class Gdn_Format {
         };
 
         if (unicodeRegexSupport()) {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = Gdn_Format::replaceButProtectCodeBlocks(

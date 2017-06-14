@@ -205,8 +205,15 @@ abstract class Controller implements InjectableInterface {
             $results = $caseScheme->convertArrayKeys($results);
             foreach ($results as $field => $errors) {
                 foreach ($errors as $error) {
-                    $message = trim(sprintf(T($error), T($field)), '.').'.';
-                    $validation->addError($field, $message);
+                    $message = trim(sprintf(
+                        $this->locale->translate($error),
+                        $this->locale->translate($field)
+                    ), '.').'.';
+                    $validation->addError(
+                        $field,
+                        $error,
+                        ['message' => $message]
+                    );
                 }
             }
         }

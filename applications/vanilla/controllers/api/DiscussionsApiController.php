@@ -242,6 +242,7 @@ class DiscussionsApiController extends AbstractApiController {
         ], 'in')->setDescription('List discussions.');
         $out = $this->schema([':a' => $this->discussionSchema()], 'out');
 
+        $query = $this->filterValues($query);
         $query = $in->validate($query);
         $where = array_intersect_key($query, array_flip(['categoryID', 'insertUserID']));
         $where['Announce'] = 'all';

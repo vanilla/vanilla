@@ -936,7 +936,8 @@ class TwitterPlugin extends Gdn_Plugin {
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
             array('AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'),
-            array('AuthenticationKey' => self::ProviderKey)
+            array('AuthenticationKey' => self::ProviderKey),
+            true
         );
     }
 }

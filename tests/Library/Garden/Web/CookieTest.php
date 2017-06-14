@@ -12,7 +12,7 @@ use Garden\Web\Cookie;
 /**
  * Test the {@link ResourceRoute} class.
  */
-class CookieTest extends \PHPUnit_Framework_TestCase {
+class CookieTest extends \PHPUnit\Framework\TestCase {
 
     /**
      * Parse a Cookie header into its individual cookie key-value pairs.

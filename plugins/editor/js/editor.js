@@ -365,7 +365,7 @@
             $('.editor-dropdown .editor-action')
                 .off('click.dd')
                 .on('click.dd', function(e) {
-                    var parentEl = $(e.target).parent();
+                    var parentEl = $(e.target).closest('.editor-dropdown');
 
                     // Again, tackling with clash from multiple codebases.
                     $('.editor-insert-dialog').each(function(i, el) {
@@ -1608,8 +1608,10 @@
                                             // after the insertion, and insert a break, because that will set the
                                             // caret to after the latest insertion.
                                             if ($(composer.element.lastChild).hasClass('Spoiler')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 
@@ -1632,8 +1634,10 @@
                                         exec: function(composer, command) {
                                             wysihtml5.commands.formatBlock.exec(composer, "formatBlock", "div", "Quote", REG_EXP);
                                             if ($(composer.element.lastChild).hasClass('Quote')) {
+                                                var bookmark = composer.selection.getBookmark();
                                                 composer.selection.setAfter(composer.element.lastChild);
                                                 composer.commands.exec("insertHTML", "<p><br></p>");
+                                                composer.selection.setBookmark(bookmark);
                                             }
                                         },
 
@@ -1686,6 +1690,13 @@
                                                 code.appendChild(selectedNodes);
                                                 range.insertNode(pre);
                                                 composer.selection.selectNode(code);
+
+                                                if ($(composer.element.lastChild).hasClass('CodeBlock')) {
+                                                    var bookmark = composer.selection.getBookmark();
+                                                    composer.selection.setAfter(composer.element.lastChild);
+                                                    composer.commands.exec("insertHTML", "<p><br></p>");
+                                                    composer.selection.setBookmark(bookmark);
+                                                }
                                             }
                                         },
                                         state: function(composer) {

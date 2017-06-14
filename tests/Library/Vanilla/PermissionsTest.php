@@ -8,7 +8,7 @@ namespace VanillaTests\Library\Vanilla;
 
 use Vanilla\Permissions;
 
-class PermissionsTest extends \PHPUnit_Framework_TestCase {
+class PermissionsTest extends \PHPUnit\Framework\TestCase {
 
     public function testAdd() {
         $permissions = new Permissions();

@@ -62,9 +62,18 @@
         <!-- Copy the relevant files, determined by the whitelist file, into our newly-made contents directory. -->
         <copy todir="${package.dir}" >
             <fileset
-                dir="${project.dir}"
-                excludesfile="package-exclude.txt"
-                includesfile="package-include.txt" />
+                    dir="${project.dir}"
+                    includesfile="package-include.txt"
+                    excludesfile="package-exclude.txt" />
+        </copy>
+
+        <!-- Copy all the license files -->
+        <copy todir="${package.dir}" >
+            <fileset
+                    dir="${project.dir}"
+                    includes="**/license.*"
+                    excludesfile="license-exclude.txt"
+                    casesensitive="false" />
         </copy>
 
         <!-- Archive everything in the package contents directory. -->

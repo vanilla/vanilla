@@ -8,13 +8,6 @@
  * @since 2.0
  */
 
-if (PHP_VERSION_ID < 50600) {
-    die("Vanilla requires PHP 5.6 or greater.");
-}
-
-define('APPLICATION', 'Vanilla');
-define('APPLICATION_VERSION', '2.4.200');
-
 // Report and track all errors.
 error_reporting(E_ERROR | E_PARSE | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR);
 ini_set('display_errors', 0);
@@ -22,14 +15,11 @@ ini_set('track_errors', 1);
 
 ob_start();
 
-// Define the constants we need to get going.
+// Minimal environment needed to use most of Vanilla's framework.
+require_once(__DIR__.'/environment.php');
 
-define('DS', DIRECTORY_SEPARATOR);
-define('PATH_ROOT', getcwd());
-
-// Include the bootstrap to configure the framework.
-
-require_once(PATH_ROOT.'/bootstrap.php');
+// Require the bootstrap to configure the application.
+require_once(__DIR__.'/bootstrap.php');
 
 // Create and configure the dispatcher.
 $dispatcher = Gdn::dispatcher();

@@ -152,7 +152,7 @@ class HtmLawedPlugin extends Gdn_Plugin {
             'css_expression' => 1,
             'deny_attribute' => $attributes,
             'direct_list_nest' => 1,
-            'elements' => '*-applet-form-input-textarea-iframe-script-style-embed-object-select-option-button-fieldset-optgroup-legend',
+            'elements' => '*-applet-button-embed-fieldset-form-iframe-input-legend-link-object-optgroup-option-script-select-style-textarea',
             'keep_bad' => 0,
             'schemes' => 'classid:clsid; href: aim, feed, file, ftp, gopher, http, https, irc, mailto, news, nntp, sftp, ssh, telnet; style: nil; *:file, http, https', // clsid allowed in class
             'unique_ids' => 1,

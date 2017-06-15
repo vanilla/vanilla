@@ -1,3 +1,4 @@
+.htaccess.dist
 applications/**
 bootstrap.php
 cache/**

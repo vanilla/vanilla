@@ -375,7 +375,6 @@ class AddonManager {
                         'basename' => $basename,
                         'event' => 'duplicate_addon'
                     ]);
-                    throw new \Exception("Duplicate addon: {$basename}");
                 }
             }
         }

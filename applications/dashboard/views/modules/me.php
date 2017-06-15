@@ -10,7 +10,7 @@ $DashboardCount = 0;
 if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
     $LogModel = new LogModel();
     //$SpamCount = $LogModel->GetOperationCount('spam');
-    $ModerationCount = $LogModel->GetOperationCount('moderate');
+    $ModerationCount = $LogModel->GetOperationCount('moderate,pending');
     $DashboardCount += $ModerationCount;
 }
 // Applicant Count

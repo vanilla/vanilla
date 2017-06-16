@@ -22,7 +22,7 @@ if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 if (!defined('PATH_ROOT')) {
-    define('PATH_ROOT', __DIR__);
+    define('PATH_ROOT', getcwd());
 }
 
 /**

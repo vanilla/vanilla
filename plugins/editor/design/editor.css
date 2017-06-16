@@ -16,8 +16,7 @@
 
 .editor-upload-progress.fade-out {
   opacity: 0 !important;
-  -webkit-transition: opacity 0.7s ease;
-          transition: opacity 0.7s ease; }
+  transition: opacity 0.7s ease; }
 
 .editor-drop-cue .BodyBox,
 .editor-drop-cue iframe.wysihtml5-sandbox {
@@ -80,8 +79,7 @@
   /* This is for the transition when removing/reattaching files. Height
   is necessary due to floated elements and width, which cause them to
   occupy space under image until width is full. */
-  -webkit-transition: all 0.1s ease;
-          transition: all 0.1s ease;
+  transition: all 0.1s ease;
   -webkit-animation-duration: 0.8s;
           animation-duration: 0.8s;
   -webkit-animation-name: editor-file-preview;
@@ -292,8 +290,8 @@
   cursor: pointer;
   border: 1px solid #fff;
   box-shadow: inset 0 0 0 1px #fff;
-  -webkit-transition: -webkit-transform 0.2s ease;
-          transition: transform 0.2s ease;
+  transition: -webkit-transform 0.2s ease;
+  transition: transform 0.2s ease;
   margin: 1px; }
 
 .editor-dropdown-color .editor-insert-dialog .color:hover,
@@ -379,8 +377,7 @@
   .editor-file-image.drag-passthrough {
     opacity: 0;
     pointer-events: none;
-    -webkit-transition: all 200ms ease;
-            transition: all 200ms ease;
+    transition: all 200ms ease;
     -webkit-transform: scale(0);
             transform: scale(0); }
 
@@ -404,8 +401,7 @@
       width: 100% !important;
       color: #000;
       box-sizing: border-box !important;
-      -webkit-transition: background-color 400ms ease, color 400ms ease;
-              transition: background-color 400ms ease, color 400ms ease; }
+      transition: background-color 400ms ease, color 400ms ease; }
     .editor-fullpage .TextBoxWrapper .BodyBox {
       min-height: 400px; }
     .editor-fullpage .TextBoxWrapper .wysihtml5-sandbox {
@@ -423,8 +419,7 @@
     padding: 0;
     overflow-y: auto;
     background-color: #fff;
-    -webkit-transition: background-color 400ms ease;
-            transition: background-color 400ms ease; }
+    transition: background-color 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate input {
       box-sizing: border-box !important; }
     .editor-fullpage #editor-fullpage-candidate .editor {
@@ -438,8 +433,7 @@
       background-color: rgba(255, 255, 255, 0.95);
       border: 1px solid transparent;
       box-shadow: 0 2px 5px -5px #000;
-      -webkit-transition: all 400ms ease;
-              transition: all 400ms ease; }
+      transition: all 400ms ease; }
     .editor-fullpage #editor-fullpage-candidate .TextBoxWrapper {
       padding: 50px 0 10px 0;
       margin: 0 auto; }
@@ -610,9 +604,11 @@ directly on the iframe's bodybox contenteditable. */
 /**
  * Mobile tweaks, specifically for Lithe Mobile
  */
-.editor-mobile .editor-dropdown-upload {
+.editor-mobile .editor-dropdown-upload,
+.editor-mobile .editor-dropdown-image {
   position: static; }
-  .editor-mobile .editor-dropdown-upload .editor-insert-dialog {
+  .editor-mobile .editor-dropdown-upload .editor-insert-dialog,
+  .editor-mobile .editor-dropdown-image .editor-insert-dialog {
     left: 0;
     right: 0;
     top: auto;

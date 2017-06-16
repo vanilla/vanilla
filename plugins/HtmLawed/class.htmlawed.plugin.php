@@ -159,6 +159,14 @@ class HtmLawedPlugin extends Gdn_Plugin {
             'valid_xhtml' => 0
         ];
 
+        // If we don't allow URL embeds, don't allow HTML media embeds, either.
+        if (c('Garden.Format.DisableUrlEmbeds')) {
+            if (!array_key_exists('elements', $config) || !is_string($config['elements'])) {
+                $config['elements'] = '';
+            }
+            $config['elements'] .= '-audio-video';
+        }
+
         // Turn embedded videos into simple links (legacy workaround)
         $html = Gdn_Format::unembedContent($html);
 

@@ -20,6 +20,7 @@ use Garden\EventManager;
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
 class AddonManager {
+
     /// Constants ///
 
     const REQ_ENABLED = 0x01; // addon enabled, yay!
@@ -323,9 +324,19 @@ class AddonManager {
         foreach ($addonDirs as $subdir) {
             try {
                 $addon = new Addon($subdir);
-                $addons[$addon->getKey()] = $addon;
+                $key = $addon->getKey();
+                if (!array_key_exists($key, $addons)) {
+                    $addons[$key] = $addon;
+                } else {
+                    \Logger::error('Duplicate addon: {key}', [
+                        'key' => $key,
+                        'event' => 'duplicate_addon'
+                    ]);
+                    throw new \Exception("Duplicate addon: {$key}");
+                }
             } catch (\Exception $ex) {
-                trigger_error("The $type in $subdir is invalid.", E_USER_WARNING);
+                $exceptionMessage = $ex->getMessage();
+                trigger_error("The $type in $subdir is invalid. $exceptionMessage", E_USER_WARNING);
             }
         }
         $this->multiCache = $addons;
@@ -351,6 +362,7 @@ class AddonManager {
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return array Returns an array of root-relative addon directories.
+     * @throws \Exception if a duplicate addon is detected.
      */
     private function scanAddonDirs($type) {
         $strlen = strlen(PATH_ROOT);
@@ -359,7 +371,15 @@ class AddonManager {
         foreach ($this->scanDirs[$type] as $subdir) {
             $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
             foreach ($paths as $path) {
-                $result[basename($path)] = substr($path, $strlen);
+                $basename = basename($path);
+                if (!array_key_exists($basename, $result)) {
+                    $result[$basename] = substr($path, $strlen);
+                } else {
+                    \Logger::error('Duplicate addon: {basename}', [
+                        'basename' => $basename,
+                        'event' => 'duplicate_addon'
+                    ]);
+                }
             }
         }
 

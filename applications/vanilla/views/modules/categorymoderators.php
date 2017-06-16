@@ -3,9 +3,11 @@
     <?php echo panelHeading(t('Moderators')); ?>
     <ul class="PanelInfo">
         <?php
-        foreach ($this->ModeratorData[0]->Moderators as $Mod) {
-            $Mod = UserBuilder($Mod);
-            echo '<li>'.UserPhoto($Mod, 'Small').' '.UserAnchor($Mod).'</li>';
+        $moderators = $this->data('Moderators', []);
+        foreach ($moderators as $user) {
+            $photo = userPhoto($user, 'Small');
+            $anchor = userAnchor($user);
+            echo "<li>{$photo} {$anchor}</li>";
         }
         ?>
     </ul>

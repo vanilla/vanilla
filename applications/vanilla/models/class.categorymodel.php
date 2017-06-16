@@ -2116,7 +2116,7 @@ class CategoryModel extends Gdn_Model {
      * @param string $Permission
      * @param string $Column
      */
-    public static function joinModerators($Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
+    public static function joinModerators(&$Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
         $Moderators = Gdn::sql()
             ->select('u.UserID, u.Name, u.Photo, u.Email')
             ->select('p.JunctionID as CategoryID')

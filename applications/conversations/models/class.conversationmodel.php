@@ -771,7 +771,7 @@ class ConversationModel extends ConversationsModel {
         }
 
         // First define the current users in the conversation
-        $OldContributorData = $this->getRecipients($ConversationID);
+        $OldContributorData = $this->getRecipients($ConversationID, 1000);
         $OldContributorData = Gdn_DataSet::index($OldContributorData, 'UserID');
         $AddedUserIDs = array();
 

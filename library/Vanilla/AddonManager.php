@@ -373,7 +373,7 @@ class AddonManager {
             foreach ($paths as $path) {
                 $basename = basename($path);
                 if (!array_key_exists($basename, $result)) {
-                    $result[basename($path)] = substr($path, $strlen);
+                    $result[$basename] = substr($path, $strlen);
                 } else {
                     \Logger::error('Duplicate addon: {basename}', [
                         'basename' => $basename,

@@ -328,6 +328,10 @@ class AddonManager {
                 if (!array_key_exists($key, $addons)) {
                     $addons[$key] = $addon;
                 } else {
+                    \Logger::error('Duplicate addon: {key}', [
+                        'key' => $key,
+                        'event' => 'duplicate_addon'
+                    ]);
                     throw new \Exception("Duplicate addon: {$key}");
                 }
             } catch (\Exception $ex) {

@@ -559,14 +559,21 @@ class CategoriesController extends VanillaController {
         $this->setData('Sort', $DiscussionModel->getSort());
         $this->setData('Filters', $DiscussionModel->getFilters());
 
-        $this->CategoryDiscussionData = array();
+        $this->CategoryDiscussionData = [];
+        $Discussions = [];
 
         foreach ($this->CategoryData->result() as $Category) {
             if ($Category->CategoryID > 0) {
-                $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->get(0, $this->DiscussionsPerCategory, array('d.CategoryID' => $Category->CategoryID, 'Announce' => 'all'));
+                $this->CategoryDiscussionData[$Category->CategoryID] = $DiscussionModel->get(0, $this->DiscussionsPerCategory, ['d.CategoryID' => $Category->CategoryID, 'Announce' => 'all']);
+
+                $Discussions = array_merge(
+                    $Discussions,
+                    $this->CategoryDiscussionData[$Category->CategoryID]->resultObject()
+                );
             }
         }
-
+        $this->setData('Discussions', $Discussions); 
+        
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');

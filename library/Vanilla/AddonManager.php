@@ -296,7 +296,7 @@ class AddonManager {
             if ($this->isCacheEnabled() && is_readable($cachePath)) {
                 $this->multiCache = require $cachePath;
             } else {
-                $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
+                $this->multiCache = $this->scan(Addon::TYPE_ADDON, $this->isCacheEnabled());
             }
         }
     }

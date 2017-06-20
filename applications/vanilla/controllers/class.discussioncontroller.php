@@ -297,6 +297,7 @@ class DiscussionController extends VanillaController {
         // Get the comments.
         $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID);
         $this->setData('Comments', $Comments, true);
+        $Comments = $Comments->result();
 
         // Set the data.
         if (count($Comments) > 0) {

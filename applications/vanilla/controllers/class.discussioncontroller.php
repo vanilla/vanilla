@@ -295,7 +295,7 @@ class DiscussionController extends VanillaController {
         $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
         // Get the comments.
-        $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID)->result();
+        $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID);
         $this->setData('Comments', $Comments, true);
 
         // Set the data.

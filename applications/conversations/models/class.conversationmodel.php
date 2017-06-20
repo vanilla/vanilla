@@ -329,7 +329,7 @@ class ConversationModel extends ConversationsModel {
      * @param int $Limit The number of recipients to grab.
      * @return Gdn_DataSet SQL results.
      */
-    public function getRecipients($ConversationID, $Limit = 20) {
+    public function getRecipients($ConversationID, $Limit = 1000) {
         $Data = $this->SQL
             ->select('uc.*')
             ->from('UserConversation uc')
@@ -771,7 +771,7 @@ class ConversationModel extends ConversationsModel {
         }
 
         // First define the current users in the conversation
-        $OldContributorData = $this->getRecipients($ConversationID, 1000);
+        $OldContributorData = $this->getRecipients($ConversationID);
         $OldContributorData = Gdn_DataSet::index($OldContributorData, 'UserID');
         $AddedUserIDs = array();
 

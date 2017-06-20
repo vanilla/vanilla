@@ -329,7 +329,7 @@ class ConversationModel extends ConversationsModel {
      * @param int $Limit The number of recipients to grab.
      * @return Gdn_DataSet SQL results.
      */
-    public function getRecipients($ConversationID, $Limit = 20) {
+    public function getRecipients($ConversationID, $Limit = 1000) {
         $Data = $this->SQL
             ->select('uc.*')
             ->from('UserConversation uc')

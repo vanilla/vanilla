@@ -22,7 +22,7 @@
 
     ####
     # Prevent access to any php script by redirecting the request to /index.php
-    # You can add an exceptions by adding another RewriteCond after this one.
+    # You can add an exception by adding another RewriteCond after this one.
     # Example: RewriteCond %{REQUEST_URI} !^/yourscriptname.php$
     # You can comment out this section if it causes you problems.
     # This is just a nice to have for security purposes.

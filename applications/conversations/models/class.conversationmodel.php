@@ -785,6 +785,11 @@ class ConversationModel extends ConversationsModel {
             ->get()
             ->firstRow();
 
+        $this->EventArguments['ConversationID'] = $ConversationID;
+        $this->EventArguments['UserIDs'] = &$UserID;
+        $this->EventArguments['OldContributorData'] = $OldContributorData;
+        $this->fireEvent('beforeAddUser');
+
         // Add the user(s) if they are not already in the conversation
         foreach ($UserID as $NewUserID) {
             if (!array_key_exists($NewUserID, $OldContributorData)) {

@@ -39,22 +39,6 @@ class HeroImagePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the image slug of the category of the current controller
-     *
-     * If the controller has no slug or the attatched category does not have one
-     * the default will be returned
-     *
-     * @see fuction getHeroImageSlugForCategory
-     *
-     * @return string|bool The slug on success, false otherwise.
-     */
-    public static function getHeroImageSlug() {
-        // Attempt to fetch the category of the controller
-        $categoryID = valr('Category.CategoryID', Gdn::controller());
-        return self::getHeroImageSlugForCategory($categoryID);
-    }
-
-    /**
      * Get the slug of the banner image for a given category
      *
      * Categories will inherit their parents CategoryBanner if they don't have
@@ -64,7 +48,7 @@ class HeroImagePlugin extends Gdn_Plugin {
      *
      * @return string|bool The category's slug on success, false otherwise.
      */
-    public static function getHeroImageSlugForCategory($categoryID) {
+    public static function getHeroImageSlug($categoryID) {
         $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
         if (!$categoryID || $categoryID < 1) {
             return c(self::DEFAULT_CONFIG_KEY);
@@ -75,7 +59,7 @@ class HeroImagePlugin extends Gdn_Plugin {
 
         if (!$slug) {
             $parentID = val('ParentCategoryID', $category);
-            $slug = self::getHeroImageSlugForCategory($parentID);
+            $slug = self::getHeroImageSlug($parentID);
         }
         return $slug;
     }

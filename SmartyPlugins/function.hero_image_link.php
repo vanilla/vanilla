@@ -15,7 +15,9 @@
  * @return string
  */
 function smarty_function_hero_image_link($params, &$smarty) {
-    $imageSlug = HeroImagePlugin::getHeroImageSlug();
+    $categoryID = valr('Category.CategoryID', Gdn::controller());
+
+    $imageSlug = HeroImagePlugin::getHeroImageSlug($categoryID);
     $url = $imageSlug ? Gdn_Upload::url($imageSlug) : '';
     return $url;
 }

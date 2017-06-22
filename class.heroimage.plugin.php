@@ -44,7 +44,7 @@ class HeroImagePlugin extends Gdn_Plugin {
      * Categories will inherit their parents CategoryBanner if they don't have
      * their own set. If no BannerImage can be found the default from the config will be returned
      *
-     * @param number $categoryID Set an explicit category.
+     * @param int $categoryID Set an explicit category.
      *
      * @return string|bool The category's slug on success, false otherwise.
      */

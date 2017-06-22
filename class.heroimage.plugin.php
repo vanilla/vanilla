@@ -50,25 +50,26 @@ class HeroImagePlugin extends Gdn_Plugin {
      */
     public static function getHeroImageSlug($category = false) {
         if (!$category) {
-            // The controller on Gdn doesn't have the key we need. So fetch it again.
-            $categoryID = valr('Category.CategoryID', Gdn::controller());
-            $category = CategoryModel::instance()->getID($categoryID);
+            $category = valr('Category', Gdn::controller());
         }
 
-        $slug = val("HeroImage", $category);
+        if (!$category) {
+            $slug = c(self::DEFAULT_CONFIG_KEY);
+        } else {
+            $slug = val("HeroImage", $category);
 
-        if (!$slug) {
-            $parentID = val('ParentCategoryID', $category);
+            if (!$slug) {
+                $parentID = val('ParentCategoryID', $category);
 
-            if ($parentID === -1) {
-                // This is a top level category with no banner set. Return the default
-                $slug = c(self::DEFAULT_CONFIG_KEY);
-            } else {
-                $parentCategory = CategoryModel::instance()->getID($parentID);
-                $slug = self::getHeroImageSlug($parentCategory);
+                if (!$parentID || $parentID === -1) {
+                    // There is no parent or we are the top level. Return the default.
+                    $slug = c(self::DEFAULT_CONFIG_KEY);
+                } else {
+                    $parentCategory = CategoryModel::instance()->getID($parentID);
+                    $slug = self::getHeroImageSlug($parentCategory);
+                }
             }
         }
-
         return $slug;
     }
 

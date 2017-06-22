@@ -40,6 +40,7 @@ $Definition['ValidateTime'] = '%s is not a valid time.';
 $Definition['ValidateTimestamp'] = '%s is not a valid timestamp.';
 $Definition['ValidateUsername'] = 'Usernames must be 3-20 characters and consist of letters, numbers, and underscores.';
 $Definition['ValidateLength'] = '%1$s is %2$s characters too long.';
+$Definition['ValidateMinLength'] = '%1$s is %2$s characters too short.'; // Deprecated
 $Definition['ValidateMinLengthSingular'] = '%1$s is %2$s character too short.';
 $Definition['ValidateMinLengthPlural'] = '%1$s is %2$s characters too short.';
 $Definition['ValidateEnum'] = '%s is not valid.';

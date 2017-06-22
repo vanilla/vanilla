@@ -46,7 +46,7 @@ class HeroImagePlugin extends Gdn_Plugin {
      *
      * @param int $categoryID Set an explicit category.
      *
-     * @return string|bool The category's slug on success, false otherwise.
+     * @return string The category's slug on success, the default otherwise.
      */
     public static function getHeroImageSlug($categoryID) {
         $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);

@@ -39,36 +39,43 @@ class HeroImagePlugin extends Gdn_Plugin {
     }
 
     /**
-     * Get the slug of the banner image for a category
+     * Get the image slug of the category of the current controller
+     *
+     * If the controller has no slug or the attatched category does not have one
+     * the default will be returned
+     *
+     * @see fuction getHeroImageSlugForCategory
+     *
+     * @return string|bool The slug on success, false otherwise.
+     */
+    public static function getHeroImageSlug() {
+        // Attempt to fetch the category of the controller
+        $categoryID = valr('Category.CategoryID', Gdn::controller());
+        return self::getHeroImageSlugForCategory($categoryID);
+    }
+
+    /**
+     * Get the slug of the banner image for a given category
      *
      * Categories will inherit their parents CategoryBanner if they don't have
-     * their own set.
+     * their own set. If no BannerImage can be found the default from the config will be returned
      *
-     * @param Category $category Set an explicit category. Defaults to the current category of the request.
+     * @param number $categoryID Set an explicit category.
      *
-     * @return void
+     * @return string|bool The category's slug on success, false otherwise.
      */
-    public static function getHeroImageSlug($category = false) {
-        if (!$category) {
-            $category = valr('Category', Gdn::controller());
+    public static function getHeroImageSlugForCategory($categoryID) {
+        $categoryID = filter_var($categoryID, FILTER_VALIDATE_INT);
+        if (!$categoryID || $categoryID < 1) {
+            return c(self::DEFAULT_CONFIG_KEY);
         }
 
-        if (!$category) {
-            $slug = c(self::DEFAULT_CONFIG_KEY);
-        } else {
-            $slug = val("HeroImage", $category);
+        $category = CategoryModel::instance()->getID($categoryID);
+        $slug = val("HeroImage", $category);
 
-            if (!$slug) {
-                $parentID = val('ParentCategoryID', $category);
-
-                if (!$parentID || $parentID === -1) {
-                    // There is no parent or we are the top level. Return the default.
-                    $slug = c(self::DEFAULT_CONFIG_KEY);
-                } else {
-                    $parentCategory = CategoryModel::instance()->getID($parentID);
-                    $slug = self::getHeroImageSlug($parentCategory);
-                }
-            }
+        if (!$slug) {
+            $parentID = val('ParentCategoryID', $category);
+            $slug = self::getHeroImageSlugForCategory($parentID);
         }
         return $slug;
     }

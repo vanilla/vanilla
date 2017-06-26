@@ -209,7 +209,7 @@ class OpenIDPlugin extends Gdn_Plugin {
                 } else {
                     try {
                         $Url = $OpenID->authUrl();
-                        redirect($Url);
+                        redirectTo($Url, 302, false);
                     } catch (Exception $Ex) {
                         $Sender->Form->addError($Ex);
                         $Sender->render('Url', '', 'plugins/OpenID');

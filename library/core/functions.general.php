@@ -3399,7 +3399,7 @@ if (!function_exists('safeURL')) {
             }
         }
 
-        return ($isTrustedDomain ? $destination : '/home/leaving?Target='.urlencode($destination));
+        return ($isTrustedDomain ? $url : url('/home/leaving?Target='.urlencode($destination)));
     }
 }
 

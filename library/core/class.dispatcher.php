@@ -231,7 +231,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
                 echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
             } else {
-                redirect('/entry/signin?Target='.urlencode($request->pathAndQuery()));
+                redirectTo('/entry/signin?Target='.urlencode($request->pathAndQuery()), 302, false);
             }
             exit();
         }

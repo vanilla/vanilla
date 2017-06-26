@@ -572,8 +572,8 @@ class CategoriesController extends VanillaController {
                 );
             }
         }
-        $this->setData('Discussions', $Discussions); 
-        
+        $this->setData('Discussions', $Discussions);
+
         // Add modules
         $this->addModule('NewDiscussionModule');
         $this->addModule('DiscussionFilterModule');
@@ -619,7 +619,7 @@ class CategoriesController extends VanillaController {
     public function initialize() {
         parent::initialize();
         if (!c('Vanilla.Categories.Use')) {
-            redirect('/discussions');
+            redirectTo('/discussions', 302, false);
         }
         if ($this->Menu) {
             $this->Menu->highlightRoute('/categories');

@@ -227,7 +227,7 @@ if (!function_exists('forceSSL')) {
     function forceSSL() {
         if (c('Garden.AllowSSL')) {
             if (Gdn::Request()->Scheme() != 'https') {
-                Redirect(Gdn::Request()->Url('', true, true));
+                redirectTo(Gdn::Request()->Url('', true, true), 302, false);
             }
         }
     }
@@ -244,7 +244,7 @@ if (!function_exists('forceNoSSL')) {
      */
     function forceNoSSL() {
         if (Gdn::Request()->Scheme() != 'http') {
-            Redirect(Gdn::Request()->Url('', true, false));
+            redirectTo(Gdn::Request()->Url('', true, false), 302, false);
         }
     }
 }
@@ -725,13 +725,13 @@ if (!function_exists('safeRedirect')) {
         }
 
         if ($isTrustedDomain) {
-            redirect($Destination, $StatusCode);
+            redirectTo($Destination, $StatusCode, false);
         } else {
             Logger::notice('Redirect to untrusted domain: {url}.', [
                 'url' => $Destination
             ]);
 
-            redirect("/home/leaving?Target=".urlencode($Destination));
+            redirectTo("/home/leaving?Target=".urlencode($Destination), 302, false);
         }
     }
 }

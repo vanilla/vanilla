@@ -302,7 +302,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
                 // Redirect to twitter's authorization page.
                 $Url = "https://api.twitter.com/oauth/authenticate?oauth_token={$Data['oauth_token']}";
-                redirect($Url);
+                redirectTo($Url, 302, false);
             }
         }
 
@@ -390,7 +390,7 @@ class TwitterPlugin extends Gdn_Plugin {
                     'url' => $Row['ShareUrl']
                 );
                 $Url = "https://twitter.com/share?".http_build_query($Get);
-                redirect($Url);
+                redirectTo($Url, 302, false);
             }
         }
 
@@ -439,7 +439,7 @@ class TwitterPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $Sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirect(userUrl($Sender->User, '', 'connections'));
+        redirectTo(userUrl($Sender->User, '', 'connections'), 302, false);
     }
 
     /**
@@ -568,7 +568,7 @@ class TwitterPlugin extends Gdn_Plugin {
             if (!isset($NewToken)) {
                 // There was an error getting the profile, which probably means the saved access token is no longer valid. Try and reauthorize.
                 if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect($this->_AuthorizeHref());
+                    redirectTo($this->_AuthorizeHref(), 302, false);
                 } else {
                     $Sender->setHeader('Content-type', 'application/json');
                     $Sender->deliveryMethod(DELIVERY_METHOD_JSON);

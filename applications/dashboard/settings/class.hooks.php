@@ -648,7 +648,7 @@ class DashboardHooks extends Gdn_Plugin {
             $deliveryType = $Sender->getDeliveryType($deliveryMethod);
             if (!$IsApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
                 $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
-                redirectUrl($url);
+                redirectTo(url($url, true), 302, false);
             }
         }
         $this->checkAccessToken();
@@ -725,7 +725,7 @@ class DashboardHooks extends Gdn_Plugin {
 
         // If an event handler didn't handle the signin then just redirect to the target.
         if (!$Handled) {
-            safeRedirect($Target, 302);
+            redirectTo($Target, 302);
         }
     }
 

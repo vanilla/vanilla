@@ -538,6 +538,72 @@ if (!function_exists('prepareArray')) {
     }
 }
 
+if (!function_exists('redirect')) {
+    /**
+     * Redirect to another URL.
+     *
+     * This function wraps {@link $Destination} in the {@link url()} function.
+     *
+     * @deprecated
+     * @param string|false $Destination The destination of the redirect.
+     * Pass a falsey value to redirect to the current URL.
+     * @param int|null $StatusCode The status of the redirect. This defaults to 302.
+     */
+    function redirect($Destination = false, $StatusCode = null) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$Destination) {
+            $Destination = '';
+        }
+
+        // Close any db connections before exit
+        $Database = Gdn::Database();
+        if ($Database instanceof Gdn_Database) {
+            $Database->CloseConnection();
+        }
+        // Clear out any previously sent content
+        @ob_end_clean();
+
+        // assign status code
+        $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
+        // re-assign the location header
+        safeHeader("Location: ".Url($Destination), true, $SendCode);
+        // Exit
+        exit();
+    }
+}
+
+if (!function_exists('redirectUrl')) {
+    /**
+     * Redirect to a specific url that can be outside of the site.
+     *
+     * @deprecated
+     * @param string $url The url to redirect to.
+     * @param int $code The http status code.
+     */
+    function redirectUrl($url, $code = 302) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$url) {
+            $url = Url('', true);
+        }
+
+        // Close any db connections before exit
+        $Database = Gdn::Database();
+        $Database->CloseConnection();
+        // Clear out any previously sent content
+        @ob_end_clean();
+
+        if (!in_array($code, array(301, 302))) {
+            $code = 302;
+        }
+
+        safeHeader("Location: ".$url, true, $code);
+
+        exit();
+    }
+}
+
 // Functions relating to data/variable types and type casting
 if (!function_exists('removeKeyFromArray')) {
     /**
@@ -627,6 +693,45 @@ if (!function_exists('safeParseStr')) {
             }
 
             $Output[$Key] = $Value;
+        }
+    }
+}
+
+if (!function_exists('safeRedirect')) {
+    /**
+     * Redirect, but only to a safe domain.
+     *
+     * @deprecated
+     * @param string $Destination Where to redirect.
+     * @param int $StatusCode The status of the redirect. Defaults to 302.
+     */
+    function safeRedirect($Destination = false, $StatusCode = null) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$Destination) {
+            $Destination = Url('', true);
+        } else {
+            $Destination = Url($Destination, true);
+        }
+
+        $trustedDomains = TrustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $Destination)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        if ($isTrustedDomain) {
+            redirect($Destination, $StatusCode);
+        } else {
+            Logger::notice('Redirect to untrusted domain: {url}.', [
+                'url' => $Destination
+            ]);
+
+            redirect("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }

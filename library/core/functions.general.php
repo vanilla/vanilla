@@ -2834,67 +2834,37 @@ if (!function_exists('betterRandomString')) {
     }
 }
 
-if (!function_exists('redirect')) {
+if (!function_exists('redirectTo')) {
     /**
-     * Redirect to another URL.
+     * Redirect to the supplied destination.
      *
-     * This function wraps {@link $Destination} in the {@link url()} function.
-     *
-     * @param string|false $Destination The destination of the redirect.
-     * Pass a falsey value to redirect to the current URL.
-     * @param int|null $StatusCode The status of the redirect. This defaults to 302.
+     * @param string|null $destination Destination URL or path.
+     *      Redirect to current URL if nothing or null is supplied.
+     * @param int $statusCode HTTP status code. 302 by default.
+     * @param bool $trustedOnly Non trusted destinations will be redirected to /home/leaving?Target=$destination
      */
-    function redirect($Destination = false, $StatusCode = null) {
-        if (!$Destination) {
-            $Destination = '';
+    function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true) {
+        if ($destination === null) {
+            $url = url('');
+        } else if ($trustedOnly) {
+            $url = safeURL($destination);
+        } else {
+            $url = url($destination);
         }
 
-//      if (Debug() && $Trace = Trace()) {
-//         Trace("Redirecting to $Destination");
-//         return;
-//      }
-
         // Close any db connections before exit
-        $Database = Gdn::Database();
-        if ($Database instanceof Gdn_Database) {
-            $Database->CloseConnection();
+        $database = Gdn::Database();
+        if ($database instanceof Gdn_Database) {
+            $database->closeConnection();
         }
         // Clear out any previously sent content
         @ob_end_clean();
 
-        // assign status code
-        $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
-        // re-assign the location header
-        safeHeader("Location: ".Url($Destination), true, $SendCode);
-        // Exit
-        exit();
-    }
-}
-
-if (!function_exists('redirectUrl')) {
-    /**
-     * Redirect to a specific url that can be outside of the site.
-     *
-     * @param string $url The url to redirect to.
-     * @param int $code The http status code.
-     */
-    function redirectUrl($url, $code = 302) {
-        if (!$url) {
-            $url = Url('', true);
+        if (!in_array($statusCode, [301, 302])) {
+            $statusCode = 302;
         }
 
-        // Close any db connections before exit
-        $Database = Gdn::Database();
-        $Database->CloseConnection();
-        // Clear out any previously sent content
-        @ob_end_clean();
-
-        if (!in_array($code, array(301, 302))) {
-            $code = 302;
-        }
-
-        safeHeader("Location: ".$url, true, $code);
-
+        safeHeader('Location: '.$url, true, $statusCode);
         exit();
     }
 }
@@ -3092,42 +3062,6 @@ if (!function_exists('safeImage')) {
             return false;
         }
         return $ImageUrl;
-    }
-}
-
-if (!function_exists('safeRedirect')) {
-    /**
-     * Redirect, but only to a safe domain.
-     *
-     * @param string $Destination Where to redirect.
-     * @param int $StatusCode The status of the redirect. Defaults to 302.
-     */
-    function safeRedirect($Destination = false, $StatusCode = null) {
-        if (!$Destination) {
-            $Destination = Url('', true);
-        } else {
-            $Destination = Url($Destination, true);
-        }
-
-        $trustedDomains = TrustedDomains();
-        $isTrustedDomain = false;
-
-        foreach ($trustedDomains as $trustedDomain) {
-            if (urlMatch($trustedDomain, $Destination)) {
-                $isTrustedDomain = true;
-                break;
-            }
-        }
-
-        if ($isTrustedDomain) {
-            redirect($Destination, $StatusCode);
-        } else {
-            Logger::notice('Redirect to untrusted domain: {url}.', [
-                'url' => $Destination
-            ]);
-
-            redirect("/home/leaving?Target=".urlencode($Destination));
-        }
     }
 }
 
@@ -3440,6 +3374,32 @@ if (!function_exists('theme')) {
      */
     function theme() {
         return Gdn::ThemeManager()->CurrentTheme();
+    }
+}
+
+if (!function_exists('safeURL')) {
+    /**
+     * Transform a destination to make sure that the resulting URL is "Safe".
+     *
+     * "Safe" means that the domain of the URL is trusted.
+     *
+     * @param $destination Destination URL or path.
+     * @return string The destination if safe, /home/leaving?Target=$destination if not.
+     */
+    function safeURL($destination) {
+        $url = url($destination, true);
+
+        $trustedDomains = trustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $url)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        return ($isTrustedDomain ? $destination : '/home/leaving?Target='.urlencode($destination));
     }
 }
 

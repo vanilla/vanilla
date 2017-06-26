@@ -205,7 +205,7 @@ class ActivityController extends Gdn_Controller {
         }
         $this->ActivityModel->deleteComment($ID);
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            redirect($Target);
+            redirectTo($Target, 302, false);
         }
 
         $this->render('Blank', 'Utility', 'Dashboard');
@@ -241,7 +241,7 @@ class ActivityController extends Gdn_Controller {
             $target = Gdn::request()->get('Target');
             if ($target) {
                 // Bail with a redirect if we got one.
-                redirect($target);
+                redirectTo($target, 302, false);
             } else {
                 // We got this as a full page somehow, so send them back to /activity.
                 $this->RedirectUrl = url('activity');
@@ -308,7 +308,7 @@ class ActivityController extends Gdn_Controller {
             if (!$Target) {
                 $Target = '/activity';
             }
-            redirect($Target);
+            redirectTo($Target, 302, false);
         } else {
             // Load the newly added comment.
             $this->setData('Comment', $this->ActivityModel->getComment($ID));
@@ -411,9 +411,9 @@ class ActivityController extends Gdn_Controller {
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             $Target = $this->Request->get('Target', '/activity');
             if (isSafeUrl($Target)) {
-                redirect($Target);
+                redirectTo($Target, 302, false);
             } else {
-                redirect(url('/activity'));
+                redirectTo(url('/activity'), 302, false);
             }
         }
 

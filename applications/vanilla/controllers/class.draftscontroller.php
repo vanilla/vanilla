@@ -110,7 +110,7 @@ class DraftsController extends VanillaController {
         // Redirect
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = GetIncomingValue('Target', '/drafts');
-            redirect($Target);
+            redirectTo($Target, 302, false);
         }
 
         // Return any errors

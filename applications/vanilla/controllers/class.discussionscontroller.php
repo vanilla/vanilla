@@ -201,7 +201,7 @@ class DiscussionsController extends VanillaController {
      */
     public function unread($Page = '0') {
         if (!Gdn::session()->isValid()) {
-            redirect('/discussions/index', 302);
+            redirectTo('/discussions/index', 302, false);
         }
 
         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
@@ -645,7 +645,7 @@ class DiscussionsController extends VanillaController {
         }
 
         if ($Target) {
-            redirect($Target);
+            redirectTo($Target, 302, false);
         }
 
         // Send sorted discussions.

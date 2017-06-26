@@ -28,7 +28,7 @@ class SocialController extends DashboardController {
      * Default method.
      */
     public function index() {
-        redirect('social/manage');
+        redirectTo('social/manage', 302, false);
     }
 
     /**

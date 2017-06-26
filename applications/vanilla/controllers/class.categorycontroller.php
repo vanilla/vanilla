@@ -27,7 +27,7 @@ class CategoryController extends VanillaController {
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect('/categories');
+            redirectTo('/categories', 302, false);
         }
 
         $this->render();
@@ -51,7 +51,7 @@ class CategoryController extends VanillaController {
             $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
         }
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect('/categories');
+            redirectTo('/categories', 302, false);
         }
 
         $this->render();

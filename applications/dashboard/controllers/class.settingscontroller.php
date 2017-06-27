@@ -2087,7 +2087,7 @@ class SettingsController extends DashboardController {
             $this->setData('EmptyMessageTitle', $emptyMessageTitle);
             $emptyMessageBody = sprintf(t('Cannot find the user identified by %s.'), htmlspecialchars($userIdentifier));
             $this->setData('EmptyMessageBody', $emptyMessageBody);
-            $this->render('bans', 'settings', 'dashboard');
+            return;
         }
 
         $matchingBans = [];
@@ -2132,7 +2132,6 @@ class SettingsController extends DashboardController {
         $this->setData('Bans', $matchingBans);
         $emptyMessage = sprintf(t('There are no existing ban rules affecting user %s.'), val('Name', $user));
         $this->setData('EmptyMessageBody', $emptyMessage);
-        $this->render('bans', 'settings', 'dashboard');
     }
 
 

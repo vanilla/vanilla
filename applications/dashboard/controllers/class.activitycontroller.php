@@ -244,7 +244,7 @@ class ActivityController extends Gdn_Controller {
                 redirectTo($target, 302, false);
             } else {
                 // We got this as a full page somehow, so send them back to /activity.
-                $this->RedirectUrl = url('activity');
+                $this->redirectTo('activity', false);
             }
         }
 

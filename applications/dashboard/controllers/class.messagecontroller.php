@@ -126,7 +126,6 @@ class MessageController extends DashboardController {
 
                 // Redirect
                 $this->informMessage(t('Your changes have been saved.'));
-                //$this->RedirectUrl = url('dashboard/message');
             }
         }
         $this->render();

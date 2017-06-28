@@ -723,9 +723,9 @@ var DashboardModal = (function() {
          * @param json
          */
         handleSuccess: function(json) {
-            if (json.RedirectUrl) {
+            if (json.RedirectTo) {
                 setTimeout(function() {
-                    document.location.replace(json.RedirectUrl);
+                    document.location.replace(json.RedirectTo);
                 }, 300);
             } else {
                 $('#' + this.id).modal('hide');

@@ -353,7 +353,7 @@ class PostController extends VanillaController {
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
                             redirectTo(discussionUrl($Discussion, 1).'?new=1', 302, false);
                         } else {
-                            $this->RedirectUrl = discussionUrl($Discussion, 1, true).'?new=1';
+                            $this->redirectTo(discussionUrl($Discussion, 1, true).'?new=1', false);
                         }
                     } else {
                         // If this was a draft save, notify the user about the save

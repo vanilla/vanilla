@@ -440,14 +440,14 @@ jQuery(document).ready(function($) {
     );
 
     // If a page loads with a hidden redirect url, go there after a few moments.
-    var redirectUrl = gdn.getMeta('RedirectUrl', '');
+    var redirectTo = gdn.getMeta('RedirectTo', '');
     var checkPopup = gdn.getMeta('CheckPopup', false);
-    if (redirectUrl !== '') {
+    if (redirectTo !== '') {
         if (checkPopup && window.opener) {
-            window.opener.location = redirectUrl;
+            window.opener.location = redirectTo;
             window.close();
         } else {
-            document.location = redirectUrl;
+            document.location = redirectTo;
         }
     }
 
@@ -758,9 +758,9 @@ jQuery(document).ready(function($) {
                 var informed = gdn.inform(json);
                 gdn.processTargets(json.Targets, $elem, $parent);
                 // If there is a redirect url, go to it.
-                if (json.RedirectUrl) {
+                if (json.RedirectTo) {
                     setTimeout(function() {
-                            window.location.replace(json.RedirectUrl);
+                            window.location.replace(json.RedirectTo);
                         },
                         informed ? 3000 : 0);
                 }

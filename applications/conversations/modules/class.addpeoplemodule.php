@@ -57,7 +57,7 @@ class AddPeopleModule extends Gdn_Module {
             $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
 
             $Sender->informMessage(t('Your changes were saved.'));
-            $Sender->RedirectUrl = url('/messages/'.$this->Conversation->ConversationID);
+            $Sender->redirectTo('/messages/'.$this->Conversation->ConversationID, false);
         }
         $this->_ApplicationFolder = $Sender->Application;
         $this->_ThemeFolder = $Sender->Theme;

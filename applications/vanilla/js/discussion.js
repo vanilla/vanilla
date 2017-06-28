@@ -116,10 +116,10 @@ jQuery(document).ready(function($) {
                 }
 
                 // If there is a redirect url, go to it
-                if (json.RedirectUrl != null && jQuery.trim(json.RedirectUrl) != '') {
+                if (json.RedirectTo != null && jQuery.trim(json.RedirectTo) != '') {
                     resetCommentForm(btn);
                     clearCommentForm(btn);
-                    window.location.replace(json.RedirectUrl);
+                    window.location.replace(json.RedirectTo);
                     return false;
                 }
 

@@ -153,7 +153,7 @@ class UtilityController extends DashboardController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($_SERVER['HTTP_REFERER']);
+            redirectTo($_SERVER['HTTP_REFERER'], 302, false);
         } else {
             $this->render();
         }
@@ -302,7 +302,7 @@ class UtilityController extends DashboardController {
         }
 
         if ($Target = $this->Request->get('Target')) {
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->fireEvent('AfterUpdate');
@@ -634,7 +634,7 @@ class UtilityController extends DashboardController {
         $icon = c('Garden.TouchIcon');
 
         if (!empty($icon)) {
-            redirect(Gdn_Upload::url($icon), 302);
+            redirectTo(Gdn_Upload::url($icon), 302, false);
         } else {
             throw new Exception('Touch icon not found.', 404);
         }

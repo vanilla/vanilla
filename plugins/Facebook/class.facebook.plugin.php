@@ -49,7 +49,7 @@ class FacebookPlugin extends Gdn_Plugin {
      */
     public function authorize($Query = false) {
         $Uri = $this->authorizeUri($Query);
-        redirect($Uri);
+        redirectTo($Uri, 302, false);
     }
 
     /**
@@ -262,7 +262,7 @@ class FacebookPlugin extends Gdn_Plugin {
                 }
 
                 $Url = 'http://www.facebook.com/dialog/feed?'.http_build_query($Get);
-                redirect($Url);
+                redirectTo($Url, 302, false);
             }
         }
 
@@ -313,7 +313,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $Sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirect(userUrl($Sender->User, '', 'connections'));
+        redirectTo(userUrl($Sender->User, '', 'connections'), 302, false);
     }
 
     /**
@@ -405,7 +405,7 @@ class FacebookPlugin extends Gdn_Plugin {
             if (!isset($NewToken)) {
                 // There was an error getting the profile, which probably means the saved access token is no longer valid. Try and reauthorize.
                 if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect($this->authorizeUri());
+                    redirectTo($this->authorizeUri(), 302, false);
                 } else {
                     $Sender->setHeader('Content-type', 'application/json');
                     $Sender->deliveryMethod(DELIVERY_METHOD_JSON);

@@ -569,7 +569,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                redirect(userUrl($user, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'), 302, false);
                 break;
             case 'entry':
             default:
@@ -582,7 +582,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url, 302, false);
                 break;
         }
     }

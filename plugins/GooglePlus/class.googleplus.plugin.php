@@ -419,7 +419,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 $this->EventArguments['User'] = $Sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirect(userUrl($User, '', 'connections'));
+                redirectTo(userUrl($User, '', 'connections'), 302, false);
                 break;
             case 'entry':
             default:
@@ -430,7 +430,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 if ($target = val('target', $State)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url, 302, false);
                 break;
         }
     }
@@ -494,7 +494,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             );
 
             $Url = 'https://plus.google.com/share?'.http_build_query($Get);
-            redirect($Url);
+            redirectTo($Url, 302, false);
         }
 
         $Sender->render('Blank', 'Utility', 'Dashboard');

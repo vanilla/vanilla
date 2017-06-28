@@ -200,7 +200,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect('/profile');
+            redirectTo('/profile', 302, false);
         } else {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
@@ -314,7 +314,7 @@ class ProfileController extends Gdn_Controller {
         Gdn::userModel()->saveAttribute($this->User->UserID, $Provider, null);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirect(userUrl($this->User), '', 'connections');
+            redirectTo(userUrl($this->User, '', 'connections'), 302, false);
         } else {
             // Grab all of the providers again.
             $PModel = new Gdn_AuthenticationProviderModel();
@@ -492,7 +492,7 @@ class ProfileController extends Gdn_Controller {
         if (c('Garden.Profile.ShowActivities', true)) {
             return $this->activity($User, $Username, $UserID, $Page);
         } elseif ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            safeRedirect(userUrl($this->User, '', 'discussions'));
+            redirectTo(userUrl($this->User, '', 'discussions'));
         }
 
         // Garden.Profile.ShowActivities is false and the user is expecting an xml or json response, so render blank.
@@ -1150,7 +1150,7 @@ class ProfileController extends Gdn_Controller {
         } else {
             $redirectUrl = userUrl($this->User, '', 'picture');
         }
-        redirect($redirectUrl);
+        redirectTo($redirectUrl, 302, false);
     }
 
     /**
@@ -1533,7 +1533,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->User === false) {
             throw notFoundException('User');
         } elseif ($this->User->Deleted == 1) {
-            redirect('dashboard/home/deleted');
+            redirectTo('dashboard/home/deleted', 302, false);
         } else {
             $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {

@@ -76,8 +76,16 @@ class Gdn_Controller extends Gdn_Pluggable {
     /** @var string The method that was requested before the dispatcher did any re-routing. */
     public $OriginalRequestMethod;
 
-    /** @var string The url to redirect the user to by ajax'd forms after the form is successfully saved. */
+    /**
+     * @deprecated
+     * @var string The URL to redirect the user to by ajax'd forms after the form is successfully saved.
+     */
     public $RedirectUrl;
+
+    /**
+     * @var string The URL to redirect the user to by ajax'd forms after the form is successfully saved.
+     */
+    protected $redirectTo;
 
     /** @var string Fully resolved path to the application/controller/method. */
     public $ResolvedPath;
@@ -1270,7 +1278,16 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->setJson('Data', ($View instanceof Gdn_IModule) ? $View->toString() : $View);
             $this->setJson('InformMessages', $this->_InformMessages);
             $this->setJson('ErrorMessages', $this->_ErrorMessages);
-            $this->setJson('RedirectUrl', $this->RedirectUrl);
+            if ($this->redirectTo !== null) {
+                $this->setJson('RedirectTo', $this->redirectTo);
+                $this->setJson('RedirectUrl', $this->redirectTo);
+            } else if ($this->RedirectUrl !== '') {
+                $this->setJson('RedirectTo', $this->RedirectUrl);
+                $this->setJson('RedirectUrl', $this->RedirectUrl);
+            } else {
+                $this->setJson('RedirectTo', '');
+                $this->setJson('RedirectUrl', '');
+            }
 
             // Make sure the database connection is closed before exiting.
             $this->finalize();
@@ -1284,12 +1301,17 @@ class Gdn_Controller extends Gdn_Pluggable {
             $this->_Json['Data'] = $json;
             exit($this->_Json['Data']);
         } else {
-            if (count($this->_InformMessages) > 0 && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
-            }
-
-            if ($this->RedirectUrl != '' && $this->SyndicationMethod === SYNDICATION_NONE) {
-                $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+            if ($this->SyndicationMethod === SYNDICATION_NONE) {
+                if (count($this->_InformMessages) > 0) {
+                    $this->addDefinition('InformMessageStack', json_encode($this->_InformMessages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT));
+                }
+                if ($this->redirectTo !== null) {
+                    $this->addDefinition('RedirectTo', $this->redirectTo);
+                    $this->addDefinition('RedirectUrl', $this->redirectTo);
+                } elseif ($this->RedirectUrl != '') {
+                    $this->addDefinition('RedirectTo', $this->RedirectUrl);
+                    $this->addDefinition('RedirectUrl', $this->RedirectUrl);
+                }
             }
 
             if ($this->_DeliveryMethod == DELIVERY_METHOD_XHTML && debug()) {
@@ -2141,5 +2163,24 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         return $this->data('Title');
+    }
+
+    /**
+     * Set the destination URL where the page will be redirected after an ajax request.
+     *
+     * @param string|null $destination Destination URL or path.
+     *      Redirect to current URL if nothing or null is supplied.
+     * @param bool $trustedOnly Non trusted destinations will be redirected to /home/leaving?Target=$destination
+     */
+    public function redirectTo($destination = null, $trustedOnly = true) {
+        if ($destination === null) {
+            $url = url('');
+        } elseif ($trustedOnly) {
+            $url = safeURL($destination);
+        } else {
+            $url = url($destination);
+        }
+
+        $this->redirectTo = $url;
     }
 }

@@ -263,7 +263,7 @@ class EntryController extends Gdn_Controller {
                 if (is_string($Reaction)) {
                     $Route = $Reaction;
                 } else {
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                 }
 
                 if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -897,7 +897,7 @@ class EntryController extends Gdn_Controller {
      * @param bool $CheckPopup
      */
     protected function _setRedirect($CheckPopup = false) {
-        $Url = url($this->redirectTo(), true);
+        $Url = url($this->getTargetRoute(), true);
 
         $this->RedirectUrl = $Url;
         $this->MasterView = 'popup';
@@ -1189,7 +1189,7 @@ class EntryController extends Gdn_Controller {
                     Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_CREATED, $UserEventData);
 
                     /// ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($Route !== false) {
                         redirectTo($Route, 302, false);
                     } else {
@@ -1317,7 +1317,7 @@ class EntryController extends Gdn_Controller {
                 Gdn::authenticator()->trigger($AuthResponse, $UserEventData);
 
                 /// ... and redirect them appropriately
-                $Route = $this->redirectTo();
+                $Route = $this->getTargetRoute();
                 if ($Route !== false) {
                     redirectTo($Route, 302, false);
                 }
@@ -1558,7 +1558,7 @@ class EntryController extends Gdn_Controller {
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                         $this->RedirectUrl = url($Route);
                     } else {
@@ -1685,7 +1685,7 @@ class EntryController extends Gdn_Controller {
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
                         $this->RedirectUrl = url($Route);
                     } else {
@@ -2013,7 +2013,7 @@ class EntryController extends Gdn_Controller {
      *
      * @return string URL.
      */
-    public function redirectTo() {
+    protected function getTargetRoute() {
         $Target = $this->target();
         return $Target == '' ? Gdn::router()->getDestination('DefaultController') : $Target;
     }

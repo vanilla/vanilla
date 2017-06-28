@@ -32,9 +32,9 @@ Gdn_Quotes.prototype.Prepare = function () {
                 .toggle();
 
         if (QuoteTarget.css('display') != 'none') {
-            Anchor.html(gdn.definition('&laquo; hide previous quotes'));
+            Anchor.html(gdn.definition('hide previous quotes'));
         } else {
-            Anchor.html(gdn.definition('&raquo; show previous quotes'));
+            Anchor.html(gdn.definition('show previous quotes'));
         }
 
         return false;
@@ -84,7 +84,7 @@ Gdn_Quotes.prototype.ExploreFold = function(QuoteTree, FoldingLevel, MaxLevel, T
                 .hide()
                 .before(
                     '<div class="QuoteFoldingWrapper"><a href="" class="QuoteFolding">' +
-                    gdn.definition('&raquo; show previous quotes') +
+                    gdn.definition('show previous quotes') +
                     '</a></div>'
                 );
             return;

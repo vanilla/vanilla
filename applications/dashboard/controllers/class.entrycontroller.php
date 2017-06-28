@@ -270,9 +270,9 @@ class EntryController extends Gdn_Controller {
                     $this->RedirectUrl = url($Route);
                 } else {
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route, 302, false);
                     } else {
-                        redirect(Gdn::router()->getDestination('DefaultController'));
+                        redirectTo(Gdn::router()->getDestination('DefaultController'), 302, false);
                     }
                 }
                 break;
@@ -364,7 +364,7 @@ class EntryController extends Gdn_Controller {
             $Url = str_ireplace('{target}', rawurlencode(url($Target, true)), $Url);
 
             if ($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) {
-                redirectUrl($Url, 302);
+                redirectTo(url($Url, true), 302, false);
             } else {
                 $this->setData('Url', $Url);
                 $this->render('Redirect', 'Utility');
@@ -909,7 +909,7 @@ class EntryController extends Gdn_Controller {
         } elseif ($CheckPopup || $this->data('CheckPopup')) {
             $this->addDefinition('CheckPopup', true);
         } else {
-            safeRedirect(url($this->RedirectUrl));
+            redirectTo(url($this->RedirectUrl));
         }
     }
 
@@ -960,25 +960,31 @@ class EntryController extends Gdn_Controller {
     public function signOut($TransientKey = "", $Override = "0") {
         $this->checkOverride('SignOut', $this->target(), $TransientKey);
 
-        if (Gdn::session()->validateTransientKey($TransientKey) || $this->Form->isPostBack()) {
+        if (Gdn::session()->validateTransientKey($TransientKey)) {
             $User = Gdn::session()->User;
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("BeforeSignOut");
 
             // Sign the user right out.
-            Gdn::session()->End();
+            Gdn::session()->end();
             $this->setData('SignedOut', true);
 
             $this->EventArguments['SignoutUser'] = $User;
             $this->fireEvent("SignOut");
 
             $this->_setRedirect();
-        } elseif (!Gdn::session()->isValid())
+        } elseif (!Gdn::session()->isValid()) {
             $this->_setRedirect();
+        }
+
+        $target = url($this->target(), true);
+        if (!isTrustedDomain($target)) {
+            $target = Gdn::router()->getDestination('DefaultController');
+        }
 
         $this->setData('Override', $Override);
-        $this->setData('Target', $this->target());
+        $this->setData('Target', $target);
         $this->Leaving = false;
         $this->render();
     }
@@ -1185,9 +1191,9 @@ class EntryController extends Gdn_Controller {
                     /// ... and redirect them appropriately
                     $Route = $this->redirectTo();
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route, 302, false);
                     } else {
-                        redirect('/');
+                        redirectTo('/', 302, false);
                     }
 
                 } else {
@@ -1313,7 +1319,7 @@ class EntryController extends Gdn_Controller {
                 /// ... and redirect them appropriately
                 $Route = $this->redirectTo();
                 if ($Route !== false) {
-                    redirect($Route);
+                    redirectTo($Route, 302, false);
                 }
             } else {
                 // Add the hidden inputs back into the form.
@@ -1327,7 +1333,7 @@ class EntryController extends Gdn_Controller {
             $Id = Gdn::authenticator()->getIdentity(true);
             if ($Id > 0) {
                 // The user is signed in so we can just go back to the homepage.
-                redirect($Target);
+                redirectTo($Target, 302, false);
             }
 
             $Name = $UserInfo['UserName'];
@@ -1557,7 +1563,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            safeRedirect($Route);
+                            redirectTo($Route);
                         }
                     }
                 }
@@ -1684,7 +1690,7 @@ class EntryController extends Gdn_Controller {
                         $this->RedirectUrl = url($Route);
                     } else {
                         if ($Route !== false) {
-                            safeRedirect($Route);
+                            redirectTo($Route);
                         }
                     }
                 }
@@ -1850,7 +1856,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($User->UserID, true);
-                    redirect('/');
+                    redirectTo('/', 302, false);
                 }
             }
 
@@ -1989,9 +1995,9 @@ class EntryController extends Gdn_Controller {
                     $this->RedirectUrl = url($Route);
                 } else {
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route, 302, false);
                     } else {
-                        redirect(Gdn::router()->getDestination('DefaultController'));
+                        redirectTo(Gdn::router()->getDestination('DefaultController'), 302, false);
                     }
                 }
                 break;
@@ -2037,6 +2043,10 @@ class EntryController extends Gdn_Controller {
             if (preg_match('`^/entry/signin`i', $Target)) {
                 $Target = '/';
             }
+        }
+
+        if (!isTrustedDomain(url($Target, true))) {
+            $Target = url(Gdn::router()->getDestination('DefaultController'));
         }
 
         return $Target;

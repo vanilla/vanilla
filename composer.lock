@@ -395,16 +395,16 @@
         },
         {
             "name": "symfony/yaml",
-            "version": "v3.2.8",
+            "version": "v3.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6"
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/acec26fcf7f3031e094e910b94b002fa53d4e4d6",
-                "reference": "acec26fcf7f3031e094e910b94b002fa53d4e4d6",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/9752a30000a8ca9f4b34b5227d15d0101b96b063",
+                "reference": "9752a30000a8ca9f4b34b5227d15d0101b96b063",
                 "shasum": ""
             },
             "require": {
@@ -419,7 +419,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.2-dev"
+                    "dev-master": "3.3-dev"
                 }
             },
             "autoload": {
@@ -446,7 +446,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-05-01T14:55:58+00:00"
+            "time": "2017-06-02T22:05:06+00:00"
         },
         {
             "name": "tburry/pquery",
@@ -632,16 +632,16 @@
         },
         {
             "name": "vanilla/garden-schema",
-            "version": "v1.4.2",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/vanilla/garden-schema.git",
-                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b"
+                "reference": "44118f07ed9135d32f02d345ef287018110d476f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/cb56f87a440a18f92c78d7df2e7d11501fcd837b",
-                "reference": "cb56f87a440a18f92c78d7df2e7d11501fcd837b",
+                "url": "https://api.github.com/repos/vanilla/garden-schema/zipball/44118f07ed9135d32f02d345ef287018110d476f",
+                "reference": "44118f07ed9135d32f02d345ef287018110d476f",
                 "shasum": ""
             },
             "require": {
@@ -664,7 +664,7 @@
                 }
             ],
             "description": "A simple data validation and cleaning library based on JSON Schema.",
-            "time": "2017-03-17T18:00:12+00:00"
+            "time": "2017-05-27T18:31:27+00:00"
         },
         {
             "name": "vanilla/htmlawed",

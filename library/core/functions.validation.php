@@ -279,6 +279,21 @@ if (!function_exists('validateUsername')) {
     }
 }
 
+if (!function_exists('validateAgainstUsernameBlacklist')) {
+    /**
+     * Validate that a string is not a blacklisted username.
+     *
+     * @param mixed $value The value to validate.
+     * @return bool|string Returns an error string if the strtolower-ed username is in the blacklist and true otherwise.
+     */
+    function validateAgainstUsernameBlacklist($value) {
+        if (in_array(strtolower($value), UserModel::getUsernameBlacklist())) {
+            return t('Username is reserved. Please choose a different username.');
+        }
+        return true;
+    }
+}
+
 if (!function_exists('validateUrlString')) {
     /**
      * Validate that a string can be used in a URL without any encoding required.
@@ -594,8 +609,10 @@ if (!function_exists('validateMinTextLength')) {
 
         if ($Diff <= 0) {
             return true;
+        } else if ($Diff == 1) {
+            return sprintf(T('ValidateMinLengthSingular'), T($field->Name), $Diff);
         } else {
-            return sprintf(T('ValidateMinLength'), T($field->Name), $Diff);
+            return sprintf(T('ValidateMinLengthPlural'), T($field->Name), $Diff);
         }
     }
 }

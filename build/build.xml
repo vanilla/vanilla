@@ -15,11 +15,11 @@
 
     <!-- Take steps to prepare for the build. -->
     <target name="prepare">
-        <loadfile property="vanilla.index" file="${project.dir}/index.php"/>
+        <loadfile property="vanilla.environment" file="${project.dir}/environment.php"/>
 
         <!-- Grab the version number from Vanilla's index.php. -->
         <propertyregex property="vanilla.version"
-            subject="${vanilla.index}"
+            subject="${vanilla.environment}"
             pattern="define\('APPLICATION_VERSION', '((\d\.?)+((a|b|p|rc)(\d+)?)?)'\)"
             match="$1"
             defaultValue="-1" />

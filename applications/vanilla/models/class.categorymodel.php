@@ -180,9 +180,14 @@ class CategoryModel extends Gdn_Model {
      * @param bool|null $addUserCategory
      */
     private function calculateUser(&$category, $addUserCategory = null) {
-        $category['Url'] = url($category['Url'], '//');
-        if ($Photo = val('Photo', $category)) {
-            $category['PhotoUrl'] = Gdn_Upload::url($Photo);
+        if (!isset($category['Url'])) {
+            $category['Url'] = self::categoryUrl($category, false, '/');
+        }
+
+        if (!isset($category['PhotoUrl'])) {
+            if ($Photo = val('Photo', $category)) {
+                $category['PhotoUrl'] = Gdn_Upload::url($Photo);
+            }
         }
 
         if (!empty($category['LastUrl'])) {
@@ -412,6 +417,7 @@ class CategoryModel extends Gdn_Model {
      */
     private static function calculate(&$category) {
         $category['Url'] = self::categoryUrl($category, false, '/');
+
         if (val('Photo', $category)) {
             $category['PhotoUrl'] = Gdn_Upload::url($category['Photo']);
         } else {
@@ -2138,7 +2144,7 @@ class CategoryModel extends Gdn_Model {
      * @param string $Permission
      * @param string $Column
      */
-    public static function joinModerators($Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
+    public static function joinModerators(&$Data, $Permission = 'Vanilla.Comments.Edit', $Column = 'Moderators') {
         $Moderators = Gdn::sql()
             ->select('u.UserID, u.Name, u.Photo, u.Email')
             ->select('p.JunctionID as CategoryID')

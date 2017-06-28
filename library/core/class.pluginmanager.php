@@ -1058,7 +1058,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param $pluginName
      * @param Gdn_Validation $validation
      * @param array|bool $options
-     * @return bool
+     * @return array|bool
      * @throws Exception
      * @throws Gdn_UserException
      */
@@ -1091,9 +1091,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         // Enable this addon's requirements.
         $requirements = $this->addonManager->lookupRequirements($addon, AddonManager::REQ_DISABLED);
+        $enabledRequirements = [];
         foreach ($requirements as $addonKey => $row) {
             $requiredAddon = $this->addonManager->lookupAddon($addonKey);
             $this->enableAddon($requiredAddon, $setup);
+            $enabledRequirements[] = $requiredAddon;
         }
 
         // Enable the addon.
@@ -1105,7 +1107,11 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         $this->EventArguments['AddonName'] = $addon->getRawKey();
         $this->fireEvent('AddonEnabled');
 
-        return true;
+        $result = [
+            'AddonEnabled' => true,
+            'RequirementsEnabled' => $enabledRequirements
+        ];
+        return $result;
     }
 
     /**

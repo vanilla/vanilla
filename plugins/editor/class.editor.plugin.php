@@ -1514,7 +1514,7 @@ class EditorPlugin extends Gdn_Plugin {
             $url = asset('/plugins/FileUpload/images/file.png');
         }
 
-        redirect($url, 301);
+        redirectTo($url, 301, false);
     }
 
     /**

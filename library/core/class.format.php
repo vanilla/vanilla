@@ -1196,15 +1196,100 @@ class Gdn_Format {
             return self::to($mixed, 'Links');
         }
 
+        $linksCallback = function($matches) {
+            static $inTag = 0;
+            static $inAnchor = false;
+
+            $inOut = $matches[1];
+            $tag = strtolower($matches[2]);
+
+            if ($inOut == '<') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = true;
+                }
+            } elseif ($inOut == '</') {
+                $inTag++;
+                if ($tag == 'a') {
+                    $inAnchor = false;
+                }
+            } elseif ($matches[3]) {
+                $inTag--;
+            }
+
+            if (c('Garden.Format.WarnLeaving', false) && isset($matches[4]) && $inAnchor) {
+                // This is a the href url value in an anchor tag.
+                $url = $matches[4];
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return url('/home/leaving?target='.urlencode($url)).'" class="Popup';
+                }
+            }
+
+            if (!isset($matches[4]) || $inTag || $inAnchor) {
+                return $matches[0];
+            }
+            // We are not in a tag and what we matched starts with //
+            if (preg_match('#^//#', $matches[4])) {
+                return $matches[0];
+            }
+
+            $url = $matches[4];
+
+            $embeddedResult = self::embedReplacement($url);
+            if ($embeddedResult !== '') {
+                return $embeddedResult;
+            }
+
+            // Unformatted links
+            if (!self::$FormatLinks) {
+                return $url;
+            }
+
+            // Strip punctuation off of the end of the url.
+            $punc = '';
+
+            // Special case where &nbsp; is right after an url and is not part of it!
+            // This can happen in WYSIWYG format if the url is the last text of the body.
+            while (stringEndsWith($url, '&nbsp;')) {
+                $url = substr($url, 0, -6);
+                $punc .= '&nbsp;';
+            }
+
+            if (preg_match('`^(.+)([.?,;:])$`', $url, $matches)) {
+                $url = $matches[1];
+                $punc = $matches[2].$punc;
+            }
+
+            // Get human-readable text from url.
+            $text = $url;
+            if (strpos($text, '%') !== false) {
+                $text = rawurldecode($text);
+                $text = htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
+            }
+
+            $nofollow = (self::$DisplayNoFollow) ? ' rel="nofollow"' : '';
+
+            if (c('Garden.Format.WarnLeaving', false)) {
+                // This is a plaintext url we're converting into an anchor.
+                $domain = parse_url($url, PHP_URL_HOST);
+                if (!isTrustedDomain($domain)) {
+                    return '<a href="'.url('/home/leaving?target='.urlencode($url)).'" class="Popup">'.$text.'</a>'.$punc;
+                }
+            }
+
+            return '<a href="'.$url.'"'.$nofollow.'>'.$text.'</a>'.$punc;
+        };
+
         if (unicodeRegexSupport()) {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@\p{L}\p{N}\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`iu";
         } else {
-            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:https?|ftp)://[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
+            $regex = "`(?:(</?)([!a-z]+))|(/?\s*>)|((?:(?:https?|ftp):)?//[@a-z0-9\x21\x23-\x27\x2a-\x2e\x3a\x3b\/\x3f-\x7a\x7e\x3d]+)`i";
         }
 
         $mixed = Gdn_Format::replaceButProtectCodeBlocks(
             $regex,
-            ['Gdn_Format', 'linksCallback'],
+            $linksCallback,
             $mixed,
             true
         );
@@ -1393,7 +1478,7 @@ EOT;
             case 'Vimeo':
                 $id = $matches[1];
                 return <<<EOT
-<iframe src="//player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+<iframe src="https://player.vimeo.com/video/{$id}" width="{$width}" height="{$height}" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1420,7 +1505,7 @@ EOT;
             case 'Vine':
                 return <<<EOT
 <div class="vine-video VideoWrap">
-   <iframe class="vine-embed" src="//vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="//platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
+   <iframe class="vine-embed" src="https://vine.co/v/{$matches[1]}/embed/simple" width="320" height="320" frameborder="0"></iframe><script async src="https://platform.vine.co/static/scripts/embed.js" charset="utf-8"></script>
 </div>
 EOT;
                 break;
@@ -1428,32 +1513,32 @@ EOT;
             case 'Instagram':
                 return <<<EOT
 <div class="instagram-video VideoWrap">
-   <iframe src="//instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
+   <iframe src="https://instagram.com/p/{$matches[1]}/embed/" width="412" height="510" frameborder="0" scrolling="no" allowtransparency="true"></iframe>
 </div>
 EOT;
                 break;
 
             case 'Pinterest':
                 return <<<EOT
-<a data-pin-do="embedPin" href="//pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
+<a data-pin-do="embedPin" href="https://pinterest.com/pin/{$matches[1]}/" class="pintrest-pin" rel="nofollow"></a>
 EOT;
                 break;
 
             case 'Getty':
                 return <<<EOT
-<iframe src="//embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
+<iframe src="https://embed.gettyimages.com/embed/{$matches[1]}" width="{$matches[2]}" height="{$matches[3]}" frameborder="0" scrolling="no"></iframe>
 EOT;
                 break;
 
             case 'Twitch':
                 return <<<EOT
-<iframe src="http://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
+<iframe src="https://player.twitch.tv/?channel={$matches[1]}&autoplay=false" height="360" width="640" frameborder="0" scrolling="no" autoplay="false" allowfullscreen="true"></iframe>
 EOT;
                 break;
 
             case 'Hitbox':
                 return <<<EOT
-<iframe src="http://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
+<iframe src="https://hitbox.tv/#!/embed/{$matches[1]}" height="360" width="640" frameborder="0" scrolling="no" allowfullscreen></iframe>
 EOT;
                 break;
 
@@ -1474,7 +1559,7 @@ EOT;
                 }
 
                 return <<<EOT
-<script charset="ISO-8859-1" src="//fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
+<script charset="ISO-8859-1" src="https://fast.wistia.com/assets/external/E-v1.js" async></script><div class="wistia_responsive_padding" style="padding:56.25% 0 0 0;position:relative;"><div class="wistia_responsive_wrapper" style="height:100%;left:0;position:absolute;top:0;width:100%;"><div class="{$wistiaClass}" style="height:100%;width:100%">&nbsp;</div></div></div>
 EOT;
         }
 
@@ -1484,10 +1569,12 @@ EOT;
     /**
      * Replaces text or anchor urls with either their embed code, or sanitized and wrapped in an anchor.
      *
+     * @deprecated
      * @param $matches
-     * @return string The anchor or embed code for the url.
+     * @return string|void The anchor or embed code for the url.
      */
     public static function linksCallback($matches) {
+        deprecated('Gdn_Format::linksCallback');
         static $inTag = 0;
         static $inAnchor = false;
 

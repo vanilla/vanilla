@@ -1040,7 +1040,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function pluginController_tagsearch_create() {
         $query = http_build_query(Gdn::request()->getQuery());
-        redirect(url('/tags/search'.($query ? '?'.$query : null)), 301);
+        redirectTo(url('/tags/search'.($query ? '?'.$query : null)), 301, false);
     }
 
     /**

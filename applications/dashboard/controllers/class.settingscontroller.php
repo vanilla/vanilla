@@ -398,7 +398,7 @@ class SettingsController extends DashboardController {
 
                     // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
                     if (!$newUpload) {
-                        redirect('/dashboard/settings/avatars');
+                        redirectTo('/dashboard/settings/avatars', 302, false);
                     }
                 }
                 $this->informMessage(t("Your settings have been saved."));
@@ -796,7 +796,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::layout instead.
      */
     public function homepage() {
-        redirect('/settings/layout');
+        redirectTo('/settings/layout', 302, false);
     }
 
     /**
@@ -805,7 +805,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
      */
     public function banner() {
-        redirect('/settings/branding');
+        redirectTo('/settings/branding', 302, false);
     }
 
 
@@ -1162,7 +1162,7 @@ class SettingsController extends DashboardController {
             $sections = DashboardNavModule::getDashboardNav()->getSectionsInfo();
             $url = val('url', val($section, $sections));
             if ($url) {
-                redirect($url);
+                redirectTo($url, 302, false);
             }
         }
 
@@ -1173,11 +1173,11 @@ class SettingsController extends DashboardController {
                 'Garden.Community.Manage',
             ], false)) {
             // We don't have permission to see the dashboard/home.
-            redirect(DashboardNavModule::getDashboardNav()->getUrlForSection('Moderation'));
+            redirectTo(DashboardNavModule::getDashboardNav()->getUrlForSection('Moderation'), 302, false);
         }
 
         // Still here?
-        redirect('dashboard/settings/home');
+        redirectTo('dashboard/settings/home', 302, false);
     }
 
     public function home() {
@@ -1285,7 +1285,7 @@ class SettingsController extends DashboardController {
             $this->informMessage(t("Your changes have been saved."));
 
             Gdn::locale()->refresh();
-            redirect('/settings/locales');
+            redirectTo('/settings/locales', 302, false);
         } else {
             $this->Form->setValue('Locale', Gdn_Locale::canonicalize(c('Garden.Locale', 'en')));
         }
@@ -1451,13 +1451,27 @@ class SettingsController extends DashboardController {
         }
 
         $addon = Gdn::addonManager()->lookupAddon($pluginName);
+        $requirementsEnabled = [];
 
         try {
             $validation = new Gdn_Validation();
-            if (!Gdn::pluginManager()->enablePlugin($pluginName, $validation)) {
+            $result = Gdn::pluginManager()->enablePlugin($pluginName, $validation);
+            if (!$result) {
                 $this->Form->setValidationResults($validation->results());
             } else {
                 Gdn_LibraryMap::ClearCache();
+
+                if (is_array($result) && array_key_exists('RequirementsEnabled', $result)) {
+                    if (is_array($result['RequirementsEnabled']) && count($result['RequirementsEnabled']) > 0) {
+                        $requirementsEnabled = $result['RequirementsEnabled'];
+                        $requirementNames = [];
+                        foreach ($requirementsEnabled as $requiredAddon) {
+                            $requirementNames[] = val('name', $requiredAddon->getInfo(), t('Plugin'));
+                        }
+                        $this->informMessage(sprintf(t('Required addons enabled: %s'), implode(', ', $requirementNames)));
+                    }
+                }
+
                 $this->informMessage(sprintf(t('%s Enabled.'), val('name', $addon->getInfo(), t('Plugin'))));
             }
             $this->EventArguments['PluginName'] = $pluginName;
@@ -1468,6 +1482,13 @@ class SettingsController extends DashboardController {
         }
 
         $this->handleAddonToggle($pluginName, $addon->getInfo(), 'plugins', true, $filter, $action);
+        if (count($requirementsEnabled) > 0) {
+            foreach ($requirementsEnabled as $requiredAddon) {
+                /** @var $requiredAddon Addon */
+                $this->handleAddonToggle($requiredAddon->getKey(), $requiredAddon->getInfo(), 'plugins', true, $filter, $action);
+            }
+        }
+
         $this->reloadPanelNavigation('Settings', '/dashboard/settings/plugins');
         $this->render('blank', 'utility', 'dashboard');
     }
@@ -1863,7 +1884,7 @@ class SettingsController extends DashboardController {
             }
 
             if ($this->Form->errorCount() == 0) {
-                redirect('/settings/themes');
+                redirectTo('/settings/themes', 302, false);
             }
 
         }
@@ -2029,7 +2050,7 @@ class SettingsController extends DashboardController {
                     $this->render('Blank', 'Utility', 'Dashboard');
                     exit;
                 } else {
-                    redirect('/settings/mobilethemes');
+                    redirectTo('/settings/mobilethemes', 302, false);
                 }
             } else {
                 if ($AsyncRequest) {
@@ -2155,9 +2176,9 @@ class SettingsController extends DashboardController {
 
             $this->fireEvent('PreviewTheme', ['ThemeInfo' => $ThemeInfo]);
 
-            redirect('/');
+            redirectTo('/', 302, false);
         } else {
-            redirect('settings/themes');
+            redirectTo('settings/themes', 302, false);
         }
     }
 
@@ -2192,9 +2213,9 @@ class SettingsController extends DashboardController {
         }
 
         if ($isMobile) {
-            redirect('settings/mobilethemes');
+            redirectTo('settings/mobilethemes', 302, false);
         } else {
-            redirect('settings/themes');
+            redirectTo('settings/themes', 302, false);
         }
     }
 

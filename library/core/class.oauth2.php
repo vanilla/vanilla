@@ -152,7 +152,19 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // If there is no token passed, try to retrieve one from the user's attributes.
         if ($this->accessToken === null && Gdn::session()->UserID) {
-            $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
+            // If this workflow uses a RefreshToken, regenerate the access token using the RefreshToken, otherwise use the stored AccessToken.
+            $refreshToken = valr($this->getProviderKey().'.RefreshToken', Gdn::session()->User->Attributes);
+            if ($refreshToken) {
+                $response = $this->requestAccessToken($refreshToken, true);
+                // save the new refresh_token if there is one and it is different from the existing one.
+                if (val('refresh_token', $response) !== $refreshToken) {
+                    $userModel = New UserModel();
+                    $userModel->saveAttribute(Gdn::session()->UserID, [$this->getProviderKey() => ['RefreshToken' => val('refresh_token', $response)]]);
+                }
+                $this->accessToken = val('access_token', $response);
+            } else {
+                $this->accessToken = valr($this->getProviderKey().'.AccessToken', Gdn::session()->User->Attributes);
+            }
         }
 
         return $this->accessToken;
@@ -543,8 +555,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                     'UniqueID' => $profile['id']]);
 
                 // Save the information as attributes.
+                // If a client has passed a refresh_token, store it as the access_token in the attributes
+                // for future requests, if not, store the access_token.
                 $attributes = [
-                    'AccessToken' => $response['access_token'],
+                    'RefreshToken' => val('refresh_token', $response),
+                    'AccessToken' => val('access_token', $response, val('refresh_token', $response)),
                     'Profile' => $profile
                 ];
 
@@ -554,20 +569,20 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                redirect(userUrl($user, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'), 302, false);
                 break;
             case 'entry':
             default:
 
                 // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
-                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => $response['access_token'], 'Profile' => $profile]);
+                Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => val('access_token', $response), 'RefreshToken' => val('refresh_token', $response), 'Profile' => $profile]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
                 //pass the target if there is one so that the user will be redirected to where the request originated.
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url, 302, false);
                 break;
         }
     }
@@ -591,9 +606,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         }
         $profile = val('Profile', $savedProfile);
         $accessToken = val('AccessToken', $savedProfile);
+        $refreshToken = val('RefreshToken', $savedProfile);
 
         trace($profile, 'Profile');
         trace($accessToken, 'Access Token');
+        trace($refreshToken, 'Refresh Token');
 
         /* @var Gdn_Form $form */
         $form = $sender->Form; //new Gdn_Form();
@@ -608,6 +625,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $attributes = [];
         $attributes[$this->getProviderKey()] = [
             'AccessToken' => $accessToken,
+            'RefreshToken' => $refreshToken,
             'Profile' => $profile
         ];
         $form->setFormValue('Attributes', $attributes);
@@ -630,21 +648,29 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      * Request access token from provider.
      *
      * @param string $code code returned from initial handshake with provider.
-     *
+     * @param bool $refresh if we are using the stored RefreshToken to request a new AccessToken
      * @return mixed Result of the API call to the provider, usually JSON.
      */
-    public function requestAccessToken($code) {
+    public function requestAccessToken($code, $refresh=false) {
         $provider = $this->provider();
         $uri = val('TokenUrl', $provider);
 
-        $defaultParams = [
-            'code' => $code,
-            'client_id' => val('AssociationKey', $provider),
-            'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
-            'client_secret' => val('AssociationSecret', $provider),
-            'grant_type' => 'authorization_code',
-            'scope' => val('AcceptedScope', $provider)
-        ];
+        //When requesting the AccessToken using the RefreshToken the params are different.
+        if ($refresh) {
+            $defaultParams = [
+                'refresh_token' => $code,
+                'grant_type' => 'refresh_token'
+            ];
+        } else {
+            $defaultParams = [
+                'code' => $code,
+                'client_id' => val('AssociationKey', $provider),
+                'redirect_uri' => url('/entry/'. $this->getProviderKey(), true),
+                'client_secret' => val('AssociationSecret', $provider),
+                'grant_type' => 'authorization_code',
+                'scope' => val('AcceptedScope', $provider)
+            ];
+        }
 
         $post = array_merge($defaultParams, $this->requestAccessTokenParams);
 

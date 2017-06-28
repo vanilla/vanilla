@@ -49,7 +49,7 @@ class OpenIDPlugin extends Gdn_Plugin {
         $OpenID = new LightOpenID();
 
         if ($url = Gdn::request()->get('url')) {
-            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            if (filter_var($url, FILTER_VALIDATE_URL) === false) {
                 throw new Gdn_UserException(sprintf(t('ValidateUrl'), 'OpenID'), 400);
             }
 
@@ -57,6 +57,12 @@ class OpenIDPlugin extends Gdn_Plugin {
             $scheme = parse_url($url, PHP_URL_SCHEME);
             if (!in_array($scheme, array('http', 'https'))) {
                 throw new Gdn_UserException(sprintf(t('ValidateUrl'), 'OpenID'), 400);
+            }
+
+            // Make sure the host is not an ip.
+            $host = parse_url($url, PHP_URL_HOST);
+            if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+                throw new Gdn_UserException(sprintf(t('ValidateUrl').' '.t('The hostname cannot be an IP address.'), 'OpenID'), 400);
             }
 
             // Don't allow open ID on a non-standard port.
@@ -143,6 +149,9 @@ class OpenIDPlugin extends Gdn_Plugin {
         if ($Session->Stash('OpenID', '', false) || $OpenID->validate()) {
             $Attr = $OpenID->getAttributes();
 
+            // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+            saveToConfig('Garden.Registration.AutoConnect', false, false);
+
             $Form = $Sender->Form; //new Gdn_Form();
             $ID = $OpenID->identity;
             $Form->setFormValue('UniqueID', $ID);
@@ -200,7 +209,7 @@ class OpenIDPlugin extends Gdn_Plugin {
                 } else {
                     try {
                         $Url = $OpenID->authUrl();
-                        redirect($Url);
+                        redirectTo($Url, 302, false);
                     } catch (Exception $Ex) {
                         $Sender->Form->addError($Ex);
                         $Sender->render('Url', '', 'plugins/OpenID');

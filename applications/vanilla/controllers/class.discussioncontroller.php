@@ -295,8 +295,9 @@ class DiscussionController extends VanillaController {
         $this->setData('CategoryID', $this->CategoryID = $this->Discussion->CategoryID, true);
 
         // Get the comments.
-        $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID)->result();
+        $Comments = $this->CommentModel->getNew($DiscussionID, $LastCommentID);
         $this->setData('Comments', $Comments, true);
+        $Comments = $Comments->result();
 
         // Set the data.
         if (count($Comments) > 0) {
@@ -393,7 +394,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            SafeRedirect('discussions');
+            redirectTo('discussions');
         }
 
         $this->jsonTarget("#Discussion_$DiscussionID", null, 'SlideUp');
@@ -596,7 +597,7 @@ class DiscussionController extends VanillaController {
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = getIncomingValue('Target', 'discussions');
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->sendOptions($Discussion);
@@ -641,7 +642,7 @@ class DiscussionController extends VanillaController {
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = getIncomingValue('Target', 'discussions');
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->SendOptions($Discussion);
@@ -687,7 +688,7 @@ class DiscussionController extends VanillaController {
 
             if ($this->Form->errorCount() == 0) {
                 if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-                    safeRedirect($Target);
+                    redirectTo($Target);
                 }
 
                 if ($Target) {
@@ -756,7 +757,7 @@ class DiscussionController extends VanillaController {
         // Redirect
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             $Target = GetIncomingValue('Target', $DefaultTarget);
-            SafeRedirect($Target);
+            redirectTo($Target);
         }
 
         if ($this->Form->errorCount() > 0) {
@@ -982,7 +983,7 @@ body { background: transparent !important; }
         $Body = Gdn_Format::to(val('Body', $Discussion), val('Format', $Discussion));
         if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
             $Url = $Matches[1];
-            safeRedirect($Url, 301);
+            redirectTo($Url, 301);
         }
     }
 

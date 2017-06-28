@@ -20,6 +20,7 @@ use Garden\EventManager;
  * - Any translations the addon has declared will be loaded for the currently enabled locale.
  */
 class AddonManager {
+
     /// Constants ///
 
     const REQ_ENABLED = 0x01; // addon enabled, yay!
@@ -98,7 +99,7 @@ class AddonManager {
         $scanDirs += array_fill_keys($types, []);
 
         foreach ($types as $type) {
-            if ($this->cacheDir !== null && !$this->typeUsesMultiCaching($type)) {
+            if ($this->isCacheEnabled() && !$this->typeUsesMultiCaching($type)) {
                 $dir = "$cacheDir/$type";
                 if (!file_exists($dir)) {
                     $r = $r && mkdir($dir, 0755);
@@ -291,14 +292,11 @@ class AddonManager {
      */
     private function ensureMultiCache() {
         if (!isset($this->multiCache)) {
-            $cachePath = null;
-            if ($this->cacheDir) {
-                $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
-            }
-            if ($cachePath !== null && is_readable($cachePath)) {
+            $cachePath = $this->cacheDir.'/'.Addon::TYPE_ADDON.'.php';
+            if ($this->isCacheEnabled() && is_readable($cachePath)) {
                 $this->multiCache = require $cachePath;
             } else {
-                $this->multiCache = $this->scan(Addon::TYPE_ADDON, true);
+                $this->multiCache = $this->scan(Addon::TYPE_ADDON, $this->isCacheEnabled());
             }
         }
     }
@@ -311,7 +309,7 @@ class AddonManager {
      * @return array Returns an array of {@link Addon} objects.
      */
     public function scan($type, $saveCache = false) {
-        if ($saveCache && empty($this->cacheDir)) {
+        if ($saveCache && !$this->isCacheEnabled()) {
             throw new \InvalidArgumentException("Cannot save the addon cache when the cache directory is empty.", 500);
         }
 
@@ -323,9 +321,19 @@ class AddonManager {
         foreach ($addonDirs as $subdir) {
             try {
                 $addon = new Addon($subdir);
-                $addons[$addon->getKey()] = $addon;
+                $key = $addon->getKey();
+                if (!array_key_exists($key, $addons)) {
+                    $addons[$key] = $addon;
+                } else {
+                    \Logger::error('Duplicate addon: {key}', [
+                        'key' => $key,
+                        'event' => 'duplicate_addon'
+                    ]);
+                    throw new \Exception("Duplicate addon: {$key}");
+                }
             } catch (\Exception $ex) {
-                trigger_error("The $type in $subdir is invalid.", E_USER_WARNING);
+                $exceptionMessage = $ex->getMessage();
+                trigger_error("The $type in $subdir is invalid. $exceptionMessage", E_USER_WARNING);
             }
         }
         $this->multiCache = $addons;
@@ -351,6 +359,7 @@ class AddonManager {
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return array Returns an array of root-relative addon directories.
+     * @throws \Exception if a duplicate addon is detected.
      */
     private function scanAddonDirs($type) {
         $strlen = strlen(PATH_ROOT);
@@ -359,7 +368,15 @@ class AddonManager {
         foreach ($this->scanDirs[$type] as $subdir) {
             $paths = glob(PATH_ROOT."$subdir/*", GLOB_ONLYDIR | GLOB_NOSORT);
             foreach ($paths as $path) {
-                $result[basename($path)] = substr($path, $strlen);
+                $basename = basename($path);
+                if (!array_key_exists($basename, $result)) {
+                    $result[$basename] = substr($path, $strlen);
+                } else {
+                    \Logger::error('Duplicate addon: {basename}', [
+                        'basename' => $basename,
+                        'event' => 'duplicate_addon'
+                    ]);
+                }
             }
         }
 
@@ -367,13 +384,13 @@ class AddonManager {
     }
 
     /**
-     * Cache an array.
+     * Cache an array if the cache is enabled.
      *
      * @param string $path Relative path path to save the array to.
      * @param string $array The array to save.
      */
     private function saveArrayCache($path, $array) {
-        if ($this->cacheDir !== null) {
+        if ($this->isCacheEnabled()) {
             $varString = '<?php return '.var_export($array, true).";\n";
             $this->filePutContents($this->cacheDir.'/'.$path, $varString);
         }
@@ -432,7 +449,7 @@ class AddonManager {
         if (!isset($this->singleIndex[$type])) {
             $cachePath = "$type-index.php";
 
-            if ($this->cacheDir !== null && is_readable("$this->cacheDir/$cachePath")) {
+            if ($this->isCacheEnabled() && is_readable("$this->cacheDir/$cachePath")) {
                 $this->singleIndex[$type] = require "$this->cacheDir/$cachePath";
             } else {
                 $addonDirs = $this->scanAddonDirs($type);
@@ -457,13 +474,7 @@ class AddonManager {
         if (isset($index[$key])) {
             unset($index[$key]);
 
-            $cachePath = null;
-            if ($this->cacheDir !== null) {
-                $cachePath = $this->cacheDir."/$type-index.php";
-            }
-            if ($cachePath !== null) {
-                $this->saveArrayCache($cachePath, $index);
-            }
+            $this->saveArrayCache($this->cacheDir."/$type-index.php", $index);
 
             $this->singleIndex[$type] = $index;
             return true;
@@ -485,7 +496,7 @@ class AddonManager {
             return $result === false ? null : $result;
         }
         // Look at the file cache.
-        if (!empty($this->cacheDir)) {
+        if ($this->isCacheEnabled()) {
             $cachePath = "{$this->cacheDir}/$type/$key.php";
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
@@ -503,9 +514,7 @@ class AddonManager {
             }
         }
         // Cache the addon's information.
-        if (!empty($this->cacheDir)) {
-            $this->saveArrayCache("$type/$key.php", $addon);
-        }
+        $this->saveArrayCache("$type/$key.php", $addon);
         $this->singleCache[$type][$key] = $addon;
         return $addon === false ? null : $addon;
     }
@@ -1017,7 +1026,7 @@ class AddonManager {
      * @return bool Returns **true** if the files were removed or **false** otherwise.
      */
     public function clearCache() {
-        if ($this->cacheDir === null) {
+        if (!$this->isCacheEnabled()) {
             return true;
         }
 
@@ -1117,5 +1126,14 @@ class AddonManager {
         } else {
             trigger_error("$pluginClass does not implement Gdn_IPlugin", E_USER_DEPRECATED);
         }
+    }
+
+    /**
+     * Tells whether the AddonManager's cache is enabled or not.
+     *
+     * @return bool
+     */
+    public function isCacheEnabled() {
+        return $this->cacheDir !== null;
     }
 }

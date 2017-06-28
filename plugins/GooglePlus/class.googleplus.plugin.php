@@ -280,6 +280,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
         $AccessToken = val('AccessToken', $GooglePlus);
         $Profile = val('Profile', $GooglePlus);
 
+        // This isn't a trusted connection. Don't allow it to automatically connect a user account.
+        saveToConfig('Garden.Registration.AutoConnect', false, false);
+
         $Form = $Sender->Form;
         $Form->setFormValue('UniqueID', val('id', $Profile));
         $Form->setFormValue('Provider', self::ProviderKey);
@@ -416,7 +419,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 $this->EventArguments['User'] = $Sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirect(userUrl($User, '', 'connections'));
+                redirectTo(userUrl($User, '', 'connections'), 302, false);
                 break;
             case 'entry':
             default:
@@ -427,7 +430,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 if ($target = val('target', $State)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url, 302, false);
                 break;
         }
     }
@@ -491,7 +494,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
             );
 
             $Url = 'https://plus.google.com/share?'.http_build_query($Get);
-            redirect($Url);
+            redirectTo($Url, 302, false);
         }
 
         $Sender->render('Blank', 'Utility', 'Dashboard');

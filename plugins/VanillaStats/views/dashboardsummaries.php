@@ -1,10 +1,15 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$userBoard = new TableSummaryModule(t('Active Users'));
+$titleSuffix = '';
+if ($this->data('UserRangeWarning')) {
+    $titleSuffix = '<span class="text-warning form-control-sm">'.$this->data('UserRangeWarning').'</span>';
+}
+
+$userBoard = new TableSummaryModule(t('Active Users').$titleSuffix);
 $userBoard->addColumn('users', t('Name'), [], TableSummaryModule::MAIN_CSS_CLASS)
     ->addColumn('count-comments', t('Comments'), ['class' => 'column-xs']);
 
-foreach ($this->Data['UserData'] as $userdata) {
+foreach ($this->data('UserData') as $userdata) {
     $id = val('UserID', $userdata);
     $user = Gdn::userModel()->getID($id);
     $name = val('Name', $user);

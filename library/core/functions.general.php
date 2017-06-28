@@ -2846,7 +2846,7 @@ if (!function_exists('redirectTo')) {
     function redirectTo($destination = null, $statusCode = 302, $trustedOnly = true) {
         if ($destination === null) {
             $url = url('');
-        } else if ($trustedOnly) {
+        } elseif ($trustedOnly) {
             $url = safeURL($destination);
         } else {
             $url = url($destination);

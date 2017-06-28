@@ -725,7 +725,7 @@ class DashboardHooks extends Gdn_Plugin {
 
         // If an event handler didn't handle the signin then just redirect to the target.
         if (!$Handled) {
-            redirectTo($Target, 302);
+            redirectTo($Target);
         }
     }
 

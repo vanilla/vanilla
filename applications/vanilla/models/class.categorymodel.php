@@ -268,6 +268,16 @@ class CategoryModel extends Gdn_Model {
     }
 
     /**
+     * Get the maximum number of available pages when viewing a list of categories.
+     *
+     * @return int
+     */
+    public function getMaxPages() {
+        $maxPages = (int)c('Vanilla.Categories.MaxPages') ?: 100;
+        return $maxPages;
+    }
+
+    /**
      * Get the display type for the root category.
      *
      * @return string
@@ -787,6 +797,18 @@ class CategoryModel extends Gdn_Model {
         }
 
         return $cdd;
+    }
+
+    /**
+     * Get a category tree.
+     *
+     * @param int $categoryID
+     * @param array $options
+     * @return array
+     */
+    public function getTree($categoryID, array $options = []) {
+        $result = $this->collection->getTree($categoryID, $options);
+        return $result;
     }
 
     /**
@@ -3277,6 +3299,60 @@ SQL;
         }
 
         self::instance()->clearCache();
+    }
+
+    /**
+     * Search for categories by name.
+     *
+     * @param string $name The whole or partial category name to search for.
+     * @param bool $expandParent Expand the parent category record.
+     * @param int|null $limit Limit the total number of results.
+     * @param int|null $offset Offset the results.
+     * @return array
+     */
+    public function searchByName($name, $expandParent = false, $limit = null, $offset = null) {
+        if ($limit !== null && filter_var($limit, FILTER_VALIDATE_INT) === false) {
+            $limit = null;
+        }
+        if ($offset !== null && filter_var($offset, FILTER_VALIDATE_INT) === false) {
+            $offset = null;
+        }
+
+        $query = $this->SQL
+            ->from('Category c')
+            ->where('CategoryID >', 0)
+            ->where('DisplayAs <>', 'Heading')
+            ->like('Name', $name)
+            ->orderBy('Name');
+        if ($limit !== null) {
+            $offset = ($offset === null ? false : $offset);
+            $query->limit($limit, $offset);
+        }
+
+        $categories = $query->get()->resultArray();
+        $result = [];
+        foreach ($categories as $category) {
+            self::calculate($category);
+            if ($category['DisplayAs'] === 'Heading') {
+                continue;
+            }
+
+            self::calculateUser($category);
+
+            if ($expandParent) {
+                if ($category['ParentCategoryID'] > 0) {
+                    $parent = static::categories($category['ParentCategoryID']);
+                    self::calculate($category);
+                    $category['Parent'] = $parent;
+//                } else {
+//                    $parent = null;
+                }
+            }
+
+            $result[] = $category;
+        }
+
+        return $result;
     }
 
     /**

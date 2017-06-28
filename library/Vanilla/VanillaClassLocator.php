@@ -58,7 +58,7 @@ class VanillaClassLocator extends ClassLocator {
     public function findMethod($object, $method) {
         $class = $this->classBasename($object);
 
-        $event = "{$class}_{$method}_method";
+        $event = "{$class}_{$method}";
 
         // Check for an overriding event.
         if ($this->eventManager->hasHandler($event)) {

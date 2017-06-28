@@ -78,9 +78,12 @@ class Dispatcher {
                     // Hold the action in case another route succeeds.
                     $ex = $action;
                 } elseif ($action !== null) {
-                    ob_start();
-                    $actionResponse = $action();
-                    $ob = ob_get_clean();
+                    try {
+                        ob_start();
+                        $actionResponse = $action();
+                    } finally {
+                        $ob = ob_get_clean();
+                    }
                     $response = $this->makeResponse($actionResponse, $ob);
                     break;
                 }
@@ -165,6 +168,8 @@ class Dispatcher {
             if ($request->hasHeader('Access-Control-Request-Headers')) {
                 $response->setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
             }
+
+            $response->setHeader('Access-Control-Max-Age', strtotime('1 hour'));
         }
     }
 
@@ -188,11 +193,11 @@ class Dispatcher {
 
         if ($this->allowedOrigins === '*') {
             return '*';
+        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
+            return $origin;
         } elseif (is_string($this->allowedOrigins) && in_array($this->allowedOrigins, [$host, $hostAndScheme], true)) {
             return $origin;
         } elseif (is_array($this->allowedOrigins) && (in_array($host, $this->allowedOrigins) || in_array($hostAndScheme, $this->allowedOrigins))) {
-            return $origin;
-        } elseif (is_callable($this->allowedOrigins) && call_user_func($this->allowedOrigins, $origin)) {
             return $origin;
         }
         return '';

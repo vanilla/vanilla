@@ -35,7 +35,7 @@ class Emoji {
     protected $archive;
 
     /** @var string The base path where the emoji are located. */
-    protected $assetPath = '/resources/emoji';
+    protected $assetPath;
 
     /** @var string If assetPath is modified, this will hold the original path. */
     protected $assetPathOriginal;
@@ -96,6 +96,8 @@ class Emoji {
      *
      */
     protected function __construct() {
+        $this->assetPath = asset('/resources/emoji', '//');
+
         // Initialize the canonical list. (emoji)
         $this->emoji = array(
             // Smileys

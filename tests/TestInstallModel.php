@@ -30,14 +30,12 @@ class TestInstallModel extends InstallModel {
      */
     public function __construct(\Gdn_Configuration $config, AddonModel $addonModel, ContainerInterface $container, \Gdn_Request $request) {
         parent::__construct($config, $addonModel, $container);
+        $this->setBaseUrl($request->url('/'));
 
         $this->config->Data = [];
         $this->config->load(PATH_ROOT.'/conf/config-defaults.php');
         $this->config->load($config->defaultPath(), 'Configuration', true);
-
-        $this->setBaseUrl($request->url('/'));
     }
-
 
     /**
      * Get the base URL of the site.
@@ -78,7 +76,12 @@ class TestInstallModel extends InstallModel {
 
         $this->createDatabase($data['database']);
 
-        return parent::install($data);
+        $result = parent::install($data);
+
+        // Flush the config.
+        $this->config->shutdown();
+
+        return $result;
     }
 
     /**

@@ -531,7 +531,7 @@ class DiscussionController extends VanillaController {
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
             if ($Target) {
-                $this->RedirectUrl = url($Target);
+                $this->setRedirectTo($Target, false);
             }
 
             $this->jsonTarget('', '', 'Refresh');
@@ -692,7 +692,7 @@ class DiscussionController extends VanillaController {
                 }
 
                 if ($Target) {
-                    $this->RedirectUrl = url($Target);
+                    $this->setRedirectTo($Target, false);
                 }
 
                 $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", null, 'SlideUp');

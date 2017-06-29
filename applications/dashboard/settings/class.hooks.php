@@ -502,7 +502,7 @@ class DashboardHooks extends Gdn_Plugin {
 
                     if ($Sender->Form->Save()) {
                         $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->RedirectUrl = url('/settings/tagging');
+                        $Sender->setRedirectTo('/settings/tagging', false);
                     }
                 }
 
@@ -544,7 +544,7 @@ class DashboardHooks extends Gdn_Plugin {
                     $Saved = $Sender->Form->save();
                     if ($Saved) {
                         $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->RedirectUrl = url('/settings/tagging');
+                        $Sender->setRedirectTo('/settings/tagging', false);
                     }
                 }
 

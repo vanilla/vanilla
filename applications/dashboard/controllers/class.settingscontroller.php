@@ -1594,7 +1594,7 @@ class SettingsController extends DashboardController {
                 $this->InviteExpiration = Gdn::config('Garden.Registration.InviteExpiration', '');
                 $this->informMessage(t("Your settings have been saved."));
                 if ($RedirectUrl != '') {
-                    $this->RedirectUrl = $RedirectUrl;
+                    $this->setRedirectTo($RedirectUrl, false);
                 }
             }
         }

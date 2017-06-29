@@ -331,7 +331,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Data = c('ProfileExtender.Fields.'.$Name, array());
                 $Data = array_merge((array)$Data, (array)$FormPostValues);
                 saveToConfig('ProfileExtender.Fields.'.$Name, $Data);
-                $Sender->RedirectUrl = url('/settings/profileextender');
+                $Sender->redirectTo('/settings/profileextender', false);
             }
         } elseif (isset($Args[0])) {
             // Editing
@@ -370,7 +370,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         if (isset($Args[0])) {
             if ($Sender->Form->authenticatedPostBack()) {
                 removeFromConfig('ProfileExtender.Fields.'.$Args[0]);
-                $Sender->RedirectUrl = url('/settings/profileextender');
+                $Sender->redirectTo('/settings/profileextender', false);
             } else {
                 $Sender->setData('Field', $this->getProfileField($Args[0]));
             }

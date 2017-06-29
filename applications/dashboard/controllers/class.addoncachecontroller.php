@@ -49,7 +49,7 @@ class AddonCacheController extends DashboardController {
         }
 
         if (!empty($target)) {
-            $this->RedirectUrl = $target;
+            $this->setRedirectTo($target, false);
         }
 
         $this->deliveryMethod(DELIVERY_METHOD_JSON);

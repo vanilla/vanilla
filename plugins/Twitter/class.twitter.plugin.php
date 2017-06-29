@@ -572,7 +572,7 @@ class TwitterPlugin extends Gdn_Plugin {
                 } else {
                     $Sender->setHeader('Content-type', 'application/json');
                     $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-                    $Sender->RedirectUrl = $this->_authorizeHref();
+                    $Sender->setRedirectTo($this->_authorizeHref(), false);
                 }
             } else {
                 throw $Ex;

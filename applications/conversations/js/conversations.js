@@ -146,8 +146,8 @@ jQuery(document).ready(function($) {
          },
          success: function(json) {
             gdn.inform(json);
-            if (json.RedirectUrl)
-              setTimeout(function() { window.location.replace(json.RedirectUrl); }, 300);
+            if (json.RedirectTo)
+              setTimeout(function() { window.location.replace(json.RedirectTo); }, 300);
          }
       });
       return false;

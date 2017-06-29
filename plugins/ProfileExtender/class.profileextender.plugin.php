@@ -262,6 +262,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
     /**
      * Add/edit a field.
+     *
+     * @param SettingsController $Sender
+     * @param array $Args
      */
     public function settingsController_profileFieldAddEdit_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
@@ -331,7 +334,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $Data = c('ProfileExtender.Fields.'.$Name, array());
                 $Data = array_merge((array)$Data, (array)$FormPostValues);
                 saveToConfig('ProfileExtender.Fields.'.$Name, $Data);
-                $Sender->redirectTo('/settings/profileextender', false);
+                $Sender->setRedirectTo('/settings/profileextender', false);
             }
         } elseif (isset($Args[0])) {
             // Editing
@@ -363,6 +366,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
     /**
      * Delete a field.
+     *
+     * @param SettingsController $Sender
+     * @param array $Args
      */
     public function settingsController_profileFieldDelete_create($Sender, $Args) {
         $Sender->permission('Garden.Settings.Manage');
@@ -370,7 +376,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         if (isset($Args[0])) {
             if ($Sender->Form->authenticatedPostBack()) {
                 removeFromConfig('ProfileExtender.Fields.'.$Args[0]);
-                $Sender->redirectTo('/settings/profileextender', false);
+                $Sender->setRedirectTo('/settings/profileextender', false);
             } else {
                 $Sender->setData('Field', $this->getProfileField($Args[0]));
             }

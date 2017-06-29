@@ -2169,7 +2169,7 @@ class Gdn_Controller extends Gdn_Pluggable {
      *      Redirect to current URL if nothing or null is supplied.
      * @param bool $trustedOnly Non trusted destinations will be redirected to /home/leaving?Target=$destination
      */
-    public function redirectTo($destination = null, $trustedOnly = true) {
+    public function setRedirectTo($destination = null, $trustedOnly = true) {
         if ($destination === null) {
             $url = url('');
         } elseif ($trustedOnly) {

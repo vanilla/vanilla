@@ -126,7 +126,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                 unset($CheckedComments[$DiscussionID]);
                 Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
                 ModerationController::informCheckedComments($Sender);
-                $Sender->redirectTo('discussion/'.$NewDiscussionID.'/'.Gdn_Format::url($Data['Name']), false);
+                $Sender->setRedirectTo('discussion/'.$NewDiscussionID.'/'.Gdn_Format::url($Data['Name']), false);
             }
         } else {
             $Sender->Form->setValue('CategoryID', val('CategoryID', $Discussion));

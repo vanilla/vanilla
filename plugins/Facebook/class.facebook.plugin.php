@@ -409,7 +409,7 @@ class FacebookPlugin extends Gdn_Plugin {
                 } else {
                     $Sender->setHeader('Content-type', 'application/json');
                     $Sender->deliveryMethod(DELIVERY_METHOD_JSON);
-                    $Sender->redirectTo($this->authorizeUri(), false);
+                    $Sender->setRedirectTo($this->authorizeUri(), false);
                 }
             } else {
                 $Sender->Form->addError('There was an error with the Facebook connection.');

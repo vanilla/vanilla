@@ -187,7 +187,7 @@ module.exports = function (grunt) {
         options: {
           map: true,
           browsers: [
-            "ie > 7",
+            "ie > 8",
             "last 6 iOS versions",
             "last 10 versions"
           ]

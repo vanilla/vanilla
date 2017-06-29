@@ -152,7 +152,9 @@ class Addon {
 
                 // Kludge that sets keyRaw until we use key everywhere.
                 if ($info['oldType'] === 'application') {
-                    $info['keyRaw'] = $info['name'];
+                    if (!isset($info['keyRaw'])) {
+                        $info['keyRaw'] = $info['name'];
+                    }
                 } else {
                     if ($addonFolder !== $info['key']) {
                         $info['keyRaw'] = $addonFolder;

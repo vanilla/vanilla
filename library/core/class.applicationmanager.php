@@ -104,9 +104,6 @@ class Gdn_ApplicationManager {
         $directories = explode(DS, $addon->getSubdir());
         $info['Folder'] = $directories[count($directories) - 1];
 
-        // $ApplicationInfo[INDEX] is converted to $info['Name'] = 'Index'
-        $info['Index'] = $info['Name'];
-
         return $info;
     }
 

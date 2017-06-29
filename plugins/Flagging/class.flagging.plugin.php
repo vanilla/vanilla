@@ -80,9 +80,6 @@ class FlaggingPlugin extends Gdn_Plugin {
      * Default method of virtual Flagging controller.
      */
     public function controller_index($Sender) {
-        $Sender->addCssFile('admin.css');
-        $Sender->addCssFile($this->getResource('design/flagging.css', false, false));
-
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(array(
@@ -148,13 +145,6 @@ class FlaggingPlugin extends Gdn_Plugin {
             $Sender->informMessage(sprintf(t('%s dismissed.'), t('Flag')));
         }
         $Sender->render('blank', 'utility', 'dashboard');
-    }
-
-    /**
-     * Add Flagging styling to Discussion.
-     */
-    public function discussionController_beforeCommentsRender_handler($Sender) {
-        $Sender->addCssFile($this->getResource('design/flagging.css', false, false));
     }
 
     /**

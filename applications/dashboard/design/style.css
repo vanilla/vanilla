@@ -64,7 +64,8 @@ blockquote, q {
 }
 
 textarea, input[type=text] {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 .textarea-autosize {
@@ -586,6 +587,7 @@ div.FileUpload .CurrentImage {
   opacity: 0;
   filter: alpha(opacity=0);
   -webkit-transform: translate(-300px, 0) scale(4);
+      -ms-transform: translate(-300px, 0) scale(4);
           transform: translate(-300px, 0) scale(4);
   direction: ltr;
   cursor: pointer;
@@ -735,8 +737,10 @@ div.FileUpload .CurrentImage {
 .ActivateSlider {
   display: inline-block;
   background: #bbb;
-  box-shadow: 0 10px 30px #333 inset;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+  -webkit-box-shadow: 0 10px 30px #333 inset;
+          box-shadow: 0 10px 30px #333 inset;
+  -webkit-box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) inset;
   border: solid 1px #ccc;
   width: 125px;
   border-radius: 4px;
@@ -958,7 +962,8 @@ a.Small img {
 .DismissMessage.Box {
   background: #fff8ce;
   border: 1px solid #c5bea4;
-  box-shadow: none;
+  -webkit-box-shadow: none;
+          box-shadow: none;
   margin: 0 0 10px;
   /* Make sure that .Box definitions don't override the base DismissMessage margin! */
 }
@@ -1138,8 +1143,10 @@ body > #Frame > .Head {
   border-radius: 2px;
   background: #fff;
   padding: 5px 0;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .MenuItems a, .MenuItems a:link, .MenuItems a:visited, .MenuItems a:active {
@@ -1218,8 +1225,10 @@ body > #Frame > .Head {
   background: #fff;
   color: #000;
   border-radius: 2px;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   border: solid 1px #999;
 }
 
@@ -1805,7 +1814,8 @@ overflow: hidden;
 
 .SearchForm .InputBox {
   width: 100%;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   font-size: 14px;
   padding: 6px 25px 6px 8px;
   border-radius: .35ex;
@@ -5222,7 +5232,8 @@ input + .ReactSprite {
 
 /* Token input */
 ul.token-input-list {
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
   border: 1px solid #aaa;
   color: #333;
   font-size: 15px;
@@ -5369,8 +5380,10 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   /* So high because a client actually had 99999 in a theme */
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: 0 5px 10px #eee;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-box-shadow: 0 5px 10px #eee;
+          box-shadow: 0 5px 10px #eee;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
 
 .atwho-view .cur {
@@ -5733,7 +5746,8 @@ Styleguide Definitions
 .item-attachment .dl-columns dd {
   float: left;
   padding: 0 10px;
-  box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
 }
 
 /*
@@ -6196,12 +6210,15 @@ img.jcrop-preview {
 
 .flex {
   display: -webkit-box;
+  display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
       -ms-flex-pack: justify;
           justify-content: space-between;
   -webkit-box-align: center;
+  -webkit-align-items: center;
       -ms-flex-align: center;
           align-items: center;
 }
@@ -6215,28 +6232,33 @@ img.jcrop-preview {
 }
 
 .flex-wrap {
-  -ms-flex-wrap: wrap;
-      flex-wrap: wrap;
+  -webkit-flex-wrap: wrap;
+      -ms-flex-wrap: wrap;
+          flex-wrap: wrap;
 }
 
 .shrink {
-  -ms-flex-negative: 1;
-      flex-shrink: 1;
+  -webkit-flex-shrink: 1;
+      -ms-flex-negative: 1;
+          flex-shrink: 1;
 }
 
 .grow {
   -webkit-box-flex: 1;
+  -webkit-flex-grow: 1;
       -ms-flex-positive: 1;
           flex-grow: 1;
 }
 
 .no-shrink {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  -webkit-flex-shrink: 0;
+      -ms-flex-negative: 0;
+          flex-shrink: 0;
 }
 
 .no-grow {
   -webkit-box-flex: 0;
+  -webkit-flex-grow: 0;
       -ms-flex-positive: 0;
           flex-grow: 0;
 }

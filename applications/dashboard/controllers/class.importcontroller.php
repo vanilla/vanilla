@@ -44,7 +44,7 @@ class ImportController extends DashboardController {
             if ($Imp->ImportPath) {
                 $Imp->CurrentStep = 1;
             } else {
-                redirectTo(strtolower($this->Application).'/import', 302, false);
+                redirectTo(strtolower($this->Application).'/import');
             }
         }
 
@@ -230,6 +230,6 @@ class ImportController extends DashboardController {
         }
         $Imp->deleteState();
 
-        redirectTo(strtolower($this->Application).'/import', 302, false);
+        redirectTo(strtolower($this->Application).'/import');
     }
 }

@@ -313,7 +313,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $this->EventArguments['User'] = $Sender->User;
         $this->fireEvent('AfterConnection');
 
-        redirectTo(userUrl($Sender->User, '', 'connections'), 302, false);
+        redirectTo(userUrl($Sender->User, '', 'connections'));
     }
 
     /**

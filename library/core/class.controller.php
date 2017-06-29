@@ -1144,7 +1144,7 @@ class Gdn_Controller extends Gdn_Pluggable {
             );
 
             if (!$Session->isValid() && $this->deliveryType() == DELIVERY_TYPE_ALL) {
-                redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()), 302, false);
+                redirectTo('/entry/signin?Target='.urlencode($this->Request->pathAndQuery()));
             } else {
                 Gdn::dispatcher()->dispatch('DefaultPermission');
                 exit();

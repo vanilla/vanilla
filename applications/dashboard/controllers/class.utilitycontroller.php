@@ -153,7 +153,7 @@ class UtilityController extends DashboardController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirectTo($_SERVER['HTTP_REFERER'], 302, false);
+            redirectTo($_SERVER['HTTP_REFERER']);
         } else {
             $this->render();
         }

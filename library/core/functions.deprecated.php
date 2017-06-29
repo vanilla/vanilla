@@ -227,7 +227,7 @@ if (!function_exists('forceSSL')) {
     function forceSSL() {
         if (c('Garden.AllowSSL')) {
             if (Gdn::Request()->Scheme() != 'https') {
-                redirectTo(Gdn::Request()->Url('', true, true), 302, false);
+                redirectTo(Gdn::Request()->Url('', true, true));
             }
         }
     }
@@ -244,7 +244,7 @@ if (!function_exists('forceNoSSL')) {
      */
     function forceNoSSL() {
         if (Gdn::Request()->Scheme() != 'http') {
-            redirectTo(Gdn::Request()->Url('', true, false), 302, false);
+            redirectTo(Gdn::Request()->Url('', true, false));
         }
     }
 }
@@ -731,7 +731,7 @@ if (!function_exists('safeRedirect')) {
                 'url' => $Destination
             ]);
 
-            redirectTo("/home/leaving?Target=".urlencode($Destination), 302, false);
+            redirectTo("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }

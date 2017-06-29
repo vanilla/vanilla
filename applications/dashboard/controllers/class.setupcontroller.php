@@ -133,7 +133,7 @@ class SetupController extends DashboardController {
 
                     // Go to the dashboard.
                     if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-                        redirectTo('/settings/gettingstarted', 302, false);
+                        redirectTo('/settings/gettingstarted');
                     }
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA) {
                     $maxCode = 0;

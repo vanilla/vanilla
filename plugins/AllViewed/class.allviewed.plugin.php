@@ -168,7 +168,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 
             // Didn't use the default async option and landed here directly.
             if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
-                redirectTo('/', 302, false);
+                redirectTo('/');
             }
 
             $sender->render('blank', 'utility', 'dashboard');

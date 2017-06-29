@@ -203,7 +203,7 @@ class DiscussionsController extends VanillaController {
         deprecated(__METHOD__);
 
         if (!Gdn::session()->isValid()) {
-            redirectTo('/discussions/index', 302, false);
+            redirectTo('/discussions/index');
         }
 
         // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
@@ -647,7 +647,7 @@ class DiscussionsController extends VanillaController {
         }
 
         if ($Target) {
-            redirectTo($Target, 302, false);
+            redirectTo($Target);
         }
 
         // Send sorted discussions.

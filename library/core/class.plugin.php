@@ -328,9 +328,9 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
                 return $CurrentConfig;
             }
             if (is_null($Redirect)) {
-                redirectTo('plugin/'.strtolower($PluginName), 302, false);
+                redirectTo('plugin/'.strtolower($PluginName));
             } else {
-                redirectTo($Redirect, 302, false);
+                redirectTo($Redirect);
             }
         }
         return $CurrentConfig;

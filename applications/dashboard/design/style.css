@@ -5440,7 +5440,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
  * Text formatting alignment
  */
 .AlignLeft, .bbcode_left {
-  float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5452,7 +5451,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .AlignRight, .bbcode_right {
-  float: right;
   margin: 0 0 10px 10px;
   text-align: right;
 }

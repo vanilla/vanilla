@@ -3487,7 +3487,7 @@ class UserModel extends Gdn_Model {
                 'Photo' => null,
                 'Password' => randomString('10'),
                 'About' => '',
-                'Email' => 'user_'.$userID.'@deleted.email',
+                'Email' => 'user_'.$userID.'@deleted.invalid',
                 'ShowEmail' => '0',
                 'Gender' => 'u',
                 'CountVisits' => 0,

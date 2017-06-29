@@ -24,8 +24,11 @@
  */
 class Gdn_OAuth2 extends Gdn_Plugin {
 
-    /** @var string token provider by authenticator  */
+    /** @var string token provided by authenticator  */
     protected $accessToken;
+
+    /** @var array response to token request by authenticator  */
+    protected $accessTokenResponse;
 
     /** @var string key for GDN_UserAuthenticationProvider table  */
     protected $providerKey = null;
@@ -529,7 +532,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         } elseif (empty($response['access_token'])) {
             throw new Gdn_UserException('The OAuth server did not return an access token.', 400);
         } else {
-            $this->accessToken($response['access_token']);
+            $this->accessToken(val('access_token', $response));
         }
 
         $this->log('Getting Profile', []);
@@ -672,11 +675,14 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             ];
         }
 
-        $post = array_merge($defaultParams, $this->requestAccessTokenParams);
+        // Merge any parameters inherited parameters, remove any empty parameters before sending them in the request.
+        $post = array_filter(array_merge($defaultParams, $this->requestAccessTokenParams));
 
         $this->log('Before calling API to request access token', ['requestAccessToken' => ['targetURI' => $uri, 'post' => $post]]);
 
-        return $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
+        $this->accessTokenResponse = $this->api($uri, 'POST', $post, $this->getAccessTokenRequestOptions());
+
+        return $this->accessTokenResponse;
     }
 
 
@@ -717,7 +723,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $defaultParams = array(
             'access_token' => $this->accessToken()
         );
-        $requestParams = array_merge($defaultParams, $this->requestProfileParams);
+        // Merge any inherited parameters and remove any empty parameters before sending them in the request.
+        $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
         // Request the profile from the Authentication Provider
         $rawProfile = $this->api($uri, 'GET', $requestParams, $this->getProfileRequestOptions());

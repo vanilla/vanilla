@@ -1281,12 +1281,9 @@ class Gdn_Controller extends Gdn_Pluggable {
             if ($this->redirectTo !== null) {
                 $this->setJson('RedirectTo', $this->redirectTo);
                 $this->setJson('RedirectUrl', $this->redirectTo);
-            } else if ($this->RedirectUrl !== '') {
+            } else {
                 $this->setJson('RedirectTo', $this->RedirectUrl);
                 $this->setJson('RedirectUrl', $this->RedirectUrl);
-            } else {
-                $this->setJson('RedirectTo', '');
-                $this->setJson('RedirectUrl', '');
             }
 
             // Make sure the database connection is closed before exiting.
@@ -1308,7 +1305,7 @@ class Gdn_Controller extends Gdn_Pluggable {
                 if ($this->redirectTo !== null) {
                     $this->addDefinition('RedirectTo', $this->redirectTo);
                     $this->addDefinition('RedirectUrl', $this->redirectTo);
-                } elseif ($this->RedirectUrl != '') {
+                } else {
                     $this->addDefinition('RedirectTo', $this->RedirectUrl);
                     $this->addDefinition('RedirectUrl', $this->RedirectUrl);
                 }
@@ -2182,5 +2179,6 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         $this->redirectTo = $url;
+        $this->RedirectUrl = $url;
     }
 }

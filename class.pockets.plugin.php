@@ -325,7 +325,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param SettingsController $Sender
      * @param bool|false $PocketID
      * @return mixed
      * @throws Gdn_UserException
@@ -390,7 +390,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Saved = $Form->save();
             if ($Saved) {
                 $Sender->StatusMessage = t('Your changes have been saved.');
-                $Sender->redirectTo('settings/pockets', false);
+                $Sender->setRedirectTo('settings/pockets', false);
             }
         } else {
             if ($PocketID !== false) {
@@ -443,7 +443,7 @@ class PocketsPlugin extends Gdn_Plugin {
     /**
      *
      *
-     * @param $Sender
+     * @param SettingsController $Sender
      * @param $PocketID
      * @return bool
      * @throws Gdn_UserException
@@ -455,7 +455,7 @@ class PocketsPlugin extends Gdn_Plugin {
         if ($Form->authenticatedPostBack()) {
             Gdn::sql()->delete('Pocket', array('PocketID' => $PocketID));
             $Sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(t('Pocket')));
-            $Sender->redirectTo('settings/pockets', false);
+            $Sender->setRedirectTo('settings/pockets', false);
         }
 
         $Sender->Form = $Form;

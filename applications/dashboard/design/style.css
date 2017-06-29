@@ -68,8 +68,7 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
-          transition: height 0.1s ease;
+  transition: height 0.1s ease;
   resize: none !important;
 }
 
@@ -5439,7 +5438,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 /**
  * Text formatting alignment
  */
-.AlignLeft, .bbcode_left {
+.AlignLeft {
+  float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5450,8 +5450,17 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
   text-align: center;
 }
 
-.AlignRight, .bbcode_right {
+.AlignRight {
+  float: right;
   margin: 0 0 10px 10px;
+  text-align: right;
+}
+
+.bbcode_left {
+  text-align: left;
+}
+
+.bbcode_right {
   text-align: right;
 }
 
@@ -5490,8 +5499,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  -webkit-transition: background-color 100ms;
-          transition: background-color 100ms;
+  transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5952,8 +5960,7 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  -webkit-transition: all 0.2s ease;
-          transition: all 0.2s ease;
+  transition: all 0.2s ease;
   opacity: 1;
 }
 

@@ -171,21 +171,44 @@ class CommentModel extends Gdn_Model {
      * @param string $orderDirection The direction to order by.
      * @param int $limit The database limit.
      * @param int $offset The database offset.
+     * @param string $alias A named alias for the Comment table.
      * @return Gdn_SQLDriver Returns SQL driver filled in with the select settings.
      */
-    private function select($where = [], $orderFields = '', $orderDirection = 'asc', $limit = 0, $offset = 0) {
-        $orderFields = $orderFields ?: $this->_OrderBy[0];
-        $orderDirection = $orderDirection ?: val(0, $this->_OrderBy, 'asc');
-        $limit = $limit ?: $this->getDefaultLimit();
-
+    private function select($where = [], $orderFields = '', $orderDirection = 'asc', $limit = 0, $offset = 0, $alias = null) {
+        // Setup a clean copy of the SQL object.
         $sql = clone $this->SQL;
         $sql->reset();
 
+        // Build up the basic query, accounting for a potential table name alias.
+        $from = $this->Name;
+        if ($alias) {
+            $from .=  " {$alias}";
+        }
         $sql->select('CommentID')
-            ->from($this->Name)
-            ->where($where)
-            ->limit($limit, $offset)
-            ->orderBy($orderFields, $orderDirection);
+            ->from($from)
+            ->where($where);
+
+        // Apply a limit.
+        $limit = $limit ?: $this->getDefaultLimit();
+        $sql->limit($limit, $offset);
+
+        // Determine which sort fields to apply.
+        if ($orderFields) {
+            $sql->orderBy($orderFields, $orderDirection);
+        } else {
+            // Fallback to the configured sort fields on the object.
+            foreach ($this->_OrderBy as $defaultOrder) {
+                list($field, $dir) = $defaultOrder;
+                // Reset any potential table prefixes, if we have an alias.
+                if ($alias) {
+                    $parts = explode('.', $field);
+                    $field = $parts[count($parts) === 1 ? 0 : 1];
+                    $field = "{$alias}.{$field}";
+                }
+                $sql->orderBy($field, $dir);
+            }
+            unset($parts, $field, $dir, $defaultOrder);
+        }
 
         return $sql;
     }
@@ -198,7 +221,7 @@ class CommentModel extends Gdn_Model {
         list($where, $options) = $this->splitWhere($where, ['joinUsers' => true]);
 
         // Build up an inner select of comments to force late-loading.
-        $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset);
+        $innerSelect = $this->select($where, $orderFields, $orderDirection, $limit, $offset, 'c3');
 
         // Add the inner select's parameters to the outer select.
         $this->SQL->mergeParameters($innerSelect);

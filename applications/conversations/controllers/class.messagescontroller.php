@@ -103,7 +103,7 @@ class MessagesController extends ConversationsController {
             $ConversationID = $this->Form->save();
             if ($ConversationID !== false) {
                 $Target = $this->Form->getFormValue('Target', 'messages/'.$ConversationID);
-                $this->setRedirectTo($Target, false);
+                $this->setRedirectTo($Target);
 
                 $Conversation = $this->ConversationModel->getID(
                     $ConversationID,
@@ -296,7 +296,7 @@ class MessagesController extends ConversationsController {
             // Clear it
             $this->ConversationModel->clear($ConversationID, $Session->UserID);
             $this->informMessage(t('The conversation has been cleared.'));
-            $this->setRedirectTo('/messages/all', false);
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->render();
@@ -324,7 +324,7 @@ class MessagesController extends ConversationsController {
 
         if ($this->Form->authenticatedPostBack(true)) {
             $this->ConversationModel->clear($conversationID, Gdn::session()->UserID);
-            $this->setRedirectTo('/messages/all', false);
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->title(t('Leave Conversation'));

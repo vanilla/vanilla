@@ -5147,7 +5147,7 @@ output {
 }
 
 .alert-success .alert-link, .CasualMessage .alert-link {
-  color: #e6e6e6;
+  color: #e6e5e5;
 }
 
 .alert-info, .InfoMessage {
@@ -5161,7 +5161,7 @@ output {
 }
 
 .alert-info .alert-link, .InfoMessage .alert-link {
-  color: #e6e6e6;
+  color: #e6e5e5;
 }
 
 .alert-warning, .WarningMessage, .AlertMessage {
@@ -5175,7 +5175,7 @@ output {
 }
 
 .alert-warning .alert-link, .WarningMessage .alert-link, .AlertMessage .alert-link {
-  color: #e6e6e6;
+  color: #e6e5e5;
 }
 
 .alert-danger, div.Messages.Errors {
@@ -5189,7 +5189,7 @@ output {
 }
 
 .alert-danger .alert-link, div.Messages.Errors .alert-link {
-  color: #e6e6e6;
+  color: #e6e5e5;
 }
 
 .toolbar-stats {

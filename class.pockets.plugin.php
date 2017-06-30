@@ -390,7 +390,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Saved = $Form->save();
             if ($Saved) {
                 $Sender->StatusMessage = t('Your changes have been saved.');
-                $Sender->setRedirectTo('settings/pockets', false);
+                $Sender->setRedirectTo('settings/pockets');
             }
         } else {
             if ($PocketID !== false) {
@@ -455,7 +455,7 @@ class PocketsPlugin extends Gdn_Plugin {
         if ($Form->authenticatedPostBack()) {
             Gdn::sql()->delete('Pocket', array('PocketID' => $PocketID));
             $Sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(t('Pocket')));
-            $Sender->setRedirectTo('settings/pockets', false);
+            $Sender->setRedirectTo('settings/pockets');
         }
 
         $Sender->Form = $Form;

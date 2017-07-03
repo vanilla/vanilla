@@ -22,7 +22,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $Counts = [
             'Discussion' => ['CountComments', 'FirstCommentID', 'LastCommentID', 'DateLastComment', 'LastCommentUserID'],
             'Category' => ['CountDiscussions', 'CountAllDiscussions', 'CountComments', 'CountAllComments', 'LastDiscussionID', 'LastCommentID', 'LastDateInserted'],
-            'Tag' => ['table' => 'Tag', 'column' => 'CountDiscussions'],
+            'Tag' => ['CountDiscussions'],
         ];
 
         foreach ($Counts as $Table => $Columns) {

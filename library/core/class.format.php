@@ -281,6 +281,7 @@ class Gdn_Format {
                 // Always filter after basic parsing.
                 // Add htmLawed-compatible specification updates.
                 $options = [
+                    'codeBlockEntities' => false,
                     'spec' => [
                         'span' => [
                             'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']

@@ -272,12 +272,24 @@ class DiscussionModel extends Gdn_Model {
                 $this->Database->query(DBAModel::getCountSQL('max', 'Discussion', 'Comment', $Column));
                 break;
             case 'DateLastComment':
-                $this->Database->query(DBAModel::getCountSQL('max', 'Discussion', 'Comment', $Column, 'DateInserted'));
+                $defaultDate = '0000-00-00 00:00:00';
+                $countSql = DBAModel::getCountSQL(
+                    'max',
+                    'Discussion',
+                    'Comment',
+                    $Column,
+                    'DateInserted',
+                    '',
+                    '',
+                    [],
+                    $defaultDate
+                );
+                $this->Database->query($countSql);
                 $this->SQL
                     ->update('Discussion')
                     ->set('DateLastComment', 'DateInserted', false, false)
                     ->where('DateLastComment', null)
-                    ->orWhere('DateLastComment','0000-00-00 00:00:00')
+                    ->orWhere('DateLastComment',$defaultDate)
                     ->put();
                 break;
             case 'LastCommentUserID':

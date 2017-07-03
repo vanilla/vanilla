@@ -62,7 +62,8 @@ class DBAModel extends Gdn_Model {
      * @param string $ChildColumnName
      * @param string $ParentJoinColumn
      * @param string $ChildJoinColumn
-     * @return type
+     * @param int|string $default A default value for the field. Passed to MySQL's coalesce function.
+     * @return string
      */
     public static function getCountSQL(
         $Aggregate,
@@ -73,8 +74,12 @@ class DBAModel extends Gdn_Model {
         $ChildColumnName = '',
         $ParentJoinColumn = '',
         $ChildJoinColumn = '',
-        $Where = array()
+        $Where = array(),
+        $default = 0
     ) {
+
+        $PDO = Gdn::database()->connection();
+        $default = $PDO->quote($default);
 
         if (!$ParentColumnName) {
             switch (strtolower($Aggregate)) {
@@ -106,13 +111,12 @@ class DBAModel extends Gdn_Model {
 
         $Result = "update :_$ParentTable p
                   set p.$ParentColumnName = (
-                     select coalesce($Aggregate(c.$ChildColumnName), 0)
+                     select coalesce($Aggregate(c.$ChildColumnName), $default)
                      from :_$ChildTable c
                      where p.$ParentJoinColumn = c.$ChildJoinColumn)";
 
         if (!empty($Where)) {
             $Wheres = array();
-            $PDO = Gdn::database()->connection();
             foreach ($Where as $Column => $Value) {
                 $Value = $PDO->quote($Value);
                 $Wheres[] = "p.`$Column` = $Value";

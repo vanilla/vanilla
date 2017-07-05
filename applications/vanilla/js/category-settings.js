@@ -3,7 +3,7 @@
         var result = [];
 
         subtree.forEach(function (row) {
-            var resultRow = { CategoryID: row.id };
+            var resultRow = { CategoryID: row.categoryId };
 
             if (row.children) {
                 resultRow.Children = massageTree(row.children);
@@ -34,9 +34,31 @@
                 expandBtnHTML   : '<button class="nestable-collapse" data-action="expand"><svg class="icon icon-16 icon-chevron-closed" viewBox="0 0 16 16"><use xlink:href="#chevron-closed" /></svg></button>',
                 collapseBtnHTML : '<button class="nestable-collapse" data-action="collapse"><svg class="icon icon-16 icon-chevron-open" viewBox="0 0 16 16"><use xlink:href="#chevron-open" /></svg></button>'
             })
-            .on('dragEnd', function(event, item, source, destination, position) {
-                var tree = $(source).nestable('serialize');
-                var postTree = massageTree(tree);
+            .on('dragEnd', function(event, items, source, destination, position) {
+                // We're going to get this list item and all its children. Reduce it down to just this list item.
+                var item = $(items).first();
+                var parent = $(item).parents(".js-nestable-item").first();
+                var parentCategoryID = $(parent).data("categoryId");
+                var parentID = parentCategoryID ? parentCategoryID : $(source).data('parentId');
+
+                var getTreeData = function(elements) {
+                    var data = [];
+
+                    $(elements).each(function(index, element) {
+                        var category = $.extend({}, $(element).data());
+
+                        var children = $(element).children(".js-nestable-list").children(".js-nestable-item");
+                        if (children.length) {
+                            category.children = getTreeData(children);
+                        }
+
+                        data.push(category);
+                    });
+
+                    return data;
+                };
+                var subtree = $(item).parent().children(".js-nestable-item");
+                var tree = getTreeData(subtree);
 
                 /**
                  * Time, in miliseconds, before displaying the "please wait" message.
@@ -54,13 +76,15 @@
                     }
                 }, saveWarningDelay);
 
+                var postTree = massageTree(tree);
+                console.log(postTree);
                 $.ajax({
                     type: "POST",
                     url: gdn.url('/vanilla/settings/categoriestree.json'),
                     data: {
                         TransientKey: gdn.getMeta('TransientKey'),
                         Subtree: JSON.stringify(postTree),
-                        ParentID: $(source).data('parentId')
+                        ParentID: parentID
                     },
                     dataType: 'json',
                     error: function (xhr) {

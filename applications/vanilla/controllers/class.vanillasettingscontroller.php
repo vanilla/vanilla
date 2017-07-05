@@ -786,6 +786,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->setData('UsePagination', $usePagination);
 
         $this->addDefinition('AllowSorting', $allowSorting);
+        $this->addDefinition('SavePending', t('Saving. Please wait.'));
 
         $this->addJsFile('category-settings.js');
         $this->addJsFile('manage-categories.js');

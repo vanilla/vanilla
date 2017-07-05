@@ -38,6 +38,22 @@
                 var tree = $(source).nestable('serialize');
                 var postTree = massageTree(tree);
 
+                /**
+                 * Time, in miliseconds, before displaying the "please wait" message.
+                 * @type {number}
+                 */
+                var saveWarningDelay = 1000;
+                $(".main").trigger("foggyOn");
+                setTimeout(function() {
+                    // Don't display unless the content area is disabled.
+                    var savePending = $(".main").first().hasClass("foggy");
+                    if (savePending) {
+                        gdn.informMessage(gdn.definition("SavePending"), {
+                            CssClass: "CategorySortMessage"
+                        });
+                    }
+                }, saveWarningDelay);
+
                 $.ajax({
                     type: "POST",
                     url: gdn.url('/vanilla/settings/categoriestree.json'),
@@ -49,11 +65,14 @@
                     dataType: 'json',
                     error: function (xhr) {
                         gdn.informError(xhr);
+                    },
+                    complete: function(jqXHR, textStatus) {
+                        // Remove overlay from tree controls and the "please wait" message, if present.
+                        $(".main").trigger("foggyOff");
+                        $(".InformWrapper.CategorySortMessage").remove();
                     }
                 });
             });
-
-            // console.log($('.dd', e.target).nestable('serialize'));
         })
         .on('click', '.js-displayas', function(e) {
             e.preventDefault();

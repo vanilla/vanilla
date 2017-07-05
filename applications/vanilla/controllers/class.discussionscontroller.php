@@ -722,40 +722,48 @@ class DiscussionsController extends VanillaController {
         $Tag = stringEndsWith($Tag, '.rss', true, true);
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
 
-        $MultipleTags = strpos($Tag, ',') !== false;
-
         $this->setData('Tag', $Tag, true);
 
         $TagModel = TagModel::instance();
-        $RecordCount = false;
-        if (!$MultipleTags) {
+        //If more than one tag has been passed via GET, pass them as an array to the model.
+        $MultipleTags = strpos($Tag, ',') !== false;
+        if ($MultipleTags) {
+            $Tags = $TagModel->getWhere(array('Name' => explode(',', $Tag)))->resultArray();
+        } else {
             $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
-
-            if (count($Tags) == 0) {
-                throw notFoundException('Page');
-            }
-
-            if (count($Tags) > 1) {
-                foreach ($Tags as $TagRow) {
-                    if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
-                        break;
-                    }
-                }
-            } else {
-                $TagRow = array_pop($Tags);
-            }
-            $Tags = $TagModel->getRelatedTags($TagRow);
-
-            $RecordCount = $TagRow['CountDiscussions'];
-            $this->setData('CountDiscussions', $RecordCount);
-            $this->setData('Tags', $Tags);
-            $this->setData('Tag', $TagRow);
-
-            $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
-            $this->setData('ChildTags', $ChildTags);
         }
 
-        $this->title(htmlspecialchars($TagRow['FullName']));
+        if (count($Tags) == 0) {
+            throw notFoundException('Page');
+        }
+
+        // Get the number of discussions and the page title by either looping
+        // through all the tags or getting it from the result from the TagModel.
+        $RecordCount = false;
+        if (count($Tags) > 1) {
+            $fullNames = [];
+            foreach ($Tags as $TagRow) {
+                $RecordCount += val('CountDiscussions', $TagRow, 0);
+                $fullNames[] = val('FullName', $TagRow);
+                if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
+                    break;
+                }
+            }
+            $pageTitle = implode(", ", $fullNames);
+        } else {
+            $TagRow = array_pop($Tags);
+            $RecordCount = val('CountDiscussions', $TagRow, 0);
+            $Tags = $TagModel->getRelatedTags($TagRow);
+            $this->setData('Tags', $Tags);
+            $this->setData('Tag', $TagRow);
+            $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
+            $this->setData('ChildTags', $ChildTags);
+            $pageTitle = $TagRow['FullName'];
+        }
+
+        $this->setData('CountDiscussions', $RecordCount);
+        $this->title(htmlspecialchars($pageTitle));
+
         $UrlTag = empty($CategoryCode) ? rawurlencode($Tag) : rawurlencode($CategoryCode).'/'.rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
             $this->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));

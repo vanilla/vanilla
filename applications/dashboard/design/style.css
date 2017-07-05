@@ -69,8 +69,7 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  -webkit-transition: height 0.1s ease;
-          transition: height 0.1s ease;
+  transition: height 0.1s ease;
   resize: none !important;
 }
 
@@ -5519,8 +5518,7 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  -webkit-transition: background-color 100ms;
-          transition: background-color 100ms;
+  transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5982,8 +5980,7 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  -webkit-transition: all 0.2s ease;
-          transition: all 0.2s ease;
+  transition: all 0.2s ease;
   opacity: 1;
 }
 

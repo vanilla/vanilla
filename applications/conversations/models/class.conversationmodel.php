@@ -380,7 +380,7 @@ class ConversationModel extends ConversationsModel {
      * Figure out whether or not a user is in a conversation.
      * @param int $ConversationID
      * @param int $UserID
-     * @return int|bool
+     * @return bool
      */
     public function inConversation($ConversationID, $UserID) {
         $Row = $this->SQL
@@ -388,11 +388,8 @@ class ConversationModel extends ConversationsModel {
             ->firstRow(DATASET_TYPE_ARRAY);
         if (!$Row) {
             return false;
-        } elseif (!$Row['Deleted']) {
-            return true;
-        } else {
-            return (int)$Row['Deleted'];
         }
+        return !(bool)$Row['Deleted'];
     }
 
     public function joinLastMessages(&$Data) {

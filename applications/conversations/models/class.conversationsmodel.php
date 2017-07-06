@@ -72,7 +72,8 @@ abstract class ConversationsModel extends Gdn_Model {
 
         $UserConversation = new Gdn_Model('UserConversation');
         $UserMembers = $UserConversation->getWhere(array(
-            'ConversationID' => $ConversationID
+            'ConversationID' => $ConversationID,
+            'Deleted' => false
         ))->resultArray();
 
         if (is_array($UserMembers) && count($UserMembers)) {

@@ -180,9 +180,8 @@ class CategoryModel extends Gdn_Model {
      * @param bool|null $addUserCategory
      */
     private function calculateUser(&$category, $addUserCategory = null) {
-        if (!isset($category['Url'])) {
-            $category['Url'] = self::categoryUrl($category, false, '/');
-        }
+        // Kludge to make sure that the url is absolute when reaching the user's screen.
+        $category['Url'] = self::categoryUrl($category, '', true);
 
         if (!isset($category['PhotoUrl'])) {
             if ($Photo = val('Photo', $category)) {

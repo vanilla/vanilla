@@ -180,7 +180,7 @@ class CategoryModel extends Gdn_Model {
      * @param bool|null $addUserCategory
      */
     private function calculateUser(&$category, $addUserCategory = null) {
-        // Kludge to make sure that the url is absolute when reaching the user's screen.
+        // Kludge to make sure that the url is absolute when reaching the user's screen (or API).
         $category['Url'] = self::categoryUrl($category, '', true);
 
         if (!isset($category['PhotoUrl'])) {

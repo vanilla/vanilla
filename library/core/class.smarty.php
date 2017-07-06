@@ -119,7 +119,10 @@ class Gdn_Smarty {
         $security->setPhpFunctions(array_merge($security->php_functions, [
             'array', // Yes, Smarty really blocks this.
             'category',
+            'categoryUrl',
             'checkPermission',
+            'commentUrl',
+            'discussionUrl',
             'inSection',
             'inCategory',
             'ismobile',
@@ -127,7 +130,8 @@ class Gdn_Smarty {
             'getValue',
             'setValue',
             'url',
-            'useragenttype'
+            'useragenttype',
+            'userUrl',
         ]));
 
         $security->php_modifiers = array_merge(

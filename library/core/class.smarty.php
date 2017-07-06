@@ -126,8 +126,12 @@ class Gdn_Smarty {
             'multiCheckPermission',
             'getValue',
             'setValue',
+            'useragenttype',
             'url',
-            'useragenttype'
+            'userUrl',
+            'commentUrl',
+            'discussionUrl',
+            'categoryUrl'
         ]));
 
         $security->php_modifiers = array_merge(

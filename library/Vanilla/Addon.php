@@ -139,10 +139,14 @@ class Addon {
 
         // Look for an addon.json file.
         if (file_exists("$dir/addon.json")) {
-            $info = json_decode(file_get_contents("$dir/addon.json"), true);
+            $addonJSON = file_get_contents("$dir/addon.json");
+            if (!$addonJSON) {
+                throw new \Exception("The addon at $subdir has an unreadable addon.json file.");
+            }
 
+            $info = json_decode($addonJSON, true);
             if (empty($info)) {
-                throw new \Exception("The addon at $subdir has an empty info array.");
+                throw new \Exception("The addon at $subdir has non valid JSON in addon.json.");
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.

@@ -764,6 +764,8 @@ class ConversationModel extends ConversationsModel {
      *
      * @param int $ConversationID Unique ID of conversation effected.
      * @param int $UserID Unique ID of current user.
+     * @return True if the operation was a success, false if the maximum number of recipients was busted.
+     *
      */
     public function addUserToConversation($ConversationID, $UserID) {
         if (!is_array($UserID)) {
@@ -772,6 +774,10 @@ class ConversationModel extends ConversationsModel {
 
         // First define the current users in the conversation
         $OldContributorData = $this->getRecipients($ConversationID);
+        if (count($OldContributorData) + count($UserID) >  self::getMaxRecipients() + 1) {
+            return false;
+        }
+
         $OldContributorData = Gdn_DataSet::index($OldContributorData, 'UserID');
         $AddedUserIDs = array();
 
@@ -829,6 +835,8 @@ class ConversationModel extends ConversationsModel {
             $this->updateUserUnreadCount($AddedUserIDs);
             $this->updateParticipantCount($ConversationID);
         }
+
+        return true;
     }
 
     /**
@@ -854,7 +862,7 @@ class ConversationModel extends ConversationsModel {
             }
 
             // Add 1 because sender counts as a recipient.
-            $CanAddRecipients = (count($CountRecipients) < ($maxRecipients + 1));
+            $CanAddRecipients = count($CountRecipients) < ($maxRecipients + 1);
         }
 
         return $CanAddRecipients;

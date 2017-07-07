@@ -194,7 +194,7 @@ class MessagesController extends ConversationsController {
 
             if ($NewMessageID) {
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirectTo('messages/'.$ConversationID.'/#'.$NewMessageID, 302, false);
+                    redirectTo('messages/'.$ConversationID.'/#'.$NewMessageID);
                 }
 
                 $this->setJson('MessageID', $NewMessageID);
@@ -584,7 +584,7 @@ class MessagesController extends ConversationsController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirectTo($_SERVER['HTTP_REFERER'], 302, false);
+            redirectTo($_SERVER['HTTP_REFERER']);
         } else {
             $this->render();
         }

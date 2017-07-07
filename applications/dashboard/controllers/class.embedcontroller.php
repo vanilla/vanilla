@@ -20,7 +20,7 @@ class EmbedController extends DashboardController {
      * Default method.
      */
     public function index() {
-        redirectTo('embed/comments', 302, false);
+        redirectTo('embed/comments');
     }
 
     /**
@@ -52,7 +52,7 @@ class EmbedController extends DashboardController {
 
         try {
             if ($this->toggle($Toggle, $TransientKey)) {
-                redirectTo('embed/forum', 302, false);
+                redirectTo('embed/forum');
             }
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
@@ -78,7 +78,7 @@ class EmbedController extends DashboardController {
 
 //        try {
 //            if ($this->toggle($Toggle, $TransientKey)) {
-//                redirectTo('embed/advanced', 302, false);
+//                redirectTo('embed/advanced');
 //            }
 //        } catch (Gdn_UserException $Ex) {
 //            $this->Form->addError($Ex);

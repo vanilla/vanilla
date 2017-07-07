@@ -419,7 +419,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 $this->EventArguments['User'] = $Sender->User;
                 $this->fireEvent('AfterConnection');
 
-                redirectTo(userUrl($User, '', 'connections'), 302, false);
+                redirectTo(userUrl($User, '', 'connections'));
                 break;
             case 'entry':
             default:
@@ -430,7 +430,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
                 if ($target = val('target', $State)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirectTo($url, 302, false);
+                redirectTo($url);
                 break;
         }
     }

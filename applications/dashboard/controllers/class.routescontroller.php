@@ -128,7 +128,7 @@ class RoutesController extends DashboardController {
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirectTo('dashboard/routes', 302, false);
+            redirectTo('dashboard/routes');
         }
 
         $this->render();

@@ -146,7 +146,7 @@ class Addon {
 
             $info = json_decode($addonJSON, true);
             if (empty($info)) {
-                throw new \Exception("The addon at $subdir has non valid JSON in addon.json.");
+                throw new \Exception("The addon at $subdir has invalid JSON in addon.json.");
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.

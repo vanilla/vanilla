@@ -104,7 +104,7 @@ class RoleController extends DashboardController {
             if ($this->Form->errorCount() == 0) {
                 // Go ahead and delete the Role
                 $this->RoleModel->deleteAndReplace($RoleID, $this->Form->getValue('ReplacementRoleID'));
-                $this->setRedirectTo('dashboard/role', false);
+                $this->setRedirectTo('dashboard/role');
                 $this->informMessage(t('Deleting role...'));
             }
         }
@@ -186,7 +186,7 @@ class RoleController extends DashboardController {
                 }
 
                 $this->informMessage(t('Your changes have been saved.'));
-                $this->setRedirectTo('dashboard/role', false);
+                $this->setRedirectTo('dashboard/role');
                 // Reload the permission data.
                 $this->setData('PermissionData', $PermissionModel->getPermissionsEdit(
                     $RoleID,

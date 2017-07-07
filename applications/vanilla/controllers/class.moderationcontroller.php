@@ -280,7 +280,7 @@ class ModerationController extends VanillaController {
             unset($CheckedComments[$DiscussionID]);
             Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
             ModerationController::InformCheckedComments($this);
-            $this->setRedirectTo('discussions', false);
+            $this->setRedirectTo('discussions');
         }
 
         $this->render();

@@ -100,7 +100,7 @@ class RoutesController extends DashboardController {
                 );
 
                 $this->informMessage(t("The route was saved successfully."));
-                $this->setRedirectTo('dashboard/routes', false);
+                $this->setRedirectTo('dashboard/routes');
             } else {
                 $this->Form->setValidationResults($ConfigurationModel->validationResults());
             }

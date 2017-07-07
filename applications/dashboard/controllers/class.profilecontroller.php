@@ -563,7 +563,7 @@ class ProfileController extends Gdn_Controller {
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
 
-        $this->setRedirectTo('/', false);
+        $this->setRedirectTo('/');
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -811,7 +811,7 @@ class ProfileController extends Gdn_Controller {
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                 $this->jsonTarget('', '', 'Refresh');
 
-                $this->setRedirectTo(userUrl($this->User), false);
+                $this->setRedirectTo(userUrl($this->User));
             }
             $this->informMessage(t("Your settings have been saved."));
         }

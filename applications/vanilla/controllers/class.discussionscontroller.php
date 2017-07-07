@@ -690,6 +690,8 @@ class DiscussionsController extends VanillaController {
 
     /**
      * Add the discussions/tagged/{TAG} endpoint.
+     * Also supports comma separated mutltiple tags (discussions/tagged/{TAG,TAG2}).
+     *
      */
     public function tagged() {
         if (!c('Tagging.Discussions.Enabled')) {
@@ -724,26 +726,26 @@ class DiscussionsController extends VanillaController {
 
         $this->setData('Tag', $Tag, true);
 
-        $TagModel = TagModel::instance();
-        //If more than one tag has been passed via GET, pass them as an array to the model.
-        $MultipleTags = strpos($Tag, ',') !== false;
-        if ($MultipleTags) {
-            $Tags = $TagModel->getWhere(array('Name' => explode(',', $Tag)))->resultArray();
+        $tagModel = TagModel::instance();
+        // If more than one tag has been passed via GET, pass them as an array to the model.
+        $multipleTags = strpos($Tag, ',') !== false;
+        if ($multipleTags) {
+            $tags = $tagModel->getWhere(['Name' => explode(',', $Tag)])->resultArray();
         } else {
-            $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
+            $tags = $tagModel->getWhere(['Name' => $Tag])->resultArray();
         }
 
-        if (count($Tags) == 0) {
+        if (count($tags) == 0) {
             throw notFoundException('Page');
         }
 
         // Get the number of discussions and the page title by either looping
         // through all the tags or getting it from the result from the TagModel.
-        $RecordCount = false;
-        if (count($Tags) > 1) {
+        $recordCount = false;
+        if (count($tags) > 1) {
             $fullNames = [];
-            foreach ($Tags as $TagRow) {
-                $RecordCount += val('CountDiscussions', $TagRow, 0);
+            foreach ($tags as $TagRow) {
+                $recordCount += val('CountDiscussions', $TagRow, 0);
                 $fullNames[] = val('FullName', $TagRow);
                 if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
                     break;
@@ -751,17 +753,17 @@ class DiscussionsController extends VanillaController {
             }
             $pageTitle = implode(", ", $fullNames);
         } else {
-            $TagRow = array_pop($Tags);
-            $RecordCount = val('CountDiscussions', $TagRow, 0);
-            $Tags = $TagModel->getRelatedTags($TagRow);
-            $this->setData('Tags', $Tags);
+            $TagRow = array_pop($tags);
+            $recordCount = val('CountDiscussions', $TagRow, 0);
+            $tags = $tagModel->getRelatedTags($TagRow);
+            $this->setData('Tags', $tags);
             $this->setData('Tag', $TagRow);
-            $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
+            $ChildTags = $tagModel->getChildTags($TagRow['TagID']);
             $this->setData('ChildTags', $ChildTags);
             $pageTitle = $TagRow['FullName'];
         }
 
-        $this->setData('CountDiscussions', $RecordCount);
+        $this->setData('CountDiscussions', $recordCount);
         $this->title(htmlspecialchars($pageTitle));
 
         $UrlTag = empty($CategoryCode) ? rawurlencode($Tag) : rawurlencode($CategoryCode).'/'.rawurlencode($Tag);
@@ -794,7 +796,7 @@ class DiscussionsController extends VanillaController {
 
         $DiscussionModel = new DiscussionModel();
 
-        $TagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
+        $tagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
 
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, array('Announce' => 'all'));
 
@@ -813,7 +815,7 @@ class DiscussionsController extends VanillaController {
         $this->Pager->configure(
             $Offset,
             $Limit,
-            $RecordCount,
+            $recordCount,
             $this->data('_PagerUrl')
         );
         $this->setData('_Page', $Page);

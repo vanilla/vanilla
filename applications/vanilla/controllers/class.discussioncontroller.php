@@ -153,7 +153,7 @@ class DiscussionController extends VanillaController {
         $this->setData('_LatestItem', $LatestItem);
 
         // Set the canonical url to have the proper page title.
-        $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
+        $this->canonicalUrl(url(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)), true));
 
 //      url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
 
@@ -876,7 +876,7 @@ body { background: transparent !important; }
             }
 
             // Set the canonical url to have the proper page title.
-            $this->canonicalUrl(discussionUrl($Discussion, pageNumber($this->Offset, $Limit)));
+            $this->canonicalUrl(url(discussionUrl($Discussion, pageNumber($this->Offset, $Limit)), true));
 
             // Load the comments.
             $CurrentOrderBy = $this->CommentModel->orderBy();

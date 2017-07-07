@@ -442,8 +442,9 @@ class Gdn_Controller extends Gdn_Pluggable {
      */
     public function canonicalUrl($Value = null) {
         if ($Value === null) {
+            $Return = null;
             if ($this->_CanonicalUrl) {
-                return $this->_CanonicalUrl;
+                $Return =  $this->_CanonicalUrl;
             } else {
                 $Parts = array();
 
@@ -469,12 +470,18 @@ class Gdn_Controller extends Gdn_Pluggable {
 
                 $Path = implode('/', $Parts);
                 $Result = Url($Path, true);
-                return $Result;
+                $Return = $Result;
             }
         } else {
             $this->_CanonicalUrl = $Value;
-            return $Value;
+            $Return = $Value;
         }
+
+        if (c('Garden.AllowSSL', true) && c('Garden.ForceSSL')) {
+            $Return = preg_replace("/^http:/i", "https:", $Return);
+        }
+
+        return $Return;
     }
 
     /**
@@ -1476,7 +1483,7 @@ class Gdn_Controller extends Gdn_Pluggable {
         }
 
         // Add schemes to to urls.
-        if (!c('Garden.AllowSSL') || c('Garden.ForceSSL')) {
+        if (c('Garden.AllowSSL', true) && c('Garden.ForceSSL')) {
             $r = array_walk_recursive($Data, array('Gdn_Controller', '_FixUrlScheme'), Gdn::request()->scheme());
         }
 

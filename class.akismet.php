@@ -72,7 +72,7 @@ class Akismet
 	private $akismetVersion;
 	
 	// This prevents some potentially sensitive information from being sent accross the wire.
-	private $ignore = array('HTTP_COOKIE', 
+	private $ignore = ['HTTP_COOKIE', 
 							'HTTP_X_FORWARDED_FOR', 
 							'HTTP_X_FORWARDED_HOST', 
 							'HTTP_MAX_FORWARDS', 
@@ -83,7 +83,7 @@ class Akismet
 							'DOCUMENT_ROOT',
 							'SERVER_ADMIN',
 							'QUERY_STRING',
-							'PHP_SELF' );
+							'PHP_SELF' ];
 	
 	/**
 	 *	@param	string	$blogURL			The URL of your blog.

@@ -159,8 +159,10 @@ class Gdn_CookieIdentity {
     }
 
     /**
+     * Given a cookie's name, attempt to determine its version.
+     *
      * @param string $name
-     * @return null
+     * @return int|null
      */
     protected function getCookieVersion($name) {
         $result = null;

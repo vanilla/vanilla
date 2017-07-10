@@ -51,17 +51,17 @@ echo $Form->errors();
             echo '<div class="info">', t('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>'; ?>
         </div>
         <div class="input-wrap">
-        <?php echo $Form->dropdown('Location', array_merge(array('' => '('.sprintf(T('Select a %s'), t('Location')).')'), $this->data('LocationsArray'))); ?>
+        <?php echo $Form->dropdown('Location', array_merge(['' => '('.sprintf(T('Select a %s'), t('Location')).')'], $this->data('LocationsArray'))); ?>
         </div>
     </li>
     <li class="js-repeat form-group">
         <?php echo $Form->labelWrap('Repeat', 'RepeatType'); ?>
         <div class="input-wrap">
         <?php
-            echo '<div>', $Form->radio('RepeatType', 'Before', array('Value' => Pocket::REPEAT_BEFORE, 'Default' => true)), '</div>';
-            echo '<div>', $Form->radio('RepeatType', 'After', array('Value' => Pocket::REPEAT_AFTER)), '</div>';
-            echo '<div>', $Form->radio('RepeatType', 'Repeat Every', array('Value' => Pocket::REPEAT_EVERY)), '</div>';
-            echo '<div>', $Form->radio('RepeatType', 'Given Indexes', array('Value' => Pocket::REPEAT_INDEX)), '</div>';
+            echo '<div>', $Form->radio('RepeatType', 'Before', ['Value' => Pocket::REPEAT_BEFORE, 'Default' => true]), '</div>';
+            echo '<div>', $Form->radio('RepeatType', 'After', ['Value' => Pocket::REPEAT_AFTER]), '</div>';
+            echo '<div>', $Form->radio('RepeatType', 'Repeat Every', ['Value' => Pocket::REPEAT_EVERY]), '</div>';
+            echo '<div>', $Form->radio('RepeatType', 'Given Indexes', ['Value' => Pocket::REPEAT_INDEX]), '</div>';
 
             // Options for repeat every.
             echo '<div class="RepeatOptions RepeatEveryOptions padded-top">',

@@ -44,7 +44,7 @@ class Pocket {
     public $RepeatType = Pocket::REPEAT_INDEX;
 
     /** $var array The repeat frequency. */
-    public $RepeatFrequency = array(1);
+    public $RepeatFrequency = [1];
 
     /** $var array The repeat frequency. */
     public $MobileOnly = false;
@@ -65,7 +65,7 @@ class Pocket {
     public $ShowInDashboard = false;
 
     /** @var array */
-    public static $NameTranslations = array('conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments');
+    public static $NameTranslations = ['conversations' => 'inbox', 'messages' => 'inbox', 'categories' => 'discussions', 'discussion' => 'comments'];
 
     /**
      * Pocket constructor.
@@ -239,10 +239,10 @@ class Pocket {
             $Frequency = explode(',', $Frequency);
             $Frequency = array_map('trim', $Frequency);
         } else {
-            $Frequency = array();
+            $Frequency = [];
         }
 
-        return array($RepeatType, $Frequency);
+        return [$RepeatType, $Frequency];
     }
 
     /**
@@ -297,10 +297,10 @@ class Pocket {
      */
     public static function touch($Name, $Value) {
         $Model = new Gdn_Model('Pocket');
-        $Pockets = $Model->getWhere(array('Name' => $Name))->resultArray();
+        $Pockets = $Model->getWhere(['Name' => $Name])->resultArray();
 
         if (empty($Pockets)) {
-            $Pocket = array(
+            $Pocket = [
                 'Name' => $Name,
                 'Location' => 'Content',
                 'Sort' => 0,
@@ -313,7 +313,7 @@ class Pocket {
                 'EmbeddedNever' => 0,
                 'ShowInDashboard' => 0,
                 'Type' => 'default'
-                );
+                ];
             $Model->save($Pocket);
         }
     }

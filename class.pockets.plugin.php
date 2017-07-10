@@ -10,24 +10,24 @@
 class PocketsPlugin extends Gdn_Plugin {
 
     /** @var array Counters for the various locations. */
-    protected $_Counters = array();
+    protected $_Counters = [];
 
     /** @var array  */
-    public $Locations = array(
-        'Content' => array('Name' => 'Content'),
-        'Panel' => array('Name' => 'Panel'),
-        'BetweenDiscussions' => array('Name' => 'Between Discussions', 'Wrap' => array('<li>', '</li>')),
-        'BetweenComments' => array('Name' => 'Between Comments', 'Wrap' => array('<li>', '</li>')),
-        'Head' => array('Name' => 'Head'),
-        'Foot' => array('Name' => 'Foot'),
-        'Custom' => array('Name' => 'Custom')
-    );
+    public $Locations = [
+        'Content' => ['Name' => 'Content'],
+        'Panel' => ['Name' => 'Panel'],
+        'BetweenDiscussions' => ['Name' => 'Between Discussions', 'Wrap' => ['<li>', '</li>']],
+        'BetweenComments' => ['Name' => 'Between Comments', 'Wrap' => ['<li>', '</li>']],
+        'Head' => ['Name' => 'Head'],
+        'Foot' => ['Name' => 'Foot'],
+        'Custom' => ['Name' => 'Custom']
+    ];
 
     /** @var array All of the pockets indexed by location. */
-    protected $_Pockets = array();
+    protected $_Pockets = [];
 
     /** @var array  */
-    protected $_PocketNames = array();
+    protected $_PocketNames = [];
 
     /** @var bool  */
     protected $StateLoaded = false;
@@ -137,7 +137,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @param array $Args
      * @return mixed
      */
-    public function settingsController_pockets_create($Sender, $Args = array()) {
+    public function settingsController_pockets_create($Sender, $Args = []) {
         $Sender->permission('Plugins.Pockets.Manage');
         $Sender->setHighlightRoute('settings/pockets');
         $Sender->addJsFile('pockets.js', 'plugins/Pockets');
@@ -247,7 +247,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 saveToConfig('Plugins.Pockets.ShowLocations', true);
                 break;
             case 'hidelocations':
-                saveToConfig('Plugins.Pockets.ShowLocations', false, array('RemoveEmpty' => true));
+                saveToConfig('Plugins.Pockets.ShowLocations', false, ['RemoveEmpty' => true]);
                 break;
         }
 
@@ -395,7 +395,7 @@ class PocketsPlugin extends Gdn_Plugin {
         } else {
             if ($PocketID !== false) {
                 // Load the pocket.
-                $Pocket = $PocketModel->getWhere(array('PocketID' => $PocketID))->firstRow(DATASET_TYPE_ARRAY);
+                $Pocket = $PocketModel->getWhere(['PocketID' => $PocketID])->firstRow(DATASET_TYPE_ARRAY);
                 if (!$Pocket) {
                     return Gdn::dispatcher()->dispatch('Default404');
                 }
@@ -423,7 +423,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $Sender->setData('Locations', $this->Locations);
         $Sender->setData('LocationsArray', $this->getLocationsArray());
-        $Sender->setData('Pages', array('' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile'));
+        $Sender->setData('Pages', ['' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile']);
 
         return $Sender->render('AddEdit', '', 'plugins/Pockets');
     }
@@ -453,7 +453,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $Form = new Gdn_Form();
         if ($Form->authenticatedPostBack()) {
-            Gdn::sql()->delete('Pocket', array('PocketID' => $PocketID));
+            Gdn::sql()->delete('Pocket', ['PocketID' => $PocketID]);
             $Sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(t('Pocket')));
             $Sender->setRedirectTo('settings/pockets');
         }
@@ -470,7 +470,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function addPocket($Pocket) {
         if (!isset($this->_Pockets[$Pocket->Location])) {
-            $this->_Pockets[$Pocket->Location] = array();
+            $this->_Pockets[$Pocket->Location] = [];
         }
 
         $this->_Pockets[$Pocket->Location][] = $Pocket;
@@ -483,7 +483,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @return array
      */
     public function getLocationsArray() {
-        $Result = array();
+        $Result = [];
         foreach ($this->Locations as $Key => $Value) {
             $Result[$Key] = val('Name', $Value, $Key);
         }
@@ -498,7 +498,7 @@ class PocketsPlugin extends Gdn_Plugin {
      */
     public function getPockets($Name) {
         $this->_loadState();
-        return val($Name, $this->_PocketNames, array());
+        return val($Name, $this->_PocketNames, []);
     }
 
     /**
@@ -540,7 +540,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $this->_loadState();
 
         // Build up the data for filtering.
-        $Data = array();
+        $Data = [];
         $Data['Request'] = Gdn::request();
 
         // Increment the counter.
@@ -556,7 +556,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $Data['Count'] = $Count;
         $Data['PageName'] = Pocket::pageName($Sender);
 
-        $LocationOptions = val($Location, $this->Locations, array());
+        $LocationOptions = val($Location, $this->Locations, []);
 
         if ($this->ShowPocketLocations && array_key_exists($Location, $this->Locations) && checkPermission('Plugins.Pockets.Manage') && $Sender->MasterView != 'admin') {
             $LocationName = val("Name", $this->Locations, $Location);
@@ -576,7 +576,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 /** @var Pocket $Pocket */
 
                 if ($Pocket->canRender($Data)) {
-                    $Wrap = val('Wrap', $LocationOptions, array());
+                    $Wrap = val('Wrap', $LocationOptions, []);
 
                     echo val(0, $Wrap, '');
                     $Pocket->render($Data);
@@ -601,7 +601,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $Pockets = $Inst->getPockets($Name);
 
         if (val('random', $Data)) {
-            $Pockets = array(array_rand($Pockets));
+            $Pockets = [array_rand($Pockets)];
         }
 
         $Result = '';
@@ -622,7 +622,7 @@ class PocketsPlugin extends Gdn_Plugin {
             $Data = array_change_key_case($Data);
 
             self::pocketStringCb($Data, true);
-            $Result = preg_replace_callback('`{{(\w+)}}`', array('PocketsPlugin', 'PocketStringCb'), $Result);
+            $Result = preg_replace_callback('`{{(\w+)}}`', ['PocketsPlugin', 'PocketStringCb'], $Result);
         }
 
         return $Result;
@@ -689,13 +689,13 @@ class PocketsPlugin extends Gdn_Plugin {
             ->column('EmbeddedNever', 'tinyint', '0')
             ->column('ShowInDashboard', 'tinyint', '0')
             ->column('TestMode', 'tinyint', '0')
-            ->column('Type', array(Pocket::TYPE_DEFAULT, Pocket::TYPE_AD), Pocket::TYPE_DEFAULT)
+            ->column('Type', [Pocket::TYPE_DEFAULT, Pocket::TYPE_AD], Pocket::TYPE_DEFAULT)
             ->set();
 
         $PermissionModel = Gdn::permissionModel();
-        $PermissionModel->define(array(
+        $PermissionModel->define([
             'Garden.NoAds.Allow' => 0
-        ));
+        ]);
     }
 
     /**
@@ -759,9 +759,9 @@ if (!function_exists('renderPocketToggle')) {
         $enabled = val('Disabled', $pocket) !== Pocket::DISABLED;
         $return = '<span id="pockets-toggle-'.val('PocketID', $pocket).'">';
         if ($enabled) {
-            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/disable/'.val('PocketID', $pocket), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/disable/'.val('PocketID', $pocket), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
         } else {
-            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/enable/'.val('PocketID', $pocket), 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+            $return .= wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/settings/pockets/enable/'.val('PocketID', $pocket), 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
         }
         $return .= '</span>';
         return $return;

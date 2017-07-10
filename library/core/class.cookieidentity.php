@@ -110,27 +110,31 @@ class Gdn_CookieIdentity {
         $name = $this->CookieName;
         $version = $this->getCookieVersion($name);
 
-        switch ($version) {
-            case 1:
-                if ($this->_checkCookie($name)) {
-                    list($userID) = self::getCookiePayload($name);
-                    // Old cookie identity. Upgrade it.
-                    $this->setIdentity($userID);
-                } else {
-                    $this->_clearIdentity();
-                }
-                break;
-            case self::VERSION:
-            default:
-                $payload = $this->getJWTPayload($name);
-                if ($payload !== null) {
-                    Gdn::pluginManager()
-                        ->fireAs(self::class)
-                        ->fireEvent('getIdentity', ['payload' => &$payload]);
+        if (array_key_exists($name, $_COOKIE)) {
+            $payload = null;
+
+            switch ($version) {
+                case 1:
+                    if ($this->_checkCookie($name)) {
+                        list($userID) = self::getCookiePayload($name);
+                        // Old cookie identity. Upgrade it.
+                        $payload = $this->setIdentity($userID);
+                    }
+                    break;
+                case self::VERSION:
+                default:
+                    $payload = $this->getJWTPayload($name);
                     $userID = val('sub', $payload, 0);
-                } else {
-                    //$this->_clearIdentity();
-                }
+            }
+
+            // The identity cookie set, but we couldn't find a user in it? Nuke it.
+            if ($userID == 0) {
+                $this->_clearIdentity();
+            } elseif (is_array($payload)) {
+                Gdn::pluginManager()
+                    ->fireAs(self::class)
+                    ->fireEvent('getIdentity', ['payload' => &$payload]);
+            }
         }
 
         if (filter_var($userID, FILTER_VALIDATE_INT) === false || $userID < -2) { // allow for handshake special id
@@ -207,11 +211,12 @@ class Gdn_CookieIdentity {
      * @param int $userID The unique id assigned to the user in the database.
      * @param boolean $persist Should the user's session remain persistent across visits?
      * @param array $data Additional data to include in the token.
+     * @return array|bool
      */
     public function setIdentity($userID, $persist = false) {
         if (is_null($userID)) {
             $this->_clearIdentity();
-            return;
+            return true;
         }
 
         $this->UserID = $userID;
@@ -241,6 +246,7 @@ class Gdn_CookieIdentity {
         // Save the cookie.
         safeCookie($this->CookieName, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
         $_COOKIE[$this->CookieName] = $jwt;
+        return $payload;
     }
 
     /**

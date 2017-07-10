@@ -11,7 +11,7 @@
 class ButtonBarPlugin extends Gdn_Plugin {
 
     /** @var array  */
-    protected $Formats = array('Html', 'BBCode', 'Markdown', 'Wysiwyg');
+    protected $Formats = ['Html', 'BBCode', 'Markdown', 'Wysiwyg'];
 
     /**
      * Insert ButtonBar resource files on every page so they are available
@@ -88,7 +88,7 @@ class ButtonBarPlugin extends Gdn_Plugin {
         $View = Gdn::controller()->fetchView('buttonbar', '', 'plugins/ButtonBar');
 
         if ($Wrap) {
-            echo wrap($View, 'div', array('class' => 'P'));
+            echo wrap($View, 'div', ['class' => 'P']);
         } else {
             echo $View;
         }

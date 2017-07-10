@@ -48,7 +48,7 @@ abstract class Gdn_Pluggable {
      *  "Before" event, you would reference it like so:
      *  $ReturnVal = $Sender->Returns['ExampleController_BeforeRender_Handler']['TestPlugin'];
      */
-    public $Returns = array();
+    public $Returns = [];
 
 
     /**
@@ -74,8 +74,8 @@ abstract class Gdn_Pluggable {
      */
     public function __construct() {
         $this->ClassName = get_class($this);
-        $this->EventArguments = array();
-        $this->Returns = array();
+        $this->EventArguments = [];
+        $this->Returns = [];
         $this->HandlerType = HANDLER_TYPE_NORMAL;
     }
 
@@ -97,7 +97,7 @@ abstract class Gdn_Pluggable {
      */
     public function fireAs($Options) {
         if (!is_array($Options)) {
-            $Options = array('FireClass' => $Options);
+            $Options = ['FireClass' => $Options];
         }
 
         if (array_key_exists('FireClass', $Options)) {

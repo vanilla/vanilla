@@ -19,7 +19,7 @@ function writeConnection($Row) {
                 echo ' <span class="Gloss Connected">';
 
                 if ($Photo = valr('Profile.Photo', $Row)) {
-                    echo ' '.Img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall'));
+                    echo ' '.Img($Photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']);
                 }
 
                 echo ' '.htmlspecialchars(GetValueR('Profile.Name', $Row)).'</span>';
@@ -51,13 +51,13 @@ function connectButton($Row) {
     $Connected = val('Connected', $Row);
     $CssClass = $Connected ? 'Active' : 'InActive';
     $ConnectUrl = val('ConnectUrl', $Row);
-    $DisconnectUrl = userUrl($c->User, '', 'Disconnect', array('provider' => $Row['ProviderKey']));
+    $DisconnectUrl = userUrl($c->User, '', 'Disconnect', ['provider' => $Row['ProviderKey']]);
 
     $Result = '<span class="ActivateSlider ActivateSlider-'.$CssClass.'">';
     if ($Connected) {
         $Result .= anchor(t('Connected'), $DisconnectUrl, 'Button Primary Hijack ActivateSlider-Button');
     } else {
-        $Result .= anchor(t('Connect'), $ConnectUrl, 'Button ActivateSlider-Button', array('target' => '_top'));
+        $Result .= anchor(t('Connect'), $ConnectUrl, 'Button ActivateSlider-Button', ['target' => '_top']);
     }
     $Result .= '</span>';
 

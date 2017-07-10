@@ -81,6 +81,6 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     protected function displayPhoto($Sender) {
         // Build user object & output photo
         $FirstUser = userBuilder($Sender->EventArguments['Discussion'], 'First');
-        echo userPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
+        echo userPhoto($FirstUser, ['LinkClass' => 'IndexPhoto']);
     }
 }

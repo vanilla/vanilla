@@ -62,7 +62,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     protected $_DataSource = null;
 
     /** @var array  */
-    public $_DataHooks = array();
+    public $_DataHooks = [];
 
     /** @var string */
     public $Token;
@@ -160,7 +160,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @param $DataSource
      * @param array $DirectSupplied
      */
-    public function fetchData($DataSource, $DirectSupplied = array()) {
+    public function fetchData($DataSource, $DirectSupplied = []) {
         $this->_DataSource = $DataSource;
 
         if ($DataSource == $this) {
@@ -202,7 +202,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @param bool $DataFieldRequired
      */
     public function hookDataField($InternalFieldName, $DataFieldName, $DataFieldRequired = true) {
-        $this->_DataHooks[$InternalFieldName] = array('lookup' => $DataFieldName, 'required' => $DataFieldRequired);
+        $this->_DataHooks[$InternalFieldName] = ['lookup' => $DataFieldName, 'required' => $DataFieldRequired];
     }
 
     /**
@@ -329,8 +329,8 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @return array|bool
      */
     public function createToken($TokenType, $ProviderKey, $UserKey = null, $Authorized = false) {
-        $TokenKey = implode('.', array('token', $ProviderKey, time(), mt_rand(0, 100000)));
-        $TokenSecret = sha1(md5(implode('.', array($TokenKey, mt_rand(0, 100000)))));
+        $TokenKey = implode('.', ['token', $ProviderKey, time(), mt_rand(0, 100000)]);
+        $TokenSecret = sha1(md5(implode('.', [$TokenKey, mt_rand(0, 100000)])));
         $uatModel = new UserAuthenticationTokenModel();
 
         $Lifetime = Gdn::config('Garden.Authenticators.handshake.TokenLifetime', 60);
@@ -338,7 +338,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             $Lifetime = 300;
         }
 
-        $InsertArray = array(
+        $InsertArray = [
             'Token' => $TokenKey,
             'TokenSecret' => $TokenSecret,
             'TokenType' => $TokenType,
@@ -346,7 +346,7 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
             'Lifetime' => $Lifetime,
             'Authorized' => ($Authorized ? 1 : 0),
             'ForeignUserKey' => null
-        );
+        ];
 
         if ($UserKey !== null) {
             $InsertArray['ForeignUserKey'] = $UserKey;
@@ -422,11 +422,11 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @return bool
      */
     public function setNonce($TokenKey, $Nonce, $Timestamp = null) {
-        $InsertArray = array(
+        $InsertArray = [
             'Token' => $TokenKey,
             'Nonce' => $Nonce,
             'Timestamp' => date('Y-m-d H:i:s', (is_null($Timestamp)) ? time() : $Timestamp)
-        );
+        ];
 
         try {
             $NumAffected = Gdn::database()->sql()->update('UserAuthenticationNonce')
@@ -474,9 +474,9 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @param $TokenKey
      */
     public function clearNonces($TokenKey) {
-        Gdn::sql()->delete('UserAuthenticationNonce', array(
+        Gdn::sql()->delete('UserAuthenticationNonce', [
             'Token' => $TokenKey
-        ));
+        ]);
     }
 
     /**

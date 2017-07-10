@@ -14,7 +14,7 @@
 class RoutesController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form');
+    public $Uses = ['Form'];
 
     /**
      * Set menu path. Automatically run on every use.
@@ -57,7 +57,7 @@ class RoutesController extends DashboardController {
 
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Route', 'Target', 'Type'));
+        $ConfigurationModel->setField(['Route', 'Target', 'Type']);
 
         // Set the model on the form.
         $this->Form->setModel($ConfigurationModel);
@@ -66,11 +66,11 @@ class RoutesController extends DashboardController {
         if (!$this->Form->authenticatedPostBack()) {
             // Apply the route info to the form.
             if ($this->Route !== false) {
-                $this->Form->setData(array(
+                $this->Form->setData([
                     'Route' => $this->Route['Route'],
                     'Target' => $this->Route['Destination'],
                     'Type' => $this->Route['Type']
-                ));
+                ]);
             }
         } else {
             // Define some validation rules for the fields being saved

@@ -59,7 +59,7 @@ if (c('Vanilla.Categories.Use')) {
 
     echo wrap(t('Organize Categories'), 'h1')
         .'<ol class="Sortable">';
-    $Right = array(); // Start with an empty $Right stack
+    $Right = []; // Start with an empty $Right stack
     $LastRight = 0;
     $OpenCount = 0;
     $Loop = 0;
@@ -96,7 +96,7 @@ if (c('Vanilla.Categories.Use')) {
             $CategoryUrl = categoryUrl($Category);
 
             if ($Category->Photo) {
-                $Photo = img(Gdn_Upload::url($Category->Photo), array('class' => 'CategoryPhoto'));
+                $Photo = img(Gdn_Upload::url($Category->Photo), ['class' => 'CategoryPhoto']);
             } else {
                 $Photo = '';
             }

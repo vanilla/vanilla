@@ -197,8 +197,8 @@ function Gdn_ExceptionHandler($Exception) {
 
             // If this error was encountered during an ajax request, don't bother gettting the css or theme files
             if ($DeliveryType == DELIVERY_TYPE_ALL) {
-                $CssPaths = array(); // Potential places where the css can be found in the filesystem.
-                $MasterViewPaths = array();
+                $CssPaths = []; // Potential places where the css can be found in the filesystem.
+                $MasterViewPaths = [];
                 $MasterViewName = 'error.master.php';
                 $MasterViewCss = 'error.css';
 
@@ -241,8 +241,8 @@ function Gdn_ExceptionHandler($Exception) {
                 }
                 if ($CssPath !== false) {
                     $CssPath = str_replace(
-                        array(PATH_ROOT, DS),
-                        array('', '/'),
+                        [PATH_ROOT, DS],
+                        ['', '/'],
                         $CssPath
                     );
                     $CssPath = ($WebRoot == '' ? '' : '/'.$WebRoot).$CssPath;
@@ -288,7 +288,7 @@ function Gdn_ExceptionHandler($Exception) {
                     }
 
                     echo '> '.str_pad($i + 1, $Padding, " ", STR_PAD_LEFT), ': ',
-                        str_replace(array("\n", "\r"), array('', ''), htmlspecialchars($ErrorLines[$i])), "\n";
+                        str_replace(["\n", "\r"], ['', ''], htmlspecialchars($ErrorLines[$i])), "\n";
                 }
             }
 
@@ -642,7 +642,7 @@ if (!function_exists('boop')) {
      * @param mixed $Message The object or string to log to the screen
      * @param optional $Arguments A list of arguments to log to the screen as if from a function call
      */
-    function boop($Message, $Arguments = array(), $Vardump = false) {
+    function boop($Message, $Arguments = [], $Vardump = false) {
         if (!defined('BOOP') || !BOOP) {
             return;
         }
@@ -672,7 +672,7 @@ if (!function_exists('cleanErrorArguments')) {
      * @param $Var
      * @param array $BlackList
      */
-    function cleanErrorArguments(&$Var, $BlackList = array('configuration', 'config', 'database', 'password')) {
+    function cleanErrorArguments(&$Var, $BlackList = ['configuration', 'config', 'database', 'password']) {
         if (is_array($Var)) {
             foreach ($Var as $Key => $Value) {
                 if (in_array(strtolower($Key), $BlackList)) {

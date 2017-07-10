@@ -111,7 +111,7 @@ class UpdateModel extends Gdn_Model {
         $Addon = [];
         $Result = [];
 
-        $InfoPaths = array(
+        $InfoPaths = [
             '/settings/about.php', // application
             '/default.php', // plugin
             '/class.*.plugin.php', // plugin
@@ -119,7 +119,7 @@ class UpdateModel extends Gdn_Model {
             '/definitions.php', // locale
             '/index.php', // vanilla core
             'vanilla2export.php' // porter
-        );
+        ];
 
         // Look for an addon.json file.
         if (file_exists("$Path/addon.json")) {
@@ -155,14 +155,14 @@ class UpdateModel extends Gdn_Model {
                     }
 
                     // The application was confirmed.
-                    $Addon = array(
+                    $Addon = [
                         'AddonKey' => 'vanilla',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla',
                         'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
                         'Version' => $Version,
                         'License' => 'GPLv2',
-                        'Path' => $entry['Path']);
+                        'Path' => $entry['Path']];
                     break;
                 } elseif ($entry['Name'] == 'vanilla2export.php') {
                     // This could be the vanilla porter.
@@ -172,14 +172,14 @@ class UpdateModel extends Gdn_Model {
                         continue;
                     }
 
-                    $Addon = array(
+                    $Addon = [
                         'AddonKey' => 'porter',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla Porter',
                         'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
                         'Version' => $Version,
                         'License' => 'GPLv2',
-                        'Path' => $entry['Path']);
+                        'Path' => $entry['Path']];
                     break;
                 } else {
                     // This could be an addon.
@@ -253,7 +253,7 @@ class UpdateModel extends Gdn_Model {
         $variable = $info['Variable'];
         $info = $info[$key];
 
-        $addon = array_merge(array('AddonKey' => $key, 'AddonTypeID' => ''), $info);
+        $addon = array_merge(['AddonKey' => $key, 'AddonTypeID' => ''], $info);
         switch ($variable) {
             case 'ApplicationInfo':
                 $addon['AddonTypeID'] = ADDON_TYPE_APPLICATION;
@@ -371,9 +371,9 @@ class UpdateModel extends Gdn_Model {
 
         if ($ZipOpened !== true) {
             if ($ThrowError) {
-                $Errors = array(ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
+                $Errors = [ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
                     ZipArchive::ER_MEMORY => 'ER_MEMORY', ZipArchive::ER_NOENT => 'ER_NOENT', ZipArchive::ER_NOZIP => 'ER_NOZIP',
-                    ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK');
+                    ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK'];
                 $Error = val($ZipOpened, $Errors, 'Unknown Error');
 
                 throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($Path $Error)", 400);
@@ -400,7 +400,7 @@ class UpdateModel extends Gdn_Model {
             $Name = '/'.ltrim($Entry['name'], '/');
 
             foreach ($InfoPaths as $InfoPath) {
-                $Preg = '`('.str_replace(array('.', '*'), array('\.', '.*'), $InfoPath).')$`';
+                $Preg = '`('.str_replace(['.', '*'], ['\.', '.*'], $InfoPath).')$`';
                 if (preg_match($Preg, $Name, $Matches)) {
                     $Base = trim(substr($Name, 0, -strlen($Matches[1])), '/');
 
@@ -412,7 +412,7 @@ class UpdateModel extends Gdn_Model {
                     }
 
                     $Zip->extractTo($TmpPath, $Entry['name']);
-                    $Result[] = array('Name' => $Matches[1], 'Path' => $TmpPath.rtrim($Entry['name'], '/'), 'Base' => $Base);
+                    $Result[] = ['Name' => $Matches[1], 'Path' => $TmpPath.rtrim($Entry['name'], '/'), 'Base' => $Base];
                 }
             }
         }
@@ -465,7 +465,7 @@ class UpdateModel extends Gdn_Model {
     public static function parseInfoArray($Path, $Variable = false) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
         $fp = fopen($Path, 'rb');
-        $Lines = array();
+        $Lines = [];
         $InArray = false;
         $GlobalKey = '';
 
@@ -496,7 +496,7 @@ class UpdateModel extends Gdn_Model {
         }
 
         // Parse the name/value information in the arrays.
-        $Result = array();
+        $Result = [];
         foreach ($Lines as $Line) {
             // Get the name from the line.
             if (!preg_match('`[\'"](.+?)[\'"]\s*=>`', $Line, $Matches) || !substr($Line, -1) == ',') {
@@ -516,7 +516,7 @@ class UpdateModel extends Gdn_Model {
                 $Value = $Line;
             } elseif (strcasecmp($Line, 'TRUE') == 0 || strcasecmp($Line, 'FALSE') == 0)
                 $Value = $Line;
-            elseif (in_array($Line[0], array('"', "'")) && substr($Line, -1) == $Line[0]) {
+            elseif (in_array($Line[0], ['"', "'"]) && substr($Line, -1) == $Line[0]) {
                 $Quote = $Line[0];
                 $Value = trim($Line, $Quote);
                 $Value = str_replace('\\'.$Quote, $Quote, $Value);
@@ -524,7 +524,7 @@ class UpdateModel extends Gdn_Model {
                 // Parse the line's array.
                 $Line = substr($Line, 6, strlen($Line) - 7);
                 $Items = explode(',', $Line);
-                $Array = array();
+                $Array = [];
                 foreach ($Items as $Item) {
                     $SubItems = explode('=>', $Item);
                     if (count($SubItems) == 1) {
@@ -542,7 +542,7 @@ class UpdateModel extends Gdn_Model {
                 $Result[$Key] = $Value;
             }
         }
-        $Result = array($GlobalKey => $Result, 'Variable' => $Variable);
+        $Result = [$GlobalKey => $Result, 'Variable' => $Variable];
         return $Result;
     }
 
@@ -591,7 +591,7 @@ class UpdateModel extends Gdn_Model {
      */
     protected static function checkRequiredFields($info) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $results = array();
+        $results = [];
 
         if (!val('Description', $info)) {
             $results[] = sprintf(t('ValidateRequired'), t('Description'));

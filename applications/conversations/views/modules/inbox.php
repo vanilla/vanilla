@@ -64,7 +64,7 @@ $SubjectsVisible = c('Conversations.Subjects.Visible');
         </div>
     <?php else: ?>
         <?php
-        echo wrap(t('Your private conversations with other members.'), 'div', array('class' => 'P'));
+        echo wrap(t('Your private conversations with other members.'), 'div', ['class' => 'P']);
         ?>
         <div class="P PagerContainer">
             <?php

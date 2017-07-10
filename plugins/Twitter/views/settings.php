@@ -7,7 +7,7 @@
     </div>
     <div class="padded">
         <?php echo t('Twitter Connect allows users to sign in using their Twitter account.'); ?>
-        <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Twitter Connect')), 'http://docs.vanillaforums.com/help/addons/social/twitter/', array('target' => '_blank')); ?>
+        <?php echo ' '.anchor(sprintf(t('How to set up %s.'), t('Twitter Connect')), 'http://docs.vanillaforums.com/help/addons/social/twitter/', ['target' => '_blank']); ?>
     </div>
 <?php
 echo $this->Form->open();

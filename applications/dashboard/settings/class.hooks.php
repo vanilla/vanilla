@@ -138,18 +138,18 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         // Add Message Modules (if necessary)
-        $MessageCache = Gdn::config('Garden.Messages.Cache', array());
+        $MessageCache = Gdn::config('Garden.Messages.Cache', []);
         $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
-        $Exceptions = array('[Base]');
+        $Exceptions = ['[Base]'];
 
-        if (in_array($Sender->MasterView, array('', 'default'))) {
+        if (in_array($Sender->MasterView, ['', 'default'])) {
             $Exceptions[] = '[NonAdmin]';
         }
 
         // SignIn popup is a special case
         $SignInOnly = ($Sender->deliveryType() == DELIVERY_TYPE_VIEW && $Location == 'Dashboard/entry/signin');
         if ($SignInOnly) {
-            $Exceptions = array();
+            $Exceptions = [];
         }
 
         if ($Sender->MasterView != 'admin' && !$Sender->data('_NoMessages') && (val('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, false) || InArrayI($Location, $MessageCache))) {
@@ -431,12 +431,12 @@ class DashboardHooks extends Gdn_Plugin {
         $Sender->Form->Action = url('/settings/tagging/?type='.$TagType);
 
         // Search results pagination will mess up a bit, so don't provide a type in the count.
-        $RecordCountWhere = array('Type' => $queryType);
+        $RecordCountWhere = ['Type' => $queryType];
         if ($queryType === false) {
             $RecordCountWhere = [];
         }
         if ($Search) {
-            $RecordCountWhere = array();
+            $RecordCountWhere = [];
         }
 
         $Sender->setData('RecordCount', $SQL->getCount('Tag', $RecordCountWhere));
@@ -462,8 +462,8 @@ class DashboardHooks extends Gdn_Plugin {
                 if ($Sender->Form->authenticatedPostBack()) {
                     // Delete tag & tag relations.
                     $SQL = Gdn::sql();
-                    $SQL->delete('TagDiscussion', array('TagID' => $TagID));
-                    $SQL->delete('Tag', array('TagID' => $TagID));
+                    $SQL->delete('TagDiscussion', ['TagID' => $TagID]);
+                    $SQL->delete('Tag', ['TagID' => $TagID]);
 
                     $Sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Tag));
                     $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
@@ -493,7 +493,7 @@ class DashboardHooks extends Gdn_Plugin {
                     }
 
                     // Make sure that the tag name is not already in use.
-                    if ($TagModel->getWhere(array('TagID <>' => $TagID, 'Name' => $TagData))->numRows() > 0) {
+                    if ($TagModel->getWhere(['TagID <>' => $TagID, 'Name' => $TagData])->numRows() > 0) {
                         $Sender->setData('MergeTagVisible', true);
                         if (!$Sender->Form->getFormValue('MergeTag')) {
                             $Sender->Form->addError('The specified tag name is already in use.');
@@ -537,7 +537,7 @@ class DashboardHooks extends Gdn_Plugin {
                     }
 
                     // Make sure that the tag name is not already in use.
-                    if ($TagModel->getWhere(array('Name' => $TagName))->numRows() > 0) {
+                    if ($TagModel->getWhere(['Name' => $TagName])->numRows() > 0) {
                         $Sender->Form->addError('The specified tag name is already in use.');
                     }
 
@@ -762,11 +762,11 @@ class DashboardHooks extends Gdn_Plugin {
         // GLOBALS
 
         // Add a link to the community home.
-        $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, array('icon' => 'home'), false);
+        $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, ['icon' => 'home'], false);
         $sender->addGroupToGlobals('', 'etc', '', 100);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, array('icon' => 'resize-full'));
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, array('icon' => 'signout'));
-        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, array('icon' => 'signin'));
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, ['icon' => 'resize-full']);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, ['icon' => 'signout']);
+        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, ['icon' => 'signin']);
 
         // DEFAULTS
 
@@ -774,8 +774,8 @@ class DashboardHooks extends Gdn_Plugin {
             return;
         }
 
-        $sender->addLinkIf(Gdn::session()->isValid(), t('Profile'), '/profile', 'main.profile', 'profile', 10, array('icon' => 'user'))
-            ->addLinkIf('Garden.Activity.View', t('Activity'), '/activity', 'main.activity', 'activity', 10, array('icon' => 'time'));
+        $sender->addLinkIf(Gdn::session()->isValid(), t('Profile'), '/profile', 'main.profile', 'profile', 10, ['icon' => 'user'])
+            ->addLinkIf('Garden.Activity.View', t('Activity'), '/activity', 'main.activity', 'activity', 10, ['icon' => 'time']);
 
         // Add the moderation items.
         $sender->addGroup(t('Moderation'), 'moderation', 'moderation', 90);
@@ -783,11 +783,11 @@ class DashboardHooks extends Gdn_Plugin {
             $RoleModel = new RoleModel();
             $applicant_count = (int)$RoleModel->getApplicantCount();
             if ($applicant_count > 0 || true) {
-                $sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', array(), array('icon' => 'user', 'badge' => $applicant_count));
+                $sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', [], ['icon' => 'user', 'badge' => $applicant_count]);
             }
         }
-        $sender->addLinkIf('Garden.Moderation.Manage', t('Spam Queue'), '/log/spam', 'moderation.spam', 'spam', array(), array('icon' => 'spam'))
-            ->addLinkIf('Garden.Settings.Manage', t('Dashboard'), '/settings', 'etc.dashboard', 'dashboard', array(), array('icon' => 'dashboard'));
+        $sender->addLinkIf('Garden.Moderation.Manage', t('Spam Queue'), '/log/spam', 'moderation.spam', 'spam', [], ['icon' => 'spam'])
+            ->addLinkIf('Garden.Settings.Manage', t('Dashboard'), '/settings', 'etc.dashboard', 'dashboard', [], ['icon' => 'dashboard']);
 
         $user = Gdn::controller()->data('Profile');
         $user_id = val('UserID', $user);
@@ -795,19 +795,19 @@ class DashboardHooks extends Gdn_Plugin {
         //EDIT PROFILE SECTION
 
         // Users can edit their own profiles and moderators can edit any profile.
-        $sender->addLinkToSectionIf(hasEditProfile($user_id), 'EditProfile', t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', array(), array('icon' => 'edit'))
-            ->addLinkToSectionIf('Garden.Users.Edit', 'EditProfile', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', array(), array('icon' => 'cog'))
-            ->addLinkToSection('EditProfile', t('Back to Profile'), userUrl($user), 'main.profile', '', 100, array('icon' => 'arrow-left'));
+        $sender->addLinkToSectionIf(hasEditProfile($user_id), 'EditProfile', t('Profile'), userUrl($user, '', 'edit'), 'main.editprofile', '', [], ['icon' => 'edit'])
+            ->addLinkToSectionIf('Garden.Users.Edit', 'EditProfile', t('Edit Account'), '/user/edit/'.$user_id, 'main.editaccount', 'Popup', [], ['icon' => 'cog'])
+            ->addLinkToSection('EditProfile', t('Back to Profile'), userUrl($user), 'main.profile', '', 100, ['icon' => 'arrow-left']);
 
 
         //PROFILE SECTION
 
-        $sender->addLinkToSectionIf(c('Garden.Profile.ShowActivities', true), 'Profile', t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', array(), array('icon' => 'time'))
-            ->addLinkToSectionIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, 'Profile', t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', array(), array('icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')))
+        $sender->addLinkToSectionIf(c('Garden.Profile.ShowActivities', true), 'Profile', t('Activity'), userUrl($user, '', 'activity'), 'main.activity', '', [], ['icon' => 'time'])
+            ->addLinkToSectionIf(Gdn::controller()->data('Profile.UserID') == Gdn::session()->UserID, 'Profile', t('Notifications'), userUrl($user, '', 'notifications'), 'main.notifications', '', [], ['icon' => 'globe', 'badge' => Gdn::controller()->data('Profile.CountNotifications')])
             // Show the invitations if we're using the invite registration method.
-            ->addLinkToSectionIf(strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0, 'Profile', t('Invitations'), userUrl($user, '', 'invitations'), 'main.invitations', '', array(), array('icon' => 'ticket'))
+            ->addLinkToSectionIf(strcasecmp(c('Garden.Registration.Method'), 'invitation') === 0, 'Profile', t('Invitations'), userUrl($user, '', 'invitations'), 'main.invitations', '', [], ['icon' => 'ticket'])
             // Users can edit their own profiles and moderators can edit any profile.
-            ->addLinkToSectionIf(hasEditProfile($user_id), 'Profile', t('Edit Profile'), userUrl($user, '', 'edit'), 'Profile', 'main.editprofile', '', array(), array('icon' => 'edit'));
+            ->addLinkToSectionIf(hasEditProfile($user_id), 'Profile', t('Edit Profile'), userUrl($user, '', 'edit'), 'Profile', 'main.editprofile', '', [], ['icon' => 'edit']);
 
     }
 
@@ -818,7 +818,7 @@ class DashboardHooks extends Gdn_Plugin {
      */
     public function updateModel_afterStructure_handler($sender) {
         // Only setup default permissions if no role permissions are set.
-        $hasPermissions = Gdn::sql()->getWhere('Permission', array('RoleID >' => 0))->firstRow(DATASET_TYPE_ARRAY);
+        $hasPermissions = Gdn::sql()->getWhere('Permission', ['RoleID >' => 0])->firstRow(DATASET_TYPE_ARRAY);
         if (!$hasPermissions) {
             PermissionModel::resetAllRoles();
         }

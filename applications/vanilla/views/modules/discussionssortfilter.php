@@ -3,10 +3,10 @@
     <?php if ($this->showSorts()) { ?>
         <span class="discussion-sorts">
         <?php foreach ($this->getSortData() as $sort) {
-            echo anchor(val('name', $sort), val('url', $sort), array(
+            echo anchor(val('name', $sort), val('url', $sort), [
                     'rel' => val('rel', $sort),
                     'class' => 'btn-default Button NavButton SortButton ' . val('cssClass', $sort, '')
-                )) . ' ';
+                ]) . ' ';
         }
         ?>
         </span>

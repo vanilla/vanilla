@@ -18,7 +18,7 @@
         <li>
             <?php
             echo $this->Form->label('New Password', 'Password');
-            echo $this->Form->Input('Password', 'password', array('Strength' => TRUE));
+            echo $this->Form->Input('Password', 'password', ['Strength' => TRUE]);
             ?>
         </li>
         <li>
@@ -28,5 +28,5 @@
             ?>
         </li>
     </ul>
-    <?php echo $this->Form->close('Change Password', '', array('class' => 'Button Primary')); ?>
+    <?php echo $this->Form->close('Change Password', '', ['class' => 'Button Primary']); ?>
 </div>

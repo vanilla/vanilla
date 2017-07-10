@@ -127,28 +127,28 @@ if (!function_exists('writeComment')) :
             </span>
             <span class="AuthorInfo">
                <?php
-               echo ' '.wrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-               echo ' '.wrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+               echo ' '.wrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
+               echo ' '.wrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
                $Sender->fireEvent('AuthorInfo');
                ?>
             </span>
                     </div>
                     <div class="Meta CommentMeta CommentInfo">
             <span class="MItem DateCreated">
-               <?php echo anchor(Gdn_Format::date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', array('name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow')); ?>
+               <?php echo anchor(Gdn_Format::date($Comment->DateInserted, 'html'), $Permalink, 'Permalink', ['name' => 'Item_'.($CurrentOffset), 'rel' => 'nofollow']); ?>
             </span>
                         <?php
-                        echo DateUpdated($Comment, array('<span class="MItem">', '</span>'));
+                        echo DateUpdated($Comment, ['<span class="MItem">', '</span>']);
                         ?>
                         <?php
                         // Include source if one was set
                         if ($Source = val('Source', $Comment)) {
-                            echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+                            echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', ['class' => 'MItem Source']);
                         }
 
                         // Include IP Address if we have permission
                         if ($Session->checkPermission('Garden.PersonalInfo.View')) {
-                            echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', array('class' => 'MItem IPAddress'));
+                            echo wrap(ipAnchor($Comment->InsertIPAddress), 'span', ['class' => 'MItem IPAddress']);
                         }
 
                         $Sender->fireEvent('CommentInfo');
@@ -210,7 +210,7 @@ if (!function_exists('getDiscussionOptions')) :
      * @return array $Options Each element must include keys 'Label' and 'Url'.
      */
     function getDiscussionOptions($Discussion = null) {
-        $Options = array();
+        $Options = [];
 
         $Sender = Gdn::controller();
         $Session = Gdn::session();
@@ -230,7 +230,7 @@ if (!function_exists('getDiscussionOptions')) :
             if ($TimeLeft) {
                 $TimeLeft = ' ('.Gdn_Format::seconds($TimeLeft).')';
             }
-            $Options['EditDiscussion'] = array('Label' => t('Edit').$TimeLeft, 'Url' => '/post/editdiscussion/'.$Discussion->DiscussionID);
+            $Options['EditDiscussion'] = ['Label' => t('Edit').$TimeLeft, 'Url' => '/post/editdiscussion/'.$Discussion->DiscussionID];
         }
 
         // Can the user announce?
@@ -422,7 +422,7 @@ if (!function_exists('getCommentOptions')) :
      * @return array $Options Each element must include keys 'Label' and 'Url'.
      */
     function getCommentOptions($Comment) {
-        $Options = array();
+        $Options = [];
 
         if (!is_numeric(val('CommentID', $Comment))) {
             return $Options;
@@ -507,7 +507,7 @@ if (!function_exists('writeCommentOptions')) :
             $Discussion = Gdn::controller()->data('Discussion');
             if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Comments.Delete')) {
                 if (!property_exists($Controller, 'CheckedComments')) {
-                    $Controller->CheckedComments = $Session->getAttribute('CheckedComments', array());
+                    $Controller->CheckedComments = $Session->getAttribute('CheckedComments', []);
                 }
                 $ItemSelected = inSubArray($Id, $Controller->CheckedComments);
                 echo '<span class="AdminCheck"><input type="checkbox" name="'.'Comment'.'ID[]" value="'.$Id.'"'.($ItemSelected ? ' checked="checked"' : '').' /></span>';
@@ -547,11 +547,11 @@ if (!function_exists('writeCommentForm')) :
                         $ReturnUrl = Gdn::request()->pathAndQuery();
                         echo formatString(
                             t('Sign In or Register to Comment.', '<a href="{SignInUrl,html}"{Popup}>Sign In</a> or <a href="{RegisterUrl,html}">Register</a> to comment.'),
-                            array(
+                            [
                                 'SignInUrl' => url(signInUrl($ReturnUrl)),
                                 'RegisterUrl' => url(registerUrl($ReturnUrl)),
                                 'Popup' => $Popup
-                            )
+                            ]
                         ); ?>
                     </div>
                     <?php //echo anchor(t('All Discussions'), 'discussions', 'TabLink'); ?>
@@ -600,10 +600,10 @@ if (!function_exists('writeEmbedCommentForm')) :
             <h2><?php echo t('Leave a comment'); ?></h2>
             <div class="MessageForm CommentForm EmbedCommentForm">
                 <?php
-                echo $Controller->Form->open(array('id' => 'Form_Comment'));
+                echo $Controller->Form->open(['id' => 'Form_Comment']);
                 echo $Controller->Form->errors();
                 echo $Controller->Form->hidden('Name');
-                echo wrap($Controller->Form->textBox('Body', array('MultiLine' => true)), 'div', array('class' => 'TextBoxWrapper'));
+                echo wrap($Controller->Form->textBox('Body', ['MultiLine' => true]), 'div', ['class' => 'TextBoxWrapper']);
                 echo "<div class=\"Buttons\">\n";
 
                 $AllowSigninPopup = c('Garden.SignIn.Popup');
@@ -623,7 +623,7 @@ if (!function_exists('writeEmbedCommentForm')) :
                         'div',
                         ['class' => 'Author']
                     );
-                    echo $Controller->Form->button('Post Comment', array('class' => 'Button CommentButton'));
+                    echo $Controller->Form->button('Post Comment', ['class' => 'Button CommentButton']);
                 } else {
                     $AuthenticationUrl = url(signInUrl($ReturnUrl), true);
                     if ($AllowSigninPopup) {

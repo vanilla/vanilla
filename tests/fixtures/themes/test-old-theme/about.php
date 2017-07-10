@@ -1,6 +1,6 @@
 <?php
 
-$ThemeInfo['test-old-theme'] = array(
+$ThemeInfo['test-old-theme'] = [
     'Name'        => "test-old-theme",
     'Description' => "This is a fixture for unit testing.",
     'Version'     => '1.0.0',
@@ -10,4 +10,4 @@ $ThemeInfo['test-old-theme'] = array(
     'RequiredPlugins' => [
         'test-old-plugin' => '1.0'
     ]
-);
+];

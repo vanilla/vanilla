@@ -714,9 +714,9 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProfile() {
         $provider = $this->provider();
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-        $defaultParams = array(
+        $defaultParams = [
             'access_token' => $this->accessToken()
-        );
+        ];
         $requestParams = array_merge($defaultParams, $this->requestProfileParams);
 
         // Request the profile from the Authentication Provider
@@ -749,7 +749,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             return;
         }
 
-        $url = $this->authorizeUri(array('target' => $args['Target']));
+        $url = $this->authorizeUri(['target' => $args['Target']]);
         $args['DefaultProvider']['SignInUrl'] = $url;
     }
 

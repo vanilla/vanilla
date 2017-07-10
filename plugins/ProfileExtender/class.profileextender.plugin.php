@@ -31,33 +31,33 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     }
 
     /** @var array */
-    public $MagicLabels = array('Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name');
+    public $MagicLabels = ['Twitter', 'Google', 'Facebook', 'LinkedIn', 'GitHub', 'Website', 'Real Name'];
 
     /**
      * Available form field types in format Gdn_Type => DisplayName.
      */
-    public $FormTypes = array(
+    public $FormTypes = [
         'TextBox' => 'TextBox',
         'Dropdown' => 'Dropdown',
         'CheckBox' => 'Checkbox',
         'DateOfBirth' => 'Birthday',
-    );
+    ];
 
     /**
      * Whitelist of allowed field properties.
      */
-    public $FieldProperties = array('Name', 'Label', 'FormType', 'Required', 'Locked',
-        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion');
+    public $FieldProperties = ['Name', 'Label', 'FormType', 'Required', 'Locked',
+        'Options', 'Length', 'Sort', 'OnRegister', 'OnProfile', 'OnDiscussion'];
 
     /**
      * Blacklist of disallowed field names.
      * Prevents accidental or malicious overwrite of sensitive fields.
      */
-    public $ReservedNames = array('Name', 'Email', 'Password', 'HashMethod', 'Admin', 'Banned', 'Points',
-        'Deleted', 'Verified', 'Attributes', 'Permissions', 'Preferences');
+    public $ReservedNames = ['Name', 'Email', 'Password', 'HashMethod', 'Admin', 'Banned', 'Points',
+        'Deleted', 'Verified', 'Attributes', 'Permissions', 'Preferences'];
 
     /** @var array */
-    public $ProfileFields = array();
+    public $ProfileFields = [];
 
     /**
      * Add the Dashboard menu item.
@@ -72,7 +72,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      */
     public function entryController_registerBeforePassword_handler($Sender) {
         $ProfileFields = $this->getProfileFields();
-        $Sender->RegistrationFields = array();
+        $Sender->RegistrationFields = [];
         foreach ($ProfileFields as $Name => $Field) {
             if (val('OnRegister', $Field) && val('FormType', $Field) != 'CheckBox') {
                 $Sender->RegistrationFields[$Name] = $Field;
@@ -86,7 +86,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      */
     public function entryController_registerFormBeforeTerms_handler($Sender) {
         $ProfileFields = $this->getProfileFields();
-        $Sender->RegistrationFields = array();
+        $Sender->RegistrationFields = [];
         foreach ($ProfileFields as $Name => $Field) {
             if (val('OnRegister', $Field) && val('FormType', $Field) == 'CheckBox') {
                 $Sender->RegistrationFields[$Name] = $Field;
@@ -117,7 +117,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Special manipulations.
      */
-    public function parseSpecialFields($Fields = array()) {
+    public function parseSpecialFields($Fields = []) {
         if (!is_array($Fields)) {
             return $Fields;
         }
@@ -144,14 +144,14 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                     $Fields['GitHub'] = anchor($Value, 'https://github.com/'.$Value);
                     break;
                 case 'Google':
-                    $Fields['Google'] = anchor('Google+', $Value, '', array('rel' => 'me'));
+                    $Fields['Google'] = anchor('Google+', $Value, '', ['rel' => 'me']);
                     break;
                 case 'Website':
                     $LinkValue = (isUrl($Value)) ? $Value : 'http://'.$Value;
                     $Fields['Website'] = anchor($Value, $LinkValue);
                     break;
                 case 'Real Name':
-                    $Fields['Real Name'] = wrap(htmlspecialchars($Value), 'span', array('itemprop' => 'name'));
+                    $Fields['Real Name'] = wrap(htmlspecialchars($Value), 'span', ['itemprop' => 'name']);
                     break;
             }
         }
@@ -180,9 +180,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @return array
      */
     private function getProfileFields() {
-        $Fields = c('ProfileExtender.Fields', array());
+        $Fields = c('ProfileExtender.Fields', []);
         if (!is_array($Fields)) {
-            $Fields = array();
+            $Fields = [];
         }
 
         // Data checks
@@ -215,7 +215,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
      * @return array
      */
     private function getProfileField($Name) {
-        $Field = c('ProfileExtender.Fields.'.$Name, array());
+        $Field = c('ProfileExtender.Fields.'.$Name, []);
         if (!isset($Field['FormType'])) {
             $Field['FormType'] = 'TextBox';
         }
@@ -331,7 +331,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
             // Save if no errors
             if (!$Sender->Form->errorCount()) {
-                $Data = c('ProfileExtender.Fields.'.$Name, array());
+                $Data = c('ProfileExtender.Fields.'.$Name, []);
                 $Data = array_merge((array)$Data, (array)$FormPostValues);
                 saveToConfig('ProfileExtender.Fields.'.$Name, $Data);
                 $Sender->setRedirectTo('/settings/profileextender');
@@ -439,7 +439,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 $BirthdayStamp = Gdn_Format::toTimestamp($Sender->User->DateOfBirth);
                 if ($BirthdayStamp) {
                     $ProfileFields['DateOfBirth'] = date(t('Birthday Format', 'F j, Y'), $BirthdayStamp);
-                    $AllFields['DateOfBirth'] = array('Label' => t('Birthday'), 'OnProfile' => true);
+                    $AllFields['DateOfBirth'] = ['Label' => t('Birthday'), 'OnProfile' => true];
                 }
             }
 
@@ -517,7 +517,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
 
         // Determine profile fields we need to add.
         $fields = $this->getProfileFields();
-        $columnNames = array('Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName');
+        $columnNames = ['Name', 'Email', 'Joined', 'Last Seen', 'Discussions', 'Comments', 'Points', 'InviteUserID', 'InvitedByName'];
 
         // Set up our basic query.
         Gdn::sql()
@@ -580,7 +580,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
             $OnRegister = array_filter((array)explode(',', $OnRegister));
 
             // Assign new data structure
-            $NewData = array();
+            $NewData = [];
             foreach ($Fields as $Field) {
                 if (unicodeRegexSupport()) {
                     $regex = '/[^\pL\pN]/u';
@@ -600,7 +600,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                 }
 
                 // Convert
-                $NewData[$Name] = array(
+                $NewData[$Name] = [
                     'Label' => $Field,
                     'Length' => $Length,
                     'FormType' => 'TextBox',
@@ -610,7 +610,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
                     'Required' => 0,
                     'Locked' => 0,
                     'Sort' => 0
-                );
+                ];
             }
             saveToConfig('ProfileExtender.Fields', $NewData);
         }

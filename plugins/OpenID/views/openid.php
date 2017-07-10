@@ -6,10 +6,10 @@
 <div class="FilterMenu">
     <?php
     $FormAction = $this->Plugin->AutoTogglePath();
-    echo $this->Form->open(array(
+    echo $this->Form->open([
         'action' => url($FormAction),
         'jsaction' => $FormAction
-    ));
+    ]);
     echo $this->Form->errors();
 
     $PluginName = $this->Plugin->GetPluginKey('Name');

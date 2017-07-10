@@ -9,7 +9,7 @@
 
 <?php
     if ($description = $this->Description()) {
-        echo wrap($description, 'div', array('class' => 'P PageDescription'));
+        echo wrap($description, 'div', ['class' => 'P PageDescription']);
     }
     $this->fireEvent('AfterPageTitle');
 

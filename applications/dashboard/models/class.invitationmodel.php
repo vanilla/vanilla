@@ -78,7 +78,7 @@ class InvitationModel extends Gdn_Model {
      * @return bool
      * @throws Exception
      */
-    public function save($FormPostValues, $UserModel, $Options = array()) {
+    public function save($FormPostValues, $UserModel, $Options = []) {
         $Session = Gdn::session();
         $UserID = $Session->UserID;
         $SendEmail = val('SendEmail', $Options, true);
@@ -114,14 +114,14 @@ class InvitationModel extends Gdn_Model {
             }
 
             // Make sure that the email does not already belong to an account in the application.
-            $TestData = $UserModel->getWhere(array('Email' => $Email));
+            $TestData = $UserModel->getWhere(['Email' => $Email]);
             if ($TestData->numRows() > 0) {
                 $this->Validation->addValidationResult('Email', 'The email you have entered is already related to an existing account.');
                 return false;
             }
 
             // Make sure that the email does not already belong to an invitation in the application.
-            $TestData = $this->getWhere(array('Email' => $Email));
+            $TestData = $this->getWhere(['Email' => $Email]);
             $DeleteID = false;
             if ($TestData->numRows() > 0) {
                 if (!$Resend) {
@@ -229,7 +229,7 @@ class InvitationModel extends Gdn_Model {
         }
 
         // Delete it.
-        $this->SQL->delete($this->Name, array('InvitationID' => $InvitationID));
+        $this->SQL->delete($this->Name, ['InvitationID' => $InvitationID]);
 
         // Add the invitation back onto the user's account if the invitation has not been accepted.
         if (!$Invitation->AcceptedUserID) {
@@ -247,7 +247,7 @@ class InvitationModel extends Gdn_Model {
         $Code = BetterRandomString(16, 'Aa0');
 
         // Make sure the string doesn't already exist in the invitation table
-        $CodeData = $this->getWhere(array('Code' => $Code));
+        $CodeData = $this->getWhere(['Code' => $Code]);
         if ($CodeData->numRows() > 0) {
             return $this->GetInvitationCode();
         } else {

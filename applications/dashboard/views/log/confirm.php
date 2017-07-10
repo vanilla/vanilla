@@ -19,7 +19,7 @@
             <?php echo '<div class="modal-body">', t('Make sure you select at least one item before continuing.'), '</div>';
         } else { ?>
             <?php
-            echo $this->Form->open(array('id' => 'ConfirmForm', 'Action' => $this->data('ActionUrl')));
+            echo $this->Form->open(['id' => 'ConfirmForm', 'Action' => $this->data('ActionUrl')]);
             echo $this->Form->errors(); ?>
             <div class="modal-body">
                 <?php
@@ -94,8 +94,8 @@
             </div>
             <div class="modal-footer">
                 <?php
-                echo anchor(t("No, get me outta here!"), '#', array('class' => 'btn btn-text ConfirmNo'));
-                echo $this->Form->button('Yes, continue', array('class' => 'btn btn-primary ConfirmYes'));
+                echo anchor(t("No, get me outta here!"), '#', ['class' => 'btn btn-text ConfirmNo']);
+                echo $this->Form->button('Yes, continue', ['class' => 'btn btn-primary ConfirmYes']);
                 ?>
             </div>
 

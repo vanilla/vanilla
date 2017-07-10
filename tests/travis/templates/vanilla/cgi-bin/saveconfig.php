@@ -207,7 +207,7 @@ class SimpleConfig {
 
                 if (is_array($selection)) {
                     if (!isset($selection[$subSelector])) {
-                        $selection[$subSelector] = array();
+                        $selection[$subSelector] = [];
                     }
                     $selection = &$selection[$subSelector];
                 } elseif (is_object($selection)) {

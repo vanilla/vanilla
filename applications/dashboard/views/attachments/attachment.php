@@ -94,11 +94,11 @@ if (!function_exists('WriteErrorAttachment')) {
      * @return string
      */
     function writeErrorAttachment($Attachment) {
-        WriteGenericAttachment(array(
+        WriteGenericAttachment([
             'Type' => 'Warning',
             'Icon' => 'warning-sign',
             'Body' => $Attachment['Error']
-        ));
+        ]);
     }
 }
 

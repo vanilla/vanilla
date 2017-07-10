@@ -14,7 +14,7 @@
 class MessageController extends DashboardController {
 
     /** @var array Objects to prep. */
-    public $Uses = array('Form', 'MessageModel');
+    public $Uses = ['Form', 'MessageModel'];
 
     /**
      * Form to create a new message.
@@ -43,7 +43,7 @@ class MessageController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->MessageModel->delete(array('MessageID' => $MessageID));
+        $this->MessageModel->delete(['MessageID' => $MessageID]);
 
         // Reset the message cache
         $this->MessageModel->setMessageCache();
@@ -65,7 +65,7 @@ class MessageController extends DashboardController {
         $Session = Gdn::session();
 
         if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
-            $Prefs = $Session->getPreference('DismissedMessages', array());
+            $Prefs = $Session->getPreference('DismissedMessages', []);
             $Prefs[] = $MessageID;
             $Session->setPreference('DismissedMessages', $Prefs);
         }
@@ -106,7 +106,7 @@ class MessageController extends DashboardController {
         }
 
         $CategoriesData = CategoryModel::categories();
-        $Categories = array();
+        $Categories = [];
         foreach ($CategoriesData as $Row) {
             if ($Row['CategoryID'] < 0) {
                 continue;
@@ -208,9 +208,9 @@ class MessageController extends DashboardController {
         $messageModel->setProperty($messageID, 'Enabled', $enabled);
         $this->MessageModel->setMessageCache();
         if ($enabled === '1') {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
         } else {
-            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+            $newToggle = wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
         }
         $this->jsonTarget("#toggle-".$messageID, $newToggle);
         if ($enabled === '1') {

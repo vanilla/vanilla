@@ -131,7 +131,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
         $Args = func_get_args();
         $ThingType = array_shift($Args);
 
-        return call_user_func_array(array($this, $ThingType), $Args);
+        return call_user_func_array([$this, $ThingType], $Args);
     }
 
     /**
@@ -147,7 +147,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
 
         $FoundRegardingType = strtolower(GetValue('Type', $RegardingData));
         if (!is_array($RegardingType)) {
-            $RegardingType = array($RegardingType);
+            $RegardingType = [$RegardingType];
         }
         $Found = false;
         foreach ($RegardingType as $RegardingTypeInstance) {
@@ -161,7 +161,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
 
         $FoundForeignType = strtolower(val('ForeignType', $RegardingData));
         if (!is_array($ForeignType)) {
-            $ForeignType = array($ForeignType);
+            $ForeignType = [$ForeignType];
         }
         $Found = false;
         foreach ($ForeignType as $ForeignTypeInstance) {
@@ -214,7 +214,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
      * @param $ForeignIDs
      */
     protected function cacheRegarding($Sender, $ParentType, $ParentID, $ForeignType, $ForeignIDs) {
-        $Sender->RegardingCache = array();
+        $Sender->RegardingCache = [];
         $ChildRegardingData = $this->regardingModel()->getAll($ForeignType, $ForeignIDs);
         $ParentRegardingData = $this->regardingModel()->get($ParentType, $ParentID);
 
@@ -229,7 +229,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
               }
         */
 
-        $this->RegardingCache = array();
+        $this->RegardingCache = [];
     }
 
     /**
@@ -249,12 +249,12 @@ class Gdn_Regarding extends Gdn_Pluggable {
             if (class_exists($EntityModelName)) {
                 $EntityModel = new $EntityModelName();
                 $Entity = $EntityModel->getID(val('ForeignID', $RegardingData));
-                $this->EventArguments = array_merge($this->EventArguments, array(
+                $this->EventArguments = array_merge($this->EventArguments, [
                     'EventSender' => $Sender,
                     'Entity' => $Entity,
                     'RegardingData' => $RegardingData,
                     'Options' => null
-                ));
+                ]);
                 $this->fireEvent('RegardingDisplay');
             }
         } catch (Exception $e) {

@@ -38,7 +38,7 @@ class Gdn_Filecache extends Gdn_Cache {
         parent::__construct();
         $this->cacheType = Gdn_Cache::CACHE_TYPE_FILE;
 
-        $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, array('gzcompress', 'gzuncompress'));
+        $this->registerFeature(Gdn_Cache::FEATURE_COMPRESS, ['gzcompress', 'gzuncompress']);
         $this->registerFeature(Gdn_Cache::FEATURE_EXPIRY);
         $this->registerFeature(Gdn_Cache::FEATURE_TIMEOUT);
     }
@@ -51,9 +51,9 @@ class Gdn_Filecache extends Gdn_Cache {
      * config file.
      */
     public function autorun() {
-        $this->addContainer(array(
+        $this->addContainer([
             Gdn_Cache::CONTAINER_LOCATION => c('Cache.Filecache.Store')
-        ));
+        ]);
     }
 
     /**
@@ -66,9 +66,9 @@ class Gdn_Filecache extends Gdn_Cache {
      */
     public function addContainer($Options) {
 
-        $Required = array(
+        $Required = [
             Gdn_Cache::CONTAINER_LOCATION
-        );
+        ];
 
         $KeyedRequirements = array_fill_keys($Required, 1);
         if (sizeof(array_intersect_key($Options, $KeyedRequirements)) != sizeof($Required)) {
@@ -83,10 +83,10 @@ class Gdn_Filecache extends Gdn_Cache {
         }
 
         // Merge the options array with our local defaults
-        $Defaults = array(
+        $Defaults = [
             Gdn_Cache::CONTAINER_ONLINE => true,
             Gdn_Cache::CONTAINER_TIMEOUT => 1
-        );
+        ];
         $FinalContainer = array_merge($Defaults, $Options);
         if ($FinalContainer[Gdn_Cache::CONTAINER_ONLINE]) {
             $this->containers[] = $FinalContainer;
@@ -141,7 +141,7 @@ class Gdn_Filecache extends Gdn_Cache {
         }
 
         $CacheLocation = $Container[Gdn_Cache::CONTAINER_LOCATION];
-        $SplitCacheLocation = CombinePaths(array($CacheLocation, $TargetFolder));
+        $SplitCacheLocation = CombinePaths([$CacheLocation, $TargetFolder]);
 
         $Flags = ($Flags & Gdn_Filecache::O_CREATE) ? Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE : 0;
         $CacheLocationOK = Gdn_FileSystem::checkFolderR($SplitCacheLocation, $Flags);
@@ -149,11 +149,11 @@ class Gdn_Filecache extends Gdn_Cache {
             return $this->failure("Computed cache folder '{$SplitCacheLocation}' could not be found, or created.");
         }
 
-        $CacheFile = rtrim(CombinePaths(array($SplitCacheLocation, $KeyHash)), '/');
+        $CacheFile = rtrim(CombinePaths([$SplitCacheLocation, $KeyHash]), '/');
 
-        return array_merge($Container, array(
+        return array_merge($Container, [
             Gdn_Filecache::CONTAINER_CACHEFILE => $CacheFile
-        ));
+        ]);
     }
 
     /**
@@ -164,7 +164,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @param array $Options
      * @return bool
      */
-    public function add($Key, $Value, $Options = array()) {
+    public function add($Key, $Value, $Options = []) {
         if ($this->exists($Key) !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
@@ -188,12 +188,12 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool
      * @throws Exception
      */
-    public function store($Key, $Value, $Options = array()) {
-        $Defaults = array(
+    public function store($Key, $Value, $Options = []) {
+        $Defaults = [
             Gdn_Cache::FEATURE_COMPRESS => false,
             Gdn_Cache::FEATURE_TIMEOUT => false,
             Gdn_Cache::FEATURE_EXPIRY => false
-        );
+        ];
         $FinalOptions = array_merge($Defaults, $Options);
 
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $FinalOptions)) {
@@ -214,11 +214,11 @@ class Gdn_Filecache extends Gdn_Cache {
             $Value = call_user_func($Compressor, $Value);
         }
 
-        $Context = implode('|', array(
+        $Context = implode('|', [
             intval($FinalOptions[Gdn_Cache::FEATURE_COMPRESS]),
             intval($FinalOptions[Gdn_Cache::FEATURE_EXPIRY]),
             time()
-        ));
+        ]);
         $Value = $Context."\n\n".$Value;
         try {
             $StoreOp = file_put_contents($CacheFile, $Value, LOCK_EX | LOCK_NB);
@@ -240,7 +240,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @return bool|mixed|null|string
      * @throws Exception
      */
-    public function get($Key, $Options = array()) {
+    public function get($Key, $Options = []) {
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $Options)) {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
@@ -352,7 +352,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @param array $Options
      * @return bool
      */
-    public function remove($Key, $Options = array()) {
+    public function remove($Key, $Options = []) {
         if (array_key_exists(Gdn_Filecache::OPT_PASSTHRU_CONTAINER, $Options)) {
             $Container = $Options[Gdn_Filecache::OPT_PASSTHRU_CONTAINER];
         } else {
@@ -389,7 +389,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @param array $Options
      * @return bool
      */
-    public function replace($Key, $Value, $Options = array()) {
+    public function replace($Key, $Value, $Options = []) {
         $Container = $this->_exists($Key);
         if ($Container === Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
@@ -407,7 +407,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @param array $Options
      * @return bool
      */
-    public function increment($Key, $Amount = 1, $Options = array()) {
+    public function increment($Key, $Amount = 1, $Options = []) {
         $Container = $this->_exists($Key);
         if ($Container !== Gdn_Cache::CACHEOP_FAILURE) {
             return Gdn_Cache::CACHEOP_FAILURE;
@@ -434,7 +434,7 @@ class Gdn_Filecache extends Gdn_Cache {
      * @param array $Options
      * @return bool
      */
-    public function decrement($Key, $Amount = 1, $Options = array()) {
+    public function decrement($Key, $Amount = 1, $Options = []) {
         return $this->increment($Key, 0 - $Amount, $Options);
     }
 

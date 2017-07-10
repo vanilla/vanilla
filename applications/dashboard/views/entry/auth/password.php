@@ -4,7 +4,7 @@
     <?php
     // Make sure to force this form to post to the correct place in case the view is
     // rendered within another view (ie. /dashboard/entry/index/):
-    echo $this->Form->open(array('Action' => $this->data('FormUrl', url('/entry/auth/password')), 'id' => 'Form_User_SignIn'));
+    echo $this->Form->open(['Action' => $this->data('FormUrl', url('/entry/auth/password')), 'id' => 'Form_User_SignIn']);
     echo $this->Form->errors();
     ?>
     <ul>
@@ -17,14 +17,14 @@
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', array('class' => 'InputBox Password'));
+            echo $this->Form->Input('Password', 'password', ['class' => 'InputBox Password']);
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
         <li class="Buttons">
             <?php
             echo $this->Form->button('Sign In');
-            echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), array('value' => '1', 'id' => 'SignInRememberMe'));
+            echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
             ?>
         </li>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>
@@ -44,7 +44,7 @@
     </ul>
     <?php
     echo $this->Form->close();
-    echo $this->Form->open(array('Action' => url('/entry/passwordrequest'), 'id' => 'Form_User_Password', 'style' => 'display: none;'));
+    echo $this->Form->open(['Action' => url('/entry/passwordrequest'), 'id' => 'Form_User_Password', 'style' => 'display: none;']);
     ?>
     <ul>
         <li>

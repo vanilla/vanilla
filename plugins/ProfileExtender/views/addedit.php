@@ -30,7 +30,7 @@ echo $this->Form->errors();
                 echo wrap(t('One option per line'), 'div', ['class' => 'info']); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->textBox('Options', array('MultiLine' => TRUE)); ?>
+                <?php echo $this->Form->textBox('Options', ['MultiLine' => TRUE]); ?>
             </div>
         </div>
     </div>

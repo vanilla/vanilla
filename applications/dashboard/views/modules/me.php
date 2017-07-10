@@ -8,7 +8,7 @@ if ($this->CssClass)
 $DashboardCount = 0;
 $ModerationCount = 0;
 // Spam & Moderation Queue
-if ($Session->checkPermission(array('Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
+if ($Session->checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false)) {
     $LogModel = new LogModel();
     //$SpamCount = $LogModel->GetOperationCount('spam');
     $ModerationCount = $LogModel->GetOperationCount('moderate,pending');
@@ -37,7 +37,7 @@ if ($Session->isValid()):
     $CNotifications = is_numeric($CountNotifications) && $CountNotifications > 0 ? '<span class="Alert NotificationsAlert">'.$CountNotifications.'</span>' : '';
 
     echo '<span class="ToggleFlyout" rel="/profile/notificationspopin">';
-    echo anchor(sprite('SpNotifications', 'Sprite Sprite16').Wrap(t('Notifications'), 'em').$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', array('title' => t('Notifications')));
+    echo anchor(sprite('SpNotifications', 'Sprite Sprite16').Wrap(t('Notifications'), 'em').$CNotifications, userUrl($User), 'MeButton FlyoutButton js-clear-notifications', ['title' => t('Notifications')]);
     echo sprite('SpFlyoutHandle', 'Arrow');
     echo '<div class="Flyout FlyoutMenu"></div></span>';
 
@@ -46,7 +46,7 @@ if ($Session->isValid()):
         $CountInbox = val('CountUnreadConversations', Gdn::session()->User);
         $CInbox = is_numeric($CountInbox) && $CountInbox > 0 ? ' <span class="Alert">'.$CountInbox.'</span>' : '';
         echo '<span class="ToggleFlyout" rel="/messages/popin">';
-        echo anchor(sprite('SpInbox', 'Sprite Sprite16').Wrap(t('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', array('title' => t('Inbox')));
+        echo anchor(sprite('SpInbox', 'Sprite Sprite16').Wrap(t('Inbox'), 'em').$CInbox, '/messages/all', 'MeButton FlyoutButton', ['title' => t('Inbox')]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -54,7 +54,7 @@ if ($Session->isValid()):
     // Bookmarks
     if (Gdn::addonManager()->lookupAddon('Vanilla')) {
         echo '<span class="ToggleFlyout" rel="/discussions/bookmarkedpopin">';
-        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16').Wrap(t('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', array('title' => t('Bookmarks')));
+        echo anchor(sprite('SpBookmarks', 'Sprite Sprite16').Wrap(t('Bookmarks'), 'em'), '/discussions/bookmarked', 'MeButton FlyoutButton', ['title' => t('Bookmarks')]);
         echo sprite('SpFlyoutHandle', 'Arrow');
         echo '<div class="Flyout FlyoutMenu"></div></span>';
     }
@@ -102,10 +102,10 @@ else:
 
     echo '<div class="SignInLinks">';
 
-    echo anchor(t('Sign In'), SignInUrl($this->_Sender->SelfUrl), (SignInPopup() ? ' SignInPopup' : ''), array('rel' => 'nofollow'));
+    echo anchor(t('Sign In'), SignInUrl($this->_Sender->SelfUrl), (SignInPopup() ? ' SignInPopup' : ''), ['rel' => 'nofollow']);
     $Url = RegisterUrl($this->_Sender->SelfUrl);
     if (!empty($Url))
-        echo Bullet(' ').anchor(t('Register'), $Url, 'ApplyButton', array('rel' => 'nofollow')).' ';
+        echo Bullet(' ').anchor(t('Register'), $Url, 'ApplyButton', ['rel' => 'nofollow']).' ';
     echo '</div>';
 
     echo ' <div class="SignInIcons">';

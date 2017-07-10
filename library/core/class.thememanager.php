@@ -115,7 +115,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 continue;
             }
 
-            $ThemePath = CombinePaths(array($SearchPath, $ThemeFolderName));
+            $ThemePath = CombinePaths([$SearchPath, $ThemeFolderName]);
             $ThemeFiles = $this->findThemeFilesOld($ThemePath);
 
             if (val('about', $ThemeFiles) === false) {
@@ -214,19 +214,19 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         $ThemeFiles = scandir($themePath);
-        $TestPatterns = array(
+        $TestPatterns = [
             'about\.php' => 'about',
             '.*\.theme\.php' => 'about',
             'class\..*themehooks\.php' => 'hooks',
             'screenshot\.(gif|jpg|jpeg|png)' => 'screenshot',
             'mobile\.(gif|jpg|jpeg|png)' => 'mobilescreenshot'
-        );
+        ];
 
-        $MatchedThemeFiles = array();
+        $MatchedThemeFiles = [];
         foreach ($ThemeFiles as $ThemeFile) {
             foreach ($TestPatterns as $TestPattern => $FileType) {
                 if (preg_match('!'.$TestPattern.'!', $ThemeFile)) {
-                    $MatchedThemeFiles[$FileType] = combinePaths(array($themePath, $ThemeFile));
+                    $MatchedThemeFiles[$FileType] = combinePaths([$themePath, $ThemeFile]);
                 }
             }
         }
@@ -258,7 +258,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         }
 
         $ParseVariableName = '$'.$VariableName;
-        ${$VariableName} = array();
+        ${$VariableName} = [];
 
         foreach ($Lines as $Line) {
             if ($InfoBuffer && substr(trim($Line), -2) == ');') {
@@ -392,11 +392,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             Logger::event(
                 'theme_changed',
                 'The {themeType} theme was changed from {oldTheme} to {newTheme}.',
-                array(
+                [
                     'themeType' => 'desktop',
                     'oldTheme' => $oldTheme,
                     'newTheme' => $newTheme
-                )
+                ]
             );
         }
     }
@@ -486,7 +486,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
         $ThemeInfo = $this->getThemeInfo($EnabledThemeName);
 
         if ($ThemeInfo === false) {
-            return array();
+            return [];
         }
 
         if ($ReturnInSourceFormat) {
@@ -499,7 +499,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             if (isset($Options['Styles'])) {
                 foreach ($Options['Styles'] as $Key => $Params) {
                     if (is_string($Params)) {
-                        $Options['Styles'][$Key] = array('Basename' => $Params);
+                        $Options['Styles'][$Key] = ['Basename' => $Params];
                     } elseif (is_array($Params) && isset($Params[0])) {
                         $Params['Basename'] = $Params[0];
                         unset($Params[0]);
@@ -510,7 +510,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
             if (isset($Options['Text'])) {
                 foreach ($Options['Text'] as $Key => $Params) {
                     if (is_string($Params)) {
-                        $Options['Text'][$Key] = array('Type' => $Params);
+                        $Options['Text'][$Key] = ['Type' => $Params];
                     } elseif (is_array($Params) && isset($Params[0])) {
                         $Params['Type'] = $Params[0];
                         unset($Params[0]);
@@ -589,11 +589,11 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 'theme_changed',
                 Logger::NOTICE,
                 'The {themeType} theme changed from {oldTheme} to {newTheme}.',
-                array(
+                [
                     'themeType' => $IsMobile ? 'mobile' : 'desktop',
                     'oldTheme' => $oldTheme,
                     'newTheme' => $ThemeName
-                )
+                ]
             );
         }
 

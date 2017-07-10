@@ -24,7 +24,7 @@ class Gdn_ApplicationManager {
     private $enabledApplications = null;
 
     /** @var array The valid paths to search for applications. */
-    public $Paths = array(PATH_APPLICATIONS);
+    public $Paths = [PATH_APPLICATIONS];
 
     /**
      * @var AddonManager
@@ -205,7 +205,7 @@ class Gdn_ApplicationManager {
         $AvailableApplications = $this->availableApplications();
         $RequiredApplications = val(
             'RequiredApplications',
-            val($applicationName, $AvailableApplications, array()),
+            val($applicationName, $AvailableApplications, []),
             false
         );
         $EnabledApplications = $this->enabledApplications();
@@ -220,7 +220,7 @@ class Gdn_ApplicationManager {
      */
     public function enableApplication($applicationName) {
         $this->testApplication($applicationName);
-        $ApplicationInfo = ArrayValueI($applicationName, $this->availableApplications(), array());
+        $ApplicationInfo = ArrayValueI($applicationName, $this->availableApplications(), []);
         $applicationName = $ApplicationInfo['Index'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
 
@@ -229,7 +229,7 @@ class Gdn_ApplicationManager {
             'addon_enabled',
             Logger::NOTICE,
             'The {addonName} application was enabled.',
-            array('addonName' => $applicationName)
+            ['addonName' => $applicationName]
         );
 
         $this->EventArguments['AddonName'] = $applicationName;
@@ -247,7 +247,7 @@ class Gdn_ApplicationManager {
      */
     public function testApplication($applicationName) {
         // Add the application to the $EnabledApplications array in conf/applications.php
-        $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), array());
+        $ApplicationInfo = arrayValueI($applicationName, $this->availableApplications(), []);
         $applicationName = $ApplicationInfo['Index'];
         $ApplicationFolder = val('Folder', $ApplicationInfo, '');
         if ($ApplicationFolder == '') {
@@ -310,7 +310,7 @@ class Gdn_ApplicationManager {
             'addon_disabled',
             Logger::NOTICE,
             'The {addonName} application was disabled.',
-            array('addonName' => $applicationName)
+            ['addonName' => $applicationName]
         );
 
         // Clear the object caches.

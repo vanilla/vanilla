@@ -261,7 +261,7 @@ class AddonManager {
      * Get all of the addons of a certain type.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return array
+     * @return array Return an array of addon indexed by their keys.
      */
     public function lookupAllByType($type) {
         if ($this->typeUsesMultiCaching($type)) {
@@ -270,14 +270,14 @@ class AddonManager {
         } else {
             $index = $this->getSingleIndex($type);
             $addons = [];
-            foreach ($index as $key => $subdir) {
-                $caseKey = basename($subdir);
+            foreach ($index as $addonDirName => $addonDirPath) {
                 try {
-                    $addons[$caseKey] = $this->lookupSingleCachedAddon($caseKey, $type);
+                    $addon = $this->lookupSingleCachedAddon($addonDirName, $type);
+                    $addons[$addon->getKey()] = $addon;
                 } catch (\Exception $ex) {
                     trigger_error("The $type in $subdir is invalid and will be skipped.", E_USER_WARNING);
                     // Clear the addon out of the index.
-                    $this->deleteSingleIndexKey($type, $key);
+                    $this->deleteSingleIndexKey($type, $addonDirName);
                 }
             }
             return $addons;
@@ -344,8 +344,9 @@ class AddonManager {
             } else {
                 // Each of these addons must be cached separately.
                 foreach ($addons as $addon) {
-                    $key = $addon->getKey();
-                    $this->saveArrayCache("$type/$key.php", $addon);
+                    /** @var Addon $addon */
+                    $addonDirName = basename($addon->getSubdir());
+                    $this->saveArrayCache("$type/$addonDirName.php", $addon);
                 }
                 // Save a index of the addon names.
                 $this->saveArrayCache("$type-index.php", $addonDirs);
@@ -443,7 +444,7 @@ class AddonManager {
      * Get the index for an addon type that is cached by single addon.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
-     * @return array Returns the index mapping lowercase addon name to directory.
+     * @return array Returns the index mapping [addonDirName => addonDirPath]
      */
     private function getSingleIndex($type) {
         if (!isset($this->singleIndex[$type])) {
@@ -466,13 +467,13 @@ class AddonManager {
      * Delete an item from a single index and re-cache it.
      *
      * @param string $type One of the **Addon::TYPE_*** constants.
-     * @param string $key The index key.
+     * @param string $addonDirName The addon's directory name.
      * @return bool Returns **true** if the item was in the index or **false** otherwise.
      */
-    private function deleteSingleIndexKey($type, $key) {
+    private function deleteSingleIndexKey($type, $addonDirName) {
         $index = $this->getSingleIndex($type);
-        if (isset($index[$key])) {
-            unset($index[$key]);
+        if (isset($index[$addonDirName])) {
+            unset($index[$addonDirName]);
 
             $this->saveArrayCache($this->cacheDir."/$type-index.php", $index);
 
@@ -485,37 +486,36 @@ class AddonManager {
     /**
      * Lookup an addon that is cached on a per-addon basis.
      *
-     * @param string $key The key of the addon.
+     * @param string $addonDirName The name of the addon directory.
      * @param string $type One of the **Addon::TYPE_*** constants.
      * @return Addon|null Returns an addon object or null if one isn't found.
      */
-    private function lookupSingleCachedAddon($key, $type) {
+    private function lookupSingleCachedAddon($addonDirName, $type) {
         // Look at our in-request cache.
-        if (isset($this->singleCache[$type][$key])) {
-            $result = $this->singleCache[$type][$key];
+        if (isset($this->singleCache[$type][$addonDirName])) {
+            $result = $this->singleCache[$type][$addonDirName];
             return $result === false ? null : $result;
         }
         // Look at the file cache.
         if ($this->isCacheEnabled()) {
-            $cachePath = "{$this->cacheDir}/$type/$key.php";
+            $cachePath = "{$this->cacheDir}/$type/$addonDirName.php";
             if (is_readable($cachePath)) {
                 $addon = require $cachePath;
-                $this->singleCache[$type][$key] = $addon;
+                $this->singleCache[$type][$addonDirName] = $addon;
                 return $addon;
             }
         }
         // Look for the addon itself.
         $addon = false;
         foreach ($this->scanDirs[$type] as $scanDir) {
-            $addonDir = PATH_ROOT."$scanDir/$key";
-            if (file_exists($addonDir)) {
-                $addon = new Addon("$scanDir/$key");
+            if (file_exists(PATH_ROOT."$scanDir/$addonDirName")) {
+                $addon = new Addon("$scanDir/$addonDirName");
                 break;
             }
         }
         // Cache the addon's information.
-        $this->saveArrayCache("$type/$key.php", $addon);
-        $this->singleCache[$type][$key] = $addon;
+        $this->saveArrayCache("$type/$addonDirName.php", $addon);
+        $this->singleCache[$type][$addonDirName] = $addon;
         return $addon === false ? null : $addon;
     }
 
@@ -749,15 +749,13 @@ class AddonManager {
     }
 
     /**
-     * Lookup a locale pack based on its key.
+     * Lookup a locale pack based on its directory name.
      *
-     * The local pack's key MUST be the same as the folder it's in.
-     *
-     * @param string $key The key of the locale pack.
+     * @param string $localeDirName The locale directory name.
      * @return null|Addon Returns an {@link Addon} object for the locale pack or **null** if it can't be found.
      */
-    public function lookupLocale($key) {
-        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_LOCALE);
+    public function lookupLocale($localeDirName) {
+        $result = $this->lookupSingleCachedAddon($localeDirName, Addon::TYPE_LOCALE);
         return $result;
     }
 
@@ -846,13 +844,11 @@ class AddonManager {
     /**
      * Lookup a theme based on its key.
      *
-     * The theme's key MUST be the same as the folder it's in.
-     *
-     * @param string $key The key of the theme.
+     * @param string $themeDirName The theme's directory name.
      * @return null|Addon Returns an {@link Addon} object for the theme or **null** if it can't be found.
      */
-    public function lookupTheme($key) {
-        $result = $this->lookupSingleCachedAddon($key, Addon::TYPE_THEME);
+    public function lookupTheme($themeDirName) {
+        $result = $this->lookupSingleCachedAddon($themeDirName, Addon::TYPE_THEME);
         return $result;
     }
 
@@ -986,6 +982,7 @@ class AddonManager {
         if ($this->typeUsesMultiCaching($type)) {
             return $this->lookupAddon($key);
         } else {
+            // key === dirName this case.
             return $this->lookupSingleCachedAddon($key, $type);
         }
     }

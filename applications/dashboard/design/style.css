@@ -68,7 +68,8 @@ textarea, input[type=text] {
 }
 
 .textarea-autosize {
-  transition: height 0.1s ease;
+  -webkit-transition: height 0.1s ease;
+          transition: height 0.1s ease;
   resize: none !important;
 }
 
@@ -2183,12 +2184,6 @@ body.Post .Popup a.Close {
   font-size: 100%;
   word-wrap: break-word;
   margin-top: 5px;
-}
-
-.Message:after {
-  content: "";
-  display: table;
-  clear: both;
 }
 
 .Message h1, .Message h2, .Message h3, .Message p, .Message .P {
@@ -5445,7 +5440,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
  * Text formatting alignment
  */
 .AlignLeft {
-  float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5457,7 +5451,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .AlignRight {
-  float: right;
   margin: 0 0 10px 10px;
   text-align: right;
 }
@@ -5505,7 +5498,8 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .SocialIcon {
-  transition: background-color 100ms;
+  -webkit-transition: background-color 100ms;
+          transition: background-color 100ms;
 }
 
 .SocialIcon .Icon,
@@ -5966,7 +5960,8 @@ Styleguide Attachments
 }
 
 .twitter-card-loaded {
-  transition: all 0.2s ease;
+  -webkit-transition: all 0.2s ease;
+          transition: all 0.2s ease;
   opacity: 1;
 }
 

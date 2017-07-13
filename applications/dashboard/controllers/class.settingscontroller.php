@@ -1565,6 +1565,13 @@ class SettingsController extends DashboardController {
         );
         $ConfigurationModel->setField($registrationOptions);
 
+        $roleModel = new RoleModel();
+        $unconfirmedCount = $roleModel
+            ->getByType(RoleModel::TYPE_UNCONFIRMED)
+            ->count();
+        $this->setData('ConfirmationSupported', $unconfirmedCount > 0);
+        unset($roleModel, $unconfirmedCount);
+
         $this->EventArguments['Validation'] = &$Validation;
         $this->EventArguments['Configuration'] = &$ConfigurationModel;
         $this->fireEvent('Registration');

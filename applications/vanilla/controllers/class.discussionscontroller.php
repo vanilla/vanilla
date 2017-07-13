@@ -690,6 +690,8 @@ class DiscussionsController extends VanillaController {
 
     /**
      * Add the discussions/tagged/{TAG} endpoint.
+     * Also supports comma separated mutltiple tags (discussions/tagged/{TAG,TAG2}).
+     *
      */
     public function tagged() {
         if (!c('Tagging.Discussions.Enabled')) {
@@ -722,40 +724,48 @@ class DiscussionsController extends VanillaController {
         $Tag = stringEndsWith($Tag, '.rss', true, true);
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
 
-        $MultipleTags = strpos($Tag, ',') !== false;
-
         $this->setData('Tag', $Tag, true);
 
-        $TagModel = TagModel::instance();
-        $RecordCount = false;
-        if (!$MultipleTags) {
-            $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
-
-            if (count($Tags) == 0) {
-                throw notFoundException('Page');
-            }
-
-            if (count($Tags) > 1) {
-                foreach ($Tags as $TagRow) {
-                    if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
-                        break;
-                    }
-                }
-            } else {
-                $TagRow = array_pop($Tags);
-            }
-            $Tags = $TagModel->getRelatedTags($TagRow);
-
-            $RecordCount = $TagRow['CountDiscussions'];
-            $this->setData('CountDiscussions', $RecordCount);
-            $this->setData('Tags', $Tags);
-            $this->setData('Tag', $TagRow);
-
-            $ChildTags = $TagModel->getChildTags($TagRow['TagID']);
-            $this->setData('ChildTags', $ChildTags);
+        $tagModel = TagModel::instance();
+        // If more than one tag has been passed via GET, pass them as an array to the model.
+        $multipleTags = strpos($Tag, ',') !== false;
+        if ($multipleTags) {
+            $tags = $tagModel->getWhere(['Name' => explode(',', $Tag)])->resultArray();
+        } else {
+            $tags = $tagModel->getWhere(['Name' => $Tag])->resultArray();
         }
 
-        $this->title(htmlspecialchars($TagRow['FullName']));
+        if (count($tags) == 0) {
+            throw notFoundException('Page');
+        }
+
+        // Get the number of discussions and the page title by either looping
+        // through all the tags or getting it from the result from the TagModel.
+        $recordCount = false;
+        if (count($tags) > 1) {
+            $fullNames = [];
+            foreach ($tags as $TagRow) {
+                $recordCount += val('CountDiscussions', $TagRow, 0);
+                $fullNames[] = val('FullName', $TagRow);
+                if ($TagRow['CategoryID'] == val('CategoryID', $Category)) {
+                    break;
+                }
+            }
+            $pageTitle = implode(", ", $fullNames);
+        } else {
+            $TagRow = array_pop($tags);
+            $recordCount = val('CountDiscussions', $TagRow, 0);
+            $tags = $tagModel->getRelatedTags($TagRow);
+            $this->setData('Tags', $tags);
+            $this->setData('Tag', $TagRow);
+            $ChildTags = $tagModel->getChildTags($TagRow['TagID']);
+            $this->setData('ChildTags', $ChildTags);
+            $pageTitle = $TagRow['FullName'];
+        }
+
+        $this->setData('CountDiscussions', $recordCount);
+        $this->title(htmlspecialchars($pageTitle));
+
         $UrlTag = empty($CategoryCode) ? rawurlencode($Tag) : rawurlencode($CategoryCode).'/'.rawurlencode($Tag);
         if (urlencode($Tag) == $Tag) {
             $this->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$UrlTag", PageNumber($Offset, $Limit, true)), true));
@@ -786,7 +796,7 @@ class DiscussionsController extends VanillaController {
 
         $DiscussionModel = new DiscussionModel();
 
-        $TagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
+        $tagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
 
         $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, array('Announce' => 'all'));
 
@@ -805,7 +815,7 @@ class DiscussionsController extends VanillaController {
         $this->Pager->configure(
             $Offset,
             $Limit,
-            $RecordCount,
+            $recordCount,
             $this->data('_PagerUrl')
         );
         $this->setData('_Page', $Page);

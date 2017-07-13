@@ -40,7 +40,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      */
     public function allowFileExtension($Extension) {
         if ($Extension === null) {
-            $this->_AllowedFileExtensions = array();
+            $this->_AllowedFileExtensions = [];
         } elseif (is_array($Extension))
             $this->_AllowedFileExtensions = array_merge($this->_AllowedFileExtensions, $Extension);
         else {
@@ -82,7 +82,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      */
     public function clear() {
         $this->_MaxFileSize = self::unformatFileSize(Gdn::config('Garden.Upload.MaxFileSize', ''));
-        $this->_AllowedFileExtensions = Gdn::config('Garden.Upload.AllowedFileExtensions', array());
+        $this->_AllowedFileExtensions = Gdn::config('Garden.Upload.AllowedFileExtensions', []);
     }
 
     /**
@@ -137,7 +137,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return string the formatted filesize.
      */
     public static function formatFileSize($Bytes, $Precision = 1) {
-        $Units = array('B', 'K', 'M', 'G', 'T');
+        $Units = ['B', 'K', 'M', 'G', 'T'];
 
         $Bytes = max((int)$Bytes, 0);
         $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
@@ -169,31 +169,31 @@ class Gdn_Upload extends Gdn_Pluggable {
         $PathUploads = str_replace('\\', '/', PATH_UPLOADS);
 
         if (preg_match('`^https?://`', $Name)) {
-            $Result = array('Name' => $Name, 'Type' => 'external', 'SaveName' => $Name, 'SaveFormat' => '%s', 'Url' => $Name,);
+            $Result = ['Name' => $Name, 'Type' => 'external', 'SaveName' => $Name, 'SaveFormat' => '%s', 'Url' => $Name,];
             return $Result;
         } elseif (stringBeginsWith($Name, $PathUploads)) {
             $Name = ltrim(substr($Name, strlen($PathUploads)), '/');
             // This is an upload.
-            $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+            $Result = ['Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s'];
         } elseif (preg_match('`^~([^/]*)/(.*)$`', $Name, $Matches)) {
             // The first part of the name tells us the type.
             $Type = $Matches[1];
             $Name = $Matches[2];
 
-            $Result = array('Name' => $Name, 'Type' => $Type, 'SaveName' => "~$Type/$Name", 'SaveFormat' => "~$Type/%s");
+            $Result = ['Name' => $Name, 'Type' => $Type, 'SaveName' => "~$Type/$Name", 'SaveFormat' => "~$Type/%s"];
         } else {
             $Parts = parse_url($Name);
             if (empty($Parts['scheme'])) {
                 $Name = ltrim($Name, '/');
                 // This is an upload in the uploads folder.
-                $Result = array('Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s');
+                $Result = ['Name' => $Name, 'Type' => '', 'SaveName' => $Name, 'SaveFormat' => '%s'];
             } else {
                 // This is a url in the format type:://domain/path.
-                $Result = array(
+                $Result = [
                     'Name' => ltrim(val('path', $Parts), '/'),
                     'Type' => $Parts['scheme'],
                     'Domain' => val('host', $Parts)
-                );
+                ];
 
                 $SaveFormat = "{$Result['Type']}://{$Result['Domain']}/%s";
                 $Result['SaveName'] = sprintf($SaveFormat, $Result['Name']);
@@ -222,7 +222,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return int The number of bytes in the string.
      */
     public static function unformatFileSize($Formatted) {
-        $Units = array('B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024);
+        $Units = ['B' => 1, 'K' => 1024, 'M' => 1024 * 1024, 'G' => 1024 * 1024 * 1024, 'T' => 1024 * 1024 * 1024 * 1024];
 
         if (preg_match('/([0-9.]+)\s*([A-Z]*)/i', $Formatted, $Matches)) {
             $Number = floatval($Matches[1]);
@@ -303,7 +303,7 @@ class Gdn_Upload extends Gdn_Pluggable {
      * @return array|bool
      * @throws Exception
      */
-    public function saveAs($Source, $Target, $Options = array()) {
+    public function saveAs($Source, $Target, $Options = []) {
         $this->EventArguments['Path'] = $Source;
         $Parsed = self::parse($Target);
         $this->EventArguments['Parsed'] =& $Parsed;

@@ -99,7 +99,7 @@ class Emoji {
         $this->assetPath = asset('/resources/emoji', '//');
 
         // Initialize the canonical list. (emoji)
-        $this->emoji = array(
+        $this->emoji = [
             // Smileys
             'smile' => 'smile.png',
             'smiley' => 'smiley.png',
@@ -176,7 +176,7 @@ class Emoji {
 
             // Custom icons, canonical naming
             'trollface' => 'trollface.png'
-        );
+        ];
 
         // Some aliases self-referencing the canonical list. Use this syntax.
 
@@ -184,7 +184,7 @@ class Emoji {
         $this->emoji['error'] = &$this->emoji['grey_question'];
 
         // Initialize the alias list. (emoticons)
-        $this->aliases = array(
+        $this->aliases = [
             ':)' => 'smile',
             ':D' => 'lol',
             '=)' => 'smiley',
@@ -205,9 +205,9 @@ class Emoji {
             'o:)' => 'innocent',
             '<3' => 'heart',
             '>:)' => 'naughty'
-        );
+        ];
 
-        $this->archive = array(
+        $this->archive = [
             'disappointed_relieved' => 'disappointed_relieved.png',
             'dizzy_face' => 'dizzy.png',
             'broken_heart' => 'heartbreak.png',
@@ -219,9 +219,9 @@ class Emoji {
             'stuck_out_tongue' => 'tongue.png',
             'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
             'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
-        );
+        ];
 
-        $this->editorList = array(
+        $this->editorList = [
             ':)' => 'smile',
             ':D' => 'lol',
             ':(' => 'disappointed',
@@ -238,7 +238,7 @@ class Emoji {
             '<3' => 'heart',
             'o:)' => 'innocent',
             '>:)' => 'naughty'
-        );
+        ];
 
         if (c('Garden.EmojiSet') === 'none') {
             $this->enabled = false;
@@ -258,20 +258,20 @@ class Emoji {
         if ($c && $this->enabled) {
             $emojis = $this->getEmoji();
             $emojiAssetPath = $this->getAssetPath();
-            $emoji = array();
+            $emoji = [];
 
             foreach ($emojis as $name => $data) {
-                $emoji[] = array(
+                $emoji[] = [
                     "name" => "".$name."",
                     "url" => Asset($emojiAssetPath.'/'.$data)
-                );
+                ];
             }
 
-            $emoji = array(
+            $emoji = [
                 'assetPath' => Asset($this->getAssetPath()),
                 'format' => $this->getFormat(),
                 'emoji' => $this->getEmoji()
-            );
+            ];
 
             $c->addDefinition('emoji', $emoji);
         }
@@ -435,7 +435,7 @@ class Emoji {
      */
     public function setEditorList($value) {
         // Convert the editor list to the proper format.
-        $list = array();
+        $list = [];
         $aliases2 = array_flip($this->aliases);
         foreach ($value as $emoji) {
             if (isset($this->aliases[$emoji])) {
@@ -553,7 +553,7 @@ class Emoji {
         if (array_key_exists('archive', $manifest)) {
             $this->setArchive($manifest['archive']);
         } else {
-            $this->setArchive(array());
+            $this->setArchive([]);
         }
 
         if (!empty($manifest['format'])) {

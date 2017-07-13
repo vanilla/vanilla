@@ -64,7 +64,7 @@ if (!class_exists('SideMenuModule', false)) {
          * @param bool $Permission
          * @param array $Attributes
          */
-        public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = array()) {
+        public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = []) {
             if (!array_key_exists($Group, $this->Items)) {
                 $this->AddItem($Group, t($Group));
             }
@@ -74,7 +74,7 @@ if (!class_exists('SideMenuModule', false)) {
                 $this->Items[$Group]['Permission'] = $Permission;
                 $this->Items[$Group]['Attributes'] = array_merge($this->Items[$Group]['Attributes'], $Attributes);
             } else {
-                $Link = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, '_Sort' => count($this->Items[$Group]['Links']));
+                $Link = ['Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, '_Sort' => count($this->Items[$Group]['Links'])];
                 if (isset($Attributes['After'])) {
                     $Link['After'] = $Attributes['After'];
                     unset($Attributes['After']);
@@ -91,9 +91,9 @@ if (!class_exists('SideMenuModule', false)) {
          * @param bool $Permission
          * @param array $Attributes
          */
-        public function addItem($Group, $Text, $Permission = false, $Attributes = array()) {
+        public function addItem($Group, $Text, $Permission = false, $Attributes = []) {
             if (!array_key_exists($Group, $this->Items)) {
-                $Item = array('Group' => $Group, 'Links' => array(), 'Attributes' => array(), '_Sort' => count($this->Items));
+                $Item = ['Group' => $Group, 'Links' => [], 'Attributes' => [], '_Sort' => count($this->Items)];
             } else {
                 $Item = $this->Items[$Group];
             }
@@ -148,7 +148,7 @@ if (!class_exists('SideMenuModule', false)) {
          *
          */
         public function clearGroups() {
-            $this->Items = array();
+            $this->Items = [];
         }
 
         /**
@@ -243,7 +243,7 @@ if (!class_exists('SideMenuModule', false)) {
          * Removes all links from a specific group.
          */
         public function removeLinks($Group) {
-            $this->Items[$Group] = array();
+            $this->Items[$Group] = [];
         }
 
         /**
@@ -295,12 +295,12 @@ if (!class_exists('SideMenuModule', false)) {
 
             // Sort the groups.
             $this->_Compare($this->Items);
-            uasort($this->Items, array($this, '_Compare'));
+            uasort($this->Items, [$this, '_Compare']);
 
             // Sort the items within the groups.
             foreach ($this->Items as &$Item) {
                 $this->_Compare($Item['Links']);
-                uasort($Item['Links'], array($this, '_Compare'));
+                uasort($Item['Links'], [$this, '_Compare']);
 
                 // Highlight the group.
                 if (val('Url', $Item) && url($Item['Url']) == $HighlightUrl) {

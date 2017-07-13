@@ -40,12 +40,12 @@ class Gdn_Smarty {
         // Assign some information about the user.
         $Session = Gdn::session();
         if ($Session->isValid()) {
-            $User = array(
+            $User = [
                 'Name' => htmlspecialchars($Session->User->Name),
                 'Photo' => '',
                 'CountNotifications' => (int)val('CountNotifications', $Session->User, 0),
                 'CountUnreadConversations' => (int)val('CountUnreadConversations', $Session->User, 0),
-                'SignedIn' => true);
+                'SignedIn' => true];
 
             $Photo = $Session->User->Photo;
             if ($Photo) {
@@ -85,10 +85,10 @@ class Gdn_Smarty {
 
         // Set the current locale for themes to take advantage of.
         $Locale = Gdn::locale()->Locale;
-        $CurrentLocale = array(
+        $CurrentLocale = [
             'Key' => $Locale,
             'Lang' => str_replace('_', '-', Gdn::locale()->language(true)) // mirrors html5 lang attribute
-        );
+        ];
         if (class_exists('Locale')) {
             $CurrentLocale['Language'] = Locale::getPrimaryLanguage($Locale);
             $CurrentLocale['Region'] = Locale::getRegion($Locale);
@@ -136,7 +136,7 @@ class Gdn_Smarty {
 
         $security->php_modifiers = array_merge(
             $security->php_functions,
-            array('sprintf')
+            ['sprintf']
         );
 
         $Smarty->enableSecurity($security);

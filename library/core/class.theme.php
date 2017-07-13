@@ -16,14 +16,14 @@
 class Gdn_Theme {
 
     /** @var array  */
-    protected static $_AssetInfo = array();
+    protected static $_AssetInfo = [];
 
     protected static $_BulletSep = false;
 
     protected static $_BulletSection = false;
 
     /** @var array */
-    protected static $_Section = array();
+    protected static $_Section = [];
 
     /**
      *
@@ -31,7 +31,7 @@ class Gdn_Theme {
      * @param string $AssetContainer
      */
     public static function assetBegin($AssetContainer = 'Panel') {
-        self::$_AssetInfo[] = array('AssetContainer' => $AssetContainer);
+        self::$_AssetInfo[] = ['AssetContainer' => $AssetContainer];
         ob_start();
     }
 
@@ -57,13 +57,13 @@ class Gdn_Theme {
      * @param array $Options
      * @return string
      */
-    public static function breadcrumbs($Data, $HomeLink = true, $Options = array()) {
+    public static function breadcrumbs($Data, $HomeLink = true, $Options = []) {
         $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
 
         $Result = '';
 
         if (!is_array($Data)) {
-            $Data = array();
+            $Data = [];
         }
 
 
@@ -73,7 +73,7 @@ class Gdn_Theme {
                 $HomeUrl = Url('/', true);
             }
 
-            $Row = array('Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb');
+            $Row = ['Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb'];
             if (!is_string($HomeLink)) {
                 $Row['Name'] = T('Home');
             }
@@ -194,7 +194,7 @@ class Gdn_Theme {
      * @param array $Options
      * @return mixed|null|string
      */
-    public static function link($Path, $Text = false, $Format = null, $Options = array()) {
+    public static function link($Path, $Text = false, $Format = null, $Options = []) {
         $Session = Gdn::session();
         $Class = val('class', $Options, '');
         $WithDomain = val('WithDomain', $Options);
@@ -227,7 +227,7 @@ class Gdn_Theme {
                 break;
             case 'dashboard':
                 $Path = 'dashboard/settings';
-                touchValue('Permissions', $Options, array('Garden.Settings.Manage', 'Garden.Settings.View'));
+                touchValue('Permissions', $Options, ['Garden.Settings.Manage', 'Garden.Settings.View']);
                 if (!$Text) {
                     $Text = t('Dashboard');
                 }
@@ -257,7 +257,7 @@ class Gdn_Theme {
                 if (is_null($Route)) {
                     $Path = '/';
                 } else {
-                    $Path = combinePaths(array('/', $Route));
+                    $Path = combinePaths(['/', $Route]);
                 }
                 break;
             case 'profile':
@@ -284,7 +284,7 @@ class Gdn_Theme {
                 if (!$Text && $Session->isValid()) {
                     $IsFullPath = strtolower(substr($Session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($Session->User->Photo, 0, 8)) == 'https://';
                     $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : Gdn_Upload::url(changeBasename($Session->User->Photo, 'n%s'));
-                    $Text = img($PhotoUrl, array('alt' => $Session->User->Name));
+                    $Text = img($PhotoUrl, ['alt' => $Session->User->Name]);
                 }
 
                 break;
@@ -357,7 +357,7 @@ class Gdn_Theme {
         $Url = Gdn::request()->url($Path, $WithDomain);
 
         if ($TK = val('TK', $Options)) {
-            if (in_array($TK, array(1, 'true'))) {
+            if (in_array($TK, [1, 'true'])) {
                 $TK = 'TransientKey';
             }
             $Url .= (strpos($Url, '?') === false ? '?' : '&').$TK.'='.urlencode(Gdn::session()->transientKey());
@@ -381,7 +381,7 @@ class Gdn_Theme {
      *
      * @param array $Properties
      */
-    public static function logo($Properties = array()) {
+    public static function logo($Properties = []) {
         $Logo = c('Garden.Logo');
 
         if ($Logo) {
@@ -421,7 +421,7 @@ class Gdn_Theme {
         $Title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
 
         if ($Logo) {
-            return Img(Gdn_Upload::url($Logo), array('alt' => $Title));
+            return Img(Gdn_Upload::url($Logo), ['alt' => $Title]);
         } else {
             return $Title;
         }
@@ -434,7 +434,7 @@ class Gdn_Theme {
      * @param array $Properties
      * @return mixed|string
      */
-    public static function module($Name, $Properties = array()) {
+    public static function module($Name, $Properties = []) {
         if (isset($Properties['cache'])) {
             $Key = isset($Properties['cachekey']) ? $Properties['cachekey'] : 'module.'.$Name;
 
@@ -457,7 +457,7 @@ class Gdn_Theme {
                 $Module->Visible = true;
 
                 // Add properties passed in from the controller.
-                $ControllerProperties = Gdn::controller()->data('_properties.'.strtolower($Name), array());
+                $ControllerProperties = Gdn::controller()->data('_properties.'.strtolower($Name), []);
                 $Properties = array_merge($ControllerProperties, $Properties);
 
                 foreach ($Properties as $Name => $value) {
@@ -481,7 +481,7 @@ class Gdn_Theme {
 
         if (isset($Key)) {
 //         Trace($Result, "Store $Key");
-            Gdn::cache()->store($Key, $Result, array(Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']));
+            Gdn::cache()->store($Key, $Result, [Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']]);
         }
 
         return $Result;

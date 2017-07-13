@@ -121,7 +121,7 @@ class Tiny_diff {
             }
         }
         if ($maxlen == 0) {
-            return array(array('del' => $old, 'ins' => $new));
+            return [['del' => $old, 'ins' => $new]];
         }
         return array_merge(
             self::diff(array_slice($old, 0, $old_max), array_slice($new, 0, $new_max)),

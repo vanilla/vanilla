@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 $Session = Gdn::session();
 if (!is_array($this->Roles))
-    $this->Roles = array();
+    $this->Roles = [];
 
 $this->fireEvent('BeforeInfo');
 if (Gdn::config('Garden.Profile.ShowAbout')) {

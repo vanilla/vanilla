@@ -185,7 +185,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
             $this->_DatasetType = $DatasetType;
         }
 
-        $Result = array();
+        $Result = [];
         if (is_null($this->_PDOStatement)) {
             $this->_Result = $Result;
             return;
@@ -274,20 +274,20 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      *   - <b>false</b>: The index is not unique and each indexed row will be an array or arrays.
      * @return array
      */
-    public static function index($Data, $Columns, $Options = array()) {
+    public static function index($Data, $Columns, $Options = []) {
         $Columns = (array)$Columns;
-        $Result = array();
+        $Result = [];
         $Options = array_change_key_case($Options);
 
         if (is_string($Options)) {
-            $Options = array('sep' => $Options);
+            $Options = ['sep' => $Options];
         }
 
         $Sep = val('sep', $Options, '|');
         $Unique = val('unique', $Options, true);
 
         foreach ($Data as $Row) {
-            $IndexValues = array();
+            $IndexValues = [];
             foreach ($Columns as $Column) {
                 $IndexValues[] = val($Column, $Row);
             }
@@ -318,11 +318,11 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      *  - <b>sql</b>: A Gdn_SQLDriver with the child query.
      *  - <b>type</b>: The join type, either JOIN_INNER, JOIN_LEFT. This defaults to JOIN_LEFT.
      */
-    public static function join(&$Data, $Columns, $Options = array()) {
+    public static function join(&$Data, $Columns, $Options = []) {
         $Options = array_change_key_case($Options);
 
         $Sql = Gdn::sql(); //GetValue('sql', $Options, Gdn::SQL());
-        $ResultColumns = array();
+        $ResultColumns = [];
 
         // Grab the columns.
         foreach ($Columns as $Index => $Name) {
@@ -419,7 +419,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         $Sql->select("$TableAlias.$ChildColumn");
 
         // Get the IDs to generate an in clause with.
-        $IDs = array();
+        $IDs = [];
         foreach ($Data as $Row) {
             $Value = val($ParentColumn, $Row);
             if ($Value) {
@@ -431,9 +431,9 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         $Sql->whereIn($ChildColumn, $IDs);
 
         $ChildData = $Sql->get()->resultArray();
-        $ChildData = self::index($ChildData, $ChildColumn, array('unique' => GetValue('unique', $Options, isset($ColumnPrefix))));
+        $ChildData = self::index($ChildData, $ChildColumn, ['unique' => GetValue('unique', $Options, isset($ColumnPrefix))]);
 
-        $NotFound = array();
+        $NotFound = [];
 
         // Join the data in.
         foreach ($Data as $Index => &$Row) {
@@ -457,7 +457,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
                             setValue($ColumnPrefix.$Name, $Row, null);
                         }
                     } else {
-                        setValue($JoinColumn, $Row, array());
+                        setValue($JoinColumn, $Row, []);
                     }
                 } else {
                     $NotFound[] = $Index;
@@ -625,7 +625,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      * @param array $Fields
      * @since 2.1
      */
-    public function unserialize($Fields = array('Attributes', 'Data')) {
+    public function unserialize($Fields = ['Attributes', 'Data']) {
         $Result =& $this->result();
         $First = true;
 
@@ -664,7 +664,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     public function value($ColumnName, $DefaultValue = null) {
         if ($Row = $this->nextRow()) {
             if (is_array($ColumnName)) {
-                $Result = array();
+                $Result = [];
                 foreach ($ColumnName as $Name => $Default) {
                     if (is_object($Row) && property_exists($Row, $Name)) {
                         return $Row->$Name;

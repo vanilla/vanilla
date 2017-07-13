@@ -37,7 +37,7 @@ if ($currentPage == 1) {
 } else {
     $disabled = '';
 }
-$pagerString .= anchor(dashboardSymbol("chevron-left"), $pager->PageUrl($currentPage - 1), $disabled.' Previous pager-previous btn btn-icon-border', array('rel' => 'prev', 'aria-label' => 'Previous page'));
+$pagerString .= anchor(dashboardSymbol("chevron-left"), $pager->PageUrl($currentPage - 1), $disabled.' Previous pager-previous btn btn-icon-border', ['rel' => 'prev', 'aria-label' => 'Previous page']);
 
 // Next
 if (!$hasNext) {
@@ -45,7 +45,7 @@ if (!$hasNext) {
 } else {
     $disabled = '';
 }
-$pagerString .= anchor(dashboardSymbol("chevron-right"), $pager->PageUrl($currentPage + 1), $disabled.' Next pager-next btn btn-icon-border', array('rel' => 'next', 'aria-label' => 'Next page')); // extra sprintf parameter in case old url style is set
+$pagerString .= anchor(dashboardSymbol("chevron-right"), $pager->PageUrl($currentPage + 1), $disabled.' Next pager-next btn btn-icon-border', ['rel' => 'next', 'aria-label' => 'Next page']); // extra sprintf parameter in case old url style is set
 $pagerString .= '</nav></div>';
 
 echo '<div class="pager-wrap '.$pager->CssClass.'">'.$pagerString.'</div>';

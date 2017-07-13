@@ -14,7 +14,7 @@
 class ToggleMenuModule extends Gdn_Module {
 
     /** @var array  */
-    private $_Labels = array();
+    private $_Labels = [];
 
     /** @var bool  */
     private $_CurrentLabelCode = false;
@@ -31,7 +31,7 @@ class ToggleMenuModule extends Gdn_Module {
             $Code = Gdn_Format::url(ucwords(trim(Gdn_Format::plainText($Name))));
         }
 
-        $this->_Labels[] = array('Name' => $Name, 'Code' => $Code, 'Url' => $Url);
+        $this->_Labels[] = ['Name' => $Name, 'Code' => $Code, 'Url' => $Url];
     }
 
     /**

@@ -29,7 +29,7 @@ class Gdn_Router extends Gdn_Pluggable {
      */
     public function __construct() {
         parent::__construct();
-        $this->RouteTypes = array(
+        $this->RouteTypes = [
             'Internal'      => 'Internal',
             'Temporary'     => 'Temporary (302)',
             'Permanent'     => 'Permanent (301)',
@@ -37,8 +37,8 @@ class Gdn_Router extends Gdn_Pluggable {
             'NotFound'      => 'Not Found (404)',
             'Drop'          => 'Drop Request',
             'Test'          => 'Test'
-        );
-        $this->ReservedRoutes = array('DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode');
+        ];
+        $this->ReservedRoutes = ['DefaultController', 'DefaultForumRoot', 'Default404', 'DefaultPermission', 'UpdateMode'];
         $this->_loadRoutes();
     }
 
@@ -66,10 +66,10 @@ class Gdn_Router extends Gdn_Pluggable {
 
         //return $this->Routes[$Route];
 
-        return array_merge($this->Routes[$Route], array(
+        return array_merge($this->Routes[$Route], [
             'TypeLocale' => T($this->RouteTypes[$this->Routes[$Route]['Type']]),
             'FinalDestination' => $this->Routes[$Route]['Destination']
-        ));
+        ]);
 
     }
 
@@ -99,7 +99,7 @@ class Gdn_Router extends Gdn_Pluggable {
      */
     public function setRoute($Route, $Destination, $Type, $Save = true) {
         $Key = $this->_encodeRouteKey($Route);
-        SaveToConfig('Routes.'.$Key, array($Destination, $Type), $Save);
+        SaveToConfig('Routes.'.$Key, [$Destination, $Type], $Save);
         $this->_loadRoutes();
     }
 
@@ -135,8 +135,8 @@ class Gdn_Router extends Gdn_Pluggable {
         foreach ($this->Routes as $Route => $RouteData) {
             // Check for wild-cards
             $Route = str_replace(
-                array(':alphanum', ':num'),
-                array('([0-9a-zA-Z-_]+)', '([0-9]+)'),
+                [':alphanum', ':num'],
+                ['([0-9a-zA-Z-_]+)', '([0-9]+)'],
                 $Route
             );
 
@@ -209,7 +209,7 @@ class Gdn_Router extends Gdn_Pluggable {
      * @return array
      */
     public function getRouteTypes() {
-        $RT = array();
+        $RT = [];
         foreach ($this->RouteTypes as $RouteType => $RouteTypeText) {
             $RT[$RouteType] = T($RouteTypeText);
         }
@@ -222,18 +222,18 @@ class Gdn_Router extends Gdn_Pluggable {
      * @throws Exception
      */
     private function _loadRoutes() {
-        $Routes = Gdn::config('Routes', array());
+        $Routes = Gdn::config('Routes', []);
         $this->EventArguments['Routes'] = &$Routes;
         $this->fireEvent("BeforeLoadRoutes");
         foreach ($Routes as $Key => $Destination) {
             $Route = $this->_decodeRouteKey($Key);
             $RouteData = $this->_parseRoute($Destination);
 
-            $this->Routes[$Route] = array_merge(array(
+            $this->Routes[$Route] = array_merge([
                 'Route' => $Route,
                 'Key' => $Key,
                 'Reserved' => in_array($Route, $this->ReservedRoutes)
-            ), $RouteData);
+            ], $RouteData);
         }
         $this->fireEvent("AfterLoadRoutes");
     }
@@ -276,10 +276,10 @@ class Gdn_Router extends Gdn_Pluggable {
      * @return array
      */
     private function _formatRoute($Destination, $RouteType) {
-        return array(
+        return [
             'Destination' => $Destination,
             'Type' => $RouteType
-        );
+        ];
     }
 
     /**

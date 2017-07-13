@@ -36,7 +36,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
     private $OriginalContent = null;
 
-    private $CollaborativeActions = array();
+    private $CollaborativeActions = [];
 
     private $CollaborativeTitle = null;
 
@@ -188,10 +188,10 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      */
     public function forCollaboration($CollaborationType, $CollaborationParameters = null) {
         if ($CollaborationType !== false) {
-            $this->CollaborativeActions[] = array(
+            $this->CollaborativeActions[] = [
                 'Type' => $CollaborationType,
                 'Parameters' => $CollaborationParameters
-            );
+            ];
         }
         return $this;
     }
@@ -207,9 +207,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         // Figure out how much space we have for the title
         $MaxLength = 90;
-        $Stripped = formatString($CollaborativeTitle, array(
+        $Stripped = formatString($CollaborativeTitle, [
             'RegardingTitle' => ''
-        ));
+        ]);
         $UsedLength = strlen($Stripped);
         $AvailableLength = $MaxLength - $UsedLength;
 
@@ -235,9 +235,9 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
             $Name = substr($Name, 0, $AvailableLength - 3).'...';
         }
 
-        $CollaborativeTitle = formatString($CollaborativeTitle, array(
+        $CollaborativeTitle = formatString($CollaborativeTitle, [
             'RegardingTitle' => $Name
-        ));
+        ]);
 
         $this->CollaborativeTitle = $CollaborativeTitle;
         return $this;
@@ -349,7 +349,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         if (!$Collapse) {
             // Create a new Regarding entry
-            $RegardingPreSend = array(
+            $RegardingPreSend = [
                 'Type' => $this->Type,
                 'ForeignType' => $this->ForeignType,
                 'ForeignID' => $this->ForeignID,
@@ -361,7 +361,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                 'Comment' => $this->Comment,
                 'OriginalContent' => $this->OriginalContent,
                 'Reports' => 1
-            );
+            ];
 
             $RegardingID = $RegardingModel->save($RegardingPreSend);
 
@@ -374,7 +374,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
 
         // Don't error on foreach
         if (!is_array($this->CollaborativeActions)) {
-            $this->CollaborativeActions = array();
+            $this->CollaborativeActions = [];
         }
 
         foreach ($this->CollaborativeActions as $Action) {
@@ -386,7 +386,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         $Discussion = Gdn::SQL()
                             ->select('*')
                             ->from('Discussion')
-                            ->where(array('RegardingID' => $RegardingID))
+                            ->where(['RegardingID' => $RegardingID])
                             ->get()->firstRow(DATASET_TYPE_ARRAY);
                     }
 
@@ -394,7 +394,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         $CategoryID = val('Parameters', $Action);
 
                         // Make a new discussion
-                        $DiscussionID = $DiscussionModel->save(array(
+                        $DiscussionID = $DiscussionModel->save([
                             'Name' => $this->CollaborativeTitle,
                             'CategoryID' => $CategoryID,
                             'Body' => $this->OriginalContent,
@@ -402,7 +402,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                             'Announce' => 0,
                             'Close' => 0,
                             'RegardingID' => $RegardingID
-                        ));
+                        ]);
 
                         if (!$DiscussionID) {
                             throw new Gdn_UserException($DiscussionModel->Validation->resultsText());
@@ -412,11 +412,11 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                     } else {
                         // Add a comment to the existing discussion.
                         $CommentModel = new CommentModel();
-                        $CommentID = $CommentModel->save(array(
+                        $CommentID = $CommentModel->save([
                             'DiscussionID' => val('DiscussionID', $Discussion),
                             'Body' => $this->Comment,
                             'InsertUserID' => $this->UserID
-                        ));
+                        ]);
 
                         $CommentModel->save2($CommentID, true);
                     }
@@ -434,12 +434,12 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                         throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
                     }
 
-                    $ConversationID = $ConversationModel->save(array(
+                    $ConversationID = $ConversationModel->save([
                         'To' => 'Admins',
                         'Body' => $this->CollaborativeTitle,
                         'RecipientUserID' => $UserList,
                         'RegardingID' => $RegardingID
-                    ), $ConversationMessageModel);
+                    ], $ConversationMessageModel);
 
                     break;
             }

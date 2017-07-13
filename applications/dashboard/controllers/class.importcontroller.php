@@ -76,7 +76,7 @@ class ImportController extends DashboardController {
         $Imp->saveState();
         $this->Form->setValidationResults($Imp->Validation->results());
 
-        $this->setData('Stats', val('Stats', $Imp->Data, array()));
+        $this->setData('Stats', val('Stats', $Imp->Data, []));
         $this->setData('CurrentStep', $Imp->CurrentStep);
         $this->setData('CurrentStepMessage', val('CurrentStepMessage', $Imp->Data, ''));
         $this->setData('ErrorType', val('ErrorType', $Imp));
@@ -107,15 +107,15 @@ class ImportController extends DashboardController {
         $Imp->loadState();
 
         // Search for the list of acceptable imports.
-        $ImportPaths = array();
-        $ExistingPaths = SafeGlob(PATH_UPLOADS.'/export*', array('gz', 'txt'));
-        $ExistingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', array('gz'));
+        $ImportPaths = [];
+        $ExistingPaths = SafeGlob(PATH_UPLOADS.'/export*', ['gz', 'txt']);
+        $ExistingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
         $ExistingPaths = array_merge($ExistingPaths, $ExistingPaths2);
         foreach ($ExistingPaths as $Path) {
             $ImportPaths[$Path] = basename($Path);
         }
         // Add the database as a path.
-        $ImportPaths = array_merge(array('db:' => t('This Database')), $ImportPaths);
+        $ImportPaths = array_merge(['db:' => t('This Database')], $ImportPaths);
 
         if ($Imp->CurrentStep < 1) {
             // Check to see if there is a file.
@@ -190,11 +190,11 @@ class ImportController extends DashboardController {
         }
 
         try {
-            $UploadedFiles = val('UploadedFiles', $Imp->Data, array());
+            $UploadedFiles = val('UploadedFiles', $Imp->Data, []);
             $ImportPaths = array_merge($ImportPaths, $UploadedFiles);
             $this->setData('ImportPaths', $ImportPaths);
             $this->setData('Header', $Imp->getImportHeader());
-            $this->setData('Stats', val('Stats', $Imp->Data, array()));
+            $this->setData('Stats', val('Stats', $Imp->Data, []));
             $this->setData('GenerateSQL', val('GenerateSQL', $Imp->Data));
             $this->setData('ImportPath', $Imp->ImportPath);
             $this->setData('OriginalFilename', val('OriginalFilename', $Imp->Data));

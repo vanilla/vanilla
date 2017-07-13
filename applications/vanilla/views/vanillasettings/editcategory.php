@@ -2,7 +2,7 @@
 /** @var Gdn_Form $form */
 $form = $this->Form;
 echo heading($this->data('Title'), '', '', [], '/vanilla/settings/categories');
-echo $form->open(array('enctype' => 'multipart/form-data'));
+echo $form->open(['enctype' => 'multipart/form-data']);
 echo $form->errors();
 echo $form->hidden('ParentCategoryID');
 helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to organize discussions.', 'Categories allow you to organize your discussions.'));
@@ -39,7 +39,7 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
             <?php echo $form->label('Description', 'Description'); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $form->textBox('Description', array('MultiLine' => TRUE)); ?>
+            <?php echo $form->textBox('Description', ['MultiLine' => TRUE]); ?>
         </div>
     </li>
     <li class="form-group">
@@ -47,14 +47,14 @@ helpAsset(sprintf(t('About %s'), t('Categories')), t('Categories are used to org
             <?php echo $form->label('Css Class', 'CssClass'); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $form->textBox('CssClass', array('MultiLine' => FALSE)); ?>
+            <?php echo $form->textBox('CssClass', ['MultiLine' => FALSE]); ?>
         </div>
     </li>
     <?php echo $form->imageUploadPreview(
         'Photo', t('Photo'), '', 'vanilla/settings/deletecategoryphoto/'.$this->Category->CategoryID
     ); ?>
     <?php echo $form->Simple(
-        $this->data('_ExtendedFields', array()));
+        $this->data('_ExtendedFields', []));
     ?>
     <li class="form-group">
         <div class="label-wrap">
@@ -90,15 +90,15 @@ if (count($this->data('DiscussionTypes')) > 1) {
     echo '</div>';
     echo '<div class="checkbox-list input-wrap">';
     foreach ($this->data('DiscussionTypes') as $Type => $Row) {
-        echo $form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), array('value' => $Type));
+        echo $form->CheckBox("AllowedDiscussionTypes[]", val('Plural', $Row, $Type), ['value' => $Type]);
     }
     echo '</div>';
     echo '</div>';
 }
 
 echo $form->Simple(
-    $this->data('_PermissionFields', array()),
-    array('Wrap' => array('<div class="form-group">', '</div>'), 'ItemWrap' => array('<div class="input-wrap">', '</div>')));
+    $this->data('_PermissionFields', []),
+    ['Wrap' => ['<div class="form-group">', '</div>'], 'ItemWrap' => ['<div class="input-wrap">', '</div>']]);
 
 echo '<div class="padded">'.sprintf(t('%s: %s'), t('Check all permissions that apply for each role'), '').'</div>';
 echo $form->CheckBoxGridGroups($this->PermissionData, 'Permission');

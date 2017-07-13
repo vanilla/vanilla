@@ -111,7 +111,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         # These leading spaces cause problem with <pre> content,
         # so we need to fix that:
         $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-            array(&$this, '_doSpoilers_callback2'), $bq);
+            [&$this, '_doSpoilers_callback2'], $bq);
 
         return "\n". $this->hashBlock(Gdn_Format::spoilerHtml($bq))."\n\n";
     }
@@ -133,7 +133,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         (.+?) # $1 = strike text
         ~~ # close
         /xm',
-        array($this, '_doStrikeout_callback'), $text);
+        [$this, '_doStrikeout_callback'], $text);
         return $text;
     }
     protected function _doStrikeout_callback($matches) {
@@ -149,7 +149,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
     protected function doSoftBreaks($text) {
         # Do soft line breaks for 1 return:
         return preg_replace_callback('/\n{1}/',
-            array($this, '_doSoftBreaks_callback'), $text);
+            [$this, '_doSoftBreaks_callback'], $text);
     }
     protected function _doSoftBreaks_callback($matches) {
         return $this->hashPart("<br$this->empty_element_suffix\n");
@@ -206,7 +206,7 @@ class MarkdownVanilla extends \Michelf\MarkdownExtra {
         // These leading spaces cause problem with <pre> content,
         // so we need to fix that:
         $bq = preg_replace_callback('{(\s*<pre>.+?</pre>)}sx',
-            array($this, '_doBlockQuotes_callback2'), $bq);
+            [$this, '_doBlockQuotes_callback2'], $bq);
 
         // return "\n" . $this->hashBlock("<blockquote>\n$bq\n</blockquote>") . "\n\n";
         return "\n" . $this->hashBlock("<blockquote class=\"UserQuote\"><div class=\"QuoteText\">\n$bq\n</div></blockquote>") . "\n\n";

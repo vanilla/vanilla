@@ -172,7 +172,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
-            $Property = array($Property => $Value);
+            $Property = [$Property => $Value];
         }
         $this->encodeRow($Property);
         parent::setField($RowID, $Property);

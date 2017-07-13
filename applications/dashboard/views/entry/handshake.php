@@ -5,7 +5,7 @@
 <h1><?php echo t("Sign In") ?></h1>
 <div class="Box">
     <?php
-    echo $this->Form->open(array('Action' => url('/entry/handshake/'.$this->HandshakeScheme), 'id' => 'Form_User_Handshake'));
+    echo $this->Form->open(['Action' => url('/entry/handshake/'.$this->HandshakeScheme), 'id' => 'Form_User_Handshake']);
     echo $this->Form->errors();
     ?>
     <div class="Info"><?php
@@ -32,7 +32,7 @@
             ?>
         </li>
         <li class="Buttons">
-            <?php echo $this->Form->button('Create New Account', array('Name' => 'User/NewAccount')); ?>
+            <?php echo $this->Form->button('Create New Account', ['Name' => 'User/NewAccount']); ?>
         </li>
     </ul>
     <ul class="LinkAccount">
@@ -50,7 +50,7 @@
             ?>
         </li>
         <li class="Buttons">
-            <?php echo $this->Form->button('Link Existing Account', array('Name' => 'User/LinkAccount')); ?>
+            <?php echo $this->Form->button('Link Existing Account', ['Name' => 'User/LinkAccount']); ?>
         </li>
     </ul>
     <?php

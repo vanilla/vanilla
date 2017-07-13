@@ -25,10 +25,10 @@ class CommentModel extends Gdn_Model {
     const COUNT_RECALC_MOD = 50;
 
     /** @var array List of fields to order results by. */
-    protected $_OrderBy = array(array('c.DateInserted', ''));
+    protected $_OrderBy = [['c.DateInserted', '']];
 
     /** @var array Wheres. */
-    protected $_Where = array();
+    protected $_Where = [];
 
     /** @var bool */
     public $pageCache;
@@ -102,7 +102,7 @@ class CommentModel extends Gdn_Model {
             $Curr = false;
         }
 
-        $New = array(GetValueR('0.DateInserted', $Result));
+        $New = [GetValueR('0.DateInserted', $Result)];
 
         if (count($Result) >= $Limit) {
             $New[] = valr(($Limit - 1).'.DateInserted', $Result);
@@ -112,7 +112,7 @@ class CommentModel extends Gdn_Model {
             trace('CommentModel->CachePageWhere()');
 
             $CacheKey = "Comment.Page.$Limit.$DiscussionID.$Page";
-            Gdn::cache()->store($CacheKey, $New, array(Gdn_Cache::FEATURE_EXPIRY => 86400));
+            Gdn::cache()->store($CacheKey, $New, [Gdn_Cache::FEATURE_EXPIRY => 86400]);
 
             trace($New, $CacheKey);
 //         Gdn::controller()->setData('_PageCacheStore', array($CacheKey, $New));
@@ -233,7 +233,7 @@ class CommentModel extends Gdn_Model {
             ->get();
 
         if ($options['joinUsers']) {
-            Gdn::userModel()->joinUsers($result, array('InsertUserID', 'UpdateUserID'));
+            Gdn::userModel()->joinUsers($result, ['InsertUserID', 'UpdateUserID']);
         }
 
         $this->setCalculatedFields($result);
@@ -289,7 +289,7 @@ class CommentModel extends Gdn_Model {
 
         $Result = $this->SQL->get();
 
-        Gdn::userModel()->joinUsers($Result, array('InsertUserID', 'UpdateUserID'));
+        Gdn::userModel()->joinUsers($Result, ['InsertUserID', 'UpdateUserID']);
 
         $this->setCalculatedFields($Result);
 
@@ -335,7 +335,7 @@ class CommentModel extends Gdn_Model {
         //$this->orderBy($this->SQL);
 
         $Data = $this->SQL->get();
-        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+        Gdn::userModel()->joinUsers($Data, ['InsertUserID', 'UpdateUserID']);
 
         return $Data;
 
@@ -358,7 +358,7 @@ class CommentModel extends Gdn_Model {
         $Perms = DiscussionModel::CategoryPermissions();
 
         if (is_array($Perms) && empty($Perms)) {
-            return new Gdn_DataSet(array());
+            return new Gdn_DataSet([]);
         }
 
         // The point of this query is to select from one comment table, but filter and sort on another.
@@ -395,7 +395,7 @@ class CommentModel extends Gdn_Model {
 
         // Now that we have th comments we can filter out the ones we don't have permission to.
         if ($Perms !== true) {
-            $Remove = array();
+            $Remove = [];
 
             foreach ($Data->result() as $Index => $Row) {
                 if (!in_array($Row->CategoryID, $Perms)) {
@@ -412,7 +412,7 @@ class CommentModel extends Gdn_Model {
             }
         }
 
-        Gdn::userModel()->joinUsers($Data, array('InsertUserID', 'UpdateUserID'));
+        Gdn::userModel()->joinUsers($Data, ['InsertUserID', 'UpdateUserID']);
 
         $this->EventArguments['Comments'] =& $Data;
         $this->fireEvent('AfterGet');
@@ -444,20 +444,20 @@ class CommentModel extends Gdn_Model {
         }
 
         if (is_string($Value)) {
-            $Value = array($Value);
+            $Value = [$Value];
         }
 
         if (is_array($Value)) {
             // Set the order of this object.
-            $OrderBy = array();
+            $OrderBy = [];
 
             foreach ($Value as $Part) {
                 if (StringEndsWith($Part, ' desc', true)) {
-                    $OrderBy[] = array(substr($Part, 0, -5), 'desc');
+                    $OrderBy[] = [substr($Part, 0, -5), 'desc'];
                 } elseif (StringEndsWith($Part, ' asc', true))
-                    $OrderBy[] = array(substr($Part, 0, -4), 'asc');
+                    $OrderBy[] = [substr($Part, 0, -4), 'asc'];
                 else {
-                    $OrderBy[] = array($Part, 'asc');
+                    $OrderBy[] = [$Part, 'asc'];
                 }
             }
             $this->_OrderBy = $OrderBy;
@@ -486,7 +486,7 @@ class CommentModel extends Gdn_Model {
         if ($Value === false) {
             return false;
         } elseif (is_array($Value)) {
-            $Result = array('DateInserted >=' => $Value[0]);
+            $Result = ['DateInserted >=' => $Value[0]];
             if (isset($Value[1])) {
                 $Result['DateInserted <='] = $Value[1];
             }
@@ -510,8 +510,8 @@ class CommentModel extends Gdn_Model {
         // Insert or update the UserComment row
         $this->SQL->replace(
             'UserComment',
-            array('Score' => $Score),
-            array('CommentID' => $CommentID, 'UserID' => $UserID)
+            ['Score' => $Score],
+            ['CommentID' => $CommentID, 'UserID' => $UserID]
         );
 
         // Get the total new score
@@ -594,14 +594,14 @@ class CommentModel extends Gdn_Model {
                     // Only update the watch if there are new comments.
                     $this->SQL->put(
                         'UserDiscussion',
-                        array(
+                        [
                             'CountComments' => $CountWatch,
                             'DateLastViewed' => Gdn_Format::toDateTime()
-                        ),
-                        array(
+                        ],
+                        [
                             'UserID' => $Session->UserID,
                             'DiscussionID' => $Discussion->DiscussionID
-                        )
+                        ]
                     );
                 }
 
@@ -615,12 +615,12 @@ class CommentModel extends Gdn_Model {
                     $this->SQL->Options('Ignore', true);
                     $this->SQL->insert(
                         'UserDiscussion',
-                        array(
+                        [
                             'UserID' => $Session->UserID,
                             'DiscussionID' => $Discussion->DiscussionID,
                             'CountComments' => $CountWatch,
                             'DateLastViewed' => Gdn_Format::toDateTime()
-                        )
+                        ]
                     );
                 }
             }
@@ -643,10 +643,10 @@ class CommentModel extends Gdn_Model {
 
                         // Find all discussions with content from after DateMarkedRead
                         $DiscussionModel = new DiscussionModel();
-                        $Discussions = $DiscussionModel->get(0, 101, array(
+                        $Discussions = $DiscussionModel->get(0, 101, [
                             'CategoryID' => $CategoryID,
                             'DateLastComment>' => $DateMarkedRead
-                        ));
+                        ]);
                         unset($DiscussionModel);
 
                         // Abort if we get back as many as we asked for, meaning a
@@ -666,7 +666,7 @@ class CommentModel extends Gdn_Model {
                             // Mark this category read if all the new content is read
                             if ($MarkAsRead) {
                                 $CategoryModel = new CategoryModel();
-                                $CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
+                                $CategoryModel->SaveUserTree($CategoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
                                 unset($CategoryModel);
                             }
 
@@ -745,7 +745,7 @@ class CommentModel extends Gdn_Model {
      * @param array $Options options to pass to the database.
      * @return mixed SQL result in format specified by $ResultType.
      */
-    public function getID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = array()) {
+    public function getID($CommentID, $ResultType = DATASET_TYPE_OBJECT, $Options = []) {
         $this->Options($Options);
 
         $this->CommentQuery(false); // FALSE supresses FireEvent
@@ -769,7 +769,7 @@ class CommentModel extends Gdn_Model {
      * @param int $CommentID Unique ID of the comment.
      * @return object SQL result.
      */
-    public function getIDData($CommentID, $Options = array()) {
+    public function getIDData($CommentID, $Options = []) {
         $this->fireEvent('BeforeGetIDData');
         $this->CommentQuery(false); // FALSE supresses FireEvent
         $this->Options($Options);
@@ -873,7 +873,7 @@ class CommentModel extends Gdn_Model {
         }
 
         // See of the user has read the discussion.
-        $UserDiscussion = $this->SQL->getWhere('UserDiscussion', array('DiscussionID' => $DiscussionID, 'UserID' => $UserID))->firstRow(DATASET_TYPE_ARRAY);
+        $UserDiscussion = $this->SQL->getWhere('UserDiscussion', ['DiscussionID' => $DiscussionID, 'UserID' => $UserID])->firstRow(DATASET_TYPE_ARRAY);
         if (empty($UserDiscussion)) {
             return 0;
         }
@@ -910,7 +910,7 @@ class CommentModel extends Gdn_Model {
             $Value = 0;
         }
 
-        return array($Expr, $Value);
+        return [$Expr, $Value];
     }
 
     /**
@@ -991,10 +991,10 @@ class CommentModel extends Gdn_Model {
 
                 if ($Insert === false) {
                     // Log the save.
-                    LogModel::LogChange('Edit', 'Comment', array_merge($Fields, array('CommentID' => $CommentID)));
+                    LogModel::LogChange('Edit', 'Comment', array_merge($Fields, ['CommentID' => $CommentID]));
                     // Save the new value.
                     $this->SerializeRow($Fields);
-                    $this->SQL->put($this->Name, $Fields, array('CommentID' => $CommentID));
+                    $this->SQL->put($this->Name, $Fields, ['CommentID' => $CommentID]);
                 } else {
                     // Make sure that the comments get formatted in the method defined by Garden.
                     if (!val('Format', $Fields) || c('Garden.ForceInputFormatter')) {
@@ -1028,7 +1028,7 @@ class CommentModel extends Gdn_Model {
 
         // Update discussion's comment count
         $DiscussionID = val('DiscussionID', $FormPostValues);
-        $this->UpdateCommentCount($DiscussionID, array('Slave' => false));
+        $this->UpdateCommentCount($DiscussionID, ['Slave' => false]);
 
         return $CommentID;
     }
@@ -1074,8 +1074,8 @@ class CommentModel extends Gdn_Model {
         // Mark the user as participated.
         $this->SQL->replace(
             'UserDiscussion',
-            array('Participated' => 1),
-            array('DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields))
+            ['Participated' => 1],
+            ['DiscussionID' => $DiscussionID, 'UserID' => val('InsertUserID', $Fields)]
         );
 
         if ($Insert) {
@@ -1088,18 +1088,18 @@ class CommentModel extends Gdn_Model {
             $ActivityModel = new ActivityModel();
             $HeadlineFormat = t('HeadlineFormat.Comment', '{ActivityUserID,user} commented on <a href="{Url,html}">{Data.Name,text}</a>');
             $Category = CategoryModel::categories($Discussion->CategoryID);
-            $Activity = array(
+            $Activity = [
                 'ActivityType' => 'Comment',
                 'ActivityUserID' => $Fields['InsertUserID'],
                 'HeadlineFormat' => $HeadlineFormat,
                 'RecordType' => 'Comment',
                 'RecordID' => $CommentID,
                 'Route' => "/discussion/comment/$CommentID#Comment_$CommentID",
-                'Data' => array(
+                'Data' => [
                     'Name' => $Discussion->Name,
                     'Category' => val('Name', $Category),
-                )
-            );
+                ]
+            ];
 
             // Allow simple fulltext notifications
             if (c('Vanilla.Activity.ShowCommentBody', false)) {
@@ -1121,7 +1121,7 @@ class CommentModel extends Gdn_Model {
 
                 $Activity['NotifyUserID'] = $Bookmark->UserID;
                 $Activity['Data']['Reason'] = 'bookmark';
-                $ActivityModel->Queue($Activity, 'BookmarkComment', array('CheckRecord' => true));
+                $ActivityModel->Queue($Activity, 'BookmarkComment', ['CheckRecord' => true]);
             }
 
             // Notify users who have participated in the discussion.
@@ -1133,7 +1133,7 @@ class CommentModel extends Gdn_Model {
 
                 $Activity['NotifyUserID'] = $UserRow->UserID;
                 $Activity['Data']['Reason'] = 'participated';
-                $ActivityModel->Queue($Activity, 'ParticipateComment', array('CheckRecord' => true));
+                $ActivityModel->Queue($Activity, 'ParticipateComment', ['CheckRecord' => true]);
             }
 
             // Record user-comment activity.
@@ -1222,10 +1222,10 @@ class CommentModel extends Gdn_Model {
 
         // Grab all of the users that need to be notified.
         $Data = $this->SQL
-            ->whereIn('Name', array('Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']))
+            ->whereIn('Name', ['Preferences.Email.NewComment.'.$Category['CategoryID'], 'Preferences.Popup.NewComment.'.$Category['CategoryID']])
             ->get('UserMeta')->resultArray();
 
-        $NotifyUsers = array();
+        $NotifyUsers = [];
         foreach ($Data as $Row) {
             if (!$Row['Value']) {
                 continue;
@@ -1259,7 +1259,7 @@ class CommentModel extends Gdn_Model {
             return;
         }
 
-        $CountComments = $this->SQL->getWhere('Discussion', array('DiscussionID' => $DiscussionID))->value('CountComments');
+        $CountComments = $this->SQL->getWhere('Discussion', ['DiscussionID' => $DiscussionID])->value('CountComments');
         $Limit = c('Vanilla.Comments.PerPage', 30);
         $PageCount = PageNumber($CountComments, $Limit) + 1;
 
@@ -1282,11 +1282,11 @@ class CommentModel extends Gdn_Model {
      *
      * @since 2.3 Added the $Options parameter.
      */
-    public function updateCommentCount($Discussion, $Options = array()) {
+    public function updateCommentCount($Discussion, $Options = []) {
         // Get the discussion.
         if (is_numeric($Discussion)) {
             $this->Options($Options);
-            $Discussion = $this->SQL->getWhere('Discussion', array('DiscussionID' => $Discussion))->firstRow(DATASET_TYPE_ARRAY);
+            $Discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $Discussion])->firstRow(DATASET_TYPE_ARRAY);
         }
         $DiscussionID = $Discussion['DiscussionID'];
 
@@ -1422,14 +1422,14 @@ class CommentModel extends Gdn_Model {
      * @param array $Options Additional options for the delete.
      * @param bool Always returns TRUE.
      */
-    public function deleteID($CommentID, $Options = array()) {
+    public function deleteID($CommentID, $Options = []) {
         $this->EventArguments['CommentID'] = $CommentID;
 
         $Comment = $this->getID($CommentID, DATASET_TYPE_ARRAY);
         if (!$Comment) {
             return false;
         }
-        $Discussion = $this->SQL->getWhere('Discussion', array('DiscussionID' => $Comment['DiscussionID']))->firstRow(DATASET_TYPE_ARRAY);
+        $Discussion = $this->SQL->getWhere('Discussion', ['DiscussionID' => $Comment['DiscussionID']])->firstRow(DATASET_TYPE_ARRAY);
 
         // Decrement the UserDiscussion comment count if the user has seen this comment
         $Offset = $this->GetOffset($CommentID);
@@ -1446,13 +1446,13 @@ class CommentModel extends Gdn_Model {
 
         // Log the deletion.
         $Log = val('Log', $Options, 'Delete');
-        LogModel::insert($Log, 'Comment', $Comment, val('LogOptions', $Options, array()));
+        LogModel::insert($Log, 'Comment', $Comment, val('LogOptions', $Options, []));
 
         // Delete the comment.
-        $this->SQL->delete('Comment', array('CommentID' => $CommentID));
+        $this->SQL->delete('Comment', ['CommentID' => $CommentID]);
 
         // Update the comment count
-        $this->UpdateCommentCount($Discussion, array('Slave' => false));
+        $this->UpdateCommentCount($Discussion, ['Slave' => false]);
 
         // Update the user's comment count
         $this->UpdateUser($Comment['InsertUserID']);
@@ -1510,7 +1510,7 @@ class CommentModel extends Gdn_Model {
         if ($Value === null) {
             return $this->_Where;
         } elseif (!$Value)
-            $this->_Where = array();
+            $this->_Where = [];
         elseif (is_a($Value, 'Gdn_SQLDriver')) {
             if (!empty($this->_Where)) {
                 $Value->where($this->_Where);

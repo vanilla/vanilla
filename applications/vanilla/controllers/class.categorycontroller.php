@@ -23,7 +23,7 @@ class CategoryController extends VanillaController {
 
     public function follow($CategoryID, $Value, $TKey) {
         if (Gdn::session()->validateTransientKey($TKey)) {
-            $this->CategoryModel->SaveUserTree($CategoryID, array('Unfollow' => (int)(!(bool)$Value)));
+            $this->CategoryModel->SaveUserTree($CategoryID, ['Unfollow' => (int)(!(bool)$Value)]);
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -48,7 +48,7 @@ class CategoryController extends VanillaController {
 
     public function markRead($CategoryID, $TKey) {
         if (Gdn::session()->validateTransientKey($TKey)) {
-            $this->CategoryModel->SaveUserTree($CategoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
+            $this->CategoryModel->SaveUserTree($CategoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
         }
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
             redirectTo('/categories');

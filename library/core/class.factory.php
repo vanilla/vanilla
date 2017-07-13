@@ -20,10 +20,10 @@
 class Gdn_Factory {
 
     /** @var array The object definitions for the factory. */
-    protected $_Objects = array();
+    protected $_Objects = [];
 
     /** @var array The property dependancies for the factory. */
-    protected $_Dependencies = array();
+    protected $_Dependencies = [];
 
     /**
      * @var \Garden\Container\Container The container used to store the class information.
@@ -35,7 +35,7 @@ class Gdn_Factory {
      */
     public function __construct(Garden\Container\Container $container = null) {
         deprecated('Gdn_Factory', 'Garden\Container\Container');
-        register_shutdown_function(array($this, 'Cleanup'));
+        register_shutdown_function([$this, 'Cleanup']);
 
         $this->container = $container !== null ? $container : new Garden\Container\Container();
     }
@@ -87,7 +87,7 @@ class Gdn_Factory {
      */
     public function install($Alias, $ClassName, $Path = '', $FactoryType = Gdn::FactorySingleton, $Data = null) {
         $FactoryType = ucfirst($FactoryType);
-        if (!in_array($FactoryType, array(Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton))) {
+        if (!in_array($FactoryType, [Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton])) {
             throw new Exception(sprintf('$FactoryType must be one of %s, %s, %s, %s.', Gdn::FactoryInstance, Gdn::FactoryPrototype, Gdn::FactorySingleton, Gdn::FactoryRealSingleton));
         }
         $this->container
@@ -146,7 +146,7 @@ class Gdn_Factory {
      */
     public function installDependency($Alias, $PropertyName, $SourceAlias) {
         if (!array_key_exists($Alias, $this->_Dependencies)) {
-            $this->_Dependencies[$Alias] = array($PropertyName => $SourceAlias);
+            $this->_Dependencies[$Alias] = [$PropertyName => $SourceAlias];
         } else {
             $this->_Dependencies[$Alias][$PropertyName] = $SourceAlias;
         }

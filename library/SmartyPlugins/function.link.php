@@ -37,7 +37,7 @@ function smarty_function_link($Params, &$Smarty) {
       $Format = '<a href="%url" class="%class">%text</a>';
     }
 
-    $Options = array();
+    $Options = [];
     if (isset($Params['withdomain'])) {
         $Options['WithDomain'] = $Params['withdomain'];
     }

@@ -30,7 +30,7 @@ class Gdn_FormatterChain {
     const PRIORITY_LAST = -1000;
 
     /** @var array  */
-    protected $_Formatters = array();
+    protected $_Formatters = [];
 
     /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::Chain() instead.
      *
@@ -44,11 +44,11 @@ class Gdn_FormatterChain {
         } elseif ($Priority > self::PRIORITY_FIRST)
             $Priority = self::PRIORITY_FIRST;
 
-        $FArray = array($Formatter, $Priority);
+        $FArray = [$Formatter, $Priority];
         $this->_Formatters[] = $FArray;
 
         // Resort the array so it's in priority order.
-        usort($this->_Formatters, array('Gdn_FormatterChain', 'Compare'));
+        usort($this->_Formatters, ['Gdn_FormatterChain', 'Compare']);
     }
 
     /**

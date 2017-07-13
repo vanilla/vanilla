@@ -14,7 +14,7 @@
 class SetupController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form', 'Database');
+    public $Uses = ['Form', 'Database'];
 
     /** @var  Gdn_Form $Form */
     public $Form;
@@ -30,7 +30,7 @@ class SetupController extends DashboardController {
         $this->addCssFile('setup.css');
         $this->addJsFile('jquery.js');
         // Make sure all errors are displayed.
-        saveToConfig('Garden.Errors.MasterView', 'deverror.master.php', array('Save' => false));
+        saveToConfig('Garden.Errors.MasterView', 'deverror.master.php', ['Save' => false]);
     }
 
     /**
@@ -88,7 +88,7 @@ class SetupController extends DashboardController {
                 if ($this->Form->errorCount() == 0) {
                     // Get list of applications to enable during install
                     // Override by creating the config and adding this setting before install begins
-                    $AppNames = c('Garden.Install.Applications', array('Conversations', 'Vanilla'));
+                    $AppNames = c('Garden.Install.Applications', ['Conversations', 'Vanilla']);
                     try {
                         // Step through the available applications, enabling each of them.
                         foreach ($AppNames as $AppName) {
@@ -125,7 +125,7 @@ class SetupController extends DashboardController {
                 if ($this->Form->errorCount() == 0) {
                     // Save a variable so that the application knows it has been installed.
                     // Now that the application is installed, select a more user friendly error page.
-                    $Config = array('Garden.Installed' => true);
+                    $Config = ['Garden.Installed' => true];
                     saveToConfig($Config);
                     $this->setData('Installed', true);
                     $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
@@ -137,7 +137,7 @@ class SetupController extends DashboardController {
                     }
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA) {
                     $maxCode = 0;
-                    $messages = array();
+                    $messages = [];
 
                     foreach ($this->Form->errors() as $row) {
                         list($code, $message) = $row;
@@ -164,7 +164,7 @@ class SetupController extends DashboardController {
         // Create a model to save configuration settings
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Garden.Locale', 'Garden.Title', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName'));
+        $ConfigurationModel->setField(['Garden.Locale', 'Garden.Title', 'Garden.WebRoot', 'Garden.Cookie.Salt', 'Garden.Cookie.Domain', 'Database.Name', 'Database.Host', 'Database.User', 'Database.Password', 'Garden.Registration.ConfirmEmail', 'Garden.Email.SupportName']);
 
         // Set the models on the forms.
         $this->Form->setModel($ConfigurationModel);
@@ -266,9 +266,9 @@ class SetupController extends DashboardController {
                     $this->Form->setValidationResults($UserModel->validationResults());
                 } else {
                     // The user has been created successfully, so sign in now.
-                    saveToConfig('Garden.Installed', true, array('Save' => false));
+                    saveToConfig('Garden.Installed', true, ['Save' => false]);
                     Gdn::session()->start($AdminUserID, true);
-                    saveToConfig('Garden.Installed', false, array('Save' => false));
+                    saveToConfig('Garden.Installed', false, ['Save' => false]);
                 }
 
                 if ($this->Form->errorCount() > 0) {
@@ -278,12 +278,12 @@ class SetupController extends DashboardController {
                 // Assign some extra settings to the configuration file if everything succeeded.
                 $ApplicationInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'dashboard'.DS.'addon.json'), true);
 
-                saveToConfig(array(
-                    'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, array()), 'Undefined'),
+                saveToConfig([
+                    'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, []), 'Undefined'),
                     'Garden.CanProcessImages' => function_exists('gd_info'),
                     'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
                     'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
-                ));
+                ]);
             }
         }
         return $this->Form->errorCount() == 0 ? true : false;
@@ -315,7 +315,7 @@ class SetupController extends DashboardController {
         $PermissionProblem = false;
 
         // Make sure the appropriate folders are writable.
-        $ProblemDirectories = array();
+        $ProblemDirectories = [];
         if (!is_readable(PATH_CONF) || !isWritable(PATH_CONF)) {
             $ProblemDirectories[] = PATH_CONF;
         }

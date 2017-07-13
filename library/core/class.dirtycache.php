@@ -17,7 +17,7 @@
 class Gdn_Dirtycache extends Gdn_Cache {
 
     /** @var array  */
-    protected $cache = array();
+    protected $cache = [];
 
     /**
      *
@@ -31,11 +31,11 @@ class Gdn_Dirtycache extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function add($Key, $Value, $Options = array()) {
+    public function add($Key, $Value, $Options = []) {
         return $this->store($Key, $Value, $Options);
     }
 
-    public function store($Key, $Value, $Options = array()) {
+    public function store($Key, $Value, $Options = []) {
         $this->cache[$Key] = $Value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
@@ -44,9 +44,9 @@ class Gdn_Dirtycache extends Gdn_Cache {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
-    public function get($Key, $Options = array()) {
+    public function get($Key, $Options = []) {
         if (is_array($Key)) {
-            $Result = array();
+            $Result = [];
             foreach ($Key as $k) {
                 if (isset($this->cache[$k])) {
                     $Result[$k] = $this->cache[$k];
@@ -62,22 +62,22 @@ class Gdn_Dirtycache extends Gdn_Cache {
         }
     }
 
-    public function remove($Key, $Options = array()) {
+    public function remove($Key, $Options = []) {
         unset($this->cache[$Key]);
 
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function replace($Key, $Value, $Options = array()) {
+    public function replace($Key, $Value, $Options = []) {
         $this->cache[$Key] = $Value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function increment($Key, $Amount = 1, $Options = array()) {
+    public function increment($Key, $Amount = 1, $Options = []) {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function decrement($Key, $Amount = 1, $Options = array()) {
+    public function decrement($Key, $Amount = 1, $Options = []) {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 

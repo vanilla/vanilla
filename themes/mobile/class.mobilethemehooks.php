@@ -24,8 +24,8 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     public function gdn_dispatcher_afterAnalyzeRequest_handler($Sender) {
         // Remove plugins so they don't mess up layout or functionality.
-        $inPublicDashboard = ($Sender->application() == 'dashboard' && in_array($Sender->controller(), array('Activity', 'Profile', 'Search')));
-        if (in_array($Sender->application(), array('vanilla', 'conversations')) || $inPublicDashboard) {
+        $inPublicDashboard = ($Sender->application() == 'dashboard' && in_array($Sender->controller(), ['Activity', 'Profile', 'Search']));
+        if (in_array($Sender->application(), ['vanilla', 'conversations']) || $inPublicDashboard) {
             Gdn::pluginManager()->removeMobileUnfriendlyPlugins();
         }
         saveToConfig('Garden.Format.EmbedSize', '240x135', false);
@@ -36,7 +36,7 @@ class MobileThemeHooks implements Gdn_IPlugin {
      */
     public function base_render_before($Sender) {
         if (isMobile() && is_object($Sender->Head)) {
-            $Sender->Head->addTag('meta', array('name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"));
+            $Sender->Head->addTag('meta', ['name' => 'viewport', 'content' => "width=device-width,minimum-scale=1.0,maximum-scale=1.0"]);
             $Sender->Head->addString('
 <script>
    // If not looking for a specific comment, hide the address bar in iphone
@@ -106,18 +106,18 @@ class MobileThemeHooks implements Gdn_IPlugin {
             if ($ButtonType == 'Discussion') {
                 $Sender->Menu->addLink(
                     'NewDiscussion',
-                    img('themes/mobile/design/images/new.png', array('alt' => t('New Discussion'))),
+                    img('themes/mobile/design/images/new.png', ['alt' => t('New Discussion')]),
                     '/post/discussion'.(array_key_exists('CategoryID', $Sender->Data) ? '/'.$Sender->Data['CategoryID'] : ''),
-                    array('Garden.SignIn.Allow'),
-                    array('class' => 'NewDiscussion')
+                    ['Garden.SignIn.Allow'],
+                    ['class' => 'NewDiscussion']
                 );
             } elseif ($ButtonType == 'Conversation')
                 $Sender->Menu->addLink(
                     'NewConversation',
-                    img('themes/mobile/design/images/new.png', array('alt' => t('New Conversation'))),
+                    img('themes/mobile/design/images/new.png', ['alt' => t('New Conversation')]),
                     '/messages/add',
                     '',
-                    array('class' => 'NewConversation')
+                    ['class' => 'NewConversation']
                 );
         }
     }

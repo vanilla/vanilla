@@ -298,12 +298,12 @@ if (!function_exists('WriteTableRow')):
                 <div class="Block Wrap">
                     <?php if ($Row['LastTitle']): ?>
                         <?php
-                        echo userPhoto($Row, array('Size' => 'Small', 'Px' => 'Last'));
+                        echo userPhoto($Row, ['Size' => 'Small', 'Px' => 'Last']);
                         echo anchor(
                             SliceString(Gdn_Format::text($Row['LastTitle']), 100),
                             $Row['LastUrl'],
                             'BlockTitle LatestPostTitle',
-                            array('title' => html_entity_decode($Row['LastTitle'])));
+                            ['title' => html_entity_decode($Row['LastTitle'])]);
                         ?>
                         <div class="Meta">
                             <?php

@@ -72,7 +72,7 @@ class Gdn_CookieIdentity {
             $Config = Gdn::config($Config);
 
         $DefaultConfig = array_replace(
-            array('PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'),
+            ['PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'],
             Gdn::config('Garden.Cookie')
         );
         $this->CookieName = val('Name', $Config, $DefaultConfig['Name']);
@@ -266,7 +266,7 @@ class Gdn_CookieIdentity {
         $CookieExpires = 0;
 
         $KeyData = $UserID.'-'.$PayloadExpires;
-        $this->_setCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
+        $this->_setCookie($this->VolatileMarker, $KeyData, [$UserID, $PayloadExpires], $CookieExpires);
     }
 
     /**
@@ -322,7 +322,7 @@ class Gdn_CookieIdentity {
         // Create the cookie signature
         $KeyHash = hash_hmac($CookieHashMethod, $KeyData, $CookieSalt);
         $KeyHashHash = hash_hmac($CookieHashMethod, $KeyData, $KeyHash);
-        $Cookie = array($KeyData, $KeyHashHash, time());
+        $Cookie = [$KeyData, $KeyHashHash, time()];
 
         // Attach cookie payload
         if (!is_null($CookieContents)) {
@@ -407,7 +407,7 @@ class Gdn_CookieIdentity {
         $Expiration = array_pop($Key);
         $UserID = implode('-', $Key);
         $Payload = array_slice($Payload, 4);
-        $Payload = array_merge(array($UserID, $Expiration), $Payload);
+        $Payload = array_merge([$UserID, $Expiration], $Payload);
 
         return $Payload;
     }

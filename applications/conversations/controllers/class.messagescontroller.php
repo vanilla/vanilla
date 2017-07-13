@@ -14,7 +14,7 @@
 class MessagesController extends ConversationsController {
 
     /** @var array Models to include. */
-    public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
+    public $Uses = ['Form', 'ConversationModel', 'ConversationMessageModel'];
 
     /**  @var ConversationModel */
     public $ConversationModel;
@@ -39,7 +39,7 @@ class MessagesController extends ConversationsController {
     public function initialize() {
         parent::initialize();
         $this->Menu->highlightRoute('/messages/inbox');
-        $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
+        $this->setData('Breadcrumbs', [['Name' => t('Inbox'), 'Url' => '/messages/inbox']]);
         $this->addModule('SignedInModule');
 
         if (checkPermission('Conversations.Conversations.Add')) {
@@ -71,7 +71,7 @@ class MessagesController extends ConversationsController {
 
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
-            $RecipientUserIDs = array();
+            $RecipientUserIDs = [];
             $To = explode(',', $this->Form->getFormValue('To', ''));
             $UserModel = new UserModel();
             foreach ($To as $Name) {
@@ -143,10 +143,10 @@ class MessagesController extends ConversationsController {
 
         Gdn_Theme::section('PostConversation');
         $this->title(t('New Conversation'));
-        $this->setData('Breadcrumbs', array(
-            array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
-            array('Name' => $this->data('Title'), 'Url' => 'messages/add')
-        ));
+        $this->setData('Breadcrumbs', [
+            ['Name' => t('Inbox'), 'Url' => '/messages/inbox'],
+            ['Name' => $this->data('Title'), 'Url' => 'messages/add']
+        ]);
 
         $this->CssClass = 'NoPanel';
 
@@ -463,9 +463,9 @@ class MessagesController extends ConversationsController {
             $Subject = t('Message');
         }
 
-        $this->Data['Breadcrumbs'][] = array(
+        $this->Data['Breadcrumbs'][] = [
             'Name' => $Subject,
-            'Url' => url('', '//'));
+            'Url' => url('', '//')];
 
         // Render view
         $this->render();
@@ -507,7 +507,7 @@ class MessagesController extends ConversationsController {
             throw notFoundException('Conversation');
         }
 
-        $Where = array();
+        $Where = [];
         if ($LastMessageID) {
             if (strrpos($LastMessageID, '_') !== false) {
                 $LastMessageID = trim(strrchr($LastMessageID, '_'), '_');
@@ -546,7 +546,7 @@ class MessagesController extends ConversationsController {
         )->resultArray();
 
         // Last message user data
-        Gdn::userModel()->joinUsers($Conversations, array('LastInsertUserID'));
+        Gdn::userModel()->joinUsers($Conversations, ['LastInsertUserID']);
 
         $this->EventArguments['Conversations'] = &$Conversations;
         $this->fireEvent('beforeMessagesPopin');

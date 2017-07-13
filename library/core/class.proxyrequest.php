@@ -77,15 +77,15 @@ class ProxyRequest {
 
         $CookieKey = md5(mt_rand(0, 72312189).microtime(true));
         if (defined('PATH_CACHE')) {
-            $this->CookieJar = CombinePaths(array(PATH_CACHE, "cookiejar.{$CookieKey}"));
+            $this->CookieJar = CombinePaths([PATH_CACHE, "cookiejar.{$CookieKey}"]);
         } else {
-            $this->CookieJar = CombinePaths(array("/tmp", "cookiejar.{$CookieKey}"));
+            $this->CookieJar = CombinePaths(["/tmp", "cookiejar.{$CookieKey}"]);
         }
 
         if (!is_array($RequestDefaults)) {
-            $RequestDefaults = array();
+            $RequestDefaults = [];
         }
-        $Defaults = array(
+        $Defaults = [
             'URL' => null,
             'Host' => null,
             'Method' => 'GET',
@@ -103,7 +103,7 @@ class ProxyRequest {
             'Redirected' => false,      // Flag. Is this a redirected request?
             'Debug' => false,      // Debug output on?
             'Simulate' => false       // Don't actually request, just set up
-        );
+        ];
 
         $this->RequestDefaults = array_merge($Defaults, $RequestDefaults);
     }
@@ -123,7 +123,7 @@ class ProxyRequest {
         if (array_key_exists($Key, $this->ResponseHeaders)) {
             if (!is_array($this->ResponseHeaders[$Key])) {
                 // Transform ResponseHeader to an array.
-                $this->ResponseHeaders[$Key] = array($this->ResponseHeaders[$Key]);
+                $this->ResponseHeaders[$Key] = [$this->ResponseHeaders[$Key]];
             }
             $this->ResponseHeaders[$Key][] = $Value;
         } elseif (!empty($Key)) {
@@ -170,7 +170,7 @@ class ProxyRequest {
 
             if ($this->SaveFile) {
                 $Success = file_exists($this->SaveFile);
-                $SavedFileResponse = array(
+                $SavedFileResponse = [
                     'Error' => curl_error($Handler),
                     'Success' => $Success,
                     'Size' => filesize($this->SaveFile),
@@ -178,7 +178,7 @@ class ProxyRequest {
                     'Speed' => curl_getinfo($Handler, CURLINFO_SPEED_DOWNLOAD),
                     'Type' => curl_getinfo($Handler, CURLINFO_CONTENT_TYPE),
                     'File' => $this->SaveFile
-                );
+                ];
                 $this->ResponseBody = json_encode($SavedFileResponse);
             }
         }
@@ -218,15 +218,15 @@ class ProxyRequest {
 
         // Allow requests that just want to use defaults to provide a string instead of an optionlist.
         if (is_string($Options)) {
-            $Options = array('URL' => $Options);
+            $Options = ['URL' => $Options];
         }
         if (is_null($Options)) {
-            $Options = array();
+            $Options = [];
         }
 
         $this->Options = $Options = array_merge($this->RequestDefaults, $Options);
 
-        $this->ResponseHeaders = array();
+        $this->ResponseHeaders = [];
         $this->ResponseStatus = 0;
         $this->ResponseBody = "";
         $this->RequestBody = "";
@@ -234,16 +234,16 @@ class ProxyRequest {
         $this->ContentLength = 0;
         $this->ContentType = '';
         $this->ConnectionMode = '';
-        $this->ActionLog = array();
+        $this->ActionLog = [];
 
         if (is_string($Files)) {
-            $Files = array($Files);
+            $Files = [$Files];
         }
         if (!is_array($Files)) {
-            $Files = array();
+            $Files = [];
         }
         if (!is_array($ExtraHeaders)) {
-            $ExtraHeaders = array();
+            $ExtraHeaders = [];
         }
 
         // Get the URL
@@ -286,7 +286,7 @@ class ProxyRequest {
          * exist. Also, change the method to POST if it is currently GET and there are valid files to send.
          */
 
-        $SendFiles = array();
+        $SendFiles = [];
         foreach ($Files as $File => $FilePath) {
             if (file_exists($FilePath)) {
                 $SendFiles[$File] = $FilePath;
@@ -309,7 +309,7 @@ class ProxyRequest {
             $ExtraHeaders['Host'] = $ForceHost;
         }
 
-        $SendExtraHeaders = array();
+        $SendExtraHeaders = [];
         foreach ($ExtraHeaders as $ExtraHeader => $ExtraHeaderValue) {
             $SendExtraHeaders[] = "{$ExtraHeader}: {$ExtraHeaderValue}";
         }
@@ -380,10 +380,10 @@ class ProxyRequest {
 
         $this->action(" transfer mode: {$TransferMode}");
 
-        $logContext = array(
+        $logContext = [
             'requestUrl' => $Url,
             'requestMethod' => $RequestMethod
-        );
+        ];
 
         /*
          * ProxyRequest can masquerade as the current user, so collect and encode
@@ -425,7 +425,7 @@ class ProxyRequest {
         curl_setopt($Handler, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($Handler, CURLOPT_USERAGENT, val('HTTP_USER_AGENT', $_SERVER, 'Vanilla/'.c('Vanilla.Version')));
         curl_setopt($Handler, CURLOPT_CONNECTTIMEOUT, $ConnectTimeout);
-        curl_setopt($Handler, CURLOPT_HEADERFUNCTION, array($this, 'CurlHeader'));
+        curl_setopt($Handler, CURLOPT_HEADERFUNCTION, [$this, 'CurlHeader']);
 
         if ($TransferMode == 'binary') {
             curl_setopt($Handler, CURLOPT_BINARYTRANSFER, true);

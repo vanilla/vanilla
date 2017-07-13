@@ -20,10 +20,10 @@ class EditorPlugin extends Gdn_Plugin {
     protected $canUpload;
 
     /** @var array Give class access to PluginInfo */
-    protected $pluginInfo = array();
+    protected $pluginInfo = [];
 
     /** @var array List of possible formats the editor supports. */
-    protected $Formats = array('Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx');
+    protected $Formats = ['Wysiwyg', 'Html', 'Markdown', 'BBCode', 'Text', 'TextEx'];
 
     /** @var string Default format being used for current rendering. Can be one of the formats listed in $Formats. */
     protected $Format;
@@ -76,7 +76,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array List of allowed editor actions
      */
     public function getAllowedEditorActions() {
-        static $allowedEditorActions = array(
+        static $allowedEditorActions = [
             'bold' => true,
             'italic' => true,
             'strike' => true,
@@ -108,7 +108,7 @@ class EditorPlugin extends Gdn_Plugin {
             'togglehtml' => true,
             'fullpage' => true,
             'lights' => true
-        );
+        ];
 
         return $allowedEditorActions;
     }
@@ -127,7 +127,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array Returns array of font colors to use in dropdown
      */
     protected function getFontColorList() {
-        $fontColorList = array(
+        $fontColorList = [
             'black',
             //'white',
             'gray',
@@ -142,7 +142,7 @@ class EditorPlugin extends Gdn_Plugin {
             //'lime',
             //'silver',
             //'maroon'
-        );
+        ];
 
         return $fontColorList;
     }
@@ -153,78 +153,78 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array
      */
     public function getFontFamilyOptions() {
-        $fontFamilyOptions = array(
-            'separator' => array(
+        $fontFamilyOptions = [
+            'separator' => [
                 'text' => '',
                 'command' => '',
                 'value' => '',
                 'class' => 'dd-separator',
                 'html_tag' => 'div'
-            ),
-            'default' => array(
+            ],
+            'default' => [
                 'text' => 'Default font',
                 'font-family' => "",
                 'command' => 'fontfamily',
                 'value' => 'default',
                 'class' => 'post-fontfamily-default'
-            ),
-            'arial' => array(
+            ],
+            'arial' => [
                 'text' => 'Arial',
                 'font-family' => "Arial, 'Helvetica Neue', Helvetica, sans-serif",
                 'command' => 'fontfamily',
                 'value' => 'arial',
                 'class' => 'post-fontfamily-arial'
-            ),
-            'comicsansms' => array(
+            ],
+            'comicsansms' => [
                 'text' => 'Comic Sans MS',
                 'font-family' => "'Comic Sans MS', cursive",
                 'command' => 'fontfamily',
                 'value' => 'comicsansms',
                 'class' => 'post-fontfamily-comicsansms'
-            ),
-            'couriernew' => array(
+            ],
+            'couriernew' => [
                 'text' => 'Courier New',
                 'font-family' => "'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace",
                 'command' => 'fontfamily',
                 'value' => 'couriernew',
                 'class' => 'post-fontfamily-couriernew'
-            ),
-            'georgia' => array(
+            ],
+            'georgia' => [
                 'text' => 'Georgia',
                 'font-family' => "Georgia, Times, 'Times New Roman', serif",
                 'command' => 'fontfamily',
                 'value' => 'georgia',
                 'class' => 'post-fontfamily-georgia'
-            ),
-            'impact' => array(
+            ],
+            'impact' => [
                 'text' => 'Impact',
                 'font-family' => "Impact, Haettenschweiler, 'Franklin Gothic Bold', Charcoal, 'Helvetica Inserat', 'Bitstream Vera Sans Bold', 'Arial Black', sans-serif",
                 'command' => 'fontfamily',
                 'value' => 'impact',
                 'class' => 'post-fontfamily-impact'
-            ),
-            'timesnewroman' => array(
+            ],
+            'timesnewroman' => [
                 'text' => 'Times New Roman',
                 'font-family' => "'Times New Roman', Times, Baskerville, Georgia, serif",
                 'command' => 'fontfamily',
                 'value' => 'timesnewroman',
                 'class' => 'post-fontfamily-timesnewroman'
-            ),
-            'trebuchetms' => array(
+            ],
+            'trebuchetms' => [
                 'text' => 'Trebuchet MS',
                 'font-family' => "'Trebuchet MS', 'Lucida Grande', 'Lucida Sans Unicode', 'Lucida Sans', Tahoma, sans-serif",
                 'command' => 'fontfamily',
                 'value' => 'trebuchetms',
                 'class' => 'post-fontfamily-trebuchetms'
-            ),
-            'verdana' => array(
+            ],
+            'verdana' => [
                 'text' => 'Verdana',
                 'font-family' => "Verdana, Geneva, sans-serif",
                 'command' => 'fontfamily',
                 'value' => 'verdana',
                 'class' => 'post-fontfamily-verdana'
-            )
-        );
+            ]
+        ];
 
         return $fontFamilyOptions;
     }
@@ -246,51 +246,51 @@ class EditorPlugin extends Gdn_Plugin {
      */
     protected function getFontFormatOptions() {
         // Stuff like 'heading1' is the editor-action.
-        $fontFormatOptions = array(
-            'heading1' => array(
+        $fontFormatOptions = [
+            'heading1' => [
                 'text' => sprintf(t('Heading %s'), 1),
                 'command' => 'formatBlock',
                 'value' => 'h1',
                 'class' => 'post-font-size-h1',
                 'sort' => 100
-            ),
-            'heading2' => array(
+            ],
+            'heading2' => [
                 'text' => sprintf(t('Heading %s'), 2),
                 'command' => 'formatBlock',
                 'value' => 'h2',
                 'class' => 'post-font-size-h2',
                 'sort' => 99
-            ),
-            'separator' => array(
+            ],
+            'separator' => [
                 'text' => '',
                 'command' => '',
                 'value' => '',
                 'class' => 'dd-separator',
                 'html_tag' => 'div',
                 'sort' => 98
-            ),
-            'blockquote' => array(
+            ],
+            'blockquote' => [
                 'text' => t('Quote'),
                 'command' => 'blockquote',
                 'value' => 'blockquote',
                 'class' => '',
                 'sort' => 10
-            ),
-            'code' => array(
+            ],
+            'code' => [
                 'text' => t('Source Code', 'Code'),
                 'command' => 'code',
                 'value' => 'code',
                 'class' => '',
                 'sort' => 9
-            ),
-            'spoiler' => array(
+            ],
+            'spoiler' => [
                 'text' => t('Spoiler'),
                 'command' => 'spoiler',
                 'value' => 'spoiler',
                 'class' => '',
                 'sort' => 8
-            )
-        );
+            ]
+        ];
 
         return $fontFormatOptions;
     }
@@ -320,9 +320,9 @@ class EditorPlugin extends Gdn_Plugin {
      * @param array $editorToolbarAll Holds the "kitchen sink" of editor actions
      * @return array Returns the array of allowed editor toolbar actions
      */
-    protected function getEditorToolbar($attributes = array()) {
-        $editorToolbar = array();
-        $editorToolbarAll = array();
+    protected function getEditorToolbar($attributes = []) {
+        $editorToolbar = [];
+        $editorToolbarAll = [];
         $allowedEditorActions = $this->getAllowedEditorActions();
         $allowedEditorActions['emoji'] = Emoji::instance()->hasEditorList();
         if (val('FileUpload', $attributes) && $this->canUpload()) {
@@ -345,22 +345,22 @@ class EditorPlugin extends Gdn_Plugin {
         $this->sortWeightedOptions($fontFormatOptions);
 
         // Build color dropdown from array
-        $toolbarColorGroups = array();
-        $toolbarDropdownFontColor = array();
-        $toolbarDropdownFontColorHighlight = array();
+        $toolbarColorGroups = [];
+        $toolbarDropdownFontColor = [];
+        $toolbarDropdownFontColorHighlight = [];
         foreach ($fontColorList as $fontColor) {
             // Fore color
             $editorDataAttr = '{"action":"color","value":"'.$fontColor.'"}';
-            $toolbarDropdownFontColor[] = array('edit' => 'basic', 'action' => 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
-            'data-editor' => $editorDataAttr));
+            $toolbarDropdownFontColor[] = ['edit' => 'basic', 'action' => 'color', 'type' => 'button', 'html_tag' => 'span', 'attr' => ['class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'foreColor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
+            'data-editor' => $editorDataAttr]];
 
             // Highlight color
             if ($fontColor == 'black') {
                 $fontColor = 'white';
             }
             $editorDataAttrHighlight = '{"action":"highlightcolor","value":"'.$fontColor.'"}';
-            $toolbarDropdownFontColorHighlight[] = array('edit' => 'basic', 'action' => 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => array('class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
-            'data-editor' => $editorDataAttrHighlight));
+            $toolbarDropdownFontColorHighlight[] = ['edit' => 'basic', 'action' => 'highlightcolor', 'type' => 'button', 'html_tag' => 'span', 'attr' => ['class' => 'color cell-color-'.$fontColor.' editor-dialog-fire-close', 'data-wysihtml5-command' => 'highlightcolor', 'data-wysihtml5-command-value' => $fontColor, /*'title' => t($fontColor),*/
+            'data-editor' => $editorDataAttrHighlight]];
         }
 
         $toolbarColorGroups['text'] = $toolbarDropdownFontColor;
@@ -369,66 +369,66 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Build formatting options
-        $toolbarFormatOptions = array();
+        $toolbarFormatOptions = [];
         foreach ($fontFormatOptions as $editorAction => $actionValues) {
             $htmlTag = (!empty($actionValues['html_tag'])) ? $actionValues['html_tag'] : 'a';
-            $toolbarFormatOptions[] = array(
+            $toolbarFormatOptions[] = [
             'edit' => 'format',
             'action' => $editorAction,
             'type' => 'button',
             'text' => $actionValues['text'],
             'html_tag' => $htmlTag,
-            'attr' => array(
+            'attr' => [
                 'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
                 'data-wysihtml5-command' => $actionValues['command'],
                 'data-wysihtml5-command-value' => $actionValues['value'],
                 'title' => $actionValues['text'],
                 'data-editor' => '{"action":"'.$editorAction.'","value":"'.$actionValues['value'].'"}'
-            )
-            );
+            ]
+            ];
         }
 
         // Build emoji dropdown from array.
         // Using CSS background images instead of img tag, because CSS images
         // do not download until actually displayed on page. display:none prevents browsers from loading the resources.
-        $toolbarDropdownEmoji = array();
+        $toolbarDropdownEmoji = [];
         $emoji = Emoji::instance();
         $emojiAliasList = $emoji->getEditorList();
         foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
             $emojiFilePath = $emoji->getEmojiPath($emojiCanonical);
             $editorDataAttr = '{"action":"emoji","value":'.json_encode($emojiAlias).'}';
-            $toolbarDropdownEmoji[] = array(
+            $toolbarDropdownEmoji[] = [
             'edit' => 'media',
             'action' => 'emoji',
             'type' => 'button',
             'html_tag' => 'span',
             'text' => $emoji->img($emojiFilePath, $emojiAlias),
-            'attr' => array(
+            'attr' => [
                 'class' => 'editor-action emoji-'.$emojiCanonical.' editor-dialog-fire-close emoji-wrap',
                 'data-wysihtml5-command' => 'insertHTML',
                 'data-wysihtml5-command-value' => ' '.$emojiAlias.' ',
                 'title' => $emojiAlias,
-                'data-editor' => $editorDataAttr));
+                'data-editor' => $editorDataAttr]];
         }
 
         // Font family options.
-        $toolbarFontFamilyOptions = array();
+        $toolbarFontFamilyOptions = [];
         foreach ($fontFamilyOptions as $editorAction => $actionValues) {
             $htmlTag = (!empty($actionValues['html_tag'])) ? $actionValues['html_tag'] : 'a';
-            $toolbarFontFamilyOptions[] = array(
+            $toolbarFontFamilyOptions[] = [
                 'edit' => 'fontfamily',
                 'action' => $editorAction,
                 'type' => 'button',
                 'text' => $actionValues['text'],
                 'html_tag' => $htmlTag,
-                'attr' => array(
+                'attr' => [
                     'class' => "editor-action editor-action-{$editorAction} editor-dialog-fire-close {$actionValues['class']}",
                     'data-wysihtml5-command' => $actionValues['command'],
                     'data-wysihtml5-command-value' => $actionValues['value'],
                     'title' => $actionValues['text'],
                     'data-editor' => '{"action":"'.$actionValues['command'].'","value":"'.$actionValues['value'].'"}'
-                )
-            );
+                ]
+            ];
         }
 
         // If enabled, just merge with current formatting dropdown.
@@ -438,41 +438,41 @@ class EditorPlugin extends Gdn_Plugin {
 
         // Compile whole list of editor actions into single $editorToolbarAll array.
         // Once complete, loop through allowedEditorActions and filter out the actions that will not be allowed.
-        $editorToolbarAll['bold'] = array('edit' => 'basic', 'action' => 'bold', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => t('Bold'), 'data-editor' => '{"action":"bold","value":""}'));
-        $editorToolbarAll['italic'] = array('edit' => 'basic', 'action' => 'italic', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => t('Italic'), 'data-editor' => '{"action":"italic","value":""}'));
-        $editorToolbarAll['strike'] = array('edit' => 'basic', 'action' => 'strike', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => t('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}'));
+        $editorToolbarAll['bold'] = ['edit' => 'basic', 'action' => 'bold', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-bold editor-dialog-fire-close', 'data-wysihtml5-command' => 'bold', 'title' => t('Bold'), 'data-editor' => '{"action":"bold","value":""}']];
+        $editorToolbarAll['italic'] = ['edit' => 'basic', 'action' => 'italic', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-italic editor-dialog-fire-close', 'data-wysihtml5-command' => 'italic', 'title' => t('Italic'), 'data-editor' => '{"action":"italic","value":""}']];
+        $editorToolbarAll['strike'] = ['edit' => 'basic', 'action' => 'strike', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-strikethrough editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'strikethrough', 'title' => t('Strikethrough'), 'data-editor' => '{"action":"strike","value":""}']];
 
-        $editorToolbarAll['color'] = array('edit' => 'basic', 'action' => 'color', 'type' =>
+        $editorToolbarAll['color'] = ['edit' => 'basic', 'action' => 'color', 'type' =>
             $toolbarColorGroups,
-            'attr' => array('class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => t('Color'), 'data-editor' => '{"action":"color","value":""}'));
+            'attr' => ['class' => 'editor-action icon icon-font editor-dd-color editor-optional-button', 'data-wysihtml5-command-group' => 'foreColor', 'title' => t('Color'), 'data-editor' => '{"action":"color","value":""}']];
 
-        $editorToolbarAll['orderedlist'] = array('edit' => 'format', 'action' => 'orderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => t('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}'));
-        $editorToolbarAll['unorderedlist'] = array('edit' => 'format', 'action' => 'unorderedlist', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => t('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}'));
-        $editorToolbarAll['indent'] = array('edit' => 'format', 'action' => 'indent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => t('Indent'), 'data-editor' => '{"action":"indent","value":""}'));
-        $editorToolbarAll['outdent'] = array('edit' => 'format', 'action' => 'outdent', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => t('Outdent'), 'data-editor' => '{"action":"outdent","value":""}'));
+        $editorToolbarAll['orderedlist'] = ['edit' => 'format', 'action' => 'orderedlist', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-list-ol editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertOrderedList', 'title' => t('Ordered list'), 'data-editor' => '{"action":"orderedlist","value":""}']];
+        $editorToolbarAll['unorderedlist'] = ['edit' => 'format', 'action' => 'unorderedlist', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-list-ul editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'insertUnorderedList', 'title' => t('Unordered list'), 'data-editor' => '{"action":"unorderedlist","value":""}']];
+        $editorToolbarAll['indent'] = ['edit' => 'format', 'action' => 'indent', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-indent-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'indent', 'title' => t('Indent'), 'data-editor' => '{"action":"indent","value":""}']];
+        $editorToolbarAll['outdent'] = ['edit' => 'format', 'action' => 'outdent', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-indent-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'outdent', 'title' => t('Outdent'), 'data-editor' => '{"action":"outdent","value":""}']];
 
-        $editorToolbarAll['sep-format'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-headers editor-optional-button'));
-        $editorToolbarAll['format'] = array('edit' => 'format', 'action' => 'headers', 'type' =>
+        $editorToolbarAll['sep-format'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-headers editor-optional-button']];
+        $editorToolbarAll['format'] = ['edit' => 'format', 'action' => 'headers', 'type' =>
             $toolbarFormatOptions,
-            'attr' => array('class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => t('Format'), 'data-editor' => '{"action":"format","value":""}'));
+            'attr' => ['class' => 'editor-action icon icon-paragraph editor-dd-format', 'title' => t('Format'), 'data-editor' => '{"action":"format","value":""}']];
 
-        $editorToolbarAll['sep-media'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-media editor-optional-button'));
-        $editorToolbarAll['emoji'] = array('edit' => 'media', 'action' => 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => array('class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => t('Emoji'), 'data-editor' => '{"action":"emoji","value":""}'));
-        $editorToolbarAll['links'] = array('edit' => 'media', 'action' => 'link', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => t('Url'), 'data-editor' => '{"action":"url","value":""}'));
-        $editorToolbarAll['images'] = array('edit' => 'media', 'action' => 'image', 'type' => array(), 'attr' => array('class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => t('Image'), 'data-editor' => '{"action":"image","value":""}'));
+        $editorToolbarAll['sep-media'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-media editor-optional-button']];
+        $editorToolbarAll['emoji'] = ['edit' => 'media', 'action' => 'emoji', 'type' => $toolbarDropdownEmoji, 'attr' => ['class' => 'editor-action icon icon-smile editor-dd-emoji', 'data-wysihtml5-command' => '', 'title' => t('Emoji'), 'data-editor' => '{"action":"emoji","value":""}']];
+        $editorToolbarAll['links'] = ['edit' => 'media', 'action' => 'link', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-link editor-dd-link editor-optional-button', 'data-wysihtml5-command' => 'createLink', 'title' => t('Url'), 'data-editor' => '{"action":"url","value":""}']];
+        $editorToolbarAll['images'] = ['edit' => 'media', 'action' => 'image', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-picture editor-dd-image', 'data-wysihtml5-command' => 'insertImage', 'title' => t('Image'), 'data-editor' => '{"action":"image","value":""}']];
 
         $editorToolbarAll['fileuploads'] = ['edit' => 'media', 'action' => 'fileupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-file editor-dd-fileupload', 'data-wysihtml5-command' => '', 'title' => t('Attach file'), 'data-editor' => '{"action":"fileupload","value":""}']];
         $editorToolbarAll['imageuploads'] = ['edit' => 'media', 'action' => 'imageupload', 'type' => [], 'attr' => ['class' => 'editor-action icon icon-picture editor-dd-imageupload', 'data-wysihtml5-command' => '', 'title' => t('Attach image'), 'data-editor' => '{"action":"imageupload","value":""}']];
 
-        $editorToolbarAll['sep-align'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-align editor-optional-button'));
-        $editorToolbarAll['alignleft'] = array('edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => t('Align left'), 'data-editor' => '{"action":"alignleft","value":""}'));
-        $editorToolbarAll['aligncenter'] = array('edit' => 'format', 'action' => 'aligncenter', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-center editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyCenter', 'title' => t('Align center'), 'data-editor' => '{"action":"aligncenter","value":""}'));
-        $editorToolbarAll['alignright'] = array('edit' => 'format', 'action' => 'alignright', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-align-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyRight', 'title' => t('Align right'), 'data-editor' => '{"action":"alignright","value":""}'));
+        $editorToolbarAll['sep-align'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-align editor-optional-button']];
+        $editorToolbarAll['alignleft'] = ['edit' => 'format', 'action' => 'alignleft', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-left editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyLeft', 'title' => t('Align left'), 'data-editor' => '{"action":"alignleft","value":""}']];
+        $editorToolbarAll['aligncenter'] = ['edit' => 'format', 'action' => 'aligncenter', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-center editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyCenter', 'title' => t('Align center'), 'data-editor' => '{"action":"aligncenter","value":""}']];
+        $editorToolbarAll['alignright'] = ['edit' => 'format', 'action' => 'alignright', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-align-right editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-command' => 'justifyRight', 'title' => t('Align right'), 'data-editor' => '{"action":"alignright","value":""}']];
 
-        $editorToolbarAll['sep-switches'] = array('type' => 'separator', 'attr' => array('class' => 'editor-sep sep-switches editor-optional-button'));
-        $editorToolbarAll['togglehtml'] = array('edit' => 'switches', 'action' => 'togglehtml', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-action' => 'change_view', 'title' => t('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}'));
-        $editorToolbarAll['fullpage'] = array('edit' => 'switches', 'action' => 'fullpage', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}'));
-        $editorToolbarAll['lights'] = array('edit' => 'switches', 'action' => 'lights', 'type' => 'button', 'attr' => array('class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}'));
+        $editorToolbarAll['sep-switches'] = ['type' => 'separator', 'attr' => ['class' => 'editor-sep sep-switches editor-optional-button']];
+        $editorToolbarAll['togglehtml'] = ['edit' => 'switches', 'action' => 'togglehtml', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-source editor-toggle-source editor-dialog-fire-close editor-optional-button', 'data-wysihtml5-action' => 'change_view', 'title' => t('Toggle HTML view'), 'data-editor' => '{"action":"togglehtml","value":""}']];
+        $editorToolbarAll['fullpage'] = ['edit' => 'switches', 'action' => 'fullpage', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-resize-full editor-toggle-fullpage-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle full page'), 'data-editor' => '{"action":"fullpage","value":""}']];
+        $editorToolbarAll['lights'] = ['edit' => 'switches', 'action' => 'lights', 'type' => 'button', 'attr' => ['class' => 'editor-action icon icon-adjust editor-toggle-lights-button editor-dialog-fire-close editor-optional-button', 'title' => t('Toggle lights'), 'data-editor' => '{"action":"lights","value":""}']];
 
         // Filter out disallowed editor actions
         foreach ($allowedEditorActions as $editorAction => $allowed) {
@@ -506,7 +506,7 @@ class EditorPlugin extends Gdn_Plugin {
      */
     public function isEmbeddedComment($Sender) {
         $isEmbeddedComment = false;
-        $requestMethod = array();
+        $requestMethod = [];
 
         if (isset($Sender->RequestMethod)) {
             $requestMethod[] = strtolower($Sender->RequestMethod);
@@ -577,7 +577,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('editorWysiwygCSS', $CssPath);
         $c->addDefinition('canUpload', $this->canUpload());
 
-        $additionalDefinitions = array();
+        $additionalDefinitions = [];
         $this->EventArguments['definitions'] = &$additionalDefinitions;
         $this->fireEvent('GetJSDefinitions');
 
@@ -652,7 +652,7 @@ class EditorPlugin extends Gdn_Plugin {
         // TODO have some way to prevent this content from getting loaded when in embedded.
         // The only problem is figuring out how to know when content is embedded.
 
-        $attributes = array();
+        $attributes = [];
         if (val('Attributes', $Args)) {
             $attributes = val('Attributes', $Args);
         }
@@ -667,7 +667,7 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // If force Wysiwyg enabled in settings
-        $needsConversion = (!in_array($this->Format, array('Wysiwyg')));
+        $needsConversion = (!in_array($this->Format, ['Wysiwyg']));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
             $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
             $Sender->setValue('Body', $wysiwygBody);
@@ -709,7 +709,7 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function postController_editorUpload_create($Sender, $args = array()) {
+    public function postController_editorUpload_create($Sender, $args = []) {
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
 
@@ -720,12 +720,12 @@ class EditorPlugin extends Gdn_Plugin {
         $discussionID = ($Sender->Request->post('DiscussionID')) ? $Sender->Request->post('DiscussionID') : '';
 
         // JSON payload of media info will get sent back to the client.
-        $json = array(
+        $json = [
             'error' => 1,
             'feedback' => 'There was a problem.',
-            'errors' => array(),
-            'payload' => array()
-        );
+            'errors' => [],
+            'payload' => []
+        ];
 
         // New upload instance
         $Upload = new Gdn_Upload();
@@ -815,7 +815,7 @@ class EditorPlugin extends Gdn_Plugin {
             $thumbWidth = null;
             $imageHeight = null;
             $imageWidth = null;
-            $thumbPathParsed = array('SaveName' => '');
+            $thumbPathParsed = ['SaveName' => ''];
             $thumbUrl = '';
 
             // This is a redundant check, because it's in the thumbnail function,
@@ -831,7 +831,7 @@ class EditorPlugin extends Gdn_Plugin {
             $Model = new MediaModel();
 
             // Will be passed to model for database insertion/update. All thumb vars will be empty.
-            $Media = array(
+            $Media = [
                 'Name' => $fileName,
                 'Type' => $fileData['type'],
                 'Size' => $fileData['size'],
@@ -843,7 +843,7 @@ class EditorPlugin extends Gdn_Plugin {
                 'DateInserted' => date('Y-m-d H:i:s'),
                 'Path' => $filePathParsed['SaveName'],
                 'ThumbPath' => $thumbPathParsed['SaveName']
-            );
+            ];
 
             // Get MediaID and pass it to client in payload.
             $MediaID = $Model->save($Media);
@@ -853,7 +853,7 @@ class EditorPlugin extends Gdn_Plugin {
                 $thumbUrl = url('/utility/mediathumbnail/'.$MediaID, true);
             }
 
-            $payload = array(
+            $payload = [
                 'MediaID' => $MediaID,
                 'Filename' => htmlspecialchars($fileName),
                 'Filesize' => $fileData['size'],
@@ -868,13 +868,13 @@ class EditorPlugin extends Gdn_Plugin {
                 'original_width' => $imageWidth,
                 'original_height' => $imageHeight,
                 'upload_type' => $uploadType
-            );
+            ];
 
-            $json = array(
+            $json = [
                 'error' => 0,
                 'feedback' => 'Editor received file successfully.',
                 'payload' => $payload
-            );
+            ];
         }
 
         // Return JSON payload
@@ -1104,16 +1104,16 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array
      */
     protected function getConversationMessageIDList($id) {
-        $Conversations = array();
+        $Conversations = [];
         $ConversationMessageModel = new Gdn_Model('ConversationMessage');
 
         // Query the Media table for discussion media.
         if (is_numeric($id)) {
-            $sqlWhere = array('ConversationID' => $id);
+            $sqlWhere = ['ConversationID' => $id];
             $Conversations = $ConversationMessageModel->getWhere($sqlWhere)->resultArray();
         }
 
-        $MessageIDList = array();
+        $MessageIDList = [];
         foreach ($Conversations as $Conversation) {
             $MessageIDList[] = val('MessageID', $Conversation);
         }
@@ -1140,7 +1140,7 @@ class EditorPlugin extends Gdn_Plugin {
         if ($Sender->data('Messages')) {
             $Message = $Sender->data('Messages')->result();
             $MessageID = val(0, $Message)->MessageID;
-            $MessageIDList = array($MessageID);
+            $MessageIDList = [$MessageID];
             if (count($MessageIDList)) {
                 $MediaData = $this->preloadDiscussionMedia(val('ConversationID', $Sender->data('Messages')), $MessageIDList, 'conversation');
             }
@@ -1157,8 +1157,8 @@ class EditorPlugin extends Gdn_Plugin {
             $commentsData->importDataset($commentsArray);
             $Comments = $commentsData;
         }
-        $CommentIDList = array();
-        $MediaData = array();
+        $CommentIDList = [];
+        $MediaData = [];
 
         if ($Sender->data('Discussion.DiscussionID')) {
             $DiscussionID = $Sender->data('Discussion.DiscussionID');
@@ -1221,18 +1221,18 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array
      */
     public function preloadDiscussionMedia($discussionID, $commentIDList, $type = 'discussion') {
-        $mediaData = array();
-        $mediaDataDiscussion = array();
-        $mediaDataComment = array();
+        $mediaData = [];
+        $mediaDataDiscussion = [];
+        $mediaDataComment = [];
         $mediaModel = new MediaModel();
 
         // Query the Media table for discussion media.
         if ($type === 'discussion') {
             if (is_numeric($discussionID)) {
-                $sqlWhere = array(
+                $sqlWhere = [
                     'ForeignTable' => 'discussion',
                     'ForeignID' => $discussionID
-                );
+                ];
                 $mediaDataDiscussion = $mediaModel->getWhere($sqlWhere)->resultArray();
             }
         }
@@ -1245,10 +1245,10 @@ class EditorPlugin extends Gdn_Plugin {
         if (is_array($commentIDList) && count($commentIDList)) {
             $commentIDList = array_filter($commentIDList);
 
-            $sqlWhere = array(
+            $sqlWhere = [
                 'ForeignTable' => ($type == 'discussion') ? 'comment' : 'message',
                 'ForeignID' => $commentIDList
-            );
+            ];
             $mediaDataComment = $mediaModel->getWhere($sqlWhere)->resultArray();
         }
 
@@ -1361,7 +1361,7 @@ class EditorPlugin extends Gdn_Plugin {
     public function settingsController_addEditCategory_handler($Sender) {
         // Only put the checkbox on edit. On creation the default value will be used.
         if ($Sender->data('CategoryID')) {
-            $Sender->Data['_PermissionFields']['AllowFileUploads'] = array('Control' => 'CheckBox');
+            $Sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
         }
     }
 
@@ -1376,11 +1376,11 @@ class EditorPlugin extends Gdn_Plugin {
 
         $Formats = array_combine($this->Formats, $this->Formats);
 
-        $Cf->initialize(array(
-            'Garden.InputFormatter' => array('LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>', 'Items' => $Formats),
-            'Plugins.editor.ForceWysiwyg' => array('LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p class="info">Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p class="info"><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'),
-            'Garden.MobileInputFormatter' => array('LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter'))
-        ));
+        $Cf->initialize([
+            'Garden.InputFormatter' => ['LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>', 'Items' => $Formats],
+            'Plugins.editor.ForceWysiwyg' => ['LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p class="info">Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p class="info"><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'],
+            'Garden.MobileInputFormatter' => ['LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter')]
+        ]);
 
 
         $Sender->setData('Title', t('Advanced Editor Settings'));
@@ -1392,10 +1392,10 @@ class EditorPlugin extends Gdn_Plugin {
      * This way, the editor plugin always takes precedence.
      */
     public function setup() {
-        touchConfig(array(
+        touchConfig([
             'Garden.MobileInputFormatter' => 'TextEx',
             'Plugins.editor.ForceWysiwyg' => false
-        ));
+        ]);
         $this->structure();
     }
 
@@ -1405,12 +1405,12 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Exception
      */
     public function structure() {
-         $pluginEditors = array(
+         $pluginEditors = [
             'cleditor',
             'ButtonBar',
             'Emotify',
             'FileUpload'
-        );
+        ];
 
         foreach ($pluginEditors as $pluginName) {
             Gdn::pluginManager()->disablePlugin($pluginName);
@@ -1469,10 +1469,10 @@ class EditorPlugin extends Gdn_Plugin {
         $thumb_destination_path = $this->getAbsoluteDestinationFilePath($local_path, $file_extension, $thumb_path);
 
         // Create thumbnail, and grab debug data from whole process.
-        $thumb_payload = generate_thumbnail($local_path, $thumb_destination_path, array(
+        $thumb_payload = generate_thumbnail($local_path, $thumb_destination_path, [
             // Give preference to height for thumbnail, so height controls.
             'height' => c('Plugins.FileUpload.ThumbnailHeight', 128)
-        ));
+        ]);
 
         if ($thumb_payload['success'] === true) {
             // Thumbnail dimensions
@@ -1485,15 +1485,15 @@ class EditorPlugin extends Gdn_Plugin {
             $parsed = Gdn_Upload::parse($thumb_destination_path);
             $target = $thumb_destination_path; // $parsed['Name'];
             $Upload = new Gdn_Upload();
-            $filepath_parsed = $Upload->saveAs($thumb_destination_path, $target, array('source' => 'content'));
+            $filepath_parsed = $Upload->saveAs($thumb_destination_path, $target, ['source' => 'content']);
 
             // Save thumbnail information to DB.
-            $model->save(array(
+            $model->save([
                 'MediaID' => $media_id,
                 'ThumbWidth' => $thumb_width,
                 'ThumbHeight' => $thumb_height,
                 'ThumbPath' => $filepath_parsed['SaveName']
-            ));
+            ]);
 
             // Remove cloud scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from cloud storage.
             $uploadFolder = basename(PATH_UPLOADS);
@@ -1504,12 +1504,12 @@ class EditorPlugin extends Gdn_Plugin {
             $url = $filepath_parsed['Url'];
         } else {
             // Fix the thumbnail information so this isn't requested again and again.
-            $model->save(array(
+            $model->save([
             'MediaID' => $media_id,
             'ImageWidth' => 0,
             'ImageHeight' => 0,
             'ThumbPath' => ''
-            ));
+            ]);
 
             $url = asset('/plugins/FileUpload/images/file.png');
         }

@@ -11,19 +11,19 @@
                 if (val('Deleted', $User)) {
                     echo anchor(
                         wrap(
-                            ($Photo ? img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
-                            wrap($Username, 'del', array('class' => 'Username')),
-                            'span', array('class' => 'Conversation-User',)
+                            ($Photo ? img($Photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']) : '').' '.
+                            wrap($Username, 'del', ['class' => 'Username']),
+                            'span', ['class' => 'Conversation-User',]
                         ),
                         userUrl($User),
-                        array('title' => sprintf(t('%s has left this conversation.'), $Username))
+                        ['title' => sprintf(t('%s has left this conversation.'), $Username)]
                     );
                 } else {
                     echo anchor(
                         wrap(
-                            ($Photo ? img($Photo, array('class' => 'ProfilePhoto ProfilePhotoSmall')) : '').' '.
-                            wrap($Username, 'span', array('class' => 'Username')),
-                            'span', array('class' => 'Conversation-User')
+                            ($Photo ? img($Photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']) : '').' '.
+                            wrap($Username, 'span', ['class' => 'Username']),
+                            'span', ['class' => 'Conversation-User']
                         ),
                         userUrl($User)
                     );

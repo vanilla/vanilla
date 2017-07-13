@@ -46,17 +46,17 @@ class ExportModel {
     public $Prefix = '';
 
     /** @var array Data format we support exporting. */
-    protected $_Structures = array(
-        'Category' => array('CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'Comment' => array('CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'),
-        'Conversation' => array('ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'),
-        'ConversationMessage' => array('MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'),
-        'Discussion' => array('DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'),
-        'Role' => array('RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'),
-        'UserConversation' => array('UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'),
-        'User' => array('UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => array('u', 'm', 'f'), 'Score' => 'float'),
-        'UserRole' => array('UserID' => 'int', 'RoleID' => 'int')
-    );
+    protected $_Structures = [
+        'Category' => ['CategoryID' => 'int', 'Name' => 'varchar(30)', 'Description' => 'varchar(250)', 'ParentCategoryID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'],
+        'Comment' => ['CommentID' => 'int', 'DiscussionID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Format' => 'varchar(20)', 'Body' => 'text', 'Score' => 'float'],
+        'Conversation' => ['ConversationID' => 'int', 'FirstMessageID' => 'int', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int'],
+        'ConversationMessage' => ['MessageID' => 'int', 'ConversationID' => 'int', 'Body' => 'text', 'InsertUserID' => 'int', 'DateInserted' => 'datetime'],
+        'Discussion' => ['DiscussionID' => 'int', 'Name' => 'varchar(100)', 'CategoryID' => 'int', 'Body' => 'text', 'Format' => 'varchar(20)', 'DateInserted' => 'datetime', 'InsertUserID' => 'int', 'DateUpdated' => 'datetime', 'UpdateUserID' => 'int', 'Score' => 'float', 'Announce' => 'tinyint', 'Closed' => 'tinyint', 'Announce' => 'tinyint'],
+        'Role' => ['RoleID' => 'int', 'Name' => 'varchar(100)', 'Description' => 'varchar(200)'],
+        'UserConversation' => ['UserID' => 'int', 'ConversationID' => 'int', 'LastMessageID' => 'int'],
+        'User' => ['UserID' => 'int', 'Name' => 'varchar(20)', 'Email' => 'varchar(200)', 'Password' => 'varbinary(34)', 'Gender' => ['u', 'm', 'f'], 'Score' => 'float'],
+        'UserRole' => ['UserID' => 'int', 'RoleID' => 'int']
+    ];
 
     /**
      * Create the export file and begin the export.
@@ -152,7 +152,7 @@ class ExportModel {
      * @param array $Mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
      *  For a list of the export tables and columns see $this->Structure().
      */
-    public function exportTable($TableName, $Query, $Mappings = array()) {
+    public function exportTable($TableName, $Query, $Mappings = []) {
         $fp = $this->_File;
 
         // Make sure the table is valid for export.
@@ -176,8 +176,8 @@ class ExportModel {
         }
 
         // Set the search and replace to escape strings.
-        $EscapeSearch = array(self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE); // escape must go first
-        $EscapeReplace = array(self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE);
+        $EscapeSearch = [self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE]; // escape must go first
+        $EscapeReplace = [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE];
 
         // Write the column header.
         fwrite($fp, implode(self::DELIM, array_keys($Structure)).self::NEWLINE);
@@ -188,7 +188,7 @@ class ExportModel {
             $First = true;
 
             // Loop through the columns in the export structure and grab their values from the row.
-            $ExRow = array();
+            $ExRow = [];
             foreach ($Structure as $Field => $Type) {
                 // Get the value of the export.
                 if (array_key_exists($Field, $Row)) {

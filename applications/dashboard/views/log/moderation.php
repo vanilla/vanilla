@@ -11,8 +11,8 @@ echo heading($this->data('Title'));
 <div class="toolbar flex-wrap">
     <div class="toolbar-buttons">
         <?php
-        echo anchor(t('Approve'), '#', array('class' => 'RestoreButton btn btn-primary'));
-        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
+        echo anchor(t('Approve'), '#', ['class' => 'RestoreButton btn btn-primary']);
+        echo anchor(t('Delete Forever'), '#', ['class' => 'DeleteButton btn btn-primary']);
         ?>
     </div>
     <div class="search toolbar-main"><?php
@@ -22,7 +22,7 @@ echo heading($this->data('Title'));
                     'Value' => val('ModerationCategoryID', $this->Data),
                     'IncludeNull' => t('Show all categories')]
             );
-            echo anchor(t('Filter'), '#', array('class' => 'FilterButton btn btn-primary'));
+            echo anchor(t('Filter'), '#', ['class' => 'FilterButton btn btn-primary']);
             echo '</div>';
         }
         ?></div>

@@ -4,7 +4,7 @@
         echo t($this->data('Summary'));
         ?>
         <ul>
-            <?php foreach ($this->data('Reasons', array()) as $Reason) { ?>
+            <?php foreach ($this->data('Reasons', []) as $Reason) { ?>
                 <li><?php echo $Reason; ?></li>
             <?php } ?>
         </ul>

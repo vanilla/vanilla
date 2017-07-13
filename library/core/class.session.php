@@ -51,8 +51,8 @@ class Gdn_Session {
     public function __construct() {
         $this->UserID = 0;
         $this->User = false;
-        $this->_Attributes = array();
-        $this->_Preferences = array();
+        $this->_Attributes = [];
+        $this->_Preferences = [];
         $this->_TransientKey = false;
 
         $this->permissions = new Permissions();
@@ -76,12 +76,12 @@ class Gdn_Session {
      * @return boolean True on valid authorization, false on failure to authorize
      */
     public function checkRankedPermission($permission) {
-        $permissionsRanked = array(
+        $permissionsRanked = [
             'Garden.Settings.Manage',
             'Garden.Community.Manage',
             'Garden.Moderation.Manage',
             'Garden.SignIn.Allow'
-        );
+        ];
 
         if ($permission === true) {
             return true;
@@ -162,8 +162,8 @@ class Gdn_Session {
 
         $this->UserID = 0;
         $this->User = false;
-        $this->_Attributes = array();
-        $this->_Preferences = array();
+        $this->_Attributes = [];
+        $this->_Preferences = [];
         $this->_TransientKey = false;
         $this->timeZone = null;
     }
@@ -380,7 +380,7 @@ class Gdn_Session {
      * @return array
      */
     public function getAttributes() {
-        return is_array($this->_Attributes) ? $this->_Attributes : array();
+        return is_array($this->_Attributes) ? $this->_Attributes : [];
     }
 
     /**
@@ -493,7 +493,7 @@ class Gdn_Session {
      */
     public function setAttribute($Name, $Value = '') {
         if (!is_array($Name)) {
-            $Name = array($Name => $Value);
+            $Name = [$Name => $Value];
         }
 
         foreach ($Name as $Key => $Val) {
@@ -513,7 +513,7 @@ class Gdn_Session {
      */
     public function setPreference($Name, $Value = '', $SaveToDatabase = true) {
         if (!is_array($Name)) {
-            $Name = array($Name => $Value);
+            $Name = [$Name => $Value];
         }
 
         foreach ($Name as $Key => $Val) {

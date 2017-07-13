@@ -21,7 +21,7 @@ foreach ($this->UserData->result() as $User) {
         </td>
         <td style="max-width: 200px;">
             <?php
-            $Roles = val('Roles', $User, array());
+            $Roles = val('Roles', $User, []);
             $RolesString = '';
 
             if ($User->Banned && !in_array('Banned', $Roles)) {
@@ -33,7 +33,7 @@ foreach ($this->UserData->result() as $User) {
             }
 
             foreach ($Roles as $RoleID => $RoleName) {
-                $Query = http_build_query(array('Keywords' => $RoleName));
+                $Query = http_build_query(['Keywords' => $RoleName]);
                 $RolesString = concatSep(', ', $RolesString, '<a href="'.url('/user/browse?'.$Query).'">'.htmlspecialchars($RoleName).'</a>');
             }
             echo $RolesString;

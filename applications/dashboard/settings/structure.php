@@ -253,7 +253,7 @@ $Construct->table('UserAuthenticationProvider')
 $Construct->table('UserAuthenticationNonce')
     ->column('Nonce', 'varchar(100)', false, 'primary')
     ->column('Token', 'varchar(128)', false)
-    ->column('Timestamp', 'timestamp', false)
+    ->column('Timestamp', 'timestamp', false, 'index')
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationToken')

@@ -54,10 +54,21 @@ class AddPeopleModule extends Gdn_Module {
                     }
                 }
             }
-            $Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs);
 
-            $Sender->informMessage(t('Your changes were saved.'));
-            $Sender->setRedirectTo('/messages/'.$this->Conversation->ConversationID);
+            if ($Sender->ConversationModel->addUserToConversation($this->Conversation->ConversationID, $NewRecipientUserIDs)) {
+                $Sender->informMessage(t('Your changes were saved.'));
+            } else {
+                $maxRecipients = ConversationModel::getMaxRecipients();
+                $Sender->informMessage(sprintf(
+                    plural(
+                        $maxRecipients,
+                        "You are limited to %s recipient.",
+                        "You are limited to %s recipients."
+                    ),
+                    $maxRecipients
+                ));
+            }
+            $Sender->setRedirectTo('/messages/'.$this->Conversation->ConversationID, false);
         }
         $this->_ApplicationFolder = $Sender->Application;
         $this->_ThemeFolder = $Sender->Theme;

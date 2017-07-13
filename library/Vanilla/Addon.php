@@ -647,7 +647,7 @@ class Addon {
                 $locale = self::canonicalizeLocale(basename(dirname($localePath)));
                 $result[$locale][] = $localePath;
 
-                $properPath = "/locale/$locale.php";
+                $properPath = $this->path("/locale/$locale.php", self::PATH_ADDON);
                 trigger_error("Locales in $localePath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
             }
         }

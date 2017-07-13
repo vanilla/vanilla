@@ -267,12 +267,12 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                    $this->setRedirectTo($Route, false);
+                    $this->setRedirectTo($Route);
                 } else {
                     if ($Route !== false) {
-                        redirectTo($Route, 302, false);
+                        redirectTo($Route);
                     } else {
-                        redirectTo(Gdn::router()->getDestination('DefaultController'), 302, false);
+                        redirectTo(Gdn::router()->getDestination('DefaultController'));
                     }
                 }
                 break;
@@ -899,7 +899,7 @@ class EntryController extends Gdn_Controller {
     protected function _setRedirect($CheckPopup = false) {
         $Url = url($this->getTargetRoute(), true);
 
-        $this->setRedirectTo($Url, false);
+        $this->setRedirectTo($Url);
         $this->MasterView = 'popup';
         $this->View = 'redirect';
 
@@ -1191,9 +1191,9 @@ class EntryController extends Gdn_Controller {
                     /// ... and redirect them appropriately
                     $Route = $this->getTargetRoute();
                     if ($Route !== false) {
-                        redirectTo($Route, 302, false);
+                        redirectTo($Route);
                     } else {
-                        redirectTo('/', 302, false);
+                        redirectTo('/');
                     }
 
                 } else {
@@ -1319,7 +1319,7 @@ class EntryController extends Gdn_Controller {
                 /// ... and redirect them appropriately
                 $Route = $this->getTargetRoute();
                 if ($Route !== false) {
-                    redirectTo($Route, 302, false);
+                    redirectTo($Route);
                 }
             } else {
                 // Add the hidden inputs back into the form.
@@ -1333,7 +1333,7 @@ class EntryController extends Gdn_Controller {
             $Id = Gdn::authenticator()->getIdentity(true);
             if ($Id > 0) {
                 // The user is signed in so we can just go back to the homepage.
-                redirectTo($Target, 302, false);
+                redirectTo($Target);
             }
 
             $Name = $UserInfo['UserName'];
@@ -1491,7 +1491,7 @@ class EntryController extends Gdn_Controller {
                     }
 
                     if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
-                        $this->setRedirectTo('/entry/registerthanks', false);
+                        $this->setRedirectTo('/entry/registerthanks');
                     }
                 }
             } catch (Exception $Ex) {
@@ -1560,7 +1560,7 @@ class EntryController extends Gdn_Controller {
                     // ... and redirect them appropriately
                     $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->setRedirectTo($Route, false);
+                        $this->setRedirectTo($Route);
                     } else {
                         if ($Route !== false) {
                             redirectTo($Route);
@@ -1687,7 +1687,7 @@ class EntryController extends Gdn_Controller {
                     // ... and redirect them appropriately
                     $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->setRedirectTo($Route, false);
+                        $this->setRedirectTo($Route);
                     } else {
                         if ($Route !== false) {
                             redirectTo($Route);
@@ -1856,7 +1856,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($User->UserID, true);
-                    redirectTo('/', 302, false);
+                    redirectTo('/');
                 }
             }
 
@@ -1992,12 +1992,12 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                    $this->setRedirectTo($Route, false);
+                    $this->setRedirectTo($Route);
                 } else {
                     if ($Route !== false) {
-                        redirectTo($Route, 302, false);
+                        redirectTo($Route);
                     } else {
-                        redirectTo(Gdn::router()->getDestination('DefaultController'), 302, false);
+                        redirectTo(Gdn::router()->getDestination('DefaultController'));
                     }
                 }
                 break;

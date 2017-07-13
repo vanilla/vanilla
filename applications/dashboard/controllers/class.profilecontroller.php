@@ -200,7 +200,7 @@ class ProfileController extends Gdn_Controller {
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirectTo('/profile', 302, false);
+            redirectTo('/profile');
         } else {
             $this->jsonTarget('#Status', '', 'Remove');
             $this->render('Blank', 'Utility');
@@ -314,7 +314,7 @@ class ProfileController extends Gdn_Controller {
         Gdn::userModel()->saveAttribute($this->User->UserID, $Provider, null);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            redirectTo(userUrl($this->User, '', 'connections'), 302, false);
+            redirectTo(userUrl($this->User, '', 'connections'));
         } else {
             // Grab all of the providers again.
             $PModel = new Gdn_AuthenticationProviderModel();
@@ -563,7 +563,7 @@ class ProfileController extends Gdn_Controller {
             safeCookie('X-UA-Device-Force', $type, $Expiration, $Path, $Domain);
         }
 
-        $this->setRedirectTo('/', false);
+        $this->setRedirectTo('/');
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -811,7 +811,7 @@ class ProfileController extends Gdn_Controller {
             if ($this->deliveryType() === DELIVERY_TYPE_VIEW) {
                 $this->jsonTarget('', '', 'Refresh');
 
-                $this->setRedirectTo(userUrl($this->User), false);
+                $this->setRedirectTo(userUrl($this->User));
             }
             $this->informMessage(t("Your settings have been saved."));
         }
@@ -1149,7 +1149,7 @@ class ProfileController extends Gdn_Controller {
         } else {
             $redirectUrl = userUrl($this->User, '', 'picture');
         }
-        redirectTo($redirectUrl, 302, false);
+        redirectTo($redirectUrl);
     }
 
     /**
@@ -1532,7 +1532,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->User === false) {
             throw notFoundException('User');
         } elseif ($this->User->Deleted == 1) {
-            redirectTo('dashboard/home/deleted', 302, false);
+            redirectTo('dashboard/home/deleted');
         } else {
             $this->RoleData = $this->UserModel->getRoles($this->User->UserID);
             if ($this->RoleData !== false && $this->RoleData->numRows(DATASET_TYPE_ARRAY) > 0) {

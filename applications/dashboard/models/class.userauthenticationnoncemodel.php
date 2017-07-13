@@ -19,6 +19,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('UserAuthenticationNonce');
         $this->setPruneField('Timestamp');
+        $this->setPruneAfter('45 minutes');
     }
 
     /**

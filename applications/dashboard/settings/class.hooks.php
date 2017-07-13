@@ -502,7 +502,7 @@ class DashboardHooks extends Gdn_Plugin {
 
                     if ($Sender->Form->Save()) {
                         $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->setRedirectTo('/settings/tagging', false);
+                        $Sender->setRedirectTo('/settings/tagging');
                     }
                 }
 
@@ -544,7 +544,7 @@ class DashboardHooks extends Gdn_Plugin {
                     $Saved = $Sender->Form->save();
                     if ($Saved) {
                         $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->setRedirectTo('/settings/tagging', false);
+                        $Sender->setRedirectTo('/settings/tagging');
                     }
                 }
 
@@ -648,7 +648,7 @@ class DashboardHooks extends Gdn_Plugin {
             $deliveryType = $Sender->getDeliveryType($deliveryMethod);
             if (!$IsApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
                 $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
-                redirectTo(url($url, true), 302, false);
+                redirectTo($url);
             }
         }
         $this->checkAccessToken();

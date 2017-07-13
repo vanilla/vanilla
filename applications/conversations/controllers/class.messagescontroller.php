@@ -103,7 +103,7 @@ class MessagesController extends ConversationsController {
             $ConversationID = $this->Form->save();
             if ($ConversationID !== false) {
                 $Target = $this->Form->getFormValue('Target', 'messages/'.$ConversationID);
-                $this->setRedirectTo($Target, false);
+                $this->setRedirectTo($Target);
 
                 $Conversation = $this->ConversationModel->getID(
                     $ConversationID,
@@ -194,7 +194,7 @@ class MessagesController extends ConversationsController {
 
             if ($NewMessageID) {
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirectTo('messages/'.$ConversationID.'/#'.$NewMessageID, 302, false);
+                    redirectTo('messages/'.$ConversationID.'/#'.$NewMessageID);
                 }
 
                 $this->setJson('MessageID', $NewMessageID);
@@ -296,7 +296,7 @@ class MessagesController extends ConversationsController {
             // Clear it
             $this->ConversationModel->clear($ConversationID, $Session->UserID);
             $this->informMessage(t('The conversation has been cleared.'));
-            $this->setRedirectTo('/messages/all', false);
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->render();
@@ -324,7 +324,7 @@ class MessagesController extends ConversationsController {
 
         if ($this->Form->authenticatedPostBack(true)) {
             $this->ConversationModel->clear($conversationID, Gdn::session()->UserID);
-            $this->setRedirectTo('/messages/all', false);
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->title(t('Leave Conversation'));
@@ -584,7 +584,7 @@ class MessagesController extends ConversationsController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirectTo($_SERVER['HTTP_REFERER'], 302, false);
+            redirectTo($_SERVER['HTTP_REFERER']);
         } else {
             $this->render();
         }

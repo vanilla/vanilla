@@ -398,7 +398,7 @@ class SettingsController extends DashboardController {
 
                     // New uploads stay on the page to allow cropping. Otherwise, redirect to avatar settings page.
                     if (!$newUpload) {
-                        redirectTo('/dashboard/settings/avatars', 302, false);
+                        redirectTo('/dashboard/settings/avatars');
                     }
                 }
                 $this->informMessage(t("Your settings have been saved."));
@@ -796,7 +796,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::layout instead.
      */
     public function homepage() {
-        redirectTo('/settings/layout', 302, false);
+        redirectTo('/settings/layout');
     }
 
     /**
@@ -805,7 +805,7 @@ class SettingsController extends DashboardController {
      * @deprecated 2.4 Legacy redirect. Use SettingsController::branding instead.
      */
     public function banner() {
-        redirectTo('/settings/branding', 302, false);
+        redirectTo('/settings/branding');
     }
 
 
@@ -1162,7 +1162,7 @@ class SettingsController extends DashboardController {
             $sections = DashboardNavModule::getDashboardNav()->getSectionsInfo();
             $url = val('url', val($section, $sections));
             if ($url) {
-                redirectTo($url, 302, false);
+                redirectTo($url);
             }
         }
 
@@ -1173,11 +1173,11 @@ class SettingsController extends DashboardController {
                 'Garden.Community.Manage',
             ], false)) {
             // We don't have permission to see the dashboard/home.
-            redirectTo(DashboardNavModule::getDashboardNav()->getUrlForSection('Moderation'), 302, false);
+            redirectTo(DashboardNavModule::getDashboardNav()->getUrlForSection('Moderation'));
         }
 
         // Still here?
-        redirectTo('dashboard/settings/home', 302, false);
+        redirectTo('dashboard/settings/home');
     }
 
     public function home() {
@@ -1285,7 +1285,7 @@ class SettingsController extends DashboardController {
             $this->informMessage(t("Your changes have been saved."));
 
             Gdn::locale()->refresh();
-            redirectTo('/settings/locales', 302, false);
+            redirectTo('/settings/locales');
         } else {
             $this->Form->setValue('Locale', Gdn_Locale::canonicalize(c('Garden.Locale', 'en')));
         }
@@ -1884,7 +1884,7 @@ class SettingsController extends DashboardController {
             }
 
             if ($this->Form->errorCount() == 0) {
-                redirectTo('/settings/themes', 302, false);
+                redirectTo('/settings/themes');
             }
 
         }
@@ -2050,7 +2050,7 @@ class SettingsController extends DashboardController {
                     $this->render('Blank', 'Utility', 'Dashboard');
                     exit;
                 } else {
-                    redirectTo('/settings/mobilethemes', 302, false);
+                    redirectTo('/settings/mobilethemes');
                 }
             } else {
                 if ($AsyncRequest) {
@@ -2175,9 +2175,9 @@ class SettingsController extends DashboardController {
 
             $this->fireEvent('PreviewTheme', ['ThemeInfo' => $ThemeInfo]);
 
-            redirectTo('/', 302, false);
+            redirectTo('/');
         } else {
-            redirectTo('settings/themes', 302, false);
+            redirectTo('settings/themes');
         }
     }
 
@@ -2212,9 +2212,9 @@ class SettingsController extends DashboardController {
         }
 
         if ($isMobile) {
-            redirectTo('settings/mobilethemes', 302, false);
+            redirectTo('settings/mobilethemes');
         } else {
-            redirectTo('settings/themes', 302, false);
+            redirectTo('settings/themes');
         }
     }
 

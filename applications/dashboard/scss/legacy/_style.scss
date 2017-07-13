@@ -20,7 +20,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 
 /* remember to define focus styles! */
 :focus {
-  outline: 0;
+  outline-style: auto;
 }
 
 body {
@@ -2169,12 +2169,6 @@ body.Post .Popup a.Close {
   font-size: 100%;
   word-wrap: break-word;
   margin-top: 5px;
-
-  &:after {
-    content: "";
-    display: table;
-    clear: both;
-  }
 }
 
 .Message h1, .Message h2, .Message h3, .Message p, .Message .P {
@@ -5443,7 +5437,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
  */
 
 .AlignLeft {
-  float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5455,7 +5448,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .AlignRight {
-  float: right;
   margin: 0 0 10px 10px;
   text-align: right;
 }

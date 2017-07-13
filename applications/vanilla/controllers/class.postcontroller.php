@@ -351,9 +351,9 @@ class PostController extends VanillaController {
                         $this->fireEvent('AfterDiscussionSave');
 
                         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-                            redirectTo(discussionUrl($Discussion, 1).'?new=1', 302, false);
+                            redirectTo(discussionUrl($Discussion, 1).'?new=1');
                         } else {
-                            $this->setRedirectTo(discussionUrl($Discussion, 1, true).'?new=1', false);
+                            $this->setRedirectTo(discussionUrl($Discussion, 1, true).'?new=1');
                         }
                     } else {
                         // If this was a draft save, notify the user about the save
@@ -620,7 +620,7 @@ class PostController extends VanillaController {
 
         // If closed, cancel & go to discussion
         if ($Discussion && $Discussion->Closed == 1 && !$Editing && !CategoryModel::checkPermission($Discussion->CategoryID, 'Vanilla.Discussions.Close')) {
-            redirectTo(DiscussionUrl($Discussion), 302, false);
+            redirectTo(DiscussionUrl($Discussion));
         }
 
         // Add hidden IDs to form
@@ -731,7 +731,7 @@ class PostController extends VanillaController {
                     if (!$Draft) {
                         // Redirect to the new comment.
                         if ($CommentID > 0) {
-                            redirectTo("discussion/comment/$CommentID/#Comment_$CommentID", 302, false);
+                            redirectTo("discussion/comment/$CommentID/#Comment_$CommentID");
                         } elseif ($CommentID == SPAM) {
                             $this->setData('DiscussionUrl', DiscussionUrl($Discussion));
                             $this->View = 'Spam';

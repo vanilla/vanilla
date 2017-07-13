@@ -27,6 +27,11 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      */
     public function insert($fields) {
         $this->prune();
+
+        if (!isset($fields['Timestamp'])) {
+            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
+        }
+
         return parent::insert($fields);
     }
 }

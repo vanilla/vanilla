@@ -1591,6 +1591,10 @@ class SettingsController extends DashboardController {
             $this->ExistingRoleInvitations = arrayCombine($InvitationRoleIDs, $InvitationCounts);
             $ConfigurationModel->forceSetting('Garden.Registration.InviteRoles', $this->ExistingRoleInvitations);
 
+            if ($this->data('ConfirmationSupported') === false && $this->Form->getValue('Garden.Registration.ConfirmEmail')) {
+                $this->Form->addError('One unconfirmed role is required for email confirmation.');
+            }
+
             // Event hook
             $this->EventArguments['ConfigurationModel'] = &$ConfigurationModel;
             $this->fireEvent('BeforeRegistrationUpdate');

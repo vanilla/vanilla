@@ -804,4 +804,29 @@ class RoleModel extends Gdn_Model {
                 or u.UserID is null
         ");
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function validate($values, $insert = false) {
+        $result = true;
+        $roleID = val('RoleID', $values);
+
+        if ($roleID && !$insert) {
+            $role = $this->getID($roleID, DATASET_TYPE_ARRAY);
+            if ($role) {
+                $roleType = val('Type', $role);
+                $newType = val('Type', $values);
+                if (c('Garden.Registration.ConfirmEmail') && $roleType === self::TYPE_UNCONFIRMED && $newType !== self::TYPE_UNCONFIRMED) {
+                    $totalUnconfirmedRoles = $this->getByType(self::TYPE_UNCONFIRMED)->count();
+                    if ($totalUnconfirmedRoles === 1) {
+                        $this->Validation->addValidationResult('Type', 'One unconfirmed role is required for email confirmation.');
+                    }
+                }
+            }
+        }
+
+        $result = $result && parent::validate($values, $insert);
+        return $result;
+    }
 }

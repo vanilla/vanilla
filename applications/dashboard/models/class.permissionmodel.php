@@ -772,14 +772,29 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $RoleID
-     * @param string $LimitToSuffix
+     * @param int $roleID
+     * @param string $limitToSuffix
      * @param bool $includeJunction
+     * @param array|bool $overrides Form values used override current permission flags.
      * @return array
      */
-    public function getPermissionsEdit($RoleID, $LimitToSuffix = '', $includeJunction = true) {
-        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix, $includeJunction);
-        return $this->UnpivotPermissions($Permissions);
+    public function getPermissionsEdit($roleID, $limitToSuffix = '', $includeJunction = true, $overrides = false) {
+        $permissions = $this->getPermissions($roleID, $limitToSuffix, $includeJunction);
+        $permissions = $this->unpivotPermissions($permissions);
+
+        if (is_array($overrides)) {
+            foreach ($permissions as $namespace) {
+                foreach ($namespace as $name => $currentPermission) {
+                    if (stringBeginsWith('_', $name)) {
+                        continue;
+                    }
+                    $postValue = val('PostValue', $currentPermission);
+                    $currentPermission['Value'] = (int)in_array($postValue, $overrides);
+                }
+            }
+        }
+
+        return $permissions;
     }
 
     /**

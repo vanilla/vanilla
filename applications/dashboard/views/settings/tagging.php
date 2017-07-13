@@ -69,7 +69,7 @@ $enabled = c('Tagging.Discussions.Enabled');
             ?>
         </div>
         <?php echo $tagTypesDropdown; ?>
-        <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
+        <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
     </div>
 
     <?php $tags = $this->data('Tags'); ?>

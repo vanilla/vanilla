@@ -71,20 +71,20 @@ if (!function_exists('WritePromotedContent')):
          </span>
          <span class="AuthorInfo">
             <?php
-            echo ' '.WrapIf(htmlspecialchars(val('Title', $Author)), 'span', array('class' => 'MItem AuthorTitle'));
-            echo ' '.WrapIf(htmlspecialchars(val('Location', $Author)), 'span', array('class' => 'MItem AuthorLocation'));
+            echo ' '.WrapIf(htmlspecialchars(val('Title', $Author)), 'span', ['class' => 'MItem AuthorTitle']);
+            echo ' '.WrapIf(htmlspecialchars(val('Location', $Author)), 'span', ['class' => 'MItem AuthorLocation']);
             $Sender->fireEvent('AuthorInfo');
             ?>
          </span>
             </div>
             <div class="Meta CommentMeta CommentInfo">
          <span class="MItem DateCreated">
-            <?php echo anchor(Gdn_Format::date($Content['DateInserted'], 'html'), $ContentURL, 'Permalink', array('rel' => 'nofollow')); ?>
+            <?php echo anchor(Gdn_Format::date($Content['DateInserted'], 'html'), $ContentURL, 'Permalink', ['rel' => 'nofollow']); ?>
          </span>
                 <?php
                 // Include source if one was set
                 if ($Source = val('Source', $Content))
-                    echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', array('class' => 'MItem Source'));
+                    echo wrap(sprintf(t('via %s'), t($Source.' Source', $Source)), 'span', ['class' => 'MItem Source']);
 
                 $Sender->fireEvent('ContentInfo');
                 ?>

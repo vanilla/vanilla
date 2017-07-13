@@ -29,8 +29,8 @@ echo $this->Form->errors();
     <ul>
         <li class="form-group">
             <?php
-            $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
-            $Fields = array('TextField' => 'Code', 'ValueField' => 'Code'); ?>
+            $Options = ['10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100'];
+            $Fields = ['TextField' => 'Code', 'ValueField' => 'Code']; ?>
             <div class="label-wrap">
             <?php echo $this->Form->label('Comments per Page', 'Garden.Embed.CommentsPerPage'); ?>
             </div>
@@ -40,8 +40,8 @@ echo $this->Form->errors();
         </li>
         <li class="form-group">
             <?php
-            $Options = array('desc' => 'Most recent first / comment form at top of list', 'asc' => 'Most recent last / comment form at bottom of list');
-            $Fields = array('TextField' => 'Text', 'ValueField' => 'Code'); ?>
+            $Options = ['desc' => 'Most recent first / comment form at top of list', 'asc' => 'Most recent last / comment form at bottom of list'];
+            $Fields = ['TextField' => 'Text', 'ValueField' => 'Code']; ?>
             <div class="label-wrap">
             <?php echo $this->Form->label('Sort blog comments in the following order:', 'Garden.Embed.SortComments'); ?>
             </div>

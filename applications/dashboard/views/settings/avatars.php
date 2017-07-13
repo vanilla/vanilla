@@ -35,7 +35,7 @@ $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
     <div class="avatars padded-bottom flex flex-wrap">
         <div class="current-avatar flex padded-top">
             <div class="image-wrap">
-                <?php echo img($this->data('avatar'), array('style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;')); ?>
+                <?php echo img($this->data('avatar'), ['style' => 'width: '.c('Garden.Thumbnail.Size').'px; height: '.c('Garden.Thumbnail.Size').'px;']); ?>
             </div>
             <div class="default-avatar-label-wrap padded-left">
                 <div class="label"><?php echo t('Default Avatar'); ?></div>
@@ -69,7 +69,7 @@ $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
             <div class="label-wrap-wide">
                 <?php
                 echo $form->label('Thumbnail Size', 'Garden.Thumbnail.Size');
-                echo wrap(t('Avatars will have their thumbnails saved at this size.'), 'div', array('class' => 'info')); ?>
+                echo wrap(t('Avatars will have their thumbnails saved at this size.'), 'div', ['class' => 'info']); ?>
             </div>
             <div class="input-wrap-right">
                 <div class="textbox-suffix" data-suffix="<?php echo t('px'); ?>">
@@ -81,7 +81,7 @@ $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
             <div class="label-wrap-wide">
                 <?php
                 echo $form->label('Max Avatar Width', 'Garden.Profile.MaxWidth');
-                echo wrap(t('Avatars will be scaled down if they exceed this width.'), 'div', array('class' => 'info')); ?>
+                echo wrap(t('Avatars will be scaled down if they exceed this width.'), 'div', ['class' => 'info']); ?>
             </div>
             <div class="input-wrap-right">
                 <div class="textbox-suffix" data-suffix="<?php echo t('px'); ?>">
@@ -93,7 +93,7 @@ $allowEditPhotos = c('Garden.Profile.EditPhotos', true);
             <div class="label-wrap-wide">
                 <?php
                 echo $form->label('Max Avatar Height', 'Garden.Profile.MaxHeight');
-                echo wrap(t('Avatars will be scaled down if they exceed this height.'), 'div', array('class' => 'info')); ?>
+                echo wrap(t('Avatars will be scaled down if they exceed this height.'), 'div', ['class' => 'info']); ?>
             </div>
             <div class="input-wrap-right">
                 <div class="textbox-suffix" data-suffix="<?php echo t('px'); ?>">

@@ -106,7 +106,7 @@ class NavModule extends Gdn_Module {
 	 * @param array|int $sort Either a numeric sort position or and array in the style: array('before|after', 'key').
 	 * @return NavModule $this The calling object.
 	 */
-	public function addDropdownIf($isAllowed = true, $dropdown, $key = '', $cssClass = '', $sort = array()) {
+	public function addDropdownIf($isAllowed = true, $dropdown, $key = '', $cssClass = '', $sort = []) {
 		if (!$this->isAllowed($isAllowed)) {
 			return $this;
 		} else {
@@ -124,7 +124,7 @@ class NavModule extends Gdn_Module {
 	 * @return NavModule $this The calling object.
 	 * @throws Exception
 	 */
-	public function addDropdown($dropdown, $key = '', $cssClass = '', $sort = array()) {
+	public function addDropdown($dropdown, $key = '', $cssClass = '', $sort = []) {
 		if (is_a($dropdown, 'DropdownModule')) {
 			$dropdown->setTag('li');
 			$dropdown->prepare();

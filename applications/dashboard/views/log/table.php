@@ -31,7 +31,7 @@ include $this->fetchViewLocation('helper_functions');
                 ->addMetaIf($viewPersonalInfo, Gdn_Format::Email($user->Email));
 
             $Url = FALSE;
-            if (in_array($Row['Operation'], array('Edit', 'Moderate'))) {
+            if (in_array($Row['Operation'], ['Edit', 'Moderate'])) {
                 switch (strtolower($Row['RecordType'])) {
                     case 'discussion':
                         $Url = "/discussion/{$Row['RecordID']}/x/p1";
@@ -75,7 +75,7 @@ include $this->fetchViewLocation('helper_functions');
                         foreach ($CustomMeta as $Key => $Value) {
                             echo ' <span class="Meta">',
                                 '<span class="Meta-Label">'.t($Key).'</span> ',
-                            wrap(Gdn_Format::Html($Value), 'span', array('class' => 'Meta-Value')),
+                            wrap(Gdn_Format::Html($Value), 'span', ['class' => 'Meta-Value']),
                             '</span>';
                         }
                     }

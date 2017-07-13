@@ -54,8 +54,8 @@ if (!class_exists('HeadModule', false)) {
          * @param string $Sender
          */
         public function __construct($Sender = '') {
-            $this->_Tags = array();
-            $this->_Strings = array();
+            $this->_Tags = [];
+            $this->_Strings = [];
             $this->_Title = '';
             $this->_Subtitle = '';
             $this->_TitleDivider = ' — ';
@@ -71,10 +71,10 @@ if (!class_exists('HeadModule', false)) {
          * @param array $Options Additional properties to pass to AddTag, e.g. 'ie' => 'lt IE 7';
          */
         public function addCss($HRef, $Media = '', $AddVersion = true, $Options = null) {
-            $Properties = array(
+            $Properties = [
                 'rel' => 'stylesheet',
                 'href' => Asset($HRef, false, $AddVersion),
-                'media' => $Media);
+                'media' => $Media];
 
             // Use same underscore convention as AddScript
             if (is_array($Options)) {
@@ -93,12 +93,12 @@ if (!class_exists('HeadModule', false)) {
          * @param $Title
          */
         public function addRss($HRef, $Title) {
-            $this->addTag('link', array(
+            $this->addTag('link', [
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
                 'title' => Gdn_Format::text($Title),
                 'href' => Asset($HRef)
-            ));
+            ]);
         }
 
         /**
@@ -109,7 +109,7 @@ if (!class_exists('HeadModule', false)) {
          * @param string an index to give the tag for later manipulation.
          */
         public function addTag($Tag, $Properties, $Content = null, $Index = null) {
-            $Tag = array_merge(array(self::TAG_KEY => strtolower($Tag)), array_change_key_case($Properties));
+            $Tag = array_merge([self::TAG_KEY => strtolower($Tag)], array_change_key_case($Properties));
             if ($Content) {
                 $Tag[self::CONTENT_KEY] = $Content;
             }
@@ -139,13 +139,13 @@ if (!class_exists('HeadModule', false)) {
          *  - array: An array of options (ex. sort, hint, version).
          *
          */
-        public function addScript($Src, $Type = 'text/javascript', $AddVersion = true, $Options = array()) {
+        public function addScript($Src, $Type = 'text/javascript', $AddVersion = true, $Options = []) {
             if (is_numeric($Options)) {
-                $Options = array('sort' => $Options);
+                $Options = ['sort' => $Options];
             } elseif (is_string($Options)) {
-                $Options = array('hint' => $Options);
+                $Options = ['hint' => $Options];
             } elseif (!is_array($Options)) {
-                $Options = array();
+                $Options = [];
             }
 
             if (is_array($AddVersion)) {
@@ -153,7 +153,7 @@ if (!class_exists('HeadModule', false)) {
                 $AddVersion = true;
             }
 
-            $Attributes = array();
+            $Attributes = [];
             if ($Src) {
                 $Attributes['src'] = asset($Src, false, $AddVersion);
             }
@@ -194,7 +194,7 @@ if (!class_exists('HeadModule', false)) {
          * Removes any added stylesheets from the head.
          */
         public function clearCSS() {
-            $this->ClearTag('link', array('rel' => 'stylesheet'));
+            $this->ClearTag('link', ['rel' => 'stylesheet']);
         }
 
         /**
@@ -219,7 +219,7 @@ if (!class_exists('HeadModule', false)) {
             if (is_array($Property)) {
                 $Query = array_change_key_case($Property);
             } elseif ($Property)
-                $Query = array(strtolower($Property) => $Value);
+                $Query = [strtolower($Property) => $Value];
             else {
                 $Query = false;
             }
@@ -249,14 +249,14 @@ if (!class_exists('HeadModule', false)) {
          */
         public function getTags($RequestedType = '') {
             // Make sure that css loads before js (for jquery)
-            usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+            usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
             if ($RequestedType == '') {
                 return $this->_Tags;
             }
 
             // Loop through each tag.
-            $Tags = array();
+            $Tags = [];
             foreach ($this->_Tags as $Index => $Attributes) {
                 $TagType = $Attributes[self::TAG_KEY];
                 if ($TagType == $RequestedType) {
@@ -431,31 +431,31 @@ if (!class_exists('HeadModule', false)) {
                 $this->_Sender->canonicalUrl($CanonicalUrl);
 //            $CurrentUrl = url('', true);
 //            if ($CurrentUrl != $CanonicalUrl) {
-                $this->addTag('link', array('rel' => 'canonical', 'href' => $CanonicalUrl));
+                $this->addTag('link', ['rel' => 'canonical', 'href' => $CanonicalUrl]);
 //            }
             }
 
             // Include facebook open-graph meta information.
             if ($FbAppID = c('Plugins.Facebook.ApplicationID')) {
-                $this->addTag('meta', array('property' => 'fb:app_id', 'content' => $FbAppID));
+                $this->addTag('meta', ['property' => 'fb:app_id', 'content' => $FbAppID]);
             }
 
             $SiteName = c('Garden.Title', '');
             if ($SiteName != '') {
-                $this->addTag('meta', array('property' => 'og:site_name', 'content' => $SiteName));
+                $this->addTag('meta', ['property' => 'og:site_name', 'content' => $SiteName]);
             }
 
             $Title = htmlEntityDecode(Gdn_Format::text($this->title('', true)));
             if ($Title != '') {
-                $this->addTag('meta', array('name' => 'twitter:title', 'property' => 'og:title', 'content' => $Title));
+                $this->addTag('meta', ['name' => 'twitter:title', 'property' => 'og:title', 'content' => $Title]);
             }
 
             if (isset($CanonicalUrl)) {
-                $this->addTag('meta', array('property' => 'og:url', 'content' => $CanonicalUrl));
+                $this->addTag('meta', ['property' => 'og:url', 'content' => $CanonicalUrl]);
             }
 
             if ($Description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
-                $this->addTag('meta', array('name' => 'description', 'property' => 'og:description', 'content' => $Description));
+                $this->addTag('meta', ['name' => 'description', 'property' => 'og:description', 'content' => $Description]);
             }
 
             $hasRelevantImage = false;
@@ -470,11 +470,11 @@ if (!class_exists('HeadModule', false)) {
                     }
 
                     $Logo = Gdn_Upload::url($Logo);
-                    $this->addTag('meta', array('property' => 'og:image', 'content' => $Logo));
+                    $this->addTag('meta', ['property' => 'og:image', 'content' => $Logo]);
                 }
             } else {
                 foreach ($this->_Sender->Image() as $Img) {
-                    $this->addTag('meta', array('name' => 'twitter:image', 'property' => 'og:image', 'content' => $Img));
+                    $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $Img]);
                     $hasRelevantImage = true;
                 }
             }
@@ -494,8 +494,8 @@ if (!class_exists('HeadModule', false)) {
 
                 // Card && Title && Description are required
                 if ($twitterCardType && $Description) {
-                    $this->addTag('meta', array('name' => 'twitter:description', 'content' => $Description));
-                    $this->addTag('meta', array('name' => 'twitter:card', 'content' => $twitterCardType));
+                    $this->addTag('meta', ['name' => 'twitter:description', 'content' => $Description]);
+                    $this->addTag('meta', ['name' => 'twitter:card', 'content' => $twitterCardType]);
                 }
             }
 
@@ -504,14 +504,14 @@ if (!class_exists('HeadModule', false)) {
             $Tags = $this->_Tags;
 
             // Make sure that css loads before js (for jquery)
-            usort($this->_Tags, array('HeadModule', 'TagCmp')); // "link" comes before "script"
+            usort($this->_Tags, ['HeadModule', 'TagCmp']); // "link" comes before "script"
 
             $Tags2 = $this->_Tags;
 
             // Start with the title.
             $Head = '<title>'.Gdn_Format::text($this->title())."</title>\n";
 
-            $TagStrings = array();
+            $TagStrings = [];
             // Loop through each tag.
             foreach ($this->_Tags as $Index => $Attributes) {
                 $Tag = $Attributes[self::TAG_KEY];

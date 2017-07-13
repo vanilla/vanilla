@@ -17,7 +17,7 @@ class RoleController extends DashboardController {
     private $hideCategoryPermissions;
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Database', 'Form', 'RoleModel');
+    public $Uses = ['Database', 'Form', 'RoleModel'];
 
     /** @var RoleModel */
     public $RoleModel;
@@ -281,7 +281,7 @@ class RoleController extends DashboardController {
      * @access protected
      */
     protected function _permission($RoleID = null) {
-        $this->permission(array('Garden.Settings.Manage', 'Garden.Roles.Manage'), false);
+        $this->permission(['Garden.Settings.Manage', 'Garden.Roles.Manage'], false);
 
         if ($RoleID && !checkPermission('Garden.Settings.Manage')) {
             // Make sure the user can assign this role.

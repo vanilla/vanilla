@@ -26,7 +26,7 @@ class NewDiscussionModule extends Gdn_Module {
     public $QueryString = '';
 
     /** @var array Collection of buttons to display. */
-    public $Buttons = array();
+    public $Buttons = [];
 
     /** @var bool Whether to show button to all users & guests regardless of permissions. */
     public $ShowGuests = false;
@@ -62,7 +62,7 @@ class NewDiscussionModule extends Gdn_Module {
      * @param $Url
      */
     public function addButton($Text, $Url) {
-        $this->Buttons[] = array('Text' => $Text, 'Url' => $Url);
+        $this->Buttons[] = ['Text' => $Text, 'Url' => $Url];
     }
 
     /**

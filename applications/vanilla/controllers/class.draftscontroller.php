@@ -14,7 +14,7 @@
 class DraftsController extends VanillaController {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'DraftModel');
+    public $Uses = ['Database', 'DraftModel'];
 
     /**
      * Default all drafts view: chronological by time saved.
@@ -41,7 +41,7 @@ class DraftsController extends VanillaController {
         // Set criteria & get drafts data
         $Limit = Gdn::config('Vanilla.Discussions.PerPage', 30);
         $Session = Gdn::session();
-        $Wheres = array('d.InsertUserID' => $Session->UserID);
+        $Wheres = ['d.InsertUserID' => $Session->UserID];
         $this->DraftData = $this->DraftModel->getByUser($Session->UserID, $Offset, $Limit);
         $CountDrafts = $this->DraftModel->getCountByUser($Session->UserID);
 

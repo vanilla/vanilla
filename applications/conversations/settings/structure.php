@@ -61,8 +61,8 @@ $UpdateCountReadMessages = $Construct->tableExists() && !$Construct->columnExist
 $DateConversationUpdatedExists = $Construct->columnExists('DateConversationUpdated');
 
 $Construct
-    ->column('UserID', 'int', false, array('primary', 'index.Inbox'))
-    ->column('ConversationID', 'int', false, array('primary', 'key'))
+    ->column('UserID', 'int', false, ['primary', 'index.Inbox'])
+    ->column('ConversationID', 'int', false, ['primary', 'key'])
     ->column('CountReadMessages', 'int', 0)// # of read messages
     ->column('LastMessageID', 'int', true) // The last message posted by a user other than this one, unless this user is the only person who has added a message
     ->column('DateLastViewed', 'datetime', true)
@@ -143,8 +143,8 @@ $Construct->table('User')
 ///  %8 = RouteCode & Route (will be changed to <a href="route">routecode</a>)
 
 // X sent you a message
-if ($SQL->getWhere('ActivityType', array('Name' => 'ConversationMessage'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array(
+if ($SQL->getWhere('ActivityType', ['Name' => 'ConversationMessage'])->numRows() == 0) {
+    $SQL->insert('ActivityType', [
         'AllowComments' => '0',
         'Name' => 'ConversationMessage',
         'FullHeadline' => '%1$s sent you a %8$s.',
@@ -152,12 +152,12 @@ if ($SQL->getWhere('ActivityType', array('Name' => 'ConversationMessage'))->numR
         'RouteCode' => 'message',
         'Notify' => '1',
         'Public' => '0'
-    ));
+    ]);
 }
 
 // X added Y to a conversation
-if ($SQL->getWhere('ActivityType', array('Name' => 'AddedToConversation'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array(
+if ($SQL->getWhere('ActivityType', ['Name' => 'AddedToConversation'])->numRows() == 0) {
+    $SQL->insert('ActivityType', [
         'AllowComments' => '0',
         'Name' => 'AddedToConversation',
         'FullHeadline' => '%1$s added %3$s to a %8$s.',
@@ -165,14 +165,14 @@ if ($SQL->getWhere('ActivityType', array('Name' => 'AddedToConversation'))->numR
         'RouteCode' => 'conversation',
         'Notify' => '1',
         'Public' => '0'
-    ));
+    ]);
 }
 
 $PermissionModel = Gdn::permissionModel();
-$PermissionModel->define(array(
+$PermissionModel->define([
     'Conversations.Moderation.Manage' => 0,
     'Conversations.Conversations.Add' => 'Garden.Profiles.Edit',
-));
+]);
 
 // Set current Conversations.Version
 $appInfo = json_decode(file_get_contents(PATH_APPLICATIONS.DS.'conversations'.DS.'addon.json'), true);

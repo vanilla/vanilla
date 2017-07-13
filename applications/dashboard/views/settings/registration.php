@@ -49,7 +49,7 @@ echo $this->Form->errors(); ?>
                 <tr<?php echo $CssClass != '' ? ' class="'.$CssClass.'"' : ''; ?>>
                     <th><?php
                         $MethodName = $Method;
-                        echo $this->Form->radio('Garden.Registration.Method', $MethodName, array('value' => $Method));
+                        echo $this->Form->radio('Garden.Registration.Method', $MethodName, ['value' => $Method]);
                         ?></th>
                     <td class="Alt"><?php echo t($Description); ?></td>
                 </tr>
@@ -70,7 +70,7 @@ echo $this->Form->errors(); ?>
     <?php echo $this->Form->label('Invitations will expire', 'Garden.Registration.InviteExpiration'); ?>
     </div>
     <div class="input-wrap">
-    <?php echo $this->Form->dropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, array('value' => $this->InviteExpiration)); ?>
+    <?php echo $this->Form->dropDown('Garden.Registration.InviteExpiration', $this->InviteExpirationOptions, ['value' => $this->InviteExpiration]); ?>
     </div>
 </div>
 <div id="InvitationSettings">
@@ -108,8 +108,8 @@ echo $this->Form->errors(); ?>
                 <th><?php echo $Role['Name']; ?></th>
                 <td class="Alt">
                     <?php
-                    echo $this->Form->DropDown('InvitationCount[]', $this->InvitationOptions, array('value' => $CurrentValue));
-                    echo $this->Form->Hidden('InvitationRoleID[]', array('value' => $Role['RoleID']));
+                    echo $this->Form->DropDown('InvitationCount[]', $this->InvitationOptions, ['value' => $CurrentValue]);
+                    echo $this->Form->Hidden('InvitationRoleID[]', ['value' => $Role['RoleID']]);
                     ?>
                 </td>
             </tr>

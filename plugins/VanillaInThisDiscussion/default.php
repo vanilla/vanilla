@@ -23,13 +23,13 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
         $Sender->setHighlightRoute('dashboard/settings/plugins');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.VanillaInThisDiscussion.Limit' => array(
+        $Conf->initialize([
+            'Plugins.VanillaInThisDiscussion.Limit' => [
                 'Description' => t('User Limit'),
                 'Default' => 20,
                 'LabelCode' => t('Enter a limit for the number of users displayed')
-            )
-        ));
+            ]
+        ]);
 
         $Conf->renderAll();
     }

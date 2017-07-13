@@ -15,13 +15,13 @@
 class Gdn_Auth extends Gdn_Pluggable {
 
     /** @var array  */
-    protected $_AuthenticationSchemes = array();
+    protected $_AuthenticationSchemes = [];
 
     /** @var object  */
     protected $_Authenticator = null;
 
     /** @var array  */
-    protected $_Authenticators = array();
+    protected $_Authenticators = [];
 
     /** @var string  */
     protected $_Protocol = 'http';
@@ -59,7 +59,7 @@ class Gdn_Auth extends Gdn_Pluggable {
         Gdn::session()->start(false, false);
 
         // Get list of enabled authenticators
-        $AuthenticationSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', array());
+        $AuthenticationSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', []);
 
         // Bring all enabled authenticator classes into the defined scope to allow them to be picked up by the plugin manager
         foreach ($AuthenticationSchemes as $AuthenticationSchemeAlias) {
@@ -85,10 +85,10 @@ class Gdn_Auth extends Gdn_Pluggable {
         }
 
         if (class_exists($AuthenticatorClass)) {
-            $this->_AuthenticationSchemes[$Alias] = array(
+            $this->_AuthenticationSchemes[$Alias] = [
                 'Name' => c("Garden.Authenticators.{$Alias}.Name", $Alias),
                 'Configure' => false
-            );
+            ];
 
             // Now wake it up so it can do setup work
             if ($this->_Started) {
@@ -159,13 +159,13 @@ class Gdn_Auth extends Gdn_Pluggable {
      */
     public function enableAuthenticationScheme($AuthenticationSchemeAlias, $SetAsDefault = false) {
         // Get list of currently enabled schemes.
-        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', array());
+        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', []);
         $ForceWrite = false;
 
         // If the list is empty (shouldnt ever be empty), add 'password' to it.
         if (!is_array($EnabledSchemes)) {
             $ForceWrite = true;
-            $EnabledSchemes = array('password');
+            $EnabledSchemes = ['password'];
         }
 
         // First, loop through the list and remove any instances of the supplied authentication scheme
@@ -201,11 +201,11 @@ class Gdn_Auth extends Gdn_Pluggable {
         $ForceWrite = false;
 
         // Remove this authenticator from the enabled schemes collection.
-        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', array());
+        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', []);
         // If the list is empty (shouldnt ever be empty), add 'password' to it.
         if (!is_array($EnabledSchemes)) {
             $ForceWrite = true;
-            $EnabledSchemes = array('password');
+            $EnabledSchemes = ['password'];
         }
 
         $HadScheme = false;
@@ -246,7 +246,7 @@ class Gdn_Auth extends Gdn_Pluggable {
      */
     public function setDefaultAuthenticator($AuthenticationSchemeAlias) {
         $AuthenticationSchemeAlias = strtolower($AuthenticationSchemeAlias);
-        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', array());
+        $EnabledSchemes = Gdn::config('Garden.Authenticator.EnabledSchemes', []);
         if (!in_array($AuthenticationSchemeAlias, $EnabledSchemes)) {
             return false;
         }
@@ -294,16 +294,16 @@ class Gdn_Auth extends Gdn_Pluggable {
      * @param array $ExtraReplacements
      * @return mixed
      */
-    public function replaceAuthPlaceholders($PlaceholderString, $ExtraReplacements = array()) {
-        $Replacements = array_merge(array(
+    public function replaceAuthPlaceholders($PlaceholderString, $ExtraReplacements = []) {
+        $Replacements = array_merge([
             'Session_TransientKey' => '',
             'Username' => '',
             'UserID' => ''
-        ), (Gdn::session()->isValid() ? array(
+        ], (Gdn::session()->isValid() ? [
             'Session_TransientKey' => Gdn::session()->transientKey(),
             'Username' => Gdn::session()->User->Name,
             'UserID' => Gdn::session()->User->UserID
-        ) : array()), $ExtraReplacements);
+        ] : []), $ExtraReplacements);
         return Gdn_Format::vanillaSprintf($PlaceholderString, $Replacements);
     }
 
@@ -318,33 +318,33 @@ class Gdn_Auth extends Gdn_Pluggable {
     public function associateUser($ProviderKey, $UserKey, $UserID = 0) {
         if ($UserID == 0) {
             try {
-                $Success = Gdn::sql()->insert('UserAuthentication', array(
+                $Success = Gdn::sql()->insert('UserAuthentication', [
                     'UserID' => 0,
                     'ForeignUserKey' => $UserKey,
                     'ProviderKey' => $ProviderKey
-                ));
+                ]);
                 $Success = true;
             } catch (Exception $e) {
                 $Success = true;
             }
         } else {
-            $Success = Gdn::sql()->replace('UserAuthentication', array(
+            $Success = Gdn::sql()->replace('UserAuthentication', [
                 'UserID' => $UserID
-            ), array(
+            ], [
                 'ForeignUserKey' => $UserKey,
                 'ProviderKey' => $ProviderKey
-            ));
+            ]);
         }
 
         if (!$Success) {
             return false;
         }
 
-        return array(
+        return [
             'UserID' => $UserID,
             'ForeignUserKey' => $UserKey,
             'ProviderKey' => $ProviderKey
-        );
+        ];
     }
 
     /**
@@ -489,7 +489,7 @@ class Gdn_Auth extends Gdn_Pluggable {
      * @return string
      */
     public function protocol($Value = null) {
-        if (!is_null($Value) && in_array($Value, array('http', 'https'))) {
+        if (!is_null($Value) && in_array($Value, ['http', 'https'])) {
             $this->_Protocol = $Value;
         }
 
@@ -614,10 +614,10 @@ class Gdn_Auth extends Gdn_Pluggable {
             return false;
         }
 
-        $ExtraReplacementParameters = array(
+        $ExtraReplacementParameters = [
             'Path' => $Redirect,
             'Scheme' => $AuthenticationScheme
-        );
+        ];
 
         // Extended return type, allows provider values to be replaced into final URL
         if (is_array($Return)) {

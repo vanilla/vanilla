@@ -19,14 +19,14 @@ class ConversationsHooks implements Gdn_IPlugin {
      * @param DbaController $Sender
      */
     public function dbaController_countJobs_Handler($Sender) {
-        $Counts = array(
-            'Conversation' => array('CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID')
-        );
+        $Counts = [
+            'Conversation' => ['CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID']
+        ];
 
         foreach ($Counts as $Table => $Columns) {
             foreach ($Columns as $Column) {
                 $Name = "Recalculate $Table.$Column";
-                $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+                $Url = "/dba/counts.json?".http_build_query(['table' => $Table, 'column' => $Column]);
 
                 $Sender->Data['Jobs'][$Name] = $Url;
             }
@@ -41,8 +41,8 @@ class ConversationsHooks implements Gdn_IPlugin {
      */
     public function userModel_beforeDeleteUser_handler($Sender) {
         $UserID = val('UserID', $Sender->EventArguments);
-        $Options = val('Options', $Sender->EventArguments, array());
-        $Options = is_array($Options) ? $Options : array();
+        $Options = val('Options', $Sender->EventArguments, []);
+        $Options = is_array($Options) ? $Options : [];
 
         $DeleteMethod = val('DeleteMethod', $Options, 'delete');
         if ($DeleteMethod == 'delete') {
@@ -61,8 +61,8 @@ class ConversationsHooks implements Gdn_IPlugin {
                 ->orWhere(['c.UpdateUserID' => $UserID])
                 ->delete();
 
-            $Sender->SQL->delete('Conversation', array('InsertUserID' => $UserID));
-            $Sender->SQL->delete('Conversation', array('UpdateUserID' => $UserID));
+            $Sender->SQL->delete('Conversation', ['InsertUserID' => $UserID]);
+            $Sender->SQL->delete('Conversation', ['UpdateUserID' => $UserID]);
         } elseif ($DeleteMethod == 'wipe') {
             $Sender->SQL->update('ConversationMessage')
                 ->set('Body', t('The user and all related content has been deleted.'))
@@ -117,11 +117,11 @@ class ConversationsHooks implements Gdn_IPlugin {
             Gdn::session()->UserID != $Sender->User->UserID &&
             Gdn::session()->checkPermission('Conversations.Conversations.Add')
         ) {
-            $Sender->EventArguments['MemberOptions'][] = array(
+            $Sender->EventArguments['MemberOptions'][] = [
                 'Text' => sprite('SpMessage').' '.t('Message'),
                 'Url' => '/messages/add/'.rawurlencode($Sender->User->Name),
                 'CssClass' => 'MessageUser'
-            );
+            ];
         }
     }
 
@@ -152,7 +152,7 @@ class ConversationsHooks implements Gdn_IPlugin {
                 $Inbox .= ' <span class="Alert">'.$CountUnreadConversations.'</span>';
             }
 
-            $Sender->Menu->addLink('Conversations', $Inbox, '/messages/all', false, array('Standard' => true));
+            $Sender->Menu->addLink('Conversations', $Inbox, '/messages/all', false, ['Standard' => true]);
         }
     }
 
@@ -171,15 +171,15 @@ class ConversationsHooks implements Gdn_IPlugin {
     public function permissionModel_defaultPermissions_handler($Sender) {
         $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
-            array('Conversations.Conversations.Add' => 1)
+            ['Conversations.Conversations.Add' => 1]
         );
         $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
-            array('Conversations.Conversations.Add' => 1)
+            ['Conversations.Conversations.Add' => 1]
         );
         $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
-            array('Conversations.Conversations.Add' => 1)
+            ['Conversations.Conversations.Add' => 1]
         );
     }
 

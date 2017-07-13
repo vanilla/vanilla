@@ -20,9 +20,9 @@ if (!function_exists('UserVerified')):
         }
 
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            return anchor($Label, $Url, array('title' => $Title, 'class' => 'User-Verified Hijack'));
+            return anchor($Label, $Url, ['title' => $Title, 'class' => 'User-Verified Hijack']);
         } else {
-            return wrap($Label, 'span', array('title' => $Title, 'class' => 'User-Verified'));
+            return wrap($Label, 'span', ['title' => $Title, 'class' => 'User-Verified']);
         }
     }
 

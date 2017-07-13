@@ -2,7 +2,7 @@
 
 if (is_array($Sender->RegistrationFields)) {
     foreach ($Sender->RegistrationFields as $Name => $Field) {
-        $Options = array();
+        $Options = [];
         if ($Field['FormType'] == 'Dropdown') {
             $values = $Field['Options'];
             $labels = val('OptionsLabels', $Field, $Field['Options']);

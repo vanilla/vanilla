@@ -14,7 +14,7 @@
 class CategoriesController extends VanillaController {
 
     /** @var array Models to include.*/
-    public $Uses = array('Database', 'Form', 'CategoryModel');
+    public $Uses = ['Database', 'Form', 'CategoryModel'];
 
     /** @var CategoryModel */
     public $CategoryModel;
@@ -65,11 +65,11 @@ class CategoriesController extends VanillaController {
 
         // Grab the discussions.
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
-        $Where = array(
+        $Where = [
             'CategoryID' => $Category['CategoryID'],
             'Announce' => 'all',
             'DateInserted >=' => $From,
-            'DateInserted <' => $To);
+            'DateInserted <' => $To];
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
         $DiscussionModel = new DiscussionModel();
@@ -97,7 +97,7 @@ class CategoriesController extends VanillaController {
         $this->title(htmlspecialchars(val('Name', $Category, '')));
         $this->Description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($From))), true);
         $this->addJsFile('discussions.js');
-        $this->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+        $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
 
         $this->ControllerName = 'DiscussionsController';
         $this->CssClass = 'Discussions';
@@ -333,11 +333,11 @@ class CategoriesController extends VanillaController {
             $this->setData('Sort', $DiscussionModel->getSort());
             $this->setData('Filters', $DiscussionModel->getFilters());
 
-            $CategoryIDs = array($CategoryID);
+            $CategoryIDs = [$CategoryID];
             if (c('Vanilla.ExpandCategories')) {
                 $CategoryIDs = array_merge($CategoryIDs, array_column($this->data('Categories'), 'CategoryID'));
             }
-            $Wheres = array('d.CategoryID' => $CategoryIDs);
+            $Wheres = ['d.CategoryID' => $CategoryIDs];
             $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
 
             // Check permission.

@@ -14,10 +14,10 @@
 class SearchModel extends Gdn_Model {
 
     /** @var array Parameters. */
-    protected $_Parameters = array();
+    protected $_Parameters = [];
 
     /** @var array SQL. */
-    protected $_SearchSql = array();
+    protected $_SearchSql = [];
 
     /** @var string Mode. */
     protected $_SearchMode = 'match';
@@ -93,7 +93,7 @@ class SearchModel extends Gdn_Model {
      *
      */
     public function reset() {
-        $this->_Parameters = array();
+        $this->_Parameters = [];
         $this->_SearchSql = '';
     }
 
@@ -109,7 +109,7 @@ class SearchModel extends Gdn_Model {
     public function search($Search, $Offset = 0, $Limit = 20) {
         // If there are no searches then return an empty array.
         if (trim($Search) == '') {
-            return array();
+            return [];
         }
 
         // Figure out the exact search mode.
@@ -145,7 +145,7 @@ class SearchModel extends Gdn_Model {
         $this->fireEvent('Search');
 
         if (count($this->_SearchSql) == 0) {
-            return array();
+            return [];
         }
 
         // Perform the search by unioning all of the sql together.

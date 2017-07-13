@@ -14,7 +14,7 @@
 class DiscussionController extends VanillaController {
 
     /** @var array Models to include. */
-    public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
+    public $Uses = ['DiscussionModel', 'CommentModel', 'Form'];
 
     /** @var array Unique identifier. */
     public $CategoryID;
@@ -207,7 +207,7 @@ class DiscussionController extends VanillaController {
             $this->Offset,
             $Limit,
             $ActualResponses,
-            array('DiscussionUrl')
+            ['DiscussionUrl']
         );
         $this->Pager->Record = $this->Discussion;
         PagerModule::current($this->Pager);
@@ -246,7 +246,7 @@ class DiscussionController extends VanillaController {
         }
 
         // Inform moderator of checked comments in this discussion
-        $CheckedComments = $Session->getAttribute('CheckedComments', array());
+        $CheckedComments = $Session->getAttribute('CheckedComments', []);
         if (count($CheckedComments) > 0) {
             ModerationController::informCheckedComments($this);
         }
@@ -444,11 +444,11 @@ class DiscussionController extends VanillaController {
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
         // Set the new value for api calls and json targets.
-        $this->setData(array(
+        $this->setData([
             'UserID' => $UserID,
             'DiscussionID' => $DiscussionID,
             'Bookmarked' => (bool)$Bookmark
-        ));
+        ]);
         setValue('Bookmarked', $Discussion, (int)$Bookmark);
 
         // Update the user's bookmark count
@@ -523,10 +523,10 @@ class DiscussionController extends VanillaController {
 
         if ($this->Form->authenticatedPostBack()) {
             // Save the property.
-            $CacheKeys = array(
+            $CacheKeys = [
                 $this->DiscussionModel->getAnnouncementCacheKey(),
                 $this->DiscussionModel->getAnnouncementCacheKey(val('CategoryID', $Discussion))
-            );
+            ];
             $this->DiscussionModel->SQL->cache($CacheKeys);
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
@@ -818,12 +818,12 @@ body { background: transparent !important; }
         $vanilla_type = getIncomingValue('vanilla_type', 'page');
         $vanilla_url = getIncomingValue('vanilla_url', '');
         $vanilla_category_id = getIncomingValue('vanilla_category_id', '');
-        $ForeignSource = array(
+        $ForeignSource = [
             'vanilla_identifier' => $vanilla_identifier,
             'vanilla_type' => $vanilla_type,
             'vanilla_url' => $vanilla_url,
             'vanilla_category_id' => $vanilla_category_id
-        );
+        ];
         $this->setData('ForeignSource', $ForeignSource);
 
         // Set comment sorting
@@ -1034,6 +1034,6 @@ body { background: transparent !important; }
         if (!$this->Head) {
             return;
         }
-        $this->Head->addTag('meta', array('property' => 'og:type', 'content' => 'article'));
+        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
     }
 }

@@ -10,8 +10,8 @@ echo $this->Form->open();
     <div class="toolbar flex-wrap">
         <div class="toolbar-buttons">
         <?php
-        echo anchor(t('Restore'), '#', array('class' => 'RestoreButton btn btn-primary'));
-        echo anchor(t('Delete Forever'), '#', array('class' => 'DeleteButton btn btn-primary'));
+        echo anchor(t('Restore'), '#', ['class' => 'RestoreButton btn btn-primary']);
+        echo anchor(t('Delete Forever'), '#', ['class' => 'DeleteButton btn btn-primary']);
         ?>
         </div>
         <?php PagerModule::write(['Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard']); ?>

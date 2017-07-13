@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit(); ?>
     <h1><?php printf(t('Delete User: %s'), userAnchor($this->User)); ?></h1>
 <?php
-echo $this->Form->open(array('class' => 'User'));
+echo $this->Form->open(['class' => 'User']);
 echo $this->Form->errors();
 ?>
 <div class="alert alert-danger padded">

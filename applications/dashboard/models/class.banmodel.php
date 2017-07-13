@@ -63,7 +63,7 @@ class BanModel extends Gdn_Model {
     public static function &allBans() {
         if (!self::$_AllBans) {
             self::$_AllBans = Gdn::sql()->get('Ban')->resultArray();
-            self::$_AllBans = Gdn_DataSet::index(self::$_AllBans, array('BanID'));
+            self::$_AllBans = Gdn_DataSet::index(self::$_AllBans, ['BanID']);
         }
 //      $AllBans =& self::$_AllBans;
         return self::$_AllBans;
@@ -83,9 +83,9 @@ class BanModel extends Gdn_Model {
             return;
         }
 
-        $OldUsers = array();
-        $NewUsers = array();
-        $NewUserIDs = array();
+        $OldUsers = [];
+        $NewUsers = [];
+        $NewUserIDs = [];
 
         $AllBans = $this->allBans();
 
@@ -163,7 +163,7 @@ class BanModel extends Gdn_Model {
      * @return array
      */
     public function banWhere($Ban) {
-        $Result = array('u.Admin' => 0, 'u.Deleted' => 0);
+        $Result = ['u.Admin' => 0, 'u.Deleted' => 0];
         $Ban['BanValue'] = str_replace('*', '%', $Ban['BanValue']);
 
         switch (strtolower($Ban['BanType'])) {
@@ -208,11 +208,11 @@ class BanModel extends Gdn_Model {
      */
     public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
         $Bans = self::AllBans();
-        $Fields = array('Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress');
-        $Banned = array();
+        $Fields = ['Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress'];
+        $Banned = [];
 
         if (!$BansFound) {
-            $BansFound = array();
+            $BansFound = [];
         }
 
         foreach ($Bans as $Ban) {
@@ -287,7 +287,7 @@ class BanModel extends Gdn_Model {
      * @return array Returns an array of the set bits.
      */
     public static function explodeBans($banned) {
-        $result = array();
+        $result = [];
 
         for ($i = 1; $i <= 8; $i++) {
             $bit = pow(2, $i - 1);
@@ -391,17 +391,17 @@ class BanModel extends Gdn_Model {
 
         // Add the activity.
         $ActivityModel = new ActivityModel();
-        $Activity = array(
+        $Activity = [
             'ActivityType' => 'Ban',
             'ActivityUserID' => $User['UserID'],
             'RegardingUserID' => $BanningUserID,
             'NotifyUserID' => ActivityModel::NOTIFY_MODS
-        );
+        ];
 
         $BannedString = $BannedValue ? 'banned' : 'unbanned';
         if ($Ban) {
             $Activity['HeadlineFormat'] = '{ActivityUserID,user} was '.$BannedString.' (based on {Data.BanType}: {Data.BanValue}).';
-            $Activity['Data'] = arrayTranslate($Ban, array('BanType', 'BanValue'));
+            $Activity['Data'] = arrayTranslate($Ban, ['BanType', 'BanValue']);
             $Activity['Story'] = $Ban['Notes'];
             $Activity['RecordType'] = 'Ban';
 

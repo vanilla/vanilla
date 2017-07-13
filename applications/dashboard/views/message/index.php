@@ -82,9 +82,9 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
                         <div id="toggle-<?php echo $messageID = val('MessageID', $Message); ?>">
                             <?php
                             if ($Message->Enabled == '1') {
-                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-on"));
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/disable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-on"]);
                             } else {
-                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', array('class' => "toggle-wrap toggle-wrap-off"));
+                                echo wrap(anchor('<div class="toggle-well"></div><div class="toggle-slider"></div>', '/dashboard/message/enable/'.$messageID, 'Hijack'), 'span', ['class' => "toggle-wrap toggle-wrap-off"]);
                             }
                             ?>
                         </div>

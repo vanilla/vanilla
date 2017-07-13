@@ -14,7 +14,7 @@
 class ActivityController extends Gdn_Controller {
 
     /**  @var array Models to include. */
-    public $Uses = array('Database', 'Form', 'ActivityModel');
+    public $Uses = ['Database', 'Form', 'ActivityModel'];
 
     /** @var ActivityModel */
     public $ActivityModel;
@@ -29,7 +29,7 @@ class ActivityController extends Gdn_Controller {
         switch ($Name) {
             case 'CommentData':
                 Deprecated('ActivityController->CommentData', "ActivityController->data('Activities')");
-                $Result = new Gdn_DataSet(array(), DATASET_TYPE_OBJECT);
+                $Result = new Gdn_DataSet([], DATASET_TYPE_OBJECT);
                 return $Result;
             case 'ActivityData':
                 Deprecated('ActivityController->ActivityData', "ActivityController->data('Activities')");
@@ -64,7 +64,7 @@ class ActivityController extends Gdn_Controller {
 
         parent::initialize();
         Gdn_Theme::section('ActivityList');
-        $this->setData('Breadcrumbs', array(array('Name' => t('Activity'), 'Url' => '/activity')));
+        $this->setData('Breadcrumbs', [['Name' => t('Activity'), 'Url' => '/activity']]);
     }
 
     /**
@@ -85,7 +85,7 @@ class ActivityController extends Gdn_Controller {
             $ActivityID = 0;
         }
 
-        $this->ActivityData = $this->ActivityModel->getWhere(array('ActivityID' => $ActivityID));
+        $this->ActivityData = $this->ActivityModel->getWhere(['ActivityID' => $ActivityID]);
 
         // Check visibility.
         $userid = val('NotifyUserID', $this->ActivityData->firstRow());
@@ -114,7 +114,7 @@ class ActivityController extends Gdn_Controller {
                 break;
         }
 
-        $this->setData('Comments', $this->ActivityModel->getComments(array($ActivityID)));
+        $this->setData('Comments', $this->ActivityModel->getComments([$ActivityID]));
         $this->setData('Activities', $this->ActivityData);
 
         $this->render();
@@ -168,7 +168,7 @@ class ActivityController extends Gdn_Controller {
         // Comment submission
         $Session = Gdn::session();
         $Comment = $this->Form->getFormValue('Comment');
-        $Activities = $this->ActivityModel->getWhere(array('NotifyUserID' => $NotifyUserID), '', '', $Limit, $Offset)->resultArray();
+        $Activities = $this->ActivityModel->getWhere(['NotifyUserID' => $NotifyUserID], '', '', $Limit, $Offset)->resultArray();
         $this->ActivityModel->joinComments($Activities);
 
         $this->setData('Filter', strtolower($Filter));
@@ -280,10 +280,10 @@ class ActivityController extends Gdn_Controller {
                     throw new Exception(t('Invalid activity'));
                 }
 
-                $ActivityComment = array(
+                $ActivityComment = [
                     'ActivityID' => $ActivityID,
                     'Body' => $Body,
-                    'Format' => 'Text');
+                    'Format' => 'Text'];
 
                 $ID = $this->ActivityModel->comment($ActivityComment);
 
@@ -352,7 +352,7 @@ class ActivityController extends Gdn_Controller {
                 break;
         }
 
-        $Activities = array();
+        $Activities = [];
 
         if ($this->Form->authenticatedPostBack()) {
             $Data = $this->Form->formValues();
@@ -363,29 +363,29 @@ class ActivityController extends Gdn_Controller {
 
             if ($UserID != Gdn::session()->UserID) {
                 // This is a wall post.
-                $Activity = array(
+                $Activity = [
                     'ActivityType' => 'WallPost',
                     'ActivityUserID' => $UserID,
                     'RegardingUserID' => Gdn::session()->UserID,
                     'HeadlineFormat' => t('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
                     'Story' => $Data['Comment'],
                     'Format' => $Data['Format'],
-                    'Data' => array('Bump' => true)
-                );
+                    'Data' => ['Bump' => true]
+                ];
             } else {
                 // This is a status update.
-                $Activity = array(
+                $Activity = [
                     'ActivityType' => 'Status',
                     'HeadlineFormat' => t('HeadlineFormat.Status', '{ActivityUserID,user}'),
                     'Story' => $Data['Comment'],
                     'Format' => $Data['Format'],
                     'NotifyUserID' => $NotifyUserID,
-                    'Data' => array('Bump' => true)
-                );
+                    'Data' => ['Bump' => true]
+                ];
                 $this->setJson('StatusMessage', Gdn_Format::plainText($Activity['Story'], $Activity['Format']));
             }
 
-            $Activity = $this->ActivityModel->save($Activity, false, array('CheckSpam' => true));
+            $Activity = $this->ActivityModel->save($Activity, false, ['CheckSpam' => true]);
             if ($Activity == SPAM || $Activity == UNAPPROVED) {
                 $this->StatusMessage = t('ActivityRequiresApproval', 'Your post will appear after it is approved.');
                 $this->render('Blank', 'Utility');
@@ -397,7 +397,7 @@ class ActivityController extends Gdn_Controller {
                     Gdn::userModel()->setField(Gdn::session()->UserID, 'About', Gdn_Format::plainText($Activity['Story'], $Activity['Format']));
                 }
 
-                $Activities = array($Activity);
+                $Activities = [$Activity];
                 ActivityModel::joinUsers($Activities);
                 $this->ActivityModel->calculateData($Activities);
             } else {

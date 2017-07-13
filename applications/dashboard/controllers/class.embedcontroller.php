@@ -14,7 +14,7 @@
 class EmbedController extends DashboardController {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form');
+    public $Uses = ['Database', 'Form'];
 
     /**
      * Default method.
@@ -90,7 +90,7 @@ class EmbedController extends DashboardController {
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(
-            array(
+            [
                 'Garden.Embed.RemoteUrl',
                 'Garden.Embed.ForceDashboard',
                 'Garden.Embed.ForceForum',
@@ -99,7 +99,7 @@ class EmbedController extends DashboardController {
                 'Garden.Embed.CommentsPerPage',
                 'Garden.Embed.SortComments',
                 'Garden.Embed.PageToForum'
-            )
+            ]
         );
 
         $this->Form->setModel($ConfigurationModel);
@@ -137,7 +137,7 @@ class EmbedController extends DashboardController {
      * @throws Gdn_UserException
      */
     private function toggle($Toggle = '', $TransientKey = '') {
-        if (in_array($Toggle, array('enable', 'disable')) && Gdn::session()->validateTransientKey($TransientKey)) {
+        if (in_array($Toggle, ['enable', 'disable']) && Gdn::session()->validateTransientKey($TransientKey)) {
             if ($Toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
             }

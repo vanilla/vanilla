@@ -43,7 +43,7 @@ class AddPeopleModule extends Gdn_Module {
                 throw permissionException();
             }
 
-            $NewRecipientUserIDs = array();
+            $NewRecipientUserIDs = [];
             $NewRecipients = explode(',', $this->Form->getFormValue('AddPeople', ''));
             $UserModel = Gdn::factory("UserModel");
             foreach ($NewRecipients as $Name) {

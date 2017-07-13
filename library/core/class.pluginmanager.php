@@ -205,7 +205,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 continue;
             }
 
-            $PluginPath = CombinePaths(array($SearchPath, $PluginFolderName));
+            $PluginPath = CombinePaths([$SearchPath, $PluginFolderName]);
             $PluginFile = $this->findPluginFileOld($PluginPath);
 
             if ($PluginFile === false) {
@@ -362,13 +362,13 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             return false;
         }
         $PluginFiles = scandir($path);
-        $TestPatterns = array(
+        $TestPatterns = [
             'default.php', '*plugin.php'
-        );
+        ];
         foreach ($PluginFiles as $PluginFile) {
             foreach ($TestPatterns as $Test) {
                 if (fnmatch($Test, $PluginFile)) {
-                    return CombinePaths(array($path, $PluginFile));
+                    return CombinePaths([$path, $PluginFile]);
                 }
             }
         }
@@ -511,7 +511,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * @param array $options
      * @return array
      */
-    public function getEventHandlers($sender, $eventName, $handlerType = 'Handler', $options = array()) {
+    public function getEventHandlers($sender, $eventName, $handlerType = 'Handler', $options = []) {
         deprecated(__METHOD__);
         // Figure out the classname.
         if (isset($options['ClassName'])) {
@@ -971,8 +971,8 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      */
     public function searchPaths($OnlyCustom = false) {
         if (is_null($this->pluginSearchPaths) || is_null($this->alternatePluginSearchPaths)) {
-            $this->pluginSearchPaths = array();
-            $this->alternatePluginSearchPaths = array();
+            $this->pluginSearchPaths = [];
+            $this->alternatePluginSearchPaths = [];
 
             // Add default search path(s) to list
             $this->pluginSearchPaths[rtrim(PATH_PLUGINS, '/')] = 'core';
@@ -983,7 +983,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 $AlternatePaths = $RawAlternatePaths;
 
                 if (!is_array($AlternatePaths)) {
-                    $AlternatePaths = array($AlternatePaths => 'alternate');
+                    $AlternatePaths = [$AlternatePaths => 'alternate'];
                 }
 
                 foreach ($AlternatePaths as $AltPath => $AltName) {
@@ -1012,7 +1012,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         if (is_null($SearchPath)) {
             return array_keys($this->enabledPlugins());
         } else {
-            $Folders = array_flip(val($SearchPath, $this->pluginFoldersByPath, array()));
+            $Folders = array_flip(val($SearchPath, $this->pluginFoldersByPath, []));
             return array_keys(array_intersect_key($Folders, $this->enabledPlugins()));
         }
     }
@@ -1027,7 +1027,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         if (is_null($SearchPath)) {
             return array_keys($this->availablePlugins());
         } else {
-            return val($SearchPath, $this->pluginFoldersByPath, array());
+            return val($SearchPath, $this->pluginFoldersByPath, []);
         }
     }
 
@@ -1154,7 +1154,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 'addon_disabled',
                 Logger::INFO,
                 'The {addonName} plugin was disabled.',
-                array('addonName' => $pluginName)
+                ['addonName' => $pluginName]
             );
         }
 
@@ -1177,10 +1177,10 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      */
     public static function splitAuthors($authorsString, $format = 'html') {
         $Authors = explode(';', $authorsString);
-        $Result = array();
+        $Result = [];
         foreach ($Authors as $AuthorString) {
             $Parts = explode(',', $AuthorString, 3);
-            $Author = array();
+            $Author = [];
             $Author['Name'] = trim($Author[0]);
             for ($i = 1; $i < count($Parts); $i++) {
                 if (strpos($Parts[$i], '@') !== false) {
@@ -1193,7 +1193,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
         if (strtolower($format) == 'html') {
             // Build the html for the authors.
-            $Htmls = array();
+            $Htmls = [];
             foreach ($Result as $Author) {
                 $Name = $Author['Name'];
                 if (isset($Author['Url'])) {
@@ -1274,7 +1274,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 'addon_enabled',
                 Logger::INFO,
                 'The {addonName} plugin was enabled.',
-                array('addonName' => $addon->getRawKey())
+                ['addonName' => $addon->getRawKey()]
             );
         }
 

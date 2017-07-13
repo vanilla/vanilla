@@ -23,7 +23,7 @@ function smarty_function_forum_root_link($Params, &$Smarty) {
     $Text = val('text', $Params, '', true);
     $Format = val('format', $Params, '<li><a href="%url" class="%class">%text</a></li>');
 
-    $Options = array();
+    $Options = [];
     if (isset($Params['class'])) {
         $Options['class'] = $Params['class'];
     }

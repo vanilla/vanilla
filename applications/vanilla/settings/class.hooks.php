@@ -28,7 +28,7 @@ class VanillaHooks implements Gdn_IPlugin {
         foreach ($Counts as $Table => $Columns) {
             foreach ($Columns as $Column) {
                 $Name = "Recalculate $Table.$Column";
-                $Url = "/dba/counts.json?".http_build_query(array('table' => $Table, 'column' => $Column));
+                $Url = "/dba/counts.json?".http_build_query(['table' => $Table, 'column' => $Column]);
                 $Sender->Data['Jobs'][$Name] = $Url;
             }
         }
@@ -43,13 +43,13 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param array $options An array of options:
      *  - DeleteMethod: One of delete, wipe, or NULL
      */
-    public function deleteUserData($userID, $options = array(), &$data = null) {
+    public function deleteUserData($userID, $options = [], &$data = null) {
         $sql = Gdn::sql();
 
         // Remove discussion watch records and drafts.
-        $sql->delete('UserDiscussion', array('UserID' => $userID));
+        $sql->delete('UserDiscussion', ['UserID' => $userID]);
 
-        Gdn::userModel()->getDelete('Draft', array('InsertUserID' => $userID), $data);
+        Gdn::userModel()->getDelete('Draft', ['InsertUserID' => $userID], $data);
 
         // Comment deletion depends on method selected
         $deleteMethod = val('DeleteMethod', $options, 'delete');
@@ -80,7 +80,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 ->get()->resultArray();
             $discussionIDs = array_column($discussionIDs, 'DiscussionID');
 
-            Gdn::userModel()->getDelete('Comment', array('InsertUserID' => $userID), $data);
+            Gdn::userModel()->getDelete('Comment', ['InsertUserID' => $userID], $data);
 
             // Update the comment counts.
             $commentCounts = $sql
@@ -94,8 +94,8 @@ class VanillaHooks implements Gdn_IPlugin {
             foreach ($commentCounts as $row) {
                 $sql->put(
                     'Discussion',
-                    array('CountComments' => $row['CountComments'] + 1, 'LastCommentID' => $row['LastCommentID']),
-                    array('DiscussionID' => $row['DiscussionID'])
+                    ['CountComments' => $row['CountComments'] + 1, 'LastCommentID' => $row['LastCommentID']],
+                    ['DiscussionID' => $row['DiscussionID']]
                 );
             }
 
@@ -114,7 +114,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 ->get('Discussion');
 
             // Delete the user's discussions.
-            Gdn::userModel()->getDelete('Discussion', array('InsertUserID' => $userID), $data);
+            Gdn::userModel()->getDelete('Discussion', ['InsertUserID' => $userID], $data);
 
             // Update the appropriate recent posts in the categories.
             $categoryModel = new CategoryModel();
@@ -140,13 +140,13 @@ class VanillaHooks implements Gdn_IPlugin {
 
         // Remove the user's profile information related to this application
         $sql->update('User')
-            ->set(array(
+            ->set([
                 'CountDiscussions' => 0,
                 'CountUnreadDiscussions' => 0,
                 'CountComments' => 0,
                 'CountDrafts' => 0,
                 'CountBookmarks' => 0
-            ))
+            ])
             ->where('UserID', $userID)
             ->put();
     }
@@ -242,7 +242,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param DiscussionModel $Sender
      */
     public function discussionModel_afterSaveDiscussion_handler($Sender) {
-        $FormPostValues = val('FormPostValues', $Sender->EventArguments, array());
+        $FormPostValues = val('FormPostValues', $Sender->EventArguments, []);
         $DiscussionID = val('DiscussionID', $Sender->EventArguments, 0);
         $CategoryID = valr('Fields.CategoryID', $Sender->EventArguments, 0);
         $RawFormTags = val('Tags', $FormPostValues, '');
@@ -312,10 +312,10 @@ class VanillaHooks implements Gdn_IPlugin {
             return;
         }
 
-        if (in_array($Sender->RequestMethod, array('discussion', 'editdiscussion', 'question'))) {
+        if (in_array($Sender->RequestMethod, ['discussion', 'editdiscussion', 'question'])) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
-            $Tags = $TagModel->getWhere(array('Type' => array_keys($TagModel->defaultTypes())), 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
+            $Tags = $TagModel->getWhere(['Type' => array_keys($TagModel->defaultTypes())], 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
             $TagsHtml = (count($Tags)) ? '' : t('No tags have been created yet.');
             $Tags = Gdn_DataSet::index($Tags, 'FullName');
             ksort($Tags);
@@ -323,12 +323,12 @@ class VanillaHooks implements Gdn_IPlugin {
             // The tags must be fetched.
             if ($Sender->Request->isPostBack()) {
                 $tag_ids = TagModel::SplitTags($Sender->Form->getFormValue('Tags'));
-                $tags = TagModel::instance()->getWhere(array('TagID' => $tag_ids))->resultArray();
+                $tags = TagModel::instance()->getWhere(['TagID' => $tag_ids])->resultArray();
                 $tags = array_column($tags, 'TagID', 'FullName');
             } else {
                 // The tags should be set on the data.
-                $tags = array_column($Sender->data('Tags', array()), 'FullName', 'TagID');
-                $xtags = $Sender->data('XTags', array());
+                $tags = array_column($Sender->data('Tags', []), 'FullName', 'TagID');
+                $xtags = $Sender->data('XTags', []);
                 foreach (TagModel::instance()->defaultTypes() as $key => $row) {
                     if (isset($xtags[$key])) {
                         $xtags2 = array_column($xtags[$key], 'FullName', 'TagID');
@@ -343,14 +343,14 @@ class VanillaHooks implements Gdn_IPlugin {
 
             // Tag text box
             echo $Sender->Form->label('Tags', 'Tags');
-            echo $Sender->Form->textBox('Tags', array('data-tags' => json_encode($tags)));
+            echo $Sender->Form->textBox('Tags', ['data-tags' => json_encode($tags)]);
 
             // Available tags
-            echo wrap(Anchor(t('Show popular tags'), '#'), 'span', array('class' => 'ShowTags'));
+            echo wrap(Anchor(t('Show popular tags'), '#'), 'span', ['class' => 'ShowTags']);
             foreach ($Tags as $Tag) {
-                $TagsHtml .= anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', array('data-name' => $Tag['Name'], 'data-id' => $Tag['TagID'])).' ';
+                $TagsHtml .= anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', ['data-name' => $Tag['Name'], 'data-id' => $Tag['TagID']]).' ';
             }
-            echo wrap($TagsHtml, 'div', array('class' => 'Hidden AvailableTags'));
+            echo wrap($TagsHtml, 'div', ['class' => 'Hidden AvailableTags']);
 
             echo '</div>';
         }
@@ -381,7 +381,7 @@ class VanillaHooks implements Gdn_IPlugin {
             // Look up the tags by name.
             $tagData = Gdn::sql()->getWhere(
                 'Tag',
-                array('Name' => $tags, 'Type' => $types)
+                ['Name' => $tags, 'Type' => $types]
             )->resultArray();
 
             // Add any missing tags.
@@ -389,7 +389,7 @@ class VanillaHooks implements Gdn_IPlugin {
             foreach ($tags as $tag) {
                 $tagKey = strtolower($tag);
                 if (!isset($tagNames[$tagKey])) {
-                    $tagData[] = array('TagID' => $tag, 'Name' => $tagKey, 'FullName' => $tag, 'Type' => '');
+                    $tagData[] = ['TagID' => $tag, 'Name' => $tagKey, 'FullName' => $tag, 'Type' => ''];
                 }
             }
 
@@ -406,15 +406,15 @@ class VanillaHooks implements Gdn_IPlugin {
         // Guest defaults
         $Sender->addDefault(
             RoleModel::TYPE_GUEST,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_GUEST,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -422,15 +422,15 @@ class VanillaHooks implements Gdn_IPlugin {
         // Unconfirmed defaults
         $Sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -438,15 +438,15 @@ class VanillaHooks implements Gdn_IPlugin {
         // Applicant defaults
         $Sender->addDefault(
             RoleModel::TYPE_APPLICANT,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_APPLICANT,
-            array(
+            [
                 'Vanilla.Discussions.View' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -454,19 +454,19 @@ class VanillaHooks implements Gdn_IPlugin {
         // Member defaults
         $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.View' => 1,
                 'Vanilla.Comments.Add' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_MEMBER,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.View' => 1,
                 'Vanilla.Comments.Add' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -474,7 +474,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Moderator defaults
         $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.Edit' => 1,
                 'Vanilla.Discussions.Announce' => 1,
@@ -485,11 +485,11 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Add' => 1,
                 'Vanilla.Comments.Edit' => 1,
                 'Vanilla.Comments.Delete' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_MODERATOR,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.Edit' => 1,
                 'Vanilla.Discussions.Announce' => 1,
@@ -500,7 +500,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Add' => 1,
                 'Vanilla.Comments.Edit' => 1,
                 'Vanilla.Comments.Delete' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -508,7 +508,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Administrator defaults
         $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.Edit' => 1,
                 'Vanilla.Discussions.Announce' => 1,
@@ -519,11 +519,11 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Add' => 1,
                 'Vanilla.Comments.Edit' => 1,
                 'Vanilla.Comments.Delete' => 1
-            )
+            ]
         );
         $Sender->addDefault(
             RoleModel::TYPE_ADMINISTRATOR,
-            array(
+            [
                 'Vanilla.Discussions.Add' => 1,
                 'Vanilla.Discussions.Edit' => 1,
                 'Vanilla.Discussions.Announce' => 1,
@@ -534,7 +534,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 'Vanilla.Comments.Add' => 1,
                 'Vanilla.Comments.Edit' => 1,
                 'Vanilla.Comments.Delete' => 1
-            ),
+            ],
             'Category',
             -1
         );
@@ -550,8 +550,8 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function userModel_beforeDeleteUser_handler($Sender) {
         $UserID = val('UserID', $Sender->EventArguments);
-        $Options = val('Options', $Sender->EventArguments, array());
-        $Options = is_array($Options) ? $Options : array();
+        $Options = val('Options', $Sender->EventArguments, []);
+        $Options = is_array($Options) ? $Options : [];
         $Content = &$Sender->EventArguments['Content'];
 
         $this->deleteUserData($UserID, $Options, $Content);
@@ -638,7 +638,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Tagging BEGIN
         // Set breadcrumbs where relevant
         if (null !== $sender->data('Tag', null) && null !== $sender->data('Tags')) {
-            $ParentTag = array();
+            $ParentTag = [];
             $CurrentTag = $sender->data('Tag');
             $CurrentTags = $sender->data('Tags');
 
@@ -654,14 +654,14 @@ class VanillaHooks implements Gdn_IPlugin {
                 }
             }
 
-            $Breadcrumbs = array();
+            $Breadcrumbs = [];
 
             if (is_array($ParentTag) && count(array_filter($ParentTag))) {
-                $Breadcrumbs[] = array('Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag, '', '/'));
+                $Breadcrumbs[] = ['Name' => $ParentTag['FullName'], 'Url' => TagUrl($ParentTag, '', '/')];
             }
 
             if (is_array($CurrentTag) && count(array_filter($CurrentTag))) {
-                $Breadcrumbs[] = array('Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag, '', '/'));
+                $Breadcrumbs[] = ['Name' => $CurrentTag['FullName'], 'Url' => TagUrl($CurrentTag, '', '/')];
             }
 
             if (count($Breadcrumbs)) {
@@ -731,13 +731,13 @@ class VanillaHooks implements Gdn_IPlugin {
 
         if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             $PostBack = $Sender->Form->authenticatedPostBack();
-            $Set = array();
+            $Set = [];
 
             // Add the category definitions to for the view to pick up.
             $DoHeadings = c('Vanilla.Categories.DoHeadings');
             // Grab all of the categories.
-            $Categories = array();
-            $Prefixes = array('Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment');
+            $Categories = [];
+            $Prefixes = ['Email.NewDiscussion', 'Popup.NewDiscussion', 'Email.NewComment', 'Popup.NewComment'];
             foreach (CategoryModel::categories() as $Category) {
                 if (!$Category['PermsDiscussionsView'] || $Category['Depth'] <= 0 || $Category['Depth'] > 2 || $Category['Archived']) {
                     continue;
@@ -796,14 +796,14 @@ class VanillaHooks implements Gdn_IPlugin {
         $home = trim(val('Destination', Gdn::router()->getRoute('DefaultController')), '/');
 
         // Add the site discussion links.
-        $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, array('icon' => 'th-list'));
-        $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, array('icon' => 'discussion'));
+        $sender->addLinkIf($home !== 'categories', t('All Categories', 'Categories'), '/categories', 'main.categories', '', 1, ['icon' => 'th-list']);
+        $sender->addLinkIf($home !== 'discussions', t('Recent Discussions'), '/discussions', 'main.discussions', '', 1, ['icon' => 'discussion']);
         $sender->addGroup(t('Favorites'), 'favorites', '', 3);
 
         if (Gdn::session()->isValid()) {
-            $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', array(), array('icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks));
-            $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', array(), array('icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions));
-            $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', array(), array('icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts));
+            $sender->addLink(t('My Bookmarks'), '/discussions/bookmarked', 'favorites.bookmarks', '', [], ['icon' => 'star', 'badge' => Gdn::session()->User->CountBookmarks]);
+            $sender->addLink(t('My Discussions'), '/discussions/mine', 'favorites.discussions', '', [], ['icon' => 'discussion', 'badge' => Gdn::session()->User->CountDiscussions]);
+            $sender->addLink(t('Drafts'), '/drafts', 'favorites.drafts', '', [], ['icon' => 'compose', 'badge' => Gdn::session()->User->CountDrafts]);
         }
 
         $user = Gdn::controller()->data('Profile');
@@ -811,8 +811,8 @@ class VanillaHooks implements Gdn_IPlugin {
             return;
         }
         $sender->addGroupToSection('Profile', t('Posts'), 'posts');
-        $sender->addLinkToSection('Profile', t('Discussions'), userUrl($user, '', 'discussions'), 'posts.discussions', '', array(), array('icon' => 'discussion', 'badge' => val('CountDiscussions', $user)));
-        $sender->addLinkToSection('Profile', t('Comments'), userUrl($user, '', 'comments'), 'posts.comments', '', array(), array('icon' => 'comment', 'badge' => val('CountComments', $user)));
+        $sender->addLinkToSection('Profile', t('Discussions'), userUrl($user, '', 'discussions'), 'posts.discussions', '', [], ['icon' => 'discussion', 'badge' => val('CountDiscussions', $user)]);
+        $sender->addLinkToSection('Profile', t('Comments'), userUrl($user, '', 'comments'), 'posts.comments', '', [], ['icon' => 'comment', 'badge' => val('CountComments', $user)]);
     }
 
     /**
@@ -867,7 +867,7 @@ class VanillaHooks implements Gdn_IPlugin {
         $Sender->ShowOptions = false;
 
         if ($Sender->Head) {
-            $Sender->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+            $Sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
         }
 
         // Render the ProfileController
@@ -926,7 +926,7 @@ class VanillaHooks implements Gdn_IPlugin {
 
         if ($Sender->Head) {
             // These pages offer only duplicate content to search engines and are a bit slow.
-            $Sender->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex,noarchive'));
+            $Sender->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex,noarchive']);
         }
 
         // Render the ProfileController
@@ -981,7 +981,7 @@ class VanillaHooks implements Gdn_IPlugin {
                 if (!$DiscussionID) {
                     $Discussion = $DiscussionModel->getForeignID($ForeignID, 'page');
                     $DiscussionID = val('DiscussionID', $Discussion);
-                    Gdn::cache()->store($Key, $DiscussionID, array(Gdn_Cache::FEATURE_EXPIRY, 1800));
+                    Gdn::cache()->store($Key, $DiscussionID, [Gdn_Cache::FEATURE_EXPIRY, 1800]);
                 }
             }
         }

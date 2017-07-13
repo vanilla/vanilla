@@ -65,7 +65,7 @@ class DiscussionsModule extends Gdn_Module {
         $discussionModel = new DiscussionModel();
 
         $categoryIDs = $this->getCategoryIDs();
-        $where = array('Announce' => 'all');
+        $where = ['Announce' => 'all'];
 
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);

@@ -16,7 +16,7 @@
 class DiscussionsController extends VanillaController {
 
     /** @var arrayModels to include. */
-    public $Uses = array('Database', 'DiscussionModel', 'Form');
+    public $Uses = ['Database', 'DiscussionModel', 'Form'];
 
     /** @var boolean Value indicating if discussion options should be displayed when rendering the discussion view.*/
     public $ShowOptions;
@@ -118,7 +118,7 @@ class DiscussionsController extends VanillaController {
         $this->addModule('BookmarkedModule');
         $this->addModule('TagModule');
 
-        $this->setData('Breadcrumbs', array(array('Name' => t('Recent Discussions'), 'Url' => '/discussions')));
+        $this->setData('Breadcrumbs', [['Name' => t('Recent Discussions'), 'Url' => '/discussions']]);
 
 
         // Set criteria & get discussions data
@@ -131,7 +131,7 @@ class DiscussionsController extends VanillaController {
 
         // Check for individual categories.
         $categoryIDs = $this->getCategoryIDs();
-        $where = array();
+        $where = [];
         if ($categoryIDs) {
             $where['d.CategoryID'] = CategoryModel::filterCategoryPermissions($categoryIDs);
         } else {
@@ -149,7 +149,7 @@ class DiscussionsController extends VanillaController {
 
         // Get Announcements
         $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($where) : false;
-        $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : array(), true);
+        $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : [], true);
 
         // RSS should include announcements.
         if ($this->SyndicationMethod !== SYNDICATION_NONE) {
@@ -252,10 +252,10 @@ class DiscussionsController extends VanillaController {
         $this->addModule('BookmarkedModule');
         $this->addModule('TagModule');
 
-        $this->setData('Breadcrumbs', array(
-            array('Name' => t('Discussions'), 'Url' => '/discussions'),
-            array('Name' => t('Unread'), 'Url' => '/discussions/unread')
-        ));
+        $this->setData('Breadcrumbs', [
+            ['Name' => t('Discussions'), 'Url' => '/discussions'],
+            ['Name' => t('Unread'), 'Url' => '/discussions/unread']
+        ]);
 
 
         // Set criteria & get discussions data
@@ -321,7 +321,7 @@ class DiscussionsController extends VanillaController {
         $this->addJsFile('discussions.js');
 
         // Inform moderator of checked comments in this discussion
-        $CheckedDiscussions = Gdn::session()->getAttribute('CheckedDiscussions', array());
+        $CheckedDiscussions = Gdn::session()->getAttribute('CheckedDiscussions', []);
         if (count($CheckedDiscussions) > 0) {
             ModerationController::InformCheckedDiscussions($this);
         }
@@ -381,10 +381,10 @@ class DiscussionsController extends VanillaController {
         $this->setData('Sort', $DiscussionModel->getSort());
         $this->setData('Filters', $DiscussionModel->getFilters());
 
-        $Wheres = array(
+        $Wheres = [
             'w.Bookmarked' => '1',
             'w.UserID' => Gdn::session()->UserID
-        );
+        ];
 
         $this->DiscussionData = $DiscussionModel->get($Page, $Limit, $Wheres);
         $this->setData('Discussions', $this->DiscussionData);
@@ -429,7 +429,7 @@ class DiscussionsController extends VanillaController {
 
         // Render default view (discussions/bookmarked.php)
         $this->setData('Title', t('My Bookmarks'));
-        $this->setData('Breadcrumbs', array(array('Name' => t('My Bookmarks'), 'Url' => '/discussions/bookmarked')));
+        $this->setData('Breadcrumbs', [['Name' => t('My Bookmarks'), 'Url' => '/discussions/bookmarked']]);
         $this->render();
     }
 
@@ -437,10 +437,10 @@ class DiscussionsController extends VanillaController {
         $this->permission('Garden.SignIn.Allow');
 
         $DiscussionModel = new DiscussionModel();
-        $Wheres = array(
+        $Wheres = [
             'w.Bookmarked' => '1',
             'w.UserID' => Gdn::session()->UserID
-        );
+        ];
 
         $Discussions = $DiscussionModel->get(0, 5, $Wheres)->result();
         $this->setData('Title', t('Bookmarks'));
@@ -477,7 +477,7 @@ class DiscussionsController extends VanillaController {
         // Set criteria & get discussions data
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
         $Session = Gdn::session();
-        $Wheres = array('d.InsertUserID' => $Session->UserID);
+        $Wheres = ['d.InsertUserID' => $Session->UserID];
 
         $DiscussionModel = new DiscussionModel();
         $DiscussionModel->setSort(Gdn::request()->get());
@@ -531,7 +531,7 @@ class DiscussionsController extends VanillaController {
 
         // Render view
         $this->setData('Title', t('My Discussions'));
-        $this->setData('Breadcrumbs', array(array('Name' => t('My Discussions'), 'Url' => '/discussions/mine')));
+        $this->setData('Breadcrumbs', [['Name' => t('My Discussions'), 'Url' => '/discussions/mine']]);
         $this->render();
     }
 
@@ -579,15 +579,15 @@ class DiscussionsController extends VanillaController {
 
         $vanilla_identifier = val('vanilla_identifier', $_GET);
         if (!is_array($vanilla_identifier)) {
-            $vanilla_identifier = array($vanilla_identifier);
+            $vanilla_identifier = [$vanilla_identifier];
         }
 
         $vanilla_identifier = array_unique($vanilla_identifier);
 
         $FinalData = array_fill_keys($vanilla_identifier, 0);
-        $Misses = array();
+        $Misses = [];
         $CacheKey = 'embed.comments.count.%s';
-        $OriginalIDs = array();
+        $OriginalIDs = [];
         foreach ($vanilla_identifier as $ForeignID) {
             $HashedForeignID = ForeignIDHash($ForeignID);
 
@@ -618,9 +618,9 @@ class DiscussionsController extends VanillaController {
 
                 // Cache using the hashed identifier
                 $RealCacheKey = sprintf($CacheKey, $Row['ForeignID']);
-                Gdn::cache()->store($RealCacheKey, $Row['CountComments'], array(
+                Gdn::cache()->store($RealCacheKey, $Row['CountComments'], [
                     Gdn_Cache::FEATURE_EXPIRY => 60
-                ));
+                ]);
             }
         }
 
@@ -729,7 +729,7 @@ class DiscussionsController extends VanillaController {
         $TagModel = TagModel::instance();
         $RecordCount = false;
         if (!$MultipleTags) {
-            $Tags = $TagModel->getWhere(array('Name' => $Tag))->resultArray();
+            $Tags = $TagModel->getWhere(['Name' => $Tag])->resultArray();
 
             if (count($Tags) == 0) {
                 throw notFoundException('Page');
@@ -782,13 +782,13 @@ class DiscussionsController extends VanillaController {
         $this->setData('Category', false, true);
 
         $this->AnnounceData = false;
-        $this->setData('Announcements', array(), true);
+        $this->setData('Announcements', [], true);
 
         $DiscussionModel = new DiscussionModel();
 
         $TagModel->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $this->Request->get('op', 'or'));
 
-        $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, array('Announce' => 'all'));
+        $this->DiscussionData = $DiscussionModel->get($Offset, $Limit, ['Announce' => 'all']);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $Offset.' to '.$Limit);

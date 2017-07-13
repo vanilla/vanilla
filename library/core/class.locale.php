@@ -34,7 +34,7 @@ class Gdn_Locale extends Gdn_Pluggable {
     private $addonManager = null;
 
     /** @var array  */
-    public static $SetLocales = array(
+    public static $SetLocales = [
         'ar' => 'ar_SA',
         'az' => 'az_AZ',
         'bg' => 'bg_BG',
@@ -64,7 +64,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         'my' => 'my_MM',
         'nb' => 'nb_NO',
         'nl' => 'nl_NL',
-        'no' => array('no_NO', 'nn_NO'),
+        'no' => ['no_NO', 'nn_NO'],
         'pl' => 'pl_PL',
         'pt' => 'pt_BR',
         'ro' => 'ro_RO',
@@ -80,7 +80,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         'ur' => 'ur_PL',
         'vi' => 'vi_VN',
         'zh' => 'zh_CN'
-    );
+    ];
 
     /** @var int  */
     public $SavedDeveloperCalls = 0;
@@ -116,7 +116,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * @return string Returns the canonicalized version of the locale code.
      */
     public static function canonicalize($locale) {
-        $locale = str_replace(array('-', '@'), array('_', '__'), $locale);
+        $locale = str_replace(['-', '@'], ['_', '__'], $locale);
         $parts = explode('_', $locale, 2);
         if (isset($parts[1])) {
             $parts[1] = strtoupper($parts[1]);
@@ -177,11 +177,11 @@ class Gdn_Locale extends Gdn_Pluggable {
 
         $Codeset = c('Garden.LocaleCodeset', 'UTF8');
 
-        $SetLocale = array(
+        $SetLocale = [
             LC_TIME,
             "$CurrentLocale.$Codeset",
             $CurrentLocale
-        );
+        ];
 
         list($Language) = explode('_', $CurrentLocale, 2);
         if (isset(self::$SetLocales[$Language])) {
@@ -196,7 +196,7 @@ class Gdn_Locale extends Gdn_Pluggable {
         $r = call_user_func_array('setlocale', $SetLocale);
 
         if (!is_array($LocaleSources)) {
-            $LocaleSources = array();
+            $LocaleSources = [];
         }
 
         // Create a locale config container
@@ -320,7 +320,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      */
     public function setTranslation($Code, $Translation = '', $Save = false) {
         if (!is_array($Code)) {
-            $Code = array($Code => $Translation);
+            $Code = [$Code => $Translation];
         }
 
         $this->LocaleContainer->saveToConfig($Code, null, $Save);

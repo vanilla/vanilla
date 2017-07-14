@@ -11,7 +11,7 @@ $Session = Gdn::session();
 $SortOrder = c('Garden.ProfileTabOrder');
 
 if (!is_array($SortOrder))
-    $SortOrder = array();
+    $SortOrder = [];
 
 // Make sure that all tabs are present in $SortOrder
 foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
@@ -27,7 +27,7 @@ foreach ($Controller->ProfileTabs as $TabCode => $TabInfo) {
             $CssClass = $TabCode == $Controller->CurrentTab ? 'Active ' : '';
             // array_key_exists: Just in case a method was removed but is still present in sortorder
             if (array_key_exists($TabCode, $Controller->ProfileTabs)) {
-                $TabInfo = val($TabCode, $Controller->ProfileTabs, array());
+                $TabInfo = val($TabCode, $Controller->ProfileTabs, []);
                 $CssClass .= val('CssClass', $TabInfo, '');
                 echo '<li'.($CssClass == '' ? '' : ' class="'.$CssClass.'"').'>'.anchor(val('TabHtml', $TabInfo, $TabCode), val('TabUrl', $TabInfo))."</li>\r\n";
             }

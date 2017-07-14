@@ -90,10 +90,10 @@ class AttachmentModel extends Gdn_Model {
         unset($Row['Attributes']);
 
         $InsertUser = Gdn::userModel()->getID($Row['InsertUserID']);
-        $Row['InsertUser'] = array(
+        $Row['InsertUser'] = [
             'Name' => $InsertUser->Name,
             'ProfileLink' => userAnchor($InsertUser)
-        );
+        ];
     }
 
     /**
@@ -120,7 +120,7 @@ class AttachmentModel extends Gdn_Model {
      * @param array $Dataset
      * @param array $IDs
      */
-    public static function gatherIDs($Dataset, &$IDs = array()) {
+    public static function gatherIDs($Dataset, &$IDs = []) {
         if ((is_array($Dataset) && isset($Dataset[0])) || $Dataset instanceof Gdn_DataSet) {
             foreach ($Dataset as $Row) {
                 $id = self::rowID($Row);
@@ -158,7 +158,7 @@ class AttachmentModel extends Gdn_Model {
      * @see Gdn_Model::GetID
      */
 
-    public function getID($ID, $DatasetType = DATASET_TYPE_ARRAY, $Options = array()) {
+    public function getID($ID, $DatasetType = DATASET_TYPE_ARRAY, $Options = []) {
         $DatasetType = DATASET_TYPE_ARRAY;
 
         $Row = (array)parent::getID($ID, $DatasetType, $Options);
@@ -211,14 +211,14 @@ class AttachmentModel extends Gdn_Model {
             return;
         }
         // Gather the Ids.
-        $ForeignIDs = array();
+        $ForeignIDs = [];
         self::gatherIDs($Data, $ForeignIDs);
         if ($Data2) {
             self::gatherIDs($Data2, $ForeignIDs);
         }
         // Get the attachments.
-        $Attachments = $this->getWhere(array('ForeignID' => array_keys($ForeignIDs)), 'DateInserted', 'desc')->resultArray();
-        $Attachments = Gdn_DataSet::index($Attachments, 'ForeignID', array('Unique' => false));
+        $Attachments = $this->getWhere(['ForeignID' => array_keys($ForeignIDs)], 'DateInserted', 'desc')->resultArray();
+        $Attachments = Gdn_DataSet::index($Attachments, 'ForeignID', ['Unique' => false]);
 
         // Join the attachments.
         $this->joinAttachmentsTo($Data, $Attachments);
@@ -234,12 +234,12 @@ class AttachmentModel extends Gdn_Model {
      * @param int $Limit
      * @return bool
      */
-    public function joinAttachmentsToUser($Sender, $Args, $Where = array(), $Limit = 20) {
+    public function joinAttachmentsToUser($Sender, $Args, $Where = [], $Limit = 20) {
         $User = $Sender->User;
         if (!is_object($User)) {
             return false;
         }
-        $Where = array_merge(array('ForeignUserID' => $User->UserID), $Where);
+        $Where = array_merge(['ForeignUserID' => $User->UserID], $Where);
 
         $Attachments = $this->getWhere($Where, '', 'desc', $Limit)->resultArray();
         $Sender->setData('Attachments', $Attachments);
@@ -275,17 +275,17 @@ class AttachmentModel extends Gdn_Model {
         $this->defineSchema();
         $SchemaFields = $this->Schema->fields();
 
-        $SaveData = array();
-        $Attributes = array();
+        $SaveData = [];
+        $Attributes = [];
 
         // Grab the current attachment.
         if (isset($Data['AttachmentID'])) {
             $PrimaryKeyVal = $Data['AttachmentID'];
-            $CurrentAttachment = $this->SQL->getWhere('Attachment', array('AttachmentID' => $PrimaryKeyVal))->firstRow(DATASET_TYPE_ARRAY);
+            $CurrentAttachment = $this->SQL->getWhere('Attachment', ['AttachmentID' => $PrimaryKeyVal])->firstRow(DATASET_TYPE_ARRAY);
             if ($CurrentAttachment) {
                 $Attributes = dbdecode($CurrentAttachment['Attributes']);
                 if (!$Attributes) {
-                    $Attributes = array();
+                    $Attributes = [];
                 }
 
                 $Insert = false;
@@ -328,7 +328,7 @@ class AttachmentModel extends Gdn_Model {
 
             if ($Insert === false) {
                 unset($Fields[$this->PrimaryKey]); // Don't try to update the primary key
-                $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+                $this->update($Fields, [$this->PrimaryKey => $PrimaryKeyVal]);
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);
             }

@@ -189,14 +189,14 @@ class HomeController extends Gdn_Controller {
      * @see HomeController::sanitize()
      */
     protected function sanitizeData() {
-        $fields = array('Exception', 'Message', 'Description');
+        $fields = ['Exception', 'Message', 'Description'];
 
         $method = $this->data('_Filter', 'safe');
         switch ($method) {
             case 'none':
                 return;
             case 'filter':
-                $callback = array('Gdn_Format', 'htmlFilter');
+                $callback = ['Gdn_Format', 'htmlFilter'];
                 break;
             case 'safe':
             default:

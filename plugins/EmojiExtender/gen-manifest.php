@@ -8,7 +8,7 @@ $path = rtrim($argv[1], '/');
 
 $manifest = [];
 $emoji_paths = glob("$path/*.*");
-$emoji = array();
+$emoji = [];
 
 $validExtensions = ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'];
 
@@ -27,7 +27,7 @@ foreach ($emoji_paths as $emoji_path) {
 }
 if (!empty($emoji)) {
     $manifest['emoji'] = $emoji;
-    $manifest['aliases'] = array(':)' => 'smile',
+    $manifest['aliases'] = [':)' => 'smile',
         ':D' => 'smiley',
         ':(' => 'disappointed',
         ';)' => 'wink',
@@ -44,9 +44,9 @@ if (!empty($emoji)) {
         '(*)' => 'star',
         '>:)' => 'smiling_imp',
         'D:' => 'anguished'
-    );
+    ];
 
-    $manifest['editor'] = array('smile',
+    $manifest['editor'] = ['smile',
         'smiley',
         'disappointed',
         'wink',
@@ -61,7 +61,7 @@ if (!empty($emoji)) {
         'innocent',
         'heart',
         'star',
-        'smiling_imp');
+        'smiling_imp'];
 }
 
 $fp = fopen($path.'/manifest.json', 'w');

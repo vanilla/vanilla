@@ -60,7 +60,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      */
     public static function getDefault() {
         if (self::$default === null) {
-            $Rows = self::getWhereStatic(array('IsDefault' => 1));
+            $Rows = self::getWhereStatic(['IsDefault' => 1]);
             if (empty($Rows)) {
                 self::$default = false;
             } else {
@@ -89,7 +89,7 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         }
 
         $Data = $this->SQL->get()->resultArray();
-        $Data = Gdn_DataSet::index($Data, array('AuthenticationKey'));
+        $Data = Gdn_DataSet::index($Data, ['AuthenticationKey']);
         foreach ($Data as &$Row) {
             self::calculate($Row);
         }
@@ -192,17 +192,17 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
         // Grab the current record.
         $Row = false;
         if ($id = val('ID', $Settings)) {
-            $Row = $this->getWhere(array($this->PrimaryKey => $id))->firstRow(DATASET_TYPE_ARRAY);
+            $Row = $this->getWhere([$this->PrimaryKey => $id])->firstRow(DATASET_TYPE_ARRAY);
         } elseif (isset($Data[$this->PrimaryKey])) {
-            $Row = $this->getWhere(array($this->PrimaryKey => $Data[$this->PrimaryKey]))->firstRow(DATASET_TYPE_ARRAY);
+            $Row = $this->getWhere([$this->PrimaryKey => $Data[$this->PrimaryKey]])->firstRow(DATASET_TYPE_ARRAY);
         } elseif ($PK = val('PK', $Settings)) {
-            $Row = $this->getWhere(array($PK => $Data[$PK]))->firstRow(DATASET_TYPE_ARRAY);
+            $Row = $this->getWhere([$PK => $Data[$PK]])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         // Get the columns and put the extended data in the attributes.
         $this->defineSchema();
         $Columns = $this->Schema->fields();
-        $Remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
+        $Remove = ['TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1];
         $Data = array_diff_key($Data, $Remove);
         $Attributes = array_diff_key($Data, $Columns);
 
@@ -225,15 +225,15 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             if ($Default) {
                 $this->SQL->put(
                     $this->Name,
-                    array('IsDefault' => 0),
-                    array('AuthenticationKey <>' => val('AuthenticationKey', $Data))
+                    ['IsDefault' => 0],
+                    ['AuthenticationKey <>' => val('AuthenticationKey', $Data)]
                 );
             }
 
             $Fields = $this->Validation->validationFields();
             if ($Insert === false) {
                 $PrimaryKeyVal = $Row[$this->PrimaryKey];
-                $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+                $this->update($Fields, [$this->PrimaryKey => $PrimaryKeyVal]);
 
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);

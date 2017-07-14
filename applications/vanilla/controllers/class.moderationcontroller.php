@@ -51,17 +51,17 @@ class ModerationController extends VanillaController {
             $DiscussionID = val('DiscussionID', $_POST, 0);
             $CheckIDs = val('CheckIDs', $_POST);
             if (empty($CheckIDs)) {
-                $CheckIDs = array();
+                $CheckIDs = [];
             }
             $CheckIDs = (array)$CheckIDs;
 
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
+            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
             if (!is_array($CheckedComments)) {
-                $CheckedComments = array();
+                $CheckedComments = [];
             }
 
             if (!array_key_exists($DiscussionID, $CheckedComments)) {
-                $CheckedComments[$DiscussionID] = array();
+                $CheckedComments[$DiscussionID] = [];
             } else {
                 // Were there checked comments in this discussion before the form was posted?
                 $HadCheckedComments = count($CheckedComments[$DiscussionID]) > 0;
@@ -84,9 +84,9 @@ class ModerationController extends VanillaController {
         } elseif ($Session->isValid()) {
             // No form posted, just retrieve checked items for display
             $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
+            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
             if (!is_array($CheckedComments)) {
-                $CheckedComments = array();
+                $CheckedComments = [];
             }
 
         }
@@ -121,15 +121,15 @@ class ModerationController extends VanillaController {
 
             $Sender->informMessage(
                 $SelectionMessage
-                .Wrap($ActionMessage, 'div', array('class' => 'Actions')),
-                array(
+                .Wrap($ActionMessage, 'div', ['class' => 'Actions']),
+                [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
-                )
+                ]
             );
         } elseif ($HadCheckedComments) {
             // Remove the message completely if there were previously checked comments in this discussion, but none now
-            $Sender->informMessage('', array('id' => 'CheckSummary'));
+            $Sender->informMessage('', ['id' => 'CheckSummary']);
         }
     }
 
@@ -145,13 +145,13 @@ class ModerationController extends VanillaController {
             // Form was posted, so accept changes to checked items.
             $CheckIDs = val('CheckIDs', $_POST);
             if (empty($CheckIDs)) {
-                $CheckIDs = array();
+                $CheckIDs = [];
             }
             $CheckIDs = (array)$CheckIDs;
 
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
             if (!is_array($CheckedDiscussions)) {
-                $CheckedDiscussions = array();
+                $CheckedDiscussions = [];
             }
 
             // Were there checked discussions before the form was posted?
@@ -170,9 +170,9 @@ class ModerationController extends VanillaController {
             Gdn::userModel()->saveAttribute($Session->User->UserID, 'CheckedDiscussions', $CheckedDiscussions);
         } elseif ($Session->isValid()) {
             // No form posted, just retrieve checked items for display
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
             if (!is_array($CheckedDiscussions)) {
-                $CheckedDiscussions = array();
+                $CheckedDiscussions = [];
             }
 
         }
@@ -195,15 +195,15 @@ class ModerationController extends VanillaController {
 
             $Sender->informMessage(
                 $SelectionMessage
-                .Wrap($ActionMessage, 'div', array('class' => 'Actions')),
-                array(
+                .Wrap($ActionMessage, 'div', ['class' => 'Actions']),
+                [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
-                )
+                ]
             );
         } elseif ($HadCheckedDiscussions) {
             // Remove the message completely if there were previously checked comments in this discussion, but none now
-            $Sender->informMessage('', array('id' => 'CheckSummary'));
+            $Sender->informMessage('', ['id' => 'CheckSummary']);
         }
     }
 
@@ -213,7 +213,7 @@ class ModerationController extends VanillaController {
     public function clearCommentSelections($DiscussionID = '', $TransientKey = '') {
         $Session = Gdn::session();
         if ($Session->validateTransientKey($TransientKey)) {
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
+            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
             unset($CheckedComments[$DiscussionID]);
             Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
         }
@@ -250,13 +250,13 @@ class ModerationController extends VanillaController {
         $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
         $this->title(t('Confirm'));
 
-        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
+        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
         if (!is_array($CheckedComments)) {
-            $CheckedComments = array();
+            $CheckedComments = [];
         }
 
-        $CommentIDs = array();
-        $DiscussionIDs = array();
+        $CommentIDs = [];
+        $DiscussionIDs = [];
         foreach ($CheckedComments as $DiscID => $Comments) {
             foreach ($Comments as $Comment) {
                 if (substr($Comment, 0, 11) == 'Discussion_') {
@@ -299,9 +299,9 @@ class ModerationController extends VanillaController {
         $this->permission('Vanilla.Discussions.Delete', true, 'Category', 'any');
         $this->title(t('Confirm'));
 
-        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
         if (!is_array($CheckedDiscussions)) {
-            $CheckedDiscussions = array();
+            $CheckedDiscussions = [];
         }
 
         $DiscussionIDs = $CheckedDiscussions;
@@ -309,7 +309,7 @@ class ModerationController extends VanillaController {
         $this->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
 
         // Check permissions on each discussion to make sure the user has permission to delete them
-        $AllowedDiscussions = array();
+        $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
         foreach ($DiscussionData->result() as $Discussion) {
             $CountCheckedDiscussions = $DiscussionData->numRows();
@@ -353,9 +353,9 @@ class ModerationController extends VanillaController {
             $CheckedDiscussions = (array)$DiscussionID;
             $ClearSelection = false;
         } else {
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
             if (!is_array($CheckedDiscussions)) {
-                $CheckedDiscussions = array();
+                $CheckedDiscussions = [];
             }
 
             $ClearSelection = true;
@@ -366,9 +366,9 @@ class ModerationController extends VanillaController {
         $this->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
 
         // Check for edit permissions on each discussion
-        $AllowedDiscussions = array();
+        $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
-        $DiscussionData = Gdn_DataSet::Index($DiscussionData->resultArray(), array('DiscussionID'));
+        $DiscussionData = Gdn_DataSet::Index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);
             if ($Category && $Category['PermsDiscussionsEdit']) {
@@ -390,7 +390,7 @@ class ModerationController extends VanillaController {
                 throw forbiddenException('@'.t('You do not have permission to add discussions to this category.'));
             }
 
-            $AffectedCategories = array();
+            $AffectedCategories = [];
 
             // Iterate and move.
             foreach ($AllowedDiscussions as $DiscussionID) {
@@ -401,15 +401,15 @@ class ModerationController extends VanillaController {
                     $DiscussionModel->defineSchema();
                     $MaxNameLength = val('Length', $DiscussionModel->Schema->GetField('Name'));
 
-                    $RedirectDiscussion = array(
+                    $RedirectDiscussion = [
                         'Name' => SliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
                         'DateInserted' => $Discussion['DateLastComment'],
                         'Type' => 'redirect',
                         'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), array('url' => DiscussionUrl($Discussion))),
+                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => DiscussionUrl($Discussion)]),
                         'Format' => 'Html',
                         'Closed' => true
-                    );
+                    ];
 
                     // Pass a forced input formatter around this exception.
                     if (c('Garden.ForceInputFormatter')) {
@@ -433,13 +433,13 @@ class ModerationController extends VanillaController {
                 $DiscussionModel->setField($DiscussionID, 'CategoryID', $CategoryID);
 
                 if (!isset($AffectedCategories[$Discussion['CategoryID']])) {
-                    $AffectedCategories[$Discussion['CategoryID']] = array(-1, -$Discussion['CountComments']);
+                    $AffectedCategories[$Discussion['CategoryID']] = [-1, -$Discussion['CountComments']];
                 } else {
                     $AffectedCategories[$Discussion['CategoryID']][0] -= 1;
                     $AffectedCategories[$Discussion['CategoryID']][1] -= $Discussion['CountComments'];
                 }
                 if (!isset($AffectedCategories[$CategoryID])) {
-                    $AffectedCategories[$CategoryID] = array(1, $Discussion['CountComments']);
+                    $AffectedCategories[$CategoryID] = [1, $Discussion['CountComments']];
                 } else {
                     $AffectedCategories[$CategoryID][0] += 1;
                     $AffectedCategories[$CategoryID][1] += $Discussion['CountComments'];

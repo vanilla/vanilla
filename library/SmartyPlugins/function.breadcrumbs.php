@@ -17,10 +17,10 @@
 function smarty_function_breadcrumbs($Params, &$Smarty) {
     $Breadcrumbs = Gdn::controller()->data('Breadcrumbs');
     if (!is_array($Breadcrumbs)) {
-        $Breadcrumbs = array();
+        $Breadcrumbs = [];
     }
 
-    $Options = arrayTranslate($Params, array('homeurl' => 'HomeUrl', 'hidelast' => 'HideLast'));
+    $Options = arrayTranslate($Params, ['homeurl' => 'HomeUrl', 'hidelast' => 'HideLast']);
    
     return Gdn_Theme::breadcrumbs($Breadcrumbs, val('homelink', $Params, true), $Options);
 }

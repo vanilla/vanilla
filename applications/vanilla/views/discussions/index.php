@@ -3,12 +3,12 @@ $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
 echo '<h1 class="H HomepageTitle">'.
-    AdminCheck(NULL, array('', ' ')).
+    AdminCheck(NULL, ['', ' ']).
     $this->data('Title').
     '</h1>';
 
 $Description = $this->data('Category.Description', $this->Description());
-echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', array('class' => 'P PageDescription'));
+echo wrapIf(Gdn_Format::htmlFilter($Description), 'div', ['class' => 'P PageDescription']);
 
 $this->fireEvent('AfterPageTitle');
 
@@ -31,13 +31,13 @@ if ($subtreeView) {
 
 $this->fireEvent('AfterCategorySubtree');
 
-$PagerOptions = array('Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows());
+$PagerOptions = ['Wrapper' => '<span class="PagerNub">&#160;</span><div %1$s>%2$s</div>', 'RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows()];
 if ($this->data('_PagerUrl'))
     $PagerOptions['Url'] = $this->data('_PagerUrl');
 
 echo '<div class="PageControls Top">';
 PagerModule::write($PagerOptions);
-echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
 $this->fireEvent('PageControls');
 echo '</div>';
 
@@ -50,7 +50,7 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
 
     echo '<div class="PageControls Bottom">';
     PagerModule::write($PagerOptions);
-    echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', array('CssClass' => 'Button Action Primary')));
+    echo Gdn_Theme::Module('NewDiscussionModule', $this->data('_NewDiscussionProperties', ['CssClass' => 'Button Action Primary']));
     echo '</div>';
 
 } else {

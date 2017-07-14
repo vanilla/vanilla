@@ -89,11 +89,11 @@ class VanillaStatsPlugin extends Gdn_Plugin {
         }
 
         if (is_null($SecurityToken)) {
-            $Request = array('VanillaID' => $this->VanillaID);
+            $Request = ['VanillaID' => $this->VanillaID];
             Gdn::statistics()->basicParameters($Request);
-            Gdn::statistics()->analytics('graph/getsecuritytoken.json', $Request, array(
-                'Success' => array($this, 'SecurityTokenCallback')
-            ));
+            Gdn::statistics()->analytics('graph/getsecuritytoken.json', $Request, [
+                'Success' => [$this, 'SecurityTokenCallback']
+            ]);
         }
         return $SecurityToken;
     }

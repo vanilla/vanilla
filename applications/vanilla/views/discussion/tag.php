@@ -11,7 +11,7 @@ echo '<p>'.t('Which tags would you like to add to the discussion?').'</p>';
 echo '<div class="Form-Tags P">';
     // Tag text box
     echo $form->label('Tags', 'Tags');
-    echo $form->textBox('Tags', array('data-tags' => ''));
+    echo $form->textBox('Tags', ['data-tags' => '']);
 echo '</div>';
 
 ?>

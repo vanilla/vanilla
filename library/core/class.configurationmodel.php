@@ -37,7 +37,7 @@ class Gdn_ConfigurationModel {
      * saved as long as validation succeeds. You can add to this collection with
      * $this->ForceSetting();
      */
-    private $_ForceSettings = array();
+    private $_ForceSettings = [];
 
     /**
      * Class constructor. Defines the related database table name.
@@ -47,7 +47,7 @@ class Gdn_ConfigurationModel {
      */
     public function __construct($Validation) {
         $this->Name = 'Configuration';
-        $this->Data = array();
+        $this->Data = [];
         $this->Validation = $Validation;
     }
 
@@ -60,7 +60,7 @@ class Gdn_ConfigurationModel {
     public function setField($FieldName) {
         $Config = Gdn::factory(Gdn::AliasConfig);
         if (is_array($FieldName) === false) {
-            $FieldName = array($FieldName);
+            $FieldName = [$FieldName];
         }
 
         foreach ($FieldName as $Index => $Value) {
@@ -103,7 +103,7 @@ class Gdn_ConfigurationModel {
      * @param array $Array The array to be normalized.
      */
     private function normalizeArray($Array) {
-        $Return = array();
+        $Return = [];
         foreach ($Array as $Key => $Value) {
             if (is_array($Value) === true && array_key_exists(0, $Value) === false) {
                 foreach ($Value as $k => $v) {

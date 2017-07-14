@@ -17,7 +17,7 @@ if (!function_exists('AdminCheck')) {
             return '';
         }
 
-        static $CanEdits = array(), $Checked = NULL;
+        static $CanEdits = [], $Checked = NULL;
         $Result = '';
 
         if ($Discussion) {
@@ -28,10 +28,10 @@ if (!function_exists('AdminCheck')) {
             if ($CanEdits[$Discussion->CategoryID]) {
                 // Grab the list of currently checked discussions.
                 if ($Checked === null) {
-                    $Checked = (array)Gdn::session()->getAttribute('CheckedDiscussions', array());
+                    $Checked = (array)Gdn::session()->getAttribute('CheckedDiscussions', []);
 
                     if (!is_array($Checked)) {
-                        $Checked = array();
+                        $Checked = [];
                     }
                 }
 
@@ -74,7 +74,7 @@ if (!function_exists('BookmarkButton')) {
             $Title,
             '/discussion/bookmark/'.$Discussion->DiscussionID.'/'.Gdn::session()->TransientKey(),
             'Hijack Bookmark'.($Discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
-            array('title' => $Title)
+            ['title' => $Title]
         );
     }
 }
@@ -90,7 +90,7 @@ if (!function_exists('CategoryLink')) :
     function categoryLink($Discussion, $Prefix = ' ') {
         $Category = CategoryModel::categories(val('CategoryID', $Discussion));
         if ($Category) {
-            return wrap($Prefix.anchor(htmlspecialchars($Category['Name']), $Category['Url']), 'span', array('class' => 'MItem Category'));
+            return wrap($Prefix.anchor(htmlspecialchars($Category['Name']), $Category['Url']), 'span', ['class' => 'MItem Category']);
         }
     }
 
@@ -168,7 +168,7 @@ if (!function_exists('WriteDiscussion')) :
             <div class="ItemContent Discussion">
                 <div class="Title">
                     <?php
-                    echo adminCheck($Discussion, array('', ' ')).anchor($DiscussionName, $DiscussionUrl);
+                    echo adminCheck($Discussion, ['', ' ']).anchor($DiscussionName, $DiscussionUrl);
                     $Sender->fireEvent('AfterDiscussionTitle');
                     ?>
                 </div>
@@ -215,7 +215,7 @@ if (!function_exists('WriteDiscussion')) :
                             anchor(htmlspecialchars($Discussion->Category),
                             CategoryUrl($Discussion->CategoryUrlCode)),
                             'span',
-                            array('class' => 'MItem Category '.$Category['CssClass'])
+                            ['class' => 'MItem Category '.$Category['CssClass']]
                         );
                     }
                     $Sender->fireEvent('DiscussionMeta');
@@ -243,10 +243,10 @@ if (!function_exists('WriteDiscussionSorter')) :
         }
         $Selected = stringBeginsWith($Selected, 'd.', TRUE, true);
 
-        $Options = array(
+        $Options = [
             'DateLastComment' => t('Sort by Last Comment', 'by Last Comment'),
             'DateInserted' => t('Sort by Start Date', 'by Start Date')
-        );
+        ];
 
         ?>
         <span class="ToggleFlyout SelectFlyout">
@@ -256,13 +256,13 @@ if (!function_exists('WriteDiscussionSorter')) :
         } else {
             $Text = reset($Options);
         }
-        echo wrap($Text.' '.sprite('', 'DropHandle'), 'span', array('class' => 'Selected'));
+        echo wrap($Text.' '.sprite('', 'DropHandle'), 'span', ['class' => 'Selected']);
         ?>
             <div class="Flyout MenuItems">
                 <ul>
                     <?php
                     foreach ($Options as $SortField => $SortText) {
-                        echo wrap(Anchor($SortText, '#', array('class' => 'SortDiscussions', 'data-field' => $SortField)), 'li');
+                        echo wrap(Anchor($SortText, '#', ['class' => 'SortDiscussions', 'data-field' => $SortField]), 'li');
                     }
                     ?>
                 </ul>

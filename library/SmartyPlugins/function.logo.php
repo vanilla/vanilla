@@ -14,7 +14,7 @@
  * @return The HTML img tag or site title if no logo is set.
  */
 function smarty_function_logo($Params, &$Smarty) {
-    $Options = array();
+    $Options = [];
 
     // Whitelist params to be passed on.
     if (isset($Params['alt'])) {

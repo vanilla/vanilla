@@ -47,7 +47,7 @@ class BookmarkedModule extends Gdn_Module {
                 $Bookmarks = $DiscussionModel->get(
                     0,
                     $this->Limit,
-                    array('w.Bookmarked' => '1')
+                    ['w.Bookmarked' => '1']
                 );
                 $this->setData('Bookmarks', $Bookmarks);
             } else {

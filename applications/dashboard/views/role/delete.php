@@ -24,11 +24,11 @@ echo $this->Form->errors();
                 <?php  echo $this->Form->DropDown(
                     'ReplacementRoleID',
                     $this->ReplacementRoles,
-                    array(
+                    [
                         'ValueField' => 'RoleID',
                         'TextField' => 'Name',
                         'IncludeNull' => true
-                    ));
+                    ]);
                 ?>
             </div>
         </li>

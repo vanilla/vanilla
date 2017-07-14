@@ -143,7 +143,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
             include $fullPath;
         }
 
-        $RequiredFilename = implode(DS, array($this->getPluginFolder($absolute), $filePath));
+        $RequiredFilename = implode(DS, [$this->getPluginFolder($absolute), $filePath]);
         if ($include && file_exists($RequiredFilename)) {
             include($RequiredFilename);
         }
@@ -163,7 +163,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      */
     public function getView($ViewName) {
         deprecated('Gdn_Plugin->getView()');
-        $PluginDirectory = implode(DS, array($this->getPluginFolder(true), 'views'));
+        $PluginDirectory = implode(DS, [$this->getPluginFolder(true), 'views']);
         return $PluginDirectory.DS.$ViewName;
     }
 
@@ -374,7 +374,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @return mixed
      * @throws Exception
      */
-    public function dispatch($Sender, $RequestArgs = array()) {
+    public function dispatch($Sender, $RequestArgs = []) {
         $this->Sender = $Sender;
         $Sender->Form = new Gdn_Form();
 
@@ -392,7 +392,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
         if (method_exists($this, $ControllerMethod)) {
             $Sender->Plugin = $this;
-            return call_user_func(array($this, $ControllerMethod), $Sender, $RequestArgs);
+            return call_user_func([$this, $ControllerMethod], $Sender, $RequestArgs);
         } else {
             $PluginName = get_class($this);
             throw NotFoundException("@{$PluginName}->{$ControllerMethod}()");

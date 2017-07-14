@@ -98,7 +98,7 @@
             CleanErrorArguments($Arguments);
             foreach ($Arguments as $Key => $Value) {
                 // Don't echo the configuration array as it contains sensitive information
-                if (!in_array($Key, array('Config', 'Configuration'))) {
+                if (!in_array($Key, ['Config', 'Configuration'])) {
                     echo '<pre'.($Odd === FALSE ? '' : ' class="Odd"').'><strong>['.$Key.']</strong> ';
                     echo htmlentities(var_export($Value, true), ENT_COMPAT, 'UTF-8');
                     echo "</pre>\r\n";

@@ -62,12 +62,12 @@ class SplitMergePlugin extends Gdn_Plugin {
         // Verify that the user has permission to perform the split
         $Sender->permission('Vanilla.Discussions.Edit', true, 'Category', $Discussion->PermissionCategoryID);
 
-        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', array());
+        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
         if (!is_array($CheckedComments)) {
-            $CheckedComments = array();
+            $CheckedComments = [];
         }
 
-        $CommentIDs = array();
+        $CommentIDs = [];
         foreach ($CheckedComments as $DiscID => $Comments) {
             foreach ($Comments as $Comment) {
                 if ($DiscID == $DiscussionID) {
@@ -148,9 +148,9 @@ class SplitMergePlugin extends Gdn_Plugin {
         $Sender->title(t('Merge Discussions'));
 
         $DiscussionModel = new DiscussionModel();
-        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', array());
+        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
         if (!is_array($CheckedDiscussions)) {
-            $CheckedDiscussions = array();
+            $CheckedDiscussions = [];
         }
 
         $DiscussionIDs = $CheckedDiscussions;
@@ -213,7 +213,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                     }
 
                     // Create a comment out of the discussion.
-                    $Comment = arrayTranslate($Discussion, array('Body', 'Format', 'DateInserted', 'InsertUserID', 'InsertIPAddress', 'DateUpdated', 'UpdateUserID', 'UpdateIPAddress', 'Attributes', 'Spam', 'Likes', 'Abuse'));
+                    $Comment = arrayTranslate($Discussion, ['Body', 'Format', 'DateInserted', 'InsertUserID', 'InsertIPAddress', 'DateUpdated', 'UpdateUserID', 'UpdateIPAddress', 'Attributes', 'Spam', 'Likes', 'Abuse']);
                     $Comment['DiscussionID'] = $MergeDiscussionID;
 
                     $CommentModel->Validation->results(true);
@@ -226,12 +226,12 @@ class SplitMergePlugin extends Gdn_Plugin {
 
                         if ($RedirectLink) {
                             // The discussion needs to be changed to a moved link.
-                            $RedirectDiscussion = array(
+                            $RedirectDiscussion = [
                                 'Name' => SliceString(sprintf(t('Merged: %s'), $Discussion['Name']), $MaxNameLength),
                                 'Type' => 'redirect',
-                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), array('url' => DiscussionUrl($MergeDiscussion))),
+                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), ['url' => DiscussionUrl($MergeDiscussion)]),
                                 'Format' => 'Html'
-                            );
+                            ];
                             $DiscussionModel->setField($Discussion['DiscussionID'], $RedirectDiscussion);
                             $CommentModel->updateCommentCount($Discussion['DiscussionID']);
                             $CommentModel->removePageCache($Discussion['DiscussionID']);

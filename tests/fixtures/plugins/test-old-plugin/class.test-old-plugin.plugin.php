@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit;
 
-$PluginInfo['test-old-plugin'] = array(
+$PluginInfo['test-old-plugin'] = [
     'Name'        => "test-old-plugin",
     'Description' => "This is a fixture for unit testing.",
     'Version'     => '1.0.0',
@@ -10,7 +10,7 @@ $PluginInfo['test-old-plugin'] = array(
     'RequiredApplications' => [
         'test-old-application' => '1.0'
     ]
-);
+];
 
 class TestOldPluginPlugin extends Gdn_Plugin {
     public function setup() {

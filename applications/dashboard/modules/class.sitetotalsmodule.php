@@ -26,7 +26,7 @@ class SiteTotalsModule extends Gdn_Module {
         $Px = Gdn::database()->DatabasePrefix;
         $Sql = "show table status where Name in ('{$Px}User', '{$Px}Discussion', '{$Px}Comment')";
 
-        $Result = array('User' => 0, 'Discussion' => 0, 'Comment' => 0);
+        $Result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
         foreach ($Result as $Name => $Value) {
             $Result[$Name] = $this->getCount($Name);
         }
@@ -48,7 +48,7 @@ class SiteTotalsModule extends Gdn_Module {
             ->get()->value('CountRows');
 
         // Save the value to the cache.
-        Gdn::cache()->store($Key, $Count, array(Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)));
+        Gdn::cache()->store($Key, $Count, [Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)]);
         return $Count;
     }
 

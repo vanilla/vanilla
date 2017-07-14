@@ -24,7 +24,7 @@ class LocaleModel {
     public function availableLocalePacks() {
         if ($this->_AvailableLocalePacks === null) {
             $LocaleInfoPaths = safeGlob(PATH_ROOT."/locales/*/definitions.php");
-            $AvailableLocales = array();
+            $AvailableLocales = [];
             foreach ($LocaleInfoPaths as $InfoPath) {
                 $LocaleInfo = Gdn::pluginManager()->scanPluginFile($InfoPath, 'LocaleInfo');
                 $this->calculateLocaleInfo($LocaleInfo);
@@ -113,7 +113,7 @@ class LocaleModel {
      * @return array
      */
     public function enabledLocalePacks($GetInfo = false) {
-        $Result = (array)c('EnabledLocales', array());
+        $Result = (array)c('EnabledLocales', []);
 
         if ($GetInfo) {
             foreach ($Result as $Key => $Locale) {
@@ -142,7 +142,7 @@ class LocaleModel {
         $Skip = (array)$Skip;
 
         $Paths = safeGlob($Path.'/*.php');
-        $Definition = array();
+        $Definition = [];
         foreach ($Paths as $Path) {
             if (in_array($Path, $Skip)) {
                 continue;

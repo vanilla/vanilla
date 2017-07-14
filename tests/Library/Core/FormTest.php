@@ -37,7 +37,7 @@ class FormTest extends \PHPUnit\Framework\TestCase {
     public function testTranslateClassesWithCustomClass() {
         $frm = new Gdn_Form('', 'bootstrap');
 
-        $input = $frm->input('DefaultAvatar', 'file', array('class' => 'js-new-avatar-upload Hidden'));
+        $input = $frm->input('DefaultAvatar', 'file', ['class' => 'js-new-avatar-upload Hidden']);
         $this->assertSame('<input type="file" id="Form_DefaultAvatar" name="DefaultAvatar" value="" class="js-new-avatar-upload Hidden form-control-file" />', $input);
     }
 }

@@ -24,7 +24,7 @@ class PclZipAdapter {
     }
 
     public function extractTo($Path, $Names) {
-        $Indexes = array();
+        $Indexes = [];
         // Convert the name(s) to indexes.
         foreach ((array)$Names as $Name) {
             if (!isset($this->_Names[$Name])) {
@@ -43,7 +43,7 @@ class PclZipAdapter {
         if (!$Result) {
             return ZipArchive::ER_READ;
         }
-        $this->_Names = array();
+        $this->_Names = [];
         foreach ($this->_Contents as $Content) {
             $this->_Names[$Content['filename']] = $Content;
         }
@@ -53,7 +53,7 @@ class PclZipAdapter {
 
     public function statIndex($Index) {
         $Content = $this->_Contents[$Index];
-        $Result = array(
+        $Result = [
             'name' => $Content['filename'],
             'index' => $Content['index'],
             'crc' => $Content['crc'],
@@ -61,7 +61,7 @@ class PclZipAdapter {
             'mtime' => $Content['mtime'],
             'comp_size' => $Content['compressed_size'],
             'comp_method' => FALSE
-        );
+        ];
         return $Result;
     }
 }

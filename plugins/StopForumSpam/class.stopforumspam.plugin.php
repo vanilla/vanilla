@@ -21,17 +21,17 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      */
     public static function check(&$Data, &$Options) {
         // Make the request.
-        $Get = array();
+        $Get = [];
 
 
         if (isset($Data['IPAddress'])) {
             $AddIP = true;
             // Don't check against the localhost.
-            foreach (array(
+            foreach ([
                          '127.0.0.1/0',
                          '10.0.0.0/8',
                          '172.16.0.0/12',
-                         '192.168.0.0/16') as $LocalCIDR) {
+                         '192.168.0.0/16'] as $LocalCIDR) {
                 if (Gdn_Statistics::cidrCheck($Data['IPAddress'], $LocalCIDR)) {
                     $AddIP = false;
                     break;
@@ -104,19 +104,19 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      */
     public function structure() {
         // Get a user for operations.
-        $UserID = Gdn::sql()->getWhere('User', array('Name' => 'StopForumSpam', 'Admin' => 2))->value('UserID');
+        $UserID = Gdn::sql()->getWhere('User', ['Name' => 'StopForumSpam', 'Admin' => 2])->value('UserID');
 
         if (!$UserID) {
-            $UserID = Gdn::sql()->insert('User', array(
+            $UserID = Gdn::sql()->insert('User', [
                 'Name' => 'StopForumSpam',
                 'Password' => randomString('20'),
                 'HashMethod' => 'Random',
                 'Email' => 'stopforumspam@domain.com',
                 'DateInserted' => Gdn_Format::toDateTime(),
                 'Admin' => '2'
-            ));
+            ]);
         }
-        saveToConfig('Plugins.StopForumSpam.UserID', $UserID, array('CheckExisting' => true));
+        saveToConfig('Plugins.StopForumSpam.UserID', $UserID, ['CheckExisting' => true]);
     }
 
     /**
@@ -178,15 +178,15 @@ class StopForumSpamPlugin extends Gdn_Plugin {
      * @param $Sender
      * @param array $Args
      */
-    public function settingsController_stopForumSpam_create($Sender, $Args = array()) {
+    public function settingsController_stopForumSpam_create($Sender, $Args = []) {
         $Sender->permission('Garden.Settings.Manage');
         $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.StopForumSpam.IPThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'),
-            'Plugins.StopForumSpam.EmailThreshold1' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'Email addresses reported this many times will be flagged as spam.'),
-            'Plugins.StopForumSpam.IPThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'IP addresses reported this many times will be completely rejected.'),
-            'Plugins.StopForumSpam.EmailThreshold2' => array('Type' => 'int', 'Control' => 'TextBox', 'Default' => 50, 'Description' => 'Email addresses reported this many times will be completely rejected.'),
-        ));
+        $Conf->initialize([
+            'Plugins.StopForumSpam.IPThreshold1' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => 5, 'Description' => 'IP addresses reported this many times will be flagged as spam.'],
+            'Plugins.StopForumSpam.EmailThreshold1' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'Email addresses reported this many times will be flagged as spam.'],
+            'Plugins.StopForumSpam.IPThreshold2' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => 20, 'Description' => 'IP addresses reported this many times will be completely rejected.'],
+            'Plugins.StopForumSpam.EmailThreshold2' => ['Type' => 'int', 'Control' => 'TextBox', 'Default' => 50, 'Description' => 'Email addresses reported this many times will be completely rejected.'],
+        ]);
 
         $Sender->setHighlightRoute('dashboard/settings/plugins');
         $Sender->setData('Title', sprintf(t('%s Settings'), 'Stop Forum Spam'));

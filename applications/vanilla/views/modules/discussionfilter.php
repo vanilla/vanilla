@@ -38,7 +38,7 @@ if (c('Vanilla.Discussions.ShowCounts', true)) {
         //      if (c('Vanilla.Categories.ShowTabs')) {
         if (c('Vanilla.Categories.Use')) {
             $CssClass = 'AllCategories';
-            if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), array('index', 'all'))) {
+            if (strtolower($Controller->ControllerName) == 'categoriescontroller' && in_array(strtolower($Controller->RequestMethod), ['index', 'all'])) {
                 $CssClass .= ' Active';
             }
 

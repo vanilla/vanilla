@@ -58,7 +58,7 @@ $Construct->PrimaryKey('CategoryID')
     ->column('PermissionCategoryID', 'int', '-1')// default to root.
     ->column('PointsCategoryID', 'int', '0')// default to global.
     ->column('HideAllDiscussions', 'tinyint(1)', '0')
-    ->column('DisplayAs', array('Categories', 'Discussions', 'Flat', 'Heading', 'Default'), 'Discussions')
+    ->column('DisplayAs', ['Categories', 'Discussions', 'Flat', 'Heading', 'Default'], 'Discussions')
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('DateInserted', 'datetime')
@@ -71,7 +71,7 @@ $Construct->PrimaryKey('CategoryID')
     ->set($Explicit, $Drop);
 
 $RootCategoryInserted = false;
-if ($SQL->getWhere('Category', array('CategoryID' => -1))->numRows() == 0) {
+if ($SQL->getWhere('Category', ['CategoryID' => -1])->numRows() == 0) {
     $SQL->insert(
         'Category',
         [
@@ -93,7 +93,7 @@ if ($SQL->getWhere('Category', array('CategoryID' => -1))->numRows() == 0) {
 }
 
 if ($Drop || !$CategoryExists) {
-    $SQL->insert('Category', array('ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'Depth' => 1, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1));
+    $SQL->insert('Category', ['ParentCategoryID' => -1, 'TreeLeft' => 2, 'TreeRight' => 3, 'Depth' => 1, 'InsertUserID' => 1, 'UpdateUserID' => 1, 'DateInserted' => Gdn_Format::toDateTime(), 'DateUpdated' => Gdn_Format::toDateTime(), 'Name' => 'General', 'UrlCode' => 'general', 'Description' => 'General discussions', 'PermissionCategoryID' => -1]);
 } elseif ($CategoryExists && !$PermissionCategoryIDExists) {
     if (!c('Garden.Permissions.Disabled.Category')) {
         // Existing installations need to be set up with per/category permissions.
@@ -121,7 +121,7 @@ $Construct
     ->PrimaryKey('DiscussionID')
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(32)', true, 'index')// For relating foreign records to discussions
-    ->column('CategoryID', 'int', false, array('index.CategoryPages', 'index.CategoryInserted'))
+    ->column('CategoryID', 'int', false, ['index.CategoryPages', 'index.CategoryInserted'])
     ->column('InsertUserID', 'int', false, 'key')
     ->column('UpdateUserID', 'int', true)
     ->column('FirstCommentID', 'int', true)
@@ -136,11 +136,11 @@ $Construct
     ->column('Closed', 'tinyint(1)', '0')
     ->column('Announce', 'tinyint(1)', '0')
     ->column('Sink', 'tinyint(1)', '0')
-    ->column('DateInserted', 'datetime', false, array('index', 'index.CategoryInserted'))
+    ->column('DateInserted', 'datetime', false, ['index', 'index.CategoryInserted'])
     ->column('DateUpdated', 'datetime', true)
     ->column('InsertIPAddress', 'ipaddress', true)
     ->column('UpdateIPAddress', 'ipaddress', true)
-    ->column('DateLastComment', 'datetime', null, array('index', 'index.CategoryPages'))
+    ->column('DateLastComment', 'datetime', null, ['index', 'index.CategoryPages'])
     ->column('LastCommentUserID', 'int', true)
     ->column('Score', 'float', null)
     ->column('Attributes', 'text', true)
@@ -174,7 +174,7 @@ $Construct->table('UserDiscussion');
 $ParticipatedExists = $Construct->columnExists('Participated');
 
 $Construct->column('UserID', 'int', false, 'primary')
-    ->column('DiscussionID', 'int', false, array('primary', 'key'))
+    ->column('DiscussionID', 'int', false, ['primary', 'key'])
     ->column('Score', 'float', null)
     ->column('CountComments', 'int', '0')
     ->column('DateLastViewed', 'datetime', null)// null signals never
@@ -188,7 +188,7 @@ $Construct->table('Comment');
 if ($Construct->TableExists()) {
     $CommentIndexes = $Construct->IndexSqlDb();
 } else {
-    $CommentIndexes = array();
+    $CommentIndexes = [];
 }
 
 $Construct
@@ -202,7 +202,7 @@ $Construct
     ->column('DeleteUserID', 'int', true)
     ->column('Body', 'text', false, 'fulltext')
     ->column('Format', 'varchar(20)', true)
-    ->column('DateInserted', 'datetime', null, array('index.1', 'index'))
+    ->column('DateInserted', 'datetime', null, ['index.1', 'index'])
     ->column('DateDeleted', 'datetime', true)
     ->column('DateUpdated', 'datetime', true)
     ->column('InsertIPAddress', 'ipaddress', true)
@@ -278,33 +278,33 @@ $Construct->table('Draft')
 ///  %8 = RouteCode & Route
 
 // X added a discussion
-if ($SQL->getWhere('ActivityType', array('Name' => 'NewDiscussion'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewDiscussion', 'FullHeadline' => '%1$s started a %8$s.', 'ProfileHeadline' => '%1$s started a %8$s.', 'RouteCode' => 'discussion', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'NewDiscussion'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'NewDiscussion', 'FullHeadline' => '%1$s started a %8$s.', 'ProfileHeadline' => '%1$s started a %8$s.', 'RouteCode' => 'discussion', 'Public' => '0']);
 }
 
 // X commented on a discussion.
-if ($SQL->getWhere('ActivityType', array('Name' => 'NewComment'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'NewComment'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'NewComment', 'FullHeadline' => '%1$s commented on a discussion.', 'ProfileHeadline' => '%1$s commented on a discussion.', 'RouteCode' => 'discussion', 'Public' => '0']);
 }
 
 // People's comments on discussions
-if ($SQL->getWhere('ActivityType', array('Name' => 'DiscussionComment'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'DiscussionComment'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'DiscussionComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s commented on %4$s %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0']);
 }
 
 // People mentioning others in discussion topics
-if ($SQL->getWhere('ActivityType', array('Name' => 'DiscussionMention'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'DiscussionMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'DiscussionMention'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'DiscussionMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'discussion', 'Notify' => '1', 'Public' => '0']);
 }
 
 // People mentioning others in comments
-if ($SQL->getWhere('ActivityType', array('Name' => 'CommentMention'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'CommentMention'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'CommentMention', 'FullHeadline' => '%1$s mentioned %3$s in a %8$s.', 'ProfileHeadline' => '%1$s mentioned %3$s in a %8$s.', 'RouteCode' => 'comment', 'Notify' => '1', 'Public' => '0']);
 }
 
 // People commenting on user's bookmarked discussions
-if ($SQL->getWhere('ActivityType', array('Name' => 'BookmarkComment'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'BookmarkComment'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'BookmarkComment', 'FullHeadline' => '%1$s commented on your %8$s.', 'ProfileHeadline' => '%1$s commented on your %8$s.', 'RouteCode' => 'bookmarked discussion', 'Notify' => '1', 'Public' => '0']);
 }
 
 $ActivityModel = new ActivityModel();
@@ -316,15 +316,15 @@ $PermissionModel->Database = Gdn::database();
 $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.
-$PermissionModel->Define(array(
+$PermissionModel->Define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
-));
-$PermissionModel->Undefine(array('Vanilla.Settings.Manage', 'Vanilla.Categories.Manage'));
+]);
+$PermissionModel->Undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 
 // Define some permissions for the Vanilla categories.
 $PermissionModel->Define(
-    array(
+    [
     'Vanilla.Discussions.View' => 1,
     'Vanilla.Discussions.Add' => 1,
     'Vanilla.Discussions.Edit' => 0,
@@ -334,7 +334,7 @@ $PermissionModel->Define(
     'Vanilla.Discussions.Delete' => 0,
     'Vanilla.Comments.Add' => 1,
     'Vanilla.Comments.Edit' => 0,
-    'Vanilla.Comments.Delete' => 0),
+    'Vanilla.Comments.Delete' => 0],
     'tinyint',
     'Category',
     'PermissionCategoryID'
@@ -415,8 +415,8 @@ foreach ($Categories as $Category) {
 
     Gdn::sql()->put(
         'Category',
-        array('UrlCode' => $UrlCode),
-        array('CategoryID' => $Category['CategoryID'])
+        ['UrlCode' => $UrlCode],
+        ['CategoryID' => $Category['CategoryID']]
     );
 }
 

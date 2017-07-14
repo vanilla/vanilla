@@ -50,7 +50,7 @@ class Gdn_Schema {
         }
 
         if (!is_array($this->_Schema)) {
-            $this->_Schema = array();
+            $this->_Schema = [];
         }
 
         if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
@@ -88,7 +88,7 @@ class Gdn_Schema {
         }
 
         if (!is_array($this->_Schema)) {
-            $this->_Schema = array();
+            $this->_Schema = [];
         }
 
         $Result = false;
@@ -113,7 +113,7 @@ class Gdn_Schema {
             $this->CurrentTable = $Table;
         }
 
-        $Properties = array('Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum');
+        $Properties = ['Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum'];
         if (in_array($Property, $Properties)) {
             $Field = $this->getField($Field, $this->CurrentTable);
             if ($Field !== false) {
@@ -151,7 +151,7 @@ class Gdn_Schema {
      */
     public function primaryKey($Table, $Database = null) {
         $Schema = $this->fetch($Table, $Database);
-        $PrimaryKeys = array();
+        $PrimaryKeys = [];
         foreach ($Schema as $FieldName => $Properties) {
             if ($Properties->PrimaryKey === true) {
                 $PrimaryKeys[] = $FieldName;

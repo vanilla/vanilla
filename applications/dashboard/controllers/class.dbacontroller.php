@@ -57,7 +57,7 @@ class DbaController extends DashboardController {
             $Result = $this->Model->counts($Table, $Column, $From, $To);
             $this->setData('Result', $Result);
         } else {
-            $this->setData('Jobs', array());
+            $this->setData('Jobs', []);
             $this->fireEvent('CountJobs');
         }
 
@@ -93,7 +93,7 @@ class DbaController extends DashboardController {
         if ($this->Request->isAuthenticatedPostBack()) {
             $CategoryModel = new CategoryModel();
             $CategoryModel->rebuildTree();
-            $this->setData('Result', array('Complete' => true));
+            $this->setData('Result', ['Complete' => true]);
         }
 
         $this->setData('Title', "Fix category tree from an import.");
@@ -133,17 +133,17 @@ class DbaController extends DashboardController {
 
             $this->setData(
                 'Result',
-                array('Complete' => true)
+                ['Complete' => true]
             );
         } else {
-            $Tables = array(
+            $Tables = [
                 'Fix comments' => 'Comment',
                 'Fix discussions' => 'Discussion'
-            );
-            $Jobs = array();
+            ];
+            $Jobs = [];
 
             foreach ($Tables as $CurrentLabel => $CurrentTable) {
-                $Jobs[$CurrentLabel] = "/dba/fixinsertuserid.json?".http_build_query(array('table' => $CurrentTable));
+                $Jobs[$CurrentLabel] = "/dba/fixinsertuserid.json?".http_build_query(['table' => $CurrentTable]);
             }
             unset($CurrentLabel, $CurrentTable);
 
@@ -178,7 +178,7 @@ class DbaController extends DashboardController {
 
         if ($this->Request->isAuthenticatedPostBack()) {
             PermissionModel::resetAllRoles();
-            $this->setData('Result', array('Complete' => true));
+            $this->setData('Result', ['Complete' => true]);
         }
 
         $this->setData('Title', 'Reset all role permissions');

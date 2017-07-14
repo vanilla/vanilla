@@ -48,7 +48,7 @@ abstract class Gdn_SQLDriver {
      * @var string An associative array of information about the database to which the
      * application is connected. Values include: Engine, Version, DatabaseName.
      */
-    protected $_DatabaseInfo = array();
+    protected $_DatabaseInfo = [];
 
     /** @var boolean A boolean value indicating if this is a distinct query. */
     protected $_Distinct;
@@ -72,7 +72,7 @@ abstract class Gdn_SQLDriver {
      * @var array An associative array of parameter_name => parameter_value pairs to be
      * inserted into the prepared $this->_PDOStatement.
      */
-    protected $_NamedParameters = array();
+    protected $_NamedParameters = [];
 
     /**
      * @var int Whether or not to reset the properties when a query is executed.
@@ -89,7 +89,7 @@ abstract class Gdn_SQLDriver {
     protected $_OpenWhereGroupCount;
 
     /**@var array Extended options for a statement, usable by the driver. */
-    protected $_Options = array();
+    protected $_Options = [];
 
     /** @var array A collection of order by statements. */
     protected $_OrderBys;
@@ -486,7 +486,7 @@ abstract class Gdn_SQLDriver {
     public function fetchTables($LimitToPrefix = false) {
         $Sql = $this->fetchTableSql($LimitToPrefix);
         $Data = $this->query($Sql);
-        $Return = array();
+        $Return = [];
         foreach ($Data->resultArray() as $Row) {
             if (isset($Row['TABLE_NAME'])) {
                 $Return[] = $Row['TABLE_NAME'];
@@ -525,7 +525,7 @@ abstract class Gdn_SQLDriver {
     public function fetchColumns($Table) {
         $Sql = $this->fetchColumnSql($Table);
         $Data = $this->query($Sql);
-        $Return = array();
+        $Return = [];
         foreach ($Data->resultArray() as $Row) {
             if (isset($Row['COLUMN_NAME'])) {
                 $Return[] = $Row['COLUMN_NAME'];
@@ -561,7 +561,7 @@ abstract class Gdn_SQLDriver {
      **/
     public function from($From) {
         if (!is_array($From)) {
-            $From = array($From);
+            $From = [$From];
         }
 
         $Count = count($From);
@@ -639,7 +639,7 @@ abstract class Gdn_SQLDriver {
      */
     protected function _getIdentifierTokens($Sql) {
         $Tokens = preg_split('/`/', $Sql, -1, PREG_SPLIT_DELIM_CAPTURE);
-        $Result = array();
+        $Result = [];
 
         $InIdent = false;
         $CurrentToken = '';
@@ -720,7 +720,7 @@ abstract class Gdn_SQLDriver {
      * @param string $TableName The name of the table to delete from.
      * @param array $Wheres An array of where conditions.
      */
-    public function getDelete($TableName, $Wheres = array()) {
+    public function getDelete($TableName, $Wheres = []) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetDelete'), E_USER_ERROR);
     }
 
@@ -758,7 +758,7 @@ abstract class Gdn_SQLDriver {
         $Sql = (!$this->_Distinct) ? 'select ' : 'select distinct ';
 
         // Don't escape the field if it is numeric or an asterisk (all columns)
-        $Selects = array();
+        $Selects = [];
         foreach ($this->_Selects as $Key => $Expr) {
             $Field = $Expr['Field'];
             $Function = $Expr['Function'];
@@ -1014,7 +1014,7 @@ abstract class Gdn_SQLDriver {
      */
     function having($Field, $Value = '', $EscapeField = true, $EscapeValue = true) {
         if (!is_array($Field)) {
-            $Field = array($Field => $Value);
+            $Field = [$Field => $Value];
         }
 
         foreach ($Field as $ChildField => $ChildValue) {
@@ -1121,7 +1121,7 @@ abstract class Gdn_SQLDriver {
                     $Set[$Key] = $Value;
                 }
             }
-            $this->_Sets = array();
+            $this->_Sets = [];
         }
 
         // Check to see if there is a row in the table like this.
@@ -1139,7 +1139,7 @@ abstract class Gdn_SQLDriver {
                         continue;
                     }
 
-                    if (in_array($Key, array('DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID'))) {
+                    if (in_array($Key, ['DateInserted', 'InsertUserID', 'DateUpdated', 'UpdateUserID'])) {
                         continue;
                     }
 
@@ -1187,7 +1187,7 @@ abstract class Gdn_SQLDriver {
      */
     public function join($TableName, $On, $Join = '') {
         $Join = strtolower(trim($Join));
-        if ($Join != '' && !in_array($Join, array('inner', 'outer', 'left', 'right', 'left outer', 'right outer'), true)) {
+        if ($Join != '' && !in_array($Join, ['inner', 'outer', 'left', 'right', 'left outer', 'right outer'], true)) {
             $Join = '';
         }
 
@@ -1234,7 +1234,7 @@ abstract class Gdn_SQLDriver {
      */
     public function like($Field, $Match = '', $Side = 'both', $Op = 'like') {
         if (!is_array($Field)) {
-            $Field = array($Field => $Match);
+            $Field = [$Field => $Match];
         }
 
         foreach ($Field as $SubField => $SubValue) {
@@ -1455,7 +1455,7 @@ abstract class Gdn_SQLDriver {
      */
     public function orLike($Field, $Match = '', $Side = 'both', $Op = 'like') {
         if (!is_array($Field)) {
-            $Field = array($Field => $Match);
+            $Field = [$Field => $Match];
         }
 
         foreach ($Field as $f => $v) {
@@ -1570,7 +1570,7 @@ abstract class Gdn_SQLDriver {
                 // This is a named parameter.
 
                 // Check to see if the named parameter is valid.
-                if (in_array(substr($Expr, 0, 1), array('=', '@'))) {
+                if (in_array(substr($Expr, 0, 1), ['=', '@'])) {
                     // The parameter has to be a default name.
                     $Result = $this->namedParameter('Param', true);
                 } else {
@@ -1639,7 +1639,7 @@ abstract class Gdn_SQLDriver {
     }
 
     public function query($Sql, $Type = 'select') {
-        $QueryOptions = array('Type' => $Type, 'Slave' => val('Slave', $this->_Options, null));
+        $QueryOptions = ['Type' => $Type, 'Slave' => val('Slave', $this->_Options, null)];
 
         switch ($Type) {
             case 'insert':
@@ -1672,7 +1672,7 @@ abstract class Gdn_SQLDriver {
         try {
             if ($this->CaptureModifications && strtolower($Type) != 'select') {
                 if (!property_exists($this->Database, 'CapturedSql')) {
-                    $this->Database->CapturedSql = array();
+                    $this->Database->CapturedSql = [];
                 }
                 $Sql2 = $this->applyParameters($Sql, $parameters);
 
@@ -1735,20 +1735,20 @@ abstract class Gdn_SQLDriver {
             case 2:
                 return;
         }
-        $this->_Selects = array();
-        $this->_Froms = array();
-        $this->_Joins = array();
-        $this->_Wheres = array();
+        $this->_Selects = [];
+        $this->_Froms = [];
+        $this->_Joins = [];
+        $this->_Wheres = [];
         $this->_WhereConcat = 'and';
         $this->_WhereConcatDefault = 'and';
         $this->_WhereGroupConcat = 'and';
         $this->_WhereGroupConcatDefault = 'and';
         $this->_WhereGroupCount = 0;
         $this->_OpenWhereGroupCount = 0;
-        $this->_GroupBys = array();
-        $this->_Havings = array();
-        $this->_OrderBys = array();
-        $this->_AliasMap = array();
+        $this->_GroupBys = [];
+        $this->_Havings = [];
+        $this->_OrderBys = [];
+        $this->_AliasMap = [];
 
         $this->_CacheKey = null;
         $this->_CacheOperation = null;
@@ -1758,9 +1758,9 @@ abstract class Gdn_SQLDriver {
         $this->_Offset = false;
         $this->_Order = false;
 
-        $this->_Sets = array();
-        $this->_NamedParameters = array();
-        $this->_Options = array();
+        $this->_Sets = [];
+        $this->_NamedParameters = [];
+        $this->_Options = [];
 
         return $this;
     }
@@ -1783,7 +1783,7 @@ abstract class Gdn_SQLDriver {
             if ($Function == '') {
                 $Select = explode(',', $Select);
             } else {
-                $Select = array($Select);
+                $Select = [$Select];
             }
         }
         $Count = count($Select);
@@ -1808,7 +1808,7 @@ abstract class Gdn_SQLDriver {
                 }
             }
 
-            $Expr = array('Field' => $Field, 'Function' => $Function, 'Alias' => $Alias);
+            $Expr = ['Field' => $Field, 'Function' => $Function, 'Alias' => $Alias];
 
             if ($Alias == '') {
                 $this->_Selects[] = $Expr;
@@ -1839,7 +1839,7 @@ abstract class Gdn_SQLDriver {
             }
         }
 
-        $Expr = array('Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions);
+        $Expr = ['Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions];
 
         if ($Alias == '') {
             $this->_Selects[] = $Expr;
@@ -1869,7 +1869,7 @@ abstract class Gdn_SQLDriver {
         $Field = Gdn_Format::objectAsArray($Field);
 
         if (!is_array($Field)) {
-            $Field = array($Field => $Value);
+            $Field = [$Field => $Value];
         }
 
         foreach ($Field as $f => $v) {
@@ -2030,7 +2030,7 @@ abstract class Gdn_SQLDriver {
      */
     public function where($Field, $Value = null, $EscapeFieldSql = true, $EscapeValueSql = true) {
         if (!is_array($Field)) {
-            $Field = array($Field => $Value);
+            $Field = [$Field => $Value];
         }
 
         foreach ($Field as $SubField => $SubValue) {
@@ -2080,7 +2080,7 @@ abstract class Gdn_SQLDriver {
         $FieldExpr = $this->_parseExpr($Field);
 
         // Build up the in clause.
-        $In = array();
+        $In = [];
         foreach ($Values as $Value) {
             if ($Escape) {
                 $ValueExpr = $this->Database->connection()->quote($Value);

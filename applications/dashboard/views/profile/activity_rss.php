@@ -3,7 +3,7 @@
     <language><?php echo Gdn::config('Garden.Locale', 'en-US'); ?></language>
     <atom:link href="<?php echo htmlspecialchars(url($this->SelfUrl, true)); ?>" rel="self" type="application/rss+xml"/>
 <?php
-$Activities = $this->data('Activities', array());
+$Activities = $this->data('Activities', []);
 foreach ($Activities as $Activity) {
     $Author = UserBuilder($Activity, 'Activity');
     ?>

@@ -61,6 +61,36 @@ class CookieTest extends \PHPUnit\Framework\TestCase {
     }
 
     /**
+     * Provide parameters for calculating a cookie's expiry.
+     */
+    public function provideExpiry() {
+        $currentTimestamp = time();
+        $data = [
+            'Twenty-four hours' => [86400, ($currentTimestamp + 86400), $currentTimestamp],
+            'One year' => [31536000, ($currentTimestamp + 31536000), $currentTimestamp],
+            'Maximum' => [Cookie::EXPIRE_THRESHOLD, ($currentTimestamp + Cookie::EXPIRE_THRESHOLD), $currentTimestamp]
+        ];
+        $absoluteTimestamp = (Cookie::EXPIRE_THRESHOLD + 1);
+        $absoluteDateTime = date('F j, Y H:i:s e', $absoluteTimestamp);
+        $data[$absoluteDateTime] = [$absoluteTimestamp, $absoluteTimestamp, $currentTimestamp];
+        return $data;
+    }
+
+    /**
+     * Test calculating a cookie's expiry, relative to the current timestamp.
+     *
+     * @param int $expiry The integer offset or timestamp value.
+     * @param int $expected The expected expiry, expressed as a timestamp.
+     * @param int $timestamp The timestamp to be used as an offset for relative expiry values.
+     * @dataProvider provideExpiry
+     */
+    public function testCalculateExpiry($expiry, $expected, $timestamp) {
+        $cookie = new Cookie();
+        $actual = $cookie->calculateExpiry($expiry, $timestamp);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
      * Test getting a single cookie value.
      */
     public function testGet() {
@@ -168,14 +198,12 @@ class CookieTest extends \PHPUnit\Framework\TestCase {
         $data = $this->cookieDecode($cookie->makeCookieHeader());
         $this->assertSame($value, $data[$name]);
 
-        $testExpire  = $cookie->calculateExpiry($expire);
         $testPath = $path === null ? $cookie->getPath() : $path;
         $testDomain = $domain === null ? $cookie->getDomain() : $domain;
 
         $result = $cookie->makeNewCookieCalls();
         $this->assertArrayHasKey($name, $result);
         $this->assertEquals($value, $result[$name][0]);
-        $this->assertEquals($testExpire, $result[$name][1]);
         $this->assertEquals($testPath, $result[$name][2]);
         $this->assertEquals($testDomain, $result[$name][3]);
         $this->assertEquals($secure, $result[$name][4]);

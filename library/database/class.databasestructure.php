@@ -196,11 +196,11 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
 
         // Check the key type for validity. A column can be in many keys by specifying an array as key type.
         $KeyTypes = (array)$KeyType;
-        $KeyTypes1 = array();
+        $KeyTypes1 = [];
         foreach ($KeyTypes as $KeyType1) {
             $Parts = explode('.', $KeyType1, 2);
 
-            if (in_array($Parts[0], array('primary', 'key', 'index', 'unique', 'fulltext', false))) {
+            if (in_array($Parts[0], ['primary', 'key', 'index', 'unique', 'fulltext', false])) {
                 $KeyTypes1[] = $KeyType1;
             }
         }
@@ -274,7 +274,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         $Length = val('Length', $Column);
         $Precision = val('Precision', $Column);
 
-        if (in_array(strtolower($Type), array('tinyint', 'smallint', 'mediumint', 'int', 'float', 'double'))) {
+        if (in_array(strtolower($Type), ['tinyint', 'smallint', 'mediumint', 'int', 'float', 'double'])) {
             $Length = null;
         }
 
@@ -283,7 +283,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         } elseif ($Type && $Length)
             $Result = "$Type($Length)";
         elseif (strtolower($Type) == 'enum') {
-            $Result = val('Enum', $Column, array());
+            $Result = val('Enum', $Column, []);
         } elseif ($Type)
             $Result = $Type;
         else {
@@ -419,7 +419,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     protected function executeQuery($sql, $checkThreshold = false) {
         if ($this->CaptureOnly) {
             if (!property_exists($this->Database, 'CapturedSql')) {
-                $this->Database->CapturedSql = array();
+                $this->Database->CapturedSql = [];
             }
             $this->Database->CapturedSql[] = $sql;
             return true;
@@ -585,13 +585,13 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      *  - <b>all</b>: All recognized types.
      */
     public function types($Class = 'all') {
-        $Date = array('datetime', 'date', 'timestamp');
-        $Decimal = array('decimal', 'numeric');
-        $Float = array('float', 'double');
-        $Int = array('int', 'tinyint', 'smallint', 'mediumint', 'bigint');
-        $String = array('varchar', 'char', 'mediumtext', 'text');
-        $Length = array('varbinary');
-        $Other = array('enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress');
+        $Date = ['datetime', 'date', 'timestamp'];
+        $Decimal = ['decimal', 'numeric'];
+        $Float = ['float', 'double'];
+        $Int = ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'];
+        $String = ['varchar', 'char', 'mediumtext', 'text'];
+        $Length = ['varbinary'];
+        $Other = ['enum', 'tinyblob', 'blob', 'mediumblob', 'longblob', 'ipaddress'];
 
         switch (strtolower($Class)) {
             case 'date':
@@ -614,7 +614,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             case 'precision':
                 return $Decimal;
             default:
-                return array();
+                return [];
         }
     }
 
@@ -645,7 +645,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
             if ($this->TableExists()) {
                 $this->_ExistingColumns = $this->Database->sql()->fetchTableSchema($this->_TableName);
             } else {
-                $this->_ExistingColumns = array();
+                $this->_ExistingColumns = [];
             }
         }
         return $this->_ExistingColumns;
@@ -668,7 +668,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      */
     public function reset() {
         $this->_CharacterEncoding = '';
-        $this->_Columns = array();
+        $this->_Columns = [];
         $this->_ExistingColumns = null;
         $this->_TableExists = null;
         $this->_TableName = '';

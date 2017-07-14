@@ -65,9 +65,9 @@ class NotificationsController extends Gdn_Controller {
 
         $ActivityModel = new ActivityModel();
         // Get five pending notifications.
-        $Where = array(
+        $Where = [
             'NotifyUserID' => Gdn::session()->UserID,
-            'Notified' => ActivityModel::SENT_PENDING);
+            'Notified' => ActivityModel::SENT_PENDING];
 
         // If we're in the middle of a visit only get very recent notifications.
         $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
@@ -83,7 +83,7 @@ class NotificationsController extends Gdn_Controller {
         foreach ($Activities as $Activity) {
             if ($Activity['Photo']) {
                 $UserPhoto = anchor(
-                    img($Activity['Photo'], array('class' => 'ProfilePhotoMedium')),
+                    img($Activity['Photo'], ['class' => 'ProfilePhotoMedium']),
                     $Activity['Url'],
                     'Icon'
                 );
@@ -96,8 +96,8 @@ class NotificationsController extends Gdn_Controller {
 
             $Sender->informMessage(
                 $UserPhoto
-                .Wrap($Activity['Headline'], 'div', array('class' => 'Title'))
-                .Wrap($Excerpt, 'div', array('class' => 'Excerpt')),
+                .Wrap($Activity['Headline'], 'div', ['class' => 'Title'])
+                .Wrap($Excerpt, 'div', ['class' => 'Excerpt']),
                 'Dismissable AutoDismiss'.$ActivityClass.($UserPhoto == '' ? '' : ' HasIcon')
             );
         }

@@ -44,8 +44,8 @@ echo $form->errors();
         </li>
         <li class="form-group">
             <?php
-            $Options = array('10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100');
-            $Fields = array('TextField' => 'Code', 'ValueField' => 'Code');
+            $Options = ['10' => '10', '15' => '15', '20' => '20', '25' => '25', '30' => '30', '40' => '40', '50' => '50', '100' => '100'];
+            $Fields = ['TextField' => 'Code', 'ValueField' => 'Code'];
             ?>
             <div class="label-wrap">
             <?php echo $form->label('Discussions per Page', 'Vanilla.Discussions.PerPage'); ?>
@@ -64,7 +64,7 @@ echo $form->errors();
         </li>
         <li class="form-group">
             <?php
-            $Options = array('0' => t('Authors may never edit'),
+            $Options = ['0' => t('Authors may never edit'),
                 '350' => sprintf(t('Authors may edit for %s'), t('5 minutes')),
                 '900' => sprintf(t('Authors may edit for %s'), t('15 minutes')),
                 '3600' => sprintf(t('Authors may edit for %s'), t('1 hour')),
@@ -72,12 +72,12 @@ echo $form->errors();
                 '86400' => sprintf(t('Authors may edit for %s'), t('1 day')),
                 '604800' => sprintf(t('Authors may edit for %s'), t('1 week')),
                 '2592000' => sprintf(t('Authors may edit for %s'), t('1 month')),
-                '-1' => t('Authors may always edit'));
-            $Fields = array('TextField' => 'Text', 'ValueField' => 'Code'); ?>
+                '-1' => t('Authors may always edit')];
+            $Fields = ['TextField' => 'Text', 'ValueField' => 'Code']; ?>
             <div class="label-wrap">
             <?php
             echo $form->label('Discussion & Comment Editing', 'Garden.EditContentTimeout');
-            echo wrap(t('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', array('class' => 'info'));
+            echo wrap(t('EditContentTimeout.Notes', 'If a user is in a role that has permission to edit content, those permissions will override this.'), 'div', ['class' => 'info']);
             ?>
             </div>
             <div class="input-wrap">
@@ -90,7 +90,7 @@ echo $form->errors();
             <div class="info"><?php echo t("It is a good idea to keep the maximum number of characters allowed in a comment down to a reasonable size."); ?></div>
             </div>
             <div class="input-wrap">
-            <?php echo $form->textBox('Vanilla.Comment.MaxLength', array('class' => 'InputBox SmallInput')); ?>
+            <?php echo $form->textBox('Vanilla.Comment.MaxLength', ['class' => 'InputBox SmallInput']); ?>
             </div>
         </li>
         <li class="form-group">
@@ -99,7 +99,7 @@ echo $form->errors();
             <div class="info"><?php echo t("You can specify a minimum comment length to discourage short comments."); ?></div>
             </div>
             <div class="input-wrap">
-            <?php echo $form->textBox('Vanilla.Comment.MinLength', array('class' => 'InputBox SmallInput')); ?>
+            <?php echo $form->textBox('Vanilla.Comment.MinLength', ['class' => 'InputBox SmallInput']); ?>
             </div>
         </li>
     </ul>

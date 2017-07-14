@@ -59,7 +59,7 @@ class Gdn_Database {
     public $Engine;
 
     /** @var array Information about the last query. */
-    public $LastInfo = array();
+    public $LastInfo = [];
 
     /** @var string The password to the database. */
     public $Password;
@@ -287,8 +287,8 @@ class Gdn_Database {
      * @param string $Sql A string of SQL to be executed.
      * @param array $InputParameters An array of values with as many elements as there are bound parameters in the SQL statement being executed.
      */
-    public function query($Sql, $InputParameters = null, $Options = array()) {
-        $this->LastInfo = array();
+    public function query($Sql, $InputParameters = null, $Options = []) {
+        $this->LastInfo = [];
 
         if ($Sql == '') {
             trigger_error(errorMessage('Database was queried with an empty string.', $this->ClassName, 'Query'), E_USER_ERROR);
@@ -450,7 +450,7 @@ class Gdn_Database {
                 Gdn::cache()->store(
                     $StoreCacheKey,
                     (($this->_CurrentResultSet instanceof Gdn_DataSet) ? $this->_CurrentResultSet->resultArray() : $this->_CurrentResultSet),
-                    val('CacheOptions', $Options, array())
+                    val('CacheOptions', $Options, [])
                 );
             }
         }

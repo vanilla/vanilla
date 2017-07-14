@@ -36,7 +36,7 @@ class Gdn_LibraryMap {
     public static function prepareCache($CacheName, $ExistingCacheArray = null, $CacheMode = 'flat') {
         // Onetime initialization of in-memory file cache
         if (!is_array(self::$Caches)) {
-            self::$Caches = array();
+            self::$Caches = [];
         }
 
         if ($CacheName != 'locale') {
@@ -44,10 +44,10 @@ class Gdn_LibraryMap {
         }
 
         if (!array_key_exists($CacheName, self::$Caches)) {
-            self::$Caches[$CacheName] = array(
-                'cache' => array(),
+            self::$Caches[$CacheName] = [
+                'cache' => [],
                 'mode' => $CacheMode
-            );
+            ];
 
             $UseCache = (Gdn::cache()->type() == Gdn_Cache::CACHE_TYPE_MEMORY && Gdn::cache()->activeEnabled());
             if ($UseCache) {
@@ -123,7 +123,7 @@ class Gdn_LibraryMap {
         } else {
             @unlink(PATH_CACHE.DS.self::$Caches[$CacheName]['ondisk']);
         }
-        self::$Caches[$CacheName]['cache'] = array();
+        self::$Caches[$CacheName]['cache'] = [];
     }
 
     /**
@@ -204,11 +204,11 @@ class Gdn_LibraryMap {
         $ExistingCacheData = self::getCache($CacheName, $CacheKey);
 
         if ($ExistingCacheData === null) {
-            $ExistingCacheData = array();
+            $ExistingCacheData = [];
         }
 
         if (!is_array($ExistingCacheData)) {
-            $ExistingCacheData = array($ExistingCacheData);
+            $ExistingCacheData = [$ExistingCacheData];
         }
 
         $ExistingCacheData[] = $CacheContents;

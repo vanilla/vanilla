@@ -2196,12 +2196,6 @@ body.Post .Popup a.Close {
   margin-top: 5px;
 }
 
-.Message:after {
-  content: "";
-  display: table;
-  clear: both;
-}
-
 .Message h1, .Message h2, .Message h3, .Message p, .Message .P {
   margin: 10px 0;
 }
@@ -5459,7 +5453,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
  * Text formatting alignment
  */
 .AlignLeft {
-  float: left;
   margin: 0 10px 10px 0;
   text-align: left;
 }
@@ -5471,7 +5464,6 @@ div.token-input-dropdown ul li.token-input-selected-dropdown-item {
 }
 
 .AlignRight {
-  float: right;
   margin: 0 0 10px 10px;
   text-align: right;
 }

@@ -18,7 +18,7 @@ use Vanilla\Addon;
 class AssetModel extends Gdn_Model {
 
     /** @var array List of CSS files to serve. */
-    protected $_CssFiles = array();
+    protected $_CssFiles = [];
 
      /** @var string */
     public $UrlPrefix = '';
@@ -416,7 +416,7 @@ class AssetModel extends Gdn_Model {
      * @return string
      */
     public function resourceHash($resources) {
-        $keys = array();
+        $keys = [];
 
         foreach ($resources as $key => $options) {
            $version = val('version', $options, '');

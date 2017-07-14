@@ -56,10 +56,10 @@ if (!class_exists('MenuModule', false)) {
          */
         public function addLink($Group, $Text, $Url, $Permission = false, $Attributes = '', $AnchorAttributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
-                $this->Items[$Group] = array();
+                $this->Items[$Group] = [];
             }
 
-            $this->Items[$Group][] = array('Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes);
+            $this->Items[$Group][] = ['Text' => $Text, 'Url' => $Url, 'Permission' => $Permission, 'Attributes' => $Attributes, 'AnchorAttributes' => $AnchorAttributes];
         }
 
         /**
@@ -72,10 +72,10 @@ if (!class_exists('MenuModule', false)) {
          */
         public function addItem($Group, $Text, $Permission = false, $Attributes = '') {
             if (!array_key_exists($Group, $this->Items)) {
-                $this->Items[$Group] = array();
+                $this->Items[$Group] = [];
             }
 
-            $this->Items[$Group][] = array('Text' => $Text, 'Url' => false, 'Permission' => $Permission, 'Attributes' => $Attributes);
+            $this->Items[$Group][] = ['Text' => $Text, 'Url' => false, 'Permission' => $Permission, 'Attributes' => $Attributes];
         }
 
         /**
@@ -91,7 +91,7 @@ if (!class_exists('MenuModule', false)) {
          *
          */
         public function clearGroups() {
-            $this->Items = array();
+            $this->Items = [];
         }
 
         /**
@@ -125,7 +125,7 @@ if (!class_exists('MenuModule', false)) {
          * Removes all links from a specific group.
          */
         public function removeLinks($Group) {
-            $this->Items[$Group] = array();
+            $this->Items[$Group] = [];
         }
 
         /**
@@ -171,7 +171,7 @@ if (!class_exists('MenuModule', false)) {
             if (count($this->Items) > 0) {
                 // Apply the menu group sort if present...
                 if (is_array($this->Sort)) {
-                    $Items = array();
+                    $Items = [];
                     $Count = count($this->Sort);
                     for ($i = 0; $i < $Count; ++$i) {
                         $Group = $this->Sort[$i];
@@ -216,10 +216,10 @@ if (!class_exists('MenuModule', false)) {
                             } else {
                                 $Text = str_replace('{Username}', $Username, $Link['Text']);
                             }
-                            $Attributes = val('Attributes', $Link, array());
-                            $AnchorAttributes = val('AnchorAttributes', $Link, array());
+                            $Attributes = val('Attributes', $Link, []);
+                            $AnchorAttributes = val('AnchorAttributes', $Link, []);
                             if ($Url !== false) {
-                                $Url = url(str_replace(array('{Username}', '{UserID}', '{Session_TransientKey}'), array(urlencode($Username), $UserID, $Session_TransientKey), $Link['Url']));
+                                $Url = url(str_replace(['{Username}', '{UserID}', '{Session_TransientKey}'], [urlencode($Username), $UserID, $Session_TransientKey], $Link['Url']));
                                 $CurrentLink = $Url == url($HighlightRoute);
 
                                 $CssClass = val('class', $Attributes, '');

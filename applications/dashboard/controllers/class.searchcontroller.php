@@ -14,7 +14,7 @@
 class SearchController extends Gdn_Controller {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Database');
+    public $Uses = ['Database'];
 
     /**  @var Gdn_Form */
     public $Form;
@@ -57,7 +57,7 @@ class SearchController extends Gdn_Controller {
         $this->addCssFile('menu.css');
         $this->addModule('GuestModule');
         parent::initialize();
-        $this->setData('Breadcrumbs', array(array('Name' => t('Search'), 'Url' => '/search')));
+        $this->setData('Breadcrumbs', [['Name' => t('Search'), 'Url' => '/search']]);
     }
 
     /**
@@ -86,13 +86,13 @@ class SearchController extends Gdn_Controller {
             $ResultSet = $this->SearchModel->search($Search, $Offset, $Limit);
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
-            $ResultSet = array();
+            $ResultSet = [];
         } catch (Exception $Ex) {
             LogException($Ex);
             $this->Form->addError($Ex);
-            $ResultSet = array();
+            $ResultSet = [];
         }
-        Gdn::userModel()->joinUsers($ResultSet, array('UserID'));
+        Gdn::userModel()->joinUsers($ResultSet, ['UserID']);
 
         // Fix up the summaries.
         $SearchTerms = explode(' ', Gdn_Format::text($Search));

@@ -40,7 +40,7 @@ if (!function_exists('ValidateRegex')) {
      * @return bool Returns true if the value validates or false otherwise.
      */
     function validateRegex($value, $regex) {
-        return (filter_var($value, FILTER_VALIDATE_REGEXP, array('options' => array('regexp' => $regex))) !== false);
+        return (filter_var($value, FILTER_VALIDATE_REGEXP, ['options' => ['regexp' => $regex]]) !== false);
     }
 }
 
@@ -336,7 +336,7 @@ if (!function_exists('validateDate')) {
         if (empty($value)) {
             return true; // blank dates validated through required.
         } else {
-            $Matches = array();
+            $Matches = [];
             if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:\s{1}(\d{2}):(\d{2})(?::(\d{2}))?)?$/', $value, $Matches)) {
                 $Year = $Matches[1];
                 $Month = $Matches[2];
@@ -410,7 +410,7 @@ if (!function_exists('validateBoolean')) {
      */
     function validateBoolean($value) {
         $String = strval($value);
-        return in_array($String, array('1', '0', 'true', 'false', '')) ? true : false;
+        return in_array($String, ['1', '0', 'true', 'false', '']) ? true : false;
     }
 }
 
@@ -648,7 +648,7 @@ if (!function_exists('validateVersion')) {
         if (preg_match('`(?:\d+\.)*\d+\s*([a-z]*)\d*`i', $value, $Matches)) {
             // Get the version word out of the matches and validate it.
             $Word = $Matches[1];
-            if (!in_array(trim($Word), array('', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p'))) {
+            if (!in_array(trim($Word), ['', 'dev', 'alpha', 'a', 'beta', 'b', 'RC', 'rc', '#', 'pl', 'p'])) {
                 return false;
             }
             return true;

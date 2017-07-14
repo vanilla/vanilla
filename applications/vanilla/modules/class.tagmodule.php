@@ -112,6 +112,7 @@ class TagModule extends Gdn_Module {
                 $TagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
                     ->select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
                     ->where('td.CategoryID', $this->ParentID)
+                    ->where('t.Type', '') // Only show user generated tags
                     ->groupBy('td.TagID')
                     ->cache($TagCacheKey, 'get', [Gdn_Cache::FEATURE_EXPIRY => 120]);
                 break;
@@ -119,6 +120,7 @@ class TagModule extends Gdn_Module {
             case 'Global':
                 $TagCacheKey = 'TagModule-Global';
                 $TagQuery->where('t.CountDiscussions >', 0, false)
+                    ->where('t.Type', '') // Only show user generated tags
                     ->cache($TagCacheKey, 'get', [Gdn_Cache::FEATURE_EXPIRY => 120]);
 
                 if ($this->CategorySearch) {
@@ -134,6 +136,7 @@ class TagModule extends Gdn_Module {
             $this->_TagData = $TagQuery
                 ->select('t.*')
                 ->from('Tag t')
+                ->where('t.Type', '') // Only show user generated tags
                 ->orderBy('t.CountDiscussions', 'desc')
                 ->limit(25)
                 ->get();

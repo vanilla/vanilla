@@ -33,7 +33,7 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
         .t($Title)
         .'</div>',
         'div',
-        array('class' => $cssClass.' label-selector-item')
+        ['class' => $cssClass.' label-selector-item']
     );
 }
 
@@ -123,6 +123,6 @@ function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '
 echo $this->Form->open();
 echo $this->Form->errors();
 echo $this->Form->Hidden('Target');
-echo $this->Form->Hidden('DiscussionsLayout', array('value' => $CurrentDiscussionLayout));
-echo $this->Form->Hidden('CategoriesLayout', array('value' => $CurrentCategoriesLayout));
+echo $this->Form->Hidden('DiscussionsLayout', ['value' => $CurrentDiscussionLayout]);
+echo $this->Form->Hidden('CategoriesLayout', ['value' => $CurrentCategoriesLayout]);
 echo $this->Form->close('Save'); ?>

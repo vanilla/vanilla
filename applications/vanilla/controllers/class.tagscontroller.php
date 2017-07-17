@@ -27,11 +27,11 @@ class TagsController extends VanillaController {
         }
 
         if ($parent && !is_numeric($parent)) {
-            $parent = Gdn::sql()->getWhere('Tag', array('Name' => $parent))->value('TagID', -1);
+            $parent = Gdn::sql()->getWhere('Tag', ['Name' => $parent])->value('TagID', -1);
         }
 
         $Query = $q;
-        $Data = array();
+        $Data = [];
         $Database = Gdn::database();
         if ($Query || $parent || $type !== 'default') {
             $TagQuery = Gdn::sql()
@@ -40,7 +40,7 @@ class TagsController extends VanillaController {
                 ->limit(20);
 
             if ($Query) {
-                $TagQuery->like('FullName', str_replace(array('%', '_'), array('\%', '_'), $Query), strlen($Query) > 2 ? 'both' : 'right');
+                $TagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $Query), strlen($Query) > 2 ? 'both' : 'right');
             }
 
             if ($type === 'default') {
@@ -63,7 +63,7 @@ class TagsController extends VanillaController {
             $TagData = $TagQuery->get();
 
             foreach ($TagData as $Tag) {
-                $Data[] = array('id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->FullName);
+                $Data[] = ['id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->FullName];
             }
         }
         // Close the db before exiting.

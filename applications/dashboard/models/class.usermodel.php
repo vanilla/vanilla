@@ -1040,6 +1040,76 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Add multi-dimensional user data to an array.
+     *
+     * @param array $rows Results we need to associate user data with.
+     * @param array $columns Database columns containing UserIDs to get data for.
+     */
+    public function expandUsers(array &$rows, array $columns) {
+        // How are we supposed to lookup users by column if we don't have any columns?
+        if (count($columns) === 0) {
+            return;
+        }
+
+        reset($rows);
+        $single = is_string(key($rows));
+
+        $users = [];
+        $populate = function(array &$row) use ($users, $columns) {
+            foreach ($columns as $key) {
+                $destination = stringEndsWith($key, 'ID', true, true);
+                $id = val($key, $row);
+                $user = null;
+                if (is_numeric($id)) {
+                    // Keep a running collection of queried users. Non-existing users are null.
+                    if (!array_key_exists($id, $users)) {
+                        $user = $this->getID($id, DATASET_TYPE_ARRAY);
+                        if (!$user) {
+                            $user = null;
+                        }
+                        $users[$id] = $user;
+                    }
+
+                    // Massage the data, before injecting it into the results.
+                    $user = $users[$id];
+                    if ($user) {
+                        // Make sure all user records have a valid photo.
+                        $photo = val('Photo', $user);
+                        if ($photo && !isUrl($photo)) {
+                            $photoBase = changeBasename($photo, 'n%s');
+                            $photo = Gdn_Upload::url($photoBase);
+                        }
+                        if (empty($photo)) {
+                            $photo = UserModel::getDefaultAvatarUrl($user);
+                        }
+                        setValue('Photo', $user, $photo);
+                        // Add an alias to Photo. Currently only used in API calls.
+                        setValue('PhotoUrl', $user, $photo);
+                    } else {
+                        $user = [
+                            'userID' => 0,
+                            'name' => 'unknown',
+                            'email' => 'unknown@example.com'
+                        ];
+                        $user['photoUrl'] = self::getDefaultAvatarUrl($user);
+                    }
+                }
+
+                setValue($destination, $row, $user);
+            }
+        };
+
+        // Inject those user records.
+        if ($single) {
+            $populate($rows);
+        } else {
+            foreach ($rows as &$row) {
+                $populate($row);
+            }
+        }
+    }
+
+    /**
      * Returns the url to the default avatar for a user.
      *
      * @param array $user The user to get the default avatar for.
@@ -1264,6 +1334,20 @@ class UserModel extends Gdn_Model {
         return $this->SQL->getWhere(
             'UserAuthentication',
             ['ForeignUserKey' => $UniqueID, 'ProviderKey' => $Provider]
+        )->firstRow(DATASET_TYPE_ARRAY);
+    }
+
+    /**
+     * Get the user authentication row by user ID.
+     *
+     * @param int $userID The ID of the user to get the authentication for.
+     * @param string $provider The key of the provider.
+     * @return array|false Returns the authentication row or **false** if there isn't one.
+     */
+    public function getAuthenticationByUser($userID, $provider) {
+        return $this->SQL->getWhere(
+            'UserAuthentication',
+            ['UserID' => $userID, 'ProviderKey' => $provider]
         )->firstRow(DATASET_TYPE_ARRAY);
     }
 
@@ -3403,7 +3487,7 @@ class UserModel extends Gdn_Model {
                 'Photo' => null,
                 'Password' => randomString('10'),
                 'About' => '',
-                'Email' => 'user_'.$userID.'@deleted.email',
+                'Email' => 'user_'.$userID.'@deleted.invalid',
                 'ShowEmail' => '0',
                 'Gender' => 'u',
                 'CountVisits' => 0,

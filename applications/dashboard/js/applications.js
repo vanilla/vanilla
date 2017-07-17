@@ -17,8 +17,8 @@ jQuery(document).ready(function($) {
             success: function(json) {
                 if (json.FormSaved == true) {
                     gdn.inform(json);
-                    if (json.RedirectUrl) {
-                        window.location.replace(json.RedirectUrl);
+                    if (json.RedirectTo) {
+                        window.location.replace(json.RedirectTo);
                     } else {
                         // Show the button again if not redirecting...
                         $(btn).show();

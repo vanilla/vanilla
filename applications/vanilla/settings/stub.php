@@ -27,10 +27,10 @@ $Now = Gdn_Format::toDateTime();
 $CategoryID = val('CategoryID', CategoryModel::DefaultCategory());
 
 // Get wall post type ID
-$WallCommentTypeID = $SQL->getWhere('ActivityType', array('Name' => 'WallPost'))->value('ActivityTypeID');
+$WallCommentTypeID = $SQL->getWhere('ActivityType', ['Name' => 'WallPost'])->value('ActivityTypeID');
 
 // Insert first wall post
-$SQL->insert('Activity', array(
+$SQL->insert('Activity', [
     'Story' => t('StubWallBody', $WallBody),
     'Format' => 'Html',
     'HeadlineFormat' => '{RegardingUserID,you} &rarr; {ActivityUserID,you}',
@@ -41,4 +41,4 @@ $SQL->insert('Activity', array(
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now,
     'DateUpdated' => $Now
-));
+]);

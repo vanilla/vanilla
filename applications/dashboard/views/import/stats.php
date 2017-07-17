@@ -2,7 +2,7 @@
 <div class="table-wrap">
     <table class="table-data">
         <?php
-        $Header = array();
+        $Header = [];
         $ImportPaths = $this->data('ImportPaths');
         if (is_array($ImportPaths))
             $Filename = val($this->data('ImportPath'), $ImportPaths);
@@ -12,8 +12,8 @@
         if ($Filename)
             $Header[T('Source')] = $Filename;
 
-        $Header = array_merge($Header, (array)GetValue('Header', $this->Data, array()));
-        $Stats = (array)GetValue('Stats', $this->Data, array());
+        $Header = array_merge($Header, (array)GetValue('Header', $this->Data, []));
+        $Stats = (array)GetValue('Stats', $this->Data, []);
         $Info = array_merge($Header, $Stats);
         foreach ($Info as $Name => $Value) {
             switch ($Name) {

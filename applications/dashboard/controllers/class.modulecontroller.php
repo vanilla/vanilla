@@ -51,7 +51,7 @@ class ModuleController extends Gdn_Controller {
                 $ModuleInstance = new $Module($this);
                 $ModuleInstance->Visible = true;
 
-                $WhiteList = array('Limit', 'Help');
+                $WhiteList = ['Limit', 'Help'];
                 foreach ($this->Request->get() as $Key => $Value) {
                     if (in_array($Key, $WhiteList)) {
                         // Set a sane max limit for this open-ended way of calling modules.

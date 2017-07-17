@@ -14,7 +14,7 @@
 class DiscussionController extends VanillaController {
 
     /** @var array Models to include. */
-    public $Uses = array('DiscussionModel', 'CommentModel', 'Form');
+    public $Uses = ['DiscussionModel', 'CommentModel', 'Form'];
 
     /** @var array Unique identifier. */
     public $CategoryID;
@@ -207,7 +207,7 @@ class DiscussionController extends VanillaController {
             $this->Offset,
             $Limit,
             $ActualResponses,
-            array('DiscussionUrl')
+            ['DiscussionUrl']
         );
         $this->Pager->Record = $this->Discussion;
         PagerModule::current($this->Pager);
@@ -246,7 +246,7 @@ class DiscussionController extends VanillaController {
         }
 
         // Inform moderator of checked comments in this discussion
-        $CheckedComments = $Session->getAttribute('CheckedComments', array());
+        $CheckedComments = $Session->getAttribute('CheckedComments', []);
         if (count($CheckedComments) > 0) {
             ModerationController::informCheckedComments($this);
         }
@@ -394,7 +394,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            SafeRedirect('discussions');
+            redirectTo('discussions');
         }
 
         $this->jsonTarget("#Discussion_$DiscussionID", null, 'SlideUp');
@@ -444,11 +444,11 @@ class DiscussionController extends VanillaController {
         $Bookmark = $this->DiscussionModel->bookmark($DiscussionID, $UserID, $Bookmark);
 
         // Set the new value for api calls and json targets.
-        $this->setData(array(
+        $this->setData([
             'UserID' => $UserID,
             'DiscussionID' => $DiscussionID,
             'Bookmarked' => (bool)$Bookmark
-        ));
+        ]);
         setValue('Bookmarked', $Discussion, (int)$Bookmark);
 
         // Update the user's bookmark count
@@ -523,15 +523,15 @@ class DiscussionController extends VanillaController {
 
         if ($this->Form->authenticatedPostBack()) {
             // Save the property.
-            $CacheKeys = array(
+            $CacheKeys = [
                 $this->DiscussionModel->getAnnouncementCacheKey(),
                 $this->DiscussionModel->getAnnouncementCacheKey(val('CategoryID', $Discussion))
-            );
+            ];
             $this->DiscussionModel->SQL->cache($CacheKeys);
             $this->DiscussionModel->SetProperty($DiscussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
             if ($Target) {
-                $this->RedirectUrl = url($Target);
+                $this->setRedirectTo($Target);
             }
 
             $this->jsonTarget('', '', 'Refresh');
@@ -597,7 +597,7 @@ class DiscussionController extends VanillaController {
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = getIncomingValue('Target', 'discussions');
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->sendOptions($Discussion);
@@ -642,7 +642,7 @@ class DiscussionController extends VanillaController {
         // Redirect to the front page
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
             $Target = getIncomingValue('Target', 'discussions');
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->SendOptions($Discussion);
@@ -688,11 +688,11 @@ class DiscussionController extends VanillaController {
 
             if ($this->Form->errorCount() == 0) {
                 if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-                    safeRedirect($Target);
+                    redirectTo($Target);
                 }
 
                 if ($Target) {
-                    $this->RedirectUrl = url($Target);
+                    $this->setRedirectTo($Target);
                 }
 
                 $this->jsonTarget(".Section-DiscussionList #Discussion_$DiscussionID", null, 'SlideUp');
@@ -757,7 +757,7 @@ class DiscussionController extends VanillaController {
         // Redirect
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
             $Target = GetIncomingValue('Target', $DefaultTarget);
-            SafeRedirect($Target);
+            redirectTo($Target);
         }
 
         if ($this->Form->errorCount() > 0) {
@@ -818,12 +818,12 @@ body { background: transparent !important; }
         $vanilla_type = getIncomingValue('vanilla_type', 'page');
         $vanilla_url = getIncomingValue('vanilla_url', '');
         $vanilla_category_id = getIncomingValue('vanilla_category_id', '');
-        $ForeignSource = array(
+        $ForeignSource = [
             'vanilla_identifier' => $vanilla_identifier,
             'vanilla_type' => $vanilla_type,
             'vanilla_url' => $vanilla_url,
             'vanilla_category_id' => $vanilla_category_id
-        );
+        ];
         $this->setData('ForeignSource', $ForeignSource);
 
         // Set comment sorting
@@ -983,7 +983,7 @@ body { background: transparent !important; }
         $Body = Gdn_Format::to(val('Body', $Discussion), val('Format', $Discussion));
         if (preg_match('`href="([^"]+)"`i', $Body, $Matches)) {
             $Url = $Matches[1];
-            safeRedirect($Url, 301);
+            redirectTo($Url, 301);
         }
     }
 
@@ -1034,6 +1034,6 @@ body { background: transparent !important; }
         if (!$this->Head) {
             return;
         }
-        $this->Head->addTag('meta', array('property' => 'og:type', 'content' => 'article'));
+        $this->Head->addTag('meta', ['property' => 'og:type', 'content' => 'article']);
     }
 }

@@ -19,6 +19,7 @@ class UserAuthenticationNonceModel extends Gdn_Model {
     public function __construct() {
         parent::__construct('UserAuthenticationNonce');
         $this->setPruneField('Timestamp');
+        $this->setPruneAfter('45 minutes');
     }
 
     /**
@@ -26,6 +27,11 @@ class UserAuthenticationNonceModel extends Gdn_Model {
      */
     public function insert($fields) {
         $this->prune();
+
+        if (!isset($fields['Timestamp'])) {
+            $fields['Timestamp'] = date(MYSQL_DATE_FORMAT);
+        }
+
         return parent::insert($fields);
     }
 }

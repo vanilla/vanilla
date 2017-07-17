@@ -55,7 +55,7 @@ class Logger implements LoggerInterface {
      * @return int Returns the numeric log level or `8` if the level is invalid.
      */
     public static function levelPriority($level) {
-        static $priorities = array(
+        static $priorities = [
             self::DEBUG => LOG_DEBUG,
             self::INFO => LOG_INFO,
             self::NOTICE => LOG_NOTICE,
@@ -64,7 +64,7 @@ class Logger implements LoggerInterface {
             self::CRITICAL => LOG_CRIT,
             self::ALERT => LOG_ALERT,
             self::EMERGENCY => LOG_EMERG
-        );
+        ];
 
         if (isset($priorities[$level])) {
             return $priorities[$level];
@@ -120,7 +120,7 @@ class Logger implements LoggerInterface {
      * @param string $message The message to log. Put fields in {braces} to replace with context values.
      * @param array $context The context to format the message with.
      */
-    public function event($event, $level, $message, $context = array()) {
+    public function event($event, $level, $message, $context = []) {
         $context['event'] = $event;
         $this->log($level, $message, $context);
     }
@@ -131,7 +131,7 @@ class Logger implements LoggerInterface {
      * @param string $message The message to log. Put fields in {braces} to replace with context values.
      * @param array $context The context to format the message with.
      */
-    public function emergency($message, array $context = array()) {
+    public function emergency($message, array $context = []) {
         $this->log(self::EMERGENCY, $message, $context);
     }
 
@@ -142,7 +142,7 @@ class Logger implements LoggerInterface {
      * @param string $message The message to log. Put fields in {braces} to replace with context values.
      * @param array $context The context to format the message with.
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
         $levelPriority = self::levelPriority($level);
         if ($levelPriority > LOG_DEBUG) {
             throw new \Psr\Log\InvalidArgumentException("Invalid log level: $level.");
@@ -182,7 +182,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function alert($message, array $context = array()) {
+    public function alert($message, array $context = []) {
         $this->log(self::ALERT, $message, $context);
     }
 
@@ -195,7 +195,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function critical($message, array $context = array()) {
+    public function critical($message, array $context = []) {
         $this->log(self::CRITICAL, $message, $context);
     }
 
@@ -206,7 +206,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function error($message, array $context = array()) {
+    public function error($message, array $context = []) {
         $this->log(self::ERROR, $message, $context);
     }
 
@@ -220,7 +220,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function warning($message, array $context = array()) {
+    public function warning($message, array $context = []) {
         $this->log(self::WARNING, $message, $context);
     }
 
@@ -231,7 +231,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function notice($message, array $context = array()) {
+    public function notice($message, array $context = []) {
         $this->log(self::NOTICE, $message, $context);
     }
 
@@ -244,7 +244,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function info($message, array $context = array()) {
+    public function info($message, array $context = []) {
         $this->log(self::INFO, $message, $context);
     }
 
@@ -255,7 +255,7 @@ class Logger implements LoggerInterface {
      * @param array $context The context to format the message with.
      * @return null
      */
-    public function debug($message, array $context = array()) {
+    public function debug($message, array $context = []) {
         $this->log(self::DEBUG, $message, $context);
     }
 

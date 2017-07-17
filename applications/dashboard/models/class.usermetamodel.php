@@ -20,7 +20,7 @@ class UserMetaModel extends Gdn_Model {
      * Class constructor. Defines the related database table name.
      */
     public function __construct() {
-        self::$MemoryCache = array();
+        self::$MemoryCache = [];
         parent::__construct('UserMeta');
         $this->SQL = clone Gdn::sql();
         $this->SQL->reset();
@@ -48,7 +48,7 @@ class UserMetaModel extends Gdn_Model {
     public function getUserMeta($UserID, $Key = null, $Default = null) {
         if (Gdn::cache()->activeEnabled()) {
             if (is_array($UserID)) {
-                $Result = array();
+                $Result = [];
                 foreach ($UserID as $ID) {
                     $Meta = $this->GetUserMeta($ID, $Key, $Default);
                     $Result[$ID] = $Meta;
@@ -61,7 +61,7 @@ class UserMetaModel extends Gdn_Model {
             $UserMeta = Gdn::cache()->get($CacheKey);
 
             if ($UserMeta === Gdn_Cache::CACHEOP_FAILURE) {
-                $UserMeta = $this->getWhere(array('UserID' => $UserID), 'Name')->resultArray();
+                $UserMeta = $this->getWhere(['UserID' => $UserID], 'Name')->resultArray();
                 $UserMeta = array_column($UserMeta, 'Value', 'Name');
                 Gdn::cache()->store($CacheKey, $UserMeta);
             }
@@ -72,12 +72,12 @@ class UserMetaModel extends Gdn_Model {
 
             if (strpos($Key, '%') === false) {
                 $Result = val($Key, $UserMeta, $Default);
-                return array($Key => $Result);
+                return [$Key => $Result];
             }
 
             $Regex = '`'.str_replace('%', '.*', preg_quote($Key)).'`i';
 
-            $Result = array();
+            $Result = [];
             foreach ($UserMeta as $Name => $Value) {
                 if (preg_match($Regex, $Name)) {
                     $Result[$Name] = $Value;
@@ -106,7 +106,7 @@ class UserMetaModel extends Gdn_Model {
 
         $UserMetaData = $UserMetaQuery->get();
 
-        $UserMeta = array();
+        $UserMeta = [];
         if ($UserMetaData->numRows()) {
             if (is_array($UserID)) {
                 while ($MetaRow = $UserMetaData->NextRow()) {
@@ -173,9 +173,9 @@ class UserMetaModel extends Gdn_Model {
             }
 
             $CacheKey = 'UserMeta_'.$UserID;
-            Gdn::cache()->store($CacheKey, $UserMeta, array(
+            Gdn::cache()->store($CacheKey, $UserMeta, [
                 Gdn_Cache::FEATURE_EXPIRY => 3600
-            ));
+            ]);
 
             // Update the DB.
             $this->SQL->reset();
@@ -191,7 +191,7 @@ class UserMetaModel extends Gdn_Model {
             } else {
                 $Px = $this->SQL->Database->DatabasePrefix;
                 $Sql = "insert {$Px}UserMeta (UserID, Name, Value) values(:UserID, :Name, :Value) on duplicate key update Value = :Value1";
-                $Params = array(':UserID' => $UserID, ':Name' => $Key, ':Value' => $Value, ':Value1' => $Value);
+                $Params = [':UserID' => $UserID, ':Name' => $Key, ':Value' => $Value, ':Value1' => $Value];
                 $this->Database->query($Sql, $Params);
             }
 
@@ -217,23 +217,23 @@ class UserMetaModel extends Gdn_Model {
             $UserMetaQuery->delete('UserMeta');
         } else {                // Set
             if (!is_array($UserID)) {
-                $UserID = array($UserID);
+                $UserID = [$UserID];
             }
 
             foreach ($UserID as $UID) {
                 try {
-                    Gdn::sql()->insert('UserMeta', array(
+                    Gdn::sql()->insert('UserMeta', [
                         'UserID' => $UID,
                         'Name' => $Key,
                         'Value' => $Value
-                    ));
+                    ]);
                 } catch (Exception $e) {
-                    Gdn::sql()->update('UserMeta', array(
+                    Gdn::sql()->update('UserMeta', [
                         'Value' => $Value
-                    ), array(
+                    ], [
                         'UserID' => $UID,
                         'Name' => $Key
-                    ))->put();
+                    ])->put();
                 }
             }
         }

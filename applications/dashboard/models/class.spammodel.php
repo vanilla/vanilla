@@ -55,7 +55,7 @@ class SpamModel extends Gdn_Pluggable {
      * @param array $Options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
      */
-    public static function isSpam($RecordType, $Data, $Options = array()) {
+    public static function isSpam($RecordType, $Data, $Options = []) {
         if (self::$Disabled) {
             return false;
         }
@@ -103,16 +103,16 @@ class SpamModel extends Gdn_Pluggable {
 
         // Log the spam entry.
         if ($Spam && val('Log', $Options, true)) {
-            $LogOptions = array();
+            $LogOptions = [];
             switch ($RecordType) {
                 case 'Registration':
-                    $LogOptions['GroupBy'] = array('RecordIPAddress');
+                    $LogOptions['GroupBy'] = ['RecordIPAddress'];
                     break;
                 case 'Comment':
                 case 'Discussion':
                 case 'Activity':
                 case 'ActivityComment':
-                    $LogOptions['GroupBy'] = array('RecordID');
+                    $LogOptions['GroupBy'] = ['RecordID'];
                     break;
             }
 
@@ -174,11 +174,11 @@ class SpamModel extends Gdn_Pluggable {
                 } elseif ($row['CountComments'] > 0) {
                     $comments = Gdn::database()->sql()->getWhere(
                         'Comment',
-                        array('DiscussionID' => $id)
+                        ['DiscussionID' => $id]
                     )->resultArray();
 
                     if (!array_key_exists('_Data', $row)) {
-                        $row['_Data'] = array();
+                        $row['_Data'] = [];
                     }
 
                     $row['_Data']['Comment'] = $comments;
@@ -188,14 +188,14 @@ class SpamModel extends Gdn_Pluggable {
                 throw notFoundException($recordType);
         }
 
-        $overrideFields = array('Name', 'Body');
+        $overrideFields = ['Name', 'Body'];
         foreach ($overrideFields as $fieldName) {
             if (($fieldValue = val($fieldName, $data, false)) !== false) {
                 $row[$fieldName] = $fieldValue;
             }
         }
 
-        $logOptions = array('GroupBy' => array('RecordID'));
+        $logOptions = ['GroupBy' => ['RecordID']];
 
         if ($deleteRow) {
             // Remove the record to the log.

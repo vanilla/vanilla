@@ -8,7 +8,7 @@ echo '<ul class="DataList Discussions">';
 $ViewLocation = $this->fetchViewLocation('discussions', 'discussions', 'vanilla');
 
 if (!is_object($this->DiscussionData) || $this->DiscussionData->numRows() <= 0) {
-    echo wrap(t("This user has not made any discussions yet."), 'li', array('Class' => 'Item Empty'));
+    echo wrap(t("This user has not made any discussions yet."), 'li', ['Class' => 'Item Empty']);
 } else {
     include($ViewLocation);
     echo $this->Pager->toString('more');

@@ -10,7 +10,7 @@ function writeActivity($Activity, $Sender, $Session) {
 
     if ($Activity->Photo) {
         $PhotoAnchor = anchor(
-            img($Activity->Photo, array('class' => 'ProfilePhoto ProfilePhotoMedium')),
+            img($Activity->Photo, ['class' => 'ProfilePhoto ProfilePhotoMedium']),
             $Activity->PhotoUrl, 'PhotoWrap');
     }
 
@@ -26,7 +26,7 @@ function writeActivity($Activity, $Sender, $Session) {
         $Excerpt = Gdn_Format::to($Excerpt, $Format);
     }
 
-    if ($Activity->NotifyUserID > 0 || !in_array($ActivityType, array('WallComment', 'WallPost', 'AboutUpdate'))) {
+    if ($Activity->NotifyUserID > 0 || !in_array($ActivityType, ['WallComment', 'WallPost', 'AboutUpdate'])) {
         $Title = '<div class="Title">'.GetValue('Headline', $Activity).'</div>';
     } else if ($ActivityType == 'WallPost') {
         $RegardingUser = UserBuilder($Activity, 'Regarding');
@@ -59,13 +59,13 @@ function writeActivity($Activity, $Sender, $Session) {
     <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $Title; ?>
-    <?php echo WrapIf($Excerpt, 'div', array('class' => 'Excerpt')); ?>
+    <?php echo WrapIf($Excerpt, 'div', ['class' => 'Excerpt']); ?>
     <?php
     $Sender->EventArguments['Activity'] = $Activity;
     $Sender->FireAs('ActivityController')->fireEvent('AfterActivityBody');
 
     // Reactions stub
-    if (in_array(val('ActivityType', $Activity), array('Status', 'WallPost')))
+    if (in_array(val('ActivityType', $Activity), ['Status', 'WallPost']))
         WriteReactions($Activity);
     ?>
       <div class="Meta">
@@ -77,7 +77,7 @@ function writeActivity($Activity, $Sender, $Session) {
         $ID = val('CommentNotifyUserID', $Activity->Data);
 
     if ($ID)
-        $SharedString = formatString(t('Comments are between {UserID,you}.'), array('UserID' => array($Activity->NotifyUserID, $ID)));
+        $SharedString = formatString(t('Comments are between {UserID,you}.'), ['UserID' => [$Activity->NotifyUserID, $ID]]);
 
     $AllowComments = $Activity->NotifyUserID < 0 || $SharedString;
 
@@ -97,7 +97,7 @@ function writeActivity($Activity, $Sender, $Session) {
       </div>
    </div>
    <?php
-    $Comments = val('Comments', $Activity, array());
+    $Comments = val('Comments', $Activity, []);
     if (count($Comments) > 0) {
         echo '<ul class="DataList ActivityComments">';
         foreach ($Comments as $Comment) {
@@ -116,11 +116,11 @@ function writeActivity($Activity, $Sender, $Session) {
             $CommentForm->setModel($Sender->ActivityModel);
             $CommentForm->addHidden('ActivityID', $Activity->ActivityID);
             $CommentForm->addHidden('Return', Gdn_Url::Request());
-            echo $CommentForm->open(array('action' => url('/dashboard/activity/comment'), 'class' => 'Hidden'));
-            echo '<div class="TextBoxWrapper">'.$CommentForm->textBox('Body', array('MultiLine' => true, 'value' => '')).'</div>';
+            echo $CommentForm->open(['action' => url('/dashboard/activity/comment'), 'class' => 'Hidden']);
+            echo '<div class="TextBoxWrapper">'.$CommentForm->textBox('Body', ['MultiLine' => true, 'value' => '']).'</div>';
 
             echo '<div class="Buttons">';
-            echo $CommentForm->button('Comment', array('class' => 'Button Primary'));
+            echo $CommentForm->button('Comment', ['class' => 'Button Primary']);
             echo '</div>';
 
             echo $CommentForm->close();

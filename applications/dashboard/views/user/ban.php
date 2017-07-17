@@ -24,12 +24,12 @@
 
     <?php
 
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', array('Value' => 'Spam')), '</div>';
-    echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', array('Value' => 'Abuse')), '</div>';
+    echo '<div class="P">', $this->Form->Radio('Reason', 'Spamming', ['Value' => 'Spam']), '</div>';
+    echo '<div class="P">', $this->Form->Radio('Reason', 'Abusive Behavior', ['Value' => 'Abuse']), '</div>';
     echo '<div class="P">',
-    $this->Form->Radio('Reason', 'Other', array('Value' => 'Other')),
+    $this->Form->Radio('Reason', 'Other', ['Value' => 'Other']),
     '<div class="TextBoxWrapper">',
-    $this->Form->textBox('ReasonText', array('MultiLine' => TRUE)),
+    $this->Form->textBox('ReasonText', ['MultiLine' => TRUE]),
     '</div>',
     '</div>';
 

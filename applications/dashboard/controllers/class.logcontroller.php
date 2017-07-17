@@ -14,7 +14,7 @@
 class LogController extends DashboardController {
 
     /** @var array Objects to prep. */
-    public $Uses = array('Form', 'LogModel');
+    public $Uses = ['Form', 'LogModel'];
 
     /** @var Gdn_Form */
     public $Form;
@@ -35,7 +35,7 @@ class LogController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false);
         $Action = Gdn::request()->post('Action', false);
         $LogIDs = Gdn::request()->post('IDs', false);
 
@@ -45,20 +45,20 @@ class LogController extends DashboardController {
         if (trim($LogIDs)) {
             $LogIDArray = explode(',', $LogIDs);
         } else {
-            $LogIDArray = array();
+            $LogIDArray = [];
         }
 
         // We also want to collect the users from the log.
         $Logs = $this->LogModel->getIDs($LogIDArray);
-        $Users = array();
+        $Users = [];
         foreach ($Logs as $Log) {
             $UserID = $Log['RecordUserID'];
             if (!$UserID) {
                 continue;
             }
-            $Users[$UserID] = array('UserID' => $UserID);
+            $Users[$UserID] = ['UserID' => $UserID];
         }
-        Gdn::userModel()->joinUsers($Users, array('UserID'));
+        Gdn::userModel()->joinUsers($Users, ['UserID']);
         $this->setData('Users', $Users);
 
         $this->setData('Action', $Action);
@@ -77,20 +77,20 @@ class LogController extends DashboardController {
      */
     public function count($Operation) {
         // Don't use Gdn_Controller->permission() here because this isn't a "real page".
-        if (!Gdn::session()->checkPermission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false)) {
+        if (!Gdn::session()->checkPermission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false)) {
             $this->statusCode(403);
             echo '';
             return;
         }
 
         if ($Operation == 'edits') {
-            $Operation = array('edit', 'delete');
+            $Operation = ['edit', 'delete'];
         } else {
             $Operation = explode(',', $Operation);
         }
         array_map('ucfirst', $Operation);
 
-        $Count = $this->LogModel->getCountWhere(array('Operation' => $Operation));
+        $Count = $this->LogModel->getCountWhere(['Operation' => $Operation]);
 
         if ($Count > 0) {
             echo '<span class="Alert">', $Count, '</span>';
@@ -109,7 +109,7 @@ class LogController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
         $LogIDs = Gdn::request()->post('LogIDs');
         $this->LogModel->delete($LogIDs);
         $this->render('Blank', 'Utility');
@@ -123,24 +123,24 @@ class LogController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false);
         $LogIDs = Gdn::request()->post('LogIDs');
         $LogIDs = explode(',', $LogIDs);
 
         // Ban the appropriate users.
-        $UserIDs = $this->Form->getFormValue('UserID', array());
+        $UserIDs = $this->Form->getFormValue('UserID', []);
         if (!is_array($UserIDs)) {
-            $UserIDs = array();
+            $UserIDs = [];
         }
 
         if (!empty($UserIDs)) {
             // Grab the rest of the log entries.
-            $OtherLogIDs = $this->LogModel->getWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserIDs));
+            $OtherLogIDs = $this->LogModel->getWhere(['Operation' => 'Spam', 'RecordUserID' => $UserIDs]);
             $OtherLogIDs = array_column($OtherLogIDs, 'LogID');
             $LogIDs = array_merge($LogIDs, $OtherLogIDs);
 
             foreach ($UserIDs as $UserID) {
-                Gdn::userModel()->ban($UserID, array('Reason' => 'Spam', 'DeleteContent' => true, 'Log' => true));
+                Gdn::userModel()->ban($UserID, ['Reason' => 'Spam', 'DeleteContent' => true, 'Log' => true]);
             }
         }
 
@@ -162,22 +162,22 @@ class LogController extends DashboardController {
         list($Offset, $Limit) = offsetLimit($Page, 10);
         $this->setData('Title', t('Change Log'));
 
-        $Operations = array('Edit', 'Delete', 'Ban');
+        $Operations = ['Edit', 'Delete', 'Ban'];
         if ($Op && in_array(ucfirst($Op), $Operations)) {
             $Operations = ucfirst($Op);
         }
 
-        $Where = array(
+        $Where = [
             'Operation' => $Operations//,
 //          'RecordType' => array('Discussion', 'Comment', 'Activity')
-        );
+        ];
 
-        $AllowedTypes = array('Discussion', 'Comment', 'Activity', 'User');
+        $AllowedTypes = ['Discussion', 'Comment', 'Activity', 'User'];
 
         $Type = strtolower($Type);
         if ($Type == 'configuration') {
             $this->permission('Garden.Settings.Manage');
-            $Where['RecordType'] = array('Configuration');
+            $Where['RecordType'] = ['Configuration'];
         } else {
             if (in_array(ucfirst($Type), $AllowedTypes)) {
                 $Where['RecordType'] = ucfirst($Type);
@@ -216,11 +216,11 @@ class LogController extends DashboardController {
         $this->setData('Title', t('Change Log'));
 
         $RecordType = ucfirst($RecordType);
-        $Where = array(
-            'Operation' => array('Edit', 'Delete', 'Ban'),
+        $Where = [
+            'Operation' => ['Edit', 'Delete', 'Ban'],
             'RecordType' => $RecordType,
             'RecordID' => $RecordID
-        );
+        ];
 
         $RecordCount = $this->LogModel->getCountWhere($Where);
         $this->setData('RecordCount', $RecordCount);
@@ -256,10 +256,10 @@ class LogController extends DashboardController {
         list($Offset, $Limit) = offsetLimit($Page, 10);
         $this->setData('Title', t('Change Log by User'));
 
-        $Where = array(
-            'Operation' => array('Edit', 'Delete', 'Ban'),
+        $Where = [
+            'Operation' => ['Edit', 'Delete', 'Ban'],
             'RecordUserID' => $recordUserID
-        );
+        ];
 
         $RecordCount = $this->LogModel->getCountWhere($Where);
         $this->setData('RecordCount', $RecordCount);
@@ -316,9 +316,9 @@ class LogController extends DashboardController {
      * @param int $Page Page number.
      */
     public function moderation($Page = '') {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'], false);
 
-        $Where = array('Operation' => array('Moderate', 'Pending'));
+        $Where = ['Operation' => ['Moderate', 'Pending']];
 
         // Filter by category menu
         if ($CategoryID = Gdn::request()->getValue('CategoryID')) {
@@ -359,7 +359,7 @@ class LogController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage', 'Moderation.ModerationQueue.Manage'], false);
         $LogIDs = Gdn::request()->post('LogIDs');
 
         // Grab the logs.
@@ -379,20 +379,20 @@ class LogController extends DashboardController {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false);
         $LogIDs = Gdn::request()->post('LogIDs');
 
-        $Logs = array();
+        $Logs = [];
 
         // Verify the appropriate users.
-        $UserIDs = $this->Form->getFormValue('UserID', array());
+        $UserIDs = $this->Form->getFormValue('UserID', []);
         if (!is_array($UserIDs)) {
-            $UserIDs = array();
+            $UserIDs = [];
         }
 
         foreach ($UserIDs as $UserID) {
             Gdn::userModel()->setField($UserID, 'Verified', true);
-            $Logs = array_merge($Logs, $this->LogModel->getWhere(array('Operation' => 'Spam', 'RecordUserID' => $UserID)));
+            $Logs = array_merge($Logs, $this->LogModel->getWhere(['Operation' => 'Spam', 'RecordUserID' => $UserID]));
         }
 
         // Grab the logs.
@@ -421,11 +421,11 @@ class LogController extends DashboardController {
      * @param int $Page Page number.
      */
     public function spam($Page = '') {
-        $this->permission(array('Garden.Moderation.Manage', 'Moderation.Spam.Manage'), false);
+        $this->permission(['Garden.Moderation.Manage', 'Moderation.Spam.Manage'], false);
         list($Offset, $Limit) = offsetLimit($Page, 10);
         $this->setData('Title', t('Spam Queue'));
 
-        $Where = array('Operation' => array('Spam'));
+        $Where = ['Operation' => ['Spam']];
 
         $RecordCount = $this->LogModel->getCountWhere($Where);
         $this->setData('RecordCount', $RecordCount);

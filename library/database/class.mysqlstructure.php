@@ -64,7 +64,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         if ($ViableEngines === null) {
             $EngineList = $this->Database->query("SHOW ENGINES;");
-            $ViableEngines = array();
+            $ViableEngines = [];
             while ($EngineList && $StorageEngine = $EngineList->value('Engine', false)) {
                 $EngineName = strtolower($StorageEngine);
                 $ViableEngines[$EngineName] = true;
@@ -202,11 +202,11 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * Creates the table defined with $this->Table() and $this->Column().
      */
     protected function _create() {
-        $PrimaryKey = array();
-        $UniqueKey = array();
-        $FullTextKey = array();
+        $PrimaryKey = [];
+        $UniqueKey = [];
+        $FullTextKey = [];
         $AllowFullText = true;
-        $Indexes = array();
+        $Indexes = [];
         $Keys = '';
         $Sql = '';
         $TableName = Gdn_Format::alphaNumeric($this->_TableName);
@@ -257,7 +257,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
         // Build the rest of the keys.
         foreach ($Indexes as $IndexType => $IndexGroups) {
-            $CreateString = val($IndexType, array('FK' => 'key', 'IX' => 'index'));
+            $CreateString = val($IndexType, ['FK' => 'key', 'IX' => 'index']);
             foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
                 if (!$IndexGroup) {
                     foreach ($ColumnNames as $ColumnName) {
@@ -322,12 +322,12 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @return string Returns the name of the character set or an empty string if the collation was not found.
      */
     protected function getCharsetFromCollation($collation) {
-        static $cache = array();
+        static $cache = [];
 
         $collation = strtolower($collation);
 
         if (!isset($cache[$collation])) {
-            $collationRow = $this->Database->query('show collation where Collation = :c', array(':c' => $collation))->firstRow(DATASET_TYPE_ARRAY);
+            $collationRow = $this->Database->query('show collation where Collation = :c', [':c' => $collation])->firstRow(DATASET_TYPE_ARRAY);
             $cache[$collation] = val('Charset', $collationRow, '');
         }
 
@@ -348,7 +348,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             return null;
         }
 
-        $result = ArrayTranslate($status, array('Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation'));
+        $result = ArrayTranslate($status, ['Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation']);
 
         // Look up the encoding for the collation.
         $result['charset'] = $this->getCharsetFromCollation($result['collation']);
@@ -366,10 +366,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 //      if ($this->TableName() != 'Comment')
 //         return array();
 
-        $Result = array();
-        $Keys = array();
-        $Prefixes = array('key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_');
-        $Indexes = array();
+        $Result = [];
+        $Keys = [];
+        $Prefixes = ['key' => 'FK_', 'index' => 'IX_', 'unique' => 'UX_', 'fulltext' => 'TX_'];
+        $Indexes = [];
 
         // Gather the names of the columns.
         foreach ($Columns as $ColumnName => $Column) {
@@ -395,13 +395,13 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
 
         // Make the multi-column keys into sql statements.
         foreach ($Indexes as $ColumnKeyType => $IndexGroups) {
-            $CreateType = val($ColumnKeyType, array('index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key'));
+            $CreateType = val($ColumnKeyType, ['index' => 'index', 'key' => 'key', 'unique' => 'unique index', 'fulltext' => 'fulltext index', 'primary' => 'primary key']);
 
             if ($ColumnKeyType == 'primary') {
                 $Result['PRIMARY'] = 'primary key (`'.implode('`, `', $IndexGroups['']).'`)';
             } else {
                 foreach ($IndexGroups as $IndexGroup => $ColumnNames) {
-                    $Multi = (strlen($IndexGroup) > 0 || in_array($ColumnKeyType, array('unique', 'fulltext')));
+                    $Multi = (strlen($IndexGroup) > 0 || in_array($ColumnKeyType, ['unique', 'fulltext']));
 
                     if ($Multi) {
                         $IndexName = "{$Prefixes[$ColumnKeyType]}{$this->_TableName}".($IndexGroup ? '_'.$IndexGroup : '');
@@ -439,7 +439,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // We don't want this to be captured so send it directly.
         $Data = $this->Database->query('show indexes from '.$this->_DatabasePrefix.$this->_TableName);
 
-        $Result = array();
+        $Result = [];
         foreach ($Data as $Row) {
             if (array_key_exists($Row->Key_name, $Result)) {
                 $Result[$Row->Key_name] .= ', `'.$Row->Column_name.'`';
@@ -492,7 +492,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      */
     protected function _modify($Explicit = false) {
         $Px = $this->_DatabasePrefix;
-        $AdditionalSql = array(); // statements executed at the end
+        $AdditionalSql = []; // statements executed at the end
         $tableInfo = $this->getTableInfo($this->_TableName);
 
         // Returns an array of schema data objects for each field in the specified
@@ -500,7 +500,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         // Name, PrimaryKey, Type, AllowNull, Default, Length, Enum.
         $existingColumns = array_change_key_case($this->existingColumns());
         $columns = array_change_key_case($this->_Columns);
-        $AlterSql = array();
+        $AlterSql = [];
         $InvalidAlterSqlCount = 0;
 
         // 1. Remove any unnecessary columns if this is an explicit modification
@@ -658,7 +658,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         }
 
         // 5. Update Indexes.
-        $IndexSql = array();
+        $IndexSql = [];
         // Go through the indexes to add or modify.
         foreach ($Indexes as $Name => $Sql) {
             if (array_key_exists($Name, $IndexesDb)) {
@@ -721,7 +721,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'ipaddress' => ['Type' => 'varbinary', 'Length' => 16]
         ];
 
-        $validColumnTypes = array(
+        $validColumnTypes = [
             'tinyint',
             'smallint',
             'mediumint',
@@ -746,7 +746,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             'mediumblob',
             'longblob',
             'bit'
-        );
+        ];
 
         $column->Type = strtolower($column->Type);
 

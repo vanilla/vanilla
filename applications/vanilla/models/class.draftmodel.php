@@ -189,7 +189,7 @@ class DraftModel extends Gdn_Model {
             if ($DraftID > 0) {
                 // Update the draft.
                 unset($Fields['DraftID']); // remove the primary key from the fields for saving
-                $this->SQL->put($this->Name, $Fields, array($this->PrimaryKey => $DraftID));
+                $this->SQL->put($this->Name, $Fields, [$this->PrimaryKey => $DraftID]);
             } else {
                 // Insert the draft
                 unset($Fields['DraftID']);
@@ -235,7 +235,7 @@ class DraftModel extends Gdn_Model {
             ->get()
             ->firstRow();
 
-        $this->SQL->delete('Draft', array('DraftID' => $draftID));
+        $this->SQL->delete('Draft', ['DraftID' => $draftID]);
         if (is_object($DraftUser)) {
             $this->updateUser($DraftUser->InsertUserID);
         }

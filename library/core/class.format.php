@@ -36,9 +36,9 @@ class Gdn_Format {
     public static $MentionsUrlFormat = '/profile/{name}';
 
     /** @var array  */
-    protected static $SanitizedFormats = array(
+    protected static $SanitizedFormats = [
         'html', 'bbcode', 'wysiwyg', 'text', 'textex', 'markdown'
-    );
+    ];
 
     /**
      * @var EventManager
@@ -281,6 +281,7 @@ class Gdn_Format {
                 // Always filter after basic parsing.
                 // Add htmLawed-compatible specification updates.
                 $options = [
+                    'codeBlockEntities' => false,
                     'spec' => [
                         'span' => [
                             'style' => ['match' => '/^(color:(#[a-f\d]{3}[a-f\d]{3}?|[a-z]+))?;?$/i']
@@ -303,17 +304,17 @@ class Gdn_Format {
                 $Mixed2 = preg_replace_callback(
                     "#\[noparse\](.*?)\[/noparse\]#si",
                     function($m) {
-                        return str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), htmlspecialchars($m[1]));
+                        return str_replace(['[',']',':', "\n"], ['&#91;','&#93;','&#58;', "<br />"], htmlspecialchars($m[1]));
                     },
                     $Mixed2
                 );
-                $Mixed2 = str_ireplace(array("[php]", "[mysql]", "[css]"), "[code]", $Mixed2);
-                $Mixed2 = str_ireplace(array("[/php]", "[/mysql]", "[/css]"), "[/code]", $Mixed2);
+                $Mixed2 = str_ireplace(["[php]", "[mysql]", "[css]"], "[code]", $Mixed2);
+                $Mixed2 = str_ireplace(["[/php]", "[/mysql]", "[/css]"], "[/code]", $Mixed2);
                 $Mixed2 = preg_replace_callback(
                     "#\\n?\[code\](.*?)\[/code\]\\n?#si",
                     function($m) {
                         $str = htmlspecialchars(trim($m[1], "\n"));
-                        return '<pre>'.str_replace(array('[',']',':', "\n"), array('&#91;','&#93;','&#58;', "<br />"), $str).'</pre>';
+                        return '<pre>'.str_replace(['[',']',':', "\n"], ['&#91;','&#93;','&#58;', "<br />"], $str).'</pre>';
                     },
                     $Mixed2
                 );
@@ -344,10 +345,10 @@ class Gdn_Format {
                 $Mixed2 = preg_replace("#\[size=[\"']?(.*?)[\"']?\]#si", '<font size="\\1">', $Mixed2);
                 $Mixed2 = preg_replace("#\[font=[\"']?(.*?)[\"']?\]#si", '<font face="\\1">', $Mixed2);
                 $Mixed2 = preg_replace("#\[color=[\"']?(.*?)[\"']?\]#si", '<font color="\\1">', $Mixed2);
-                $Mixed2 = str_ireplace(array("[/size]", "[/font]", "[/color]"), "</font>", $Mixed2);
-                $Mixed2 = str_ireplace(array('[indent]', '[/indent]'), array('<div class="Indent">', '</div>'), $Mixed2);
-                $Mixed2 = str_ireplace(array("[left]", "[/left]"), '', $Mixed2);
-                $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", array('Gdn_Format', 'ListCallback'), $Mixed2);
+                $Mixed2 = str_ireplace(["[/size]", "[/font]", "[/color]"], "</font>", $Mixed2);
+                $Mixed2 = str_ireplace(['[indent]', '[/indent]'], ['<div class="Indent">', '</div>'], $Mixed2);
+                $Mixed2 = str_ireplace(["[left]", "[/left]"], '', $Mixed2);
+                $Mixed2 = preg_replace_callback("#\[list\](.*?)\[/list\]#si", ['Gdn_Format', 'ListCallback'], $Mixed2);
 
                 // Always filter after basic parsing.
                 $Sanitized = Gdn_Format::htmlFilter($Mixed2);
@@ -411,7 +412,7 @@ class Gdn_Format {
         }
 
         if ($Format == 'html') {
-            $Result = wrap($Result, 'span', array('title' => number_format($Number)));
+            $Result = wrap($Result, 'span', ['title' => number_format($Number)]);
         }
 
         return $Result;
@@ -425,7 +426,7 @@ class Gdn_Format {
      * @return string The formatted bytes.
      */
     public static function bytes($Bytes, $Precision = 2) {
-        $Units = array('B', 'K', 'M', 'G', 'T');
+        $Units = ['B', 'K', 'M', 'G', 'T'];
         $Bytes = max($Bytes, 0);
         $Pow = floor(($Bytes ? log($Bytes) : 0) / log(1024));
         $Pow = min($Pow, count($Units) - 1);
@@ -434,7 +435,7 @@ class Gdn_Format {
     }
 
     /** @var array Unicode to ascii conversion table. */
-    protected static $_CleanChars = array(
+    protected static $_CleanChars = [
         '-' => ' ', '_' => ' ', '&lt;' => '', '&gt;' => '', '&#039;' => '', '&amp;' => '',
         '&quot;' => '', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae',
         '&Auml;' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae',
@@ -481,7 +482,7 @@ class Gdn_Format {
 		'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh',
 		'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'є' => 'ye',
 		'ю' => 'yu', 'я' => 'ya', 'ї' => 'yi'
-    );
+    ];
 
     /**
      * Convert certain unicode characters into their ascii equivalents.
@@ -602,7 +603,7 @@ class Gdn_Format {
         $Result = strftime($Format, $Timestamp);
 
         if ($Html) {
-            $Result = wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+            $Result = wrap($Result, 'time', ['title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)]);
         }
         return $Result;
     }
@@ -657,7 +658,7 @@ class Gdn_Format {
         $Result = strftime($FullFormat, $Timestamp);
 
         if ($Html) {
-            $Result = wrap($Result, 'time', array('title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)));
+            $Result = wrap($Result, 'time', ['title' => strftime($FullFormat, $Timestamp), 'datetime' => gmdate('c', $GmTimestamp)]);
         }
         return $Result;
     }
@@ -706,7 +707,7 @@ class Gdn_Format {
             return self::to($Mixed, 'Display');
         } else {
             $Mixed = htmlspecialchars($Mixed, ENT_QUOTES, 'UTF-8');
-            $Mixed = str_replace(array("&quot;", "&amp;"), array('"', '&'), $Mixed);
+            $Mixed = str_replace(["&quot;", "&amp;"], ['"', '&'], $Mixed);
             $Mixed = Gdn_Format::processHTML($Mixed);
 
 
@@ -801,7 +802,7 @@ class Gdn_Format {
         $sod_now = mktime(0, 0, 0, date('m', $NOW), date('d', $NOW), date('Y', $NOW));
 
         // Used to convert numbers to strings
-        $convert = array(0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven'));
+        $convert = [0 => t('a'), 1 => t('a'), 2 => t('two'), 3 => t('three'), 4 => t('four'), 5 => t('five'), 6 => t('six'), 7 => t('seven'), 8 => t('eight'), 9 => t('nine'), 10 => t('ten'), 11 => t('eleven')];
 
         // Today
         if ($sod_now == $sod) {
@@ -967,7 +968,7 @@ class Gdn_Format {
         $Caption = Gdn_Format::plainText(val('Caption', $Image));
         return '<div class="ImageWrap">'
             .'<div class="Image">'
-            .img($Url, array('alt' => $Caption, 'title' => $Caption))
+            .img($Url, ['alt' => $Caption, 'title' => $Caption])
             .'</div>'
             .'<div class="Caption">'.$Caption.'</div>'
             .'</div>';
@@ -1067,7 +1068,7 @@ class Gdn_Format {
 
         if ($Format != 'Text') {
             // Remove returns and then replace html return tags with returns.
-            $Result = str_replace(array("\n", "\r"), ' ', $Result);
+            $Result = str_replace(["\n", "\r"], ' ', $Result);
             $Result = preg_replace('`<br\s*/?>`', "\n", $Result);
 
             // Fix lists.
@@ -1104,7 +1105,7 @@ class Gdn_Format {
      * @return string
      */
     public static function rssHtml($Text, $Format = 'Html') {
-        if (!in_array($Text, array('Html', 'Raw'))) {
+        if (!in_array($Text, ['Html', 'Raw'])) {
             $Text = Gdn_Format::to($Text, $Format);
         }
 
@@ -1695,12 +1696,12 @@ EOT;
      * @return array array(Width, Height)
      */
     public static function getEmbedSize() {
-        $Sizes = array(
-            'tiny' => array(400, 225),
-            'small' => array(560, 340),
-            'normal' => array(640, 385),
-            'big' => array(853, 505),
-            'huge' => array(1280, 745));
+        $Sizes = [
+            'tiny' => [400, 225],
+            'small' => [560, 340],
+            'normal' => [640, 385],
+            'big' => [853, 505],
+            'huge' => [1280, 745]];
         $Size = Gdn::config('Garden.Format.EmbedSize', 'normal');
 
         // We allow custom sizes <Width>x<Height>
@@ -1721,7 +1722,7 @@ EOT;
         if (isset($Sizes[$Size])) {
             list($Width, $Height) = $Sizes[$Size];
         }
-        return array($Width, $Height);
+        return [$Width, $Height];
     }
 
     /**
@@ -1914,7 +1915,7 @@ EOT;
             if (c('Garden.Format.MeActions')) {
                 $Mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\n])(\/me)(\s[^(\n)]+)/i',
-                    '\1'.wrap(wrap('\2', 'span', array('class' => 'MeActionName')).'\3', 'span', array('class' => 'AuthorAction')),
+                    '\1'.wrap(wrap('\2', 'span', ['class' => 'MeActionName']).'\3', 'span', ['class' => 'AuthorAction']),
                     $Mixed
                 );
             }
@@ -1950,8 +1951,8 @@ EOT;
     public static function replaceButProtectCodeBlocks($Search, $Replace, $Subject, $IsCallback = false) {
         // Take the code blocks out, replace with a hash of the string, and
         // keep track of what substring got replaced with what hash.
-        $CodeBlockContents = array();
-        $CodeBlockHashes = array();
+        $CodeBlockContents = [];
+        $CodeBlockHashes = [];
         $Subject = preg_replace_callback(
             '/<code.*?>.*?<\/code>/is',
             function ($Matches) use (&$CodeBlockContents, &$CodeBlockHashes) {
@@ -2010,7 +2011,7 @@ EOT;
             return $Object;
         }
 
-        $Return = array();
+        $Return = [];
         foreach (get_object_vars($Object) as $Property => $Value) {
             $Return[$Property] = $Value;
         }
@@ -2273,7 +2274,7 @@ EOT;
     }
 
     /** @var array  */
-    protected static $_UrlTranslations = array('–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi');
+    protected static $_UrlTranslations = ['–' => '-', '—' => '-', 'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'Ae', 'Ä' => 'A', 'Å' => 'A', 'Ā' => 'A', 'Ą' => 'A', 'Ă' => 'A', 'Æ' => 'Ae', 'Ç' => 'C', 'Ć' => 'C', 'Č' => 'C', 'Ĉ' => 'C', 'Ċ' => 'C', 'Ď' => 'D', 'Đ' => 'D', 'Ð' => 'D', 'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ē' => 'E', 'Ě' => 'E', 'Ĕ' => 'E', 'Ė' => 'E', 'Ĝ' => 'G', 'Ğ' => 'G', 'Ġ' => 'G', 'Ģ' => 'G', 'Ĥ' => 'H', 'Ħ' => 'H', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 'Ī' => 'I', 'Ĩ' => 'I', 'Ĭ' => 'I', 'Į' => 'I', 'İ' => 'I', 'Ĳ' => 'IJ', 'Ĵ' => 'J', 'Ķ' => 'K', 'Ł' => 'K', 'Ľ' => 'K', 'Ĺ' => 'K', 'Ļ' => 'K', 'Ŀ' => 'K', 'Ñ' => 'N', 'Ń' => 'N', 'Ň' => 'N', 'Ņ' => 'N', 'Ŋ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'Oe', 'Ö' => 'Oe', 'Ō' => 'O', 'Ő' => 'O', 'Ŏ' => 'O', 'Œ' => 'OE', 'Ŕ' => 'R', 'Ŗ' => 'R', 'Ś' => 'S', 'Š' => 'S', 'Ş' => 'S', 'Ŝ' => 'S', 'Ť' => 'T', 'Ţ' => 'T', 'Ŧ' => 'T', 'Ț' => 'T', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'Ue', 'Ū' => 'U', 'Ü' => 'Ue', 'Ů' => 'U', 'Ű' => 'U', 'Ŭ' => 'U', 'Ũ' => 'U', 'Ų' => 'U', 'Ŵ' => 'W', 'Ý' => 'Y', 'Ŷ' => 'Y', 'Ÿ' => 'Y', 'Ź' => 'Z', 'Ž' => 'Z', 'Ż' => 'Z', 'Þ' => 'T', 'à' => 'a', 'á' => 'a', 'â' => 'a', 'ã' => 'a', 'ä' => 'ae', 'ä' => 'ae', 'å' => 'a', 'ā' => 'a', 'ą' => 'a', 'ă' => 'a', 'æ' => 'ae', 'ç' => 'c', 'ć' => 'c', 'č' => 'c', 'ĉ' => 'c', 'ċ' => 'c', 'ď' => 'd', 'đ' => 'd', 'ð' => 'd', 'è' => 'e', 'é' => 'e', 'ê' => 'e', 'ë' => 'e', 'ē' => 'e', 'ę' => 'e', 'ě' => 'e', 'ĕ' => 'e', 'ė' => 'e', 'ƒ' => 'f', 'ĝ' => 'g', 'ğ' => 'g', 'ġ' => 'g', 'ģ' => 'g', 'ĥ' => 'h', 'ħ' => 'h', 'ì' => 'i', 'í' => 'i', 'î' => 'i', 'ï' => 'i', 'ī' => 'i', 'ĩ' => 'i', 'ĭ' => 'i', 'į' => 'i', 'ı' => 'i', 'ĳ' => 'ij', 'ĵ' => 'j', 'ķ' => 'k', 'ĸ' => 'k', 'ł' => 'l', 'ľ' => 'l', 'ĺ' => 'l', 'ļ' => 'l', 'ŀ' => 'l', 'ñ' => 'n', 'ń' => 'n', 'ň' => 'n', 'ņ' => 'n', 'ŉ' => 'n', 'ŋ' => 'n', 'ò' => 'o', 'ó' => 'o', 'ô' => 'o', 'õ' => 'o', 'ö' => 'oe', 'ö' => 'oe', 'ø' => 'o', 'ō' => 'o', 'ő' => 'o', 'ŏ' => 'o', 'œ' => 'oe', 'ŕ' => 'r', 'ř' => 'r', 'ŗ' => 'r', 'š' => 's', 'ù' => 'u', 'ú' => 'u', 'û' => 'u', 'ü' => 'ue', 'ū' => 'u', 'ü' => 'ue', 'ů' => 'u', 'ű' => 'u', 'ŭ' => 'u', 'ũ' => 'u', 'ų' => 'u', 'ŵ' => 'w', 'ý' => 'y', 'ÿ' => 'y', 'ŷ' => 'y', 'ž' => 'z', 'ż' => 'z', 'ź' => 'z', 'þ' => 't', 'ß' => 'ss', 'ſ' => 'ss', 'А' => 'A', 'Б' => 'B', 'В' => 'V', 'Г' => 'G', 'Д' => 'D', 'Е' => 'E', 'Ё' => 'YO', 'Ж' => 'ZH', 'З' => 'Z', 'И' => 'I', 'И' => 'I', 'І' => 'I', 'Й' => 'Y', 'К' => 'K', 'Л' => 'L', 'М' => 'M', 'Н' => 'N', 'О' => 'O', 'П' => 'P', 'Р' => 'R', 'С' => 'S', 'ș' => 's', 'ț' => 't', 'Ț' => 'T', 'Т' => 'T', 'У' => 'U', 'Ф' => 'F', 'Х' => 'H', 'Ц' => 'C', 'Ч' => 'CH', 'Ш' => 'SH', 'Щ' => 'SCH', 'Ъ' => '', 'Ы' => 'Y', 'Ь' => '', 'Э' => 'E', 'Ю' => 'YU', 'Я' => 'YA', 'Є' => 'YE', 'Ї' => 'YI', 'а' => 'a', 'б' => 'b', 'в' => 'v', 'г' => 'g', 'д' => 'd', 'е' => 'e', 'ё' => 'yo', 'ж' => 'zh', 'з' => 'z', 'и' => 'i', 'і' => 'i', 'й' => 'y', 'к' => 'k', 'л' => 'l', 'м' => 'm', 'н' => 'n', 'о' => 'o', 'п' => 'p', 'р' => 'r', 'с' => 's', 'т' => 't', 'у' => 'u', 'ф' => 'f', 'х' => 'h', 'ц' => 'c', 'ч' => 'ch', 'ш' => 'sh', 'щ' => 'sch', 'ъ' => '', 'ы' => 'y', 'ь' => '', 'э' => 'e', 'ю' => 'yu', 'я' => 'ya', 'є' => 'ye', 'ї' => 'yi'];
 
     /**
      * Creates URL codes containing only lowercase Roman letters, digits, and hyphens.
@@ -2337,10 +2338,10 @@ EOT;
         // Set replacement array inside callback
         Gdn_Format::vanillaSprintfCallback(null, $ReplaceWith);
 
-        $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', array('Gdn_Format', 'VanillaSprintfCallback'), $PlaceholderString);
+        $FinalString = preg_replace_callback('/({([a-z0-9_:]+)})/i', ['Gdn_Format', 'VanillaSprintfCallback'], $PlaceholderString);
 
         // Cleanup replacement list
-        Gdn_Format::vanillaSprintfCallback(null, array());
+        Gdn_Format::vanillaSprintfCallback(null, []);
 
         return $FinalString;
     }
@@ -2353,7 +2354,7 @@ EOT;
      * @return mixed
      */
     protected static function vanillaSprintfCallback($Match, $InternalReplacementList = false) {
-        static $InternalReplacement = array();
+        static $InternalReplacement = [];
 
         if (is_array($InternalReplacementList)) {
             $InternalReplacement = $InternalReplacementList;

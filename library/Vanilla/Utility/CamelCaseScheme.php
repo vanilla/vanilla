@@ -23,10 +23,10 @@ class CamelCaseScheme extends NameScheme {
         }, $name);
 
         // Check for the final ID case.
-//        if (preg_match('`[a-z](ID|IP)(s)?$`', $name, $m)) {
-//            $sx = $m[1].$m[2];
-//            $name = substr($name, -strlen($sx));
-//        }
+        if (preg_match('`[a-z](I[Dd]|I[Pp])(s?)$`', $name, $m)) {
+            $sx = strtoupper($m[1].$m[2]);
+            $name = substr($name, 0, -strlen($sx));
+        }
 
         // Fix multiple occurrences of capital letters.
         $name = preg_replace_callback('`([A-Z]{2,})(.|$)`', function ($m) {

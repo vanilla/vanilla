@@ -107,14 +107,14 @@ if (!function_exists('checkRequirements')) {
 
         // 1. Make sure that $RequiredItems are present
         if (is_array($RequiredItems)) {
-            $MissingRequirements = array();
+            $MissingRequirements = [];
 
             foreach ($RequiredItems as $RequiredItemName => $RequiredVersion) {
                 if (!array_key_exists($RequiredItemName, $EnabledItems)) {
                     $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
                 } elseif ($RequiredVersion && $RequiredVersion != '*') { // * means any version
                     // If the item exists and is enabled, check the version
-                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, array()), '');
+                    $EnabledVersion = val('Version', val($RequiredItemName, $EnabledItems, []), '');
                     // Compare the versions.
                     if (version_compare($EnabledVersion, $RequiredVersion, '<')) {
                         $MissingRequirements[] = "$RequiredItemName $RequiredVersion";
@@ -166,7 +166,7 @@ if (!function_exists('ConsolidateArrayValuesByKey')) {
     function consolidateArrayValuesByKey($Array, $Key, $ValueKey = '', $DefaultValue = null) {
         deprecated(__FUNCTION__, 'array_column');
 
-        $Return = array();
+        $Return = [];
         foreach ($Array as $Index => $AssociativeArray) {
             if (is_object($AssociativeArray)) {
                 if ($ValueKey === '') {
@@ -206,7 +206,7 @@ if (!function_exists('cTo')) {
 
         foreach ($Name as $Key) {
             if (!isset($Current[$Key])) {
-                $Current[$Key] = array();
+                $Current[$Key] = [];
             }
 
             $Current =& $Current[$Key];
@@ -227,7 +227,7 @@ if (!function_exists('forceSSL')) {
     function forceSSL() {
         if (c('Garden.AllowSSL')) {
             if (Gdn::Request()->Scheme() != 'https') {
-                Redirect(Gdn::Request()->Url('', true, true));
+                redirectTo(Gdn::Request()->Url('', true, true));
             }
         }
     }
@@ -244,7 +244,7 @@ if (!function_exists('forceNoSSL')) {
      */
     function forceNoSSL() {
         if (Gdn::Request()->Scheme() != 'http') {
-            Redirect(Gdn::Request()->Url('', true, false));
+            redirectTo(Gdn::Request()->Url('', true, false));
         }
     }
 }
@@ -269,14 +269,14 @@ if (!function_exists('formatArrayAssignment')) {
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $value);
+                $FormattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
                 $array[] = $prefix .= " = array('".implode("', '", $FormattedValue)."');";
             }
         } elseif (is_int($value)) {
             $array[] = $prefix .= ' = '.$value.';';
         } elseif (is_bool($value)) {
             $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-        } elseif (in_array($value, array('true', 'false'))) {
+        } elseif (in_array($value, ['true', 'false'])) {
             $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
         } else {
             $array[] = $prefix .= ' = '.var_export($value, true).';';
@@ -304,7 +304,7 @@ if (!function_exists('formatDottedAssignment')) {
                 }
             } else {
                 // If $Value is not an associative array, just write it like a simple array definition.
-                $FormattedValue = array_map(array('Gdn_Format', 'ArrayValueForPhp'), $value);
+                $FormattedValue = array_map(['Gdn_Format', 'ArrayValueForPhp'], $value);
                 $prefix .= "']";
                 $array[] = $prefix .= " = array('".implode("', '", $FormattedValue)."');";
             }
@@ -314,7 +314,7 @@ if (!function_exists('formatDottedAssignment')) {
                 $array[] = $prefix .= ' = '.$value.';';
             } elseif (is_bool($value)) {
                 $array[] = $prefix .= ' = '.($value ? 'true' : 'false').';';
-            } elseif (in_array($value, array('true', 'false'))) {
+            } elseif (in_array($value, ['true', 'false'])) {
                 $array[] = $prefix .= ' = '.($value == 'true' ? 'true' : 'false').';';
             } else {
                 $array[] = $prefix .= ' = '.var_export($value, true).';';
@@ -507,7 +507,7 @@ if (!function_exists('prepareArray')) {
         switch ($PrepareType) {
             case 'array':
                 if (!is_array($Array[$Key])) {
-                    $Array[$Key] = array();
+                    $Array[$Key] = [];
                 }
                 break;
 
@@ -538,6 +538,72 @@ if (!function_exists('prepareArray')) {
     }
 }
 
+if (!function_exists('redirect')) {
+    /**
+     * Redirect to another URL.
+     *
+     * This function wraps {@link $Destination} in the {@link url()} function.
+     *
+     * @deprecated
+     * @param string|false $Destination The destination of the redirect.
+     * Pass a falsey value to redirect to the current URL.
+     * @param int|null $StatusCode The status of the redirect. This defaults to 302.
+     */
+    function redirect($Destination = false, $StatusCode = null) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$Destination) {
+            $Destination = '';
+        }
+
+        // Close any db connections before exit
+        $Database = Gdn::Database();
+        if ($Database instanceof Gdn_Database) {
+            $Database->CloseConnection();
+        }
+        // Clear out any previously sent content
+        @ob_end_clean();
+
+        // assign status code
+        $SendCode = (is_null($StatusCode)) ? 302 : $StatusCode;
+        // re-assign the location header
+        safeHeader("Location: ".Url($Destination), true, $SendCode);
+        // Exit
+        exit();
+    }
+}
+
+if (!function_exists('redirectUrl')) {
+    /**
+     * Redirect to a specific url that can be outside of the site.
+     *
+     * @deprecated
+     * @param string $url The url to redirect to.
+     * @param int $code The http status code.
+     */
+    function redirectUrl($url, $code = 302) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$url) {
+            $url = Url('', true);
+        }
+
+        // Close any db connections before exit
+        $Database = Gdn::Database();
+        $Database->CloseConnection();
+        // Clear out any previously sent content
+        @ob_end_clean();
+
+        if (!in_array($code, [301, 302])) {
+            $code = 302;
+        }
+
+        safeHeader("Location: ".$url, true, $code);
+
+        exit();
+    }
+}
+
 // Functions relating to data/variable types and type casting
 if (!function_exists('removeKeyFromArray')) {
     /**
@@ -550,7 +616,7 @@ if (!function_exists('removeKeyFromArray')) {
      */
     function removeKeyFromArray($Array, $Key) {
         if (!is_array($Key)) {
-            $Key = array($Key);
+            $Key = [$Key];
         }
 
         $Count = count($Key);
@@ -609,7 +675,7 @@ if (!function_exists('safeParseStr')) {
      */
     function safeParseStr($Str, &$Output, $Original = null) {
         $Exploded = explode('&', $Str);
-        $Output = array();
+        $Output = [];
         if (is_array($Original)) {
             $FirstValue = reset($Original);
             $FirstKey = key($Original);
@@ -627,6 +693,45 @@ if (!function_exists('safeParseStr')) {
             }
 
             $Output[$Key] = $Value;
+        }
+    }
+}
+
+if (!function_exists('safeRedirect')) {
+    /**
+     * Redirect, but only to a safe domain.
+     *
+     * @deprecated
+     * @param string $Destination Where to redirect.
+     * @param int $StatusCode The status of the redirect. Defaults to 302.
+     */
+    function safeRedirect($Destination = false, $StatusCode = null) {
+        deprecated(__FUNCTION__, 'redirectTo');
+
+        if (!$Destination) {
+            $Destination = Url('', true);
+        } else {
+            $Destination = Url($Destination, true);
+        }
+
+        $trustedDomains = TrustedDomains();
+        $isTrustedDomain = false;
+
+        foreach ($trustedDomains as $trustedDomain) {
+            if (urlMatch($trustedDomain, $Destination)) {
+                $isTrustedDomain = true;
+                break;
+            }
+        }
+
+        if ($isTrustedDomain) {
+            redirectTo($Destination, $StatusCode, false);
+        } else {
+            Logger::notice('Redirect to untrusted domain: {url}.', [
+                'url' => $Destination
+            ]);
+
+            redirectTo("/home/leaving?Target=".urlencode($Destination));
         }
     }
 }
@@ -663,7 +768,7 @@ if (!function_exists('viewLocation')) {
      */
     function viewLocation($View, $Controller, $Folder) {
         deprecated('viewLocation()');
-        $Paths = array();
+        $Paths = [];
 
         if (strpos($View, '/') !== false) {
             // This is a path to the view from the root.
@@ -675,7 +780,7 @@ if (!function_exists('viewLocation')) {
                 $Controller = '/'.$Controller;
             }
 
-            $Extensions = array('tpl', 'php');
+            $Extensions = ['tpl', 'php'];
 
             // 1. First we check the theme.
             if (Gdn::Controller() && $Theme = Gdn::Controller()->Theme) {
@@ -713,7 +818,7 @@ if (!function_exists('viewLocation')) {
             }
         }
 
-        Trace(array('view' => $View, 'controller' => $Controller, 'folder' => $Folder), 'View');
+        Trace(['view' => $View, 'controller' => $Controller, 'folder' => $Folder], 'View');
         Trace($Paths, 'ViewLocation()');
 
         return false;

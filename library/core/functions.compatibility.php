@@ -87,7 +87,7 @@ if (!function_exists('array_column')) {
             }
         }
 
-        $resultArray = array();
+        $resultArray = [];
 
         foreach ($paramsInput as $row) {
             $key = $value = null;
@@ -230,8 +230,8 @@ if (!function_exists('http_build_url')) {
      * @see https://github.com/fuel/core/blob/974281dde67345ca8d7cfa27bcf4aa55c984d48e/base.php#L248
      * @see http://stackoverflow.com/questions/7751679/php-http-build-url-and-pecl-install/7753154#comment11239561_7753154
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = false) {
-        $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
+    function http_build_url($url, $parts = [], $flags = HTTP_URL_REPLACE, &$new_url = false) {
+        $keys = ['user', 'pass', 'port', 'path', 'query', 'fragment'];
 
         // HTTP_URL_STRIP_ALL becomes all the HTTP_URL_STRIP_Xs
         if ($flags & HTTP_URL_STRIP_ALL) {
@@ -351,7 +351,7 @@ if (!function_exists('parse_ini_string')) {
      */
     function parse_ini_string($Ini) {
         $Lines = explode("\n", $Ini);
-        $Result = array();
+        $Result = [];
         foreach ($Lines as $Line) {
             $Parts = explode('=', $Line, 2);
             if (count($Parts) == 1) {
@@ -385,11 +385,11 @@ if (!function_exists('paths')) {
         if (is_array($paths)) {
             $mungedPath = implode($delimiter, $paths);
             $mungedPath = str_replace(
-                array($delimiter.$delimiter.$delimiter, $delimiter.$delimiter),
-                array($delimiter, $delimiter),
+                [$delimiter.$delimiter.$delimiter, $delimiter.$delimiter],
+                [$delimiter, $delimiter],
                 $mungedPath
             );
-            return str_replace(array('http:/', 'https:/'), array('http://', 'https://'), $mungedPath);
+            return str_replace(['http:/', 'https:/'], ['http://', 'https://'], $mungedPath);
         } else {
             return $paths;
         }
@@ -477,7 +477,7 @@ function setvalr($key, &$collection, $value = null) {
 
             if (is_array($selection)) {
                 if (!isset($selection[$subSelector])) {
-                    $selection[$subSelector] = array();
+                    $selection[$subSelector] = [];
                 }
                 $selection = &$selection[$subSelector];
             } elseif (is_object($selection)) {

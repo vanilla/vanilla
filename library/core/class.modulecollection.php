@@ -15,7 +15,7 @@
 class Gdn_ModuleCollection extends Gdn_Module {
 
     /** @var array  */
-    public $Items = array();
+    public $Items = [];
 
     /**
      *

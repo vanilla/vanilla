@@ -22,7 +22,7 @@ echo $this->Form->errors();
         <li>
             <?php
             echo $this->Form->label('Reason', 'Plugin.Flagging.Reason');
-            echo $this->Form->textBox('Plugin.Flagging.Reason', array('MultiLine' => TRUE));
+            echo $this->Form->textBox('Plugin.Flagging.Reason', ['MultiLine' => TRUE]);
             ?>
         </li>
         <?php

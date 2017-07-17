@@ -17,7 +17,7 @@ class UtilityController extends DashboardController {
     const MAINTENANCE_AUTO = 2;
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form');
+    public $Uses = ['Form'];
 
     /** @var  Gdn_Form $Form */
     public $Form;
@@ -27,14 +27,14 @@ class UtilityController extends DashboardController {
      * Typically, HTTP headers in the $_SERVER array will be prefixed with
      * `HTTP_` or `X_`. These are not so we list them here for later reference.
      */
-    protected static $specialHeaders = array(
+    protected static $specialHeaders = [
         'CONTENT_TYPE',
         'CONTENT_LENGTH',
         'PHP_AUTH_USER',
         'PHP_AUTH_PW',
         'PHP_AUTH_DIGEST',
         'AUTH_TYPE'
-    );
+    ];
 
     /**
      * Runs before every call to this controller.
@@ -61,7 +61,7 @@ class UtilityController extends DashboardController {
             if ($TableID) {
                 $Rows = Gdn::request()->Post($TableID);
                 if (is_array($Rows)) {
-                    $Table = str_replace(array('Table', '`'), '', $TableID);
+                    $Table = str_replace(['Table', '`'], '', $TableID);
                     $ModelName = $Table.'Model';
                     if (class_exists($ModelName)) {
                         $TableModel = new $ModelName();
@@ -135,7 +135,7 @@ class UtilityController extends DashboardController {
                 $Value = '0';
             }
 
-            if (in_array($UserPropertyColumn, array('preference', 'attribute'))
+            if (in_array($UserPropertyColumn, ['preference', 'attribute'])
                 && $Name != ''
                 && $Value != ''
                 && $Session->UserID > 0
@@ -153,7 +153,7 @@ class UtilityController extends DashboardController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($_SERVER['HTTP_REFERER']);
+            redirectTo($_SERVER['HTTP_REFERER']);
         } else {
             $this->render();
         }
@@ -302,7 +302,7 @@ class UtilityController extends DashboardController {
         }
 
         if ($Target = $this->Request->get('Target')) {
-            safeRedirect($Target);
+            redirectTo($Target);
         }
 
         $this->fireEvent('AfterUpdate');
@@ -546,16 +546,16 @@ class UtilityController extends DashboardController {
      * @param string $FeedFormat How we want it (valid formats are 'normal' or 'sexy'. OK, not really).
      */
     public function getFeed($type = 'news', $length = 5, $feedFormat = 'normal') {
-        $validTypes = array(
+        $validTypes = [
             'releases',
             'help',
             'news',
             'cloud'
-        );
-        $validFormats = array(
+        ];
+        $validFormats = [
             'extended',
             'normal'
-        );
+        ];
 
         $length = is_numeric($length) && $length <= 50 ? $length : 5;
 
@@ -634,7 +634,7 @@ class UtilityController extends DashboardController {
         $icon = c('Garden.TouchIcon');
 
         if (!empty($icon)) {
-            redirect(Gdn_Upload::url($icon), 302);
+            redirectTo(Gdn_Upload::url($icon), 302, false);
         } else {
             throw new Exception('Touch icon not found.', 404);
         }

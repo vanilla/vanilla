@@ -14,7 +14,7 @@ echo $this->Form->errors();
         <li class="form-group">
             <div class="label-wrap">
                 <?php echo $this->Form->label('Route Expression', 'Route');
-                $Attributes = array('class' => 'InputBox WideInput');
+                $Attributes = ['class' => 'InputBox WideInput'];
                 if ($this->Route['Reserved']) {
                     //$Attributes['value'] = $this->Route;
                     $Attributes['disabled'] = 'disabled';
@@ -29,7 +29,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('Target', 'Target'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->textBox('Target', array('class' => 'InputBox WideInput')); ?>
+                <?php echo $this->Form->textBox('Target', ['class' => 'InputBox WideInput']); ?>
             </div>
         </li>
         <li class="form-group">

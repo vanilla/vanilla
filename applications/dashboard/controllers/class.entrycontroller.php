@@ -14,7 +14,7 @@
 class EntryController extends Gdn_Controller {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form', 'UserModel');
+    public $Uses = ['Database', 'Form', 'UserModel'];
 
     /** @var Gdn_Form */
     public $Form;
@@ -57,7 +57,7 @@ class EntryController extends Gdn_Controller {
      */
     public function initialize() {
         $this->Head = new HeadModule($this);
-        $this->Head->addTag('meta', array('name' => 'robots', 'content' => 'noindex'));
+        $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
 
         $this->addJsFile('jquery.js');
         $this->addJsFile('jquery.form.js');
@@ -171,11 +171,11 @@ class EntryController extends Gdn_Controller {
                     } else {
                         $AuthenticationResponse = $Authenticator->authenticate();
 
-                        $UserInfo = array();
-                        $UserEventData = array_merge(array(
+                        $UserInfo = [];
+                        $UserEventData = array_merge([
                             'UserID' => Gdn::session()->UserID,
                             'Payload' => val('HandshakeResponse', $Authenticator, false)
-                        ), $UserInfo);
+                        ], $UserInfo);
 
                         Gdn::authenticator()->trigger($AuthenticationResponse, $UserEventData);
                         switch ($AuthenticationResponse) {
@@ -263,16 +263,16 @@ class EntryController extends Gdn_Controller {
                 if (is_string($Reaction)) {
                     $Route = $Reaction;
                 } else {
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                 }
 
                 if ($this->_RealDeliveryType != DELIVERY_TYPE_ALL && $this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                    $this->RedirectUrl = url($Route);
+                    $this->setRedirectTo($Route);
                 } else {
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route);
                     } else {
-                        redirect(Gdn::router()->getDestination('DefaultController'));
+                        redirectTo(Gdn::router()->getDestination('DefaultController'));
                     }
                 }
                 break;
@@ -364,7 +364,7 @@ class EntryController extends Gdn_Controller {
             $Url = str_ireplace('{target}', rawurlencode(url($Target, true)), $Url);
 
             if ($this->deliveryType() == DELIVERY_TYPE_ALL && strcasecmp($this->data('Method'), 'POST') != 0) {
-                redirectUrl($Url, 302);
+                redirectTo(url($Url, true), 302, false);
             } else {
                 $this->setData('Url', $Url);
                 $this->render('Redirect', 'Utility');
@@ -797,7 +797,7 @@ class EntryController extends Gdn_Controller {
 
                     if (c('Garden.Registration.NameUnique')) {
                         // Check to see if there is already a user with the given name.
-                        $User = $UserModel->getWhere(array('Name' => $ConnectName))->firstRow(DATASET_TYPE_ARRAY);
+                        $User = $UserModel->getWhere(['Name' => $ConnectName])->firstRow(DATASET_TYPE_ARRAY);
                     }
 
                     if (!$User) {
@@ -897,9 +897,9 @@ class EntryController extends Gdn_Controller {
      * @param bool $CheckPopup
      */
     protected function _setRedirect($CheckPopup = false) {
-        $Url = url($this->redirectTo(), true);
+        $Url = url($this->getTargetRoute(), true);
 
-        $this->RedirectUrl = $Url;
+        $this->setRedirectTo($Url);
         $this->MasterView = 'popup';
         $this->View = 'redirect';
 
@@ -909,7 +909,7 @@ class EntryController extends Gdn_Controller {
         } elseif ($CheckPopup || $this->data('CheckPopup')) {
             $this->addDefinition('CheckPopup', true);
         } else {
-            safeRedirect(url($this->RedirectUrl));
+            redirectTo($this->redirectTo ?: url($this->RedirectUrl));
         }
     }
 
@@ -1013,7 +1013,7 @@ class EntryController extends Gdn_Controller {
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default.
 
         // Additional signin methods are set up with plugins.
-        $Methods = array();
+        $Methods = [];
 
         $this->setData('Methods', $Methods);
         $this->setData('FormUrl', url('entry/signin'));
@@ -1038,7 +1038,7 @@ class EntryController extends Gdn_Controller {
 
                 if (!$User) {
                     $this->addCredentialErrorToForm('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
-                    Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', array('signin' => $Email));
+                    Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', ['signin' => $Email]);
                     $this->fireEvent('BadSignIn', [
                         'Email' => $Email,
                         'Password' => $this->Form->getFormValue('Password'),
@@ -1059,7 +1059,7 @@ class EntryController extends Gdn_Controller {
                             $HashMethod = val('HashMethod', $User);
                             if ($PasswordHash->Weak || ($HashMethod && strcasecmp($HashMethod, 'Vanilla') != 0)) {
                                 $Pw = $PasswordHash->hashPassword($Password);
-                                Gdn::userModel()->setField(val('UserID', $User), array('Password' => $Pw, 'HashMethod' => 'Vanilla'));
+                                Gdn::userModel()->setField(val('UserID', $User), ['Password' => $Pw, 'HashMethod' => 'Vanilla']);
                             }
 
                             Gdn::session()->start(val('UserID', $User), true, (bool)$this->Form->getFormValue('RememberMe'));
@@ -1087,7 +1087,7 @@ class EntryController extends Gdn_Controller {
                                 'signin_failure',
                                 Logger::WARNING,
                                 '{username} failed to sign in.  Invalid password.',
-                                array('InsertName' => $User->Name)
+                                ['InsertName' => $User->Name]
                             );
                             $this->fireEvent('BadSignIn', [
                                 'Email' => $Email,
@@ -1143,13 +1143,13 @@ class EntryController extends Gdn_Controller {
             return Gdn::dispatcher()->dispatch();
         }
 
-        $UserInfo = array(
+        $UserInfo = [
             'UserKey' => $Authenticator->GetUserKeyFromHandshake($Payload),
             'ConsumerKey' => $Authenticator->GetProviderKeyFromHandshake($Payload),
             'TokenKey' => $Authenticator->GetTokenKeyFromHandshake($Payload),
             'UserName' => $Authenticator->GetUserNameFromHandshake($Payload),
             'UserEmail' => $Authenticator->GetUserEmailFromHandshake($Payload)
-        );
+        ];
 
         if (method_exists($Authenticator, 'GetRolesFromHandshake')) {
             $RemoteRoles = $Authenticator->GetRolesFromHandshake($Payload);
@@ -1170,11 +1170,11 @@ class EntryController extends Gdn_Controller {
 
             case 'off':
             case 'smart':
-                $UserID = $this->UserModel->synchronize($UserInfo['UserKey'], array(
+                $UserID = $this->UserModel->synchronize($UserInfo['UserKey'], [
                     'Name' => $UserInfo['UserName'],
                     'Email' => $UserInfo['UserEmail'],
                     'Roles' => val('Roles', $UserInfo)
-                ));
+                ]);
 
                 if ($UserID > 0) {
                     // Account created successfully.
@@ -1182,18 +1182,18 @@ class EntryController extends Gdn_Controller {
                     // Finalize the link between the forum user and the foreign userkey
                     $Authenticator->finalize($UserInfo['UserKey'], $UserID, $UserInfo['ConsumerKey'], $UserInfo['TokenKey'], $Payload);
 
-                    $UserEventData = array_merge(array(
+                    $UserEventData = array_merge([
                         'UserID' => $UserID,
                         'Payload' => $Payload
-                    ), $UserInfo);
+                    ], $UserInfo);
                     Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_CREATED, $UserEventData);
 
                     /// ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route);
                     } else {
-                        redirect('/');
+                        redirectTo('/');
                     }
 
                 } else {
@@ -1204,9 +1204,9 @@ class EntryController extends Gdn_Controller {
 
                     } else {
                         // Set the memory cookie to allow signinloopback to shortcircuit remote query.
-                        $CookiePayload = array(
+                        $CookiePayload = [
                             'Sync' => 'Failed'
-                        );
+                        ];
                         $encodedCookiePayload = dbencode($CookiePayload);
                         $Authenticator->remember($UserInfo['ConsumerKey'], $encodedCookiePayload);
 
@@ -1244,9 +1244,9 @@ class EntryController extends Gdn_Controller {
         $this->Form->addHidden('ClientHour', date('Y-m-d H:00')); // Use the server's current hour as a default
         $this->Form->addHidden('Target', $this->target());
 
-        $PreservedKeys = array(
+        $PreservedKeys = [
             'UserKey', 'Token', 'Consumer', 'Email', 'Name', 'Gender', 'HourOffset'
-        );
+        ];
         $UserID = 0;
         $Target = $this->target();
 
@@ -1255,10 +1255,10 @@ class EntryController extends Gdn_Controller {
             if (val('StopLinking', $FormValues)) {
                 $AuthResponse = Gdn_Authenticator::AUTH_ABORTED;
 
-                $UserEventData = array_merge(array(
+                $UserEventData = array_merge([
                     'UserID' => $UserID,
                     'Payload' => $Payload
-                ), $UserInfo);
+                ], $UserInfo);
                 Gdn::authenticator()->trigger($AuthResponse, $UserEventData);
 
                 $Authenticator->deleteCookie();
@@ -1310,16 +1310,16 @@ class EntryController extends Gdn_Controller {
                 // Finalize the link between the forum user and the foreign userkey
                 $Authenticator->finalize($UserInfo['UserKey'], $UserID, $UserInfo['ConsumerKey'], $UserInfo['TokenKey'], $Payload);
 
-                $UserEventData = array_merge(array(
+                $UserEventData = array_merge([
                     'UserID' => $UserID,
                     'Payload' => $Payload
-                ), $UserInfo);
+                ], $UserInfo);
                 Gdn::authenticator()->trigger($AuthResponse, $UserEventData);
 
                 /// ... and redirect them appropriately
-                $Route = $this->redirectTo();
+                $Route = $this->getTargetRoute();
                 if ($Route !== false) {
-                    redirect($Route);
+                    redirectTo($Route);
                 }
             } else {
                 // Add the hidden inputs back into the form.
@@ -1333,7 +1333,7 @@ class EntryController extends Gdn_Controller {
             $Id = Gdn::authenticator()->getIdentity(true);
             if ($Id > 0) {
                 // The user is signed in so we can just go back to the homepage.
-                redirect($Target);
+                redirectTo($Target);
             }
 
             $Name = $UserInfo['UserName'];
@@ -1381,11 +1381,11 @@ class EntryController extends Gdn_Controller {
         $this->Form->setModel($this->UserModel);
 
         // Define gender dropdown options
-        $this->GenderOptions = array(
+        $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
             'f' => t('Female')
-        );
+        ];
 
         // Make sure that the hour offset for new users gets defined when their account is created
         $this->addJsFile('entry.js');
@@ -1410,7 +1410,7 @@ class EntryController extends Gdn_Controller {
      */
     protected function getRegistrationhandler() {
         $registrationMethod = Gdn::config('Garden.Registration.Method');
-        if (!in_array($registrationMethod, array('Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'))) {
+        if (!in_array($registrationMethod, ['Closed', 'Basic', 'Captcha', 'Approval', 'Invitation', 'Connect'])) {
             $registrationMethod = 'Basic';
         }
 
@@ -1484,14 +1484,14 @@ class EntryController extends Gdn_Controller {
                     $this->View = "RegisterThanks"; // Tell the user their application will be reviewed by an administrator.
 
                     // Grab all of the users that need to be notified.
-                    $Data = Gdn::database()->sql()->getWhere('UserMeta', array('Name' => 'Preferences.Email.Applicant'))->resultArray();
+                    $Data = Gdn::database()->sql()->getWhere('UserMeta', ['Name' => 'Preferences.Email.Applicant'])->resultArray();
                     $ActivityModel = new ActivityModel();
                     foreach ($Data as $Row) {
                         $ActivityModel->add($AuthUserID, 'Applicant', $Story, $Row['UserID'], '', '/dashboard/user/applicants', 'Only');
                     }
 
                     if ($this->deliveryType() !== DELIVERY_TYPE_ALL) {
-                        $this->RedirectUrl = url('/entry/registerthanks');
+                        $this->setRedirectTo('/entry/registerthanks');
                     }
                 }
             } catch (Exception $Ex) {
@@ -1558,12 +1558,12 @@ class EntryController extends Gdn_Controller {
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->RedirectUrl = url($Route);
+                        $this->setRedirectTo($Route);
                     } else {
                         if ($Route !== false) {
-                            safeRedirect($Route);
+                            redirectTo($Route);
                         }
                     }
                 }
@@ -1622,11 +1622,11 @@ class EntryController extends Gdn_Controller {
         $this->Form->setModel($this->UserModel);
 
         // Define gender dropdown options
-        $this->GenderOptions = array(
+        $this->GenderOptions = [
             'u' => t('Unspecified'),
             'm' => t('Male'),
             'f' => t('Female')
-        );
+        ];
 
         if (!$this->Form->isPostBack()) {
             $this->Form->setValue('InvitationCode', $InvitationCode);
@@ -1636,7 +1636,7 @@ class EntryController extends Gdn_Controller {
 
         // Look for the invitation.
         $Invitation = $InvitationModel
-            ->getWhere(array('Code' => $this->Form->getValue('InvitationCode')))
+            ->getWhere(['Code' => $this->Form->getValue('InvitationCode')])
             ->firstRow(DATASET_TYPE_ARRAY);
 
         if (!$Invitation) {
@@ -1671,7 +1671,7 @@ class EntryController extends Gdn_Controller {
                 $Values = $this->Form->formValues();
                 $Values = $this->UserModel->filterForm($Values, true);
                 unset($Values['Roles']);
-                $AuthUserID = $this->UserModel->register($Values, array('Method' => 'Invitation'));
+                $AuthUserID = $this->UserModel->register($Values, ['Method' => 'Invitation']);
                 $this->setData('UserID', $AuthUserID);
                 if (!$AuthUserID) {
                     $this->Form->setValidationResults($this->UserModel->validationResults());
@@ -1685,12 +1685,12 @@ class EntryController extends Gdn_Controller {
                     $this->fireEvent('RegistrationSuccessful');
 
                     // ... and redirect them appropriately
-                    $Route = $this->redirectTo();
+                    $Route = $this->getTargetRoute();
                     if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                        $this->RedirectUrl = url($Route);
+                        $this->setRedirectTo($Route);
                     } else {
                         if ($Route !== false) {
-                            safeRedirect($Route);
+                            redirectTo($Route);
                         }
                     }
                 }
@@ -1743,7 +1743,7 @@ class EntryController extends Gdn_Controller {
                             'password_reset_failure',
                             Logger::INFO,
                             'Can\'t find account associated with email/username {Input}.',
-                            array('Input' => $Email)
+                            ['Input' => $Email]
                         );
                     }
                 } catch (Exception $ex) {
@@ -1756,7 +1756,7 @@ class EntryController extends Gdn_Controller {
                         'password_reset_request',
                         Logger::INFO,
                         '{Input} has been sent a password reset email.',
-                        array('Input' => $Email)
+                        ['Input' => $Email]
                     );
                     $this->fireEvent('PasswordRequest', [
                         'Email' => $Email
@@ -1769,7 +1769,7 @@ class EntryController extends Gdn_Controller {
                         'password_reset_failure',
                         Logger::INFO,
                         'Can\'t find account associated with email/username {Input}.',
-                        array('Input' => $this->Form->getValue('Email'))
+                        ['Input' => $this->Form->getValue('Email')]
                     );
                 }
             }
@@ -1821,7 +1821,7 @@ class EntryController extends Gdn_Controller {
         if ($this->Form->errorCount() == 0) {
             $User = $this->UserModel->getID($UserID, DATASET_TYPE_ARRAY);
             if ($User) {
-                $User = arrayTranslate($User, array('UserID', 'Name', 'Email'));
+                $User = arrayTranslate($User, ['UserID', 'Name', 'Email']);
                 $this->setData('User', $User);
             }
 
@@ -1856,7 +1856,7 @@ class EntryController extends Gdn_Controller {
                         '{username} has reset their password.'
                     );
                     Gdn::session()->start($User->UserID, true);
-                    redirect('/');
+                    redirectTo('/');
                 }
             }
 
@@ -1992,12 +1992,12 @@ class EntryController extends Gdn_Controller {
                 }
 
                 if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
-                    $this->RedirectUrl = url($Route);
+                    $this->setRedirectTo($Route);
                 } else {
                     if ($Route !== false) {
-                        redirect($Route);
+                        redirectTo($Route);
                     } else {
-                        redirect(Gdn::router()->getDestination('DefaultController'));
+                        redirectTo(Gdn::router()->getDestination('DefaultController'));
                     }
                 }
                 break;
@@ -2013,7 +2013,7 @@ class EntryController extends Gdn_Controller {
      *
      * @return string URL.
      */
-    public function redirectTo() {
+    protected function getTargetRoute() {
         $Target = $this->target();
         return $Target == '' ? Gdn::router()->getDestination('DefaultController') : $Target;
     }

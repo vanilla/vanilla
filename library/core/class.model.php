@@ -101,7 +101,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $this->Validation = new Gdn_Validation();
         $this->Name = $Name;
         $this->PrimaryKey = $Name.'ID';
-        $this->filterFields = array(
+        $this->filterFields = [
             'Attributes' => 0,
             'DateInserted' => 0,
             'InsertUserID' => 0,
@@ -115,7 +115,7 @@ class Gdn_Model extends Gdn_Pluggable {
             'OK' => 0,
             'TransientKey' => 0,
             'hpt' => 0
-        );
+        ];
 
         parent::__construct();
     }
@@ -154,7 +154,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $Row = array_intersect_key($Data, $this->Schema->fields());
         $Attributes = array_diff_key($Data, $Row);
 
-        TouchValue($Name, $Row, array());
+        TouchValue($Name, $Row, []);
         if (isset($Row[$Name]) && is_array($Row[$Name])) {
             $Row[$Name] = array_merge($Row[$Name], $Attributes);
         } else {
@@ -217,6 +217,15 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
+     * Get the default page size limit.
+     *
+     * @return int
+     */
+    public function getDefaultLimit() {
+        return 30;
+    }
+
+    /**
      * Remove one or more fields from the filter field array.
      *
      * @param string|array $field One or more field names to remove.
@@ -260,7 +269,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $Fields = $this->coerceData($Fields, false);
             unset($Fields[$this->PrimaryKey]); // Don't try to insert or update the primary key
             if ($Insert === false) {
-                $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+                $this->update($Fields, [$this->PrimaryKey => $PrimaryKeyVal]);
             } else {
                 $PrimaryKeyVal = $this->insert($Fields);
             }
@@ -280,13 +289,13 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
-            $Property = array($Property => $Value);
+            $Property = [$Property => $Value];
         }
 
         $this->defineSchema();
         $Set = array_intersect_key($Property, $this->Schema->fields());
         self::serializeRow($Set);
-        $this->SQL->put($this->Name, $Set, array($this->PrimaryKey => $RowID));
+        $this->SQL->put($this->Name, $Set, [$this->PrimaryKey => $RowID]);
     }
 
     /**
@@ -308,10 +317,59 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public static function serializeRow(&$Row) {
         foreach ($Row as $Name => &$Value) {
-            if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
+            if (is_array($Value) && in_array($Name, ['Attributes', 'Data'])) {
                 $Value = empty($Value) ? null : dbencode($Value);
             }
         }
+    }
+
+    /**
+     * Strip database prefixes off a where clause.
+     *
+     * This method is mainly for backwards compatibility with model methods that demand a database prefix.
+     *
+     * @param array|false $where The where to strip.
+     * @return array Returns a where array without database prefixes.
+     */
+    protected function stripWherePrefixes($where) {
+        if (empty($where)) {
+            return [];
+        }
+
+        $result = [];
+        foreach ((array)$where as $key => $value) {
+            $parts = explode('.', $key);
+            $key =  $parts[count($parts) === 1 ? 0 : 1];
+            $result[$key] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Split a where array into where values and options.
+     *
+     * Some model methods don't have an options parameter so their options are carried in the where clause.
+     * This method splits those options out
+     *
+     * @param array|false $where The where clause.
+     * @param array $options An array of option keys to default values.
+     * @return array Returns an array in the form `[$where, $options]`.
+     */
+    protected function splitWhere($where, array $options) {
+        if (empty($where)) {
+            return [[], $options];
+        }
+
+        $result = [];
+        foreach ($where as $key => $value) {
+            if (array_key_exists($key, $options)) {
+                $options[$key] = $value;
+            } else {
+                $result[$key] = $value;
+            }
+        }
+
+        return [$result, $options];
     }
 
 
@@ -331,9 +389,9 @@ class Gdn_Model extends Gdn_Pluggable {
             $Fields = array_intersect_key($Fields, $SchemaFields);
 
             // Quote all of the fields.
-            $QuotedFields = array();
+            $QuotedFields = [];
             foreach ($Fields as $Name => $Value) {
-                if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
+                if (is_array($Value) && in_array($Name, ['Attributes', 'Data'])) {
                     $Value = empty($Value) ? null : dbencode($Value);
                 }
 
@@ -372,9 +430,9 @@ class Gdn_Model extends Gdn_Pluggable {
             $Fields = array_intersect_key($Fields, $SchemaFields);
 
             // Quote all of the fields.
-            $QuotedFields = array();
+            $QuotedFields = [];
             foreach ($Fields as $Name => $Value) {
-                if (is_array($Value) && in_array($Name, array('Attributes', 'Data'))) {
+                if (is_array($Value) && in_array($Name, ['Attributes', 'Data'])) {
                     $Value = empty($Value) ? null : dbencode($Value);
                 }
 
@@ -400,7 +458,7 @@ class Gdn_Model extends Gdn_Pluggable {
     public function delete($where = [], $options = []) {
         if (is_numeric($where)) {
             deprecated('Gdn_Model->delete(int)', 'Gdn_Model->deleteID()');
-            $where = array($this->PrimaryKey => $where);
+            $where = [$this->PrimaryKey => $where];
         }
 
         $ResetData = false;
@@ -511,11 +569,11 @@ class Gdn_Model extends Gdn_Pluggable {
      *
      * @since 2.3 Added the $Options parameter.
      */
-    public function getID($ID, $DatasetType = false, $Options = array()) {
+    public function getID($ID, $DatasetType = false, $Options = []) {
         $this->options($Options);
-        $Result = $this->getWhere(array($this->PrimaryKey => $ID))->firstRow($DatasetType);
+        $Result = $this->getWhere([$this->PrimaryKey => $ID])->firstRow($DatasetType);
 
-        $Fields = array('Attributes', 'Data');
+        $Fields = ['Attributes', 'Data'];
 
         foreach ($Fields as $Field) {
             if (is_array($Result)) {
@@ -762,11 +820,11 @@ class Gdn_Model extends Gdn_Pluggable {
         }
 
         if (!is_array($Values)) {
-            $Values = array();
+            $Values = [];
         }
         if (!is_array($Name)) {
             // Assign the new value(s)
-            $Name = array($Name => $Value);
+            $Name = [$Name => $Value];
         }
 
         $Values = dbencode(array_merge($Values, $Name));
@@ -835,7 +893,7 @@ class Gdn_Model extends Gdn_Pluggable {
      */
     public static function setRecordAttribute(&$Record, $Attribute, $Value) {
         if (!array_key_exists('Attributes', $Record)) {
-            $Record['Attributes'] = array();
+            $Record['Attributes'] = [];
         }
 
         if (!is_array($Record['Attributes'])) {
@@ -845,7 +903,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $Work = &$Record['Attributes'];
         $Parts = explode('.', $Attribute);
         while ($Part = array_shift($Parts)) {
-            $SetValue = sizeof($Parts) ? array() : $Value;
+            $SetValue = sizeof($Parts) ? [] : $Value;
             $Work[$Part] = $SetValue;
             $Work = &$Work[$Part];
         }

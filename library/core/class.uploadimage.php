@@ -51,7 +51,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      */
     public function clear() {
         parent::clear();
-        $this->_AllowedFileExtensions = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico');
+        $this->_AllowedFileExtensions = ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'];
     }
 
     /**
@@ -67,14 +67,14 @@ class Gdn_UploadImage extends Gdn_Upload {
             $Filename = $Path;
         }
 
-        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png'))) {
+        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), ['gif', 'jpg', 'jpeg', 'png'])) {
             $ImageSize = @getimagesize($Path);
-            if (!is_array($ImageSize) || !in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-                return array(0, 0, false);
+            if (!is_array($ImageSize) || !in_array($ImageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+                return [0, 0, false];
             }
             return $ImageSize;
         }
-        return array(0, 0, false);
+        return [0, 0, false];
     }
 
     /**
@@ -114,7 +114,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      *  - <b>SourceX, SourceY</b>: If you want to create a thumbnail that is a crop of the image these are the coordinates of the thumbnail.
      *  - <b>SourceHeight. SourceWidth</b>: If you want to create a thumbnail that is a crop of the image these are it's dimensions.
      */
-    public static function saveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
+    public static function saveImageAs($Source, $Target, $Height = '', $Width = '', $Options = []) {
         $Crop = false;
         $OutputType = '';
         $ImageQuality = c('Garden.UploadImage.Quality', 100);
@@ -164,7 +164,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         }
 
         if (!$OutputType) {
-            $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
+            $OutputTypes = [1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico'];
             $OutputType = val($Type, $OutputTypes, 'jpg');
         } elseif ($Type == 17 && $OutputType != 'ico') {
             // Icons cannot be converted
@@ -280,11 +280,11 @@ class Gdn_UploadImage extends Gdn_Upload {
                             break;
                         case 6:
                             $TargetImage = imagerotate($TargetImage, -90, 0);
-                            list($Width, $Height) = array($Height, $Width);
+                            list($Width, $Height) = [$Height, $Width];
                             break;
                         case 8:
                             $TargetImage = imagerotate($TargetImage, 90, 0);
-                            list($Width, $Height) = array($Height, $Width);
+                            list($Width, $Height) = [$Height, $Width];
                             break;
                     }
                 }
@@ -306,7 +306,7 @@ class Gdn_UploadImage extends Gdn_Upload {
 
         // Allow a plugin to move the file to a different location.
         $Sender = new stdClass();
-        $Sender->EventArguments = array();
+        $Sender->EventArguments = [];
         $Sender->EventArguments['Path'] = $TargetPath;
         $Parsed = self::parse($TargetPath);
         $Parsed['Width'] = $Width;
@@ -314,7 +314,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         $Sender->EventArguments['Parsed'] =& $Parsed;
         $Sender->EventArguments['Options'] = $Options;
         $Sender->EventArguments['OriginalFilename'] = val('OriginalFilename', $Options);
-        $Sender->Returns = array();
+        $Sender->Returns = [];
         Gdn::pluginManager()->callEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
         return $Sender->EventArguments['Parsed'];
     }

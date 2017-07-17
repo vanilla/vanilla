@@ -51,7 +51,7 @@ class NestedCollectionAdapter {
      * @param array $attributes
      * @return $this|void
      */
-    public function addItem($group, $text, $permission = false, $attributes = array()) {
+    public function addItem($group, $text, $permission = false, $attributes = []) {
         if ($permission === false) {
             $permission = true;
         }

@@ -4,7 +4,7 @@ $Session = Gdn::session();
 ?>
     <h1><?php echo t('Outgoing Email'); ?></h1>
 <?php
-echo $this->Form->open(array('autocomplete' => 'off'));
+echo $this->Form->open(['autocomplete' => 'off']);
 echo $this->Form->errors();
 ?>
     <ul>
@@ -56,7 +56,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('SMTP User', 'Garden.Email.SmtpUser'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->textBox('Garden.Email.SmtpUser', array('autocomplete' => 'off')); ?>
+                <?php echo $this->Form->textBox('Garden.Email.SmtpUser', ['autocomplete' => 'off']); ?>
             </div>
         </li>
         <li class="form-group">
@@ -64,7 +64,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('SMTP Password', 'Garden.Email.SmtpPassword'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->Input('Garden.Email.SmtpPassword', 'password', array('autocomplete' => 'off')); ?>
+                <?php echo $this->Form->Input('Garden.Email.SmtpPassword', 'password', ['autocomplete' => 'off']); ?>
             </div>
         </li>
         <li class="form-group">
@@ -80,7 +80,7 @@ echo $this->Form->errors();
                 <?php echo $this->Form->label('SMTP Security', 'Garden.Email.SmtpSecurity'); ?>
             </div>
             <div class="input-wrap">
-                <?php echo $this->Form->RadioList('Garden.Email.SmtpSecurity', array('' => 'None', 'ssl' => 'SSL', 'tls' => 'TLS')); ?>
+                <?php echo $this->Form->RadioList('Garden.Email.SmtpSecurity', ['' => 'None', 'ssl' => 'SSL', 'tls' => 'TLS']); ?>
             </div>
         </li>
     </ul>

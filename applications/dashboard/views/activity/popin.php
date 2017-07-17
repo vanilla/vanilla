@@ -15,7 +15,7 @@
             <?php
             if ($Activity['Photo']) {
                 $PhotoAnchor = anchor(
-                    img($Activity['Photo'], array('class' => 'ProfilePhoto PhotoWrapMedium')),
+                    img($Activity['Photo'], ['class' => 'ProfilePhoto PhotoWrapMedium']),
                     $Activity['PhotoUrl'], 'PhotoWrap PhotoWrapMedium');
             } else {
                 $PhotoAnchor = '';

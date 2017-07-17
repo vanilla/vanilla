@@ -22,7 +22,7 @@ foreach ($files as $file) {
 
 // ===========================================================================
 // Adding the minimum dependencies to support unit testing for core libraries
-// ===========================================================================.
+// ===========================================================================
 require PATH_ROOT.'/environment.php';
 
 // Set up the dependency injection container.
@@ -33,3 +33,5 @@ $bootstrap->run(new Container());
 \Gdn_FileSystem::removeFolder(PATH_ROOT.'/tests/cache');
 
 require_once PATH_LIBRARY_CORE.'/functions.validation.php';
+
+require_once PATH_LIBRARY_CORE.'/functions.render.php';

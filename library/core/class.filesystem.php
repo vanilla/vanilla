@@ -41,7 +41,7 @@ class Gdn_FileSystem {
      */
     public static function exists($Files) {
         if (!is_array($Files)) {
-            $Files = array($Files);
+            $Files = [$Files];
         }
 
         $Return = false;
@@ -64,20 +64,20 @@ class Gdn_FileSystem {
      */
     public static function folders($SourceFolders) {
         if (!is_array($SourceFolders)) {
-            $SourceFolders = array($SourceFolders);
+            $SourceFolders = [$SourceFolders];
         }
 
         $BlackList = Gdn::config('Garden.FolderBlacklist');
         if (!is_array($BlackList)) {
-            $BlackList = array('.', '..');
+            $BlackList = ['.', '..'];
         }
 
-        $Result = array();
+        $Result = [];
 
         foreach ($SourceFolders as $SourceFolder) {
             if ($DirectoryHandle = opendir($SourceFolder)) {
                 while (($Item = readdir($DirectoryHandle)) !== false) {
-                    $SubFolder = combinePaths(array($SourceFolder, $Item));
+                    $SubFolder = combinePaths([$SourceFolder, $Item]);
                     if (!in_array($Item, $BlackList) && is_dir($SubFolder)) {
                         $Result[] = $Item;
                     }
@@ -144,20 +144,20 @@ class Gdn_FileSystem {
      * Default is to return an array of every instance.
      */
     private static function _find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = false) {
-        $Return = array();
+        $Return = [];
 
         if (!is_array($SourceFolders)) {
-            $SourceFolders = array($SourceFolders);
+            $SourceFolders = [$SourceFolders];
         }
 
         foreach ($SourceFolders as $SourceFolder) {
             if ($WhiteList === false) {
-                $Path = CombinePaths(array($SourceFolder, $FileName));
+                $Path = CombinePaths([$SourceFolder, $FileName]);
                 if (file_exists($Path)) {
                     if ($ReturnFirst) {
                         return $Path;
                     } else {
-                        $Return[] = array($Path);
+                        $Return[] = [$Path];
                     }
                 }
             } else {
@@ -171,16 +171,16 @@ class Gdn_FileSystem {
                         $WhiteList = scandir($SourceFolder);
                     }
 
-                    $SubFolders = array();
+                    $SubFolders = [];
                     foreach ($WhiteList as $WhiteFolder) {
-                        $SubFolder = combinePaths(array($SourceFolder, $WhiteFolder));
+                        $SubFolder = combinePaths([$SourceFolder, $WhiteFolder]);
                         if (is_dir($SubFolder)) {
                             $SubFolders[] = $SubFolder;
-                            $Path = combinePaths(array($SubFolder, $FileName));
+                            $Path = combinePaths([$SubFolder, $FileName]);
                             // echo '<div style="color: red;">Looking For: '.$Path.'</div>';
                             if (file_exists($Path)) {
                                 if ($ReturnFirst) {
-                                    return array($Path);
+                                    return [$Path];
                                 } else {
                                     $Return[] = $Path;
                                 }
@@ -214,7 +214,7 @@ class Gdn_FileSystem {
 
         // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
         if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1) {
-            $LibraryName = combinePaths(array($FolderWhiteList[0], $LibraryName));
+            $LibraryName = combinePaths([$FolderWhiteList[0], $LibraryName]);
         }
 
         $LibraryKey = str_replace('.', '__', $LibraryName);
@@ -324,7 +324,7 @@ class Gdn_FileSystem {
             $Name = rawurldecode($Name);
 
             // Figure out the MIME type
-            $MimeTypes = array(
+            $MimeTypes = [
                 "pdf" => "application/pdf",
                 "txt" => "text/plain",
                 "html" => "text/html",
@@ -340,7 +340,7 @@ class Gdn_FileSystem {
                 "jpg" => "image/jpg",
                 "php" => "text/plain",
                 "ico" => "image/vnd.microsoft.icon"
-            );
+            ];
 
             if ($MimeType == '') {
                 if (array_key_exists($FileExtension, $MimeTypes)) {
@@ -420,7 +420,7 @@ class Gdn_FileSystem {
         $PathParts = explode('/', $TrimPath);
         $Prepend = (strlen($Path) !== strlen($TrimPath)) ? DS : '';
 
-        $CurrentPath = array();
+        $CurrentPath = [];
         foreach ($PathParts as $FolderPart) {
             array_push($CurrentPath, $FolderPart);
             $TestFolder = $Prepend.implode(DS, $CurrentPath);
@@ -470,7 +470,7 @@ class Gdn_FileSystem {
      * @param $options //folderPermission,filePermission
      * @return boolean
      */
-    public static function copy($source, $dest, $options = array('folderPermission' => 0755, 'filePermission' => 0755)) {
+    public static function copy($source, $dest, $options = ['folderPermission' => 0755, 'filePermission' => 0755]) {
         $result = false;
 
         if (is_file($source)) {

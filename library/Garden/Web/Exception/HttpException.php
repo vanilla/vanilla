@@ -16,7 +16,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
     /**
      * @var array HTTP response codes and messages.
      */
-    protected static $messages = array(
+    protected static $messages = [
         // Informational 1xx
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -70,7 +70,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported'
-    );
+    ];
 
     /**
      * Construct an {@link HttpException}.
@@ -81,7 +81,7 @@ abstract class HttpException extends \Exception implements \JsonSerializable {
      * - TODO: Keys beginning with **HTTP_** will be added as headers.
      * - **description** will give the exception a longer description.
      *
-     * @param string $message The error message.
+     * @param int|string $message The error message.
      * @param int $code The http error code.
      * @param array $context An array of context variables that can be used to render a more detailed response.
      */

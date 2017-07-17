@@ -133,7 +133,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      * @return array An array representing an image.
      */
     public function getDefaultEmailImage() {
-        $image = array();
+        $image = [];
         if (c('Garden.EmailTemplate.Image', '')) {
             $image['source'] = Gdn_UploadImage::url(c('Garden.EmailTemplate.Image'));
         }
@@ -269,9 +269,9 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
         if (!$backgroundColor) {
             $backgroundColor = $this->defaultButtonBackgroundColor;
         }
-        $this->footer = array('text' => htmlspecialchars($this->formatContent($text)),
+        $this->footer = ['text' => htmlspecialchars($this->formatContent($text)),
             'textColor' => htmlspecialchars($textColor),
-            'backgroundColor' => htmlspecialchars($backgroundColor));
+            'backgroundColor' => htmlspecialchars($backgroundColor)];
         return $this;
     }
 
@@ -416,10 +416,10 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
         if (!$backgroundColor) {
             $backgroundColor = $this->defaultButtonBackgroundColor;
         }
-        $this->button = array('url' => htmlspecialchars($url),
+        $this->button = ['url' => htmlspecialchars($url),
                               'text' => htmlspecialchars($this->formatContent($text)),
                               'textColor' => htmlspecialchars($textColor),
-                              'backgroundColor' => htmlspecialchars($backgroundColor));
+                              'backgroundColor' => htmlspecialchars($backgroundColor)];
         return $this;
     }
 
@@ -457,9 +457,9 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
     public function setImage($sourceUrl = '', $linkUrl = '', $alt = '') {
         // We need either a source image or an alt to have an img tag.
         if ($sourceUrl || $alt) {
-            $this->image = array('source' => htmlspecialchars($sourceUrl),
+            $this->image = ['source' => htmlspecialchars($sourceUrl),
                 'link' => htmlspecialchars($linkUrl),
-                'alt' => $alt);
+                'alt' => $alt];
         }
         return $this;
     }
@@ -491,7 +491,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      */
     protected function objectToArray($email) {
         if (is_array($email) || is_object($email)) {
-            $result = array();
+            $result = [];
             foreach ($email as $key => $value) {
                 $result[$key] = $this->objectToArray($value);
             }

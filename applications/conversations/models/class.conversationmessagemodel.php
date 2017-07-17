@@ -90,7 +90,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @return Gdn_DataSet
      */
     public function getID($ID, $DatasetType = false, $options = []) {
-        $Result = $this->getWhere(array("MessageID" => $ID))->firstRow($DatasetType);
+        $Result = $this->getWhere(["MessageID" => $ID])->firstRow($DatasetType);
         return $Result;
     }
 
@@ -195,7 +195,7 @@ class ConversationMessageModel extends ConversationsModel {
      * @param array $FormPostValues Values submitted via form.
      * @return int Unique ID of message created or updated.
      */
-    public function save($FormPostValues, $Conversation = null, $Options = array()) {
+    public function save($FormPostValues, $Conversation = null, $Options = []) {
         $Session = Gdn::session();
 
         // Define the primary key in this model's table.
@@ -228,7 +228,7 @@ class ConversationMessageModel extends ConversationsModel {
 
             if (!$Conversation) {
                 $Conversation = $this->SQL
-                    ->getWhere('Conversation', array('ConversationID' => $ConversationID))
+                    ->getWhere('Conversation', ['ConversationID' => $ConversationID])
                     ->firstRow(DATASET_TYPE_ARRAY);
             }
 
@@ -302,8 +302,8 @@ class ConversationMessageModel extends ConversationsModel {
                 ->where('ConversationID', $ConversationID)
                 ->get()->result(DATASET_TYPE_ARRAY);
 
-            $UpdateCountUserIDs = array();
-            $NotifyUserIDs = array();
+            $UpdateCountUserIDs = [];
+            $NotifyUserIDs = [];
 
             // Collapse for call to UpdateUserCache and ActivityModel.
             $InsertUserFound = false;
@@ -317,8 +317,8 @@ class ConversationMessageModel extends ConversationsModel {
                     if ($Deleted) {
                         $this->SQL->put(
                             'UserConversation',
-                            array('Deleted' => 0, 'DateConversationUpdated' => $DateUpdated),
-                            array('ConversationID' => $ConversationID, 'UserID' => $UserID)
+                            ['Deleted' => 0, 'DateConversationUpdated' => $DateUpdated],
+                            ['ConversationID' => $ConversationID, 'UserID' => $UserID]
                         );
                     }
                 }
@@ -335,12 +335,12 @@ class ConversationMessageModel extends ConversationsModel {
             }
 
             if (!$InsertUserFound) {
-                $UserConversation = array(
+                $UserConversation = [
                     'UserID' => val('InsertUserID', $Fields),
                     'ConversationID' => $ConversationID,
                     'LastMessageID' => $LastMessageID,
                     'CountReadMessages' => $CountMessages,
-                    'DateConversationUpdated' => $DateUpdated);
+                    'DateConversationUpdated' => $DateUpdated];
                 $this->SQL->insert('UserConversation', $UserConversation);
             }
 
@@ -362,7 +362,7 @@ class ConversationMessageModel extends ConversationsModel {
                     continue; // don't notify self.
                 }
                 // Notify the users of the new message.
-                $activity = array(
+                $activity = [
                     'ActivityType' => 'ConversationMessage',
                     'ActivityUserID' => val('InsertUserID', $Fields),
                     'NotifyUserID' => $notifyUserID,
@@ -372,7 +372,7 @@ class ConversationMessageModel extends ConversationsModel {
                     'Story' => $body,
                     'Format' => val('Format', $Fields, c('Garden.InputFormatter')),
                     'Route' => "/messages/{$ConversationID}#{$MessageID}",
-                );
+                ];
 
                 if (c('Conversations.Subjects.Visible') && $subject) {
                     $activity['HeadlineFormat'] = $subject;

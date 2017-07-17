@@ -163,10 +163,10 @@ class CropImageModule extends Gdn_Module {
         $y = $this->getCropYValue();
         $w = $this->getCropWidth();
         $h = $this->getCropHeight();
-        return array('SourceX'      => $x,
+        return ['SourceX'      => $x,
                      'SourceY'      => $y,
                      'SourceWidth'  => $w,
-                     'SourceHeight' => $h);
+                     'SourceHeight' => $h];
     }
 
     /**

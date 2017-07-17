@@ -41,7 +41,11 @@ class AccessTokenModel extends Gdn_Model {
      * @return string Returns a signed access token.
      */
     public function issue($userID, $expires = '1 month', $type = 'system', $scope = []) {
-        $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
+        if ($expires instanceof  DateTimeInterface) {
+            $expireDate = $expires->format(MYSQL_DATE_FORMAT);
+        } else {
+            $expireDate = Gdn_Format::toDateTime($this->toTimestamp($expires));
+        }
         $token = $this->insert([
             'UserID' => $userID,
             'Type' => $type,
@@ -168,7 +172,7 @@ class AccessTokenModel extends Gdn_Model {
      */
     public function setField($RowID, $Property, $Value = false) {
         if (!is_array($Property)) {
-            $Property = array($Property => $Value);
+            $Property = [$Property => $Value];
         }
         $this->encodeRow($Property);
         parent::setField($RowID, $Property);

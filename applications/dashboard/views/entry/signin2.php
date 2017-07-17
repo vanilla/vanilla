@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Methods = $this->data('Methods', array());
-$SelectedMethod = $this->data('SelectedMethod', array());
+$Methods = $this->data('Methods', []);
+$SelectedMethod = $this->data('SelectedMethod', []);
 $CssClass = count($Methods) > 0 ? ' MultipleEntryMethods' : ' SingleEntryMethod';
 
 // Testing

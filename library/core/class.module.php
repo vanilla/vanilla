@@ -24,7 +24,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
     protected $_ApplicationFolder;
 
     /** @var array Data that is passed into the view. */
-    public $Data = array();
+    public $Data = [];
 
     /** @var Gdn_Controller The object that constructed this object. Typically this should be a Controller object. */
     protected $_Sender;
@@ -125,7 +125,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         if (is_object($this->_Sender) && isset($this->_Sender->Data)) {
             $Data = $this->_Sender->Data;
         } else {
-            $Data = array();
+            $Data = [];
         }
         include($viewPath);
         $String = ob_get_contents();
@@ -188,7 +188,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         }
 
         if (!$ViewPath) {
-            $ViewPaths = array();
+            $ViewPaths = [];
             // 1. An explicitly defined path to a view
             if (strpos($View, '/') !== false) {
                 $ViewPaths[] = $View;
@@ -197,21 +197,21 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             // 2. A theme
             if ($ThemeFolder != '') {
                 // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
-                $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View.'.php'));
+                $ViewPaths[] = CombinePaths([PATH_THEMES, $ThemeFolder, $ApplicationFolder, 'views', 'modules', $View.'.php']);
 
                 // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
-                $ViewPaths[] = CombinePaths(array(PATH_THEMES, $ThemeFolder, 'views', 'modules', $View.'.php'));
+                $ViewPaths[] = CombinePaths([PATH_THEMES, $ThemeFolder, 'views', 'modules', $View.'.php']);
             }
 
             // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
             if ($this->_ApplicationFolder) {
-                $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View.'.php'));
+                $ViewPaths[] = CombinePaths([PATH_APPLICATIONS, $ApplicationFolder, 'views', 'modules', $View.'.php']);
             } else {
                 $ViewPaths[] = dirname($this->path())."/../views/modules/$View.php";
             }
 
             // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
-            $ViewPaths[] = CombinePaths(array(PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View.'.php'));
+            $ViewPaths[] = CombinePaths([PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $View.'.php']);
 
             $ViewPath = Gdn_FileSystem::exists($ViewPaths);
         }

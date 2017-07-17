@@ -1,5 +1,5 @@
 <?php if (!defined('APPLICATION')) exit();
-$RedirectUrl = $this->RedirectUrl;
+$RedirectUrl = $this->redirectTo ?: $this->RedirectUrl;
 
 echo '<h1>', t('Redirecting...'), '</h1>',
 '<div><div class="P">',

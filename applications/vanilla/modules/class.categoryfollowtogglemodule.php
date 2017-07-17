@@ -32,7 +32,7 @@ class CategoryFollowToggleModule extends Gdn_Module {
                 $Session->setPreference('ShowAllCategories', $ShowAllCategories);
             }
 
-            redirect('/'.ltrim(Gdn::request()->Path(), '/'));
+            redirectTo('/'.ltrim(Gdn::request()->Path(), '/'));
         }
     }
 

@@ -99,7 +99,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @var array Associative array of $FieldName => $ValidationFunctionName arrays that
      *    describe how each field specified failed validation.
      */
-    protected $_ValidationResults = array();
+    protected $_ValidationResults = [];
 
     /**
      * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection
@@ -114,7 +114,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    private property is used to record all IDs so that duplicate IDs are not
      *    added to the screen.
      */
-    private $_IDCollection = array();
+    private $_IDCollection = [];
 
     /**
      * Constructor
@@ -260,7 +260,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @since 2.1
      * @return string HTML element.
      */
-    public function bodyBox($Column = 'Body', $Attributes = array()) {
+    public function bodyBox($Column = 'Body', $Attributes = []) {
         touchValue('MultiLine', $Attributes, true);
         touchValue('Wrap', $Attributes, true);
         touchValue('class', $Attributes, '');
@@ -304,7 +304,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function button($ButtonCode, $Attributes = array()) {
+    public function button($ButtonCode, $Attributes = []) {
         $Type = arrayValueI('type', $Attributes);
         if ($Type === false) {
             $Type = 'submit';
@@ -398,7 +398,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      * @todo Create calendar helper
      */
-    public function calendar($FieldName, $Attributes = array()) {
+    public function calendar($FieldName, $Attributes = []) {
         // TODO: CREATE A CALENDAR HELPER CLASS AND LOAD/REFERENCE IT HERE.
         // THE CLASS SHOULD BE DECLARED WITH:
         //  if (!class_exists('Calendar') {
@@ -450,7 +450,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function categoryDropDown($FieldName = 'CategoryID', $Options = array()) {
+    public function categoryDropDown($FieldName = 'CategoryID', $Options = []) {
 
         $this->EventArguments['Options'] = &$Options;
         $this->fireEvent('BeforeCategoryDropDown');
@@ -468,7 +468,7 @@ class Gdn_Form extends Gdn_Pluggable {
         if (is_object($CategoryData)) {
             $CategoryData = (array)$CategoryData;
         } elseif (!is_array($CategoryData)) {
-            $CategoryData = array();
+            $CategoryData = [];
         }
 
         $Permission = val('Permission', $Options, 'add');
@@ -478,13 +478,13 @@ class Gdn_Form extends Gdn_Pluggable {
             $CategoryData = CategoryModel::getByPermission(
                 'Discussions.View',
                 $Value,
-                val('Filter', $Options, array('Archived' => 0)),
-                val('PermFilter', $Options, array())
+                val('Filter', $Options, ['Archived' => 0]),
+                val('PermFilter', $Options, [])
             );
         }
 
         // Respect category permissions (remove categories that the user shouldn't see).
-        $SafeCategoryData = array();
+        $SafeCategoryData = [];
         foreach ($CategoryData as $CategoryID => $Category) {
             $Name = $Category['Name'];
 
@@ -521,11 +521,11 @@ class Gdn_Form extends Gdn_Pluggable {
             $Value = $this->getValue($FieldName);
         }
         if (!is_array($Value)) {
-            $Value = array($Value);
+            $Value = [$Value];
         }
 
         // Prevent default $Value from matching key of zero
-        $HasValue = ($Value !== array(false) && $Value !== array('')) ? true : false;
+        $HasValue = ($Value !== [false] && $Value !== ['']) ? true : false;
 
         // Start with null option?
         $IncludeNull = val('IncludeNull', $Options);
@@ -833,7 +833,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function checkBox($FieldName, $Label = '', $Attributes = array()) {
+    public function checkBox($FieldName, $Label = '', $Attributes = []) {
         $Value = arrayValueI('value', $Attributes, true);
         $Attributes['value'] = $Value;
         $Display = val('display', $Attributes, 'wrap');
@@ -922,7 +922,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = array()) {
+    public function checkBoxList($FieldName, $DataSet, $ValueDataSet = null, $Attributes = []) {
         // Never display individual inline errors for these CheckBoxes
         $Attributes['InlineErrors'] = false;
 
@@ -938,7 +938,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 }
             }
         } else {
-            $CheckedValues = $this->getFormValue($FieldName, array());
+            $CheckedValues = $this->getFormValue($FieldName, []);
         }
         $i = 1;
         if (is_object($DataSet)) {
@@ -1039,9 +1039,9 @@ class Gdn_Form extends Gdn_Pluggable {
             $ValueField = arrayValueI('ValueField', $Attributes, 'value');
             $TextField = arrayValueI('TextField', $Attributes, 'text');
             $LastGroup = '';
-            $Group = array();
-            $Rows = array();
-            $Cols = array();
+            $Group = [];
+            $Rows = [];
+            $Cols = [];
             $CheckBox = '';
             foreach ($DataSet->result() as $Data) {
                 // Define the checkbox
@@ -1076,13 +1076,13 @@ class Gdn_Form extends Gdn_Pluggable {
                         );
 
                         // Clean out the $Group array & Rowcount
-                        $Group = array();
-                        $Rows = array();
-                        $Cols = array();
+                        $Group = [];
+                        $Rows = [];
+                        $Cols = [];
                     }
 
                     if (array_key_exists($ColName, $Group) === false || is_array($Group[$ColName]) === false) {
-                        $Group[$ColName] = array();
+                        $Group[$ColName] = [];
                         if (!in_array($ColName, $Cols)) {
                             $Cols[] = $ColName;
                         }
@@ -1203,7 +1203,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param string $Xhtml
      * @return string
      */
-    public function close($ButtonCode = '', $Xhtml = '', $Attributes = array()) {
+    public function close($ButtonCode = '', $Xhtml = '', $Attributes = []) {
         $Return = "</div>\n</form>";
 
         if ($Xhtml != '') {
@@ -1235,7 +1235,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param array $attributes
      * @return string
      */
-    public function currentImage($fieldName, $attributes = array()) {
+    public function currentImage($fieldName, $attributes = []) {
         $result = $this->hidden($fieldName);
 
         $value = $this->getValue($fieldName);
@@ -1258,7 +1258,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *       Fields, array of month, day, year. Those are only valid values. Order matters.
      * @return string
      */
-    public function date($FieldName, $Attributes = array()) {
+    public function date($FieldName, $Attributes = []) {
         $Return = '';
         $YearRange = arrayValueI('yearrange', $Attributes, false);
         $StartYear = 0;
@@ -1279,12 +1279,12 @@ class Gdn_Form extends Gdn_Pluggable {
             explode(',', 'Month,Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec')
         );
 
-        $Days = array(t('Day'));
+        $Days = [t('Day')];
         for ($i = 1; $i < 32; ++$i) {
             $Days[] = $i;
         }
 
-        $Years = array(t('Year'));
+        $Years = [t('Year')];
         foreach (range($StartYear, $EndYear) as $Year) {
             $Years[$Year] = $Year;
         }
@@ -1309,7 +1309,7 @@ class Gdn_Form extends Gdn_Pluggable {
         }
 
         // Allow us to specify which fields to show & order
-        $Fields = arrayValueI('fields', $Attributes, array('month', 'day', 'year'));
+        $Fields = arrayValueI('fields', $Attributes, ['month', 'day', 'year']);
         if (is_array($Fields)) {
             foreach ($Fields as $Field) {
                 switch ($Field) {
@@ -1379,7 +1379,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *
      * @return string
      */
-    public function dropDown($FieldName, $DataSet, $Attributes = array()) {
+    public function dropDown($FieldName, $DataSet, $Attributes = []) {
         // Show inline errors?
         $ShowErrors = ($this->_InlineErrors && array_key_exists($FieldName, $this->_ValidationResults));
 
@@ -1414,11 +1414,11 @@ class Gdn_Form extends Gdn_Pluggable {
             $Value = $this->getValue($FieldName, val('Default', $Attributes));
         }
         if (!is_array($Value)) {
-            $Value = array($Value);
+            $Value = [$Value];
         }
 
         // Prevent default $Value from matching key of zero
-        $HasValue = ($Value !== array(false) && $Value !== array('')) ? true : false;
+        $HasValue = ($Value !== [false] && $Value !== ['']) ? true : false;
 
         // Start with null option?
         $IncludeNull = arrayValueI('IncludeNull', $Attributes, false);
@@ -1454,7 +1454,7 @@ class Gdn_Form extends Gdn_Pluggable {
                     $Text = val('Text', $Attribs, '');
                     unset($Attribs['Text']);
                 } else {
-                    $Attribs = array();
+                    $Attribs = [];
                 }
                 $Return .= '<option value="'.$ID.'"';
                 if (in_array($ID, $Value) && $HasValue) {
@@ -1488,7 +1488,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @param array $Attributes
      * @return string
      */
-    public function dropDownGroup($FieldName, $Data, $GroupField, $TextField, $ValueField, $Attributes = array()) {
+    public function dropDownGroup($FieldName, $Data, $GroupField, $TextField, $ValueField, $Attributes = []) {
         $Return = '<select'
             .$this->_idAttribute($FieldName, $Attributes)
             .$this->_nameAttribute($FieldName, $Attributes)
@@ -1688,7 +1688,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $Return = '';
         if (is_array($this->HiddenInputs)) {
             foreach ($this->HiddenInputs as $Name => $Value) {
-                $Return .= $this->Hidden($Name, array('value' => $Value));
+                $Return .= $this->Hidden($Name, ['value' => $Value]);
             }
             // Clean out the array
             // mosullivan - removed cleanout so that entry forms can all have the same hidden inputs added once on the entry/index view.
@@ -1707,7 +1707,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * class, etc
      * @return string
      */
-    public function hidden($FieldName, $Attributes = array()) {
+    public function hidden($FieldName, $Attributes = []) {
         $Return = '<input type="hidden"';
         $Return .= $this->_idAttribute($FieldName, $Attributes);
         $Return .= $this->_nameAttribute($FieldName, $Attributes);
@@ -1725,7 +1725,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * @return string
      * @since 2.1
      */
-    public function imageUpload($FieldName, $Attributes = array()) {
+    public function imageUpload($FieldName, $Attributes = []) {
         $Result = '<div class="FileUpload ImageUpload">'.
             $this->currentImage($FieldName, $Attributes).
             '<div>'.
@@ -1777,7 +1777,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *    Setting 'InlineErrors' to FALSE prevents error message even if $this->InlineErrors is enabled.
      * @return string
      */
-    public function input($FieldName, $Type = 'text', $Attributes = array()) {
+    public function input($FieldName, $Type = 'text', $Attributes = []) {
         switch ($Type) {
             case 'checkbox':
             case 'button':
@@ -1868,7 +1868,7 @@ PASSWORDMETER;
     }
 
 
-    public function inputWrap($FieldName, $Type = 'text', $Attributes = array()) {
+    public function inputWrap($FieldName, $Type = 'text', $Attributes = []) {
         return '<div class="input-wrap">'.$this->input($FieldName, $Type, $Attributes).'</div>';
     }
 
@@ -1882,7 +1882,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function label($TranslationCode, $FieldName = '', $Attributes = array()) {
+    public function label($TranslationCode, $FieldName = '', $Attributes = []) {
         // Assume we always want a 'for' attribute because it's Good & Proper.
         // Precedence: 'for' attribute, 'id' attribute, $FieldName, $TranslationCode
         $DefaultFor = ($FieldName == '') ? $TranslationCode : $FieldName;
@@ -1892,7 +1892,7 @@ PASSWORDMETER;
         return $return;
     }
 
-    public function labelWrap($TranslationCode, $FieldName = '', $Attributes = array()) {
+    public function labelWrap($TranslationCode, $FieldName = '', $Attributes = []) {
         return '<div class="label-wrap">'.$this->label($TranslationCode, $FieldName, $Attributes).'</div>';
     }
 
@@ -1944,9 +1944,9 @@ PASSWORDMETER;
      *
      * @todo check that missing DataObject parameter
      */
-    public function open($Attributes = array()) {
+    public function open($Attributes = []) {
         if (!is_array($Attributes)) {
-            $Attributes = array();
+            $Attributes = [];
         }
 
         $Return = '<form';
@@ -1969,7 +1969,7 @@ PASSWORDMETER;
         if (strcasecmp($this->Method, 'get') == 0) {
             // The path is not getting passed on get forms so put them in hidden fields.
             $Action = strrchr($this->Action, '?');
-            $Exclude = val('Exclude', $Attributes, array());
+            $Exclude = val('Exclude', $Attributes, []);
             if ($Action !== false) {
                 $this->Action = substr($this->Action, 0, -strlen($Action));
                 parse_str(trim($Action, '?'), $Query);
@@ -1999,7 +1999,7 @@ PASSWORDMETER;
             $Session = Gdn::session();
             $Return .= $this->hidden(
                 'TransientKey',
-                array('value' => $Session->transientKey())
+                ['value' => $Session->transientKey()]
             );
             // Also add a honeypot if Forms.HoneypotName has been defined
             $HoneypotName = Gdn::config(
@@ -2008,7 +2008,7 @@ PASSWORDMETER;
             if ($HoneypotName) {
                 $Return .= $this->hidden(
                     $HoneypotName,
-                    array('Name' => $HoneypotName, 'style' => "display: none;")
+                    ['Name' => $HoneypotName, 'style' => "display: none;"]
                 );
             }
         }
@@ -2030,7 +2030,7 @@ PASSWORDMETER;
      *    Special values 'Value' and 'Default' (see RadioList).
      * @return string
      */
-    public function radio($FieldName, $Label = '', $Attributes = array()) {
+    public function radio($FieldName, $Label = '', $Attributes = []) {
         $Value = arrayValueI('Value', $Attributes, 'TRUE');
         $Attributes['value'] = $Value;
         $FormValue = $this->getValue($FieldName, arrayValueI('Default', $Attributes));
@@ -2096,7 +2096,7 @@ PASSWORDMETER;
      *
      * @return string
      */
-    public function radioList($FieldName, $DataSet, $Attributes = array()) {
+    public function radioList($FieldName, $DataSet, $Attributes = []) {
         $List = val('list', $Attributes);
 
         $Return = '';
@@ -2165,9 +2165,9 @@ PASSWORDMETER;
      *  class, etc
      * @return string
      */
-    public function textBox($FieldName, $Attributes = array()) {
+    public function textBox($FieldName, $Attributes = []) {
         if (!is_array($Attributes)) {
-            $Attributes = array();
+            $Attributes = [];
         }
 
         $MultiLine = arrayValueI('MultiLine', $Attributes);
@@ -2220,7 +2220,7 @@ PASSWORDMETER;
         return $Return;
     }
 
-    public function textBoxWrap($FieldName, $Attributes = array()) {
+    public function textBoxWrap($FieldName, $Attributes = []) {
         return '<div class="input-wrap">'.$this->textBox($FieldName, $Attributes).'</div>';
     }
 
@@ -2270,16 +2270,16 @@ PASSWORDMETER;
         }
 
         if (!is_array($this->_ValidationResults)) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         if (!array_key_exists($FieldName, $this->_ValidationResults)) {
-            $this->_ValidationResults[$FieldName] = array($ErrorCode);
+            $this->_ValidationResults[$FieldName] = [$ErrorCode];
         } else {
             if (!is_array($this->_ValidationResults[$FieldName])) {
-                $this->_ValidationResults[$FieldName] = array(
+                $this->_ValidationResults[$FieldName] = [
                 $this->_ValidationResults[$FieldName],
-                $ErrorCode);
+                $ErrorCode];
             } else {
                 $this->_ValidationResults[$FieldName][] = $ErrorCode;
             }
@@ -2351,7 +2351,7 @@ PASSWORDMETER;
      * Emptys the $this->_FormValues collection so that all form fields will load empty.
      */
     public function clearInputs() {
-        $this->_FormValues = array();
+        $this->_FormValues = [];
     }
 
     /**
@@ -2361,7 +2361,7 @@ PASSWORDMETER;
      */
     public function errorCount() {
         if (!is_array($this->_ValidationResults)) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         return count($this->_ValidationResults);
@@ -2382,8 +2382,8 @@ PASSWORDMETER;
      * @return string
      */
     public function escapeFieldName($string) {
-        $search = array('\\', '-dot-', '.');
-        $replace = array('\\\\', '\\-dot-', '-dot-');
+        $search = ['\\', '-dot-', '.'];
+        $replace = ['\\\\', '\\-dot-', '-dot-'];
         return str_replace($search, $replace, $string);
     }
 
@@ -2398,8 +2398,8 @@ PASSWORDMETER;
      * @return string
      */
     public function unescapeFieldName($string) {
-        $search = array('/(?<!\\\\)(\\\\\\\\)*-dot-/', '/\\\\-dot-/', '/\\\\\\\\/');
-        $replace = array('$1.', '-dot-', '\\\\');
+        $search = ['/(?<!\\\\)(\\\\\\\\)*-dot-/', '/\\\\-dot-/', '/\\\\\\\\/'];
+        $replace = ['$1.', '-dot-', '\\\\'];
         return preg_replace($search, $replace, $string);
     }
 
@@ -2456,12 +2456,12 @@ PASSWORDMETER;
             $this->formValues();
         }
 
-        $Result = array(array());
+        $Result = [[]];
         foreach ($this->_FormValues as $Key => $Value) {
             if (is_array($Value)) {
                 foreach ($Value as $RowIndex => $RowValue) {
                     if (!array_key_exists($RowIndex, $Result)) {
-                        $Result[$RowIndex] = array($Key => $RowValue);
+                        $Result[$RowIndex] = [$Key => $RowValue];
                     } else {
                         $Result[$RowIndex][$Key] = $RowValue;
                     }
@@ -2489,7 +2489,7 @@ PASSWORDMETER;
         }
 
         if (!is_array($this->_FormValues)) {
-            $this->_FormValues = array();
+            $this->_FormValues = [];
 
             $Request = Gdn::request();
             $Collection = $this->Method == 'get' ? $Request->get() : $Request->post();
@@ -2700,7 +2700,7 @@ PASSWORDMETER;
 
             $Args = array_merge(
                 func_get_args(),
-                array(
+                [
                     null,
                     null,
                     null,
@@ -2710,7 +2710,7 @@ PASSWORDMETER;
                     null,
                     null,
                     null,
-                    null)
+                    null]
             );
             $SaveResult = $this->_Model->save(
                 $Data,
@@ -2743,7 +2743,7 @@ PASSWORDMETER;
      *  - CurrentImage: Current image to clean if the save is successful
      * @return bool
      */
-    public function saveImage($Field, $Options = array()) {
+    public function saveImage($Field, $Options = []) {
         $Upload = new Gdn_UploadImage();
 
         $FileField = str_replace('.', '_', $Field);
@@ -2864,7 +2864,7 @@ PASSWORDMETER;
         $this->formValues();
 
         if (!is_array($FieldName)) {
-            $FieldName = array($FieldName);
+            $FieldName = [$FieldName];
         }
 
         foreach ($FieldName as $Field) {
@@ -2898,7 +2898,7 @@ PASSWORDMETER;
      */
     public function setValidationResults($ValidationResults) {
         if (!is_array($this->_ValidationResults)) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         $this->_ValidationResults = array_merge_recursive($this->_ValidationResults, $ValidationResults);
@@ -2914,7 +2914,7 @@ PASSWORDMETER;
      */
     public function setValue($FieldName, $Value) {
         if (!is_array($this->_DataArray)) {
-            $this->_DataArray = array();
+            $this->_DataArray = [];
         }
 
         $this->_DataArray[$FieldName] = $Value;
@@ -2941,19 +2941,19 @@ PASSWORDMETER;
      *  - Wrap: A two item array specifying the text to wrap the form in.
      *  - ItemWrap: A two item array specifying the text to wrap each form item in.
      */
-    public function simple($Schema, $Options = array()) {
+    public function simple($Schema, $Options = []) {
         $Result = valr('Wrap.0', $Options, '<ul>');
 
         foreach ($Schema as $Index => $Row) {
             if (is_string($Row)) {
-                $Row = array('Name' => $Index, 'Control' => $Row);
+                $Row = ['Name' => $Index, 'Control' => $Row];
             }
 
             if (!isset($Row['Name'])) {
                 $Row['Name'] = $Index;
             }
             if (!isset($Row['Options'])) {
-                $Row['Options'] = array();
+                $Row['Options'] = [];
             }
 
             touchValue('Control', $Row, 'TextBox');
@@ -2961,7 +2961,7 @@ PASSWORDMETER;
             if (strtolower($Row['Control']) == 'callback') {
                 $ItemWrap = '';
             } else {
-                $DefaultWrap = array('<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n");
+                $DefaultWrap = ['<li class="'.$this->getStyle('form-group')."\">\n", "\n</li>\n"];
                 $ItemWrap = val('ItemWrap', $Row, val('ItemWrap', $Options, $DefaultWrap));
             }
 
@@ -3105,7 +3105,7 @@ PASSWORDMETER;
      * @return string
      */
     protected function _attributesToString($Attributes) {
-        $ReservedAttributes = array(
+        $ReservedAttributes = [
             'id',
             'name',
             'value',
@@ -3123,7 +3123,7 @@ PASSWORDMETER;
             'inlineerrors',
             'wrap',
             'categorydata'
-        );
+        ];
         $Return = '';
 
         // Build string from array

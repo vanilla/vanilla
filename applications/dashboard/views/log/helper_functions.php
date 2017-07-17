@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit;
 
 function pluralCount($Count, $Type) {
-    $PluralCodes = array('Activity' => '%s Activities');
+    $PluralCodes = ['Activity' => '%s Activities'];
     $SingleCode = '%s '.Gdn_Form::LabelCode($Type);
     return plural($Count, $SingleCode, val($Type, $PluralCodes, $SingleCode.'s'));
 }

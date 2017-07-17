@@ -8,7 +8,7 @@
 echo $this->Form->errors();
 
 $CurrentStep = val('CurrentStep', $this->Data, 0);
-$Steps = val('Steps', $this->Data, array());
+$Steps = val('Steps', $this->Data, []);
 $Complete = FALSE;
 
 if ($CurrentStep > 0 && !array_key_exists($CurrentStep, $Steps)) {

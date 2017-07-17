@@ -10,8 +10,8 @@ echo $this->Form->open();
 <div class="toolbar flex-wrap">
     <div class="toolbar-buttons">
         <?php
-        echo anchor(t('Spam'), '#', array('class' => 'SpamButton btn btn-primary'));
-        echo anchor(t('Not Spam'), '#', array('class' => 'NotSpamButton btn btn-primary'));
+        echo anchor(t('Spam'), '#', ['class' => 'SpamButton btn btn-primary']);
+        echo anchor(t('Not Spam'), '#', ['class' => 'NotSpamButton btn btn-primary']);
         ?>
     </div>
     <?php PagerModule::write(['Sender' => $this, 'Limit' => 10, 'View' => 'pager-dashboard']); ?>

@@ -10,7 +10,7 @@
 
                 <div class="Item-Body Media">
                     <?php
-                    $Photo = userPhoto($Row, array('LinkClass' => 'Img'));
+                    $Photo = userPhoto($Row, ['LinkClass' => 'Img']);
                     if ($Photo) {
                         echo $Photo;
                     }
@@ -83,6 +83,6 @@ if ($RecordCount) {
     echo '<span class="Gloss">'.plural($RecordCount, '%s result', '%s results').'</span>';
 }
 
-PagerModule::write(array('Wrapper' => '<div %1$s>%2$s</div>'));
+PagerModule::write(['Wrapper' => '<div %1$s>%2$s</div>']);
 
 echo '</div>';

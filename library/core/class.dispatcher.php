@@ -229,9 +229,9 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
             if ($this->deliveryType === DELIVERY_TYPE_DATA) {
                 safeHeader('HTTP/1.0 401 Unauthorized', true, 401);
                 safeHeader('Content-Type: application/json; charset=utf-8', true);
-                echo json_encode(array('Code' => '401', 'Exception' => t('You must sign in.')));
+                echo json_encode(['Code' => '401', 'Exception' => t('You must sign in.')]);
             } else {
-                redirect('/entry/signin?Target='.urlencode($request->pathAndQuery()));
+                redirectTo('/entry/signin?Target='.urlencode($request->pathAndQuery()));
             }
             exit();
         }
@@ -700,10 +700,10 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
 
                 case 'Test':
                     decho($matchRoute, 'Route');
-                    decho(array(
+                    decho([
                         'Path' => $request->path(),
                         'Get' => $request->get()
-                    ), 'Request');
+                    ], 'Request');
                     die();
             }
         } elseif (in_array($request->path(), ['', '/'])) {

@@ -14,7 +14,7 @@
 class MessageModel extends Gdn_Model {
 
     /** @var array Non-standard message location allowed. */
-    private $_SpecialLocations = array('[Base]', '[NonAdmin]');
+    private $_SpecialLocations = ['[Base]', '[NonAdmin]'];
 
     /** @var array Current message data. */
     protected static $Messages;
@@ -47,7 +47,7 @@ class MessageModel extends Gdn_Model {
      * @param array $options Options to modify the behavior of the get.
      * @return array Requested message.
      */
-    public function getID($messageID, $datasetType = false, $options = array()) {
+    public function getID($messageID, $datasetType = false, $options = []) {
         if (Gdn::cache()->activeEnabled()) {
             $message = self::messages($messageID);
             if (!$message) {
@@ -134,9 +134,9 @@ class MessageModel extends Gdn_Model {
      * @param null $CategoryID
      * @return array|null
      */
-    public function getMessagesForLocation($Location, $Exceptions = array('[Base]'), $CategoryID = null) {
+    public function getMessagesForLocation($Location, $Exceptions = ['[Base]'], $CategoryID = null) {
         $Session = Gdn::session();
-        $Prefs = $Session->getPreference('DismissedMessages', array());
+        $Prefs = $Session->getPreference('DismissedMessages', []);
         if (count($Prefs) == 0) {
             $Prefs[] = 0;
         }
@@ -153,7 +153,7 @@ class MessageModel extends Gdn_Model {
         if (Gdn::cache()->activeEnabled()) {
             // Get the messages from the cache.
             $Messages = self::messages();
-            $Result = array();
+            $Result = [];
             foreach ($Messages as $MessageID => $Message) {
                 if (in_array($MessageID, $Prefs) || !$Message['Enabled']) {
                     continue;
@@ -224,7 +224,7 @@ class MessageModel extends Gdn_Model {
             ->groupBy('Application,Controller,Method')
             ->get();
 
-        $Locations = array();
+        $Locations = [];
         foreach ($Data as $Row) {
             if (in_array($Row->Controller, $this->_SpecialLocations)) {
                 $Locations[] = $Row->Controller;
@@ -257,7 +257,7 @@ class MessageModel extends Gdn_Model {
         $Messages = Gdn::cache()->get('Messages');
         if ($Messages === Gdn_Cache::CACHEOP_FAILURE) {
             $Messages = Gdn::sql()->get('Message', 'Sort')->resultArray();
-            $Messages = Gdn_DataSet::index($Messages, array('MessageID'));
+            $Messages = Gdn_DataSet::index($Messages, ['MessageID']);
             Gdn::cache()->store('Messages', $Messages);
         }
         if ($ID === false) {

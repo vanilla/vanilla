@@ -14,7 +14,7 @@
 class SocialController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form', 'Database');
+    public $Uses = ['Form', 'Database'];
 
     /**
      * Runs before every call to this controller.
@@ -28,7 +28,7 @@ class SocialController extends DashboardController {
      * Default method.
      */
     public function index() {
-        redirect('social/manage');
+        redirectTo('social/manage');
     }
 
     /**

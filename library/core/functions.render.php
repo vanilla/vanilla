@@ -761,6 +761,16 @@ if (!function_exists('formatPossessive')) {
     }
 }
 
+if (!function_exists('formatRssCustom')) {
+    /**
+     * @param string $html
+     * @return string Returns the filtered RSS.
+     */
+    function formatRssHtmlCustom($html) {
+        return Htmlawed::filterRSS($html);
+    }
+}
+
 if (!function_exists('formatUsername')) {
     /**
      *

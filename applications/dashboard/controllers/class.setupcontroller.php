@@ -282,7 +282,6 @@ class SetupController extends DashboardController {
                     'Garden.Version' => val('Version', val('Dashboard', $ApplicationInfo, []), 'Undefined'),
                     'Garden.CanProcessImages' => function_exists('gd_info'),
                     'EnabledPlugins.GettingStarted' => 'GettingStarted', // Make sure the getting started plugin is enabled
-                    'EnabledPlugins.HtmLawed' => 'HtmLawed' // Make sure html purifier is enabled so html has a default way of being safely parsed.
                 ]);
             }
         }

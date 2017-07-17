@@ -359,6 +359,8 @@ class DashboardHooks extends Gdn_Plugin {
      * @param SettingsController $Sender
      */
     public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
+        $Sender->permission('Garden.Settings.Manage');
+
         $Sender->title('Tagging');
         $Sender->setHighlightRoute('settings/tagging');
         $SQL = Gdn::sql();

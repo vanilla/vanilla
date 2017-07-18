@@ -17,7 +17,7 @@ use PDO;
  * Handles installing Vanilla.
  */
 class InstallModel {
-    protected static $DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent', 'Htmlawed'];
+    protected static $DEFAULT_ADDONS = ['vanilla', 'conversations', 'stubcontent'];
 
     protected $config;
 

@@ -177,6 +177,10 @@ $dic->setInstance('Garden\Container\Container', $dic)
     ->setClass('BBCode')
     ->setShared(true)
 
+    ->rule('HtmlFormatter')
+    ->setClass(VanillaHtmlFormatter::class)
+    ->setShared(true)
+
     ->rule('Smarty')
     ->setShared(true)
 

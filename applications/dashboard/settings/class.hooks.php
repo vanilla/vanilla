@@ -854,4 +854,113 @@ class DashboardHooks extends Gdn_Plugin {
 
         $args['Path'] = $localPath;
     }
+
+    /**
+     * Send notifications to admins/moderators about new content in the moderation/spam queue.
+     *
+     * @param LogModel $sender Sending object.
+     * @param array $args Event's arguments.
+     */
+    public function logModel_afterInsert_handler($sender, $args) {
+        $sendNotification = false;
+        $operation = $args['Log']['Operation'];
+
+        if (in_array($operation, ['Pending', 'Moderate'])) {
+            $queue = 'Moderation';
+            $sendNotification = true;
+        } elseif ($operation === 'Spam') {
+            $queue = 'Spam';
+            $sendNotification = true;
+        }
+
+        if (!$sendNotification) {
+            return;
+        }
+
+        // Fetch all the users that should be notified
+        $roleModel = new RoleModel();
+        $userModel = new UserModel();
+        $userMetaModel = new UserMetaModel();
+
+        $moderationRoles = $roleModel->getByPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'])->resultArray();
+        $roleIDs = array_column($moderationRoles, 'RoleID');
+
+        $moderators = $userModel->getByRole($roleIDs)->resultArray();
+        $superAdmins = $userModel->getWhere(['Admin' => 1])->resultArray();
+
+        $users = array_merge($moderators, $superAdmins);
+        $users = Gdn_DataSet::index($users, 'UserID');
+        $userIDs = array_keys($users);
+
+
+        if ($userIDs) {
+            // Notify each users while respecting their delay between notifications.
+            $currentDate = new DateTime();
+            $currentTime = $currentDate->getTimestamp();
+            $usersPreferences = $userMetaModel->getUserMeta($userIDs, 'QueueNotifications.%');
+
+            $unitToIntervalSpec = [
+                'minute' => 'PT%sM',
+                'hour' => 'PT%sH',
+                'day' => 'P%sD',
+            ];
+
+            $email = new Gdn_Email();
+
+            foreach ($userIDs as $userID) {
+                if (!$users[$userID]['Email']) {
+                    continue;
+                }
+
+                $currentUserPreferences = val($userID, $usersPreferences, []);
+                $prefixPref = "QueueNotifications.$queue";
+                if (!val("$prefixPref.Enabled", $currentUserPreferences)) {
+                    continue;
+                }
+
+                // Check that the delay between notification is respected.
+                $lastNotification = val("$prefixPref.LastNotification", $currentUserPreferences);
+                if ($lastNotification) {
+                    $lastNotificationDate = new DateTimeImmutable($lastNotification);
+
+                    $amount = val("$prefixPref.IntervalAmount", $currentUserPreferences, '1');
+                    $intervalSpec = $unitToIntervalSpec[val("$prefixPref.IntervalUnit", $currentUserPreferences, 'day')];
+                    $dateInterval = new DateInterval(sprintf($intervalSpec, $amount));
+
+                    $nextNotification = $lastNotificationDate->add($dateInterval);
+
+                    if ($nextNotification->getTimestamp() > $currentTime) {
+                        continue;
+                    }
+                }
+
+                // Update the last notification value.
+                $userMetaModel->setUserMeta($userID, "$prefixPref.LastNotification", $currentTime);
+
+                // Let's notify the user about the current queue.
+                try {
+                    $lcQueue = strtolower($queue);
+                    $queueName = strtolower($lcQueue === 'moderation' ? t('Moderation Queue') : t('Spam Queue'));
+                    $email
+                        ->clear()
+                        ->setEmailTemplate(new RawEmailTemplate())
+                        ->setFormat('html')
+                        ->subject(sprintf(t('New notification(s) in the %s awaits your review.'), strtolower($queueName)))
+                        ->to($users[$userID]['Email'])
+                        ->message(sprintf(
+                            t('Go to your %s to review it.'),
+                            anchor(strtolower($queueName), url("/dashboard/log/$lcQueue", true))
+                        ))
+                        ->send()
+                    ;
+                } catch (Exception $ex) {
+                    // Welp...
+                    trace([
+                        'Error' => 'Unable to send notification',
+                        'Message' => $ex->getMessage(),
+                    ]);
+                }
+            }
+        }
+    }
 }

@@ -882,7 +882,11 @@ class DashboardHooks extends Gdn_Plugin {
         $userModel = new UserModel();
         $userMetaModel = new UserMetaModel();
 
-        $moderationRoles = $roleModel->getByPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'])->resultArray();
+        $moderationRoles = $roleModel->getByPermission([
+            'Garden.Settings.Manage',
+            'Garden.Moderation.Manage',
+            'Moderation.ModerationQueue.Manage'
+        ])->resultArray();
         $roleIDs = array_column($moderationRoles, 'RoleID');
 
         $moderators = $userModel->getByRole($roleIDs)->resultArray();

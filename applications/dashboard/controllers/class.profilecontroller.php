@@ -963,7 +963,7 @@ class ProfileController extends Gdn_Controller {
         $queueNotificationsPrefs = [];
 
         // Moderation Notifications Preferences
-        if (checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage'])) {
+        if (checkPermission(['Garden.Settings.Manage', 'Garden.Moderation.Manage', 'Moderation.ModerationQueue.Manage'])) {
             $queueNotificationsPrefs = UserModel::getMeta($this->User->UserID, 'QueueNotifications.%', 'QueueNotifications.');
 
             $intervalUnits = [

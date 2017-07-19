@@ -18,6 +18,10 @@
         border-top: none;
     }
 
+    table.PreferenceGroup td {
+        vertical-align: middle;
+    }
+
     th.PrefCheckBox, td.PrefCheckBox {
         width: 50px;
         text-align: center;
@@ -36,9 +40,56 @@
 
     <div class="Preferences">
         <?php
-        echo $this->Form->open();
-        echo $this->Form->errors();
-        $this->fireEvent("BeforePreferencesRender");
+        /** @var Gdn_Form $form */
+        $form = $this->Form;
+        echo $form->open();
+        echo $form->errors();
+        $this->fireEvent('BeforePreferencesRender');
+
+        $queueNotifications = $this->data('QueueNotifications.Data');
+        if ($queueNotifications) {
+            ?>
+            <h2><?php echo t('Moderation Notifications'); ?></h2>
+            <table class="PreferenceGroup">
+                <thead>
+                    <tr>
+                        <th style="text-align:left"><?php echo t('Notification'); ?></th>
+                        <th style="text-align:left"><?php echo t('Enabled'); ?></th>
+                        <th style="text-align:left" colspan="2"><?php echo t('Minimum delay between notifications'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php
+                $intervalUnits = $this->data('QueueNotifications.IntervalUnits');
+                foreach ($queueNotifications as $id => $settings) {
+                    $stateCheckbox = $form->checkBox(
+                        "$id.Enabled",
+                        '',
+                        $settings['Enabled'] ? ['Checked' => true] : []
+                    );
+                    $intervalAmountInput = $form->textBox(
+                        "$id.IntervalAmount",
+                        ['Value' => $form->getValue("$id.IntervalAmount", $settings['IntervalAmount'])]
+                    );
+                    $intervalUnitDropdown = $form->dropDown(
+                        "$id.IntervalUnit",
+                        $intervalUnits,
+                        ['Default' => $form->getValue("$id.IntervalUnit", $settings['IntervalUnit'])]
+                    );
+                ?>
+                    <tr>
+                        <td class="Description"><?php echo $settings['Name']; ?></td>
+                        <td class="PrefCheckBox"><?php echo $stateCheckbox; ?></td>
+                        <td><?php echo $intervalAmountInput; ?></td>
+                        <td><?php echo $intervalUnitDropdown; ?></td>
+                    </tr>
+                <?php
+                }
+                ?>
+                </tbody>
+            </table>
+            <?php
+        }
 
         foreach ($this->data('PreferenceGroups') as $PreferenceGroup => $Preferences) {
             if ($PreferenceGroup == 'Notifications') {
@@ -95,7 +146,7 @@
                             $ColumnsMarkup .= wrap('&nbsp;', 'td', ['class' => 'PrefCheckBox']);
                         } else {
                             // Everything's fine, show checkbox.
-                            $checkbox = $this->Form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1']);
+                            $checkbox = $form->checkBox($NotificationType.'.'.$Event, '', ['value' => '1']);
                             $ColumnsMarkup .= wrap(
                                 $checkbox,
                                 'td',
@@ -135,7 +186,7 @@
         <?php
         }
         $this->fireEvent('CustomNotificationPreferences');
-        echo $this->Form->close('Save Preferences', '', ['class' => 'Button Primary']);
+        echo $form->close('Save Preferences', '', ['class' => 'Button Primary']);
         $this->fireEvent("AfterPreferencesRender");
         ?>
     </div>

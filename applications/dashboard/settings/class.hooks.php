@@ -895,6 +895,7 @@ class DashboardHooks extends Gdn_Plugin {
         $users = array_merge($moderators, $superAdmins);
         $users = Gdn_DataSet::index($users, 'UserID');
         $userIDs = array_keys($users);
+        rsort($userIDs);
 
 
         if ($userIDs) {
@@ -922,20 +923,35 @@ class DashboardHooks extends Gdn_Plugin {
                     continue;
                 }
 
-                // Check that the delay between notification is respected.
+
+                /*
+                 * Check that the delay between notification is respected.
+                 * This is primarily based on User.DateLastActive and then on UserMeta.LastNotification.
+                 */
                 $lastNotification = val("$prefixPref.LastNotification", $currentUserPreferences);
                 if ($lastNotification) {
-                    $lastNotificationDate = new DateTimeImmutable($lastNotification);
-
                     $amount = val("$prefixPref.IntervalAmount", $currentUserPreferences, '1');
                     $intervalSpec = $unitToIntervalSpec[val("$prefixPref.IntervalUnit", $currentUserPreferences, 'day')];
                     $dateInterval = new DateInterval(sprintf($intervalSpec, $amount));
 
-                    $nextNotification = $lastNotificationDate->add($dateInterval);
+                    $fromDates = [new DateTimeImmutable("@$lastNotification")];
 
-                    if ($nextNotification->getTimestamp() > $currentTime) {
-                        continue;
+                    $lastTimeActive = Gdn_Format::toTimestamp($users[$userID]['DateLastActive']);
+                    if ($lastTimeActive) {
+                        $userDateLastActive = new DateTimeImmutable("@$lastTimeActive");
+                        // Test against User.DateLastActive first.
+                        array_unshift($fromDates, $userDateLastActive);
                     }
+
+                    foreach ($fromDates as $date) {
+                        $nextNotificationDate = $date->add($dateInterval);
+                        // The next notification is set to be in the future so let's skip this one.
+                        if ($nextNotificationDate->getTimestamp() > $currentTime) {
+                            // Go to the next record of the $userIDs loop.
+                            continue 2;
+                        }
+                    }
+
                 }
 
                 // Update the last notification value.

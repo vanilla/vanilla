@@ -483,11 +483,10 @@ class Gdn_Form extends Gdn_Pluggable {
             );
         }
 
-        // Respect category permissions (remove categories that the user shouldn't see).
+        // Remove categories the user shouldn't see.
         $SafeCategoryData = [];
+        $discussionType = val('DiscussionType', $Options);
         foreach ($CategoryData as $CategoryID => $Category) {
-            $Name = $Category['Name'];
-
             if ($Value != $CategoryID) {
                 if ($Category['CategoryID'] <= 0 || !$Category['PermsDiscussionsView']) {
                     continue;
@@ -496,17 +495,25 @@ class Gdn_Form extends Gdn_Pluggable {
                 if ($Category['Archived']) {
                     continue;
                 }
+
+                // Filter out categories that don't allow our discussion type, if specified
+                if ($discussionType) {
+                    $permissionCategory = CategoryModel::permissionCategory($Category);
+                    $allowedDiscussionTypes = CategoryModel::allowedDiscussionTypes($permissionCategory, $Category);
+                    if (!array_key_exists($discussionType, $allowedDiscussionTypes)) {
+                        continue;
+                    }
+                }
             }
 
             $SafeCategoryData[$CategoryID] = $Category;
         }
+        unset($discussionType, $permissionCategory, $allowedDiscussionTypes);
 
         unset($Options['Filter'], $Options['PermFilter'], $Options['Context'], $Options['CategoryData']);
 
         if (!isset($Options['class'])) {
             $Options['class'] = $this->getStyle('dropdown');
-        } else {
-            $Options['class'] = $this->translateClasses($Attributes['class']);
         }
 
         // Opening select tag
@@ -572,7 +579,6 @@ class Gdn_Form extends Gdn_Pluggable {
                 $Name = htmlspecialchars(val('Name', $Category, 'Blank Category Name'));
                 if ($Depth > 1) {
                     $Name = str_repeat('&#160;', 4 * ($Depth - 1)).$Name;
-//               $Name = str_replace(' ', '&#160;', $Name);
                 }
 
                 $Return .= '>'.$Name."</option>\n";

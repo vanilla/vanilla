@@ -895,8 +895,6 @@ class DashboardHooks extends Gdn_Plugin {
         $users = array_merge($moderators, $superAdmins);
         $users = Gdn_DataSet::index($users, 'UserID');
         $userIDs = array_keys($users);
-        rsort($userIDs);
-
 
         if ($userIDs) {
             // Notify each users while respecting their delay between notifications.

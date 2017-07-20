@@ -24,6 +24,10 @@ if (!$CancelUrl) {
         if ($this->Context) {
             $options['Context'] = $this->Context;
         }
+        $discussionType = property_exists($this, 'Type') ? $this->Type : $this->data('Type');
+        if ($discussionType) {
+            $options['DiscussionType'] = $discussionType;
+        }
         echo '<div class="P">';
         echo '<div class="Category">';
         echo $this->Form->label('Category', 'CategoryID'), ' ';

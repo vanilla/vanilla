@@ -130,15 +130,6 @@ class VanillaHtmlFormatter {
     protected $extraAllowedClasses = [];
 
     /**
-     * VanillaHtmlFormatter constructor.
-     *
-     * @param EventManager $eventManager
-     */
-    public function __construct(EventManager $eventManager) {
-        $eventManager->fire(__CLASS__.'_init', $this);
-    }
-
-    /**
      * Filter provided HTML through htmlLawed and return the result.
      *
      * @param string $html String of HTML to filter.

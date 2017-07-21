@@ -23,10 +23,10 @@ abstract class VanillaModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param string $Name Database table name.
+     * @param string $name Database table name.
      */
-    public function __construct($Name = '') {
-        parent::__construct($Name);
+    public function __construct($name = '') {
+        parent::__construct($name);
     }
 
     /**

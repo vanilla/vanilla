@@ -22,9 +22,9 @@ class DraftsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of drafts to skip.
+     * @param int $offset Number of drafts to skip.
      */
-    public function index($Offset = '0') {
+    public function index($offset = '0') {
         Gdn_Theme::section('DiscussionList');
 
         // Setup head
@@ -34,27 +34,27 @@ class DraftsController extends VanillaController {
         $this->title(t('My Drafts'));
 
         // Validate $Offset
-        if (!is_numeric($Offset) || $Offset < 0) {
-            $Offset = 0;
+        if (!is_numeric($offset) || $offset < 0) {
+            $offset = 0;
         }
 
         // Set criteria & get drafts data
-        $Limit = Gdn::config('Vanilla.Discussions.PerPage', 30);
-        $Session = Gdn::session();
-        $Wheres = ['d.InsertUserID' => $Session->UserID];
-        $this->DraftData = $this->DraftModel->getByUser($Session->UserID, $Offset, $Limit);
-        $CountDrafts = $this->DraftModel->getCountByUser($Session->UserID);
+        $limit = Gdn::config('Vanilla.Discussions.PerPage', 30);
+        $session = Gdn::session();
+        $wheres = ['d.InsertUserID' => $session->UserID];
+        $this->DraftData = $this->DraftModel->getByUser($session->UserID, $offset, $limit);
+        $countDrafts = $this->DraftModel->getCountByUser($session->UserID);
 
         // Build a pager
-        $PagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $PagerFactory->GetPager('MorePager', $this);
+        $pagerFactory = new Gdn_PagerFactory();
+        $this->Pager = $pagerFactory->GetPager('MorePager', $this);
         $this->Pager->MoreCode = 'More drafts';
         $this->Pager->LessCode = 'Newer drafts';
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
-            $Offset,
-            $Limit,
-            $CountDrafts,
+            $offset,
+            $limit,
+            $countDrafts,
             'drafts/%1$s'
         );
 
@@ -83,22 +83,22 @@ class DraftsController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param int $DraftID Unique ID of draft to be deleted.
-     * @param string $TransientKey Single-use hash to prove intent.
+     * @param int $draftID Unique ID of draft to be deleted.
+     * @param string $transientKey Single-use hash to prove intent.
      */
-    public function delete($DraftID = '', $TransientKey = '') {
-        $Form = Gdn::factory('Form');
-        $Session = Gdn::session();
-        if (is_numeric($DraftID) && $DraftID > 0) {
-            $Draft = $this->DraftModel->getID($DraftID);
+    public function delete($draftID = '', $transientKey = '') {
+        $form = Gdn::factory('Form');
+        $session = Gdn::session();
+        if (is_numeric($draftID) && $draftID > 0) {
+            $draft = $this->DraftModel->getID($draftID);
         }
-        if ($Draft) {
-            if ($Session->validateTransientKey($TransientKey)
-                && ((val('InsertUserID', $Draft) == $Session->UserID) || checkPermission('Garden.Community.Manage'))
+        if ($draft) {
+            if ($session->validateTransientKey($transientKey)
+                && ((val('InsertUserID', $draft) == $session->UserID) || checkPermission('Garden.Community.Manage'))
             ) {
                 // Delete the draft
-                if (!$this->DraftModel->deleteID($DraftID)) {
-                    $Form->addError('Failed to delete draft');
+                if (!$this->DraftModel->deleteID($draftID)) {
+                    $form->addError('Failed to delete draft');
                 }
             } else {
                 throw permissionException('Garden.Community.Manage');
@@ -109,13 +109,13 @@ class DraftsController extends VanillaController {
 
         // Redirect
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = GetIncomingValue('Target', '/drafts');
-            redirectTo($Target);
+            $target = GetIncomingValue('Target', '/drafts');
+            redirectTo($target);
         }
 
         // Return any errors
-        if ($Form->errorCount() > 0) {
-            $this->setJson('ErrorMessage', $Form->errors());
+        if ($form->errorCount() > 0) {
+            $this->setJson('ErrorMessage', $form->errors());
         }
 
         // Render default view

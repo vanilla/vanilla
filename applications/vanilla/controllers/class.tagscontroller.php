@@ -21,56 +21,56 @@ class TagsController extends VanillaController {
      */
     public function search($q = '', $id = false, $parent = false, $type = 'default') {
         // Allow per-category tags
-        $CategorySearch = c('Vanilla.Tagging.CategorySearch', false);
-        if ($CategorySearch) {
-            $CategoryID = GetIncomingValue('CategoryID');
+        $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
+        if ($categorySearch) {
+            $categoryID = GetIncomingValue('CategoryID');
         }
 
         if ($parent && !is_numeric($parent)) {
             $parent = Gdn::sql()->getWhere('Tag', ['Name' => $parent])->value('TagID', -1);
         }
 
-        $Query = $q;
-        $Data = [];
-        $Database = Gdn::database();
-        if ($Query || $parent || $type !== 'default') {
-            $TagQuery = Gdn::sql()
+        $query = $q;
+        $data = [];
+        $database = Gdn::database();
+        if ($query || $parent || $type !== 'default') {
+            $tagQuery = Gdn::sql()
                 ->select('*')
                 ->from('Tag')
                 ->limit(20);
 
-            if ($Query) {
-                $TagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $Query), strlen($Query) > 2 ? 'both' : 'right');
+            if ($query) {
+                $tagQuery->like('FullName', str_replace(['%', '_'], ['\%', '_'], $query), strlen($query) > 2 ? 'both' : 'right');
             }
 
             if ($type === 'default') {
                 $defaultTypes = array_keys(TagModel::instance()->defaultTypes());
-                $TagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
+                $tagQuery->where('Type', $defaultTypes); // Other UIs can set a different type
             } elseif ($type) {
-                $TagQuery->where('Type', $type);
+                $tagQuery->where('Type', $type);
             }
 
             // Allow per-category tags
-            if ($CategorySearch) {
-                $TagQuery->where('CategoryID', $CategoryID);
+            if ($categorySearch) {
+                $tagQuery->where('CategoryID', $categoryID);
             }
 
             if ($parent) {
-                $TagQuery->where('ParentTagID', $parent);
+                $tagQuery->where('ParentTagID', $parent);
             }
 
             // Run tag search query
-            $TagData = $TagQuery->get();
+            $tagData = $tagQuery->get();
 
-            foreach ($TagData as $Tag) {
-                $Data[] = ['id' => $id ? $Tag->TagID : $Tag->Name, 'name' => $Tag->FullName];
+            foreach ($tagData as $tag) {
+                $data[] = ['id' => $id ? $tag->TagID : $tag->Name, 'name' => $tag->FullName];
             }
         }
         // Close the db before exiting.
-        $Database->closeConnection();
+        $database->closeConnection();
         // Return the data
         header("Content-type: application/json");
-        echo json_encode($Data);
+        echo json_encode($data);
         exit();
     }
 }

@@ -32,41 +32,41 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Values
+     * @param $values
      * @return array
      */
-    protected function _Backtick($Values) {
-        $NewValues = [];
-        foreach ($Values as $Key => $Value) {
-            $NewValues['`'.$Key.'`'] = $Value;
+    protected function _Backtick($values) {
+        $newValues = [];
+        foreach ($values as $key => $value) {
+            $newValues['`'.$key.'`'] = $value;
         }
-        return $NewValues;
+        return $newValues;
     }
 
     /**
      * Add an entry into the list of default permissions.
      *
-     * @param string $Type Type of role the permissions should be added for.
-     * @param array $Permissions The list of permissions to include.
-     * @param null|string $Junction Type of junction to base the permission on.
-     * @param null|int $JunctionId Identifier for the specific junction record to base the permission on.
+     * @param string $type Type of role the permissions should be added for.
+     * @param array $permissions The list of permissions to include.
+     * @param null|string $junction Type of junction to base the permission on.
+     * @param null|int $junctionId Identifier for the specific junction record to base the permission on.
      */
-    public function addDefault($Type, $Permissions, $Junction = null, $JunctionId = null) {
-        if (!array_key_exists($Type, $this->DefaultPermissions)) {
-            $this->DefaultPermissions[$Type] = ['global' => []];
+    public function addDefault($type, $permissions, $junction = null, $junctionId = null) {
+        if (!array_key_exists($type, $this->DefaultPermissions)) {
+            $this->DefaultPermissions[$type] = ['global' => []];
         }
 
-        if ($Junction && $JunctionId) {
-            $JunctionKey = "$Junction:$JunctionId";
-            if (!array_key_exists($JunctionKey, $this->DefaultPermissions[$Type])) {
-                $this->DefaultPermissions[$Type][$JunctionKey] = [];
+        if ($junction && $junctionId) {
+            $junctionKey = "$junction:$junctionId";
+            if (!array_key_exists($junctionKey, $this->DefaultPermissions[$type])) {
+                $this->DefaultPermissions[$type][$junctionKey] = [];
             }
-            $Defaults =& $this->DefaultPermissions[$Type][$JunctionKey];
+            $defaults =& $this->DefaultPermissions[$type][$junctionKey];
         } else {
-            $Defaults =& $this->DefaultPermissions[$Type]['global'];
+            $defaults =& $this->DefaultPermissions[$type]['global'];
         }
 
-        $Defaults = array_merge($Defaults, $Permissions);
+        $defaults = array_merge($defaults, $permissions);
     }
 
     /**
@@ -98,11 +98,11 @@ class PermissionModel extends Gdn_Model {
     /**
      * Populate a list of default permissions, per type.
      *
-     * @param bool $ResetDefaults If we already have defaults, should they be discarded?
+     * @param bool $resetDefaults If we already have defaults, should they be discarded?
      */
-    public function assignDefaults($ResetDefaults = false) {
+    public function assignDefaults($resetDefaults = false) {
         if (count($this->DefaultPermissions)) {
-            if ($ResetDefaults) {
+            if ($resetDefaults) {
                 $this->DefaultPermissions = [];
             } else {
                 return;
@@ -118,7 +118,7 @@ class PermissionModel extends Gdn_Model {
         );
         $this->addDefault(
             RoleModel::TYPE_UNCONFIRMED,
-            $Permissions = [
+            $permissions = [
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
@@ -127,7 +127,7 @@ class PermissionModel extends Gdn_Model {
         );
         $this->addDefault(
             RoleModel::TYPE_APPLICANT,
-            $Permissions = [
+            $permissions = [
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Activity.View' => 1,
                 'Garden.Profiles.View' => 1,
@@ -136,7 +136,7 @@ class PermissionModel extends Gdn_Model {
         );
         $this->addDefault(
             RoleModel::TYPE_MODERATOR,
-            $Permissions = [
+            $permissions = [
                 'Garden.SignIn.Allow' => 1,
                 'Garden.Activity.View' => 1,
                 'Garden.Curation.Manage' => 1,
@@ -189,69 +189,69 @@ class PermissionModel extends Gdn_Model {
      * Remove the cached permissions for all users.
      */
     public function clearPermissions() {
-        static $PermissionsCleared = false;
+        static $permissionsCleared = false;
 
-        if (!$PermissionsCleared) {
+        if (!$permissionsCleared) {
             Gdn::userModel()->clearPermissions();
-            $PermissionsCleared = true;
+            $permissionsCleared = true;
         }
     }
 
     /**
      * Define one or more permissions with default values.
      *
-     * @param array $PermissionNames
-     * @param string $Type
-     * @param string? $JunctionTable
-     * @param string? $JunctionColumn
+     * @param array $permissionNames
+     * @param string $type
+     * @param string? $junctionTable
+     * @param string? $junctionColumn
      * @throws Exception
      */
-    public function define($PermissionNames, $Type = 'tinyint', $JunctionTable = null, $JunctionColumn = null) {
-        if (!is_array($PermissionNames)) {
+    public function define($permissionNames, $type = 'tinyint', $junctionTable = null, $junctionColumn = null) {
+        if (!is_array($permissionNames)) {
             trigger_error(__CLASS__.'->'.__METHOD__.' was called with an invalid $PermissionNames parameter.', E_USER_ERROR);
             return;
         }
 
-        $Structure = $this->Database->structure();
-        $Structure->table('Permission');
-        $DefaultPermissions = [];
-        $NewColumns = [];
+        $structure = $this->Database->structure();
+        $structure->table('Permission');
+        $defaultPermissions = [];
+        $newColumns = [];
 
-        foreach ($PermissionNames as $Key => $Value) {
-            if (is_numeric($Key)) {
+        foreach ($permissionNames as $key => $value) {
+            if (is_numeric($key)) {
                 // Only got a permissions name with no default.
-                $PermissionName = $Value;
-                $DefaultPermissions[$PermissionName] = 2;
+                $permissionName = $value;
+                $defaultPermissions[$permissionName] = 2;
             } else {
-                $PermissionName = $Key;
+                $permissionName = $key;
 
-                if ($Value === 0) {
+                if ($value === 0) {
                     // "Off for all"
-                    $DefaultPermissions[$PermissionName] = 2;
-                } elseif ($Value === 1)
+                    $defaultPermissions[$permissionName] = 2;
+                } elseif ($value === 1)
                     // "On for all"
-                    $DefaultPermissions[$PermissionName] = 3;
-                elseif (!$Structure->columnExists($Value) && array_key_exists($Value, $PermissionNames))
+                    $defaultPermissions[$permissionName] = 3;
+                elseif (!$structure->columnExists($value) && array_key_exists($value, $permissionNames))
                     // Mapped to an explicitly-defined permission.
-                    $DefaultPermissions[$PermissionName] = $PermissionNames[$Value] ? 3 : 2;
+                    $defaultPermissions[$permissionName] = $permissionNames[$value] ? 3 : 2;
                 else {
                     // Mapped to another permission for which we don't have the value.
-                    $DefaultPermissions[$PermissionName] = "`{$Value}`";
+                    $defaultPermissions[$permissionName] = "`{$value}`";
                 }
             }
-            if (!$Structure->columnExists($PermissionName)) {
-                $Default = $DefaultPermissions[$PermissionName];
-                $NewColumns[$PermissionName] = is_numeric($Default) ? $Default - 2 : $Default;
+            if (!$structure->columnExists($permissionName)) {
+                $default = $defaultPermissions[$permissionName];
+                $newColumns[$permissionName] = is_numeric($default) ? $default - 2 : $default;
             }
 
             // Define the column.
-            $Structure->column($PermissionName, $Type, 0);
+            $structure->column($permissionName, $type, 0);
 
         }
-        $Structure->set(false, false);
+        $structure->set(false, false);
 
         // Detect an initial permission setup by seeing if our placeholder row exists yet.
-        $DefaultRow = $this->SQL
+        $defaultRow = $this->SQL
             ->select('*')
             ->from('Permission')
             ->where('RoleID', 0)
@@ -262,33 +262,33 @@ class PermissionModel extends Gdn_Model {
 
         // If this is our initial setup, map missing permissions to off.
         // Otherwise we'd be left with placeholders in our final query, which would cause a strict mode failure.
-        if (!$DefaultRow) {
-            $DefaultPermissions = array_map(
-                function ($Value) {
+        if (!$defaultRow) {
+            $defaultPermissions = array_map(
+                function ($value) {
                     // All non-numeric values are converted to "off" flag.
-                    return (is_numeric($Value)) ? $Value : 2;
+                    return (is_numeric($value)) ? $value : 2;
                 },
-                $DefaultPermissions
+                $defaultPermissions
             );
         }
 
         // Set the default permissions on the placeholder.
         $this->SQL
-            ->set($this->_backtick($DefaultPermissions), '', false)
-            ->replace('Permission', [], ['RoleID' => 0, 'JunctionTable' => $JunctionTable, 'JunctionColumn' => $JunctionColumn], true);
+            ->set($this->_backtick($defaultPermissions), '', false)
+            ->replace('Permission', [], ['RoleID' => 0, 'JunctionTable' => $junctionTable, 'JunctionColumn' => $junctionColumn], true);
 
         // Set the default permissions for new columns on all roles.
-        if (count($NewColumns) > 0) {
-            $Where = ['RoleID <>' => 0];
-            if (!$JunctionTable) {
-                $Where['JunctionTable'] = null;
+        if (count($newColumns) > 0) {
+            $where = ['RoleID <>' => 0];
+            if (!$junctionTable) {
+                $where['JunctionTable'] = null;
             } else {
-                $Where['JunctionTable'] = $JunctionTable;
+                $where['JunctionTable'] = $junctionTable;
             }
 
             $this->SQL
-                ->set($this->_backtick($NewColumns), '', false)
-                ->put('Permission', [], $Where);
+                ->set($this->_backtick($newColumns), '', false)
+                ->put('Permission', [], $where);
         }
 
         // Flush permissions cache & loaded schema.
@@ -303,26 +303,26 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param null $RoleID
-     * @param null $JunctionTable
-     * @param null $JunctionColumn
-     * @param null $JunctionID
+     * @param null $roleID
+     * @param null $junctionTable
+     * @param null $junctionColumn
+     * @param null $junctionID
      */
-    public function delete($RoleID = null, $JunctionTable = null, $JunctionColumn = null, $JunctionID = null) {
+    public function delete($roleID = null, $junctionTable = null, $junctionColumn = null, $junctionID = null) {
         // Build the where clause.
-        $Where = [];
-        if (!is_null($RoleID)) {
-            $Where['RoleID'] = $RoleID;
+        $where = [];
+        if (!is_null($roleID)) {
+            $where['RoleID'] = $roleID;
         }
-        if (!is_null($JunctionTable)) {
-            $Where['JunctionTable'] = $JunctionTable;
-            $Where['JunctionColumn'] = $JunctionColumn;
-            $Where['JunctionID'] = $JunctionID;
+        if (!is_null($junctionTable)) {
+            $where['JunctionTable'] = $junctionTable;
+            $where['JunctionColumn'] = $junctionColumn;
+            $where['JunctionID'] = $junctionID;
         }
 
-        $this->SQL->delete('Permission', $Where);
+        $this->SQL->delete('Permission', $where);
 
-        if (!is_null($RoleID)) {
+        if (!is_null($roleID)) {
             // Rebuild the permission cache.
         }
     }
@@ -348,7 +348,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function getRowDefaults() {
         if (empty($this->RowDefaults)) {
-            $DefaultRow = $this->SQL
+            $defaultRow = $this->SQL
                 ->select('*')
                 ->from('Permission')
                 ->where('RoleID', 0)
@@ -357,21 +357,21 @@ class PermissionModel extends Gdn_Model {
                 ->limit(1)
                 ->get()->firstRow(DATASET_TYPE_ARRAY);
 
-            if (!$DefaultRow) {
+            if (!$defaultRow) {
                 throw new Exception(t('No default permission row.'));
             }
 
-            $this->_MergeDisabledPermissions($DefaultRow);
+            $this->_MergeDisabledPermissions($defaultRow);
 
             unset(
-                $DefaultRow['PermissionID'],
-                $DefaultRow['RoleID'],
-                $DefaultRow['JunctionTable'],
-                $DefaultRow['JunctionColumn'],
-                $DefaultRow['JunctionID']
+                $defaultRow['PermissionID'],
+                $defaultRow['RoleID'],
+                $defaultRow['JunctionTable'],
+                $defaultRow['JunctionColumn'],
+                $defaultRow['JunctionID']
             );
 
-            $this->RowDefaults = $this->StripPermissions($DefaultRow, $DefaultRow);
+            $this->RowDefaults = $this->StripPermissions($defaultRow, $defaultRow);
         }
 
         return $this->RowDefaults;
@@ -383,39 +383,39 @@ class PermissionModel extends Gdn_Model {
      * If no junction table is specified, will return ONLY non-junction permissions.
      * If you need every permission regardless of junction & suffix, see CachePermissions.
      *
-     * @param int $UserID Unique identifier for user.
-     * @param string $LimitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
-     * @param string $JunctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
-     * @param string $JunctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $JunctionTable.
-     * @param string $ForeignKey Foreign table column to join on.
-     * @param int $ForeignID Foreign ID to limit join to.
+     * @param int $userID Unique identifier for user.
+     * @param string $limitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
+     * @param string $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+     * @param string $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
+     * @param string $foreignKey Foreign table column to join on.
+     * @param int $foreignID Foreign ID to limit join to.
      * @return array Permission records.
      */
-    public function getUserPermissions($UserID, $LimitToSuffix = '', $JunctionTable = false, $JunctionColumn = false, $ForeignKey = false, $ForeignID = false) {
+    public function getUserPermissions($userID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
         // Get all permissions
-        $PermissionColumns = $this->PermissionColumns($JunctionTable, $JunctionColumn);
+        $permissionColumns = $this->PermissionColumns($junctionTable, $junctionColumn);
 
         // Select any that match $LimitToSuffix
-        foreach ($PermissionColumns as $ColumnName => $Value) {
-            if (!empty($LimitToSuffix) && substr($ColumnName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+        foreach ($permissionColumns as $columnName => $value) {
+            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) != $limitToSuffix) {
                 continue; // permission not in $LimitToSuffix
-            }            $this->SQL->select('p.`'.$ColumnName.'`', 'MAX');
+            }            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
 
         // Generic part of query
         $this->SQL->from('Permission p')
             ->join('UserRole ur', 'p.RoleID = ur.RoleID')
-            ->where('ur.UserID', $UserID);
+            ->where('ur.UserID', $userID);
 
         // Either limit to 1 junction or exclude junctions
-        if ($JunctionTable && $JunctionColumn) {
+        if ($junctionTable && $junctionColumn) {
             $this->SQL
                 ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
                 ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-            if ($ForeignKey && $ForeignID) {
+            if ($foreignKey && $foreignID) {
                 $this->SQL
-                    ->join("$JunctionTable j", "j.$JunctionColumn = p.JunctionID")
-                    ->where("j.$ForeignKey", $ForeignID);
+                    ->join("$junctionTable j", "j.$junctionColumn = p.JunctionID")
+                    ->where("j.$foreignKey", $foreignID);
             }
         } else {
             $this->SQL->where('p.JunctionTable is null');
@@ -430,38 +430,38 @@ class PermissionModel extends Gdn_Model {
      * If no junction table is specified, will return ONLY non-junction permissions.
      * If you need every permission regardless of junction & suffix, see CachePermissions.
      *
-     * @param int $RoleID Unique identifier for role.
-     * @param string $LimitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
-     * @param string $JunctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
-     * @param string $JunctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $JunctionTable.
-     * @param string $ForeignKey Foreign table column to join on.
-     * @param int $ForeignID Foreign ID to limit join to.
+     * @param int $roleID Unique identifier for role.
+     * @param string $limitToSuffix String permission name must match, starting on right (ex: 'View' would match *.*.View)
+     * @param string $junctionTable Optionally limit returned permissions to 1 junction (ex: 'Category').
+     * @param string $junctionColumn Column to join junction table on (ex: 'CategoryID'). Required if using $junctionTable.
+     * @param string $foreignKey Foreign table column to join on.
+     * @param int $foreignID Foreign ID to limit join to.
      * @return array Permission records.
      */
-    public function getRolePermissions($RoleID, $LimitToSuffix = '', $JunctionTable = false, $JunctionColumn = false, $ForeignKey = false, $ForeignID = false) {
+    public function getRolePermissions($roleID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
         // Get all permissions
-        $PermissionColumns = $this->PermissionColumns($JunctionTable, $JunctionColumn);
+        $permissionColumns = $this->PermissionColumns($junctionTable, $junctionColumn);
 
         // Select any that match $LimitToSuffix
-        foreach ($PermissionColumns as $ColumnName => $Value) {
-            if (!empty($LimitToSuffix) && substr($ColumnName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+        foreach ($permissionColumns as $columnName => $value) {
+            if (!empty($limitToSuffix) && substr($columnName, -strlen($limitToSuffix)) != $limitToSuffix) {
                 continue; // permission not in $LimitToSuffix
-            }            $this->SQL->select('p.`'.$ColumnName.'`', 'MAX');
+            }            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
 
         // Generic part of query
         $this->SQL->from('Permission p')
-            ->where('p.RoleID', $RoleID);
+            ->where('p.RoleID', $roleID);
 
         // Either limit to 1 junction or exclude junctions
-        if ($JunctionTable && $JunctionColumn) {
+        if ($junctionTable && $junctionColumn) {
             $this->SQL
                 ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
                 ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
-            if ($ForeignKey && $ForeignID) {
+            if ($foreignKey && $foreignID) {
                 $this->SQL
-                    ->join("$JunctionTable j", "j.$JunctionColumn = p.JunctionID")
-                    ->where("j.$ForeignKey", $ForeignID);
+                    ->join("$junctionTable j", "j.$junctionColumn = p.JunctionID")
+                    ->where("j.$foreignKey", $foreignID);
             }
         } else {
             $this->SQL->where('p.JunctionTable is null');
@@ -477,159 +477,159 @@ class PermissionModel extends Gdn_Model {
      * @return array
      */
     public function getAllowedPermissionNamespaces() {
-        $ApplicationManager = Gdn::applicationManager();
-        $EnabledApplications = $ApplicationManager->EnabledApplications();
+        $applicationManager = Gdn::applicationManager();
+        $enabledApplications = $applicationManager->EnabledApplications();
 
-        $PluginNamespaces = [];
-        foreach (Gdn::pluginManager()->EnabledPlugins() as $Plugin) {
-            if (!array_key_exists('RegisterPermissions', $Plugin) || !is_array($Plugin['RegisterPermissions'])) {
+        $pluginNamespaces = [];
+        foreach (Gdn::pluginManager()->EnabledPlugins() as $plugin) {
+            if (!array_key_exists('RegisterPermissions', $plugin) || !is_array($plugin['RegisterPermissions'])) {
                 continue;
             }
-            foreach ($Plugin['RegisterPermissions'] as $Index => $PermissionName) {
-                if (is_string($Index)) {
-                    $PermissionName = $Index;
+            foreach ($plugin['RegisterPermissions'] as $index => $permissionName) {
+                if (is_string($index)) {
+                    $permissionName = $index;
                 }
 
-                $Namespace = substr($PermissionName, 0, strrpos($PermissionName, '.'));
-                $PluginNamespaces[$Namespace] = true;
+                $namespace = substr($permissionName, 0, strrpos($permissionName, '.'));
+                $pluginNamespaces[$namespace] = true;
             }
         }
 
-        $Result = array_merge(array_keys($EnabledApplications), array_keys($PluginNamespaces));
-        if (in_array('Dashboard', $Result)) {
-            $Result[] = 'Garden';
+        $result = array_merge(array_keys($enabledApplications), array_keys($pluginNamespaces));
+        if (in_array('Dashboard', $result)) {
+            $result[] = 'Garden';
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param null $UserID
-     * @param null $RoleID
+     * @param null $userID
+     * @param null $roleID
      * @return array|null
      */
-    public function cachePermissions($UserID = null, $RoleID = null) {
-        if (!$UserID) {
-            $RoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
+    public function cachePermissions($userID = null, $roleID = null) {
+        if (!$userID) {
+            $roleID = RoleModel::getDefaultRoles(RoleModel::TYPE_GUEST);
         }
 
         // Select all of the permission columns.
-        $PermissionColumns = $this->PermissionColumns();
-        foreach ($PermissionColumns as $ColumnName => $Value) {
-            $this->SQL->select('p.`'.$ColumnName.'`', 'MAX');
+        $permissionColumns = $this->PermissionColumns();
+        foreach ($permissionColumns as $columnName => $value) {
+            $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
 
         $this->SQL->from('Permission p');
 
-        if (!is_null($RoleID)) {
-            $this->SQL->where('p.RoleID', $RoleID);
-        } elseif (!is_null($UserID))
-            $this->SQL->join('UserRole ur', 'p.RoleID = ur.RoleID')->where('ur.UserID', $UserID);
+        if (!is_null($roleID)) {
+            $this->SQL->where('p.RoleID', $roleID);
+        } elseif (!is_null($userID))
+            $this->SQL->join('UserRole ur', 'p.RoleID = ur.RoleID')->where('ur.UserID', $userID);
 
         $this->SQL
             ->select(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID'])
             ->groupBy(['p.JunctionTable', 'p.JunctionColumn', 'p.JunctionID']);
 
-        $Result = $this->SQL->get()->resultArray();
-        return $Result;
+        $result = $this->SQL->get()->resultArray();
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Where
-     * @param null $JunctionTable
-     * @param string $LimitToSuffix
-     * @param array $Options
+     * @param $where
+     * @param null $junctionTable
+     * @param string $limitToSuffix
+     * @param array $options
      * @return array
      */
-    public function getJunctionPermissions($Where, $JunctionTable = null, $LimitToSuffix = '', $Options = []) {
-        $Namespaces = $this->GetAllowedPermissionNamespaces();
-        $RoleID = val('RoleID', $Where, null);
-        $JunctionID = val('JunctionID', $Where, null);
-        $limitToDefault = val('LimitToDefault', $Options);
-        $SQL = $this->SQL;
+    public function getJunctionPermissions($where, $junctionTable = null, $limitToSuffix = '', $options = []) {
+        $namespaces = $this->GetAllowedPermissionNamespaces();
+        $roleID = val('RoleID', $where, null);
+        $junctionID = val('JunctionID', $where, null);
+        $limitToDefault = val('LimitToDefault', $options);
+        $sQL = $this->SQL;
 
         // Load all of the default junction permissions.
-        $SQL->select('*')
+        $sQL->select('*')
             ->from('Permission p')
             ->where('p.RoleID', 0);
 
-        if (is_null($JunctionTable)) {
-            $SQL->where('p.JunctionTable is not null');
+        if (is_null($junctionTable)) {
+            $sQL->where('p.JunctionTable is not null');
         } else {
-            $SQL->where('p.JunctionTable', $JunctionTable);
+            $sQL->where('p.JunctionTable', $junctionTable);
         }
 
         // Get the disabled permissions.
-        $DisabledPermissions = c('Garden.Permissions.Disabled');
-        if (is_array($DisabledPermissions)) {
-            $DisabledWhere = [];
-            foreach ($DisabledPermissions as $TableName => $Disabled) {
-                if ($Disabled) {
-                    $DisabledWhere[] = $TableName;
+        $disabledPermissions = c('Garden.Permissions.Disabled');
+        if (is_array($disabledPermissions)) {
+            $disabledWhere = [];
+            foreach ($disabledPermissions as $tableName => $disabled) {
+                if ($disabled) {
+                    $disabledWhere[] = $tableName;
                 }
             }
-            if (count($DisabledWhere) > 0) {
-                $SQL->whereNotIn('JunctionTable', $DisabledWhere);
+            if (count($disabledWhere) > 0) {
+                $sQL->whereNotIn('JunctionTable', $disabledWhere);
             }
         }
 
-        $Data = $SQL->get()->resultArray();
-        $Result = [];
-        foreach ($Data as $Row) {
-            $JunctionTable = $Row['JunctionTable'];
-            $JunctionColumn = $Row['JunctionColumn'];
-            unset($Row['PermissionID'], $Row['RoleID'], $Row['JunctionTable'], $Row['JunctionColumn'], $Row['JunctionID']);
+        $data = $sQL->get()->resultArray();
+        $result = [];
+        foreach ($data as $row) {
+            $junctionTable = $row['JunctionTable'];
+            $junctionColumn = $row['JunctionColumn'];
+            unset($row['PermissionID'], $row['RoleID'], $row['JunctionTable'], $row['JunctionColumn'], $row['JunctionID']);
 
             // If the junction column is not the primary key then we must figure out and limit the permissions.
-            if ($limitToDefault === false && $JunctionColumn != $JunctionTable.'ID') {
-                $JuncIDs = $SQL
+            if ($limitToDefault === false && $junctionColumn != $junctionTable.'ID') {
+                $juncIDs = $sQL
                     ->Distinct(true)
-                    ->select("p.{$JunctionTable}ID")
-                    ->select("c.$JunctionColumn")
+                    ->select("p.{$junctionTable}ID")
+                    ->select("c.$junctionColumn")
                     ->select('p.Name')
-                    ->from("$JunctionTable c")
-                    ->join("$JunctionTable p", "c.$JunctionColumn = p.{$JunctionTable}ID", 'left')
+                    ->from("$junctionTable c")
+                    ->join("$junctionTable p", "c.$junctionColumn = p.{$junctionTable}ID", 'left')
                     ->get()->resultArray();
 
-                foreach ($JuncIDs as &$JuncRow) {
-                    if (!$JuncRow[$JunctionTable.'ID']) {
-                        $JuncRow[$JunctionTable.'ID'] = -1;
+                foreach ($juncIDs as &$juncRow) {
+                    if (!$juncRow[$junctionTable.'ID']) {
+                        $juncRow[$junctionTable.'ID'] = -1;
                     }
                 }
             }
 
-            if (!empty($RoleID) || !empty($JunctionID)) {
+            if (!empty($roleID) || !empty($junctionID)) {
                 // Figure out which columns to select.
-                foreach ($Row as $PermissionName => $Value) {
-                    if (!($Value & 2)) {
+                foreach ($row as $permissionName => $value) {
+                    if (!($value & 2)) {
                         continue; // permission not applicable to this junction table
                     }
-                    if (!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+                    if (!empty($limitToSuffix) && substr($permissionName, -strlen($limitToSuffix)) != $limitToSuffix) {
                         continue; // permission not in $LimitToSuffix
                     }
-                    if ($index = strpos($PermissionName, '.')) {
-                        if (!in_array(substr($PermissionName, 0, $index), $Namespaces) &&
-                            !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces)
+                    if ($index = strpos($permissionName, '.')) {
+                        if (!in_array(substr($permissionName, 0, $index), $namespaces) &&
+                            !in_array(substr($permissionName, 0, strrpos($permissionName, '.')), $namespaces)
                         ) {
                             continue; // permission not in allowed namespaces
                         }
                     }
 
                     // If we are viewing the permissions by junction table (ex. Category) then set the default value when a permission row doesn't exist.
-                    if (!$RoleID && $JunctionColumn != $JunctionTable.'ID' && val('AddDefaults', $Options)) {
-                        $DefaultValue = $Value & 1 ? 1 : 0;
+                    if (!$roleID && $junctionColumn != $junctionTable.'ID' && val('AddDefaults', $options)) {
+                        $defaultValue = $value & 1 ? 1 : 0;
                     } else {
-                        $DefaultValue = 0;
+                        $defaultValue = 0;
                     }
 
-                    $SQL->select("p.`$PermissionName`, $DefaultValue", 'coalesce', $PermissionName);
+                    $sQL->select("p.`$permissionName`, $defaultValue", 'coalesce', $permissionName);
                 }
 
-                if (!empty($RoleID)) {
-                    $roleIDs = (array)$RoleID;
+                if (!empty($roleID)) {
+                    $roleIDs = (array)$roleID;
                     if (count($roleIDs) === 1) {
                         $roleOn = 'p.RoleID = '.$this->SQL->Database->connection()->quote(reset($roleIDs));
                     } else {
@@ -638,101 +638,101 @@ class PermissionModel extends Gdn_Model {
                     }
 
                     // Get the permissions for the junction table.
-                    $SQL->select('junc.Name')
-                        ->select('junc.'.$JunctionColumn, '', 'JunctionID')
-                        ->from($JunctionTable.' junc')
-                        ->join('Permission p', "p.JunctionID = junc.$JunctionColumn and $roleOn", 'left')
+                    $sQL->select('junc.Name')
+                        ->select('junc.'.$junctionColumn, '', 'JunctionID')
+                        ->from($junctionTable.' junc')
+                        ->join('Permission p', "p.JunctionID = junc.$junctionColumn and $roleOn", 'left')
                         ->orderBy('junc.Sort')
                         ->orderBy('junc.Name');
 
                     if ($limitToDefault) {
-                        $SQL->where("junc.{$JunctionTable}ID", -1);
-                    } elseif (isset($JuncIDs)) {
-                        $SQL->whereIn("junc.{$JunctionTable}ID", array_column($JuncIDs, "{$JunctionTable}ID"));
+                        $sQL->where("junc.{$junctionTable}ID", -1);
+                    } elseif (isset($juncIDs)) {
+                        $sQL->whereIn("junc.{$junctionTable}ID", array_column($juncIDs, "{$junctionTable}ID"));
                     }
 
-                    $JuncData = $SQL->get()->resultArray();
-                } elseif (!empty($JunctionID)) {
+                    $juncData = $sQL->get()->resultArray();
+                } elseif (!empty($junctionID)) {
                     // Here we are getting permissions for all roles.
-                    $JuncData = $SQL->select('r.RoleID, r.Name, r.CanSession')
+                    $juncData = $sQL->select('r.RoleID, r.Name, r.CanSession')
                         ->from('Role r')
-                        ->join('Permission p', "p.RoleID = r.RoleID and p.JunctionTable = '$JunctionTable' and p.JunctionColumn = '$JunctionColumn' and p.JunctionID = $JunctionID", 'left')
+                        ->join('Permission p', "p.RoleID = r.RoleID and p.JunctionTable = '$junctionTable' and p.JunctionColumn = '$junctionColumn' and p.JunctionID = $junctionID", 'left')
                         ->orderBy('r.Sort, r.Name')
                         ->get()->resultArray();
                 }
             } else {
-                $JuncData = [];
+                $juncData = [];
             }
 
             // Add all of the necessary information back to the result.
-            foreach ($JuncData as $JuncRow) {
-                $JuncRow['JunctionTable'] = $JunctionTable;
-                $JuncRow['JunctionColumn'] = $JunctionColumn;
-                if (!is_null($JunctionID)) {
-                    $JuncRow['JunctionID'] = $JunctionID;
+            foreach ($juncData as $juncRow) {
+                $juncRow['JunctionTable'] = $junctionTable;
+                $juncRow['JunctionColumn'] = $junctionColumn;
+                if (!is_null($junctionID)) {
+                    $juncRow['JunctionID'] = $junctionID;
                 }
-                if ($JuncRow['JunctionID'] < 0) {
-                    $JuncRow['Name'] = sprintf(t('Default %s Permissions'), t('Permission.'.$JunctionTable, $JunctionTable));
+                if ($juncRow['JunctionID'] < 0) {
+                    $juncRow['Name'] = sprintf(t('Default %s Permissions'), t('Permission.'.$junctionTable, $junctionTable));
                 }
 
-                if (array_key_exists('CanSession', $JuncRow)) {
-                    if (!$JuncRow['CanSession']) {
+                if (array_key_exists('CanSession', $juncRow)) {
+                    if (!$juncRow['CanSession']) {
                         // Remove view permissions.
-                        foreach ($JuncRow as $PermissionName => $Value) {
-                            if (strpos($PermissionName, '.') !== false && strpos($PermissionName, '.View') === false) {
-                                unset($JuncRow[$PermissionName]);
+                        foreach ($juncRow as $permissionName => $value) {
+                            if (strpos($permissionName, '.') !== false && strpos($permissionName, '.View') === false) {
+                                unset($juncRow[$permissionName]);
                             }
                         }
                     }
 
-                    unset($JuncRow['CanSession']);
+                    unset($juncRow['CanSession']);
                 }
 
-                if (!$RoleID && !$JunctionID && array_key_exists(0, $Data)) {
+                if (!$roleID && !$junctionID && array_key_exists(0, $data)) {
                     // Set all of the default permissions for a new role.
-                    foreach ($JuncRow as $PermissionName => $Value) {
-                        if (val($PermissionName, $Data[0], 0) & 1) {
-                            $JuncRow[$PermissionName] = 1;
+                    foreach ($juncRow as $permissionName => $value) {
+                        if (val($permissionName, $data[0], 0) & 1) {
+                            $juncRow[$permissionName] = 1;
                         }
                     }
                 }
 
-                $Result[] = $JuncRow;
+                $result[] = $juncRow;
             }
         }
-        return $Result;
+        return $result;
     }
 
     /**
      * Returns all defined permissions not related to junction tables. Excludes
      * permissions related to applications & plugins that are disabled.
      *
-     * @param int|array $RoleID The role(s) to get the permissions for.
-     * @param string $LimitToSuffix An optional suffix to limit the permission names to.
+     * @param int|array $roleID The role(s) to get the permissions for.
+     * @param string $limitToSuffix An optional suffix to limit the permission names to.
      * @param bool $includeJunction
      * @return array
      */
-    public function getPermissions($RoleID, $LimitToSuffix = '', $includeJunction = true) {
-        $RoleID = (array)$RoleID;
-        $Result = [];
+    public function getPermissions($roleID, $limitToSuffix = '', $includeJunction = true) {
+        $roleID = (array)$roleID;
+        $result = [];
 
-        $GlobalPermissions = $this->GetGlobalPermissions($RoleID, $LimitToSuffix);
-        $Result[] = $GlobalPermissions;
+        $globalPermissions = $this->GetGlobalPermissions($roleID, $limitToSuffix);
+        $result[] = $globalPermissions;
 
         $junctionOptions = [];
         if ($includeJunction === false) {
             // If we're skipping junction permissions, just grab the defaults.
             $junctionOptions['LimitToDefault'] = true;
         }
-        $JunctionPermissions = $this->GetJunctionPermissions(
-            ['RoleID' => $RoleID],
+        $junctionPermissions = $this->GetJunctionPermissions(
+            ['RoleID' => $roleID],
             null,
-            $LimitToSuffix,
+            $limitToSuffix,
             $junctionOptions
         );
-        $Result = array_merge($Result, $JunctionPermissions);
+        $result = array_merge($result, $junctionPermissions);
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -772,116 +772,116 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $RoleID
-     * @param string $LimitToSuffix
+     * @param $roleID
+     * @param string $limitToSuffix
      * @param bool $includeJunction
      * @return array
      */
-    public function getPermissionsEdit($RoleID, $LimitToSuffix = '', $includeJunction = true) {
-        $Permissions = $this->GetPermissions($RoleID, $LimitToSuffix, $includeJunction);
-        return $this->UnpivotPermissions($Permissions);
+    public function getPermissionsEdit($roleID, $limitToSuffix = '', $includeJunction = true) {
+        $permissions = $this->GetPermissions($roleID, $limitToSuffix, $includeJunction);
+        return $this->UnpivotPermissions($permissions);
     }
 
     /**
      * Get all of the global permissions for one or more roles.
      *
-     * @param int|array $RoleID The role(s) to get the permissions for.
-     * @param string $LimitToSuffix Whether or not to limit the permissions to a suffix.
+     * @param int|array $roleID The role(s) to get the permissions for.
+     * @param string $limitToSuffix Whether or not to limit the permissions to a suffix.
      * @return Returns an
      */
-    public function getGlobalPermissions($RoleID, $LimitToSuffix = '') {
-        $RoleIDs = (array)$RoleID;
+    public function getGlobalPermissions($roleID, $limitToSuffix = '') {
+        $roleIDs = (array)$roleID;
 
         // Get the global permissions.
-        $Data = $this->SQL
+        $data = $this->SQL
             ->select('*')
             ->from('Permission p')
-            ->whereIn('p.RoleID', array_merge($RoleIDs, [0]))
+            ->whereIn('p.RoleID', array_merge($roleIDs, [0]))
             ->where('p.JunctionTable is null')
             ->orderBy('p.RoleID')
             ->get()->resultArray();
 
-        $this->_MergeDisabledPermissions($Data);
-        $Data = Gdn_DataSet::Index($Data, 'RoleID');
+        $this->_MergeDisabledPermissions($data);
+        $data = Gdn_DataSet::Index($data, 'RoleID');
 
-        $DefaultRow = $Data[0];
-        unset($Data[0], $DefaultRow['RoleID'], $DefaultRow['JunctionTable'], $DefaultRow['JunctionColumn'], $DefaultRow['JunctionID']);
-        $DefaultRow = $this->StripPermissions($DefaultRow, $DefaultRow, $LimitToSuffix);
-        if ($RoleID) {
+        $defaultRow = $data[0];
+        unset($data[0], $defaultRow['RoleID'], $defaultRow['JunctionTable'], $defaultRow['JunctionColumn'], $defaultRow['JunctionID']);
+        $defaultRow = $this->StripPermissions($defaultRow, $defaultRow, $limitToSuffix);
+        if ($roleID) {
             // When editing a role make sure the default permissions are false so as not to be misleading.
-            $DefaultRow = array_fill_keys(array_keys($DefaultRow), 0);
+            $defaultRow = array_fill_keys(array_keys($defaultRow), 0);
         }
 
-        foreach ($RoleIDs as $ID) {
-            if (isset($Data[$ID])) {
-                $Data[$ID] = array_intersect_key($Data[$ID], $DefaultRow);
+        foreach ($roleIDs as $iD) {
+            if (isset($data[$iD])) {
+                $data[$iD] = array_intersect_key($data[$iD], $defaultRow);
             } else {
-                $Data[$ID] = $DefaultRow;
-                $Data[$ID]['PermissionID'] = null;
+                $data[$iD] = $defaultRow;
+                $data[$iD]['PermissionID'] = null;
             }
         }
 
-        if (count($RoleIDs) === 1) {
-            return array_pop($Data);
+        if (count($roleIDs) === 1) {
+            return array_pop($data);
         } else {
-            return $Data;
+            return $data;
         }
     }
 
     /**
      * Take a permission row and strip the global/local permissions from it.
      *
-     * @param $Row
-     * @param $DefaultRow
-     * @param string $LimitToSuffix
+     * @param $row
+     * @param $defaultRow
+     * @param string $limitToSuffix
      * @return mixed
      */
-    public function stripPermissions($Row, $DefaultRow, $LimitToSuffix = '') {
-        static $Namespaces;
-        if (!isset($Namespaces)) {
-            $Namespaces = $this->GetAllowedPermissionNamespaces();
+    public function stripPermissions($row, $defaultRow, $limitToSuffix = '') {
+        static $namespaces;
+        if (!isset($namespaces)) {
+            $namespaces = $this->GetAllowedPermissionNamespaces();
         }
 
-        foreach ($DefaultRow as $PermissionName => $Value) {
-            if (in_array($PermissionName, ['PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'])) {
+        foreach ($defaultRow as $permissionName => $value) {
+            if (in_array($permissionName, ['PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'])) {
                 continue;
             }
 
-            if (!$this->IsGlobalPermission($Value, $PermissionName, $LimitToSuffix, $Namespaces)) {
-                unset($Row[$PermissionName]);
+            if (!$this->IsGlobalPermission($value, $permissionName, $limitToSuffix, $namespaces)) {
+                unset($row[$permissionName]);
                 continue;
             }
 
-            switch ($DefaultRow[$PermissionName]) {
+            switch ($defaultRow[$permissionName]) {
                 case 3:
-                    $Row[$PermissionName] = 1;
+                    $row[$permissionName] = 1;
                     break;
                 case 2:
-                    $Row[$PermissionName] = 0;
+                    $row[$permissionName] = 0;
                     break;
             }
         }
-        return $Row;
+        return $row;
     }
 
     /**
      * Returns whether or not a permission is a global permission.
      *
-     * @param $Value
-     * @param $PermissionName
-     * @param $LimitToSuffix
-     * @param $Namespaces
+     * @param $value
+     * @param $permissionName
+     * @param $limitToSuffix
+     * @param $namespaces
      * @return bool
      */
-    protected function isGlobalPermission($Value, $PermissionName, $LimitToSuffix, $Namespaces) {
-        if (!($Value & 2)) {
+    protected function isGlobalPermission($value, $permissionName, $limitToSuffix, $namespaces) {
+        if (!($value & 2)) {
             return false;
         }
-        if (!empty($LimitToSuffix) && substr($PermissionName, -strlen($LimitToSuffix)) != $LimitToSuffix) {
+        if (!empty($limitToSuffix) && substr($permissionName, -strlen($limitToSuffix)) != $limitToSuffix) {
             return false;
         }
-        if ($index = strpos($PermissionName, '.')) {
-            if (!in_array(substr($PermissionName, 0, $index), $Namespaces) && !in_array(substr($PermissionName, 0, strrpos($PermissionName, '.')), $Namespaces)) {
+        if ($index = strpos($permissionName, '.')) {
+            if (!in_array(substr($permissionName, 0, $index), $namespaces) && !in_array(substr($permissionName, 0, strrpos($permissionName, '.')), $namespaces)) {
                 return false;
             }
         }
@@ -890,46 +890,46 @@ class PermissionModel extends Gdn_Model {
 
     /** Merge junction permissions with global permissions if they are disabled.
      *
-     * @param array $GlobalPermissions
+     * @param array $globalPermissions
      * @return void
      */
-    protected function _MergeDisabledPermissions(&$GlobalPermissions) {
+    protected function _MergeDisabledPermissions(&$globalPermissions) {
         // Get the default permissions for junctions that are disabled.
-        $DisabledPermissions = c('Garden.Permissions.Disabled');
-        if (!$DisabledPermissions) {
+        $disabledPermissions = c('Garden.Permissions.Disabled');
+        if (!$disabledPermissions) {
             return;
         }
 
-        $DisabledIn = [];
-        foreach ($DisabledPermissions as $JunctionTable => $Disabled) {
-            if ($Disabled) {
-                $DisabledIn[] = $JunctionTable;
+        $disabledIn = [];
+        foreach ($disabledPermissions as $junctionTable => $disabled) {
+            if ($disabled) {
+                $disabledIn[] = $junctionTable;
             }
         }
 
-        if (!$DisabledIn) {
+        if (!$disabledIn) {
             return;
         }
 
-        $DisabledData = $this->SQL
+        $disabledData = $this->SQL
             ->select('*')
             ->from('Permission p')
             ->where('p.RoleID', 0)
-            ->whereIn('p.JunctionTable', $DisabledIn)
+            ->whereIn('p.JunctionTable', $disabledIn)
             ->get()->resultArray();
 
-        $DefaultRow =& $GlobalPermissions[0];
+        $defaultRow =& $globalPermissions[0];
 
         // Loop through each row and add it's default definition to the global permissions.
-        foreach ($DisabledData as $PermissionRow) {
-            foreach ($PermissionRow as $ColumnName => $Value) {
-                if (in_array($ColumnName, ['PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'])) {
+        foreach ($disabledData as $permissionRow) {
+            foreach ($permissionRow as $columnName => $value) {
+                if (in_array($columnName, ['PermissionID', 'RoleID', 'JunctionTable', 'JunctionColumn', 'JunctionID'])) {
                     continue;
                 }
 
-                if ($Value & 2) {
-                    $Setting = $Value | val($ColumnName, $DefaultRow, 0);
-                    setValue($ColumnName, $DefaultRow, $Setting);
+                if ($value & 2) {
+                    $setting = $value | val($columnName, $defaultRow, 0);
+                    setValue($columnName, $defaultRow, $setting);
                 }
             }
         }
@@ -938,48 +938,48 @@ class PermissionModel extends Gdn_Model {
     /**
      * Get all of the permission columns in the system.
      *
-     * @param bool $JunctionTable
-     * @param bool $JunctionColumn
+     * @param bool $junctionTable
+     * @param bool $junctionColumn
      * @return mixed
      * @throws Exception
      */
-    public function permissionColumns($JunctionTable = false, $JunctionColumn = false) {
-        $Key = "{$JunctionTable}__{$JunctionColumn}";
+    public function permissionColumns($junctionTable = false, $junctionColumn = false) {
+        $key = "{$junctionTable}__{$junctionColumn}";
 
-        if (!isset($this->_PermissionColumns[$Key])) {
-            $SQL = clone $this->SQL;
-            $SQL->reset();
+        if (!isset($this->_PermissionColumns[$key])) {
+            $sQL = clone $this->SQL;
+            $sQL->reset();
 
-            $SQL
+            $sQL
                 ->select('*')
                 ->from('Permission')
                 ->limit(1);
 
-            if ($JunctionTable !== false && $JunctionColumn !== false) {
-                $SQL
-                    ->where('JunctionTable', $JunctionTable)
-                    ->where('JunctionColumn', $JunctionColumn)
+            if ($junctionTable !== false && $junctionColumn !== false) {
+                $sQL
+                    ->where('JunctionTable', $junctionTable)
+                    ->where('JunctionColumn', $junctionColumn)
                     ->where('RoleID', 0);
             }
 
-            $Cols = $SQL->get()->firstRow(DATASET_TYPE_ARRAY);
+            $cols = $sQL->get()->firstRow(DATASET_TYPE_ARRAY);
 
-            unset($Cols['RoleID'], $Cols['JunctionTable'], $Cols['JunctionColumn'], $Cols['JunctionID']);
+            unset($cols['RoleID'], $cols['JunctionTable'], $cols['JunctionColumn'], $cols['JunctionID']);
 
-            $this->_PermissionColumns[$Key] = $Cols;
+            $this->_PermissionColumns[$key] = $cols;
         }
-        return $this->_PermissionColumns[$Key];
+        return $this->_PermissionColumns[$key];
     }
 
     /**
      *
      *
-     * @param $PermissionName
+     * @param $permissionName
      * @return string
      */
-    public static function permissionNamespace($PermissionName) {
-        if ($Index = strpos($PermissionName)) {
-            return substr($PermissionName, 0, $Index);
+    public static function permissionNamespace($permissionName) {
+        if ($index = strpos($permissionName)) {
+            return substr($permissionName, 0, $index);
         }
         return '';
     }
@@ -987,66 +987,66 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Data
-     * @param null $Overrides
+     * @param $data
+     * @param null $overrides
      * @return array
      */
-    public function pivotPermissions($Data, $Overrides = null) {
+    public function pivotPermissions($data, $overrides = null) {
         // Get all of the columns in the permissions table.
-        $Schema = $this->SQL->get('Permission', '', '', 1)->firstRow(DATASET_TYPE_ARRAY);
-        foreach ($Schema as $Key => $Value) {
-            if (strpos($Key, '.') !== false) {
-                $Schema[$Key] = 0;
+        $schema = $this->SQL->get('Permission', '', '', 1)->firstRow(DATASET_TYPE_ARRAY);
+        foreach ($schema as $key => $value) {
+            if (strpos($key, '.') !== false) {
+                $schema[$key] = 0;
             }
         }
-        unset($Schema['PermissionID']);
-        $Schema['RoleID'] = 0;
-        $Schema['JunctionTable'] = null;
-        $Schema['JunctionColumn'] = null;
-        $Schema['JunctionID'] = null;
+        unset($schema['PermissionID']);
+        $schema['RoleID'] = 0;
+        $schema['JunctionTable'] = null;
+        $schema['JunctionColumn'] = null;
+        $schema['JunctionID'] = null;
 
-        $Result = [];
-        if (is_array($Data)) {
-            foreach ($Data as $SetPermission) {
+        $result = [];
+        if (is_array($data)) {
+            foreach ($data as $setPermission) {
                 // Get the parts out of the permission.
-                $Parts = explode('//', $SetPermission);
-                if (count($Parts) > 1) {
+                $parts = explode('//', $setPermission);
+                if (count($parts) > 1) {
                     // This is a junction permission.
-                    $PermissionName = $Parts[1];
-                    $Key = $Parts[0];
-                    $Parts = explode('/', $Key);
-                    $JunctionTable = $Parts[0];
-                    $JunctionColumn = $Parts[1];
-                    $JunctionID = val('JunctionID', $Overrides, $Parts[2]);
-                    if (count($Parts) >= 4) {
-                        $RoleID = $Parts[3];
+                    $permissionName = $parts[1];
+                    $key = $parts[0];
+                    $parts = explode('/', $key);
+                    $junctionTable = $parts[0];
+                    $junctionColumn = $parts[1];
+                    $junctionID = val('JunctionID', $overrides, $parts[2]);
+                    if (count($parts) >= 4) {
+                        $roleID = $parts[3];
                     } else {
-                        $RoleID = val('RoleID', $Overrides, null);
+                        $roleID = val('RoleID', $overrides, null);
                     }
                 } else {
                     // This is a global permission.
-                    $PermissionName = $Parts[0];
-                    $Key = 'Global';
-                    $JunctionTable = null;
-                    $JunctionColumn = null;
-                    $JunctionID = null;
-                    $RoleID = val('RoleID', $Overrides, null);
+                    $permissionName = $parts[0];
+                    $key = 'Global';
+                    $junctionTable = null;
+                    $junctionColumn = null;
+                    $junctionID = null;
+                    $roleID = val('RoleID', $overrides, null);
                 }
 
                 // Check for a row in the result for these permissions.
-                if (!array_key_exists($Key, $Result)) {
-                    $NewRow = $Schema;
-                    $NewRow['RoleID'] = $RoleID;
-                    $NewRow['JunctionTable'] = $JunctionTable;
-                    $NewRow['JunctionColumn'] = $JunctionColumn;
-                    $NewRow['JunctionID'] = $JunctionID;
-                    $Result[$Key] = $NewRow;
+                if (!array_key_exists($key, $result)) {
+                    $newRow = $schema;
+                    $newRow['RoleID'] = $roleID;
+                    $newRow['JunctionTable'] = $junctionTable;
+                    $newRow['JunctionColumn'] = $junctionColumn;
+                    $newRow['JunctionID'] = $junctionID;
+                    $result[$key] = $newRow;
                 }
-                $Result[$Key][$PermissionName] = 1;
+                $result[$key][$permissionName] = 1;
             }
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -1118,66 +1118,66 @@ class PermissionModel extends Gdn_Model {
     /**
      * Save a permission row.
      *
-     * @param array $Values The values you want to save. See the Permission table for possible columns.
-     * @param bool $SaveGlobal Also save a junction permission to the global permissions.
+     * @param array $values The values you want to save. See the Permission table for possible columns.
+     * @param bool $saveGlobal Also save a junction permission to the global permissions.
      */
-    public function save($Values, $SaveGlobal = false) {
+    public function save($values, $saveGlobal = false) {
         // Get the list of columns that are available for permissions.
-        $PermissionColumns = Gdn::permissionModel()->defineSchema()->Fields();
-        if (isset($Values['Role'])) {
-            $PermissionColumns['Role'] = true;
+        $permissionColumns = Gdn::permissionModel()->defineSchema()->Fields();
+        if (isset($values['Role'])) {
+            $permissionColumns['Role'] = true;
         }
-        $Values = array_intersect_key($Values, $PermissionColumns);
+        $values = array_intersect_key($values, $permissionColumns);
 
         // Figure out how to find the existing permission.
-        if (array_key_exists('PermissionID', $Values)) {
-            $Where = ['PermissionID' => $Values['PermissionID']];
-            unset($Values['PermissionID']);
+        if (array_key_exists('PermissionID', $values)) {
+            $where = ['PermissionID' => $values['PermissionID']];
+            unset($values['PermissionID']);
 
-            $this->SQL->update('Permission', $this->_Backtick($Values), $Where)->put();
+            $this->SQL->update('Permission', $this->_Backtick($values), $where)->put();
         } else {
-            $Where = [];
+            $where = [];
 
-            if (array_key_exists('RoleID', $Values)) {
-                $Where['RoleID'] = $Values['RoleID'];
-                unset($Values['RoleID']);
-            } elseif (array_key_exists('Role', $Values)) {
+            if (array_key_exists('RoleID', $values)) {
+                $where['RoleID'] = $values['RoleID'];
+                unset($values['RoleID']);
+            } elseif (array_key_exists('Role', $values)) {
                 // Get the RoleID.
-                $RoleID = $this->SQL->getWhere('Role', ['Name' => $Values['Role']])->value('RoleID');
-                if (!$RoleID) {
+                $roleID = $this->SQL->getWhere('Role', ['Name' => $values['Role']])->value('RoleID');
+                if (!$roleID) {
                     return;
                 }
-                $Where['RoleID'] = $RoleID;
-                unset($Values['Role']);
+                $where['RoleID'] = $roleID;
+                unset($values['Role']);
             } else {
-                $Where['RoleID'] = 0; // default role.
+                $where['RoleID'] = 0; // default role.
             }
 
-            if (array_key_exists('JunctionTable', $Values)) {
-                $Where['JunctionTable'] = $Values['JunctionTable'];
+            if (array_key_exists('JunctionTable', $values)) {
+                $where['JunctionTable'] = $values['JunctionTable'];
 
                 // If the junction table was given then so must the other values.
-                if (array_key_exists('JunctionColumn', $Values)) {
-                    $Where['JunctionColumn'] = $Values['JunctionColumn'];
+                if (array_key_exists('JunctionColumn', $values)) {
+                    $where['JunctionColumn'] = $values['JunctionColumn'];
                 }
-                $Where['JunctionID'] = $Values['JunctionID'];
+                $where['JunctionID'] = $values['JunctionID'];
             } else {
-                $Where['JunctionTable'] = null; // no junction table.
-                $Where['JunctionColumn'] = null;
-                $Where['JunctionID'] = null;
+                $where['JunctionTable'] = null; // no junction table.
+                $where['JunctionColumn'] = null;
+                $where['JunctionID'] = null;
             }
 
-            unset($Values['JunctionTable'], $Values['JunctionColumn'], $Values['JunctionID']);
+            unset($values['JunctionTable'], $values['JunctionColumn'], $values['JunctionID']);
 
-            $this->SQL->replace('Permission', $this->_Backtick($Values), $Where, true);
+            $this->SQL->replace('Permission', $this->_Backtick($values), $where, true);
 
-            if ($SaveGlobal && !is_null($Where['JunctionTable'])) {
+            if ($saveGlobal && !is_null($where['JunctionTable'])) {
                 // Save these permissions with the global permissions.
-                $Where['JunctionTable'] = null; // no junction table.
-                $Where['JunctionColumn'] = null;
-                $Where['JunctionID'] = null;
+                $where['JunctionTable'] = null; // no junction table.
+                $where['JunctionColumn'] = null;
+                $where['JunctionID'] = null;
 
-                $this->SQL->replace('Permission', $this->_Backtick($Values), $Where, true);
+                $this->SQL->replace('Permission', $this->_Backtick($values), $where, true);
             }
         }
 
@@ -1187,40 +1187,40 @@ class PermissionModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Permissions
-     * @param null $AllWhere
+     * @param $permissions
+     * @param null $allWhere
      */
-    public function saveAll($Permissions, $AllWhere = null) {
+    public function saveAll($permissions, $allWhere = null) {
         // Load the permission data corresponding to the where so unset permissions get ovewritten.
-        if (is_array($AllWhere)) {
-            $AllPermissions = $this->SQL->getWhere('Permission', $AllWhere)->resultArray();
+        if (is_array($allWhere)) {
+            $allPermissions = $this->SQL->getWhere('Permission', $allWhere)->resultArray();
             // Find the permissions that were loaded, but not saved.
-            foreach ($AllPermissions as $i => $AllRow) {
-                foreach ($Permissions as $SaveRow) {
-                    if ($AllRow['RoleID'] == $SaveRow['RoleID']
-                        && $AllRow['JunctionTable'] == $SaveRow['JunctionTable']
-                        && $AllRow['JunctionID'] == $SaveRow['JunctionID']
+            foreach ($allPermissions as $i => $allRow) {
+                foreach ($permissions as $saveRow) {
+                    if ($allRow['RoleID'] == $saveRow['RoleID']
+                        && $allRow['JunctionTable'] == $saveRow['JunctionTable']
+                        && $allRow['JunctionID'] == $saveRow['JunctionID']
                     ) {
-                        unset($AllPermissions[$i]); // saving handled already.
+                        unset($allPermissions[$i]); // saving handled already.
                         break;
                     }
                 }
             }
             // Make all permission false that need to be saved here.
-            foreach ($AllPermissions as &$AllRow) {
-                foreach ($AllRow as $Name => $Value) {
-                    if (strpos($Name, '.') !== false) {
-                        $AllRow[$Name] = 0;
+            foreach ($allPermissions as &$allRow) {
+                foreach ($allRow as $name => $value) {
+                    if (strpos($name, '.') !== false) {
+                        $allRow[$name] = 0;
                     }
                 }
             }
-            if (count($AllPermissions) > 0) {
-                $Permissions = array_merge($Permissions, $AllPermissions);
+            if (count($allPermissions) > 0) {
+                $permissions = array_merge($permissions, $allPermissions);
             }
         }
 
-        foreach ($Permissions as $Row) {
-            $this->save($Row);
+        foreach ($permissions as $row) {
+            $this->save($row);
         }
 
         // TODO: Clear the permissions for rows that aren't here.
@@ -1229,63 +1229,63 @@ class PermissionModel extends Gdn_Model {
     /**
      * Reset permissions for all roles, based on the value in their Type column.
      *
-     * @param string $Type Role type to limit the updates to.
+     * @param string $type Role type to limit the updates to.
      */
-    public static function resetAllRoles($Type = null) {
+    public static function resetAllRoles($type = null) {
         // Retrieve an array containing all available roles.
-        $RoleModel = new RoleModel();
-        if ($Type) {
-            $Result = $RoleModel->getByType($Type)->resultArray();
-            $Roles = array_column($Result, 'Name', 'RoleID');
+        $roleModel = new RoleModel();
+        if ($type) {
+            $result = $roleModel->getByType($type)->resultArray();
+            $roles = array_column($result, 'Name', 'RoleID');
         } else {
-            $Roles = $RoleModel->getArray();
+            $roles = $roleModel->getArray();
         }
 
         // Iterate through our roles and reset their permissions.
-        $Permissions = Gdn::permissionModel();
-        foreach ($Roles as $RoleID => $Role) {
-            $Permissions->resetRole($RoleID);
+        $permissions = Gdn::permissionModel();
+        foreach ($roles as $roleID => $role) {
+            $permissions->resetRole($roleID);
         }
     }
 
     /**
      * Reset permissions for a role, based on the value in its Type column.
      *
-     * @param int $RoleId ID of the role to reset permissions for.
+     * @param int $roleId ID of the role to reset permissions for.
      * @throws Exception
      */
-    public function resetRole($RoleId) {
+    public function resetRole($roleId) {
         // Grab the value of Type for this role.
-        $RoleType = $this->SQL->getWhere('Role', ['RoleID' => $RoleId])->value('Type');
+        $roleType = $this->SQL->getWhere('Role', ['RoleID' => $roleId])->value('Type');
 
-        if ($RoleType == '') {
-            $RoleType = RoleModel::TYPE_MEMBER;
+        if ($roleType == '') {
+            $roleType = RoleModel::TYPE_MEMBER;
         }
 
-        $Defaults = $this->getDefaults();
-        $RowDefaults = $this->getRowDefaults();
+        $defaults = $this->getDefaults();
+        $rowDefaults = $this->getRowDefaults();
 
-        $ResetValues = array_fill_keys(array_keys($RowDefaults), 0);
+        $resetValues = array_fill_keys(array_keys($rowDefaults), 0);
 
-        if (array_key_exists($RoleType, $Defaults)) {
-            foreach ($Defaults[$RoleType] as $Specificity => $Permissions) {
-                $Permissions['RoleID'] = $RoleId;
-                $Permissions = array_merge($ResetValues, $Permissions);
+        if (array_key_exists($roleType, $defaults)) {
+            foreach ($defaults[$roleType] as $specificity => $permissions) {
+                $permissions['RoleID'] = $roleId;
+                $permissions = array_merge($resetValues, $permissions);
 
-                if (strpos($Specificity, ':')) {
-                    list($Junction, $JunctionId) = explode(':', $Specificity);
-                    if ($Junction && $JunctionId) {
-                        switch ($Junction) {
+                if (strpos($specificity, ':')) {
+                    list($junction, $junctionId) = explode(':', $specificity);
+                    if ($junction && $junctionId) {
+                        switch ($junction) {
                             case 'Category':
                             default:
-                                $Permissions['JunctionTable'] = $Junction;
-                                $Permissions['JunctionColumn'] = 'PermissionCategoryID';
-                                $Permissions['JunctionID'] = $JunctionId;
+                                $permissions['JunctionTable'] = $junction;
+                                $permissions['JunctionColumn'] = 'PermissionCategoryID';
+                                $permissions['JunctionID'] = $junctionId;
                         }
                     }
                 }
 
-                $this->save($Permissions);
+                $this->save($permissions);
             }
         }
     }
@@ -1293,146 +1293,146 @@ class PermissionModel extends Gdn_Model {
     /**
      * Split a permission name into its constituant parts.
      *
-     * @param string $PermissionName The name of the permission.
+     * @param string $permissionName The name of the permission.
      * @return array The split permission in the form array(Namespace, Permission,Suffix).
      */
-    public static function splitPermission($PermissionName) {
-        $i = strpos($PermissionName, '.');
-        $j = strrpos($PermissionName, '.');
+    public static function splitPermission($permissionName) {
+        $i = strpos($permissionName, '.');
+        $j = strrpos($permissionName, '.');
 
         if ($i !== false) { // $j must also not be false
-            return [substr($PermissionName, 0, $i), substr($PermissionName, $i + 1, $j - $i - 1), substr($PermissionName, $j + 1)];
+            return [substr($permissionName, 0, $i), substr($permissionName, $i + 1, $j - $i - 1), substr($permissionName, $j + 1)];
         } else {
-            return [$PermissionName, '', ''];
+            return [$permissionName, '', ''];
         }
     }
 
     /**
      * Joins the query to a permission junction table and limits the results accordingly.
      *
-     * @param Gdn_SQLDriver $SQL The SQL driver to add the permission to.
-     * @param mixed $Permissions The permission name (or array of names) to use when limiting the query.
-     * @param string $ForeignAlias The alias of the table to join to (ie. Category).
-     * @param string $ForeignColumn The primary key column name of $JunctionTable (ie. CategoryID).
-     * @param string $JunctionTable
-     * @param string $JunctionColumn
+     * @param Gdn_SQLDriver $sQL The SQL driver to add the permission to.
+     * @param mixed $permissions The permission name (or array of names) to use when limiting the query.
+     * @param string $foreignAlias The alias of the table to join to (ie. Category).
+     * @param string $foreignColumn The primary key column name of $junctionTable (ie. CategoryID).
+     * @param string $junctionTable
+     * @param string $junctionColumn
      */
-    public function sQLPermission($SQL, $Permissions, $ForeignAlias, $ForeignColumn, $JunctionTable = '', $JunctionColumn = '') {
-        $Session = Gdn::session();
+    public function sQLPermission($sQL, $permissions, $foreignAlias, $foreignColumn, $junctionTable = '', $junctionColumn = '') {
+        $session = Gdn::session();
 
         // Figure out the junction table if necessary.
-        if (!$JunctionTable && StringEndsWith($ForeignColumn, 'ID')) {
-            $JunctionTable = substr($ForeignColumn, 0, -2);
+        if (!$junctionTable && StringEndsWith($foreignColumn, 'ID')) {
+            $junctionTable = substr($foreignColumn, 0, -2);
         }
 
         // Check to see if the permission is disabled.
-        if (c('Garden.Permission.Disabled.'.$JunctionTable)) {
-            if (!$Session->checkPermission($Permissions)) {
-                $SQL->where('1', '0', false, false);
+        if (c('Garden.Permission.Disabled.'.$junctionTable)) {
+            if (!$session->checkPermission($permissions)) {
+                $sQL->where('1', '0', false, false);
             }
-        } elseif ($Session->UserID <= 0 || (is_object($Session->User) && $Session->User->Admin != '1')) {
-            $SQL->Distinct()
-                ->join('Permission _p', '_p.JunctionID = '.$ForeignAlias.'.'.$ForeignColumn, 'inner')
+        } elseif ($session->UserID <= 0 || (is_object($session->User) && $session->User->Admin != '1')) {
+            $sQL->Distinct()
+                ->join('Permission _p', '_p.JunctionID = '.$foreignAlias.'.'.$foreignColumn, 'inner')
                 ->join('UserRole _ur', '_p.RoleID = _ur.RoleID', 'inner')
                 ->beginWhereGroup()
-                ->where('_ur.UserID', $Session->UserID);
+                ->where('_ur.UserID', $session->UserID);
 
-            if (!is_array($Permissions)) {
-                $Permissions = [$Permissions];
+            if (!is_array($permissions)) {
+                $permissions = [$permissions];
             }
 
-            $SQL->beginWhereGroup();
-            foreach ($Permissions as $Permission) {
-                $SQL->where('_p.`'.$Permission.'`', 1);
+            $sQL->beginWhereGroup();
+            foreach ($permissions as $permission) {
+                $sQL->where('_p.`'.$permission.'`', 1);
             }
-            $SQL->endWhereGroup();
+            $sQL->endWhereGroup();
         } else {
             // Force this method to play nice in case it is used in an or clause
             // (ie. it returns true in a sql sense by doing 1 = 1)
-            $SQL->where('1', '1', false, false);
+            $sQL->where('1', '1', false, false);
         }
 
-        return $SQL;
+        return $sQL;
     }
 
     /**
      *
      *
-     * @param $Permissions
-     * @param bool $IncludeRole
+     * @param $permissions
+     * @param bool $includeRole
      * @return array
      */
-    public function unpivotPermissions($Permissions, $IncludeRole = false) {
-        $Result = [];
-        foreach ($Permissions as $Row) {
-            $this->_UnpivotPermissionsRow($Row, $Result, $IncludeRole);
+    public function unpivotPermissions($permissions, $includeRole = false) {
+        $result = [];
+        foreach ($permissions as $row) {
+            $this->_UnpivotPermissionsRow($row, $result, $includeRole);
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Names
+     * @param $names
      */
-    public function undefine($Names) {
-        $Names = (array)$Names;
-        $St = $this->Database->Structure();
-        $St->table('Permission');
+    public function undefine($names) {
+        $names = (array)$names;
+        $st = $this->Database->Structure();
+        $st->table('Permission');
 
-        foreach ($Names as $Name) {
-            if ($St->columnExists($Name)) {
-                $St->DropColumn($Name);
+        foreach ($names as $name) {
+            if ($st->columnExists($name)) {
+                $st->DropColumn($name);
             }
         }
-        $St->reset();
+        $st->reset();
     }
 
     /**
      *
      *
-     * @param $Row
-     * @param $Result
-     * @param bool $IncludeRole
+     * @param $row
+     * @param $result
+     * @param bool $includeRole
      */
-    protected function _UnpivotPermissionsRow($Row, &$Result, $IncludeRole = false) {
-        $GlobalName = val('Name', $Row);
+    protected function _UnpivotPermissionsRow($row, &$result, $includeRole = false) {
+        $globalName = val('Name', $row);
 
         // Loop through each permission in the row and place them in the correct place in the grid.
-        foreach ($Row as $PermissionName => $Value) {
-            list($Namespace, $Name, $Suffix) = self::SplitPermission($PermissionName);
-            if (empty($Name)) {
+        foreach ($row as $permissionName => $value) {
+            list($namespace, $name, $suffix) = self::SplitPermission($permissionName);
+            if (empty($name)) {
                 continue; // was some other column
             }
-            if ($GlobalName) {
-                $Namespace = $GlobalName;
+            if ($globalName) {
+                $namespace = $globalName;
             }
 
-            if (array_key_exists('JunctionTable', $Row) && ($JunctionTable = $Row['JunctionTable'])) {
-                $Key = "$JunctionTable/{$Row['JunctionColumn']}/{$Row['JunctionID']}".($IncludeRole ? '/'.$Row['RoleID'] : '');
+            if (array_key_exists('JunctionTable', $row) && ($junctionTable = $row['JunctionTable'])) {
+                $key = "$junctionTable/{$row['JunctionColumn']}/{$row['JunctionID']}".($includeRole ? '/'.$row['RoleID'] : '');
             } else {
-                $Key = '_'.$Namespace;
+                $key = '_'.$namespace;
             }
 
 
             // Check to see if the namespace is in the result.
-            if (!array_key_exists($Key, $Result)) {
-                $Result[$Key] = ['_Columns' => [], '_Rows' => [], '_Info' => ['Name' => $Namespace]];
+            if (!array_key_exists($key, $result)) {
+                $result[$key] = ['_Columns' => [], '_Rows' => [], '_Info' => ['Name' => $namespace]];
             }
-            $NamespaceArray = &$Result[$Key];
+            $namespaceArray = &$result[$key];
 
             // Add the names to the columns and rows.
-            $NamespaceArray['_Columns'][$Suffix] = true;
-            $NamespaceArray['_Rows'][$Name] = true;
+            $namespaceArray['_Columns'][$suffix] = true;
+            $namespaceArray['_Rows'][$name] = true;
 
             // Augment the value depending on the junction ID.
-            if (substr($Key, 0, 1) === '_') {
-                $PostValue = $PermissionName;
+            if (substr($key, 0, 1) === '_') {
+                $postValue = $permissionName;
             } else {
-                $PostValue = $Key.'//'.$PermissionName;
+                $postValue = $key.'//'.$permissionName;
             }
 
-            $NamespaceArray[$Name.'.'.$Suffix] = ['Value' => $Value, 'PostValue' => $PostValue];
+            $namespaceArray[$name.'.'.$suffix] = ['Value' => $value, 'PostValue' => $postValue];
         }
     }
 }

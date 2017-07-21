@@ -26,16 +26,16 @@ class TraceModule extends Gdn_Module {
 
     public function toString() {
         try {
-            $Traces = trace();
-            if (!$Traces) {
+            $traces = trace();
+            if (!$traces) {
                 return '';
             }
 
-            $this->setData('Traces', $Traces);
+            $this->setData('Traces', $traces);
 
             return $this->fetchView();
-        } catch (Exception $Ex) {
-            return $Ex->getMessage();
+        } catch (Exception $ex) {
+            return $ex->getMessage();
         }
     }
 }

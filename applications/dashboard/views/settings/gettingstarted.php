@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
 
-function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $noGrid = false) {
-    $Tutorial = GetTutorials($TutorialCode);
-    if (!$Tutorial)
+function tutLink($tutorialCode, $writeTitle = TRUE, $thumbnailSize = 'medium', $noGrid = false) {
+    $tutorial = GetTutorials($tutorialCode);
+    if (!$tutorial)
         return '';
 
-    $Thumbnail = $ThumbnailSize == 'medium' ? $Tutorial['Thumbnail'] : $Tutorial['LargeThumbnail'];
+    $thumbnail = $thumbnailSize == 'medium' ? $tutorial['Thumbnail'] : $tutorial['LargeThumbnail'];
     $noGrid = ($noGrid) ? 'no-grid' : '';
 
     ob_start();
     echo '<div class="video label-selector-item '.$noGrid.'">';
     echo '<div class="image-wrap">';
-    echo '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
-    <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
+    echo '<img src="'.$thumbnail.'" alt="'.$tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
+    <a class="overlay" href="<?php echo url('/settings/tutorials/'.$tutorial['Code']); ?>">
         <div class="buttons">
             <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
         </div>
@@ -21,7 +21,7 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $
     </a>
     <?php
     echo '</div>';
-    echo ($WriteTitle) ? wrap($Tutorial['Name'], 'div', ['class' => 'video-title title']) : '';
+    echo ($writeTitle) ? wrap($tutorial['Name'], 'div', ['class' => 'video-title title']) : '';
     echo '</div>';
 
     $tutLink = ob_get_contents();

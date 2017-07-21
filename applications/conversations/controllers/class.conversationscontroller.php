@@ -17,7 +17,7 @@ class ConversationsController extends Gdn_Controller {
      *
      * @return array
      */
-    public function getSettingsPages(&$Menu) {
+    public function getSettingsPages(&$menu) {
         // There are no configuration pages for Conversations
     }
 

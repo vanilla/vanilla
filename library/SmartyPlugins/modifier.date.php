@@ -11,6 +11,6 @@
  *
  * @see Gdn_Format::Date()
  */
-function smarty_modifier_date($Date, $Format = '') {
-	return Gdn_Format::date($Date, $Format);
+function smarty_modifier_date($date, $format = '') {
+	return Gdn_Format::date($date, $format);
 }

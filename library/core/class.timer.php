@@ -30,85 +30,85 @@ class Gdn_Timer {
      */
     public function elapsedTime() {
         if (is_null($this->FinishTime)) {
-            $Result = microtime(true) - $this->StartTime;
+            $result = microtime(true) - $this->StartTime;
         } else {
-            $Result = $this->FinishTime - $this->StartTime;
+            $result = $this->FinishTime - $this->StartTime;
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param string $Message
+     * @param string $message
      */
-    public function finish($Message = '') {
+    public function finish($message = '') {
         $this->FinishTime = microtime(true);
-        if ($Message) {
-            $this->write($Message, $this->FinishTime, $this->StartTime);
+        if ($message) {
+            $this->write($message, $this->FinishTime, $this->StartTime);
         }
     }
 
     /**
      *
      *
-     * @param $Span
+     * @param $span
      * @return string
      */
-    public static function formatElapsed($Span) {
-        $m = floor($Span / 60);
-        $s = $Span - $m * 60;
+    public static function formatElapsed($span) {
+        $m = floor($span / 60);
+        $s = $span - $m * 60;
         return sprintf('%d:%05.2f', $m, $s);
     }
 
     /**
      *
      *
-     * @param string $Message
+     * @param string $message
      */
-    public function start($Message = '') {
+    public function start($message = '') {
         $this->StartTime = microtime(true);
         $this->SplitTime = $this->StartTime;
         $this->FinishTime = null;
 
-        if ($Message) {
-            $this->write($Message, $this->StartTime);
+        if ($message) {
+            $this->write($message, $this->StartTime);
         }
     }
 
     /**
      *
      *
-     * @param string $Message
+     * @param string $message
      */
-    public function split($Message = '') {
-        $PrevSplit = $this->SplitTime;
+    public function split($message = '') {
+        $prevSplit = $this->SplitTime;
         $this->SplitTime = microtime(true);
-        if ($Message) {
+        if ($message) {
         }
-        $this->write($Message, $this->SplitTime, $PrevSplit);
+        $this->write($message, $this->SplitTime, $prevSplit);
     }
 
     /**
      *
      *
-     * @param $Message
-     * @param null $Time
-     * @param null $PrevTime
+     * @param $message
+     * @param null $time
+     * @param null $prevTime
      */
-    public function write($Message, $Time = null, $PrevTime = null) {
-        if ($Message) {
-            echo $Message;
+    public function write($message, $time = null, $prevTime = null) {
+        if ($message) {
+            echo $message;
         }
-        if (!is_null($Time)) {
-            if ($Message) {
+        if (!is_null($time)) {
+            if ($message) {
                 echo ': ';
             }
-            echo date('Y-m-d H:i:s', $Time);
-            if (!is_null($PrevTime)) {
-                $Span = $Time - $PrevTime;
-                $m = floor($Span / 60);
-                $s = $Span - $m * 60;
+            echo date('Y-m-d H:i:s', $time);
+            if (!is_null($prevTime)) {
+                $span = $time - $prevTime;
+                $m = floor($span / 60);
+                $s = $span - $m * 60;
                 echo sprintf(' (%d:%05.2f)', $m, $s);
             }
         }

@@ -32,74 +32,74 @@ if (!function_exists('writeDiscussionRow')) :
     /**
      * Writes a discussion in table row format.
      */
-    function writeDiscussionRow($Discussion, $Sender, $Session) {
-        if (!property_exists($Sender, 'CanEditDiscussions')) {
-            $Sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($Discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
+    function writeDiscussionRow($discussion, $sender, $session) {
+        if (!property_exists($sender, 'CanEditDiscussions')) {
+            $sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
         }
-        $CssClass = CssClass($Discussion);
-        $DiscussionUrl = $Discussion->Url;
+        $cssClass = CssClass($discussion);
+        $discussionUrl = $discussion->Url;
 
-        if ($Session->UserID) {
-            $DiscussionUrl .= '#latest';
+        if ($session->UserID) {
+            $discussionUrl .= '#latest';
         }
-        $Sender->EventArguments['DiscussionUrl'] = &$DiscussionUrl;
-        $Sender->EventArguments['Discussion'] = &$Discussion;
-        $Sender->EventArguments['CssClass'] = &$CssClass;
+        $sender->EventArguments['DiscussionUrl'] = &$discussionUrl;
+        $sender->EventArguments['Discussion'] = &$discussion;
+        $sender->EventArguments['CssClass'] = &$cssClass;
 
-        $First = UserBuilder($Discussion, 'First');
-        if ($Discussion->LastUserID) {
-            $Last = UserBuilder($Discussion, 'Last');
+        $first = UserBuilder($discussion, 'First');
+        if ($discussion->LastUserID) {
+            $last = UserBuilder($discussion, 'Last');
         } else {
-            $Last = $First;
+            $last = $first;
         }
-        $Sender->EventArguments['FirstUser'] = &$First;
-        $Sender->EventArguments['LastUser'] = &$Last;
+        $sender->EventArguments['FirstUser'] = &$first;
+        $sender->EventArguments['LastUser'] = &$last;
 
-        $Sender->fireEvent('BeforeDiscussionName');
+        $sender->fireEvent('BeforeDiscussionName');
 
-        $DiscussionName = $Discussion->Name;
+        $discussionName = $discussion->Name;
         // If there are no word character detected in the title treat it as if it is blank.
-        if (!preg_match('/\w/u', $DiscussionName)) {
-            $DiscussionName = t('Blank Discussion Topic');
+        if (!preg_match('/\w/u', $discussionName)) {
+            $discussionName = t('Blank Discussion Topic');
         }
-        $Sender->EventArguments['DiscussionName'] = &$DiscussionName;
+        $sender->EventArguments['DiscussionName'] = &$discussionName;
 
-        static $FirstDiscussion = true;
-        if (!$FirstDiscussion) {
-            $Sender->fireEvent('BetweenDiscussion');
+        static $firstDiscussion = true;
+        if (!$firstDiscussion) {
+            $sender->fireEvent('BetweenDiscussion');
         } else {
-            $FirstDiscussion = false;
+            $firstDiscussion = false;
         }
 
-        $Discussion->CountPages = ceil($Discussion->CountComments / $Sender->CountCommentsPerPage);
+        $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
 
-        $FirstPageUrl = DiscussionUrl($Discussion, 1);
-        $LastPageUrl = DiscussionUrl($Discussion, val('CountPages', $Discussion)).'#latest';
+        $firstPageUrl = DiscussionUrl($discussion, 1);
+        $lastPageUrl = DiscussionUrl($discussion, val('CountPages', $discussion)).'#latest';
         ?>
-        <tr id="Discussion_<?php echo $Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
-            <?php $Sender->fireEvent('BeforeDiscussionContent'); ?>
-            <?php echo AdminCheck($Discussion, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
+        <tr id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
+            <?php $sender->fireEvent('BeforeDiscussionContent'); ?>
+            <?php echo AdminCheck($discussion, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
             <td class="DiscussionName">
                 <div class="Wrap">
          <span class="Options">
             <?php
-            echo OptionsList($Discussion);
-            echo BookmarkButton($Discussion);
+            echo OptionsList($discussion);
+            echo BookmarkButton($discussion);
             ?>
          </span>
                     <?php
-                    $Sender->fireEvent('BeforeDiscussionTitle');
-                    echo anchor($DiscussionName, $DiscussionUrl, 'Title').' ';
-                    $Sender->fireEvent('AfterDiscussionTitle');
+                    $sender->fireEvent('BeforeDiscussionTitle');
+                    echo anchor($discussionName, $discussionUrl, 'Title').' ';
+                    $sender->fireEvent('AfterDiscussionTitle');
 
-                    WriteMiniPager($Discussion);
-                    echo NewComments($Discussion);
-                    if ($Sender->data('_ShowCategoryLink', true)) {
-                        echo CategoryLink($Discussion, ' '.t('in').' ');
+                    WriteMiniPager($discussion);
+                    echo NewComments($discussion);
+                    if ($sender->data('_ShowCategoryLink', true)) {
+                        echo CategoryLink($discussion, ' '.t('in').' ');
                     }
                     // Other stuff that was in the standard view that you may want to display:
                     echo '<div class="Meta Meta-Discussion">';
-                    WriteTags($Discussion);
+                    WriteTags($discussion);
                     echo '</div>';
 
                     //			if ($Source = val('Source', $Discussion))
@@ -111,10 +111,10 @@ if (!function_exists('writeDiscussionRow')) :
             <td class="BlockColumn BlockColumn-User FirstUser">
                 <div class="Block Wrap">
                     <?php
-                    echo userPhoto($First, ['Size' => 'Small']);
-                    echo userAnchor($First, 'UserLink BlockTitle');
+                    echo userPhoto($first, ['Size' => 'Small']);
+                    echo userAnchor($first, 'UserLink BlockTitle');
                     echo '<div class="Meta">';
-                    echo anchor(Gdn_Format::date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
+                    echo anchor(Gdn_Format::date($discussion->FirstDate, 'html'), $firstPageUrl, 'CommentDate MItem');
                     echo '</div>';
                     ?>
                 </div>
@@ -126,7 +126,7 @@ if (!function_exists('writeDiscussionRow')) :
                     // echo number_format($Discussion->CountComments);
 
                     // Round Number
-                    echo BigPlural($Discussion->CountComments, '%s comment');
+                    echo BigPlural($discussion->CountComments, '%s comment');
                     ?>
                 </div>
             </td>
@@ -137,18 +137,18 @@ if (!function_exists('writeDiscussionRow')) :
                     // echo number_format($Discussion->CountViews);
 
                     // Round Number
-                    echo BigPlural($Discussion->CountViews, '%s view');
+                    echo BigPlural($discussion->CountViews, '%s view');
                     ?>
                 </div>
             </td>
             <td class="BlockColumn BlockColumn-User LastUser">
                 <div class="Block Wrap">
                     <?php
-                    if ($Last) {
-                        echo userPhoto($Last, ['Size' => 'Small']);
-                        echo userAnchor($Last, 'UserLink BlockTitle');
+                    if ($last) {
+                        echo userPhoto($last, ['Size' => 'Small']);
+                        echo userAnchor($last, 'UserLink BlockTitle');
                         echo '<div class="Meta">';
-                        echo anchor(Gdn_Format::date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate MItem');
+                        echo anchor(Gdn_Format::date($discussion->LastDate, 'html'), $lastPageUrl, 'CommentDate MItem');
                         echo '</div>';
                     } else {
                         echo '&nbsp;';
@@ -178,19 +178,19 @@ if (!function_exists('WriteDiscussionTable')) :
                 </thead>
                 <tbody>
                 <?php
-                $Session = Gdn::session();
-                $Announcements = $c->data('Announcements');
-                if (is_a($Announcements, 'Gdn_DataSet')) {
-                    foreach ($Announcements->result() as $Discussion) {
-                        writeDiscussionRow($Discussion, $c, $Session);
+                $session = Gdn::session();
+                $announcements = $c->data('Announcements');
+                if (is_a($announcements, 'Gdn_DataSet')) {
+                    foreach ($announcements->result() as $discussion) {
+                        writeDiscussionRow($discussion, $c, $session);
                     }
                 }
 
-                $Discussions = $c->data('Discussions');
-                if (is_a($Discussions, 'Gdn_DataSet')) {
-                    foreach ($Discussions->result() as $Discussion) {
+                $discussions = $c->data('Discussions');
+                if (is_a($discussions, 'Gdn_DataSet')) {
+                    foreach ($discussions->result() as $discussion) {
 //            var_dump($Discussion);
-                        writeDiscussionRow($Discussion, $c, $Session);
+                        writeDiscussionRow($discussion, $c, $session);
                     }
                 }
                 ?>

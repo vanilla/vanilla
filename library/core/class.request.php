@@ -124,11 +124,11 @@ class Gdn_Request implements RequestInterface {
      * Gets/Sets the domain from the current url. e.g. "http://localhost" in
      * "http://localhost/this/that/garden/index.php?/controller/action/"
      *
-     * @param $Domain optional value to set
+     * @param $domain optional value to set
      * @return string | null
      */
-    public function domain($Domain = null) {
-        return $this->_parsedRequestElement('Domain', $Domain);
+    public function domain($domain = null) {
+        return $this->_parsedRequestElement('Domain', $domain);
     }
 
     /**

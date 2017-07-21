@@ -39,8 +39,8 @@ class SocialController extends DashboardController {
         $this->title("Social Connect Addons");
         $this->setHighlightRoute('/social/manage');
 
-        $Connections = $this->getConnections();
-        $this->setData('Connections', $Connections);
+        $connections = $this->getConnections();
+        $this->setData('Connections', $connections);
 
         $this->render();
     }

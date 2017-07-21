@@ -21,14 +21,14 @@ class UpdateModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Addon
-     * @param $Addons
+     * @param $addon
+     * @param $addons
      * @deprecated since 2.3
      */
-    private static function addAddon($Addon, &$Addons) {
+    private static function addAddon($addon, &$addons) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $Slug = strtolower($Addon['AddonKey']).'-'.strtolower($Addon['AddonType']);
-        $Addons[$Slug] = $Addon;
+        $slug = strtolower($addon['AddonKey']).'-'.strtolower($addon['AddonType']);
+        $addons[$slug] = $addon;
     }
 
     /**
@@ -94,24 +94,24 @@ class UpdateModel extends Gdn_Model {
     /**
      * Check an addon's file to extract the addon information out of it.
      *
-     * @param string $Path The path to the file.
-     * @param bool $ThrowError Whether or not to throw an exception if there is a problem analyzing the addon.
+     * @param string $path The path to the file.
+     * @param bool $throwError Whether or not to throw an exception if there is a problem analyzing the addon.
      * @return array An array of addon information.
      * @deprecated since 2.3
      */
-    public static function analyzeAddon($Path, $ThrowError = true) {
+    public static function analyzeAddon($path, $throwError = true) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        if (!file_exists($Path)) {
-            if ($ThrowError) {
-                throw new Exception("$Path not found.", 404);
+        if (!file_exists($path)) {
+            if ($throwError) {
+                throw new Exception("$path not found.", 404);
             }
             return false;
         }
 
-        $Addon = [];
-        $Result = [];
+        $addon = [];
+        $result = [];
 
-        $InfoPaths = [
+        $infoPaths = [
             '/settings/about.php', // application
             '/default.php', // plugin
             '/class.*.plugin.php', // plugin
@@ -122,86 +122,86 @@ class UpdateModel extends Gdn_Model {
         ];
 
         // Look for an addon.json file.
-        if (file_exists("$Path/addon.json")) {
+        if (file_exists("$path/addon.json")) {
 
-            $Info = self::addonJsonConverter($Path);
+            $info = self::addonJsonConverter($path);
 
-            $entry['Path'] = $Path;
-            $entry['Name'] = val('Name', $Info[key($Info)]);
-            $entry['Base'] = val('Key', $Info[key($Info)]);
+            $entry['Path'] = $path;
+            $entry['Name'] = val('Name', $info[key($info)]);
+            $entry['Base'] = val('Key', $info[key($info)]);
 
-            $Result = self::checkAddon($Info, $entry);
-            if (empty($Result)) {
-                $Addon = self::buildAddon($Info);
+            $result = self::checkAddon($info, $entry);
+            if (empty($result)) {
+                $addon = self::buildAddon($info);
             }
 
         } else {
             // Get the list of potential files to analyze.
-            if (is_dir($Path)) {
-                $Entries = self::getInfoFiles($Path, $InfoPaths);
-                $DeleteEntries = false;
+            if (is_dir($path)) {
+                $entries = self::getInfoFiles($path, $infoPaths);
+                $deleteEntries = false;
             } else {
-                $Entries = self::getInfoZip($Path, $InfoPaths, false, $ThrowError);
-                $DeleteEntries = true;
+                $entries = self::getInfoZip($path, $infoPaths, false, $throwError);
+                $deleteEntries = true;
             }
 
-            foreach ($Entries as $entry) {
+            foreach ($entries as $entry) {
                 if ($entry['Name'] == '/index.php') {
                     // This could be the core vanilla package.
-                    $Version = self::parseCoreVersion($entry['Path']);
+                    $version = self::parseCoreVersion($entry['Path']);
 
-                    if (!$Version) {
+                    if (!$version) {
                         continue;
                     }
 
                     // The application was confirmed.
-                    $Addon = [
+                    $addon = [
                         'AddonKey' => 'vanilla',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla',
                         'Description' => 'Vanilla is an open-source, standards-compliant, multi-lingual, fully extensible discussion forum for the web. Anyone who has web-space that meets the requirements can download and use Vanilla for free!',
-                        'Version' => $Version,
+                        'Version' => $version,
                         'License' => 'GPLv2',
                         'Path' => $entry['Path']];
                     break;
                 } elseif ($entry['Name'] == 'vanilla2export.php') {
                     // This could be the vanilla porter.
-                    $Version = self::parseCoreVersion($entry['Path']);
+                    $version = self::parseCoreVersion($entry['Path']);
 
-                    if (!$Version) {
+                    if (!$version) {
                         continue;
                     }
 
-                    $Addon = [
+                    $addon = [
                         'AddonKey' => 'porter',
                         'AddonTypeID' => ADDON_TYPE_CORE,
                         'Name' => 'Vanilla Porter',
                         'Description' => 'Drop this script in your existing site and navigate to it in your web browser to export your existing forum data to the Vanilla 2 import format.',
-                        'Version' => $Version,
+                        'Version' => $version,
                         'License' => 'GPLv2',
                         'Path' => $entry['Path']];
                     break;
                 } else {
                     // This could be an addon.
-                    $Info = self::parseInfoArray($entry['Path']);
-                    $Result = self::checkAddon($Info, $entry);
-                    if (!empty($Result)) {
+                    $info = self::parseInfoArray($entry['Path']);
+                    $result = self::checkAddon($info, $entry);
+                    if (!empty($result)) {
                         break;
                     }
-                    $Addon = self::buildAddon($Info);
+                    $addon = self::buildAddon($info);
                 }
             }
 
-            if ($DeleteEntries) {
-                $FolderPath = substr($Path, 0, -4);
-                Gdn_FileSystem::removeFolder($FolderPath);
+            if ($deleteEntries) {
+                $folderPath = substr($path, 0, -4);
+                Gdn_FileSystem::removeFolder($folderPath);
             }
         }
 
         // Add the addon requirements.
-        if (!empty($Addon)) {
-            $Requirements = arrayTranslate(
-                $Addon,
+        if (!empty($addon)) {
+            $requirements = arrayTranslate(
+                $addon,
                 [
                     'RequiredApplications' => 'Applications',
                     'RequiredPlugins' => 'Plugins',
@@ -209,32 +209,32 @@ class UpdateModel extends Gdn_Model {
                     'Require' => 'Addons'
                 ]
             );
-            foreach ($Requirements as $Type => $Items) {
-                if (!is_array($Items)) {
-                    unset($Requirements[$Type]);
+            foreach ($requirements as $type => $items) {
+                if (!is_array($items)) {
+                    unset($requirements[$type]);
                 }
             }
-            $Addon['Requirements'] = dbencode($Requirements);
+            $addon['Requirements'] = dbencode($requirements);
 
-            $Addon['Checked'] = true;
-            $Addon['Path'] = $Path;
-            $UploadsPath = PATH_UPLOADS.'/';
-            if (stringBeginsWith($Addon['Path'], $UploadsPath)) {
-                $Addon['File'] = substr($Addon['Path'], strlen($UploadsPath));
+            $addon['Checked'] = true;
+            $addon['Path'] = $path;
+            $uploadsPath = PATH_UPLOADS.'/';
+            if (stringBeginsWith($addon['Path'], $uploadsPath)) {
+                $addon['File'] = substr($addon['Path'], strlen($uploadsPath));
             }
 
-            if (is_file($Path)) {
-                $Addon['MD5'] = md5_file($Path);
-                $Addon['FileSize'] = filesize($Path);
+            if (is_file($path)) {
+                $addon['MD5'] = md5_file($path);
+                $addon['FileSize'] = filesize($path);
             }
-        } elseif ($ThrowError) {
-            $Msg = implode("\n", $Result);
-            throw new Gdn_UserException($Msg, 400);
+        } elseif ($throwError) {
+            $msg = implode("\n", $result);
+            throw new Gdn_UserException($msg, 400);
         } else {
             return false;
         }
 
-        return $Addon;
+        return $addon;
     }
 
     /**
@@ -316,270 +316,270 @@ class UpdateModel extends Gdn_Model {
     /**
      *
      *
-     * @param string $Path
-     * @param array $InfoPaths
+     * @param string $path
+     * @param array $infoPaths
      * @return array
      * @deprecated since 2.3
      */
-    private static function getInfoFiles($Path, $InfoPaths) {
+    private static function getInfoFiles($path, $infoPaths) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $Path = str_replace('\\', '/', rtrim($Path));
+        $path = str_replace('\\', '/', rtrim($path));
 
-        $Result = [];
+        $result = [];
         // Check to see if the paths exist.
-        foreach ($InfoPaths as $InfoPath) {
-            $Glob = glob($Path.$InfoPath);
-            if (is_array($Glob)) {
-                foreach ($Glob as $GlobPath) {
-                    $Result[] = ['Name' => substr($GlobPath, strlen($Path)), 'Path' => $GlobPath];
+        foreach ($infoPaths as $infoPath) {
+            $glob = glob($path.$infoPath);
+            if (is_array($glob)) {
+                foreach ($glob as $globPath) {
+                    $result[] = ['Name' => substr($globPath, strlen($path)), 'Path' => $globPath];
                 }
             }
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Open a zip archive and inspect its contents for the requested paths.
      *
-     * @param string $Path
-     * @param array $InfoPaths
-     * @param bool $TmpPath
-     * @param bool $ThrowError
+     * @param string $path
+     * @param array $infoPaths
+     * @param bool $tmpPath
+     * @param bool $throwError
      * @return array
      * @throws Exception
      * @deprecated since 2.3
      */
-    private static function getInfoZip($Path, $InfoPaths, $TmpPath = false, $ThrowError = true) {
+    private static function getInfoZip($path, $infoPaths, $tmpPath = false, $throwError = true) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
         // Extract the zip file so we can make sure it has appropriate information.
-        $Zip = null;
-        $ZipOpened = false;
+        $zip = null;
+        $zipOpened = false;
 
         if (class_exists('ZipArchive', false)) {
-            $Zip = new ZipArchive();
-            $ZipOpened = $Zip->open($Path);
-            if ($ZipOpened !== true) {
-                $Zip = null;
+            $zip = new ZipArchive();
+            $zipOpened = $zip->open($path);
+            if ($zipOpened !== true) {
+                $zip = null;
             }
         }
 
-        if (!$Zip) {
-            $Zip = new PclZipAdapter();
-            $ZipOpened = $Zip->open($Path);
+        if (!$zip) {
+            $zip = new PclZipAdapter();
+            $zipOpened = $zip->open($path);
         }
 
-        if ($ZipOpened !== true) {
-            if ($ThrowError) {
-                $Errors = [ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
+        if ($zipOpened !== true) {
+            if ($throwError) {
+                $errors = [ZipArchive::ER_EXISTS => 'ER_EXISTS', ZipArchive::ER_INCONS => 'ER_INCONS', ZipArchive::ER_INVAL => 'ER_INVAL',
                     ZipArchive::ER_MEMORY => 'ER_MEMORY', ZipArchive::ER_NOENT => 'ER_NOENT', ZipArchive::ER_NOZIP => 'ER_NOZIP',
                     ZipArchive::ER_OPEN => 'ER_OPEN', ZipArchive::ER_READ => 'ER_READ', ZipArchive::ER_SEEK => 'ER_SEEK'];
-                $Error = val($ZipOpened, $Errors, 'Unknown Error');
+                $error = val($zipOpened, $errors, 'Unknown Error');
 
-                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($Path $Error)", 400);
+                throw new Exception(t('Could not open addon file. Addons must be zip files.')." ($path $error)", 400);
             }
             return [];
         }
 
-        if ($TmpPath === false) {
-            $TmpPath = dirname($Path).'/'.basename($Path, '.zip').'/';
+        if ($tmpPath === false) {
+            $tmpPath = dirname($path).'/'.basename($path, '.zip').'/';
         }
 
-        if (file_exists($TmpPath)) {
-            Gdn_FileSystem::removeFolder($TmpPath);
+        if (file_exists($tmpPath)) {
+            Gdn_FileSystem::removeFolder($tmpPath);
         }
 
-        $Result = [];
-        for ($i = 0; $i < $Zip->numFiles; $i++) {
-            $Entry = $Zip->statIndex($i);
+        $result = [];
+        for ($i = 0; $i < $zip->numFiles; $i++) {
+            $entry = $zip->statIndex($i);
 
-            if (preg_match('#(\.\.[\\/])#', $Entry['name'])) {
-                throw new Gdn_UserException("Invalid path in zip file: ".htmlspecialchars($Entry['name']));
+            if (preg_match('#(\.\.[\\/])#', $entry['name'])) {
+                throw new Gdn_UserException("Invalid path in zip file: ".htmlspecialchars($entry['name']));
             }
 
-            $Name = '/'.ltrim($Entry['name'], '/');
+            $name = '/'.ltrim($entry['name'], '/');
 
-            foreach ($InfoPaths as $InfoPath) {
-                $Preg = '`('.str_replace(['.', '*'], ['\.', '.*'], $InfoPath).')$`';
-                if (preg_match($Preg, $Name, $Matches)) {
-                    $Base = trim(substr($Name, 0, -strlen($Matches[1])), '/');
+            foreach ($infoPaths as $infoPath) {
+                $preg = '`('.str_replace(['.', '*'], ['\.', '.*'], $infoPath).')$`';
+                if (preg_match($preg, $name, $matches)) {
+                    $base = trim(substr($name, 0, -strlen($matches[1])), '/');
 
-                    if (strpos($Base, '/') !== false) {
+                    if (strpos($base, '/') !== false) {
                         continue; // file nested too deep.
                     }
-                    if (!file_exists($TmpPath)) {
-                        mkdir($TmpPath, 0777, true);
+                    if (!file_exists($tmpPath)) {
+                        mkdir($tmpPath, 0777, true);
                     }
 
-                    $Zip->extractTo($TmpPath, $Entry['name']);
-                    $Result[] = ['Name' => $Matches[1], 'Path' => $TmpPath.rtrim($Entry['name'], '/'), 'Base' => $Base];
+                    $zip->extractTo($tmpPath, $entry['name']);
+                    $result[] = ['Name' => $matches[1], 'Path' => $tmpPath.rtrim($entry['name'], '/'), 'Base' => $base];
                 }
             }
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Parse the version out of the core's index.php file.
      *
-     * @param string $Path The path to the index.php file.
+     * @param string $path The path to the index.php file.
      * @return string A string containing the version or empty if the file could not be parsed.
      * @deprecated since 2.3
      */
-    public static function parseCoreVersion($Path) {
+    public static function parseCoreVersion($path) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $fp = fopen($Path, 'rb');
-        $Application = false;
-        $Version = '';
+        $fp = fopen($path, 'rb');
+        $application = false;
+        $version = '';
 
-        while (($Line = fgets($fp)) !== false) {
-            if (preg_match("`define\\('(.*?)', '(.*?)'\\);`", $Line, $Matches)) {
-                $Name = $Matches[1];
-                $Value = $Matches[2];
-                switch ($Name) {
+        while (($line = fgets($fp)) !== false) {
+            if (preg_match("`define\\('(.*?)', '(.*?)'\\);`", $line, $matches)) {
+                $name = $matches[1];
+                $value = $matches[2];
+                switch ($name) {
                     case 'APPLICATION':
-                        $Application = $Value;
+                        $application = $value;
                         break;
                     case 'APPLICATION_VERSION':
-                        $Version = $Value;
+                        $version = $value;
                 }
             }
 
-            if ($Application !== false && $Version !== '') {
+            if ($application !== false && $version !== '') {
                 break;
             }
         }
         fclose($fp);
-        return $Version;
+        return $version;
     }
 
     /**
      * Offers a quick and dirty way of parsing an addon's info array without using eval().
      *
-     * @param string $Path The path to the info array.
-     * @param string $Variable The name of variable containing the information.
+     * @param string $path The path to the info array.
+     * @param string $variable The name of variable containing the information.
      * @return array|false The info array or false if the file could not be parsed.
      * @deprecated since 2.3
      */
-    public static function parseInfoArray($Path, $Variable = false) {
+    public static function parseInfoArray($path, $variable = false) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $fp = fopen($Path, 'rb');
-        $Lines = [];
-        $InArray = false;
-        $GlobalKey = '';
+        $fp = fopen($path, 'rb');
+        $lines = [];
+        $inArray = false;
+        $globalKey = '';
 
         // Get all of the lines in the info array.
-        while (($Line = fgets($fp)) !== false) {
+        while (($line = fgets($fp)) !== false) {
             // Remove comments from the line.
-            $Line = preg_replace('`\s//.*$`', '', $Line);
-            if (!$Line) {
+            $line = preg_replace('`\s//.*$`', '', $line);
+            if (!$line) {
                 continue;
             }
 
-            if (!$InArray && preg_match('`\$([A-Za-z]+Info)\s*\[`', trim($Line), $Matches)) {
-                $Variable = $Matches[1];
-                if (preg_match('`\[\s*[\'"](.+?)[\'"]\s*\]`', $Line, $Matches)) {
-                    $GlobalKey = $Matches[1];
-                    $InArray = true;
+            if (!$inArray && preg_match('`\$([A-Za-z]+Info)\s*\[`', trim($line), $matches)) {
+                $variable = $matches[1];
+                if (preg_match('`\[\s*[\'"](.+?)[\'"]\s*\]`', $line, $matches)) {
+                    $globalKey = $matches[1];
+                    $inArray = true;
                 }
-            } elseif ($InArray && StringEndsWith(trim($Line), ';')) {
+            } elseif ($inArray && StringEndsWith(trim($line), ';')) {
                 break;
-            } elseif ($InArray) {
-                $Lines[] = trim($Line);
+            } elseif ($inArray) {
+                $lines[] = trim($line);
             }
         }
         fclose($fp);
 
-        if (count($Lines) == 0) {
+        if (count($lines) == 0) {
             return false;
         }
 
         // Parse the name/value information in the arrays.
-        $Result = [];
-        foreach ($Lines as $Line) {
+        $result = [];
+        foreach ($lines as $line) {
             // Get the name from the line.
-            if (!preg_match('`[\'"](.+?)[\'"]\s*=>`', $Line, $Matches) || !substr($Line, -1) == ',') {
+            if (!preg_match('`[\'"](.+?)[\'"]\s*=>`', $line, $matches) || !substr($line, -1) == ',') {
                 continue;
             }
-            $Key = $Matches[1];
+            $key = $matches[1];
 
             // Strip the key from the line.
-            $Line = trim(trim(substr(strstr($Line, '=>'), 2)), ',');
+            $line = trim(trim(substr(strstr($line, '=>'), 2)), ',');
 
-            if (strlen($Line) == 0) {
+            if (strlen($line) == 0) {
                 continue;
             }
 
-            $Value = null;
-            if (is_numeric($Line)) {
-                $Value = $Line;
-            } elseif (strcasecmp($Line, 'TRUE') == 0 || strcasecmp($Line, 'FALSE') == 0)
-                $Value = $Line;
-            elseif (in_array($Line[0], ['"', "'"]) && substr($Line, -1) == $Line[0]) {
-                $Quote = $Line[0];
-                $Value = trim($Line, $Quote);
-                $Value = str_replace('\\'.$Quote, $Quote, $Value);
-            } elseif (stringBeginsWith($Line, 'array(') && substr($Line, -1) == ')') {
+            $value = null;
+            if (is_numeric($line)) {
+                $value = $line;
+            } elseif (strcasecmp($line, 'TRUE') == 0 || strcasecmp($line, 'FALSE') == 0)
+                $value = $line;
+            elseif (in_array($line[0], ['"', "'"]) && substr($line, -1) == $line[0]) {
+                $quote = $line[0];
+                $value = trim($line, $quote);
+                $value = str_replace('\\'.$quote, $quote, $value);
+            } elseif (stringBeginsWith($line, 'array(') && substr($line, -1) == ')') {
                 // Parse the line's array.
-                $Line = substr($Line, 6, strlen($Line) - 7);
-                $Items = explode(',', $Line);
-                $Array = [];
-                foreach ($Items as $Item) {
-                    $SubItems = explode('=>', $Item);
-                    if (count($SubItems) == 1) {
-                        $Array[] = trim(trim($SubItems[0]), '"\'');
-                    } elseif (count($SubItems) == 2) {
-                        $SubKey = trim(trim($SubItems[0]), '"\'');
-                        $SubValue = trim(trim($SubItems[1]), '"\'');
-                        $Array[$SubKey] = $SubValue;
+                $line = substr($line, 6, strlen($line) - 7);
+                $items = explode(',', $line);
+                $array = [];
+                foreach ($items as $item) {
+                    $subItems = explode('=>', $item);
+                    if (count($subItems) == 1) {
+                        $array[] = trim(trim($subItems[0]), '"\'');
+                    } elseif (count($subItems) == 2) {
+                        $subKey = trim(trim($subItems[0]), '"\'');
+                        $subValue = trim(trim($subItems[1]), '"\'');
+                        $array[$subKey] = $subValue;
                     }
                 }
-                $Value = $Array;
+                $value = $array;
             }
 
-            if ($Value != null) {
-                $Result[$Key] = $Value;
+            if ($value != null) {
+                $result[$key] = $value;
             }
         }
-        $Result = [$GlobalKey => $Result, 'Variable' => $Variable];
-        return $Result;
+        $result = [$globalKey => $result, 'Variable' => $variable];
+        return $result;
     }
 
     /**
      *
      *
-     * @param array $MyAddons
-     * @param array $LatestAddons
+     * @param array $myAddons
+     * @param array $latestAddons
      * @return bool
      * @deprecated since 2.3
      */
-    public function compareAddons($MyAddons, $LatestAddons) {
+    public function compareAddons($myAddons, $latestAddons) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
-        $UpdateAddons = false;
+        $updateAddons = false;
 
         // Join the site addons with my addons.
-        foreach ($LatestAddons as $Addon) {
-            $Key = val('AddonKey', $Addon);
-            $Type = val('Type', $Addon);
-            $Slug = strtolower($Key).'-'.strtolower($Type);
-            $Version = val('Version', $Addon);
-            $FileUrl = val('Url', $Addon);
+        foreach ($latestAddons as $addon) {
+            $key = val('AddonKey', $addon);
+            $type = val('Type', $addon);
+            $slug = strtolower($key).'-'.strtolower($type);
+            $version = val('Version', $addon);
+            $fileUrl = val('Url', $addon);
 
-            if (isset($MyAddons[$Slug])) {
-                $MyAddon = $MyAddons[$Slug];
+            if (isset($myAddons[$slug])) {
+                $myAddon = $myAddons[$slug];
 
-                if (version_compare($Version, val('Version', $MyAddon, '999'), '>')) {
-                    $MyAddon['NewVersion'] = $Version;
-                    $MyAddon['NewDownloadUrl'] = $FileUrl;
-                    $UpdateAddons[$Slug] = $MyAddon;
+                if (version_compare($version, val('Version', $myAddon, '999'), '>')) {
+                    $myAddon['NewVersion'] = $version;
+                    $myAddon['NewDownloadUrl'] = $fileUrl;
+                    $updateAddons[$slug] = $myAddon;
                 }
             } else {
-                unset($MyAddons[$Slug]);
+                unset($myAddons[$slug]);
             }
         }
 
-        return $UpdateAddons;
+        return $updateAddons;
     }
 
     /**
@@ -611,11 +611,11 @@ class UpdateModel extends Gdn_Model {
     /**
      * Deprecated.
      *
-     * @param bool $Enabled Deprecated.
+     * @param bool $enabled Deprecated.
      * @return array Deprecated.
      * @deprecated since 2.3
      */
-    public function getAddons($Enabled = false) {
+    public function getAddons($enabled = false) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
         return [];
     }
@@ -623,11 +623,11 @@ class UpdateModel extends Gdn_Model {
     /**
      * Deprecated.
      *
-     * @param bool $Enabled Deprecated.
+     * @param bool $enabled Deprecated.
      * @return array|bool Deprecated.
      * @deprecated
      */
-    public function getAddonUpdates($Enabled = false) {
+    public function getAddonUpdates($enabled = false) {
         deprecated(__CLASS__.'->'.__METHOD__.'()');
     }
 

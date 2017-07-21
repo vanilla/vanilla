@@ -22,20 +22,20 @@ class ActivityController extends Gdn_Controller {
     /**
      * Create some virtual properties.
      *
-     * @param $Name
+     * @param $name
      * @return Gdn_DataSet
      */
-    public function __get($Name) {
-        switch ($Name) {
+    public function __get($name) {
+        switch ($name) {
             case 'CommentData':
                 Deprecated('ActivityController->CommentData', "ActivityController->data('Activities')");
-                $Result = new Gdn_DataSet([], DATASET_TYPE_OBJECT);
-                return $Result;
+                $result = new Gdn_DataSet([], DATASET_TYPE_OBJECT);
+                return $result;
             case 'ActivityData':
                 Deprecated('ActivityController->ActivityData', "ActivityController->data('Activities')");
-                $Result = new Gdn_DataSet($this->data('Activities'), DATASET_TYPE_ARRAY);
-                $Result->datasetType(DATASET_TYPE_OBJECT);
-                return $Result;
+                $result = new Gdn_DataSet($this->data('Activities'), DATASET_TYPE_ARRAY);
+                $result->datasetType(DATASET_TYPE_OBJECT);
+                return $result;
         }
     }
 
@@ -75,17 +75,17 @@ class ActivityController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $ActivityID Unique ID of activity item to display.
+     * @param int $activityID Unique ID of activity item to display.
      */
-    public function item($ActivityID = 0) {
+    public function item($activityID = 0) {
         $this->addJsFile('activity.js');
         $this->title(t('Activity Item'));
 
-        if (!is_numeric($ActivityID) || $ActivityID < 0) {
-            $ActivityID = 0;
+        if (!is_numeric($activityID) || $activityID < 0) {
+            $activityID = 0;
         }
 
-        $this->ActivityData = $this->ActivityModel->getWhere(['ActivityID' => $ActivityID]);
+        $this->ActivityData = $this->ActivityModel->getWhere(['ActivityID' => $activityID]);
 
         // Check visibility.
         $userid = val('NotifyUserID', $this->ActivityData->firstRow());
@@ -114,7 +114,7 @@ class ActivityController extends Gdn_Controller {
                 break;
         }
 
-        $this->setData('Comments', $this->ActivityModel->getComments([$ActivityID]));
+        $this->setData('Comments', $this->ActivityModel->getComments([$activityID]));
         $this->setData('Activities', $this->ActivityData);
 
         $this->render();
@@ -126,36 +126,36 @@ class ActivityController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $Offset Number of activity items to skip.
+     * @param int $offset Number of activity items to skip.
      */
-    public function index($Filter = false, $Page = false) {
-        switch (strtolower($Filter)) {
+    public function index($filter = false, $page = false) {
+        switch (strtolower($filter)) {
             case 'mods':
                 $this->title(t('Recent Moderator Activity'));
                 $this->permission('Garden.Moderation.Manage');
-                $NotifyUserID = ActivityModel::NOTIFY_MODS;
+                $notifyUserID = ActivityModel::NOTIFY_MODS;
                 break;
             case 'admins':
                 $this->title(t('Recent Admin Activity'));
                 $this->permission('Garden.Settings.Manage');
-                $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
+                $notifyUserID = ActivityModel::NOTIFY_ADMINS;
                 break;
             case '':
             case 'feed': // rss feed
-                $Filter = 'public';
+                $filter = 'public';
                 $this->title(t('Recent Activity'));
                 $this->permission('Garden.Activity.View');
-                $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
+                $notifyUserID = ActivityModel::NOTIFY_PUBLIC;
                 break;
             default:
                 throw notFoundException();
         }
 
         // Which page to load
-        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Activities.PerPage',30));
-        $Offset = is_numeric($Offset) ? $Offset : 0;
-        if ($Offset < 0) {
-            $Offset = 0;
+        list($offset, $limit) = offsetLimit($page, c('Garden.Activities.PerPage',30));
+        $offset = is_numeric($offset) ? $offset : 0;
+        if ($offset < 0) {
+            $offset = 0;
         }
 
         // Page meta.
@@ -166,13 +166,13 @@ class ActivityController extends Gdn_Controller {
         }
 
         // Comment submission
-        $Session = Gdn::session();
-        $Comment = $this->Form->getFormValue('Comment');
-        $Activities = $this->ActivityModel->getWhere(['NotifyUserID' => $NotifyUserID], '', '', $Limit, $Offset)->resultArray();
-        $this->ActivityModel->joinComments($Activities);
+        $session = Gdn::session();
+        $comment = $this->Form->getFormValue('Comment');
+        $activities = $this->ActivityModel->getWhere(['NotifyUserID' => $notifyUserID], '', '', $limit, $offset)->resultArray();
+        $this->ActivityModel->joinComments($activities);
 
-        $this->setData('Filter', strtolower($Filter));
-        $this->setData('Activities', $Activities);
+        $this->setData('Filter', strtolower($filter));
+        $this->setData('Activities', $activities);
 
         $this->addModule('ActivityFilterModule');
 
@@ -180,17 +180,17 @@ class ActivityController extends Gdn_Controller {
         $this->render();
     }
 
-    public function deleteComment($ID, $TK, $Target = '') {
+    public function deleteComment($iD, $tK, $target = '') {
         $session = Gdn::session();
-        if (!$session->validateTransientKey($TK)) {
+        if (!$session->validateTransientKey($tK)) {
             throw permissionException();
         }
 
-        if (!is_numeric($ID)) {
+        if (!is_numeric($iD)) {
             throw Gdn_UserException('Invalid ID');
         }
 
-        $comment = $this->ActivityModel->getComment($ID);
+        $comment = $this->ActivityModel->getComment($iD);
         if (!$comment) {
             throw notFoundException('Comment');
         }
@@ -203,9 +203,9 @@ class ActivityController extends Gdn_Controller {
         if (!$this->ActivityModel->canDelete($activity)) {
             throw permissionException();
         }
-        $this->ActivityModel->deleteComment($ID);
+        $this->ActivityModel->deleteComment($iD);
         if ($this->deliveryType() === DELIVERY_TYPE_ALL) {
-            redirectTo($Target);
+            redirectTo($target);
         }
 
         $this->render('Blank', 'Utility', 'Dashboard');
@@ -217,24 +217,24 @@ class ActivityController extends Gdn_Controller {
      * @since 2.0.0
      * @access public
      *
-     * @param int $ActivityID Unique ID of item to delete.
-     * @param string $TransientKey Verify intent.
+     * @param int $activityID Unique ID of item to delete.
+     * @param string $transientKey Verify intent.
      */
-    public function delete($ActivityID = '', $TransientKey = '') {
+    public function delete($activityID = '', $transientKey = '') {
         $session = Gdn::session();
-        if (!$session->validateTransientKey($TransientKey)) {
+        if (!$session->validateTransientKey($transientKey)) {
             throw permissionException();
         }
 
-        if (!is_numeric($ActivityID)) {
+        if (!is_numeric($activityID)) {
             throw Gdn_UserException('Invalid ID');
         }
 
-        if (!$this->ActivityModel->canDelete($this->ActivityModel->getID($ActivityID))) {
+        if (!$this->ActivityModel->canDelete($this->ActivityModel->getID($activityID))) {
             throw permissionException();
         }
 
-        $this->ActivityModel->deleteID($ActivityID);
+        $this->ActivityModel->deleteID($activityID);
 
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -260,16 +260,16 @@ class ActivityController extends Gdn_Controller {
     public function comment() {
         $this->permission('Garden.Profiles.Edit');
 
-        $Session = Gdn::session();
+        $session = Gdn::session();
         $this->Form->setModel($this->ActivityModel);
-        $NewActivityID = 0;
+        $newActivityID = 0;
 
         // Form submitted
         if ($this->Form->authenticatedPostBack()) {
-            $Body = $this->Form->getValue('Body', '');
-            $ActivityID = $this->Form->getValue('ActivityID', '');
-            if (is_numeric($ActivityID) && $ActivityID > 0) {
-                $activity = $this->ActivityModel->getID($ActivityID);
+            $body = $this->Form->getValue('Body', '');
+            $activityID = $this->Form->getValue('ActivityID', '');
+            if (is_numeric($activityID) && $activityID > 0) {
+                $activity = $this->ActivityModel->getID($activityID);
                 if ($activity) {
                     if ($activity['NotifyUserID'] == ActivityModel::NOTIFY_ADMINS) {
                         $this->permission('Garden.Settings.Manage');
@@ -280,14 +280,14 @@ class ActivityController extends Gdn_Controller {
                     throw new Exception(t('Invalid activity'));
                 }
 
-                $ActivityComment = [
-                    'ActivityID' => $ActivityID,
-                    'Body' => $Body,
+                $activityComment = [
+                    'ActivityID' => $activityID,
+                    'Body' => $body,
                     'Format' => 'Text'];
 
-                $ID = $this->ActivityModel->comment($ActivityComment);
+                $iD = $this->ActivityModel->comment($activityComment);
 
-                if ($ID == SPAM || $ID == UNAPPROVED) {
+                if ($iD == SPAM || $iD == UNAPPROVED) {
                     $this->StatusMessage = t('ActivityCommentRequiresApproval', 'Your comment will appear after it is approved.');
                     $this->render('Blank', 'Utility');
                     return;
@@ -304,14 +304,14 @@ class ActivityController extends Gdn_Controller {
 
         // Redirect back to the sending location if this isn't an ajax request
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $Target = $this->Form->getValue('Return');
-            if (!$Target) {
-                $Target = '/activity';
+            $target = $this->Form->getValue('Return');
+            if (!$target) {
+                $target = '/activity';
             }
-            redirectTo($Target);
+            redirectTo($target);
         } else {
             // Load the newly added comment.
-            $this->setData('Comment', $this->ActivityModel->getComment($ID));
+            $this->setData('Comment', $this->ActivityModel->getComment($iD));
 
             // Set it in the appropriate view.
             $this->View = 'comment';
@@ -324,82 +324,82 @@ class ActivityController extends Gdn_Controller {
     /**
      *
      *
-     * @param bool $Notify
-     * @param bool $UserID
+     * @param bool $notify
+     * @param bool $userID
      */
-    public function post($Notify = false, $UserID = false) {
-        if (is_numeric($Notify)) {
-            $UserID = $Notify;
-            $Notify = false;
+    public function post($notify = false, $userID = false) {
+        if (is_numeric($notify)) {
+            $userID = $notify;
+            $notify = false;
         }
 
-        if (!$UserID) {
-            $UserID = Gdn::session()->UserID;
+        if (!$userID) {
+            $userID = Gdn::session()->UserID;
         }
 
-        switch ($Notify) {
+        switch ($notify) {
             case 'mods':
                 $this->permission('Garden.Moderation.Manage');
-                $NotifyUserID = ActivityModel::NOTIFY_MODS;
+                $notifyUserID = ActivityModel::NOTIFY_MODS;
                 break;
             case 'admins':
                 $this->permission('Garden.Settings.Manage');
-                $NotifyUserID = ActivityModel::NOTIFY_ADMINS;
+                $notifyUserID = ActivityModel::NOTIFY_ADMINS;
                 break;
             default:
                 $this->permission('Garden.Profiles.Edit');
-                $NotifyUserID = ActivityModel::NOTIFY_PUBLIC;
+                $notifyUserID = ActivityModel::NOTIFY_PUBLIC;
                 break;
         }
 
-        $Activities = [];
+        $activities = [];
 
         if ($this->Form->authenticatedPostBack()) {
-            $Data = $this->Form->formValues();
-            $Data = $this->ActivityModel->filterForm($Data);
-            if (!isset($Data['Format']) || strcasecmp($Data['Format'], 'Raw') == 0) {
-                $Data['Format'] = c('Garden.InputFormatter');
+            $data = $this->Form->formValues();
+            $data = $this->ActivityModel->filterForm($data);
+            if (!isset($data['Format']) || strcasecmp($data['Format'], 'Raw') == 0) {
+                $data['Format'] = c('Garden.InputFormatter');
             }
 
-            if ($UserID != Gdn::session()->UserID) {
+            if ($userID != Gdn::session()->UserID) {
                 // This is a wall post.
-                $Activity = [
+                $activity = [
                     'ActivityType' => 'WallPost',
-                    'ActivityUserID' => $UserID,
+                    'ActivityUserID' => $userID,
                     'RegardingUserID' => Gdn::session()->UserID,
                     'HeadlineFormat' => t('HeadlineFormat.WallPost', '{RegardingUserID,you} &rarr; {ActivityUserID,you}'),
-                    'Story' => $Data['Comment'],
-                    'Format' => $Data['Format'],
+                    'Story' => $data['Comment'],
+                    'Format' => $data['Format'],
                     'Data' => ['Bump' => true]
                 ];
             } else {
                 // This is a status update.
-                $Activity = [
+                $activity = [
                     'ActivityType' => 'Status',
                     'HeadlineFormat' => t('HeadlineFormat.Status', '{ActivityUserID,user}'),
-                    'Story' => $Data['Comment'],
-                    'Format' => $Data['Format'],
-                    'NotifyUserID' => $NotifyUserID,
+                    'Story' => $data['Comment'],
+                    'Format' => $data['Format'],
+                    'NotifyUserID' => $notifyUserID,
                     'Data' => ['Bump' => true]
                 ];
-                $this->setJson('StatusMessage', Gdn_Format::plainText($Activity['Story'], $Activity['Format']));
+                $this->setJson('StatusMessage', Gdn_Format::plainText($activity['Story'], $activity['Format']));
             }
 
-            $Activity = $this->ActivityModel->save($Activity, false, ['CheckSpam' => true]);
-            if ($Activity == SPAM || $Activity == UNAPPROVED) {
+            $activity = $this->ActivityModel->save($activity, false, ['CheckSpam' => true]);
+            if ($activity == SPAM || $activity == UNAPPROVED) {
                 $this->StatusMessage = t('ActivityRequiresApproval', 'Your post will appear after it is approved.');
                 $this->render('Blank', 'Utility');
                 return;
             }
 
-            if ($Activity) {
-                if ($UserID == Gdn::session()->UserID && $NotifyUserID == ActivityModel::NOTIFY_PUBLIC) {
-                    Gdn::userModel()->setField(Gdn::session()->UserID, 'About', Gdn_Format::plainText($Activity['Story'], $Activity['Format']));
+            if ($activity) {
+                if ($userID == Gdn::session()->UserID && $notifyUserID == ActivityModel::NOTIFY_PUBLIC) {
+                    Gdn::userModel()->setField(Gdn::session()->UserID, 'About', Gdn_Format::plainText($activity['Story'], $activity['Format']));
                 }
 
-                $Activities = [$Activity];
-                ActivityModel::joinUsers($Activities);
-                $this->ActivityModel->calculateData($Activities);
+                $activities = [$activity];
+                ActivityModel::joinUsers($activities);
+                $this->ActivityModel->calculateData($activities);
             } else {
                 $this->Form->setValidationResults($this->ActivityModel->validationResults());
 
@@ -409,15 +409,15 @@ class ActivityController extends Gdn_Controller {
         }
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-            $Target = $this->Request->get('Target', '/activity');
-            if (isSafeUrl($Target)) {
-                redirectTo($Target);
+            $target = $this->Request->get('Target', '/activity');
+            if (isSafeUrl($target)) {
+                redirectTo($target);
             } else {
                 redirectTo('/activity');
             }
         }
 
-        $this->setData('Activities', $Activities);
+        $this->setData('Activities', $activities);
         $this->render('Activities');
     }
 }

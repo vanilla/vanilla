@@ -34,28 +34,28 @@ class DbaController extends DashboardController {
     /**
      * Recalculate counters.
      *
-     * @param bool $Table
-     * @param bool $Column
-     * @param bool $From
-     * @param bool $To
-     * @param bool $Max
+     * @param bool $table
+     * @param bool $column
+     * @param bool $from
+     * @param bool $to
+     * @param bool $max
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function counts($Table = false, $Column = false, $From = false, $To = false, $Max = false) {
+    public function counts($table = false, $column = false, $from = false, $to = false, $max = false) {
         increaseMaxExecutionTime(300);
         $this->permission('Garden.Settings.Manage');
 
-        if ($Table && $Column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
-            if (!ValidateRequired($Table)) {
+        if ($table && $column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
+            if (!ValidateRequired($table)) {
                 throw new Gdn_UserException("Table is required.");
             }
-            if (!ValidateRequired($Column)) {
+            if (!ValidateRequired($column)) {
                 throw new Gdn_UserException("Column is required.");
             }
 
-            $Result = $this->Model->counts($Table, $Column, $From, $To);
-            $this->setData('Result', $Result);
+            $result = $this->Model->counts($table, $column, $from, $to);
+            $this->setData('Result', $result);
         } else {
             $this->setData('Jobs', []);
             $this->fireEvent('CountJobs');
@@ -75,8 +75,8 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
-            $Result = $this->Model->fixPermissions();
-            $this->setData('Result', $Result);
+            $result = $this->Model->fixPermissions();
+            $this->setData('Result', $result);
         }
 
         $this->setData('Title', "Fix missing permission records after import");
@@ -91,8 +91,8 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
-            $CategoryModel = new CategoryModel();
-            $CategoryModel->rebuildTree();
+            $categoryModel = new CategoryModel();
+            $categoryModel->rebuildTree();
             $this->setData('Result', ['Complete' => true]);
         }
 
@@ -104,18 +104,18 @@ class DbaController extends DashboardController {
     /**
      *
      *
-     * @param $Table
-     * @param $Column
+     * @param $table
+     * @param $column
      */
-    public function fixUrlCodes($Table, $Column) {
+    public function fixUrlCodes($table, $column) {
         $this->permission('Garden.Settings.Manage');
 
         if ($this->Request->isAuthenticatedPostBack()) {
-            $Result = $this->Model->fixUrlCodes($Table, $Column);
-            $this->setData('Result', $Result);
+            $result = $this->Model->fixUrlCodes($table, $column);
+            $this->setData('Result', $result);
         }
 
-        $this->setData('Title', "Fix url codes for $Table.$Column");
+        $this->setData('Title', "Fix url codes for $table.$column");
         $this->_setJob($this->data('Title'));
         $this->render('Job');
     }
@@ -123,31 +123,31 @@ class DbaController extends DashboardController {
     /**
      * Scan a table for invalid InsertUserID values and update with SystemUserID
      *
-     * @param bool|string $Table The name of the table to fix InsertUserID in.
+     * @param bool|string $table The name of the table to fix InsertUserID in.
      */
-    public function fixInsertUserID($Table = false) {
+    public function fixInsertUserID($table = false) {
         $this->permission('Garden.Settings.Manage');
 
-        if ($this->Request->isAuthenticatedPostBack() && $Table) {
-            $this->Model->fixInsertUserID($Table);
+        if ($this->Request->isAuthenticatedPostBack() && $table) {
+            $this->Model->fixInsertUserID($table);
 
             $this->setData(
                 'Result',
                 ['Complete' => true]
             );
         } else {
-            $Tables = [
+            $tables = [
                 'Fix comments' => 'Comment',
                 'Fix discussions' => 'Discussion'
             ];
-            $Jobs = [];
+            $jobs = [];
 
-            foreach ($Tables as $CurrentLabel => $CurrentTable) {
-                $Jobs[$CurrentLabel] = "/dba/fixinsertuserid.json?".http_build_query(['table' => $CurrentTable]);
+            foreach ($tables as $currentLabel => $currentTable) {
+                $jobs[$currentLabel] = "/dba/fixinsertuserid.json?".http_build_query(['table' => $currentTable]);
             }
-            unset($CurrentLabel, $CurrentTable);
+            unset($currentLabel, $currentTable);
 
-            $this->setData('Jobs', $Jobs);
+            $this->setData('Jobs', $jobs);
         }
 
         $this->setData('Title', t('Fix Invalid InsertUserID'));
@@ -189,11 +189,11 @@ class DbaController extends DashboardController {
     /**
      * Set a job.
      *
-     * @param string $Name
+     * @param string $name
      */
-    protected function _setJob($Name) {
-        $Args = array_change_key_case($this->ReflectArgs);
-        $Url = "/dba/{$this->RequestMethod}.json?".http_build_query($Args);
-        $this->Data['Jobs'][$Name] = $Url;
+    protected function _setJob($name) {
+        $args = array_change_key_case($this->ReflectArgs);
+        $url = "/dba/{$this->RequestMethod}.json?".http_build_query($args);
+        $this->Data['Jobs'][$name] = $url;
     }
 }

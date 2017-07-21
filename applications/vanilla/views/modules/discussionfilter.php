@@ -20,9 +20,9 @@ if ($Session->isValid()) {
 }
 
 if (!function_exists('FilterCountString')) {
-    function filterCountString($Count, $Url = '') {
-        $Count = CountString($Count, $Url);
-        return $Count != '' ? '<span class="Aside">'.$Count.'</span>' : '';
+    function filterCountString($count, $url = '') {
+        $count = CountString($count, $url);
+        return $count != '' ? '<span class="Aside">'.$count.'</span>' : '';
     }
 }
 if (c('Vanilla.Discussions.ShowCounts', true)) {

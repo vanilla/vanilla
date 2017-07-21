@@ -22,27 +22,27 @@ class ToggleMenuModule extends Gdn_Module {
     /**
      *
      *
-     * @param $Name
-     * @param string $Code
-     * @param string $Url
+     * @param $name
+     * @param string $code
+     * @param string $url
      */
-    public function addLabel($Name, $Code = '', $Url = '') {
-        if ($Code == '') {
-            $Code = Gdn_Format::url(ucwords(trim(Gdn_Format::plainText($Name))));
+    public function addLabel($name, $code = '', $url = '') {
+        if ($code == '') {
+            $code = Gdn_Format::url(ucwords(trim(Gdn_Format::plainText($name))));
         }
 
-        $this->_Labels[] = ['Name' => $Name, 'Code' => $Code, 'Url' => $Url];
+        $this->_Labels[] = ['Name' => $name, 'Code' => $code, 'Url' => $url];
     }
 
     /**
      *
      *
-     * @param string $Label
+     * @param string $label
      * @return bool|string
      */
-    public function currentLabelCode($Label = '') {
-        if ($Label != '') {
-            $this->_CurrentLabelCode = $Label;
+    public function currentLabelCode($label = '') {
+        if ($label != '') {
+            $this->_CurrentLabelCode = $label;
         }
 
         // If the current code hasn't been assigned, use the first available label
@@ -59,28 +59,28 @@ class ToggleMenuModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
-        $Return = '<ul class="FilterMenu ToggleMenu">';
-        foreach ($this->_Labels as $Label) {
-            $Url = val('Url', $Label, '');
-            if ($Url == '') {
-                $Url = '#';
+        $return = '<ul class="FilterMenu ToggleMenu">';
+        foreach ($this->_Labels as $label) {
+            $url = val('Url', $label, '');
+            if ($url == '') {
+                $url = '#';
             }
 
-            $Name = val('Name', $Label, '');
-            $Code = val('Code', $Label, '');
-            $Active = strcasecmp($Code, $this->CurrentLabelCode()) == 0;
-            $CssClass = 'Handle-'.$Code;
-            $AnchorClass = '';
-            if ($Active) {
-                $CssClass .= ' Active';
-                $AnchorClass = 'TextColor';
+            $name = val('Name', $label, '');
+            $code = val('Code', $label, '');
+            $active = strcasecmp($code, $this->CurrentLabelCode()) == 0;
+            $cssClass = 'Handle-'.$code;
+            $anchorClass = '';
+            if ($active) {
+                $cssClass .= ' Active';
+                $anchorClass = 'TextColor';
             }
 
-            $Return .= '<li class="'.$CssClass.'">';
-            $Return .= anchor($Name, $Url, $AnchorClass);
-            $Return .= '</li>';
+            $return .= '<li class="'.$cssClass.'">';
+            $return .= anchor($name, $url, $anchorClass);
+            $return .= '</li>';
         }
-        $Return .= '</ul>';
-        return $Return;
+        $return .= '</ul>';
+        return $return;
     }
 }

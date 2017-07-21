@@ -9,13 +9,13 @@
 /**
  *
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_drafts_link($Params, &$Smarty) {
-    $Wrap = val('wrap', $Params, 'li');
+function smarty_function_drafts_link($params, &$smarty) {
+    $wrap = val('wrap', $params, 'li');
     return Gdn_Theme::link('drafts',
-        val('text', $Params, t('My Drafts')),
-        val('format', $Params, wrap('<a href="%url" class="%class">%text</a>', $Wrap)));
+        val('text', $params, t('My Drafts')),
+        val('format', $params, wrap('<a href="%url" class="%class">%text</a>', $wrap)));
 }

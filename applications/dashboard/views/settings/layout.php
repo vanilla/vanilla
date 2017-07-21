@@ -9,28 +9,28 @@ $CurrentCategoriesLayout = c('Vanilla.Categories.Layout', 'modern');
 if ($CurrentCategoriesLayout == '')
     $CurrentCategoriesLayout = 'modern';
 
-function writeHomepageOption($Title, $Url, $iconName, $Current, $Description = '') {
+function writeHomepageOption($title, $url, $iconName, $current, $description = '') {
     $iconPath = 'applications/dashboard/design/images/'.$iconName.'.png';
 
     $cssClass = '';
-    if ($Current == $Url) {
+    if ($current == $url) {
         $cssClass = 'active';
     }
     $cssClass .= ' Choice';
 
     echo wrap(
         '<div class="image-wrap">'
-        .img($iconPath, ['alt' => $Title, 'class' => 'label-selector-image'])
+        .img($iconPath, ['alt' => $title, 'class' => 'label-selector-image'])
         .'<div class="overlay">'
         .'<div class="buttons">'
-        .anchor(t('Select'), $Url, 'btn btn-overlay', ['title' => $Description, 'rel' => $Url])
+        .anchor(t('Select'), $url, 'btn btn-overlay', ['title' => $description, 'rel' => $url])
         .'</div>'
         .'<div class="selected">'
         .dashboardSymbol('checkmark')
         .'</div>'
         .'</div></div>'
         .'<div class="title">'
-        .t($Title)
+        .t($title)
         .'</div>',
         'div',
         ['class' => $cssClass.' label-selector-item']

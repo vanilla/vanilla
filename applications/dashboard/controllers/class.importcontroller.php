@@ -34,35 +34,35 @@ class ImportController extends DashboardController {
         if (!Gdn::session()->validateTransientKey($transientKey) && !Gdn::request()->isAuthenticatedPostBack()) {
             throw new Gdn_UserException('The CSRF token is invalid.', 403);
         }
-        $Imp = new ImportModel();
-        $Imp->loadState();
-        $this->setData('Steps', $Imp->steps());
+        $imp = new ImportModel();
+        $imp->loadState();
+        $this->setData('Steps', $imp->steps());
         $this->Form = new Gdn_Form();
 
-        if ($Imp->CurrentStep < 1) {
+        if ($imp->CurrentStep < 1) {
             // Check for the import file.
-            if ($Imp->ImportPath) {
-                $Imp->CurrentStep = 1;
+            if ($imp->ImportPath) {
+                $imp->CurrentStep = 1;
             } else {
                 redirectTo(strtolower($this->Application).'/import');
             }
         }
 
-        if ($Imp->CurrentStep >= 1) {
+        if ($imp->CurrentStep >= 1) {
             if ($this->Form->authenticatedPostBack()) {
-                $Imp->fromPost($this->Form->formValues());
+                $imp->fromPost($this->Form->formValues());
             }
             try {
-                $Result = $Imp->runStep($Imp->CurrentStep);
-            } catch (Exception $Ex) {
-                $Result = false;
-                $this->Form->addError($Ex);
+                $result = $imp->runStep($imp->CurrentStep);
+            } catch (Exception $ex) {
+                $result = false;
+                $this->Form->addError($ex);
                 $this->setJson('Error', true);
             }
 
-            if ($Result === true) {
-                $Imp->CurrentStep++;
-            } elseif ($Result === 'COMPLETE') {
+            if ($result === true) {
+                $imp->CurrentStep++;
+            } elseif ($result === 'COMPLETE') {
                 $this->setJson('Complete', true);
             }
 
@@ -73,19 +73,19 @@ class ImportController extends DashboardController {
 				$this->setData('CurrentStepMessage', val('Message', $Result));
 			}*/
         }
-        $Imp->saveState();
-        $this->Form->setValidationResults($Imp->Validation->results());
+        $imp->saveState();
+        $this->Form->setValidationResults($imp->Validation->results());
 
-        $this->setData('Stats', val('Stats', $Imp->Data, []));
-        $this->setData('CurrentStep', $Imp->CurrentStep);
-        $this->setData('CurrentStepMessage', val('CurrentStepMessage', $Imp->Data, ''));
-        $this->setData('ErrorType', val('ErrorType', $Imp));
+        $this->setData('Stats', val('Stats', $imp->Data, []));
+        $this->setData('CurrentStep', $imp->CurrentStep);
+        $this->setData('CurrentStepMessage', val('CurrentStepMessage', $imp->Data, ''));
+        $this->setData('ErrorType', val('ErrorType', $imp));
         if ($this->data('ErrorType')) {
             $this->setJson('Error', true);
         }
 
-        $Imp->toPost($Post);
-        $this->Form->formValues($Post);
+        $imp->toPost($post);
+        $this->Form->formValues($post);
 
         $this->addJsFile('import.js');
         $this->render();
@@ -99,110 +99,110 @@ class ImportController extends DashboardController {
      */
     public function index() {
         $this->permission('Garden.Import'); // This permission doesn't exist, so only users with Admin == '1' will succeed.
-        $Timer = new Gdn_Timer();
+        $timer = new Gdn_Timer();
 
         // Determine the current step.
         $this->Form = new Gdn_Form();
-        $Imp = new ImportModel();
-        $Imp->loadState();
+        $imp = new ImportModel();
+        $imp->loadState();
 
         // Search for the list of acceptable imports.
-        $ImportPaths = [];
-        $ExistingPaths = SafeGlob(PATH_UPLOADS.'/export*', ['gz', 'txt']);
-        $ExistingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
-        $ExistingPaths = array_merge($ExistingPaths, $ExistingPaths2);
-        foreach ($ExistingPaths as $Path) {
-            $ImportPaths[$Path] = basename($Path);
+        $importPaths = [];
+        $existingPaths = SafeGlob(PATH_UPLOADS.'/export*', ['gz', 'txt']);
+        $existingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
+        $existingPaths = array_merge($existingPaths, $existingPaths2);
+        foreach ($existingPaths as $path) {
+            $importPaths[$path] = basename($path);
         }
         // Add the database as a path.
-        $ImportPaths = array_merge(['db:' => t('This Database')], $ImportPaths);
+        $importPaths = array_merge(['db:' => t('This Database')], $importPaths);
 
-        if ($Imp->CurrentStep < 1) {
+        if ($imp->CurrentStep < 1) {
             // Check to see if there is a file.
-            $ImportPath = c('Garden.Import.ImportPath');
-            $Validation = new Gdn_Validation();
+            $importPath = c('Garden.Import.ImportPath');
+            $validation = new Gdn_Validation();
 
 
             if (Gdn::request()->isAuthenticatedPostBack(true)) {
-                $Upload = new Gdn_Upload();
-                $Validation = new Gdn_Validation();
-                if (count($ImportPaths) > 0) {
-                    $Validation->applyRule('PathSelect', 'Required', t('You must select a file to import.'));
+                $upload = new Gdn_Upload();
+                $validation = new Gdn_Validation();
+                if (count($importPaths) > 0) {
+                    $validation->applyRule('PathSelect', 'Required', t('You must select a file to import.'));
                 }
 
-                if (count($ImportPaths) == 0 || $this->Form->getFormValue('PathSelect') == 'NEW') {
-                    $TmpFile = $Upload->ValidateUpload('ImportFile', false);
+                if (count($importPaths) == 0 || $this->Form->getFormValue('PathSelect') == 'NEW') {
+                    $tmpFile = $upload->ValidateUpload('ImportFile', false);
                 } else {
-                    $TmpFile = '';
+                    $tmpFile = '';
                 }
 
-                if ($TmpFile) {
-                    $Filename = $_FILES['ImportFile']['name'];
-                    $Extension = pathinfo($Filename, PATHINFO_EXTENSION);
-                    $TargetFolder = PATH_ROOT.DS.'uploads'.DS.'import';
-                    if (!file_exists($TargetFolder)) {
-                        mkdir($TargetFolder, 0777, true);
+                if ($tmpFile) {
+                    $filename = $_FILES['ImportFile']['name'];
+                    $extension = pathinfo($filename, PATHINFO_EXTENSION);
+                    $targetFolder = PATH_ROOT.DS.'uploads'.DS.'import';
+                    if (!file_exists($targetFolder)) {
+                        mkdir($targetFolder, 0777, true);
                     }
-                    $ImportPath = $Upload->GenerateTargetName(PATH_ROOT.DS.'uploads'.DS.'import', $Extension);
-                    $Upload->SaveAs($TmpFile, $ImportPath);
-                    $Imp->ImportPath = $ImportPath;
-                    $this->Form->setFormValue('PathSelect', $ImportPath);
+                    $importPath = $upload->GenerateTargetName(PATH_ROOT.DS.'uploads'.DS.'import', $extension);
+                    $upload->SaveAs($tmpFile, $importPath);
+                    $imp->ImportPath = $importPath;
+                    $this->Form->setFormValue('PathSelect', $importPath);
 
-                    $UploadedFiles = val('UploadedFiles', $Imp->Data);
-                    $UploadedFiles[$ImportPath] = basename($Filename);
-                    $Imp->Data['UploadedFiles'] = $UploadedFiles;
-                } elseif (($PathSelect = $this->Form->getFormValue('PathSelect'))) {
-                    if ($PathSelect == 'NEW') {
-                        $Validation->addValidationResult('ImportFile', 'ValidateRequired');
+                    $uploadedFiles = val('UploadedFiles', $imp->Data);
+                    $uploadedFiles[$importPath] = basename($filename);
+                    $imp->Data['UploadedFiles'] = $uploadedFiles;
+                } elseif (($pathSelect = $this->Form->getFormValue('PathSelect'))) {
+                    if ($pathSelect == 'NEW') {
+                        $validation->addValidationResult('ImportFile', 'ValidateRequired');
                     } else {
-                        $Imp->ImportPath = $PathSelect;
+                        $imp->ImportPath = $pathSelect;
                     }
-                } elseif (!$Imp->ImportPath && count($ImportPaths) == 0) {
+                } elseif (!$imp->ImportPath && count($importPaths) == 0) {
                     // There was no file uploaded this request or before.
-                    $Validation->addValidationResult('ImportFile', $Upload->Exception);
+                    $validation->addValidationResult('ImportFile', $upload->Exception);
                 }
 
                 // Validate the overwrite.
                 if (true || strcasecmp($this->Form->getFormValue('Overwrite'), 'Overwrite') == 0) {
                     if (!stringBeginsWith($this->Form->getFormValue('PathSelect'), 'Db:', true)) {
-                        $Validation->applyRule('Email', 'Required');
+                        $validation->applyRule('Email', 'Required');
                     }
                 }
 
-                if ($Validation->validate($this->Form->formValues())) {
+                if ($validation->validate($this->Form->formValues())) {
                     $this->Form->setFormValue('Overwrite', 'overwrite');
-                    $Imp->fromPost($this->Form->formValues());
+                    $imp->fromPost($this->Form->formValues());
                     $this->View = 'Info';
                 } else {
-                    $this->Form->setValidationResults($Validation->results());
+                    $this->Form->setValidationResults($validation->results());
                 }
             } else {
-                $this->Form->setFormValue('PathSelect', $Imp->ImportPath);
+                $this->Form->setFormValue('PathSelect', $imp->ImportPath);
             }
-            $Imp->saveState();
+            $imp->saveState();
         } else {
-            $this->setData('Steps', $Imp->steps());
+            $this->setData('Steps', $imp->steps());
             $this->View = 'Info';
         }
 
-        if (!stringBeginsWith($Imp->ImportPath, 'db:') && !file_exists($Imp->ImportPath)) {
-            $Imp->deleteState();
+        if (!stringBeginsWith($imp->ImportPath, 'db:') && !file_exists($imp->ImportPath)) {
+            $imp->deleteState();
         }
 
         try {
-            $UploadedFiles = val('UploadedFiles', $Imp->Data, []);
-            $ImportPaths = array_merge($ImportPaths, $UploadedFiles);
-            $this->setData('ImportPaths', $ImportPaths);
-            $this->setData('Header', $Imp->getImportHeader());
-            $this->setData('Stats', val('Stats', $Imp->Data, []));
-            $this->setData('GenerateSQL', val('GenerateSQL', $Imp->Data));
-            $this->setData('ImportPath', $Imp->ImportPath);
-            $this->setData('OriginalFilename', val('OriginalFilename', $Imp->Data));
-            $this->setData('CurrentStep', $Imp->CurrentStep);
-            $this->setData('LoadSpeedWarning', $Imp->loadTableType(false) == 'LoadTableWithInsert');
-        } catch (Gdn_UserException $Ex) {
-            $this->Form->addError($Ex);
-            $Imp->saveState();
+            $uploadedFiles = val('UploadedFiles', $imp->Data, []);
+            $importPaths = array_merge($importPaths, $uploadedFiles);
+            $this->setData('ImportPaths', $importPaths);
+            $this->setData('Header', $imp->getImportHeader());
+            $this->setData('Stats', val('Stats', $imp->Data, []));
+            $this->setData('GenerateSQL', val('GenerateSQL', $imp->Data));
+            $this->setData('ImportPath', $imp->ImportPath);
+            $this->setData('OriginalFilename', val('OriginalFilename', $imp->Data));
+            $this->setData('CurrentStep', $imp->CurrentStep);
+            $this->setData('LoadSpeedWarning', $imp->loadTableType(false) == 'LoadTableWithInsert');
+        } catch (Gdn_UserException $ex) {
+            $this->Form->addError($ex);
+            $imp->saveState();
             $this->View = 'Index';
         }
         $this->addJsFile('import.js');
@@ -222,13 +222,13 @@ class ImportController extends DashboardController {
         }
 
         // Delete the individual table files.
-        $Imp = new ImportModel();
+        $imp = new ImportModel();
         try {
-            $Imp->loadState();
-            $Imp->deleteFiles();
-        } catch (Exception $Ex) {
+            $imp->loadState();
+            $imp->deleteFiles();
+        } catch (Exception $ex) {
         }
-        $Imp->deleteState();
+        $imp->deleteState();
 
         redirectTo(strtolower($this->Application).'/import');
     }

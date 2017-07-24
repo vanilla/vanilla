@@ -74,10 +74,16 @@ class Gdn_Dirtycache extends Gdn_Cache {
     }
 
     public function increment($Key, $Amount = 1, $Options = []) {
+        $value = array_key_exists($Key, $this->cache) ? intval($this->cache[$Key]) : 0;
+        $value += $Amount;
+        $this->cache[$Key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
     public function decrement($Key, $Amount = 1, $Options = []) {
+        $value = array_key_exists($Key, $this->cache) ? intval($this->cache[$Key]) : 0;
+        $value -= $Amount;
+        $this->cache[$Key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 

@@ -2329,6 +2329,11 @@ class CategoryModel extends Gdn_Model {
         }
         self::setCache();
         $this->collection->flushCache();
+
+        // Make sure the shared instance is reset.
+        if ($this !== self::instance()) {
+            self::instance()->collection->flushCache();
+        }
     }
 
     /**

@@ -320,8 +320,8 @@ class Gdn_OAuth2 extends Gdn_Plugin {
      */
     protected function getSettingsFormFields() {
         $formFields = [
-            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to be appended to the base domain to direct a user to register.'],
-            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to be appended to the base domain to log a user out.'],
+            'RegisterUrl' => ['LabelCode' => 'Register Url', 'Description' => 'Enter the endpoint to direct a user to register.'],
+            'SignOutUrl' => ['LabelCode' => 'Sign Out Url', 'Description' => 'Enter the endpoint to log a user out.'],
             'AcceptedScope' => ['LabelCode' => 'Request Scope', 'Description' => 'Enter the scope to be sent with Token Requests.'],
             'ProfileKeyEmail' => ['LabelCode' => 'Email', 'Description' => 'The Key in the JSON array to designate Emails'],
             'ProfileKeyPhoto' => ['LabelCode' => 'Photo', 'Description' => 'The Key in the JSON array to designate Photo.'],
@@ -359,6 +359,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             $sender->Form->validateRule('AssociationSecret', 'ValidateRequired', 'You must provide a Secret');
             $sender->Form->validateRule('AuthorizeUrl', 'isUrl', 'You must provide a complete URL in the Authorize Url field.');
             $sender->Form->validateRule('TokenUrl', 'isUrl', 'You must provide a complete URL in the Token Url field.');
+            $sender->Form->validateRule('ProfileUrl', 'isUrl', 'You must provide a complete URL in the Profile Url field.');
 
             // To satisfy the AuthenticationProviderModel, create a BaseUrl.
             $baseUrlParts = parse_url($form->getValue('AuthorizeUrl'));
@@ -376,9 +377,9 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $formFields = [
             'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Enter the unique ID of the authentication application.'],
             'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to be appended to the base domain to retrieve a user\'s profile.']
+            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to retrieve the authorization token for a user.'],
+            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to retrieve the authorization token for a user.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to retrieve a user\'s profile.']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -394,7 +395,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
 
-        // Create send the possible redirect URLs that will be required by Oculus and display them in the dashboard.
+        // Create and send the possible redirect URLs that will be required by the authenticating server and display them in the dashboard.
         // Use Gdn::Request instead of convience function so that we can return http and https.
         $redirectUrls = Gdn::request()->url('/entry/'. $this->getProviderKey(), true, true);
         $sender->setData('redirectUrls', $redirectUrls);

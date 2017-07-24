@@ -29,13 +29,13 @@ class ConditionModule extends Gdn_Module {
             if ($this->_Sender->Form->authenticatedPostBack()) {
                 $this->_Conditions = $this->_FromForm();
             } else {
-                $this->_Conditions = array();
+                $this->_Conditions = [];
             }
         }
 
         if ($Value === true) {
             // Remove blank conditions from the array. This is used for saving.
-            $Result = array();
+            $Result = [];
             foreach ($this->_Conditions as $Condition) {
                 if (count($Condition) < 2 || !$Condition[0]) {
                     continue;
@@ -57,7 +57,7 @@ class ConditionModule extends Gdn_Module {
         } else {
         }
 
-        $this->Types = array_merge(array('' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'), Gdn_Condition::AllTypes());
+        $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::AllTypes());
         //die(print_r($this->Types));
 
         // Get all of the permissions that are valid for the permissions dropdown.
@@ -66,13 +66,13 @@ class ConditionModule extends Gdn_Module {
         $Permissions = array_keys($Permissions);
         sort($Permissions);
         $Permissions = array_combine($Permissions, $Permissions);
-        $Permissions = array_merge(array('' => '('.sprintf(t('Select a %s'), t('Permission')).')'), $Permissions);
+        $Permissions = array_merge(['' => '('.sprintf(t('Select a %s'), t('Permission')).')'], $Permissions);
         $this->Permissions = $Permissions;
 
         // Get all of the roles.
         $RoleModel = new RoleModel();
         $Roles = $RoleModel->getArray();
-        $Roles = array_merge(array('-' => '('.sprintf(t('Select a %s'), t('Role')).')'), $Roles);
+        $Roles = array_merge(['-' => '('.sprintf(t('Select a %s'), t('Role')).')'], $Roles);
         $this->Roles = $Roles;
 
         $this->Form = $Form;
@@ -84,15 +84,15 @@ class ConditionModule extends Gdn_Module {
         $Form = new Gdn_Form();
         $Px = $this->Prefix;
 
-        $Types = (array)$Form->getFormValue($Px.'Type', array());
-        $PermissionFields = (array)$Form->getFormValue($Px.'PermissionField', array());
-        $RoleFields = (array)$Form->getFormValue($Px.'RoleField', array());
-        $Fields = (array)$Form->getFormValue($Px.'Field', array());
-        $Expressions = (array)$Form->getFormValue($Px.'Expr', array());
+        $Types = (array)$Form->getFormValue($Px.'Type', []);
+        $PermissionFields = (array)$Form->getFormValue($Px.'PermissionField', []);
+        $RoleFields = (array)$Form->getFormValue($Px.'RoleField', []);
+        $Fields = (array)$Form->getFormValue($Px.'Field', []);
+        $Expressions = (array)$Form->getFormValue($Px.'Expr', []);
 
-        $Conditions = array();
+        $Conditions = [];
         for ($i = 0; $i < count($Types) - 1; $i++) {
-            $Condition = array($Types[$i]);
+            $Condition = [$Types[$i]];
             switch ($Types[$i]) {
                 case Gdn_Condition::PERMISSION:
                     $Condition[1] = val($i, $PermissionFields, '');

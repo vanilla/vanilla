@@ -62,7 +62,8 @@ class DBAModel extends Gdn_Model {
      * @param string $ChildColumnName
      * @param string $ParentJoinColumn
      * @param string $ChildJoinColumn
-     * @return type
+     * @param int|string $default A default value for the field. Passed to MySQL's coalesce function.
+     * @return string
      */
     public static function getCountSQL(
         $Aggregate,
@@ -73,8 +74,12 @@ class DBAModel extends Gdn_Model {
         $ChildColumnName = '',
         $ParentJoinColumn = '',
         $ChildJoinColumn = '',
-        $Where = array()
+        $Where = [],
+        $default = 0
     ) {
+
+        $PDO = Gdn::database()->connection();
+        $default = $PDO->quote($default);
 
         if (!$ParentColumnName) {
             switch (strtolower($Aggregate)) {
@@ -106,13 +111,12 @@ class DBAModel extends Gdn_Model {
 
         $Result = "update :_$ParentTable p
                   set p.$ParentColumnName = (
-                     select coalesce($Aggregate(c.$ChildColumnName), 0)
+                     select coalesce($Aggregate(c.$ChildColumnName), $default)
                      from :_$ChildTable c
                      where p.$ParentJoinColumn = c.$ChildJoinColumn)";
 
         if (!empty($Where)) {
-            $Wheres = array();
-            $PDO = Gdn::database()->connection();
+            $Wheres = [];
             foreach ($Where as $Column => $Value) {
                 $Value = $PDO->quote($Value);
                 $Wheres[] = "p.`$Column` = $Value";
@@ -145,18 +149,18 @@ class DBAModel extends Gdn_Model {
             ->limit($Limit)
             ->get()->resultArray();
 
-        $Result = array();
+        $Result = [];
         $Result['Count'] = count($Data);
         $Result['Complete'] = false;
-        $Result['Decoded'] = array();
-        $Result['NotDecoded'] = array();
+        $Result['Decoded'] = [];
+        $Result['NotDecoded'] = [];
 
         // Loop through each row in the working set and decode the values.
         foreach ($Data as $Row) {
             $Value = $Row[$Column];
             $DecodedValue = HtmlEntityDecode($Value);
 
-            $Item = array('From' => $Value, 'To' => $DecodedValue);
+            $Item = ['From' => $Value, 'To' => $DecodedValue];
 
             if ($Value != $DecodedValue) {
                 $Model->setField($Row[$Model->PrimaryKey], $Column, $DecodedValue);
@@ -202,7 +206,7 @@ class DBAModel extends Gdn_Model {
 
             if (!count($Permissions)) {
                 // Set basic permission record
-                $DefaultRecord = array(
+                $DefaultRecord = [
                     'RoleID' => $RoleID,
                     'JunctionTable' => null,
                     'JunctionColumn' => null,
@@ -213,11 +217,11 @@ class DBAModel extends Gdn_Model {
                     'Garden.Profiles.View' => 1,
                     'Garden.Profiles.Edit' => 1,
                     'Conversations.Conversations.Add' => 1
-                );
+                ];
                 $PermissionModel->save($DefaultRecord);
 
                 // Set default category permission
-                $DefaultCategory = array(
+                $DefaultCategory = [
                     'RoleID' => $RoleID,
                     'JunctionTable' => 'Category',
                     'JunctionColumn' => 'PermissionCategoryID',
@@ -225,12 +229,12 @@ class DBAModel extends Gdn_Model {
                     'Vanilla.Discussions.View' => 1,
                     'Vanilla.Discussions.Add' => 1,
                     'Vanilla.Comments.Add' => 1
-                );
+                ];
                 $PermissionModel->save($DefaultCategory);
             }
         }
 
-        return array('Complete' => true);
+        return ['Complete' => true];
     }
 
     public function fixUrlCodes($Table, $Column) {
@@ -255,7 +259,7 @@ class DBAModel extends Gdn_Model {
             }
         }
 
-        return array('Complete' => true);
+        return ['Complete' => true];
     }
 
     /**
@@ -351,9 +355,9 @@ class DBAModel extends Gdn_Model {
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
         if ($Data) {
-            return array($Data['MinValue'], $Data['MaxValue']);
+            return [$Data['MinValue'], $Data['MaxValue']];
         } else {
-            return array(0, 0);
+            return [0, 0];
         }
     }
 }

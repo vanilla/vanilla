@@ -156,7 +156,7 @@ class MorePagerModule extends PagerModule {
         // Check for new style page.
         if (strpos($Url, '{Page}') !== false || strpos($Url, '{Offset}') !== false) {
             $Page = PageNumber($Offset, $Limit, true);
-            return str_replace(array('{Offset}', '{Page}', '{Size}'), array($Offset, $Page, $Limit), $Url);
+            return str_replace(['{Offset}', '{Page}', '{Size}'], [$Offset, $Page, $Limit], $Url);
         } else {
             return self::FormatUrl($Url, $Page, $Limit);
         }
@@ -184,7 +184,7 @@ class MorePagerModule extends PagerModule {
         }
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
-        $this->Url = str_replace(array('%1$s', '%2$s', '%s'), array('{Offset}', '{Size}', '{Offset}'), $this->Url);
+        $this->Url = str_replace(['%1$s', '%2$s', '%s'], ['{Offset}', '{Size}', '{Offset}'], $this->Url);
 
         $Pager = '';
         if ($Type == 'more') {
@@ -203,7 +203,7 @@ class MorePagerModule extends PagerModule {
                     sprintf(t($this->MoreCode), $ActualRecordsLeft),
                     self::FormatUrl($this->Url, $NextOffset, $this->Limit),
                     '',
-                    array('rel' => 'nofollow')
+                    ['rel' => 'nofollow']
                 );
             }
         } elseif ($Type == 'less') {
@@ -225,14 +225,14 @@ class MorePagerModule extends PagerModule {
                     sprintf(t($this->LessCode), $this->Offset),
                     self::FormatUrl($this->Url, $PreviousOffset, $RecordsBefore),
                     '',
-                    array('rel' => 'nofollow')
+                    ['rel' => 'nofollow']
                 );
             }
         }
         if ($Pager == '') {
             return $this->PagerEmpty;
         } else {
-            return sprintf($this->Wrapper, Attribute(array('id' => $ClientID, 'class' => $this->CssClass)), $Pager);
+            return sprintf($this->Wrapper, Attribute(['id' => $ClientID, 'class' => $this->CssClass]), $Pager);
         }
     }
 

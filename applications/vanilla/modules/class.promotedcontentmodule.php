@@ -52,7 +52,7 @@ class PromotedContentModule extends Gdn_Module {
     public $Expiry = 60;
 
     /** @var array Whitelist of accepted parameters. */
-    public $Properties = array(
+    public $Properties = [
         'Selector',
         'Selection',
         'ContentType',
@@ -61,7 +61,7 @@ class PromotedContentModule extends Gdn_Module {
         'TitleLimit',
         'BodyLimit',
         'Expiry'
-    );
+    ];
 
     public function __construct() {
         parent::__construct();
@@ -73,7 +73,7 @@ class PromotedContentModule extends Gdn_Module {
      *
      * @param array $Parameters Use lowercase key names that map to class properties.
      */
-    public function load($Parameters = array()) {
+    public function load($Parameters = []) {
         $Result = $this->validate($Parameters);
         if ($Result === true) {
             // Match existing properties to validates parameters.
@@ -99,7 +99,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Parameters .
      * @return string|true True on success or string (message) on error.
      */
-    public function validate($Parameters = array()) {
+    public function validate($Parameters = []) {
         $validation = new Gdn_Validation();
 
         // Validate integer properties.
@@ -114,13 +114,13 @@ class PromotedContentModule extends Gdn_Module {
 
         // Validate selector.
         $validation->applyRule('selector', 'Required');
-        $selectorWhitelist = array('role', 'rank', 'category', 'score', 'promoted');
+        $selectorWhitelist = ['role', 'rank', 'category', 'score', 'promoted'];
         if (isset($Parameters['selector']) && !in_array($Parameters['selector'], $selectorWhitelist)) {
             $validation->addValidationResult('selector', 'Invalid selector.');
         }
 
         // Validate ContentType.
-        $typeWhitelist = array('all', 'discussions', 'comments');
+        $typeWhitelist = ['all', 'discussions', 'comments'];
         if (isset($Parameters['contenttype']) && !in_array($Parameters['contenttype'], $typeWhitelist)) {
             $validation->addValidationResult('contenttype', 'Invalid contenttype.');
         }
@@ -136,7 +136,7 @@ class PromotedContentModule extends Gdn_Module {
         $this->setData('Content', false);
         $SelectorMethod = 'SelectBy'.ucfirst($this->Selector);
         if (method_exists($this, $SelectorMethod)) {
-            $this->setData('Content', call_user_func(array($this, $SelectorMethod), $this->Selection));
+            $this->setData('Content', call_user_func([$this, $SelectorMethod], $this->Selection));
         } else {
             $this->fireEvent($SelectorMethod);
         }
@@ -159,7 +159,7 @@ class PromotedContentModule extends Gdn_Module {
         if ($RoleID && is_string($RoleID)) {
             $RoleModel = new RoleModel();
             $Roles = explode(',', $RoleID);
-            $RoleID = array();
+            $RoleID = [];
             foreach ($Roles as $TestRoleID) {
                 $TestRoleID = trim($TestRoleID);
                 $Role = $RoleModel->GetByName($TestRoleID);
@@ -192,7 +192,7 @@ class PromotedContentModule extends Gdn_Module {
             $UserIDs = array_column($UserIDs, 'UserID');
 
             // Get matching Discussions
-            $Discussions = array();
+            $Discussions = [];
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
@@ -203,7 +203,7 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Get matching Comments
-            $Comments = array();
+            $Comments = [];
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
@@ -216,16 +216,16 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Interleave
-            $Content = $this->Union('DateInserted', array(
+            $Content = $this->Union('DateInserted', [
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
-            ));
+            ]);
             $this->processContent($Content);
 
             // Add result to cache
-            Gdn::cache()->store($SelectorRoleCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorRoleCacheKey, $Content, [
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
-            ));
+            ]);
         }
 
         $this->Security($Content);
@@ -254,7 +254,7 @@ class PromotedContentModule extends Gdn_Module {
         // Check for Rank passed by name.
         if (!is_numeric($RankID)) {
             $RankModel = new RankModel();
-            $Rank = $RankModel->getWhere(array('Name' => $RankID))->firstRow();
+            $Rank = $RankModel->getWhere(['Name' => $RankID])->firstRow();
             $RankID = val('RankID', $Rank);
         }
 
@@ -277,7 +277,7 @@ class PromotedContentModule extends Gdn_Module {
             $UserIDs = array_column($UserIDs, 'UserID');
 
             // Get matching Discussions
-            $Discussions = array();
+            $Discussions = [];
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
@@ -288,7 +288,7 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Get matching Comments
-            $Comments = array();
+            $Comments = [];
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
@@ -301,16 +301,16 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Interleave
-            $Content = $this->Union('DateInserted', array(
+            $Content = $this->Union('DateInserted', [
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
-            ));
+            ]);
             $this->processContent($Content);
 
             // Add result to cache
-            Gdn::cache()->store($SelectorRankCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorRankCacheKey, $Content, [
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
-            ));
+            ]);
         }
 
         $this->Security($Content);
@@ -346,7 +346,7 @@ class PromotedContentModule extends Gdn_Module {
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
-            $Discussions = array();
+            $Discussions = [];
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
@@ -357,7 +357,7 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Get matching Comments
-            $Comments = array();
+            $Comments = [];
             if ($this->ShowComments()) {
                 $CommentDiscussionIDs = Gdn::sql()->select('d.DiscussionID')
                     ->from('Discussion d')
@@ -378,16 +378,16 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Interleave
-            $Content = $this->Union('DateInserted', array(
+            $Content = $this->Union('DateInserted', [
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
-            ));
+            ]);
             $this->processContent($Content);
 
             // Add result to cache
-            Gdn::cache()->store($SelectorCategoryCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorCategoryCacheKey, $Content, [
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
-            ));
+            ]);
         }
 
         $this->Security($Content);
@@ -418,7 +418,7 @@ class PromotedContentModule extends Gdn_Module {
 
         if ($Content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
-            $Discussions = array();
+            $Discussions = [];
             if ($this->ShowDiscussions()) {
                 $Discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
@@ -431,7 +431,7 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Get matching Comments
-            $Comments = array();
+            $Comments = [];
             if ($this->ShowComments()) {
                 $Comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
@@ -446,16 +446,16 @@ class PromotedContentModule extends Gdn_Module {
             }
 
             // Interleave
-            $Content = $this->Union('DateInserted', array(
+            $Content = $this->Union('DateInserted', [
                 'Discussion' => $Discussions,
                 'Comment' => $Comments
-            ));
+            ]);
             $this->processContent($Content);
 
             // Add result to cache
-            Gdn::cache()->store($SelectorScoreCacheKey, $Content, array(
+            Gdn::cache()->store($SelectorScoreCacheKey, $Content, [
                 Gdn_Cache::FEATURE_EXPIRY => $this->Expiry
-            ));
+            ]);
         }
 
         $this->Security($Content);
@@ -476,7 +476,7 @@ class PromotedContentModule extends Gdn_Module {
             return;
         }
 
-        $RecordTypes = array();
+        $RecordTypes = [];
         if ($this->ShowDiscussions()) {
             $RecordTypes[] = 'Discussion';
         }
@@ -487,7 +487,7 @@ class PromotedContentModule extends Gdn_Module {
         $ReactionModel = new ReactionModel();
         $PromotedTagID = $ReactionModel->DefineTag('Promoted', 'BestOf');
         $Content = $ReactionModel->GetRecordsWhere(
-            array('TagID' => $PromotedTagID, 'RecordType' => $RecordTypes),
+            ['TagID' => $PromotedTagID, 'RecordType' => $RecordTypes],
             'DateInserted',
             'desc',
             $this->Limit
@@ -504,7 +504,7 @@ class PromotedContentModule extends Gdn_Module {
      * @param array $Comments
      */
     protected function joinCategory(&$Comments) {
-        $DiscussionIDs = array();
+        $DiscussionIDs = [];
 
         foreach ($Comments as &$Comment) {
             $DiscussionIDs[$Comment['DiscussionID']] = true;
@@ -516,7 +516,7 @@ class PromotedContentModule extends Gdn_Module {
             ->whereIn('DiscussionID', $DiscussionIDs)
             ->get()->result(DATASET_TYPE_ARRAY);
 
-        $DiscussionsByID = array();
+        $DiscussionsByID = [];
         foreach ($Discussions as $Discussion) {
             $DiscussionsByID[$Discussion['DiscussionID']] = $Discussion;
         }
@@ -540,7 +540,7 @@ class PromotedContentModule extends Gdn_Module {
             return;
         }
 
-        $Interleaved = array();
+        $Interleaved = [];
         foreach ($Sections as $SectionType => $Section) {
             if (!is_array($Section)) {
                 continue;
@@ -548,7 +548,7 @@ class PromotedContentModule extends Gdn_Module {
 
             foreach ($Section as $Item) {
                 $ItemField = val($Field, $Item);
-                $Interleaved[$ItemField] = array_merge($Item, array('RecordType' => $SectionType));
+                $Interleaved[$ItemField] = array_merge($Item, ['RecordType' => $SectionType]);
 
                 ksort($Interleaved);
             }
@@ -568,12 +568,12 @@ class PromotedContentModule extends Gdn_Module {
         foreach ($content as &$item) {
             $contentType = val('RecordType', $item);
             $userID = val('InsertUserID', $item);
-            $itemProperties = array();
-            $itemFields = array('DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl',);
+            $itemProperties = [];
+            $itemFields = ['DiscussionID', 'DateInserted', 'DateUpdated', 'Body', 'Format', 'RecordType', 'Url', 'CategoryID', 'CategoryName', 'CategoryUrl',];
 
             switch (strtolower($contentType)) {
                 case 'comment':
-                    $itemFields = array_merge($itemFields, array('CommentID'));
+                    $itemFields = array_merge($itemFields, ['CommentID']);
 
                     // Comment specific
                     $itemProperties['Name'] = sprintf(t('Re: %s'), valr('Discussion.Name', $item, val('Name', $item)));
@@ -581,7 +581,7 @@ class PromotedContentModule extends Gdn_Module {
                     break;
 
                 case 'discussion':
-                    $itemFields = array_merge($itemFields, array('Name', 'Type'));
+                    $itemFields = array_merge($itemFields, ['Name', 'Type']);
                     $url = DiscussionUrl($item);
                     break;
             }
@@ -598,7 +598,7 @@ class PromotedContentModule extends Gdn_Module {
             $item = $itemProperties;
 
             // Attach User
-            $userFields = array('UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames');
+            $userFields = ['UserID', 'Name', 'Title', 'Location', 'PhotoUrl', 'RankName', 'Url', 'Roles', 'RoleNames'];
 
             $user = Gdn::userModel()->getID($userID);
             $roleModel = new RoleModel();
@@ -612,13 +612,13 @@ class PromotedContentModule extends Gdn_Module {
             if (class_exists('RankModel')) {
                 $rankName = val('Name', RankModel::Ranks(val('RankID', $user)), null);
             }
-            $userProperties = array(
+            $userProperties = [
                 'Url' => url(userUrl($user), true),
                 'PhotoUrl' => UserPhotoUrl($user),
                 'RankName' => $rankName,
                 'RoleNames' => $roleNames,
                 'CssClass' => val('_CssClass', $user)
-            );
+            ];
             $user = (array)$user;
             $userFields = array_fill_keys($userFields, true);
             $filteredUser = array_intersect_key($user, $userFields);
@@ -636,7 +636,7 @@ class PromotedContentModule extends Gdn_Module {
         if (!is_array($Content)) {
             return;
         }
-        $Content = array_filter($Content, array($this, 'SecurityFilter'));
+        $Content = array_filter($Content, [$this, 'SecurityFilter']);
     }
 
     /**

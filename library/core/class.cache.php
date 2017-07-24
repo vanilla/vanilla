@@ -24,7 +24,7 @@ abstract class Gdn_Cache {
     protected $cacheType;
 
     /** @var array Memory copy of store containers. */
-    protected static $stores = array();
+    protected static $stores = [];
 
     /** Allows items to be internally compressed/decompressed. */
     const FEATURE_COMPRESS = 'f_compress';
@@ -111,19 +111,19 @@ abstract class Gdn_Cache {
     const CACHE_SHARD_AUTO_SIZE = 100000;
 
     /**  @var array Local in-memory cache of fetched data. This prevents duplicate gets to memcache. */
-    protected static $localCache = array();
+    protected static $localCache = [];
 
     /** @var bool  */
     public static $trace = true;
 
     /** @var array  */
-    public static $trackGet = array();
+    public static $trackGet = [];
 
     /** @var int  */
     public static $trackGets = 0;
 
     /** @var array  */
-    public static $trackSet = array();
+    public static $trackSet = [];
 
     /** @var int  */
     public static $trackSets = 0;
@@ -135,8 +135,8 @@ abstract class Gdn_Cache {
      *
      */
     public function __construct() {
-        $this->containers = array();
-        $this->features = array();
+        $this->containers = [];
+        $this->features = [];
     }
 
     /**
@@ -266,7 +266,7 @@ abstract class Gdn_Cache {
         if (is_array($LocalStore)) {
             // Convert to ActiveStore format (with 'Active' key)
             $Save = false;
-            $ActiveStore = array();
+            $ActiveStore = [];
             foreach ($LocalStore as $StoreServerName => &$StoreServer) {
                 $IsDelayed = &$StoreServer['Delay'];
                 $IsActive = &$StoreServer['Active'];
@@ -298,16 +298,16 @@ abstract class Gdn_Cache {
             $ActiveStore = c($ActiveStoreKey, false);
 
             // Convert to LocalStore format
-            $LocalStore = array();
+            $LocalStore = [];
             $ActiveStore = (array)$ActiveStore;
             foreach ($ActiveStore as $StoreServer) {
                 $StoreServerName = md5($StoreServer);
-                $LocalStore[$StoreServerName] = array(
+                $LocalStore[$StoreServerName] = [
                     'Server' => $StoreServer,
                     'Active' => true,
                     'Delay' => false,
                     'Fails' => 0
-                );
+                ];
             }
 
             $Save = true;
@@ -408,7 +408,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return boolean true on success or false on failure.
      */
-    abstract public function add($Key, $Value, $Options = array());
+    abstract public function add($Key, $Value, $Options = []);
 
     public function stripKey($Key, $Options) {
         $UsePrefix = !val(Gdn_Cache::FEATURE_NOPREFIX, $Options, false);
@@ -436,7 +436,7 @@ abstract class Gdn_Cache {
      *   - FEATURE_FALLBACK: Allows querying DB for missing keys, or firing a callback (see Gdn_Cache->Fallback).
      * @return boolean true on success or false on failure.
      */
-    abstract public function store($Key, $Value, $Options = array());
+    abstract public function store($Key, $Value, $Options = []);
 
     /**
      * Check if a value exists in the cache.
@@ -453,7 +453,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return mixed key value or false on failure or not found.
      */
-    abstract public function get($Key, $Options = array());
+    abstract public function get($Key, $Options = []);
 
     /**
      * Remove a key/value pair from the cache.
@@ -462,7 +462,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return boolean true on success or false on failure.
      */
-    abstract public function remove($Key, $Options = array());
+    abstract public function remove($Key, $Options = []);
 
     /**
      * Replace an existing key's value with the provided value.
@@ -474,7 +474,7 @@ abstract class Gdn_Cache {
      * @param array $Options
      * @return boolean true on success or false on failure.
      */
-    abstract public function replace($Key, $Value, $Options = array());
+    abstract public function replace($Key, $Value, $Options = []);
 
     /**
      * Increment the value of the provided key by {@link $Amount}.
@@ -486,7 +486,7 @@ abstract class Gdn_Cache {
      * @param int $Amount Amount to shift value up.
      * @return int new value or false on failure.
      */
-    abstract public function increment($Key, $Amount = 1, $Options = array());
+    abstract public function increment($Key, $Amount = 1, $Options = []);
 
     /**
      * Decrement the value of the provided key by {@link $Amount}.
@@ -498,7 +498,7 @@ abstract class Gdn_Cache {
      * @param int $Amount Amount to shift value down.
      * @return int new value or false on failure.
      */
-    abstract public function decrement($Key, $Amount = 1, $Options = array());
+    abstract public function decrement($Key, $Amount = 1, $Options = []);
 
     /**
      * Add a container to the cache pool.
@@ -610,9 +610,9 @@ abstract class Gdn_Cache {
             }
 
             $CacheRevisionKey = "{$ConfigPrefix}.Revision";
-            $CacheRevision = $this->get($CacheRevisionKey, array(
+            $CacheRevision = $this->get($CacheRevisionKey, [
                 Gdn_Cache::FEATURE_NOPREFIX => true
-            ));
+            ]);
 
             if ($CacheRevision === Gdn_Cache::CACHEOP_FAILURE) {
                 $CacheRevision = 1;
@@ -629,14 +629,14 @@ abstract class Gdn_Cache {
         }
 
         $CacheRevisionKey = "{$CachePrefix}.Revision";
-        $Incremented = $this->increment($CacheRevisionKey, 1, array(
+        $Incremented = $this->increment($CacheRevisionKey, 1, [
             Gdn_Cache::FEATURE_NOPREFIX => true
-        ));
+        ]);
 
         if (!$Incremented) {
-            return $this->store($CacheRevisionKey, 2, array(
+            return $this->store($CacheRevisionKey, 2, [
                 Gdn_Cache::FEATURE_NOPREFIX => true
-            ));
+            ]);
         }
 
         return true;
@@ -652,7 +652,7 @@ abstract class Gdn_Cache {
         }
 
         if (is_array($Key)) {
-            $Result = array();
+            $Result = [];
             foreach ($Key as $i => $v) {
                 $Result[$i] = $Prefix.$v;
             }
@@ -693,7 +693,7 @@ abstract class Gdn_Cache {
         if (is_null($ActiveOptions)) {
             $ActiveCacheShortName = ucfirst($this->activeCache());
             $OptionKey = "Cache.{$ActiveCacheShortName}.Option";
-            $ActiveOptions = c($OptionKey, array());
+            $ActiveOptions = c($OptionKey, []);
         }
 
         if (is_null($Option)) {
@@ -718,7 +718,7 @@ abstract class Gdn_Cache {
         if (is_null($ActiveConfig)) {
             $ActiveCacheShortName = ucfirst($this->activeCache());
             $ConfigKey = "Cache.{$ActiveCacheShortName}.Config";
-            $ActiveConfig = c($ConfigKey, array());
+            $ActiveConfig = c($ConfigKey, []);
         }
 
         if (is_null($Key)) {
@@ -759,7 +759,7 @@ abstract class Gdn_Cache {
         }
 
         if (!is_array($key)) {
-            $key = array($key => $value);
+            $key = [$key => $value];
         }
         self::$localCache = array_merge(self::$localCache, $key);
     }
@@ -768,7 +768,7 @@ abstract class Gdn_Cache {
      * Clear local cache (process memory cache).
      */
     protected static function localClear() {
-        self::$localCache = array();
+        self::$localCache = [];
     }
 
     /**

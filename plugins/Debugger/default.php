@@ -66,7 +66,7 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function gdn_pluginManager_afterStart_handler($sender) {
         $tmp = Gdn::factoryOverwrite(true);
-        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', __DIR__.DS.'class.databasedebug.php', Gdn::FactorySingleton, array('Database'));
+        Gdn::factoryInstall(Gdn::AliasDatabase, 'Gdn_DatabaseDebug', __DIR__.DS.'class.databasedebug.php', Gdn::FactorySingleton, ['Database']);
         Gdn::factoryOverwrite($tmp);
         unset($tmp);
     }
@@ -138,6 +138,6 @@ class DebuggerPlugin extends Gdn_Plugin {
      *
      */
     public function onDisable() {
-        saveToConfig('Debug', FALSE, array('RemoveEmpty' => TRUE));
+        saveToConfig('Debug', FALSE, ['RemoveEmpty' => TRUE]);
     }
 }

@@ -26,7 +26,7 @@ class Gdn_Email extends Gdn_Pluggable {
     private $_IsToSet;
 
     /** @var array Recipients that were skipped because they lack permission. */
-    public $Skipped = array();
+    public $Skipped = [];
 
     /** @var EmailTemplate The email body renderer. Use this to edit the email body. */
     protected $emailTemplate;
@@ -35,7 +35,7 @@ class Gdn_Email extends Gdn_Pluggable {
     protected $format;
 
     /** @var string The supported email formats. */
-    public static $supportedFormats = array('html', 'text');
+    public static $supportedFormats = ['html', 'text'];
 
     /**
      * Constructor.
@@ -162,7 +162,7 @@ class Gdn_Email extends Gdn_Pluggable {
         $this->_IsToSet = false;
         $this->mimeType(c('Garden.Email.MimeType', 'text/plain'));
         $this->_MasterView = 'email.master';
-        $this->Skipped = array();
+        $this->Skipped = [];
         return $this;
     }
 

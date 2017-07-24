@@ -93,10 +93,10 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
      * @param string $iconPath The url path to the icon.
      */
     public function addEmojiSet($key, $manifest, $basePath) {
-        $this->emojiSets[$key] = array(
+        $this->emojiSets[$key] = [
             'manifest' => $manifest,
             'basePath' => $basePath
-        );
+        ];
     }
 
     /**
@@ -110,13 +110,13 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
 
             $this->addEmojiSet(
                 '',
-                array(
+                [
                     'name' => 'Apple Emoji',
                     'author' => 'Apple Inc.',
                     'description' => 'A modern set of emoji you might recognize from any of your ubiquitous iDevices.',
                     'icon' => 'icon.png'
 
-                ),
+                ],
                 '/resources/emoji'
             );
 
@@ -158,12 +158,12 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
         $sender->permission('Garden.Settings.Manage');
 
         $cf = new ConfigurationModule($sender);
-        $items = array();
+        $items = [];
 
         foreach ($this->getEmojiSets() as $key => $emojiSet) {
             $manifest = $this->getManifest($emojiSet);
             $selected = '<svg class="icon icon-svg-checkmark" viewBox="0 0 17 17"><use xlink:href="#checkmark" /></svg>';
-            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], array('alt' => $manifest['name'], 'class' => 'label-selector-image')) : '';
+            $icon = (isset($manifest['icon'])) ? img($emojiSet['basePath'].'/'.$manifest['icon'], ['alt' => $manifest['name'], 'class' => 'label-selector-image']) : '';
             $items[$key] =
                 '@<div class="image-wrap">'.
                 $icon.
@@ -180,16 +180,16 @@ class EmojiExtenderPlugin extends Gdn_Plugin {
                 (empty($manifest['description']) ? '' : '<p class="emojiset-description">'.Gdn_Format::wysiwyg($manifest['description']).'</p>').
                 '</div>';
         }
-        $cf->initialize(array(
-            'Garden.EmojiSet' => array(
+        $cf->initialize([
+            'Garden.EmojiSet' => [
                 'LabelCode' => 'Emoji Set',
                 'Control' => 'radiolist',
                 'Items' => $items,
-                'Options' => array('list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list label-selector', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true)
-            ),
+                'Options' => ['list' => true, 'list-item-class' => 'label-selector-item', 'listclass' => 'emojiext-list label-selector', 'display' => 'after', 'class' => 'label-selector-input', 'no-grid' => true]
+            ],
             //If ever you want the functionality to merge the custom emoji set with the default set, uncomment below
             //'Plugins.EmojiExtender.merge' => array('LabelCode' => 'Merge set', 'Control' => 'Checkbox', 'Description' => '<p>Would you like to merge the selected emoji set with the default set?</p> <p><small><strong>Note:</strong> Some emojis in the default set may not be represented in the selected set and vice-versa.</small></p>'),
-        ));
+        ]);
 
 
         $sender->setData('Title', t('Choose Your Emoji Set'));

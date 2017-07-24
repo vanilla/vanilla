@@ -33,7 +33,7 @@ class SettingsModule extends Gdn_Module {
                 $ApplicationManager = Gdn::Factory('ApplicationManager');
 
                 if ($IsRemovable = !array_key_exists($Name, $ApplicationManager->EnabledApplications())) {
-                    $ApplicationInfo = val($Name, $ApplicationManager->AvailableApplications(), array());
+                    $ApplicationInfo = val($Name, $ApplicationManager->AvailableApplications(), []);
                     $ApplicationFolder = val('Folder', $ApplicationInfo, '');
 
                     $IsRemovable = IsWritable(PATH_APPLICATIONS.DS.$ApplicationFolder);

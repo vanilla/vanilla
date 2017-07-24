@@ -3,12 +3,12 @@ $Session = Gdn::session();
 include_once $this->fetchViewLocation('helper_functions', 'discussions', 'vanilla');
 
 echo '<h1 class="H HomepageTitle">'.
-    AdminCheck(NULL, array('', ' ')).
+    AdminCheck(NULL, ['', ' ']).
     $this->data('Title').
     '</h1>';
 
 if ($Description = $this->Description()) {
-    echo wrap($Description, 'div', array('class' => 'P PageDescription'));
+    echo wrap($Description, 'div', ['class' => 'P PageDescription']);
 }
 // echo Gdn_Theme::Module('DiscussionFilterModule');
 
@@ -18,7 +18,7 @@ if ($this->DiscussionData->numRows() > 0 || (isset($this->AnnounceData) && is_ob
         <?php include($this->fetchViewLocation('discussions')); ?>
     </ul>
     <?php
-    $PagerOptions = array('RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows());
+    $PagerOptions = ['RecordCount' => $this->data('CountDiscussions'), 'CurrentRecords' => $this->data('Discussions')->numRows()];
     if ($this->data('_PagerUrl'))
         $PagerOptions['Url'] = $this->data('_PagerUrl');
 

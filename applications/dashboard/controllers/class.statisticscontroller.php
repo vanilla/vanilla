@@ -14,7 +14,7 @@
 class StatisticsController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form');
+    public $Uses = ['Form'];
 
     /**
      * Output available info.

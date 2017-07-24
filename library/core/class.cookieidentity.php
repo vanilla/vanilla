@@ -11,10 +11,18 @@
  * @since 2.0
  */
 
+use Firebase\JWT\JWT;
+
 /**
  * Validating, Setting, and Retrieving session data in cookies.
  */
 class Gdn_CookieIdentity {
+
+    /** Signing algorithm for JWT tokens. */
+    const JWT_ALGORITHM = 'HS256';
+
+    /** Current cookie identity version. */
+    const VERSION = '2';
 
     /** @var int|null */
     public $UserID = null;
@@ -64,7 +72,7 @@ class Gdn_CookieIdentity {
             $Config = Gdn::config($Config);
 
         $DefaultConfig = array_replace(
-            array('PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'),
+            ['PersistExpiry' => '30 days', 'SessionExpiry' => '2 days'],
             Gdn::config('Garden.Cookie')
         );
         $this->CookieName = val('Name', $Config, $DefaultConfig['Name']);
@@ -98,18 +106,45 @@ class Gdn_CookieIdentity {
             return $this->UserID;
         }
 
-        if (!$this->_checkCookie($this->CookieName)) {
-            $this->_clearIdentity();
-            return 0;
+        $userID = 0;
+        $name = $this->CookieName;
+        $version = $this->getCookieVersion($name);
+
+        if (array_key_exists($name, $_COOKIE)) {
+            $payload = null;
+
+            switch ($version) {
+                case 1:
+                    if ($this->_checkCookie($name)) {
+                        list($userID) = self::getCookiePayload($name);
+                        // Old cookie identity. Upgrade it.
+                        $payload = $this->setIdentity($userID);
+                    }
+                    break;
+                case self::VERSION:
+                default:
+                    $payload = $this->getJWTPayload($name);
+                    $userID = val('sub', $payload, 0);
+            }
+
+            // The identity cookie set, but we couldn't find a user in it? Nuke it.
+            if ($userID == 0) {
+                $this->_clearIdentity();
+            } elseif (is_array($payload)) {
+                Gdn::pluginManager()
+                    ->fireAs(self::class)
+                    ->fireEvent('getIdentity', ['payload' => &$payload]);
+            }
         }
 
-        list($UserID) = self::getCookiePayload($this->CookieName);
-
-        if (!is_numeric($UserID) || $UserID < -2) { // allow for handshake special id
-            return 0;
+        if (filter_var($userID, FILTER_VALIDATE_INT) === false || $userID < -2) { // allow for handshake special id
+            $userID = 0;
         }
 
-        return $this->UserID = $UserID;
+        if ($userID != 0) {
+            $this->UserID = $userID;
+        }
+        return $userID;
     }
 
     /**
@@ -125,6 +160,29 @@ class Gdn_CookieIdentity {
         }
 
         return $HasMarker;
+    }
+
+    /**
+     * Given a cookie's name, attempt to determine its version.
+     *
+     * @param string $name
+     * @return int|null
+     */
+    protected function getCookieVersion($name) {
+        $result = null;
+
+        if (array_key_exists($name, $_COOKIE)) {
+            $cookie = $_COOKIE[$name];
+
+            $v1Parts = explode('|', $cookie);
+            if (count($v1Parts) === 5) {
+                $result = 1;
+            } elseif ($this->getJWTPayload($name) !== null) {
+                $result = 2;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -150,33 +208,45 @@ class Gdn_CookieIdentity {
     /**
      * Generates the user's session cookie.
      *
-     * @param int $UserID The unique id assigned to the user in the database.
-     * @param boolean $Persist Should the user's session remain persistent across visits?
+     * @param int $userID The unique id assigned to the user in the database.
+     * @param boolean $persist Should the user's session remain persistent across visits?
+     * @param array $data Additional data to include in the token.
+     * @return array|bool
      */
-    public function setIdentity($UserID, $Persist = false) {
-        if (is_null($UserID)) {
+    public function setIdentity($userID, $persist = false) {
+        if (is_null($userID)) {
             $this->_clearIdentity();
-            return;
+            return true;
         }
 
-        $this->UserID = $UserID;
+        $this->UserID = $userID;
 
         // If we're persisting, both the cookie and its payload expire in 30days
-        if ($Persist) {
-            $PayloadExpires = strtotime($this->PersistExpiry);
-            $CookieExpires = $PayloadExpires;
-
-            // Otherwise the payload expires in 2 days and the cookie expires on borwser restart
+        if ($persist) {
+            $expiry = strtotime($this->PersistExpiry);
+            // Otherwise the payload expires in 2 days and the cookie expires on browser restart
         } else {
             // Note: $CookieExpires = 0 causes cookie to die when browser closes.
-            $PayloadExpires = strtotime($this->SessionExpiry);
-            $CookieExpires = 0;
+            $expiry = 0;
         }
 
-        // Create the cookie
-        $KeyData = $UserID.'-'.$PayloadExpires;
-        $this->_setCookie($this->CookieName, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
-        $this->setVolatileMarker($UserID);
+        // Generate the token.
+        $timestamp = time();
+        $payload = [
+            'exp' => strtotime($this->PersistExpiry), // Expiration
+            'iat' => $timestamp, // Issued at
+            'nbf' => $timestamp, // Not before
+            'sub' => $userID // Subject
+        ];
+        Gdn::pluginManager()
+            ->fireAs(self::class)
+            ->fireEvent('setIdentity', ['payload' => &$payload]);
+        $jwt = JWT::encode($payload, $this->CookieSalt, self::JWT_ALGORITHM);
+
+        // Save the cookie.
+        safeCookie($this->CookieName, $jwt, $expiry, $this->CookiePath, $this->CookieDomain, null, true);
+        $_COOKIE[$this->CookieName] = $jwt;
+        return $payload;
     }
 
     /**
@@ -196,7 +266,7 @@ class Gdn_CookieIdentity {
         $CookieExpires = 0;
 
         $KeyData = $UserID.'-'.$PayloadExpires;
-        $this->_setCookie($this->VolatileMarker, $KeyData, array($UserID, $PayloadExpires), $CookieExpires);
+        $this->_setCookie($this->VolatileMarker, $KeyData, [$UserID, $PayloadExpires], $CookieExpires);
     }
 
     /**
@@ -252,7 +322,7 @@ class Gdn_CookieIdentity {
         // Create the cookie signature
         $KeyHash = hash_hmac($CookieHashMethod, $KeyData, $CookieSalt);
         $KeyHashHash = hash_hmac($CookieHashMethod, $KeyData, $KeyHash);
-        $Cookie = array($KeyData, $KeyHashHash, time());
+        $Cookie = [$KeyData, $KeyHashHash, time()];
 
         // Attach cookie payload
         if (!is_null($CookieContents)) {
@@ -337,9 +407,38 @@ class Gdn_CookieIdentity {
         $Expiration = array_pop($Key);
         $UserID = implode('-', $Key);
         $Payload = array_slice($Payload, 4);
-        $Payload = array_merge(array($UserID, $Expiration), $Payload);
+        $Payload = array_merge([$UserID, $Expiration], $Payload);
 
         return $Payload;
+    }
+
+    /**
+     * Attempt to decode a JWT payload from a cookie value.
+     *
+     * @param string $name Name of the cookie holding a JWT token.
+     * @return array|null
+     */
+    public function getJWTPayload($name) {
+        $result = null;
+
+        if (array_key_exists($name, $_COOKIE)) {
+            $jwt = $_COOKIE[$name];
+            try {
+                $payload = JWT::decode($jwt, $this->CookieSalt, [self::JWT_ALGORITHM]);
+                if (is_object($payload)) {
+                    $result = (array)$payload;
+                }
+            } catch (Exception $e) {
+                Logger::event(
+                    'cookie_jwt_error',
+                    Logger::ERROR,
+                    $e->getMessage(),
+                    ['jwt' => $jwt]
+                );
+            }
+        }
+
+        return $result;
     }
 
     /**

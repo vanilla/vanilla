@@ -139,10 +139,14 @@ class Addon {
 
         // Look for an addon.json file.
         if (file_exists("$dir/addon.json")) {
-            $info = json_decode(file_get_contents("$dir/addon.json"), true);
+            $addonJSON = file_get_contents("$dir/addon.json");
+            if (!$addonJSON) {
+                throw new \Exception("The addon at $subdir has an unreadable addon.json file.");
+            }
 
+            $info = json_decode($addonJSON, true);
             if (empty($info)) {
-                throw new \Exception("The addon at $subdir has an empty info array.");
+                throw new \Exception("The addon at $subdir has invalid JSON in addon.json.");
             }
 
             // Kludge that sets oldType until we unify applications and plugins into addon.
@@ -152,7 +156,9 @@ class Addon {
 
                 // Kludge that sets keyRaw until we use key everywhere.
                 if ($info['oldType'] === 'application') {
-                    $info['keyRaw'] = $info['name'];
+                    if (!isset($info['keyRaw'])) {
+                        $info['keyRaw'] = $info['name'];
+                    }
                 } else {
                     if ($addonFolder !== $info['key']) {
                         $info['keyRaw'] = $addonFolder;
@@ -574,14 +580,14 @@ class Addon {
                 $foundNamespace = false;
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_CLASS && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
                 if ($i - 4 >= 0 && $tokens[$i - 4][0] == T_ABSTRACT) {
-                    $classes[$ii][] = array('name' => $token[1], 'type' => 'ABSTRACT CLASS');
+                    $classes[$ii][] = ['name' => $token[1], 'type' => 'ABSTRACT CLASS'];
                 } else {
-                    $classes[$ii][] = array('name' => $token[1], 'type' => 'CLASS');
+                    $classes[$ii][] = ['name' => $token[1], 'type' => 'CLASS'];
                 }
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_INTERFACE && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
-                $classes[$ii][] = array('name' => $token[1], 'type' => 'INTERFACE');
+                $classes[$ii][] = ['name' => $token[1], 'type' => 'INTERFACE'];
             } elseif ($i - 2 >= 0 && $tokens[$i - 2][0] == T_TRAIT && $tokens[$i - 1][0] == T_WHITESPACE && $token[0] == T_STRING) {
-                $classes[$ii][] = array('name' => $token[1], 'type' => 'TRAIT');
+                $classes[$ii][] = ['name' => $token[1], 'type' => 'TRAIT'];
             }
         }
         error_reporting($er);
@@ -598,7 +604,7 @@ class Addon {
 
                 $ns = trim($ns);
                 if (!empty($classes[$k + 1])) {
-                    $final[$k] = array('namespace' => $ns, 'classes' => $classes[$k + 1]);
+                    $final[$k] = ['namespace' => $ns, 'classes' => $classes[$k + 1]];
                 }
             }
             $classes = $final;
@@ -641,7 +647,7 @@ class Addon {
                 $locale = self::canonicalizeLocale(basename(dirname($localePath)));
                 $result[$locale][] = $localePath;
 
-                $properPath = "/locale/$locale.php";
+                $properPath = $this->path("/locale/$locale.php", self::PATH_ADDON);
                 trigger_error("Locales in $localePath is deprecated. Use $properPath instead.", E_USER_DEPRECATED);
             }
         }
@@ -656,7 +662,7 @@ class Addon {
      * @return string Returns the canonicalized version of the locale code.
      */
     private static function canonicalizeLocale($locale) {
-        $locale = str_replace(array('-', '@'), array('_', '__'), $locale);
+        $locale = str_replace(['-', '@'], ['_', '__'], $locale);
         $parts = explode('_', $locale, 2);
         if (isset($parts[1])) {
             $parts[1] = strtoupper($parts[1]);

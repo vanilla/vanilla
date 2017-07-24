@@ -112,14 +112,16 @@ class TagModule extends Gdn_Module {
                 $TagQuery->join('TagDiscussion td', 't.TagID = td.TagID')
                     ->select('COUNT(DISTINCT td.TagID)', '', 'NumTags')
                     ->where('td.CategoryID', $this->ParentID)
+                    ->where('t.Type', '') // Only show user generated tags
                     ->groupBy('td.TagID')
-                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+                    ->cache($TagCacheKey, 'get', [Gdn_Cache::FEATURE_EXPIRY => 120]);
                 break;
 
             case 'Global':
                 $TagCacheKey = 'TagModule-Global';
                 $TagQuery->where('t.CountDiscussions >', 0, false)
-                    ->cache($TagCacheKey, 'get', array(Gdn_Cache::FEATURE_EXPIRY => 120));
+                    ->where('t.Type', '') // Only show user generated tags
+                    ->cache($TagCacheKey, 'get', [Gdn_Cache::FEATURE_EXPIRY => 120]);
 
                 if ($this->CategorySearch) {
                     $TagQuery->where('t.CategoryID', '-1');
@@ -134,6 +136,7 @@ class TagModule extends Gdn_Module {
             $this->_TagData = $TagQuery
                 ->select('t.*')
                 ->from('Tag t')
+                ->where('t.Type', '') // Only show user generated tags
                 ->orderBy('t.CountDiscussions', 'desc')
                 ->limit(25)
                 ->get();
@@ -183,7 +186,7 @@ class TagModule extends Gdn_Module {
                             echo anchor(
                                 htmlspecialchars(TagFullName($Tag)),
                                 TagUrl($Tag, '', '/'),
-                                array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                                ['class' => 'Tag_'.str_replace(' ', '_', $Tag['Name'])]
                             );
                             ?></li>
                     <?php
@@ -227,9 +230,9 @@ endforeach; ?>
 ?>
                         <li><?php
                             echo anchor(
-                                htmlspecialchars(TagFullName($Tag)).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', array('class' => 'Count')),
+                                htmlspecialchars(TagFullName($Tag)).' '.Wrap(number_format($Tag['CountDiscussions']), 'span', ['class' => 'Count']),
                                 TagUrl($Tag, '', '/'),
-                                array('class' => 'Tag_'.str_replace(' ', '_', $Tag['Name']))
+                                ['class' => 'Tag_'.str_replace(' ', '_', $Tag['Name'])]
                             );
                             ?></li>
                     <?php

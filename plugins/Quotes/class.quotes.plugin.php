@@ -56,9 +56,9 @@ class QuotesPlugin extends Gdn_Plugin {
         $ViewingUserID = Gdn::session()->UserID;
 
         if ($Sender->User->UserID == $ViewingUserID) {
-            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, array('class' => 'Popup QuoteSettingsLink'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), '/profile/quotes', false, ['class' => 'Popup QuoteSettingsLink']);
         } else {
-            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', array('class' => 'Popup QuoteSettingsLink'));
+            $SideMenu->addLink('Options', sprite('SpQuote').' '.t('Quote Settings'), userUrl($Sender->User, '', 'quotes'), 'Garden.Users.Edit', ['class' => 'Popup QuoteSettingsLink']);
         }
     }
 
@@ -73,7 +73,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
         $Args = $Sender->RequestArgs;
         if (sizeof($Args) < 2) {
-            $Args = array_merge($Args, array(0, 0));
+            $Args = array_merge($Args, [0, 0]);
         } elseif (sizeof($Args) > 2) {
             $Args = array_slice($Args, 0, 2);
         }
@@ -83,7 +83,7 @@ class QuotesPlugin extends Gdn_Plugin {
         $Sender->getUserInfo($UserReference, $Username);
         $UserPrefs = dbdecode($Sender->User->Preferences);
         if (!is_array($UserPrefs)) {
-            $UserPrefs = array();
+            $UserPrefs = [];
         }
 
         $UserID = Gdn::session()->UserID;
@@ -100,14 +100,14 @@ class QuotesPlugin extends Gdn_Plugin {
         $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
         $Sender->Form->setValue('QuoteFolding', $QuoteFolding);
 
-        $Sender->setData('QuoteFoldingOptions', array(
+        $Sender->setData('QuoteFoldingOptions', [
             'None' => t("Don't fold quotes"),
             '1' => plural(1, '%s level deep', '%s levels deep'),
             '2' => plural(2, '%s level deep', '%s levels deep'),
             '3' => plural(3, '%s level deep', '%s levels deep'),
             '4' => plural(4, '%s level deep', '%s levels deep'),
             '5' => plural(5, '%s level deep', '%s levels deep')
-        ));
+        ]);
 
         // Form submission handling.
         if ($Sender->Form->authenticatedPostBack()) {
@@ -133,13 +133,13 @@ class QuotesPlugin extends Gdn_Plugin {
 
         $UserPrefs = dbdecode(Gdn::session()->User->Preferences);
         if (!is_array($UserPrefs)) {
-            $UserPrefs = array();
+            $UserPrefs = [];
         }
 
         $QuoteFolding = val('Quotes.Folding', $UserPrefs, '1');
         $Sender->addDefinition('QuotesFolding', $QuoteFolding);
-        $Sender->addDefinition('&laquo; hide previous quotes', t('&laquo; hide previous quotes'));
-        $Sender->addDefinition('&raquo; show previous quotes', t('&raquo; show previous quotes'));
+        $Sender->addDefinition('hide previous quotes', t('hide previous quotes', '&laquo; hide previous quotes'));
+        $Sender->addDefinition('show previous quotes', t('show previous quotes', '&raquo; show previous quotes'));
     }
 
     /**
@@ -180,9 +180,9 @@ class QuotesPlugin extends Gdn_Plugin {
             $Format = c('Garden.InputFormatter');
         }
 
-        $QuoteData = array(
+        $QuoteData = [
             'status' => 'failed'
-        );
+        ];
 
         $QuoteData['selector'] = $Selector;
         list($Type, $ID) = explode('_', $Selector);
@@ -303,7 +303,7 @@ class QuotesPlugin extends Gdn_Plugin {
 
         switch ($Object->Format) {
             case 'Html':
-                $Object->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", array($this, 'QuoteAuthorCallback'), $Object->Body);
+                $Object->Body = preg_replace_callback("/(<blockquote\s+(?:class=\"(?:User)?Quote\")?\s+rel=\"([^\"]+)\">)/ui", [$this, 'QuoteAuthorCallback'], $Object->Body);
                 $Object->Body = str_ireplace('</blockquote>', '</p></div></blockquote>', $Object->Body);
                 break;
 //         case 'Wysiwyg':
@@ -314,7 +314,7 @@ class QuotesPlugin extends Gdn_Plugin {
             // WHY IS BBCODE PARSING DONE FOR MARKDOWN?
             case 'Markdown':
                 // BBCode quotes with authors
-                $Object->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", array($this, 'QuoteAuthorCallback'), $Object->Body);
+                $Object->Body = preg_replace_callback("#(\[quote(\s+author)?=[\"']?(.*?)(\s+link.*?)?(;[\d]+)?[\"']?\])#usi", [$this, 'QuoteAuthorCallback'], $Object->Body);
 
                 // BBCode quotes without authors
                 $Object->Body = str_ireplace('[quote]', '<blockquote class="Quote UserQuote"><div class="QuoteText"><p>', $Object->Body);
@@ -339,7 +339,7 @@ class QuotesPlugin extends Gdn_Plugin {
      */
     protected function quoteAuthorCallback($Matches) {
         $Attribution = t('%s said:');
-        $Link = anchor($Matches[2], '/profile/'.$Matches[2], '', array('rel' => 'nofollow'));
+        $Link = anchor($Matches[2], '/profile/'.$Matches[2], '', ['rel' => 'nofollow']);
         $Attribution = sprintf($Attribution, $Link);
         return <<<BLOCKQUOTE
       <blockquote class="UserQuote"><div class="QuoteAuthor">{$Attribution}</div><div class="QuoteText"><p>
@@ -373,9 +373,9 @@ BLOCKQUOTE;
             }
             $Selector = $Sender->RequestArgs[1];
             list($Type, $ID) = explode('_', $Selector);
-            $QuoteData = array(
+            $QuoteData = [
                 'status' => 'failed'
-            );
+            ];
             $this->formatQuote($Type, $ID, $QuoteData);
             if ($QuoteData['status'] == 'success') {
                 $Sender->Form->setValue('Body', "{$QuoteData['body']}\n");
@@ -430,7 +430,7 @@ BLOCKQUOTE;
             // Perform transcoding if possible
             $NewBody = $Data->Body;
             if ($QuoteFormat != $NewFormat) {
-                if (in_array($NewFormat, array('Html', 'Wysiwyg'))) {
+                if (in_array($NewFormat, ['Html', 'Wysiwyg'])) {
                     $NewBody = Gdn_Format::to($NewBody, $QuoteFormat);
                 } elseif ($QuoteFormat == 'Html' && $NewFormat == 'BBCode') {
                     $NewBody = Gdn_Format::text($NewBody, false);
@@ -440,7 +440,7 @@ BLOCKQUOTE;
                     $NewBody = Gdn_Format::plainText($NewBody, $QuoteFormat);
                 }
 
-                if (!in_array($NewFormat, array('Html', 'Wysiwyg'))) {
+                if (!in_array($NewFormat, ['Html', 'Wysiwyg'])) {
                     Gdn::controller()->informMessage(sprintf(
                         t('The quote had to be converted from %s to %s.', 'The quote had to be converted from %s to %s. Some formatting may have been lost.'),
                         htmlspecialchars($QuoteFormat),
@@ -489,7 +489,7 @@ BQ;
 
                     break;
                 case 'Wysiwyg':
-                    $Attribution = sprintf(t('%s said:'), userAnchor($Data, null, array('Px' => 'Insert')));
+                    $Attribution = sprintf(t('%s said:'), userAnchor($Data, null, ['Px' => 'Insert']));
                     $QuoteBody = $Data->Body;
 
                     // TODO: Strip inner quotes...
@@ -506,7 +506,7 @@ BLOCKQUOTE;
                     break;
             }
 
-            $QuoteData = array_merge($QuoteData, array(
+            $QuoteData = array_merge($QuoteData, [
                 'status' => 'success',
                 'body' => $Quote,
                 'format' => $Format,
@@ -514,7 +514,7 @@ BLOCKQUOTE;
                 'authorname' => $Data->InsertName,
                 'type' => $Type,
                 'typeid' => $ID
-            ));
+            ]);
         }
 
         // Undo Emoji disable.

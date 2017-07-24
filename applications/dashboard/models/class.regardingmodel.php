@@ -27,7 +27,7 @@ class RegardingModel extends Gdn_Model {
      * @return array|bool|stdClass
      */
     public function getID($RegardingID) {
-        $Regarding = $this->getWhere(array('RegardingID' => $RegardingID))->firstRow();
+        $Regarding = $this->getWhere(['RegardingID' => $RegardingID])->firstRow();
         return $Regarding;
     }
 
@@ -39,10 +39,10 @@ class RegardingModel extends Gdn_Model {
      * @return array|bool|stdClass
      */
     public function get($ForeignType, $ForeignID) {
-        return $this->getWhere(array(
+        return $this->getWhere([
             'ForeignType' => $ForeignType,
             'ForeignID' => $ForeignID
-        ))->firstRow(DATASET_TYPE_ARRAY);
+        ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -54,11 +54,11 @@ class RegardingModel extends Gdn_Model {
      * @return array|bool|stdClass
      */
     public function getRelated($Type, $ForeignType, $ForeignID) {
-        return $this->getWhere(array(
+        return $this->getWhere([
             'Type' => $Type,
             'ForeignType' => $ForeignType,
             'ForeignID' => $ForeignID
-        ))->firstRow(DATASET_TYPE_ARRAY);
+        ])->firstRow(DATASET_TYPE_ARRAY);
     }
 
     /**
@@ -68,9 +68,9 @@ class RegardingModel extends Gdn_Model {
      * @param array $ForeignIDs
      * @return Gdn_DataSet
      */
-    public function getAll($ForeignType, $ForeignIDs = array()) {
+    public function getAll($ForeignType, $ForeignIDs = []) {
         if (count($ForeignIDs) == 0) {
-            return new Gdn_DataSet(array());
+            return new Gdn_DataSet([]);
         }
 
         return Gdn::sql()->select('*')

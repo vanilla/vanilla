@@ -32,7 +32,7 @@ class Gdn_Condition {
      * @return array
      */
     public static function allTypes() {
-        return array(self::PERMISSION => self::PERMISSION, self::ROLE => self::ROLE);
+        return [self::PERMISSION => self::PERMISSION, self::ROLE => self::ROLE];
     }
 
     /**
@@ -41,7 +41,7 @@ class Gdn_Condition {
      * @return array
      */
     public static function blank() {
-        return array('', '', '');
+        return ['', '', ''];
     }
 
     /**
@@ -54,7 +54,7 @@ class Gdn_Condition {
      * @see Gdn_Condition::toString().
      */
     public static function fromString($String) {
-        $Result = array();
+        $Result = [];
 
         // Each condition is delimited by a newline.
         $Conditions = explode("\n", $String);

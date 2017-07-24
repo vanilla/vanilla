@@ -52,7 +52,7 @@ abstract class ConversationsModel extends Gdn_Model {
         $session = Gdn::session();
 
         // Validate $type
-        if (!in_array($type, array('Conversation', 'ConversationMessage'))) {
+        if (!in_array($type, ['Conversation', 'ConversationMessage'])) {
             trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
         }
 
@@ -68,12 +68,12 @@ abstract class ConversationsModel extends Gdn_Model {
      * @return array Array of user IDs.
      */
     public function getConversationMembers($ConversationID) {
-        $ConversationMembers = array();
+        $ConversationMembers = [];
 
         $UserConversation = new Gdn_Model('UserConversation');
-        $UserMembers = $UserConversation->getWhere(array(
+        $UserMembers = $UserConversation->getWhere([
             'ConversationID' => $ConversationID
-        ))->resultArray();
+        ])->resultArray();
 
         if (is_array($UserMembers) && count($UserMembers)) {
             $ConversationMembers = array_column($UserMembers, 'UserID');

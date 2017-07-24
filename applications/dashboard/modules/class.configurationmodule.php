@@ -106,7 +106,7 @@ class ConfigurationModule extends Gdn_Module {
 
         if ($Form->authenticatedPostBack()) {
             // Grab the data from the form.
-            $Data = array();
+            $Data = [];
             $Post = $Form->formValues();
 
             foreach ($this->_Schema as $Row) {
@@ -152,12 +152,12 @@ class ConfigurationModule extends Gdn_Module {
             // Halt the save if we've had errors assigned.
             if ($Form->errorCount() == 0) {
                 // Save it to the config.
-                saveToConfig($Data, array('RemoveEmpty' => true));
+                saveToConfig($Data, ['RemoveEmpty' => true]);
                 $this->_Sender->informMessage(t('Saved'));
             }
         } else {
             // Load the form data from the config.
-            $Data = array();
+            $Data = [];
             foreach ($this->_Schema as $Row) {
                 $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
             }
@@ -214,10 +214,10 @@ class ConfigurationModule extends Gdn_Module {
      */
     public function schema($Def = null) {
         if ($Def !== null) {
-            $Schema = array();
+            $Schema = [];
 
             foreach ($Def as $Key => $Value) {
-                $Row = array('Name' => '', 'Type' => 'string', 'Control' => 'TextBox', 'Options' => array());
+                $Row = ['Name' => '', 'Type' => 'string', 'Control' => 'TextBox', 'Options' => []];
 
                 if (is_numeric($Key)) {
                     $Row['Name'] = $Value;

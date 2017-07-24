@@ -26,7 +26,7 @@ If you are importing a very large file (ex. over 200,000 comments) you might wan
     <?php echo t('Garden.Import.Overwrite.Description', 'Warning: All data in this forum will be overwritten.'); ?>
 </div>
 <?php
-echo $this->Form->open(array('enctype' => 'multipart/form-data'));
+echo $this->Form->open(['enctype' => 'multipart/form-data']);
 echo $this->Form->errors();
 ?>
 <ul>
@@ -36,7 +36,7 @@ echo $this->Form->errors();
             <?php
             foreach ($this->data('ImportPaths') as $Path => $Text) {
                 echo '<div>',
-                $this->Form->Radio('PathSelect', $Text, array('value' => $Path)),
+                $this->Form->Radio('PathSelect', $Text, ['value' => $Path]),
                 '</div>';
             }
             ?>

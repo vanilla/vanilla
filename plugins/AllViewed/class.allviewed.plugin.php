@@ -93,7 +93,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @param int $categoryID
      */
     private function markCategoryRead($categoryModel, $categoryID) {
-        $categoryModel->saveUserTree($categoryID, array('DateMarkedRead' => Gdn_Format::toDateTime()));
+        $categoryModel->saveUserTree($categoryID, ['DateMarkedRead' => Gdn_Format::toDateTime()]);
     }
 
     /**
@@ -110,7 +110,7 @@ class AllViewedPlugin extends Gdn_Plugin {
             if (strlen($CategoryID) > 0 && (int)$CategoryID > 0) {
                 $CategoryModel = new CategoryModel();
                 $this->markCategoryRead($CategoryModel, $CategoryID);
-                $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), array($CategoryID));
+                $this->recursiveMarkCategoryRead($CategoryModel, CategoryModel::categories(), [$CategoryID]);
 
                 $sender->informMessage(t('Category marked as viewed.'));
                 $sender->render('blank', 'utility', 'dashboard');
@@ -130,7 +130,7 @@ class AllViewedPlugin extends Gdn_Plugin {
      * @param array $ParentIDs
      */
     private function recursiveMarkCategoryRead($CategoryModel, $UnprocessedCategories, $ParentIDs) {
-        $CurrentUnprocessedCategories = array();
+        $CurrentUnprocessedCategories = [];
         $CurrentParentIDs = $ParentIDs;
         foreach ($UnprocessedCategories as $Category) {
             if (in_array($Category["ParentCategoryID"], $ParentIDs)) {
@@ -168,7 +168,7 @@ class AllViewedPlugin extends Gdn_Plugin {
 
             // Didn't use the default async option and landed here directly.
             if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
-                redirect('/');
+                redirectTo('/');
             }
 
             $sender->render('blank', 'utility', 'dashboard');

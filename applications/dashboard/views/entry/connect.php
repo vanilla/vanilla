@@ -49,7 +49,7 @@ if (!$hasUserID) {
                 <?php
                 if ($ConnectPhoto) {
                     echo '<span class="PhotoWrap">',
-                    img($ConnectPhoto, array('alt' => t('Profile Picture'), 'class' => 'ProfilePhoto')),
+                    img($ConnectPhoto, ['alt' => t('Profile Picture'), 'class' => 'ProfilePhoto']),
                     '</span>';
                 }
 
@@ -102,18 +102,18 @@ if (!$hasUserID) {
                         $Row = reset($ExistingUsers);
 
                         echo '<div class="FinePrint">', t('ConnectAccountExists', 'You already have an account here.'), '</div>',
-                        wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', array('class' => 'ExistingUsername'));
+                        wrap(sprintf(t('ConnectRegisteredName', 'Your registered username: <strong>%s</strong>'), htmlspecialchars($Row['Name'])), 'div', ['class' => 'ExistingUsername']);
                         $this->addDefinition('NoConnectName', true);
-                        echo $this->Form->hidden('UserSelect', array('Value' => $Row['UserID']));
+                        echo $this->Form->hidden('UserSelect', ['Value' => $Row['UserID']]);
                     } else {
                         echo $this->Form->label('Username', 'ConnectName');
                         echo '<div class="FinePrint">', t('ConnectChooseName', 'Choose a name to identify yourself on the site.'), '</div>';
 
                         if (count($ExistingUsers) > 0) {
                             foreach ($ExistingUsers as $Row) {
-                                echo wrap($this->Form->radio('UserSelect', $Row['Name'], array('value' => $Row['UserID'])), 'div');
+                                echo wrap($this->Form->radio('UserSelect', $Row['Name'], ['value' => $Row['UserID']]), 'div');
                             }
-                            echo wrap($this->Form->radio('UserSelect', t('Other'), array('value' => 'other')), 'div');
+                            echo wrap($this->Form->radio('UserSelect', t('Other'), ['value' => 'other']), 'div');
                         }
                     }
 
@@ -128,14 +128,14 @@ if (!$hasUserID) {
                 <li id="ConnectPassword">
                     <?php
                     echo $this->Form->label('Password', 'ConnectPassword');
-                    echo wrap($PasswordMessage, 'div', array('class' => 'FinePrint'));
+                    echo wrap($PasswordMessage, 'div', ['class' => 'FinePrint']);
                     echo $this->Form->input('ConnectPassword', 'password');
                     ?>
                 </li>
             </ul>
 
             <?php
-            echo '<div class="Buttons">', wrap($this->Form->button('Connect', array('class' => 'Button Primary')), 'div', array('class' => 'ButtonContainer')), '</div>';
+            echo '<div class="Buttons">', wrap($this->Form->button('Connect', ['class' => 'Button Primary']), 'div', ['class' => 'ButtonContainer']), '</div>';
 
         endif;
 

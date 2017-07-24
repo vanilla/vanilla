@@ -22,33 +22,33 @@ $ConversationBody = "Pssst. Hey. A conversation is a private chat between two or
 $SystemUserID = Gdn::userModel()->getSystemUserID();
 $TargetUserID = Gdn::session()->UserID;
 $Now = Gdn_Format::toDateTime();
-$Contributors = dbencode(array($SystemUserID, $TargetUserID));
+$Contributors = dbencode([$SystemUserID, $TargetUserID]);
 
 // Insert stub conversation
-$ConversationID = $SQL->insert('Conversation', array(
+$ConversationID = $SQL->insert('Conversation', [
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now,
     'Contributors' => $Contributors,
     'CountMessages' => 1
-));
+]);
 
-$MessageID = $SQL->insert('ConversationMessage', array(
+$MessageID = $SQL->insert('ConversationMessage', [
     'ConversationID' => $ConversationID,
     'Body' => t('StubConversationBody', $ConversationBody),
     'Format' => 'Html',
     'InsertUserID' => $SystemUserID,
     'DateInserted' => $Now
-));
+]);
 
 $SQL->update('Conversation')
     ->set('LastMessageID', $MessageID)
     ->where('ConversationID', $ConversationID)
     ->put();
 
-$SQL->insert('UserConversation', array(
+$SQL->insert('UserConversation', [
     'ConversationID' => $ConversationID,
     'UserID' => $TargetUserID,
     'CountReadMessages' => 0,
     'LastMessageID' => $MessageID,
     'DateConversationUpdated' => $Now
-));
+]);

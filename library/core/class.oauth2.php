@@ -573,7 +573,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 $sender->EventArguments['User'] = $sender->User;
                 $sender->fireEvent('AfterConnection');
 
-                redirect(userUrl($user, '', 'connections'));
+                redirectTo(userUrl($user, '', 'connections'));
                 break;
             case 'entry':
             default:
@@ -586,7 +586,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
                 if ($target = val('target', $state)) {
                     $url .= '?Target='.urlencode($target);
                 }
-                redirect($url);
+                redirectTo($url);
                 break;
         }
     }
@@ -721,9 +721,10 @@ class Gdn_OAuth2 extends Gdn_Plugin {
     public function getProfile() {
         $provider = $this->provider();
         $uri = $this->requireVal('ProfileUrl', $provider, 'provider');
-        $defaultParams = array(
+        $defaultParams = [
             'access_token' => $this->accessToken()
-        );
+        ];
+
         // Merge any inherited parameters and remove any empty parameters before sending them in the request.
         $requestParams = array_filter(array_merge($defaultParams, $this->requestProfileParams));
 
@@ -757,7 +758,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             return;
         }
 
-        $url = $this->authorizeUri(array('target' => $args['Target']));
+        $url = $this->authorizeUri(['target' => $args['Target']]);
         $args['DefaultProvider']['SignInUrl'] = $url;
     }
 

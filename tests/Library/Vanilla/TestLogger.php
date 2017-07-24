@@ -57,7 +57,7 @@ class TestLogger implements LoggerInterface {
      * @param array $context
      * @return null
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
         $msg = $this->replaceContext($message, $context);
         $this->logs[] = "$level $msg";
         $this->last = [$level, $message, $context];

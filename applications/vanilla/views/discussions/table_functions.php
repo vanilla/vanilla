@@ -7,7 +7,7 @@ if (!function_exists('WriteDiscussionHeading')) :
     function writeDiscussionHeading() {
         ?>
         <tr>
-            <?php echo AdminCheck(NULL, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
+            <?php echo AdminCheck(NULL, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
             <td class="DiscussionName">
                 <div class="Wrap"><?php echo DiscussionHeading() ?></div>
             </td>
@@ -78,7 +78,7 @@ if (!function_exists('writeDiscussionRow')) :
         ?>
         <tr id="Discussion_<?php echo $Discussion->DiscussionID; ?>" class="<?php echo $CssClass; ?>">
             <?php $Sender->fireEvent('BeforeDiscussionContent'); ?>
-            <?php echo AdminCheck($Discussion, array('<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>')); ?>
+            <?php echo AdminCheck($Discussion, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
             <td class="DiscussionName">
                 <div class="Wrap">
          <span class="Options">
@@ -111,7 +111,7 @@ if (!function_exists('writeDiscussionRow')) :
             <td class="BlockColumn BlockColumn-User FirstUser">
                 <div class="Block Wrap">
                     <?php
-                    echo userPhoto($First, array('Size' => 'Small'));
+                    echo userPhoto($First, ['Size' => 'Small']);
                     echo userAnchor($First, 'UserLink BlockTitle');
                     echo '<div class="Meta">';
                     echo anchor(Gdn_Format::date($Discussion->FirstDate, 'html'), $FirstPageUrl, 'CommentDate MItem');
@@ -145,7 +145,7 @@ if (!function_exists('writeDiscussionRow')) :
                 <div class="Block Wrap">
                     <?php
                     if ($Last) {
-                        echo userPhoto($Last, array('Size' => 'Small'));
+                        echo userPhoto($Last, ['Size' => 'Small']);
                         echo userAnchor($Last, 'UserLink BlockTitle');
                         echo '<div class="Meta">';
                         echo anchor(Gdn_Format::date($Discussion->LastDate, 'html'), $LastPageUrl, 'CommentDate MItem');

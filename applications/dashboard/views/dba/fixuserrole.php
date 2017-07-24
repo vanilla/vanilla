@@ -34,10 +34,10 @@
                 echo $this->Form->DropDown(
                     'DefaultUserRole',
                     $RoleModel->get(),
-                    array(
+                    [
                         'TextField' => 'Name',
                         'ValueField' => 'RoleID'
-                    )
+                    ]
                 );
                 ?></li>
         </ul>

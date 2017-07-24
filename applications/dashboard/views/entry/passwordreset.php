@@ -16,7 +16,7 @@
             <li>
                 <?php
                 echo $this->Form->label('New Password', 'Password');
-                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', array('class' => 'Gloss'));
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
                 echo $this->Form->Input('Password', 'password', ['Wrap' => true, 'Strength' => true]);
                 ?>
             </li>
@@ -29,7 +29,7 @@
             </li>
             <li class="Buttons">
                 <?php
-                echo $this->Form->button('Save your password', array('class' => 'Button Primary'));
+                echo $this->Form->button('Save your password', ['class' => 'Button Primary']);
                 ?>
             </li>
         </ul>

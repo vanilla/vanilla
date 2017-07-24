@@ -39,22 +39,22 @@ class Gdn_Validation {
      * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
      * These are rules that have been explicitly called with {@link Gdn_Validation::ApplyRule()}.
      */
-    protected $_FieldRules = array();
+    protected $_FieldRules = [];
 
     /**
      * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
      * These are rules that come from the current schema that have been applied by {@link Gdn_Validation::ApplyRulesBySchema()}.
      */
-    protected $_SchemaRules = array();
+    protected $_SchemaRules = [];
 
     /** @var array The schema being used to generate validation rules. */
-    protected $_Schema = array();
+    protected $_Schema = [];
 
     /** @var bool Whether or not to reset the validation results on validate. */
     protected $_ResetOnValidate = false;
 
     /** @var array An array of FieldName.RuleName => "Custom Error Message"s. See $this->ApplyRule. */
-    private $_CustomErrors = array();
+    private $_CustomErrors = [];
 
     /**
      * Class constructor. Optionally takes a schema definition to generate validation rules for.
@@ -69,7 +69,7 @@ class Gdn_Validation {
         $this->setResetOnValidate($ResetOnValidate);
 
         // Define the default validation functions
-        $this->_Rules = array();
+        $this->_Rules = [];
         $this->addRule('Required', 'function:ValidateRequired');
         $this->addRule('RequiredArray', 'function:ValidateRequiredArray');
         $this->addRule('Email', 'function:ValidateEmail');
@@ -106,7 +106,7 @@ class Gdn_Validation {
      * @return array Returns an array of error messages.
      */
     public static function resultsAsArray($results) {
-        $Errors = array();
+        $Errors = [];
         foreach ($results as $Name => $Value) {
             if (is_array($Value)) {
                 foreach ($Value as $Code) {
@@ -126,22 +126,22 @@ class Gdn_Validation {
      * table schema.
      */
     protected function applyRulesBySchema() {
-        $this->_SchemaRules = array();
+        $this->_SchemaRules = [];
 
         foreach ($this->_Schema as $Field => $Properties) {
             if (is_scalar($Properties) || $Properties === null) {
                 // Some code passes a record as a schema so account for that here.
-                $Properties = array(
+                $Properties = [
                     'AutoIncrement' => false,
                     'AllowNull' => true,
                     'Type' => 'text',
                     'Length' => ''
-                );
+                ];
                 $Properties = (object)$Properties;
             }
 
             // Create an array to hold rules for this field
-            $RuleNames = array();
+            $RuleNames = [];
 
             // Force non-null fields without defaults to be required.
             if ($Properties->AllowNull === false && $Properties->Default == '') {
@@ -201,7 +201,7 @@ class Gdn_Validation {
                 case 'longtext':
                 case 'binary':
                 case 'varbinary':
-                    if (!in_array($Field, array('Attributes', 'Data', 'Preferences', 'Permissions'))) {
+                    if (!in_array($Field, ['Attributes', 'Data', 'Preferences', 'Permissions'])) {
                         $RuleNames[] = 'String';
                     }
                     if ($Properties->Length != '') {
@@ -262,10 +262,10 @@ class Gdn_Validation {
                 $this->_CustomErrors[$FieldName.'.'.$RuleName] = $CustomError;
             }
 
-            $RuleName = array($RuleName);
+            $RuleName = [$RuleName];
         }
 
-        $ExistingRules = val($FieldName, $Array, array());
+        $ExistingRules = val($FieldName, $Array, []);
 
         // Merge the new rules with the existing ones (array_merge) and make
         // sure there is only one of each rule applied (array_unique).
@@ -292,7 +292,7 @@ class Gdn_Validation {
      * @return array Returns the subset of {@link $PostedFields} that will be validated.
      */
     protected function defineValidationFields($PostedFields, $Insert = false) {
-        $Result = array();
+        $Result = [];
 
         // Start with the fields that have been explicitly defined by `ApplyRule`.
         foreach ($this->_FieldRules as $Field => $Rules) {
@@ -396,7 +396,7 @@ class Gdn_Validation {
      */
     public function validationFields() {
         if (!is_array($this->_ValidationFields)) {
-            $this->_ValidationFields = array();
+            $this->_ValidationFields = [];
         }
 
         return $this->_ValidationFields;
@@ -471,7 +471,7 @@ class Gdn_Validation {
      */
     protected function addValidationField($FieldName, $PostedFields) {
         if (!is_array($this->_ValidationFields)) {
-            $this->_ValidationFields = array();
+            $this->_ValidationFields = [];
         }
 
         $Value = val($FieldName, $PostedFields, null);
@@ -603,7 +603,7 @@ class Gdn_Validation {
     public function validate($PostedFields, $Insert = false) {
         // Create an array to hold validation result messages
         if (!is_array($this->_ValidationResults) || $this->resetOnValidate()) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         // Check for a honeypot (anti-spam input)
@@ -624,7 +624,7 @@ class Gdn_Validation {
                 $Rules = $FieldRules[$FieldName];
 
                 // Get the field info for the field.
-                $FieldInfo = array('Name' => $FieldName);
+                $FieldInfo = ['Name' => $FieldName];
                 if (is_array($this->_Schema) && array_key_exists($FieldName, $this->_Schema)) {
                     $FieldInfo = array_merge($FieldInfo, (array)$this->_Schema[$FieldName]);
                 }
@@ -677,7 +677,7 @@ class Gdn_Validation {
      */
     public function addValidationResult($FieldName, $ErrorCode = '') {
         if (!is_array($this->_ValidationResults)) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         if (is_array($FieldName)) {
@@ -685,7 +685,7 @@ class Gdn_Validation {
             $this->_ValidationResults = array_merge($this->_ValidationResults, $ValidationResults);
         } else {
             if (!array_key_exists($FieldName, $this->_ValidationResults)) {
-                $this->_ValidationResults[$FieldName] = array();
+                $this->_ValidationResults[$FieldName] = [];
             }
 
             $this->_ValidationResults[$FieldName][] = $ErrorCode;
@@ -708,7 +708,7 @@ class Gdn_Validation {
      */
     public function results($Reset = false) {
         if (!is_array($this->_ValidationResults) || $Reset) {
-            $this->_ValidationResults = array();
+            $this->_ValidationResults = [];
         }
 
         return $this->_ValidationResults;

@@ -27,10 +27,10 @@ class DiscussionSorterModule extends Gdn_Module {
         $this->Visible = false;
 
         // Default options
-        $this->SortOptions = array(
+        $this->SortOptions = [
             'd.DateLastComment' => t('SortOptionLastComment', 'by Last Comment'),
             'd.DateInserted' => t('SortOptionStartDate', 'by Start Date')
-        );
+        ];
 
         // Get sort option selected
         $this->SortFieldSelected = Gdn::session()->GetPreference('Discussions.SortField', 'd.DateLastComment');

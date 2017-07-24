@@ -14,7 +14,7 @@ if (count($Discussions) < 2) {
     $RadioData = array_column($Discussions, 'Name', 'DiscussionID');
     array_map('htmlspecialchars', $RadioData);
     echo '<ul><li>';
-    echo $this->Form->RadioList('MergeDiscussionID', $RadioData, array('ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID));
+    echo $this->Form->RadioList('MergeDiscussionID', $RadioData, ['ValueField' => 'DiscussionID', 'TextField' => 'Name', 'Default' => $DefaultDiscussionID]);
     echo '</li></ul>';
 
     echo '<div class="P">'.

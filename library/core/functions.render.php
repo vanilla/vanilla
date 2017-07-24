@@ -269,7 +269,7 @@ if (!function_exists('buttonDropDown')) {
             }
 
             // Strip "Button" or "NavButton" off the group class.
-            echo '<div class="ButtonGroup'.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
+            echo '<div class="ButtonGroup'.str_replace(['NavButton', 'Button'], ['', ''], $CssClass).'">';
 
             echo '<ul class="Dropdown MenuItems">';
             foreach ($Links as $Link) {
@@ -337,7 +337,7 @@ if (!function_exists('buttonGroup')) {
                 $ButtonClass .= ' Primary';
             }
             // Strip "Button" or "NavButton" off the group class.
-            echo '<div class="ButtonGroup Multi '.str_replace(array('NavButton', 'Button'), array('', ''), $CssClass).'">';
+            echo '<div class="ButtonGroup Multi '.str_replace(['NavButton', 'Button'], ['', ''], $CssClass).'">';
             echo anchor($Text, $Url, $ButtonClass);
 
             echo '<ul class="Dropdown MenuItems">';
@@ -439,7 +439,7 @@ if (!function_exists('countString')) {
      * @param array $Options
      * @return string
      */
-    function countString($Number, $Url = '', $Options = array()) {
+    function countString($Number, $Url = '', $Options = []) {
         if (!$Number && $Number !== null) {
             return '';
         }
@@ -604,7 +604,7 @@ if (!function_exists('anchor')) {
      */
     function anchor($Text, $Destination = '', $CssClass = '', $Attributes = [], $ForceAnchor = false) {
         if (!is_array($CssClass) && $CssClass != '') {
-            $CssClass = array('class' => $CssClass);
+            $CssClass = ['class' => $CssClass];
         }
 
         if ($Destination == '' && $ForceAnchor === false) {
@@ -628,7 +628,7 @@ if (!function_exists('anchor')) {
         }
 
         $Prefix = substr($Destination, 0, 7);
-        if (!in_array($Prefix, array('https:/', 'http://', 'mailto:')) && ($Destination != '' || $ForceAnchor === false)) {
+        if (!in_array($Prefix, ['https:/', 'http://', 'mailto:']) && ($Destination != '' || $ForceAnchor === false)) {
             $Destination = Gdn::request()->url($Destination, $WithDomain, $SSL);
         }
 
@@ -823,7 +823,7 @@ if (!function_exists('hasEditProfile')) {
      * @return bool Return true if the user should have the edit profile link or false otherwise.
      */
     function hasEditProfile($userID) {
-        if (checkPermission(array('Garden.Users.Edit', 'Moderation.Profiles.Edit'))) {
+        if (checkPermission(['Garden.Users.Edit', 'Moderation.Profiles.Edit'])) {
             return true;
         }
         if ($userID != Gdn::session()->UserID) {
@@ -851,7 +851,7 @@ if (!function_exists('hoverHelp')) {
      * @return string
      */
     function hoverHelp($String, $Help) {
-        return wrap($String.wrap($Help, 'span', array('class' => 'Help')), 'span', array('class' => 'HoverHelp'));
+        return wrap($String.wrap($Help, 'span', ['class' => 'Help']), 'span', ['class' => 'HoverHelp']);
     }
 }
 
@@ -886,7 +886,7 @@ if (!function_exists('inCategory')) {
      * @since 2.1
      */
     function inCategory($Category) {
-        $Breadcrumbs = (array)Gdn::controller()->data('Breadcrumbs', array());
+        $Breadcrumbs = (array)Gdn::controller()->data('Breadcrumbs', []);
 
         foreach ($Breadcrumbs as $Breadcrumb) {
             if (isset($Breadcrumb['CategoryID']) && strcasecmp($Breadcrumb['UrlCode'], $Category) == 0) {
@@ -1117,17 +1117,17 @@ if (!function_exists('userAnchor')) {
             $Options = $CssClass;
             $CssClass = null;
         } elseif (is_string($Options)) {
-            $Options = array('Px' => $Options);
+            $Options = ['Px' => $Options];
         }
 
         $Px = val('Px', $Options, '');
         $Name = val($Px.'Name', $User, t('Unknown'));
         $Text = val('Text', $Options, htmlspecialchars($Name)); // Allow anchor text to be overridden.
 
-        $Attributes = array(
+        $Attributes = [
             'class' => $CssClass,
             'rel' => val('Rel', $Options)
-        );
+        ];
         if (isset($Options['title'])) {
             $Attributes['title'] = $Options['title'];
         }
@@ -1190,9 +1190,9 @@ if (!function_exists('userPhoto')) {
      * @param array $Options
      * @return string HTML.
      */
-    function userPhoto($User, $Options = array()) {
+    function userPhoto($User, $Options = []) {
         if (is_string($Options)) {
-            $Options = array('LinkClass' => $Options);
+            $Options = ['LinkClass' => $Options];
         }
 
         if ($Px = val('Px', $Options)) {
@@ -1369,11 +1369,11 @@ if (!function_exists('discussionLink')) {
 
         $DiscussionID = val('DiscussionID', $Discussion);
         $DiscussionName = val('Name', $Discussion);
-        $Parts = array(
+        $Parts = [
             'discussion',
             $DiscussionID,
             Gdn_Format::url($DiscussionName)
-        );
+        ];
         if ($Extended) {
             $Parts[] = ($Discussion->CountCommentWatch > 0) ? '#Item_'.$Discussion->CountCommentWatch : '';
         }
@@ -1606,7 +1606,7 @@ if (!function_exists('writeReactions')) {
 
             echo ' <span class="FlagMenu ToggleFlyout">';
             // Write the handle.
-            echo anchor(sprite('ReactFlag', 'ReactSprite').' '.wrap(t('Flag'), 'span', array('class' => 'ReactLabel')), '', 'Hijack ReactButton-Flag FlyoutButton', array('title' => t('Flag')), true);
+            echo anchor(sprite('ReactFlag', 'ReactSprite').' '.wrap(t('Flag'), 'span', ['class' => 'ReactLabel']), '', 'Hijack ReactButton-Flag FlyoutButton', ['title' => t('Flag')], true);
             echo sprite('SpFlyoutHandle', 'Arrow');
             echo '<ul class="Flyout MenuItems Flags" style="display: none;">';
             foreach ($Flags as $Flag) {

@@ -18,24 +18,24 @@ function writeConditionEdit($Condition, $Sender) {
 
     // Type.
     echo '<td>',
-    $Form->DropDown($Px.'Type[]', $Sender->Types, array('Value' => $Type, 'Class' => 'CondType')),
+    $Form->DropDown($Px.'Type[]', $Sender->Types, ['Value' => $Type, 'Class' => 'CondType']),
     '</td>';
 
     echo '<td>';
 
     // Permission fields.
     echo '<div class="Cond_permission"'._DN($Type, Gdn_Condition::PERMISSION).'>',
-    $Form->DropDown($Px.'PermissionField[]', $Sender->Permissions, array('Value' => $Type == Gdn_Condition::PERMISSION ? $Field : '')),
+    $Form->DropDown($Px.'PermissionField[]', $Sender->Permissions, ['Value' => $Type == Gdn_Condition::PERMISSION ? $Field : '']),
     '</div>';
 
     // Role fields.
     echo '<div class="Cond_role"'._DN($Type, Gdn_Condition::ROLE).'>',
-    $Form->DropDown($Px.'RoleField[]', $Sender->Roles, array('Value' => $Type == Gdn_Condition::ROLE ? $Field : '')),
+    $Form->DropDown($Px.'RoleField[]', $Sender->Roles, ['Value' => $Type == Gdn_Condition::ROLE ? $Field : '']),
     '</div>';
 
     // Textbox field.
     echo '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->textBox($Px.'Field[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Field : ''));
+    $Form->textBox($Px.'Field[]', ['Value' => $Type == Gdn_Condition::REQUEST ? $Field : '']);
     '</div>';
 
     echo '</td>';
@@ -43,7 +43,7 @@ function writeConditionEdit($Condition, $Sender) {
     // Expression.
     echo '<td>',
         '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->textBox($Px.'Expr[]', array('Value' => $Type == Gdn_Condition::REQUEST ? $Expr : '')),
+    $Form->textBox($Px.'Expr[]', ['Value' => $Type == Gdn_Condition::REQUEST ? $Expr : '']),
     '</div>',
     '</td>';
 

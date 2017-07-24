@@ -40,7 +40,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      */
     public function escapeSql($String, $FirstWordOnly = false) {
         if (is_array($String)) {
-            $EscapedArray = array();
+            $EscapedArray = [];
 
             foreach ($String as $k => $v) {
                 $EscapedArray[$this->escapeSql($k)] = $this->escapeSql($v, $FirstWordOnly);
@@ -75,7 +75,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             return "`{$String}`";
         }
 
-        $Exceptions = array('as', '/', '-', '%', '+', '*');
+        $Exceptions = ['as', '/', '-', '%', '+', '*'];
 
         foreach ($Exceptions as $Exception) {
             if (stristr($String, " `{$Exception}` ") !== false) {
@@ -139,7 +139,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
         // Format the table name.
         $Table = $this->escapeSql($this->Database->DatabasePrefix.$Table);
         $DataSet = $this->query($this->fetchColumnSql($Table));
-        $Schema = array();
+        $Schema = [];
 
         foreach ($DataSet->result() as $Field) {
             $Type = $Field->Type;
@@ -154,7 +154,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 $Type = substr($Type, 0, $Parentheses);
 
                 if (strcasecmp($Type, 'enum') == 0) {
-                    $Enum = array();
+                    $Enum = [];
                     foreach ($LengthParts as $Value) {
                         $Enum[] = trim($Value, "'");
                     }
@@ -218,7 +218,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $TableName The name of the table to delete from.
      * @param array $Wheres An array of where conditions.
      */
-    public function getDelete($TableName, $Wheres = array(), $Limit = 0) {
+    public function getDelete($TableName, $Wheres = [], $Limit = 0) {
         $Conditions = '';
         $Joins = '';
         $DeleteFrom = '';
@@ -229,7 +229,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             $Joins .= implode("\n", $this->_Joins);
 
 
-            $DeleteFroms = array();
+            $DeleteFroms = [];
             foreach ($this->_Froms as $From) {
                 $Parts = preg_split('`\s`', trim($From));
                 if (count($Parts) > 1) {
@@ -282,7 +282,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             if (array_key_exists(0, $Data)) {
                 // This is a big insert with a bunch of rows.
                 $Keys = array_keys($Data[0]);
-                $Keys = array_map(array($this, 'Backtick'), $Keys);
+                $Keys = array_map([$this, 'Backtick'], $Keys);
                 $Sql .= "\n(".implode(', ', $Keys).') '
                     ."\nvalues ";
 
@@ -295,7 +295,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 }
             } else {
                 $Keys = array_keys($Data);
-                $Keys = array_map(array($this, 'Backtick'), $Keys);
+                $Keys = array_map([$this, 'Backtick'], $Keys);
                 $Sql .= "\n(".implode(', ', $Keys).') '
                     ."\nvalues (".implode(', ', array_values($Data)).')';
             }
@@ -331,7 +331,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
             trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', '_GetUpdate'), E_USER_ERROR);
         }
 
-        $Sets = array();
+        $Sets = [];
         foreach ($Data as $Field => $Value) {
             $Sets[] = $Field." = ".$Value;
         }
@@ -396,7 +396,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
                 $CaseOptions .= ' when '.$Key.' then '.$Val;
             }
         }
-        $this->_Selects[] = array('Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions);
+        $this->_Selects[] = ['Field' => $Field, 'Function' => '', 'Alias' => $Alias, 'CaseOptions' => $CaseOptions];
         return $this;
     }
 
@@ -410,7 +410,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
         if ($Encoding != '' && $Encoding !== false) {
             // Make sure to pass through any named parameters from queries defined before the connection was opened.
             $SavedNamedParameters = $this->_NamedParameters;
-            $this->_NamedParameters = array();
+            $this->_NamedParameters = [];
             $this->_NamedParameters[':encoding'] = $Encoding;
             $this->query('set names :encoding');
             $this->_NamedParameters = $SavedNamedParameters;

@@ -19,10 +19,10 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * Add Prettify to page text.
      */
     public function addPretty($Sender) {
-        $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), $this->GetJs());
-        $Sender->addJsFile('prettify.js', 'plugins/GooglePrettify', array('_sort' => 101));
+        $Sender->Head->addTag('script', ['type' => 'text/javascript', '_sort' => 100], $this->GetJs());
+        $Sender->addJsFile('prettify.js', 'plugins/GooglePrettify', ['_sort' => 101]);
         if ($Language = c('Plugins.GooglePrettify.Language')) {
-            $Sender->addJsFile("lang-$Language.js", 'plugins/GooglePrettify', array('_sort' => 102));
+            $Sender->addJsFile("lang-$Language.js", 'plugins/GooglePrettify', ['_sort' => 102]);
         }
     }
 
@@ -32,7 +32,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
     public function addTabby($Sender) {
         if (c('Plugins.GooglePrettify.UseTabby', false)) {
             $Sender->addJsFile('jquery.textarea.js', 'plugins/GooglePrettify');
-            $Sender->Head->addTag('script', array('type' => 'text/javascript', '_sort' => 100), '
+            $Sender->Head->addTag('script', ['type' => 'text/javascript', '_sort' => 100], '
         function init() {
             $("textarea").not(".Tabby").addClass("Tabby").tabby();
         }
@@ -140,7 +140,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
         $Cf = new ConfigurationModule($Sender);
         $CssUrl = asset('/plugins/GooglePrettify/design/prettify.css', true);
 
-        $Languages = array(
+        $Languages = [
             'apollo' => 'apollo',
             'clj' => 'clj',
             'css' => 'css',
@@ -159,15 +159,15 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
             'wiki' => 'wiki',
             'xq' => 'xq',
             'yaml' => 'yaml'
-        );
+        ];
 
-        $Cf->initialize(array(
-            'Plugins.GooglePrettify.LineNumbers' => array('Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false),
-            'Plugins.GooglePrettify.NoCssFile' => array('Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => false),
-            'Plugins.GooglePrettify.UseTabby' => array('Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => false),
-            'Plugins.GooglePrettify.Language' => array('Control' => 'DropDown', 'Items' => $Languages, 'Options' => array('IncludeNull' => true),
-                'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)')
-        ));
+        $Cf->initialize([
+            'Plugins.GooglePrettify.LineNumbers' => ['Control' => 'CheckBox', 'Description' => 'Add line numbers to source code.', 'Default' => false],
+            'Plugins.GooglePrettify.NoCssFile' => ['Control' => 'CheckBox', 'LabelCode' => 'Exclude Default CSS File', 'Description' => "If you want to define syntax highlighting in your custom theme you can disable the <a href='$CssUrl'>default css</a> with this setting.", 'Default' => false],
+            'Plugins.GooglePrettify.UseTabby' => ['Control' => 'CheckBox', 'LabelCode' => 'Allow Tab Characters', 'Description' => "If users enter a lot of source code then enable this setting to make the tab key enter a tab instead of skipping to the next control.", 'Default' => false],
+            'Plugins.GooglePrettify.Language' => ['Control' => 'DropDown', 'Items' => $Languages, 'Options' => ['IncludeNull' => true],
+                'Description' => 'We try our best to guess which language you are typing in, but if you have a more obscure language you can force all highlighting to be in that language. (Not recommended)']
+        ]);
 
 
         $Sender->setData('Title', t('Syntax Prettifier Settings'));

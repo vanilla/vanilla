@@ -14,13 +14,13 @@
 class EmbedController extends DashboardController {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form');
+    public $Uses = ['Database', 'Form'];
 
     /**
      * Default method.
      */
     public function index() {
-        redirect('embed/comments');
+        redirectTo('embed/comments');
     }
 
     /**
@@ -52,7 +52,7 @@ class EmbedController extends DashboardController {
 
         try {
             if ($this->toggle($Toggle, $TransientKey)) {
-                redirect('embed/forum');
+                redirectTo('embed/forum');
             }
         } catch (Gdn_UserException $Ex) {
             $this->Form->addError($Ex);
@@ -78,7 +78,7 @@ class EmbedController extends DashboardController {
 
 //        try {
 //            if ($this->toggle($Toggle, $TransientKey)) {
-//                redirect('embed/advanced');
+//                redirectTo('embed/advanced');
 //            }
 //        } catch (Gdn_UserException $Ex) {
 //            $this->Form->addError($Ex);
@@ -90,7 +90,7 @@ class EmbedController extends DashboardController {
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
         $ConfigurationModel->setField(
-            array(
+            [
                 'Garden.Embed.RemoteUrl',
                 'Garden.Embed.ForceDashboard',
                 'Garden.Embed.ForceForum',
@@ -99,7 +99,7 @@ class EmbedController extends DashboardController {
                 'Garden.Embed.CommentsPerPage',
                 'Garden.Embed.SortComments',
                 'Garden.Embed.PageToForum'
-            )
+            ]
         );
 
         $this->Form->setModel($ConfigurationModel);
@@ -137,7 +137,7 @@ class EmbedController extends DashboardController {
      * @throws Gdn_UserException
      */
     private function toggle($Toggle = '', $TransientKey = '') {
-        if (in_array($Toggle, array('enable', 'disable')) && Gdn::session()->validateTransientKey($TransientKey)) {
+        if (in_array($Toggle, ['enable', 'disable']) && Gdn::session()->validateTransientKey($TransientKey)) {
             if ($Toggle == 'enable' && Gdn::addonManager()->isEnabled('embedvanilla', \Vanilla\Addon::TYPE_ADDON)) {
                 throw new Gdn_UserException('You must disable the "Embed Vanilla" plugin before continuing.');
             }

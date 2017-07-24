@@ -14,7 +14,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
     protected $_ExecutionTime = 0;
 
     /** @var array  */
-    protected $_Queries = array();
+    protected $_Queries = [];
 
     /**
      *
@@ -94,7 +94,7 @@ class Gdn_DatabaseDebug extends Gdn_Database {
      * @param array $Options
      * @return Gdn_DataSet|object|string
      */
-    public function query($Sql, $InputParameters = null, $Options = array()) {
+    public function query($Sql, $InputParameters = null, $Options = []) {
         $Trace = debug_backtrace();
         $Method = '';
         foreach ($Trace as $Info) {
@@ -109,11 +109,11 @@ class Gdn_DatabaseDebug extends Gdn_Database {
 
         // Save the query for debugging
         // echo '<br />adding to queries: '.$Sql;
-        $Query = array('Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method);
+        $Query = ['Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method];
         $SaveQuery = true;
         if (isset($Options['Cache'])) {
             $CacheKeys = (array)$Options['Cache'];
-            $Cache = array();
+            $Cache = [];
 
             $AllSet = true;
             foreach ($CacheKeys as $CacheKey) {
@@ -150,6 +150,6 @@ class Gdn_DatabaseDebug extends Gdn_Database {
      * @return array
      */
     public function queryTimes() {
-        return array();
+        return [];
     }
 }

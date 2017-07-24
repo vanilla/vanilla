@@ -55,7 +55,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
             // Don't allow open ID on a non-standard scheme.
             $scheme = parse_url($url, PHP_URL_SCHEME);
-            if (!in_array($scheme, array('http', 'https'))) {
+            if (!in_array($scheme, ['http', 'https'])) {
                 throw new Gdn_UserException(sprintf(t('ValidateUrl'), 'OpenID'), 400);
             }
 
@@ -67,7 +67,7 @@ class OpenIDPlugin extends Gdn_Plugin {
 
             // Don't allow open ID on a non-standard port.
             $port = parse_url($url, PHP_URL_PORT);
-            if ($port && !in_array($port, array(80, 8080, 443))) {
+            if ($port && !in_array($port, [80, 8080, 443])) {
                 throw new Gdn_UserException(t('OpenID is not allowed on non-standard ports.'));
             }
 
@@ -77,10 +77,10 @@ class OpenIDPlugin extends Gdn_Plugin {
         $Url = url('/entry/connect/openid', true);
         $UrlParts = explode('?', $Url);
         parse_str(val(1, $UrlParts, ''), $Query);
-        $Query = array_merge($Query, arrayTranslate($_GET, array('display', 'Target')));
+        $Query = array_merge($Query, arrayTranslate($_GET, ['display', 'Target']));
 
         $OpenID->returnUrl = $UrlParts[0].'?'.http_build_query($Query);
-        $OpenID->required = array('contact/email', 'namePerson/first', 'namePerson/last', 'pref/language');
+        $OpenID->required = ['contact/email', 'namePerson/first', 'namePerson/last', 'pref/language'];
 
         $this->EventArguments['OpenID'] = $OpenID;
         $this->fireEvent('GetOpenID');
@@ -209,7 +209,7 @@ class OpenIDPlugin extends Gdn_Plugin {
                 } else {
                     try {
                         $Url = $OpenID->authUrl();
-                        redirect($Url);
+                        redirectTo($Url, 302, false);
                     } catch (Exception $Ex) {
                         $Sender->Form->addError($Ex);
                         $Sender->render('Url', '', 'plugins/OpenID');
@@ -229,10 +229,10 @@ class OpenIDPlugin extends Gdn_Plugin {
             $Url = $this->_authorizeHref();
 
             // Add the OpenID method to the controller.
-            $Method = array(
+            $Method = [
                 'Name' => 'OpenID',
-                'SignInHtml' => socialSigninButton('OpenID', $Url, 'button', array('class' => 'js-extern'))
-            );
+                'SignInHtml' => socialSigninButton('OpenID', $Url, 'button', ['class' => 'js-extern'])
+            ];
 
             $Sender->Data['Methods'][] = $Method;
         }
@@ -279,7 +279,7 @@ class OpenIDPlugin extends Gdn_Plugin {
     private function _getButton() {
         if ($this->signInAllowed()) {
             $Url = $this->_authorizeHref();
-            return socialSigninButton('OpenID', $Url, 'icon', array('class' => 'js-extern', 'rel' => 'nofollow'));
+            return socialSigninButton('OpenID', $Url, 'icon', ['class' => 'js-extern', 'rel' => 'nofollow']);
         }
     }
 
@@ -290,7 +290,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      */
     public function base_beforeSignInLink_handler($Sender) {
         if (!Gdn::session()->isValid() && $this->signInAllowed()) {
-            echo "\n".wrap($this->_getButton(), 'li', array('class' => 'Connect OpenIDConnect'));
+            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect OpenIDConnect']);
         }
     }
 
@@ -303,9 +303,9 @@ class OpenIDPlugin extends Gdn_Plugin {
         $Sender->permission('Garden.Settings.Manage');
 
         $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize(array(
-            'Plugins.OpenID.DisableSignIn' => array('Control' => 'Toggle', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false)
-        ));
+        $Conf->initialize([
+            'Plugins.OpenID.DisableSignIn' => ['Control' => 'Toggle', 'LabelCode' => 'Disable OpenID sign in', 'Default' => false]
+        ]);
 
 
         $Sender->setData('Title', sprintf(t('%s Settings'), t('OpenID')));

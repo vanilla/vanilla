@@ -14,7 +14,7 @@
 class VanillaSettingsController extends Gdn_Controller {
 
     /** @var array Models to include. */
-    public $Uses = array('Database', 'Form', 'CategoryModel');
+    public $Uses = ['Database', 'Form', 'CategoryModel'];
 
     /** @var CategoryModel */
     public $CategoryModel;
@@ -43,7 +43,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Load up config options we'll be setting
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $ConfigurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Discussions.PerPage',
             'Vanilla.Comments.PerPage',
@@ -53,7 +53,7 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.Comment.MaxLength',
             'Vanilla.Comment.MinLength',
             'Garden.Format.DisableUrlEmbeds',
-        ));
+        ]);
 
         // Set the model on the form.
         $this->Form->setModel($ConfigurationModel);
@@ -101,7 +101,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @deprecated 2.4 Legacy redirect. Use VanillaSettingsController::posting instead.
      */
     public function advanced() {
-        redirect('/vanilla/settings/posting');
+        redirectTo('/vanilla/settings/posting');
     }
 
     /**
@@ -114,10 +114,10 @@ class VanillaSettingsController extends Gdn_Controller {
         // Load up config options we'll be setting
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $ConfigurationModel->setField([
             'Vanilla.Archive.Date',
             'Vanilla.Archive.Exclude'
-        ));
+        ]);
 
         // Set the model on the form.
         $this->Form->setModel($ConfigurationModel);
@@ -161,7 +161,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @access public
      */
     public function index() {
-        redirect('/vanilla/settings/categories');
+        redirectTo('/vanilla/settings/categories');
     }
 
     /**
@@ -183,7 +183,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $this->addJsFile('jquery.autosize.min.js');
         $this->addJsFile('global.js');
 
-        if (in_array($this->ControllerName, array('profilecontroller', 'activitycontroller'))) {
+        if (in_array($this->ControllerName, ['profilecontroller', 'activitycontroller'])) {
             $this->addCssFile('style.css');
             $this->addCssFile('vanillicon.css', 'static');
         } else {
@@ -232,7 +232,7 @@ class VanillaSettingsController extends Gdn_Controller {
         $IsConversationsEnabled = Gdn::addonManager()->isEnabled('Conversations', \Vanilla\Addon::TYPE_ADDON);
         $this->setData('IsConversationsEnabled', $IsConversationsEnabled);
 
-        $ConfigurationFields = array(
+        $ConfigurationFields = [
             'Vanilla.Discussion.SpamCount',
             'Vanilla.Discussion.SpamTime',
             'Vanilla.Discussion.SpamLock',
@@ -245,18 +245,18 @@ class VanillaSettingsController extends Gdn_Controller {
             'Vanilla.ActivityComment.SpamCount',
             'Vanilla.ActivityComment.SpamTime',
             'Vanilla.ActivityComment.SpamLock',
-        );
+        ];
         if ($IsConversationsEnabled) {
             $ConfigurationFields = array_merge(
                 $ConfigurationFields,
-                array(
+                [
                     'Conversations.Conversation.SpamCount',
                     'Conversations.Conversation.SpamTime',
                     'Conversations.Conversation.SpamLock',
                     'Conversations.ConversationMessage.SpamCount',
                     'Conversations.ConversationMessage.SpamTime',
                     'Conversations.ConversationMessage.SpamLock'
-                )
+                ]
             );
         }
         // Load up config options we'll be setting
@@ -353,7 +353,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
         $this->fireAs('SettingsController');
         $this->fireEvent('AddEditCategory');
-        $this->setupDiscussionTypes(array());
+        $this->setupDiscussionTypes([]);
 
         $displayAsOptions = CategoryModel::getDisplayAsOptions();
 
@@ -390,7 +390,7 @@ class VanillaSettingsController extends Gdn_Controller {
                 $this->setData('Category', $Category);
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('vanilla/settings/categories');
+                    redirectTo('vanilla/settings/categories');
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -415,7 +415,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => isset($CategoryID) ? $CategoryID : 0), 'Category');
+        $Permissions = $PermissionModel->getJunctionPermissions(['JunctionID' => isset($CategoryID) ? $CategoryID : 0], 'Category');
         $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -546,7 +546,7 @@ class VanillaSettingsController extends Gdn_Controller {
                     }
 
                     if ($this->Form->errorCount() == 0) {
-                        $this->RedirectUrl = url('vanilla/settings/categories');
+                        $this->setRedirectTo('vanilla/settings/categories');
                         $this->informMessage(t('Deleting category...'));
                     }
                 }
@@ -700,7 +700,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
                     $destination = $this->categoryPageByParent($parentCategory);
-                    redirect($destination);
+                    redirectTo($destination);
                 } elseif ($this->deliveryType() === DELIVERY_TYPE_DATA && method_exists($this, 'getCategory')) {
                     $this->Data = [];
                     $this->getCategory($CategoryID);
@@ -714,7 +714,7 @@ class VanillaSettingsController extends Gdn_Controller {
         }
 
         // Get all of the currently selected role/permission combinations for this junction.
-        $Permissions = $PermissionModel->getJunctionPermissions(array('JunctionID' => $CategoryID), 'Category', '', array('AddDefaults' => !$this->Category->CustomPermissions));
+        $Permissions = $PermissionModel->getJunctionPermissions(['JunctionID' => $CategoryID], 'Category', '', ['AddDefaults' => !$this->Category->CustomPermissions]);
         $Permissions = $PermissionModel->unpivotPermissions($Permissions, true);
 
         if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
@@ -871,17 +871,17 @@ class VanillaSettingsController extends Gdn_Controller {
         // Setup & save forms
         $Validation = new Gdn_Validation();
         $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+        $ConfigurationModel->setField([
             'Vanilla.Categories.MaxDisplayDepth',
             'Vanilla.Categories.DoHeadings',
             'Vanilla.Categories.HideModule'
-        ));
+        ]);
 
         // Set the model on the form.
         $this->Form->setModel($ConfigurationModel);
 
         // Define MaxDepthOptions
-        $DepthData = array();
+        $DepthData = [];
         $DepthData['2'] = sprintf(t('more than %s deep'), plural(1, '%s level', '%s levels'));
         $DepthData['3'] = sprintf(t('more than %s deep'), plural(2, '%s level', '%s levels'));
         $DepthData['4'] = sprintf(t('more than %s deep'), plural(3, '%s level', '%s levels'));
@@ -958,7 +958,7 @@ class VanillaSettingsController extends Gdn_Controller {
             $this->setData('Enabled', $enabled);
 
             if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-                $this->RedirectUrl = url('/vanilla/settings/categories');
+                $this->setRedirectTo('/vanilla/settings/categories');
             }
         } else {
             throw forbiddenException('GET');

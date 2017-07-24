@@ -36,9 +36,9 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
             <div class="image-wrap">
                 <?php
                 if ($PreviewUrl !== FALSE) {
-                    echo img($PreviewUrl, array('alt' => $this->data('EnabledThemeName')));
+                    echo img($PreviewUrl, ['alt' => $this->data('EnabledThemeName')]);
                 } else {
-                    echo img('/themes/mobile/mobile.png', array('alt' => $ScreenName));
+                    echo img('/themes/mobile/mobile.png', ['alt' => $ScreenName]);
                 } ?>
             </div>
         </div>
@@ -111,7 +111,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
             echo '<div class="Alert alert">';
             echo url(
                 sprintf(t('%1$s version %2$s is available.'), $this->data('EnabledThemeName'), $NewVersion),
-                CombinePaths(array($AddonUrl, 'find', urlencode($this->data('EnabledThemeName'))), '/')
+                CombinePaths([$AddonUrl, 'find', urlencode($this->data('EnabledThemeName'))], '/')
             );
             echo '</div>';
         }
@@ -119,7 +119,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
         </div>
     </div>
 </div>
-<?php if (count($this->data('AvailableThemes', array()))): ?>
+<?php if (count($this->data('AvailableThemes', []))): ?>
 
     <ul class="browser-mobile-themes label-selector">
         <?php
@@ -163,8 +163,8 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
 
 
             $PreviewImageHtml = ($PreviewUrl !== FALSE)
-                ? anchor(Img($PreviewUrl, array('alt' => $ScreenName, 'class' => 'label-selector-image')), $PreviewUrl, '', array('class' => 'theme-image mfp-image'))
-                : anchor(Img('/themes/mobile/mobile.png', array('alt' => $ScreenName, 'class' => 'label-selector-image')), $PreviewUrl, '', array('class' => 'theme-image mfp-image'));
+                ? anchor(Img($PreviewUrl, ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image'])
+                : anchor(Img('/themes/mobile/mobile.png', ['alt' => $ScreenName, 'class' => 'label-selector-image']), $PreviewUrl, '', ['class' => 'theme-image mfp-image']);
 
             $DescriptionHtml = ($Description)
                 ? '<em class="theme-description">'.$Description.'</em>'
@@ -189,7 +189,7 @@ helpAsset(t('About Theme Preview'), t('Not getting what you expect when you prev
                                 <?php echo anchor(dashboardSymbol('expand', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-modal-type' => 'noheader']); ?>
                             </div>
                             <div class="buttons">
-                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-overlay', array('target' => '_top'));
+                                <?php echo anchor(t('Apply'), 'dashboard/settings/mobilethemes/'.$ThemeName.'/'.$Session->TransientKey(), 'EnableAddon EnableTheme btn btn-overlay', ['target' => '_top']);
                                 if ($allowPreview) {
                                     echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay js-preview-addon');
                                 }

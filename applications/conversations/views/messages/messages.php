@@ -3,7 +3,7 @@ $Session = Gdn::session();
 
 $Alt = false;
 $CurrentOffset = $this->Offset;
-$Messages = $this->data('Messages', array());
+$Messages = $this->data('Messages', []);
 foreach ($Messages as $Message) {
     $CurrentOffset++;
     $Alt = !$Alt;

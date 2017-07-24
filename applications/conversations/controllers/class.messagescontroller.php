@@ -14,7 +14,7 @@
 class MessagesController extends ConversationsController {
 
     /** @var array Models to include. */
-    public $Uses = array('Form', 'ConversationModel', 'ConversationMessageModel');
+    public $Uses = ['Form', 'ConversationModel', 'ConversationMessageModel'];
 
     /**  @var ConversationModel */
     public $ConversationModel;
@@ -39,7 +39,7 @@ class MessagesController extends ConversationsController {
     public function initialize() {
         parent::initialize();
         $this->Menu->highlightRoute('/messages/inbox');
-        $this->setData('Breadcrumbs', array(array('Name' => t('Inbox'), 'Url' => '/messages/inbox')));
+        $this->setData('Breadcrumbs', [['Name' => t('Inbox'), 'Url' => '/messages/inbox']]);
         $this->addModule('SignedInModule');
 
         if (checkPermission('Conversations.Conversations.Add')) {
@@ -71,7 +71,7 @@ class MessagesController extends ConversationsController {
 
         // Sending a new conversation.
         if ($this->Form->authenticatedPostBack()) {
-            $RecipientUserIDs = array();
+            $RecipientUserIDs = [];
             $To = explode(',', $this->Form->getFormValue('To', ''));
             $UserModel = new UserModel();
             foreach ($To as $Name) {
@@ -103,7 +103,7 @@ class MessagesController extends ConversationsController {
             $ConversationID = $this->Form->save();
             if ($ConversationID !== false) {
                 $Target = $this->Form->getFormValue('Target', 'messages/'.$ConversationID);
-                $this->RedirectUrl = url($Target);
+                $this->setRedirectTo($Target);
 
                 $Conversation = $this->ConversationModel->getID(
                     $ConversationID,
@@ -143,10 +143,10 @@ class MessagesController extends ConversationsController {
 
         Gdn_Theme::section('PostConversation');
         $this->title(t('New Conversation'));
-        $this->setData('Breadcrumbs', array(
-            array('Name' => t('Inbox'), 'Url' => '/messages/inbox'),
-            array('Name' => $this->data('Title'), 'Url' => 'messages/add')
-        ));
+        $this->setData('Breadcrumbs', [
+            ['Name' => t('Inbox'), 'Url' => '/messages/inbox'],
+            ['Name' => $this->data('Title'), 'Url' => 'messages/add']
+        ]);
 
         $this->CssClass = 'NoPanel';
 
@@ -194,7 +194,7 @@ class MessagesController extends ConversationsController {
 
             if ($NewMessageID) {
                 if ($this->deliveryType() == DELIVERY_TYPE_ALL) {
-                    redirect('messages/'.$ConversationID.'/#'.$NewMessageID, 302);
+                    redirectTo('messages/'.$ConversationID.'/#'.$NewMessageID);
                 }
 
                 $this->setJson('MessageID', $NewMessageID);
@@ -296,7 +296,7 @@ class MessagesController extends ConversationsController {
             // Clear it
             $this->ConversationModel->clear($ConversationID, $Session->UserID);
             $this->informMessage(t('The conversation has been cleared.'));
-            $this->RedirectUrl = url('/messages/all');
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->render();
@@ -324,7 +324,7 @@ class MessagesController extends ConversationsController {
 
         if ($this->Form->authenticatedPostBack(true)) {
             $this->ConversationModel->clear($conversationID, Gdn::session()->UserID);
-            $this->RedirectUrl = url('/messages/all');
+            $this->setRedirectTo('/messages/all');
         }
 
         $this->title(t('Leave Conversation'));
@@ -463,9 +463,9 @@ class MessagesController extends ConversationsController {
             $Subject = t('Message');
         }
 
-        $this->Data['Breadcrumbs'][] = array(
+        $this->Data['Breadcrumbs'][] = [
             'Name' => $Subject,
-            'Url' => url('', '//'));
+            'Url' => url('', '//')];
 
         // Render view
         $this->render();
@@ -507,7 +507,7 @@ class MessagesController extends ConversationsController {
             throw notFoundException('Conversation');
         }
 
-        $Where = array();
+        $Where = [];
         if ($LastMessageID) {
             if (strrpos($LastMessageID, '_') !== false) {
                 $LastMessageID = trim(strrchr($LastMessageID, '_'), '_');
@@ -546,7 +546,7 @@ class MessagesController extends ConversationsController {
         )->resultArray();
 
         // Last message user data
-        Gdn::userModel()->joinUsers($Conversations, array('LastInsertUserID'));
+        Gdn::userModel()->joinUsers($Conversations, ['LastInsertUserID']);
 
         $this->EventArguments['Conversations'] = &$Conversations;
         $this->fireEvent('beforeMessagesPopin');
@@ -584,7 +584,7 @@ class MessagesController extends ConversationsController {
 
         // Redirect back where the user came from if necessary
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            redirect($_SERVER['HTTP_REFERER']);
+            redirectTo($_SERVER['HTTP_REFERER']);
         } else {
             $this->render();
         }

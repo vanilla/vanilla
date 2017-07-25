@@ -2116,7 +2116,7 @@ class DiscussionModel extends Gdn_Model {
                         'HeadlineFormat' => $HeadlineFormat,
                         'RecordType' => 'Discussion',
                         'RecordID' => $DiscussionID,
-                        'Route' => DiscussionUrl($Fields, '', false),
+                        'Route' => discussionUrl($Fields, '', '/'),
                         'Data' => [
                             'Name' => $DiscussionName,
                             'Category' => val('Name', $Category)

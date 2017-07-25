@@ -976,11 +976,11 @@ class PostController extends VanillaController {
             'HeadlineFormat' => $HeadlineFormat,
             'RecordType' => 'Discussion',
             'RecordID' => $DiscussionID,
-            'Route' => DiscussionUrl($Discussion, '', false),
-            'Data' => array(
+            'Route' => discussionUrl($Discussion, '', '/'),
+            'Data' => [
                 'Name' => $Discussion->Name,
                 'Category' => val('Name', $Category)
-            )
+            ]
         );
 
         $ActivityModel = new ActivityModel();

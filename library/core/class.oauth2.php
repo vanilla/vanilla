@@ -375,11 +375,11 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         // Set up the form.
         $formFields = [
-            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Enter the unique ID of the authentication application.'],
-            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Enter the secret provided by the authentication provider.'],
-            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'Enter the endpoint to retrieve the authorization token for a user.'],
-            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Enter the endpoint to retrieve the authorization token for a user.'],
-            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Enter the endpoint to retrieve a user\'s profile.']
+            'AssociationKey' =>  ['LabelCode' => 'Client ID', 'Description' => 'Unique ID of the authentication application.'],
+            'AssociationSecret' =>  ['LabelCode' => 'Secret', 'Description' => 'Secret provided by the authentication provider.'],
+            'AuthorizeUrl' =>  ['LabelCode' => 'Authorize Url', 'Description' => 'URL where users sign-in with the authentication provider.'],
+            'TokenUrl' => ['LabelCode' => 'Token Url', 'Description' => 'Endpoint to retrieve the authorization token for a user.'],
+            'ProfileUrl' => ['LabelCode' => 'Profile Url', 'Description' => 'Endpoint to retrieve a user\'s profile.']
         ];
 
         $formFields = $formFields + $this->getSettingsFormFields();
@@ -533,7 +533,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         } elseif (empty($response['access_token'])) {
             throw new Gdn_UserException('The OAuth server did not return an access token.', 400);
         } else {
-            $this->accessToken(val('access_token', $response));
+            $this->accessToken($response['access_token']);
         }
 
         $this->log('Getting Profile', []);

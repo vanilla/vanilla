@@ -634,7 +634,7 @@
 
       Controller.prototype.get_range = function() {
         var thisWin = this.setting.cWindow || window;
-        if(thisWin.getSelection && thisWin.getSelection() && thisWin.rangeCount > 0) {
+        if(thisWin.getSelection && thisWin.getSelection() && thisWin.getSelection().rangeCount > 0) {
           return thisWin.getSelection().getRangeAt(0);
         } else {
           return this.range || void 0;

@@ -1106,8 +1106,10 @@
                         if (!result.error) {
                             var payload = result.payload;
 
-                            // If photo, insert directly into editor area.
-                            if (payload.upload_type === 'image') {
+                            var imgTag = buildImgTag(payload.original_url, format);
+
+                            // If we uploaded an image and we have an image tag, insert directly into editor area.
+                            if (payload.upload_type === 'image' && imgTag) {
                                 // Determine max height for sample. They can resize it
                                 // afterwards.
                                 var maxHeight = (payload.original_height >= 400)
@@ -1122,8 +1124,6 @@
                                 if (editorWidth < payloadWidth) {
                                     payloadHeight = (editorWidth * payload.original_height) / payload.original_width;
                                 }
-
-                                var imgTag = buildImgTag(payload.original_url, format);
 
                                 if (handleIframe) {
                                     editor.focus();

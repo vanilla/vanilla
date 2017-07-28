@@ -2729,7 +2729,7 @@ class DiscussionModel extends Gdn_Model {
         $Comments = $this->SQL->getWhere('Comment', ['DiscussionID' => $discussionID])->resultArray();
         $totalComments = count($Comments);
 
-        if ($totalComments > 0 && $totalComments < 50) {
+        if ($totalComments > 0 && $totalComments <= 25) {
             // A smaller number of comments should just be stored with the record.
             $Data['_Data']['Comment'] = $Comments;
             LogModel::insert($Log, 'Discussion', $Data, $LogOptions);

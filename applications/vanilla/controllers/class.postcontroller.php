@@ -976,7 +976,7 @@ class PostController extends VanillaController {
             'HeadlineFormat' => $headlineFormat,
             'RecordType' => 'Discussion',
             'RecordID' => $discussionID,
-            'Route' => DiscussionUrl($discussion, '', false),
+            'Route' => discussionUrl($discussion, '', '/'),
             'Data' => [
                 'Name' => $discussion->Name,
                 'Category' => val('Name', $category)

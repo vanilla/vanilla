@@ -628,9 +628,10 @@ if (!function_exists('dbdecode')) {
      * Decode a value retrieved from database storage.
      *
      * @param string $value An encoded string representation of a value to be decoded.
-     * @return mixed A decoded value on success or false on failure.
+     * @return mixed Null if the $value was empty, a decoded value on success or false on failure.
      */
     function dbdecode($value) {
+        // Mirror dbencode behaviour.
         if ($value === null || $value === '') {
             return null;
         } elseif (is_array($value)) {
@@ -638,7 +639,13 @@ if (!function_exists('dbdecode')) {
             return $value;
         }
 
-        $decodedValue = @unserialize($value);
+        $decodedValue = json_decode($value, true);
+
+        // Backward compatibility.
+        if ($decodedValue === null) {
+            // Suppress errors https://github.com/vanilla/vanilla/pull/3734#issuecomment-210664113
+            $decodedValue = @unserialize($value);
+        }
 
         if (is_array($value) || is_object($value)) {
             // IP addresses are binary packed now. Let's convert them from text to binary
@@ -654,9 +661,10 @@ if (!function_exists('dbencode')) {
      * Encode a value in preparation for database storage.
      *
      * @param mixed $value A value to be encoded.
-     * @return mixed An encoded string representation of the provided value or false on failure.
+     * @return mixed An encoded string representation of the provided value, null if the value was empty or false on failure.
      */
     function dbencode($value) {
+        // Treat an empty value as null so that we insert "nothing" in the database instead of an empty string.
         if ($value === null || $value === '') {
             return null;
         }
@@ -667,7 +675,15 @@ if (!function_exists('dbencode')) {
             $value = ipDecodeRecursive($value);
         }
 
-        $encodedValue = serialize($value);
+        $encodedValue = false;
+        try {
+            $encodedValue = jsonEncodeChecked($value, JSON_UNESCAPED_SLASHES);
+        } catch (Exception $ex) {
+            $msg = 'Failed to encode a value in dbencode()';
+            $context = ['value' => $value];
+            trace(array_merge(['Error' => $msg], $context), TRACE_ERROR);
+            Logger::log(Logger::ERROR, 'Failed to encode a value in dbencode()', $context);
+        }
 
         return $encodedValue;
     }

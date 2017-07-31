@@ -97,7 +97,7 @@ class EmailTemplate extends Gdn_Pluggable implements Gdn_IEmailTemplate {
      *
      * @throws Exception
      */
-    function __construct($message = '', $title = '', $lead = '', $view = 'email-basic') {
+    public function __construct($message = '', $title = '', $lead = '', $view = 'email-basic') {
         parent::__construct();
 
         $this->setMessage($message);

@@ -67,7 +67,7 @@ class LightOpenID {
         'pref/timezone' => 'timezone',
     ];
 
-    function __construct() {
+    public function __construct() {
         $this->trustRoot = Gdn::request()->Scheme().'://'.Gdn::request()->Host();
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot.$uri;
@@ -75,7 +75,7 @@ class LightOpenID {
         $this->data = $_POST + $_GET; # OPs may send data as POST or GET.
     }
 
-    function __set($name, $value) {
+    public function __set($name, $value) {
         switch ($name) {
             case 'identity':
                 if (strlen($value = trim((String)$value))) {
@@ -96,7 +96,7 @@ class LightOpenID {
         }
     }
 
-    function __get($name) {
+    public function __get($name) {
         switch ($name) {
             case 'identity':
                 # We return claimed_id instead of identity,
@@ -129,7 +129,7 @@ class LightOpenID {
      * @param $url url to check
      * @return true, if the server exists; false otherwise
      */
-    function hostExists($url) {
+    public function hostExists($url) {
         if (strpos($url, '/') === false) {
             $server = $url;
         } else {
@@ -335,8 +335,13 @@ class LightOpenID {
     }
 
     /**
-     * Helper function used to scan for <meta>/<link> tags and extract information
-     * from them
+     * Helper function used to scan for <meta>/<link> tags and extract information from them
+     *
+     * @param string $tag
+     * @param string $attrName
+     * @param string $attrValue
+     * @param string $valueName
+     * @return string
      */
     protected function htmlTag($content, $tag, $attrName, $attrValue, $valueName) {
         preg_match_all("#<{$tag}[^>]*$attrName=['\"].*?$attrValue.*?['\"][^>]*$valueName=['\"](.+?)['\"][^>]*/?>#i", $content, $matches1);
@@ -352,7 +357,7 @@ class LightOpenID {
      * @return String OP Endpoint (i.e. OpenID provider address).
      * @throws ErrorException
      */
-    function discover($url) {
+    public function discover($url) {
         if (!$url) {
             throw new ErrorException('No identity supplied.');
         }
@@ -621,11 +626,11 @@ class LightOpenID {
 
     /**
      * Returns authentication url. Usually, you want to redirect your user to it.
-     * @return String The authentication url.
-     * @param String $select_identifier Whether to request OP to select identity for an user in OpenID 2. Does not affect OpenID 1.
+     *
      * @throws ErrorException
+     * @return string The authentication url.
      */
-    function authUrl($identifier_select = null) {
+    public function authUrl($identifier_select = null) {
         if (!$this->server) {
             $this->discover($this->identity);
         }
@@ -644,7 +649,7 @@ class LightOpenID {
      * @return Bool Whether the verification was successful.
      * @throws ErrorException
      */
-    function validate() {
+    public function validate() {
         $this->claimed_id = isset($this->data['openid_claimed_id']) ? $this->data['openid_claimed_id'] : $this->data['openid_identity'];
         $params = [
             'openid.assoc_handle' => $this->data['openid_assoc_handle'],
@@ -760,7 +765,7 @@ class LightOpenID {
      *     * @return Array Array of attributes with keys being the AX schema names, e.g. 'contact/email'
      * @see http://www.axschema.org/types/
      */
-    function getAttributes() {
+    public function getAttributes() {
         if (isset($this->data['openid_ns'])
             && $this->data['openid_ns'] == 'http://specs.openid.net/auth/2.0'
         ) { # OpenID 2.0

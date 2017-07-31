@@ -163,5 +163,3 @@ $html_toolbar .= '<div class="editor-upload-attention">'.t('Drop image/file').'<
 
 // Generate output for view
 echo $html_toolbar;
-
-?>

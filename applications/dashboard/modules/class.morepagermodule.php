@@ -88,7 +88,7 @@ class MorePagerModule extends PagerModule {
      *
      * @return bool
      */
-    function assetTarget() {
+    public function assetTarget() {
         return false;
     }
 

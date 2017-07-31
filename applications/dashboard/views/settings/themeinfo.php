@@ -1,1 +1,1 @@
-<?php echo $this->Data('Theme'); ?>
+<?php echo $this->Data('Theme');

@@ -43,4 +43,3 @@ foreach ($this->Data['DiscussionData'] as $discussion) {
 }
 
 echo $discussionBoard;
-?>

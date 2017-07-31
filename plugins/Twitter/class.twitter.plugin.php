@@ -506,7 +506,8 @@ class TwitterPlugin extends Gdn_Plugin {
             return;
         }
 
-        $form = $sender->Form; //new Gdn_Form();
+        /** @var Gdn_Form $form */
+        $form = $sender->Form;
 
         $requestToken = val('oauth_token', $_GET);
         $accessToken = $form->getFormValue('AccessToken');

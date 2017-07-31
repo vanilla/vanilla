@@ -108,7 +108,7 @@ class PagerModule extends Gdn_Module {
      *
      * @return bool
      */
-    function assetTarget() {
+    public function assetTarget() {
         return false;
     }
 

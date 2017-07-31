@@ -520,6 +520,9 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         if ($error = $sender->Request->get('error')) {
             throw new Gdn_UserException($error);
         }
+        if (empty($code)) {
+            throw new Gdn_UserException('The code parameter is either not set or empty.');
+        }
 
         Gdn::session()->stash($this->getProviderKey()); // remove any stashed provider data.
 

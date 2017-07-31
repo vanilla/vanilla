@@ -2291,6 +2291,7 @@ class CategoryModel extends Gdn_Model {
                 $cat['_PermissionCategoryID'] = $cat['PermissionCategoryID'];
                 $cat['_ParentCategoryID'] = $cat['ParentCategoryID'];
             } catch (Exception $ex) {
+                // Suppress exceptions from bubbling up.
             }
 
             if ($cat['CategoryID'] == -1) {

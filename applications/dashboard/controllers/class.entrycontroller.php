@@ -1553,6 +1553,7 @@ class EntryController extends Gdn_Controller {
                     try {
                         $this->UserModel->sendWelcomeEmail($authUserID, '', 'Register');
                     } catch (Exception $ex) {
+                        // Suppress exceptions from bubbling up.
                     }
 
                     $this->fireEvent('RegistrationSuccessful');
@@ -1663,7 +1664,6 @@ class EntryController extends Gdn_Controller {
             $this->UserModel->Validation->applyRule('Password', 'Required');
             $this->UserModel->Validation->applyRule('Password', 'Strength');
             $this->UserModel->Validation->applyRule('Password', 'Match');
-            // $this->UserModel->Validation->applyRule('DateOfBirth', 'MinimumAge');
 
             $this->fireEvent('RegisterValidation');
 
@@ -1913,6 +1913,7 @@ class EntryController extends Gdn_Controller {
         try {
             $this->UserModel->sendEmailConfirmationEmail($userID);
         } catch (Exception $ex) {
+            // Suppress exceptions from bubbling up.
         }
         $this->Form->setValidationResults($this->UserModel->validationResults());
 

@@ -64,14 +64,14 @@ class PagerModule extends Gdn_Module {
     public $Offset;
 
     /** @var int The last offset of the current page. (ie. Offset to LastOffset of TotalRecords). */
-    private $_LastOffset;
+    protected $_LastOffset;
 
     /**
      * @var bool Certain properties are required to be defined before the pager can build
      * itself. Once they are created, this property is set to true so they are
      * not needlessly recreated.
      */
-    private $_PropertiesDefined;
+    protected $_PropertiesDefined;
 
     /**
      * @var bool A boolean value indicating if the total number of records is known or

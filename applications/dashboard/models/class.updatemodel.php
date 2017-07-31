@@ -86,7 +86,7 @@ class UpdateModel extends Gdn_Model {
         }
 
         $addonInfo['Variable'] = ucfirst($type).'Info';
-        $info[$slug] = $addonInfo;
+        $info = [$slug => $addonInfo];
 
         return $info;
     }
@@ -126,9 +126,11 @@ class UpdateModel extends Gdn_Model {
 
             $info = self::addonJsonConverter($path);
 
-            $entry['Path'] = $path;
-            $entry['Name'] = val('Name', $info[key($info)]);
-            $entry['Base'] = val('Key', $info[key($info)]);
+            $entry = [
+                'Path' => $path,
+                'Name' => val('Name', $info[key($info)]),
+                'Base' => val('Key', $info[key($info)])
+            ];
 
             $result = self::checkAddon($info, $entry);
             if (empty($result)) {

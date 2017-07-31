@@ -107,6 +107,7 @@ class vBulletinImportModel extends Gdn_Model {
                     true
                 );
             } catch (Exception $ex) {
+                // Suppress exceptions from bubbling up.
             }
         }
     }

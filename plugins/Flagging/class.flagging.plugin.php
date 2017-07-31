@@ -320,6 +320,7 @@ class FlaggingPlugin extends Gdn_Plugin {
                     'DateInserted' => date('Y-m-d H:i:s')
                 ]);
             } catch (Exception $e) {
+                // Suppress exceptions from bubbling up.
             }
 
             // Notify users with permission who've chosen to be notified

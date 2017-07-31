@@ -27,57 +27,57 @@ class Gdn_Dirtycache extends Gdn_Cache {
         $this->cacheType = Gdn_Cache::CACHE_TYPE_NULL;
     }
 
-    public function addContainer($Options) {
+    public function addContainer($options) {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function add($Key, $Value, $Options = []) {
-        return $this->store($Key, $Value, $Options);
+    public function add($key, $value, $options = []) {
+        return $this->store($key, $value, $options);
     }
 
-    public function store($Key, $Value, $Options = []) {
-        $this->cache[$Key] = $Value;
+    public function store($key, $value, $options = []) {
+        $this->cache[$key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function exists($Key) {
+    public function exists($key) {
         return Gdn_Cache::CACHEOP_FAILURE;
     }
 
-    public function get($Key, $Options = []) {
-        if (is_array($Key)) {
-            $Result = [];
-            foreach ($Key as $k) {
+    public function get($key, $options = []) {
+        if (is_array($key)) {
+            $result = [];
+            foreach ($key as $k) {
                 if (isset($this->cache[$k])) {
-                    $Result[$k] = $this->cache[$k];
+                    $result[$k] = $this->cache[$k];
                 }
             }
-            return $Result;
+            return $result;
         } else {
-            if (array_key_exists($Key, $this->cache)) {
-                return $this->cache[$Key];
+            if (array_key_exists($key, $this->cache)) {
+                return $this->cache[$key];
             } else {
                 return Gdn_Cache::CACHEOP_FAILURE;
             }
         }
     }
 
-    public function remove($Key, $Options = []) {
-        unset($this->cache[$Key]);
+    public function remove($key, $options = []) {
+        unset($this->cache[$key]);
 
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function replace($Key, $Value, $Options = []) {
-        $this->cache[$Key] = $Value;
+    public function replace($key, $value, $options = []) {
+        $this->cache[$key] = $value;
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function increment($Key, $Amount = 1, $Options = []) {
+    public function increment($key, $amount = 1, $options = []) {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 
-    public function decrement($Key, $Amount = 1, $Options = []) {
+    public function decrement($key, $amount = 1, $options = []) {
         return Gdn_Cache::CACHEOP_SUCCESS;
     }
 

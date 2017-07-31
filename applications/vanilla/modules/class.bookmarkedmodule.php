@@ -30,26 +30,26 @@ class BookmarkedModule extends Gdn_Module {
 
     public function getData() {
         if (Gdn::session()->isValid()) {
-            $BookmarkIDs = Gdn::sql()
+            $bookmarkIDs = Gdn::sql()
                 ->select('DiscussionID')
                 ->from('UserDiscussion')
                 ->where('UserID', Gdn::session()->UserID)
                 ->where('Bookmarked', 1)
                 ->get()->resultArray();
-            $BookmarkIDs = array_column($BookmarkIDs, 'DiscussionID');
+            $bookmarkIDs = array_column($bookmarkIDs, 'DiscussionID');
 
-            if (count($BookmarkIDs)) {
-                $DiscussionModel = new DiscussionModel();
+            if (count($bookmarkIDs)) {
+                $discussionModel = new DiscussionModel();
                 DiscussionModel::CategoryPermissions();
 
-                $DiscussionModel->SQL->whereIn('d.DiscussionID', $BookmarkIDs);
+                $discussionModel->SQL->whereIn('d.DiscussionID', $bookmarkIDs);
 
-                $Bookmarks = $DiscussionModel->get(
+                $bookmarks = $discussionModel->get(
                     0,
                     $this->Limit,
                     ['w.Bookmarked' => '1']
                 );
-                $this->setData('Bookmarks', $Bookmarks);
+                $this->setData('Bookmarks', $bookmarks);
             } else {
                 $this->setData('Bookmarks', new Gdn_DataSet());
             }
@@ -65,9 +65,9 @@ class BookmarkedModule extends Gdn_Module {
             $this->GetData();
         }
 
-        $Bookmarks = $this->data('Bookmarks');
+        $bookmarks = $this->data('Bookmarks');
 
-        if (is_object($Bookmarks) && ($Bookmarks->numRows() > 0 || $this->Help)) {
+        if (is_object($bookmarks) && ($bookmarks->numRows() > 0 || $this->Help)) {
             return parent::ToString();
         }
 

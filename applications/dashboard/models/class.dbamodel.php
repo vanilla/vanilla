@@ -19,171 +19,171 @@ class DBAModel extends Gdn_Model {
     /**
      * Update the counters.
      *
-     * @param $Table
-     * @param $Column
-     * @param bool $From
-     * @param bool $To
+     * @param $table
+     * @param $column
+     * @param bool $from
+     * @param bool $to
      * @return mixed
      * @throws Gdn_UserException
      */
-    public function counts($Table, $Column, $From = false, $To = false) {
-        $Model = $this->createModel($Table);
+    public function counts($table, $column, $from = false, $to = false) {
+        $model = $this->createModel($table);
 
-        if (!method_exists($Model, 'Counts')) {
-            throw new Gdn_UserException("The $Table model does not support count recalculation.");
+        if (!method_exists($model, 'Counts')) {
+            throw new Gdn_UserException("The $table model does not support count recalculation.");
         }
 
-        $Result = $Model->counts($Column, $From, $To);
-        return $Result;
+        $result = $model->counts($column, $from, $to);
+        return $result;
     }
 
     /**
      * Create a model for the given table.
      *
-     * @param string $Table
+     * @param string $table
      * @return Gdn_Model
      */
-    public function createModel($Table) {
-        $ModelName = $Table.'Model';
-        if (class_exists($ModelName)) {
-            return new $ModelName();
+    public function createModel($table) {
+        $modelName = $table.'Model';
+        if (class_exists($modelName)) {
+            return new $modelName();
         } else {
-            return new Gdn_Model($Table);
+            return new Gdn_Model($table);
         }
     }
 
     /**
      * Return SQL for updating a count.
      *
-     * @param string $Aggregate count, max, min, etc.
-     * @param string $ParentTable The name of the parent table.
-     * @param string $ChildTable The name of the child table
-     * @param string $ParentColumnName
-     * @param string $ChildColumnName
-     * @param string $ParentJoinColumn
-     * @param string $ChildJoinColumn
+     * @param string $aggregate count, max, min, etc.
+     * @param string $parentTable The name of the parent table.
+     * @param string $childTable The name of the child table
+     * @param string $parentColumnName
+     * @param string $childColumnName
+     * @param string $parentJoinColumn
+     * @param string $childJoinColumn
      * @param int|string $default A default value for the field. Passed to MySQL's coalesce function.
      * @return string
      */
     public static function getCountSQL(
-        $Aggregate,
+        $aggregate,
         // count, max, min, etc.
-        $ParentTable,
-        $ChildTable,
-        $ParentColumnName = '',
-        $ChildColumnName = '',
-        $ParentJoinColumn = '',
-        $ChildJoinColumn = '',
-        $Where = [],
+        $parentTable,
+        $childTable,
+        $parentColumnName = '',
+        $childColumnName = '',
+        $parentJoinColumn = '',
+        $childJoinColumn = '',
+        $where = [],
         $default = 0
     ) {
 
-        $PDO = Gdn::database()->connection();
-        $default = $PDO->quote($default);
+        $pDO = Gdn::database()->connection();
+        $default = $pDO->quote($default);
 
-        if (!$ParentColumnName) {
-            switch (strtolower($Aggregate)) {
+        if (!$parentColumnName) {
+            switch (strtolower($aggregate)) {
                 case 'count':
-                    $ParentColumnName = "Count{$ChildTable}s";
+                    $parentColumnName = "Count{$childTable}s";
                     break;
                 case 'max':
-                    $ParentColumnName = "Last{$ChildTable}ID";
+                    $parentColumnName = "Last{$childTable}ID";
                     break;
                 case 'min':
-                    $ParentColumnName = "First{$ChildTable}ID";
+                    $parentColumnName = "First{$childTable}ID";
                     break;
                 case 'sum':
-                    $ParentColumnName = "Sum{$ChildTable}s";
+                    $parentColumnName = "Sum{$childTable}s";
                     break;
             }
         }
 
-        if (!$ChildColumnName) {
-            $ChildColumnName = $ChildTable.'ID';
+        if (!$childColumnName) {
+            $childColumnName = $childTable.'ID';
         }
 
-        if (!$ParentJoinColumn) {
-            $ParentJoinColumn = $ParentTable.'ID';
+        if (!$parentJoinColumn) {
+            $parentJoinColumn = $parentTable.'ID';
         }
-        if (!$ChildJoinColumn) {
-            $ChildJoinColumn = $ParentJoinColumn;
+        if (!$childJoinColumn) {
+            $childJoinColumn = $parentJoinColumn;
         }
 
-        $Result = "update :_$ParentTable p
-                  set p.$ParentColumnName = (
-                     select coalesce($Aggregate(c.$ChildColumnName), $default)
-                     from :_$ChildTable c
-                     where p.$ParentJoinColumn = c.$ChildJoinColumn)";
+        $result = "update :_$parentTable p
+                  set p.$parentColumnName = (
+                     select coalesce($aggregate(c.$childColumnName), $default)
+                     from :_$childTable c
+                     where p.$parentJoinColumn = c.$childJoinColumn)";
 
-        if (!empty($Where)) {
-            $Wheres = [];
-            foreach ($Where as $Column => $Value) {
-                $Value = $PDO->quote($Value);
-                $Wheres[] = "p.`$Column` = $Value";
+        if (!empty($where)) {
+            $wheres = [];
+            foreach ($where as $column => $value) {
+                $value = $pDO->quote($value);
+                $wheres[] = "p.`$column` = $value";
             }
 
-            $Result .= "\n where ".implode(" and ", $Wheres);
+            $result .= "\n where ".implode(" and ", $wheres);
         }
 
-        $Result = str_replace(':_', Gdn::database()->DatabasePrefix, $Result);
-        return $Result;
+        $result = str_replace(':_', Gdn::database()->DatabasePrefix, $result);
+        return $result;
     }
 
     /**
      * Remove html entities from a column in the database.
      *
-     * @param string $Table The name of the table.
-     * @param array $Column The column to decode.
-     * @param int $Limit The number of records to work on.
+     * @param string $table The name of the table.
+     * @param array $column The column to decode.
+     * @param int $limit The number of records to work on.
      */
-    public function htmlEntityDecode($Table, $Column, $Limit = 100) {
+    public function htmlEntityDecode($table, $column, $limit = 100) {
         // Construct a model to save the results.
-        $Model = $this->createModel($Table);
+        $model = $this->createModel($table);
 
         // Get the data to decode.
-        $Data = $this->SQL
-            ->select($Model->PrimaryKey)
-            ->select($Column)
-            ->from($Table)
-            ->like($Column, '&%;', 'both')
-            ->limit($Limit)
+        $data = $this->SQL
+            ->select($model->PrimaryKey)
+            ->select($column)
+            ->from($table)
+            ->like($column, '&%;', 'both')
+            ->limit($limit)
             ->get()->resultArray();
 
-        $Result = [];
-        $Result['Count'] = count($Data);
-        $Result['Complete'] = false;
-        $Result['Decoded'] = [];
-        $Result['NotDecoded'] = [];
+        $result = [];
+        $result['Count'] = count($data);
+        $result['Complete'] = false;
+        $result['Decoded'] = [];
+        $result['NotDecoded'] = [];
 
         // Loop through each row in the working set and decode the values.
-        foreach ($Data as $Row) {
-            $Value = $Row[$Column];
-            $DecodedValue = HtmlEntityDecode($Value);
+        foreach ($data as $row) {
+            $value = $row[$column];
+            $decodedValue = HtmlEntityDecode($value);
 
-            $Item = ['From' => $Value, 'To' => $DecodedValue];
+            $item = ['From' => $value, 'To' => $decodedValue];
 
-            if ($Value != $DecodedValue) {
-                $Model->setField($Row[$Model->PrimaryKey], $Column, $DecodedValue);
-                $Result['Decoded'] = $Item;
+            if ($value != $decodedValue) {
+                $model->setField($row[$model->PrimaryKey], $column, $decodedValue);
+                $result['Decoded'] = $item;
             } else {
-                $Result['NotDecoded'] = $Item;
+                $result['NotDecoded'] = $item;
             }
         }
-        $Result['Complete'] = $Result['Count'] < $Limit;
+        $result['Complete'] = $result['Count'] < $limit;
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Updates a table's InsertUserID values to the system user ID, when invalid.
      *
-     * @param $Table The name of table to fix InsertUserID in.
+     * @param $table The name of table to fix InsertUserID in.
      * @return bool|Gdn_DataSet|string
      * @throws Exception
      */
-    public function fixInsertUserID($Table) {
+    public function fixInsertUserID($table) {
         return $this->SQL
-            ->update($Table)
+            ->update($table)
             ->set('InsertUserID', Gdn::userModel()->getSystemUserID())
             ->where('InsertUserID <', 1)
             ->put();
@@ -195,19 +195,19 @@ class DBAModel extends Gdn_Model {
      * @return array
      */
     public function fixPermissions() {
-        $Roles = RoleModel::roles();
-        $RoleModel = new RoleModel();
-        $PermissionModel = new PermissionModel();
+        $roles = RoleModel::roles();
+        $roleModel = new RoleModel();
+        $permissionModel = new PermissionModel();
 
         // Find roles missing permission records
-        foreach ($Roles as $RoleID => $Role) {
-            $Permissions = $this->SQL->select('*')->from('Permission p')
-                ->where('p.RoleID', $RoleID)->get()->resultArray();
+        foreach ($roles as $roleID => $role) {
+            $permissions = $this->SQL->select('*')->from('Permission p')
+                ->where('p.RoleID', $roleID)->get()->resultArray();
 
-            if (!count($Permissions)) {
+            if (!count($permissions)) {
                 // Set basic permission record
-                $DefaultRecord = [
-                    'RoleID' => $RoleID,
+                $defaultRecord = [
+                    'RoleID' => $roleID,
                     'JunctionTable' => null,
                     'JunctionColumn' => null,
                     'JunctionID' => null,
@@ -218,11 +218,11 @@ class DBAModel extends Gdn_Model {
                     'Garden.Profiles.Edit' => 1,
                     'Conversations.Conversations.Add' => 1
                 ];
-                $PermissionModel->save($DefaultRecord);
+                $permissionModel->save($defaultRecord);
 
                 // Set default category permission
-                $DefaultCategory = [
-                    'RoleID' => $RoleID,
+                $defaultCategory = [
+                    'RoleID' => $roleID,
                     'JunctionTable' => 'Category',
                     'JunctionColumn' => 'PermissionCategoryID',
                     'JunctionID' => -1,
@@ -230,32 +230,32 @@ class DBAModel extends Gdn_Model {
                     'Vanilla.Discussions.Add' => 1,
                     'Vanilla.Comments.Add' => 1
                 ];
-                $PermissionModel->save($DefaultCategory);
+                $permissionModel->save($defaultCategory);
             }
         }
 
         return ['Complete' => true];
     }
 
-    public function fixUrlCodes($Table, $Column) {
-        $Model = $this->createModel($Table);
+    public function fixUrlCodes($table, $column) {
+        $model = $this->createModel($table);
 
         // Get the data to decode.
-        $Data = $this->SQL
-            ->select($Model->PrimaryKey)
-            ->select($Column)
-            ->from($Table)
+        $data = $this->SQL
+            ->select($model->PrimaryKey)
+            ->select($column)
+            ->from($table)
 //         ->like($Column, '&%;', 'both')
 //         ->limit($Limit)
             ->get()->resultArray();
 
-        foreach ($Data as $Row) {
-            $Value = $Row[$Column];
-            $Encoded = Gdn_Format::url($Value);
+        foreach ($data as $row) {
+            $value = $row[$column];
+            $encoded = Gdn_Format::url($value);
 
-            if (!$Value || $Value != $Encoded) {
-                $Model->setField($Row[$Model->PrimaryKey], $Column, $Encoded);
-                Gdn::controller()->Data['Encoded'][$Row[$Model->PrimaryKey]] = $Encoded;
+            if (!$value || $value != $encoded) {
+                $model->setField($row[$model->PrimaryKey], $column, $encoded);
+                Gdn::controller()->Data['Encoded'][$row[$model->PrimaryKey]] = $encoded;
             }
         }
 
@@ -265,97 +265,97 @@ class DBAModel extends Gdn_Model {
     /**
      * Apply the specified RoleID to all users without a valid role
      *
-     * @param $RoleID
+     * @param $roleID
      * @return bool|Gdn_DataSet|string
      * @throws Exception
      */
-    public function fixUserRole($RoleID) {
-        $PDO = Gdn::database()->connection();
-        $InsertQuery = "
+    public function fixUserRole($roleID) {
+        $pDO = Gdn::database()->connection();
+        $insertQuery = "
          insert into :_UserRole
 
-         select u.UserID, ".$PDO->quote($RoleID)." as RoleID
+         select u.UserID, ".$pDO->quote($roleID)." as RoleID
          from :_User u
             left join :_UserRole ur on u.UserID = ur.UserID
             left join :_Role r on ur.RoleID = r.RoleID
          where r.Name is null";
-        $InsertQuery = str_replace(':_', Gdn::database()->DatabasePrefix, $InsertQuery);
-        return $this->SQL->query($InsertQuery);
+        $insertQuery = str_replace(':_', Gdn::database()->DatabasePrefix, $insertQuery);
+        return $this->SQL->query($insertQuery);
     }
 
     /**
      *
      *
-     * @param $Table
-     * @param $Key
+     * @param $table
+     * @param $key
      */
-    public function resetBatch($Table, $Key) {
-        $Key = "DBA.Range.$Key";
-        Gdn::set($Key, null);
+    public function resetBatch($table, $key) {
+        $key = "DBA.Range.$key";
+        Gdn::set($key, null);
     }
 
     /**
      *
      *
-     * @param $Table
-     * @param $Key
-     * @param int $Limit
-     * @param bool $Max
+     * @param $table
+     * @param $key
+     * @param int $limit
+     * @param bool $max
      * @return array|mixed
      */
-    public function getBatch($Table, $Key, $Limit = 10000, $Max = false) {
-        $Key = "DBA.Range.$Key";
+    public function getBatch($table, $key, $limit = 10000, $max = false) {
+        $key = "DBA.Range.$key";
 
         // See if there is already a range.
-        $Current = dbdecode(Gdn::get($Key, ''));
-        if (!is_array($Current) || !isset($Current['Min']) || !isset($Current['Max'])) {
-            list($Current['Min'], $Current['Max']) = $this->primaryKeyRange($Table);
+        $current = dbdecode(Gdn::get($key, ''));
+        if (!is_array($current) || !isset($current['Min']) || !isset($current['Max'])) {
+            list($current['Min'], $current['Max']) = $this->primaryKeyRange($table);
 
-            if ($Max && $Current['Max'] > $Max) {
-                $Current['Max'] = $Max;
+            if ($max && $current['Max'] > $max) {
+                $current['Max'] = $max;
             }
         }
 
-        if (!isset($Current['To'])) {
-            $Current['To'] = $Current['Max'];
+        if (!isset($current['To'])) {
+            $current['To'] = $current['Max'];
         } else {
-            $Current['To'] -= $Limit - 1;
+            $current['To'] -= $limit - 1;
         }
-        $Current['From'] = $Current['To'] - $Limit;
-        Gdn::set($Key, dbencode($Current));
-        $Current['Complete'] = $Current['To'] < $Current['Min'];
+        $current['From'] = $current['To'] - $limit;
+        Gdn::set($key, dbencode($current));
+        $current['Complete'] = $current['To'] < $current['Min'];
 
-        $Total = $Current['Max'] - $Current['Min'];
-        if ($Total > 0) {
-            $Complete = $Current['Max'] - $Current['From'];
+        $total = $current['Max'] - $current['Min'];
+        if ($total > 0) {
+            $complete = $current['Max'] - $current['From'];
 
-            $Percent = 100 * $Complete / $Total;
-            if ($Percent > 100) {
-                $Percent = 100;
+            $percent = 100 * $complete / $total;
+            if ($percent > 100) {
+                $percent = 100;
             }
-            $Current['Percent'] = round($Percent).'%';
+            $current['Percent'] = round($percent).'%';
         }
 
-        return $Current;
+        return $current;
     }
 
     /**
      * Return the min and max values of a table's primary key.
      *
-     * @param string $Table The name of the table to look at.
+     * @param string $table The name of the table to look at.
      * @return array An array in the form (min, max).
      */
-    public function primaryKeyRange($Table) {
-        $Model = $this->createModel($Table);
+    public function primaryKeyRange($table) {
+        $model = $this->createModel($table);
 
-        $Data = $this->SQL
-            ->select($Model->PrimaryKey, 'min', 'MinValue')
-            ->select($Model->PrimaryKey, 'max', 'MaxValue')
-            ->from($Table)
+        $data = $this->SQL
+            ->select($model->PrimaryKey, 'min', 'MinValue')
+            ->select($model->PrimaryKey, 'max', 'MaxValue')
+            ->from($table)
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
-        if ($Data) {
-            return [$Data['MinValue'], $Data['MaxValue']];
+        if ($data) {
+            return [$data['MinValue'], $data['MaxValue']];
         } else {
             return [0, 0];
         }

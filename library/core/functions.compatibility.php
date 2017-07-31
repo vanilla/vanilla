@@ -346,21 +346,21 @@ if (!function_exists('parse_ini_string')) {
     /**
      * The parse_ini_string function is not supported until PHP 5.3.0, and we currently support PHP 5.2.0.
      *
-     * @param string $Ini The INI string to parse.
+     * @param string $ini The INI string to parse.
      * @return array Returns the array representation of the INI string.
      */
-    function parse_ini_string($Ini) {
-        $Lines = explode("\n", $Ini);
-        $Result = [];
-        foreach ($Lines as $Line) {
-            $Parts = explode('=', $Line, 2);
-            if (count($Parts) == 1) {
-                $Result[trim($Parts[0])] = '';
-            } elseif (count($Parts) >= 2) {
-                $Result[trim($Parts[0])] = trim($Parts[1]);
+    function parse_ini_string($ini) {
+        $lines = explode("\n", $ini);
+        $result = [];
+        foreach ($lines as $line) {
+            $parts = explode('=', $line, 2);
+            if (count($parts) == 1) {
+                $result[trim($parts[0])] = '';
+            } elseif (count($parts) >= 2) {
+                $result[trim($parts[0])] = trim($parts[1]);
             }
         }
-        return $Result;
+        return $result;
     }
 }
 

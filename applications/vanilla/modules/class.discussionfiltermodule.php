@@ -13,8 +13,8 @@
  */
 class DiscussionFilterModule extends Gdn_Module {
 
-    public function __construct($Sender) {
-        parent::__construct($Sender, 'Vanilla');
+    public function __construct($sender) {
+        parent::__construct($sender, 'Vanilla');
     }
 
     public function assetTarget() {

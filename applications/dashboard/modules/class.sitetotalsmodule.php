@@ -23,33 +23,33 @@ class SiteTotalsModule extends Gdn_Module {
     }
 
     protected function _GetData() {
-        $Px = Gdn::database()->DatabasePrefix;
-        $Sql = "show table status where Name in ('{$Px}User', '{$Px}Discussion', '{$Px}Comment')";
+        $px = Gdn::database()->DatabasePrefix;
+        $sql = "show table status where Name in ('{$px}User', '{$px}Discussion', '{$px}Comment')";
 
-        $Result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
-        foreach ($Result as $Name => $Value) {
-            $Result[$Name] = $this->getCount($Name);
+        $result = ['User' => 0, 'Discussion' => 0, 'Comment' => 0];
+        foreach ($result as $name => $value) {
+            $result[$name] = $this->getCount($name);
         }
-        $this->setData('Totals', $Result);
+        $this->setData('Totals', $result);
     }
 
-    protected function getCount($Table) {
+    protected function getCount($table) {
         // Try and get the count from the cache.
-        $Key = "$Table.CountRows";
-        $Count = Gdn::cache()->get($Key);
-        if ($Count !== Gdn_Cache::CACHEOP_FAILURE) {
-            return $Count;
+        $key = "$table.CountRows";
+        $count = Gdn::cache()->get($key);
+        if ($count !== Gdn_Cache::CACHEOP_FAILURE) {
+            return $count;
         }
 
         // The count wasn't in the cache so grab it from the table.
-        $Count = Gdn::sql()
-            ->select($Table.'ID', 'count', 'CountRows')
-            ->from($Table)
+        $count = Gdn::sql()
+            ->select($table.'ID', 'count', 'CountRows')
+            ->from($table)
             ->get()->value('CountRows');
 
         // Save the value to the cache.
-        Gdn::cache()->store($Key, $Count, [Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)]);
-        return $Count;
+        Gdn::cache()->store($key, $count, [Gdn_Cache::FEATURE_EXPIRY => 5 * 60 + mt_rand(0, 30)]);
+        return $count;
     }
 
     public function toString() {

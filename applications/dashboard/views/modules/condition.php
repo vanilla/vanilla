@@ -1,49 +1,49 @@
 <?php if (!defined('APPLICATION')) exit();
 
-function _DN($Current, $Type) {
-    if ($Current != $Type)
+function _DN($current, $type) {
+    if ($current != $type)
         return ' style="display:none"';
     return '';
 }
 
-function writeConditionEdit($Condition, $Sender) {
-    $Px = $Sender->Prefix;
-    $Form = new Gdn_Form();
+function writeConditionEdit($condition, $sender) {
+    $px = $sender->Prefix;
+    $form = new Gdn_Form();
 
-    $Type = val(0, $Condition, '');
-    $Field = val(1, $Condition, '');
-    $Expr = val(2, $Condition, '');
+    $type = val(0, $condition, '');
+    $field = val(1, $condition, '');
+    $expr = val(2, $condition, '');
 
     echo '<tr>';
 
     // Type.
     echo '<td>',
-    $Form->DropDown($Px.'Type[]', $Sender->Types, ['Value' => $Type, 'Class' => 'CondType']),
+    $form->DropDown($px.'Type[]', $sender->Types, ['Value' => $type, 'Class' => 'CondType']),
     '</td>';
 
     echo '<td>';
 
     // Permission fields.
-    echo '<div class="Cond_permission"'._DN($Type, Gdn_Condition::PERMISSION).'>',
-    $Form->DropDown($Px.'PermissionField[]', $Sender->Permissions, ['Value' => $Type == Gdn_Condition::PERMISSION ? $Field : '']),
+    echo '<div class="Cond_permission"'._DN($type, Gdn_Condition::PERMISSION).'>',
+    $form->DropDown($px.'PermissionField[]', $sender->Permissions, ['Value' => $type == Gdn_Condition::PERMISSION ? $field : '']),
     '</div>';
 
     // Role fields.
-    echo '<div class="Cond_role"'._DN($Type, Gdn_Condition::ROLE).'>',
-    $Form->DropDown($Px.'RoleField[]', $Sender->Roles, ['Value' => $Type == Gdn_Condition::ROLE ? $Field : '']),
+    echo '<div class="Cond_role"'._DN($type, Gdn_Condition::ROLE).'>',
+    $form->DropDown($px.'RoleField[]', $sender->Roles, ['Value' => $type == Gdn_Condition::ROLE ? $field : '']),
     '</div>';
 
     // Textbox field.
-    echo '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->textBox($Px.'Field[]', ['Value' => $Type == Gdn_Condition::REQUEST ? $Field : '']);
+    echo '<div class="Cond_request"'._DN($type, Gdn_Condition::REQUEST).'>',
+    $form->textBox($px.'Field[]', ['Value' => $type == Gdn_Condition::REQUEST ? $field : '']);
     '</div>';
 
     echo '</td>';
 
     // Expression.
     echo '<td>',
-        '<div class="Cond_request"'._DN($Type, Gdn_Condition::REQUEST).'>',
-    $Form->textBox($Px.'Expr[]', ['Value' => $Type == Gdn_Condition::REQUEST ? $Expr : '']),
+        '<div class="Cond_request"'._DN($type, Gdn_Condition::REQUEST).'>',
+    $form->textBox($px.'Expr[]', ['Value' => $type == Gdn_Condition::REQUEST ? $expr : '']),
     '</div>',
     '</td>';
 

@@ -30,11 +30,11 @@ class SearchController extends Gdn_Controller {
 
         // Object instantiation
         $this->SearchModel = new SearchModel();
-        $Form = Gdn::Factory('Form');
+        $form = Gdn::Factory('Form');
 
         // Form prep
-        $Form->Method = 'get';
-        $this->Form = $Form;
+        $form->Method = 'get';
+        $this->Form = $form;
     }
 
     /**
@@ -65,47 +65,47 @@ class SearchController extends Gdn_Controller {
      *
      * @since 2.0.0
      * @access public
-     * @param int $Page Page number.
+     * @param int $page Page number.
      */
-    public function index($Page = '') {
+    public function index($page = '') {
         $this->addJsFile('search.js');
         $this->title(t('Search'));
 
         saveToConfig('Garden.Format.EmbedSize', '160x90', false);
         Gdn_Theme::section('SearchResults');
 
-        list($Offset, $Limit) = offsetLimit($Page, c('Garden.Search.PerPage', 20));
-        $this->setData('_Limit', $Limit);
+        list($offset, $limit) = offsetLimit($page, c('Garden.Search.PerPage', 20));
+        $this->setData('_Limit', $limit);
 
-        $Search = $this->Form->getFormValue('Search');
-        $Mode = $this->Form->getFormValue('Mode');
-        if ($Mode) {
-            $this->SearchModel->ForceSearchMode = $Mode;
+        $search = $this->Form->getFormValue('Search');
+        $mode = $this->Form->getFormValue('Mode');
+        if ($mode) {
+            $this->SearchModel->ForceSearchMode = $mode;
         }
         try {
-            $ResultSet = $this->SearchModel->search($Search, $Offset, $Limit);
-        } catch (Gdn_UserException $Ex) {
-            $this->Form->addError($Ex);
-            $ResultSet = [];
-        } catch (Exception $Ex) {
-            LogException($Ex);
-            $this->Form->addError($Ex);
-            $ResultSet = [];
+            $resultSet = $this->SearchModel->search($search, $offset, $limit);
+        } catch (Gdn_UserException $ex) {
+            $this->Form->addError($ex);
+            $resultSet = [];
+        } catch (Exception $ex) {
+            LogException($ex);
+            $this->Form->addError($ex);
+            $resultSet = [];
         }
-        Gdn::userModel()->joinUsers($ResultSet, ['UserID']);
+        Gdn::userModel()->joinUsers($resultSet, ['UserID']);
 
         // Fix up the summaries.
-        $SearchTerms = explode(' ', Gdn_Format::text($Search));
-        foreach ($ResultSet as &$Row) {
-            $Row['Summary'] = searchExcerpt(htmlspecialchars(Gdn_Format::plainText($Row['Summary'], $Row['Format'])), $SearchTerms);
-            $Row['Summary'] = Emoji::instance()->translateToHtml($Row['Summary']);
-            $Row['Format'] = 'Html';
+        $searchTerms = explode(' ', Gdn_Format::text($search));
+        foreach ($resultSet as &$row) {
+            $row['Summary'] = searchExcerpt(htmlspecialchars(Gdn_Format::plainText($row['Summary'], $row['Format'])), $searchTerms);
+            $row['Summary'] = Emoji::instance()->translateToHtml($row['Summary']);
+            $row['Format'] = 'Html';
         }
 
-        $this->setData('SearchResults', $ResultSet, true);
-        $this->setData('SearchTerm', Gdn_Format::text($Search), true);
+        $this->setData('SearchResults', $resultSet, true);
+        $this->setData('SearchTerm', Gdn_Format::text($search), true);
 
-        $this->setData('_CurrentRecords', count($ResultSet));
+        $this->setData('_CurrentRecords', count($resultSet));
 
         $this->canonicalUrl(url('search', true));
         $this->render();

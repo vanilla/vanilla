@@ -27,8 +27,8 @@ class CategoriesModule extends Gdn_Module {
      */
     public $root = null;
 
-    public function __construct($Sender = '') {
-        parent::__construct($Sender);
+    public function __construct($sender = '') {
+        parent::__construct($sender);
         $this->_ApplicationFolder = 'vanilla';
 
         $this->Visible = c('Vanilla.Categories.Use') && !c('Vanilla.Categories.HideModule');
@@ -63,11 +63,11 @@ class CategoriesModule extends Gdn_Module {
         $this->Data = $data;
     }
 
-    public function filterDepth(&$Categories, $startDepth, $endDepth) {
+    public function filterDepth(&$categories, $startDepth, $endDepth) {
         if ($startDepth != 1 || $endDepth) {
-            foreach ($Categories as $i => $Category) {
-                if (val('Depth', $Category) < $startDepth || ($endDepth && val('Depth', $Category) > $endDepth)) {
-                    unset($Categories[$i]);
+            foreach ($categories as $i => $category) {
+                if (val('Depth', $category) < $startDepth || ($endDepth && val('Depth', $category) > $endDepth)) {
+                    unset($categories[$i]);
                 }
             }
         }

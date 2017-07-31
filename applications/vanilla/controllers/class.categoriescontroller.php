@@ -36,66 +36,66 @@ class CategoriesController extends VanillaController {
     /**
      *
      *
-     * @param $Category
-     * @param $Month
-     * @param bool $Page
+     * @param $category
+     * @param $month
+     * @param bool $page
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function archives($Category, $Month, $Page = false) {
-        $Category = CategoryModel::categories($Category);
-        if (!$Category) {
+    public function archives($category, $month, $page = false) {
+        $category = CategoryModel::categories($category);
+        if (!$category) {
             throw notFoundException('Category');
         }
 
-        if (!$Category['PermsDiscussionsView']) {
+        if (!$category['PermsDiscussionsView']) {
             throw permissionException();
         }
 
-        $Timestamp = strtotime($Month);
-        if (!$Timestamp) {
+        $timestamp = strtotime($month);
+        if (!$timestamp) {
             throw new Gdn_UserException("The archive month is not a valid date.");
         }
 
-        $this->setData('Category', $Category);
+        $this->setData('Category', $category);
 
         // Round the month to the first day.
-        $From = gmdate('Y-m-01', $Timestamp);
-        $To = gmdate('Y-m-01', strtotime('+1 month', strtotime($From)));
+        $from = gmdate('Y-m-01', $timestamp);
+        $to = gmdate('Y-m-01', strtotime('+1 month', strtotime($from)));
 
         // Grab the discussions.
-        list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30));
-        $Where = [
-            'CategoryID' => $Category['CategoryID'],
+        list($offset, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
+        $where = [
+            'CategoryID' => $category['CategoryID'],
             'Announce' => 'all',
-            'DateInserted >=' => $From,
-            'DateInserted <' => $To];
+            'DateInserted >=' => $from,
+            'DateInserted <' => $to];
 
         saveToConfig('Vanilla.Discussions.SortField', 'd.DateInserted', false);
-        $DiscussionModel = new DiscussionModel();
-        $DiscussionModel->setSort(Gdn::request()->get());
-        $DiscussionModel->setFilters(Gdn::request()->get());
-        $this->setData('Sort', $DiscussionModel->getSort());
-        $this->setData('Filters', $DiscussionModel->getFilters());
-        $Discussions = $DiscussionModel->getWhereRecent($Where, $Limit, $Offset);
-        $this->DiscussionData = $this->setData('Discussions', $Discussions);
-        $this->setData('_CurrentRecords', count($Discussions));
-        $this->setData('_Limit', $Limit);
+        $discussionModel = new DiscussionModel();
+        $discussionModel->setSort(Gdn::request()->get());
+        $discussionModel->setFilters(Gdn::request()->get());
+        $this->setData('Sort', $discussionModel->getSort());
+        $this->setData('Filters', $discussionModel->getFilters());
+        $discussions = $discussionModel->getWhereRecent($where, $limit, $offset);
+        $this->DiscussionData = $this->setData('Discussions', $discussions);
+        $this->setData('_CurrentRecords', count($discussions));
+        $this->setData('_Limit', $limit);
 
-        $Canonical = '/categories/archives/'.rawurlencode($Category['UrlCode']).'/'.gmdate('Y-m', $Timestamp);
-        $Page = PageNumber($Offset, $Limit, true, false);
-        $this->canonicalUrl(url($Canonical.($Page ? '?page='.$Page : ''), true));
+        $canonical = '/categories/archives/'.rawurlencode($category['UrlCode']).'/'.gmdate('Y-m', $timestamp);
+        $page = PageNumber($offset, $limit, true, false);
+        $this->canonicalUrl(url($canonical.($page ? '?page='.$page : ''), true));
 
-        PagerModule::Current()->configure($Offset, $Limit, false, $Canonical.'?page={Page}');
+        PagerModule::Current()->configure($offset, $limit, false, $canonical.'?page={Page}');
 
 //      PagerModule::Current()->Offset = $Offset;
 //      PagerModule::Current()->Url = '/categories/archives'.rawurlencode($Category['UrlCode']).'?page={Page}';
 
-        Gdn_Theme::section(val('CssClass', $Category));
+        Gdn_Theme::section(val('CssClass', $category));
         Gdn_Theme::section('DiscussionList');
 
-        $this->title(htmlspecialchars(val('Name', $Category, '')));
-        $this->Description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($From))), true);
+        $this->title(htmlspecialchars(val('Name', $category, '')));
+        $this->Description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
         $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
 
@@ -160,16 +160,16 @@ class CategoriesController extends VanillaController {
     /**
      * "Table" layout for categories. Mimics more traditional forum category layout.
      *
-     * @param string $Category
+     * @param string $category
      * @param string $displayAs
      */
-    public function table($Category = '', $displayAs = '') {
+    public function table($category = '', $displayAs = '') {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
             $this->View = $displayAs === 'Flat' ? 'flat_table' : 'table';
         } else {
             $this->View = $displayAs === 'Flat' ? 'flat_all' : 'all';
         }
-        $this->All($Category, $displayAs);
+        $this->All($category, $displayAs);
     }
 
     /**
@@ -212,15 +212,15 @@ class CategoriesController extends VanillaController {
      * @since 2.0.0
      * @access public
      *
-     * @param string $CategoryIdentifier Unique category slug or ID.
-     * @param int $Offset Number of discussions to skip.
+     * @param string $categoryIdentifier Unique category slug or ID.
+     * @param int $offset Number of discussions to skip.
      */
-    public function index($CategoryIdentifier = '', $Page = '0') {
+    public function index($categoryIdentifier = '', $page = '0') {
         // Figure out which category layout to choose (Defined on "Homepage" settings page).
-        $Layout = c('Vanilla.Categories.Layout');
+        $layout = c('Vanilla.Categories.Layout');
 
-        if ($CategoryIdentifier == '') {
-            switch ($Layout) {
+        if ($categoryIdentifier == '') {
+            switch ($layout) {
                 case 'mixed':
                     $this->View = 'discussions';
                     $this->discussions();
@@ -235,48 +235,48 @@ class CategoriesController extends VanillaController {
             }
             return;
         } else {
-            $Category = CategoryModel::categories($CategoryIdentifier);
+            $category = CategoryModel::categories($categoryIdentifier);
 
-            if (empty($Category)) {
+            if (empty($category)) {
                 throw notFoundException();
             }
-            $Category = (object)$Category;
+            $category = (object)$category;
 
             // Check permission
-            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $Category));
+            $this->permission('Vanilla.Discussions.View', true, 'Category', val('PermissionCategoryID', $category));
 
-            Gdn_Theme::section($Category->CssClass);
+            Gdn_Theme::section($category->CssClass);
 
             // Load the breadcrumbs.
-            $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $Category)));
+            $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $category)));
 
-            $this->setData('Category', $Category, true);
+            $this->setData('Category', $category, true);
 
-            $this->title(htmlspecialchars(val('Name', $Category, '')));
-            $this->description(val('Description', $Category), true);
+            $this->title(htmlspecialchars(val('Name', $category, '')));
+            $this->description(val('Description', $category), true);
 
-            switch ($Category->DisplayAs) {
+            switch ($category->DisplayAs) {
                 case 'Flat':
                 case 'Heading':
                 case 'Categories':
-                    $stopHeadings = val('Depth', $Category) > CategoryModel::instance()->getNavDepth();
+                    $stopHeadings = val('Depth', $category) > CategoryModel::instance()->getNavDepth();
                     CategoryModel::instance()->setStopHeadingsCalculation($stopHeadings);
                     if ($this->SyndicationMethod != SYNDICATION_NONE) {
                         // RSS can't show a category list so just tell it to expand all categories.
                         saveToConfig('Vanilla.ExpandCategories', true, false);
                     } else {
                         // This category is an overview style category and displays as a category list.
-                        switch ($Layout) {
+                        switch ($layout) {
                             case 'mixed':
                                 $this->View = 'discussions';
-                                $this->discussions($CategoryIdentifier);
+                                $this->discussions($categoryIdentifier);
                                 break;
                             case 'table':
-                                $this->table($CategoryIdentifier, $Category->DisplayAs);
+                                $this->table($categoryIdentifier, $category->DisplayAs);
                                 break;
                             default:
                                 $this->View = 'all';
-                                $this->All($CategoryIdentifier, $Category->DisplayAs);
+                                $this->All($categoryIdentifier, $category->DisplayAs);
                                 break;
                         }
                         return;
@@ -286,8 +286,8 @@ class CategoriesController extends VanillaController {
 
             Gdn_Theme::section('DiscussionList');
             // Figure out which discussions layout to choose (Defined on "Homepage" settings page).
-            $Layout = c('Vanilla.Discussions.Layout');
-            switch ($Layout) {
+            $layout = c('Vanilla.Discussions.Layout');
+            switch ($layout) {
                 case 'table':
                     if ($this->SyndicationMethod == SYNDICATION_NONE) {
                         $this->View = 'table';
@@ -299,12 +299,12 @@ class CategoriesController extends VanillaController {
             }
 
             $this->setData('CategoryTree', $this->getCategoryTree(
-                $CategoryIdentifier, val('DisplayAs', $Category)
+                $categoryIdentifier, val('DisplayAs', $category)
             ));
 
             // Add a backwards-compatibility shim for the old categories.
-            $this->categoriesCompatibilityCallback = function () use ($CategoryIdentifier) {
-                $categories = CategoryModel::getSubtree($CategoryIdentifier, false);
+            $this->categoriesCompatibilityCallback = function () use ($categoryIdentifier) {
+                $categories = CategoryModel::getSubtree($categoryIdentifier, false);
                 return $categories;
             };
 
@@ -312,12 +312,12 @@ class CategoriesController extends VanillaController {
             $this->Menu->highlightRoute('/discussions');
             if ($this->Head) {
                 $this->addJsFile('discussions.js');
-                $this->Head->addRss(categoryUrl($Category) . '/feed.rss', $this->Head->title());
+                $this->Head->addRss(categoryUrl($category) . '/feed.rss', $this->Head->title());
             }
 
             // Set CategoryID
-            $CategoryID = val('CategoryID', $Category);
-            $this->setData('CategoryID', $CategoryID, true);
+            $categoryID = val('CategoryID', $category);
+            $this->setData('CategoryID', $categoryID, true);
 
             // Add modules
             $this->addModule('NewDiscussionModule');
@@ -327,99 +327,99 @@ class CategoriesController extends VanillaController {
             $this->addModule('TagModule');
 
             // Get a DiscussionModel
-            $DiscussionModel = new DiscussionModel();
-            $DiscussionModel->setSort(Gdn::request()->get());
-            $DiscussionModel->setFilters(Gdn::request()->get());
-            $this->setData('Sort', $DiscussionModel->getSort());
-            $this->setData('Filters', $DiscussionModel->getFilters());
+            $discussionModel = new DiscussionModel();
+            $discussionModel->setSort(Gdn::request()->get());
+            $discussionModel->setFilters(Gdn::request()->get());
+            $this->setData('Sort', $discussionModel->getSort());
+            $this->setData('Filters', $discussionModel->getFilters());
 
-            $CategoryIDs = [$CategoryID];
+            $categoryIDs = [$categoryID];
             if (c('Vanilla.ExpandCategories')) {
-                $CategoryIDs = array_merge($CategoryIDs, array_column($this->data('Categories'), 'CategoryID'));
+                $categoryIDs = array_merge($categoryIDs, array_column($this->data('Categories'), 'CategoryID'));
             }
-            $Wheres = ['d.CategoryID' => $CategoryIDs];
-            $this->setData('_ShowCategoryLink', count($CategoryIDs) > 1);
+            $wheres = ['d.CategoryID' => $categoryIDs];
+            $this->setData('_ShowCategoryLink', count($categoryIDs) > 1);
 
             // Check permission.
-            $this->categoryPermission($Category, 'Vanilla.Discussions.View');
+            $this->categoryPermission($category, 'Vanilla.Discussions.View');
 
             // Set discussion meta data.
             $this->EventArguments['PerPage'] = c('Vanilla.Discussions.PerPage', 30);
             $this->fireEvent('BeforeGetDiscussions');
-            list($Offset, $Limit) = offsetLimit($Page, $this->EventArguments['PerPage']);
-            if (!is_numeric($Offset) || $Offset < 0) {
-                $Offset = 0;
+            list($offset, $limit) = offsetLimit($page, $this->EventArguments['PerPage']);
+            if (!is_numeric($offset) || $offset < 0) {
+                $offset = 0;
             }
 
-            $Page = PageNumber($Offset, $Limit);
+            $page = PageNumber($offset, $limit);
 
             // Allow page manipulation
-            $this->EventArguments['Page'] = &$Page;
-            $this->EventArguments['Offset'] = &$Offset;
-            $this->EventArguments['Limit'] = &$Limit;
+            $this->EventArguments['Page'] = &$page;
+            $this->EventArguments['Offset'] = &$offset;
+            $this->EventArguments['Limit'] = &$limit;
             $this->fireEvent('AfterPageCalculation');
 
             // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
-            $MaxPages = c('Vanilla.Categories.MaxPages');
-            if ($MaxPages && $Page > $MaxPages) {
+            $maxPages = c('Vanilla.Categories.MaxPages');
+            if ($maxPages && $page > $maxPages) {
                 throw notFoundException();
             }
 
-            $CountDiscussions = $DiscussionModel->getCount($Wheres);
-            if ($MaxPages && $MaxPages * $Limit < $CountDiscussions) {
-                $CountDiscussions = $MaxPages * $Limit;
+            $countDiscussions = $discussionModel->getCount($wheres);
+            if ($maxPages && $maxPages * $limit < $countDiscussions) {
+                $countDiscussions = $maxPages * $limit;
             }
 
-            $this->setData('CountDiscussions', $CountDiscussions);
-            $this->setData('_Limit', $Limit);
+            $this->setData('CountDiscussions', $countDiscussions);
+            $this->setData('_Limit', $limit);
 
             // We don't wan't child categories in announcements.
-            $Wheres['d.CategoryID'] = $CategoryID;
-            $AnnounceData = $DiscussionModel->getAnnouncements($Wheres, $Offset, $Limit);
-            $this->AnnounceData = $this->setData('Announcements', $AnnounceData);
-            $Wheres['d.CategoryID'] = $CategoryIDs;
+            $wheres['d.CategoryID'] = $categoryID;
+            $announceData = $discussionModel->getAnnouncements($wheres, $offset, $limit);
+            $this->AnnounceData = $this->setData('Announcements', $announceData);
+            $wheres['d.CategoryID'] = $categoryIDs;
 
             // RSS should include announcements.
             if ($this->SyndicationMethod !== SYNDICATION_NONE) {
-                $Wheres['Announce'] = 'all';
+                $wheres['Announce'] = 'all';
             }
 
-            $this->DiscussionData = $this->setData('Discussions', $DiscussionModel->getWhereRecent($Wheres, $Limit, $Offset));
+            $this->DiscussionData = $this->setData('Discussions', $discussionModel->getWhereRecent($wheres, $limit, $offset));
 
             // Build a pager
-            $PagerFactory = new Gdn_PagerFactory();
-            $url = CategoryUrl($CategoryIdentifier);
+            $pagerFactory = new Gdn_PagerFactory();
+            $url = CategoryUrl($categoryIdentifier);
 
             $this->EventArguments['PagerType'] = 'Pager';
             $this->fireEvent('BeforeBuildPager');
             if (!$this->data('_PagerUrl')) {
                 $this->setData('_PagerUrl', $url.'/{Page}');
             }
-            $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
+            $queryString = DiscussionModel::getSortFilterQueryString($discussionModel->getSort(), $discussionModel->getFilters());
             $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
 
-            $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+            $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
             $this->Pager->ClientID = 'Pager';
             $this->Pager->configure(
-                $Offset,
-                $Limit,
-                $CountDiscussions,
+                $offset,
+                $limit,
+                $countDiscussions,
                 $this->data('_PagerUrl')
             );
 
-            $this->Pager->Record = $Category;
+            $this->Pager->Record = $category;
             PagerModule::current($this->Pager);
-            $this->setData('_Page', $Page);
-            $this->setData('_Limit', $Limit);
+            $this->setData('_Page', $page);
+            $this->setData('_Limit', $limit);
             $this->fireEvent('AfterBuildPager');
 
             // Set the canonical Url.
-            $this->canonicalUrl(categoryUrl($Category, pageNumber($Offset, $Limit)));
+            $this->canonicalUrl(categoryUrl($category, pageNumber($offset, $limit)));
 
             // Change the controller name so that it knows to grab the discussion views
             $this->ControllerName = 'DiscussionsController';
             // Pick up the discussions class
-            $this->CssClass = 'Discussions Category-'.val('UrlCode', $Category);
+            $this->CssClass = 'Discussions Category-'.val('UrlCode', $category);
 
             // Deliver JSON data if necessary
             if ($this->_DeliveryType != DELIVERY_TYPE_ALL) {
@@ -598,8 +598,8 @@ class CategoriesController extends VanillaController {
         $this->render();
     }
 
-    public function __get($Name) {
-        switch ($Name) {
+    public function __get($name) {
+        switch ($name) {
             case 'CategoryData':
 //            Deprecated('CategoriesController->CategoryData', "CategoriesController->data('Categories')");
                 $this->CategoryData = new Gdn_DataSet($this->data('Categories'), DATASET_TYPE_ARRAY);
@@ -661,21 +661,21 @@ class CategoriesController extends VanillaController {
     /**
      * {@inheritdoc}
      */
-    public function data($Path, $Default = '') {
-        if (isset($this->Data[$Path])) {
-            return $this->Data[$Path];
+    public function data($path, $default = '') {
+        if (isset($this->Data[$path])) {
+            return $this->Data[$path];
         }
 
-        switch ($Path) {
+        switch ($path) {
             case 'Categories':
                 if ($this->categoriesCompatibilityCallback instanceof \Closure) {
                     deprecated('Categories', 'CategoryTree');
                     $this->Data['Categories'] = $categories = call_user_func($this->categoriesCompatibilityCallback);
                     return $categories;
                 }
-                return $Default;
+                return $default;
             default:
-                return parent::data($Path, $Default);
+                return parent::data($path, $default);
         }
     }
 }

@@ -28,10 +28,10 @@ class Gdn_Theme {
     /**
      *
      *
-     * @param string $AssetContainer
+     * @param string $assetContainer
      */
-    public static function assetBegin($AssetContainer = 'Panel') {
-        self::$_AssetInfo[] = ['AssetContainer' => $AssetContainer];
+    public static function assetBegin($assetContainer = 'Panel') {
+        self::$_AssetInfo[] = ['AssetContainer' => $assetContainer];
         ob_start();
     }
 
@@ -43,128 +43,128 @@ class Gdn_Theme {
             return;
         }
 
-        $Asset = ob_get_clean();
-        $AssetInfo = array_pop(self::$_AssetInfo);
+        $asset = ob_get_clean();
+        $assetInfo = array_pop(self::$_AssetInfo);
 
-        Gdn::controller()->addAsset($AssetInfo['AssetContainer'], $Asset);
+        Gdn::controller()->addAsset($assetInfo['AssetContainer'], $asset);
     }
 
     /**
      *
      *
-     * @param $Data
-     * @param bool $HomeLink
-     * @param array $Options
+     * @param $data
+     * @param bool $homeLink
+     * @param array $options
      * @return string
      */
-    public static function breadcrumbs($Data, $HomeLink = true, $Options = []) {
-        $Format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
+    public static function breadcrumbs($data, $homeLink = true, $options = []) {
+        $format = '<a href="{Url,html}" itemprop="url"><span itemprop="title">{Name,html}</span></a>';
 
-        $Result = '';
+        $result = '';
 
-        if (!is_array($Data)) {
-            $Data = [];
+        if (!is_array($data)) {
+            $data = [];
         }
 
 
-        if ($HomeLink) {
-            $HomeUrl = val('HomeUrl', $Options);
-            if (!$HomeUrl) {
-                $HomeUrl = Url('/', true);
+        if ($homeLink) {
+            $homeUrl = val('HomeUrl', $options);
+            if (!$homeUrl) {
+                $homeUrl = Url('/', true);
             }
 
-            $Row = ['Name' => $HomeLink, 'Url' => $HomeUrl, 'CssClass' => 'CrumbLabel HomeCrumb'];
-            if (!is_string($HomeLink)) {
-                $Row['Name'] = T('Home');
+            $row = ['Name' => $homeLink, 'Url' => $homeUrl, 'CssClass' => 'CrumbLabel HomeCrumb'];
+            if (!is_string($homeLink)) {
+                $row['Name'] = T('Home');
             }
 
-            array_unshift($Data, $Row);
+            array_unshift($data, $row);
         }
 
-        if (val('HideLast', $Options)) {
+        if (val('HideLast', $options)) {
             // Remove the last item off the list.
-            array_pop($Data);
+            array_pop($data);
         }
 
-        $DefaultRoute = ltrim(val('Destination', Gdn::router()->getRoute('DefaultController'), ''), '/');
+        $defaultRoute = ltrim(val('Destination', Gdn::router()->getRoute('DefaultController'), ''), '/');
 
-        $Count = 0;
-        $DataCount = 0;
-        $HomeLinkFound = false;
+        $count = 0;
+        $dataCount = 0;
+        $homeLinkFound = false;
 
-        foreach ($Data as $Row) {
-            $DataCount++;
+        foreach ($data as $row) {
+            $dataCount++;
 
-            if ($HomeLinkFound && Gdn::request()->urlCompare($Row['Url'], $DefaultRoute) === 0) {
+            if ($homeLinkFound && Gdn::request()->urlCompare($row['Url'], $defaultRoute) === 0) {
                 continue; // don't show default route twice.
             } else {
-                $HomeLinkFound = true;
+                $homeLinkFound = true;
             }
 
             // Add the breadcrumb wrapper.
-            if ($Count > 0) {
-                $Result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
+            if ($count > 0) {
+                $result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
             }
 
-            $Row['Url'] = $Row['Url'] ? Url($Row['Url']) : '#';
-            $CssClass = 'CrumbLabel '.val('CssClass', $Row);
-            if ($DataCount == count($Data)) {
-                $CssClass .= ' Last';
+            $row['Url'] = $row['Url'] ? Url($row['Url']) : '#';
+            $cssClass = 'CrumbLabel '.val('CssClass', $row);
+            if ($dataCount == count($data)) {
+                $cssClass .= ' Last';
             }
 
-            $Label = '<span class="'.$CssClass.'">'.formatString($Format, $Row).'</span> ';
-            $Result = concatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $Result, $Label);
+            $label = '<span class="'.$cssClass.'">'.formatString($format, $row).'</span> ';
+            $result = concatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $result, $label);
 
-            $Count++;
+            $count++;
         }
 
         // Close the stack.
-        for ($Count--; $Count > 0; $Count--) {
-            $Result .= '</span>';
+        for ($count--; $count > 0; $count--) {
+            $result .= '</span>';
         }
 
-        $Result = '<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$Result.'</span>';
-        return $Result;
+        $result = '<span class="Breadcrumbs" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">'.$result.'</span>';
+        return $result;
     }
 
     /**
      * Call before writing an item and it will optionally write a bullet seperator.
      *
-     * @param string $Section The name of the section.
-     * @param bool $Return whether or not to return the result or echo it.
+     * @param string $section The name of the section.
+     * @param bool $return whether or not to return the result or echo it.
      * @return string
      * @since 2.1
      */
-    public static function bulletItem($Section, $Return = true) {
-        $Result = '';
+    public static function bulletItem($section, $return = true) {
+        $result = '';
 
         if (self::$_BulletSection === false) {
-            self::$_BulletSection = $Section;
-        } elseif (self::$_BulletSection != $Section) {
-            $Result = "<!-- $Section -->".self::$_BulletSep;
-            self::$_BulletSection = $Section;
+            self::$_BulletSection = $section;
+        } elseif (self::$_BulletSection != $section) {
+            $result = "<!-- $section -->".self::$_BulletSep;
+            self::$_BulletSection = $section;
         }
 
-        if ($Return) {
-            return $Result;
+        if ($return) {
+            return $result;
         } else {
-            echo $Result;
+            echo $result;
         }
     }
 
     /**
      * Call before starting a row of bullet-seperated items.
      *
-     * @param strng|bool $Sep The seperator used to seperate each section.
+     * @param strng|bool $sep The seperator used to seperate each section.
      * @since 2.1
      */
-    public static function bulletRow($Sep = false) {
-        if (!$Sep) {
+    public static function bulletRow($sep = false) {
+        if (!$sep) {
             if (!self::$_BulletSep) {
                 self::$_BulletSep = ' '.Bullet().' ';
             }
         } else {
-            self::$_BulletSep = $Sep;
+            self::$_BulletSep = $sep;
         }
         self::$_BulletSection = false;
     }
@@ -173,12 +173,12 @@ class Gdn_Theme {
     /**
      * Returns whether or not the page is in the current section.
      *
-     * @param string|array $Section
+     * @param string|array $section
      */
-    public static function inSection($Section) {
-        $Section = (array)$Section;
-        foreach ($Section as $Name) {
-            if (isset(self::$_Section[$Name])) {
+    public static function inSection($section) {
+        $section = (array)$section;
+        foreach ($section as $name) {
+            if (isset(self::$_Section[$name])) {
                 return true;
             }
         }
@@ -188,226 +188,226 @@ class Gdn_Theme {
     /**
      *
      *
-     * @param $Path
-     * @param bool $Text
-     * @param null $Format
-     * @param array $Options
+     * @param $path
+     * @param bool $text
+     * @param null $format
+     * @param array $options
      * @return mixed|null|string
      */
-    public static function link($Path, $Text = false, $Format = null, $Options = []) {
-        $Session = Gdn::session();
-        $Class = val('class', $Options, '');
-        $WithDomain = val('WithDomain', $Options);
-        $Target = val('Target', $Options, '');
-        if ($Target == 'current') {
-            $Target = trim(url('', true), '/ ');
+    public static function link($path, $text = false, $format = null, $options = []) {
+        $session = Gdn::session();
+        $class = val('class', $options, '');
+        $withDomain = val('WithDomain', $options);
+        $target = val('Target', $options, '');
+        if ($target == 'current') {
+            $target = trim(url('', true), '/ ');
         }
 
-        if (is_null($Format)) {
-            $Format = '<a href="%url" class="%class">%text</a>';
+        if (is_null($format)) {
+            $format = '<a href="%url" class="%class">%text</a>';
         }
 
-        switch ($Path) {
+        switch ($path) {
             case 'activity':
-                touchValue('Permissions', $Options, 'Garden.Activity.View');
+                touchValue('Permissions', $options, 'Garden.Activity.View');
                 break;
             case 'category':
-                $Breadcrumbs = Gdn::controller()->data('Breadcrumbs');
-                if (is_array($Breadcrumbs) && count($Breadcrumbs) > 0) {
-                    $Last = array_pop($Breadcrumbs);
-                    $Path = val('Url', $Last);
-                    $DefaultText = val('Name', $Last, T('Back'));
+                $breadcrumbs = Gdn::controller()->data('Breadcrumbs');
+                if (is_array($breadcrumbs) && count($breadcrumbs) > 0) {
+                    $last = array_pop($breadcrumbs);
+                    $path = val('Url', $last);
+                    $defaultText = val('Name', $last, T('Back'));
                 } else {
-                    $Path = '/';
-                    $DefaultText = c('Garden.Title', T('Back'));
+                    $path = '/';
+                    $defaultText = c('Garden.Title', T('Back'));
                 }
-                if (!$Text) {
-                    $Text = $DefaultText;
+                if (!$text) {
+                    $text = $defaultText;
                 }
                 break;
             case 'dashboard':
-                $Path = 'dashboard/settings';
-                touchValue('Permissions', $Options, ['Garden.Settings.Manage', 'Garden.Settings.View']);
-                if (!$Text) {
-                    $Text = t('Dashboard');
+                $path = 'dashboard/settings';
+                touchValue('Permissions', $options, ['Garden.Settings.Manage', 'Garden.Settings.View']);
+                if (!$text) {
+                    $text = t('Dashboard');
                 }
                 break;
             case 'home':
-                $Path = '/';
-                if (!$Text) {
-                    $Text = t('Home');
+                $path = '/';
+                if (!$text) {
+                    $text = t('Home');
                 }
                 break;
             case 'inbox':
-                $Path = 'messages/inbox';
-                touchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text) {
-                    $Text = t('Inbox');
+                $path = 'messages/inbox';
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text) {
+                    $text = t('Inbox');
                 }
-                if ($Session->isValid() && $Session->User->CountUnreadConversations) {
-                    $Class = trim($Class.' HasCount');
-                    $Text .= ' <span class="Alert">'.$Session->User->CountUnreadConversations.'</span>';
+                if ($session->isValid() && $session->User->CountUnreadConversations) {
+                    $class = trim($class.' HasCount');
+                    $text .= ' <span class="Alert">'.$session->User->CountUnreadConversations.'</span>';
                 }
-                if (!$Session->isValid() || !Gdn::addonManager()->lookupAddon('conversations')) {
-                    $Text = false;
+                if (!$session->isValid() || !Gdn::addonManager()->lookupAddon('conversations')) {
+                    $text = false;
                 }
                 break;
             case 'forumroot':
-                $Route = Gdn::router()->getDestination('DefaultForumRoot');
-                if (is_null($Route)) {
-                    $Path = '/';
+                $route = Gdn::router()->getDestination('DefaultForumRoot');
+                if (is_null($route)) {
+                    $path = '/';
                 } else {
-                    $Path = combinePaths(['/', $Route]);
+                    $path = combinePaths(['/', $route]);
                 }
                 break;
             case 'profile':
-                touchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text && $Session->isValid()) {
-                    $Text = $Session->User->Name;
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text && $session->isValid()) {
+                    $text = $session->User->Name;
                 }
-                if ($Session->isValid() && $Session->User->CountNotifications) {
-                    $Class = trim($Class.' HasCount');
-                    $Text .= ' <span class="Alert">'.$Session->User->CountNotifications.'</span>';
+                if ($session->isValid() && $session->User->CountNotifications) {
+                    $class = trim($class.' HasCount');
+                    $text .= ' <span class="Alert">'.$session->User->CountNotifications.'</span>';
                 }
                 break;
             case 'user':
-                $Path = 'profile';
-                touchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text && $Session->isValid()) {
-                    $Text = $Session->User->Name;
+                $path = 'profile';
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text && $session->isValid()) {
+                    $text = $session->User->Name;
                 }
 
                 break;
             case 'photo':
-                $Path = 'profile';
-                TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text && $Session->isValid()) {
-                    $IsFullPath = strtolower(substr($Session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($Session->User->Photo, 0, 8)) == 'https://';
-                    $PhotoUrl = ($IsFullPath) ? $Session->User->Photo : Gdn_Upload::url(changeBasename($Session->User->Photo, 'n%s'));
-                    $Text = img($PhotoUrl, ['alt' => $Session->User->Name]);
+                $path = 'profile';
+                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text && $session->isValid()) {
+                    $isFullPath = strtolower(substr($session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($session->User->Photo, 0, 8)) == 'https://';
+                    $photoUrl = ($isFullPath) ? $session->User->Photo : Gdn_Upload::url(changeBasename($session->User->Photo, 'n%s'));
+                    $text = img($photoUrl, ['alt' => $session->User->Name]);
                 }
 
                 break;
             case 'drafts':
-                TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text) {
-                    $Text = t('My Drafts');
+                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text) {
+                    $text = t('My Drafts');
                 }
-                if ($Session->isValid() && $Session->User->CountDrafts) {
-                    $Class = trim($Class.' HasCount');
-                    $Text .= ' <span class="Alert">'.$Session->User->CountDrafts.'</span>';
+                if ($session->isValid() && $session->User->CountDrafts) {
+                    $class = trim($class.' HasCount');
+                    $text .= ' <span class="Alert">'.$session->User->CountDrafts.'</span>';
                 }
                 break;
             case 'discussions/bookmarked':
-                TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text) {
-                    $Text = t('My Bookmarks');
+                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text) {
+                    $text = t('My Bookmarks');
                 }
-                if ($Session->isValid() && $Session->User->CountBookmarks) {
-                    $Class = trim($Class.' HasCount');
-                    $Text .= ' <span class="Count">'.$Session->User->CountBookmarks.'</span>';
+                if ($session->isValid() && $session->User->CountBookmarks) {
+                    $class = trim($class.' HasCount');
+                    $text .= ' <span class="Count">'.$session->User->CountBookmarks.'</span>';
                 }
                 break;
             case 'discussions/mine':
-                TouchValue('Permissions', $Options, 'Garden.SignIn.Allow');
-                if (!$Text) {
-                    $Text = t('My Discussions');
+                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                if (!$text) {
+                    $text = t('My Discussions');
                 }
-                if ($Session->isValid() && $Session->User->CountDiscussions) {
-                    $Class = trim($Class.' HasCount');
-                    $Text .= ' <span class="Count">'.$Session->User->CountDiscussions.'</span>';
+                if ($session->isValid() && $session->User->CountDiscussions) {
+                    $class = trim($class.' HasCount');
+                    $text .= ' <span class="Count">'.$session->User->CountDiscussions.'</span>';
                 }
                 break;
             case 'register':
-                if (!$Text) {
-                    $Text = t('Register');
+                if (!$text) {
+                    $text = t('Register');
                 }
-                $Path = registerUrl($Target);
+                $path = registerUrl($target);
                 break;
             case 'signin':
             case 'signinout':
                 // The destination is the signin/signout toggle link.
-                if ($Session->isValid()) {
-                    if (!$Text) {
-                        $Text = T('Sign Out');
+                if ($session->isValid()) {
+                    if (!$text) {
+                        $text = T('Sign Out');
                     }
-                    $Path = signOutUrl($Target);
-                    $Class = concatSep(' ', $Class, 'SignOut');
+                    $path = signOutUrl($target);
+                    $class = concatSep(' ', $class, 'SignOut');
                 } else {
-                    if (!$Text) {
-                        $Text = t('Sign In');
+                    if (!$text) {
+                        $text = t('Sign In');
                     }
 
-                    $Path = signInUrl($Target);
+                    $path = signInUrl($target);
                     if (signInPopup() && strpos(Gdn::Request()->Url(), 'entry') === false) {
-                        $Class = concatSep(' ', $Class, 'SignInPopup');
+                        $class = concatSep(' ', $class, 'SignInPopup');
                     }
                 }
                 break;
         }
 
-        if ($Text == false && strpos($Format, '%text') !== false) {
+        if ($text == false && strpos($format, '%text') !== false) {
             return '';
         }
 
-        if (val('Permissions', $Options) && !$Session->checkPermission($Options['Permissions'], false)) {
+        if (val('Permissions', $options) && !$session->checkPermission($options['Permissions'], false)) {
             return '';
         }
 
-        $Url = Gdn::request()->url($Path, $WithDomain);
+        $url = Gdn::request()->url($path, $withDomain);
 
-        if ($TK = val('TK', $Options)) {
-            if (in_array($TK, [1, 'true'])) {
-                $TK = 'TransientKey';
+        if ($tK = val('TK', $options)) {
+            if (in_array($tK, [1, 'true'])) {
+                $tK = 'TransientKey';
             }
-            $Url .= (strpos($Url, '?') === false ? '?' : '&').$TK.'='.urlencode(Gdn::session()->transientKey());
+            $url .= (strpos($url, '?') === false ? '?' : '&').$tK.'='.urlencode(Gdn::session()->transientKey());
         }
 
-        if (strcasecmp(trim($Path, '/'), Gdn::request()->path()) == 0) {
-            $Class = concatSep(' ', $Class, 'Selected');
+        if (strcasecmp(trim($path, '/'), Gdn::request()->path()) == 0) {
+            $class = concatSep(' ', $class, 'Selected');
         }
 
         // Build the final result.
-        $Result = $Format;
-        $Result = str_replace('%url', $Url, $Result);
-        $Result = str_replace('%text', $Text, $Result);
-        $Result = str_replace('%class', $Class, $Result);
+        $result = $format;
+        $result = str_replace('%url', $url, $result);
+        $result = str_replace('%text', $text, $result);
+        $result = str_replace('%class', $class, $result);
 
-        return $Result;
+        return $result;
     }
 
     /**
      * Renders the banner logo, or just the banner title if the logo is not defined.
      *
-     * @param array $Properties
+     * @param array $properties
      */
-    public static function logo($Properties = []) {
-        $Logo = c('Garden.Logo');
+    public static function logo($properties = []) {
+        $logo = c('Garden.Logo');
 
-        if ($Logo) {
+        if ($logo) {
             // Only trim slash from relative paths.
-            if (!stringBeginsWith($Logo, '//')) {
-                $Logo = ltrim($Logo, '/');
+            if (!stringBeginsWith($logo, '//')) {
+                $logo = ltrim($logo, '/');
             }
 
             // Fix the logo path.
-            if (stringBeginsWith($Logo, 'uploads/')) {
-                $Logo = substr($Logo, strlen('uploads/'));
+            if (stringBeginsWith($logo, 'uploads/')) {
+                $logo = substr($logo, strlen('uploads/'));
             }
 
             // Set optional title text.
-            if (empty($Properties['title']) && c('Garden.LogoTitle')) {
-                $Properties['title'] = c('Garden.LogoTitle');
+            if (empty($properties['title']) && c('Garden.LogoTitle')) {
+                $properties['title'] = c('Garden.LogoTitle');
             }
         }
 
         // Use the site title as alt if none was given.
-        $Title = c('Garden.Title', 'Title');
-        if (empty($Properties['alt'])) {
-            $Properties['alt'] = $Title;
+        $title = c('Garden.Title', 'Title');
+        if (empty($properties['alt'])) {
+            $properties['alt'] = $title;
         }
 
-        echo $Logo ? Img(Gdn_Upload::url($Logo), $Properties) : $Title;
+        echo $logo ? Img(Gdn_Upload::url($logo), $properties) : $title;
     }
 
     /**
@@ -417,74 +417,74 @@ class Gdn_Theme {
      * @return string
      */
     public static function mobileLogo() {
-        $Logo = c('Garden.MobileLogo', c('Garden.Logo'));
-        $Title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
+        $logo = c('Garden.MobileLogo', c('Garden.Logo'));
+        $title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
 
-        if ($Logo) {
-            return Img(Gdn_Upload::url($Logo), ['alt' => $Title]);
+        if ($logo) {
+            return Img(Gdn_Upload::url($logo), ['alt' => $title]);
         } else {
-            return $Title;
+            return $title;
         }
     }
 
     /**
      *
      *
-     * @param $Name
-     * @param array $Properties
+     * @param $name
+     * @param array $properties
      * @return mixed|string
      */
-    public static function module($Name, $Properties = []) {
-        if (isset($Properties['cache'])) {
-            $Key = isset($Properties['cachekey']) ? $Properties['cachekey'] : 'module.'.$Name;
+    public static function module($name, $properties = []) {
+        if (isset($properties['cache'])) {
+            $key = isset($properties['cachekey']) ? $properties['cachekey'] : 'module.'.$name;
 
-            $Result = Gdn::cache()->get($Key);
-            if ($Result !== Gdn_Cache::CACHEOP_FAILURE) {
+            $result = Gdn::cache()->get($key);
+            if ($result !== Gdn_Cache::CACHEOP_FAILURE) {
 //            Trace('Module: '.$Result, $Key);
-                return $Result;
+                return $result;
             }
         }
 
         try {
-            if (!class_exists($Name)) {
+            if (!class_exists($name)) {
                 if (debug()) {
-                    $Result = "Error: $Name doesn't exist";
+                    $result = "Error: $name doesn't exist";
                 } else {
-                    $Result = "<!-- Error: $Name doesn't exist -->";
+                    $result = "<!-- Error: $name doesn't exist -->";
                 }
             } else {
-                $Module = new $Name(Gdn::controller(), '');
-                $Module->Visible = true;
+                $module = new $name(Gdn::controller(), '');
+                $module->Visible = true;
 
                 // Add properties passed in from the controller.
-                $ControllerProperties = Gdn::controller()->data('_properties.'.strtolower($Name), []);
-                $Properties = array_merge($ControllerProperties, $Properties);
+                $controllerProperties = Gdn::controller()->data('_properties.'.strtolower($name), []);
+                $properties = array_merge($controllerProperties, $properties);
 
-                foreach ($Properties as $Name => $value) {
+                foreach ($properties as $name => $value) {
                     // Check for a setter method
-                    if (method_exists($Module, $method = 'set'.ucfirst($Name))) {
-                        $Module->$method($value);
+                    if (method_exists($module, $method = 'set'.ucfirst($name))) {
+                        $module->$method($value);
                     } else {
-                        $Module->$Name = $value;
+                        $module->$name = $value;
                     }
                 }
 
-                $Result = $Module->toString();
+                $result = $module->toString();
             }
-        } catch (Exception $Ex) {
+        } catch (Exception $ex) {
             if (debug()) {
-                $Result = '<pre class="Exception">'.htmlspecialchars($Ex->getMessage()."\n".$Ex->getTraceAsString()).'</pre>';
+                $result = '<pre class="Exception">'.htmlspecialchars($ex->getMessage()."\n".$ex->getTraceAsString()).'</pre>';
             } else {
-                $Result = $Ex->getMessage();
+                $result = $ex->getMessage();
             }
         }
 
-        if (isset($Key)) {
+        if (isset($key)) {
 //         Trace($Result, "Store $Key");
-            Gdn::cache()->store($Key, $Result, [Gdn_Cache::FEATURE_EXPIRY => $Properties['cache']]);
+            Gdn::cache()->store($key, $result, [Gdn_Cache::FEATURE_EXPIRY => $properties['cache']]);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -493,9 +493,9 @@ class Gdn_Theme {
      * @return string
      */
     public static function pagename() {
-        $Application = Gdn::dispatcher()->application();
-        $Controller = Gdn::dispatcher()->controller();
-        switch ($Controller) {
+        $application = Gdn::dispatcher()->application();
+        $controller = Gdn::dispatcher()->controller();
+        switch ($controller) {
             case 'discussions':
             case 'discussion':
             case 'post':
@@ -508,8 +508,8 @@ class Gdn_Theme {
                 return 'activity';
 
             case 'profile':
-                $Args = Gdn::dispatcher()->controllerArguments();
-                if (!sizeof($Args) || (sizeof($Args) && $Args[0] == Gdn::session()->UserID)) {
+                $args = Gdn::dispatcher()->controllerArguments();
+                if (!sizeof($args) || (sizeof($args) && $args[0] == Gdn::session()->UserID)) {
                     return 'profile';
                 }
                 break;
@@ -523,22 +523,22 @@ class Gdn_Theme {
      *
      * @since 2.1
      *
-     * @param string $Section The name of the section.
-     * @param string $Method One of: add, remove, set, get.
+     * @param string $section The name of the section.
+     * @param string $method One of: add, remove, set, get.
      */
-    public static function section($Section, $Method = 'add') {
-        $Section = array_fill_keys((array)$Section, true);
+    public static function section($section, $method = 'add') {
+        $section = array_fill_keys((array)$section, true);
 
 
-        switch (strtolower($Method)) {
+        switch (strtolower($method)) {
             case 'add':
-                self::$_Section = array_merge(self::$_Section, $Section);
+                self::$_Section = array_merge(self::$_Section, $section);
                 break;
             case 'remove':
-                self::$_Section = array_diff_key(self::$_Section, $Section);
+                self::$_Section = array_diff_key(self::$_Section, $section);
                 break;
             case 'set':
-                self::$_Section = $Section;
+                self::$_Section = $section;
                 break;
             case 'get':
             default:
@@ -549,11 +549,11 @@ class Gdn_Theme {
     /**
      *
      *
-     * @param $Code
-     * @param $Default
+     * @param $code
+     * @param $default
      * @return mixed
      */
-    public static function text($Code, $Default) {
-        return c("ThemeOption.{$Code}", t('Theme_'.$Code, $Default));
+    public static function text($code, $default) {
+        return c("ThemeOption.{$code}", t('Theme_'.$code, $default));
     }
 }

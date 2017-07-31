@@ -46,8 +46,8 @@ class SetupController extends DashboardController {
         $this->ApplicationFolder = 'dashboard';
         $this->MasterView = 'setup';
         // Fatal error if Garden has already been installed.
-        $Installed = c('Garden.Installed');
-        if ($Installed) {
+        $installed = c('Garden.Installed');
+        if ($installed) {
             throw new Gdn_UserException('Vanilla is installed!', 409);
         }
 
@@ -80,7 +80,7 @@ class SetupController extends DashboardController {
                 }
             }
 
-            $ApplicationManager = Gdn::applicationManager();
+            $applicationManager = Gdn::applicationManager();
 
             // Need to go through all of the setups for each application. Garden,
             if ($this->configure() && $this->Form->isPostBack()) {
@@ -88,13 +88,13 @@ class SetupController extends DashboardController {
                 if ($this->Form->errorCount() == 0) {
                     // Get list of applications to enable during install
                     // Override by creating the config and adding this setting before install begins
-                    $AppNames = c('Garden.Install.Applications', ['Conversations', 'Vanilla']);
+                    $appNames = c('Garden.Install.Applications', ['Conversations', 'Vanilla']);
                     try {
                         // Step through the available applications, enabling each of them.
-                        foreach ($AppNames as $AppName) {
-                            $Validation = new Gdn_Validation();
-                            $ApplicationManager->RegisterPermissions($AppName, $Validation);
-                            $ApplicationManager->EnableApplication($AppName, $Validation);
+                        foreach ($appNames as $appName) {
+                            $validation = new Gdn_Validation();
+                            $applicationManager->RegisterPermissions($appName, $validation);
+                            $applicationManager->EnableApplication($appName, $validation);
                         }
 
                         Gdn::pluginManager()->start(true);
@@ -105,15 +105,15 @@ class SetupController extends DashboardController {
 
                 if ($this->Form->errorCount() == 0) {
                     // Install config-defaults plugins
-                    $PluginNames = c('EnabledPlugins', []);
+                    $pluginNames = c('EnabledPlugins', []);
                     try {
-                        foreach ($PluginNames as $PluginName => $isEnabled) {
+                        foreach ($pluginNames as $pluginName => $isEnabled) {
                             if ($isEnabled !== true) {
                                 continue;
                             }
 
-                            $Validation = new Gdn_Validation();
-                            Gdn::pluginManager()->enablePlugin($PluginName, $Validation, [
+                            $validation = new Gdn_Validation();
+                            Gdn::pluginManager()->enablePlugin($pluginName, $validation, [
                                 'Force' => true
                             ]);
                         }
@@ -125,8 +125,8 @@ class SetupController extends DashboardController {
                 if ($this->Form->errorCount() == 0) {
                     // Save a variable so that the application knows it has been installed.
                     // Now that the application is installed, select a more user friendly error page.
-                    $Config = ['Garden.Installed' => true];
-                    saveToConfig($Config);
+                    $config = ['Garden.Installed' => true];
+                    saveToConfig($config);
                     $this->setData('Installed', true);
                     $this->fireAs('UpdateModel')->fireEvent('AfterStructure');
                     $this->fireEvent('Installed');
@@ -311,59 +311,59 @@ class SetupController extends DashboardController {
         }
 
         // Make sure that the correct filesystem permissions are in place.
-        $PermissionProblem = false;
+        $permissionProblem = false;
 
         // Make sure the appropriate folders are writable.
-        $ProblemDirectories = [];
+        $problemDirectories = [];
         if (!is_readable(PATH_CONF) || !isWritable(PATH_CONF)) {
-            $ProblemDirectories[] = PATH_CONF;
+            $problemDirectories[] = PATH_CONF;
         }
 
         if (!is_readable(PATH_UPLOADS) || !isWritable(PATH_UPLOADS)) {
-            $ProblemDirectories[] = PATH_UPLOADS;
+            $problemDirectories[] = PATH_UPLOADS;
         }
 
         if (!is_readable(PATH_CACHE) || !isWritable(PATH_CACHE)) {
-            $ProblemDirectories[] = PATH_CACHE;
+            $problemDirectories[] = PATH_CACHE;
         }
 
         if (file_exists(PATH_CACHE.'/Smarty/compile') && (!is_readable(PATH_CACHE.'/Smarty/compile') || !isWritable(PATH_CACHE.'/Smarty/compile'))) {
-            $ProblemDirectories[] = PATH_CACHE.'/Smarty/compile';
+            $problemDirectories[] = PATH_CACHE.'/Smarty/compile';
         }
 
         // Display our permission errors.
-        if (count($ProblemDirectories) > 0) {
-            $PermissionProblem = true;
-            $PermissionError = t(
+        if (count($problemDirectories) > 0) {
+            $permissionProblem = true;
+            $permissionError = t(
                 'Some folders don\'t have correct permissions.',
                 '<p>These folders must be readable and writable by the web server:</p>'
             );
-            $PermissionHelp = '<pre>'.implode("\n", $ProblemDirectories).'</pre>';
+            $permissionHelp = '<pre>'.implode("\n", $problemDirectories).'</pre>';
 
-            $this->Form->addError($PermissionError.$PermissionHelp);
+            $this->Form->addError($permissionError.$permissionHelp);
         }
 
         // Make sure the config folder is writable.
-        if (!$PermissionProblem) {
-            $ConfigFile = Gdn::config()->defaultPath();
+        if (!$permissionProblem) {
+            $configFile = Gdn::config()->defaultPath();
 
-            if (file_exists($ConfigFile)) {
+            if (file_exists($configFile)) {
                 // Make sure the config file is writable.
-                if (!is_readable($ConfigFile) || !isWritable($ConfigFile)) {
-                    $this->Form->addError(sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $ConfigFile));
-                    $PermissionProblem = true;
+                if (!is_readable($configFile) || !isWritable($configFile)) {
+                    $this->Form->addError(sprintf(t('Your configuration file does not have the correct permissions. PHP needs to be able to read and write to this file: <code>%s</code>'), $configFile));
+                    $permissionProblem = true;
                 }
             } else {
                 // Make sure the config file can be created.
-                if (!is_writeable(dirname($ConfigFile))) {
-                    $this->Form->addError(sprintf(t('Your configuration file cannot be created. PHP needs to be able to create this file: <code>%s</code>'), $ConfigFile));
-                    $PermissionProblem = true;
+                if (!is_writeable(dirname($configFile))) {
+                    $this->Form->addError(sprintf(t('Your configuration file cannot be created. PHP needs to be able to create this file: <code>%s</code>'), $configFile));
+                    $permissionProblem = true;
                 }
             }
         }
 
         // Make sure the cache folder is writable
-        if (!$PermissionProblem) {
+        if (!$permissionProblem) {
             if (!file_exists(PATH_CACHE.'/Smarty')) {
                 mkdir(PATH_CACHE.'/Smarty');
             }

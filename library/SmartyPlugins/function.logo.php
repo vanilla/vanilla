@@ -9,30 +9,30 @@
 /**
  * Writes the site logo to the page.
  *
- * @param array $Params The parameters passed into the function.
- * @param Smarty $Smarty The smarty object rendering the template.
+ * @param array $params The parameters passed into the function.
+ * @param Smarty $smarty The smarty object rendering the template.
  * @return The HTML img tag or site title if no logo is set.
  */
-function smarty_function_logo($Params, &$Smarty) {
-    $Options = [];
+function smarty_function_logo($params, &$smarty) {
+    $options = [];
 
     // Whitelist params to be passed on.
-    if (isset($Params['alt'])) {
-        $Options['alt'] = $Params['alt'];
+    if (isset($params['alt'])) {
+        $options['alt'] = $params['alt'];
     }
-    if (isset($Params['class'])) {
-        $Options['class']  = $Params['class'];
+    if (isset($params['class'])) {
+        $options['class']  = $params['class'];
     }
-    if (isset($Params['title'])) {
-        $Options['title']  = $Params['title'];
+    if (isset($params['title'])) {
+        $options['title']  = $params['title'];
     }
-    if (isset($Params['height'])) {
-        $Options['height'] = $Params['height'];
+    if (isset($params['height'])) {
+        $options['height'] = $params['height'];
     }
-    if (isset($Params['width'])) {
-        $Options['width']  = $Params['width'];
+    if (isset($params['width'])) {
+        $options['width']  = $params['width'];
     }
 
-    $Result = Gdn_Theme::logo($Options);
-	return $Result;
+    $result = Gdn_Theme::logo($options);
+	return $result;
 }

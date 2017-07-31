@@ -19,10 +19,10 @@ class DiscussionSorterModule extends Gdn_Module {
     /** @string Current sort field user preference. */
     var $SortFieldSelected;
 
-    public function __construct($Sender) {
+    public function __construct($sender) {
         deprecated('DiscussionSorterModule', 'DiscussionSortFilterModule', 'March 2016');
 
-        parent::__construct($Sender, 'Vanilla');
+        parent::__construct($sender, 'Vanilla');
 
         $this->Visible = false;
 

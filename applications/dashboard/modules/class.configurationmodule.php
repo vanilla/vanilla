@@ -34,11 +34,11 @@ class ConfigurationModule extends Gdn_Module {
      *
      * @param Gdn_Controller $Controller The controller using this model.
      */
-    public function __construct($Sender = null) {
-        parent::__construct($Sender);
+    public function __construct($sender = null) {
+        parent::__construct($sender);
 
-        if (property_exists($Sender, 'Form')) {
-            $this->Form($Sender->Form);
+        if (property_exists($sender, 'Form')) {
+            $this->Form($sender->Form);
         }
 
         $this->ConfigurationModule = $this;
@@ -56,18 +56,18 @@ class ConfigurationModule extends Gdn_Module {
     /**
      *
      *
-     * @param Gdn_Form $NewValue
+     * @param Gdn_Form $newValue
      * @return Gdn_Form
      */
-    public function form($NewValue = null) {
-        static $Form = null;
+    public function form($newValue = null) {
+        static $form = null;
 
-        if ($NewValue !== null) {
-            $Form = $NewValue;
-        } elseif ($Form === null)
-            $Form = new Gdn_Form('', 'bootstrap');
+        if ($newValue !== null) {
+            $form = $newValue;
+        } elseif ($form === null)
+            $form = new Gdn_Form('', 'bootstrap');
 
-        return $Form;
+        return $form;
     }
 
     /**
@@ -76,121 +76,121 @@ class ConfigurationModule extends Gdn_Module {
      * @return bool
      */
     public function hasFiles() {
-        static $HasFiles = null;
+        static $hasFiles = null;
 
-        if ($HasFiles === null) {
-            $HasFiles = false;
-            foreach ($this->schema() as $K => $Row) {
-                if (strtolower(val('Control', $Row)) == 'imageupload') {
-                    $HasFiles = true;
+        if ($hasFiles === null) {
+            $hasFiles = false;
+            foreach ($this->schema() as $k => $row) {
+                if (strtolower(val('Control', $row)) == 'imageupload') {
+                    $hasFiles = true;
                     break;
                 }
             }
         }
-        return $HasFiles;
+        return $hasFiles;
     }
 
     /**
      *
      *
-     * @param null $Schema
+     * @param null $schema
      * @throws Exception
      */
-    public function initialize($Schema = null) {
-        if ($Schema !== null) {
-            $this->schema($Schema);
+    public function initialize($schema = null) {
+        if ($schema !== null) {
+            $this->schema($schema);
         }
 
         /** @var Gdn_Form $Form */
-        $Form = $this->form();
+        $form = $this->form();
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // Grab the data from the form.
-            $Data = [];
-            $Post = $Form->formValues();
+            $data = [];
+            $post = $form->formValues();
 
-            foreach ($this->_Schema as $Row) {
-                $Name = $Row['Name'];
-                $Config = $Row['Config'];
+            foreach ($this->_Schema as $row) {
+                $name = $row['Name'];
+                $config = $row['Config'];
 
                 // For API calls make this a sparse save.
-                if ($this->controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($Name, $Post)) {
+                if ($this->controller()->deliveryType() === DELIVERY_TYPE_DATA && !array_key_exists($name, $post)) {
                     continue;
                 }
 
-                if (strtolower(val('Control', $Row)) == 'imageupload') {
-                    $options = arrayTranslate($Row, ['Prefix', 'Size']);
-                    if (val('OutputType', $Row, false)) {
-                        $options['OutputType'] = val('OutputType', $Row);
+                if (strtolower(val('Control', $row)) == 'imageupload') {
+                    $options = arrayTranslate($row, ['Prefix', 'Size']);
+                    if (val('OutputType', $row, false)) {
+                        $options['OutputType'] = val('OutputType', $row);
                     }
-                    if (val('Crop', $Row, false)) {
-                        $options['Crop'] = val('Crop', $Row);
+                    if (val('Crop', $row, false)) {
+                        $options['Crop'] = val('Crop', $row);
                     }
 
                     // Old image to clean!
-                    $options['CurrentImage'] = c($Name, false);
+                    $options['CurrentImage'] = c($name, false);
 
                     // Save the new image and clean up the old one.
-                    $Form->saveImage($Name, $options);
+                    $form->saveImage($name, $options);
                 }
 
-                $Value = $Form->getFormValue($Name);
+                $value = $form->getFormValue($name);
 
                 // Trim all incoming values by default.
-                if (val('Trim', $Row, true)) {
-                    $Value = trim($Value);
+                if (val('Trim', $row, true)) {
+                    $value = trim($value);
                 }
 
-                if ($Value == val('Default', $Value, '')) {
-                    $Value = '';
+                if ($value == val('Default', $value, '')) {
+                    $value = '';
                 }
 
-                $Data[$Config] = $Value;
-                $this->controller()->setData($Name, $Value);
+                $data[$config] = $value;
+                $this->controller()->setData($name, $value);
             }
 
             // Halt the save if we've had errors assigned.
-            if ($Form->errorCount() == 0) {
+            if ($form->errorCount() == 0) {
                 // Save it to the config.
-                saveToConfig($Data, ['RemoveEmpty' => true]);
+                saveToConfig($data, ['RemoveEmpty' => true]);
                 $this->_Sender->informMessage(t('Saved'));
             }
         } else {
             // Load the form data from the config.
-            $Data = [];
-            foreach ($this->_Schema as $Row) {
-                $Data[$Row['Name']] = c($Row['Config'], val('Default', $Row, ''));
+            $data = [];
+            foreach ($this->_Schema as $row) {
+                $data[$row['Name']] = c($row['Config'], val('Default', $row, ''));
             }
-            $Form->setData($Data);
-            $this->controller()->Data = array_merge($this->controller()->Data, $Data);
+            $form->setData($data);
+            $this->controller()->Data = array_merge($this->controller()->Data, $data);
         }
     }
 
     /**
      *
      *
-     * @param $SchemaRow
+     * @param $schemaRow
      * @return bool|mixed|string
      */
-    public function labelCode($SchemaRow) {
-        if (isset($SchemaRow['LabelCode'])) {
-            return $SchemaRow['LabelCode'];
+    public function labelCode($schemaRow) {
+        if (isset($schemaRow['LabelCode'])) {
+            return $schemaRow['LabelCode'];
         }
 
-        if (strpos($SchemaRow['Name'], '.') !== false) {
-            $LabelCode = trim(strrchr($SchemaRow['Name'], '.'), '.');
+        if (strpos($schemaRow['Name'], '.') !== false) {
+            $labelCode = trim(strrchr($schemaRow['Name'], '.'), '.');
         } else {
-            $LabelCode = $SchemaRow['Name'];
+            $labelCode = $schemaRow['Name'];
         }
 
         // Split camel case labels into seperate words.
-        $LabelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $LabelCode);
-        $LabelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $LabelCode);
-        $LabelCode = trim($LabelCode);
+        $labelCode = preg_replace('`(?<![A-Z0-9])([A-Z0-9])`', ' $1', $labelCode);
+        $labelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $labelCode);
+        $labelCode = trim($labelCode);
 
-        $LabelCode = StringEndsWith($LabelCode, " ID", true, true);
+        $labelCode = StringEndsWith($labelCode, " ID", true, true);
 
-        return $LabelCode;
+        return $labelCode;
     }
 
     /**
@@ -200,40 +200,40 @@ class ConfigurationModule extends Gdn_Module {
      */
     public function renderAll() {
         $this->RenderAll = true;
-        $Controller = $this->Controller();
-        $Controller->ConfigurationModule = $this;
+        $controller = $this->Controller();
+        $controller->ConfigurationModule = $this;
 
-        $Controller->render($this->fetchViewLocation());
+        $controller->render($this->fetchViewLocation());
         $this->RenderAll = false;
     }
 
     /**
      * Set the data definition to load/save from the config.
      *
-     * @param array $Def A list of fields from the config that this form will use.
+     * @param array $def A list of fields from the config that this form will use.
      */
-    public function schema($Def = null) {
-        if ($Def !== null) {
-            $Schema = [];
+    public function schema($def = null) {
+        if ($def !== null) {
+            $schema = [];
 
-            foreach ($Def as $Key => $Value) {
-                $Row = ['Name' => '', 'Type' => 'string', 'Control' => 'TextBox', 'Options' => []];
+            foreach ($def as $key => $value) {
+                $row = ['Name' => '', 'Type' => 'string', 'Control' => 'TextBox', 'Options' => []];
 
-                if (is_numeric($Key)) {
-                    $Row['Name'] = $Value;
-                } elseif (is_string($Value)) {
-                    $Row['Name'] = $Key;
-                    $Row['Type'] = $Value;
-                } elseif (is_array($Value)) {
-                    $Row['Name'] = $Key;
-                    $Row = array_merge($Row, $Value);
+                if (is_numeric($key)) {
+                    $row['Name'] = $value;
+                } elseif (is_string($value)) {
+                    $row['Name'] = $key;
+                    $row['Type'] = $value;
+                } elseif (is_array($value)) {
+                    $row['Name'] = $key;
+                    $row = array_merge($row, $value);
                 } else {
-                    $Row['Name'] = $Key;
+                    $row['Name'] = $key;
                 }
-                touchValue('Config', $Row, $Row['Name']);
-                $Schema[] = $Row;
+                touchValue('Config', $row, $row['Name']);
+                $schema[] = $row;
             }
-            $this->_Schema = $Schema;
+            $this->_Schema = $schema;
         }
         return $this->_Schema;
     }

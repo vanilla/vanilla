@@ -1,23 +1,23 @@
 <?php if (!defined('APPLICATION')) exit;
 
-function pluralCount($Count, $Type) {
-    $PluralCodes = ['Activity' => '%s Activities'];
-    $SingleCode = '%s '.Gdn_Form::LabelCode($Type);
-    return plural($Count, $SingleCode, val($Type, $PluralCodes, $SingleCode.'s'));
+function pluralCount($count, $type) {
+    $pluralCodes = ['Activity' => '%s Activities'];
+    $singleCode = '%s '.Gdn_Form::LabelCode($type);
+    return plural($count, $singleCode, val($type, $pluralCodes, $singleCode.'s'));
 }
 
-function otherRecordsMeta($Data) {
-    if (!val('_Data', $Data)) {
+function otherRecordsMeta($data) {
+    if (!val('_Data', $data)) {
         return '';
     }
 
-    $Result = '<div><b>'.t('Other Records').':</b></div><div>';
-    $_Data = val('_Data', $Data);
-    foreach ($_Data as $Type => $Rows) {
-        $Result .= '<span class="Meta"><span class="Meta-Value">'.
-            PluralCount(count($Rows), $Type).
+    $result = '<div><b>'.t('Other Records').':</b></div><div>';
+    $_Data = val('_Data', $data);
+    foreach ($_Data as $type => $rows) {
+        $result .= '<span class="Meta"><span class="Meta-Value">'.
+            PluralCount(count($rows), $type).
             '</span></span>';
     }
-    $Result .= '</div>';
-    return $Result;
+    $result .= '</div>';
+    return $result;
 }

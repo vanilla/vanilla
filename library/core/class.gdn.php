@@ -128,38 +128,38 @@ class Gdn {
     /**
      * Get a configuration setting for the application.
      *
-     * @param string $Name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
-     * @param mixed $Default The result to return if the configuration setting is not found.
+     * @param string $name The name of the configuration setting. Settings in different sections are seperated by a dot ('.')
+     * @param mixed $default The result to return if the configuration setting is not found.
      * @return Gdn_Configuration|mixed The configuration setting.
      */
-    public static function config($Name = false, $Default = false) {
+    public static function config($name = false, $default = false) {
         if (self::$_Config === null) {
             self::$_Config = static::getContainer()->get(self::AliasConfig);
         }
-        $Config = self::$_Config;
-        if ($Name === false) {
-            $Result = $Config;
+        $config = self::$_Config;
+        if ($name === false) {
+            $result = $config;
         } else {
-            $Result = $Config->get($Name, $Default);
+            $result = $config->get($name, $default);
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
      * The current controller being targetted.
      *
-     * @param Gdn_Controller $Value
+     * @param Gdn_Controller $value
      * @return Gdn_Controller
      */
-    public static function controller($Value = null) {
-        static $Controller = null;
+    public static function controller($value = null) {
+        static $controller = null;
 
-        if ($Value !== null) {
-            $Controller = $Value;
+        if ($value !== null) {
+            $controller = $value;
         }
 
-        return $Controller;
+        return $controller;
     }
 
     /**
@@ -226,79 +226,79 @@ class Gdn {
     /**
      * Checks whether or not a factory alias exists.
      *
-     * @param string $Alias The alias of the factory to check for.
+     * @param string $alias The alias of the factory to check for.
      * @return boolean Whether or not a factory definintion exists.
      * @see Gdn_Factory::Exists()
      */
-    public static function factoryExists($Alias) {
-        return static::getContainer()->hasRule($Alias);
+    public static function factoryExists($alias) {
+        return static::getContainer()->hasRule($alias);
     }
 
     /**
      * Install a class to the factory.
      *
-     * @param string $Alias An alias for the class that will be used to retreive instances of it.
-     * @param string $ClassName The actual name of the class.
-     * @param string $Path The path to the class' file. You can prefix the path with ~ to start at the application root.
-     * @param string $FactoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
-     * @param mixed $Data Additional data for the installation.
+     * @param string $alias An alias for the class that will be used to retreive instances of it.
+     * @param string $className The actual name of the class.
+     * @param string $path The path to the class' file. You can prefix the path with ~ to start at the application root.
+     * @param string $factoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
+     * @param mixed $data Additional data for the installation.
      * @see Gdn_Factory::Install()
      */
-    public static function factoryInstall($Alias, $ClassName, $Path = '', $FactoryType = self::FactorySingleton, $Data = null) {
+    public static function factoryInstall($alias, $className, $path = '', $factoryType = self::FactorySingleton, $data = null) {
         // Don't overwrite an existing definition.
-        if (self::$_FactoryOverwrite === false && self::factoryExists($Alias)) {
+        if (self::$_FactoryOverwrite === false && self::factoryExists($alias)) {
             return;
         }
 
         $dic = static::getContainer();
 
-        $dic->rule($Alias);
+        $dic->rule($alias);
 
-        if ($Alias !== $ClassName) {
-            $dic->setClass($ClassName);
+        if ($alias !== $className) {
+            $dic->setClass($className);
         }
 
         // Set the other data of the object.
-        switch (ucfirst($FactoryType)) {
+        switch (ucfirst($factoryType)) {
             case Gdn::FactoryInstance:
                 $dic->setShared(false);
                 break;
             case Gdn::FactoryPrototype:
-                if (is_null($Data)) {
+                if (is_null($data)) {
                     throw new Exception('You must supply a prototype object when installing an object of type Prototype.');
                 }
                 $dic->setShared(false)
-                    ->setFactory(function () use ($Data) {
-                        $r = clone $Data;
+                    ->setFactory(function () use ($data) {
+                        $r = clone $data;
                         return $r;
                     });
                 break;
             case Gdn::FactorySingleton:
                 $dic->setShared(true);
-                if (is_array($Data)) {
-                    $dic->setConstructorArgs($Data);
-                } elseif ($Data !== null) {
-                    $dic->setInstance($Alias, $Data);
+                if (is_array($data)) {
+                    $dic->setConstructorArgs($data);
+                } elseif ($data !== null) {
+                    $dic->setInstance($alias, $data);
                 }
                 break;
             case Gdn::FactoryRealSingleton:
                 $dic->setShared(true)
-                    ->setFactory([$ClassName, $Data]);
+                    ->setFactory([$className, $data]);
                 break;
             default:
-                throw new \Exception("Unknown factory type '$FactoryType'.", 500);
+                throw new \Exception("Unknown factory type '$factoryType'.", 500);
         }
     }
 
     /**
      * Installs a dependency to the factory.
      *
-     * @param string $Alias The alias of the class that will have the dependency.
-     * @param string $PropertyName The name of the property on the class that will have the dependency.
-     * @param string $SourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
+     * @param string $alias The alias of the class that will have the dependency.
+     * @param string $propertyName The name of the property on the class that will have the dependency.
+     * @param string $sourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
      * @see Gdn_Factory::InstalDependency()
      */
-    public static function factoryInstallDependency($Alias, $PropertyName, $SourceAlias) {
+    public static function factoryInstallDependency($alias, $propertyName, $sourceAlias) {
         deprecated('Gdn::factoryInstallDependency()');
     }
 
@@ -323,18 +323,18 @@ class Gdn {
     /**
      *
      *
-     * @param null $Value
+     * @param null $value
      * @return int
      * @deprecated
      */
-    public static function factoryOverwrite($Value = null) {
-        $Result = (self::$_FactoryOverwrite & 1 > 0);
+    public static function factoryOverwrite($value = null) {
+        $result = (self::$_FactoryOverwrite & 1 > 0);
 
-        if (!is_null($Value)) {
-            self::$_FactoryOverwrite = $Value;
+        if (!is_null($value)) {
+            self::$_FactoryOverwrite = $value;
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -358,51 +358,51 @@ class Gdn {
     /**
      * Gets/Sets the Garden InstallationID
      *
-     * @staticvar string $InstallationID
-     * @param string $SetInstallationID
+     * @staticvar string $installationID
+     * @param string $setInstallationID
      * @return string Installation ID or NULL
      */
-    public static function installationID($SetInstallationID = null) {
-        static $InstallationID = false;
-        if (!is_null($SetInstallationID)) {
-            if ($SetInstallationID !== false) {
-                SaveToConfig('Garden.InstallationID', $SetInstallationID);
+    public static function installationID($setInstallationID = null) {
+        static $installationID = false;
+        if (!is_null($setInstallationID)) {
+            if ($setInstallationID !== false) {
+                SaveToConfig('Garden.InstallationID', $setInstallationID);
             } else {
                 RemoveFromConfig('Garden.InstallationID');
             }
-            $InstallationID = $SetInstallationID;
+            $installationID = $setInstallationID;
         }
 
-        if ($InstallationID === false) {
-            $InstallationID = c('Garden.InstallationID', null);
+        if ($installationID === false) {
+            $installationID = c('Garden.InstallationID', null);
         }
 
-        return $InstallationID;
+        return $installationID;
     }
 
     /**
      * Gets/Sets the Garden Installation Secret
      *
-     * @staticvar string $InstallationSecret
-     * @param string $SetInstallationSecret
+     * @staticvar string $installationSecret
+     * @param string $setInstallationSecret
      * @return string Installation Secret or NULL
      */
-    public static function installationSecret($SetInstallationSecret = null) {
-        static $InstallationSecret = false;
-        if (!is_null($SetInstallationSecret)) {
-            if ($SetInstallationSecret !== false) {
-                SaveToConfig('Garden.InstallationSecret', $SetInstallationSecret);
+    public static function installationSecret($setInstallationSecret = null) {
+        static $installationSecret = false;
+        if (!is_null($setInstallationSecret)) {
+            if ($setInstallationSecret !== false) {
+                SaveToConfig('Garden.InstallationSecret', $setInstallationSecret);
             } else {
                 RemoveFromConfig('Garden.InstallationSecret');
             }
-            $InstallationSecret = $SetInstallationSecret;
+            $installationSecret = $setInstallationSecret;
         }
 
-        if ($InstallationSecret === false) {
-            $InstallationSecret = c('Garden.InstallationSecret', null);
+        if ($installationSecret === false) {
+            $installationSecret = c('Garden.InstallationSecret', null);
         }
 
-        return $InstallationSecret;
+        return $installationSecret;
     }
 
     /**
@@ -450,23 +450,23 @@ class Gdn {
     /**
      * Get or set the current request object.
      *
-     * @param Gdn_Request $NewRequest The new request or null to just get the request.
+     * @param Gdn_Request $newRequest The new request or null to just get the request.
      * @return Gdn_Request
      */
-    public static function request($NewRequest = null) {
+    public static function request($newRequest = null) {
         if (self::$_Request === null) {
             self::$_Request = static::getContainer()->get(self::AliasRequest);
         }
 
-        $Request = self::$_Request; //self::Factory(self::AliasRequest);
-        if (!is_null($NewRequest)) {
-            if (is_string($NewRequest)) {
-                $Request->withURI($NewRequest);
-            } elseif (is_object($NewRequest))
-                $Request->fromImport($NewRequest);
+        $request = self::$_Request; //self::Factory(self::AliasRequest);
+        if (!is_null($newRequest)) {
+            if (is_string($newRequest)) {
+                $request->withURI($newRequest);
+            } elseif (is_object($newRequest))
+                $request->fromImport($newRequest);
         }
 
-        return $Request;
+        return $request;
     }
 
     /**
@@ -490,16 +490,16 @@ class Gdn {
         return self::$_Session;
     }
 
-    public static function set($Key, $Value = null) {
-        return Gdn::userMetaModel()->setUserMeta(0, $Key, $Value);
+    public static function set($key, $value = null) {
+        return Gdn::userMetaModel()->setUserMeta(0, $key, $value);
     }
 
-    public static function get($Key, $Default = null) {
-        $Response = Gdn::userMetaModel()->getUserMeta(0, $Key, $Default);
-        if (sizeof($Response) == 1) {
-            return val($Key, $Response, $Default);
+    public static function get($key, $default = null) {
+        $response = Gdn::userMetaModel()->getUserMeta(0, $key, $default);
+        if (sizeof($response) == 1) {
+            return val($key, $response, $default);
         }
-        return $Default;
+        return $default;
     }
 
     /**
@@ -509,9 +509,9 @@ class Gdn {
      * @see Gdn_Database::SQL()
      */
     public static function sql() {
-        $Database = self::database();
-        $Result = $Database->sql();
-        return $Result;
+        $database = self::database();
+        $result = $database->sql();
+        return $result;
     }
 
     /**
@@ -529,9 +529,9 @@ class Gdn {
      * @return Gdn_DatabaseStructure
      */
     public static function structure() {
-        $Database = self::database();
-        $Result = $Database->structure();
-        return $Result;
+        $database = self::database();
+        $result = $database->structure();
+        return $result;
     }
 
     /**
@@ -546,16 +546,16 @@ class Gdn {
     /**
      * Translates a code into the selected locale's definition.
      *
-     * @param string $Code The code related to the language-specific definition.
-     * @param string $Default The default value to be displayed if the translation code is not found.
-     * @return string The translated string or $Code if there is no value in $Default.
+     * @param string $code The code related to the language-specific definition.
+     * @param string $default The default value to be displayed if the translation code is not found.
+     * @return string The translated string or $code if there is no value in $default.
      */
-    public static function translate($Code, $Default = false) {
-        $Locale = Gdn::locale();
-        if ($Locale) {
-            return $Locale->translate($Code, $Default);
+    public static function translate($code, $default = false) {
+        $locale = Gdn::locale();
+        if ($locale) {
+            return $locale->translate($code, $default);
         } else {
-            return $Default;
+            return $default;
         }
     }
 
@@ -574,23 +574,23 @@ class Gdn {
      * @return UserMetaModel
      */
     public static function userMetaModel() {
-        static $UserMetaModel = null;
-        if (is_null($UserMetaModel)) {
-            $UserMetaModel = new UserMetaModel();
+        static $userMetaModel = null;
+        if (is_null($userMetaModel)) {
+            $userMetaModel = new UserMetaModel();
         }
-        return $UserMetaModel;
+        return $userMetaModel;
     }
 
     /**
      * Set the object used as the factory for the api.
      *
-     * @param Gdn_Factory $Factory The object used as the factory.
-     * @param boolean $Override whether to override the property if it is already set.
+     * @param Gdn_Factory $factory The object used as the factory.
+     * @param boolean $override whether to override the property if it is already set.
      */
-    public static function setFactory($Factory, $Override = true) {
+    public static function setFactory($factory, $override = true) {
         deprecated('Gdn::setFactory()');
-        if ($Override || is_null(self::$_Factory)) {
-            self::$_Factory = $Factory;
+        if ($override || is_null(self::$_Factory)) {
+            self::$_Factory = $factory;
         }
     }
 

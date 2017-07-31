@@ -61,23 +61,23 @@ class ExportModel {
     /**
      * Create the export file and begin the export.
      *
-     * @param string $Path The path to the export file.
-     * @param string $Source The source program that created the export. This may be used by the import routine to do additional processing.
+     * @param string $path The path to the export file.
+     * @param string $source The source program that created the export. This may be used by the import routine to do additional processing.
      */
-    public function beginExport($Path, $Source = '') {
+    public function beginExport($path, $source = '') {
         $this->BeginTime = microtime(true);
-        $TimeStart = list($sm, $ss) = explode(' ', microtime());
+        $timeStart = list($sm, $ss) = explode(' ', microtime());
 
         if ($this->UseCompression && function_exists('gzopen')) {
-            $fp = gzopen($Path, 'wb');
+            $fp = gzopen($path, 'wb');
         } else {
-            $fp = fopen($Path, 'wb');
+            $fp = fopen($path, 'wb');
         }
         $this->_File = $fp;
 
         fwrite($fp, 'Vanilla Export: '.$this->Version());
-        if ($Source) {
-            fwrite($fp, self::DELIM.' Source: '.$Source);
+        if ($source) {
+            fwrite($fp, self::DELIM.' Source: '.$source);
         }
         fwrite($fp, self::NEWLINE.self::NEWLINE);
         $this->Comment('Exported Started: '.date('Y-m-d H:i:s'));
@@ -86,13 +86,13 @@ class ExportModel {
     /**
      * Write a comment to the export file.
      *
-     * @param string $Message The message to write.
-     * @param bool $Echo Whether or not to echo the message in addition to writing it to the file.
+     * @param string $message The message to write.
+     * @param bool $echo Whether or not to echo the message in addition to writing it to the file.
      */
-    public function comment($Message, $Echo = true) {
-        fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $Message).self::NEWLINE);
-        if ($Echo) {
-            echo $Message, "\n";
+    public function comment($message, $echo = true) {
+        fwrite($this->_File, self::COMMENT.' '.str_replace(self::NEWLINE, self::NEWLINE.self::COMMENT.' ', $message).self::NEWLINE);
+        if ($echo) {
+            echo $message, "\n";
         }
     }
 
@@ -119,21 +119,21 @@ class ExportModel {
     /**
      * Gets or sets the PDO connection to the database.
      *
-     * @param mixed $DsnOrPDO One of the following:
+     * @param mixed $dsnOrPDO One of the following:
      *  - <b>String</b>: The dsn to the database.
      *  - <b>PDO</b>: An existing connection to the database.
      *  - <b>Null</b>: The PDO connection will not be set.
-     * @param string $Username The username for the database if a dsn is specified.
-     * @param string $Password The password for the database if a dsn is specified.
+     * @param string $username The username for the database if a dsn is specified.
+     * @param string $password The password for the database if a dsn is specified.
      * @return PDO The current database connection.
      */
-    public function pDO($DsnOrPDO = null, $Username = null, $Password = null) {
-        if (!is_null($DsnOrPDO)) {
-            if ($DsnOrPDO instanceof PDO) {
-                $this->_PDO = $DsnOrPDO;
+    public function pDO($dsnOrPDO = null, $username = null, $password = null) {
+        if (!is_null($dsnOrPDO)) {
+            if ($dsnOrPDO instanceof PDO) {
+                $this->_PDO = $dsnOrPDO;
             } else {
-                $this->_PDO = new PDO($DsnOrPDO, $Username, $Password);
-                if (strncasecmp($DsnOrPDO, 'mysql', 5) == 0) {
+                $this->_PDO = new PDO($dsnOrPDO, $username, $password);
+                if (strncasecmp($dsnOrPDO, 'mysql', 5) == 0) {
                     $this->_PDO->exec('set names utf8mb4');
                 }
             }
@@ -144,85 +144,85 @@ class ExportModel {
     /**
      * Export a table to the export file.
      *
-     * @param string $TableName the name of the table to export. This must correspond to one of the accepted vanilla tables.
-     * @param mixed $Query The query that will fetch the data for the export this can be one of the following:
+     * @param string $tableName the name of the table to export. This must correspond to one of the accepted vanilla tables.
+     * @param mixed $query The query that will fetch the data for the export this can be one of the following:
      *  - <b>String</b>: Represents a string of sql to execute.
      *  - <b>PDOStatement</b>: Represents an already executed query resultset.
      *  - <b>Array</b>: Represents an array of associative arrays or objects containing the data in the export.
-     * @param array $Mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
+     * @param array $mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
      *  For a list of the export tables and columns see $this->Structure().
      */
-    public function exportTable($TableName, $Query, $Mappings = []) {
+    public function exportTable($tableName, $query, $mappings = []) {
         $fp = $this->_File;
 
         // Make sure the table is valid for export.
-        if (!array_key_exists($TableName, $this->_Structures)) {
-            $this->Comment("Error: $TableName is not a valid export."
+        if (!array_key_exists($tableName, $this->_Structures)) {
+            $this->Comment("Error: $tableName is not a valid export."
                 ." The valid tables for export are ".implode(", ", array_keys($this->_Structures)));
             fwrite($fp, self::NEWLINE);
             return;
         }
-        $Structure = $this->_Structures[$TableName];
+        $structure = $this->_Structures[$tableName];
 
         // Start with the table name.
-        fwrite($fp, 'Table: '.$TableName.self::NEWLINE);
+        fwrite($fp, 'Table: '.$tableName.self::NEWLINE);
 
         // Get the data for the query.
-        if (is_string($Query)) {
-            $Query = str_replace(':_', $this->Prefix, $Query); // replace prefix.
-            $Data = $this->PDO()->query($Query, PDO::FETCH_ASSOC);
-        } elseif ($Query instanceof PDOStatement) {
-            $Data = $Query;
+        if (is_string($query)) {
+            $query = str_replace(':_', $this->Prefix, $query); // replace prefix.
+            $data = $this->PDO()->query($query, PDO::FETCH_ASSOC);
+        } elseif ($query instanceof PDOStatement) {
+            $data = $query;
         }
 
         // Set the search and replace to escape strings.
-        $EscapeSearch = [self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE]; // escape must go first
-        $EscapeReplace = [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE];
+        $escapeSearch = [self::ESCAPE, self::DELIM, self::NEWLINE, self::QUOTE]; // escape must go first
+        $escapeReplace = [self::ESCAPE.self::ESCAPE, self::ESCAPE.self::DELIM, self::ESCAPE.self::NEWLINE, self::ESCAPE.self::QUOTE];
 
         // Write the column header.
-        fwrite($fp, implode(self::DELIM, array_keys($Structure)).self::NEWLINE);
+        fwrite($fp, implode(self::DELIM, array_keys($structure)).self::NEWLINE);
 
         // Loop through the data and write it to the file.
-        foreach ($Data as $Row) {
-            $Row = (array)$Row;
-            $First = true;
+        foreach ($data as $row) {
+            $row = (array)$row;
+            $first = true;
 
             // Loop through the columns in the export structure and grab their values from the row.
-            $ExRow = [];
-            foreach ($Structure as $Field => $Type) {
+            $exRow = [];
+            foreach ($structure as $field => $type) {
                 // Get the value of the export.
-                if (array_key_exists($Field, $Row)) {
+                if (array_key_exists($field, $row)) {
                     // The column has an exact match in the export.
-                    $Value = $Row[$Field];
-                } elseif (array_key_exists($Field, $Mappings)) {
+                    $value = $row[$field];
+                } elseif (array_key_exists($field, $mappings)) {
                     // The column is mapped.
-                    $Value = $Row[$Mappings[$Field]];
+                    $value = $row[$mappings[$field]];
                 } else {
-                    $Value = null;
+                    $value = null;
                 }
                 // Format the value for writing.
-                if (is_null($Value)) {
-                    $Value = self::NULL;
-                } elseif (is_numeric($Value)) {
+                if (is_null($value)) {
+                    $value = self::NULL;
+                } elseif (is_numeric($value)) {
                     // Do nothing, formats as is.
-                } elseif (is_string($Value)) {
+                } elseif (is_string($value)) {
                     //if(mb_detect_encoding($Value) != 'UTF-8')
                     //   $Value = utf8_encode($Value);
 
-                    $Value = self::QUOTE
-                        .str_replace($EscapeSearch, $EscapeReplace, $Value)
+                    $value = self::QUOTE
+                        .str_replace($escapeSearch, $escapeReplace, $value)
                         .self::QUOTE;
-                } elseif (is_bool($Value)) {
-                    $Value = $Value ? 1 : 0;
+                } elseif (is_bool($value)) {
+                    $value = $value ? 1 : 0;
                 } else {
                     // Unknown format.
-                    $Value = self::NULL;
+                    $value = self::NULL;
                 }
 
-                $ExRow[] = $Value;
+                $exRow[] = $value;
             }
             // Write the data.
-            fwrite($fp, implode(self::DELIM, $ExRow));
+            fwrite($fp, implode(self::DELIM, $exRow));
             // End the record.
             fwrite($fp, self::NEWLINE);
         }
@@ -230,8 +230,8 @@ class ExportModel {
         // Write an empty line to signify the end of the table.
         fwrite($fp, self::NEWLINE);
 
-        if ($Data instanceof PDOStatement) {
-            $Data->closeCursor();
+        if ($data instanceof PDOStatement) {
+            $data->closeCursor();
         }
     }
 

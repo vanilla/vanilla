@@ -22,12 +22,12 @@ class UserInfoModule extends Gdn_Module {
     /**
      *
      *
-     * @param string $Sender
+     * @param string $sender
      */
-    public function __construct($Sender = '') {
+    public function __construct($sender = '') {
         $this->User = false;
         $this->Path(__FILE__);
-        parent::__construct($Sender);
+        parent::__construct($sender);
     }
 
     public function assetTarget() {
@@ -35,9 +35,9 @@ class UserInfoModule extends Gdn_Module {
     }
 
     public function loadData() {
-        $UserID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
-        $this->User = Gdn::userModel()->getID($UserID);
-        $this->Roles = Gdn::userModel()->GetRoles($UserID)->resultArray();
+        $userID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
+        $this->User = Gdn::userModel()->getID($userID);
+        $this->Roles = Gdn::userModel()->GetRoles($userID)->resultArray();
         // Hide personal info roles
         if (!checkPermission('Garden.PersonalInfo.View')) {
             $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');

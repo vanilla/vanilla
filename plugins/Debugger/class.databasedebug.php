@@ -28,52 +28,52 @@ class Gdn_DatabaseDebug extends Gdn_Database {
     /**
      *
      *
-     * @param $Args
+     * @param $args
      * @return string
      */
-    private static function formatArgs($Args) {
-        if (!is_array($Args)) {
+    private static function formatArgs($args) {
+        if (!is_array($args)) {
             return '';
         }
 
-        $Result = '';
-        foreach ($Args as $i => $Expr) {
-            if (strlen($Result) > 0) {
-                $Result .= ', ';
+        $result = '';
+        foreach ($args as $i => $expr) {
+            if (strlen($result) > 0) {
+                $result .= ', ';
             }
-            $Result .= self::formatExpr($Expr);
+            $result .= self::formatExpr($expr);
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Expr
+     * @param $expr
      * @return string
      */
-    private static function formatExpr($Expr) {
-        if (is_array($Expr)) {
-            if (count($Expr) > 3) {
-                $Result = count($Expr);
+    private static function formatExpr($expr) {
+        if (is_array($expr)) {
+            if (count($expr) > 3) {
+                $result = count($expr);
             } else {
-                $Result = '';
-                foreach ($Expr as $Key => $Value) {
-                    if (strlen($Result) > 0) {
-                        $Result .= ', ';
+                $result = '';
+                foreach ($expr as $key => $value) {
+                    if (strlen($result) > 0) {
+                        $result .= ', ';
                     }
-                    $Result .= '\''.str_replace('\'', '\\\'', $Key).'\' => '.self::formatExpr($Value);
+                    $result .= '\''.str_replace('\'', '\\\'', $key).'\' => '.self::formatExpr($value);
                 }
             }
-            return 'array('.$Result.')';
-        } elseif (is_null($Expr)) {
+            return 'array('.$result.')';
+        } elseif (is_null($expr)) {
             return 'NULL';
-        } elseif (is_string($Expr)) {
-            return '\''.str_replace('\'', '\\\'', $Expr).'\'';
-        } elseif (is_object($Expr)) {
-            return 'Object:'.get_class($Expr);
+        } elseif (is_string($expr)) {
+            return '\''.str_replace('\'', '\\\'', $expr).'\'';
+        } elseif (is_object($expr)) {
+            return 'Object:'.get_class($expr);
         } else {
-            return $Expr;
+            return $expr;
         }
     }
 
@@ -89,59 +89,59 @@ class Gdn_DatabaseDebug extends Gdn_Database {
     /**
      *
      *
-     * @param string $Sql
-     * @param null $InputParameters
-     * @param array $Options
+     * @param string $sql
+     * @param null $inputParameters
+     * @param array $options
      * @return Gdn_DataSet|object|string
      */
-    public function query($Sql, $InputParameters = null, $Options = []) {
-        $Trace = debug_backtrace();
-        $Method = '';
-        foreach ($Trace as $Info) {
-            $Class = val('class', $Info, '');
-            if ($Class === '' || stringEndsWith($Class, 'Model', true) || stringEndsWith($Class, 'Plugin', true)) {
-                $Type = val('type', $Info, '');
+    public function query($sql, $inputParameters = null, $options = []) {
+        $trace = debug_backtrace();
+        $method = '';
+        foreach ($trace as $info) {
+            $class = val('class', $info, '');
+            if ($class === '' || stringEndsWith($class, 'Model', true) || stringEndsWith($class, 'Plugin', true)) {
+                $type = val('type', $info, '');
 
-                $Method = $Class.$Type.$Info['function'].'('.self::formatArgs($Info['args']).')';
+                $method = $class.$type.$info['function'].'('.self::formatArgs($info['args']).')';
                 break;
             }
         }
 
         // Save the query for debugging
         // echo '<br />adding to queries: '.$Sql;
-        $Query = ['Sql' => $Sql, 'Parameters' => $InputParameters, 'Method' => $Method];
-        $SaveQuery = true;
-        if (isset($Options['Cache'])) {
-            $CacheKeys = (array)$Options['Cache'];
-            $Cache = [];
+        $query = ['Sql' => $sql, 'Parameters' => $inputParameters, 'Method' => $method];
+        $saveQuery = true;
+        if (isset($options['Cache'])) {
+            $cacheKeys = (array)$options['Cache'];
+            $cache = [];
 
-            $AllSet = true;
-            foreach ($CacheKeys as $CacheKey) {
-                $Value = Gdn::cache()->get($CacheKey);
-                $CacheValue = $Value !== Gdn_Cache::CACHEOP_FAILURE;
-                $AllSet &= $CacheValue;
-                $Cache[$CacheKey] = $CacheValue;
+            $allSet = true;
+            foreach ($cacheKeys as $cacheKey) {
+                $value = Gdn::cache()->get($cacheKey);
+                $cacheValue = $value !== Gdn_Cache::CACHEOP_FAILURE;
+                $allSet &= $cacheValue;
+                $cache[$cacheKey] = $cacheValue;
             }
-            $SaveQuery = !$AllSet;
-            $Query['Cache'] = $Cache;
+            $saveQuery = !$allSet;
+            $query['Cache'] = $cache;
         }
 
         // Start the Query Timer
-        $TimeStart = now();
+        $timeStart = now();
 
-        $Result = parent::query($Sql, $InputParameters, $Options);
-        $Query = array_merge($this->LastInfo, $Query);
+        $result = parent::query($sql, $inputParameters, $options);
+        $query = array_merge($this->LastInfo, $query);
 
         // Aggregate the query times
-        $TimeEnd = now();
-        $this->_ExecutionTime += ($TimeEnd - $TimeStart);
+        $timeEnd = now();
+        $this->_ExecutionTime += ($timeEnd - $timeStart);
 
-        if ($SaveQuery && !stringBeginsWith($Sql, 'set names')) {
-            $Query['Time'] = ($TimeEnd - $TimeStart);
-            $this->_Queries[] = $Query;
+        if ($saveQuery && !stringBeginsWith($sql, 'set names')) {
+            $query['Time'] = ($timeEnd - $timeStart);
+            $this->_Queries[] = $query;
         }
 
-        return $Result;
+        return $result;
     }
 
     /**

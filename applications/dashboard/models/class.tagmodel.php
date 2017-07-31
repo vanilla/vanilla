@@ -20,9 +20,9 @@ class TagModel extends Gdn_Model {
     public $StringTags;
 
     /**
-     * @param string $Name
+     * @param string $name
      */
-    public function __construct($Name = '') {
+    public function __construct($name = '') {
         parent::__construct('Tag');
         $this->StringTags = c('Vanilla.Tagging.StringTags');
     }
@@ -56,62 +56,62 @@ class TagModel extends Gdn_Model {
     /**
      *
      *
-     * @param array $FormPostValues
-     * @param bool $Settings
+     * @param array $formPostValues
+     * @param bool $settings
      * @return bool|unknown
      * @throws Exception
      */
-    public function save($FormPostValues, $Settings = false) {
+    public function save($formPostValues, $settings = false) {
         // Get the ID of an existing tag with the same name.
-        $ExistingTag = $this->getWhere(['Name' => $FormPostValues['Name'], 'TagID <>' => val('TagID', $FormPostValues)])->firstRow(DATASET_TYPE_ARRAY);
-        if ($ExistingTag) {
-            if (!val('TagID', $FormPostValues)) {
-                return $ExistingTag['TagID'];
+        $existingTag = $this->getWhere(['Name' => $formPostValues['Name'], 'TagID <>' => val('TagID', $formPostValues)])->firstRow(DATASET_TYPE_ARRAY);
+        if ($existingTag) {
+            if (!val('TagID', $formPostValues)) {
+                return $existingTag['TagID'];
             }
 
             // This tag will be merged with the existing one.
-            $Px = $this->Database->DatabasePrefix;
-            $FromID = $FormPostValues['TagID'];
-            $ToID = $ExistingTag['TagID'];
+            $px = $this->Database->DatabasePrefix;
+            $fromID = $formPostValues['TagID'];
+            $toID = $existingTag['TagID'];
 
             try {
                 $this->Database->beginTransaction();
 
                 // Delete all of the overlapping tags.
-                $Sql = "delete tg.*
-               from {$Px}TagDiscussion tg
-               join {$Px}TagDiscussion tg2
+                $sql = "delete tg.*
+               from {$px}TagDiscussion tg
+               join {$px}TagDiscussion tg2
                  on tg.DiscussionID = tg2.DiscussionID
                    and tg.TagID = :FromID and tg2.TagID = :ToID";
-                $this->Database->query($Sql, [':FromID' => $FromID, ':ToID' => $ToID]);
+                $this->Database->query($sql, [':FromID' => $fromID, ':ToID' => $toID]);
 
                 // Update the tagged discussions.
-                $Sql = "update {$Px}TagDiscussion
+                $sql = "update {$px}TagDiscussion
                set TagID = :ToID
                where TagID = :FromID";
-                $this->Database->query($Sql, [':FromID' => $FromID, ':ToID' => $ToID]);
+                $this->Database->query($sql, [':FromID' => $fromID, ':ToID' => $toID]);
 
                 // Update the counts
-                $this->updateTagCountDiscussions($ToID);
+                $this->updateTagCountDiscussions($toID);
 
                 // Delete the old tag.
-                $Sql = "delete from {$Px}Tag where TagID = :FromID";
-                $this->Database->query($Sql, [':FromID' => $FromID]);
+                $sql = "delete from {$px}Tag where TagID = :FromID";
+                $this->Database->query($sql, [':FromID' => $fromID]);
 
                 $this->Database->commitTransaction();
-            } catch (Exception $Ex) {
+            } catch (Exception $ex) {
                 $this->Database->rollbackTransaction();
-                throw $Ex;
+                throw $ex;
             }
 
-            return $ToID;
+            return $toID;
         } else {
             if (Gdn::session()->checkPermission('Vanilla.Tagging.Add')) {
                 // Tag-type tags (i.e., user generated tags) are saved with no type.
-                if (strtolower(val('Type', $FormPostValues)) == 'tag') {
-                    $FormPostValues['Type'] = '';
+                if (strtolower(val('Type', $formPostValues)) == 'tag') {
+                    $formPostValues['Type'] = '';
                 }
-                return parent::save($FormPostValues, $Settings);
+                return parent::save($formPostValues, $settings);
             } else {
                 return false;
             }
@@ -163,43 +163,43 @@ class TagModel extends Gdn_Model {
      * @return array
      */
     public function getTagTypes() {
-        $TagTypes = $this->types();
+        $tagTypes = $this->types();
 
-        if (!is_array($TagTypes)) {
-            $TagTypes = [];
+        if (!is_array($tagTypes)) {
+            $tagTypes = [];
         }
 
         // Remove the defaults out of the list, and add them to the start
-        $start = array_intersect_key($TagTypes, ['' => [], 'tags' => []]);
-        unset($TagTypes['']);
-        unset($TagTypes['tags']);
+        $start = array_intersect_key($tagTypes, ['' => [], 'tags' => []]);
+        unset($tagTypes['']);
+        unset($tagTypes['tags']);
 
         // Sort by keys, and because the default, "Tags," has a blank key, it
         // will be set as the first key, which is good for the tabs.
-        if (count($TagTypes)) {
-            ksort($TagTypes);
+        if (count($tagTypes)) {
+            ksort($tagTypes);
         }
 
-        $TagTypes = array_merge($start, $TagTypes);
+        $tagTypes = array_merge($start, $tagTypes);
 
-        return $TagTypes;
+        return $tagTypes;
     }
 
     /**
      * Update the tag count per discussion in the Tag table
      *
-     * @param int $TagID
+     * @param int $tagID
      */
-    public function updateTagCountDiscussions($TagID) {
-        $Px = $this->Database->DatabasePrefix;
+    public function updateTagCountDiscussions($tagID) {
+        $px = $this->Database->DatabasePrefix;
         // Update the counts.
-        $Sql = "update {$Px}Tag t
+        $sql = "update {$px}Tag t
          set CountDiscussions = (
             select count(DiscussionID)
-            from {$Px}TagDiscussion td
+            from {$px}TagDiscussion td
             where td.TagID = t.TagID)
           where t.TagID = :TagID";
-        $this->Database->query($Sql, [':TagID' => $TagID]);
+        $this->Database->query($sql, [':TagID' => $tagID]);
     }
 
     /**
@@ -254,35 +254,35 @@ class TagModel extends Gdn_Model {
      * may appear to be categories, should have their specific data available,
      * like Type, or Source.
      *
-     * @param int $DiscussionID
+     * @param int $discussionID
      * @return array
      */
-    public function getDiscussionTags($DiscussionID, $indexed = true) {
-        $Tags = Gdn::sql()->select('t.*')
+    public function getDiscussionTags($discussionID, $indexed = true) {
+        $tags = Gdn::sql()->select('t.*')
             ->from('TagDiscussion td')
             ->join('Tag t', 'td.TagID = t.TagID')
-            ->where('td.DiscussionID', $DiscussionID)
+            ->where('td.DiscussionID', $discussionID)
             ->get()->resultArray();
 
         if ($indexed) {
             if ($indexed === TagModel::IX_TAGID) {
-                $Tags = Gdn_DataSet::index($Tags, 'TagID');
+                $tags = Gdn_DataSet::index($tags, 'TagID');
             } else {
                 // The tags are indexed by type.
-                $Tags = Gdn_DataSet::index($Tags, 'Type', ['Unique' => false]);
+                $tags = Gdn_DataSet::index($tags, 'Type', ['Unique' => false]);
                 if ($indexed === TagModel::IX_EXTENDED) {
                     // The tags are indexed by type, but tags with no type are seperated.
-                    if (array_key_exists('', $Tags)) {
-                        $Tags = ['Tags' => $Tags[''], 'XTags' => $Tags];
-                        unset($Tags['XTags']['']);
+                    if (array_key_exists('', $tags)) {
+                        $tags = ['Tags' => $tags[''], 'XTags' => $tags];
+                        unset($tags['XTags']['']);
                     } else {
-                        $Tags = ['Tags' => [], 'XTags' => $Tags];
+                        $tags = ['Tags' => [], 'XTags' => $tags];
                     }
                 }
             }
         }
 
-        return $Tags;
+        return $tags;
     }
 
     /**
@@ -513,82 +513,82 @@ class TagModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Tag
-     * @param $Limit
-     * @param $Offset
-     * @param string $Op
+     * @param $tag
+     * @param $limit
+     * @param $offset
+     * @param string $op
      * @return Gdn_DataSet
      */
-    public function getDiscussions($Tag, $Limit, $Offset, $Op = 'or') {
-        $DiscussionModel = new DiscussionModel();
-        $this->setTagSql($DiscussionModel->SQL, $Tag, $Limit, $Offset, $Op);
-        $Result = $DiscussionModel->get($Offset, $Limit, ['Announce' => 'all']);
+    public function getDiscussions($tag, $limit, $offset, $op = 'or') {
+        $discussionModel = new DiscussionModel();
+        $this->setTagSql($discussionModel->SQL, $tag, $limit, $offset, $op);
+        $result = $discussionModel->get($offset, $limit, ['Announce' => 'all']);
 
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param Gdn_SQLDriver $Sql
+     * @param Gdn_SQLDriver $sql
      */
-    public function setTagSql($Sql, $Tag, &$Limit, &$Offset = 0, $Op = 'or') {
-        $SortField = 'd.DateLastComment';
-        $SortDirection = 'desc';
+    public function setTagSql($sql, $tag, &$limit, &$offset = 0, $op = 'or') {
+        $sortField = 'd.DateLastComment';
+        $sortDirection = 'desc';
 
-        $TagSql = clone Gdn::sql();
+        $tagSql = clone Gdn::sql();
 
-        if ($DateFrom = Gdn::request()->get('DateFrom')) {
+        if ($dateFrom = Gdn::request()->get('DateFrom')) {
             // Find the discussion ID of the first discussion created on or after the date from.
-            $DiscussionIDFrom = $TagSql->getWhere('Discussion', ['DateInserted >= ' => $DateFrom], 'DiscussionID', 'asc', 1)->value('DiscussionID');
-            $SortField = 'd.DiscussionID';
+            $discussionIDFrom = $tagSql->getWhere('Discussion', ['DateInserted >= ' => $dateFrom], 'DiscussionID', 'asc', 1)->value('DiscussionID');
+            $sortField = 'd.DiscussionID';
         }
 
-        if (!is_array($Tag)) {
-            $Tags = array_map('trim', explode(',', $Tag));
+        if (!is_array($tag)) {
+            $tags = array_map('trim', explode(',', $tag));
         }
-        $TagIDs = $TagSql
+        $tagIDs = $tagSql
             ->select('TagID')
             ->from('Tag')
-            ->whereIn('Name', $Tags)
+            ->whereIn('Name', $tags)
             ->get()->resultArray();
 
-        $TagIDs = array_column($TagIDs, 'TagID');
+        $tagIDs = array_column($tagIDs, 'TagID');
 
-        if ($Op == 'and' && count($Tags) > 1) {
-            $DiscussionIDs = $TagSql
+        if ($op == 'and' && count($tags) > 1) {
+            $discussionIDs = $tagSql
                 ->select('DiscussionID')
                 ->select('TagID', 'count', 'CountTags')
                 ->from('TagDiscussion')
-                ->whereIn('TagID', $TagIDs)
+                ->whereIn('TagID', $tagIDs)
                 ->groupBy('DiscussionID')
-                ->having('CountTags >=', count($Tags))
-                ->limit($Limit, $Offset)
+                ->having('CountTags >=', count($tags))
+                ->limit($limit, $offset)
                 ->orderBy('DiscussionID', 'desc')
                 ->get()->resultArray();
-            $Limit = '';
-            $Offset = 0;
+            $limit = '';
+            $offset = 0;
 
-            $DiscussionIDs = array_column($DiscussionIDs, 'DiscussionID');
+            $discussionIDs = array_column($discussionIDs, 'DiscussionID');
 
-            $Sql->whereIn('d.DiscussionID', $DiscussionIDs);
-            $SortField = 'd.DiscussionID';
+            $sql->whereIn('d.DiscussionID', $discussionIDs);
+            $sortField = 'd.DiscussionID';
         } else {
-            $Sql
+            $sql
                 ->join('TagDiscussion td', 'd.DiscussionID = td.DiscussionID')
-                ->limit($Limit, $Offset)
-                ->whereIn('td.TagID', $TagIDs);
+                ->limit($limit, $offset)
+                ->whereIn('td.TagID', $tagIDs);
 
-            if ($Op == 'and') {
-                $SortField = 'd.DiscussionID';
+            if ($op == 'and') {
+                $sortField = 'd.DiscussionID';
             }
         }
 
         // Set up the sort field and direction.
         saveToConfig(
             [
-            'Vanilla.Discussions.SortField' => $SortField,
-            'Vanilla.Discussions.SortDirection' => $SortDirection],
+            'Vanilla.Discussions.SortField' => $sortField,
+            'Vanilla.Discussions.SortDirection' => $sortDirection],
             '',
             false
         );
@@ -611,37 +611,37 @@ class TagModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Column
-     * @param null $UserID
+     * @param $column
+     * @param null $userID
      * @return array
      * @throws Gdn_UserException
      */
-    public function counts($Column, $UserID = null) {
+    public function counts($column, $userID = null) {
         // Delete all the orphaned tagdiscussion records
-        $Px = $this->Database->DatabasePrefix;
-        $Sql = "delete td.* from {$Px}TagDiscussion as td left join {$Px}Discussion as d ON td.DiscussionID = d.DiscussionID where d.DiscussionID is null";
-        $this->Database->query($Sql);
+        $px = $this->Database->DatabasePrefix;
+        $sql = "delete td.* from {$px}TagDiscussion as td left join {$px}Discussion as d ON td.DiscussionID = d.DiscussionID where d.DiscussionID is null";
+        $this->Database->query($sql);
 
-        $Result = ['Complete' => true];
-        switch ($Column) {
+        $result = ['Complete' => true];
+        switch ($column) {
             case 'CountDiscussions':
                 Gdn::database()->query(DBAModel::getCountSQL('count', 'Tag', 'TagDiscussion', 'CountDiscussions', 'DiscussionID', 'TagID', 'TagID'));
                 break;
             default:
-                throw new Gdn_UserException("Unknown column $Column");
+                throw new Gdn_UserException("Unknown column $column");
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Tag
+     * @param $tag
      * @return bool
      */
-    public static function validateTag($Tag) {
+    public static function validateTag($tag) {
         // Tags can't contain commas.
-        if (preg_match('`,`', $Tag)) {
+        if (preg_match('`,`', $tag)) {
             return false;
         }
         return true;
@@ -650,16 +650,16 @@ class TagModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Tags
+     * @param $tags
      * @return bool
      */
-    public static function validateTags($Tags) {
-        if (is_string($Tags)) {
-            $Tags = self::splitTags($Tags);
+    public static function validateTags($tags) {
+        if (is_string($tags)) {
+            $tags = self::splitTags($tags);
         }
 
-        foreach ($Tags as $Tag) {
-            if (!self::validateTag($Tag)) {
+        foreach ($tags as $tag) {
+            if (!self::validateTag($tag)) {
                 return false;
             }
         }
@@ -669,87 +669,87 @@ class TagModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Type
+     * @param $type
      * @return bool
      */
-    public function validateType($Type) {
-        $ValidType = false;
-        $TagTypes = $this->types();
+    public function validateType($type) {
+        $validType = false;
+        $tagTypes = $this->types();
 
-        foreach ($TagTypes as $TypeKey => $TypeMeta) {
-            $TypeChecks = [
-                strtolower($TypeKey),
-                strtolower($TypeMeta['key']),
-                strtolower($TypeMeta['name']),
-                strtolower($TypeMeta['plural'])
+        foreach ($tagTypes as $typeKey => $typeMeta) {
+            $typeChecks = [
+                strtolower($typeKey),
+                strtolower($typeMeta['key']),
+                strtolower($typeMeta['name']),
+                strtolower($typeMeta['plural'])
             ];
 
-            if (in_array(strtolower($Type), $TypeChecks)) {
-                $ValidType = true;
+            if (in_array(strtolower($type), $typeChecks)) {
+                $validType = true;
                 break;
             }
         }
 
-        return $ValidType;
+        return $validType;
     }
 
     /**
      *
      *
-     * @param $Type
+     * @param $type
      * @return bool
      */
-    public function canAddTagForType($Type) {
-        $CanAddTagForType = false;
-        $TagTypes = $this->types();
+    public function canAddTagForType($type) {
+        $canAddTagForType = false;
+        $tagTypes = $this->types();
 
-        foreach ($TagTypes as $TypeKey => $TypeMeta) {
-            $TypeChecks = [
-                strtolower($TypeKey),
-                strtolower($TypeMeta['key']),
-                strtolower($TypeMeta['name']),
-                strtolower($TypeMeta['plural'])
+        foreach ($tagTypes as $typeKey => $typeMeta) {
+            $typeChecks = [
+                strtolower($typeKey),
+                strtolower($typeMeta['key']),
+                strtolower($typeMeta['name']),
+                strtolower($typeMeta['plural'])
             ];
 
-            if (in_array(strtolower($Type), $TypeChecks)
-                && $TypeMeta['addtag']
+            if (in_array(strtolower($type), $typeChecks)
+                && $typeMeta['addtag']
             ) {
-                $CanAddTagForType = true;
+                $canAddTagForType = true;
                 break;
             }
         }
 
-        return $CanAddTagForType;
+        return $canAddTagForType;
     }
 
     /**
      *
      *
-     * @param $TagsString
+     * @param $tagsString
      * @return array
      */
-    public static function splitTags($TagsString) {
-        $Tags = preg_split('`[,]`', $TagsString);
+    public static function splitTags($tagsString) {
+        $tags = preg_split('`[,]`', $tagsString);
         // Trim each tag.
-        foreach ($Tags as $Index => $Tag) {
-            $Tag = trim($Tag);
-            if (!$Tag) {
-                unset($Tags[$Index]);
+        foreach ($tags as $index => $tag) {
+            $tag = trim($tag);
+            if (!$tag) {
+                unset($tags[$index]);
             } else {
-                $Tags[$Index] = $Tag;
+                $tags[$index] = $tag;
             }
         }
-        $Tags = array_unique($Tags);
-        return $Tags;
+        $tags = array_unique($tags);
+        return $tags;
     }
 
     /**
      *
      *
-     * @param $Str
+     * @param $str
      * @return string
      */
-    public static function tagSlug($Str) {
-        return rawurldecode(Gdn_Format::url($Str));
+    public static function tagSlug($str) {
+        return rawurldecode(Gdn_Format::url($str));
     }
 }

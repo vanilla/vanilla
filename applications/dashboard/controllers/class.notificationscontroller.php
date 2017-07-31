@@ -55,50 +55,50 @@ class NotificationsController extends Gdn_Controller {
      * @since 2.0.18
      * @access public
      *
-     * @param Gdn_Controller $Sender The object calling this method.
+     * @param Gdn_Controller $sender The object calling this method.
      */
-    public static function informNotifications($Sender) {
-        $Session = Gdn::session();
-        if (!$Session->isValid()) {
+    public static function informNotifications($sender) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
             return;
         }
 
-        $ActivityModel = new ActivityModel();
+        $activityModel = new ActivityModel();
         // Get five pending notifications.
-        $Where = [
+        $where = [
             'NotifyUserID' => Gdn::session()->UserID,
             'Notified' => ActivityModel::SENT_PENDING];
 
         // If we're in the middle of a visit only get very recent notifications.
-        $Where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
+        $where['DateUpdated >'] = Gdn_Format::toDateTime(strtotime('-5 minutes'));
 
-        $Activities = $ActivityModel->getWhere($Where, '', '', 5, 0)->resultArray();
+        $activities = $activityModel->getWhere($where, '', '', 5, 0)->resultArray();
 
-        $ActivityIDs = array_column($Activities, 'ActivityID');
-        $ActivityModel->setNotified($ActivityIDs);
+        $activityIDs = array_column($activities, 'ActivityID');
+        $activityModel->setNotified($activityIDs);
 
-        $Sender->EventArguments['Activities'] = &$Activities;
-        $Sender->fireEvent('InformNotifications');
+        $sender->EventArguments['Activities'] = &$activities;
+        $sender->fireEvent('InformNotifications');
 
-        foreach ($Activities as $Activity) {
-            if ($Activity['Photo']) {
-                $UserPhoto = anchor(
-                    img($Activity['Photo'], ['class' => 'ProfilePhotoMedium']),
-                    $Activity['Url'],
+        foreach ($activities as $activity) {
+            if ($activity['Photo']) {
+                $userPhoto = anchor(
+                    img($activity['Photo'], ['class' => 'ProfilePhotoMedium']),
+                    $activity['Url'],
                     'Icon'
                 );
             } else {
-                $UserPhoto = '';
+                $userPhoto = '';
             }
-            $Excerpt = htmlspecialchars(Gdn_Format::plainText($Activity['Story']));
-            $ActivityClass = ' Activity-'.$Activity['ActivityType'];
+            $excerpt = htmlspecialchars(Gdn_Format::plainText($activity['Story']));
+            $activityClass = ' Activity-'.$activity['ActivityType'];
 
 
-            $Sender->informMessage(
-                $UserPhoto
-                .Wrap($Activity['Headline'], 'div', ['class' => 'Title'])
-                .Wrap($Excerpt, 'div', ['class' => 'Excerpt']),
-                'Dismissable AutoDismiss'.$ActivityClass.($UserPhoto == '' ? '' : ' HasIcon')
+            $sender->informMessage(
+                $userPhoto
+                .Wrap($activity['Headline'], 'div', ['class' => 'Title'])
+                .Wrap($excerpt, 'div', ['class' => 'Excerpt']),
+                'Dismissable AutoDismiss'.$activityClass.($userPhoto == '' ? '' : ' HasIcon')
             );
         }
     }

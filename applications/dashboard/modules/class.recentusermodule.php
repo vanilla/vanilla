@@ -13,13 +13,13 @@
  */
 class RecentUserModule extends Gdn_Module {
 
-    public function __construct($Sender = '') {
-        parent::__construct($Sender);
+    public function __construct($sender = '') {
+        parent::__construct($sender);
     }
 
-    public function getData($Limit = 20) {
-        $UserModel = new UserModel();
-        $this->_Sender->RecentUserData = $UserModel->GetActiveUsers($Limit);
+    public function getData($limit = 20) {
+        $userModel = new UserModel();
+        $this->_Sender->RecentUserData = $userModel->GetActiveUsers($limit);
     }
 
     public function assetTarget() {
@@ -31,8 +31,8 @@ class RecentUserModule extends Gdn_Module {
             return '';
         }
 
-        $Data = $this->_Sender->RecentUserData;
-        if ($Data !== false && $Data->numRows() > 0) {
+        $data = $this->_Sender->RecentUserData;
+        if ($data !== false && $data->numRows() > 0) {
             return parent::ToString();
         }
 

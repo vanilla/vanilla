@@ -47,13 +47,13 @@ class Gdn_Memcached extends Gdn_Cache {
          * THIS UNLESS YOU ARE QUITE CERTAIN THIS IS SOLVED!
          */
 
-        $Persist = $this->config(Gdn_Cache::CONTAINER_PERSISTENT);
-        if ($Persist) {
-            $PoolSize = $this->config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
-            $PoolKeyFormat = $this->config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
-            $PoolIndex = mt_rand(1, $PoolSize);
-            $PoolKey = sprintf($PoolKeyFormat, $PoolIndex);
-            $this->memcache = new Memcached($PoolKey);
+        $persist = $this->config(Gdn_Cache::CONTAINER_PERSISTENT);
+        if ($persist) {
+            $poolSize = $this->config(Gdn_Cache::CONTAINER_POOLSIZE, 10);
+            $poolKeyFormat = $this->config(Gdn_Cache::CONTAINER_POOLKEY, "cachekey-%d");
+            $poolIndex = mt_rand(1, $poolSize);
+            $poolKey = sprintf($poolKeyFormat, $poolIndex);
+            $this->memcache = new Memcached($poolKey);
         } else {
             $this->memcache = new Memcached;
         }
@@ -79,7 +79,7 @@ class Gdn_Memcached extends Gdn_Cache {
             Gdn_Cache::FEATURE_LOCAL => true
         ];
 
-        $DefaultOptions = [
+        $defaultOptions = [
             Memcached::OPT_COMPRESSION => true,
             Memcached::OPT_DISTRIBUTION => Memcached::DISTRIBUTION_CONSISTENT,
             Memcached::OPT_LIBKETAMA_COMPATIBLE => true,
@@ -89,11 +89,11 @@ class Gdn_Memcached extends Gdn_Cache {
             Memcached::OPT_SERVER_FAILURE_LIMIT => 2
         ];
 
-        $Options = $this->option(null, []);
-        $Options = array_replace($DefaultOptions, $Options);
+        $options = $this->option(null, []);
+        $options = array_replace($defaultOptions, $options);
 
-        foreach ($Options as $Option => $OptValue) {
-            $this->memcache->setOption($Option, $OptValue);
+        foreach ($options as $option => $optValue) {
+            $this->memcache->setOption($option, $optValue);
         }
 
     }
@@ -106,13 +106,13 @@ class Gdn_Memcached extends Gdn_Cache {
      * config file.
      */
     public function autorun() {
-        $Servers = Gdn_Cache::activeStore('memcached');
-        if (!is_array($Servers)) {
-            $Servers = explode(',', $Servers);
+        $servers = Gdn_Cache::activeStore('memcached');
+        if (!is_array($servers)) {
+            $servers = explode(',', $servers);
         }
 
         // No servers, cache temporarily offline
-        if (!sizeof($Servers)) {
+        if (!sizeof($servers)) {
             SaveToConfig('Cache.Enabled', false, false);
             return false;
         }
@@ -122,7 +122,7 @@ class Gdn_Memcached extends Gdn_Cache {
             return true;
         }
 
-        $Keys = [
+        $keys = [
             Gdn_Cache::CONTAINER_LOCATION,
             Gdn_Cache::CONTAINER_PERSISTENT,
             Gdn_Cache::CONTAINER_WEIGHT,
@@ -130,19 +130,19 @@ class Gdn_Memcached extends Gdn_Cache {
             Gdn_Cache::CONTAINER_ONLINE,
             Gdn_Cache::CONTAINER_CALLBACK
         ];
-        foreach ($Servers as $CacheServer) {
-            $CacheServer = explode(' ', $CacheServer);
-            $CacheServer = array_pad($CacheServer, count($Keys), null);
-            $CacheServer = array_combine($Keys, $CacheServer);
+        foreach ($servers as $cacheServer) {
+            $cacheServer = explode(' ', $cacheServer);
+            $cacheServer = array_pad($cacheServer, count($keys), null);
+            $cacheServer = array_combine($keys, $cacheServer);
 
-            foreach ($Keys as $KeyName) {
-                $Value = val($KeyName, $CacheServer, null);
-                if (is_null($Value)) {
-                    unset($CacheServer[$KeyName]);
+            foreach ($keys as $keyName) {
+                $value = val($keyName, $cacheServer, null);
+                if (is_null($value)) {
+                    unset($cacheServer[$keyName]);
                 }
             }
 
-            $this->addContainer($CacheServer);
+            $this->addContainer($cacheServer);
         }
     }
 
@@ -154,42 +154,42 @@ class Gdn_Memcached extends Gdn_Cache {
      * const CONTAINER_ONLINE = 5;
      * const CONTAINER_CALLBACK = 6;
      */
-    public function addContainer($Options) {
+    public function addContainer($options) {
 
-        $Required = [
+        $required = [
             Gdn_Cache::CONTAINER_LOCATION
         ];
 
-        $KeyedRequirements = array_fill_keys($Required, 1);
-        if (sizeof(array_intersect_key($Options, $KeyedRequirements)) != sizeof($Required)) {
-            $Missing = implode(", ", array_keys(array_diff_key($KeyedRequirements, $Options)));
-            return $this->failure("Required parameters not supplied. Missing: {$Missing}");
+        $keyedRequirements = array_fill_keys($required, 1);
+        if (sizeof(array_intersect_key($options, $keyedRequirements)) != sizeof($required)) {
+            $missing = implode(", ", array_keys(array_diff_key($keyedRequirements, $options)));
+            return $this->failure("Required parameters not supplied. Missing: {$missing}");
         }
 
-        $CacheLocation = val(Gdn_Cache::CONTAINER_LOCATION, $Options);
+        $cacheLocation = val(Gdn_Cache::CONTAINER_LOCATION, $options);
 
         // Merge the options array with our local defaults
-        $Defaults = [
+        $defaults = [
             Gdn_Cache::CONTAINER_WEIGHT => 1
         ];
 
-        $FinalContainer = array_merge($Defaults, $Options);
-        $this->containers[$CacheLocation] = $FinalContainer;
-        $PathInfo = explode(':', $CacheLocation);
+        $finalContainer = array_merge($defaults, $options);
+        $this->containers[$cacheLocation] = $finalContainer;
+        $pathInfo = explode(':', $cacheLocation);
 
-        $ServerHostname = val(0, $PathInfo);
-        $ServerPort = val(1, $PathInfo, 11211);
+        $serverHostname = val(0, $pathInfo);
+        $serverPort = val(1, $pathInfo, 11211);
 
-        $AddServerResult = $this->memcache->addServer(
-            $ServerHostname,
-            $ServerPort,
-            val(Gdn_Cache::CONTAINER_WEIGHT, $FinalContainer, 1)
+        $addServerResult = $this->memcache->addServer(
+            $serverHostname,
+            $serverPort,
+            val(Gdn_Cache::CONTAINER_WEIGHT, $finalContainer, 1)
         );
 
-        if (!$AddServerResult) {
-            $Callback = val(Gdn_Cache::CONTAINER_CALLBACK, $FinalContainer, null);
-            if (!is_null($Callback)) {
-                call_user_func($Callback, $ServerHostname, $ServerPort);
+        if (!$addServerResult) {
+            $callback = val(Gdn_Cache::CONTAINER_CALLBACK, $finalContainer, null);
+            if (!is_null($callback)) {
+                call_user_func($callback, $serverHostname, $serverPort);
             }
 
             return Gdn_Cache::CACHEOP_FAILURE;
@@ -663,12 +663,12 @@ class Gdn_Memcached extends Gdn_Cache {
     /**
      * {@inheritdoc}
      */
-    public function exists($Key, $Options = []) {
+    public function exists($key, $options = []) {
         if (!$this->online()) {
             return Gdn_Cache::CACHEOP_FAILURE;
         }
 
-        return ($this->get($Key, $Options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
+        return ($this->get($key, $options) === Gdn_Cache::CACHEOP_FAILURE) ? Gdn_Cache::CACHEOP_FAILURE : Gdn_Cache::CACHEOP_SUCCESS;
     }
 
     /**

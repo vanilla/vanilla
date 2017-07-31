@@ -30,12 +30,12 @@ class VanilliconPlugin extends Gdn_Plugin {
    /**
     * Set the vanillicon on the user' profile.
     *
-    * @param ProfileController $Sender
-    * @param array $Args
+    * @param ProfileController $sender
+    * @param array $args
     */
-    public function profileController_afterAddSideMenu_handler($Sender, $Args) {
-        if (!$Sender->User->Photo) {
-            $Sender->User->Photo = userPhotoDefaultUrl($Sender->User, ['Size' => 200]);
+    public function profileController_afterAddSideMenu_handler($sender, $args) {
+        if (!$sender->User->Photo) {
+            $sender->User->Photo = userPhotoDefaultUrl($sender->User, ['Size' => 200]);
         }
     }
 

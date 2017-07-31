@@ -129,16 +129,16 @@ class Gdn_ApplicationManager {
      * @return bool|mixed Returns the application's info, a specific value, or false if the application cannot be found.
      */
     public function getApplicationInfo($applicationName, $key = null) {
-        $ApplicationInfo = val($applicationName, $this->availableApplications(), null);
-        if (is_null($ApplicationInfo)) {
+        $applicationInfo = val($applicationName, $this->availableApplications(), null);
+        if (is_null($applicationInfo)) {
             return false;
         }
 
         if (!is_null($key)) {
-            return GetValueR($key, $ApplicationInfo, false);
+            return GetValueR($key, $applicationInfo, false);
         }
 
-        return $ApplicationInfo;
+        return $applicationInfo;
     }
 
     /**
@@ -147,13 +147,13 @@ class Gdn_ApplicationManager {
      * @return array Returns an array of application info arrays.
      */
     public function availableVisibleApplications() {
-        $AvailableApplications = $this->availableApplications();
-        foreach ($AvailableApplications as $ApplicationName => $Info) {
-            if (!val('AllowEnable', $Info, true) || !val('AllowDisable', $Info, true)) {
-                unset($AvailableApplications[$ApplicationName]);
+        $availableApplications = $this->availableApplications();
+        foreach ($availableApplications as $applicationName => $info) {
+            if (!val('AllowEnable', $info, true) || !val('AllowDisable', $info, true)) {
+                unset($availableApplications[$applicationName]);
             }
         }
-        return $AvailableApplications;
+        return $availableApplications;
     }
 
     /**
@@ -162,18 +162,18 @@ class Gdn_ApplicationManager {
      * @return array Returns an array of application info arrays.
      */
     public function enabledVisibleApplications() {
-        $AvailableApplications = $this->availableApplications();
-        $EnabledApplications = $this->enabledApplications();
-        foreach ($AvailableApplications as $ApplicationName => $Info) {
-            if (array_key_exists($ApplicationName, $EnabledApplications)) {
-                if (!val('AllowEnable', $Info, true) || !val('AllowDisable', $Info, true)) {
-                    unset($AvailableApplications[$ApplicationName]);
+        $availableApplications = $this->availableApplications();
+        $enabledApplications = $this->enabledApplications();
+        foreach ($availableApplications as $applicationName => $info) {
+            if (array_key_exists($applicationName, $enabledApplications)) {
+                if (!val('AllowEnable', $info, true) || !val('AllowDisable', $info, true)) {
+                    unset($availableApplications[$applicationName]);
                 }
             } else {
-                unset($AvailableApplications[$ApplicationName]);
+                unset($availableApplications[$applicationName]);
             }
         }
-        return $AvailableApplications;
+        return $availableApplications;
     }
 
     /**
@@ -202,14 +202,14 @@ class Gdn_ApplicationManager {
      * @param string $applicationName The name of the application to check.
      */
     public function checkRequirements($applicationName) {
-        $AvailableApplications = $this->availableApplications();
-        $RequiredApplications = val(
+        $availableApplications = $this->availableApplications();
+        $requiredApplications = val(
             'RequiredApplications',
-            val($applicationName, $AvailableApplications, []),
+            val($applicationName, $availableApplications, []),
             false
         );
-        $EnabledApplications = $this->enabledApplications();
-        checkRequirements($applicationName, $RequiredApplications, $EnabledApplications, 'application');
+        $enabledApplications = $this->enabledApplications();
+        checkRequirements($applicationName, $requiredApplications, $enabledApplications, 'application');
     }
 
     /**
@@ -220,11 +220,11 @@ class Gdn_ApplicationManager {
      */
     public function enableApplication($applicationName) {
         $this->testApplication($applicationName);
-        $ApplicationInfo = ArrayValueI($applicationName, $this->availableApplications(), []);
-        $applicationName = $ApplicationInfo['Index'];
-        $ApplicationFolder = val('Folder', $ApplicationInfo, '');
+        $applicationInfo = ArrayValueI($applicationName, $this->availableApplications(), []);
+        $applicationName = $applicationInfo['Index'];
+        $applicationFolder = val('Folder', $applicationInfo, '');
 
-        saveToConfig('EnabledApplications'.'.'.$applicationName, $ApplicationFolder);
+        saveToConfig('EnabledApplications'.'.'.$applicationName, $applicationFolder);
         Logger::event(
             'addon_enabled',
             Logger::NOTICE,
@@ -320,14 +320,14 @@ class Gdn_ApplicationManager {
     /**
      * Check whether or not an application is enabled.
      *
-     * @param string $Name The name of the application.
+     * @param string $name The name of the application.
      * @return bool Whether or not the application is enabled.
      * @since 2.2
      * @deprecated
      */
-    public function isEnabled($Name) {
+    public function isEnabled($name) {
         deprecated('Gdn_ApplicationManager->isEnabled()', 'AddonManager->isEnabled()');
-        return $this->addonManager->isEnabled($Name, Addon::TYPE_ADDON);
+        return $this->addonManager->isEnabled($name, Addon::TYPE_ADDON);
     }
 
     /**

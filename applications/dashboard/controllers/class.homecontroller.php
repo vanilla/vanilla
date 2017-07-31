@@ -58,9 +58,9 @@ class HomeController extends Gdn_Controller {
 
         $this->setData('_NoMessages', true);
 
-        $Code = $this->data('Code', 400);
+        $code = $this->data('Code', 400);
         $this->clearNavigationPreferences();
-        safeheader("HTTP/1.0 $Code ".Gdn_Controller::GetStatusMessage($Code), true, $Code);
+        safeheader("HTTP/1.0 $code ".Gdn_Controller::GetStatusMessage($code), true, $code);
         Gdn_Theme::section('Error');
 
         $this->render();

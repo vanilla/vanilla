@@ -42,20 +42,20 @@ class VanillaSearchModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param object $SearchModel SearchModel (Dashboard)
+     * @param object $searchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function discussionSql($SearchModel, $AddMatch = true) {
+    public function discussionSql($searchModel, $addMatch = true) {
         // Get permission and limit search categories if necessary.
-        if ($AddMatch) {
-            $Perms = CategoryModel::CategoryWatch(false);
+        if ($addMatch) {
+            $perms = CategoryModel::CategoryWatch(false);
 
-            if ($Perms !== true) {
-                $this->SQL->whereIn('d.CategoryID', $Perms);
+            if ($perms !== true) {
+                $this->SQL->whereIn('d.CategoryID', $perms);
             }
 
             // Build search part of query.
-            $SearchModel->AddMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
+            $searchModel->AddMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
         }
 
         // Build base query
@@ -67,17 +67,17 @@ class VanillaSearchModel extends Gdn_Model {
             ->select("'Discussion'", '', 'RecordType')
             ->from('Discussion d');
 
-        if ($AddMatch) {
+        if ($addMatch) {
             // Execute query.
-            $Result = $this->SQL->GetSelect();
+            $result = $this->SQL->GetSelect();
 
             // Unset SQL
             $this->SQL->reset();
         } else {
-            $Result = $this->SQL;
+            $result = $this->SQL;
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -86,19 +86,19 @@ class VanillaSearchModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param object $SearchModel SearchModel (Dashboard)
+     * @param object $searchModel SearchModel (Dashboard)
      * @return object SQL result.
      */
-    public function commentSql($SearchModel, $AddMatch = true) {
-        if ($AddMatch) {
+    public function commentSql($searchModel, $addMatch = true) {
+        if ($addMatch) {
             // Get permission and limit search categories if necessary.
-            $Perms = CategoryModel::CategoryWatch(false);
-            if ($Perms !== true) {
-                $this->SQL->whereIn('d.CategoryID', $Perms);
+            $perms = CategoryModel::CategoryWatch(false);
+            if ($perms !== true) {
+                $this->SQL->whereIn('d.CategoryID', $perms);
             }
 
             // Build search part of query
-            $SearchModel->AddMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
+            $searchModel->AddMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
         }
 
         // Build base query
@@ -111,17 +111,17 @@ class VanillaSearchModel extends Gdn_Model {
             ->from('Comment c')
             ->join('Discussion d', 'd.DiscussionID = c.DiscussionID');
 
-        if ($AddMatch) {
+        if ($addMatch) {
             // Exectute query
-            $Result = $this->SQL->GetSelect();
+            $result = $this->SQL->GetSelect();
 
             // Unset SQL
             $this->SQL->reset();
         } else {
-            $Result = $this->SQL;
+            $result = $this->SQL;
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
@@ -130,10 +130,10 @@ class VanillaSearchModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param object $SearchModel SearchModel (Dashboard)
+     * @param object $searchModel SearchModel (Dashboard)
      */
-    public function search($SearchModel) {
-        $SearchModel->AddSearch($this->DiscussionSql($SearchModel));
-        $SearchModel->AddSearch($this->CommentSql($SearchModel));
+    public function search($searchModel) {
+        $searchModel->AddSearch($this->DiscussionSql($searchModel));
+        $searchModel->AddSearch($this->CommentSql($searchModel));
     }
 }

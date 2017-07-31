@@ -9,14 +9,14 @@
 /**
  *
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_module($Params, &$Smarty) {
-    $Name = val('name', $Params);
-    unset($Params['name']);
+function smarty_function_module($params, &$smarty) {
+    $name = val('name', $params);
+    unset($params['name']);
    
-    $Result = Gdn_Theme::module($Name, $Params);
-	return $Result;
+    $result = Gdn_Theme::module($name, $params);
+	return $result;
 }

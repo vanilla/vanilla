@@ -23,28 +23,28 @@ class vBulletinImportModel extends Gdn_Model {
      */
     public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
-        $Router = Gdn::router();
+        $router = Gdn::router();
 
         // Categories
-        $Router->SetRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
-        $Router->SetRoute('archive\.php/f-(\d+)\.html', 'categories/$1', 'Permanent');
+        $router->SetRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
+        $router->SetRoute('archive\.php/f-(\d+)\.html', 'categories/$1', 'Permanent');
 
         // Discussions & Comments
-        $Router->SetRoute('showthread\.php\?t=(\d+)', 'discussion/$1', 'Permanent');
+        $router->SetRoute('showthread\.php\?t=(\d+)', 'discussion/$1', 'Permanent');
         //$Router->SetRoute('showthread\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
         //$Router->SetRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
-        $Router->SetRoute('archive\.php/t-(\d+)\.html', 'discussion/$1', 'Permanent');
+        $router->SetRoute('archive\.php/t-(\d+)\.html', 'discussion/$1', 'Permanent');
 
         // Profiles
-        $Router->SetRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');
-        $Router->SetRoute('usercp\.php', 'profile', 'Permanent');
-        $Router->SetRoute('profile\.php', 'profile', 'Permanent');
+        $router->SetRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');
+        $router->SetRoute('usercp\.php', 'profile', 'Permanent');
+        $router->SetRoute('profile\.php', 'profile', 'Permanent');
 
         // Other
-        $Router->SetRoute('attachment\.php\?attachmentid=(\d+)', 'discussion/download/$1', 'Permanent');
-        $Router->SetRoute('search\.php', 'discussions', 'Permanent');
-        $Router->SetRoute('private\.php', 'messages/all', 'Permanent');
-        $Router->SetRoute('subscription\.php', 'discussions/bookmarked', 'Permanent');
+        $router->SetRoute('attachment\.php\?attachmentid=(\d+)', 'discussion/download/$1', 'Permanent');
+        $router->SetRoute('search\.php', 'discussions', 'Permanent');
+        $router->SetRoute('private\.php', 'messages/all', 'Permanent');
+        $router->SetRoute('subscription\.php', 'discussions/bookmarked', 'Permanent');
 
         // Make different sizes of avatars
         $this->ProcessAvatars();
@@ -53,13 +53,13 @@ class vBulletinImportModel extends Gdn_Model {
         $this->ProfileExtenderPrep();
 
         // Set guests to System user to prevent security issues
-        $SystemUserID = Gdn::userModel()->GetSystemUserID();
+        $systemUserID = Gdn::userModel()->GetSystemUserID();
         $this->SQL->update('Discussion')
-            ->set('InsertUserID', $SystemUserID)
+            ->set('InsertUserID', $systemUserID)
             ->where('InsertUserID', 0)
             ->put();
         $this->SQL->update('Comment')
-            ->set('InsertUserID', $SystemUserID)
+            ->set('InsertUserID', $systemUserID)
             ->where('InsertUserID', 0)
             ->put();
     }
@@ -68,8 +68,8 @@ class vBulletinImportModel extends Gdn_Model {
      * Create different sizes of user photos.
      */
     public function processAvatars() {
-        $UploadImage = new Gdn_UploadImage();
-        $UserData = $this->SQL->select('u.Photo')->from('User u')->where('u.Photo is not null')->get();
+        $uploadImage = new Gdn_UploadImage();
+        $userData = $this->SQL->select('u.Photo')->from('User u')->where('u.Photo is not null')->get();
 
         // Make sure the avatars folder exists.
         if (!file_exists(PATH_UPLOADS.'/userpics')) {
@@ -77,33 +77,33 @@ class vBulletinImportModel extends Gdn_Model {
         }
 
         // Get sizes
-        $ProfileHeight = c('Garden.Profile.MaxHeight');
-        $ProfileWidth = c('Garden.Profile.MaxWidth');
-        $ThumbSize = c('Garden.Thumbnail.Size');
+        $profileHeight = c('Garden.Profile.MaxHeight');
+        $profileWidth = c('Garden.Profile.MaxWidth');
+        $thumbSize = c('Garden.Thumbnail.Size');
 
         // Temporarily set maximum quality
         saveToConfig('Garden.UploadImage.Quality', 100, false);
 
         // Create profile and thumbnail sizes
-        foreach ($UserData->result() as $User) {
+        foreach ($userData->result() as $user) {
             try {
-                $Image = PATH_ROOT.DS.'uploads'.DS.GetValue('Photo', $User);
-                $ImageBaseName = pathinfo($Image, PATHINFO_BASENAME);
+                $image = PATH_ROOT.DS.'uploads'.DS.GetValue('Photo', $user);
+                $imageBaseName = pathinfo($image, PATHINFO_BASENAME);
 
                 // Save profile size
-                $UploadImage->SaveImageAs(
-                    $Image,
-                    PATH_UPLOADS.'/userpics/p'.$ImageBaseName,
-                    $ProfileHeight,
-                    $ProfileWidth
+                $uploadImage->SaveImageAs(
+                    $image,
+                    PATH_UPLOADS.'/userpics/p'.$imageBaseName,
+                    $profileHeight,
+                    $profileWidth
                 );
 
                 // Save thumbnail size
-                $UploadImage->SaveImageAs(
-                    $Image,
-                    PATH_UPLOADS.'/userpics/n'.$ImageBaseName,
-                    $ThumbSize,
-                    $ThumbSize,
+                $uploadImage->SaveImageAs(
+                    $image,
+                    PATH_UPLOADS.'/userpics/n'.$imageBaseName,
+                    $thumbSize,
+                    $thumbSize,
                     true
                 );
             } catch (Exception $ex) {
@@ -115,16 +115,16 @@ class vBulletinImportModel extends Gdn_Model {
      * Get profile fields imported and add to ProfileFields list.
      */
     public function profileExtenderPrep() {
-        $ProfileKeyData = $this->SQL->select('m.Name')->Distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
-        $ExistingKeys = array_filter((array)explode(',', c('Plugins.ProfileExtender.ProfileFields', '')));
-        foreach ($ProfileKeyData->result() as $Key) {
-            $Name = str_replace('Profile.', '', $Key->Name);
-            if (!in_array($Name, $ExistingKeys)) {
-                $ExistingKeys[] = $Name;
+        $profileKeyData = $this->SQL->select('m.Name')->Distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
+        $existingKeys = array_filter((array)explode(',', c('Plugins.ProfileExtender.ProfileFields', '')));
+        foreach ($profileKeyData->result() as $key) {
+            $name = str_replace('Profile.', '', $key->Name);
+            if (!in_array($name, $existingKeys)) {
+                $existingKeys[] = $name;
             }
         }
-        if (count($ExistingKeys)) {
-            saveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $ExistingKeys));
+        if (count($existingKeys)) {
+            saveToConfig('Plugins.ProfileExtender.ProfileFields', implode(',', $existingKeys));
         }
     }
 }

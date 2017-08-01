@@ -31,7 +31,7 @@
  *
  *  <b>Usage:</b>
  *  <code>
- *    $akismet = new Akismet('http://www.example.com/blog/', 'aoeu1aoue');
+ *    $akismet = new akismet('http://www.example.com/blog/', 'aoeu1aoue');
  *    $akismet->setCommentAuthor($name);
  *    $akismet->setCommentAuthorEmail($email);
  *    $akismet->setCommentAuthorURL($url);
@@ -46,7 +46,7 @@
  *  Optionally you may wish to check if your WordPress API key is valid as in the example below.
  * 
  * <code>
- *   $akismet = new Akismet('http://www.example.com/blog/', 'aoeu1aoue');
+ *   $akismet = new akismet('http://www.example.com/blog/', 'aoeu1aoue');
  *   
  *   if($akismet->isKeyValid()) {
  *     // api key is okay

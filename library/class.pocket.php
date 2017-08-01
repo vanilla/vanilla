@@ -221,17 +221,17 @@ class Pocket {
      * @return array
      */
     public static function parseRepeat($repeat) {
-        if (StringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
+        if (stringBeginsWith($repeat, Pocket::REPEAT_EVERY)) {
             $repeatType = Pocket::REPEAT_EVERY;
             $frequency = substr($repeat, strlen(Pocket::REPEAT_EVERY));
-        } elseif (StringBeginsWith($repeat, Pocket::REPEAT_INDEX)) {
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_INDEX)) {
             $repeatType = Pocket::REPEAT_INDEX;
             $frequency = substr($repeat, strlen(Pocket::REPEAT_INDEX));
-        } elseif (StringBeginsWith($repeat, Pocket::REPEAT_ONCE)) {
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_ONCE)) {
             $repeatType = Pocket::REPEAT_ONCE;
-        } elseif (StringBeginsWith($repeat, Pocket::REPEAT_BEFORE)) {
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_BEFORE)) {
             $repeatType = Pocket::REPEAT_BEFORE;
-        } elseif (StringBeginsWith($repeat, Pocket::REPEAT_AFTER)) {
+        } elseif (stringBeginsWith($repeat, Pocket::REPEAT_AFTER)) {
             $repeatType = Pocket::REPEAT_AFTER;
         }
 

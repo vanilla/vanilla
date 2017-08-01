@@ -70,7 +70,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function base_GetAppSettingsMenuItems_Handler($sender) {
+    public function base_getAppSettingsMenuItems_handler($sender) {
         $menu = $sender->EventArguments['SideMenu'];
         $menu->addItem('Appearance', t('Appearance'));
         $menu->addLink('Appearance', t('Pockets'), 'settings/pockets', 'Plugins.Pockets.Manage');
@@ -81,7 +81,7 @@ class PocketsPlugin extends Gdn_Plugin {
      *
      * @param $sender
      */
-    public function base_BeforeRenderAsset_Handler($sender) {
+    public function base_beforeRenderAsset_handler($sender) {
         $assetName = valr('EventArguments.AssetName', $sender);
         $this->processPockets($sender, $assetName, Pocket::REPEAT_BEFORE);
     }
@@ -403,8 +403,8 @@ class PocketsPlugin extends Gdn_Plugin {
                 // Convert some of the pocket data into a format digestable by the form.
                 list($repeatType, $repeatFrequency) = Pocket::parseRepeat($pocket['Repeat']);
                 $pocket['RepeatType'] = $repeatType;
-                $pocket['EveryFrequency'] = GetValue(0, $repeatFrequency, 1);
-                $pocket['EveryBegin'] = GetValue(1, $repeatFrequency, 1);
+                $pocket['EveryFrequency'] = getValue(0, $repeatFrequency, 1);
+                $pocket['EveryBegin'] = getValue(1, $repeatFrequency, 1);
                 $pocket['Indexes'] = implode(',', $repeatFrequency);
                 $pocket['Ad'] = $pocket['Type'] == Pocket::TYPE_AD;
                 $pocket['TestMode'] = Pocket::inTestMode($pocket);
@@ -423,7 +423,7 @@ class PocketsPlugin extends Gdn_Plugin {
 
         $sender->setData('Locations', $this->Locations);
         $sender->setData('LocationsArray', $this->getLocationsArray());
-        $sender->setData('Pages', ['' => '('.T('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile']);
+        $sender->setData('Pages', ['' => '('.t('All').')', 'activity' => 'activity', 'comments' => 'comments', 'dashboard' => 'dashboard', 'discussions' => 'discussions', 'inbox' => 'inbox', 'profile' => 'profile']);
 
         return $sender->render('AddEdit', '', 'plugins/Pockets');
     }
@@ -436,7 +436,7 @@ class PocketsPlugin extends Gdn_Plugin {
      * @return mixed
      */
     protected function _Edit($sender, $pocketID) {
-        $sender->setData('Title', sprintf(T('Edit %s'), T('Pocket')));
+        $sender->setData('Title', sprintf(t('Edit %s'), t('Pocket')));
         return $this->_AddEdit($sender, $pocketID);
     }
 
@@ -454,7 +454,7 @@ class PocketsPlugin extends Gdn_Plugin {
         $form = new Gdn_Form();
         if ($form->authenticatedPostBack()) {
             Gdn::sql()->delete('Pocket', ['PocketID' => $pocketID]);
-            $sender->StatusMessage = sprintf(T('The %s has been deleted.'), strtolower(t('Pocket')));
+            $sender->StatusMessage = sprintf(t('The %s has been deleted.'), strtolower(t('Pocket')));
             $sender->setRedirectTo('settings/pockets');
         }
 

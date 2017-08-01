@@ -3,7 +3,7 @@
 echo '<h1>', $this->data('Title'), '</h1>';
 
 /** @var Gdn_Form $Form */
-$Form = $this->Form; //new Gdn_Form();
+$Form = $this->Form; //new gdn_Form();
 echo $Form->open();
 echo $Form->errors();
 ?>
@@ -51,7 +51,7 @@ echo $Form->errors();
             echo '<div class="info">', t('Select the location of the pocket.', 'Select the location of the pocket.'), '</div>'; ?>
         </div>
         <div class="input-wrap">
-        <?php echo $Form->dropdown('Location', array_merge(['' => '('.sprintf(T('Select a %s'), t('Location')).')'], $this->data('LocationsArray'))); ?>
+        <?php echo $Form->dropdown('Location', array_merge(['' => '('.sprintf(t('Select a %s'), t('Location')).')'], $this->data('LocationsArray'))); ?>
         </div>
     </li>
     <li class="js-repeat form-group">

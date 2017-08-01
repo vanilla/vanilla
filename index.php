@@ -21,9 +21,25 @@ require_once(__DIR__.'/environment.php');
 // Require the bootstrap to configure the application.
 require_once(__DIR__.'/bootstrap.php');
 
-// Create and configure the dispatcher.
-$dispatcher = Gdn::dispatcher();
+//// Create and configure the dispatcher.
+//$dispatcher = Gdn::dispatcher();
+//
+//// Process the request.
+//$dispatcher->start();
+//$dispatcher->dispatch();
 
-// Process the request.
-$dispatcher->start();
-$dispatcher->dispatch();
+
+$uanm = new UserAuthenticationNonceModel();
+$nonce = 'BLABLA';
+$token = 'BLEBLE';
+$date = date(MYSQL_DATE_FORMAT, 1501620292);
+
+$uanm->insert([
+    'nonce' => $nonce,
+    'token' => $token,
+    'timestamp' => $date,
+]);
+
+$uanm->delete([
+    'token' => $token
+]);

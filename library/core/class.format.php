@@ -1871,7 +1871,7 @@ EOT;
             }
 
             if ($mention) {
-                $parts[$i] = anchor('@'.$mention, str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat)).$suffix;
+                $parts[$i] = anchor('@'.$mention, url(str_replace('{name}', rawurlencode($mention), self::$MentionsUrlFormat), true)).$suffix;
             } else {
                 $parts[$i] = '@' . $parts[$i];
             }
@@ -1906,7 +1906,7 @@ EOT;
             if (c('Garden.Format.Hashtags')) {
                 $mixed = Gdn_Format::replaceButProtectCodeBlocks(
                     '/(^|[\s,\.>])\#([\w\-]+)(?=[\s,\.!?<]|$)/i',
-                    '\1'.anchor('#\2', '/search?Search=%23\2&Mode=like').'\3',
+                    '\1'.anchor('#\2', url('/search?Search=%23\2&Mode=like', true)).'\3',
                     $mixed
                 );
             }

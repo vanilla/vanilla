@@ -96,7 +96,7 @@ class Emoji {
      *
      */
     protected function __construct() {
-        $this->assetPath = asset('/resources/emoji', '//');
+        $this->assetPath = asset('/resources/emoji', true);
 
         // Initialize the canonical list. (emoji)
         $this->emoji = [
@@ -263,12 +263,12 @@ class Emoji {
             foreach ($emojis as $name => $data) {
                 $emoji[] = [
                     "name" => "".$name."",
-                    "url" => Asset($emojiAssetPath.'/'.$data)
+                    "url" => asset($emojiAssetPath.'/'.$data, true)
                 ];
             }
 
             $emoji = [
-                'assetPath' => Asset($this->getAssetPath()),
+                'assetPath' => asset($this->getAssetPath(), true),
                 'format' => $this->getFormat(),
                 'emoji' => $this->getEmoji()
             ];
@@ -482,7 +482,7 @@ class Emoji {
         $filename = basename($emoji_path);
         $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
         $basename = basename($filename, $ext);
-        $src = asset($emoji_path);
+        $src = asset($emoji_path, true);
 
         $attributes = [$src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext];
         $attributes = array_map('htmlspecialchars', $attributes);

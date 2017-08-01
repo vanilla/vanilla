@@ -541,7 +541,7 @@ class ProfileController extends Gdn_Controller {
      * - 1: Unset the force cookie and use the user agent to determine the theme.
      */
     public function noMobile($type = 'desktop') {
-        // Only validate CSRF for non guests.
+        // Only validate CSRF token for authenticated users because guests do not get the transient key cookie.
         if (Gdn::session()->isValid()) {
             $valid = Gdn::request()->isAuthenticatedPostBack(true);
         } else {

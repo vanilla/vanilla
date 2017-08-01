@@ -54,6 +54,6 @@ class SiteTotalsModule extends Gdn_Module {
 
     public function toString() {
         $this->_GetData();
-        return parent::ToString();
+        return parent::toString();
     }
 }

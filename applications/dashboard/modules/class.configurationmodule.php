@@ -12,11 +12,11 @@
  * This class gives a simple way to load/save configuration settings.
  *
  * To use this module you must:
- *  1. Call Schema() to set the config fields you are using.
- *  2. Call Initialize() within the controller to load/save the data.
+ *  1. Call schema() to set the config fields you are using.
+ *  2. Call initialize() within the controller to load/save the data.
  *  3. Do one of the following:
- *   a) Call the controller's Render() method and call Render() somewhere inside of the view.
- *   b) Call this object's RenderAll() method within the view if you don't want to customize the view any further.
+ *   a) Call the controller's render() method and call render() somewhere inside of the view.
+ *   b) Call this object's renderAll() method within the view if you don't want to customize the view any further.
  */
 class ConfigurationModule extends Gdn_Module {
 
@@ -38,7 +38,7 @@ class ConfigurationModule extends Gdn_Module {
         parent::__construct($sender);
 
         if (property_exists($sender, 'Form')) {
-            $this->Form($sender->Form);
+            $this->form($sender->Form);
         }
 
         $this->ConfigurationModule = $this;
@@ -188,7 +188,7 @@ class ConfigurationModule extends Gdn_Module {
         $labelCode = preg_replace('`([A-Z0-9])(?=[a-z])`', ' $1', $labelCode);
         $labelCode = trim($labelCode);
 
-        $labelCode = StringEndsWith($labelCode, " ID", true, true);
+        $labelCode = stringEndsWith($labelCode, " ID", true, true);
 
         return $labelCode;
     }
@@ -200,7 +200,7 @@ class ConfigurationModule extends Gdn_Module {
      */
     public function renderAll() {
         $this->RenderAll = true;
-        $controller = $this->Controller();
+        $controller = $this->controller();
         $controller->ConfigurationModule = $this;
 
         $controller->render($this->fetchViewLocation());

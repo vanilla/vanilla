@@ -67,7 +67,7 @@ class Gdn_Router extends Gdn_Pluggable {
         //return $this->Routes[$Route];
 
         return array_merge($this->Routes[$route], [
-            'TypeLocale' => T($this->RouteTypes[$this->Routes[$route]['Type']]),
+            'TypeLocale' => t($this->RouteTypes[$this->Routes[$route]['Type']]),
             'FinalDestination' => $this->Routes[$route]['Destination']
         ]);
 
@@ -99,7 +99,7 @@ class Gdn_Router extends Gdn_Pluggable {
      */
     public function setRoute($route, $destination, $type, $save = true) {
         $key = $this->_encodeRouteKey($route);
-        SaveToConfig('Routes.'.$key, [$destination, $type], $save);
+        saveToConfig('Routes.'.$key, [$destination, $type], $save);
         $this->_loadRoutes();
     }
 
@@ -114,7 +114,7 @@ class Gdn_Router extends Gdn_Pluggable {
         // Is a valid route?
         if ($route !== false) {
             if (!in_array($route['Route'], $this->ReservedRoutes)) {
-                RemoveFromConfig('Routes.'.$route['Key']);
+                removeFromConfig('Routes.'.$route['Key']);
                 $this->_loadRoutes();
             }
         }
@@ -211,7 +211,7 @@ class Gdn_Router extends Gdn_Pluggable {
     public function getRouteTypes() {
         $rT = [];
         foreach ($this->RouteTypes as $routeType => $routeTypeText) {
-            $rT[$routeType] = T($routeTypeText);
+            $rT[$routeType] = t($routeTypeText);
         }
         return $rT;
     }

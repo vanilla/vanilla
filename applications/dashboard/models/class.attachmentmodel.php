@@ -18,7 +18,7 @@
  * Attachment Fields
  *
  *    [AttachmentID]       - int       - Primary Key
- *    [ForeignID]          - string    - @see AttachmentModel::RowID()
+ *    [ForeignID]          - string    - @see AttachmentModel::rowID()
  *    [ForeignUserID]      - int       - WIll be used for attachments on User (currently not supported)
  *    [Source]             - string    - PluginID ie 'salesforce', 'zendesk'
  *    [SourceID]           - string    - ie 123, abc123
@@ -56,7 +56,7 @@
  *
  * Errors
  *
- * To set an error just use the key 'Error'.  WriteErrorAttachment() will then display the error.
+ * To set an error just use the key 'Error'.  writeErrorAttachment() will then display the error.
  */
 class AttachmentModel extends Gdn_Model {
 
@@ -111,8 +111,8 @@ class AttachmentModel extends Gdn_Model {
      * <code>
      * <?php
      * $ForeignIDs = array();
-     * AttachmentModel::GatherIDs($Discussion, $ForeignIDs);
-     * AttachmentModel::GatherIDs($Comments, $ForeignIDs);
+     * AttachmentModel::gatherIDs($Discussion, $ForeignIDs);
+     * AttachmentModel::gatherIDs($Comments, $ForeignIDs);
      * $Attachments = $AttachmentModel->getWhere(['ForeignID' => array_keys($ForeignIDs)]);
      * ?>
      * </code>
@@ -198,7 +198,7 @@ class AttachmentModel extends Gdn_Model {
      *
      * <code>
      * <?php
-     * $AttachmentModel->JoinAttachments($Discussion, $Comments);
+     * $AttachmentModel->joinAttachments($Discussion, $Comments);
      * ?>
      * </code>
      *

@@ -7,9 +7,9 @@ if (!function_exists('WriteDiscussionHeading')) :
     function writeDiscussionHeading() {
         ?>
         <tr>
-            <?php echo AdminCheck(NULL, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
+            <?php echo adminCheck(NULL, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
             <td class="DiscussionName">
-                <div class="Wrap"><?php echo DiscussionHeading() ?></div>
+                <div class="Wrap"><?php echo discussionHeading() ?></div>
             </td>
             <td class="BlockColumn BlockColumn-User FirstUser">
                 <div class="Wrap"><?php echo t('Started By'); ?></div>
@@ -36,7 +36,7 @@ if (!function_exists('writeDiscussionRow')) :
         if (!property_exists($sender, 'CanEditDiscussions')) {
             $sender->CanEditDiscussions = val('PermsDiscussionsEdit', CategoryModel::categories($discussion->CategoryID)) && c('Vanilla.AdminCheckboxes.Use');
         }
-        $cssClass = CssClass($discussion);
+        $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
 
         if ($session->UserID) {
@@ -46,9 +46,9 @@ if (!function_exists('writeDiscussionRow')) :
         $sender->EventArguments['Discussion'] = &$discussion;
         $sender->EventArguments['CssClass'] = &$cssClass;
 
-        $first = UserBuilder($discussion, 'First');
+        $first = userBuilder($discussion, 'First');
         if ($discussion->LastUserID) {
-            $last = UserBuilder($discussion, 'Last');
+            $last = userBuilder($discussion, 'Last');
         } else {
             $last = $first;
         }
@@ -73,18 +73,18 @@ if (!function_exists('writeDiscussionRow')) :
 
         $discussion->CountPages = ceil($discussion->CountComments / $sender->CountCommentsPerPage);
 
-        $firstPageUrl = DiscussionUrl($discussion, 1);
-        $lastPageUrl = DiscussionUrl($discussion, val('CountPages', $discussion)).'#latest';
+        $firstPageUrl = discussionUrl($discussion, 1);
+        $lastPageUrl = discussionUrl($discussion, val('CountPages', $discussion)).'#latest';
         ?>
         <tr id="Discussion_<?php echo $discussion->DiscussionID; ?>" class="<?php echo $cssClass; ?>">
             <?php $sender->fireEvent('BeforeDiscussionContent'); ?>
-            <?php echo AdminCheck($discussion, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
+            <?php echo adminCheck($discussion, ['<td class="CheckBoxColumn"><div class="Wrap">', '</div></td>']); ?>
             <td class="DiscussionName">
                 <div class="Wrap">
          <span class="Options">
             <?php
-            echo OptionsList($discussion);
-            echo BookmarkButton($discussion);
+            echo optionsList($discussion);
+            echo bookmarkButton($discussion);
             ?>
          </span>
                     <?php
@@ -92,14 +92,14 @@ if (!function_exists('writeDiscussionRow')) :
                     echo anchor($discussionName, $discussionUrl, 'Title').' ';
                     $sender->fireEvent('AfterDiscussionTitle');
 
-                    WriteMiniPager($discussion);
-                    echo NewComments($discussion);
+                    writeMiniPager($discussion);
+                    echo newComments($discussion);
                     if ($sender->data('_ShowCategoryLink', true)) {
-                        echo CategoryLink($discussion, ' '.t('in').' ');
+                        echo categoryLink($discussion, ' '.t('in').' ');
                     }
                     // Other stuff that was in the standard view that you may want to display:
                     echo '<div class="Meta Meta-Discussion">';
-                    WriteTags($discussion);
+                    writeTags($discussion);
                     echo '</div>';
 
                     //			if ($Source = val('Source', $Discussion))
@@ -126,7 +126,7 @@ if (!function_exists('writeDiscussionRow')) :
                     // echo number_format($Discussion->CountComments);
 
                     // Round Number
-                    echo BigPlural($discussion->CountComments, '%s comment');
+                    echo bigPlural($discussion->CountComments, '%s comment');
                     ?>
                 </div>
             </td>
@@ -137,7 +137,7 @@ if (!function_exists('writeDiscussionRow')) :
                     // echo number_format($Discussion->CountViews);
 
                     // Round Number
-                    echo BigPlural($discussion->CountViews, '%s view');
+                    echo bigPlural($discussion->CountViews, '%s view');
                     ?>
                 </div>
             </td>
@@ -173,7 +173,7 @@ if (!function_exists('WriteDiscussionTable')) :
             <table class="DataTable DiscussionsTable">
                 <thead>
                 <?php
-                WriteDiscussionHeading();
+                writeDiscussionHeading();
                 ?>
                 </thead>
                 <tbody>

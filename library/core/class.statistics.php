@@ -148,7 +148,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      */
     public function basicParameters(&$request) {
         $request = array_merge($request, [
-            'ServerHostname' => Url('/', true),
+            'ServerHostname' => url('/', true),
             'ServerType' => Gdn::request()->getValue('SERVER_SOFTWARE'),
             'PHPVersion' => str_replace(PHP_EXTRA_VERSION, '', PHP_VERSION),
             'VanillaVersion' => APPLICATION_VERSION
@@ -332,10 +332,10 @@ class Gdn_Statistics extends Gdn_Pluggable {
         $vanillaID = val('VanillaID', $response, false);
         $secret = val('Secret', $response, false);
         if (($secret && $vanillaID) !== false) {
-            Gdn::InstallationID($vanillaID);
-            Gdn::InstallationSecret($secret);
-            Gdn::Set('Garden.Analytics.Registering', null);
-            Gdn::Set('Garden.Analytics.LastSentDate', null);
+            Gdn::installationID($vanillaID);
+            Gdn::installationSecret($secret);
+            Gdn::set('Garden.Analytics.Registering', null);
+            Gdn::set('Garden.Analytics.LastSentDate', null);
         }
     }
 
@@ -419,7 +419,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
                     case 'DoDisable':
                         if ($verified) {
                             // Turn yourself off
-                            SaveToConfig('Garden.Analytics.Enabled', false);
+                            saveToConfig('Garden.Analytics.Enabled', false);
                         }
                         break;
 
@@ -504,7 +504,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
      */
     public function sign(&$request, $modify = false) {
         // Fail if no ID is present
-        $vanillaID = GetValue('VanillaID', $request, false);
+        $vanillaID = getValue('VanillaID', $request, false);
         if (empty($vanillaID)) {
             return false;
         }
@@ -732,7 +732,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
     public function tick() {
         // Fire an event for plugins to track their own stats.
         // TODO: Make this analyze the path and throw a specific event (this event will change in future versions).
-        $this->EventArguments['Path'] = Gdn::Request()->Post('Path');
+        $this->EventArguments['Path'] = Gdn::request()->post('Path');
         $this->fireEvent('Tick');
 
         // Store the view, using denormalization if enabled
@@ -753,8 +753,8 @@ class Gdn_Statistics extends Gdn_Pluggable {
 
         if (Gdn::session()->checkPermission('Garden.Settings.Manage')) {
             if (Gdn::get('Garden.Analytics.Notify', false) !== false) {
-                $callMessage = Sprite('Bandaid', 'InformSprite');
-                $callMessage .= sprintf(T("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"), Url('dashboard/statistics'));
+                $callMessage = sprite('Bandaid', 'InformSprite');
+                $callMessage .= sprintf(t("There's a problem with Vanilla Analytics that needs your attention.<br/> Handle it <a href=\"%s\">here &raquo;</a>"), url('dashboard/statistics'));
                 Gdn::controller()->informMessage($callMessage, ['CssClass' => 'HasSprite']);
             }
         }
@@ -1083,7 +1083,7 @@ class Gdn_Statistics extends Gdn_Pluggable {
     protected function verifySignature($request) {
 
         // If this response has no ID, return NULL (could not verify)
-        $vanillaID = GetValue('VanillaID', $request, null);
+        $vanillaID = getValue('VanillaID', $request, null);
         if (is_null($vanillaID)) {
             return null;
         }

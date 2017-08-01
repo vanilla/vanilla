@@ -29,7 +29,7 @@ echo '<div class="MainForm">';
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', ['class' => 'InputBox Password']);
+            echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
@@ -43,7 +43,7 @@ echo '</div>';
 // Render the buttons to select other methods of signing in.
 if (count($Methods) > 0) {
     echo '<div class="Methods">'
-        .Wrap('<b>'.t('Or you can...').'</b>', 'div');
+        .wrap('<b>'.t('Or you can...').'</b>', 'div');
 
     foreach ($Methods as $Key => $Method) {
         $CssClass = 'Method Method_'.$Key;
@@ -61,7 +61,7 @@ echo '</div>';
     <div class="Buttons">
         <?php
         echo $this->Form->button('Sign In', ['class' => 'Button Primary']);
-        echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
+        echo $this->Form->checkBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
         ?>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>
             <div class="CreateAccount">

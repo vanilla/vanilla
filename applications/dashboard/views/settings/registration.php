@@ -108,8 +108,8 @@ echo $this->Form->errors(); ?>
                 <th><?php echo $Role['Name']; ?></th>
                 <td class="Alt">
                     <?php
-                    echo $this->Form->DropDown('InvitationCount[]', $this->InvitationOptions, ['value' => $CurrentValue]);
-                    echo $this->Form->Hidden('InvitationRoleID[]', ['value' => $Role['RoleID']]);
+                    echo $this->Form->dropDown('InvitationCount[]', $this->InvitationOptions, ['value' => $CurrentValue]);
+                    echo $this->Form->hidden('InvitationRoleID[]', ['value' => $Role['RoleID']]);
                     ?>
                 </td>
             </tr>

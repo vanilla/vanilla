@@ -26,7 +26,7 @@ class UserInfoModule extends Gdn_Module {
      */
     public function __construct($sender = '') {
         $this->User = false;
-        $this->Path(__FILE__);
+        $this->path(__FILE__);
         parent::__construct($sender);
     }
 
@@ -37,7 +37,7 @@ class UserInfoModule extends Gdn_Module {
     public function loadData() {
         $userID = Gdn::controller()->data('Profile.UserID', Gdn::session()->UserID);
         $this->User = Gdn::userModel()->getID($userID);
-        $this->Roles = Gdn::userModel()->GetRoles($userID)->resultArray();
+        $this->Roles = Gdn::userModel()->getRoles($userID)->resultArray();
         // Hide personal info roles
         if (!checkPermission('Garden.PersonalInfo.View')) {
             $this->Roles = array_filter($this->Roles, 'RoleModel::FilterPersonalInfo');
@@ -46,11 +46,11 @@ class UserInfoModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->User) {
-            $this->LoadData();
+            $this->loadData();
         }
 
         if (is_object($this->User)) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

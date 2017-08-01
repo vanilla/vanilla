@@ -68,7 +68,7 @@ class ToggleMenuModule extends Gdn_Module {
 
             $name = val('Name', $label, '');
             $code = val('Code', $label, '');
-            $active = strcasecmp($code, $this->CurrentLabelCode()) == 0;
+            $active = strcasecmp($code, $this->currentLabelCode()) == 0;
             $cssClass = 'Handle-'.$code;
             $anchorClass = '';
             if ($active) {

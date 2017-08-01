@@ -89,11 +89,11 @@ class Gdn_PasswordHash {
                 break;
             case 'reset':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_UserException(sprintf(T('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                throw new Gdn_UserException(sprintf(t('You need to reset your password.', 'You need to reset your password. This is most likely because an administrator recently changed your account information. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
                 break;
             case 'random':
                 $resetUrl = url('entry/passwordrequest'.(Gdn::request()->get('display') ? '?display='.urlencode(Gdn::request()->get('display')) : ''));
-                throw new Gdn_UserException(sprintf(T('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
+                throw new Gdn_UserException(sprintf(t('You don\'t have a password.', 'Your account does not have a password assigned to it yet. Click <a href="%s">here</a> to reset your password.'), $resetUrl));
                 break;
             case 'smf':
                 $result = $this->getAlgorithm('Smf')->verify($password, $storedHash);

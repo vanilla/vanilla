@@ -51,7 +51,7 @@ class Gdn_ErrorException extends ErrorException {
  * @return bool|void
  * @throws Gdn_ErrorException
  */
-function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
+function gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
     $errorReporting = error_reporting();
 
     // Don't do anything for @supressed errors.
@@ -89,7 +89,7 @@ function Gdn_ErrorHandler($errorNumber, $message, $file, $line, $arguments) {
  *
  * @param Exception $Exception The exception that was thrown.
  */
-function Gdn_ExceptionHandler($Exception) {
+function gdn_ExceptionHandler($Exception) {
     try {
         // Attempt to log the exception as early as possible
         if ($Exception instanceof \ErrorException) {
@@ -141,10 +141,10 @@ function Gdn_ExceptionHandler($Exception) {
         } elseif ($MessageCount == 3) {
             list($SenderMessage, $SenderObject, $SenderMethod) = $MessageInfo;
         } elseif (function_exists('GetValueR')) {
-            $IsError = (GetValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
+            $IsError = (getValueR('0.function', $SenderTrace) == 'Gdn_ErrorHandler'); // not exception
             $N = ($IsError) ? '1' : '0';
-            $SenderMethod = GetValueR($N.'.function', $SenderTrace, $SenderMethod);
-            $SenderObject = GetValueR($N.'.class', $SenderTrace, $SenderObject);
+            $SenderMethod = getValueR($N.'.function', $SenderTrace, $SenderMethod);
+            $SenderObject = getValueR($N.'.class', $SenderTrace, $SenderObject);
         }
 
         $SenderMessage = htmlspecialchars($SenderMessage);
@@ -711,8 +711,8 @@ function setHandlers() {
 function notFoundException($recordType = 'Page') {
     Gdn::dispatcher()
         ->passData('RecordType', $recordType)
-        ->passData('Description', sprintf(T('The %s you were looking for could not be found.'), T(strtolower($recordType))));
-    return new Gdn_UserException(sprintf(T('%s not found.'), T($recordType)), 404);
+        ->passData('Description', sprintf(t('The %s you were looking for could not be found.'), t(strtolower($recordType))));
+    return new Gdn_UserException(sprintf(t('%s not found.'), t($recordType)), 404);
 }
 
 /**

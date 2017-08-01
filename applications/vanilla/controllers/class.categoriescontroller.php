@@ -29,7 +29,7 @@ class CategoriesController extends VanillaController {
     public $Category;
 
     /**
-     * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->Data('Categories')`.
+     * @var \Closure $categoriesCompatibilityCallback A backwards-compatible callback to get `$this->data('Categories')`.
      */
     private $categoriesCompatibilityCallback;
 
@@ -83,19 +83,19 @@ class CategoriesController extends VanillaController {
         $this->setData('_Limit', $limit);
 
         $canonical = '/categories/archives/'.rawurlencode($category['UrlCode']).'/'.gmdate('Y-m', $timestamp);
-        $page = PageNumber($offset, $limit, true, false);
+        $page = pageNumber($offset, $limit, true, false);
         $this->canonicalUrl(url($canonical.($page ? '?page='.$page : ''), true));
 
-        PagerModule::Current()->configure($offset, $limit, false, $canonical.'?page={Page}');
+        PagerModule::current()->configure($offset, $limit, false, $canonical.'?page={Page}');
 
-//      PagerModule::Current()->Offset = $Offset;
-//      PagerModule::Current()->Url = '/categories/archives'.rawurlencode($Category['UrlCode']).'?page={Page}';
+//      PagerModule::current()->Offset = $Offset;
+//      PagerModule::current()->Url = '/categories/archives'.rawurlencode($Category['UrlCode']).'?page={Page}';
 
         Gdn_Theme::section(val('CssClass', $category));
         Gdn_Theme::section('DiscussionList');
 
         $this->title(htmlspecialchars(val('Name', $category, '')));
-        $this->Description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
+        $this->description(sprintf(t("Archives for %s"), gmdate('F Y', strtotime($from))), true);
         $this->addJsFile('discussions.js');
         $this->Head->addTag('meta', ['name' => 'robots', 'content' => 'noindex']);
 
@@ -169,7 +169,7 @@ class CategoriesController extends VanillaController {
         } else {
             $this->View = $displayAs === 'Flat' ? 'flat_all' : 'all';
         }
-        $this->All($category, $displayAs);
+        $this->all($category, $displayAs);
     }
 
     /**
@@ -276,7 +276,7 @@ class CategoriesController extends VanillaController {
                                 break;
                             default:
                                 $this->View = 'all';
-                                $this->All($categoryIdentifier, $category->DisplayAs);
+                                $this->all($categoryIdentifier, $category->DisplayAs);
                                 break;
                         }
                         return;
@@ -351,7 +351,7 @@ class CategoriesController extends VanillaController {
                 $offset = 0;
             }
 
-            $page = PageNumber($offset, $limit);
+            $page = pageNumber($offset, $limit);
 
             // Allow page manipulation
             $this->EventArguments['Page'] = &$page;
@@ -388,7 +388,7 @@ class CategoriesController extends VanillaController {
 
             // Build a pager
             $pagerFactory = new Gdn_PagerFactory();
-            $url = CategoryUrl($categoryIdentifier);
+            $url = categoryUrl($categoryIdentifier);
 
             $this->EventArguments['PagerType'] = 'Pager';
             $this->fireEvent('BeforeBuildPager');
@@ -398,7 +398,7 @@ class CategoriesController extends VanillaController {
             $queryString = DiscussionModel::getSortFilterQueryString($discussionModel->getSort(), $discussionModel->getFilters());
             $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
 
-            $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+            $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
             $this->Pager->ClientID = 'Pager';
             $this->Pager->configure(
                 $offset,
@@ -455,29 +455,29 @@ class CategoriesController extends VanillaController {
         Gdn_Theme::section('CategoryList');
 
         if (!$Category) {
-            $this->Description(c('Garden.Description', null));
+            $this->description(c('Garden.Description', null));
         }
 
-        $this->setData('Breadcrumbs', CategoryModel::GetAncestors(val('CategoryID', $this->data('Category'))));
+        $this->setData('Breadcrumbs', CategoryModel::getAncestors(val('CategoryID', $this->data('Category'))));
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
-        $CategoryFollowToggleModule->SetToggle();
+        $CategoryFollowToggleModule->setToggle();
 
         // Get category data
-        $this->CategoryModel->Watching = !Gdn::session()->GetPreference('ShowAllCategories');
+        $this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
 
         if ($Category) {
             $this->setData('Category', CategoryModel::categories($Category));
 
             $this->categoriesCompatibilityCallback = function () use ($Category) {
-                $Subtree = CategoryModel::GetSubtree($Category, false);
+                $Subtree = CategoryModel::getSubtree($Category, false);
                 $CategoryIDs = array_column($Subtree, 'CategoryID');
-                return $this->CategoryModel->GetFull($CategoryIDs)->resultArray();
+                return $this->CategoryModel->getFull($CategoryIDs)->resultArray();
             };
         } else {
             $this->categoriesCompatibilityCallback = function () {
-                return $this->CategoryModel->GetFull()->resultArray();
+                return $this->CategoryModel->getFull()->resultArray();
             };
         }
 
@@ -530,23 +530,23 @@ class CategoriesController extends VanillaController {
         }
 
         if (!$Category) {
-            $this->Description(c('Garden.Description', null));
+            $this->description(c('Garden.Description', null));
         }
 
         Gdn_Theme::section('CategoryDiscussionList');
 
         // Set the category follow toggle before we load category data so that it affects the category query appropriately.
         $CategoryFollowToggleModule = new CategoryFollowToggleModule($this);
-        $CategoryFollowToggleModule->SetToggle();
+        $CategoryFollowToggleModule->setToggle();
 
-        $this->CategoryModel->Watching = !Gdn::session()->GetPreference('ShowAllCategories');
+        $this->CategoryModel->Watching = !Gdn::session()->getPreference('ShowAllCategories');
 
         if ($Category) {
-            $Subtree = CategoryModel::GetSubtree($Category, false);
+            $Subtree = CategoryModel::getSubtree($Category, false);
             $CategoryIDs = array_column($Subtree, 'CategoryID');
-            $Categories = $this->CategoryModel->GetFull($CategoryIDs)->resultArray();
+            $Categories = $this->CategoryModel->getFull($CategoryIDs)->resultArray();
         } else {
-            $Categories = $this->CategoryModel->GetFull()->resultArray();
+            $Categories = $this->CategoryModel->getFull()->resultArray();
         }
 
         $this->setData('Categories', $Categories);
@@ -601,9 +601,9 @@ class CategoriesController extends VanillaController {
     public function __get($name) {
         switch ($name) {
             case 'CategoryData':
-//            Deprecated('CategoriesController->CategoryData', "CategoriesController->data('Categories')");
+//            deprecated('CategoriesController->CategoryData', "CategoriesController->data('Categories')");
                 $this->CategoryData = new Gdn_DataSet($this->data('Categories'), DATASET_TYPE_ARRAY);
-                $this->CategoryData->DatasetType(DATASET_TYPE_OBJECT);
+                $this->CategoryData->datasetType(DATASET_TYPE_OBJECT);
                 return $this->CategoryData;
         }
     }

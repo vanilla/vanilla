@@ -108,8 +108,8 @@ class ImportController extends DashboardController {
 
         // Search for the list of acceptable imports.
         $importPaths = [];
-        $existingPaths = SafeGlob(PATH_UPLOADS.'/export*', ['gz', 'txt']);
-        $existingPaths2 = SafeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
+        $existingPaths = safeGlob(PATH_UPLOADS.'/export*', ['gz', 'txt']);
+        $existingPaths2 = safeGlob(PATH_UPLOADS.'/porter/export*', ['gz']);
         $existingPaths = array_merge($existingPaths, $existingPaths2);
         foreach ($existingPaths as $path) {
             $importPaths[$path] = basename($path);
@@ -131,7 +131,7 @@ class ImportController extends DashboardController {
                 }
 
                 if (count($importPaths) == 0 || $this->Form->getFormValue('PathSelect') == 'NEW') {
-                    $tmpFile = $upload->ValidateUpload('ImportFile', false);
+                    $tmpFile = $upload->validateUpload('ImportFile', false);
                 } else {
                     $tmpFile = '';
                 }
@@ -143,8 +143,8 @@ class ImportController extends DashboardController {
                     if (!file_exists($targetFolder)) {
                         mkdir($targetFolder, 0777, true);
                     }
-                    $importPath = $upload->GenerateTargetName(PATH_ROOT.DS.'uploads'.DS.'import', $extension);
-                    $upload->SaveAs($tmpFile, $importPath);
+                    $importPath = $upload->generateTargetName(PATH_ROOT.DS.'uploads'.DS.'import', $extension);
+                    $upload->saveAs($tmpFile, $importPath);
                     $imp->ImportPath = $importPath;
                     $this->Form->setFormValue('PathSelect', $importPath);
 

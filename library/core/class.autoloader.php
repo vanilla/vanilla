@@ -555,7 +555,7 @@ class Gdn_Autoloader {
         while ($file = readdir($cacheFolder)) {
             $extension = pathinfo($file, PATHINFO_EXTENSION);
             if ($extension == 'ini' && $file != 'locale_map.ini') {
-                @unlink(CombinePaths([PATH_CACHE, $file]));
+                @unlink(combinePaths([PATH_CACHE, $file]));
             }
         }
 
@@ -748,7 +748,7 @@ class Gdn_Autoloader_Map {
             if (in_array($fileName, $this->ignore)) {
                 continue;
             }
-            $fullPath = CombinePaths([$path, $fileName]);
+            $fullPath = combinePaths([$path, $fileName]);
 
             // If this is a folder...
             if (is_dir($fullPath)) {
@@ -793,7 +793,7 @@ class Gdn_Autoloader_Map {
             if (in_array($fileName, $this->ignore)) {
                 continue;
             }
-            $fullPath = CombinePaths([$path, $fileName]);
+            $fullPath = combinePaths([$path, $fileName]);
 
             // If this is a folder, maybe recurse it eh?
             if (is_dir($fullPath)) {
@@ -971,7 +971,7 @@ class Gdn_Autoloader_Map {
                     $this->mapInfo['dirty'] = true;
                 }
 
-//            $ProvidesClasses = $this->Investigate($File);
+//            $ProvidesClasses = $this->investigate($File);
 //            if ($ProvidesClasses === false) continue;
 //
 //            foreach ($ProvidesClasses as $ProvidedClass) {
@@ -1026,7 +1026,7 @@ class Gdn_Autoloader_Map {
      * @return bool|mixed
      */
     protected function getClassNameFromFile($file) {
-        if (StringEndsWith($file, '.plugin.php')) {
+        if (stringEndsWith($file, '.plugin.php')) {
             return false;
         }
 

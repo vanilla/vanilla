@@ -27,7 +27,7 @@ if (!function_exists('addActivity')) {
         $sendEmail = ''
     ) {
         $activityModel = new ActivityModel();
-        return $activityModel->Add($activityUserID, $activityType, $story, $regardingUserID, '', $route, $sendEmail);
+        return $activityModel->add($activityUserID, $activityType, $story, $regardingUserID, '', $route, $sendEmail);
     }
 }
 
@@ -226,8 +226,8 @@ if (!function_exists('forceSSL')) {
      */
     function forceSSL() {
         if (c('Garden.AllowSSL')) {
-            if (Gdn::Request()->Scheme() != 'https') {
-                redirectTo(Gdn::Request()->Url('', true, true));
+            if (Gdn::request()->scheme() != 'https') {
+                redirectTo(Gdn::request()->url('', true, true));
             }
         }
     }
@@ -243,8 +243,8 @@ if (!function_exists('forceNoSSL')) {
      * @deprecated
      */
     function forceNoSSL() {
-        if (Gdn::Request()->Scheme() != 'http') {
-            redirectTo(Gdn::Request()->Url('', true, false));
+        if (Gdn::request()->scheme() != 'http') {
+            redirectTo(Gdn::request()->url('', true, false));
         }
     }
 }
@@ -333,7 +333,7 @@ if (!function_exists('getIncomingValue')) {
      * @param mixed $default The value to return if the field is not found.
      * @return mixed Returns the value of the field or {@link $default}.
      *
-     * @deprecated Use the various methods on {@link Gdn::Request()}.
+     * @deprecated Use the various methods on {@link Gdn::request()}.
      */
     function getIncomingValue($fieldName, $default = false) {
         if (array_key_exists($fieldName, $_POST) === true) {
@@ -426,7 +426,7 @@ if (!function_exists('mergeArrays')) {
                 // both values are also arrays - because we don't want to overwrite
                 // values in the dominant array with ones from the subservient array.
                 if (is_array($dominant[$key]) && is_array($value)) {
-                    $dominant[$key] = MergeArrays($dominant[$key], $value);
+                    $dominant[$key] = mergeArrays($dominant[$key], $value);
                 }
             }
         }
@@ -557,9 +557,9 @@ if (!function_exists('redirect')) {
         }
 
         // Close any db connections before exit
-        $database = Gdn::Database();
+        $database = Gdn::database();
         if ($database instanceof Gdn_Database) {
-            $database->CloseConnection();
+            $database->closeConnection();
         }
         // Clear out any previously sent content
         @ob_end_clean();
@@ -567,7 +567,7 @@ if (!function_exists('redirect')) {
         // assign status code
         $sendCode = (is_null($statusCode)) ? 302 : $statusCode;
         // re-assign the location header
-        safeHeader("Location: ".Url($destination), true, $sendCode);
+        safeHeader("Location: ".url($destination), true, $sendCode);
         // Exit
         exit();
     }
@@ -585,12 +585,12 @@ if (!function_exists('redirectUrl')) {
         deprecated(__FUNCTION__, 'redirectTo');
 
         if (!$url) {
-            $url = Url('', true);
+            $url = url('', true);
         }
 
         // Close any db connections before exit
-        $database = Gdn::Database();
-        $database->CloseConnection();
+        $database = Gdn::database();
+        $database->closeConnection();
         // Clear out any previously sent content
         @ob_end_clean();
 
@@ -709,12 +709,12 @@ if (!function_exists('safeRedirect')) {
         deprecated(__FUNCTION__, 'redirectTo');
 
         if (!$destination) {
-            $destination = Url('', true);
+            $destination = url('', true);
         } else {
-            $destination = Url($destination, true);
+            $destination = url($destination, true);
         }
 
-        $trustedDomains = TrustedDomains();
+        $trustedDomains = trustedDomains();
         $isTrustedDomain = false;
 
         foreach ($trustedDomains as $trustedDomain) {
@@ -775,7 +775,7 @@ if (!function_exists('viewLocation')) {
             $paths[] = $view;
         } else {
             $view = strtolower($view);
-            $controller = strtolower(StringEndsWith($controller, 'Controller', true, true));
+            $controller = strtolower(stringEndsWith($controller, 'Controller', true, true));
             if ($controller) {
                 $controller = '/'.$controller;
             }
@@ -783,14 +783,14 @@ if (!function_exists('viewLocation')) {
             $extensions = ['tpl', 'php'];
 
             // 1. First we check the theme.
-            if (Gdn::Controller() && $theme = Gdn::Controller()->Theme) {
+            if (Gdn::controller() && $theme = Gdn::controller()->Theme) {
                 foreach ($extensions as $ext) {
                     $paths[] = PATH_THEMES."/{$theme}/views{$controller}/$view.$ext";
                 }
             }
 
             // 2. Then we check the application/plugin.
-            if (StringBeginsWith($folder, 'plugins/')) {
+            if (stringBeginsWith($folder, 'plugins/')) {
                 // This is a plugin view.
                 foreach ($extensions as $ext) {
                     $paths[] = PATH_ROOT."/{$folder}/views{$controller}/$view.$ext";
@@ -802,7 +802,7 @@ if (!function_exists('viewLocation')) {
                     $paths[] = PATH_APPLICATIONS."/{$folder}/views{$controller}/$view.$ext";
                 }
 
-                if ($folder != 'dashboard' && StringEndsWith($view, '.master')) {
+                if ($folder != 'dashboard' && stringEndsWith($view, '.master')) {
                     // This is a master view that can always fall back to the dashboard.
                     foreach ($extensions as $ext) {
                         $paths[] = PATH_APPLICATIONS."/dashboard/views{$controller}/$view.$ext";
@@ -818,8 +818,8 @@ if (!function_exists('viewLocation')) {
             }
         }
 
-        Trace(['view' => $view, 'controller' => $controller, 'folder' => $folder], 'View');
-        Trace($paths, 'ViewLocation()');
+        trace(['view' => $view, 'controller' => $controller, 'folder' => $folder], 'View');
+        trace($paths, 'ViewLocation()');
 
         return false;
     }

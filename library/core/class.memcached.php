@@ -113,12 +113,12 @@ class Gdn_Memcached extends Gdn_Cache {
 
         // No servers, cache temporarily offline
         if (!sizeof($servers)) {
-            SaveToConfig('Cache.Enabled', false, false);
+            saveToConfig('Cache.Enabled', false, false);
             return false;
         }
 
         // Persistent, and already have servers. Short circuit adding.
-        if ($this->Config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->servers())) {
+        if ($this->config(Gdn_Cache::CONTAINER_PERSISTENT) && count($this->servers())) {
             return true;
         }
 
@@ -612,7 +612,7 @@ class Gdn_Memcached extends Gdn_Cache {
 
             $keyTime = sizeof($realKeys) ? $elapsedTime / sizeof($realKeys) : $elapsedTime;
             foreach ($realKeys as $realKey) {
-                TouchValue($realKey, Gdn_Cache::$trackGet, [
+                touchValue($realKey, Gdn_Cache::$trackGet, [
                     'hits' => 0,
                     'time' => 0,
                     'keysize' => null,

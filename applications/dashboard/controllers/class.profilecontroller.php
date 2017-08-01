@@ -164,7 +164,7 @@ class ProfileController extends Gdn_Controller {
             }
 
             // Make sure to only query this page if the user has no new activity since the requesting browser last saw it.
-            $this->SetLastModified($lastModifiedDate);
+            $this->setLastModified($lastModifiedDate);
         }
 
         // Set the canonical Url.
@@ -242,7 +242,7 @@ class ProfileController extends Gdn_Controller {
     }
 
     /**
-     * Generic way to get count via UserModel->ProfileCount().
+     * Generic way to get count via UserModel->profileCount().
      *
      * @since 2.0.?
      * @access public
@@ -583,24 +583,24 @@ class ProfileController extends Gdn_Controller {
         $this->getUserInfo();
         $this->_setBreadcrumbs(t('Notifications'), '/profile/notifications');
 
-        $this->SetTabView('Notifications');
+        $this->setTabView('Notifications');
         $session = Gdn::session();
 
         $this->ActivityModel = new ActivityModel();
 
         // Drop notification count back to zero.
-        $this->ActivityModel->MarkRead($session->UserID);
+        $this->ActivityModel->markRead($session->UserID);
 
         // Get notifications data.
         $activities = $this->ActivityModel->getNotifications($session->UserID, $offset, $limit)->resultArray();
         $this->ActivityModel->joinComments($activities);
         $this->setData('Activities', $activities);
         unset($activities);
-        //$TotalRecords = $this->ActivityModel->GetCountNotifications($Session->UserID);
+        //$TotalRecords = $this->ActivityModel->getCountNotifications($Session->UserID);
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $pagerFactory->GetPager('MorePager', $this);
+        $this->Pager = $pagerFactory->getPager('MorePager', $this);
         $this->Pager->MoreCode = 'More';
         $this->Pager->LessCode = 'Newer Notifications';
         $this->Pager->ClientID = 'Pager';
@@ -671,7 +671,7 @@ class ProfileController extends Gdn_Controller {
         if ($this->Form->authenticatedPostBack() === true) {
             $this->Form->setFormValue('UserID', $this->User->UserID);
             $this->UserModel->defineSchema();
-//         $this->UserModel->Validation->AddValidationField('OldPassword', $this->Form->formValues());
+//         $this->UserModel->Validation->addValidationField('OldPassword', $this->Form->formValues());
 
             // No password may have been set if they have only signed in with a connect plugin
             if (!$this->User->HashMethod || $this->User->HashMethod == "Vanilla") {
@@ -924,7 +924,7 @@ class ProfileController extends Gdn_Controller {
 
         if ($this->Form->authenticatedPostBack()) {
             $data = $this->Form->formValues();
-            Gdn::userModel()->SavePreference(Gdn::session()->UserID, $data);
+            Gdn::userModel()->savePreference(Gdn::session()->UserID, $data);
         } else {
             $user = Gdn::userModel()->getID(Gdn::session()->UserID, DATASET_TYPE_ARRAY);
             $pref = valr($key, $user['Preferences'], null);
@@ -959,7 +959,7 @@ class ProfileController extends Gdn_Controller {
         if (!is_array($userPrefs)) {
             $userPrefs = [];
         }
-        $metaPrefs = UserModel::GetMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
+        $metaPrefs = UserModel::getMeta($this->User->UserID, 'Preferences.%', 'Preferences.');
 
         // Define the preferences to be managed
         $notifications = [];

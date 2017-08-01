@@ -120,15 +120,15 @@ class MorePagerModule extends PagerModule {
     */
     public function details($formatString = '') {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
+            trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager details.', 'MorePager', 'Details'), E_USER_ERROR);
         }
 
         $details = false;
         if ($this->TotalRecords > 0) {
             if ($this->_Totalled === true) {
-                $details = self::FormatUrl(t('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
+                $details = self::formatUrl(t('%s$1 to %s$2 of %s$3'), $this->Offset + 1, $this->_LastOffset, $this->TotalRecords);
             } else {
-                $details = self::FormatUrl(t('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
+                $details = self::formatUrl(t('%s$1 to %s$2'), $this->Offset, $this->_LastOffset);
             }
         }
         return $details;
@@ -155,10 +155,10 @@ class MorePagerModule extends PagerModule {
     public static function formatUrl($url, $offset, $limit = '') {
         // Check for new style page.
         if (strpos($url, '{Page}') !== false || strpos($url, '{Offset}') !== false) {
-            $page = PageNumber($offset, $limit, true);
+            $page = pageNumber($offset, $limit, true);
             return str_replace(['{Offset}', '{Page}', '{Size}'], [$offset, $page, $limit], $url);
         } else {
-            return self::FormatUrl($url, $page, $limit);
+            return self::formatUrl($url, $page, $limit);
         }
 
     }
@@ -180,7 +180,7 @@ class MorePagerModule extends PagerModule {
      */
     public function toString($type = 'more') {
         if ($this->_PropertiesDefined === false) {
-            trigger_error(ErrorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
+            trigger_error(errorMessage('You must configure the pager with $Pager->configure() before retrieving the pager.', 'MorePager', 'GetSimple'), E_USER_ERROR);
         }
 
         // Urls with url-encoded characters will break sprintf, so we need to convert them for backwards compatibility.
@@ -201,7 +201,7 @@ class MorePagerModule extends PagerModule {
 
                 $pager .= anchor(
                     sprintf(t($this->MoreCode), $actualRecordsLeft),
-                    self::FormatUrl($this->Url, $nextOffset, $this->Limit),
+                    self::formatUrl($this->Url, $nextOffset, $this->Limit),
                     '',
                     ['rel' => 'nofollow']
                 );
@@ -223,7 +223,7 @@ class MorePagerModule extends PagerModule {
 
                 $pager .= anchor(
                     sprintf(t($this->LessCode), $this->Offset),
-                    self::FormatUrl($this->Url, $previousOffset, $recordsBefore),
+                    self::formatUrl($this->Url, $previousOffset, $recordsBefore),
                     '',
                     ['rel' => 'nofollow']
                 );
@@ -232,7 +232,7 @@ class MorePagerModule extends PagerModule {
         if ($pager == '') {
             return $this->PagerEmpty;
         } else {
-            return sprintf($this->Wrapper, Attribute(['id' => $clientID, 'class' => $this->CssClass]), $pager);
+            return sprintf($this->Wrapper, attribute(['id' => $clientID, 'class' => $this->CssClass]), $pager);
         }
     }
 

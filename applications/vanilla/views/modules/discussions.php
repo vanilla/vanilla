@@ -9,7 +9,7 @@ if (!isset($this->Prefix))
     <ul class="PanelInfo PanelDiscussions DataList">
         <?php
         foreach ($this->data('Discussions')->result() as $Discussion) {
-            WriteModuleDiscussion($Discussion, $this->Prefix, $this->getShowPhotos());
+            writeModuleDiscussion($Discussion, $this->Prefix, $this->getShowPhotos());
         }
         if ($this->data('Discussions')->numRows() >= $this->Limit) {
             ?>

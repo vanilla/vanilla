@@ -97,7 +97,7 @@ class StubContentPlugin extends Gdn_Plugin {
         //$this->addStubContent('conversation');
 
         try {
-            Gdn::set(sprintf(self::RECORD_KEY, 'locale'), C('Garden.Locale'));
+            Gdn::set(sprintf(self::RECORD_KEY, 'locale'), c('Garden.Locale'));
         } catch (Exception $ex) {
             // Nothing
         }
@@ -149,7 +149,7 @@ class StubContentPlugin extends Gdn_Plugin {
      * @return boolean
      */
     public function addStubContent($type) {
-        $activeLocale = C('Garden.Locale');
+        $activeLocale = c('Garden.Locale');
 
         $allContent = $this->getStubContent($type);
 
@@ -206,7 +206,7 @@ class StubContentPlugin extends Gdn_Plugin {
         }
 
         $contentID = $this->getContentID($content);
-        $activeLocale = C('Garden.Locale');
+        $activeLocale = c('Garden.Locale');
 
         switch ($content['type']) {
 
@@ -431,7 +431,7 @@ class StubContentPlugin extends Gdn_Plugin {
      */
     public function updateContent($content, $record) {
 
-        $activeLocale = C('Garden.Locale');
+        $activeLocale = c('Garden.Locale');
         setvalr('Attributes.StubLocale', $record['row'], $activeLocale);
 
         switch ($content['type']) {

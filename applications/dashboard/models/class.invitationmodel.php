@@ -91,7 +91,7 @@ class InvitationModel extends Gdn_Model {
         $this->Validation->applyRule('Email', 'Email');
 
         // Make sure required db fields are present.
-        $this->AddInsertFields($formPostValues);
+        $this->addInsertFields($formPostValues);
         if (!isset($formPostValues['DateExpires'])) {
             $expires = strtotime(c('Garden.Registration.InviteExpiration'));
             if ($expires > time()) {
@@ -99,15 +99,15 @@ class InvitationModel extends Gdn_Model {
             }
         }
 
-        $formPostValues['Code'] = $this->GetInvitationCode();
+        $formPostValues['Code'] = $this->getInvitationCode();
 
         // Validate the form posted values
         if ($this->validate($formPostValues, true) === true) {
-            $fields = $this->Validation->ValidationFields(); // All fields on the form that need to be validated
+            $fields = $this->Validation->validationFields(); // All fields on the form that need to be validated
             $email = val('Email', $fields, '');
 
             // Make sure this user has a spare invitation to send.
-            $inviteCount = $userModel->GetInvitationCount($userID);
+            $inviteCount = $userModel->getInvitationCount($userID);
             if ($inviteCount == 0) {
                 $this->Validation->addValidationResult('Email', 'You do not have enough invitations left.');
                 return false;
@@ -134,7 +134,7 @@ class InvitationModel extends Gdn_Model {
             }
 
             // Define the fields to be inserted
-            $fields = $this->Validation->SchemaValidationFields();
+            $fields = $this->Validation->schemaValidationFields();
 
             // Call the base model for saving
             $invitationID = $this->insert($fields);
@@ -146,7 +146,7 @@ class InvitationModel extends Gdn_Model {
 
             // Now that saving has succeeded, update the user's invitation settings
             if ($inviteCount > 0) {
-                $userModel->ReduceInviteCount($userID);
+                $userModel->reduceInviteCount($userID);
             }
 
             // And send the invitation email
@@ -170,7 +170,7 @@ class InvitationModel extends Gdn_Model {
      * @throws Exception
      */
     public function send($invitationID) {
-        $invitation = $this->GetByInvitationID($invitationID);
+        $invitation = $this->getByInvitationID($invitationID);
         $session = Gdn::session();
         if ($invitation === false) {
             throw new Exception(t('ErrorRecordNotFound'));
@@ -178,7 +178,7 @@ class InvitationModel extends Gdn_Model {
             throw new Exception(t('InviteErrorPermission', t('ErrorPermission')));
         } else {
             // Some information for the email
-            $registrationUrl = ExternalUrl("entry/registerinvitation/{$invitation->Code}");
+            $registrationUrl = externalUrl("entry/registerinvitation/{$invitation->Code}");
 
             $appTitle = Gdn::config('Garden.Title');
             $email = new Gdn_Email();
@@ -233,7 +233,7 @@ class InvitationModel extends Gdn_Model {
 
         // Add the invitation back onto the user's account if the invitation has not been accepted.
         if (!$invitation->AcceptedUserID) {
-            Gdn::userModel()->IncreaseInviteCount($userID);
+            Gdn::userModel()->increaseInviteCount($userID);
         }
 
         return true;
@@ -244,12 +244,12 @@ class InvitationModel extends Gdn_Model {
      */
     protected function getInvitationCode() {
         // Generate a new invitation code.
-        $code = BetterRandomString(16, 'Aa0');
+        $code = betterRandomString(16, 'Aa0');
 
         // Make sure the string doesn't already exist in the invitation table
         $codeData = $this->getWhere(['Code' => $code]);
         if ($codeData->numRows() > 0) {
-            return $this->GetInvitationCode();
+            return $this->getInvitationCode();
         } else {
             return $code;
         }

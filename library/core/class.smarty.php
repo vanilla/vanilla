@@ -28,14 +28,14 @@ class Gdn_Smarty {
 
         // Get a friendly name for the controller.
         $controllerName = get_class($controller);
-        if (StringEndsWith($controllerName, 'Controller', true)) {
+        if (stringEndsWith($controllerName, 'Controller', true)) {
             $controllerName = substr($controllerName, 0, -10);
         }
 
         // Get an ID for the body.
         $bodyIdentifier = strtolower($controller->ApplicationFolder.'_'.$controllerName.'_'.Gdn_Format::alphaNumeric(strtolower($controller->RequestMethod)));
         $smarty->assign('BodyID', htmlspecialchars($bodyIdentifier));
-        //$Smarty->assign('Config', Gdn::Config());
+        //$Smarty->assign('Config', Gdn::config());
 
         // Assign some information about the user.
         $session = Gdn::session();
@@ -174,7 +174,7 @@ class Gdn_Smarty {
             $smarty->setCompileDir(PATH_CACHE.'/Smarty/compile');
             $smarty->addPluginsDir(PATH_LIBRARY.'/SmartyPlugins');
 
-//         Gdn::PluginManager()->Trace = TRUE;
+//         Gdn::pluginManager()->Trace = TRUE;
             Gdn::pluginManager()->callEventHandlers($smarty, 'Gdn_Smarty', 'Init');
 
             $this->_Smarty = $smarty;
@@ -199,7 +199,7 @@ class Gdn_Smarty {
         $return = true;
         try {
             $result = $smarty->fetch($path, null, $compileID);
-            // echo Wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
+            // echo wrap($Result, 'textarea', array('style' => 'width: 900px; height: 400px;'));
             $return = ($result == '' || strpos($result, '<title>Fatal Error</title>') > 0 || strpos($result, '<h1>Something has gone wrong.</h1>') > 0) ? false : true;
         } catch (Exception $ex) {
             $return = false;

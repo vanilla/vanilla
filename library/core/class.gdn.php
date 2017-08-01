@@ -228,7 +228,7 @@ class Gdn {
      *
      * @param string $alias The alias of the factory to check for.
      * @return boolean Whether or not a factory definintion exists.
-     * @see Gdn_Factory::Exists()
+     * @see Gdn_Factory::exists()
      */
     public static function factoryExists($alias) {
         return static::getContainer()->hasRule($alias);
@@ -242,7 +242,7 @@ class Gdn {
      * @param string $path The path to the class' file. You can prefix the path with ~ to start at the application root.
      * @param string $factoryType The way objects will be instantiated for the class. One of the Gdn::Factory* constants.
      * @param mixed $data Additional data for the installation.
-     * @see Gdn_Factory::Install()
+     * @see Gdn_Factory::install()
      */
     public static function factoryInstall($alias, $className, $path = '', $factoryType = self::FactorySingleton, $data = null) {
         // Don't overwrite an existing definition.
@@ -296,7 +296,7 @@ class Gdn {
      * @param string $alias The alias of the class that will have the dependency.
      * @param string $propertyName The name of the property on the class that will have the dependency.
      * @param string $sourceAlias The alias of the class that will provide the value of the property when objects are instantiated.
-     * @see Gdn_Factory::InstalDependency()
+     * @see Gdn_Factory::instalDependency()
      */
     public static function factoryInstallDependency($alias, $propertyName, $sourceAlias) {
         deprecated('Gdn::factoryInstallDependency()');
@@ -366,9 +366,9 @@ class Gdn {
         static $installationID = false;
         if (!is_null($setInstallationID)) {
             if ($setInstallationID !== false) {
-                SaveToConfig('Garden.InstallationID', $setInstallationID);
+                saveToConfig('Garden.InstallationID', $setInstallationID);
             } else {
-                RemoveFromConfig('Garden.InstallationID');
+                removeFromConfig('Garden.InstallationID');
             }
             $installationID = $setInstallationID;
         }
@@ -391,9 +391,9 @@ class Gdn {
         static $installationSecret = false;
         if (!is_null($setInstallationSecret)) {
             if ($setInstallationSecret !== false) {
-                SaveToConfig('Garden.InstallationSecret', $setInstallationSecret);
+                saveToConfig('Garden.InstallationSecret', $setInstallationSecret);
             } else {
-                RemoveFromConfig('Garden.InstallationSecret');
+                removeFromConfig('Garden.InstallationSecret');
             }
             $installationSecret = $setInstallationSecret;
         }
@@ -437,7 +437,7 @@ class Gdn {
             self::$_PluginManager = static::getContainer()->get(self::AliasPluginManager);
         }
 
-        return self::$_PluginManager; //self::Factory(self::AliasPluginManager);
+        return self::$_PluginManager; //self::factory(self::AliasPluginManager);
     }
 
     /**
@@ -458,7 +458,7 @@ class Gdn {
             self::$_Request = static::getContainer()->get(self::AliasRequest);
         }
 
-        $request = self::$_Request; //self::Factory(self::AliasRequest);
+        $request = self::$_Request; //self::factory(self::AliasRequest);
         if (!is_null($newRequest)) {
             if (is_string($newRequest)) {
                 $request->withURI($newRequest);
@@ -506,7 +506,7 @@ class Gdn {
      * Get a reference to the default SQL driver object.
      *
      * @return Gdn_SQLDriver
-     * @see Gdn_Database::SQL()
+     * @see Gdn_Database::sql()
      */
     public static function sql() {
         $database = self::database();

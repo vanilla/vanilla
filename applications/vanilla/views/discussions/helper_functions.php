@@ -72,7 +72,7 @@ if (!function_exists('BookmarkButton')) {
         $title = t($discussion->Bookmarked == '1' ? 'Unbookmark' : 'Bookmark');
         return anchor(
             $title,
-            '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->TransientKey(),
+            '/discussion/bookmark/'.$discussion->DiscussionID.'/'.Gdn::session()->transientKey(),
             'Hijack Bookmark'.($discussion->Bookmarked == '1' ? ' Bookmarked' : ''),
             ['title' => $title]
         );
@@ -117,7 +117,7 @@ if (!function_exists('WriteDiscussion')) :
      * @param $session
      */
     function writeDiscussion($discussion, $sender, $session) {
-        $cssClass = CssClass($discussion);
+        $cssClass = cssClass($discussion);
         $discussionUrl = $discussion->Url;
         $category = CategoryModel::categories($discussion->CategoryID);
 
@@ -128,8 +128,8 @@ if (!function_exists('WriteDiscussion')) :
         $sender->EventArguments['Discussion'] = &$discussion;
         $sender->EventArguments['CssClass'] = &$cssClass;
 
-        $first = UserBuilder($discussion, 'First');
-        $last = UserBuilder($discussion, 'Last');
+        $first = userBuilder($discussion, 'First');
+        $last = userBuilder($discussion, 'Last');
         $sender->EventArguments['FirstUser'] = &$first;
         $sender->EventArguments['LastUser'] = &$last;
 
@@ -213,7 +213,7 @@ if (!function_exists('WriteDiscussion')) :
                     if ($sender->data('_ShowCategoryLink', true) && c('Vanilla.Categories.Use') && $category) {
                         echo wrap(
                             anchor(htmlspecialchars($discussion->Category),
-                            CategoryUrl($discussion->CategoryUrlCode)),
+                            categoryUrl($discussion->CategoryUrlCode)),
                             'span',
                             ['class' => 'MItem Category '.$category['CssClass']]
                         );
@@ -262,7 +262,7 @@ if (!function_exists('WriteDiscussionSorter')) :
                 <ul>
                     <?php
                     foreach ($options as $sortField => $sortText) {
-                        echo wrap(Anchor($sortText, '#', ['class' => 'SortDiscussions', 'data-field' => $sortField]), 'li');
+                        echo wrap(anchor($sortText, '#', ['class' => 'SortDiscussions', 'data-field' => $sortField]), 'li');
                     }
                     ?>
                 </ul>
@@ -287,14 +287,14 @@ if (!function_exists('WriteMiniPager')) :
             echo '<span class="MiniPager">';
             if ($discussion->CountPages < 5) {
                 for ($i = 0; $i < $discussion->CountPages; $i++) {
-                    WritePageLink($discussion, $i + 1);
+                    writePageLink($discussion, $i + 1);
                 }
             } else {
-                WritePageLink($discussion, 1);
-                WritePageLink($discussion, 2);
+                writePageLink($discussion, 1);
+                writePageLink($discussion, 2);
                 echo '<span class="Elipsis">...</span>';
-                WritePageLink($discussion, $discussion->CountPages - 1);
-                WritePageLink($discussion, $discussion->CountPages);
+                writePageLink($discussion, $discussion->CountPages - 1);
+                writePageLink($discussion, $discussion->CountPages);
                 // echo anchor('Go To Page', '#', 'GoToPageLink');
             }
             echo '</span>';
@@ -310,7 +310,7 @@ if (!function_exists('WritePageLink')):
      * @param $pageNumber
      */
     function writePageLink($discussion, $pageNumber) {
-        echo anchor($pageNumber, DiscussionUrl($discussion, $pageNumber));
+        echo anchor($pageNumber, discussionUrl($discussion, $pageNumber));
     }
 endif;
 
@@ -373,8 +373,8 @@ if (!function_exists('writeTags')) :
     function writeTags($discussion) {
         Gdn::controller()->fireEvent('BeforeDiscussionMeta');
 
-        echo Tag($discussion, 'Announce', 'Announcement');
-        echo Tag($discussion, 'Closed', 'Closed');
+        echo tag($discussion, 'Announce', 'Announcement');
+        echo tag($discussion, 'Closed', 'Closed');
 
         Gdn::controller()->fireEvent('AfterDiscussionLabels');
     }

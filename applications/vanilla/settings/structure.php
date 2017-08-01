@@ -2,7 +2,7 @@
 /**
  * Vanilla database structure.
  *
- * Called by VanillaHooks::Setup() to update database upon enabling app.
+ * Called by VanillaHooks::setup() to update database upon enabling app.
  *
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2
@@ -19,13 +19,13 @@ if (!isset($Explicit)) {
 }
 
 $SQL = Gdn::database()->sql();
-$Construct = Gdn::database()->Structure();
-$Px = $Construct->DatabasePrefix();
+$Construct = Gdn::database()->structure();
+$Px = $Construct->databasePrefix();
 
 $captureOnly = Gdn::database()->structure()->CaptureOnly;
 
 $Construct->table('Category');
-$CategoryExists = $Construct->TableExists();
+$CategoryExists = $Construct->tableExists();
 $CountCategoriesExists = $Construct->columnExists('CountCategories');
 $PermissionCategoryIDExists = $Construct->columnExists('PermissionCategoryID');
 
@@ -34,7 +34,7 @@ $LastDiscussionIDExists = $Construct->columnExists('LastDiscussionID');
 $CountAllDiscussionsExists = $Construct->columnExists('CountAllDiscussions');
 $CountAllCommentsExists = $Construct->columnExists('CountAllComments');
 
-$Construct->PrimaryKey('CategoryID')
+$Construct->primaryKey('CategoryID')
     ->column('ParentCategoryID', 'int', true, 'key')
     ->column('TreeLeft', 'int', true)
     ->column('TreeRight', 'int', true)
@@ -110,7 +110,7 @@ if ($CategoryExists) {
 
 // Construct the discussion table.
 $Construct->table('Discussion');
-$DiscussionExists = $Construct->TableExists();
+$DiscussionExists = $Construct->tableExists();
 $FirstCommentIDExists = $Construct->columnExists('FirstCommentID');
 $BodyExists = $Construct->columnExists('Body');
 $LastCommentIDExists = $Construct->columnExists('LastCommentID');
@@ -118,7 +118,7 @@ $LastCommentUserIDExists = $Construct->columnExists('LastCommentUserID');
 $CountBookmarksExists = $Construct->columnExists('CountBookmarks');
 
 $Construct
-    ->PrimaryKey('DiscussionID')
+    ->primaryKey('DiscussionID')
     ->column('Type', 'varchar(10)', true, 'index')
     ->column('ForeignID', 'varchar(32)', true, 'index')// For relating foreign records to discussions
     ->column('CategoryID', 'int', false, ['index.CategoryPages', 'index.CategoryInserted'])
@@ -168,7 +168,7 @@ $Construct->table('UserCategory')
     ->set($Explicit, $Drop);
 
 // Allows the tracking of relationships between discussions and users (bookmarks, dismissed announcements, # of read comments in a discussion, etc)
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
+// column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 $Construct->table('UserDiscussion');
 
 $ParticipatedExists = $Construct->columnExists('Participated');
@@ -185,15 +185,15 @@ $Construct->column('UserID', 'int', false, 'primary')
 
 $Construct->table('Comment');
 
-if ($Construct->TableExists()) {
-    $CommentIndexes = $Construct->IndexSqlDb();
+if ($Construct->tableExists()) {
+    $CommentIndexes = $Construct->indexSqlDb();
 } else {
     $CommentIndexes = [];
 }
 
 $Construct
     ->table('Comment')
-    ->PrimaryKey('CommentID')
+    ->primaryKey('CommentID')
     ->column('DiscussionID', 'int', false, 'index.1')
     //->column('Type', 'varchar(10)', true)
     //->column('ForeignID', 'varchar(32)', TRUE, 'index') // For relating foreign records to discussions
@@ -251,7 +251,7 @@ $Construct->table('User')
     ->set();
 
 $Construct->table('Draft')
-    ->PrimaryKey('DraftID')
+    ->primaryKey('DraftID')
     ->column('DiscussionID', 'int', true, 'key')
     ->column('CategoryID', 'int', true, 'key')
     ->column('InsertUserID', 'int', false, 'key')
@@ -308,22 +308,22 @@ if ($SQL->getWhere('ActivityType', ['Name' => 'BookmarkComment'])->numRows() == 
 }
 
 $ActivityModel = new ActivityModel();
-$ActivityModel->DefineType('Discussion');
-$ActivityModel->DefineType('Comment');
+$ActivityModel->defineType('Discussion');
+$ActivityModel->defineType('Comment');
 
 $PermissionModel = Gdn::permissionModel();
 $PermissionModel->Database = Gdn::database();
 $PermissionModel->SQL = $SQL;
 
 // Define some global vanilla permissions.
-$PermissionModel->Define([
+$PermissionModel->define([
     'Vanilla.Approval.Require',
     'Vanilla.Comments.Me' => 1,
 ]);
-$PermissionModel->Undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
+$PermissionModel->undefine(['Vanilla.Settings.Manage', 'Vanilla.Categories.Manage']);
 
 // Define some permissions for the Vanilla categories.
-$PermissionModel->Define(
+$PermissionModel->define(
     [
     'Vanilla.Discussions.View' => 1,
     'Vanilla.Discussions.Add' => 1,
@@ -340,7 +340,7 @@ $PermissionModel->Define(
     'PermissionCategoryID'
 );
 
-$PermissionModel->Undefine('Vanilla.Spam.Manage');
+$PermissionModel->undefine('Vanilla.Spam.Manage');
 
 /*
 Apr 26th, 2010
@@ -392,7 +392,7 @@ $Construct
     ->column('DiscussionID', 'int', false, 'primary')
     ->column('CategoryID', 'int', false, 'index')
     ->column('DateInserted', 'datetime', !$DateInsertedExists)
-    ->Engine('InnoDB')
+    ->engine('InnoDB')
     ->set($Explicit, $Drop);
 
 if (!$DateInsertedExists) {

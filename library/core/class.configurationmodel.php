@@ -35,7 +35,7 @@ class Gdn_ConfigurationModel {
     /**
      * @var string A collection of Field => Values that will NOT be validated and WILL be
      * saved as long as validation succeeds. You can add to this collection with
-     * $this->ForceSetting();
+     * $this->forceSetting();
      */
     private $_ForceSettings = [];
 
@@ -163,7 +163,7 @@ class Gdn_ConfigurationModel {
     }
 
     /**
-     * Returns the $this->Validation->ValidationResults() array.
+     * Returns the $this->Validation->validationResults() array.
      */
     public function validationResults() {
         return $this->Validation->results();

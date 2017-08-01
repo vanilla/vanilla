@@ -21,7 +21,7 @@ class Smf2ImportModel extends Gdn_Model {
      */
     public function afterImport() {
         // Make different sizes of avatars
-        $this->ProcessAvatars();
+        $this->processAvatars();
     }
 
     /**
@@ -50,7 +50,7 @@ class Smf2ImportModel extends Gdn_Model {
 
                 // Save the uploaded image in profile size
                 if (!file_exists(PATH_ROOT.'/uploads/userpics/p'.$imageBaseName)) {
-                    $uploadImage->SaveImageAs(
+                    $uploadImage->saveImageAs(
                         $image,
                         PATH_ROOT.'/uploads/userpics/p'.$imageBaseName,
                         Gdn::config('Garden.Profile.MaxHeight'),
@@ -60,7 +60,7 @@ class Smf2ImportModel extends Gdn_Model {
 
                 // Save the uploaded image in preview size
                 /*if (!file_exists(PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName))
-                $UploadImage->SaveImageAs(
+                $UploadImage->saveImageAs(
                    $Image,
                    PATH_ROOT.'/uploads/userpics/t'.$ImageBaseName,
                    Gdn::config('Garden.Preview.MaxHeight', 100),
@@ -70,7 +70,7 @@ class Smf2ImportModel extends Gdn_Model {
                 // Save the uploaded image in thumbnail size
                 $thumbSize = Gdn::config('Garden.Thumbnail.Size');
                 if (!file_exists(PATH_ROOT.'/uploads/userpics/n'.$imageBaseName)) {
-                    $uploadImage->SaveImageAs(
+                    $uploadImage->saveImageAs(
                         $image,
                         PATH_ROOT.'/uploads/userpics/n'.$imageBaseName,
                         $thumbSize,

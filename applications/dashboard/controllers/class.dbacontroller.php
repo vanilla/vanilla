@@ -47,10 +47,10 @@ class DbaController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if ($table && $column && strcasecmp($this->Request->requestMethod(), Gdn_Request::INPUT_POST) == 0) {
-            if (!ValidateRequired($table)) {
+            if (!validateRequired($table)) {
                 throw new Gdn_UserException("Table is required.");
             }
-            if (!ValidateRequired($column)) {
+            if (!validateRequired($column)) {
                 throw new Gdn_UserException("Column is required.");
             }
 

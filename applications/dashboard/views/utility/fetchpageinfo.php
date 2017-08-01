@@ -12,7 +12,7 @@ if ($Title == '') {
     }
 
     if ($Strip = c('Vanilla.Embed.StripSuffix')) {
-        $Title = StringEndsWith($Title, $Strip, true, true);
+        $Title = stringEndsWith($Title, $Strip, true, true);
     }
 }
 $Title = trim($Title);

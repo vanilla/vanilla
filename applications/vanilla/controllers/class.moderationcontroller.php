@@ -21,7 +21,7 @@ class ModerationController extends VanillaController {
     public function checkedComments() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        ModerationController::InformCheckedComments($this);
+        ModerationController::informCheckedComments($this);
         $this->render();
     }
 
@@ -33,7 +33,7 @@ class ModerationController extends VanillaController {
     public function checkedDiscussions() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        ModerationController::InformCheckedDiscussions($this);
+        ModerationController::informCheckedDiscussions($this);
         $this->render();
     }
 
@@ -68,11 +68,11 @@ class ModerationController extends VanillaController {
             }
             foreach ($checkIDs as $check) {
                 if (val('checked', $check)) {
-                    if (!ArrayHasValue($checkedComments, $check['checkId'])) {
+                    if (!arrayHasValue($checkedComments, $check['checkId'])) {
                         $checkedComments[$discussionID][] = $check['checkId'];
                     }
                 } else {
-                    RemoveValueFromArray($checkedComments[$discussionID], $check['checkId']);
+                    removeValueFromArray($checkedComments[$discussionID], $check['checkId']);
                 }
             }
 
@@ -121,7 +121,7 @@ class ModerationController extends VanillaController {
 
             $sender->informMessage(
                 $selectionMessage
-                .Wrap($actionMessage, 'div', ['class' => 'Actions']),
+                .wrap($actionMessage, 'div', ['class' => 'Actions']),
                 [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
@@ -159,11 +159,11 @@ class ModerationController extends VanillaController {
 
             foreach ($checkIDs as $check) {
                 if (val('checked', $check)) {
-                    if (!ArrayHasValue($checkedDiscussions, $check['checkId'])) {
+                    if (!arrayHasValue($checkedDiscussions, $check['checkId'])) {
                         $checkedDiscussions[] = $check['checkId'];
                     }
                 } else {
-                    RemoveValueFromArray($checkedDiscussions, $check['checkId']);
+                    removeValueFromArray($checkedDiscussions, $check['checkId']);
                 }
             }
 
@@ -195,7 +195,7 @@ class ModerationController extends VanillaController {
 
             $sender->informMessage(
                 $selectionMessage
-                .Wrap($actionMessage, 'div', ['class' => 'Actions']),
+                .wrap($actionMessage, 'div', ['class' => 'Actions']),
                 [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
@@ -218,7 +218,7 @@ class ModerationController extends VanillaController {
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedComments', $checkedComments);
         }
 
-        redirectTo(GetIncomingValue('Target', '/discussions'));
+        redirectTo(getIncomingValue('Target', '/discussions'));
     }
 
     /**
@@ -230,7 +230,7 @@ class ModerationController extends VanillaController {
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', false);
         }
 
-        redirectTo(GetIncomingValue('Target', '/discussions'));
+        redirectTo(getIncomingValue('Target', '/discussions'));
     }
 
     /**
@@ -279,7 +279,7 @@ class ModerationController extends VanillaController {
             // Clear selections
             unset($checkedComments[$discussionID]);
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedComments', $checkedComments);
-            ModerationController::InformCheckedComments($this);
+            ModerationController::informCheckedComments($this);
             $this->setRedirectTo('discussions');
         }
 
@@ -332,7 +332,7 @@ class ModerationController extends VanillaController {
 
             // Clear selections
             Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
-            ModerationController::InformCheckedDiscussions($this, true);
+            ModerationController::informCheckedDiscussions($this, true);
         }
 
         $this->render();
@@ -368,7 +368,7 @@ class ModerationController extends VanillaController {
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
-        $DiscussionData = Gdn_DataSet::Index($DiscussionData->resultArray(), ['DiscussionID']);
+        $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);
             if ($Category && $Category['PermsDiscussionsEdit']) {
@@ -399,14 +399,14 @@ class ModerationController extends VanillaController {
                 // Create the shadow redirect.
                 if ($RedirectLink) {
                     $DiscussionModel->defineSchema();
-                    $MaxNameLength = val('Length', $DiscussionModel->Schema->GetField('Name'));
+                    $MaxNameLength = val('Length', $DiscussionModel->Schema->getField('Name'));
 
                     $RedirectDiscussion = [
-                        'Name' => SliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
+                        'Name' => sliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
                         'DateInserted' => $Discussion['DateLastComment'],
                         'Type' => 'redirect',
                         'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => DiscussionUrl($Discussion)]),
+                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => discussionUrl($Discussion)]),
                         'Format' => 'Html',
                         'Closed' => true
                     ];
@@ -471,7 +471,7 @@ class ModerationController extends VanillaController {
             // Clear selections.
             if ($ClearSelection) {
                 Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
-                ModerationController::InformCheckedDiscussions($this);
+                ModerationController::informCheckedDiscussions($this);
             }
 
             if ($this->Form->errorCount() == 0) {

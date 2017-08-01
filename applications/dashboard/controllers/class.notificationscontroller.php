@@ -96,8 +96,8 @@ class NotificationsController extends Gdn_Controller {
 
             $sender->informMessage(
                 $userPhoto
-                .Wrap($activity['Headline'], 'div', ['class' => 'Title'])
-                .Wrap($excerpt, 'div', ['class' => 'Excerpt']),
+                .wrap($activity['Headline'], 'div', ['class' => 'Title'])
+                .wrap($excerpt, 'div', ['class' => 'Excerpt']),
                 'Dismissable AutoDismiss'.$activityClass.($userPhoto == '' ? '' : ' HasIcon')
             );
         }

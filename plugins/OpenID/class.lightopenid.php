@@ -68,7 +68,7 @@ class LightOpenID {
     ];
 
     public function __construct() {
-        $this->trustRoot = Gdn::request()->Scheme().'://'.Gdn::request()->Host();
+        $this->trustRoot = Gdn::request()->scheme().'://'.Gdn::request()->host();
         $uri = rtrim(preg_replace('#((?<=\?)|&)openid\.[^&]+#', '', $_SERVER['REQUEST_URI']), '?');
         $this->returnUrl = $this->trustRoot.$uri;
 

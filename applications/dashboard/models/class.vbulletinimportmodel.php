@@ -26,34 +26,34 @@ class vBulletinImportModel extends Gdn_Model {
         $router = Gdn::router();
 
         // Categories
-        $router->SetRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
-        $router->SetRoute('archive\.php/f-(\d+)\.html', 'categories/$1', 'Permanent');
+        $router->setRoute('forumdisplay\.php\?f=(\d+)', 'categories/$1', 'Permanent');
+        $router->setRoute('archive\.php/f-(\d+)\.html', 'categories/$1', 'Permanent');
 
         // Discussions & Comments
-        $router->SetRoute('showthread\.php\?t=(\d+)', 'discussion/$1', 'Permanent');
-        //$Router->SetRoute('showthread\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
-        //$Router->SetRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
-        $router->SetRoute('archive\.php/t-(\d+)\.html', 'discussion/$1', 'Permanent');
+        $router->setRoute('showthread\.php\?t=(\d+)', 'discussion/$1', 'Permanent');
+        //$Router->setRoute('showthread\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
+        //$Router->setRoute('showpost\.php\?p=(\d+)', 'discussion/comment/$1#Comment_$1', 'Permanent');
+        $router->setRoute('archive\.php/t-(\d+)\.html', 'discussion/$1', 'Permanent');
 
         // Profiles
-        $router->SetRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');
-        $router->SetRoute('usercp\.php', 'profile', 'Permanent');
-        $router->SetRoute('profile\.php', 'profile', 'Permanent');
+        $router->setRoute('member\.php\?u=(\d+)', 'profile/$1/x', 'Permanent');
+        $router->setRoute('usercp\.php', 'profile', 'Permanent');
+        $router->setRoute('profile\.php', 'profile', 'Permanent');
 
         // Other
-        $router->SetRoute('attachment\.php\?attachmentid=(\d+)', 'discussion/download/$1', 'Permanent');
-        $router->SetRoute('search\.php', 'discussions', 'Permanent');
-        $router->SetRoute('private\.php', 'messages/all', 'Permanent');
-        $router->SetRoute('subscription\.php', 'discussions/bookmarked', 'Permanent');
+        $router->setRoute('attachment\.php\?attachmentid=(\d+)', 'discussion/download/$1', 'Permanent');
+        $router->setRoute('search\.php', 'discussions', 'Permanent');
+        $router->setRoute('private\.php', 'messages/all', 'Permanent');
+        $router->setRoute('subscription\.php', 'discussions/bookmarked', 'Permanent');
 
         // Make different sizes of avatars
-        $this->ProcessAvatars();
+        $this->processAvatars();
 
         // Prep config for ProfileExtender plugin based on imported fields
-        $this->ProfileExtenderPrep();
+        $this->profileExtenderPrep();
 
         // Set guests to System user to prevent security issues
-        $systemUserID = Gdn::userModel()->GetSystemUserID();
+        $systemUserID = Gdn::userModel()->getSystemUserID();
         $this->SQL->update('Discussion')
             ->set('InsertUserID', $systemUserID)
             ->where('InsertUserID', 0)
@@ -87,11 +87,11 @@ class vBulletinImportModel extends Gdn_Model {
         // Create profile and thumbnail sizes
         foreach ($userData->result() as $user) {
             try {
-                $image = PATH_ROOT.DS.'uploads'.DS.GetValue('Photo', $user);
+                $image = PATH_ROOT.DS.'uploads'.DS.getValue('Photo', $user);
                 $imageBaseName = pathinfo($image, PATHINFO_BASENAME);
 
                 // Save profile size
-                $uploadImage->SaveImageAs(
+                $uploadImage->saveImageAs(
                     $image,
                     PATH_UPLOADS.'/userpics/p'.$imageBaseName,
                     $profileHeight,
@@ -99,7 +99,7 @@ class vBulletinImportModel extends Gdn_Model {
                 );
 
                 // Save thumbnail size
-                $uploadImage->SaveImageAs(
+                $uploadImage->saveImageAs(
                     $image,
                     PATH_UPLOADS.'/userpics/n'.$imageBaseName,
                     $thumbSize,
@@ -115,7 +115,7 @@ class vBulletinImportModel extends Gdn_Model {
      * Get profile fields imported and add to ProfileFields list.
      */
     public function profileExtenderPrep() {
-        $profileKeyData = $this->SQL->select('m.Name')->Distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
+        $profileKeyData = $this->SQL->select('m.Name')->distinct()->from('UserMeta m')->like('m.Name', 'Profile_%')->get();
         $existingKeys = array_filter((array)explode(',', c('Plugins.ProfileExtender.ProfileFields', '')));
         foreach ($profileKeyData->result() as $key) {
             $name = str_replace('Profile.', '', $key->Name);

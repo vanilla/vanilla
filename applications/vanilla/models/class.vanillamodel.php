@@ -47,7 +47,7 @@ abstract class VanillaModel extends Gdn_Model {
 
         // Validate $Type
         if (!in_array($type, ['Comment', 'Discussion'])) {
-            trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
+            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Vanilla', $type);

@@ -620,7 +620,7 @@ class PostController extends VanillaController {
 
         // If closed, cancel & go to discussion
         if ($Discussion && $Discussion->Closed == 1 && !$Editing && !CategoryModel::checkPermission($Discussion->CategoryID, 'Vanilla.Discussions.Close')) {
-            redirectTo(DiscussionUrl($Discussion));
+            redirectTo(discussionUrl($Discussion));
         }
 
         // Add hidden IDs to form
@@ -668,7 +668,7 @@ class PostController extends VanillaController {
                 $DraftID = $this->Form->getFormValue('DraftID', 0);
             }
 
-            $Type = GetIncomingValue('Type');
+            $Type = getIncomingValue('Type');
             $Draft = $Type == 'Draft';
             $this->EventArguments['Draft'] = $Draft;
             $Preview = $Type == 'Preview';
@@ -733,7 +733,7 @@ class PostController extends VanillaController {
                         if ($CommentID > 0) {
                             redirectTo("discussion/comment/$CommentID/#Comment_$CommentID");
                         } elseif ($CommentID == SPAM) {
-                            $this->setData('DiscussionUrl', DiscussionUrl($Discussion));
+                            $this->setData('DiscussionUrl', discussionUrl($Discussion));
                             $this->View = 'Spam';
 
                         }
@@ -785,7 +785,7 @@ class PostController extends VanillaController {
                             $this->View = 'comments';
 
                             // Also define the discussion url in case this request came from the post screen and needs to be redirected to the discussion
-                            $this->setJson('DiscussionUrl', DiscussionUrl($this->Discussion).'#Comment_'.$CommentID);
+                            $this->setJson('DiscussionUrl', discussionUrl($this->Discussion).'#Comment_'.$CommentID);
                         } else {
                             // If the comment model isn't sorted by DateInserted or CommentID then we can't do any fancy loading of comments.
                             $OrderBy = valr('0.0', $this->CommentModel->orderBy());
@@ -799,22 +799,22 @@ class PostController extends VanillaController {
 //                           $LastCommentID = $CommentID - 1; // Failsafe back to this new comment if the lastcommentid was not defined properly
 //
 //                        // Don't reload the first comment if this new comment is the first one.
-//                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->GetOffset($LastCommentID);
+//                        $this->Offset = $LastCommentID == 0 ? 1 : $this->CommentModel->getOffset($LastCommentID);
 //                        // Do not load more than a single page of data...
 //                        $Limit = c('Vanilla.Comments.PerPage', 30);
 //
 //                        // Redirect if the new new comment isn't on the same page.
-//                        $Redirect |= !$DisplayNewCommentOnly && PageNumber($this->Offset, $Limit) != PageNumber($Discussion->CountComments - 1, $Limit);
+//                        $Redirect |= !$DisplayNewCommentOnly && pageNumber($this->Offset, $Limit) != pageNumber($Discussion->CountComments - 1, $Limit);
 //                     }
 
 //                     if ($Redirect) {
 //                        // The user posted a comment on a page other than the last one, so just redirect to the last page.
-//                        $this->RedirectUrl = Gdn::request()->Url("discussion/comment/$CommentID/#Comment_$CommentID", true);
+//                        $this->RedirectUrl = Gdn::request()->url("discussion/comment/$CommentID/#Comment_$CommentID", true);
 //                     } else {
 //                        // Make sure to load all new comments since the page was last loaded by this user
 //								if ($DisplayNewCommentOnly)
-                            $this->Offset = $this->CommentModel->GetOffset($CommentID);
-                            $Comments = $this->CommentModel->GetIDData($CommentID, ['Slave' => false]);
+                            $this->Offset = $this->CommentModel->getOffset($CommentID);
+                            $Comments = $this->CommentModel->getIDData($CommentID, ['Slave' => false]);
                             $this->setData('Comments', $Comments);
 
                             $this->setData('NewComments', true);
@@ -828,7 +828,7 @@ class PostController extends VanillaController {
                             $CountComments = $this->CommentModel->getCountByDiscussion($DiscussionID);
                             $Limit = is_object($this->data('Comments')) ? $this->data('Comments')->numRows() : $Discussion->CountComments;
                             $Offset = $CountComments - $Limit;
-                            $this->CommentModel->SetWatch($this->Discussion, $Limit, $Offset, $CountComments);
+                            $this->CommentModel->setWatch($this->Discussion, $Limit, $Offset, $CountComments);
                         }
                     } else {
                         // If this was a draft save, notify the user about the save
@@ -874,7 +874,7 @@ class PostController extends VanillaController {
                 }
                 $this->Data = ['Comment' => $Comment];
             }
-            $this->RenderData($this->Data);
+            $this->renderData($this->Data);
         } else {
             require_once $this->fetchViewLocation('helper_functions', 'Discussion');
             // Render default view.
@@ -893,7 +893,7 @@ class PostController extends VanillaController {
      * @param bool $inserted
      */
     public function comment2($commentID, $inserted = false) {
-        $this->CommentModel->Save2($commentID, $inserted);
+        $this->CommentModel->save2($commentID, $inserted);
         $this->render('Blank', 'Utility', 'Dashboard');
     }
 
@@ -922,7 +922,7 @@ class PostController extends VanillaController {
         }
 
         $this->View = 'editcomment';
-        $this->Comment($this->Comment->DiscussionID);
+        $this->comment($this->Comment->DiscussionID);
     }
 
     /**
@@ -984,8 +984,8 @@ class PostController extends VanillaController {
         ];
 
         $activityModel = new ActivityModel();
-        $this->DiscussionModel->NotifyNewDiscussion($discussion, $activityModel, $activity);
-        $activityModel->SaveQueue();
+        $this->DiscussionModel->notifyNewDiscussion($discussion, $activityModel, $activity);
+        $activityModel->saveQueue();
         $this->DiscussionModel->setField($discussionID, 'Notified', ActivityModel::SENT_OK);
 
         die('OK');
@@ -1022,13 +1022,13 @@ function checkOrRadio($fieldName, $labelCode, $listOptions, $attributes = []) {
         $value = array_pop(array_keys($listOptions));
 
         // This can be represented by a checkbox.
-        return $form->CheckBox($fieldName, $labelCode);
+        return $form->checkBox($fieldName, $labelCode);
     } else {
         $cssClass = val('ListClass', $attributes, 'List Inline');
 
         $result = ' <b>'.t($labelCode)."</b> <ul class=\"$cssClass\">";
         foreach ($listOptions as $value => $code) {
-            $result .= ' <li>'.$form->Radio($fieldName, $code, ['Value' => $value, 'class' => 'radio-inline']).'</li> ';
+            $result .= ' <li>'.$form->radio($fieldName, $code, ['Value' => $value, 'class' => 'radio-inline']).'</li> ';
         }
         $result .= '</ul>';
         return $result;

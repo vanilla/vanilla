@@ -2,7 +2,7 @@
 require_once $this->fetchViewLocation('helper_functions');
 
 function tutLink($tutorialCode, $writeTitle = TRUE, $thumbnailSize = 'medium', $noGrid = false) {
-    $tutorial = GetTutorials($tutorialCode);
+    $tutorial = getTutorials($tutorialCode);
     if (!$tutorial)
         return '';
 
@@ -52,9 +52,9 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="info"><?php echo t('Learn how to use the basic functionality of your forum.'); ?></div>
         <div class="videos label-selector">
             <?php
-            echo TutLink('using-the-forum');
-            echo TutLink('private-conversations');
-            echo TutLink('user-profiles');
+            echo tutLink('using-the-forum');
+            echo tutLink('private-conversations');
+            echo tutLink('user-profiles');
             ?>
         </div>
     </div>
@@ -62,7 +62,7 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="video-section-heading"><?php echo t("Appearance"); ?></div>
         <div class="info"><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></div>
         <div class="videos label-selector">
-            <?php echo TutLink('appearance'); ?>
+            <?php echo tutLink('appearance'); ?>
         </div>
     </div>
     <div class="video-section">
@@ -70,10 +70,10 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="info"><?php echo t('Create & organize discussion categories and manage your users.'); ?></div>
         <div class="videos label-selector">
             <?php
-            echo TutLink('user-registration');
-            echo TutLink('users');
-            echo TutLink('roles-and-permissions');
-            echo TutLink('category-management-and-advanced-settings');
+            echo tutLink('user-registration');
+            echo tutLink('users');
+            echo tutLink('roles-and-permissions');
+            echo tutLink('category-management-and-advanced-settings');
             ?>
         </div>
     </div>

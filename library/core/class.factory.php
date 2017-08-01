@@ -127,7 +127,7 @@ class Gdn_Factory {
                     ->setFactory([$className, $data]);
                 break;
             default:
-                throw Exception();
+                throw exception();
         }
     }
 
@@ -135,7 +135,7 @@ class Gdn_Factory {
      * Install a dependency for the factory.
      *
      * This method provides support for simple dependency injection.
-     * When an object with dependencies is created then the factory will call inline{@link Gdn_Factory::Factory()}
+     * When an object with dependencies is created then the factory will call inline{@link Gdn_Factory::factory()}
      * for each dependency and set the object properties before returning it.
      * Those dependencies can also have their own dependencies which will all be set when the object is returned.
      *

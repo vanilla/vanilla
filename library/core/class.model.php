@@ -57,14 +57,14 @@ class Gdn_Model extends Gdn_Pluggable {
 
     /**
      * @var stringThe name of the primary key field of this model. The default is 'id'. If
-     * $this->DefineSchema() is called, this value will be automatically changed
+     * $this->defineSchema() is called, this value will be automatically changed
      * to any primary key discovered when examining the table schema.
      */
     public $PrimaryKey = 'id';
 
     /**
      * @var Gdn_Schema An object that is used to store and examine database schema information
-     * related to this model. This object is defined and populated with $this->DefineSchema().
+     * related to this model. This object is defined and populated with $this->defineSchema().
      */
     public $Schema;
 
@@ -80,7 +80,7 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * @var Gdn_Validation An object that is used to manage and execute data integrity rules on this
      * object. By default, this object only enforces maxlength, data types, and
-     * required fields (defined when $this->DefineSchema() is called).
+     * required fields (defined when $this->defineSchema() is called).
      */
     public $Validation;
 
@@ -97,7 +97,7 @@ class Gdn_Model extends Gdn_Pluggable {
         }
 
         $this->Database = Gdn::database();
-        $this->SQL = $this->Database->SQL();
+        $this->SQL = $this->Database->sql();
         $this->Validation = new Gdn_Validation();
         $this->Name = $name;
         $this->PrimaryKey = $name.'ID';
@@ -154,7 +154,7 @@ class Gdn_Model extends Gdn_Pluggable {
         $row = array_intersect_key($data, $this->Schema->fields());
         $attributes = array_diff_key($data, $row);
 
-        TouchValue($name, $row, []);
+        touchValue($name, $row, []);
         if (isset($row[$name]) && is_array($row[$name])) {
             $row[$name] = array_merge($row[$name], $attributes);
         } else {
@@ -549,7 +549,7 @@ class Gdn_Model extends Gdn_Pluggable {
             ->from($this->Name);
 
         if (is_array($wheres)) {
-            $this->SQL->Where($wheres);
+            $this->SQL->where($wheres);
         }
 
         $data = $this->SQL
@@ -603,7 +603,7 @@ class Gdn_Model extends Gdn_Pluggable {
     /**
      * Get a dataset for the model with a where filter.
      *
-     * @param array|bool $where A filter suitable for passing to Gdn_SQLDriver::Where().
+     * @param array|bool $where A filter suitable for passing to Gdn_SQLDriver::where().
      * @param string $orderFields A comma delimited string to order the data.
      * @param string $orderDirection One of **asc** or **desc**.
      * @param int|false $limit The database limit.
@@ -616,7 +616,7 @@ class Gdn_Model extends Gdn_Pluggable {
     }
 
     /**
-     * Returns the $this->Validation->ValidationResults() array.
+     * Returns the $this->Validation->validationResults() array.
      *
      * @return array
      */
@@ -760,7 +760,7 @@ class Gdn_Model extends Gdn_Pluggable {
             }
         }
 
-        if ($this->Schema->FieldExists($this->Name, 'UpdateIPAddress') && !isset($fields['UpdateIPAddress'])) {
+        if ($this->Schema->fieldExists($this->Name, 'UpdateIPAddress') && !isset($fields['UpdateIPAddress'])) {
             $fields['UpdateIPAddress'] = ipEncode(Gdn::request()->ipAddress());
         }
     }
@@ -811,12 +811,12 @@ class Gdn_Model extends Gdn_Pluggable {
             ->firstRow();
 
         if (!$row) {
-            throw new Exception(T('ErrorRecordNotFound'));
+            throw new Exception(t('ErrorRecordNotFound'));
         }
         $values = dbdecode($row->$column);
 
         if (is_string($values) && $values != '') {
-            throw new Exception(T('Serialized column failed to be unserialized.'));
+            throw new Exception(t('Serialized column failed to be unserialized.'));
         }
 
         if (!is_array($values)) {

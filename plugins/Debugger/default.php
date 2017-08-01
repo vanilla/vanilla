@@ -34,7 +34,7 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function base_afterBody_handler($Sender) {
         $Session = Gdn::session();
-        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View') || $Sender->MasterView == 'admin') {
+        if (!debug() || !$Session->checkPermission('Plugins.Debugger.View') || $Sender->MasterView == 'admin') {
             return;
         }
 
@@ -50,7 +50,7 @@ class DebuggerPlugin extends Gdn_Plugin {
     public function base_afterRenderAsset_handler($sender, $args) {
         if (val('AssetName', $args) == 'Content' && $sender->MasterView == 'admin') {
             $session = Gdn::session();
-            if (!Debug() || !$session->checkPermission('Plugins.Debugger.View')) {
+            if (!debug() || !$session->checkPermission('Plugins.Debugger.View')) {
                 return;
             }
             require $sender->fetchViewLocation('Debug', '', 'plugins/Debugger');

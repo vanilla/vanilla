@@ -223,7 +223,7 @@ class Gdn_Email extends Gdn_Pluggable {
     }
 
     public function formatMessage($message) {
-        // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::Text()
+        // htmlspecialchars_decode is being used here to revert any specialchar escaping done by Gdn_Format::text()
         // which, untreated, would result in &#039; in the message in place of single quotes.
 
         if ($this->PhpMailer->ContentType == 'text/html') {
@@ -403,7 +403,7 @@ class Gdn_Email extends Gdn_Pluggable {
         if (is_string($recipientEmail)) {
             if (strpos($recipientEmail, ',') > 0) {
                 $recipientEmail = explode(',', $recipientEmail);
-                // trim no need, PhpMailer::AddAnAddress() will do it
+                // trim no need, PhpMailer::addAnAddress() will do it
                 return $this->to($recipientEmail, $recipientName);
             }
             if ($this->PhpMailer->SingleTo) {
@@ -459,7 +459,7 @@ class Gdn_Email extends Gdn_Pluggable {
             return $this;
         }
 
-        trigger_error(errorMessage('Incorrect first parameter ('.getType($recipientEmail).') passed to function.', 'Email', 'To'), E_USER_ERROR);
+        trigger_error(errorMessage('Incorrect first parameter ('.gettype($recipientEmail).') passed to function.', 'Email', 'To'), E_USER_ERROR);
     }
 
     public function charset($use = '') {

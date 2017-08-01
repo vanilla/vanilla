@@ -5,7 +5,7 @@ function writeActivity($activity, $sender, $session) {
     // If this was a status update or a wall comment, don't bother with activity strings
     $activityType = explode(' ', $activity->ActivityType); // Make sure you strip out any extra css classes munged in here
     $activityType = $activityType[0];
-    $author = UserBuilder($activity, 'Activity');
+    $author = userBuilder($activity, 'Activity');
     $photoAnchor = '';
 
     if ($activity->Photo) {
@@ -27,22 +27,22 @@ function writeActivity($activity, $sender, $session) {
     }
 
     if ($activity->NotifyUserID > 0 || !in_array($activityType, ['WallComment', 'WallPost', 'AboutUpdate'])) {
-        $title = '<div class="Title">'.GetValue('Headline', $activity).'</div>';
+        $title = '<div class="Title">'.getValue('Headline', $activity).'</div>';
     } else if ($activityType == 'WallPost') {
-        $regardingUser = UserBuilder($activity, 'Regarding');
+        $regardingUser = userBuilder($activity, 'Regarding');
         $photoAnchor = userPhoto($regardingUser);
         $title = '<div class="Title">'
-            .UserAnchor($regardingUser, 'Name')
+            .userAnchor($regardingUser, 'Name')
             .' <span>&rarr;</span> '
-            .UserAnchor($author, 'Name')
+            .userAnchor($author, 'Name')
             .'</div>';
 
         if (!$format)
-            $excerpt = Gdn_Format::Display($excerpt);
+            $excerpt = Gdn_Format::display($excerpt);
     } else {
         $title = userAnchor($author, 'Name');
         if (!$format)
-            $excerpt = Gdn_Format::Display($excerpt);
+            $excerpt = Gdn_Format::display($excerpt);
     }
     $sender->EventArguments['Activity'] = &$activity;
     $sender->EventArguments['CssClass'] = &$cssClass;
@@ -51,7 +51,7 @@ function writeActivity($activity, $sender, $session) {
 <li id="Activity_<?php echo $activity->ActivityID; ?>" class="<?php echo $cssClass; ?>">
    <?php
     if (ActivityModel::canDelete($activity)) {
-        echo '<div class="Options">'.anchor('&times;', 'dashboard/activity/delete/'.$activity->ActivityID.'/'.$session->TransientKey().'?Target='.urlencode($sender->SelfUrl), 'Delete').'</div>';
+        echo '<div class="Options">'.anchor('&times;', 'dashboard/activity/delete/'.$activity->ActivityID.'/'.$session->transientKey().'?Target='.urlencode($sender->SelfUrl), 'Delete').'</div>';
     }
     if ($photoAnchor != '') {
         ?>
@@ -59,14 +59,14 @@ function writeActivity($activity, $sender, $session) {
     <?php } ?>
    <div class="ItemContent Activity">
       <?php echo $title; ?>
-    <?php echo WrapIf($excerpt, 'div', ['class' => 'Excerpt']); ?>
+    <?php echo wrapIf($excerpt, 'div', ['class' => 'Excerpt']); ?>
     <?php
     $sender->EventArguments['Activity'] = $activity;
-    $sender->FireAs('ActivityController')->fireEvent('AfterActivityBody');
+    $sender->fireAs('ActivityController')->fireEvent('AfterActivityBody');
 
     // Reactions stub
     if (in_array(val('ActivityType', $activity), ['Status', 'WallPost']))
-        WriteReactions($activity);
+        writeReactions($activity);
     ?>
       <div class="Meta">
          <span class="MItem DateCreated"><?php echo Gdn_Format::date($activity->DateInserted); ?></span>
@@ -101,7 +101,7 @@ function writeActivity($activity, $sender, $session) {
     if (count($comments) > 0) {
         echo '<ul class="DataList ActivityComments">';
         foreach ($comments as $comment) {
-            WriteActivityComment($comment, $activity);
+            writeActivityComment($comment, $activity);
         }
     } else {
         echo '<ul class="DataList ActivityComments Hidden">';
@@ -112,10 +112,10 @@ function writeActivity($activity, $sender, $session) {
         <li class="CommentForm">
             <?php
             echo anchor(t('Write a comment'), '/dashboard/activity/comment/'.$activity->ActivityID, 'CommentLink');
-            $commentForm = Gdn::Factory('Form');
+            $commentForm = Gdn::factory('Form');
             $commentForm->setModel($sender->ActivityModel);
             $commentForm->addHidden('ActivityID', $activity->ActivityID);
-            $commentForm->addHidden('Return', Gdn_Url::Request());
+            $commentForm->addHidden('Return', Gdn_Url::request());
             echo $commentForm->open(['action' => url('/dashboard/activity/comment'), 'class' => 'Hidden']);
             echo '<div class="TextBoxWrapper">'.$commentForm->textBox('Body', ['MultiLine' => true, 'value' => '']).'</div>';
 
@@ -138,7 +138,7 @@ if (!function_exists('WriteActivityComment')):
 
     function writeActivityComment($comment, $activity) {
         $session = Gdn::session();
-        $author = UserBuilder($comment, 'Insert');
+        $author = userBuilder($comment, 'Insert');
         $photoAnchor = userPhoto($author, 'Photo');
         $cssClass = 'Item ActivityComment ActivityComment';
         if ($photoAnchor != '')
@@ -156,7 +156,7 @@ if (!function_exists('WriteActivityComment')):
                     <span class="DateCreated"><?php echo Gdn_Format::date($comment['DateInserted'], 'html'); ?></span>
                     <?php
                     if (ActivityModel::canDelete($activity)) {
-                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->TransientKey().'&target='.urlencode(Gdn_Url::Request()), 'DeleteComment');
+                        echo anchor(t('Delete'), "dashboard/activity/deletecomment?id={$comment['ActivityCommentID']}&tk=".$session->transientKey().'&target='.urlencode(Gdn_Url::request()), 'DeleteComment');
                     }
                     ?>
                 </div>

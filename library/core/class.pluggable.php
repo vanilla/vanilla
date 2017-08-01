@@ -33,7 +33,7 @@ abstract class Gdn_Pluggable {
      * and were local to the method being executed. It is an associative array
      * of Argument_Name => Argument_Value pairs. The EventArguments can be
      * accessed (and changed) in the plugin since the plugin has full
-     * access to the object throwing the event (see FireEvent() below).
+     * access to the object throwing the event (see fireEvent() below).
      */
     public $EventArguments;
 
@@ -44,7 +44,7 @@ abstract class Gdn_Pluggable {
      * Note: Method overrides and direct method call return values are NOT saved
      * in this array; they are returned as normal.
      *  Example: To get the return value a plugin called "TestPlugin" that
-     *  attaches to an "ExampleController->Render()" method using the magic
+     *  attaches to an "ExampleController->render()" method using the magic
      *  "Before" event, you would reference it like so:
      *  $ReturnVal = $Sender->Returns['ExampleController_BeforeRender_Handler']['TestPlugin'];
      */
@@ -111,7 +111,7 @@ abstract class Gdn_Pluggable {
      * Fires an event to be dealt with by plugins. Plugins can create
      * custom methods to handle the event simply by naming their handler method
      * appropriately. The convention is:
-     *  public function SenderClassName_EventName_Handler($Sender) {}
+     *  public function senderClassName_EventName_Handler($Sender) {}
      *
      * @param string $eventName The name of the event being fired.
      */
@@ -139,10 +139,10 @@ abstract class Gdn_Pluggable {
      * There are two types of extended method calls:
      *  1. Declared: The method was declared with the lowercase "x" prefix and called without it.
      *     ie. Declaration: public function xMethodName() {}
-     *         Call: $Object->MethodName();
+     *         Call: $Object->methodName();
      *
      *  2. Called: The method was declared without the lowercase "x" prefix and called with it.
-     *     ie. Declaration: public function MethodName() {}
+     *     ie. Declaration: public function methodName() {}
      *         Call: $Object->xMethodName();
      *
      * Note: Plugins will always refer to the method name without the "x"
@@ -185,7 +185,7 @@ abstract class Gdn_Pluggable {
         if (!method_exists($this, $actualMethodName)) {
             // Make sure that a plugin is not handling the call
             if (!Gdn::pluginManager()->hasNewMethod($this->ClassName, $referenceMethodName)) {
-                trigger_error(ErrorMessage('The "'.$this->ClassName.'" object does not have a "'.$actualMethodName.'" method.', $this->ClassName, $actualMethodName), E_USER_ERROR);
+                trigger_error(errorMessage('The "'.$this->ClassName.'" object does not have a "'.$actualMethodName.'" method.', $this->ClassName, $actualMethodName), E_USER_ERROR);
             }
         }
 

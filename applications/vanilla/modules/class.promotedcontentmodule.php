@@ -162,7 +162,7 @@ class PromotedContentModule extends Gdn_Module {
             $roleID = [];
             foreach ($roles as $testRoleID) {
                 $testRoleID = trim($testRoleID);
-                $role = $roleModel->GetByName($testRoleID);
+                $role = $roleModel->getByName($testRoleID);
                 if (!$role) {
                     continue;
                 } else {
@@ -193,7 +193,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Discussions
             $discussions = [];
-            if ($this->ShowDiscussions()) {
+            if ($this->showDiscussions()) {
                 $discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
                     ->whereIn('d.InsertUserID', $userIDs)
@@ -204,7 +204,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Comments
             $comments = [];
-            if ($this->ShowComments()) {
+            if ($this->showComments()) {
                 $comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
                     ->whereIn('InsertUserID', $userIDs)
@@ -212,11 +212,11 @@ class PromotedContentModule extends Gdn_Module {
                     ->limit($this->Limit)
                     ->get()->result(DATASET_TYPE_ARRAY);
 
-                $this->JoinCategory($comments);
+                $this->joinCategory($comments);
             }
 
             // Interleave
-            $content = $this->Union('DateInserted', [
+            $content = $this->union('DateInserted', [
                 'Discussion' => $discussions,
                 'Comment' => $comments
             ]);
@@ -228,8 +228,8 @@ class PromotedContentModule extends Gdn_Module {
             ]);
         }
 
-        $this->Security($content);
-        $this->Condense($content, $this->Limit);
+        $this->security($content);
+        $this->condense($content, $this->Limit);
         return $content;
     }
 
@@ -278,7 +278,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Discussions
             $discussions = [];
-            if ($this->ShowDiscussions()) {
+            if ($this->showDiscussions()) {
                 $discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
                     ->whereIn('d.InsertUserID', $userIDs)
@@ -289,7 +289,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Comments
             $comments = [];
-            if ($this->ShowComments()) {
+            if ($this->showComments()) {
                 $comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
                     ->whereIn('InsertUserID', $userIDs)
@@ -297,11 +297,11 @@ class PromotedContentModule extends Gdn_Module {
                     ->limit($this->Limit)
                     ->get()->result(DATASET_TYPE_ARRAY);
 
-                $this->JoinCategory($comments);
+                $this->joinCategory($comments);
             }
 
             // Interleave
-            $content = $this->Union('DateInserted', [
+            $content = $this->union('DateInserted', [
                 'Discussion' => $discussions,
                 'Comment' => $comments
             ]);
@@ -313,8 +313,8 @@ class PromotedContentModule extends Gdn_Module {
             ]);
         }
 
-        $this->Security($content);
-        $this->Condense($content, $this->Limit);
+        $this->security($content);
+        $this->condense($content, $this->Limit);
         return $content;
     }
 
@@ -347,7 +347,7 @@ class PromotedContentModule extends Gdn_Module {
         if ($content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
             $discussions = [];
-            if ($this->ShowDiscussions()) {
+            if ($this->showDiscussions()) {
                 $discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
                     ->where('d.CategoryID', $categoryID)
@@ -358,7 +358,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Comments
             $comments = [];
-            if ($this->ShowComments()) {
+            if ($this->showComments()) {
                 $commentDiscussionIDs = Gdn::sql()->select('d.DiscussionID')
                     ->from('Discussion d')
                     ->where('d.CategoryID', $categoryID)
@@ -374,11 +374,11 @@ class PromotedContentModule extends Gdn_Module {
                     ->limit($this->Limit)
                     ->get()->result(DATASET_TYPE_ARRAY);
 
-                $this->JoinCategory($comments);
+                $this->joinCategory($comments);
             }
 
             // Interleave
-            $content = $this->Union('DateInserted', [
+            $content = $this->union('DateInserted', [
                 'Discussion' => $discussions,
                 'Comment' => $comments
             ]);
@@ -390,8 +390,8 @@ class PromotedContentModule extends Gdn_Module {
             ]);
         }
 
-        $this->Security($content);
-        $this->Condense($content, $this->Limit);
+        $this->security($content);
+        $this->condense($content, $this->Limit);
         return $content;
     }
 
@@ -419,7 +419,7 @@ class PromotedContentModule extends Gdn_Module {
         if ($content == Gdn_Cache::CACHEOP_FAILURE) {
             // Get matching Discussions
             $discussions = [];
-            if ($this->ShowDiscussions()) {
+            if ($this->showDiscussions()) {
                 $discussions = Gdn::sql()->select('d.*')
                     ->from('Discussion d')
                     ->orderBy('DateInserted', 'DESC')
@@ -432,7 +432,7 @@ class PromotedContentModule extends Gdn_Module {
 
             // Get matching Comments
             $comments = [];
-            if ($this->ShowComments()) {
+            if ($this->showComments()) {
                 $comments = Gdn::sql()->select('c.*')
                     ->from('Comment c')
                     ->orderBy('DateInserted', 'DESC')
@@ -442,11 +442,11 @@ class PromotedContentModule extends Gdn_Module {
                 }
                 $comments = $comments->get()->result(DATASET_TYPE_ARRAY);
 
-                $this->JoinCategory($comments);
+                $this->joinCategory($comments);
             }
 
             // Interleave
-            $content = $this->Union('DateInserted', [
+            $content = $this->union('DateInserted', [
                 'Discussion' => $discussions,
                 'Comment' => $comments
             ]);
@@ -458,8 +458,8 @@ class PromotedContentModule extends Gdn_Module {
             ]);
         }
 
-        $this->Security($content);
-        $this->Condense($content, $this->Limit);
+        $this->security($content);
+        $this->condense($content, $this->Limit);
         return $content;
     }
 
@@ -477,16 +477,16 @@ class PromotedContentModule extends Gdn_Module {
         }
 
         $recordTypes = [];
-        if ($this->ShowDiscussions()) {
+        if ($this->showDiscussions()) {
             $recordTypes[] = 'Discussion';
         }
-        if ($this->ShowComments()) {
+        if ($this->showComments()) {
             $recordTypes[] = 'Comment';
         }
 
         $reactionModel = new ReactionModel();
-        $promotedTagID = $reactionModel->DefineTag('Promoted', 'BestOf');
-        $content = $reactionModel->GetRecordsWhere(
+        $promotedTagID = $reactionModel->defineTag('Promoted', 'BestOf');
+        $content = $reactionModel->getRecordsWhere(
             ['TagID' => $promotedTagID, 'RecordType' => $recordTypes],
             'DateInserted',
             'desc',
@@ -577,12 +577,12 @@ class PromotedContentModule extends Gdn_Module {
 
                     // Comment specific
                     $itemProperties['Name'] = sprintf(t('Re: %s'), valr('Discussion.Name', $item, val('Name', $item)));
-                    $url = CommentUrl($item);
+                    $url = commentUrl($item);
                     break;
 
                 case 'discussion':
                     $itemFields = array_merge($itemFields, ['Name', 'Type']);
-                    $url = DiscussionUrl($item);
+                    $url = discussionUrl($item);
                     break;
             }
 
@@ -590,7 +590,7 @@ class PromotedContentModule extends Gdn_Module {
             if ($categoryId = val('CategoryID', $item)) {
                 $category = CategoryModel::categories($categoryId);
                 $item['CategoryName'] = val('Name', $category);
-                $item['CategoryUrl'] = CategoryUrl($category);
+                $item['CategoryUrl'] = categoryUrl($category);
             }
             $itemFields = array_fill_keys($itemFields, true);
             $filteredItem = array_intersect_key($item, $itemFields);
@@ -602,7 +602,7 @@ class PromotedContentModule extends Gdn_Module {
 
             $user = Gdn::userModel()->getID($userID);
             $roleModel = new RoleModel();
-            $roles = $roleModel->GetByUserID($userID)->resultArray();
+            $roles = $roleModel->getByUserID($userID)->resultArray();
             $roleNames = [];
             foreach ($roles as $role) {
                 $roleNames[] = val('Name', $role);
@@ -610,11 +610,11 @@ class PromotedContentModule extends Gdn_Module {
             // check
             $rankName = null;
             if (class_exists('RankModel')) {
-                $rankName = val('Name', RankModel::Ranks(val('RankID', $user)), null);
+                $rankName = val('Name', RankModel::ranks(val('RankID', $user)), null);
             }
             $userProperties = [
                 'Url' => url(userUrl($user), true),
-                'PhotoUrl' => UserPhotoUrl($user),
+                'PhotoUrl' => userPhotoUrl($user),
                 'RankName' => $rankName,
                 'RoleNames' => $roleNames,
                 'CssClass' => val('_CssClass', $user)
@@ -704,9 +704,9 @@ class PromotedContentModule extends Gdn_Module {
      */
     public function toString() {
         if ($this->data('Content', null) == null) {
-            $this->GetData();
+            $this->getData();
         }
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

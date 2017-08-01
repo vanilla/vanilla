@@ -50,7 +50,7 @@ class GuestModule extends Gdn_Module {
      */
     public function toString() {
         if (!Gdn::session()->isValid()) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

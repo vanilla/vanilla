@@ -102,7 +102,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      * @param string $table The name of the table to fetch column data from.
      */
     public function fetchColumnSql($table) {
-        if ($table[0] != '`' && !StringBeginsWith($table, $this->Database->DatabasePrefix)) {
+        if ($table[0] != '`' && !stringBeginsWith($table, $this->Database->DatabasePrefix)) {
             $table = $this->Database->DatabasePrefix.$table;
         }
 
@@ -265,7 +265,7 @@ class Gdn_MySQLDriver extends Gdn_SQLDriver {
      */
     public function getInsert($table, $data, $select = '') {
         if (!is_array($data)) {
-            trigger_error(ErrorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
+            trigger_error(errorMessage('The data provided is not in a proper format (Array).', 'MySQLDriver', 'GetInsert'), E_USER_ERROR);
         }
 
         if ($this->options('Replace')) {

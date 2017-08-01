@@ -109,7 +109,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      *
      * Example:
      *
-     *     echo Gdn_Locale::Canonicalize('en-us');
+     *     echo Gdn_Locale::canonicalize('en-us');
      *     // prints en_US
      *
      * @param string $locale The locale code to canonicalize.
@@ -393,7 +393,7 @@ class Gdn_Locale extends Gdn_Pluggable {
      * Get all definitions from the loaded locale.
      */
     public function getDefinitions() {
-        return $this->LocaleContainer->Get('.');
+        return $this->LocaleContainer->get('.');
     }
 
     /**

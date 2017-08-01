@@ -29,6 +29,6 @@ class UserPhotoModule extends Gdn_Module {
     }
 
     public function toString() {
-        return parent::ToString();
+        return parent::toString();
     }
 }

@@ -31,7 +31,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Drops $this->Table() from the database.
+     * Drops $this->table() from the database.
      */
     public function drop() {
         if ($this->tableExists()) {
@@ -40,14 +40,14 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Drops $name column from $this->Table().
+     * Drops $name column from $this->table().
      *
-     * @param string $name The name of the column to drop from $this->Table().
+     * @param string $name The name of the column to drop from $this->table().
      * @return boolean
      */
     public function dropColumn($name) {
         if (!$this->executeQuery('alter table `'.$this->_DatabasePrefix.$this->_TableName.'` drop column `'.$name.'`')) {
-            throw new Exception(sprintf(T('Failed to remove the `%1$s` column from the `%2$s` table.'), $name, $this->_DatabasePrefix.$this->_TableName));
+            throw new Exception(sprintf(t('Failed to remove the `%1$s` column from the `%2$s` table.'), $name, $this->_DatabasePrefix.$this->_TableName));
         }
 
         return true;
@@ -89,7 +89,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         $engine = strtolower($engine);
 
         if ($checkAvailability) {
-            if (!$this->HasEngine($engine)) {
+            if (!$this->hasEngine($engine)) {
                 return $this;
             }
         }
@@ -118,7 +118,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Renames a column in $this->Table().
+     * Renames a column in $this->table().
      *
      * @param string $oldName The name of the column to be renamed.
      * @param string $newName The new name for the column being renamed.
@@ -199,7 +199,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Creates the table defined with $this->Table() and $this->Column().
+     * Creates the table defined with $this->table() and $this->column().
      */
     protected function _create() {
         $primaryKey = [];
@@ -348,7 +348,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
             return null;
         }
 
-        $result = ArrayTranslate($status, ['Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation']);
+        $result = arrayTranslate($status, ['Engine' => 'engine', 'Rows' => 'rows', 'Collation' => 'collation']);
 
         // Look up the encoding for the collation.
         $result['charset'] = $this->getCharsetFromCollation($result['collation']);
@@ -363,7 +363,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
      * @return array
      */
     protected function _indexSql($columns, $keyType = false) {
-//      if ($this->TableName() != 'Comment')
+//      if ($this->tableName() != 'Comment')
 //         return array();
 
         $result = [];
@@ -485,10 +485,10 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
     }
 
     /**
-     * Modifies $this->Table() with the columns specified with $this->Column().
+     * Modifies $this->table() with the columns specified with $this->column().
      *
      * @param boolean $explicit If TRUE, this method will remove any columns from the table that were not
-     * defined with $this->Column().
+     * defined with $this->column().
      */
     protected function _modify($explicit = false) {
         $px = $this->_DatabasePrefix;
@@ -532,7 +532,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 // Check to drop a fulltext index if we don't support it.
                 if (!$this->_supportsFulltext()) {
                     foreach ($indexesDb as $indexName => $indexSql) {
-                        if (StringBeginsWith($indexSql, 'fulltext', true)) {
+                        if (stringBeginsWith($indexSql, 'fulltext', true)) {
                             $dropIndexQuery = "$alterSqlPrefix drop index $indexName;\n";
                             if (!$this->executeQuery($dropIndexQuery)) {
                                 throw new Exception(sprintf(t('Failed to drop the index `%1$s` on table `%2$s`.'), $indexName, $this->_TableName));
@@ -653,7 +653,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
                 $builtQuery = '-- '.$builtQuery;
             }
             if (!$this->executeQuery($builtQuery, true)) {
-                throw new Exception(sprintf(T('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
+                throw new Exception(sprintf(t('Failed to alter the `%s` table.'), $this->_DatabasePrefix.$this->_TableName));
             }
         }
 
@@ -691,7 +691,7 @@ class Gdn_MySQLStructure extends Gdn_DatabaseStructure {
         foreach ($indexSql as $name => $sqls) {
             foreach ($sqls as $sql) {
                 if (!$this->executeQuery($sql)) {
-                    throw new Exception(sprintf(T('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
+                    throw new Exception(sprintf(t('Error.ModifyIndex', 'Failed to add or modify the `%1$s` index in the `%2$s` table.'), $name, $this->_TableName));
                 }
             }
         }

@@ -19,7 +19,7 @@ class GooglePrettifyPlugin extends Gdn_Plugin {
      * Add Prettify to page text.
      */
     public function addPretty($sender) {
-        $sender->Head->addTag('script', ['type' => 'text/javascript', '_sort' => 100], $this->GetJs());
+        $sender->Head->addTag('script', ['type' => 'text/javascript', '_sort' => 100], $this->getJs());
         $sender->addJsFile('prettify.js', 'plugins/GooglePrettify', ['_sort' => 101]);
         if ($language = c('Plugins.GooglePrettify.Language')) {
             $sender->addJsFile("lang-$language.js", 'plugins/GooglePrettify', ['_sort' => 102]);

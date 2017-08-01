@@ -18,7 +18,7 @@ class ConversationsHooks implements Gdn_IPlugin {
      *
      * @param DbaController $sender
      */
-    public function dbaController_countJobs_Handler($sender) {
+    public function dbaController_countJobs_handler($sender) {
         $counts = [
             'Conversation' => ['CountMessages', 'CountParticipants', 'FirstMessageID', 'LastMessageID', 'DateUpdated', 'UpdateUserID']
         ];

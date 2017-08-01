@@ -64,10 +64,10 @@ class ButtonBarPlugin extends Gdn_Plugin {
         $this->attachButtonBar($sender, $wrap);
     }
 //   public function discussionController_BeforeBodyField_handler($Sender) {
-//      $this->AttachButtonBar($Sender);
+//      $this->attachButtonBar($Sender);
 //   }
 //   public function postController_BeforeBodyField_handler($Sender) {
-//      $this->AttachButtonBar($Sender);
+//      $this->attachButtonBar($Sender);
 //   }
 
     /**

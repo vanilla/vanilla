@@ -158,7 +158,7 @@ class Gdn_Session {
         $this->setCookie('-sid', null, -3600);
         $this->setCookie('-tk', null, -3600);
 
-        Gdn::PluginManager()->CallEventHandlers($this, 'Gdn_Session', 'End');
+        Gdn::pluginManager()->callEventHandlers($this, 'Gdn_Session', 'End');
 
         $this->UserID = 0;
         $this->User = false;
@@ -194,7 +194,7 @@ class Gdn_Session {
      * @return mixed
      */
     public function getCookie($suffix, $default = null) {
-        return GetValue(c('Garden.Cookie.Name').$suffix, $_COOKIE, $default);
+        return getValue(c('Garden.Cookie.Name').$suffix, $_COOKIE, $default);
     }
 
     /**
@@ -243,7 +243,7 @@ class Gdn_Session {
                         $guestHourOffset = floor($offset / 3600);
                     } catch (Exception $ex) {
                         $guestHourOffset = 0;
-                        LogException($ex);
+                        logException($ex);
                     }
                 }
             }
@@ -266,7 +266,7 @@ class Gdn_Session {
 
         // If the domain being set is completely incompatible with the current domain then make the domain work.
         $currentHost = Gdn::request()->host();
-        if (!StringEndsWith($currentHost, trim($domain, '.'))) {
+        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
             $domain = '';
         }
 

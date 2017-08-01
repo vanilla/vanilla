@@ -166,7 +166,7 @@ class StopForumSpamPlugin extends Gdn_Plugin {
             case 'Comment':
             case 'Discussion':
             case 'Activity':
-//            $Result = $this->CheckTest($RecordType, $Data) || $this->CheckStopForumSpam($RecordType, $Data) || $this->CheckAkismet($RecordType, $Data);
+//            $Result = $this->checkTest($RecordType, $Data) || $this->checkStopForumSpam($RecordType, $Data) || $this->checkAkismet($RecordType, $Data);
                 break;
         }
         $sender->EventArguments['IsSpam'] = $result;

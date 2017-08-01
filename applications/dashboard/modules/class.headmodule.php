@@ -73,7 +73,7 @@ if (!class_exists('HeadModule', false)) {
         public function addCss($hRef, $media = '', $addVersion = true, $options = null) {
             $properties = [
                 'rel' => 'stylesheet',
-                'href' => Asset($hRef, false, $addVersion),
+                'href' => asset($hRef, false, $addVersion),
                 'media' => $media];
 
             // Use same underscore convention as AddScript
@@ -97,7 +97,7 @@ if (!class_exists('HeadModule', false)) {
                 'rel' => 'alternate',
                 'type' => 'application/rss+xml',
                 'title' => Gdn_Format::text($title),
-                'href' => Asset($hRef)
+                'href' => asset($hRef)
             ]);
         }
 
@@ -194,14 +194,14 @@ if (!class_exists('HeadModule', false)) {
          * Removes any added stylesheets from the head.
          */
         public function clearCSS() {
-            $this->ClearTag('link', ['rel' => 'stylesheet']);
+            $this->clearTag('link', ['rel' => 'stylesheet']);
         }
 
         /**
          * Removes any script include tags from the head.
          */
         public function clearScripts() {
-            $this->ClearTag('script');
+            $this->clearTag('script');
         }
 
         /**
@@ -425,7 +425,7 @@ if (!class_exists('HeadModule', false)) {
                 $canonicalUrl = $this->_Sender->canonicalUrl();
 
                 if (!isUrl($canonicalUrl)) {
-                    $canonicalUrl = Gdn::router()->ReverseRoute($canonicalUrl);
+                    $canonicalUrl = Gdn::router()->reverseRoute($canonicalUrl);
                 }
 
                 $this->_Sender->canonicalUrl($canonicalUrl);
@@ -454,14 +454,14 @@ if (!class_exists('HeadModule', false)) {
                 $this->addTag('meta', ['property' => 'og:url', 'content' => $canonicalUrl]);
             }
 
-            if ($description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->Description()))) {
+            if ($description = trim(Gdn_Format::reduceWhiteSpaces($this->_Sender->description()))) {
                 $this->addTag('meta', ['name' => 'description', 'property' => 'og:description', 'content' => $description]);
             }
 
             $hasRelevantImage = false;
 
             // Default to the site logo if there were no images provided by the controller.
-            if (count($this->_Sender->Image()) == 0) {
+            if (count($this->_Sender->image()) == 0) {
                 $logo = c('Garden.ShareImage', c('Garden.Logo', ''));
                 if ($logo != '') {
                     // Fix the logo path.
@@ -473,7 +473,7 @@ if (!class_exists('HeadModule', false)) {
                     $this->addTag('meta', ['property' => 'og:image', 'content' => $logo]);
                 }
             } else {
-                foreach ($this->_Sender->Image() as $img) {
+                foreach ($this->_Sender->image() as $img) {
                     $this->addTag('meta', ['name' => 'twitter:image', 'property' => 'og:image', 'content' => $img]);
                     $hasRelevantImage = true;
                 }
@@ -553,7 +553,7 @@ if (!class_exists('HeadModule', false)) {
                     }
 
                     // Build tag
-                    $tagString .= '  <'.$tag.Attribute($attributes, '_');
+                    $tagString .= '  <'.$tag.attribute($attributes, '_');
                     if (array_key_exists(self::CONTENT_KEY, $attributes)) {
                         $tagString .= '>'.$attributes[self::CONTENT_KEY].'</'.$tag.'>';
                     } elseif ($tag == 'script') {

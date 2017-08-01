@@ -33,7 +33,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
 
     const ACCESS_PLUGINNAME = 'pluginname';
 
-    /** @var array Available plugins. Never access this directly, instead use $this->AvailablePlugins(); */
+    /** @var array Available plugins. Never access this directly, instead use $this->availablePlugins(); */
     protected $pluginCache = null;
 
     /** @var array */
@@ -205,7 +205,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
                 continue;
             }
 
-            $pluginPath = CombinePaths([$searchPath, $pluginFolderName]);
+            $pluginPath = combinePaths([$searchPath, $pluginFolderName]);
             $pluginFile = $this->findPluginFileOld($pluginPath);
 
             if ($pluginFile === false) {
@@ -368,7 +368,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
         foreach ($pluginFiles as $pluginFile) {
             foreach ($testPatterns as $test) {
                 if (fnmatch($test, $pluginFile)) {
-                    return CombinePaths([$path, $pluginFile]);
+                    return combinePaths([$path, $pluginFile]);
                 }
             }
         }
@@ -408,10 +408,10 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
      * For example:
      *
      *  class MyPlugin implements Gdn_IPlugin {
-     *   public function MyController_SignIn_After($Sender) {
+     *   public function myController_SignIn_After($Sender) {
      *      // Do something neato
      *   }
-     *   public function Url_AppRoot_Override($WithDomain) {
+     *   public function url_AppRoot_Override($WithDomain) {
      *      return "MyCustomAppRoot!";
      *   }
      *  }
@@ -1158,7 +1158,7 @@ class Gdn_PluginManager extends Gdn_Pluggable implements ContainerInterface {
             );
         }
 
-        // Redefine the locale manager's settings $Locale->Set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
+        // Redefine the locale manager's settings $Locale->set($CurrentLocale, $EnabledApps, $EnabledPlugins, TRUE);
         Gdn::locale()->refresh();
 
         $this->EventArguments['AddonName'] = $pluginName;

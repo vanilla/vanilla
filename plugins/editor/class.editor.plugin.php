@@ -58,7 +58,7 @@ class EditorPlugin extends Gdn_Plugin {
         parent::__construct();
         $this->mediaCache = null;
         $this->mediaCacheExpire = 60 * 60 * 6;
-        $this->AssetPath = Asset('/plugins/editor');
+        $this->AssetPath = asset('/plugins/editor');
         $this->pluginInfo = Gdn::pluginManager()->getPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 

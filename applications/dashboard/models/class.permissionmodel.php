@@ -371,7 +371,7 @@ class PermissionModel extends Gdn_Model {
                 $defaultRow['JunctionID']
             );
 
-            $this->RowDefaults = $this->StripPermissions($defaultRow, $defaultRow);
+            $this->RowDefaults = $this->stripPermissions($defaultRow, $defaultRow);
         }
 
         return $this->RowDefaults;
@@ -393,7 +393,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function getUserPermissions($userID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
         // Get all permissions
-        $permissionColumns = $this->PermissionColumns($junctionTable, $junctionColumn);
+        $permissionColumns = $this->permissionColumns($junctionTable, $junctionColumn);
 
         // Select any that match $LimitToSuffix
         foreach ($permissionColumns as $columnName => $value) {
@@ -440,7 +440,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function getRolePermissions($roleID, $limitToSuffix = '', $junctionTable = false, $junctionColumn = false, $foreignKey = false, $foreignID = false) {
         // Get all permissions
-        $permissionColumns = $this->PermissionColumns($junctionTable, $junctionColumn);
+        $permissionColumns = $this->permissionColumns($junctionTable, $junctionColumn);
 
         // Select any that match $LimitToSuffix
         foreach ($permissionColumns as $columnName => $value) {
@@ -478,10 +478,10 @@ class PermissionModel extends Gdn_Model {
      */
     public function getAllowedPermissionNamespaces() {
         $applicationManager = Gdn::applicationManager();
-        $enabledApplications = $applicationManager->EnabledApplications();
+        $enabledApplications = $applicationManager->enabledApplications();
 
         $pluginNamespaces = [];
-        foreach (Gdn::pluginManager()->EnabledPlugins() as $plugin) {
+        foreach (Gdn::pluginManager()->enabledPlugins() as $plugin) {
             if (!array_key_exists('RegisterPermissions', $plugin) || !is_array($plugin['RegisterPermissions'])) {
                 continue;
             }
@@ -515,7 +515,7 @@ class PermissionModel extends Gdn_Model {
         }
 
         // Select all of the permission columns.
-        $permissionColumns = $this->PermissionColumns();
+        $permissionColumns = $this->permissionColumns();
         foreach ($permissionColumns as $columnName => $value) {
             $this->SQL->select('p.`'.$columnName.'`', 'MAX');
         }
@@ -545,7 +545,7 @@ class PermissionModel extends Gdn_Model {
      * @return array
      */
     public function getJunctionPermissions($where, $junctionTable = null, $limitToSuffix = '', $options = []) {
-        $namespaces = $this->GetAllowedPermissionNamespaces();
+        $namespaces = $this->getAllowedPermissionNamespaces();
         $roleID = val('RoleID', $where, null);
         $junctionID = val('JunctionID', $where, null);
         $limitToDefault = val('LimitToDefault', $options);
@@ -586,7 +586,7 @@ class PermissionModel extends Gdn_Model {
             // If the junction column is not the primary key then we must figure out and limit the permissions.
             if ($limitToDefault === false && $junctionColumn != $junctionTable.'ID') {
                 $juncIDs = $sQL
-                    ->Distinct(true)
+                    ->distinct(true)
                     ->select("p.{$junctionTable}ID")
                     ->select("c.$junctionColumn")
                     ->select('p.Name')
@@ -716,7 +716,7 @@ class PermissionModel extends Gdn_Model {
         $roleID = (array)$roleID;
         $result = [];
 
-        $globalPermissions = $this->GetGlobalPermissions($roleID, $limitToSuffix);
+        $globalPermissions = $this->getGlobalPermissions($roleID, $limitToSuffix);
         $result[] = $globalPermissions;
 
         $junctionOptions = [];
@@ -724,7 +724,7 @@ class PermissionModel extends Gdn_Model {
             // If we're skipping junction permissions, just grab the defaults.
             $junctionOptions['LimitToDefault'] = true;
         }
-        $junctionPermissions = $this->GetJunctionPermissions(
+        $junctionPermissions = $this->getJunctionPermissions(
             ['RoleID' => $roleID],
             null,
             $limitToSuffix,
@@ -778,8 +778,8 @@ class PermissionModel extends Gdn_Model {
      * @return array
      */
     public function getPermissionsEdit($roleID, $limitToSuffix = '', $includeJunction = true) {
-        $permissions = $this->GetPermissions($roleID, $limitToSuffix, $includeJunction);
-        return $this->UnpivotPermissions($permissions);
+        $permissions = $this->getPermissions($roleID, $limitToSuffix, $includeJunction);
+        return $this->unpivotPermissions($permissions);
     }
 
     /**
@@ -802,11 +802,11 @@ class PermissionModel extends Gdn_Model {
             ->get()->resultArray();
 
         $this->_MergeDisabledPermissions($data);
-        $data = Gdn_DataSet::Index($data, 'RoleID');
+        $data = Gdn_DataSet::index($data, 'RoleID');
 
         $defaultRow = $data[0];
         unset($data[0], $defaultRow['RoleID'], $defaultRow['JunctionTable'], $defaultRow['JunctionColumn'], $defaultRow['JunctionID']);
-        $defaultRow = $this->StripPermissions($defaultRow, $defaultRow, $limitToSuffix);
+        $defaultRow = $this->stripPermissions($defaultRow, $defaultRow, $limitToSuffix);
         if ($roleID) {
             // When editing a role make sure the default permissions are false so as not to be misleading.
             $defaultRow = array_fill_keys(array_keys($defaultRow), 0);
@@ -839,7 +839,7 @@ class PermissionModel extends Gdn_Model {
     public function stripPermissions($row, $defaultRow, $limitToSuffix = '') {
         static $namespaces;
         if (!isset($namespaces)) {
-            $namespaces = $this->GetAllowedPermissionNamespaces();
+            $namespaces = $this->getAllowedPermissionNamespaces();
         }
 
         foreach ($defaultRow as $permissionName => $value) {
@@ -847,7 +847,7 @@ class PermissionModel extends Gdn_Model {
                 continue;
             }
 
-            if (!$this->IsGlobalPermission($value, $permissionName, $limitToSuffix, $namespaces)) {
+            if (!$this->isGlobalPermission($value, $permissionName, $limitToSuffix, $namespaces)) {
                 unset($row[$permissionName]);
                 continue;
             }
@@ -1095,7 +1095,7 @@ class PermissionModel extends Gdn_Model {
 
         $PermissionCount = count($Permission);
         // Validate the permissions first
-        if (ValidatePermissionFormat($Permission)) {
+        if (validatePermissionFormat($Permission)) {
            // Now save them
            $this->defineSchema();
            for ($i = 0; $i < $PermissionCount; ++$i) {
@@ -1123,7 +1123,7 @@ class PermissionModel extends Gdn_Model {
      */
     public function save($values, $saveGlobal = false) {
         // Get the list of columns that are available for permissions.
-        $permissionColumns = Gdn::permissionModel()->defineSchema()->Fields();
+        $permissionColumns = Gdn::permissionModel()->defineSchema()->fields();
         if (isset($values['Role'])) {
             $permissionColumns['Role'] = true;
         }
@@ -1181,7 +1181,7 @@ class PermissionModel extends Gdn_Model {
             }
         }
 
-        $this->ClearPermissions();
+        $this->clearPermissions();
     }
 
     /**
@@ -1321,7 +1321,7 @@ class PermissionModel extends Gdn_Model {
         $session = Gdn::session();
 
         // Figure out the junction table if necessary.
-        if (!$junctionTable && StringEndsWith($foreignColumn, 'ID')) {
+        if (!$junctionTable && stringEndsWith($foreignColumn, 'ID')) {
             $junctionTable = substr($foreignColumn, 0, -2);
         }
 
@@ -1331,7 +1331,7 @@ class PermissionModel extends Gdn_Model {
                 $sQL->where('1', '0', false, false);
             }
         } elseif ($session->UserID <= 0 || (is_object($session->User) && $session->User->Admin != '1')) {
-            $sQL->Distinct()
+            $sQL->distinct()
                 ->join('Permission _p', '_p.JunctionID = '.$foreignAlias.'.'.$foreignColumn, 'inner')
                 ->join('UserRole _ur', '_p.RoleID = _ur.RoleID', 'inner')
                 ->beginWhereGroup()
@@ -1377,12 +1377,12 @@ class PermissionModel extends Gdn_Model {
      */
     public function undefine($names) {
         $names = (array)$names;
-        $st = $this->Database->Structure();
+        $st = $this->Database->structure();
         $st->table('Permission');
 
         foreach ($names as $name) {
             if ($st->columnExists($name)) {
-                $st->DropColumn($name);
+                $st->dropColumn($name);
             }
         }
         $st->reset();
@@ -1400,7 +1400,7 @@ class PermissionModel extends Gdn_Model {
 
         // Loop through each permission in the row and place them in the correct place in the grid.
         foreach ($row as $permissionName => $value) {
-            list($namespace, $name, $suffix) = self::SplitPermission($permissionName);
+            list($namespace, $name, $suffix) = self::splitPermission($permissionName);
             if (empty($name)) {
                 continue; // was some other column
             }

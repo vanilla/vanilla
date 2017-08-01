@@ -93,8 +93,8 @@ class SetupController extends DashboardController {
                         // Step through the available applications, enabling each of them.
                         foreach ($appNames as $appName) {
                             $validation = new Gdn_Validation();
-                            $applicationManager->RegisterPermissions($appName, $validation);
-                            $applicationManager->EnableApplication($appName, $validation);
+                            $applicationManager->registerPermissions($appName, $validation);
+                            $applicationManager->enableApplication($appName, $validation);
                         }
 
                         Gdn::pluginManager()->start(true);
@@ -183,7 +183,7 @@ class SetupController extends DashboardController {
             $DatabaseName = $this->Form->getFormValue('Database.Name', '~~Invalid~~');
             $DatabaseUser = $this->Form->getFormValue('Database.User', '~~Invalid~~');
             $DatabasePassword = $this->Form->getFormValue('Database.Password', '~~Invalid~~');
-            $ConnectionString = GetConnectionString($DatabaseName, $DatabaseHost);
+            $ConnectionString = getConnectionString($DatabaseName, $DatabaseHost);
             try {
                 $Connection = new PDO(
                     $ConnectionString,
@@ -262,7 +262,7 @@ class SetupController extends DashboardController {
                 $UserModel->Validation->applyRule('Password', 'Match');
                 $UserModel->Validation->applyRule('Email', 'Email');
 
-                if (!($AdminUserID = $UserModel->SaveAdminUser($ConfigurationFormValues))) {
+                if (!($AdminUserID = $UserModel->saveAdminUser($ConfigurationFormValues))) {
                     $this->Form->setValidationResults($UserModel->validationResults());
                 } else {
                     // The user has been created successfully, so sign in now.

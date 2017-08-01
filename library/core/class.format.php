@@ -79,18 +79,18 @@ class Gdn_Format {
         $genderSuffixGender = $activity->ActivityGender;
 
         if ($viewingUserID == $activity->ActivityUserID) {
-            $activityName = $activityNameP = T('You');
+            $activityName = $activityNameP = t('You');
         } else {
             $activityName = $activity->ActivityName;
-            $activityNameP = FormatPossessive($activityName);
+            $activityNameP = formatPossessive($activityName);
             $genderSuffixCode = 'Third';
         }
 
         if ($profileUserID != $activity->ActivityUserID) {
             // If we're not looking at the activity user's profile, link the name
             $activityNameD = urlencode($activity->ActivityName);
-            $activityName = Anchor($activityName, UserUrl($activity, 'Activity'));
-            $activityNameP = Anchor($activityNameP, UserUrl($activity, 'Activity'));
+            $activityName = anchor($activityName, userUrl($activity, 'Activity'));
+            $activityNameP = anchor($activityNameP, userUrl($activity, 'Activity'));
             $genderSuffixCode = 'Third';
         }
 
@@ -115,7 +115,7 @@ class Gdn_Format {
             $regardingNameP = t('your');
             $genderSuffixGender = $activity->RegardingGender;
         } else {
-            $regardingName = $activity->RegardingName == '' ? T('somebody') : $activity->RegardingName;
+            $regardingName = $activity->RegardingName == '' ? t('somebody') : $activity->RegardingName;
             $regardingNameP = formatPossessive($regardingName);
 
             if ($activity->ActivityUserID != $viewingUserID) {
@@ -140,7 +140,7 @@ class Gdn_Format {
             }
             $regardingWallActivityPath = userUrl($activity, 'Regarding');
             $regardingWallLink = url($regardingWallActivityPath);
-            $regardingWall = anchor(T('wall'), $regardingWallActivityPath);
+            $regardingWall = anchor(t('wall'), $regardingWallActivityPath);
         }
         if ($regardingWall == '') {
             $regardingWall = t('wall');
@@ -155,7 +155,7 @@ class Gdn_Format {
             }
         } else {
             $activityRouteLink = url($activity->Route);
-            $route = anchor(T($activity->RouteCode), $activity->Route);
+            $route = anchor(t($activity->RouteCode), $activity->Route);
         }
 
         // Translate the gender suffix.
@@ -236,7 +236,7 @@ class Gdn_Format {
      * Formats a string so that it can be saved to a PHP file in double-quotes of an array value assignment.
      *
      * @example from garden/library/core/class.locale.php:
-     *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->ArrayValueForPhp($LocaleSources[$i])."';";
+     *  $FileContents[] = "\$LocaleSources['".$SafeLocaleName."'][] = '".$Format->arrayValueForPhp($LocaleSources[$i])."';";
      *
      * @param string The string to be formatted.
      * @return string
@@ -326,7 +326,7 @@ class Gdn_Format {
                 $mixed2 = preg_replace("#\[u\](.*?)\[/u\]#si", '<u>\\1</u>', $mixed2);
                 $mixed2 = preg_replace("#\[s\](.*?)\[/s\]#si", '<s>\\1</s>', $mixed2);
                 $mixed2 = preg_replace("#\[strike\](.*?)\[/strike\]#si", '<s>\\1</s>', $mixed2);
-                $mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(T('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $mixed2);
+                $mixed2 = preg_replace("#\[quote=[\"']?([^\]]+)(;[\d]+)?[\"']?\](.*?)\[/quote\]#si", '<blockquote class="Quote" rel="\\1"><div class="QuoteAuthor">'.sprintf(t('%s said:'), '\\1').'</div><div class="QuoteText">\\3</div></blockquote>', $mixed2);
                 $mixed2 = preg_replace("#\[quote\](.*?)\[/quote\]#si", '<blockquote class="Quote"><div class="QuoteText">\\1</div></blockquote>', $mixed2);
                 $mixed2 = preg_replace("#\[cite\](.*?)\[/cite\]#si", '<blockquote class="Quote">\\1</blockquote>', $mixed2);
                 $mixed2 = preg_replace("#\[hide\](.*?)\[/hide\]#si", '\\1', $mixed2);
@@ -528,7 +528,7 @@ class Gdn_Format {
         }
 
         if ($timestamp === null) {
-            return T('Null Date', '-');
+            return t('Null Date', '-');
         }
 
         if (!$timestamp) {
@@ -677,7 +677,7 @@ class Gdn_Format {
             if (is_null($formatter)) {
                 return Gdn_Format::display($mixed);
             } else {
-                return $formatter->format(Wrap($mixed, 'div', ' class="Deleted"'));
+                return $formatter->format(wrap($mixed, 'div', ' class="Deleted"'));
             }
         }
     }
@@ -907,7 +907,7 @@ class Gdn_Format {
     /**
      * Takes a mixed variable, filters unsafe HTML and returns it.
      *
-     * Use this instead of Gdn_Format::Html() when you do not want magic formatting.
+     * Use this instead of Gdn_Format::html() when you do not want magic formatting.
      *
      * @param mixed $mixed An object, array, or string to be formatted.
      * @param array $options An array of filter options. These will also be passed through to the formatter.
@@ -1110,7 +1110,7 @@ class Gdn_Format {
         }
 
         if (function_exists('FormatRssHtmlCustom')) {
-            return FormatRssHtmlCustom($text);
+            return formatRssHtmlCustom($text);
         } else {
             return Gdn_Format::html($text);
         }
@@ -1485,7 +1485,7 @@ EOT;
 
             case 'Gifv':
                 $id = $matches[1];
-                $modernBrowser = T('Your browser does not support HTML5 video!');
+                $modernBrowser = t('Your browser does not support HTML5 video!');
                 return <<<EOT
 <div class="imgur-gifv VideoWrap">
 <video poster="https://i.imgur.com/{$id}h.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="loop">
@@ -2037,19 +2037,19 @@ EOT;
         $years = round($seconds / 31556926);
 
         if ($seconds < 60) {
-            return sprintf(Plural($seconds, '%s second', '%s seconds'), $seconds);
+            return sprintf(plural($seconds, '%s second', '%s seconds'), $seconds);
         } elseif ($minutes < 60)
-            return sprintf(Plural($minutes, '%s minute', '%s minutes'), $minutes);
+            return sprintf(plural($minutes, '%s minute', '%s minutes'), $minutes);
         elseif ($hours < 24)
-            return sprintf(Plural($hours, '%s hour', '%s hours'), $hours);
+            return sprintf(plural($hours, '%s hour', '%s hours'), $hours);
         elseif ($days < 7)
-            return sprintf(Plural($days, '%s day', '%s days'), $days);
+            return sprintf(plural($days, '%s day', '%s days'), $days);
         elseif ($weeks < 4)
-            return sprintf(Plural($weeks, '%s week', '%s weeks'), $weeks);
+            return sprintf(plural($weeks, '%s week', '%s weeks'), $weeks);
         elseif ($months < 12)
-            return sprintf(Plural($months, '%s month', '%s months'), $months);
+            return sprintf(plural($months, '%s month', '%s months'), $months);
         else {
-            return sprintf(Plural($years, '%s year', '%s years'), $years);
+            return sprintf(plural($years, '%s year', '%s years'), $years);
         }
     }
 

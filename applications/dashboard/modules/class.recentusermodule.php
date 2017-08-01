@@ -19,7 +19,7 @@ class RecentUserModule extends Gdn_Module {
 
     public function getData($limit = 20) {
         $userModel = new UserModel();
-        $this->_Sender->RecentUserData = $userModel->GetActiveUsers($limit);
+        $this->_Sender->RecentUserData = $userModel->getActiveUsers($limit);
     }
 
     public function assetTarget() {
@@ -33,7 +33,7 @@ class RecentUserModule extends Gdn_Module {
 
         $data = $this->_Sender->RecentUserData;
         if ($data !== false && $data->numRows() > 0) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

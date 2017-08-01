@@ -52,10 +52,10 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             }
 
             // Get the values from the DataSource
-            $email = $this->GetValue('Email');
-            $password = $this->GetValue('Password');
-            $persistentSession = $this->GetValue('RememberMe');
-            $clientHour = $this->GetValue('ClientHour');
+            $email = $this->getValue('Email');
+            $password = $this->getValue('Password');
+            $persistentSession = $this->getValue('RememberMe');
+            $clientHour = $this->getValue('ClientHour');
         } else {
             $persistentSession = false;
             $clientHour = 0;
@@ -64,8 +64,8 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
         $userID = 0;
 
         // Retrieve matching username/password values
-        $userModel = Gdn::Authenticator()->GetUserModel();
-        $userData = $userModel->ValidateCredentials($email, 0, $password);
+        $userModel = Gdn::authenticator()->getUserModel();
+        $userData = $userModel->validateCredentials($email, 0, $password);
         if ($userData !== false) {
             // Get ID
             $userID = $userData->UserID;
@@ -73,8 +73,8 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
             // Get Sign-in permission
             $signInPermission = $userData->Admin ? true : false;
             if ($signInPermission === false && !$userData->Banned) {
-                $permissionModel = Gdn::Authenticator()->GetPermissionModel();
-                foreach ($permissionModel->GetUserPermissions($userID) as $permissions) {
+                $permissionModel = Gdn::authenticator()->getPermissionModel();
+                foreach ($permissionModel->getUserPermissions($userID) as $permissions) {
                     $signInPermission |= val('Garden.SignIn.Allow', $permissions, false);
                 }
             }
@@ -86,12 +86,12 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
                 $this->setIdentity($userID, $persistentSession);
 
                 // Update some information about the user...
-                $userModel->UpdateVisit($userID, $clientHour);
+                $userModel->updateVisit($userID, $clientHour);
 
-                Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_SUCCESS);
-                $this->FireEvent('Authenticated');
+                Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_SUCCESS);
+                $this->fireEvent('Authenticated');
             } else {
-                Gdn::Authenticator()->Trigger(Gdn_Authenticator::AUTH_DENIED);
+                Gdn::authenticator()->trigger(Gdn_Authenticator::AUTH_DENIED);
             }
         }
         return $userID;
@@ -104,7 +104,7 @@ class Gdn_PasswordAuthenticator extends Gdn_Authenticator {
      */
     public function currentStep() {
         // Was data submitted through the form already?
-        if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->IsPostBack() === true)) {
+        if (is_object($this->_DataSource) && ($this->_DataSource == $this || $this->_DataSource->isPostBack() === true)) {
             return $this->_checkHookedFields();
         }
 

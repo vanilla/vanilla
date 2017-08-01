@@ -44,7 +44,7 @@ class Gdn_Schema {
      * @param Gdn_Database
      * @return array
      */
-    public function Fetch($table = false, $database = null) {
+    public function fetch($table = false, $database = null) {
         if ($table !== false) {
             $this->CurrentTable = $table;
         }
@@ -55,9 +55,9 @@ class Gdn_Schema {
 
         if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
             if ($database !== null) {
-                $sQL = $database->SQL();
+                $sQL = $database->sql();
             } else {
-                $sQL = Gdn::SQL();
+                $sQL = Gdn::sql();
             }
             $this->_Schema[$this->CurrentTable] = $sQL->fetchTableSchema($this->CurrentTable);
         }
@@ -126,7 +126,7 @@ class Gdn_Schema {
 
     /**
      * Returns a boolean value indicating if the specified $field exists in
-     * $table. Assumes that $this->Fetch() has been called for $table.
+     * $table. Assumes that $this->fetch() has been called for $table.
      *
      * @param string The name of the table to look for $field in.
      * @param string The name of the field to look for in $table.

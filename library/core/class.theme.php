@@ -70,12 +70,12 @@ class Gdn_Theme {
         if ($homeLink) {
             $homeUrl = val('HomeUrl', $options);
             if (!$homeUrl) {
-                $homeUrl = Url('/', true);
+                $homeUrl = url('/', true);
             }
 
             $row = ['Name' => $homeLink, 'Url' => $homeUrl, 'CssClass' => 'CrumbLabel HomeCrumb'];
             if (!is_string($homeLink)) {
-                $row['Name'] = T('Home');
+                $row['Name'] = t('Home');
             }
 
             array_unshift($data, $row);
@@ -106,14 +106,14 @@ class Gdn_Theme {
                 $result .= '<span itemprop="child" itemscope itemtype="http://data-vocabulary.org/Breadcrumb">';
             }
 
-            $row['Url'] = $row['Url'] ? Url($row['Url']) : '#';
+            $row['Url'] = $row['Url'] ? url($row['Url']) : '#';
             $cssClass = 'CrumbLabel '.val('CssClass', $row);
             if ($dataCount == count($data)) {
                 $cssClass .= ' Last';
             }
 
             $label = '<span class="'.$cssClass.'">'.formatString($format, $row).'</span> ';
-            $result = concatSep('<span class="Crumb">'.T('Breadcrumbs Crumb', '›').'</span> ', $result, $label);
+            $result = concatSep('<span class="Crumb">'.t('Breadcrumbs Crumb', '›').'</span> ', $result, $label);
 
             $count++;
         }
@@ -161,7 +161,7 @@ class Gdn_Theme {
     public static function bulletRow($sep = false) {
         if (!$sep) {
             if (!self::$_BulletSep) {
-                self::$_BulletSep = ' '.Bullet().' ';
+                self::$_BulletSep = ' '.bullet().' ';
             }
         } else {
             self::$_BulletSep = $sep;
@@ -216,10 +216,10 @@ class Gdn_Theme {
                 if (is_array($breadcrumbs) && count($breadcrumbs) > 0) {
                     $last = array_pop($breadcrumbs);
                     $path = val('Url', $last);
-                    $defaultText = val('Name', $last, T('Back'));
+                    $defaultText = val('Name', $last, t('Back'));
                 } else {
                     $path = '/';
-                    $defaultText = c('Garden.Title', T('Back'));
+                    $defaultText = c('Garden.Title', t('Back'));
                 }
                 if (!$text) {
                     $text = $defaultText;
@@ -280,7 +280,7 @@ class Gdn_Theme {
                 break;
             case 'photo':
                 $path = 'profile';
-                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text && $session->isValid()) {
                     $isFullPath = strtolower(substr($session->User->Photo, 0, 7)) == 'http://' || strtolower(substr($session->User->Photo, 0, 8)) == 'https://';
                     $photoUrl = ($isFullPath) ? $session->User->Photo : Gdn_Upload::url(changeBasename($session->User->Photo, 'n%s'));
@@ -289,7 +289,7 @@ class Gdn_Theme {
 
                 break;
             case 'drafts':
-                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text) {
                     $text = t('My Drafts');
                 }
@@ -299,7 +299,7 @@ class Gdn_Theme {
                 }
                 break;
             case 'discussions/bookmarked':
-                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text) {
                     $text = t('My Bookmarks');
                 }
@@ -309,7 +309,7 @@ class Gdn_Theme {
                 }
                 break;
             case 'discussions/mine':
-                TouchValue('Permissions', $options, 'Garden.SignIn.Allow');
+                touchValue('Permissions', $options, 'Garden.SignIn.Allow');
                 if (!$text) {
                     $text = t('My Discussions');
                 }
@@ -329,7 +329,7 @@ class Gdn_Theme {
                 // The destination is the signin/signout toggle link.
                 if ($session->isValid()) {
                     if (!$text) {
-                        $text = T('Sign Out');
+                        $text = t('Sign Out');
                     }
                     $path = signOutUrl($target);
                     $class = concatSep(' ', $class, 'SignOut');
@@ -339,7 +339,7 @@ class Gdn_Theme {
                     }
 
                     $path = signInUrl($target);
-                    if (signInPopup() && strpos(Gdn::Request()->Url(), 'entry') === false) {
+                    if (signInPopup() && strpos(Gdn::request()->url(), 'entry') === false) {
                         $class = concatSep(' ', $class, 'SignInPopup');
                     }
                 }
@@ -407,7 +407,7 @@ class Gdn_Theme {
             $properties['alt'] = $title;
         }
 
-        echo $logo ? Img(Gdn_Upload::url($logo), $properties) : $title;
+        echo $logo ? img(Gdn_Upload::url($logo), $properties) : $title;
     }
 
     /**
@@ -421,7 +421,7 @@ class Gdn_Theme {
         $title = c('Garden.MobileTitle', c('Garden.Title', 'Title'));
 
         if ($logo) {
-            return Img(Gdn_Upload::url($logo), ['alt' => $title]);
+            return img(Gdn_Upload::url($logo), ['alt' => $title]);
         } else {
             return $title;
         }
@@ -440,7 +440,7 @@ class Gdn_Theme {
 
             $result = Gdn::cache()->get($key);
             if ($result !== Gdn_Cache::CACHEOP_FAILURE) {
-//            Trace('Module: '.$Result, $Key);
+//            trace('Module: '.$Result, $Key);
                 return $result;
             }
         }
@@ -480,7 +480,7 @@ class Gdn_Theme {
         }
 
         if (isset($key)) {
-//         Trace($Result, "Store $Key");
+//         trace($Result, "Store $Key");
             Gdn::cache()->store($key, $result, [Gdn_Cache::FEATURE_EXPIRY => $properties['cache']]);
         }
 

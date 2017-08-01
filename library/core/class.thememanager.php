@@ -31,7 +31,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
     /** @var array */
     private $alternateThemeSearchPaths = null;
 
-    /** @var array An array of available plugins. Never access this directly, instead use $this->AvailablePlugins(); */
+    /** @var array An array of available plugins. Never access this directly, instead use $this->availablePlugins(); */
     private $themeCache = null;
 
     /** @var bool Whether to use APC for theme cache storage. */
@@ -115,7 +115,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
                 continue;
             }
 
-            $themePath = CombinePaths([$searchPath, $themeFolderName]);
+            $themePath = combinePaths([$searchPath, $themeFolderName]);
             $themeFiles = $this->findThemeFilesOld($themePath);
 
             if (val('about', $themeFiles) === false) {
@@ -345,7 +345,7 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      * @return mixed
      */
     public function currentTheme() {
-        if (IsMobile()) {
+        if (isMobile()) {
             if ($this->hasMobilePreview()) {
                 return $this->getMobilePreview();
             }
@@ -381,10 +381,10 @@ class Gdn_ThemeManager extends Gdn_Pluggable {
      */
     public function disableTheme() {
         if ($this->currentTheme() == 'default') {
-            throw new Gdn_UserException(T('You cannot disable the default theme.'));
+            throw new Gdn_UserException(t('You cannot disable the default theme.'));
         }
         $oldTheme = $this->getEnabledDesktopThemeKey();
-        RemoveFromConfig('Garden.Theme');
+        removeFromConfig('Garden.Theme');
         $newTheme = $this->getEnabledDesktopThemeKey();
 
         if ($oldTheme != $newTheme) {

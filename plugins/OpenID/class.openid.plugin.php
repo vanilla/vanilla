@@ -96,11 +96,11 @@ class OpenIDPlugin extends Gdn_Plugin {
 //		$this->dispatch($Sender, $Sender->RequestArgs);
 //   }
 
-//   public function Controller_Toggle($Sender) {
-//      $this->AutoToggle($Sender);
+//   public function controller_Toggle($Sender) {
+//      $this->autoToggle($Sender);
 //   }
 
-//   public function AuthenticationController_render_before($Sender, $Args) {
+//   public function authenticationController_render_before($Sender, $Args) {
 //      if (isset($Sender->ChooserList)) {
 //         $Sender->ChooserList['openid'] = 'OpenID';
 //      }
@@ -143,16 +143,16 @@ class OpenIDPlugin extends Gdn_Plugin {
         $session = Gdn::session();
         $openID = $session->stash('OpenID', '', false);
         if (!$openID) {
-            $openID = $this->GetOpenID();
+            $openID = $this->getOpenID();
         }
 
-        if ($session->Stash('OpenID', '', false) || $openID->validate()) {
+        if ($session->stash('OpenID', '', false) || $openID->validate()) {
             $attr = $openID->getAttributes();
 
             // This isn't a trusted connection. Don't allow it to automatically connect a user account.
             saveToConfig('Garden.Registration.AutoConnect', false, false);
 
-            $form = $sender->Form; //new Gdn_Form();
+            $form = $sender->Form; //new gdn_Form();
             $iD = $openID->identity;
             $form->setFormValue('UniqueID', $iD);
             $form->setFormValue('Provider', self::$ProviderKey);
@@ -253,7 +253,7 @@ class OpenIDPlugin extends Gdn_Plugin {
      * @param $sender
      * @param $args
      */
-    public function base_SignInIcons_handler($sender, $args) {
+    public function base_signInIcons_handler($sender, $args) {
         if ($this->signInAllowed()) {
             echo "\n".$this->_getButton();
         }

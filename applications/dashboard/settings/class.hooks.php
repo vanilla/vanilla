@@ -152,7 +152,7 @@ class DashboardHooks extends Gdn_Plugin {
             $exceptions = [];
         }
 
-        if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') && (val('MessagesLoaded', $sender) != '1' && $sender->MasterView != 'empty' && ArrayInArray($exceptions, $messageCache, false) || InArrayI($location, $messageCache))) {
+        if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') && (val('MessagesLoaded', $sender) != '1' && $sender->MasterView != 'empty' && arrayInArray($exceptions, $messageCache, false) || inArrayI($location, $messageCache))) {
             $messageModel = new MessageModel();
             $messageData = $messageModel->getMessagesForLocation($location, $exceptions, $sender->data('Category.CategoryID'));
             foreach ($messageData as $message) {
@@ -175,7 +175,7 @@ class DashboardHooks extends Gdn_Plugin {
             // Record the remote url where the forum is being embedded.
             $remoteUrl = c('Garden.Embed.RemoteUrl');
             if (!$remoteUrl) {
-                $remoteUrl = GetIncomingValue('remote');
+                $remoteUrl = getIncomingValue('remote');
                 if ($remoteUrl) {
                     saveToConfig('Garden.Embed.RemoteUrl', $remoteUrl);
                 }
@@ -188,8 +188,8 @@ class DashboardHooks extends Gdn_Plugin {
             }
 
             // Force embedding?
-            if (!IsSearchEngine() && strtolower($sender->ControllerName) != 'entry') {
-                if (IsMobile()) {
+            if (!isSearchEngine() && strtolower($sender->ControllerName) != 'entry') {
+                if (isMobile()) {
                     $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
                 } else {
                     $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
@@ -220,13 +220,13 @@ class DashboardHooks extends Gdn_Plugin {
         // Allow return to mobile site
         $forceNoMobile = val('X-UA-Device-Force', $_COOKIE);
         if ($forceNoMobile === 'desktop') {
-            $sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
+            $sender->addAsset('Foot', wrap(anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
         }
 
         // Allow global translation of TagHint
         if (c('Tagging.Discussions.Enabled')) {
             $sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
-            $sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
+            $sender->addDefinition('TaggingSearchUrl', Gdn::request()->url('tags/search'));
             $sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
             $sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
         }
@@ -412,7 +412,7 @@ class DashboardHooks extends Gdn_Plugin {
 
         // Determine if new tags can be added for the current type.
         $canAddTags = (!empty($tagTypes[$type]['addtag']) && $tagTypes[$type]['addtag']) ? 1 : 0;
-        $canAddTags &= CheckPermission('Vanilla.Tagging.Add');
+        $canAddTags &= checkPermission('Vanilla.Tagging.Add');
 
         $sender->setData('_CanAddTags', $canAddTags);
 
@@ -502,7 +502,7 @@ class DashboardHooks extends Gdn_Plugin {
                         }
                     }
 
-                    if ($sender->Form->Save()) {
+                    if ($sender->Form->save()) {
                         $sender->informMessage(t('Your changes have been saved.'));
                         $sender->setRedirectTo('/settings/tagging');
                     }
@@ -569,12 +569,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if (!filter_var($discussionID, FILTER_VALIDATE_INT)) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         $sender->title('Add Tags');
@@ -675,8 +675,8 @@ class DashboardHooks extends Gdn_Plugin {
             try {
                 $authRow = $model->verify($token, true);
 
-                Gdn::Session()->start($authRow['UserID'], false, false);
-                Gdn::Session()->validateTransientKey(true);
+                Gdn::session()->start($authRow['UserID'], false, false);
+                Gdn::session()->validateTransientKey(true);
             } catch (\Exception $ex) {
                 // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
                 $msg = $ex->getMessage();
@@ -766,9 +766,9 @@ class DashboardHooks extends Gdn_Plugin {
         // Add a link to the community home.
         $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, ['icon' => 'home'], false);
         $sender->addGroupToGlobals('', 'etc', '', 100);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, ['icon' => 'resize-full']);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, ['icon' => 'signout']);
-        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, ['icon' => 'signin']);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && isMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, ['icon' => 'resize-full']);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), signOutUrl(), 'etc.signout', '', 100, ['icon' => 'signout']);
+        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), signinUrl(), 'etc.signin', '', 100, ['icon' => 'signin']);
 
         // DEFAULTS
 

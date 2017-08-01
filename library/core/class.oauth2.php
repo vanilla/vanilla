@@ -348,7 +348,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         $form->setModel($model);
         $sender->Form = $form;
 
-        if (!$form->AuthenticatedPostBack()) {
+        if (!$form->authenticatedPostBack()) {
             $provider = $this->provider();
             $form->setData($provider);
         } else {
@@ -390,7 +390,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
 
         $sender->setHighlightRoute();
         if (!$sender->data('Title')) {
-            $sender->setData('Title', sprintf(T('%s Settings'), 'Oauth2 SSO'));
+            $sender->setData('Title', sprintf(t('%s Settings'), 'Oauth2 SSO'));
         }
 
         $view = ($this->settingsView) ? $this->settingsView : 'plugins/oauth2';
@@ -578,7 +578,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
             case 'entry':
             default:
 
-                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is Base_ConnectData_Handler() in this class.
+                // This is an sso request, we need to redispatch to /entry/connect/[providerKey] which is base_ConnectData_Handler() in this class.
                 Gdn::session()->stash($this->getProviderKey(), ['AccessToken' => val('access_token', $response), 'RefreshToken' => val('refresh_token', $response), 'Profile' => $profile]);
                 $url = '/entry/connect/'.$this->getProviderKey();
 
@@ -617,7 +617,7 @@ class Gdn_OAuth2 extends Gdn_Plugin {
         trace($refreshToken, 'Refresh Token');
 
         /* @var Gdn_Form $form */
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
 
         // Create a form and populate it with values from the profile.
         $originaFormValues = $form->formValues();

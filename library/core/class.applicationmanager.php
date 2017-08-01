@@ -17,10 +17,10 @@ use Vanilla\AddonManager;
  */
 class Gdn_ApplicationManager {
 
-    /** @var array Available applications. Never access this directly, instead use $this->AvailableApplications(); */
+    /** @var array Available applications. Never access this directly, instead use $this->availableApplications(); */
     private $availableApplications = null;
 
-    /** @var array Enabled applications. Never access this directly, instead use $this->EnabledApplications(); */
+    /** @var array Enabled applications. Never access this directly, instead use $this->enabledApplications(); */
     private $enabledApplications = null;
 
     /** @var array The valid paths to search for applications. */
@@ -135,7 +135,7 @@ class Gdn_ApplicationManager {
         }
 
         if (!is_null($key)) {
-            return GetValueR($key, $applicationInfo, false);
+            return getValueR($key, $applicationInfo, false);
         }
 
         return $applicationInfo;
@@ -220,7 +220,7 @@ class Gdn_ApplicationManager {
      */
     public function enableApplication($applicationName) {
         $this->testApplication($applicationName);
-        $applicationInfo = ArrayValueI($applicationName, $this->availableApplications(), []);
+        $applicationInfo = arrayValueI($applicationName, $this->availableApplications(), []);
         $applicationName = $applicationInfo['Index'];
         $applicationFolder = val('Folder', $applicationInfo, '');
 

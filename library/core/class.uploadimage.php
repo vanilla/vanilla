@@ -82,7 +82,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      */
     public function validateUpload($inputName, $throwError = true) {
         if (!function_exists('gd_info')) {
-            throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+            throw new Exception(t('The uploaded file could not be processed because GD is not installed.'));
         }
 
         // Make sure that all standard file upload checks are performed.
@@ -92,7 +92,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         if ($tmpFileName) {
             $size = getimagesize($tmpFileName);
             if ($size === false) {
-                throw new Exception(T('The uploaded file was not an image.'));
+                throw new Exception(t('The uploaded file was not an image.'));
             }
         }
 
@@ -103,7 +103,7 @@ class Gdn_UploadImage extends Gdn_Upload {
      * Saves the specified image at $target in the specified format with the
      * specified dimensions (or the existing dimensions if height/width are not provided.
      *
-     * @param string The path to the source image. Typically this is the tmp file name returned by $this->ValidateUpload();
+     * @param string The path to the source image. Typically this is the tmp file name returned by $this->validateUpload();
      * @param string The full path to where the image should be saved, including image name.
      * @param int An integer value indicating the maximum allowed height of the image (in pixels).
      * @param int An integer value indicating the maximum allowed width of the image (in pixels).
@@ -146,7 +146,7 @@ class Gdn_UploadImage extends Gdn_Upload {
         // Make sure type, height & width are properly defined.
 
         if (!function_exists('gd_info')) {
-            throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+            throw new Exception(t('The uploaded file could not be processed because GD is not installed.'));
         }
 
         $gdInfo = gd_info();
@@ -168,7 +168,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             $outputType = val($type, $outputTypes, 'jpg');
         } elseif ($type == 17 && $outputType != 'ico') {
             // Icons cannot be converted
-            throw new Exception(T('Upload cannot convert icons.'));
+            throw new Exception(t('Upload cannot convert icons.'));
         }
 
         // Figure out the target path.
@@ -251,7 +251,7 @@ class Gdn_UploadImage extends Gdn_Upload {
             }
 
             if (!$sourceImage) {
-                throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $type));
+                throw new Exception(sprintf(t('You cannot save images of this type (%s).'), $type));
             }
 
             // Create a new image from the raw source

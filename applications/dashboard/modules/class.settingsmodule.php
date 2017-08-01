@@ -30,21 +30,21 @@ class SettingsModule extends Gdn_Module {
 
         switch ($type) {
             case self::TYPE_APPLICATION:
-                $applicationManager = Gdn::Factory('ApplicationManager');
+                $applicationManager = Gdn::factory('ApplicationManager');
 
-                if ($isRemovable = !array_key_exists($name, $applicationManager->EnabledApplications())) {
-                    $applicationInfo = val($name, $applicationManager->AvailableApplications(), []);
+                if ($isRemovable = !array_key_exists($name, $applicationManager->enabledApplications())) {
+                    $applicationInfo = val($name, $applicationManager->availableApplications(), []);
                     $applicationFolder = val('Folder', $applicationInfo, '');
 
-                    $isRemovable = IsWritable(PATH_APPLICATIONS.DS.$applicationFolder);
+                    $isRemovable = isWritable(PATH_APPLICATIONS.DS.$applicationFolder);
                 }
                 break;
             case self::TYPE_PLUGIN:
-                if ($isRemovable = !array_key_exists($name, Gdn::pluginManager()->EnabledPlugins())) {
-                    $pluginInfo = val($name, Gdn::pluginManager()->AvailablePlugins(), false);
+                if ($isRemovable = !array_key_exists($name, Gdn::pluginManager()->enabledPlugins())) {
+                    $pluginInfo = val($name, Gdn::pluginManager()->availablePlugins(), false);
                     $pluginFolder = val('Folder', $pluginInfo, false);
 
-                    $isRemovable = IsWritable(PATH_PLUGINS.DS.$pluginFolder);
+                    $isRemovable = isWritable(PATH_PLUGINS.DS.$pluginFolder);
                 }
                 break;
             case self::TYPE_THEME:

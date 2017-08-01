@@ -18,19 +18,19 @@ function writeConditionEdit($condition, $sender) {
 
     // Type.
     echo '<td>',
-    $form->DropDown($px.'Type[]', $sender->Types, ['Value' => $type, 'Class' => 'CondType']),
+    $form->dropDown($px.'Type[]', $sender->Types, ['Value' => $type, 'Class' => 'CondType']),
     '</td>';
 
     echo '<td>';
 
     // Permission fields.
     echo '<div class="Cond_permission"'._DN($type, Gdn_Condition::PERMISSION).'>',
-    $form->DropDown($px.'PermissionField[]', $sender->Permissions, ['Value' => $type == Gdn_Condition::PERMISSION ? $field : '']),
+    $form->dropDown($px.'PermissionField[]', $sender->Permissions, ['Value' => $type == Gdn_Condition::PERMISSION ? $field : '']),
     '</div>';
 
     // Role fields.
     echo '<div class="Cond_role"'._DN($type, Gdn_Condition::ROLE).'>',
-    $form->DropDown($px.'RoleField[]', $sender->Roles, ['Value' => $type == Gdn_Condition::ROLE ? $field : '']),
+    $form->dropDown($px.'RoleField[]', $sender->Roles, ['Value' => $type == Gdn_Condition::ROLE ? $field : '']),
     '</div>';
 
     // Textbox field.
@@ -69,18 +69,18 @@ function writeConditionEdit($condition, $sender) {
         </thead>
         <?php
         // Write all of the conditions.
-        foreach ($this->Conditions() as $Condition) {
-            WriteConditionEdit($Condition, $this);
+        foreach ($this->conditions() as $Condition) {
+            writeConditionEdit($Condition, $this);
         }
 
         // Write a blank row for a new condition.
-        if (count($this->Conditions()) == 0) {
-            WriteConditionEdit(Gdn_Condition::Blank(), $this);
+        if (count($this->conditions()) == 0) {
+            writeConditionEdit(Gdn_Condition::blank(), $this);
         }
 
         // Write a template for new rows.
         echo '<tfoot style="display:none">';
-        WriteConditionEdit(Gdn_Condition::Blank(), $this);
+        writeConditionEdit(Gdn_Condition::blank(), $this);
         echo '</tfoot>';
         ?>
     </table>

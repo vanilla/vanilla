@@ -207,7 +207,7 @@ class BanModel extends Gdn_Model {
      * @return bool Whether user is banned.
      */
     public static function checkUser($User, $Validation = null, $UpdateBlocks = false, &$BansFound = null) {
-        $Bans = self::AllBans();
+        $Bans = self::allBans();
         $Fields = ['Name' => 'Name', 'Email' => 'Email', 'IPAddress' => 'LastIPAddress'];
         $Banned = [];
 
@@ -243,7 +243,7 @@ class BanModel extends Gdn_Model {
         // Add the validation results.
         if ($Validation) {
             foreach ($Banned as $BanType => $Value) {
-                $Validation->addValidationResult(Gdn_Form::LabelCode($BanType), 'ValidateBanned');
+                $Validation->addValidationResult(Gdn_Form::labelCode($BanType), 'ValidateBanned');
             }
         }
         return count($Banned) == 0;
@@ -264,7 +264,7 @@ class BanModel extends Gdn_Model {
         $result = parent::delete($where, $options);
 
         if (isset($oldBan)) {
-            $this->ApplyBan(null, $oldBan);
+            $this->applyBan(null, $oldBan);
         }
 
         return $result;
@@ -352,15 +352,15 @@ class BanModel extends Gdn_Model {
             $currentBan = null;
         }
 
-        $this->SetCounts($formPostValues);
-        $banID = parent::Save($formPostValues, $settings);
+        $this->setCounts($formPostValues);
+        $banID = parent::save($formPostValues, $settings);
         $formPostValues['BanID'] = $banID;
 
         $this->EventArguments['CurrentBan'] = $currentBan;
         $this->EventArguments['FormPostValues'] = $formPostValues;
         $this->fireEvent('AfterSave');
 
-        $this->ApplyBan($formPostValues, $currentBan);
+        $this->applyBan($formPostValues, $currentBan);
     }
 
     /**
@@ -386,7 +386,7 @@ class BanModel extends Gdn_Model {
         $banningUserID = Gdn::session()->UserID;
         // This is true when a session is started and the session user has a new ip address and it matches a banning rule ip address
         if ($user['UserID'] == $banningUserID) {
-            $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->GetSystemUserID());
+            $banningUserID = val('InsertUserID', $ban, Gdn::userModel()->getSystemUserID());
         }
 
         // Add the activity.
@@ -427,7 +427,7 @@ class BanModel extends Gdn_Model {
             $countUsers = $this->SQL
                 ->select('UserID', 'count', 'CountUsers')
                 ->from('User u')
-                ->where($this->BanWhere($data))
+                ->where($this->banWhere($data))
                 ->get()->value('CountUsers', 0);
         } catch (Exception $e) {
             Logger::log(

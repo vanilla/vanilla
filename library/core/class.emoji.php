@@ -263,12 +263,12 @@ class Emoji {
             foreach ($emojis as $name => $data) {
                 $emoji[] = [
                     "name" => "".$name."",
-                    "url" => Asset($emojiAssetPath.'/'.$data)
+                    "url" => asset($emojiAssetPath.'/'.$data)
                 ];
             }
 
             $emoji = [
-                'assetPath' => Asset($this->getAssetPath()),
+                'assetPath' => asset($this->getAssetPath()),
                 'format' => $this->getFormat(),
                 'emoji' => $this->getEmoji()
             ];
@@ -590,7 +590,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::ReplaceButProtectCodeBlocks(
+                $text = Gdn_Format::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text

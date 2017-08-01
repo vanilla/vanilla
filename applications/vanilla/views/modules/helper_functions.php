@@ -3,20 +3,20 @@
 if (!function_exists('WriteModuleDiscussion')):
     function writeModuleDiscussion($discussion, $px = 'Bookmark', $showPhotos = false) {
         ?>
-        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo CssClass($discussion); ?>">
+        <li id="<?php echo "{$px}_{$discussion->DiscussionID}"; ?>" class="<?php echo cssClass($discussion); ?>">
             <?php if ($showPhotos) :
                 $firstUser = userBuilder($discussion, 'First');
                 echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
             endif; ?>
    <span class="Options">
       <?php
-      //      echo OptionsList($Discussion);
-      echo BookmarkButton($discussion);
+      //      echo optionsList($Discussion);
+      echo bookmarkButton($discussion);
       ?>
    </span>
 
             <div class="Title"><?php
-                echo anchor(Gdn_Format::text($discussion->Name, false), DiscussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
+                echo anchor(Gdn_Format::text($discussion->Name, false), discussionUrl($discussion).($discussion->CountCommentWatch > 0 ? '#Item_'.$discussion->CountCommentWatch : ''), 'DiscussionLink');
                 ?></div>
             <div class="Meta DiscussionsModuleMeta">
                 <?php
@@ -24,10 +24,10 @@ if (!function_exists('WriteModuleDiscussion')):
                 $last->UserID = $discussion->LastUserID;
                 $last->Name = $discussion->LastName;
 
-                echo NewComments($discussion);
+                echo newComments($discussion);
 
                 $translation = pluralTranslate($discussion->CountComments, '%s comment html', '%s comments html', t('%s comment'), t('%s comments'));
-                echo '<span class="MItem">'.Gdn_Format::date($discussion->LastDate, 'html').UserAnchor($last).'</span>';
+                echo '<span class="MItem">'.Gdn_Format::date($discussion->LastDate, 'html').userAnchor($last).'</span>';
                 echo '<span class="MItem CountComments Hidden">'.sprintf($translation, $discussion->CountComments).'</span>';
                 ?>
             </div>
@@ -55,7 +55,7 @@ if (!function_exists('WritePromotedContent')):
         $sender->EventArguments['Content'] = &$content;
         $sender->EventArguments['ContentUrl'] = &$contentURL;
         ?>
-        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo CssClass($content); ?>">
+        <div id="<?php echo "Promoted_{$contentType}_{$contentID}"; ?>" class="<?php echo cssClass($content); ?>">
             <div class="AuthorWrap">
          <span class="Author">
             <?php
@@ -71,8 +71,8 @@ if (!function_exists('WritePromotedContent')):
          </span>
          <span class="AuthorInfo">
             <?php
-            echo ' '.WrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
-            echo ' '.WrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
+            echo ' '.wrapIf(htmlspecialchars(val('Title', $author)), 'span', ['class' => 'MItem AuthorTitle']);
+            echo ' '.wrapIf(htmlspecialchars(val('Location', $author)), 'span', ['class' => 'MItem AuthorLocation']);
             $sender->fireEvent('AuthorInfo');
             ?>
          </span>

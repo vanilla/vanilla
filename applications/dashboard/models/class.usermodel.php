@@ -2192,6 +2192,34 @@ class UserModel extends Gdn_Model {
                         }
                     }
 
+                    // Determine if the password reset information needs to be cleared.
+                    $clearPasswordReset = false;
+                    if (array_key_exists('Password', $fields)) {
+                        // New password? Clear the password reset info.
+                        $clearPasswordReset = true;
+                    } elseif (array_key_exists('Email', $fields)) {
+                        $row = $this->getID($userID, DATASET_TYPE_ARRAY);
+                        if ($fields['Email'] != val('Email', $row)) {
+                            // New email? Clear the password reset info.
+                            $clearPasswordReset = true;
+                        }
+                    }
+
+                    if ($clearPasswordReset) {
+                        $this->clearPasswordReset($userID);
+                        // The save routine could've tweaked existing attributes. Make sure fields are purged here too.
+                        if (array_key_exists('Attributes', $fields)) {
+                            // Attributes might be a string at this point. They'll be converted into a string before saving.
+                            if (is_string($fields['Attributes'])) {
+                                $fields['Attributes'] = dbdecode($fields['Attributes']);
+                            }
+                            if (!empty($fields['Attributes']) && is_array($fields['Attributes'])) {
+                                unset($fields['Attributes']['PasswordResetKey']);
+                                unset($fields['Attributes']['PasswordResetExpires']);
+                            }
+                        }
+                    }
+
                     if (array_key_exists('Preferences', $fields) && !is_string($fields['Preferences'])) {
                         $fields['Preferences'] = dbencode($fields['Preferences']);
                     }
@@ -4416,9 +4444,16 @@ class UserModel extends Gdn_Model {
         $passwordHash = new Gdn_PasswordHash();
         $password = $passwordHash->hashPassword($password);
 
-        $this->SQL->update('User')->set('Password', $password)->set('HashMethod', 'Vanilla')->where('UserID', $userID)->put();
-        $this->saveAttribute($userID, 'PasswordResetKey', '');
-        $this->saveAttribute($userID, 'PasswordResetExpires', '');
+        // Set the new password on the user row.
+        $this->SQL
+            ->update('User')
+            ->set('Password', $password)
+            ->set('HashMethod', 'Vanilla')
+            ->where('UserID', $userID)
+            ->put();
+
+        // Clear any password reset information.
+        $this->clearPasswordReset($userID);
 
         $this->EventArguments['UserID'] = $userID;
         $this->fireEvent('AfterPasswordReset');
@@ -4493,6 +4528,18 @@ class UserModel extends Gdn_Model {
         }
 
         return true;
+    }
+
+    /**
+     * Clear out the password reset values for a user.
+     *
+     * @param int $userID
+     */
+    private function clearPasswordReset($userID) {
+        $this->saveAttribute($userID, [
+            'PasswordResetKey' => null,
+            'PasswordResetExpires' => null
+        ]);
     }
 
     /**

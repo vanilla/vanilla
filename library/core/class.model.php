@@ -16,7 +16,7 @@
  * represent) and used directly, or it can be extended and overridden for more
  * complicated procedures related to different tables.
  */
-class Gdn_Model extends Gdn_Pluggable {
+class Gdn_Model extends Gdn_Pluggable implements DBFieldConversionSchemaProvider {
 
     /**  @var Gdn_DataSet An object representation of the current working dataset. */
     public $Data;
@@ -96,7 +96,7 @@ class Gdn_Model extends Gdn_Pluggable {
             $name = get_class($this);
         }
 
-        $this->Database = Gdn::database();
+        $this->Database = new DBFieldConverter(Gdn::database(), $this);
         $this->SQL = $this->Database->SQL();
         $this->Validation = new Gdn_Validation();
         $this->Name = $name;
@@ -118,6 +118,10 @@ class Gdn_Model extends Gdn_Pluggable {
         ];
 
         parent::__construct();
+    }
+
+    public function getConversionSchema() {
+
     }
 
     /**

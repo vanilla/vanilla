@@ -206,8 +206,9 @@ class CategoriesApiController extends AbstractApiController {
                 'description' => 'Expand with the parent record.'
             ]
         ]);
-        $query = $in->validate($query);
         $out = $this->schema([':a' => $this->schemaWithParent($query['expand'])], 'out');
+
+        $query = $in->validate($query);
 
         list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
         $rows = $this->categoryModel->searchByName(

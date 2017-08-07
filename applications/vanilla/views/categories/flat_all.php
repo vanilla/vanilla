@@ -23,7 +23,7 @@
         $this->EventArguments['Category'] = &$category;
         $this->fireEvent('BeforeCategoryItem');
 
-        writeListItem($category);
+        writeListItem($category, 1);
     }
 ?>
 </ul>

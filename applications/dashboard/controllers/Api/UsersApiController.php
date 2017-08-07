@@ -109,6 +109,7 @@ class UsersApiController extends AbstractApiController {
         $this->massageRow($row);
 
         $result = $out->validate($row);
+        $this->massageRow($result);
         return $result;
     }
 
@@ -193,6 +194,9 @@ class UsersApiController extends AbstractApiController {
             $userID = $row['UserID'];
             $roles = $this->userModel->getRoles($userID)->resultArray();
             $row['roles'] = $roles;
+        }
+        if (array_key_exists('Photo', $row)) {
+            $row['Photo'] = userPhotoUrl($row);
         }
     }
 
@@ -351,7 +355,10 @@ class UsersApiController extends AbstractApiController {
      */
     public function userSchema($type = '') {
         if ($this->userSchema === null) {
-            $this->userSchema = $this->schema($this->fullSchema(), 'User');
+            $schema = Schema::parse(['userID', 'name', 'email', 'photo', 'confirmed',
+                'showEmail', 'verified', 'banned', 'roles']);
+            $schema = $schema->add($this->fullSchema());
+            $this->userSchema = $this->schema($schema, 'User');
         }
         return $this->schema($this->userSchema, $type);
     }

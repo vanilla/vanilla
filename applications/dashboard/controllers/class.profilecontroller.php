@@ -692,7 +692,9 @@ class ProfileController extends Gdn_Controller {
 
             if ($this->Form->save()) {
                 $this->informMessage(sprite('Check', 'InformSprite').t('Your password has been changed.'), 'Dismissable AutoDismiss HasSprite');
+
                 $this->Form->clearInputs();
+
                 Logger::event(
                     'password_change',
                     Logger::INFO,

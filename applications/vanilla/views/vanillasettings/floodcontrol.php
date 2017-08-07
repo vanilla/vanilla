@@ -2,9 +2,9 @@
 $Count = [1, 2, 3, 4, 5, 10, 15, 20, 25, 30];
 $Time = [30, 60, 90, 120, 240];
 $Lock = [30, 60, 90, 120, 240];
-$SpamCount = ArrayCombine($Count, $Count);
-$SpamTime = ArrayCombine($Time, $Time);
-$SpamLock = ArrayCombine([60, 120, 180, 240, 300, 600], [1, 2, 3, 4, 5, 10]);
+$SpamCount = arrayCombine($Count, $Count);
+$SpamTime = arrayCombine($Time, $Time);
+$SpamLock = arrayCombine([60, 120, 180, 240, 300, 600], [1, 2, 3, 4, 5, 10]);
 
 $ConversationsEnabled = $this->data('IsConversationsEnabled');
 
@@ -27,57 +27,57 @@ echo heading(t('Flood Control'));
         <tbody>
         <tr>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamCount', $SpamCount); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Discussion.SpamCount', $SpamCount); ?>
                 <?php echo t('discussion(s)'); ?>
             </td>
             <td class="Alt">
-                <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamTime', $SpamTime); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Discussion.SpamTime', $SpamTime); ?>
                 <?php echo t('seconds'); ?>
             </td>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Discussion.SpamLock', $SpamLock); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Discussion.SpamLock', $SpamLock); ?>
                 <?php echo t('minute(s)'); ?>
             </td>
         </tr>
         <tr>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Comment.SpamCount', $SpamCount); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Comment.SpamCount', $SpamCount); ?>
                 <?php echo t('comment(s)'); ?>
             </td>
             <td class="Alt">
-                <?php echo $this->Form->DropDown('Vanilla.Comment.SpamTime', $SpamTime); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Comment.SpamTime', $SpamTime); ?>
                 <?php echo t('seconds'); ?>
             </td>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Comment.SpamLock', $SpamLock); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Comment.SpamLock', $SpamLock); ?>
                 <?php echo t('minute(s)'); ?>
             </td>
         </tr>
         <tr>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamCount', $SpamCount); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Activity.SpamCount', $SpamCount); ?>
                 <?php echo t('activity(ies)'); ?>
             </td>
             <td class="Alt">
-                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamTime', $SpamTime); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Activity.SpamTime', $SpamTime); ?>
                 <?php echo t('seconds'); ?>
             </td>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.Activity.SpamLock', $SpamLock); ?>
+                <?php echo $this->Form->dropDown('Vanilla.Activity.SpamLock', $SpamLock); ?>
                 <?php echo t('minute(s)'); ?>
             </td>
         </tr>
         <tr>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamCount', $SpamCount); ?>
+                <?php echo $this->Form->dropDown('Vanilla.ActivityComment.SpamCount', $SpamCount); ?>
                 <?php echo t('activity\'s comment(s)'); ?>
             </td>
             <td class="Alt">
-                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamTime', $SpamTime); ?>
+                <?php echo $this->Form->dropDown('Vanilla.ActivityComment.SpamTime', $SpamTime); ?>
                 <?php echo t('seconds'); ?>
             </td>
             <td>
-                <?php echo $this->Form->DropDown('Vanilla.ActivityComment.SpamLock', $SpamLock); ?>
+                <?php echo $this->Form->dropDown('Vanilla.ActivityComment.SpamLock', $SpamLock); ?>
                 <?php echo t('minute(s)'); ?>
             </td>
         </tr>
@@ -86,29 +86,29 @@ echo heading(t('Flood Control'));
 
             <tr>
                 <td>
-                    <?php echo $this->Form->DropDown('Conversations.Conversation.SpamCount', $SpamCount); ?>
+                    <?php echo $this->Form->dropDown('Conversations.Conversation.SpamCount', $SpamCount); ?>
                     <?php echo t('private conversation(s)'); ?>
                 </td>
                 <td class="Alt">
-                    <?php echo $this->Form->DropDown('Conversations.Conversation.SpamTime', $SpamTime); ?>
+                    <?php echo $this->Form->dropDown('Conversations.Conversation.SpamTime', $SpamTime); ?>
                     <?php echo t('seconds'); ?>
                 </td>
                 <td>
-                    <?php echo $this->Form->DropDown('Conversations.Conversation.SpamLock', $SpamLock); ?>
+                    <?php echo $this->Form->dropDown('Conversations.Conversation.SpamLock', $SpamLock); ?>
                     <?php echo t('minute(s)'); ?>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamCount', $SpamCount); ?>
+                    <?php echo $this->Form->dropDown('Conversations.ConversationMessage.SpamCount', $SpamCount); ?>
                     <?php echo t('reply to private conversation(s)'); ?>
                 </td>
                 <td class="Alt">
-                    <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamTime', $SpamTime); ?>
+                    <?php echo $this->Form->dropDown('Conversations.ConversationMessage.SpamTime', $SpamTime); ?>
                     <?php echo t('seconds'); ?>
                 </td>
                 <td>
-                    <?php echo $this->Form->DropDown('Conversations.ConversationMessage.SpamLock', $SpamLock); ?>
+                    <?php echo $this->Form->dropDown('Conversations.ConversationMessage.SpamLock', $SpamLock); ?>
                     <?php echo t('minute(s)'); ?>
                 </td>
             </tr>

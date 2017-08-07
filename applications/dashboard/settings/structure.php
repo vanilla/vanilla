@@ -318,7 +318,7 @@ if ($PermissionModel instanceof PermissionModel) {
         ->column('JunctionTable', 'varchar(100)', true)
         ->column('JunctionColumn', 'varchar(100)', true)
         ->column('JunctionID', 'int', true)
-        // The actual permissions will be added by PermissionModel::Define()
+        // The actual permissions will be added by PermissionModel::define()
         ->set($Explicit, $Drop);
 }
 
@@ -387,7 +387,7 @@ $Construct->table('ActivityType')
     ->set($Explicit, $Drop);
 
 // Activity Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
+// column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 
 $Construct->table('Activity');
 $ActivityExists = $Construct->tableExists();
@@ -641,7 +641,7 @@ $Construct->table('Tag')
     ->column('InsertUserID', 'int', true, 'key')
     ->column('DateInserted', 'datetime')
     ->column('CategoryID', 'int', -1, 'unique')
-    ->Engine('InnoDB')
+    ->engine('InnoDB')
     ->set($Explicit, $Drop);
 
 if (!$FullNameColumnExists) {

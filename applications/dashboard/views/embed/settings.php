@@ -35,7 +35,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Comments per Page', 'Garden.Embed.CommentsPerPage'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Garden.Embed.CommentsPerPage', $Options, $Fields); ?>
+            <?php echo $this->Form->dropDown('Garden.Embed.CommentsPerPage', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -46,7 +46,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Sort blog comments in the following order:', 'Garden.Embed.SortComments'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('Garden.Embed.SortComments', $Options, $Fields); ?>
+            <?php echo $this->Form->dropDown('Garden.Embed.SortComments', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -59,7 +59,7 @@ echo $this->Form->errors();
                 </div>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->CheckBox('Garden.Embed.PageToForum', "Send users to forum after the first page of comments."); ?>
+            <?php echo $this->Form->checkBox('Garden.Embed.PageToForum', "Send users to forum after the first page of comments."); ?>
             </div>
         </li>
     </ul>

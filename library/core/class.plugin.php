@@ -152,10 +152,10 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
-     * Converts view files to Render() paths.
+     * Converts view files to render() paths.
      *
      * This method takes a simple filename and, assuming it is located inside <plugin>/views/,
-     * converts it into a path that is suitable for $Sender->Render().
+     * converts it into a path that is suitable for $Sender->render().
      *
      * @param string $viewName The name of the view file, including extension.
      * @return string Returns the path to the view file, relative to the document root.
@@ -182,7 +182,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
     }
 
     /**
-     * Implementation of {@link Gdn_IPlugin::Setup()}.
+     * Implementation of {@link Gdn_IPlugin::setup()}.
      */
     public function setup() {
         // Do nothing...
@@ -318,7 +318,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
 
         if ($sender->Form->authenticatedPostBack() || Gdn::session()->validateTransientKey($passedKey)) {
             $currentConfig = !$currentConfig;
-            SaveToConfig($enabledKey, $currentConfig);
+            saveToConfig($enabledKey, $currentConfig);
         }
 
         if ($sender->Form->authenticatedPostBack()) {
@@ -361,7 +361,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * @return boolean Status of plugin's 2nd level activation
      */
     public function isEnabled() {
-        $pluginName = $this->GetPluginIndex();
+        $pluginName = $this->getPluginIndex();
         $enabledKey = "Plugins.{$pluginName}.Enabled";
         return (bool)c($enabledKey, false);
     }
@@ -395,7 +395,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
             return call_user_func([$this, $controllerMethod], $sender, $requestArgs);
         } else {
             $pluginName = get_class($this);
-            throw NotFoundException("@{$pluginName}->{$controllerMethod}()");
+            throw notFoundException("@{$pluginName}->{$controllerMethod}()");
         }
     }
 
@@ -403,7 +403,7 @@ abstract class Gdn_Plugin extends Gdn_Pluggable implements Gdn_IPlugin {
      * Passthru render request to sender.
      *
      * This render method automatically adds the correct ApplicationFolder parameter
-     * so that $Sender->Render() will first check the plugin's views/ folder.
+     * so that $Sender->render() will first check the plugin's views/ folder.
      *
      * @param string $view The name of the view to render.
      */

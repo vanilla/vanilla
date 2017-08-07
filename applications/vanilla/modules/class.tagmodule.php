@@ -184,8 +184,8 @@ class TagModule extends Gdn_Module {
 ?>
                         <li><?php
                             echo anchor(
-                                htmlspecialchars(TagFullName($tag)),
-                                TagUrl($tag, '', '/'),
+                                htmlspecialchars(tagFullName($tag)),
+                                tagUrl($tag, '', '/'),
                                 ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
                             );
                             ?></li>
@@ -230,8 +230,8 @@ endforeach; ?>
 ?>
                         <li><?php
                             echo anchor(
-                                htmlspecialchars(TagFullName($tag)).' '.Wrap(number_format($tag['CountDiscussions']), 'span', ['class' => 'Count']),
-                                TagUrl($tag, '', '/'),
+                                htmlspecialchars(tagFullName($tag)).' '.wrap(number_format($tag['CountDiscussions']), 'span', ['class' => 'Count']),
+                                tagUrl($tag, '', '/'),
                                 ['class' => 'Tag_'.str_replace(' ', '_', $tag['Name'])]
                             );
                             ?></li>

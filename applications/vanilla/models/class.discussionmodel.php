@@ -982,7 +982,7 @@ class DiscussionModel extends Gdn_Model {
         // Fix up output
         $discussion->Name = Gdn_Format::text($discussion->Name);
         $discussion->Attributes = dbdecode($discussion->Attributes);
-        $discussion->Url = DiscussionUrl($discussion);
+        $discussion->Url = discussionUrl($discussion);
         $discussion->Tags = $this->formatTags($discussion->Tags);
 
         // Join in the category.
@@ -1429,7 +1429,7 @@ class DiscussionModel extends Gdn_Model {
             }
 
             if ($strip = c('Vanilla.Embed.StripSuffix')) {
-                $title = StringEndsWith($title, $strip, true, true);
+                $title = stringEndsWith($title, $strip, true, true);
             }
         }
         $title = trim($title);
@@ -2128,7 +2128,7 @@ class DiscussionModel extends Gdn_Model {
                         'HeadlineFormat' => $headlineFormat,
                         'RecordType' => 'Discussion',
                         'RecordID' => $discussionID,
-                        'Route' => DiscussionUrl($fields, '', '/'),
+                        'Route' => discussionUrl($fields, '', '/'),
                         'Data' => [
                             'Name' => $discussionName,
                             'Category' => val('Name', $category)
@@ -2321,8 +2321,8 @@ class DiscussionModel extends Gdn_Model {
             $this->addArchiveWhere();
 
             $data = $this->SQL->get()->firstRow();
-            $countDiscussions = (int)GetValue('CountDiscussions', $data, 0);
-            $countComments = (int)GetValue('CountComments', $data, 0);
+            $countDiscussions = (int)getValue('CountDiscussions', $data, 0);
+            $countComments = (int)getValue('CountComments', $data, 0);
 
             $cacheAmendment = [
                 'CountDiscussions' => $countDiscussions,

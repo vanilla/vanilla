@@ -315,14 +315,14 @@ class VanillaHooks implements Gdn_IPlugin {
         if (in_array($Sender->RequestMethod, ['discussion', 'editdiscussion', 'question'])) {
             // Setup, get most popular tags
             $TagModel = TagModel::instance();
-            $Tags = $TagModel->getWhere(['Type' => array_keys($TagModel->defaultTypes())], 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->Result(DATASET_TYPE_ARRAY);
+            $Tags = $TagModel->getWhere(['Type' => array_keys($TagModel->defaultTypes())], 'CountDiscussions', 'desc', c('Vanilla.Tagging.ShowLimit', 50))->result(DATASET_TYPE_ARRAY);
             $TagsHtml = (count($Tags)) ? '' : t('No tags have been created yet.');
             $Tags = Gdn_DataSet::index($Tags, 'FullName');
             ksort($Tags);
 
             // The tags must be fetched.
             if ($Sender->Request->isPostBack()) {
-                $tag_ids = TagModel::SplitTags($Sender->Form->getFormValue('Tags'));
+                $tag_ids = TagModel::splitTags($Sender->Form->getFormValue('Tags'));
                 $tags = TagModel::instance()->getWhere(['TagID' => $tag_ids])->resultArray();
                 $tags = array_column($tags, 'TagID', 'FullName');
             } else {
@@ -346,7 +346,7 @@ class VanillaHooks implements Gdn_IPlugin {
             echo $Sender->Form->textBox('Tags', ['data-tags' => json_encode($tags)]);
 
             // Available tags
-            echo wrap(Anchor(t('Show popular tags'), '#'), 'span', ['class' => 'ShowTags']);
+            echo wrap(anchor(t('Show popular tags'), '#'), 'span', ['class' => 'ShowTags']);
             foreach ($Tags as $Tag) {
                 $TagsHtml .= anchor(htmlspecialchars($Tag['FullName']), '#', 'AvailableTag', ['data-name' => $Tag['Name'], 'data-id' => $Tag['TagID']]).' ';
             }
@@ -363,7 +363,7 @@ class VanillaHooks implements Gdn_IPlugin {
      */
     public function postController_render_before($Sender) {
         $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
-        $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
+        $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->url('tags/search'));
         $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
 
         // Make sure that detailed tag data is available to the form.
@@ -561,7 +561,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * Check whether a user has access to view discussions in a particular category.
      *
      * @since 2.0.18
-     * @example $UserModel->GetCategoryViewPermission($userID, $categoryID).
+     * @example $UserModel->getCategoryViewPermission($userID, $categoryID).
      *
      * @param $sender UserModel.
      * @return bool Whether user has permission.
@@ -657,11 +657,11 @@ class VanillaHooks implements Gdn_IPlugin {
             $breadcrumbs = [];
 
             if (is_array($parentTag) && count(array_filter($parentTag))) {
-                $breadcrumbs[] = ['Name' => $parentTag['FullName'], 'Url' => TagUrl($parentTag, '', '/')];
+                $breadcrumbs[] = ['Name' => $parentTag['FullName'], 'Url' => tagUrl($parentTag, '', '/')];
             }
 
             if (is_array($currentTag) && count(array_filter($currentTag))) {
-                $breadcrumbs[] = ['Name' => $currentTag['FullName'], 'Url' => TagUrl($currentTag, '', '/')];
+                $breadcrumbs[] = ['Name' => $currentTag['FullName'], 'Url' => tagUrl($currentTag, '', '/')];
             }
 
             if (count($breadcrumbs)) {
@@ -699,8 +699,8 @@ class VanillaHooks implements Gdn_IPlugin {
             $discussionsLabel = sprite('SpDiscussions').' '.t('Discussions');
             $commentsLabel = sprite('SpComments').' '.t('Comments');
             if (c('Vanilla.Profile.ShowCounts', true)) {
-                $discussionsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountDiscussions', $sender, null), "/profile/count/discussions?userid=$userID").'</span>';
-                $commentsLabel .= '<span class="Aside">'.CountString(GetValueR('User.CountComments', $sender, null), "/profile/count/comments?userid=$userID").'</span>';
+                $discussionsLabel .= '<span class="Aside">'.countString(getValueR('User.CountDiscussions', $sender, null), "/profile/count/discussions?userid=$userID").'</span>';
+                $commentsLabel .= '<span class="Aside">'.countString(getValueR('User.CountComments', $sender, null), "/profile/count/comments?userid=$userID").'</span>';
             }
             $sender->addProfileTab(t('Discussions'), 'profile/discussions/'.$sender->User->UserID.'/'.rawurlencode($sender->User->Name), 'Discussions', $discussionsLabel);
             $sender->addProfileTab(t('Comments'), 'profile/comments/'.$sender->User->UserID.'/'.rawurlencode($sender->User->Name), 'Comments', $commentsLabel);
@@ -769,7 +769,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param ProfileController $Sender
      */
-    public function profileController_CustomNotificationPreferences_Handler($Sender) {
+    public function profileController_customNotificationPreferences_handler($Sender) {
         if (Gdn::session()->checkPermission('Garden.AdvancedNotifications.Allow')) {
             include $Sender->fetchViewLocation('notificationpreferences', 'vanillasettings', 'vanilla');
         }
@@ -783,7 +783,7 @@ class VanillaHooks implements Gdn_IPlugin {
      *
      * @param object $sender SearchModel
      */
-    public function searchModel_Search_Handler($sender) {
+    public function searchModel_search_handler($sender) {
         $searchModel = new VanillaSearchModel();
         $searchModel->search($sender);
     }
@@ -830,7 +830,7 @@ class VanillaHooks implements Gdn_IPlugin {
         // Tell the ProfileController what tab to load
         $sender->getUserInfo($userReference, $username, $userID);
         $sender->_setBreadcrumbs(t('Comments'), userUrl($sender->User, '', 'comments'));
-        $sender->SetTabView('Comments', 'profile', 'Discussion', 'Vanilla');
+        $sender->setTabView('Comments', 'profile', 'Discussion', 'Vanilla');
 
         $pageSize = c('Vanilla.Discussions.PerPage', 30);
         list($offset, $limit) = offsetLimit($page, $pageSize);
@@ -1015,7 +1015,7 @@ class VanillaHooks implements Gdn_IPlugin {
      * @param LogModel $sender
      * @param array $args
      */
-    public function logModel_AfterRestore_handler($sender, $args) {
+    public function logModel_afterRestore_handler($sender, $args) {
         $recordType = valr('Log.RecordType', $args);
         $recordUserID = valr('Log.RecordUserID', $args);
 

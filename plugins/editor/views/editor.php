@@ -3,7 +3,7 @@
 $format = strtolower($this->data('_EditorInputFormat'));
 $html_toolbar = ''; // for regular text
 
-$css_ismobile_class = (IsMobile())
+$css_ismobile_class = (isMobile())
    ? 'editor-mobile'
    : 'editor-desktop';
 

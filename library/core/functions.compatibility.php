@@ -221,7 +221,7 @@ if (!function_exists('http_build_url')) {
     /**
      * Takes an associative array in the layout of parse_url, and constructs a URL from it.
      *
-     * @param mixed $url Part(s) of a URL in form of a string or associative array like parse_url() returns.
+     * @param mixed $url part(s) of a URL in form of a string or associative array like parse_url() returns.
      * @param mixed $parts Same as the first argument.
      * @param int $flags A bit mask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default.
      * @param array &$new_url If set, it will be filled with the parts of the composed url like parse_url() would return.
@@ -423,7 +423,7 @@ if (!function_exists('valr')) {
     /**
      * Return the value from an associative array or an object.
      *
-     * This function differs from GetValue() in that $Key can be a string consisting of dot notation that will be used
+     * This function differs from getValue() in that $Key can be a string consisting of dot notation that will be used
      * to recursively traverse the collection.
      *
      * @param string $key The key or property name of the value.

@@ -127,7 +127,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_BeforeSignInButton_handler($sender, $args) {
+    public function base_beforeSignInButton_handler($sender, $args) {
         if (!$this->socialSignIn()) {
             return;
         }
@@ -146,7 +146,7 @@ class TwitterPlugin extends Gdn_Plugin {
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".Wrap($this->_getButton(), 'li', ['class' => 'Connect TwitterConnect']);
+            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect TwitterConnect']);
         }
     }
 
@@ -163,7 +163,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $options =& $args['Options'];
         $options .= ' <li>'.
-            $sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
+            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
             '</li> ';
     }
 
@@ -179,7 +179,7 @@ class TwitterPlugin extends Gdn_Plugin {
         }
 
         echo ' '.
-            $sender->Form->checkBox('ShareTwitter', '@'.Sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
+            $sender->Form->checkBox('ShareTwitter', '@'.sprite('ReactTwitter', 'ReactSprite'), ['value' => '1', 'title' => sprintf(t('Share to %s.'), 'Twitter')]).
             ' ';
     }
 
@@ -237,10 +237,10 @@ class TwitterPlugin extends Gdn_Plugin {
                 return;
             }
 
-            $url = DiscussionUrl($discussion, '', true);
-            $message = SliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
+            $url = discussionUrl($discussion, '', true);
+            $message = sliceTwitter(Gdn_Format::plainText($row['Body'], $row['Format'])).' '.$url;
 
-            $r = $this->API(
+            $r = $this->aPI(
                 '/statuses/update.json',
                 [
                 'status' => $message
@@ -344,7 +344,7 @@ class TwitterPlugin extends Gdn_Plugin {
             throw permissionException();
         }
 
-        $row = GetRecord($recordType, $iD, true);
+        $row = getRecord($recordType, $iD, true);
         if ($row) {
             // Grab the tweet message.
             switch (strtolower($recordType)) {
@@ -365,7 +365,7 @@ class TwitterPlugin extends Gdn_Plugin {
             $linkLen = 22;
             $max -= $linkLen;
 
-            $message = SliceParagraph($message, $max);
+            $message = sliceParagraph($message, $max);
             if (strlen($message) > $max) {
                 $message = substr($message, 0, $max - strlen($elips)).$elips;
             }
@@ -618,7 +618,7 @@ class TwitterPlugin extends Gdn_Plugin {
             'ProviderKey' => self::ProviderKey,
             'ConnectUrl' => '/entry/twauthorize/profile',
             'Profile' => [
-                'Name' => '@'.GetValue('screen_name', $profile),
+                'Name' => '@'.getValue('screen_name', $profile),
                 'Photo' => val('profile_image_url_https', $profile)
             ]
         ];
@@ -858,7 +858,7 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_AfterReactions_handler($sender, $args) {
+    public function base_afterReactions_handler($sender, $args) {
         if (!$this->socialReactions()) {
             return;
         }
@@ -908,9 +908,9 @@ class TwitterPlugin extends Gdn_Plugin {
         } else {
             $sender->Form->setValue('ConsumerKey', c('Plugins.Twitter.ConsumerKey'));
             $sender->Form->setValue('Secret', c('Plugins.Twitter.Secret'));
-            $sender->Form->setValue('SocialSignIn', $this->SocialSignIn());
-            $sender->Form->setValue('SocialReactions', $this->SocialReactions());
-            $sender->Form->setValue('SocialSharing', $this->SocialSharing());
+            $sender->Form->setValue('SocialSignIn', $this->socialSignIn());
+            $sender->Form->setValue('SocialReactions', $this->socialReactions());
+            $sender->Form->setValue('SocialSharing', $this->socialSharing());
         }
 
         $sender->setHighlightRoute('dashboard/social');

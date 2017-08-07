@@ -22,7 +22,7 @@
     <?php
 
     if ($LogID = $this->data('User.Attributes.BanLogID')) {
-        echo '<div class="P">', $this->Form->CheckBox('RestoreContent', "Restore deleted content."), '</div>';
+        echo '<div class="P">', $this->Form->checkBox('RestoreContent', "Restore deleted content."), '</div>';
     }
 
     echo '<div class="Buttons P">', $this->Form->button('Unban'), '</div>';

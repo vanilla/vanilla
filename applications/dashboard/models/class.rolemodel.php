@@ -382,7 +382,7 @@ class RoleModel extends Gdn_Model {
             $limitToSuffix = val('CanSession', $role, true) ? '' : 'View';
         }
 
-        $result = $permissionModel->GetPermissions($roleIDs, $limitToSuffix);
+        $result = $permissionModel->getPermissions($roleIDs, $limitToSuffix);
         return $result;
     }
 
@@ -425,7 +425,7 @@ class RoleModel extends Gdn_Model {
         $cacheKey = 'Moderation.ApplicantCount';
 
         if ($force) {
-            Gdn::cache()->Remove($cacheKey);
+            Gdn::cache()->remove($cacheKey);
         }
 
         $applicantRoleIDs = static::getDefaultRoles(self::TYPE_APPLICANT);
@@ -516,7 +516,7 @@ class RoleModel extends Gdn_Model {
             $roles = Gdn::cache()->get($key);
             if ($roles === Gdn_Cache::CACHEOP_FAILURE) {
                 $roles = Gdn::sql()->get('Role', 'Sort')->resultArray();
-                $roles = Gdn_DataSet::Index($roles, ['RoleID']);
+                $roles = Gdn_DataSet::index($roles, ['RoleID']);
                 Gdn::cache()->store($key, $roles, [Gdn_Cache::FEATURE_EXPIRY => 24 * 3600]);
             }
         } else {
@@ -570,7 +570,7 @@ class RoleModel extends Gdn_Model {
                 $this->insert($fields);
             }
             // Now update the role permissions
-            $role = $this->GetByRoleID($roleID);
+            $role = $this->getByRoleID($roleID);
 
             $permissionModel = Gdn::permissionModel();
 
@@ -610,7 +610,7 @@ class RoleModel extends Gdn_Model {
 
             if (Gdn::cache()->activeEnabled()) {
                 // Don't update the user table if we are just using cached permissions.
-                $this->ClearCache();
+                $this->clearCache();
                 Gdn::userModel()->clearPermissions();
             } else {
                 // Remove the cached permissions for all users with this role.
@@ -660,7 +660,7 @@ class RoleModel extends Gdn_Model {
                 ->whereIn('ur.UserID', array_keys($missingIDs))
                 ->get()->resultArray();
 
-            $dbUserRoles = Gdn_DataSet::Index($dbUserRoles, 'UserID', ['Unique' => false]);
+            $dbUserRoles = Gdn_DataSet::index($dbUserRoles, 'UserID', ['Unique' => false]);
 
             // Store the user role mappings.
             foreach ($dbUserRoles as $userID => $rows) {

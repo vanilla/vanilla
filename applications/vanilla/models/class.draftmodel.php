@@ -194,7 +194,7 @@ class DraftModel extends Gdn_Model {
                 // Insert the draft
                 unset($fields['DraftID']);
                 $draftID = $this->SQL->insert($this->Name, $fields);
-                $this->UpdateUser($session->UserID);
+                $this->updateUser($session->UserID);
             }
         }
 

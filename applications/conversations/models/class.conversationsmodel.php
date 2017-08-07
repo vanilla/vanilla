@@ -53,7 +53,7 @@ abstract class ConversationsModel extends Gdn_Model {
 
         // Validate $type
         if (!in_array($type, ['Conversation', 'ConversationMessage'])) {
-            trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
+            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Conversations', $type);

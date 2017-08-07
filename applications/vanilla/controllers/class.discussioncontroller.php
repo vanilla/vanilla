@@ -35,7 +35,7 @@ class DiscussionController extends VanillaController {
     public function __get($name) {
         switch ($name) {
             case 'CommentData':
-                Deprecated('DiscussionController->CommentData', "DiscussionController->data('Comments')");
+                deprecated('DiscussionController->CommentData', "DiscussionController->data('Comments')");
                 return $this->data('Comments');
                 break;
         }
@@ -155,12 +155,12 @@ class DiscussionController extends VanillaController {
         // Set the canonical url to have the proper page title.
         $this->canonicalUrl(discussionUrl($this->Discussion, pageNumber($this->Offset, $Limit, 0, false)));
 
-//      url(ConcatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), PageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
+//      url(concatSep('/', 'discussion/'.$this->Discussion->DiscussionID.'/'. Gdn_Format::url($this->Discussion->Name), pageNumber($this->Offset, $Limit, TRUE, Gdn::session()->UserID != 0)), true), Gdn::session()->UserID == 0);
 
         // Load the comments
         $this->setData('Comments', $this->CommentModel->getByDiscussion($DiscussionID, $Limit, $this->Offset));
 
-        $PageNumber = PageNumber($this->Offset, $Limit);
+        $PageNumber = pageNumber($this->Offset, $Limit);
         $this->setData('Page', $PageNumber);
         $this->_SetOpenGraph();
         if ($PageNumber == 1) {
@@ -168,7 +168,7 @@ class DiscussionController extends VanillaController {
             // Add images to head for open graph
             $Dom = pQuery::parseStr(Gdn_Format::to($this->Discussion->Body, $this->Discussion->Format));
         } else {
-            $this->Data['Title'] .= sprintf(t(' - Page %s'), PageNumber($this->Offset, $Limit));
+            $this->Data['Title'] .= sprintf(t(' - Page %s'), pageNumber($this->Offset, $Limit));
 
             $FirstComment = $this->data('Comments')->firstRow();
             $FirstBody = val('Body', $FirstComment);
@@ -193,7 +193,7 @@ class DiscussionController extends VanillaController {
 
         // Make sure to set the user's discussion watch records if this is not an API request.
         if ($this->deliveryType() !== DELIVERY_TYPE_DATA) {
-            $this->CommentModel->SetWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
+            $this->CommentModel->setWatch($this->Discussion, $Limit, $this->Offset, $this->Discussion->CountComments);
         }
 
         // Build a pager
@@ -214,7 +214,7 @@ class DiscussionController extends VanillaController {
         $this->fireEvent('AfterBuildPager');
 
         // Define the form for the comment input
-        $this->Form = Gdn::Factory('Form', 'Comment');
+        $this->Form = Gdn::factory('Form', 'Comment');
         $this->Form->Action = url('/post/comment/');
         $this->DiscussionID = $this->Discussion->DiscussionID;
         $this->Form->addHidden('DiscussionID', $this->DiscussionID);
@@ -528,7 +528,7 @@ class DiscussionController extends VanillaController {
                 $this->DiscussionModel->getAnnouncementCacheKey(val('CategoryID', $discussion))
             ];
             $this->DiscussionModel->SQL->cache($cacheKeys);
-            $this->DiscussionModel->SetProperty($discussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
+            $this->DiscussionModel->setProperty($discussionID, 'Announce', (int)$this->Form->getFormValue('Announce', 0));
 
             if ($target) {
                 $this->setRedirectTo($target);
@@ -645,7 +645,7 @@ class DiscussionController extends VanillaController {
             redirectTo($Target);
         }
 
-        $this->SendOptions($Discussion);
+        $this->sendOptions($Discussion);
 
         if ($Close) {
             require_once $this->fetchViewLocation('helper_functions', 'Discussions');
@@ -756,7 +756,7 @@ class DiscussionController extends VanillaController {
 
         // Redirect
         if ($this->_DeliveryType == DELIVERY_TYPE_ALL) {
-            $target = GetIncomingValue('Target', $defaultTarget);
+            $target = getIncomingValue('Target', $defaultTarget);
             redirectTo($target);
         }
 
@@ -801,7 +801,7 @@ body { background: transparent !important; }
         $this->addJsFile('discussion.js');
         $this->removeJsFile('autosave.js');
         $this->addDefinition('DoInform', '0'); // Suppress inform messages on embedded page.
-        $this->addDefinition('SelfUrl', Gdn::request()->PathAndQuery());
+        $this->addDefinition('SelfUrl', Gdn::request()->pathAndQuery());
         $this->addDefinition('Embedded', true);
 
         // Define incoming variables (prefer querystring parameters over method parameters)
@@ -835,7 +835,7 @@ body { background: transparent !important; }
         if ($discussionID > 0) {
             $discussion = $this->DiscussionModel->getID($discussionID);
         } elseif ($vanilla_identifier != '' && $vanilla_type != '') {
-            $discussion = $this->DiscussionModel->GetForeignID($vanilla_identifier, $vanilla_type);
+            $discussion = $this->DiscussionModel->getForeignID($vanilla_identifier, $vanilla_type);
         }
 
         // Set discussion data if we have one for this page
@@ -880,7 +880,7 @@ body { background: transparent !important; }
 
             // Load the comments.
             $currentOrderBy = $this->CommentModel->orderBy();
-            if (stringBeginsWith(GetValueR('0.0', $currentOrderBy), 'c.DateInserted')) {
+            if (stringBeginsWith(getValueR('0.0', $currentOrderBy), 'c.DateInserted')) {
                 $this->CommentModel->orderBy('c.DateInserted '.$sortComments); // allow custom sort
             }
             $this->setData('Comments', $this->CommentModel->getByDiscussion($discussion->DiscussionID, $limit, $this->Offset), true);
@@ -909,7 +909,7 @@ body { background: transparent !important; }
         }
 
         // Define the form for the comment input
-        $this->Form = Gdn::Factory('Form', 'Comment');
+        $this->Form = Gdn::factory('Form', 'Comment');
         $this->Form->Action = url('/post/comment/');
         $this->Form->addHidden('CommentID', '');
         $this->Form->addHidden('Embedded', 'true'); // Tell the post controller that this is an embedded page (in case there are custom views it needs to pick up from a theme).

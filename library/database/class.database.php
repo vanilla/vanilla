@@ -74,7 +74,7 @@ class Gdn_Database {
      *
      *
      * @param mixed $config The configuration settings for this object.
-     * @see Database::Init()
+     * @see Database::init()
      */
     public function __construct($config = null) {
         $this->ClassName = get_class($this);

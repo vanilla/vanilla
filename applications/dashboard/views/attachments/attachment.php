@@ -13,10 +13,10 @@ if (!function_exists('WriteAttachment')) {
      */
     function writeAttachment($attachment) {
 
-        $customMethod = AttachmentModel::GetWriteAttachmentMethodName($attachment['Type']);
+        $customMethod = AttachmentModel::getWriteAttachmentMethodName($attachment['Type']);
         if (function_exists($customMethod)) {
             if (val('Error', $attachment)) {
-                WriteErrorAttachment($attachment);
+                writeErrorAttachment($attachment);
                 return;
             }
             $customMethod($attachment);
@@ -34,7 +34,7 @@ if (!function_exists('WriteAttachments')) {
         foreach ($attachments as $attachment) {
             ?>
             <div class="item-attachments">
-                <?php WriteAttachment($attachment); ?>
+                <?php writeAttachment($attachment); ?>
             </div>
         <?php
         }
@@ -94,7 +94,7 @@ if (!function_exists('WriteErrorAttachment')) {
      * @return string
      */
     function writeErrorAttachment($attachment) {
-        WriteGenericAttachment([
+        writeGenericAttachment([
             'Type' => 'Warning',
             'Icon' => 'warning-sign',
             'Body' => $attachment['Error']
@@ -131,13 +131,13 @@ if (!function_exists('WriteGenericAttachment')) {
 
                             <div class="item-header">
                                 <?php if ($title): ?>
-                                <h4 class="media-heading item-heading"><?php echo Gdn_Format::Html($title); ?>
+                                <h4 class="media-heading item-heading"><?php echo Gdn_Format::html($title); ?>
                                     <?php endif; ?>
 
                                     <?php if ($meta): ?>
                                         <div class="item-meta">
                                             <?php foreach ($meta as $item): ?>
-                                                <span><?php echo Gdn_Format::Html($item); ?></span>
+                                                <span><?php echo Gdn_Format::html($item); ?></span>
                                             <?php endforeach; ?>
                                         </div>
                                     <?php endif; ?>
@@ -149,14 +149,14 @@ if (!function_exists('WriteGenericAttachment')) {
 
                             <div class="item-body">
                                 <?php if ($body): ?>
-                                    <?php echo Gdn_Format::Html($body); ?>
+                                    <?php echo Gdn_Format::html($body); ?>
                                 <?php endif; ?>
 
                                 <?php if ($fields): ?>
                                     <dl class="dl-columns">
                                         <?php foreach ($fields as $title => $field): ?>
                                             <dt><?php echo t($title); ?></dt>
-                                            <dd><?php echo Gdn_Format::Html($field); ?></dd>
+                                            <dd><?php echo Gdn_Format::html($field); ?></dd>
                                         <?php endforeach; ?>
                                     </dl>
                                 <?php endif; ?>

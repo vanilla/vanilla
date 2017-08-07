@@ -158,7 +158,7 @@ class UserController extends DashboardController {
         $this->setHighlightRoute('dashboard/user');
 
         $roleModel = new RoleModel();
-        $roleData = $roleModel->GetAssignable();
+        $roleData = $roleModel->getAssignable();
         $userRoleData = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
 
         $userModel = new UserModel();
@@ -198,7 +198,7 @@ class UserController extends DashboardController {
                 if ($newUserID !== false) {
                     $this->setData('UserID', $newUserID);
                     if ($noPassword) {
-                        $password = T('No password');
+                        $password = t('No password');
                     } else {
                         $password = $this->Form->getValue('Password', '');
                     }
@@ -382,10 +382,10 @@ class UserController extends DashboardController {
             if ($unban) {
                 $userModel->unban($userID, ['RestoreContent' => $this->Form->getFormValue('RestoreContent')]);
             } else {
-                if (!ValidateRequired($this->Form->getFormValue('Reason'))) {
+                if (!validateRequired($this->Form->getFormValue('Reason'))) {
                     $this->Form->addError('ValidateRequired', 'Reason');
                 }
-                if ($this->Form->getFormValue('Reason') == 'Other' && !ValidateRequired($this->Form->getFormValue('ReasonText'))) {
+                if ($this->Form->getFormValue('Reason') == 'Other' && !validateRequired($this->Form->getFormValue('ReasonText'))) {
                     $this->Form->addError('ValidateRequired', 'Reason Text');
                 }
 
@@ -436,7 +436,7 @@ class UserController extends DashboardController {
      */
     public function browse($keywords = '', $page = '', $order = '') {
         $this->View = 'index';
-        $this->Index($keywords, $page, $order = '');
+        $this->index($keywords, $page, $order = '');
     }
 
     /**
@@ -502,7 +502,7 @@ class UserController extends DashboardController {
             $userRoleData = $userModel->getRoles($userID)->resultArray();
             $roleIDs = array_column($userRoleData, 'RoleID');
             $roleNames = array_column($userRoleData, 'Name');
-            $this->UserRoleData = ArrayCombine($roleIDs, $roleNames);
+            $this->UserRoleData = arrayCombine($roleIDs, $roleNames);
             $this->EventArguments['UserRoleData'] = &$this->UserRoleData;
 
             $this->fireEvent("BeforeUserDelete");
@@ -739,7 +739,7 @@ class UserController extends DashboardController {
 
                 if ($this->Form->save(['SaveRoles' => true]) !== false) {
                     if ($this->Form->getValue('ResetPassword', '') == 'Auto') {
-                        $userModel->PasswordRequest($user['Email']);
+                        $userModel->passwordRequest($user['Email']);
                         $userModel->setField($userID, 'HashMethod', 'Reset');
                     }
 
@@ -905,7 +905,7 @@ class UserController extends DashboardController {
         $validation = new Gdn_Validation();
         $validation->applyRule('OldUserID', 'ValidateRequired');
         $validation->applyRule('NewUserID', 'ValidateRequired');
-        if ($validation->validate($this->Request->Post())) {
+        if ($validation->validate($this->Request->post())) {
             $result = Gdn::userModel()->merge(
                 $this->Request->post('OldUserID'),
                 $this->Request->post('NewUserID')
@@ -1068,19 +1068,19 @@ class UserController extends DashboardController {
             // Grab the user.
             $user = false;
             if ($email = $form->getFormValue('Email')) {
-                $user = Gdn::userModel()->GetByEmail($email);
+                $user = Gdn::userModel()->getByEmail($email);
             }
             if (!$user && ($username = $form->getFormValue('Username'))) {
-                $user = Gdn::userModel()->GetByUsername($username);
+                $user = Gdn::userModel()->getByUsername($username);
             }
             if (!$user) {
-                throw new Gdn_UserException(sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))), 404);
+                throw new Gdn_UserException(sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))), 404);
             }
 
             // Validate the user's password.
             $passwordHash = new Gdn_PasswordHash();
             $password = $this->Form->getFormValue('Password', null);
-            if ($password !== null && !$passwordHash->CheckPassword($password, val('Password', $user), val('HashMethod', $user))) {
+            if ($password !== null && !$passwordHash->checkPassword($password, val('Password', $user), val('HashMethod', $user))) {
                 throw new Gdn_UserException(t('Invalid password.'), 401);
             }
 

@@ -12,13 +12,13 @@
 
 /**
  * Manages data integrity validation rules. Can automatically define a set of
- * validation rules based on a @@Schema with $this->GenerateBySchema($Schema);
+ * validation rules based on a @@Schema with $this->generateBySchema($Schema);
  */
 class Gdn_Validation {
 
     /**
      * @var array The collection of validation rules in the format of $RuleName => $Rule.
-     * This list can be added to with $this->AddRule($RuleName, $Rule).
+     * This list can be added to with $this->addRule($RuleName, $Rule).
      */
     protected $_Rules;
 
@@ -37,13 +37,13 @@ class Gdn_Validation {
 
     /**
      * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
-     * These are rules that have been explicitly called with {@link Gdn_Validation::ApplyRule()}.
+     * These are rules that have been explicitly called with {@link Gdn_Validation::applyRule()}.
      */
     protected $_FieldRules = [];
 
     /**
      * @var array An associative array of $FieldName => array($RuleName1, $RuleNameN) rules to be applied to fields.
-     * These are rules that come from the current schema that have been applied by {@link Gdn_Validation::ApplyRulesBySchema()}.
+     * These are rules that come from the current schema that have been applied by {@link Gdn_Validation::applyRulesBySchema()}.
      */
     protected $_SchemaRules = [];
 
@@ -60,7 +60,7 @@ class Gdn_Validation {
      * Class constructor. Optionally takes a schema definition to generate validation rules for.
      *
      * @param Gdn_Schema|array $schema A schema object to generate validation rules for.
-     * @param bool Whether or not to reset the validation results on {@link Validate()}.
+     * @param bool Whether or not to reset the validation results on {@link validate()}.
      */
     public function __construct($schema = false, $resetOnValidate = false) {
         if (is_object($schema) || is_array($schema)) {
@@ -110,10 +110,10 @@ class Gdn_Validation {
         foreach ($results as $name => $value) {
             if (is_array($value)) {
                 foreach ($value as $code) {
-                    $errors[] = trim(sprintf(T($code), T($name)), '.').'.';
+                    $errors[] = trim(sprintf(t($code), t($name)), '.').'.';
                 }
             } else {
-                $errors[] = trim(sprintf(T($value), T($name)), '.').'.';
+                $errors[] = trim(sprintf(t($value), t($name)), '.').'.';
             }
         }
         return $errors;
@@ -276,7 +276,7 @@ class Gdn_Validation {
      * Allows the explicit definition of a schema to use.
      *
      * @param array $schema
-     * @deprecated This method has been deprecated in favor of {@link Gdn_Validation::SetSchema()}.
+     * @deprecated This method has been deprecated in favor of {@link Gdn_Validation::setSchema()}.
      */
     public function applySchema($schema) {
         deprecated('ApplySchema', 'SetSchema');
@@ -413,7 +413,7 @@ class Gdn_Validation {
      * the remaining string name as a function with the field value passed as
      * the first parameter and the related field properties as the second
      * parameter. ie. "function:MySpecialValidation" will evaluate as
-     * MySpecialValidation($FieldValue, $FieldProperties). Any function defined
+     * mySpecialValidation($FieldValue, $FieldProperties). Any function defined
      * in this way is expected to return boolean TRUE or FALSE.
      *  2. If $rule begins with "regex:", when the rule is evaluated on a
      * field, it will strip the "regex:" from $rule and use the remaining
@@ -443,7 +443,7 @@ class Gdn_Validation {
     }
 
     /**
-     * Whether or not the validation results etc should reset whenever {@link Validate()} is called.
+     * Whether or not the validation results etc should reset whenever {@link validate()} is called.
      *
      * @return boolean Returns true if we reset or false otherwise.
      */
@@ -452,7 +452,7 @@ class Gdn_Validation {
     }
 
     /**
-     * Set whether or not the validation results etc should reset whenever {@link Validate()} is called.
+     * Set whether or not the validation results etc should reset whenever {@link validate()} is called.
      *
      * @param boolean $resetOnValidate True to reset or false otherwise.
      * @return Gdn_Validation Returns `$this` for fluent calls.
@@ -552,7 +552,7 @@ class Gdn_Validation {
             elseif (is_string($result))
                 return $result;
             else {
-                return sprintf(T($ruleName), T($fieldName));
+                return sprintf(t($ruleName), t($fieldName));
             }
         } else {
             return sprintf('Validation does not exist: %s.', $ruleName);
@@ -560,7 +560,7 @@ class Gdn_Validation {
     }
 
     /**
-     * Remove a validation rule that was added with {@link Gdn_Validation::ApplyRule()}.
+     * Remove a validation rule that was added with {@link Gdn_Validation::applyRule()}.
      *
      * @param $fieldName
      * @param bool $ruleName
@@ -652,7 +652,7 @@ class Gdn_Validation {
                             }
                         } elseif (substr($rule, 0, 6) == 'regex:') {
                             $regex = substr($rule, 6);
-                            if (ValidateRegex($fieldValue, $regex) !== true) {
+                            if (validateRegex($fieldValue, $regex) !== true) {
                                 $errorCode = 'Regex';
                                 // If there is a custom error, use it above all else
                                 $errorCode = val($fieldName.'.'.$ruleName, $this->_CustomErrors, $errorCode);
@@ -735,7 +735,7 @@ class Gdn_Validation {
     /**
      * Format an array of validation results as a string.
      *
-     * @param array $results An array of validation results returned from {@link Gdn_Validation::Results()}.
+     * @param array $results An array of validation results returned from {@link Gdn_Validation::results()}.
      * @return string Returns the validation results as a string.
      */
     public static function resultsAsText($results) {

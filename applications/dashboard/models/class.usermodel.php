@@ -1016,7 +1016,7 @@ class UserModel extends Gdn_Model {
         // Get column name prefix (ex: 'Insert' from 'InsertUserID')
         $prefixes = [];
         foreach ($columns as $columnName) {
-            $prefixes[] = StringEndsWith($columnName, 'UserID', true, true);
+            $prefixes[] = stringEndsWith($columnName, 'UserID', true, true);
         }
 
         // Join the user data using prefixes (ex: 'Name' for 'InsertUserID' becomes 'InsertName')
@@ -1198,7 +1198,7 @@ class UserModel extends Gdn_Model {
      */
     public function get($orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
         if (is_numeric($orderFields)) {
-            // They're using the old version that was a misnamed GetID()
+            // They're using the old version that was a misnamed getID()
             deprecated('UserModel->get()', 'UserModel->getID()');
             $result = $this->getID($orderFields);
         } else {
@@ -1233,7 +1233,7 @@ class UserModel extends Gdn_Model {
         // Apply calculated fields
         $this->setCalculatedFields($user);
 
-        // By default, FirstRow() gives stdClass
+        // By default, firstRow() gives stdClass
         if ($user !== false) {
             $user = (object)$user;
         }
@@ -1863,7 +1863,7 @@ class UserModel extends Gdn_Model {
      * @param int $categoryID
      * @param int|false $timestamp
      * @since 2.1.0
-     * @see UserModel::GivePoints()
+     * @see UserModel::givePoints()
      */
     private static function givePointsInternal($userID, $points, $slotType, $source = 'Total', $categoryID = 0, $timestamp = false) {
         $timeSlot = gmdate('Y-m-d', Gdn_Statistics::timeSlotStamp($slotType, $timestamp));
@@ -3852,7 +3852,7 @@ class UserModel extends Gdn_Model {
     /**
      * Saves a user preference to the database.
      *
-     * This is a convenience method that uses $this->SaveToSerializedColumn().
+     * This is a convenience method that uses $this->saveToSerializedColumn().
      *
      * @param int $userID The UserID to save.
      * @param mixed $preference The name of the preference being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $value argument will be ignored.
@@ -3871,7 +3871,7 @@ class UserModel extends Gdn_Model {
     /**
      * Saves a user attribute to the database.
      *
-     * This is a convenience method that uses $this->SaveToSerializedColumn().
+     * This is a convenience method that uses $this->saveToSerializedColumn().
      *
      * @param int $userID The UserID to save.
      * @param mixed $attribute The name of the attribute being saved, or an associative array of name => value pairs to be saved. If this is an associative array, the $value argument will be ignored.
@@ -4103,7 +4103,7 @@ class UserModel extends Gdn_Model {
         $sender = $this->getID($session->UserID);
         $user = $this->getID($userID);
 
-        if (!ValidateEmail($user->Email)) {
+        if (!validateEmail($user->Email)) {
             return;
         }
 

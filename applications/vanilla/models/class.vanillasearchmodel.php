@@ -48,14 +48,14 @@ class VanillaSearchModel extends Gdn_Model {
     public function discussionSql($searchModel, $addMatch = true) {
         // Get permission and limit search categories if necessary.
         if ($addMatch) {
-            $perms = CategoryModel::CategoryWatch(false);
+            $perms = CategoryModel::categoryWatch(false);
 
             if ($perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $perms);
             }
 
             // Build search part of query.
-            $searchModel->AddMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
+            $searchModel->addMatchSql($this->SQL, 'd.Name, d.Body', 'd.DateInserted');
         }
 
         // Build base query
@@ -69,7 +69,7 @@ class VanillaSearchModel extends Gdn_Model {
 
         if ($addMatch) {
             // Execute query.
-            $result = $this->SQL->GetSelect();
+            $result = $this->SQL->getSelect();
 
             // Unset SQL
             $this->SQL->reset();
@@ -92,13 +92,13 @@ class VanillaSearchModel extends Gdn_Model {
     public function commentSql($searchModel, $addMatch = true) {
         if ($addMatch) {
             // Get permission and limit search categories if necessary.
-            $perms = CategoryModel::CategoryWatch(false);
+            $perms = CategoryModel::categoryWatch(false);
             if ($perms !== true) {
                 $this->SQL->whereIn('d.CategoryID', $perms);
             }
 
             // Build search part of query
-            $searchModel->AddMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
+            $searchModel->addMatchSql($this->SQL, 'c.Body', 'c.DateInserted');
         }
 
         // Build base query
@@ -113,7 +113,7 @@ class VanillaSearchModel extends Gdn_Model {
 
         if ($addMatch) {
             // Exectute query
-            $result = $this->SQL->GetSelect();
+            $result = $this->SQL->getSelect();
 
             // Unset SQL
             $this->SQL->reset();
@@ -133,7 +133,7 @@ class VanillaSearchModel extends Gdn_Model {
      * @param object $searchModel SearchModel (Dashboard)
      */
     public function search($searchModel) {
-        $searchModel->AddSearch($this->DiscussionSql($searchModel));
-        $searchModel->AddSearch($this->CommentSql($searchModel));
+        $searchModel->addSearch($this->discussionSql($searchModel));
+        $searchModel->addSearch($this->commentSql($searchModel));
     }
 }

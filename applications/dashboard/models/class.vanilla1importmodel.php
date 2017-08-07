@@ -22,10 +22,10 @@ class Vanilla1ImportModel extends Gdn_Model {
     public function afterImport() {
         // Set up the routes to redirect from their older counterparts.
         $router = Gdn::router();
-        $router->SetRoute('\?CategoryID=(\d+)(?:&page=(\d+))?', 'categories/$1/p$2', 'Permanent');
-        $router->SetRoute('\?page=(\d+)', 'discussions/p$1', 'Permanent');
-        $router->SetRoute('comments\.php\?DiscussionID=(\d+)', 'discussion/$1/x', 'Permanent');
-        $router->SetRoute('comments\.php\?DiscussionID=(\d+)&page=(\d+)', 'discussion/$1/x/p$2', 'Permanent');
-        $router->SetRoute('account\.php\?u=(\d+)', 'dashboard/profile/$1/x', 'Permanent');
+        $router->setRoute('\?CategoryID=(\d+)(?:&page=(\d+))?', 'categories/$1/p$2', 'Permanent');
+        $router->setRoute('\?page=(\d+)', 'discussions/p$1', 'Permanent');
+        $router->setRoute('comments\.php\?DiscussionID=(\d+)', 'discussion/$1/x', 'Permanent');
+        $router->setRoute('comments\.php\?DiscussionID=(\d+)&page=(\d+)', 'discussion/$1/x/p$2', 'Permanent');
+        $router->setRoute('account\.php\?u=(\d+)', 'dashboard/profile/$1/x', 'Permanent');
     }
 }

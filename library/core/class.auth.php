@@ -468,8 +468,8 @@ class Gdn_Auth extends Gdn_Pluggable {
      */
     public function identity() {
         if (is_null($this->_Identity)) {
-            $this->_Identity = Gdn::Factory('Identity');
-            $this->_Identity->Init();
+            $this->_Identity = Gdn::factory('Identity');
+            $this->_Identity->init();
         }
 
         return $this->_Identity;
@@ -625,7 +625,7 @@ class Gdn_Auth extends Gdn_Pluggable {
             $return = $return['URL'];
         }
 
-        $fullRedirect = ($redirect != '') ? Url($redirect, true) : '';
+        $fullRedirect = ($redirect != '') ? url($redirect, true) : '';
         $extraReplacementParameters['Redirect'] = $fullRedirect;
         $extraReplacementParameters['CurrentPage'] = $fullRedirect;
 
@@ -636,7 +636,7 @@ class Gdn_Auth extends Gdn_Pluggable {
         $return = $this->replaceAuthPlaceholders($return, $extraReplacementParameters);
 
         if ($this->protocol() == 'https') {
-            $return = str_replace('http:', 'https:', Url($return, true));
+            $return = str_replace('http:', 'https:', url($return, true));
         }
 
         return $return;

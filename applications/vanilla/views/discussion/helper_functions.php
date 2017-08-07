@@ -121,7 +121,7 @@ if (!function_exists('writeComment')) :
                    echo userAnchor($author, 'Username');
                    echo userPhoto($author);
                }
-               echo FormatMeAction($comment);
+               echo formatMeAction($comment);
                $sender->fireEvent('AuthorPhoto');
                ?>
             </span>
@@ -138,7 +138,7 @@ if (!function_exists('writeComment')) :
                <?php echo anchor(Gdn_Format::date($comment->DateInserted, 'html'), $permalink, 'Permalink', ['name' => 'Item_'.($currentOffset), 'rel' => 'nofollow']); ?>
             </span>
                         <?php
-                        echo DateUpdated($comment, ['<span class="MItem">', '</span>']);
+                        echo dateUpdated($comment, ['<span class="MItem">', '</span>']);
                         ?>
                         <?php
                         // Include source if one was set

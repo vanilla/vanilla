@@ -61,7 +61,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
         }
         $url .= 'access_token='.urlencode($this->accessToken());
 
-        $result = $this->Curl($url, empty($post) ? 'GET' : 'POST', $post);
+        $result = $this->curl($url, empty($post) ? 'GET' : 'POST', $post);
         return $result;
     }
 
@@ -253,7 +253,7 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_AfterReactions_handler($sender, $args) {
+    public function base_afterReactions_handler($sender, $args) {
         if (!$this->socialReactions()) {
             return;
         }
@@ -485,9 +485,9 @@ class GooglePlusPlugin extends Gdn_Plugin {
      * @throws type
      */
     public function postController_googlePlus_create($sender, $recordType, $iD) {
-        $row = GetRecord($recordType, $iD);
+        $row = getRecord($recordType, $iD);
         if ($row) {
-            $message = SliceParagraph(Gdn_Format::plainText($row['Body'], $row['Format']), 160);
+            $message = sliceParagraph(Gdn_Format::plainText($row['Body'], $row['Format']), 160);
 
             $get = [
                 'url' => $row['ShareUrl']

@@ -117,7 +117,7 @@ class SplitMergePlugin extends Gdn_Plugin {
                 // Update counts on both discussions
                 $commentModel = new CommentModel();
                 $commentModel->updateCommentCount($discussionID);
-//            $CommentModel->UpdateUserCommentCounts($DiscussionID);
+//            $CommentModel->updateUserCommentCounts($DiscussionID);
                 $commentModel->updateCommentCount($newDiscussionID);
                 $commentModel->removePageCache($discussionID, 1);
 
@@ -227,9 +227,9 @@ class SplitMergePlugin extends Gdn_Plugin {
                         if ($RedirectLink) {
                             // The discussion needs to be changed to a moved link.
                             $RedirectDiscussion = [
-                                'Name' => SliceString(sprintf(t('Merged: %s'), $Discussion['Name']), $MaxNameLength),
+                                'Name' => sliceString(sprintf(t('Merged: %s'), $Discussion['Name']), $MaxNameLength),
                                 'Type' => 'redirect',
-                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), ['url' => DiscussionUrl($MergeDiscussion)]),
+                                'Body' => formatString(t('This discussion has been <a href="{url,html}">merged</a>.'), ['url' => discussionUrl($MergeDiscussion)]),
                                 'Format' => 'Html'
                             ];
                             $DiscussionModel->setField($Discussion['DiscussionID'], $RedirectDiscussion);

@@ -47,10 +47,10 @@ class Gdn_Condition {
     /**
      * Convert the condition values in a given string to a conditions array.
      *
-     * This method is the opposite as Gdn_Condition::ToString().
+     * This method is the opposite as Gdn_Condition::toString().
      *
      * @param string $string
-     * @return array A conditions array suitable to be passed to Gdn_Condition::Test().
+     * @return array A conditions array suitable to be passed to Gdn_Condition::test().
      * @see Gdn_Condition::toString().
      */
     public static function fromString($string) {

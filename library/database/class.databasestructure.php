@@ -165,7 +165,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Defines a column to be added to $this->Table().
+     * Defines a column to be added to $this->table().
      *
      * @param string $name The name of the column to create.
      * @param mixed $type The data type of the column to be created. Types with a length speecifty the length in barackets.
@@ -308,16 +308,16 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Drops $this->Table() from the database.
+     * Drops $this->table() from the database.
      */
     public function drop() {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'Drop'), E_USER_ERROR);
     }
 
     /**
-     * Drops $name column from $this->Table().
+     * Drops $name column from $this->table().
      *
-     * @param string $name The name of the column to drop from $this->Table().
+     * @param string $name The name of the column to drop from $this->table().
      */
     public function dropColumn($name) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'DropColumn'), E_USER_ERROR);
@@ -445,7 +445,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Renames a column in $this->Table().
+     * Renames a column in $this->table().
      *
      * @param string $oldName The name of the column to be renamed.
      * @param string $newName The new name for the column being renamed.
@@ -467,14 +467,14 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Creates the table and columns specified with $this->Table() and
-     * $this->Column(). If no table or columns have been specified, this method
+     * Creates the table and columns specified with $this->table() and
+     * $this->column(). If no table or columns have been specified, this method
      * will throw a fatal error.
      *
-     * @param boolean $explicit If TRUE, and the table specified with $this->Table() already exists, this
+     * @param boolean $explicit If TRUE, and the table specified with $this->table() already exists, this
      * method will remove any columns from the table that were not defined with
-     * $this->Column().
-     * @param boolean $drop If TRUE, and the table specified with $this->Table() already exists, this
+     * $this->column().
+     * @param boolean $drop If TRUE, and the table specified with $this->table() already exists, this
      * method will drop the table before attempting to re-create it.
      */
     public function set($explicit = false, $drop = false) {
@@ -486,11 +486,11 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
         try {
             // Make sure that table and columns have been defined
             if ($this->_TableName == '') {
-                throw new Exception(T('You must specify a table before calling DatabaseStructure::Set()'));
+                throw new Exception(t('You must specify a table before calling DatabaseStructure::Set()'));
             }
 
             if (count($this->_Columns) == 0) {
-                throw new Exception(T('You must provide at least one column before calling DatabaseStructure::Set()'));
+                throw new Exception(t('You must provide at least one column before calling DatabaseStructure::Set()'));
             }
 
             if ($this->tableExists()) {
@@ -629,7 +629,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Creates the table defined with $this->Table() and $this->Column().
+     * Creates the table defined with $this->table() and $this->column().
      */
     protected function _create() {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Create'), E_USER_ERROR);
@@ -642,7 +642,7 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
      */
     public function existingColumns() {
         if ($this->_ExistingColumns === null) {
-            if ($this->TableExists()) {
+            if ($this->tableExists()) {
                 $this->_ExistingColumns = $this->Database->sql()->fetchTableSchema($this->_TableName);
             } else {
                 $this->_ExistingColumns = [];
@@ -652,10 +652,10 @@ abstract class Gdn_DatabaseStructure extends Gdn_Pluggable {
     }
 
     /**
-     * Modifies $this->Table() with the columns specified with $this->Column().
+     * Modifies $this->table() with the columns specified with $this->column().
      *
      * @param boolean $explicit If TRUE, this method will remove any columns from the table that were not
-     * defined with $this->Column().
+     * defined with $this->column().
      */
     protected function _modify($explicit = false) {
         trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, '_Modify'), E_USER_ERROR);

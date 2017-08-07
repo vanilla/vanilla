@@ -158,7 +158,7 @@ class DBAModel extends Gdn_Model {
         // Loop through each row in the working set and decode the values.
         foreach ($data as $row) {
             $value = $row[$column];
-            $decodedValue = HtmlEntityDecode($value);
+            $decodedValue = htmlEntityDecode($value);
 
             $item = ['From' => $value, 'To' => $decodedValue];
 

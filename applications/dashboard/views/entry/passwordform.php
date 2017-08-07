@@ -9,21 +9,21 @@
     <ul>
         <li>
             <?php
-            echo $this->Form->label(UserModel::SigninLabelCode(), 'Email');
+            echo $this->Form->label(UserModel::signinLabelCode(), 'Email');
             echo $this->Form->textBox('Email', ['autofocus' => 'autofocus', 'autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', ['class' => 'InputBox Password']);
+            echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
         <li class="Buttons">
             <?php
             echo $this->Form->button('Sign In', ['class' => 'Button Primary']);
-            echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
+            echo $this->Form->checkBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
             ?>
         </li>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>

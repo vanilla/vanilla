@@ -204,7 +204,7 @@ class FacebookPlugin extends Gdn_Plugin {
         }
 
         if (!Gdn::session()->isValid()) {
-            echo "\n".Wrap($this->_getButton(), 'li', ['class' => 'Connect FacebookConnect']);
+            echo "\n".wrap($this->_getButton(), 'li', ['class' => 'Connect FacebookConnect']);
         }
     }
 
@@ -279,7 +279,7 @@ class FacebookPlugin extends Gdn_Plugin {
      *
      * @throws Gdn_UserException
      */
-    public function profileController_FacebookConnect_create($sender, $userReference, $username, $code = false) {
+    public function profileController_facebookConnect_create($sender, $userReference, $username, $code = false) {
         $transientKey = Gdn::request()->get('state');
         if (empty($transientKey) || Gdn::session()->validateTransientKey($transientKey) === false) {
             throw new Gdn_UserException(t('Invalid CSRF token.', 'Invalid CSRF token. Please try again.'), 403);
@@ -419,7 +419,7 @@ class FacebookPlugin extends Gdn_Plugin {
         // This isn't a trusted connection. Don't allow it to automatically connect a user account.
         saveToConfig('Garden.Registration.AutoConnect', false, false);
 
-        $form = $sender->Form; //new Gdn_Form();
+        $form = $sender->Form; //new gdn_Form();
         $iD = val('id', $profile);
         $form->setFormValue('UniqueID', $iD);
         $form->setFormValue('Provider', self::ProviderKey);

@@ -96,7 +96,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
             $modelName = ucfirst($thingType).'Model';
 
             if (!class_exists($modelName)) {
-                throw new Exception(sprintf(T("Could not find a model for %s objects."), ucfirst($thingType)));
+                throw new Exception(sprintf(t("Could not find a model for %s objects."), ucfirst($thingType)));
             }
 
             // If we can lookup this object, it is verified
@@ -119,7 +119,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
             return $regarding;
         }
 
-        throw new Exception(sprintf(T("Could not verify entity relationship '%s(%d)' for Regarding call"), $modelName, $thingID));
+        throw new Exception(sprintf(t("Could not verify entity relationship '%s(%d)' for Regarding call"), $modelName, $thingID));
     }
 
     /**
@@ -145,7 +145,7 @@ class Gdn_Regarding extends Gdn_Pluggable {
     public function matchEvent($regardingType, $foreignType, $foreignID = null) {
         $regardingData = val('RegardingData', $this->EventArguments);
 
-        $foundRegardingType = strtolower(GetValue('Type', $regardingData));
+        $foundRegardingType = strtolower(getValue('Type', $regardingData));
         if (!is_array($regardingType)) {
             $regardingType = [$regardingType];
         }
@@ -188,20 +188,20 @@ class Gdn_Regarding extends Gdn_Pluggable {
      */
 
     // Cache regarding data for displayed comments
-//   public function DiscussionController_BeforeDiscussionRender_Handler($Sender) {
-//      if (GetValue('RegardingCache', $Sender, NULL) != NULL) return;
+//   public function discussionController_BeforeDiscussionRender_Handler($Sender) {
+//      if (getValue('RegardingCache', $Sender, NULL) != NULL) return;
 //
-//      $Comments = $Sender->Data('Comments');
+//      $Comments = $Sender->data('Comments');
 //      $CommentIDList = array();
 //      if ($Comments && $Comments instanceof Gdn_DataSet) {
-//         $Comments->DataSeek(-1);
-//         while ($Comment = $Comments->NextRow()) {
+//         $Comments->dataSeek(-1);
+//         while ($Comment = $Comments->nextRow()) {
 //            if (!isset($Comment->CommentID) || !is_numeric($Comment->CommentID))
 //               continue;
 //            $CommentIDList[] = $Comment->CommentID;
 //         }
 //      }
-//      $this->CacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
+//      $this->cacheRegarding($Sender, 'discussion', $Sender->Discussion->DiscussionID, 'comment', $CommentIDList);
 //   }
 
     /**
@@ -221,8 +221,8 @@ class Gdn_Regarding extends Gdn_Pluggable {
         /*
               $MediaArray = array();
               if ($MediaData !== FALSE) {
-                 $MediaData->DataSeek(-1);
-                 while ($Media = $MediaData->NextRow()) {
+                 $MediaData->dataSeek(-1);
+                 while ($Media = $MediaData->nextRow()) {
                     $MediaArray[$Media->ForeignTable.'/'.$Media->ForeignID][] = $Media;
                     $this->MediaCacheById[GetValue('MediaID',$Media)] = $Media;
                  }

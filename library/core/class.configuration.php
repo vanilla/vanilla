@@ -305,7 +305,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
             $session = Gdn::session();
             $user = $session->UserID > 0 && is_object($session->User) ? $session->User->Name : 'Unknown';
             $lines[] = '';
-            $lines[] = '// Last edited by '.$user.' ('.RemoteIp().')'.Gdn_Format::toDateTime();
+            $lines[] = '// Last edited by '.$user.' ('.remoteIp().')'.Gdn_Format::toDateTime();
         }
 
         $result = implode(PHP_EOL, $lines);
@@ -317,7 +317,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param string $name The name of the configuration setting to get. If the setting is contained
      * within an associative array, use dot denomination to get the setting. ie.
-     * <code>$this->Get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
+     * <code>$this->get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */
@@ -330,7 +330,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $keys = explode('.', $name);
         // If splitting is off, HANDLE IT
         if (!$this->splitting) {
-//         $FirstKey = GetValue(0, $Keys);
+//         $FirstKey = getValue(0, $Keys);
             $firstKey = $keys[0];
             if ($firstKey == $this->defaultGroup) {
                 $keys = [array_shift($keys), implode('.', $keys)];
@@ -379,11 +379,11 @@ class Gdn_Configuration extends Gdn_Pluggable {
      *
      * @param string $name The name of the configuration setting to assign. If the setting is
      *   contained within an associative array, use dot denomination to get the
-     *   setting. ie. $this->Set('Database.Host', $value) would set
+     *   setting. ie. $this->set('Database.Host', $value) would set
      *   $Configuration[$Group]['Database']['Host'] = $value
      * @param mixed $value The value of the configuration setting.
      * @param boolean $overwrite If the setting already exists, should it's value be overwritten? Defaults to true.
-     * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::Save().
+     * @param boolean $AddToSave Whether or not to queue the value up for the next call to Gdn_Config::save().
      */
     public function set($name, $value, $overwrite = true, $save = true) {
         // Make sure the config settings are in the right format
@@ -462,7 +462,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         $keys = explode('.', $name);
         // If splitting is off, HANDLE IT
         if (!$this->splitting) {
-            $firstKey = GetValue(0, $keys);
+            $firstKey = getValue(0, $keys);
             if ($firstKey == $this->defaultGroup) {
                 $keys = [array_shift($keys), implode('.', $keys)];
             } else {
@@ -737,7 +737,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
      */
     public function save($file = null, $group = null) {
 
-        // Plain calls to Gdn::Config()->Save() simply save the dynamic config and return
+        // Plain calls to Gdn::config()->save() simply save the dynamic config and return
         if (is_null($file)) {
             return $this->dynamic->save();
         }
@@ -784,7 +784,7 @@ class Gdn_Configuration extends Gdn_Pluggable {
         ]);
 
         if ($fileContents === false) {
-            trigger_error(ErrorMessage('Failed to define configuration file contents.', $group, 'Save'), E_USER_ERROR);
+            trigger_error(errorMessage('Failed to define configuration file contents.', $group, 'Save'), E_USER_ERROR);
         }
 
         $fileKey = sprintf(Gdn_Configuration::CONFIG_FILE_CACHE_KEY, $file);
@@ -1314,7 +1314,7 @@ class Gdn_ConfigurationSource extends Gdn_Pluggable {
      *
      * @param string $name The name of the configuration setting to get. If the setting is contained
      * within an associative array, use dot denomination to get the setting. ie.
-     * <code>$this->Get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
+     * <code>$this->get('Database.Host')</code> would retrieve <code>$Configuration[$Group]['Database']['Host']</code>.
      * @param mixed $defaultValue If the parameter is not found in the group, this value will be returned.
      * @return mixed The configuration value.
      */

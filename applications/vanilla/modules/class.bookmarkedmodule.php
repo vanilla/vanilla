@@ -40,7 +40,7 @@ class BookmarkedModule extends Gdn_Module {
 
             if (count($bookmarkIDs)) {
                 $discussionModel = new DiscussionModel();
-                DiscussionModel::CategoryPermissions();
+                DiscussionModel::categoryPermissions();
 
                 $discussionModel->SQL->whereIn('d.DiscussionID', $bookmarkIDs);
 
@@ -62,13 +62,13 @@ class BookmarkedModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->data('Bookmarks')) {
-            $this->GetData();
+            $this->getData();
         }
 
         $bookmarks = $this->data('Bookmarks');
 
         if (is_object($bookmarks) && ($bookmarks->numRows() > 0 || $this->Help)) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

@@ -18,7 +18,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
         <tbody>
         <?php
         foreach ($this->MessageData->result() as $Message) {
-            $Message = $this->MessageModel->DefineLocation($Message);
+            $Message = $this->MessageModel->defineLocation($Message);
             ?>
             <tr id="<?php
             echo $Message->MessageID;
@@ -32,7 +32,7 @@ echo heading(t('Manage Messages'), t('Add Message'), 'dashboard/message/add', 'j
 
                     if (val('CategoryID', $Message) && $Category = CategoryModel::categories($Message->CategoryID)) {
                         echo '<div>'.
-                            anchor($Category['Name'], CategoryUrl($Category));
+                            anchor($Category['Name'], categoryUrl($Category));
 
                         if (val('IncludeSubcategories', $Message)) {
                             echo ' '.t('and subcategories');

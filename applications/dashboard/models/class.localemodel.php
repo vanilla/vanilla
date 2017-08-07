@@ -177,7 +177,7 @@ class LocaleModel {
         $extraDefinitions = array_diff($definitions, $baseDefinitions);
 
         // Generate the changes file.
-        $tmpPath = dirname($basePath).'/tmp_'.RandomString(10);
+        $tmpPath = dirname($basePath).'/tmp_'.randomString(10);
         $fp = fopen($tmpPath, 'wb');
         if (!$fp) {
             throw new Exception(sprintf(t('Could not open %s.'), $tmpPath));
@@ -226,7 +226,7 @@ class LocaleModel {
         }
 
         // Grab all of the definition files from the locale.
-        $paths = SafeGlob(PATH_ROOT."/locales/{$localeKey}/*.php");
+        $paths = safeGlob(PATH_ROOT."/locales/{$localeKey}/*.php");
 
         // Unload the dynamic config
         Gdn::locale()->unload();

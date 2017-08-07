@@ -86,7 +86,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
      * Returns the name of the asset where this component should be rendered.
      */
     public function assetTarget() {
-        trigger_error(ErrorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
+        trigger_error(errorMessage("Any class extended from the Module class must implement it's own AssetTarget method.", get_class($this), 'AssetTarget'), E_USER_ERROR);
     }
 
     /**
@@ -100,7 +100,7 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
         if ($name == null) {
             $result = $this->Data;
         } else {
-            $result = GetValueR($name, $this->Data, $default);
+            $result = getValueR($name, $this->Data, $default);
         }
         return $result;
     }
@@ -197,27 +197,27 @@ class Gdn_Module extends Gdn_Pluggable implements Gdn_IModule {
             // 2. A theme
             if ($themeFolder != '') {
                 // a. Application-specific theme view. eg. /path/to/application/themes/theme_name/app_name/views/modules/
-                $viewPaths[] = CombinePaths([PATH_THEMES, $themeFolder, $applicationFolder, 'views', 'modules', $view.'.php']);
+                $viewPaths[] = combinePaths([PATH_THEMES, $themeFolder, $applicationFolder, 'views', 'modules', $view.'.php']);
 
                 // b. Garden-wide theme view. eg. /path/to/application/themes/theme_name/views/modules/
-                $viewPaths[] = CombinePaths([PATH_THEMES, $themeFolder, 'views', 'modules', $view.'.php']);
+                $viewPaths[] = combinePaths([PATH_THEMES, $themeFolder, 'views', 'modules', $view.'.php']);
             }
 
             // 3. Application default. eg. /path/to/application/app_name/views/controller_name/
             if ($this->_ApplicationFolder) {
-                $viewPaths[] = CombinePaths([PATH_APPLICATIONS, $applicationFolder, 'views', 'modules', $view.'.php']);
+                $viewPaths[] = combinePaths([PATH_APPLICATIONS, $applicationFolder, 'views', 'modules', $view.'.php']);
             } else {
                 $viewPaths[] = dirname($this->path())."/../views/modules/$view.php";
             }
 
             // 4. Garden default. eg. /path/to/application/dashboard/views/modules/
-            $viewPaths[] = CombinePaths([PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $view.'.php']);
+            $viewPaths[] = combinePaths([PATH_APPLICATIONS, 'dashboard', 'views', 'modules', $view.'.php']);
 
             $viewPath = Gdn_FileSystem::exists($viewPaths);
         }
 
         if ($viewPath === false) {
-            throw new Exception(ErrorMessage('Could not find a `'.$view.'` view for the `'.$this->Name().'` module in the `'.$applicationFolder.'` application.', get_class($this), 'FetchView'), E_USER_ERROR);
+            throw new Exception(errorMessage('Could not find a `'.$view.'` view for the `'.$this->name().'` module in the `'.$applicationFolder.'` application.', get_class($this), 'FetchView'), E_USER_ERROR);
         }
 
         return $viewPath;

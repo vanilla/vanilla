@@ -42,7 +42,7 @@ class ExportModel {
     /** @var bool Whether or not to use compression when creating the file.  */
     public $UseCompression = true;
 
-    /** @var string The database prefix that ExportTable() it will replace :_ with in a query string. */
+    /** @var string The database prefix that exportTable() it will replace :_ with in a query string. */
     public $Prefix = '';
 
     /** @var array Data format we support exporting. */
@@ -75,12 +75,12 @@ class ExportModel {
         }
         $this->_File = $fp;
 
-        fwrite($fp, 'Vanilla Export: '.$this->Version());
+        fwrite($fp, 'Vanilla Export: '.$this->version());
         if ($source) {
             fwrite($fp, self::DELIM.' Source: '.$source);
         }
         fwrite($fp, self::NEWLINE.self::NEWLINE);
-        $this->Comment('Exported Started: '.date('Y-m-d H:i:s'));
+        $this->comment('Exported Started: '.date('Y-m-d H:i:s'));
     }
 
     /**
@@ -99,7 +99,7 @@ class ExportModel {
     /**
      * End the export and close the export file.
      *
-     * This method must be called if BeginExport() has been called or else the export file will not be closed.
+     * This method must be called if beginExport() has been called or else the export file will not be closed.
      */
     public function endExport() {
         $this->EndTime = microtime(true);
@@ -107,7 +107,7 @@ class ExportModel {
         $m = floor($this->TotalTime / 60);
         $s = $this->TotalTime - $m * 60;
 
-        $this->Comment('Exported Completed: '.date('Y-m-d H:i:s').sprintf(', Elapsed Time: %02d:%02.2f', $m, $s));
+        $this->comment('Exported Completed: '.date('Y-m-d H:i:s').sprintf(', Elapsed Time: %02d:%02.2f', $m, $s));
 
         if ($this->UseCompression && function_exists('gzopen')) {
             gzclose($this->_File);
@@ -150,14 +150,14 @@ class ExportModel {
      *  - <b>PDOStatement</b>: Represents an already executed query resultset.
      *  - <b>Array</b>: Represents an array of associative arrays or objects containing the data in the export.
      * @param array $mappings Specifies mappings, if any, between the source and the export where the keys represent the export columns and the values represent the source columns.
-     *  For a list of the export tables and columns see $this->Structure().
+     *  For a list of the export tables and columns see $this->structure().
      */
     public function exportTable($tableName, $query, $mappings = []) {
         $fp = $this->_File;
 
         // Make sure the table is valid for export.
         if (!array_key_exists($tableName, $this->_Structures)) {
-            $this->Comment("Error: $tableName is not a valid export."
+            $this->comment("Error: $tableName is not a valid export."
                 ." The valid tables for export are ".implode(", ", array_keys($this->_Structures)));
             fwrite($fp, self::NEWLINE);
             return;
@@ -170,7 +170,7 @@ class ExportModel {
         // Get the data for the query.
         if (is_string($query)) {
             $query = str_replace(':_', $this->Prefix, $query); // replace prefix.
-            $data = $this->PDO()->query($query, PDO::FETCH_ASSOC);
+            $data = $this->pDO()->query($query, PDO::FETCH_ASSOC);
         } elseif ($query instanceof PDOStatement) {
             $data = $query;
         }
@@ -239,9 +239,9 @@ class ExportModel {
 
     /**
      * Returns an array of all the expected export tables and expected columns in the exports.
-     * When exporting tables using ExportTable() all of the columns in this structure will always be exported in the order here, regardless of how their order in the query.
+     * When exporting tables using exportTable() all of the columns in this structure will always be exported in the order here, regardless of how their order in the query.
      * @return array
-     * @see vnExport::ExportTable()
+     * @see vnExport::exportTable()
      */
     public function structures() {
         return $this->_Structures;

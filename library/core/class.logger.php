@@ -290,7 +290,7 @@ class Logger {
             'ip' => Gdn::request()->ipAddress(),
             'timestamp' => time(),
             'method' => Gdn::request()->requestMethod(),
-            'domain' => rtrim(Url('/', true), '/'),
+            'domain' => rtrim(url('/', true), '/'),
             'path' => Gdn::request()->path()
         ];
         $context = $context + $defaults;

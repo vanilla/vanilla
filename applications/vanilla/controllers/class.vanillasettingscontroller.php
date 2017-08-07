@@ -141,7 +141,7 @@ class VanillaSettingsController extends Gdn_Controller {
 
                 if ($archiveExclude != $archiveExcludeBak || ($archiveExclude && $archiveDate != $archiveDateBak)) {
                     $discussionModel = new DiscussionModel();
-                    $discussionModel->UpdateDiscussionCount('All');
+                    $discussionModel->updateDiscussionCount('All');
                 }
                 $this->informMessage(t("Your changes have been saved."));
             }
@@ -584,7 +584,7 @@ class VanillaSettingsController extends Gdn_Controller {
      * @param $category
      */
     protected function setupDiscussionTypes($category) {
-        $discussionTypes = DiscussionModel::DiscussionTypes();
+        $discussionTypes = DiscussionModel::discussionTypes();
         $this->setData('DiscussionTypes', $discussionTypes);
 
         if (!$this->Form->isPostBack()) {
@@ -1008,7 +1008,7 @@ class VanillaSettingsController extends Gdn_Controller {
         // Set delivery type to true/false
         if (Gdn::request()->isAuthenticatedPostBack()) {
             $treeArray = val('TreeArray', $_POST);
-            $saves = $this->CategoryModel->SaveTree($treeArray);
+            $saves = $this->CategoryModel->saveTree($treeArray);
             $this->setData('Result', true);
             $this->setData('Saves', $saves);
         }

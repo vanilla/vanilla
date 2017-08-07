@@ -33,7 +33,7 @@ class QuotesPlugin extends Gdn_Plugin {
         parent::__construct();
 
         if (function_exists('ValidateUsernameRegex')) {
-            $this->ValidateUsernameRegex = ValidateUsernameRegex();
+            $this->ValidateUsernameRegex = validateUsernameRegex();
         } else {
             $this->ValidateUsernameRegex = "[\d\w_]{3,20}";
         }
@@ -216,7 +216,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param Gdn_Controller $sender
      * @param array $args
      */
-    public function base_AfterFlag_handler($sender, $args) {
+    public function base_afterFlag_handler($sender, $args) {
         $this->addQuoteButton($sender, $args);
     }
 
@@ -251,7 +251,7 @@ class QuotesPlugin extends Gdn_Plugin {
             return;
         }
 
-        echo Gdn_Theme::BulletItem('Flags');
+        echo Gdn_Theme::bulletItem('Flags');
         echo anchor(sprite('ReactQuote', 'ReactSprite').' '.t('Quote'), url("post/quote/{$object->DiscussionID}/{$objectID}", true), 'ReactButton Quote Visible').' ';
     }
 
@@ -261,7 +261,7 @@ class QuotesPlugin extends Gdn_Plugin {
      * @param discussionController $sender
      */
     public function discussionController_beforeDiscussionDisplay_handler($sender) {
-        $this->RenderQuotes($sender);
+        $this->renderQuotes($sender);
     }
 
     public function postController_beforeDiscussionDisplay_handler($sender) {
@@ -366,7 +366,7 @@ BLOCKQUOTE;
      *
      * @param postController $sender
      */
-    public function postController_BeforeCommentRender_handler($sender) {
+    public function postController_beforeCommentRender_handler($sender) {
         if ($sender->data('Plugin.Quotes.QuoteSource')) {
             if (sizeof($sender->RequestArgs) < 2) {
                 return;

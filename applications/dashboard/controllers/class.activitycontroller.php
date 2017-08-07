@@ -28,11 +28,11 @@ class ActivityController extends Gdn_Controller {
     public function __get($name) {
         switch ($name) {
             case 'CommentData':
-                Deprecated('ActivityController->CommentData', "ActivityController->data('Activities')");
+                deprecated('ActivityController->CommentData', "ActivityController->data('Activities')");
                 $result = new Gdn_DataSet([], DATASET_TYPE_OBJECT);
                 return $result;
             case 'ActivityData':
-                Deprecated('ActivityController->ActivityData', "ActivityController->data('Activities')");
+                deprecated('ActivityController->ActivityData', "ActivityController->data('Activities')");
                 $result = new Gdn_DataSet($this->data('Activities'), DATASET_TYPE_ARRAY);
                 $result->datasetType(DATASET_TYPE_OBJECT);
                 return $result;
@@ -108,7 +108,7 @@ class ActivityController extends Gdn_Controller {
 
             default:
                 // Actual userid.
-                if (!checkPermission('Garden.Community.Manage') && Gdn::Session()->UserID !== $userid) {
+                if (!checkPermission('Garden.Community.Manage') && Gdn::session()->UserID !== $userid) {
                     throw permissionException();
                 }
                 break;
@@ -187,7 +187,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($iD)) {
-            throw Gdn_UserException('Invalid ID');
+            throw gdn_UserException('Invalid ID');
         }
 
         $comment = $this->ActivityModel->getComment($iD);
@@ -227,7 +227,7 @@ class ActivityController extends Gdn_Controller {
         }
 
         if (!is_numeric($activityID)) {
-            throw Gdn_UserException('Invalid ID');
+            throw gdn_UserException('Invalid ID');
         }
 
         if (!$this->ActivityModel->canDelete($this->ActivityModel->getID($activityID))) {

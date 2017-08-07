@@ -53,16 +53,16 @@ class ConditionModule extends Gdn_Module {
 
         if ($form->authenticatedPostBack()) {
             // Grab the conditions from the form and convert them to the conditions array.
-            $this->Conditions($this->_FromForm());
+            $this->conditions($this->_FromForm());
         } else {
         }
 
-        $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::AllTypes());
+        $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::allTypes());
         //die(print_r($this->Types));
 
         // Get all of the permissions that are valid for the permissions dropdown.
         $permissionModel = new PermissionModel();
-        $permissions = $permissionModel->GetGlobalPermissions(0);
+        $permissions = $permissionModel->getGlobalPermissions(0);
         $permissions = array_keys($permissions);
         sort($permissions);
         $permissions = array_combine($permissions, $permissions);
@@ -76,7 +76,7 @@ class ConditionModule extends Gdn_Module {
         $this->Roles = $roles;
 
         $this->Form = $form;
-        return parent::ToString();
+        return parent::toString();
     }
 
     /** Grab the values from the form into the conditions array. */

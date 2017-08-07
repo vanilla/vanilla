@@ -573,13 +573,13 @@ if (!function_exists('dateUpdated')) {
         if ($dateUpdated) {
             $updateUser = Gdn::userModel()->getID($updateUserID);
             if ($updateUser) {
-                $title = sprintf(T('Edited %s by %s.'), Gdn_Format::dateFull($dateUpdated), val('Name', $updateUser));
+                $title = sprintf(t('Edited %s by %s.'), Gdn_Format::dateFull($dateUpdated), val('Name', $updateUser));
             } else {
-                $title = sprintf(T('Edited %s.'), Gdn_Format::dateFull($dateUpdated));
+                $title = sprintf(t('Edited %s.'), Gdn_Format::dateFull($dateUpdated));
             }
 
             $result = ' <span title="'.htmlspecialchars($title).'" class="DateUpdated">'.
-                sprintf(T('edited %s'), Gdn_Format::date($dateUpdated)).
+                sprintf(t('edited %s'), Gdn_Format::date($dateUpdated)).
                 '</span> ';
 
             if ($wrap) {
@@ -1150,7 +1150,7 @@ if (!function_exists('userAnchor')) {
 
 if (!function_exists('userBuilder')) {
     /**
-     * Take an object & prefix value and convert it to a user object that can be used by UserAnchor() && UserPhoto().
+     * Take an object & prefix value and convert it to a user object that can be used by userAnchor() && userPhoto().
      *
      * The object must have the following fields: UserID, Name, Photo.
      *
@@ -1291,7 +1291,7 @@ if (!function_exists('userUrl')) {
      * @param string $px The prefix to apply before fieldnames.
      * @param string $method Optional. ProfileController method to target.
      * @param array? $get An optional query string array to add to the URL.
-     * @return string The url suitable to be passed into the Url() function.
+     * @return string The url suitable to be passed into the url() function.
      * @since 2.1
      */
     function userUrl($user, $px = '', $method = '', $get = null) {

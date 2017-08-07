@@ -37,7 +37,7 @@ class Gdn_ModuleCollection extends Gdn_Module {
                     $renderedCount++;
                 }
             } elseif ($item instanceof Gdn_IModule) {
-                if (!GetValue('Visible', $item, true)) {
+                if (!getValue('Visible', $item, true)) {
                     continue;
                 }
 

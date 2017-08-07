@@ -104,7 +104,7 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
         foreach ($profileFields as $name => $field) {
             // Check both so you can't break register form by requiring omitted field
             if (val('Required', $field) && val('OnRegister', $field)) {
-                $sender->UserModel->Validation->applyRule($name, 'Required', T('%s is required.', $field['Label']));
+                $sender->UserModel->Validation->applyRule($name, 'Required', t('%s is required.', $field['Label']));
             }
         }
 
@@ -169,9 +169,9 @@ class ProfileExtenderPlugin extends Gdn_Plugin {
     /**
      * Add custom fields to discussions.
      */
-    public function base_AuthorInfo_handler($sender, $args) {
-        //echo ' '.WrapIf(htmlspecialchars(val('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
-        //echo ' '.WrapIf(htmlspecialchars(val('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
+    public function base_authorInfo_handler($sender, $args) {
+        //echo ' '.wrapIf(htmlspecialchars(val('Department', $Args['Author'])), 'span', array('class' => 'MItem AuthorDepartment'));
+        //echo ' '.wrapIf(htmlspecialchars(val('Organization', $Args['Author'])), 'span', array('class' => 'MItem AuthorOrganization'));
     }
 
     /**

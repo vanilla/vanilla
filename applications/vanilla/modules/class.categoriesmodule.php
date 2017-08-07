@@ -75,11 +75,11 @@ class CategoriesModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->Data) {
-            $this->GetData();
+            $this->getData();
         }
 
         $this->filterDepth($this->Data->result(), $this->startDepth, $this->endDepth);
 
-        return parent::ToString();
+        return parent::toString();
     }
 }

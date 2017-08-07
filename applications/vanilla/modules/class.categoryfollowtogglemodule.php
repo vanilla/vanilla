@@ -24,15 +24,15 @@ class CategoryFollowToggleModule extends Gdn_Module {
             return;
         }
 
-        $showAllCategories = GetIncomingValue('ShowAllCategories', '');
+        $showAllCategories = getIncomingValue('ShowAllCategories', '');
         if ($showAllCategories != '') {
             $showAllCategories = $showAllCategories == 'true' ? true : false;
-            $showAllCategoriesPref = $session->GetPreference('ShowAllCategories');
+            $showAllCategoriesPref = $session->getPreference('ShowAllCategories');
             if ($showAllCategories != $showAllCategoriesPref) {
                 $session->setPreference('ShowAllCategories', $showAllCategories);
             }
 
-            redirectTo('/'.ltrim(Gdn::request()->Path(), '/'));
+            redirectTo('/'.ltrim(Gdn::request()->path(), '/'));
         }
     }
 

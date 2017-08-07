@@ -30,7 +30,7 @@ class SearchController extends Gdn_Controller {
 
         // Object instantiation
         $this->SearchModel = new SearchModel();
-        $form = Gdn::Factory('Form');
+        $form = Gdn::factory('Form');
 
         // Form prep
         $form->Method = 'get';
@@ -88,7 +88,7 @@ class SearchController extends Gdn_Controller {
             $this->Form->addError($ex);
             $resultSet = [];
         } catch (Exception $ex) {
-            LogException($ex);
+            logException($ex);
             $this->Form->addError($ex);
             $resultSet = [];
         }

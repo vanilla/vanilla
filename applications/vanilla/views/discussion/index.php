@@ -13,9 +13,9 @@ echo '<!-- Page Title -->
 echo '<div class="Options">';
 
 $this->fireEvent('BeforeDiscussionOptions');
-WriteBookmarkLink();
+writeBookmarkLink();
 echo getDiscussionOptionsDropdown();
-WriteAdminCheck();
+writeAdminCheck();
 
 echo '</div>';
 
@@ -54,7 +54,7 @@ if ($this->data('Comments')->numRows() > 0)
     </ul>
 <?php
 $this->fireEvent('AfterComments');
-if ($this->Pager->LastPage()) {
+if ($this->Pager->lastPage()) {
     $LastCommentID = $this->addDefinition('LastCommentID');
     if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
         $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
@@ -68,4 +68,4 @@ echo $this->Pager->toString('more');
 echo '</div>';
 echo '</div>';
 
-WriteCommentForm();
+writeCommentForm();

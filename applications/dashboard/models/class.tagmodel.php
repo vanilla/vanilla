@@ -417,7 +417,7 @@ class TagModel extends Gdn_Model {
 
         // Turn the tags into a nice array.
         if (is_string($tags)) {
-            $tags = TagModel::SplitTags($tags);
+            $tags = TagModel::splitTags($tags);
         }
 
         $new_tags = [];
@@ -437,7 +437,7 @@ class TagModel extends Gdn_Model {
             $found_tags = $this->getWhere(['Name' => array_keys($new_tags)])->resultArray();
             foreach ($found_tags as $found_tag_row) {
                 $tag_ids[$found_tag_row['TagID']] = $found_tag_row;
-                unset($new_tags[TagModel::TagSlug($found_tag_row['Name'])]);
+                unset($new_tags[TagModel::tagSlug($found_tag_row['Name'])]);
             }
         }
 

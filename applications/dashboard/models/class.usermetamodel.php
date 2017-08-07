@@ -50,7 +50,7 @@ class UserMetaModel extends Gdn_Model {
             if (is_array($userID)) {
                 $result = [];
                 foreach ($userID as $iD) {
-                    $meta = $this->GetUserMeta($iD, $key, $default);
+                    $meta = $this->getUserMeta($iD, $key, $default);
                     $result[$iD] = $meta;
                 }
                 return $result;
@@ -109,11 +109,11 @@ class UserMetaModel extends Gdn_Model {
         $userMeta = [];
         if ($userMetaData->numRows()) {
             if (is_array($userID)) {
-                while ($metaRow = $userMetaData->NextRow()) {
+                while ($metaRow = $userMetaData->nextRow()) {
                     $userMeta[$metaRow->UserID][$metaRow->Name] = $metaRow->Value;
                 }
             } else {
-                while ($metaRow = $userMetaData->NextRow()) {
+                while ($metaRow = $userMetaData->nextRow()) {
                     $userMeta[$metaRow->Name] = $metaRow->Value;
                 }
             }
@@ -147,12 +147,12 @@ class UserMetaModel extends Gdn_Model {
         if (Gdn::cache()->activeEnabled()) {
             if (is_array($userID)) {
                 foreach ($userID as $iD) {
-                    $this->SetUserMeta($iD, $key, $value);
+                    $this->setUserMeta($iD, $key, $value);
                 }
                 return;
             }
 
-            $userMeta = $this->GetUserMeta($userID);
+            $userMeta = $this->getUserMeta($userID);
             if (!stristr($key, '%')) {
                 if ($value === null) {
                     unset($userMeta[$key]);

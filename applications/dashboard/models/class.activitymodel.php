@@ -249,7 +249,7 @@ class ActivityModel extends Gdn_Model {
      *
      * Events: AfterGet.
      *
-     * @param array $where A filter suitable for passing to Gdn_SQLDriver::Where().
+     * @param array $where A filter suitable for passing to Gdn_SQLDriver::where().
      * @param string $orderFields A comma delimited string to order the data.
      * @param string $orderDirection One of **asc** or **desc**.
      * @param int|bool $limit The database limit.

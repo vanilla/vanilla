@@ -57,9 +57,9 @@ class UtilityController extends DashboardController {
         $this->permission('Garden.Settings.Manage');
 
         if (Gdn::request()->isAuthenticatedPostBack()) {
-            $tableID = Gdn::request()->Post('TableID');
+            $tableID = Gdn::request()->post('TableID');
             if ($tableID) {
-                $rows = Gdn::request()->Post($tableID);
+                $rows = Gdn::request()->post($tableID);
                 if (is_array($rows)) {
                     $table = str_replace(['Table', '`'], '', $tableID);
                     $modelName = $table.'Model';
@@ -292,7 +292,7 @@ class UtilityController extends DashboardController {
         } catch (Exception $ex) {
             $this->setData('Success', false);
             $this->setData('Error', $ex->getMessage());
-            if (Debug()) {
+            if (debug()) {
                 throw $ex;
             }
         }

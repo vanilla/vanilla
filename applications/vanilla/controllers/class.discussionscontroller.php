@@ -40,7 +40,7 @@ class DiscussionsController extends VanillaController {
         if ($this->SyndicationMethod == SYNDICATION_NONE) {
             $this->View = 'table';
         }
-        $this->Index($page);
+        $this->index($page);
     }
 
     /**
@@ -77,7 +77,7 @@ class DiscussionsController extends VanillaController {
 
         // Determine offset from $Page
         list($Offset, $Limit) = offsetLimit($Page, c('Vanilla.Discussions.PerPage', 30), true);
-        $Page = PageNumber($Offset, $Limit);
+        $Page = pageNumber($Offset, $Limit);
 
         // Allow page manipulation
         $this->EventArguments['Page'] = &$Page;
@@ -86,7 +86,7 @@ class DiscussionsController extends VanillaController {
         $this->fireEvent('AfterPageCalculation');
 
         // Set canonical URL
-        $this->canonicalUrl(url(ConcatSep('/', 'discussions', PageNumber($Offset, $Limit, true, false)), true));
+        $this->canonicalUrl(url(concatSep('/', 'discussions', pageNumber($Offset, $Limit, true, false)), true));
 
         // We want to limit the number of pages on large databases because requesting a super-high page can kill the db.
         $MaxPages = c('Vanilla.Discussions.MaxPages');
@@ -97,18 +97,18 @@ class DiscussionsController extends VanillaController {
         // Setup head.
         if (!$this->data('Title')) {
             $Title = c('Garden.HomepageTitle');
-            $DefaultControllerRoute = val('Destination', Gdn::router()->GetRoute('DefaultController'));
+            $DefaultControllerRoute = val('Destination', Gdn::router()->getRoute('DefaultController'));
             if ($Title && ($DefaultControllerRoute == 'discussions')) {
                 $this->title($Title, '');
             } else {
                 $this->title(t('Recent Discussions'));
             }
         }
-        if (!$this->Description()) {
-            $this->Description(c('Garden.Description', null));
+        if (!$this->description()) {
+            $this->description(c('Garden.Description', null));
         }
         if ($this->Head) {
-            $this->Head->AddRss(url('/discussions/feed.rss', true), $this->Head->title());
+            $this->Head->addRss(url('/discussions/feed.rss', true), $this->Head->title());
         }
 
         // Add modules
@@ -148,7 +148,7 @@ class DiscussionsController extends VanillaController {
         $this->setData('CountDiscussions', $CountDiscussions);
 
         // Get Announcements
-        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->GetAnnouncements($where) : false;
+        $this->AnnounceData = $Offset == 0 ? $DiscussionModel->getAnnouncements($where) : false;
         $this->setData('Announcements', $this->AnnounceData !== false ? $this->AnnounceData : [], true);
 
         // RSS should include announcements.
@@ -171,7 +171,7 @@ class DiscussionsController extends VanillaController {
         }
         $queryString = DiscussionModel::getSortFilterQueryString($DiscussionModel->getSort(), $DiscussionModel->getFilters());
         $this->setData('_PagerUrl', $this->data('_PagerUrl').$queryString);
-        $this->Pager = $PagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $PagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
             $Offset,
@@ -180,7 +180,7 @@ class DiscussionsController extends VanillaController {
             $this->data('_PagerUrl')
         );
 
-        PagerModule::Current($this->Pager);
+        PagerModule::current($this->Pager);
 
         $this->setData('_Page', $Page);
         $this->setData('_Limit', $Limit);
@@ -222,7 +222,7 @@ class DiscussionsController extends VanillaController {
 
         // Determine offset from $Page
         list($page, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
-        $this->canonicalUrl(url(ConcatSep('/', 'discussions', 'unread', PageNumber($page, $limit, true, false)), true));
+        $this->canonicalUrl(url(concatSep('/', 'discussions', 'unread', pageNumber($page, $limit, true, false)), true));
 
         // Validate $Page
         if (!is_numeric($page) || $page < 0) {
@@ -238,11 +238,11 @@ class DiscussionsController extends VanillaController {
                 $this->title(t('Unread Discussions'));
             }
         }
-        if (!$this->Description()) {
-            $this->Description(c('Garden.Description', null));
+        if (!$this->description()) {
+            $this->description(c('Garden.Description', null));
         }
         if ($this->Head) {
-            $this->Head->AddRss(url('/discussions/unread/feed.rss', true), $this->Head->title());
+            $this->Head->addRss(url('/discussions/unread/feed.rss', true), $this->Head->title());
         }
 
         // Add modules
@@ -268,11 +268,11 @@ class DiscussionsController extends VanillaController {
         $discussionModel->Watching = true;
 
         // Get Discussion Count
-        $countDiscussions = $discussionModel->GetUnreadCount();
+        $countDiscussions = $discussionModel->getUnreadCount();
         $this->setData('CountDiscussions', $countDiscussions);
 
         // Get Discussions
-        $this->DiscussionData = $discussionModel->GetUnread($page, $limit);
+        $this->DiscussionData = $discussionModel->getUnread($page, $limit);
 
         $this->setData('Discussions', $this->DiscussionData, true);
         $this->setJson('Loading', $page.' to '.$limit);
@@ -281,7 +281,7 @@ class DiscussionsController extends VanillaController {
         $pagerFactory = new Gdn_PagerFactory();
         $this->EventArguments['PagerType'] = 'Pager';
         $this->fireEvent('BeforeBuildPager');
-        $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
             $page,
@@ -323,7 +323,7 @@ class DiscussionsController extends VanillaController {
         // Inform moderator of checked comments in this discussion
         $checkedDiscussions = Gdn::session()->getAttribute('CheckedDiscussions', []);
         if (count($checkedDiscussions) > 0) {
-            ModerationController::InformCheckedDiscussions($this);
+            ModerationController::informCheckedDiscussions($this);
         }
 
         $this->CountCommentsPerPage = c('Vanilla.Comments.PerPage', 30);
@@ -368,7 +368,7 @@ class DiscussionsController extends VanillaController {
 
         // Determine offset from $Page
         list($page, $limit) = offsetLimit($page, c('Vanilla.Discussions.PerPage', 30));
-        $this->canonicalUrl(url(ConcatSep('/', 'discussions', 'bookmarked', PageNumber($page, $limit, true, false)), true));
+        $this->canonicalUrl(url(concatSep('/', 'discussions', 'bookmarked', pageNumber($page, $limit, true, false)), true));
 
         // Validate $Page
         if (!is_numeric($page) || $page < 0) {
@@ -398,7 +398,7 @@ class DiscussionsController extends VanillaController {
         $pagerFactory = new Gdn_PagerFactory();
         $this->EventArguments['PagerType'] = 'Pager';
         $this->fireEvent('BeforeBuildBookmarkedPager');
-        $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
             $page,
@@ -498,7 +498,7 @@ class DiscussionsController extends VanillaController {
         $pagerFactory = new Gdn_PagerFactory();
         $this->EventArguments['PagerType'] = 'MorePager';
         $this->fireEvent('BeforeBuildMinePager');
-        $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->MoreCode = 'More Discussions';
         $this->Pager->LessCode = 'Newer Discussions';
         $this->Pager->ClientID = 'Pager';
@@ -575,7 +575,7 @@ class DiscussionsController extends VanillaController {
      * Takes a set of discussion identifiers and returns their comment counts in the same order.
      */
     public function getCommentCounts() {
-        $this->AllowJSONP(true);
+        $this->allowJSONP(true);
 
         $vanilla_identifier = val('vanilla_identifier', $_GET);
         if (!is_array($vanilla_identifier)) {
@@ -589,7 +589,7 @@ class DiscussionsController extends VanillaController {
         $cacheKey = 'embed.comments.count.%s';
         $originalIDs = [];
         foreach ($vanilla_identifier as $foreignID) {
-            $hashedForeignID = ForeignIDHash($foreignID);
+            $hashedForeignID = foreignIDHash($foreignID);
 
             // Keep record of non-hashed identifiers for the reply
             $originalIDs[$hashedForeignID] = $foreignID;
@@ -666,10 +666,10 @@ class DiscussionsController extends VanillaController {
     public function promoted() {
         // Create module & set data.
         $promotedModule = new PromotedContentModule();
-        $status = $promotedModule->Load(Gdn::request()->get());
+        $status = $promotedModule->load(Gdn::request()->get());
         if ($status === true) {
             // Good parameters.
-            $promotedModule->GetData();
+            $promotedModule->getData();
             $this->setData('Content', $promotedModule->data('Content'));
             $this->setData('Title', t('Promoted Content'));
             $this->setData('View', c('Vanilla.Discussions.Layout'));
@@ -758,11 +758,11 @@ class DiscussionsController extends VanillaController {
         $this->title(htmlspecialchars($tagRow['FullName']));
         $urlTag = empty($categoryCode) ? rawurlencode($tag) : rawurlencode($categoryCode).'/'.rawurlencode($tag);
         if (urlencode($tag) == $tag) {
-            $this->canonicalUrl(url(ConcatSep('/', "/discussions/tagged/$urlTag", PageNumber($offset, $limit, true)), true));
-            $feedUrl = url(ConcatSep('/', "/discussions/tagged/$urlTag/feed.rss", PageNumber($offset, $limit, true, false)), '//');
+            $this->canonicalUrl(url(concatSep('/', "/discussions/tagged/$urlTag", pageNumber($offset, $limit, true)), true));
+            $feedUrl = url(concatSep('/', "/discussions/tagged/$urlTag/feed.rss", pageNumber($offset, $limit, true, false)), '//');
         } else {
-            $this->canonicalUrl(url(ConcatSep('/', 'discussions/tagged', PageNumber($offset, $limit, true)).'?Tag='.$urlTag, true));
-            $feedUrl = url(ConcatSep('/', 'discussions/tagged', PageNumber($offset, $limit, true, false), 'feed.rss').'?Tag='.$urlTag, '//');
+            $this->canonicalUrl(url(concatSep('/', 'discussions/tagged', pageNumber($offset, $limit, true)).'?Tag='.$urlTag, true));
+            $feedUrl = url(concatSep('/', 'discussions/tagged', pageNumber($offset, $limit, true, false), 'feed.rss').'?Tag='.$urlTag, '//');
         }
 
         if ($this->Head) {
@@ -800,7 +800,7 @@ class DiscussionsController extends VanillaController {
         if (!$this->data('_PagerUrl')) {
             $this->setData('_PagerUrl', "/discussions/tagged/$urlTag/{Page}");
         }
-        $this->Pager = $pagerFactory->GetPager($this->EventArguments['PagerType'], $this);
+        $this->Pager = $pagerFactory->getPager($this->EventArguments['PagerType'], $this);
         $this->Pager->ClientID = 'Pager';
         $this->Pager->configure(
             $offset,

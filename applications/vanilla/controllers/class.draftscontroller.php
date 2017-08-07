@@ -47,7 +47,7 @@ class DraftsController extends VanillaController {
 
         // Build a pager
         $pagerFactory = new Gdn_PagerFactory();
-        $this->Pager = $pagerFactory->GetPager('MorePager', $this);
+        $this->Pager = $pagerFactory->getPager('MorePager', $this);
         $this->Pager->MoreCode = 'More drafts';
         $this->Pager->LessCode = 'Newer drafts';
         $this->Pager->ClientID = 'Pager';
@@ -109,7 +109,7 @@ class DraftsController extends VanillaController {
 
         // Redirect
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            $target = GetIncomingValue('Target', '/drafts');
+            $target = getIncomingValue('Target', '/drafts');
             redirectTo($target);
         }
 

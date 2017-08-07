@@ -13,12 +13,12 @@
  * Output formatter chain
  *
  * This object facilitates chaining custom formatters for use in the Gdn_FormatObject.
- * A custom formatter is an object with a Format($String) method that formats a string in a particular way.
+ * A custom formatter is an object with a format($String) method that formats a string in a particular way.
  * Certain calls to the various Gdn_Format methods (such as Html and To) will look for a custom formatter to use before formatting.
  *
  * If you want to create a custom formatter, but have it act in addition to an existing custom formatter than use a Gdn_FormatterChain with this process.
- *  - Create the object with a Format($String) method.
- *  - Call the static method Gdn_FormatterChain::Chain() to install it on top of the other formatter.
+ *  - Create the object with a format($String) method.
+ *  - Call the static method Gdn_FormatterChain::chain() to install it on top of the other formatter.
  *  - Depending on the priority you specified your formatter will be called before or after the existing formatter.
  */
 class Gdn_FormatterChain {
@@ -32,7 +32,7 @@ class Gdn_FormatterChain {
     /** @var array  */
     protected $_Formatters = [];
 
-    /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::Chain() instead.
+    /** Add a formatter to the chain. This method isn't usuall called directly. Use Gdn_FormatterChain::chain() instead.
      *
      * @param object $formatter The formatter to install.
      * @param int $priority The priority of the formatter in the chain. High priorities come first.

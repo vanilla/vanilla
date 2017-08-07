@@ -161,7 +161,7 @@ abstract class Gdn_Cache {
 
         // Null caches should not acount as enabled.
         if (!$forceEnable && $cacheObject->type() === Gdn_Cache::CACHE_TYPE_NULL) {
-            SaveToConfig('Cache.Enabled', false, false);
+            saveToConfig('Cache.Enabled', false, false);
         }
 
         if (method_exists($cacheObject, 'Autorun')) {
@@ -517,10 +517,10 @@ abstract class Gdn_Cache {
     /**
      * Invalidate all items in the cache.
      *
-     * Gdn_Cache::Flush() invalidates all existing cache items immediately.
+     * Gdn_Cache::flush() invalidates all existing cache items immediately.
      * After invalidation none of the items will be returned in response to a
      * retrieval command (unless it's stored again under the same key after
-     * Gdn_Cache::Flush() has invalidated the items).
+     * Gdn_Cache::flush() has invalidated the items).
      *
      * @return boolean true on success of false on failure.
      */
@@ -800,7 +800,7 @@ abstract class Gdn_Cache {
      * Check whether this cache supports the specified feature.
      *
      * @param int $feature One of the feature constants.
-     * @return mixed $Meta returns the meta data supplied during RegisterFeature().
+     * @return mixed $Meta returns the meta data supplied during registerFeature().
      */
     public function hasFeature($feature) {
         return isset($this->features[$feature]) ? $this->features[$feature] : Gdn_Cache::CACHEOP_FAILURE;

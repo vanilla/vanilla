@@ -590,7 +590,7 @@ class Emoji {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
             if (strpos($text, htmlentities($emojiAlias)) !== false) {
-                $text = Gdn_Format::ReplaceButProtectCodeBlocks(
+                $text = Gdn_Format::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
                     $text

@@ -8,7 +8,7 @@ function writeConnection($row) {
         <div class="Connection-Header">
          <span class="IconWrap">
             <?php
-            echo img(val('Icon', $row, Asset('/applications/dashboard/design/images/connection-64.png')));
+            echo img(val('Icon', $row, asset('/applications/dashboard/design/images/connection-64.png')));
             ?>
          </span>
          <span class="Connection-Name">
@@ -19,23 +19,23 @@ function writeConnection($row) {
                 echo ' <span class="Gloss Connected">';
 
                 if ($photo = valr('Profile.Photo', $row)) {
-                    echo ' '.Img($photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']);
+                    echo ' '.img($photo, ['class' => 'ProfilePhoto ProfilePhotoSmall']);
                 }
 
-                echo ' '.htmlspecialchars(GetValueR('Profile.Name', $row)).'</span>';
+                echo ' '.htmlspecialchars(getValueR('Profile.Name', $row)).'</span>';
             }
             ?>
          </span>
          <span class="Connection-Connect">
             <?php
-            echo ConnectButton($row);
+            echo connectButton($row);
             ?>
          </span>
         </div>
         <!--      <div class="Connection-Body">
          <?php
 
-        //         if (Debug()) {
+        //         if (debug()) {
         //            decho(val($Row['ProviderKey'], $c->User->Attributes), 'Attributes');
         //         }
         ?>

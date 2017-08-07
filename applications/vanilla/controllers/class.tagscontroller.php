@@ -23,7 +23,7 @@ class TagsController extends VanillaController {
         // Allow per-category tags
         $categorySearch = c('Vanilla.Tagging.CategorySearch', false);
         if ($categorySearch) {
-            $categoryID = GetIncomingValue('CategoryID');
+            $categoryID = getIncomingValue('CategoryID');
         }
 
         if ($parent && !is_numeric($parent)) {

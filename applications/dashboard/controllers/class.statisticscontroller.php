@@ -60,7 +60,7 @@ class StatisticsController extends DashboardController {
                 Gdn::installationID(false);
                 Gdn::installationSecret(false);
 
-                Gdn::Statistics()->register();
+                Gdn::statistics()->register();
 
                 if (!Gdn::installationID()) {
                     Gdn::installationID($id);
@@ -87,7 +87,7 @@ class StatisticsController extends DashboardController {
             if ($flow && $this->Form->getFormValue('ClearCredentials')) {
                 Gdn::installationID(false);
                 Gdn::installationSecret(false);
-                Gdn::statistics()->Tick();
+                Gdn::statistics()->tick();
                 $flow = false;
             }
         } else {

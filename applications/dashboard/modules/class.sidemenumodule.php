@@ -10,7 +10,7 @@
 
 if (!class_exists('SideMenuModule', false)) {
     /**
-     * Manages the items in the page menu and eventually returns the menu as a string with ToString();
+     * Manages the items in the page menu and eventually returns the menu as a string with toString();
      */
     class SideMenuModule extends Gdn_Module {
 
@@ -37,7 +37,7 @@ if (!class_exists('SideMenuModule', false)) {
 
         /**
          * @var string A route that, if found in the menu links, should cause that link to
-         * have the Highlight class applied. This property is assigned with $this->Highlight();
+         * have the Highlight class applied. This property is assigned with $this->highlight();
          */
         private $_HighlightRoute;
 
@@ -52,7 +52,7 @@ if (!class_exists('SideMenuModule', false)) {
             $this->_ApplicationFolder = 'dashboard';
             $this->HtmlId = 'SideMenu';
             $this->AutoLinkGroups = true;
-            $this->ClearGroups();
+            $this->clearGroups();
         }
 
         /**
@@ -66,7 +66,7 @@ if (!class_exists('SideMenuModule', false)) {
          */
         public function addLink($group, $text, $url, $permission = false, $attributes = []) {
             if (!array_key_exists($group, $this->Items)) {
-                $this->AddItem($group, t($group));
+                $this->addItem($group, t($group));
             }
             if ($text === false) {
                 // This link is the group heading.
@@ -267,7 +267,7 @@ if (!class_exists('SideMenuModule', false)) {
                 $highlightRoute = $this->_HighlightRoute;
             }
             if ($highlightRoute == '') {
-                $highlightRoute = Gdn_Url::Request();
+                $highlightRoute = Gdn_Url::request();
             }
             $highlightUrl = url($highlightRoute);
 
@@ -304,19 +304,19 @@ if (!class_exists('SideMenuModule', false)) {
 
                 // Highlight the group.
                 if (val('Url', $item) && url($item['Url']) == $highlightUrl) {
-                    $item['Attributes']['class'] = ConcatSep(' ', val('class', $item['Attributes']), 'Active');
+                    $item['Attributes']['class'] = concatSep(' ', val('class', $item['Attributes']), 'Active');
                 }
 
                 // Hightlight the correct item in the group.
                 foreach ($item['Links'] as &$link) {
                     if (val('Url', $link) && url($link['Url']) == $highlightUrl) {
-                        $link['Attributes']['class'] = ConcatSep(' ', val('class', $link['Attributes']), 'Active');
-                        $item['Attributes']['class'] = ConcatSep(' ', val('class', $item['Attributes']), 'Active');
+                        $link['Attributes']['class'] = concatSep(' ', val('class', $link['Attributes']), 'Active');
+                        $item['Attributes']['class'] = concatSep(' ', val('class', $item['Attributes']), 'Active');
                     }
                 }
             }
 
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

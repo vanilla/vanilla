@@ -483,7 +483,7 @@ class UpdateModel extends Gdn_Model {
                     $globalKey = $matches[1];
                     $inArray = true;
                 }
-            } elseif ($inArray && StringEndsWith(trim($line), ';')) {
+            } elseif ($inArray && stringEndsWith(trim($line), ';')) {
                 break;
             } elseif ($inArray) {
                 $lines[] = trim($line);

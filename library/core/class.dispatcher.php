@@ -535,7 +535,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         }
 
         if (strpos($folder, 'plugins/') === 0) {
-            $plugin = StringBeginsWith($folder, 'plugins/', false, true);
+            $plugin = stringBeginsWith($folder, 'plugins/', false, true);
 
             if (array_key_exists($plugin, $this->addonManager->getEnabled())) {
                 return $plugin;
@@ -557,7 +557,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param string $assetName The name of the asset collection to add the string to.
      * @param mixed $asset The string asset to be added. The asset can be one of two things.
      * - <b>string</b>: The string will be rendered to the page.
-     * - <b>Gdn_IModule</b>: The Gdn_IModule::Render() method will be called when the asset is rendered.
+     * - <b>Gdn_IModule</b>: The Gdn_IModule::render() method will be called when the asset is rendered.
      */
     public function passAsset($assetName, $asset) {
         $this->controllerAssets[$assetName][] = $asset;
@@ -655,7 +655,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
      * @param Gdn_Request $request The request to rewrite.
      */
     private function rewriteRequest($request) {
-        $pathAndQuery = $request->PathAndQuery();
+        $pathAndQuery = $request->pathAndQuery();
         $matchRoute = Gdn::router()->matchRoute($pathAndQuery);
 
         // We have a route. Take action.
@@ -882,7 +882,7 @@ class Gdn_Dispatcher extends Gdn_Pluggable {
         // Kludge for controllers that modify the dispatcher.
         $pathArgs = $this->controllerArguments();
         if (!empty($this->ControllerMethod)) {
-            array_unshift($pathArgs, Gdn::Dispatcher()->ControllerMethod);
+            array_unshift($pathArgs, Gdn::dispatcher()->ControllerMethod);
         }
         $routeArgs['pathArgs'] = $pathArgs;
         // End kluge.

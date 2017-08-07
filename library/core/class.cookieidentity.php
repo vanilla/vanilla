@@ -472,7 +472,7 @@ class Gdn_CookieIdentity {
         }
 
         $currentHost = Gdn::request()->host();
-        if (!StringEndsWith($currentHost, trim($domain, '.'))) {
+        if (!stringEndsWith($currentHost, trim($domain, '.'))) {
             $domain = '';
         }
 

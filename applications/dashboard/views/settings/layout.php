@@ -81,14 +81,14 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
             $CurrentTarget = $this->data('CurrentTarget');
 
             if (Gdn::addonManager()->isEnabled('Vanilla', \Vanilla\Addon::TYPE_ADDON)) {
-                echo WriteHomepageOption('Discussions', 'discussions', 'disc-modern', $CurrentTarget);
-                echo WriteHomepageOption('Categories', 'categories', 'cat-modern', $CurrentTarget);
-                // echo WriteHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
+                echo writeHomepageOption('Discussions', 'discussions', 'disc-modern', $CurrentTarget);
+                echo writeHomepageOption('Categories', 'categories', 'cat-modern', $CurrentTarget);
+                // echo writeHomepageOption('Categories &amp; Discussions', 'categories/discussions', 'categoriesdiscussions', $CurrentTarget);
             }
-            //echo WriteHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
+            //echo writeHomepageOption('Activity', 'activity', 'SpActivity', $CurrentTarget);
 
             if (Gdn::addonManager()->isEnabled('Reactions', \Vanilla\Addon::TYPE_ADDON)) {
-                echo WriteHomepageOption('Best Of', 'bestof', 'best-of', $CurrentTarget);
+                echo writeHomepageOption('Best Of', 'bestof', 'best-of', $CurrentTarget);
             }
             ?>
         </div>
@@ -100,8 +100,8 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
         ?>
         <div class="LayoutOptions DiscussionsLayout label-selector">
             <?php
-            echo WriteHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
-            echo WriteHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
+            echo writeHomepageOption('Modern Layout', 'modern', 'disc-modern', $CurrentDiscussionLayout, t('Modern non-table-based layout'));
+            echo writeHomepageOption('Table Layout', 'table', 'disc-table', $CurrentDiscussionLayout, t('Classic table layout used by traditional forums'));
             ?>
         </div>
         <?php
@@ -110,9 +110,9 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
         ?>
         <div class="LayoutOptions CategoriesLayout label-selector">
             <?php
-            echo WriteHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
-            echo WriteHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
-            echo WriteHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
+            echo writeHomepageOption('Modern Layout', 'modern', 'cat-modern', $CurrentCategoriesLayout, t('Modern non-table-based layout'));
+            echo writeHomepageOption('Table Layout', 'table', 'cat-table', $CurrentCategoriesLayout, t('Classic table layout used by traditional forums'));
+            echo writeHomepageOption('Mixed Layout', 'mixed', 'cat-mixed', $CurrentCategoriesLayout, t('All categories listed with a selection of 5 recent discussions under each'));
             ?>
         </div>
 
@@ -122,7 +122,7 @@ function writeHomepageOption($title, $url, $iconName, $current, $description = '
 <?php
 echo $this->Form->open();
 echo $this->Form->errors();
-echo $this->Form->Hidden('Target');
-echo $this->Form->Hidden('DiscussionsLayout', ['value' => $CurrentDiscussionLayout]);
-echo $this->Form->Hidden('CategoriesLayout', ['value' => $CurrentCategoriesLayout]);
+echo $this->Form->hidden('Target');
+echo $this->Form->hidden('DiscussionsLayout', ['value' => $CurrentDiscussionLayout]);
+echo $this->Form->hidden('CategoriesLayout', ['value' => $CurrentCategoriesLayout]);
 echo $this->Form->close('Save'); ?>

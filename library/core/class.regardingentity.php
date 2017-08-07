@@ -128,7 +128,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
         $modelName = ucfirst($parentType).'Model';
 
         if (!class_exists($modelName)) {
-            throw new Exception(sprintf(T("Could not find a model for %s objects (parent type for %s objects)."), ucfirst($parentType), ucfirst($this->ForeignType)));
+            throw new Exception(sprintf(t("Could not find a model for %s objects (parent type for %s objects)."), ucfirst($parentType), ucfirst($this->ForeignType)));
         }
 
         // If we can lookup this object, it is verified
@@ -275,7 +275,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                     $uRL = "/";
                     break;
             }
-            $uRL = Url($uRL);
+            $uRL = url($uRL);
         }
 
         $this->ForeignURL = $uRL;
@@ -315,19 +315,19 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
      */
     public function commit() {
         if (is_null($this->Type)) {
-            throw new Exception(T("Adding a Regarding event requires a type."));
+            throw new Exception(t("Adding a Regarding event requires a type."));
         }
 
         if (is_null($this->ForeignType)) {
-            throw new Exception(T("Adding a Regarding event requires a foreign association type."));
+            throw new Exception(t("Adding a Regarding event requires a foreign association type."));
         }
 
         if (is_null($this->ForeignID)) {
-            throw new Exception(T("Adding a Regarding event requires a foreign association id."));
+            throw new Exception(t("Adding a Regarding event requires a foreign association id."));
         }
 
         if (is_null($this->Comment)) {
-            throw new Exception(T("Adding a Regarding event requires a comment."));
+            throw new Exception(t("Adding a Regarding event requires a comment."));
         }
 
         if (is_null($this->UserID)) {
@@ -383,7 +383,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                 case 'discussion':
                     $discussionModel = new DiscussionModel();
                     if ($collapse) {
-                        $discussion = Gdn::SQL()
+                        $discussion = Gdn::sql()
                             ->select('*')
                             ->from('Discussion')
                             ->where(['RegardingID' => $regardingID])
@@ -431,7 +431,7 @@ class Gdn_RegardingEntity extends Gdn_Pluggable {
                     $users = val('Parameters', $action);
                     $userList = explode(',', $users);
                     if (!sizeof($userList)) {
-                        throw new Exception(sprintf(T("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
+                        throw new Exception(sprintf(t("The userlist provided for collaboration on '%s:%s' is invalid.", $this->Type, $this->ForeignType)));
                     }
 
                     $conversationID = $conversationModel->save([

@@ -85,11 +85,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
     /**
      * @var array Associative array containing the key => value pairs being placed in the
-     *    controls returned by this object. Assigned by $this->Open() or $this->SetData().
+     *    controls returned by this object. Assigned by $this->open() or $this->setData().
      */
     protected $_DataArray;
 
-    /** @var bool Whether to display inline errors with form elements. Set with ShowErrors() and HideErrors(). */
+    /** @var bool Whether to display inline errors with form elements. Set with showErrors() and hideErrors(). */
     protected $_InlineErrors = false;
 
     /** @var object Model that enforces data rules on $this->_DataArray. */
@@ -104,8 +104,8 @@ class Gdn_Form extends Gdn_Pluggable {
     /**
      * @var array $Field => $Value pairs from the form in the $_POST or $_GET collection
      *    (depending on which method was specified for sending form data in $this->Method).
-     *    Populated & accessed by $this->FormValues().
-     *    Values can be retrieved with $this->GetFormValue($FieldName).
+     *    Populated & accessed by $this->formValues().
+     *    Values can be retrieved with $this->getFormValue($FieldName).
      */
     public $_FormValues;
 
@@ -445,7 +445,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *                 interset with the CategoryData
      *                 that is relative to the category
      *                 we're in.
-     *   CategoryData  Custom set of categories to    CategoryModel::Categories()
+     *   CategoryData  Custom set of categories to    CategoryModel::categories()
      *                 display.
      *
      * @return string
@@ -875,13 +875,13 @@ class Gdn_Form extends Gdn_Pluggable {
                 attribute('title', val('title', $attributes)).'>';
 
             if ($display === 'wrap') {
-                $input = $labelElement.$input.' '.T($label).'</label>';
+                $input = $labelElement.$input.' '.t($label).'</label>';
             } elseif ($display === 'before') {
-                $input = $labelElement.T($label).'</label> '.$input;
+                $input = $labelElement.t($label).'</label> '.$input;
             } elseif ($display === 'toggle') {
-                $input = '<div class="label-wrap"><label>'.T($label).'</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.$input.$labelElement.'</label></div></div> ';
+                $input = '<div class="label-wrap"><label>'.t($label).'</label></div><div class="toggle-box-wrapper"><div class="toggle-box">'.$input.$labelElement.'</label></div></div> ';
             } else {
-                $input = $input.' '.$labelElement.T($label).'</label>';
+                $input = $input.' '.$labelElement.t($label).'</label>';
             }
         }
 
@@ -942,8 +942,8 @@ class Gdn_Form extends Gdn_Pluggable {
         }
         $i = 1;
         if (is_object($dataSet)) {
-            $valueField = ArrayValueI('ValueField', $attributes, 'value');
-            $textField = ArrayValueI('TextField', $attributes, 'text');
+            $valueField = arrayValueI('ValueField', $attributes, 'value');
+            $textField = arrayValueI('TextField', $attributes, 'text');
             foreach ($dataSet->result() as $data) {
                 $instance = $attributes;
                 unset($instance['TextField'], $instance['ValueField']);
@@ -1143,11 +1143,11 @@ class Gdn_Form extends Gdn_Pluggable {
 
         $result = '<div class="table-wrap"><table class="table-data js-checkbox-grid table-checkbox-grid">';
         // Append the header.
-        $result .= '<thead><tr><th>'.T($groupName).'</th>';
+        $result .= '<thead><tr><th>'.t($groupName).'</th>';
         foreach ($columns as $columnName => $x) {
             $result .=
                 '<td>'
-                .T($columnName)
+                .t($columnName)
                 .'</td>';
         }
         $result.'</tr></thead>';
@@ -1161,9 +1161,9 @@ class Gdn_Form extends Gdn_Pluggable {
             // If the row name is still seperated by dots then put those in spans.
             $rowNames = explode('.', $rowName);
             for ($i = 0; $i < count($rowNames) - 1; ++$i) {
-                $result .= '<span class="Parent">'.T($rowNames[$i]).'</span>';
+                $result .= '<span class="Parent">'.t($rowNames[$i]).'</span>';
             }
-            $result .= T(self::labelCode($rowNames[count($rowNames) - 1])).'</th>';
+            $result .= t(self::labelCode($rowNames[count($rowNames) - 1])).'</th>';
             // Append the columns within the rows.
             foreach ($columns as $columnName => $y) {
                 $result .= '<td>';
@@ -1375,7 +1375,7 @@ class Gdn_Form extends Gdn_Pluggable {
      *               first option.
      *   InlineErrors  Show inline error message?   TRUE
      *               Allows disabling per-dropdown
-     *               for multi-fields like Date()
+     *               for multi-fields like date()
      *
      * @return string
      */
@@ -1498,7 +1498,7 @@ class Gdn_Form extends Gdn_Pluggable {
         // Get the current value.
         $currentValue = val('Value', $attributes, false);
         if ($currentValue === false) {
-            $currentValue = $this->getValue($fieldName, GetValue('Default', $attributes));
+            $currentValue = $this->getValue($fieldName, getValue('Default', $attributes));
         }
 
         // Add a null option?
@@ -1608,7 +1608,7 @@ class Gdn_Form extends Gdn_Pluggable {
      * Returns a checkbox table.
      *
      * @param string $groupName The name of the checkbox table (the text that appears in the top-left
-     * cell of the table). This value will be passed through the T()
+     * cell of the table). This value will be passed through the t()
      * function before render.
      *
      * @param array $group An array of $PermissionName => $CheckBoxXhtml to be rendered within the
@@ -1639,7 +1639,7 @@ class Gdn_Form extends Gdn_Pluggable {
 
                 if ($j == 0) {
                     $headings .= '<td'.($alt ? ' class="Alt"' : '').
-                    '>'.T($colName).'</td>';
+                    '>'.t($colName).'</td>';
                 }
 
                 if (array_key_exists($rowName, $group[$colName])) {
@@ -1664,7 +1664,7 @@ class Gdn_Form extends Gdn_Pluggable {
                 for ($i = 0; $i < $rowNameCount; ++$i) {
                     if ($i < $rowNameCount - 1) {
                         $rowName .= '<span class="Parent">'.
-                        T($aRowName[$i]).'</span>';
+                        t($aRowName[$i]).'</span>';
                     } else {
                         $rowName .= t($aRowName[$i]);
                     }
@@ -1688,7 +1688,7 @@ class Gdn_Form extends Gdn_Pluggable {
         $return = '';
         if (is_array($this->HiddenInputs)) {
             foreach ($this->HiddenInputs as $name => $value) {
-                $return .= $this->Hidden($name, ['value' => $value]);
+                $return .= $this->hidden($name, ['value' => $value]);
             }
             // Clean out the array
             // mosullivan - removed cleanout so that entry forms can all have the same hidden inputs added once on the entry/index view.
@@ -1760,7 +1760,7 @@ class Gdn_Form extends Gdn_Pluggable {
     public function inlineError($fieldName) {
         $appendError = '<p class="'.$this->ErrorClass.'">';
         foreach ($this->_ValidationResults[$fieldName] as $validationError) {
-            $appendError .= sprintf(T($validationError), t($fieldName)).' ';
+            $appendError .= sprintf(t($validationError), t($fieldName)).' ';
         }
         $appendError .= '</p>';
 
@@ -1900,7 +1900,7 @@ PASSWORDMETER;
      * Generate a friendly looking label translation code from a camel case variable name
      * @param string|array $item The item to generate the label from.
      *  - string: Generate the label directly from the item.
-     *  - array: Generate the label from the item as if it is a schema row passed to Gdn_Form::Simple().
+     *  - array: Generate the label from the item as if it is a schema row passed to Gdn_Form::simple().
      * @return string
      */
     public static function labelCode($item) {
@@ -2021,7 +2021,7 @@ PASSWORDMETER;
     /**
      * Returns XHTML for a radio input element.
      *
-     * Provides way of wrapping Input() with a label.
+     * Provides way of wrapping input() with a label.
      *
      * @param string $fieldName Name of the field that is being displayed/posted with this input.
      *    It should related directly to a field name in $this->_DataArray.
@@ -2046,7 +2046,7 @@ PASSWORDMETER;
         $attributes['InlineErrors'] = false;
 
         // Get standard radio Input
-        $input = $this->Input($fieldName, 'radio', $attributes);
+        $input = $this->input($fieldName, 'radio', $attributes);
 
         if (isset($attributes['class'])) {
             $class = $this->translateClasses($attributes['class']);
@@ -2056,7 +2056,7 @@ PASSWORDMETER;
 
         // Wrap with label.
         if ($label != '') {
-            $labelElement = '<label for="'.arrayValueI('id', $attributes, $this->EscapeID($fieldName, false)).'" class="'.val('class', $attributes, 'RadioLabel').'">';
+            $labelElement = '<label for="'.arrayValueI('id', $attributes, $this->escapeID($fieldName, false)).'" class="'.val('class', $attributes, 'RadioLabel').'">';
             if ($display === 'wrap') {
                 $labelElement = '<label'.attribute('class', $class).'>';
                 $input = $labelElement.$input.' '.t($label).'</label>';
@@ -2092,7 +2092,7 @@ PASSWORDMETER;
      *   Default     The default value.             empty
      *   InlineErrors  Show inline error message?   TRUE
      *               Allows disabling per-dropdown
-     *               for multi-fields like Date()
+     *               for multi-fields like date()
      *
      * @return string
      */
@@ -2232,7 +2232,7 @@ PASSWORDMETER;
     /**
      * Adds an error to the errors collection and optionally relates it to the
      * specified FieldName. Errors added with this method can be rendered with
-     * $this->Errors().
+     * $this->errors().
      *
      * @param mixed $errorCode
      *  - <b>string</b>: The translation code that represents the error to display.
@@ -2310,7 +2310,7 @@ PASSWORDMETER;
     /**
      * Returns a boolean value indicating if the current page has an authenticated postback.
      *
-     * It validates the postback by looking at a transient value that was rendered using $this->Open()
+     * It validates the postback by looking at a transient value that was rendered using $this->open()
      * and submitted with the form. Ref: http://en.wikipedia.org/wiki/Cross-site_request_forgery
      *
      * @param bool $throw Whether or not to throw an exception if this is a postback AND the transient key doesn't validate.
@@ -2336,7 +2336,7 @@ PASSWORDMETER;
     }
 
     /**
-     * Checks $this->FormValues() to see if the specified button translation
+     * Checks $this->formValues() to see if the specified button translation
      * code was submitted with the form (helps figuring out what button was
      * pressed to submit the form when there is more than one button available).
      *
@@ -2656,7 +2656,7 @@ PASSWORDMETER;
     /**
      * Check if THIS particular form was submitted
      *
-     * Just like IsPostBack(), except auto populates FormValues and doesnt just check
+     * Just like isPostBack(), except auto populates FormValues and doesnt just check
      * "was some data submitted lol?!".
      *
      * @return boolean
@@ -2684,7 +2684,7 @@ PASSWORDMETER;
         if ($this->errorCount() == 0) {
             if (!isset($this->_Model)) {
                 trigger_error(
-                    ErrorMessage(
+                    errorMessage(
                         "You cannot call the form's save method if a model has not been defined.",
                         "Form",
                         "Save"
@@ -2770,7 +2770,7 @@ PASSWORDMETER;
         if ($ext == 'jpeg') {
             $ext = 'jpg';
         }
-            Trace($ext, 'Ext');
+            trace($ext, 'Ext');
 
         // The file is valid so let's come up with its new name.
         if (isset($options['Name'])) {
@@ -2887,7 +2887,7 @@ PASSWORDMETER;
         $this->_Model = $model;
 
         if ($dataSet !== false) {
-            $this->SetData($dataSet);
+            $this->setData($dataSet);
         }
     }
 
@@ -3070,7 +3070,7 @@ PASSWORDMETER;
      * @param string $customError A custom error string.
      * @return bool Whether or not the rule succeeded.
      *
-     * @see Gdn_Validation::ValidateRule()
+     * @see Gdn_Validation::validateRule()
      */
     public function validateRule($fieldName, $rule, $customError = '') {
         $value = $this->getFormValue($fieldName);

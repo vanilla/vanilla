@@ -914,7 +914,7 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
-     * Default to SignIn().
+     * Default to signIn().
      *
      * @access public
      * @since 2.0.0
@@ -935,7 +935,7 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
-     * Auth via default method. Simpler, old version of SignIn().
+     * Auth via default method. Simpler, old version of signIn().
      *
      * Events: SignIn
      *
@@ -1031,13 +1031,13 @@ class EntryController extends Gdn_Controller {
             // Check the user.
             if ($this->Form->errorCount() == 0) {
                 $email = $this->Form->getFormValue('Email');
-                $user = Gdn::userModel()->GetByEmail($email);
+                $user = Gdn::userModel()->getByEmail($email);
                 if (!$user) {
-                    $user = Gdn::userModel()->GetByUsername($email);
+                    $user = Gdn::userModel()->getByUsername($email);
                 }
 
                 if (!$user) {
-                    $this->addCredentialErrorToForm('@'.sprintf(t('User not found.'), strtolower(t(UserModel::SigninLabelCode()))));
+                    $this->addCredentialErrorToForm('@'.sprintf(t('User not found.'), strtolower(t(UserModel::signinLabelCode()))));
                     Logger::event('signin_failure', Logger::INFO, '{signin} failed to sign in. User not found.', ['signin' => $email]);
                     $this->fireEvent('BadSignIn', [
                         'Email' => $email,
@@ -1139,20 +1139,20 @@ class EntryController extends Gdn_Controller {
                 return Gdn::dispatcher()->dispatch();
             }
         } catch (Exception $e) {
-            Gdn::request()->WithURI('/entry/signin');
+            Gdn::request()->withURI('/entry/signin');
             return Gdn::dispatcher()->dispatch();
         }
 
         $userInfo = [
-            'UserKey' => $authenticator->GetUserKeyFromHandshake($payload),
-            'ConsumerKey' => $authenticator->GetProviderKeyFromHandshake($payload),
-            'TokenKey' => $authenticator->GetTokenKeyFromHandshake($payload),
-            'UserName' => $authenticator->GetUserNameFromHandshake($payload),
-            'UserEmail' => $authenticator->GetUserEmailFromHandshake($payload)
+            'UserKey' => $authenticator->getUserKeyFromHandshake($payload),
+            'ConsumerKey' => $authenticator->getProviderKeyFromHandshake($payload),
+            'TokenKey' => $authenticator->getTokenKeyFromHandshake($payload),
+            'UserName' => $authenticator->getUserNameFromHandshake($payload),
+            'UserEmail' => $authenticator->getUserEmailFromHandshake($payload)
         ];
 
         if (method_exists($authenticator, 'GetRolesFromHandshake')) {
-            $remoteRoles = $authenticator->GetRolesFromHandshake($payload);
+            $remoteRoles = $authenticator->getRolesFromHandshake($payload);
             if (!empty($remoteRoles)) {
                 $userInfo['Roles'] = $remoteRoles;
             }
@@ -1212,7 +1212,7 @@ class EntryController extends Gdn_Controller {
 
                         // This resets vanilla's internal "where am I" to the homepage. Needed.
                         Gdn::request()->withRoute('DefaultController');
-                        $this->SelfUrl = url(''); //Gdn::request()->Path();
+                        $this->SelfUrl = url(''); //Gdn::request()->path();
 
                         $this->View = 'syncfailed';
                         $this->ProviderSite = $authenticator->getProviderUrl();
@@ -1471,12 +1471,12 @@ class EntryController extends Gdn_Controller {
                     Gdn::session()->start($authUserID);
 
                     if ($this->Form->getFormValue('RememberMe')) {
-                        Gdn::authenticator()->SetIdentity($authUserID, true);
+                        Gdn::authenticator()->setIdentity($authUserID, true);
                     }
 
                     // Notification text
                     $label = t('NewApplicantEmail', 'New applicant:');
-                    $story = anchor(Gdn_Format::text($label.' '.$values['Name']), ExternalUrl('dashboard/user/applicants'));
+                    $story = anchor(Gdn_Format::text($label.' '.$values['Name']), externalUrl('dashboard/user/applicants'));
 
                     $this->EventArguments['AuthUserID'] = $authUserID;
                     $this->EventArguments['Story'] = &$story;
@@ -1920,7 +1920,7 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
-     * Does actual de-authentication of a user. Used by SignOut().
+     * Does actual de-authentication of a user. Used by signOut().
      *
      * @access public
      * @since 2.0.0
@@ -2006,7 +2006,7 @@ class EntryController extends Gdn_Controller {
     }
 
     /**
-     * Go to requested Target() or the default controller if none was set.
+     * Go to requested target() or the default controller if none was set.
      *
      * @access public
      * @since 2.0.0

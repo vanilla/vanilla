@@ -138,8 +138,8 @@ abstract class Gdn_SQLDriver {
     //protected function _FilterTableAliases($Statements) {
     //   foreach ($Statements as $k => $v) {
     //      foreach ($this->_AliasMap as $Alias => $Table) {
-    //         $Statement = preg_replace('/(\w+\.\w+)/', $this->EscapeIdentifier('$0'), $v); // Makes `table.field`
-    //         $Statement = str_replace(array($this->Database->DatabasePrefix.$Table, '.'), array($Table, $this->EscapeSql('.')), $Statement);
+    //         $Statement = preg_replace('/(\w+\.\w+)/', $this->escapeIdentifier('$0'), $v); // Makes `table.field`
+    //         $Statement = str_replace(array($this->Database->DatabasePrefix.$Table, '.'), array($Table, $this->escapeSql('.')), $Statement);
     //      }
     //      $Statements[$k] = $Statement;
     //   }
@@ -149,11 +149,11 @@ abstract class Gdn_SQLDriver {
     /**
      * Concat the next where expression with an 'and' operator.
      * <b>Note</b>: Since 'and' is the default operator to begin with this method doesn't usually have to be called,
-     * unless Gdn_DatabaseDriver::Or(FALSE) has previously been called.
+     * unless Gdn_DatabaseDriver::or(FALSE) has previously been called.
      *
      * @param boolean $setDefault Whether or not the 'and' is one time or sets the default operator.
      * @return Gdn_SQLDriver $this
-     * @see Gdn_DatabaseDriver::OrOp()
+     * @see Gdn_DatabaseDriver::orOp()
      */
     public function andOp($setDefault = false) {
         $this->_WhereConcat = 'and';
@@ -192,7 +192,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * A convenience method that calls Gdn_DatabaseDriver::BeginWhereGroup with concatenated with an 'or.'
-     * @See Gdn_DatabaseDriver::BeginWhereGroup()
+     * @See Gdn_DatabaseDriver::beginWhereGroup()
      * @return Gdn_SQLDriver $this
      */
     public function orBeginWhereGroup() {
@@ -223,7 +223,7 @@ abstract class Gdn_SQLDriver {
      * <ul>
      * <li><b>=</b>: This means that the argument is a function call.
      *   If you want to pass field reference arguments into the function then enclose them in square brackets.
-     *   ex. <code>'=LEFT([u.Name], 4)'</code> will call the LEFT database function on the u.Name column.</li>
+     *   ex. <code>'=lEFT([u.Name], 4)'</code> will call the LEFT database function on the u.Name column.</li>
      * <li><b>@</b>: This means that the argument is a literal.
      *   This is useful for passing in literal numbers.</li>
      * <li><b>no prefix></b>: This will treat the argument differently depending on the argument.
@@ -293,7 +293,7 @@ abstract class Gdn_SQLDriver {
      *
      * @param string|array $key The cache key (or array of keys) that this query will save into.
      * @param string $operation The cache operation as a hint to the db.
-     * @param array $options The cache options as passed into Gdn_Cache::Store().
+     * @param array $options The cache options as passed into Gdn_Cache::store().
      * @return Gdn_SQLDriver $this
      */
     public function cache($key, $operation = null, $options = null) {
@@ -609,7 +609,7 @@ abstract class Gdn_SQLDriver {
      */
     public function get($table = '', $orderFields = '', $orderDirection = 'asc', $limit = false, $pageNumber = false) {
         if ($table != '') {
-            //$this->MapAliases($Table);
+            //$this->mapAliases($Table);
             $this->from($table);
         }
 
@@ -670,11 +670,11 @@ abstract class Gdn_SQLDriver {
      * Returns the total number of records in the specified table.
      *
      * @param string $table The table from which to count rows of data.
-     * @param mixed $where Adds to the $this->_Wheres collection using $this->Where();
+     * @param mixed $where Adds to the $this->_Wheres collection using $this->where();
      */
     public function getCount($table = '', $where = false) {
         if ($table != '') {
-            //$this->MapAliases($Table);
+            //$this->mapAliases($Table);
             $this->from($table);
         }
 
@@ -694,7 +694,7 @@ abstract class Gdn_SQLDriver {
      * Returns the total number of records in the specified table.
      *
      * @param string $table The table from which to count rows of data.
-     * @param mixed $like Adds to the $this->_Wheres collection using $this->Like();
+     * @param mixed $like Adds to the $this->_Wheres collection using $this->like();
      */
     public function getCountLike($table = '', $like = false) {
         if ($table != '') {
@@ -742,14 +742,14 @@ abstract class Gdn_SQLDriver {
      * @param int $limit The number of records to limit the query to.
      * @param int $offset The number of records to offset the query from.
      */
-    public function GetLimit($query, $limit, $offset) {
-        trigger_error(ErrorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetLimit'), E_USER_ERROR);
+    public function getLimit($query, $limit, $offset) {
+        trigger_error(errorMessage('The selected database engine does not perform the requested task.', $this->ClassName, 'GetLimit'), E_USER_ERROR);
     }
 
     /**
      * Builds the select statement based on the various collections in this
      * object. This method should not be called directly; it is called by
-     * $this->Get() and $this->GetWhere().
+     * $this->get() and $this->getWhere().
      */
     public function getSelect() {
         // Close off any open query elements.
@@ -874,7 +874,7 @@ abstract class Gdn_SQLDriver {
      * object. Allows a where clause, limit, and offset to be added directly.
      *
      * @param string $table The table from which to select data. Adds to the $this->_Froms collection.
-     * @param mixed $where Adds to the $this->_Wheres collection using $this->Where();
+     * @param mixed $where Adds to the $this->_Wheres collection using $this->where();
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
      * @param int $limit The number of records to limit the query to.
@@ -883,7 +883,7 @@ abstract class Gdn_SQLDriver {
      */
     public function getWhere($table = '', $where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = 0) {
         if ($table != '') {
-            //$this->MapAliases($Table);
+            //$this->mapAliases($Table);
             $this->from($table);
         }
 
@@ -909,7 +909,7 @@ abstract class Gdn_SQLDriver {
      * object. Allows a like clause, limit, and offset to be added directly.
      *
      * @param string $table The table from which to select data. Adds to the $this->_Froms collection.
-     * @param mixed $like Adds to the $this->_Wheres collection using $this->Like();
+     * @param mixed $like Adds to the $this->_Wheres collection using $this->like();
      * @param string $orderFields A string of fields to be ordered.
      * @param string $orderDirection The direction of the sort.
      * @param int $limit The number of records to limit the query to.
@@ -1001,8 +1001,8 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Adds to the $this->_Havings collection. Called by $this->Having() and
-     * $this->OrHaving().
+     * Adds to the $this->_Havings collection. Called by $this->having() and
+     * $this->orHaving().
      *
      * @param mixed $field The name of the field (or array of field names) in the having clause.
      * @param string $value The string on the right side of the having comparison.
@@ -1192,7 +1192,7 @@ abstract class Gdn_SQLDriver {
         }
 
         // Add the table prefix to any table specifications in the clause
-        // echo '<div>'.$TableName.' ---> '.$this->EscapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
+        // echo '<div>'.$TableName.' ---> '.$this->escapeSql($this->Database->DatabasePrefix.$TableName, TRUE).'</div>';
         if ($this->Database->DatabasePrefix && $tableName[0] !== '(') {
             $tableName = $this->mapAliases($tableName);
 
@@ -1212,7 +1212,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * A convenience method for Gdn_DatabaseDriver::Join that makes the join type 'left.'
-     * @see Gdn_DatabaseDriver::Join()
+     * @see Gdn_DatabaseDriver::join()
      */
     public function leftJoin($tableName, $on) {
         return $this->join($tableName, $on, 'left');
@@ -1220,7 +1220,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Adds to the $this->_Wheres collection. Used to generate the LIKE portion
-     * of a query. Called by $this->Like(), $this->NotLike()
+     * of a query. Called by $this->like(), $this->notLike()
      *
      * @param mixed $field The field name (or array of field name => match values) to search in for
      * a like $match.
@@ -1317,7 +1317,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * A convenience method for Gdn_DatabaseDriver::Like that changes the operator to 'not like.'
-     * @see Gdn_DatabaseDriver::Like()
+     * @see Gdn_DatabaseDriver::like()
      */
     public function notLike($field, $match = '', $side = 'both') {
         return $this->like($field, $match, $side, 'not like');
@@ -1380,7 +1380,7 @@ abstract class Gdn_SQLDriver {
     public function offset($offset) {
         // SQL chokes on ints over 2^31
         if ($offset > self::MAX_SIGNED_INT) {
-            throw new Exception(T('Invalid offset.'), 400);
+            throw new Exception(t('Invalid offset.'), 400);
         }
 
         $this->_Offset = $offset;
@@ -1442,7 +1442,7 @@ abstract class Gdn_SQLDriver {
      * @param boolean $escapeValue A boolean value indicating if $this->EscapeString method should be called
      * on $value.
      * @return Gdn_SQLDriver $this
-     * @see Gdn_DatabaseDriver::Having()
+     * @see Gdn_DatabaseDriver::having()
      */
     function orHaving($field, $value = '', $escapeField = true, $escapeValue = true) {
         return $this->orOp()->having($field, $value, $escapeField, $escapeValue);
@@ -1450,7 +1450,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * A convenience method that calls Gdn_DatabaseDriver::Like with concatenated with an 'or.'
-     * @See Gdn_DatabaseDriver::Like()
+     * @See Gdn_DatabaseDriver::like()
      * @return Gdn_SQLDriver $this
      */
     public function orLike($field, $match = '', $side = 'both', $op = 'like') {
@@ -1463,13 +1463,13 @@ abstract class Gdn_SQLDriver {
         }
         return $this;
 
-//       return $this->OrOp()->Like($Field, $Match, $Side, $Op);
+//       return $this->orOp()->like($Field, $Match, $Side, $Op);
     }
 
     /** A convenience method for Gdn_DatabaseDriver::Like that changes the operator to 'not like,'
      *    and is concatenated with an 'or.'
-     * @see Gdn_DatabaseDriver::NotLike()
-     * @see GenricDriver::Like()
+     * @see Gdn_DatabaseDriver::notLike()
+     * @see GenricDriver::like()
      */
     public function orNotLike($field, $match = '', $side = 'both') {
         return $this->orLike($field, $match, $side, 'not like');
@@ -1480,7 +1480,7 @@ abstract class Gdn_SQLDriver {
      *
      * @param boolean $setDefault Whether or not the 'or' is one time, or will revert.
      * @return Gdn_SQLDriver $this
-     * @see Gdn_DatabaseDriver::AndOp()
+     * @see Gdn_DatabaseDriver::andOp()
      */
     public function orOp($setDefault = false) {
         $this->_WhereConcat = 'or';
@@ -1493,42 +1493,42 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * @link Gdn_DatabaseDriver::Where()
+     * @link Gdn_DatabaseDriver::where()
      */
     public function orWhere($field, $value = null, $escapeFieldSql = true, $escapeValueSql = true) {
         return $this->orOp()->where($field, $value, $escapeFieldSql, $escapeValueSql);
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::WhereExists() concatenates with an 'or.'
-     * @see Gdn_DatabaseDriver::WhereExists()
+     * A convienience method for Gdn_DatabaseDriver::whereExists() concatenates with an 'or.'
+     * @see Gdn_DatabaseDriver::whereExists()
      */
     public function orWhereExists($sqlDriver, $op = 'exists') {
         return $this->orOp()->whereExists($sqlDriver, $op);
     }
 
     /**
-     * @ling Gdn_DatabaseDriver::WhereIn()
+     * @ling Gdn_DatabaseDriver::whereIn()
      */
     public function orWhereIn($field, $values) {
         return $this->orOp()->whereIn($field, $values);
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::WhereExists() that changes the operator to 'not exists,'
+     * A convienience method for Gdn_DatabaseDriver::whereExists() that changes the operator to 'not exists,'
      *   and concatenates with an 'or.'
-     * @see Gdn_DatabaseDriver::WhereExists()
-     * @see Gdn_DatabaseDriver::WhereNotExists()
+     * @see Gdn_DatabaseDriver::whereExists()
+     * @see Gdn_DatabaseDriver::whereNotExists()
      */
     public function orWhereNotExists($sqlDriver) {
         return $this->orWhereExists($sqlDriver, 'not exists');
     }
 
     /**
-     * A convenience method for Gdn_DatabaseDriver::WhereIn() that changes the operator to 'not in,'
+     * A convenience method for Gdn_DatabaseDriver::whereIn() that changes the operator to 'not in,'
      *   and concatenates with an 'or.'
-     * @see Gdn_DatabaseDriver::WhereIn()
-     * @see Gdn_DatabaseDriver::WhereNotIn()
+     * @see Gdn_DatabaseDriver::whereIn()
+     * @see Gdn_DatabaseDriver::whereNotIn()
      */
     public function orWhereNotIn($field, $values) {
         return $this->orOp()->whereNotIn($field, $values);
@@ -1621,7 +1621,7 @@ abstract class Gdn_SQLDriver {
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->Where();
+     * @param string $where Adds to the $this->_Wheres collection using $this->where();
      * @param int $limit Adds a limit to the query.
      */
     public function put($table = '', $set = null, $where = false, $limit = false) {
@@ -1722,8 +1722,8 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Resets properties of this object that relate to building a select
-     * statement back to their default values. Called by $this->Get() and
-     * $this->GetWhere().
+     * statement back to their default values. Called by $this->get() and
+     * $this->getWhere().
      * @return Gdn_SQLDriver $this
      */
     public function reset() {
@@ -1767,7 +1767,7 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Allows the specification of columns to be selected in a database query.
-     * Returns this object for chaining purposes. ie. $db->Select()->From();
+     * Returns this object for chaining purposes. ie. $db->select()->from();
      *
      * @param mixed $select NotRequired "*" The field(s) being selected. It
      * can be a comma delimited string, the name of a single field, or an array
@@ -1905,10 +1905,10 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Similar to $this->Set() in every way except that if a named parameter is
+     * Similar to $this->set() in every way except that if a named parameter is
      * used in place of $value, it will overwrite any existing value associated
      * with that name as opposed to adding a new name/value (which is the
-     * default way that $this->Set() works).
+     * default way that $this->set() works).
      *
      * @param mixed $field The name of the field to save value as. Alternately this can be an array
      * of $fieldName => $value pairs, or even an object of $DataSet->Field
@@ -1944,12 +1944,12 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Allows the specification of a table to be updated in a database query.
-     * Returns this object for chaining purposes. ie. $db->Update()->Join()->Set()->Where();
+     * Returns this object for chaining purposes. ie. $db->update()->join()->set()->where();
      *
      * @param string $table The table to which data should be updated.
      * @param mixed $set An array of $FieldName => $Value pairs, or an object of $DataSet->Field
      * properties containing one rowset.
-     * @param string $where Adds to the $this->_Wheres collection using $this->Where();
+     * @param string $where Adds to the $this->_Wheres collection using $this->where();
      * @param int $limit Adds a limit to the query.
      * @return Gdn_SQLDriver $this
      */
@@ -2015,13 +2015,13 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * Adds to the $this->_Wheres collection. Called by $this->Where() and $this->OrWhere();
+     * Adds to the $this->_Wheres collection. Called by $this->where() and $this->orWhere();
      *
      * @param mixed $field The string on the left side of the comparison, or an associative array of
      * Field => Value items to compare.
      * @param mixed $value The string on the right side of the comparison. You can optionally
      * provide an array of DatabaseFunction => Value, which will be converted to
-     * DatabaseFunction('Value'). If DatabaseFunction contains a '%s' then sprintf will be used for to place DatabaseFunction into the value.
+     * databaseFunction('Value'). If DatabaseFunction contains a '%s' then sprintf will be used for to place DatabaseFunction into the value.
      * @param boolean $escapeFieldSql A boolean value indicating if $this->EscapeSql method should be called
      * on $field.
      * @param boolean $EscapeValueString A boolean value indicating if $this->EscapeString method should be called
@@ -2062,8 +2062,8 @@ abstract class Gdn_SQLDriver {
 
     /**
      * Adds to the $this->_WhereIns collection. Used to generate a "where field
-     * in (1,2,3)" query. Called by $this->WhereIn(), $this->OrWhereIn(),
-     * $this->WhereNotIn(), and $this->OrWhereNotIn().
+     * in (1,2,3)" query. Called by $this->whereIn(), $this->orWhereIn(),
+     * $this->whereNotIn(), and $this->orWhereNotIn().
      *
      * @param string $field The field to search in for $values.
      * @param array $values An array of values to look for in $field.
@@ -2118,8 +2118,8 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * A convenience method for Gdn_DatabaseDriver::WhereIn() that changes the operator to 'not in.'
-     * @see Gdn_DatabaseDriver::WhereIn()
+     * A convenience method for Gdn_DatabaseDriver::whereIn() that changes the operator to 'not in.'
+     * @see Gdn_DatabaseDriver::whereIn()
      * @return Gdn_SQLDriver $this
      */
     public function whereNotIn($field, $values, $escape = true) {
@@ -2147,8 +2147,8 @@ abstract class Gdn_SQLDriver {
     }
 
     /**
-     * A convienience method for Gdn_DatabaseDriver::WhereExists() that changes the operator to 'not exists'.
-     * @see Gdn_DatabaseDriver::WhereExists()
+     * A convienience method for Gdn_DatabaseDriver::whereExists() that changes the operator to 'not exists'.
+     * @see Gdn_DatabaseDriver::whereExists()
      */
     public function whereNotExists($sqlDriver) {
         return $this->whereExists(@SqlDriver, 'not exists');

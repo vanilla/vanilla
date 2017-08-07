@@ -11,7 +11,7 @@
 if (!class_exists('MenuModule', false)) {
     /**
      * Manages the items in the page menu and eventually returns the menu as a
-     * string with ToString();
+     * string with toString();
      */
     class MenuModule extends Gdn_Module {
 
@@ -29,7 +29,7 @@ if (!class_exists('MenuModule', false)) {
 
         /**
          * @var string A route that, if found in the menu links, should cause that link to
-         * have the Highlight class applied. This property is assigned with $this->Highlight();
+         * have the Highlight class applied. This property is assigned with $this->highlight();
          */
         private $_HighlightRoute;
 
@@ -40,7 +40,7 @@ if (!class_exists('MenuModule', false)) {
          */
         public function __construct($sender = '') {
             $this->HtmlId = 'Menu';
-            $this->ClearGroups();
+            $this->clearGroups();
             parent::__construct($sender);
         }
 
@@ -150,7 +150,7 @@ if (!class_exists('MenuModule', false)) {
             }
 
             if ($highlightRoute == '') {
-                $highlightRoute = Gdn_Url::Request();
+                $highlightRoute = Gdn_Url::request();
             }
 
             $this->fireEvent('BeforeToString');
@@ -163,7 +163,7 @@ if (!class_exists('MenuModule', false)) {
             if ($session->isValid() === true) {
                 $userID = $session->User->UserID;
                 $username = $session->User->Name;
-                $session_TransientKey = $session->TransientKey();
+                $session_TransientKey = $session->transientKey();
                 $admin = $session->User->Admin > 0 ? true : false;
             }
 
@@ -227,10 +227,10 @@ if (!class_exists('MenuModule', false)) {
                                     $attributes['class'] = $cssClass.' Highlight';
                                 }
 
-                                $group .= '<li'.Attribute($attributes).'><a'.Attribute($anchorAttributes).' href="'.$url.'">'.$text.'</a>';
+                                $group .= '<li'.attribute($attributes).'><a'.attribute($anchorAttributes).' href="'.$url.'">'.$text.'</a>';
                                 ++$linkCount;
                             } else {
-                                $group .= '<li'.Attribute($attributes).'>'.$text;
+                                $group .= '<li'.attribute($attributes).'>'.$text;
                             }
                             ++$itemCount;
                         }

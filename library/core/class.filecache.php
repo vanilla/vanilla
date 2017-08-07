@@ -141,7 +141,7 @@ class Gdn_Filecache extends Gdn_Cache {
         }
 
         $cacheLocation = $container[Gdn_Cache::CONTAINER_LOCATION];
-        $splitCacheLocation = CombinePaths([$cacheLocation, $targetFolder]);
+        $splitCacheLocation = combinePaths([$cacheLocation, $targetFolder]);
 
         $flags = ($flags & Gdn_Filecache::O_CREATE) ? Gdn_FileSystem::O_CREATE | Gdn_FileSystem::O_WRITE : 0;
         $cacheLocationOK = Gdn_FileSystem::checkFolderR($splitCacheLocation, $flags);
@@ -149,7 +149,7 @@ class Gdn_Filecache extends Gdn_Cache {
             return $this->failure("Computed cache folder '{$splitCacheLocation}' could not be found, or created.");
         }
 
-        $cacheFile = rtrim(CombinePaths([$splitCacheLocation, $keyHash]), '/');
+        $cacheFile = rtrim(combinePaths([$splitCacheLocation, $keyHash]), '/');
 
         return array_merge($container, [
             Gdn_Filecache::CONTAINER_CACHEFILE => $cacheFile

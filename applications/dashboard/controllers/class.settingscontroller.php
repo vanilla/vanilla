@@ -578,7 +578,7 @@ class SettingsController extends DashboardController {
             case 'add':
             case 'edit':
                 $this->Form->setModel($banModel);
-                $this->setData('Title', sprintf(t(ucFirst($action).' %s'), t('Ban Rule')));
+                $this->setData('Title', sprintf(t(ucfirst($action).' %s'), t('Ban Rule')));
 
                 if ($this->Form->authenticatedPostBack()) {
                     if ($iD) {
@@ -1231,7 +1231,7 @@ class SettingsController extends DashboardController {
         // loaded regardless of the application loading them.
         $updateCheckDate = Gdn::config('Garden.UpdateCheckDate', '');
         if ($updateCheckDate == '' // was not previous defined
-            || !IsTimestamp($updateCheckDate) // was not a valid timestamp
+            || !isTimestamp($updateCheckDate) // was not a valid timestamp
             || $updateCheckDate < strtotime("-1 day") // was not done within the last day
         ) {
             $updateData = [];
@@ -1357,7 +1357,7 @@ class SettingsController extends DashboardController {
         }
         $this->permission('Garden.Settings.Manage');
 
-        RemoveFromConfig("EnabledLocales.$addonName");
+        removeFromConfig("EnabledLocales.$addonName");
         $this->informMessage(sprintf(t('%s Disabled.'), val('Name', $addonInfo, t('Locale'))));
 
         $this->handleAddonToggle($addonName, $addonInfo, 'locales', false);
@@ -1459,7 +1459,7 @@ class SettingsController extends DashboardController {
             if (!$result) {
                 $this->Form->setValidationResults($validation->results());
             } else {
-                Gdn_LibraryMap::ClearCache();
+                Gdn_LibraryMap::clearCache();
 
                 if (is_array($result) && array_key_exists('RequirementsEnabled', $result)) {
                     if (is_array($result['RequirementsEnabled']) && count($result['RequirementsEnabled']) > 0) {
@@ -1629,7 +1629,7 @@ class SettingsController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @see self::SortAddons()
+     * @see self::sortAddons()
      * @param array $a First addon data.
      * @param array $b Second addon data.
      * @return int Result of strcasecmp.
@@ -1662,7 +1662,7 @@ class SettingsController extends DashboardController {
         } else {
             $addonManagerName = $addonType.'Manager';
             $testMethod = 'Test'.$addonType;
-            $addonManager = Gdn::Factory($addonManagerName);
+            $addonManager = Gdn::factory($addonManagerName);
         }
         if ($addonName != '') {
             $validation = new Gdn_Validation();
@@ -1670,7 +1670,7 @@ class SettingsController extends DashboardController {
             try {
                 $addonManager->$testMethod($addonName, $validation);
             } catch (Exception $ex) {
-                if (Debug()) {
+                if (debug()) {
                     throw $ex;
                 } else {
                     echo $ex->getMessage();
@@ -2097,7 +2097,7 @@ class SettingsController extends DashboardController {
             $userIPs = $userModel->getIPs($userID);
 
             // Check auto bans
-            $banRules = BanModel::AllBans();
+            $banRules = BanModel::allBans();
             foreach ($banRules as $banRule) {
                 // Convert ban to regex.
                 $parts = explode('*', str_replace('%', '*', $banRule['BanValue']));

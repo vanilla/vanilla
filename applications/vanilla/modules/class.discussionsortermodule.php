@@ -33,7 +33,7 @@ class DiscussionSorterModule extends Gdn_Module {
         ];
 
         // Get sort option selected
-        $this->SortFieldSelected = Gdn::session()->GetPreference('Discussions.SortField', 'd.DateLastComment');
+        $this->SortFieldSelected = Gdn::session()->getPreference('Discussions.SortField', 'd.DateLastComment');
     }
 
     public function assetTarget() {
@@ -42,7 +42,7 @@ class DiscussionSorterModule extends Gdn_Module {
 
     public function toString() {
         if (Gdn::session()->isValid()) {
-            return parent::ToString();
+            return parent::toString();
         }
     }
 }

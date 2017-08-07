@@ -14,7 +14,7 @@
  * @param bool $addVersion Whether or not to add a version to the resulting asset to help bust the cache.
  * @return Returns the url to the asset.
  *
- * @see Asset()
+ * @see asset()
  */
 function smarty_modifier_asset_url($path, $withDomain = false, $addVersion = false) {
     return asset($path, $withDomain, $addVersion);

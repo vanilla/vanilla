@@ -152,7 +152,7 @@ class Gdn_FileSystem {
 
         foreach ($sourceFolders as $sourceFolder) {
             if ($whiteList === false) {
-                $path = CombinePaths([$sourceFolder, $fileName]);
+                $path = combinePaths([$sourceFolder, $fileName]);
                 if (file_exists($path)) {
                     if ($returnFirst) {
                         return $path;
@@ -163,7 +163,7 @@ class Gdn_FileSystem {
             } else {
                 if ($directoryHandle = opendir($sourceFolder)) {
                     if ($directoryHandle === false) {
-                        trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $sourceFolder), E_USER_ERROR);
+                        trigger_error(errorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $sourceFolder), E_USER_ERROR);
                     }
 
                     // Search all subfolders
@@ -227,9 +227,9 @@ class Gdn_FileSystem {
 
             // Attempt to find the file directly off the root (if the app folder was provided in the querystring)
             /*if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1) {
-               $LibraryPath = self::Find($SourceFolders, $LibraryName);
+               $LibraryPath = self::find($SourceFolders, $LibraryName);
             } else {
-               $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
+               $LibraryPath = self::find($SourceFolders, $LibraryName, $FolderWhiteList);
             }*/
             $libraryPath = self::find($sourceFolders, $libraryName, $folderWhiteList);
 
@@ -269,7 +269,7 @@ class Gdn_FileSystem {
             throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.', $fileBaseName, $dirName));
         }
 
-        if (!IsWritable($dirName)) {
+        if (!isWritable($dirName)) {
             throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.', $fileBaseName, $dirName));
         }
 

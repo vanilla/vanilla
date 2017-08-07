@@ -45,7 +45,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * @var PDOStatement Contains a PDOStatement object returned by a PDO query. FALSE by default.
      * This property is assigned by the database driver object when a query is
-     * executed in $Database->Query().
+     * executed in $Database->query().
      */
     private $_PDOStatement;
 
@@ -225,7 +225,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Format the resultset with the given method.
      *
-     * @param string $formatMethod The method to use with Gdn_Format::To().
+     * @param string $formatMethod The method to use with Gdn_Format::to().
      * @return Gdn_Dataset $this pointer for chaining.
      */
     public function format($formatMethod) {
@@ -265,7 +265,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     /**
      * Index a result array.
      *
-     * @param array|Traversable $data The array to index. It is formatted similar to the array returned by Gdn_DataSet::Result().
+     * @param array|Traversable $data The array to index. It is formatted similar to the array returned by Gdn_DataSet::result().
      * @param string|array $columns The name of the column to index on or an array of columns to index on.
      * @param array $options An array of options for the method.
      *  - <b>Sep</b>: The string to seperate index columns by. Default '|'.
@@ -321,7 +321,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
     public static function join(&$data, $columns, $options = []) {
         $options = array_change_key_case($options);
 
-        $sql = Gdn::sql(); //GetValue('sql', $Options, Gdn::SQL());
+        $sql = Gdn::sql(); //GetValue('sql', $Options, Gdn::sql());
         $resultColumns = [];
 
         // Grab the columns.
@@ -391,7 +391,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
             } elseif (isset($table))
                 $parentColumn = $table.'ID';
             else {
-                throw Exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
+                throw exception("Gdn_DataSet::Join(): Missing 'parent' argument'.");
             }
         }
 
@@ -402,7 +402,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
             } elseif (isset($table))
                 $childColumn = $table.'ID';
             else {
-                throw Exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
+                throw exception("Gdn_DataSet::Join(): Missing 'child' argument'.");
             }
         }
 
@@ -431,7 +431,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
         $sql->whereIn($childColumn, $iDs);
 
         $childData = $sql->get()->resultArray();
-        $childData = self::index($childData, $childColumn, ['unique' => GetValue('unique', $options, isset($columnPrefix))]);
+        $childData = self::index($childData, $childColumn, ['unique' => getValue('unique', $options, isset($columnPrefix))]);
 
         $notFound = [];
 
@@ -611,7 +611,7 @@ class Gdn_DataSet implements IteratorAggregate, Countable, JsonSerializable {
      *
      * @param PDOStatement $pDOStatement The PDO Statement Object being assigned.
      */
-    public function PDOStatement(&$pDOStatement = false) {
+    public function pDOStatement(&$pDOStatement = false) {
         if ($pDOStatement === false) {
             return $this->_PDOStatement;
         } else {

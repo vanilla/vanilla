@@ -31,7 +31,7 @@ class DraftsModule extends Gdn_Module {
 
     public function toString() {
         if (is_object($this->Data) && $this->Data->numRows() > 0) {
-            return parent::ToString();
+            return parent::toString();
         }
 
         return '';

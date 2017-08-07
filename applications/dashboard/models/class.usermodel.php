@@ -72,6 +72,16 @@ class UserModel extends Gdn_Model {
     }
 
     /**
+     * Generate a random code for use in email confirmation.
+     *
+     * @return string
+     */
+    private function confirmationCode() {
+        $result = betterRandomString(32, 'Aa0');
+        return $result;
+    }
+
+    /**
      * Whether or not we are past the user threshold.
      *
      * This is a useful indication that some database operations on the User table will be painfully long.
@@ -933,7 +943,7 @@ class UserModel extends Gdn_Model {
 
             if (!empty($confirmRoleIDs)) {
                 touchValue('Attributes', $fields, []);
-                $confirmationCode = randomString(8);
+                $confirmationCode = $this->confirmationCode();
                 $fields['Attributes']['EmailKey'] = $confirmationCode;
                 $fields['Confirmed'] = 0;
                 $roles = array_merge($roles, $confirmRoleIDs);
@@ -2146,7 +2156,7 @@ class UserModel extends Gdn_Model {
                     $confirmEmailRoleID = RoleModel::getDefaultRoles(RoleModel::TYPE_UNCONFIRMED);
                     if (!empty($confirmEmailRoleID)) {
                         // The confirm email role is set and it exists so go ahead with the email confirmation.
-                        $newKey = randomString(8);
+                        $newKey = $this->confirmationCode();
                         $emailKey = touchValue('EmailKey', $attributes, $newKey);
                         $fields['Attributes'] = dbencode($attributes);
                         $fields['Confirmed'] = 0;
@@ -4039,7 +4049,7 @@ class UserModel extends Gdn_Model {
         // Make sure there is a confirmation code.
         $code = valr('Attributes.EmailKey', $user);
         if (!$code) {
-            $code = randomString(8);
+            $code = $this->confirmationCode();
             $attributes = $user['Attributes'];
             if (!is_array($attributes)) {
                 $attributes = ['EmailKey' => $code];

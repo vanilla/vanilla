@@ -506,7 +506,7 @@ class Gdn_Form extends Gdn_Pluggable {
         if (!isset($options['class'])) {
             $options['class'] = $this->getStyle('dropdown');
         } else {
-            $options['class'] = $this->translateClasses($attributes['class']);
+            $options['class'] = $this->translateClasses($options['class']);
         }
 
         // Opening select tag

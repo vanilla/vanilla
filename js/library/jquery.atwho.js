@@ -633,13 +633,12 @@
       };
 
       Controller.prototype.get_range = function() {
-        ////return this.range || (window.getSelection ? window.getSelection().getRangeAt(0) : void 0);
-
-
-         var thisWin = this.setting.cWindow;
-         //////return this.range || (thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : void 0);
-         return thisWin.getSelection ? thisWin.getSelection().getRangeAt(0) : (this.range || void 0);
-
+        var thisWin = this.setting.cWindow || window;
+        if(thisWin.getSelection && thisWin.getSelection() && thisWin.getSelection().rangeCount > 0) {
+          return thisWin.getSelection().getRangeAt(0);
+        } else {
+          return this.range || void 0;
+        }
       };
 
       Controller.prototype.get_ie_range = function() {

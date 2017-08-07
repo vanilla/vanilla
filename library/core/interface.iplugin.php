@@ -34,7 +34,7 @@ interface Gdn_IPlugin {
      * if they do not exist.
      */
 
-    // public function OnLoad()    - Called as the plugin is instantiated (each page load)
-    // public function OnDisable() - Called as the plugin is disabled
-    // public function CleanUp()   - Called as the plugin is removed
+    // public function onLoad()    - Called as the plugin is instantiated (each page load)
+    // public function onDisable() - Called as the plugin is disabled
+    // public function cleanUp()   - Called as the plugin is removed
 }

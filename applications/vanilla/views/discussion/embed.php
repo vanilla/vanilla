@@ -16,7 +16,7 @@ if (!function_exists('WriteComment'))
     echo '</span>';
 
     if ($SortComments == 'desc')
-        WriteEmbedCommentForm();
+        writeEmbedCommentForm();
     else if ($HasCommentData && $Comments->numRows() > 0)
         echo wrap(t('Comments'), 'h2');
     ?>
@@ -28,14 +28,14 @@ if (!function_exists('WriteComment'))
             foreach ($Comments as $Comment) {
                 ++$CurrentOffset;
                 $this->CurrentComment = $Comment;
-                WriteComment($Comment, $this, $Session, $CurrentOffset);
+                writeComment($Comment, $this, $Session, $CurrentOffset);
             }
         }
         ?>
     </ul>
     <?php
     if ($HasCommentData) {
-        if ($this->Pager->LastPage()) {
+        if ($this->Pager->lastPage()) {
             $LastCommentID = $this->addDefinition('LastCommentID');
             if (!$LastCommentID || $this->Data['Discussion']->LastCommentID > $LastCommentID)
                 $this->addDefinition('LastCommentID', (int)$this->Data['Discussion']->LastCommentID);
@@ -43,8 +43,8 @@ if (!function_exists('WriteComment'))
         }
 
         // Send the user to the discussion in the forum when paging
-        if (c('Garden.Embed.PageToForum') && $this->Pager->HasMorePages()) {
-            $DiscussionUrl = DiscussionUrl($Discussion).'#latest';
+        if (c('Garden.Embed.PageToForum') && $this->Pager->hasMorePages()) {
+            $DiscussionUrl = discussionUrl($Discussion).'#latest';
             echo '<div class="PageToForum Foot">';
             echo anchor(t('More Comments'), $DiscussionUrl);
             echo '</div>';
@@ -53,7 +53,7 @@ if (!function_exists('WriteComment'))
     }
 
     if ($SortComments != 'desc')
-        WriteEmbedCommentForm();
+        writeEmbedCommentForm();
 
     ?>
 </div>

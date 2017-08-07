@@ -243,42 +243,42 @@ class InstallModel {
     private function validateDatabaseConnection(array $dbInfo) {
         try {
             $this->createPDO($dbInfo);
-        } catch (\PDOException $Exception) {
+        } catch (\PDOException $exception) {
             $validation = new Validation();
-            switch ($Exception->getCode()) {
+            switch ($exception->getCode()) {
                 case 1044:
                     $validation->addError(
                         '',
                         'The database user you specified does not have permission to access the database. Have you created the database yet? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 1045:
                     $validation->addError(
                         '',
                         'Failed to connect to the database with the username and password you entered. Did you mistype them? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 1049:
                     $validation->addError(
                         '',
                         'It appears as though the database you specified does not exist yet. Have you created it yet? Did you mistype the name? The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 case 2005:
                     $validation->addError(
                         '',
                         "Are you sure you've entered the correct database host name? Maybe you mistyped it? The database reported: {dbMessage}.",
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
                 default:
                     $validation->addError(
                         '',
                         'The connection parameters you specified failed to open a connection to the database. The database reported: {dbMessage}.',
-                        ['dbMessage' => strip_tags($Exception->getMessage())]
+                        ['dbMessage' => strip_tags($exception->getMessage())]
                     );
                     break;
             }

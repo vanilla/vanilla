@@ -10,17 +10,17 @@
 /**
  * Render a breadcrumb trail for the user based on the page they are on.
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_breadcrumbs($Params, &$Smarty) {
-    $Breadcrumbs = Gdn::controller()->data('Breadcrumbs');
-    if (!is_array($Breadcrumbs)) {
-        $Breadcrumbs = [];
+function smarty_function_breadcrumbs($params, &$smarty) {
+    $breadcrumbs = Gdn::controller()->data('Breadcrumbs');
+    if (!is_array($breadcrumbs)) {
+        $breadcrumbs = [];
     }
 
-    $Options = arrayTranslate($Params, ['homeurl' => 'HomeUrl', 'hidelast' => 'HideLast']);
+    $options = arrayTranslate($params, ['homeurl' => 'HomeUrl', 'hidelast' => 'HideLast']);
    
-    return Gdn_Theme::breadcrumbs($Breadcrumbs, val('homelink', $Params, true), $Options);
+    return Gdn_Theme::breadcrumbs($breadcrumbs, val('homelink', $params, true), $options);
 }

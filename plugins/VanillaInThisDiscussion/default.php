@@ -15,15 +15,15 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
     /**
      * Setup settings page.
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function settingsController_inThisDiscussion_create($Sender) {
-        $Sender->permission('Garden.Settings.Manage');
-        $Sender->setData('Title', t('In This Discussion Settings'));
-        $Sender->setHighlightRoute('dashboard/settings/plugins');
+    public function settingsController_inThisDiscussion_create($sender) {
+        $sender->permission('Garden.Settings.Manage');
+        $sender->setData('Title', t('In This Discussion Settings'));
+        $sender->setHighlightRoute('dashboard/settings/plugins');
 
-        $Conf = new ConfigurationModule($Sender);
-        $Conf->initialize([
+        $conf = new ConfigurationModule($sender);
+        $conf->initialize([
             'Plugins.VanillaInThisDiscussion.Limit' => [
                 'Description' => t('User Limit'),
                 'Default' => 20,
@@ -31,7 +31,7 @@ class VanillaInThisDiscussionPlugin extends Gdn_Plugin {
             ]
         ]);
 
-        $Conf->renderAll();
+        $conf->renderAll();
     }
 
     /**

@@ -28,6 +28,6 @@ class ActivityFilterModule extends Gdn_Module {
      * @return string
      */
     public function toString() {
-        return parent::ToString();
+        return parent::toString();
     }
 }

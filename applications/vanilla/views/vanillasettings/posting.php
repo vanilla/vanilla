@@ -39,7 +39,7 @@ echo $form->errors();
             ?>
             </div>
             <div class="input-wrap">
-            <?php echo $form->DropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
+            <?php echo $form->dropDown('Vanilla.Categories.MaxDisplayDepth', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -51,7 +51,7 @@ echo $form->errors();
             <?php echo $form->label('Discussions per Page', 'Vanilla.Discussions.PerPage'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $form->DropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
+            <?php echo $form->dropDown('Vanilla.Discussions.PerPage', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -59,7 +59,7 @@ echo $form->errors();
             <?php echo $form->label('Comments per Page', 'Vanilla.Comments.PerPage'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $form->DropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
+            <?php echo $form->dropDown('Vanilla.Comments.PerPage', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">
@@ -81,7 +81,7 @@ echo $form->errors();
             ?>
             </div>
             <div class="input-wrap">
-            <?php echo $form->DropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
+            <?php echo $form->dropDown('Garden.EditContentTimeout', $Options, $Fields); ?>
             </div>
         </li>
         <li class="form-group">

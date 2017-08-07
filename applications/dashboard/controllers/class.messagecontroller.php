@@ -35,15 +35,15 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      *
-     * @param int|string $MessageID
+     * @param int|string $messageID
      */
-    public function delete($MessageID = '') {
+    public function delete($messageID = '') {
         $this->permission('Garden.Community.Manage');
 
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
-        $this->MessageModel->delete(['MessageID' => $MessageID]);
+        $this->MessageModel->delete(['MessageID' => $messageID]);
 
         // Reset the message cache
         $this->MessageModel->setMessageCache();
@@ -58,16 +58,16 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      *
-     * @param int|string $MessageID
-     * @param mixed $TransientKey
+     * @param int|string $messageID
+     * @param mixed $transientKey
      */
-    public function dismiss($MessageID = '', $TransientKey = false) {
-        $Session = Gdn::session();
+    public function dismiss($messageID = '', $transientKey = false) {
+        $session = Gdn::session();
 
-        if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
-            $Prefs = $Session->getPreference('DismissedMessages', []);
-            $Prefs[] = $MessageID;
-            $Session->setPreference('DismissedMessages', $Prefs);
+        if ($transientKey !== false && $session->validateTransientKey($transientKey)) {
+            $prefs = $session->getPreference('DismissedMessages', []);
+            $prefs[] = $messageID;
+            $session->setPreference('DismissedMessages', $prefs);
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
@@ -83,9 +83,9 @@ class MessageController extends DashboardController {
      * @since 2.0.0
      * @access public
      *
-     * @param int|string $MessageID
+     * @param int|string $messageID
      */
-    public function edit($MessageID = '') {
+    public function edit($messageID = '') {
         $this->addJsFile('jquery.autosize.min.js');
 
         $this->permission('Garden.Community.Manage');
@@ -97,30 +97,30 @@ class MessageController extends DashboardController {
 
         // Set the model on the form.
         $this->Form->setModel($this->MessageModel);
-        $this->Message = $this->MessageModel->getID($MessageID);
+        $this->Message = $this->MessageModel->getID($messageID);
         $this->Message = $this->MessageModel->defineLocation($this->Message);
 
         // Make sure the form knows which item we are editing.
-        if (is_numeric($MessageID) && $MessageID > 0) {
-            $this->Form->addHidden('MessageID', $MessageID);
+        if (is_numeric($messageID) && $messageID > 0) {
+            $this->Form->addHidden('MessageID', $messageID);
         }
 
-        $CategoriesData = CategoryModel::categories();
-        $Categories = [];
-        foreach ($CategoriesData as $Row) {
-            if ($Row['CategoryID'] < 0) {
+        $categoriesData = CategoryModel::categories();
+        $categories = [];
+        foreach ($categoriesData as $row) {
+            if ($row['CategoryID'] < 0) {
                 continue;
             }
 
-            $Categories[$Row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $Row['Depth'] - 1)).$Row['Name'];
+            $categories[$row['CategoryID']] = str_repeat('&nbsp;&nbsp;&nbsp;', max(0, $row['Depth'] - 1)).$row['Name'];
         }
-        $this->setData('Categories', $Categories);
+        $this->setData('Categories', $categories);
 
         // If seeing the form for the first time...
         if (!$this->Form->authenticatedPostBack()) {
             $this->Form->setData($this->Message);
         } else {
-            if ($MessageID = $this->Form->save()) {
+            if ($messageID = $this->Form->save()) {
                 // Reset the message cache
                 $this->MessageModel->setMessageCache();
 
@@ -231,15 +231,15 @@ class MessageController extends DashboardController {
      * @return array
      */
     protected function _getAssetData() {
-        $AssetData = [
+        $assetData = [
             'Content' => t('Above Main Content'),
             'Panel' => t('Below Sidebar')
         ];
 
-        $this->EventArguments['AssetData'] = &$AssetData;
+        $this->EventArguments['AssetData'] = &$assetData;
         $this->fireEvent('AfterGetAssetData');
 
-        return $AssetData;
+        return $assetData;
     }
 
     /**
@@ -251,7 +251,7 @@ class MessageController extends DashboardController {
      * @return array
      */
     protected function _getLocationData() {
-        $ControllerData = [
+        $controllerData = [
             '[Base]' => t('All Pages'),
             '[NonAdmin]' => t('All Forum Pages'),
             'Dashboard/Profile/Index' => t('Profile Page'),
@@ -263,9 +263,9 @@ class MessageController extends DashboardController {
             'Dashboard/Entry/Register' => t('Registration')
         ];
 
-        $this->EventArguments['ControllerData'] = &$ControllerData;
+        $this->EventArguments['ControllerData'] = &$controllerData;
         $this->fireEvent('AfterGetLocationData');
 
-        return $ControllerData;
+        return $controllerData;
     }
 }

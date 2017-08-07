@@ -19,11 +19,11 @@ require_once Gdn::controller()->fetchViewLocation('helper_functions', 'modules',
                 if ($this->Group):
                     echo '<div class="PromotedGroup">';
                     foreach ($ContentChunk as $ContentItem):
-                        WritePromotedContent($ContentItem, $this);
+                        writePromotedContent($ContentItem, $this);
                     endforeach;
                     echo '</div>';
                 else:
-                    WritePromotedContent($ContentChunk, $this);
+                    writePromotedContent($ContentChunk, $this);
                 endif;
             endforeach;
 

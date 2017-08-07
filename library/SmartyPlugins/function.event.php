@@ -9,11 +9,11 @@
 /**
  *
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_event($Params, &$Smarty) {
-	 $Name = val('name', $Params);
-	 Gdn::controller()->fireEvent($Name);
+function smarty_function_event($params, &$smarty) {
+	 $name = val('name', $params);
+	 Gdn::controller()->fireEvent($name);
 }

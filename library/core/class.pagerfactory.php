@@ -18,21 +18,21 @@ class Gdn_PagerFactory {
     /**
      *
      *
-     * @param $PagerType
-     * @param $Sender
+     * @param $pagerType
+     * @param $sender
      * @return bool
      */
-    public function getPager($PagerType, $Sender) {
-        $PagerType = $PagerType.'Module';
+    public function getPager($pagerType, $sender) {
+        $pagerType = $pagerType.'Module';
 
-        if (!class_exists($PagerType)) {
-            $PagerType = 'PagerModule';
+        if (!class_exists($pagerType)) {
+            $pagerType = 'PagerModule';
         }
 
-        if (!class_exists($PagerType)) {
+        if (!class_exists($pagerType)) {
             return false;
         }
 
-        return new $PagerType($Sender);
+        return new $pagerType($sender);
     }
 }

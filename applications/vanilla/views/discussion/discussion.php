@@ -10,10 +10,10 @@ if (!defined('APPLICATION')) {
 $UserPhotoFirst = c('Vanilla.Comment.UserPhotoFirst', true);
 
 $Discussion = $this->data('Discussion');
-$Author = Gdn::userModel()->getID($Discussion->InsertUserID); // UserBuilder($Discussion, 'Insert');
+$Author = Gdn::userModel()->getID($Discussion->InsertUserID); // userBuilder($Discussion, 'Insert');
 
 // Prep event args.
-$CssClass = CssClass($Discussion, false);
+$CssClass = cssClass($Discussion, false);
 $this->EventArguments['Discussion'] = &$Discussion;
 $this->EventArguments['Author'] = &$Author;
 $this->EventArguments['CssClass'] = &$CssClass;

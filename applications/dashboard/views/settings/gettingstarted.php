@@ -1,19 +1,19 @@
 <?php if (!defined('APPLICATION')) exit();
 require_once $this->fetchViewLocation('helper_functions');
 
-function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $noGrid = false) {
-    $Tutorial = GetTutorials($TutorialCode);
-    if (!$Tutorial)
+function tutLink($tutorialCode, $writeTitle = TRUE, $thumbnailSize = 'medium', $noGrid = false) {
+    $tutorial = getTutorials($tutorialCode);
+    if (!$tutorial)
         return '';
 
-    $Thumbnail = $ThumbnailSize == 'medium' ? $Tutorial['Thumbnail'] : $Tutorial['LargeThumbnail'];
+    $thumbnail = $thumbnailSize == 'medium' ? $tutorial['Thumbnail'] : $tutorial['LargeThumbnail'];
     $noGrid = ($noGrid) ? 'no-grid' : '';
 
     ob_start();
     echo '<div class="video label-selector-item '.$noGrid.'">';
     echo '<div class="image-wrap">';
-    echo '<img src="'.$Thumbnail.'" alt="'.$Tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
-    <a class="overlay" href="<?php echo url('/settings/tutorials/'.$Tutorial['Code']); ?>">
+    echo '<img src="'.$thumbnail.'" alt="'.$tutorial['Name'].'" class = "video-img label-selector-image" />'; ?>
+    <a class="overlay" href="<?php echo url('/settings/tutorials/'.$tutorial['Code']); ?>">
         <div class="buttons">
             <div class="icon-wrapper"><?php echo dashboardSymbol('play')?></div>
         </div>
@@ -21,7 +21,7 @@ function tutLink($TutorialCode, $WriteTitle = TRUE, $ThumbnailSize = 'medium', $
     </a>
     <?php
     echo '</div>';
-    echo ($WriteTitle) ? wrap($Tutorial['Name'], 'div', ['class' => 'video-title title']) : '';
+    echo ($writeTitle) ? wrap($tutorial['Name'], 'div', ['class' => 'video-title title']) : '';
     echo '</div>';
 
     $tutLink = ob_get_contents();
@@ -52,9 +52,9 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="info"><?php echo t('Learn how to use the basic functionality of your forum.'); ?></div>
         <div class="videos label-selector">
             <?php
-            echo TutLink('using-the-forum');
-            echo TutLink('private-conversations');
-            echo TutLink('user-profiles');
+            echo tutLink('using-the-forum');
+            echo tutLink('private-conversations');
+            echo tutLink('user-profiles');
             ?>
         </div>
     </div>
@@ -62,7 +62,7 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="video-section-heading"><?php echo t("Appearance"); ?></div>
         <div class="info"><?php echo t("Learn how to completely change your forum's look and feel: upload your logo, set your homepage, choose a theme and customize it."); ?></div>
         <div class="videos label-selector">
-            <?php echo TutLink('appearance'); ?>
+            <?php echo tutLink('appearance'); ?>
         </div>
     </div>
     <div class="video-section">
@@ -70,10 +70,10 @@ echo hero($tagline.$logo, $body, $button, $media);
         <div class="info"><?php echo t('Create & organize discussion categories and manage your users.'); ?></div>
         <div class="videos label-selector">
             <?php
-            echo TutLink('user-registration');
-            echo TutLink('users');
-            echo TutLink('roles-and-permissions');
-            echo TutLink('category-management-and-advanced-settings');
+            echo tutLink('user-registration');
+            echo tutLink('users');
+            echo tutLink('roles-and-permissions');
+            echo tutLink('category-management-and-advanced-settings');
             ?>
         </div>
     </div>

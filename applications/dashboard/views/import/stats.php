@@ -10,10 +10,10 @@
             $Filename = '';
         //$Filename = val('OriginalFilename', $this->Data);
         if ($Filename)
-            $Header[T('Source')] = $Filename;
+            $Header[t('Source')] = $Filename;
 
-        $Header = array_merge($Header, (array)GetValue('Header', $this->Data, []));
-        $Stats = (array)GetValue('Stats', $this->Data, []);
+        $Header = array_merge($Header, (array)getValue('Header', $this->Data, []));
+        $Stats = (array)getValue('Stats', $this->Data, []);
         $Info = array_merge($Header, $Stats);
         foreach ($Info as $Name => $Value) {
             switch ($Name) {
@@ -21,7 +21,7 @@
                 case 'Orphaned Discussions':
                     $Value .= ' '.anchor(
                             t('Click here to fix.'),
-                            Gdn::request()->Url('dba/fixinsertuserid')
+                            Gdn::request()->url('dba/fixinsertuserid')
                         );
                     break;
                 default:
@@ -29,7 +29,7 @@
                     $Value = htmlspecialchars($Value);
 
                     if (substr_compare('Time', $Name, 0, 4, true) == 0) {
-                        $Value = Gdn_Timer::FormatElapsed($Value);
+                        $Value = Gdn_Timer::formatElapsed($Value);
                     }
             }
 

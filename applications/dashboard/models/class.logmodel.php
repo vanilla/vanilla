@@ -784,7 +784,11 @@ class LogModel extends Gdn_Pluggable {
                     if (isset($data['Username'])) {
                         $set['Name'] = $data['Username'];
                     }
-                    $iD = Gdn::userModel()->insertForBasic($set, false, ['ValidateSpam' => false]);
+                    if (c('Garden.Registration.Method') === 'Approval') {
+                        $iD = Gdn::userModel()->insertForApproval($set, ['ValidateSpam' => false, 'CheckCaptcha' => false]);
+                    } else {
+                        $iD = Gdn::userModel()->insertForBasic($set, false, ['ValidateSpam' => false]);
+                    }
                     if (!$iD) {
                         throw new Exception(Gdn::userModel()->Validation->resultsText());
                     } else {

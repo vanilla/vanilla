@@ -48,7 +48,7 @@ class UserModel extends Gdn_Model {
 
     /** Timeout for SSO */
     const SSO_TIMEOUT = 1200;
-    
+
     /** @var */
     public $SessionColumns;
 
@@ -2858,6 +2858,8 @@ class UserModel extends Gdn_Model {
      *
      * @param array $formPostValues
      * @param array $options
+     *  - ValidateSpam
+     *  - CheckCaptcha
      * @return int UserID.
      */
     public function insertForApproval($formPostValues, $options = []) {
@@ -2884,11 +2886,14 @@ class UserModel extends Gdn_Model {
         $this->addInsertFields($formPostValues);
 
         if ($this->validate($formPostValues, true)) {
-            // Check for spam.
-            $spam = SpamModel::isSpam('Registration', $formPostValues);
-            if ($spam) {
-                $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
-                return;
+
+            if (val('ValidateSpam', $options, true)) {
+                // Check for spam.
+                $spam = SpamModel::isSpam('Registration', $formPostValues);
+                if ($spam) {
+                    $this->Validation->addValidationResult('Spam', 'You are not allowed to register at this time.');
+                    return;
+                }
             }
 
             $fields = $this->Validation->validationFields(); // All fields on the form that need to be validated (including non-schema field rules defined above)

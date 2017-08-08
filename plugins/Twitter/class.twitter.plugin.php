@@ -458,6 +458,9 @@ class TwitterPlugin extends Gdn_Plugin {
 
         // Get the request secret.
         $requestToken = $this->getOAuthToken($requestToken);
+        if (!$requestToken) {
+            throw new Gdn_UserException('Token was not found or is invalid for the current action.');
+        }
 
         $consumer = new OAuthConsumer(c('Plugins.Twitter.ConsumerKey'), c('Plugins.Twitter.Secret'));
 
@@ -708,7 +711,18 @@ class TwitterPlugin extends Gdn_Plugin {
         ])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($row) {
-            $result = new OAuthToken($row['Token'], $row['TokenSecret']);
+            $canUseToken = false;
+            if (!empty($row['ForeignUserKey'])) {
+                if (Gdn::session()->isValid() && $row['ForeignUserKey'] == Gdn::session()->UserID) {
+                    $canUseToken = true;
+                }
+            } else {
+                $canUseToken = true;
+            }
+
+            if ($canUseToken) {
+                $result = new OAuthToken($row['Token'], $row['TokenSecret']);
+            }
         }
         return $result;
     }
@@ -770,6 +784,7 @@ class TwitterPlugin extends Gdn_Plugin {
         $set = [
             'TokenSecret' => $secret,
             'TokenType' => $type,
+            'ForeignUserKey' => Gdn::session()->isValid() ? Gdn::session()->UserID : 0,
             'Authorized' => 0,
             'Lifetime' => 60 * 5
         ];

@@ -13,7 +13,7 @@
 class TwitterPlugin extends Gdn_Plugin {
 
     /** Authentication provider key. */
-    const ProviderKey = 'Twitter';
+    const PROVIDER_KEY = 'Twitter';
 
     /** @var string Twitter's URL. */
     public static $BaseApiUrl = 'https://api.twitter.com/1.1/';
@@ -46,7 +46,7 @@ class TwitterPlugin extends Gdn_Plugin {
             if ($token) {
                 $this->_AccessToken = $this->getOAuthToken($token);
             } elseif (Gdn::session()->User) {
-                $accessToken = valr(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
+                $accessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
 
                 if (is_array($accessToken)) {
                     $this->_AccessToken = new OAuthToken($accessToken[0], $accessToken[1]);
@@ -425,7 +425,7 @@ class TwitterPlugin extends Gdn_Plugin {
         // Save the authentication.
         Gdn::userModel()->saveAuthentication([
             'UserID' => $sender->User->UserID,
-            'Provider' => self::ProviderKey,
+            'Provider' => self::PROVIDER_KEY,
             'UniqueID' => $profile['id']]);
 
         // Save the information as attributes.
@@ -433,9 +433,9 @@ class TwitterPlugin extends Gdn_Plugin {
             'AccessToken' => [$accessToken->key, $accessToken->secret],
             'Profile' => $profile
         ];
-        Gdn::userModel()->saveAttribute($sender->User->UserID, self::ProviderKey, $attributes);
+        Gdn::userModel()->saveAttribute($sender->User->UserID, self::PROVIDER_KEY, $attributes);
 
-        $this->EventArguments['Provider'] = self::ProviderKey;
+        $this->EventArguments['Provider'] = self::PROVIDER_KEY;
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
@@ -585,7 +585,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $iD = val('id', $profile);
         $form->setFormValue('UniqueID', $iD);
-        $form->setFormValue('Provider', self::ProviderKey);
+        $form->setFormValue('Provider', self::PROVIDER_KEY);
         $form->setFormValue('ProviderName', 'Twitter');
         $form->setValue('ConnectName', val('screen_name', $profile));
         $form->setFormValue('Name', val('screen_name', $profile));
@@ -594,7 +594,7 @@ class TwitterPlugin extends Gdn_Plugin {
         $form->addHidden('AccessToken', $accessToken->key);
 
         // Save some original data in the attributes of the connection for later API calls.
-        $attributes = [self::ProviderKey => [
+        $attributes = [self::PROVIDER_KEY => [
             'AccessToken' => [$accessToken->key, $accessToken->secret],
             'Profile' => $profile
         ]];
@@ -610,12 +610,12 @@ class TwitterPlugin extends Gdn_Plugin {
      * @param $args
      */
     public function base_getConnections_handler($sender, $args) {
-        $profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $args);
+        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
 
-        $sender->Data["Connections"][self::ProviderKey] = [
+        $sender->Data["Connections"][self::PROVIDER_KEY] = [
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Twitter',
-            'ProviderKey' => self::ProviderKey,
+            'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => '/entry/twauthorize/profile',
             'Profile' => [
                 'Name' => '@'.getValue('screen_name', $profile),
@@ -704,7 +704,7 @@ class TwitterPlugin extends Gdn_Plugin {
         $result = null;
         $row = $uatModel->getWhere([
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ])->firstRow(DATASET_TYPE_ARRAY);
 
         if ($row) {
@@ -775,7 +775,7 @@ class TwitterPlugin extends Gdn_Plugin {
         ];
         $where = [
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ];
         $row = $uatModel->getWhere($where, '', '', 1)->firstRow();
 
@@ -800,7 +800,7 @@ class TwitterPlugin extends Gdn_Plugin {
 
         $uatModel->delete([
             'Token' => $token,
-            'ProviderKey' => self::ProviderKey
+            'ProviderKey' => self::PROVIDER_KEY
         ]);
     }
 
@@ -940,7 +940,7 @@ class TwitterPlugin extends Gdn_Plugin {
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
             ['AuthenticationSchemeAlias' => 'twitter', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
-            ['AuthenticationKey' => self::ProviderKey],
+            ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
     }

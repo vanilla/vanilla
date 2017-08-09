@@ -75,7 +75,9 @@ class AllViewedPlugin extends Gdn_Plugin {
             /** @var DropdownModule $dropdown */
             $dropdown = $args['Dropdown'];
             $dropdown->addGroup('', 'discussions', '', ['after' => 'profile']); // Add links after profile menu items
-            $allModifiers['listItemCssClasses'] = ['MarkAllViewed', 'link-mark-all-viewed'];
+            $allModifiers = [
+                'listItemCssClasses' => ['MarkAllViewed', 'link-mark-all-viewed']
+            ];
             $dropdown->addLink(t('Mark All Viewed'), '/discussions/markallviewed', 'discussions.markallviewed', 'Hijack', [], $allModifiers);
             $categoryID = (int)(empty(Gdn::controller()->CategoryID) ? 0 : Gdn::controller()->CategoryID);
             $categoryModifiers['listItemCssClasses'] = ['MarkCategoryViewed', 'link-mark-category-viewed'];

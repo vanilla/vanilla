@@ -51,16 +51,6 @@ class MorePagerModule extends PagerModule {
     /** @var int The first record of the current page (the dataset offset). */
     public $Offset;
 
-    /** @var int The last offset of the current page. (ie. Offset to LastOffset of TotalRecords). */
-    private $_LastOffset;
-
-    /**
-     * @var array Certain properties are required to be defined before the pager can build
-     * itself. Once they are created, this property is set to true so they are
-     * not needlessly recreated.
-     */
-    private $_PropertiesDefined;
-
     /**
      *
      *

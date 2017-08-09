@@ -13,7 +13,7 @@ class FacebookPlugin extends Gdn_Plugin {
     const API_VERSION = '2.7';
 
     /** Authentication table key. */
-    const ProviderKey = 'Facebook';
+    const PROVIDER_KEY = 'Facebook';
 
     /** @var string  */
     protected $_AccessToken = null;
@@ -33,7 +33,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
         if ($this->_AccessToken === null) {
             if (Gdn::session()->isValid()) {
-                $this->_AccessToken = valr(self::ProviderKey.'.AccessToken', Gdn::session()->User->Attributes);
+                $this->_AccessToken = valr(self::PROVIDER_KEY.'.AccessToken', Gdn::session()->User->Attributes);
             } else {
                 $this->_AccessToken = false;
             }
@@ -128,7 +128,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
             // Add the facebook method to the controller.
             $fbMethod = [
-                'Name' => self::ProviderKey,
+                'Name' => self::PROVIDER_KEY,
                 'SignInHtml' => socialSigninButton('Facebook', $url, 'button')
             ];
 
@@ -215,12 +215,12 @@ class FacebookPlugin extends Gdn_Plugin {
      * @param array $args
      */
     public function base_getConnections_handler($sender, $args) {
-        $profile = valr('User.Attributes.'.self::ProviderKey.'.Profile', $args);
+        $profile = valr('User.Attributes.'.self::PROVIDER_KEY.'.Profile', $args);
 
-        $sender->Data["Connections"][self::ProviderKey] = [
+        $sender->Data["Connections"][self::PROVIDER_KEY] = [
             'Icon' => $this->getWebResource('icon.png', '/'),
             'Name' => 'Facebook',
-            'ProviderKey' => self::ProviderKey,
+            'ProviderKey' => self::PROVIDER_KEY,
             'ConnectUrl' => $this->authorizeUri(false, self::profileConnecUrl()),
             'Profile' => [
                 'Name' => val('name', $profile),
@@ -299,7 +299,7 @@ class FacebookPlugin extends Gdn_Plugin {
         // Save the authentication.
         Gdn::userModel()->saveAuthentication([
             'UserID' => $sender->User->UserID,
-            'Provider' => self::ProviderKey,
+            'Provider' => self::PROVIDER_KEY,
             'UniqueID' => $profile['id']]);
 
         // Save the information as attributes.
@@ -307,9 +307,9 @@ class FacebookPlugin extends Gdn_Plugin {
             'AccessToken' => $accessToken,
             'Profile' => $profile
         ];
-        Gdn::userModel()->saveAttribute($sender->User->UserID, self::ProviderKey, $attributes);
+        Gdn::userModel()->saveAttribute($sender->User->UserID, self::PROVIDER_KEY, $attributes);
 
-        $this->EventArguments['Provider'] = self::ProviderKey;
+        $this->EventArguments['Provider'] = self::PROVIDER_KEY;
         $this->EventArguments['User'] = $sender->User;
         $this->fireEvent('AfterConnection');
 
@@ -422,7 +422,7 @@ class FacebookPlugin extends Gdn_Plugin {
         $form = $sender->Form; //new gdn_Form();
         $iD = val('id', $profile);
         $form->setFormValue('UniqueID', $iD);
-        $form->setFormValue('Provider', self::ProviderKey);
+        $form->setFormValue('Provider', self::PROVIDER_KEY);
         $form->setFormValue('ProviderName', 'Facebook');
         $form->setFormValue('FullName', val('name', $profile));
         $form->setFormValue('Email', val('email', $profile));
@@ -440,7 +440,7 @@ class FacebookPlugin extends Gdn_Plugin {
 
         // Save some original data in the attributes of the connection for later API calls.
         $attributes = [];
-        $attributes[self::ProviderKey] = [
+        $attributes[self::PROVIDER_KEY] = [
             'AccessToken' => $accessToken,
             'Profile' => $profile
         ];
@@ -652,7 +652,7 @@ class FacebookPlugin extends Gdn_Plugin {
         Gdn::sql()->replace(
             'UserAuthenticationProvider',
             ['AuthenticationSchemeAlias' => 'facebook', 'URL' => '...', 'AssociationSecret' => '...', 'AssociationHashMethod' => '...'],
-            ['AuthenticationKey' => self::ProviderKey],
+            ['AuthenticationKey' => self::PROVIDER_KEY],
             true
         );
     }

@@ -694,6 +694,9 @@ class LogModel extends Gdn_Pluggable {
      * @throws Exception Throws an exception if restoring the record causes a validation error.
      */
     private function restoreOne($log, $deleteLog = true) {
+        // Keep track of table structures we've already fetched.
+        static $columns = [];
+
         // Throw an event to see if the restore is being overridden.
         $handled = false;
         $this->EventArguments['Handled'] =& $handled;

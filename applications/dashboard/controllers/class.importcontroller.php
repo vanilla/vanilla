@@ -227,6 +227,7 @@ class ImportController extends DashboardController {
             $imp->loadState();
             $imp->deleteFiles();
         } catch (Exception $ex) {
+            // Suppress exceptions from bubbling up.
         }
         $imp->deleteState();
 

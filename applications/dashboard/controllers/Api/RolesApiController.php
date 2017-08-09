@@ -202,10 +202,11 @@ class RolesApiController extends AbstractApiController {
         $out = $this->roleSchema('out');
 
         $body = $in->validate($body, true);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['RoleID'] = $id;
-        $row = $this->roleByID($id);
-        $this->roleModel->save($data);
+        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
+        $this->roleByID($id);
+        $roleData = $this->caseScheme->convertArrayKeys($body);
+        $roleData['RoleID'] = $id;
+        $this->roleModel->save($roleData);
         $row = $this->roleByID($id);
 
         $result = $out->validate($row);
@@ -227,8 +228,8 @@ class RolesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $id = $this->roleModel->save($data);
+        $roleData = $this->caseScheme->convertArrayKeys($body);
+        $id = $this->roleModel->save($roleData);
 
         if (!$id) {
             throw new ServerException('Unable to add role.', 500);

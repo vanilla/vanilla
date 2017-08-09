@@ -280,16 +280,16 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body, true);
 
         $row = $this->discussionByID($id);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['DiscussionID'] = $id;
+        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $discussionData['DiscussionID'] = $id;
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Edit', $row['CategoryID']);
         }
-        if (array_key_exists('CategoryID', $data) && $row['CategoryID'] !== $data['CategoryID']) {
-            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $data['CategoryID']);
+        if (array_key_exists('CategoryID', $discussionData) && $row['CategoryID'] !== $discussionData['CategoryID']) {
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $discussionData['CategoryID']);
         }
 
-        $this->discussionModel->save($data);
+        $this->discussionModel->save($discussionData);
 
         $result = $this->discussionByID($id);
         $this->prepareRow($result);
@@ -312,8 +312,8 @@ class DiscussionsApiController extends AbstractApiController {
         $body = $in->validate($body);
         $this->discussionModel->categoryPermission('Vanilla.Discussions.Add', $body['categoryID']);
 
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $id = $this->discussionModel->save($data);
+        $discussionData = $this->caseScheme->convertArrayKeys($body);
+        $id = $this->discussionModel->save($discussionData);
 
         if (!$id) {
             throw new ServerException('Unable to insert discussion.', 500);

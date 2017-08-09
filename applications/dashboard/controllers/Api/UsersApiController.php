@@ -215,10 +215,11 @@ class UsersApiController extends AbstractApiController {
         $out = $this->userSchema('out');
 
         $body = $in->validate($body, true);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['UserID'] = $id;
-        $row = $this->userByID($id);
-        $this->userModel->save($data);
+        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
+        $this->userByID($id);
+        $userData = $this->caseScheme->convertArrayKeys($body);
+        $userData['UserID'] = $id;
+        $this->userModel->save($userData);
         $row = $this->userByID($id);
 
         $result = $out->validate($row);
@@ -240,15 +241,15 @@ class UsersApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $data = $this->caseScheme->convertArrayKeys($body);
-        if (!array_key_exists('RoleID', $data)) {
-            $data['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
+        $userData = $this->caseScheme->convertArrayKeys($body);
+        if (!array_key_exists('RoleID', $userData)) {
+            $userData['RoleID'] = RoleModel::getDefaultRoles(RoleModel::TYPE_MEMBER);
         }
         $settings = [
             'NoConfirmEmail' => true,
             'SaveRoles' => true
         ];
-        $id = $this->userModel->save($data, $settings);
+        $id = $this->userModel->save($userData, $settings);
 
         if (!$id) {
             throw new ServerException('Unable to add user.', 500);

@@ -317,9 +317,10 @@ class CategoriesApiController extends AbstractApiController {
         $out = $this->schemaWithParent('out');
 
         $body = $in->validate($body, true);
-        $data = $this->caseScheme->convertArrayKeys($body);
+        // If a row associated with this ID cannot be found, a "not found" exception will be thrown.
         $this->category($id);
-        $this->categoryModel->setField($id, $data);
+        $categoryData = $this->caseScheme->convertArrayKeys($body);
+        $this->categoryModel->setField($id, $categoryData);
         $row = $this->category($id);
 
         $result = $out->validate($row);
@@ -341,8 +342,8 @@ class CategoriesApiController extends AbstractApiController {
 
         $body = $in->validate($body);
 
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $id = $this->categoryModel->save($data);
+        $categoryData = $this->caseScheme->convertArrayKeys($body);
+        $id = $this->categoryModel->save($categoryData);
 
         if (!$id) {
             throw new ServerException('Unable to add category.', 500);

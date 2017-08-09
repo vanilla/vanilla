@@ -45,7 +45,6 @@ class UsersApiController extends AbstractApiController {
      *
      * @param int $id The ID of the user.
      * @throws NotFoundException if the user could not be found.
-     * @return null
      */
     public function delete($id) {
         $this->permission('Garden.Users.Delete');
@@ -55,8 +54,6 @@ class UsersApiController extends AbstractApiController {
 
         $this->userByID($id);
         $this->userModel->deleteID($id);
-
-        return null;
     }
 
     /**

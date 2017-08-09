@@ -51,7 +51,6 @@ class DiscussionsApiController extends AbstractApiController {
      * Delete a discussion.
      *
      * @param int $id The ID of the discussion.
-     * @return array
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -64,8 +63,6 @@ class DiscussionsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.Delete', $row['CategoryID']);
         }
         $this->discussionModel->deleteID($id);
-
-        return null;
     }
 
     /**

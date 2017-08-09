@@ -99,7 +99,6 @@ class CommentsApiController extends AbstractApiController {
      * Delete a comment.
      *
      * @param int $id The ID of the comment.
-     * @return array
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -113,8 +112,6 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
         }
         $this->commentModel->deleteID($id);
-
-        return null;
     }
 
     /**

@@ -48,7 +48,6 @@ class RolesApiController extends AbstractApiController {
      * Delete a role.
      *
      * @param int $id The ID of the role.
-     * @return null
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
@@ -58,8 +57,6 @@ class RolesApiController extends AbstractApiController {
 
         $this->roleByID($id);
         $this->roleModel->deleteID($id);
-
-        return null;
     }
 
     /**

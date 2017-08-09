@@ -93,7 +93,6 @@ class CategoriesApiController extends AbstractApiController {
      * @throws NotFoundException if the category cannot be found.
      * @throws ServerException if the category has its CanDelete flag set to false.
      * @throws ServerException if the category has children.
-     * @return null
      */
     public function delete($id) {
         $this->permission('Garden.Settings.Manage');
@@ -110,8 +109,6 @@ class CategoriesApiController extends AbstractApiController {
             throw new ServerException('Cannot delete categories with children.', 500);
         }
         $this->categoryModel->deleteID($id);
-
-        return null;
     }
 
     /**

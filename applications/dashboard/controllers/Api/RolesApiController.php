@@ -103,7 +103,7 @@ class RolesApiController extends AbstractApiController {
         $out = $this->schema($this->roleSchema(), 'out');
 
         $row = $this->roleByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -158,7 +158,7 @@ class RolesApiController extends AbstractApiController {
 
         $rows = $this->roleModel->getWithRankPermissions()->resultArray();
         foreach ($rows as &$row) {
-            $this->massageRow($row);
+            $this->prepareRow($row);
         }
 
         $result = $out->validate($rows);
@@ -170,7 +170,7 @@ class RolesApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    protected function massageRow(array &$row) {
+    protected function prepareRow(array &$row) {
         if (array_key_exists('RoleID', $row)) {
             $roleID = $row['RoleID'];
             $rawPerms = $this->permissionModel->getPermissionsByRole($roleID);
@@ -235,7 +235,7 @@ class RolesApiController extends AbstractApiController {
         }
 
         $row = $this->roleByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return new Data($result, 201);

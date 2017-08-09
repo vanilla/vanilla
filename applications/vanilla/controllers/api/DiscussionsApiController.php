@@ -155,14 +155,14 @@ class DiscussionsApiController extends AbstractApiController {
 
         $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $row['CategoryID']);
 
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);
         return $result;
     }
 
-    public function massageRow(&$row) {
+    public function prepareRow(&$row) {
         $row['Announce'] = (bool)$row['Announce'];
         $row['Bookmarked'] = (bool)$row['Bookmarked'];
         $row['Url'] = discussionUrl($row);
@@ -256,7 +256,7 @@ class DiscussionsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->massageRow($currentRow);
+            $this->prepareRow($currentRow);
         }
 
         $result = $out->validate($rows, true);
@@ -292,7 +292,7 @@ class DiscussionsApiController extends AbstractApiController {
         $this->discussionModel->save($data);
 
         $result = $this->discussionByID($id);
-        $this->massageRow($result);
+        $this->prepareRow($result);
         return $out->validate($result);
     }
 
@@ -321,7 +321,7 @@ class DiscussionsApiController extends AbstractApiController {
 
         $row = $this->discussionByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
     }

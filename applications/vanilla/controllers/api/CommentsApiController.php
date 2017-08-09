@@ -168,7 +168,7 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->massageRow($comment);
+        $this->prepareRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
@@ -268,7 +268,7 @@ class CommentsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->massageRow($currentRow);
+            $this->prepareRow($currentRow);
         }
 
         $result = $out->validate($rows);
@@ -280,7 +280,7 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    public function massageRow(array &$row) {
+    public function prepareRow(array &$row) {
         $this->formatField($row, 'Body', $row['Format']);
         $row['Url'] = commentUrl($row);
 
@@ -322,7 +322,7 @@ class CommentsApiController extends AbstractApiController {
         $this->commentModel->save($data);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -350,7 +350,7 @@ class CommentsApiController extends AbstractApiController {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);

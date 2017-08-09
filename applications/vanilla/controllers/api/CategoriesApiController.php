@@ -151,7 +151,7 @@ class CategoriesApiController extends AbstractApiController {
         $out = $this->schema($this->schemaWithParent(), 'out');
 
         $row = $this->category($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -219,7 +219,7 @@ class CategoriesApiController extends AbstractApiController {
         );
 
         foreach ($rows as &$row) {
-            $this->massageRow($row);
+            $this->prepareRow($row);
         }
 
         $result = $out->validate($rows);
@@ -295,7 +295,7 @@ class CategoriesApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    public function massageRow(array &$row) {
+    public function prepareRow(array &$row) {
         if ($row['ParentCategoryID'] <= 0) {
             $row['ParentCategoryID'] = null;
         }
@@ -349,7 +349,7 @@ class CategoriesApiController extends AbstractApiController {
         }
 
         $row = $this->category($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $result = $out->validate($row);
         return new Data($result, 201);
     }

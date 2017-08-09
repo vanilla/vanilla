@@ -106,10 +106,10 @@ class UsersApiController extends AbstractApiController {
         $out = $this->schema($this->userSchema(), 'out');
 
         $row = $this->userByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
-        $this->massageRow($result);
+        $this->prepareRow($result);
         return $result;
     }
 
@@ -189,7 +189,7 @@ class UsersApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    protected function massageRow(array &$row) {
+    protected function prepareRow(array &$row) {
         if (array_key_exists('UserID', $row)) {
             $userID = $row['UserID'];
             $roles = $this->userModel->getRoles($userID)->resultArray();
@@ -255,7 +255,7 @@ class UsersApiController extends AbstractApiController {
         }
 
         $row = $this->userByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return new Data($result, 201);

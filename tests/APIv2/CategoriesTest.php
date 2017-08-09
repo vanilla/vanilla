@@ -12,94 +12,74 @@ namespace VanillaTests\APIv2;
  */
 class CategoriesTest extends AbstractResourceTest {
 
+    /** The standard parent category ID. */
+    const PARENT_CATEGORY_ID = 1;
+
+    /** @var int A value to ensure new records are unique. */
+    protected static $recordCounter = 1;
+
+    /** {@inheritdoc} */
+    protected $baseUrl = '/categories';
+
+    /** {@inheritdoc} */
+    protected $editFields = ['description', 'name', 'parentCategoryID', 'urlCode'];
+
+    /** {@inheritdoc} */
+    protected $patchFields = ['description', 'name', 'parentCategoryID', 'urlCode'];
+
+    /** {@inheritdoc} */
+    protected $pk = 'categoryID';
+
+    /** {@inheritdoc} */
+    protected $singular = 'category';
+
     /**
      * {@inheritdoc}
      */
-    public function __construct($name = null, array $data = [], $dataName = '') {
-        $this->baseUrl = '/categories';
-
-        parent::__construct($name, $data, $dataName);
+    protected function modifyRow(array $row) {
+        $row = parent::modifyRow($row);
+        $dt = new \DateTimeImmutable();
+        foreach ($this->patchFields as $key) {
+            $value = $row[$key];
+            switch ($key) {
+                case 'urlCode':
+                    $value = md5($value);
+            }
+            $row[$key] = $value;
+        }
+        return $row;
     }
 
     /**
-     * Delete a category.
-     *
-     * @requires function CategoriesApiController::delete
+     * {@inheritdoc}
      */
-    public function testDelete() {
-        $this->fail('Remove placeholder for CategoriesApiController::delete test');
+    public function indexUrl() {
+        // Categories are created under a standard parent. For testing the index, make sure we're looking in the right place.
+        return $this->baseUrl.'?parentCategoryID='.self::PARENT_CATEGORY_ID;
     }
 
     /**
-     * Get a category.
-     *
-     * @requires function CategoriesApiController::get
+     * {@inheritdoc}
      */
-    public function testGet() {
-        $this->fail('Remove placeholder for CategoriesApiController::get test');
+    public function record() {
+        $count = static::$recordCounter;
+        $name = "Test Category {$count}";
+        $urlCode = strtolower(preg_replace('/[^A-Z0-9]/i', '-', $name));
+        $record = [
+            'name' => $name,
+            'urlCode' => $urlCode,
+            'parentCategoryID' => self::PARENT_CATEGORY_ID
+        ];
+        static::$recordCounter++;
+        return $record;
     }
 
     /**
-     * Get a category's data, prepared for editing.
-     *
-     * @requires function CategoriesApiController::get_edit
+     * {@inheritdoc}
      */
-    public function testGetEdit() {
-        $this->fail('Remove placeholder for CategoriesApiController::get_edit test');
-    }
-
-    /**
-     * Get a category's data, prepared for editing.
-     *
-     * @requires function CategoriesApiController::get_edit
-     */
-    public function testGetEditFields() {
-        $this->fail('Remove placeholder for CategoriesApiController::get_edit test');
-    }
-
-    /**
-     * Get a list of categories.
-     *
-     * @requires function CategoriesApiController::post
-     */
-    public function testIndex() {
-        $this->fail('Remove placeholder for CategoriesApiController::index test');
-    }
-
-    /**
-     * Search categories.
-     *
-     * @requires function CategoriesApiController::post
-     */
-    public function testGetSearch() {
-        $this->fail('Remove placeholder for CategoriesApiController::get_search test');
-    }
-
-    /**
-     * Update a category row.
-     *
-     * @requires function CategoriesApiController::patch
-     */
-    public function testPatchFull() {
-        $this->fail('Remove placeholder for CategoriesApiController::patch full test');
-    }
-
-    /**
-     * Update a category row.
-     *
-     * @param string $field The name of the field to patch.
-     * @requires function CategoriesApiController::patch
-     */
-    public function testPatchSparse($field) {
-        $this->fail('Remove placeholder for CategoriesApiController::patch sparse test');
-    }
-
-    /**
-     * Insert a category.
-     *
-     * @requires function CategoriesApiController::post
-     */
-    public function testPost() {
-        $this->fail('Remove placeholder for CategoriesApiController::post test');
+    public function testGetEdit($record = null) {
+        $row = $this->testPost();
+        $result = parent::testGetEdit($row);
+        return $result;
     }
 }

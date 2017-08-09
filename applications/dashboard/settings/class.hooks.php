@@ -660,11 +660,13 @@ class DashboardHooks extends Gdn_Plugin {
      * Check the access token.
      */
     private function checkAccessToken() {
-        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
-           ((empty($_SERVER['HTTP_AUTHORIZATION']) || !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)) &&
-                empty($_GET['access_token'])
-           )
-        ) {
+        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/')) {
+            return;
+        }
+
+        $hasAuthHeader = (!empty($_SERVER['HTTP_AUTHORIZATION']) && preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m));
+        $hasTokenParam = !empty($_GET['access_token']);
+        if (!$hasAuthHeader && !$hasTokenParam) {
             return;
         }
 

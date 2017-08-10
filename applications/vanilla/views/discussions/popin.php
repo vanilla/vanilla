@@ -32,7 +32,7 @@
         <?php endforeach; ?>
         <li class="Item Center">
             <?php
-            echo anchor(sprintf(t('All %s'), t('Bookmarks')), '/discussions/bookmarked');
+            echo anchor(t('All Bookmarks'), '/discussions/bookmarked');
             ?>
         </li>
     <?php else: ?>

@@ -99,7 +99,6 @@ class CommentsApiController extends AbstractApiController {
      * Delete a comment.
      *
      * @param int $id The ID of the comment.
-     * @return array
      */
     public function delete($id) {
         $this->permission('Garden.SignIn.Allow');
@@ -113,8 +112,6 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Comments.Delete', $discussion['CategoryID']);
         }
         $this->commentModel->deleteID($id);
-
-        return null;
     }
 
     /**
@@ -168,7 +165,7 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
         }
 
-        $this->massageRow($comment);
+        $this->prepareRow($comment);
         $this->userModel->expandUsers($comment, ['InsertUserID']);
         $result = $out->validate($comment);
         return $result;
@@ -268,7 +265,7 @@ class CommentsApiController extends AbstractApiController {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
         }
         foreach ($rows as &$currentRow) {
-            $this->massageRow($currentRow);
+            $this->prepareRow($currentRow);
         }
 
         $result = $out->validate($rows);
@@ -280,7 +277,7 @@ class CommentsApiController extends AbstractApiController {
      *
      * @param array $row
      */
-    public function massageRow(array &$row) {
+    public function prepareRow(array &$row) {
         $this->formatField($row, 'Body', $row['Format']);
         $row['Url'] = commentUrl($row);
 
@@ -304,25 +301,25 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body, true);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $data['CommentID'] = $id;
+        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $commentData['CommentID'] = $id;
         $row = $this->commentByID($id);
         if ($row['InsertUserID'] !== $this->getSession()->UserID) {
             $discussion = $this->discussionByID($row['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Edit', $discussion['CategoryID']);
         }
-        if (array_key_exists('DiscussionID', $data) && $row['DiscussionID'] !== $data['DiscussionID']) {
-            $discussion = $this->discussionByID($data['DiscussionID']);
+        if (array_key_exists('DiscussionID', $commentData) && $row['DiscussionID'] !== $commentData['DiscussionID']) {
+            $discussion = $this->discussionByID($commentData['DiscussionID']);
             $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
         }
         // Body is a required field in CommentModel::save.
-        if (!array_key_exists('Body', $data)) {
-            $data['Body'] = $row['Body'];
+        if (!array_key_exists('Body', $commentData)) {
+            $commentData['Body'] = $row['Body'];
         }
-        $this->commentModel->save($data);
+        $this->commentModel->save($commentData);
         $row = $this->commentByID($id);
         $this->userModel->expandUsers($row, ['InsertUserID']);
-        $this->massageRow($row);
+        $this->prepareRow($row);
 
         $result = $out->validate($row);
         return $result;
@@ -342,15 +339,15 @@ class CommentsApiController extends AbstractApiController {
         $out = $this->commentSchema('out');
 
         $body = $in->validate($body);
-        $data = $this->caseScheme->convertArrayKeys($body);
-        $discussion = $this->discussionByID($data['DiscussionID']);
+        $commentData = $this->caseScheme->convertArrayKeys($body);
+        $discussion = $this->discussionByID($commentData['DiscussionID']);
         $this->discussionModel->categoryPermission('Vanilla.Comments.Add', $discussion['CategoryID']);
-        $id = $this->commentModel->save($data);
+        $id = $this->commentModel->save($commentData);
         if (!$id) {
             throw new ServerException('Unable to insert comment.', 500);
         }
         $row = $this->commentByID($id);
-        $this->massageRow($row);
+        $this->prepareRow($row);
         $this->userModel->expandUsers($row, ['InsertUserID']);
 
         $result = $out->validate($row);

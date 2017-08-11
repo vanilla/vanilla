@@ -10,27 +10,27 @@
     <ul>
         <li>
             <?php
-            echo $this->Form->label(UserModel::SigninLabelCode(), 'Email');
+            echo $this->Form->label(UserModel::signinLabelCode(), 'Email');
             echo $this->Form->textBox('Email');
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('Password', 'Password');
-            echo $this->Form->Input('Password', 'password', ['class' => 'InputBox Password']);
+            echo $this->Form->input('Password', 'password', ['class' => 'InputBox Password']);
             echo anchor(t('Forgot?'), '/entry/passwordrequest', 'ForgotPassword');
             ?>
         </li>
         <li class="Buttons">
             <?php
             echo $this->Form->button('Sign In');
-            echo $this->Form->CheckBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
+            echo $this->Form->checkBox('RememberMe', t('Keep me signed in'), ['value' => '1', 'id' => 'SignInRememberMe']);
             ?>
         </li>
         <?php if (strcasecmp(c('Garden.Registration.Method'), 'Connect') != 0): ?>
             <li class="CreateAccount">
                 <?php
-                $Target = GetIncomingValue('Target', '');
+                $Target = getIncomingValue('Target', '');
                 if ($Target != '') {
                     $Target = '?Target='.$Target;
                 }
@@ -56,7 +56,7 @@
         <li class="Buttons">
             <?php
             echo $this->Form->button('Request a new password');
-            echo wrap(Anchor(t('I remember now!'), '/entry/signin', 'ForgotPassword'), 'div');
+            echo wrap(anchor(t('I remember now!'), '/entry/signin', 'ForgotPassword'), 'div');
             ?>
         </li>
     </ul>

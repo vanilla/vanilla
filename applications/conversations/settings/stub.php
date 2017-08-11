@@ -2,7 +2,7 @@
 /**
  * Conversations stub content for a new site.
  *
- * Called by ConversationsHooks::Setup() to insert stub content upon enabling app.
+ * Called by ConversationsHooks::setup() to insert stub content upon enabling app.
  *
  * @copyright 2009-2017 Vanilla Forums Inc.
  * @license http://www.opensource.org/licenses/gpl-2.0.php GNU GPL v2

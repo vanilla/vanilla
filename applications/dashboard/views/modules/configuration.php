@@ -3,17 +3,17 @@
 /** @var ConfigurationModule $Sf */
 $Sf = $this->ConfigurationModule;
 /* @var Gdn_Form $Form */
-$Form = $Sf->Form();
+$Form = $Sf->form();
 
 if ($Sf->RenderAll) {
-    echo '<h1>', $Sf->Controller()->data('Title'), '</h1>';
-    if ($Sf->Controller()->data('Description')) {
-        echo '<div class="padded">', $Sf->Controller()->data('Description'), '</div>';
+    echo '<h1>', $Sf->controller()->data('Title'), '</h1>';
+    if ($Sf->controller()->data('Description')) {
+        echo '<div class="padded">', $Sf->controller()->data('Description'), '</div>';
     }
 }
 
 $Options = [];
-if ($Sf->HasFiles()) {
+if ($Sf->hasFiles()) {
     $Options['enctype'] = 'multipart/form-data';
 }
 
@@ -23,7 +23,7 @@ echo $Form->errors();
 <ul>
     <?php
 
-    foreach ($Sf->Schema() as $Row) {
+    foreach ($Sf->schema() as $Row) {
 
         if ((strtolower($Row['Control'])) !== 'imageupload') {
             if (val('no-grid', $Row['Options'])) {
@@ -33,7 +33,7 @@ echo $Form->errors();
             }
         }
 
-        $LabelCode = $Sf->LabelCode($Row);
+        $LabelCode = $Sf->labelCode($Row);
         $Description = val('Description', $Row, '');
         if (strtolower($Row['Control']) !== 'checkbox' && $Description) {
             $Description = '<div class="info">'.$Description.'</div>';
@@ -46,19 +46,19 @@ echo $Form->errors();
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->CategoryDropDown($Row['Name'], $Row['Options']);
+                echo $Form->categoryDropDown($Row['Name'], $Row['Options']);
                 echo '</div>';
                 break;
             case 'labelcheckbox':
                 echo $Form->label($LabelCode);
-                echo $Form->CheckBox($Row['Name'], '', $Row['Options']);
+                echo $Form->checkBox($Row['Name'], '', $Row['Options']);
                 break;
             case 'checkbox':
                 echo '<div class="label-wrap">';
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->CheckBox($Row['Name'], t($LabelCode), $Row['Options']);
+                echo $Form->checkBox($Row['Name'], t($LabelCode), $Row['Options']);
                 echo '</div>';
                 break;
             case 'toggle':
@@ -70,7 +70,7 @@ echo $Form->errors();
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->DropDown($Row['Name'], $Row['Items'], $Row['Options']);
+                echo $Form->dropDown($Row['Name'], $Row['Items'], $Row['Options']);
                 echo '</div>';
                 break;
             case 'imageupload':
@@ -92,13 +92,13 @@ echo $Form->errors();
                 echo $Description;
                 echo '</div>';
                 echo '<div class="input-wrap">';
-                echo $Form->RadioList($Row['Name'], $Row['Items'], $Row['Options']);
+                echo $Form->radioList($Row['Name'], $Row['Items'], $Row['Options']);
                 echo '</div>';
                 break;
             case 'checkboxlist':
                 echo $Form->label($LabelCode, $Row['Name']);
                 echo $Description;
-                echo $Form->CheckBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
+                echo $Form->checkBoxList($Row['Name'], $Row['Items'], null, $Row['Options']);
                 break;
             case 'textbox':
                 echo '<div class="label-wrap">';

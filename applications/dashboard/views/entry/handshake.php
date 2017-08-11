@@ -22,13 +22,13 @@
         <li>
             <?php
             echo $this->Form->label('Username', 'NewName');
-            echo $this->Form->Textbox('NewName');
+            echo $this->Form->textbox('NewName');
             ?>
         </li>
         <li>
             <?php
             echo $this->Form->label('Email', 'NewEmail');
-            echo $this->Form->Textbox('NewEmail');
+            echo $this->Form->textbox('NewEmail');
             ?>
         </li>
         <li class="Buttons">
@@ -46,7 +46,7 @@
         <li>
             <?php
             echo $this->Form->label('Password', 'SignInPassword');
-            echo $this->Form->Input('SignInPassword', 'password');
+            echo $this->Form->input('SignInPassword', 'password');
             ?>
         </li>
         <li class="Buttons">

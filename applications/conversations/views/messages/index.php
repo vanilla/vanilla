@@ -6,7 +6,7 @@
 
             if ($this->data('Conversation.Subject')) {
                 echo
-                    Bullet(' ').
+                    bullet(' ').
                     '<span class="Gloss">'.htmlspecialchars($this->data('Conversation.Subject')).'</span>';
             }
             ?>

@@ -30,7 +30,7 @@
                     $this->Form->setValue("Job_$i", true);
                 }
 
-                echo $this->Form->CheckBox("Job_$i", htmlspecialchars($Name));
+                echo $this->Form->checkBox("Job_$i", htmlspecialchars($Name));
 
                 echo ' <span class="Count" style="display: none">0</span> ';
                 ?>

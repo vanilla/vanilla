@@ -129,10 +129,10 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      * Get one of the three Forwarding URLs (Registration, SignIn, SignOut).
      *
-     * @param $URLType
+     * @param $uRLType
      * @return mixed
      */
-    abstract public function getURL($URLType);
+    abstract public function getURL($uRLType);
 
     /**
      *
@@ -157,35 +157,35 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $DataSource
-     * @param array $DirectSupplied
+     * @param $dataSource
+     * @param array $directSupplied
      */
-    public function fetchData($DataSource, $DirectSupplied = []) {
-        $this->_DataSource = $DataSource;
+    public function fetchData($dataSource, $directSupplied = []) {
+        $this->_DataSource = $dataSource;
 
-        if ($DataSource == $this) {
-            foreach ($this->_DataHooks as $DataTarget => $DataHook) {
-                $this->_DataHooks[$DataTarget]['value'] = val($DataTarget, $DirectSupplied);
+        if ($dataSource == $this) {
+            foreach ($this->_DataHooks as $dataTarget => $dataHook) {
+                $this->_DataHooks[$dataTarget]['value'] = val($dataTarget, $directSupplied);
             }
 
             return;
         }
 
         if (sizeof($this->_DataHooks)) {
-            foreach ($this->_DataHooks as $DataTarget => $DataHook) {
+            foreach ($this->_DataHooks as $dataTarget => $dataHook) {
                 switch ($this->_DataSourceType) {
                     case self::DATA_REQUEST:
                     case self::DATA_FORM:
-                        $this->_DataHooks[$DataTarget]['value'] = $this->_DataSource->getValue(
-                            $DataHook['lookup'],
+                        $this->_DataHooks[$dataTarget]['value'] = $this->_DataSource->getValue(
+                            $dataHook['lookup'],
                             false
                         );
                         break;
 
                     case self::DATA_COOKIE:
-                        $this->_DataHooks[$DataTarget]['value'] = $this->_DataSource->getValueFrom(
+                        $this->_DataHooks[$dataTarget]['value'] = $this->_DataSource->getValueFrom(
                             Gdn_Authenticator::INPUT_COOKIES,
-                            $DataHook['lookup'],
+                            $dataHook['lookup'],
                             false
                         );
                         break;
@@ -197,27 +197,27 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $InternalFieldName
-     * @param $DataFieldName
-     * @param bool $DataFieldRequired
+     * @param $internalFieldName
+     * @param $dataFieldName
+     * @param bool $dataFieldRequired
      */
-    public function hookDataField($InternalFieldName, $DataFieldName, $DataFieldRequired = true) {
-        $this->_DataHooks[$InternalFieldName] = ['lookup' => $DataFieldName, 'required' => $DataFieldRequired];
+    public function hookDataField($internalFieldName, $dataFieldName, $dataFieldRequired = true) {
+        $this->_DataHooks[$internalFieldName] = ['lookup' => $dataFieldName, 'required' => $dataFieldRequired];
     }
 
     /**
      *
      *
-     * @param $Key
-     * @param bool $Default
+     * @param $key
+     * @param bool $default
      * @return bool
      */
-    public function getValue($Key, $Default = false) {
-        if (array_key_exists($Key, $this->_DataHooks) && array_key_exists('value', $this->_DataHooks[$Key])) {
-            return $this->_DataHooks[$Key]['value'];
+    public function getValue($key, $default = false) {
+        if (array_key_exists($key, $this->_DataHooks) && array_key_exists('value', $this->_DataHooks[$key])) {
+            return $this->_DataHooks[$key]['value'];
         }
 
-        return $Default;
+        return $default;
     }
 
     /**
@@ -226,8 +226,8 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @return string
      */
     protected function _checkHookedFields() {
-        foreach ($this->_DataHooks as $DataKey => $DataValue) {
-            if ($DataValue['required'] == true && (!array_key_exists('value', $DataValue) || $DataValue['value'] == null)) {
+        foreach ($this->_DataHooks as $dataKey => $dataValue) {
+            if ($dataValue['required'] == true && (!array_key_exists('value', $dataValue) || $dataValue['value'] == null)) {
                 return Gdn_Authenticator::MODE_GATHER;
             }
         }
@@ -238,37 +238,37 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param null $ProviderKey
-     * @param bool $Force
+     * @param null $providerKey
+     * @param bool $force
      * @return array|bool|stdClass
      */
-    public function getProvider($ProviderKey = null, $Force = false) {
-        static $AuthModel = null;
-        static $Provider = null;
+    public function getProvider($providerKey = null, $force = false) {
+        static $authModel = null;
+        static $provider = null;
 
-        if (is_null($AuthModel)) {
-            $AuthModel = new Gdn_AuthenticationProviderModel();
+        if (is_null($authModel)) {
+            $authModel = new Gdn_AuthenticationProviderModel();
         }
 
-        $AuthenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
-        if (is_null($Provider) || $Force === true) {
-            if (!is_null($ProviderKey)) {
-                $ProviderData = $AuthModel->getProviderByKey($ProviderKey);
+        $authenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
+        if (is_null($provider) || $force === true) {
+            if (!is_null($providerKey)) {
+                $providerData = $authModel->getProviderByKey($providerKey);
             } else {
-                $ProviderData = $AuthModel->getProviderByScheme($AuthenticationSchemeAlias, Gdn::session()->UserID);
-                if (!$ProviderData && Gdn::session()->UserID > 0) {
-                    $ProviderData = $AuthModel->getProviderByScheme($AuthenticationSchemeAlias, null);
+                $providerData = $authModel->getProviderByScheme($authenticationSchemeAlias, Gdn::session()->UserID);
+                if (!$providerData && Gdn::session()->UserID > 0) {
+                    $providerData = $authModel->getProviderByScheme($authenticationSchemeAlias, null);
                 }
             }
 
-            if ($ProviderData) {
-                $Provider = $ProviderData;
+            if ($providerData) {
+                $provider = $providerData;
             } else {
                 return false;
             }
         }
 
-        return $Provider;
+        return $provider;
     }
 
     /**
@@ -302,15 +302,15 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      * @return array|bool|stdClass
      */
     public function getNonce() {
-        $Token = $this->getToken();
+        $token = $this->getToken();
         if (is_null($this->Nonce)) {
-            $UserNonceData = Gdn::sql()->select('uan.*')
+            $userNonceData = Gdn::sql()->select('uan.*')
                 ->from('UserAuthenticationNonce uan')
                 ->where('uan.Token', $this->Token['Token'])
                 ->get();
 
-            if ($UserNonceData->numRows()) {
-                $this->Nonce = $UserNonceData->firstRow(DATASET_TYPE_ARRAY);
+            if ($userNonceData->numRows()) {
+                $this->Nonce = $userNonceData->firstRow(DATASET_TYPE_ARRAY);
             } else {
                 return false;
             }
@@ -322,60 +322,60 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $TokenType
-     * @param $ProviderKey
-     * @param null $UserKey
-     * @param bool $Authorized
+     * @param $tokenType
+     * @param $providerKey
+     * @param null $userKey
+     * @param bool $authorized
      * @return array|bool
      */
-    public function createToken($TokenType, $ProviderKey, $UserKey = null, $Authorized = false) {
-        $TokenKey = implode('.', ['token', $ProviderKey, time(), mt_rand(0, 100000)]);
-        $TokenSecret = sha1(md5(implode('.', [$TokenKey, mt_rand(0, 100000)])));
+    public function createToken($tokenType, $providerKey, $userKey = null, $authorized = false) {
+        $tokenKey = implode('.', ['token', $providerKey, time(), mt_rand(0, 100000)]);
+        $tokenSecret = sha1(md5(implode('.', [$tokenKey, mt_rand(0, 100000)])));
         $uatModel = new UserAuthenticationTokenModel();
 
-        $Lifetime = Gdn::config('Garden.Authenticators.handshake.TokenLifetime', 60);
-        if ($Lifetime == 0 && $TokenType == 'request') {
-            $Lifetime = 300;
+        $lifetime = Gdn::config('Garden.Authenticators.handshake.TokenLifetime', 60);
+        if ($lifetime == 0 && $tokenType == 'request') {
+            $lifetime = 300;
         }
 
-        $InsertArray = [
-            'Token' => $TokenKey,
-            'TokenSecret' => $TokenSecret,
-            'TokenType' => $TokenType,
-            'ProviderKey' => $ProviderKey,
-            'Lifetime' => $Lifetime,
-            'Authorized' => ($Authorized ? 1 : 0),
+        $insertArray = [
+            'Token' => $tokenKey,
+            'TokenSecret' => $tokenSecret,
+            'TokenType' => $tokenType,
+            'ProviderKey' => $providerKey,
+            'Lifetime' => $lifetime,
+            'Authorized' => ($authorized ? 1 : 0),
             'ForeignUserKey' => null
         ];
 
-        if ($UserKey !== null) {
-            $InsertArray['ForeignUserKey'] = $UserKey;
+        if ($userKey !== null) {
+            $insertArray['ForeignUserKey'] = $userKey;
         }
 
         try {
-            $uatModel->insert($InsertArray);
+            $uatModel->insert($insertArray);
 
-            if ($TokenType == 'access' && !is_null($UserKey)) {
-                $this->deleteToken($ProviderKey, $UserKey, 'request');
+            if ($tokenType == 'access' && !is_null($userKey)) {
+                $this->deleteToken($providerKey, $userKey, 'request');
             }
         } catch (Exception $e) {
             return false;
         }
 
-        return $InsertArray;
+        return $insertArray;
     }
 
     /**
      *
      *
-     * @param $TokenKey
+     * @param $tokenKey
      * @return bool
      */
-    public function authorizeToken($TokenKey) {
+    public function authorizeToken($tokenKey) {
         $uatModel = new UserAuthenticationTokenModel();
         $result = true;
         try {
-            $uatModel->update(['Authorized' => 1], ['Token' => $TokenKey]);
+            $uatModel->update(['Authorized' => 1], ['Token' => $tokenKey]);
         } catch (Exception $e) {
             $result = false;
         }
@@ -416,31 +416,31 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $TokenKey
-     * @param $Nonce
-     * @param null $Timestamp
+     * @param $tokenKey
+     * @param $nonce
+     * @param null $timestamp
      * @return bool
      */
-    public function setNonce($TokenKey, $Nonce, $Timestamp = null) {
-        $InsertArray = [
-            'Token' => $TokenKey,
-            'Nonce' => $Nonce,
-            'Timestamp' => date('Y-m-d H:i:s', (is_null($Timestamp)) ? time() : $Timestamp)
+    public function setNonce($tokenKey, $nonce, $timestamp = null) {
+        $insertArray = [
+            'Token' => $tokenKey,
+            'Nonce' => $nonce,
+            'Timestamp' => date('Y-m-d H:i:s', (is_null($timestamp)) ? time() : $timestamp)
         ];
 
         try {
-            $NumAffected = Gdn::database()->sql()->update('UserAuthenticationNonce')
-                ->set('Nonce', $InsertArray['Nonce'])
-                ->set('Timestamp', $InsertArray['Timestamp'])
-                ->where('Token', $InsertArray['Token'])
+            $numAffected = Gdn::database()->sql()->update('UserAuthenticationNonce')
+                ->set('Nonce', $insertArray['Nonce'])
+                ->set('Timestamp', $insertArray['Timestamp'])
+                ->where('Token', $insertArray['Token'])
                 ->put();
 
-            if (!$NumAffected || !$NumAffected->pdoStatement() || !$NumAffected->pdoStatement()->rowCount()) {
+            if (!$numAffected || !$numAffected->pdoStatement() || !$numAffected->pdoStatement()->rowCount()) {
                 throw new Exception("Nothing to update.");
             }
 
         } catch (Exception $e) {
-            $Inserted = Gdn::database()->sql()->insert('UserAuthenticationNonce', $InsertArray);
+            $inserted = Gdn::database()->sql()->insert('UserAuthenticationNonce', $insertArray);
         }
         return true;
     }
@@ -448,21 +448,21 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $TokenKey
-     * @param null $Nonce
+     * @param $tokenKey
+     * @param null $nonce
      * @return bool
      */
-    public function lookupNonce($TokenKey, $Nonce = null) {
+    public function lookupNonce($tokenKey, $nonce = null) {
 
-        $NonceData = Gdn::database()->sql()
+        $nonceData = Gdn::database()->sql()
             ->select('uan.*')
             ->from('UserAuthenticationNonce uan')
-            ->where('uan.Token', $TokenKey)
+            ->where('uan.Token', $tokenKey)
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);
 
-        if ($NonceData && (is_null($Nonce) || $NonceData['Nonce'] == $Nonce)) {
-            return $NonceData['Nonce'];
+        if ($nonceData && (is_null($nonce) || $nonceData['Nonce'] == $nonce)) {
+            return $nonceData['Nonce'];
         }
 
         return false;
@@ -471,11 +471,11 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $TokenKey
+     * @param $tokenKey
      */
-    public function clearNonces($TokenKey) {
+    public function clearNonces($tokenKey) {
         Gdn::sql()->delete('UserAuthenticationNonce', [
-            'Token' => $TokenKey
+            'Token' => $tokenKey
         ]);
     }
 
@@ -495,24 +495,24 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
      */
     public function getAuthenticationSchemeAlias() {
         $stripSuffix = str_replace('Gdn_', '', __CLASS__);
-        $ClassName = str_replace('Gdn_', '', get_class($this));
-        $ClassName = substr($ClassName, -strlen($stripSuffix)) == $stripSuffix ? substr($ClassName, 0, -strlen($stripSuffix)) : $ClassName;
-        return strtolower($ClassName);
+        $className = str_replace('Gdn_', '', get_class($this));
+        $className = substr($className, -strlen($stripSuffix)) == $stripSuffix ? substr($className, 0, -strlen($stripSuffix)) : $className;
+        return strtolower($className);
     }
 
     /**
      *
      *
-     * @param $UserID
-     * @param bool $Persist
+     * @param $userID
+     * @param bool $persist
      */
-    public function setIdentity($UserID, $Persist = true) {
-        $AuthenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
-        Gdn::authenticator()->setIdentity($UserID, $Persist);
+    public function setIdentity($userID, $persist = true) {
+        $authenticationSchemeAlias = $this->getAuthenticationSchemeAlias();
+        Gdn::authenticator()->setIdentity($userID, $persist);
         Gdn::session()->start();
 
-        if ($UserID > 0) {
-            Gdn::session()->setPreference('Authenticator', $AuthenticationSchemeAlias);
+        if ($userID > 0) {
+            Gdn::session()->setPreference('Authenticator', $authenticationSchemeAlias);
         } else {
             Gdn::session()->setPreference('Authenticator', '');
         }
@@ -521,17 +521,17 @@ abstract class Gdn_Authenticator extends Gdn_Pluggable {
     /**
      *
      *
-     * @param $Key
-     * @param bool $Default
+     * @param $key
+     * @param bool $default
      * @return bool
      */
-    public function getProviderValue($Key, $Default = false) {
-        $Provider = $this->getProvider();
-        if (array_key_exists($Key, $Provider)) {
-            return $Provider[$Key];
+    public function getProviderValue($key, $default = false) {
+        $provider = $this->getProvider();
+        if (array_key_exists($key, $provider)) {
+            return $provider[$key];
         }
 
-        return $Default;
+        return $default;
     }
 
     /**

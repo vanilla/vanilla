@@ -13,5 +13,5 @@ foreach ($this->data('Activities') as $Activity) {
     if ($this->HideActivity)
         $Activity->ActivityType .= ' Hidden';
 
-    WriteActivity($Activity, $this, $Session);
+    writeActivity($Activity, $this, $Session);
 }

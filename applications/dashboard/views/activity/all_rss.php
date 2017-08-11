@@ -5,16 +5,16 @@
 <?php
 $Activities = $this->data('Activities', []);
 foreach ($Activities as $Activity) {
-    $Author = UserBuilder($Activity, 'Activity');
+    $Author = userBuilder($Activity, 'Activity');
     ?>
     <item>
         <title><?php echo Gdn_Format::text(val('Headline', $Activity)); ?></title>
         <link><?php echo url('/activity', true); ?></link>
-        <pubDate><?php echo date('r', Gdn_Format::ToTimeStamp(val('DateUpdated', $Activity))); ?></pubDate>
+        <pubDate><?php echo date('r', Gdn_Format::toTimeStamp(val('DateUpdated', $Activity))); ?></pubDate>
         <dc:creator><?php echo Gdn_Format::text($Author->Name); ?></dc:creator>
-        <guid isPermaLink="false"><?php echo val('ActivityID', $Activity).'@'.Url('/activity'); ?></guid>
+        <guid isPermaLink="false"><?php echo val('ActivityID', $Activity).'@'.url('/activity'); ?></guid>
         <?php if ($Story = val('Story', $Activity)) : ?>
-            <description><![CDATA[<?php echo Gdn_Format::RssHtml($Story, val('Format', $Activity)); ?>]]>
+            <description><![CDATA[<?php echo Gdn_Format::rssHtml($Story, val('Format', $Activity)); ?>]]>
             </description>
         <?php endif; ?>
     </item>

@@ -16,7 +16,7 @@ if (sizeof($this->data('Comments'))) {
                 <div class="Message">
                     <h2><?php echo anchor(Gdn_Format::text($comment->DiscussionName), $permalink); ?></h2>
                     <?php
-                    echo SliceString(Gdn_Format::plainText($comment->Body, $comment->Format), 250);
+                    echo sliceString(Gdn_Format::plainText($comment->Body, $comment->Format), 250);
                     ?></div>
                 <div class="Meta">
                 <span class="MItem"><?php echo t('Comment in', 'in').' '; ?>

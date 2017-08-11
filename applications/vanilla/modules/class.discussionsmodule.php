@@ -82,12 +82,12 @@ class DiscussionsModule extends Gdn_Module {
 
     public function toString() {
         if (!$this->data('Discussions')) {
-            $this->GetData();
+            $this->getData();
         }
 
         require_once Gdn::controller()->fetchViewLocation('helper_functions', 'Discussions', 'Vanilla');
 
-        return parent::ToString();
+        return parent::toString();
     }
 
     /**

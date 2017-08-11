@@ -21,7 +21,7 @@ class ModerationController extends VanillaController {
     public function checkedComments() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        ModerationController::InformCheckedComments($this);
+        ModerationController::informCheckedComments($this);
         $this->render();
     }
 
@@ -33,253 +33,253 @@ class ModerationController extends VanillaController {
     public function checkedDiscussions() {
         $this->deliveryType(DELIVERY_TYPE_BOOL);
         $this->deliveryMethod(DELIVERY_METHOD_JSON);
-        ModerationController::InformCheckedDiscussions($this);
+        ModerationController::informCheckedDiscussions($this);
         $this->render();
     }
 
     /**
      * Looks at the user's attributes and form postback to see if any comments
      * have been checked for administration, and if so, adds an inform message to
-     * $Sender to take action.
+     * $sender to take action.
      */
-    public static function informCheckedComments($Sender) {
-        $Session = Gdn::session();
-        $HadCheckedComments = false;
-        $TransientKey = val('TransientKey', $_POST);
-        if ($Session->isValid() && $Session->validateTransientKey($TransientKey)) {
+    public static function informCheckedComments($sender) {
+        $session = Gdn::session();
+        $hadCheckedComments = false;
+        $transientKey = val('TransientKey', $_POST);
+        if ($session->isValid() && $session->validateTransientKey($transientKey)) {
             // Form was posted, so accept changes to checked items.
-            $DiscussionID = val('DiscussionID', $_POST, 0);
-            $CheckIDs = val('CheckIDs', $_POST);
-            if (empty($CheckIDs)) {
-                $CheckIDs = [];
+            $discussionID = val('DiscussionID', $_POST, 0);
+            $checkIDs = val('CheckIDs', $_POST);
+            if (empty($checkIDs)) {
+                $checkIDs = [];
             }
-            $CheckIDs = (array)$CheckIDs;
+            $checkIDs = (array)$checkIDs;
 
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
-            if (!is_array($CheckedComments)) {
-                $CheckedComments = [];
+            $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
+            if (!is_array($checkedComments)) {
+                $checkedComments = [];
             }
 
-            if (!array_key_exists($DiscussionID, $CheckedComments)) {
-                $CheckedComments[$DiscussionID] = [];
+            if (!array_key_exists($discussionID, $checkedComments)) {
+                $checkedComments[$discussionID] = [];
             } else {
                 // Were there checked comments in this discussion before the form was posted?
-                $HadCheckedComments = count($CheckedComments[$DiscussionID]) > 0;
+                $hadCheckedComments = count($checkedComments[$discussionID]) > 0;
             }
-            foreach ($CheckIDs as $Check) {
-                if (val('checked', $Check)) {
-                    if (!ArrayHasValue($CheckedComments, $Check['checkId'])) {
-                        $CheckedComments[$DiscussionID][] = $Check['checkId'];
+            foreach ($checkIDs as $check) {
+                if (val('checked', $check)) {
+                    if (!arrayHasValue($checkedComments, $check['checkId'])) {
+                        $checkedComments[$discussionID][] = $check['checkId'];
                     }
                 } else {
-                    RemoveValueFromArray($CheckedComments[$DiscussionID], $Check['checkId']);
+                    removeValueFromArray($checkedComments[$discussionID], $check['checkId']);
                 }
             }
 
-            if (count($CheckedComments[$DiscussionID]) == 0) {
-                unset($CheckedComments[$DiscussionID]);
+            if (count($checkedComments[$discussionID]) == 0) {
+                unset($checkedComments[$discussionID]);
             }
 
-            Gdn::userModel()->saveAttribute($Session->User->UserID, 'CheckedComments', $CheckedComments);
-        } elseif ($Session->isValid()) {
+            Gdn::userModel()->saveAttribute($session->User->UserID, 'CheckedComments', $checkedComments);
+        } elseif ($session->isValid()) {
             // No form posted, just retrieve checked items for display
-            $DiscussionID = property_exists($Sender, 'DiscussionID') ? $Sender->DiscussionID : 0;
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
-            if (!is_array($CheckedComments)) {
-                $CheckedComments = [];
+            $discussionID = property_exists($sender, 'DiscussionID') ? $sender->DiscussionID : 0;
+            $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
+            if (!is_array($checkedComments)) {
+                $checkedComments = [];
             }
 
         }
 
         // Retrieve some information about the checked items
-        $CountDiscussions = count($CheckedComments);
-        $CountComments = 0;
-        foreach ($CheckedComments as $DiscID => $Comments) {
-            if ($DiscID == $DiscussionID) {
-                $CountComments += count($Comments); // Sum of comments in this discussion
+        $countDiscussions = count($checkedComments);
+        $countComments = 0;
+        foreach ($checkedComments as $discID => $comments) {
+            if ($discID == $discussionID) {
+                $countComments += count($comments); // Sum of comments in this discussion
             }
         }
-        if ($CountComments > 0) {
-            $SelectionMessage = wrap(sprintf(
+        if ($countComments > 0) {
+            $selectionMessage = wrap(sprintf(
                 t('You have selected %1$s in this discussion.'),
-                plural($CountComments, '%s comment', '%s comments')
+                plural($countComments, '%s comment', '%s comments')
             ), 'div');
-            $ActionMessage = t('Take Action:');
+            $actionMessage = t('Take Action:');
 
             // Can the user delete the comment?
-            $DiscussionModel = new DiscussionModel();
-            $Discussion = $DiscussionModel->getID($DiscussionID);
-            if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Comments.Delete')) {
-                $ActionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmcommentdeletes/'.$DiscussionID, 'Delete Popup');
+            $discussionModel = new DiscussionModel();
+            $discussion = $discussionModel->getID($discussionID);
+            if (CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Comments.Delete')) {
+                $actionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmcommentdeletes/'.$discussionID, 'Delete Popup');
             }
 
-            $Sender->EventArguments['SelectionMessage'] = &$SelectionMessage;
-            $Sender->EventArguments['ActionMessage'] = &$ActionMessage;
-            $Sender->EventArguments['Discussion'] = $Discussion;
-            $Sender->fireEvent('BeforeCheckComments');
-            $ActionMessage .= ' '.anchor(t('Cancel'), 'moderation/clearcommentselections/'.$DiscussionID.'/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
+            $sender->EventArguments['SelectionMessage'] = &$selectionMessage;
+            $sender->EventArguments['ActionMessage'] = &$actionMessage;
+            $sender->EventArguments['Discussion'] = $discussion;
+            $sender->fireEvent('BeforeCheckComments');
+            $actionMessage .= ' '.anchor(t('Cancel'), 'moderation/clearcommentselections/'.$discussionID.'/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
 
-            $Sender->informMessage(
-                $SelectionMessage
-                .Wrap($ActionMessage, 'div', ['class' => 'Actions']),
+            $sender->informMessage(
+                $selectionMessage
+                .wrap($actionMessage, 'div', ['class' => 'Actions']),
                 [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
                 ]
             );
-        } elseif ($HadCheckedComments) {
+        } elseif ($hadCheckedComments) {
             // Remove the message completely if there were previously checked comments in this discussion, but none now
-            $Sender->informMessage('', ['id' => 'CheckSummary']);
+            $sender->informMessage('', ['id' => 'CheckSummary']);
         }
     }
 
     /**
      * Looks at the user's attributes and form postback to see if any discussions
      * have been checked for administration, and if so, adds an inform message to
-     * $Sender to take action.
+     * $sender to take action.
      */
-    public static function informCheckedDiscussions($Sender, $Force = false) {
-        $Session = Gdn::session();
-        $HadCheckedDiscussions = $Force;
-        if ($Session->isValid() && Gdn::request()->isAuthenticatedPostBack()) {
+    public static function informCheckedDiscussions($sender, $force = false) {
+        $session = Gdn::session();
+        $hadCheckedDiscussions = $force;
+        if ($session->isValid() && Gdn::request()->isAuthenticatedPostBack()) {
             // Form was posted, so accept changes to checked items.
-            $CheckIDs = val('CheckIDs', $_POST);
-            if (empty($CheckIDs)) {
-                $CheckIDs = [];
+            $checkIDs = val('CheckIDs', $_POST);
+            if (empty($checkIDs)) {
+                $checkIDs = [];
             }
-            $CheckIDs = (array)$CheckIDs;
+            $checkIDs = (array)$checkIDs;
 
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
-            if (!is_array($CheckedDiscussions)) {
-                $CheckedDiscussions = [];
+            $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+            if (!is_array($checkedDiscussions)) {
+                $checkedDiscussions = [];
             }
 
             // Were there checked discussions before the form was posted?
-            $HadCheckedDiscussions |= count($CheckedDiscussions) > 0;
+            $hadCheckedDiscussions |= count($checkedDiscussions) > 0;
 
-            foreach ($CheckIDs as $Check) {
-                if (val('checked', $Check)) {
-                    if (!ArrayHasValue($CheckedDiscussions, $Check['checkId'])) {
-                        $CheckedDiscussions[] = $Check['checkId'];
+            foreach ($checkIDs as $check) {
+                if (val('checked', $check)) {
+                    if (!arrayHasValue($checkedDiscussions, $check['checkId'])) {
+                        $checkedDiscussions[] = $check['checkId'];
                     }
                 } else {
-                    RemoveValueFromArray($CheckedDiscussions, $Check['checkId']);
+                    removeValueFromArray($checkedDiscussions, $check['checkId']);
                 }
             }
 
-            Gdn::userModel()->saveAttribute($Session->User->UserID, 'CheckedDiscussions', $CheckedDiscussions);
-        } elseif ($Session->isValid()) {
+            Gdn::userModel()->saveAttribute($session->User->UserID, 'CheckedDiscussions', $checkedDiscussions);
+        } elseif ($session->isValid()) {
             // No form posted, just retrieve checked items for display
-            $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
-            if (!is_array($CheckedDiscussions)) {
-                $CheckedDiscussions = [];
+            $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+            if (!is_array($checkedDiscussions)) {
+                $checkedDiscussions = [];
             }
 
         }
 
         // Retrieve some information about the checked items
-        $CountDiscussions = count($CheckedDiscussions);
-        if ($CountDiscussions > 0) {
-            $SelectionMessage = wrap(sprintf(
+        $countDiscussions = count($checkedDiscussions);
+        if ($countDiscussions > 0) {
+            $selectionMessage = wrap(sprintf(
                 t('You have selected %1$s.'),
-                plural($CountDiscussions, '%s discussion', '%s discussions')
+                plural($countDiscussions, '%s discussion', '%s discussions')
             ), 'div');
-            $ActionMessage = t('Take Action:');
-            $ActionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmdiscussiondeletes/', 'Delete Popup');
-            $ActionMessage .= ' '.anchor(t('Move'), 'moderation/confirmdiscussionmoves/', 'Move Popup');
+            $actionMessage = t('Take Action:');
+            $actionMessage .= ' '.anchor(t('Delete'), 'moderation/confirmdiscussiondeletes/', 'Delete Popup');
+            $actionMessage .= ' '.anchor(t('Move'), 'moderation/confirmdiscussionmoves/', 'Move Popup');
 
-            $Sender->EventArguments['SelectionMessage'] = &$SelectionMessage;
-            $Sender->EventArguments['ActionMessage'] = &$ActionMessage;
-            $Sender->fireEvent('BeforeCheckDiscussions');
-            $ActionMessage .= ' '.anchor(t('Cancel'), 'moderation/cleardiscussionselections/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
+            $sender->EventArguments['SelectionMessage'] = &$selectionMessage;
+            $sender->EventArguments['ActionMessage'] = &$actionMessage;
+            $sender->fireEvent('BeforeCheckDiscussions');
+            $actionMessage .= ' '.anchor(t('Cancel'), 'moderation/cleardiscussionselections/{TransientKey}/?Target={SelfUrl}', 'CancelAction');
 
-            $Sender->informMessage(
-                $SelectionMessage
-                .Wrap($ActionMessage, 'div', ['class' => 'Actions']),
+            $sender->informMessage(
+                $selectionMessage
+                .wrap($actionMessage, 'div', ['class' => 'Actions']),
                 [
                     'CssClass' => 'NoDismiss',
                     'id' => 'CheckSummary'
                 ]
             );
-        } elseif ($HadCheckedDiscussions) {
+        } elseif ($hadCheckedDiscussions) {
             // Remove the message completely if there were previously checked comments in this discussion, but none now
-            $Sender->informMessage('', ['id' => 'CheckSummary']);
+            $sender->informMessage('', ['id' => 'CheckSummary']);
         }
     }
 
     /**
      * Remove all comments checked for administration from the user's attributes.
      */
-    public function clearCommentSelections($DiscussionID = '', $TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
-            unset($CheckedComments[$DiscussionID]);
-            Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
+    public function clearCommentSelections($discussionID = '', $transientKey = '') {
+        $session = Gdn::session();
+        if ($session->validateTransientKey($transientKey)) {
+            $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
+            unset($checkedComments[$discussionID]);
+            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedComments', $checkedComments);
         }
 
-        redirectTo(GetIncomingValue('Target', '/discussions'));
+        redirectTo(getIncomingValue('Target', '/discussions'));
     }
 
     /**
      * Remove all discussions checked for administration from the user's attributes.
      */
-    public function clearDiscussionSelections($TransientKey = '') {
-        $Session = Gdn::session();
-        if ($Session->validateTransientKey($TransientKey)) {
-            Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
+    public function clearDiscussionSelections($transientKey = '') {
+        $session = Gdn::session();
+        if ($session->validateTransientKey($transientKey)) {
+            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', false);
         }
 
-        redirectTo(GetIncomingValue('Target', '/discussions'));
+        redirectTo(getIncomingValue('Target', '/discussions'));
     }
 
     /**
      * Form to confirm that the administrator wants to delete the selected
      * comments (and has permission to do so).
      */
-    public function confirmCommentDeletes($DiscussionID = '') {
-        $Session = Gdn::session();
+    public function confirmCommentDeletes($discussionID = '') {
+        $session = Gdn::session();
         $this->Form = new Gdn_Form();
-        $DiscussionModel = new DiscussionModel();
-        $Discussion = $DiscussionModel->getID($DiscussionID);
-        if (!$Discussion) {
+        $discussionModel = new DiscussionModel();
+        $discussion = $discussionModel->getID($discussionID);
+        if (!$discussion) {
             return;
         }
 
         // Verify that the user has permission to perform the delete
-        $this->categoryPermission($Discussion->CategoryID, 'Vanilla.Comments.Delete');
+        $this->categoryPermission($discussion->CategoryID, 'Vanilla.Comments.Delete');
         $this->title(t('Confirm'));
 
-        $CheckedComments = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedComments', []);
-        if (!is_array($CheckedComments)) {
-            $CheckedComments = [];
+        $checkedComments = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedComments', []);
+        if (!is_array($checkedComments)) {
+            $checkedComments = [];
         }
 
-        $CommentIDs = [];
-        $DiscussionIDs = [];
-        foreach ($CheckedComments as $DiscID => $Comments) {
-            foreach ($Comments as $Comment) {
-                if (substr($Comment, 0, 11) == 'Discussion_') {
-                    $DiscussionIDs[] = str_replace('Discussion_', '', $Comment);
-                } elseif ($DiscID == $DiscussionID) {
-                    $CommentIDs[] = str_replace('Comment_', '', $Comment);
+        $commentIDs = [];
+        $discussionIDs = [];
+        foreach ($checkedComments as $discID => $comments) {
+            foreach ($comments as $comment) {
+                if (substr($comment, 0, 11) == 'Discussion_') {
+                    $discussionIDs[] = str_replace('Discussion_', '', $comment);
+                } elseif ($discID == $discussionID) {
+                    $commentIDs[] = str_replace('Comment_', '', $comment);
                 }
             }
         }
-        $CountCheckedComments = count($CommentIDs);
-        $this->setData('CountCheckedComments', $CountCheckedComments);
+        $countCheckedComments = count($commentIDs);
+        $this->setData('CountCheckedComments', $countCheckedComments);
 
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected comments
-            $CommentModel = new CommentModel();
-            foreach ($CommentIDs as $CommentID) {
-                $CommentModel->deleteID($CommentID);
+            $commentModel = new CommentModel();
+            foreach ($commentIDs as $commentID) {
+                $commentModel->deleteID($commentID);
             }
 
             // Clear selections
-            unset($CheckedComments[$DiscussionID]);
-            Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedComments', $CheckedComments);
-            ModerationController::InformCheckedComments($this);
+            unset($checkedComments[$discussionID]);
+            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedComments', $checkedComments);
+            ModerationController::informCheckedComments($this);
             $this->setRedirectTo('discussions');
         }
 
@@ -291,48 +291,48 @@ class ModerationController extends VanillaController {
      * discussions (and has permission to do so).
      */
     public function confirmDiscussionDeletes() {
-        $Session = Gdn::session();
+        $session = Gdn::session();
         $this->Form = new Gdn_Form();
-        $DiscussionModel = new DiscussionModel();
+        $discussionModel = new DiscussionModel();
 
         // Verify that the user has permission to perform the deletes
         $this->permission('Vanilla.Discussions.Delete', true, 'Category', 'any');
         $this->title(t('Confirm'));
 
-        $CheckedDiscussions = Gdn::userModel()->getAttribute($Session->User->UserID, 'CheckedDiscussions', []);
-        if (!is_array($CheckedDiscussions)) {
-            $CheckedDiscussions = [];
+        $checkedDiscussions = Gdn::userModel()->getAttribute($session->User->UserID, 'CheckedDiscussions', []);
+        if (!is_array($checkedDiscussions)) {
+            $checkedDiscussions = [];
         }
 
-        $DiscussionIDs = $CheckedDiscussions;
-        $CountCheckedDiscussions = count($DiscussionIDs);
-        $this->setData('CountCheckedDiscussions', $CountCheckedDiscussions);
+        $discussionIDs = $checkedDiscussions;
+        $countCheckedDiscussions = count($discussionIDs);
+        $this->setData('CountCheckedDiscussions', $countCheckedDiscussions);
 
         // Check permissions on each discussion to make sure the user has permission to delete them
-        $AllowedDiscussions = [];
-        $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
-        foreach ($DiscussionData->result() as $Discussion) {
-            $CountCheckedDiscussions = $DiscussionData->numRows();
-            if (CategoryModel::checkPermission(val('CategoryID', $Discussion), 'Vanilla.Discussions.Delete')) {
-                $AllowedDiscussions[] = $Discussion->DiscussionID;
+        $allowedDiscussions = [];
+        $discussionData = $discussionModel->SQL->select('DiscussionID, CategoryID')->from('Discussion')->whereIn('DiscussionID', $discussionIDs)->get();
+        foreach ($discussionData->result() as $discussion) {
+            $countCheckedDiscussions = $discussionData->numRows();
+            if (CategoryModel::checkPermission(val('CategoryID', $discussion), 'Vanilla.Discussions.Delete')) {
+                $allowedDiscussions[] = $discussion->DiscussionID;
             }
         }
-        $this->setData('CountAllowed', count($AllowedDiscussions));
-        $CountNotAllowed = $CountCheckedDiscussions - count($AllowedDiscussions);
-        $this->setData('CountNotAllowed', $CountNotAllowed);
+        $this->setData('CountAllowed', count($allowedDiscussions));
+        $countNotAllowed = $countCheckedDiscussions - count($allowedDiscussions);
+        $this->setData('CountNotAllowed', $countNotAllowed);
 
         if ($this->Form->authenticatedPostBack()) {
             // Delete the selected discussions (that the user has permission to delete).
-            foreach ($AllowedDiscussions as $DiscussionID) {
-                $Deleted = $DiscussionModel->deleteID($DiscussionID);
-                if ($Deleted) {
-                    $this->jsonTarget("#Discussion_$DiscussionID", '', 'SlideUp');
+            foreach ($allowedDiscussions as $discussionID) {
+                $deleted = $discussionModel->deleteID($discussionID);
+                if ($deleted) {
+                    $this->jsonTarget("#Discussion_$discussionID", '', 'SlideUp');
                 }
             }
 
             // Clear selections
-            Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', null);
-            ModerationController::InformCheckedDiscussions($this, true);
+            Gdn::userModel()->saveAttribute($session->UserID, 'CheckedDiscussions', null);
+            ModerationController::informCheckedDiscussions($this, true);
         }
 
         $this->render();
@@ -368,7 +368,7 @@ class ModerationController extends VanillaController {
         // Check for edit permissions on each discussion
         $AllowedDiscussions = [];
         $DiscussionData = $DiscussionModel->SQL->select('DiscussionID, Name, DateLastComment, CategoryID, CountComments')->from('Discussion')->whereIn('DiscussionID', $DiscussionIDs)->get();
-        $DiscussionData = Gdn_DataSet::Index($DiscussionData->resultArray(), ['DiscussionID']);
+        $DiscussionData = Gdn_DataSet::index($DiscussionData->resultArray(), ['DiscussionID']);
         foreach ($DiscussionData as $DiscussionID => $Discussion) {
             $Category = CategoryModel::categories($Discussion['CategoryID']);
             if ($Category && $Category['PermsDiscussionsEdit']) {
@@ -399,14 +399,14 @@ class ModerationController extends VanillaController {
                 // Create the shadow redirect.
                 if ($RedirectLink) {
                     $DiscussionModel->defineSchema();
-                    $MaxNameLength = val('Length', $DiscussionModel->Schema->GetField('Name'));
+                    $MaxNameLength = val('Length', $DiscussionModel->Schema->getField('Name'));
 
                     $RedirectDiscussion = [
-                        'Name' => SliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
+                        'Name' => sliceString(sprintf(t('Moved: %s'), $Discussion['Name']), $MaxNameLength),
                         'DateInserted' => $Discussion['DateLastComment'],
                         'Type' => 'redirect',
                         'CategoryID' => $Discussion['CategoryID'],
-                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => DiscussionUrl($Discussion)]),
+                        'Body' => formatString(t('This discussion has been <a href="{url,html}">moved</a>.'), ['url' => discussionUrl($Discussion)]),
                         'Format' => 'Html',
                         'Closed' => true
                     ];
@@ -471,7 +471,7 @@ class ModerationController extends VanillaController {
             // Clear selections.
             if ($ClearSelection) {
                 Gdn::userModel()->saveAttribute($Session->UserID, 'CheckedDiscussions', false);
-                ModerationController::InformCheckedDiscussions($this);
+                ModerationController::informCheckedDiscussions($this);
             }
 
             if ($this->Form->errorCount() == 0) {

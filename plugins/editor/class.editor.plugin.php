@@ -58,7 +58,7 @@ class EditorPlugin extends Gdn_Plugin {
         parent::__construct();
         $this->mediaCache = null;
         $this->mediaCacheExpire = 60 * 60 * 6;
-        $this->AssetPath = Asset('/plugins/editor');
+        $this->AssetPath = asset('/plugins/editor');
         $this->pluginInfo = Gdn::pluginManager()->getPluginInfo('editor', Gdn_PluginManager::ACCESS_PLUGINNAME);
         $this->ForceWysiwyg = c('Plugins.editor.ForceWysiwyg', false);
 
@@ -487,9 +487,9 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Load CSS into head for editor
      */
-    public function assetModel_styleCss_handler($Sender) {
-        $Sender->addCssFile('vanillicon.css', 'static');
-        $Sender->addCssFile('editor.css', 'plugins/editor');
+    public function assetModel_styleCss_handler($sender) {
+        $sender->addCssFile('vanillicon.css', 'static');
+        $sender->addCssFile('editor.css', 'plugins/editor');
     }
 
 
@@ -501,19 +501,19 @@ class EditorPlugin extends Gdn_Plugin {
      * might not be the best way to do this, but there does not seem to be any
      * easy way to determine whether content is embedded or not.
      *
-     * @param Controller $Sender
+     * @param Controller $sender
      * @return bool
      */
-    public function isEmbeddedComment($Sender) {
+    public function isEmbeddedComment($sender) {
         $isEmbeddedComment = false;
         $requestMethod = [];
 
-        if (isset($Sender->RequestMethod)) {
-            $requestMethod[] = strtolower($Sender->RequestMethod);
+        if (isset($sender->RequestMethod)) {
+            $requestMethod[] = strtolower($sender->RequestMethod);
         }
 
-        if (isset($Sender->OriginalRequestMethod)) {
-            $requestMethod[] = strtolower($Sender->OriginalRequestMethod);
+        if (isset($sender->OriginalRequestMethod)) {
+            $requestMethod[] = strtolower($sender->OriginalRequestMethod);
         }
 
         if (count($requestMethod)) {
@@ -530,11 +530,11 @@ class EditorPlugin extends Gdn_Plugin {
      * Placed these components everywhere due to some Web sites loading the
      * editor in some areas where the values were not yet injected into HTML.
      */
-    public function base_render_before($Sender) {
+    public function base_render_before($sender) {
         // Don't render any assets for editor if it's embedded. This effectively
         // disables the editor from embedded comments. Some HTML is still
         // inserted, because of the BeforeBodyBox handler, which does not contain any data relating to embedded content.
-        if ($this->isEmbeddedComment($Sender)) {
+        if ($this->isEmbeddedComment($sender)) {
             return false;
         }
 
@@ -542,9 +542,9 @@ class EditorPlugin extends Gdn_Plugin {
 
         // If user wants to modify styling of Wysiwyg content in editor,
         // they can override the styles with this file.
-        $CssInfo = AssetModel::cssPath('wysiwyg.css', 'plugins/editor');
-        if ($CssInfo) {
-            $CssPath = asset($CssInfo[1]);
+        $cssInfo = AssetModel::cssPath('wysiwyg.css', 'plugins/editor');
+        if ($cssInfo) {
+            $cssPath = asset($cssInfo[1]);
         }
 
         // Load JavaScript used by every editor view.
@@ -574,7 +574,7 @@ class EditorPlugin extends Gdn_Plugin {
         $c->addDefinition('htmlHelpText', t('editor.HtmlHelpText', 'You can use <a href="http://htmlguide.drgrog.com/cheatsheet.php" target="_new">Simple HTML</a> in your post.'));
         $c->addDefinition('markdownHelpText', t('editor.MarkdownHelpText', 'You can use <a href="http://en.wikipedia.org/wiki/Markdown" target="_new">Markdown</a> in your post.'));
         $c->addDefinition('textHelpText', t('editor.TextHelpText', 'You are using plain text in your post.'));
-        $c->addDefinition('editorWysiwygCSS', $CssPath);
+        $c->addDefinition('editorWysiwygCSS', $cssPath);
         $c->addDefinition('canUpload', $this->canUpload());
 
         $additionalDefinitions = [];
@@ -590,15 +590,15 @@ class EditorPlugin extends Gdn_Plugin {
         }
 
         // Set variables for file uploads
-        $PostMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));
-        $FileMaxSize = Gdn_Upload::unformatFileSize(ini_get('upload_max_filesize'));
-        $ConfigMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
-        $MaxSize = min($PostMaxSize, $FileMaxSize, $ConfigMaxSize);
-        $c->addDefinition('maxUploadSize', $MaxSize);
+        $postMaxSize = Gdn_Upload::unformatFileSize(ini_get('post_max_size'));
+        $fileMaxSize = Gdn_Upload::unformatFileSize(ini_get('upload_max_filesize'));
+        $configMaxSize = Gdn_Upload::unformatFileSize(c('Garden.Upload.MaxFileSize', '1MB'));
+        $maxSize = min($postMaxSize, $fileMaxSize, $configMaxSize);
+        $c->addDefinition('maxUploadSize', $maxSize);
 
         // Set file input name
         $c->addDefinition('editorFileInputName', $this->editorFileInputName);
-        $Sender->setData('_editorFileInputName', $this->editorFileInputName);
+        $sender->setData('_editorFileInputName', $this->editorFileInputName);
         // Save allowed file types
         $allowedFileExtensions = c('Garden.Upload.AllowedFileExtensions');
         $imageExtensions = ['gif', 'png', 'jpeg', 'jpg', 'bmp', 'tif', 'tiff', 'svg'];
@@ -630,12 +630,12 @@ class EditorPlugin extends Gdn_Plugin {
         // prepend extensions with a '.'
         $allowedFileExtensions = array_map($prependDot, $allowedFileExtensions);
         $accept = implode(',', array_merge($allowedFileExtensions, $allowedMimeTypes));
-        $Sender->setData('Accept', $accept);
+        $sender->setData('Accept', $accept);
 
         // prepend extensions with a '.'
         $allowedImageExtensions = array_map($prependDot, $allowedImageExtensions);
         $acceptImage = implode(',', array_merge($allowedImageExtensions, $allowedImageMimeTypes));
-        $Sender->setData('AcceptImage', $acceptImage);
+        $sender->setData('AcceptImage', $acceptImage);
 
         // Get max file uploads, to be used for max drops at once.
         $c->addDefinition('maxFileUploads', ini_get('max_file_uploads'));
@@ -646,34 +646,34 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * It is not being used for editing a posted reply, so find another event to hook into.
      *
-     * @param Gdn_Form $Sender
+     * @param Gdn_Form $sender
      */
-    public function gdn_form_beforeBodyBox_handler($Sender, $Args) {
+    public function gdn_form_beforeBodyBox_handler($sender, $args) {
         // TODO have some way to prevent this content from getting loaded when in embedded.
         // The only problem is figuring out how to know when content is embedded.
 
         $attributes = [];
-        if (val('Attributes', $Args)) {
-            $attributes = val('Attributes', $Args);
+        if (val('Attributes', $args)) {
+            $attributes = val('Attributes', $args);
         }
 
         // TODO move this property to constructor
-        $this->Format = $Sender->getValue('Format');
+        $this->Format = $sender->getValue('Format');
 
         // Make sure we have some sort of format.
         if (!$this->Format) {
             $this->Format = c('Garden.InputFormatter', 'Html');
-            $Sender->setValue('Format', $this->Format);
+            $sender->setValue('Format', $this->Format);
         }
 
         // If force Wysiwyg enabled in settings
         $needsConversion = (!in_array($this->Format, ['Wysiwyg']));
         if (c('Garden.InputFormatter', 'Wysiwyg') == 'Wysiwyg' && $this->ForceWysiwyg == true && $needsConversion) {
-            $wysiwygBody = Gdn_Format::to($Sender->getValue('Body'), $this->Format);
-            $Sender->setValue('Body', $wysiwygBody);
+            $wysiwygBody = Gdn_Format::to($sender->getValue('Body'), $this->Format);
+            $sender->setValue('Body', $wysiwygBody);
 
             $this->Format = 'Wysiwyg';
-            $Sender->setValue('Format', $this->Format);
+            $sender->setValue('Format', $this->Format);
         }
 
         if (in_array(strtolower($this->Format), array_map('strtolower', $this->Formats))) {
@@ -695,9 +695,9 @@ class EditorPlugin extends Gdn_Plugin {
             // Determine which controller (post or discussion) is invoking this.
             // At the moment they're both the same, but in future you may want
             // to know this information to modify it accordingly.
-            $View = $c->fetchView('editor', '', 'plugins/editor');
+            $view = $c->fetchView('editor', '', 'plugins/editor');
 
-            $Args['BodyBox'] .= $View;
+            $args['BodyBox'] .= $view;
         }
     }
 
@@ -886,22 +886,22 @@ class EditorPlugin extends Gdn_Plugin {
      * Attach a file to a foreign table and ID.
      *
      * @access protected
-     * @param int $FileID
-     * @param int $ForeignID
-     * @param string $ForeignType Lowercase.
+     * @param int $fileID
+     * @param int $foreignID
+     * @param string $foreignType Lowercase.
      * @return bool Whether attach was successful.
      */
-    protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
+    protected function attachEditorUploads($fileID, $foreignID, $foreignType) {
         // Save data to database using model with media table
-        $Model = new MediaModel();
+        $model = new MediaModel();
 
-        $Media = $Model->getID($FileID);
-        if ($Media) {
-            $Media->ForeignID = $ForeignID;
-            $Media->ForeignTable = $ForeignType;
+        $media = $model->getID($fileID);
+        if ($media) {
+            $media->ForeignID = $foreignID;
+            $media->ForeignTable = $foreignType;
 
             try {
-                $Model->save($Media);
+                $model->save($media);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;
@@ -915,22 +915,22 @@ class EditorPlugin extends Gdn_Plugin {
      * Remove file from filesystem, and clear db entry.
      *
      * @param type $FileID
-     * @param type $ForeignID
-     * @param type $ForeignType
+     * @param type $foreignID
+     * @param type $foreignType
      * @return boolean
      */
-    protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
+    protected function deleteEditorUploads($mediaID, $foreignID = '', $foreignType = '') {
         // Save data to database using model with media table
-        $Model = new MediaModel();
-        $Media = $Model->getID($MediaID, DATASET_TYPE_ARRAY);
+        $model = new MediaModel();
+        $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
 
-        $IsOwner = (!empty($Media['InsertUserID']) && Gdn::session()->UserID == $Media['InsertUserID']);
+        $isOwner = (!empty($media['InsertUserID']) && Gdn::session()->UserID == $media['InsertUserID']);
         // @todo Per-category edit permission would be better, but this global is far simpler to check here.
         // However, this currently matches the permission check in views/attachments.php so keep that in sync.
-        $CanDelete = ($IsOwner || Gdn::session()->checkPermission('Garden.Moderation.Manage'));
-        if ($Media && $CanDelete) {
+        $canDelete = ($isOwner || Gdn::session()->checkPermission('Garden.Moderation.Manage'));
+        if ($media && $canDelete) {
             try {
-                $Model->deleteID($MediaID, ['deleteFile' => true]);
+                $model->deleteID($mediaID, ['deleteFile' => true]);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;
@@ -972,80 +972,80 @@ class EditorPlugin extends Gdn_Plugin {
      * Attach files to a comment during save.
      *
      * @access public
-     * @param object $Sender
-     * @param array $Args
+     * @param object $sender
+     * @param array $args
      */
-    public function postController_afterCommentSave_handler($Sender, $Args) {
-        if (!$Args['Comment']) {
+    public function postController_afterCommentSave_handler($sender, $args) {
+        if (!$args['Comment']) {
             return;
         }
 
-        $CommentID = $Args['Comment']->CommentID;
-        if (!$CommentID) {
+        $commentID = $args['Comment']->CommentID;
+        if (!$commentID) {
             return;
         }
 
-        $this->saveUploads($CommentID, 'comment');
+        $this->saveUploads($commentID, 'comment');
     }
 
     /**
      * Attach files to a discussion during save.
      *
      * @access public
-     * @param object $Sender
-     * @param array $Args
+     * @param object $sender
+     * @param array $args
      */
-    public function postController_afterDiscussionSave_handler($Sender, $Args) {
-        if (!$Args['Discussion']) {
+    public function postController_afterDiscussionSave_handler($sender, $args) {
+        if (!$args['Discussion']) {
             return;
         }
 
-        $DiscussionID = $Args['Discussion']->DiscussionID;
-        if (!$DiscussionID) {
+        $discussionID = $args['Discussion']->DiscussionID;
+        if (!$discussionID) {
             return;
         }
 
-        $this->saveUploads($DiscussionID, 'discussion');
+        $this->saveUploads($discussionID, 'discussion');
     }
 
     /**
      * Attach files to a message during save.
      *
      * @access public
-     * @param object $Sender
-     * @param array $Args
+     * @param object $sender
+     * @param array $args
      */
-    public function messagesController_afterMessageSave_handler($Sender, $Args) {
-        if (!$Args['MessageID']) {
+    public function messagesController_afterMessageSave_handler($sender, $args) {
+        if (!$args['MessageID']) {
             return;
         }
 
-        $MessageID = $Args['MessageID'];
-        if (!$MessageID) {
+        $messageID = $args['MessageID'];
+        if (!$messageID) {
             return;
         }
 
-        $this->saveUploads($MessageID, 'message');
+        $this->saveUploads($messageID, 'message');
     }
 
     /**
      * Attach files to a message during conversation save.
      *
      * @access public
-     * @param object $Sender
-     * @param array $Args
+     * @param object $sender
+     * @param array $args
      */
-    public function messagesController_afterConversationSave_handler($Sender, $Args) {
-        if (!$Args['MessageID']) {
+    public function messagesController_afterConversationSave_handler($sender, $args) {
+        if (!$args['MessageID']) {
             return;
         }
 
-        $MessageID = $Args['MessageID'];
-        if (!$MessageID) {
+        $messageID = $args['MessageID'];
+        if (!$messageID) {
             return;
         }
 
-        $this->saveUploads($MessageID, 'message');
+        $this->saveUploads($messageID, 'message');
     }
 
     /**
@@ -1055,22 +1055,22 @@ class EditorPlugin extends Gdn_Plugin {
      * exist per discussion or comment.
      *
      * @param multiple $Controller The controller.
-     * @param string $Type The type of row, either discussion or comment.
+     * @param string $type The type of row, either discussion or comment.
      * @param array|object $row The row of data being attached to.
      */
-    protected function attachUploadsToComment($Sender, $Type = 'comment', $row = null) {
-        $param = ucfirst($Type).'ID';
-        $foreignId = val($param, val(ucfirst($Type), $Sender->EventArguments));
+    protected function attachUploadsToComment($sender, $type = 'comment', $row = null) {
+        $param = ucfirst($type).'ID';
+        $foreignId = val($param, val(ucfirst($type), $sender->EventArguments));
 
         // Get all media for the page.
-        $mediaList = $this->mediaCache($Sender);
+        $mediaList = $this->mediaCache($sender);
 
         if (is_array($mediaList)) {
             // Filter out the ones that don't match.
-            $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $Type) {
+            $attachments = array_filter($mediaList, function($attachment) use ($foreignId, $type) {
                 if (isset($attachment['ForeignID'])
                 && $attachment['ForeignID'] == $foreignId
-                && $attachment['ForeignTable'] == $Type
+                && $attachment['ForeignTable'] == $type
                 ) {
                     return true;
                 }
@@ -1090,9 +1090,9 @@ class EditorPlugin extends Gdn_Plugin {
                     $attachment['InBody'] = $inbody;
                 }
 
-                $Sender->setData('_attachments', $attachments);
-                $Sender->setData('_editorkey', strtolower($param.$foreignId));
-                echo $Sender->fetchView('attachments', '', 'plugins/editor');
+                $sender->setData('_attachments', $attachments);
+                $sender->setData('_editorkey', strtolower($param.$foreignId));
+                echo $sender->fetchView('attachments', '', 'plugins/editor');
             }
         }
     }
@@ -1104,20 +1104,20 @@ class EditorPlugin extends Gdn_Plugin {
      * @return array
      */
     protected function getConversationMessageIDList($id) {
-        $Conversations = [];
-        $ConversationMessageModel = new Gdn_Model('ConversationMessage');
+        $conversations = [];
+        $conversationMessageModel = new Gdn_Model('ConversationMessage');
 
         // Query the Media table for discussion media.
         if (is_numeric($id)) {
             $sqlWhere = ['ConversationID' => $id];
-            $Conversations = $ConversationMessageModel->getWhere($sqlWhere)->resultArray();
+            $conversations = $conversationMessageModel->getWhere($sqlWhere)->resultArray();
         }
 
-        $MessageIDList = [];
-        foreach ($Conversations as $Conversation) {
-            $MessageIDList[] = val('MessageID', $Conversation);
+        $messageIDList = [];
+        foreach ($conversations as $conversation) {
+            $messageIDList[] = val('MessageID', $conversation);
         }
-        return $MessageIDList;
+        return $messageIDList;
     }
 
     /**
@@ -1125,61 +1125,61 @@ class EditorPlugin extends Gdn_Plugin {
      *
      * This will call PreloadDiscussionMedia, which will either query the db, or query memcached.
      *
-     * @param mixed $Sender
+     * @param mixed $sender
      */
-    protected function cacheAttachedMedia($Sender) {
-        if ($Sender->data('Conversation')) {
-            $ConversationMessageIDList = $this->getConversationMessageIDList(val('ConversationID', $Sender->data('Conversation')));
-            if (count($ConversationMessageIDList)) {
-                $MediaData = $this->preloadDiscussionMedia(val('ConversationID', $Sender->data('Conversation')), $ConversationMessageIDList, 'conversation');
+    protected function cacheAttachedMedia($sender) {
+        if ($sender->data('Conversation')) {
+            $conversationMessageIDList = $this->getConversationMessageIDList(val('ConversationID', $sender->data('Conversation')));
+            if (count($conversationMessageIDList)) {
+                $mediaData = $this->preloadDiscussionMedia(val('ConversationID', $sender->data('Conversation')), $conversationMessageIDList, 'conversation');
             }
-            $this->mediaCache = $MediaData;
+            $this->mediaCache = $mediaData;
             return;
         }
 
-        if ($Sender->data('Messages')) {
-            $Message = $Sender->data('Messages')->result();
-            $MessageID = val(0, $Message)->MessageID;
-            $MessageIDList = [$MessageID];
-            if (count($MessageIDList)) {
-                $MediaData = $this->preloadDiscussionMedia(val('ConversationID', $Sender->data('Messages')), $MessageIDList, 'conversation');
+        if ($sender->data('Messages')) {
+            $message = $sender->data('Messages')->result();
+            $messageID = val(0, $message)->MessageID;
+            $messageIDList = [$messageID];
+            if (count($messageIDList)) {
+                $mediaData = $this->preloadDiscussionMedia(val('ConversationID', $sender->data('Messages')), $messageIDList, 'conversation');
             }
-            $this->mediaCache = $MediaData;
+            $this->mediaCache = $mediaData;
             return;
         }
 
-        $DiscussionID = null;
-        $Comments = $Sender->data('Comments');
-        if ($answers = $Sender->data('Answers')) {
-            $commentsArray = $Comments->resultObject();
+        $discussionID = null;
+        $comments = $sender->data('Comments');
+        if ($answers = $sender->data('Answers')) {
+            $commentsArray = $comments->resultObject();
             $commentsArray = array_merge($answers, $commentsArray);
             $commentsData = new Gdn_DataSet();
             $commentsData->importDataset($commentsArray);
-            $Comments = $commentsData;
+            $comments = $commentsData;
         }
-        $CommentIDList = [];
-        $MediaData = [];
+        $commentIDList = [];
+        $mediaData = [];
 
-        if ($Sender->data('Discussion.DiscussionID')) {
-            $DiscussionID = $Sender->data('Discussion.DiscussionID');
-        }
-
-        if (is_null($DiscussionID) && !empty($Comments)) {
-            $DiscussionID = $Comments->firstRow()->DiscussionID;
+        if ($sender->data('Discussion.DiscussionID')) {
+            $discussionID = $sender->data('Discussion.DiscussionID');
         }
 
-        if ($DiscussionID) {
-            if ($Comments instanceof Gdn_DataSet && $Comments->numRows()) {
-                $Comments->dataSeek(-1);
-                while ($Comment = $Comments->nextRow()) {
-                    $CommentIDList[] = $Comment->CommentID;
+        if (is_null($discussionID) && !empty($comments)) {
+            $discussionID = $comments->firstRow()->DiscussionID;
+        }
+
+        if ($discussionID) {
+            if ($comments instanceof Gdn_DataSet && $comments->numRows()) {
+                $comments->dataSeek(-1);
+                while ($comment = $comments->nextRow()) {
+                    $commentIDList[] = $comment->CommentID;
                 }
-            } elseif (!empty($Sender->Discussion)) {
-                $CommentIDList[] = $Sender->DiscussionID = $Sender->Discussion->DiscussionID;
+            } elseif (!empty($sender->Discussion)) {
+                $commentIDList[] = $sender->DiscussionID = $sender->Discussion->DiscussionID;
             }
 
-            if (isset($Sender->Comment) && isset($Sender->Comment->CommentID)) {
-                $CommentIDList[] = $Sender->Comment->CommentID;
+            if (isset($sender->Comment) && isset($sender->Comment->CommentID)) {
+                $commentIDList[] = $sender->Comment->CommentID;
             }
 
             // TODO
@@ -1193,20 +1193,20 @@ class EditorPlugin extends Gdn_Plugin {
             // file is uploaded, or just getting a list of all comments for a discussion.
             // This is why memcaching has been disabled for now. There are a couple
             // ways to prevent this, but they all seem unnecessary.
-            if (count($CommentIDList)) {
-                $MediaData = $this->preloadDiscussionMedia($DiscussionID, $CommentIDList);
+            if (count($commentIDList)) {
+                $mediaData = $this->preloadDiscussionMedia($discussionID, $commentIDList);
             }
 
-            $this->mediaCache = $MediaData;
+            $this->mediaCache = $mediaData;
         }
     }
 
     /**
      * Get media list for inserting into discussion and comments.
      */
-    public function mediaCache($Sender) {
+    public function mediaCache($sender) {
         if ($this->mediaCache === null) {
-            $this->cacheAttachedMedia($Sender);
+            $this->cacheAttachedMedia($sender);
         }
 
         return $this->mediaCache;
@@ -1257,28 +1257,28 @@ class EditorPlugin extends Gdn_Plugin {
         return $mediaData;
     }
 
-    public function postController_discussionFormOptions_handler($Sender, $Args) {
-        if (!is_null($Discussion = val('Discussion', $Sender, null))) {
-            $Sender->EventArguments['Type'] = 'Discussion';
-            $Sender->EventArguments['Discussion'] = $Discussion;
-            $this->attachUploadsToComment($Sender, 'discussion');
+    public function postController_discussionFormOptions_handler($sender, $args) {
+        if (!is_null($discussion = val('Discussion', $sender, null))) {
+            $sender->EventArguments['Type'] = 'Discussion';
+            $sender->EventArguments['Discussion'] = $discussion;
+            $this->attachUploadsToComment($sender, 'discussion');
         }
     }
 
-    public function discussionController_afterCommentBody_handler($Sender, $Args) {
-        $this->attachUploadsToComment($Sender, 'comment', val('Comment', $Args));
+    public function discussionController_afterCommentBody_handler($sender, $args) {
+        $this->attachUploadsToComment($sender, 'comment', val('Comment', $args));
     }
 
-    public function discussionController_afterDiscussionBody_handler($Sender, $Args) {
-        $this->attachUploadsToComment($Sender, 'discussion', val('Discussion', $Args));
+    public function discussionController_afterDiscussionBody_handler($sender, $args) {
+        $this->attachUploadsToComment($sender, 'discussion', val('Discussion', $args));
     }
 
-    public function postController_afterCommentBody_handler($Sender, $Args) {
-        $this->attachUploadsToComment($Sender);
+    public function postController_afterCommentBody_handler($sender, $args) {
+        $this->attachUploadsToComment($sender);
     }
 
-    public function messagesController_afterConversationMessageBody_handler($Sender, $Args) {
-        $this->attachUploadsToComment($Sender, 'message', val('Message', $Args));
+    public function messagesController_afterConversationMessageBody_handler($sender, $args) {
+        $this->attachUploadsToComment($sender, 'message', val('Message', $args));
     }
 
     /**
@@ -1356,35 +1356,35 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Add upload option checkbox to custom permissions for categories.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function settingsController_addEditCategory_handler($Sender) {
+    public function settingsController_addEditCategory_handler($sender) {
         // Only put the checkbox on edit. On creation the default value will be used.
-        if ($Sender->data('CategoryID')) {
-            $Sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
+        if ($sender->data('CategoryID')) {
+            $sender->Data['_PermissionFields']['AllowFileUploads'] = ['Control' => 'CheckBox'];
         }
     }
 
     /**
      *
-     * @param SettingsController $Sender
-     * @param array $Args
+     * @param SettingsController $sender
+     * @param array $args
      */
-    public function settingsController_editor_create($Sender, $Args) {
-        $Sender->permission('Garden.Settings.Manage');
-        $Cf = new ConfigurationModule($Sender);
+    public function settingsController_editor_create($sender, $args) {
+        $sender->permission('Garden.Settings.Manage');
+        $cf = new ConfigurationModule($sender);
 
-        $Formats = array_combine($this->Formats, $this->Formats);
+        $formats = array_combine($this->Formats, $this->Formats);
 
-        $Cf->initialize([
-            'Garden.InputFormatter' => ['LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>', 'Items' => $Formats],
+        $cf->initialize([
+            'Garden.InputFormatter' => ['LabelCode' => 'Post Format', 'Control' => 'DropDown', 'Description' => '<p>Select the default format of the editor for posts in the community.</p><p><strong>Note:</strong> the editor will auto-detect the format of old posts when editing them and load their original formatting rules. Aside from this exception, the selected post format below will take precedence.</p>', 'Items' => $formats],
             'Plugins.editor.ForceWysiwyg' => ['LabelCode' => 'Reinterpret All Posts As Wysiwyg', 'Control' => 'Checkbox', 'Description' => '<p class="info">Check the below option to tell the editor to reinterpret all old posts as Wysiwyg.</p> <p class="info"><strong>Note:</strong> This setting will only take effect if Wysiwyg was chosen as the Post Format above. The purpose of this option is to normalize the editor format. If older posts edited with another format, such as markdown or BBCode, are loaded, this option will force Wysiwyg.</p>'],
-            'Garden.MobileInputFormatter' => ['LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $Formats, 'DefaultValue' => c('Garden.MobileInputFormatter')]
+            'Garden.MobileInputFormatter' => ['LabelCode' => 'Mobile Format', 'Control' => 'DropDown', 'Description' => '<p>Specify an editing format for mobile devices. If mobile devices should have the same experience, specify the same one as above. If users report issues with mobile editing, this is a good option to change.</p>', 'Items' => $formats, 'DefaultValue' => c('Garden.MobileInputFormatter')]
         ]);
 
 
-        $Sender->setData('Title', t('Advanced Editor Settings'));
-        $Cf->renderAll();
+        $sender->setData('Title', t('Advanced Editor Settings'));
+        $cf->renderAll();
     }
 
     /**
@@ -1419,8 +1419,8 @@ class EditorPlugin extends Gdn_Plugin {
         // Set to false by default, so change in config if uploads allowed.
         touchConfig('Garden.AllowFileUploads', true);
 
-        $Structure = Gdn::structure();
-        $Structure
+        $structure = Gdn::structure();
+        $structure
             ->table('Category')
             ->column('AllowFileUploads', 'tinyint(1)', '1')
             ->set();
@@ -1531,8 +1531,8 @@ class EditorPlugin extends Gdn_Plugin {
             // Check config and user role upload permission
             if (c('Garden.AllowFileUploads', true) && Gdn::session()->checkPermission('Plugins.Attachments.Upload.Allow', false)) {
                 // Check category-specific permission
-                $PermissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
-                $this->canUpload = val('AllowFileUploads', $PermissionCategory, true);
+                $permissionCategory = CategoryModel::permissionCategory(Gdn::controller()->data('Category'));
+                $this->canUpload = val('AllowFileUploads', $permissionCategory, true);
             } else {
                 $this->canUpload = false;
             }

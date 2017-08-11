@@ -179,6 +179,7 @@ $dic->setInstance('Garden\Container\Container', $dic)
 
     ->rule('HtmlFormatter')
     ->setClass(VanillaHtmlFormatter::class)
+    ->addAlias(VanillaHtmlFormatter::class)
     ->setShared(true)
 
     ->rule('Smarty')

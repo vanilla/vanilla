@@ -31,14 +31,14 @@ if ($CountNotAllowed > 0) {
             <?php
             echo '<p><div class="Category">';
             echo $this->Form->label('Category', 'CategoryID'), ' ';
-            echo $this->Form->CategoryDropDown();
+            echo $this->Form->categoryDropDown();
             echo '</div></p>';
             ?>
         </li>
         <li>
             <?php
             echo '<p>'.
-                $this->Form->CheckBox('RedirectLink', 'Leave a redirect link.').
+                $this->Form->checkBox('RedirectLink', 'Leave a redirect link.').
                 '</p>';
             ?>
         </li>

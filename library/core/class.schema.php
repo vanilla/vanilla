@@ -30,9 +30,9 @@ class Gdn_Schema {
      * @param string Explicitly define the name of the table that this model represents. You can also explicitly set this value with $this->TableName.
      * @param Gdn_Database
      */
-    public function __construct($Table = '', $Database = null) {
-        if ($Table != '') {
-            $this->fetch($Table, $Database);
+    public function __construct($table = '', $database = null) {
+        if ($table != '') {
+            $this->fetch($table, $database);
         }
     }
 
@@ -44,9 +44,9 @@ class Gdn_Schema {
      * @param Gdn_Database
      * @return array
      */
-    public function Fetch($Table = false, $Database = null) {
-        if ($Table !== false) {
-            $this->CurrentTable = $Table;
+    public function fetch($table = false, $database = null) {
+        if ($table !== false) {
+            $this->CurrentTable = $table;
         }
 
         if (!is_array($this->_Schema)) {
@@ -54,12 +54,12 @@ class Gdn_Schema {
         }
 
         if (!array_key_exists($this->CurrentTable, $this->_Schema)) {
-            if ($Database !== null) {
-                $SQL = $Database->SQL();
+            if ($database !== null) {
+                $sQL = $database->sql();
             } else {
-                $SQL = Gdn::SQL();
+                $sQL = Gdn::sql();
             }
-            $this->_Schema[$this->CurrentTable] = $SQL->fetchTableSchema($this->CurrentTable);
+            $this->_Schema[$this->CurrentTable] = $sQL->fetchTableSchema($this->CurrentTable);
         }
         return $this->_Schema[$this->CurrentTable];
     }
@@ -68,74 +68,74 @@ class Gdn_Schema {
      *
      * @return array
      */
-    public function fields($Tablename = false) {
-        if (!$Tablename) {
-            $Tablename = $this->CurrentTable;
+    public function fields($tablename = false) {
+        if (!$tablename) {
+            $tablename = $this->CurrentTable;
         }
 
-        return $this->_Schema[$Tablename];
+        return $this->_Schema[$tablename];
     }
 
     /**
      * Returns a the entire field object.
      *
-     * @param string The name of the field to look for in $this->CurrentTable (or $Table if it is defined).
-     * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
+     * @param string The name of the field to look for in $this->CurrentTable (or $table if it is defined).
+     * @param string If this value is specified, $this->CurrentTable will be switched to $table.
      */
-    public function getField($Field, $Table = '') {
-        if ($Table != '') {
-            $this->CurrentTable = $Table;
+    public function getField($field, $table = '') {
+        if ($table != '') {
+            $this->CurrentTable = $table;
         }
 
         if (!is_array($this->_Schema)) {
             $this->_Schema = [];
         }
 
-        $Result = false;
-        if ($this->fieldExists($this->CurrentTable, $Field) === true) {
-            $Result = $this->_Schema[$this->CurrentTable][$Field];
+        $result = false;
+        if ($this->fieldExists($this->CurrentTable, $field) === true) {
+            $result = $this->_Schema[$this->CurrentTable][$field];
         }
 
-        return $Result;
+        return $result;
     }
 
     /**
-     * Returns the value of $Property or $Default if not found.
+     * Returns the value of $property or $default if not found.
      *
-     * @param string The name of the field to look for in $this->CurrentTable (or $Table if it is defined).
-     * @param string The name of the property to retrieve from $Field. Options are: Name, PrimaryKey, Type, AllowNull, Default, Length, and Enum.
-     * @param string The default value to return if $Property is not found in $Field of $Table.
-     * @param string If this value is specified, $this->CurrentTable will be switched to $Table.
+     * @param string The name of the field to look for in $this->CurrentTable (or $table if it is defined).
+     * @param string The name of the property to retrieve from $field. Options are: Name, PrimaryKey, Type, AllowNull, Default, Length, and Enum.
+     * @param string The default value to return if $property is not found in $field of $table.
+     * @param string If this value is specified, $this->CurrentTable will be switched to $table.
      */
-    public function getProperty($Field, $Property, $Default = false, $Table = '') {
-        $Return = $Default;
-        if ($Table != '') {
-            $this->CurrentTable = $Table;
+    public function getProperty($field, $property, $default = false, $table = '') {
+        $return = $default;
+        if ($table != '') {
+            $this->CurrentTable = $table;
         }
 
-        $Properties = ['Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum'];
-        if (in_array($Property, $Properties)) {
-            $Field = $this->getField($Field, $this->CurrentTable);
-            if ($Field !== false) {
-                $Return = $Field->$Property;
+        $properties = ['Name', 'PrimaryKey', 'Type', 'AllowNull', 'Default', 'Length', 'Enum'];
+        if (in_array($property, $properties)) {
+            $field = $this->getField($field, $this->CurrentTable);
+            if ($field !== false) {
+                $return = $field->$property;
             }
         }
 
-        return $Return;
+        return $return;
     }
 
     /**
-     * Returns a boolean value indicating if the specified $Field exists in
-     * $Table. Assumes that $this->Fetch() has been called for $Table.
+     * Returns a boolean value indicating if the specified $field exists in
+     * $table. Assumes that $this->fetch() has been called for $table.
      *
-     * @param string The name of the table to look for $Field in.
-     * @param string The name of the field to look for in $Table.
+     * @param string The name of the table to look for $field in.
+     * @param string The name of the field to look for in $table.
      */
-    public function fieldExists($Table, $Field) {
-        if (array_key_exists($Table, $this->_Schema)
-            && is_array($this->_Schema[$Table])
-            && array_key_exists($Field, $this->_Schema[$Table])
-            && is_object($this->_Schema[$Table][$Field])
+    public function fieldExists($table, $field) {
+        if (array_key_exists($table, $this->_Schema)
+            && is_array($this->_Schema[$table])
+            && array_key_exists($field, $this->_Schema[$table])
+            && is_object($this->_Schema[$table][$field])
         ) {
             return true;
         } else {
@@ -145,25 +145,25 @@ class Gdn_Schema {
 
     /**
      * Returns the name (or array of names) of the field(s) that represents the
-     * primary key on $Table.
+     * primary key on $table.
      *
      * @param string The name of the table for which to find the primary key(s).
      */
-    public function primaryKey($Table, $Database = null) {
-        $Schema = $this->fetch($Table, $Database);
-        $PrimaryKeys = [];
-        foreach ($Schema as $FieldName => $Properties) {
-            if ($Properties->PrimaryKey === true) {
-                $PrimaryKeys[] = $FieldName;
+    public function primaryKey($table, $database = null) {
+        $schema = $this->fetch($table, $database);
+        $primaryKeys = [];
+        foreach ($schema as $fieldName => $properties) {
+            if ($properties->PrimaryKey === true) {
+                $primaryKeys[] = $fieldName;
             }
         }
 
-        if (count($PrimaryKeys) == 0) {
+        if (count($primaryKeys) == 0) {
             return '';
-        } elseif (count($PrimaryKeys) == 1)
-            return $PrimaryKeys[0];
+        } elseif (count($primaryKeys) == 1)
+            return $primaryKeys[0];
         else {
-            return $PrimaryKeys;
+            return $primaryKeys;
         }
     }
 }

@@ -19,7 +19,7 @@ foreach ($Messages as $Message) {
         $Class .= ' HasPhoto';
 
     $Format = empty($Message->Format) ? 'Display' : $Message->Format;
-    $Author = UserBuilder($Message, 'Insert');
+    $Author = userBuilder($Message, 'Insert');
 
     $this->EventArguments['Message'] = &$Message;
     $this->EventArguments['Class'] = &$Class;

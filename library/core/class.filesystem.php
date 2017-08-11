@@ -36,209 +36,209 @@ class Gdn_FileSystem {
      * Searches the provided file path(s). Returns the first one it finds in the
      * filesystem.
      *
-     * @param mixed $Files The path (or array of paths) to files which should be checked for
+     * @param mixed $files The path (or array of paths) to files which should be checked for
      * existence.
      */
-    public static function exists($Files) {
-        if (!is_array($Files)) {
-            $Files = [$Files];
+    public static function exists($files) {
+        if (!is_array($files)) {
+            $files = [$files];
         }
 
-        $Return = false;
-        $Count = count($Files);
-        for ($i = 0; $i < $Count; ++$i) {
-            if (file_exists($Files[$i])) {
-                $Return = $Files[$i];
+        $return = false;
+        $count = count($files);
+        for ($i = 0; $i < $count; ++$i) {
+            if (file_exists($files[$i])) {
+                $return = $files[$i];
                 break;
             }
         }
 
-        return $Return;
+        return $return;
     }
 
     /**
      * Returns an array of all folder names within the source folder or FALSE
      * if SourceFolder does not exist.
      *
-     * @param string $SourceFolder
+     * @param string $sourceFolder
      */
-    public static function folders($SourceFolders) {
-        if (!is_array($SourceFolders)) {
-            $SourceFolders = [$SourceFolders];
+    public static function folders($sourceFolders) {
+        if (!is_array($sourceFolders)) {
+            $sourceFolders = [$sourceFolders];
         }
 
-        $BlackList = Gdn::config('Garden.FolderBlacklist');
-        if (!is_array($BlackList)) {
-            $BlackList = ['.', '..'];
+        $blackList = Gdn::config('Garden.FolderBlacklist');
+        if (!is_array($blackList)) {
+            $blackList = ['.', '..'];
         }
 
-        $Result = [];
+        $result = [];
 
-        foreach ($SourceFolders as $SourceFolder) {
-            if ($DirectoryHandle = opendir($SourceFolder)) {
-                while (($Item = readdir($DirectoryHandle)) !== false) {
-                    $SubFolder = combinePaths([$SourceFolder, $Item]);
-                    if (!in_array($Item, $BlackList) && is_dir($SubFolder)) {
-                        $Result[] = $Item;
+        foreach ($sourceFolders as $sourceFolder) {
+            if ($directoryHandle = opendir($sourceFolder)) {
+                while (($item = readdir($directoryHandle)) !== false) {
+                    $subFolder = combinePaths([$sourceFolder, $item]);
+                    if (!in_array($item, $blackList) && is_dir($subFolder)) {
+                        $result[] = $item;
                     }
                 }
-                closedir($DirectoryHandle);
+                closedir($directoryHandle);
             }
         }
-        if (count($Result) == 0) {
+        if (count($result) == 0) {
             return false;
         }
-        return $Result;
+        return $result;
     }
 
     /**
-     * Searches in $SourceFolders for $FileName. Returns the path to the file or
+     * Searches in $sourceFolders for $fileName. Returns the path to the file or
      * FALSE if not found.
      *
-     * @param mixed $SourceFolders A string (or array of strings) representing the path to the root of the
+     * @param mixed $sourceFolders A string (or array of strings) representing the path to the root of the
      * search.
-     * @param string $FileName The name of the file to search for.
-     * @param mixed $WhiteList An option white-list of sub-folders within $SourceFolders in which the
+     * @param string $fileName The name of the file to search for.
+     * @param mixed $whiteList An option white-list of sub-folders within $sourceFolders in which the
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function find($SourceFolders, $FileName, $WhiteList = false) {
-        $Return = self::_find($SourceFolders, $WhiteList, $FileName, true);
-        if (is_array($Return)) {
-            return count($Return) > 0 ? $Return[0] : false;
+    public static function find($sourceFolders, $fileName, $whiteList = false) {
+        $return = self::_find($sourceFolders, $whiteList, $fileName, true);
+        if (is_array($return)) {
+            return count($return) > 0 ? $return[0] : false;
         } else {
-            return $Return;
+            return $return;
         }
     }
 
     /**
-     * Searches in $SourceFolders (and $WhiteList of subfolders, if present) for
-     * $FileName. Returns an array containing the full path of every occurrence
-     * of $FileName or FALSE if not found.
+     * Searches in $sourceFolders (and $whiteList of subfolders, if present) for
+     * $fileName. Returns an array containing the full path of every occurrence
+     * of $fileName or FALSE if not found.
      *
-     * @param mixed $SourceFolders A string (or array of strings) representing the path to the root of the
+     * @param mixed $sourceFolders A string (or array of strings) representing the path to the root of the
      * search.
-     * @param string $FileName The name of the file to search for.
-     * @param mixed $WhiteList An option white-list of sub-folders within $SourceFolder in which the
+     * @param string $fileName The name of the file to search for.
+     * @param mixed $whiteList An option white-list of sub-folders within $SourceFolder in which the
      * search can be performed. If no white-list is provided, the search will
      * only be performed in $SourceFolder.
      */
-    public static function findAll($SourceFolders, $FileName, $WhiteList = false) {
-        return self::_find($SourceFolders, $WhiteList, $FileName, false);
+    public static function findAll($sourceFolders, $fileName, $whiteList = false) {
+        return self::_find($sourceFolders, $whiteList, $fileName, false);
     }
 
     /**
-     * Searches in $SourceFolders (and $WhiteList of subfolders, if present) for
-     * $FileName. Returns an array containing the full path of every occurrence
-     * of $FileName or just the first occurrence of the path if $ReturnFirst is
+     * Searches in $sourceFolders (and $whiteList of subfolders, if present) for
+     * $fileName. Returns an array containing the full path of every occurrence
+     * of $fileName or just the first occurrence of the path if $returnFirst is
      * TRUE. Returns FALSE if the file is not found.
      *
-     * @param mixed $SourceFolders A string (or array of strings) representing the path to the root of the
+     * @param mixed $sourceFolders A string (or array of strings) representing the path to the root of the
      * search.
-     * @param mixed $WhiteList An optional white-list array of sub-folders within $SourceFolder in which
+     * @param mixed $whiteList An optional white-list array of sub-folders within $sourceFolder in which
      * the search can be performed. If FALSE is specified instead, the search
-     * will only be performed in $SourceFolders.
-     * @param string $FileName The name of the file to search for.
-     * @param boolean $ReturnFirst Should the method return the path to the first occurrence of $FileName,
+     * will only be performed in $sourceFolders.
+     * @param string $fileName The name of the file to search for.
+     * @param boolean $returnFirst Should the method return the path to the first occurrence of $fileName,
      * or should it return an array of every instance in which it is found?
      * Default is to return an array of every instance.
      */
-    private static function _find($SourceFolders, $WhiteList, $FileName, $ReturnFirst = false) {
-        $Return = [];
+    private static function _find($sourceFolders, $whiteList, $fileName, $returnFirst = false) {
+        $return = [];
 
-        if (!is_array($SourceFolders)) {
-            $SourceFolders = [$SourceFolders];
+        if (!is_array($sourceFolders)) {
+            $sourceFolders = [$sourceFolders];
         }
 
-        foreach ($SourceFolders as $SourceFolder) {
-            if ($WhiteList === false) {
-                $Path = CombinePaths([$SourceFolder, $FileName]);
-                if (file_exists($Path)) {
-                    if ($ReturnFirst) {
-                        return $Path;
+        foreach ($sourceFolders as $sourceFolder) {
+            if ($whiteList === false) {
+                $path = combinePaths([$sourceFolder, $fileName]);
+                if (file_exists($path)) {
+                    if ($returnFirst) {
+                        return $path;
                     } else {
-                        $Return[] = [$Path];
+                        $return[] = [$path];
                     }
                 }
             } else {
-                if ($DirectoryHandle = opendir($SourceFolder)) {
-                    if ($DirectoryHandle === false) {
-                        trigger_error(ErrorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $SourceFolder), E_USER_ERROR);
+                if ($directoryHandle = opendir($sourceFolder)) {
+                    if ($directoryHandle === false) {
+                        trigger_error(errorMessage('Failed to open folder when performing a filesystem search.', 'Gdn_FileSystem', '_Find', $sourceFolder), E_USER_ERROR);
                     }
 
                     // Search all subfolders
-                    if ($WhiteList === true) {
-                        $WhiteList = scandir($SourceFolder);
+                    if ($whiteList === true) {
+                        $whiteList = scandir($sourceFolder);
                     }
 
-                    $SubFolders = [];
-                    foreach ($WhiteList as $WhiteFolder) {
-                        $SubFolder = combinePaths([$SourceFolder, $WhiteFolder]);
-                        if (is_dir($SubFolder)) {
-                            $SubFolders[] = $SubFolder;
-                            $Path = combinePaths([$SubFolder, $FileName]);
+                    $subFolders = [];
+                    foreach ($whiteList as $whiteFolder) {
+                        $subFolder = combinePaths([$sourceFolder, $whiteFolder]);
+                        if (is_dir($subFolder)) {
+                            $subFolders[] = $subFolder;
+                            $path = combinePaths([$subFolder, $fileName]);
                             // echo '<div style="color: red;">Looking For: '.$Path.'</div>';
-                            if (file_exists($Path)) {
-                                if ($ReturnFirst) {
-                                    return [$Path];
+                            if (file_exists($path)) {
+                                if ($returnFirst) {
+                                    return [$path];
                                 } else {
-                                    $Return[] = $Path;
+                                    $return[] = $path;
                                 }
                             }
                         }
                     }
                 }
-                closedir($DirectoryHandle);
+                closedir($directoryHandle);
             }
         }
 
-        return count($Return) > 0 ? $Return : false;
+        return count($return) > 0 ? $return : false;
     }
 
     /**
-     * Searches in the specified mapping cache for $LibraryName. If a mapping is
+     * Searches in the specified mapping cache for $libraryName. If a mapping is
      * found, it returns it. If not, it searches through the application
-     * directories $Depth levels deep looking for $LibraryName. Returns FALSE
+     * directories $Depth levels deep looking for $libraryName. Returns FALSE
      * if not found.
      *
      * @param string $MappingsFileName The name of the mappings file to look in for library mappings. These
      * files are contained in the application's /cache folder.
-     * @param string $SourceFolders The path to the folders that should be considered the "root" of this search.
-     * @param mixed $FolderWhiteList A white-list array of sub-folders within $SourceFolder in which the
+     * @param string $sourceFolders The path to the folders that should be considered the "root" of this search.
+     * @param mixed $folderWhiteList A white-list array of sub-folders within $SourceFolder in which the
      * search can be performed. If FALSE is specified instead, the search will
-     * only be performed in $SourceFolders.
-     * @param string $LibraryName The name of the library to search for. This is a valid file name.
+     * only be performed in $sourceFolders.
+     * @param string $libraryName The name of the library to search for. This is a valid file name.
      * ie. "class.database.php"
      */
-    public static function findByMapping($MappingCacheName, $SourceFolders, $FolderWhiteList, $LibraryName) {
+    public static function findByMapping($mappingCacheName, $sourceFolders, $folderWhiteList, $libraryName) {
 
         // If the application folder was provided, it will be the only entry in the whitelist, so prepend it.
-        if (is_array($FolderWhiteList) && count($FolderWhiteList) == 1) {
-            $LibraryName = combinePaths([$FolderWhiteList[0], $LibraryName]);
+        if (is_array($folderWhiteList) && count($folderWhiteList) == 1) {
+            $libraryName = combinePaths([$folderWhiteList[0], $libraryName]);
         }
 
-        $LibraryKey = str_replace('.', '__', $LibraryName);
-        Gdn_LibraryMap::prepareCache($MappingCacheName);
-        $LibraryPath = Gdn_LibraryMap::getCache($MappingCacheName, $LibraryKey);
-        if ($LibraryPath === null) {
+        $libraryKey = str_replace('.', '__', $libraryName);
+        Gdn_LibraryMap::prepareCache($mappingCacheName);
+        $libraryPath = Gdn_LibraryMap::getCache($mappingCacheName, $libraryKey);
+        if ($libraryPath === null) {
             // $LibraryName wasn't contained in the mappings array.
             // I need to look through the folders in this application for the requested file.
             // Once I find it, I need to save the mapping so we don't have to search for it again.
 
             // Attempt to find the file directly off the root (if the app folder was provided in the querystring)
             /*if ($FolderWhiteList !== FALSE && count($FolderWhiteList) == 1) {
-               $LibraryPath = self::Find($SourceFolders, $LibraryName);
+               $LibraryPath = self::find($SourceFolders, $LibraryName);
             } else {
-               $LibraryPath = self::Find($SourceFolders, $LibraryName, $FolderWhiteList);
+               $LibraryPath = self::find($SourceFolders, $LibraryName, $FolderWhiteList);
             }*/
-            $LibraryPath = self::find($SourceFolders, $LibraryName, $FolderWhiteList);
+            $libraryPath = self::find($sourceFolders, $libraryName, $folderWhiteList);
 
             // If the mapping was found
-            if ($LibraryPath !== false) {
-                Gdn_LibraryMap::cache($MappingCacheName, $LibraryKey, $LibraryPath);
+            if ($libraryPath !== false) {
+                Gdn_LibraryMap::cache($mappingCacheName, $libraryKey, $libraryPath);
             }
         }
-        return $LibraryPath;
+        return $libraryPath;
     }
 
     /**
@@ -246,9 +246,9 @@ class Gdn_FileSystem {
      * exist.
      */
     public static function getContents() {
-        $File = combinePaths(func_get_args());
-        if (file_exists($File) && is_file($File)) {
-            return file_get_contents($File);
+        $file = combinePaths(func_get_args());
+        if (file_exists($file) && is_file($file)) {
+            return file_get_contents($file);
         } else {
             return false;
         }
@@ -257,74 +257,74 @@ class Gdn_FileSystem {
     /**
      * Saves the specified file with the provided file contents.
      *
-     * @param string $FileName The full path and name of the file to be saved.
-     * @param string $FileContents The contents of the file being saved.
+     * @param string $fileName The full path and name of the file to be saved.
+     * @param string $fileContents The contents of the file being saved.
      */
-    public static function saveFile($FileName, $FileContents, $Flags = VANILLA_FILE_PUT_FLAGS) {
+    public static function saveFile($fileName, $fileContents, $flags = VANILLA_FILE_PUT_FLAGS) {
 
         // Check that the folder exists and is writable
-        $DirName = dirname($FileName);
-        $FileBaseName = basename($FileName);
-        if (!is_dir($DirName)) {
-            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.', $FileBaseName, $DirName));
+        $dirName = dirname($fileName);
+        $fileBaseName = basename($fileName);
+        if (!is_dir($dirName)) {
+            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] does not exist.', $fileBaseName, $dirName));
         }
 
-        if (!IsWritable($DirName)) {
-            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.', $FileBaseName, $DirName));
+        if (!isWritable($dirName)) {
+            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed because target folder [%2$s] is not writable.', $fileBaseName, $dirName));
         }
 
-        if (file_put_contents($FileName, $FileContents, $Flags) === false) {
-            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!', $FileBaseName));
+        if (file_put_contents($fileName, $fileContents, $flags) === false) {
+            throw new Exception(sprintf('Requested save operation [%1$s] could not be completed!', $fileBaseName));
         }
 
         return true;
     }
 
     /**
-     * Similar to the unix touch command, this method checks to see if $FileName
+     * Similar to the unix touch command, this method checks to see if $fileName
      * exists. If it does not, it creates the file with nothing inside it.
      *
-     * @param string $FileName The full path to the file being touched.
+     * @param string $fileName The full path to the file being touched.
      */
-    public static function touch($FileName) {
-        if (!file_exists($FileName)) {
-            file_put_contents($FileName, '', LOCK_EX);
+    public static function touch($fileName) {
+        if (!file_exists($fileName)) {
+            file_put_contents($fileName, '', LOCK_EX);
         }
     }
 
     /**
      * Serves a file to the browser.
      *
-     * @param string $File Full path to the file being served.
-     * @param string $Name Name to give the file being served. Including extension overrides $File extension. Uses $File filename if empty.
-     * @param string $MimeType The mime type of the file.
-     * @param string $ServeMode Whether to download the file as an attachment, or inline
+     * @param string $file Full path to the file being served.
+     * @param string $name Name to give the file being served. Including extension overrides $file extension. Uses $file filename if empty.
+     * @param string $mimeType The mime type of the file.
+     * @param string $serveMode Whether to download the file as an attachment, or inline
      */
-    public static function serveFile($File, $Name = '', $MimeType = '', $ServeMode = 'attachment') {
+    public static function serveFile($file, $name = '', $mimeType = '', $serveMode = 'attachment') {
 
-        $FileIsLocal = (substr($File, 0, 4) == 'http') ? false : true;
-        $FileAvailable = ($FileIsLocal) ? is_readable($File) : true;
+        $fileIsLocal = (substr($file, 0, 4) == 'http') ? false : true;
+        $fileAvailable = ($fileIsLocal) ? is_readable($file) : true;
 
-        if ($FileAvailable) {
+        if ($fileAvailable) {
             // Close the database connection
             Gdn::database()->closeConnection();
 
             // Determine if Path extension should be appended to Name
-            $NameExtension = strtolower(pathinfo($Name, PATHINFO_EXTENSION));
-            $FileExtension = strtolower(pathinfo($File, PATHINFO_EXTENSION));
-            if ($NameExtension == '') {
-                if ($Name == '') {
-                    $Name = pathinfo($File, PATHINFO_FILENAME).'.'.$FileExtension;
-                } elseif (!stringEndsWith($Name, '.'.$FileExtension)) {
-                    $Name .= '.'.$FileExtension;
+            $nameExtension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+            $fileExtension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            if ($nameExtension == '') {
+                if ($name == '') {
+                    $name = pathinfo($file, PATHINFO_FILENAME).'.'.$fileExtension;
+                } elseif (!stringEndsWith($name, '.'.$fileExtension)) {
+                    $name .= '.'.$fileExtension;
                 }
             } else {
-                $Extension = $NameExtension;
+                $extension = $nameExtension;
             }
-            $Name = rawurldecode($Name);
+            $name = rawurldecode($name);
 
             // Figure out the MIME type
-            $MimeTypes = [
+            $mimeTypes = [
                 "pdf" => "application/pdf",
                 "txt" => "text/plain",
                 "html" => "text/html",
@@ -342,11 +342,11 @@ class Gdn_FileSystem {
                 "ico" => "image/vnd.microsoft.icon"
             ];
 
-            if ($MimeType == '') {
-                if (array_key_exists($FileExtension, $MimeTypes)) {
-                    $MimeType = $MimeTypes[$FileExtension];
+            if ($mimeType == '') {
+                if (array_key_exists($fileExtension, $mimeTypes)) {
+                    $mimeType = $mimeTypes[$fileExtension];
                 } else {
-                    $MimeType = 'application/force-download';
+                    $mimeType = 'application/force-download';
                 };
             };
 
@@ -357,19 +357,19 @@ class Gdn_FileSystem {
                 ini_set('zlib.output_compression', 'Off');
             }
 
-            if ($ServeMode == 'inline') {
-                safeHeader('Content-Disposition: inline; filename="'.$Name.'"');
+            if ($serveMode == 'inline') {
+                safeHeader('Content-Disposition: inline; filename="'.$name.'"');
             } else {
-                safeHeader('Content-Disposition: attachment; filename="'.$Name.'"');
+                safeHeader('Content-Disposition: attachment; filename="'.$name.'"');
             }
 
-            safeHeader('Content-Type: '.$MimeType);
+            safeHeader('Content-Type: '.$mimeType);
             safeHeader("Content-Transfer-Encoding: binary");
             safeHeader('Accept-Ranges: bytes');
             safeHeader("Cache-control: private");
             safeHeader('Pragma: private');
             safeHeader("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-            readfile($File);
+            readfile($file);
             exit();
         } else {
             die('not readable');
@@ -383,68 +383,68 @@ class Gdn_FileSystem {
      * @param string $Dir
      * @return void
      */
-    public static function removeFolder($Path) {
-        if (!file_exists($Path)) {
+    public static function removeFolder($path) {
+        if (!file_exists($path)) {
             return;
         }
 
-        if (is_file($Path)) {
-            unlink($Path);
+        if (is_file($path)) {
+            unlink($path);
             return;
         }
 
-        $Path = rtrim($Path, '/').'/';
+        $path = rtrim($path, '/').'/';
 
         // Get all of the files in the directory.
-        if ($dh = opendir($Path)) {
-            while (($File = readdir($dh)) !== false) {
-                if (trim($File, '.') == '') {
+        if ($dh = opendir($path)) {
+            while (($file = readdir($dh)) !== false) {
+                if (trim($file, '.') == '') {
                     continue;
                 }
 
-                $SubPath = $Path.$File;
+                $subPath = $path.$file;
 
-                if (is_dir($SubPath)) {
-                    self::removeFolder($SubPath);
+                if (is_dir($subPath)) {
+                    self::removeFolder($subPath);
                 } else {
-                    unlink($SubPath);
+                    unlink($subPath);
                 }
             }
             closedir($dh);
         }
-        rmdir($Path);
+        rmdir($path);
     }
 
-    public static function checkFolderR($Path, $Flags = 0) {
-        $TrimPath = ltrim($Path, '/');
-        $PathParts = explode('/', $TrimPath);
-        $Prepend = (strlen($Path) !== strlen($TrimPath)) ? DS : '';
+    public static function checkFolderR($path, $flags = 0) {
+        $trimPath = ltrim($path, '/');
+        $pathParts = explode('/', $trimPath);
+        $prepend = (strlen($path) !== strlen($trimPath)) ? DS : '';
 
-        $CurrentPath = [];
-        foreach ($PathParts as $FolderPart) {
-            array_push($CurrentPath, $FolderPart);
-            $TestFolder = $Prepend.implode(DS, $CurrentPath);
+        $currentPath = [];
+        foreach ($pathParts as $folderPart) {
+            array_push($currentPath, $folderPart);
+            $testFolder = $prepend.implode(DS, $currentPath);
 
-            if ($Flags & Gdn_FileSystem::O_CREATE) {
-                if (!is_dir($TestFolder)) {
-                    @mkdir($TestFolder);
+            if ($flags & Gdn_FileSystem::O_CREATE) {
+                if (!is_dir($testFolder)) {
+                    @mkdir($testFolder);
                 }
             }
 
-            if (!is_dir($TestFolder)) {
+            if (!is_dir($testFolder)) {
                 return false;
             }
 
         }
 
-        if ($Flags & Gdn_FileSystem::O_READ) {
-            if (!is_readable($Path)) {
+        if ($flags & Gdn_FileSystem::O_READ) {
+            if (!is_readable($path)) {
                 return false;
             }
         }
 
-        if ($Flags & Gdn_FileSystem::O_WRITE) {
-            if (!is_writable($Path)) {
+        if ($flags & Gdn_FileSystem::O_WRITE) {
+            if (!is_writable($path)) {
                 return false;
             }
         }

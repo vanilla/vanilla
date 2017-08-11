@@ -16,7 +16,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
 
             if ($this->User->ShowEmail == 1 || $Session->checkPermission('Garden.Moderation.Manage')) {
                 echo '<dt>'.t('Email').'</dt>
-         <dd>'.Gdn_Format::Email($this->User->Email).'</dd>';
+         <dd>'.Gdn_Format::email($this->User->Email).'</dd>';
             }
             ?>
             <dt class="Label Joined"><?php echo t('Joined'); ?>
@@ -37,7 +37,7 @@ if (Gdn::config('Garden.Profile.ShowAbout')) {
                 $Inviter->UserID = $this->User->InviteUserID;
                 $Inviter->Name = $this->User->InviteName;
                 echo '<dt class="Label InvitedBy">'.t('Invited by').'</dt>
-         <dd class="Value InvitedBy">'.UserAnchor($Inviter).'</dd>';
+         <dd class="Value InvitedBy">'.userAnchor($Inviter).'</dd>';
             }
             $this->fireEvent('OnBasicInfo');
             ?>

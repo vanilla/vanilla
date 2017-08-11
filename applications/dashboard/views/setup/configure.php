@@ -32,7 +32,7 @@ echo $this->Form->open();
             <li>
                 <?php
                 echo $this->Form->label('Database Password', 'Database.Password');
-                echo $this->Form->Input('Database.Password', 'password');
+                echo $this->Form->input('Database.Password', 'password');
                 ?>
             </li>
             <?php if ($this->data('NoHtaccess')): ?>
@@ -76,13 +76,13 @@ echo $this->Form->open();
             <li>
                 <?php
                 echo $this->Form->label('Admin Password', 'Password');
-                echo $this->Form->Input('Password', 'password');
+                echo $this->Form->input('Password', 'password');
                 ?>
             </li>
             <li class="Last">
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
-                echo $this->Form->Input('PasswordMatch', 'password');
+                echo $this->Form->input('PasswordMatch', 'password');
                 ?>
             </li>
         </ul>

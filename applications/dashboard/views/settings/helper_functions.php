@@ -158,9 +158,11 @@ function writeAddonMedia($addonName, $addonInfo, $isEnabled, $addonType, $filter
     $settingsPopupClass = val('UsePopupSettings', $addonInfo, true) ? ' js-modal' : '';
 
     if ($settingsUrl != '') {
-        $attr['class'] = 'btn btn-icon-border'.$settingsPopupClass;
-        $attr['aria-label'] = sprintf(t('Settings for %s'), $screenName);
-        $attr['data-reload-page-on-save'] = false;
+        $attr = [
+            'class' => 'btn btn-icon-border'.$settingsPopupClass,
+            'aria-label' => sprintf(t('Settings for %s'), $screenName),
+            'data-reload-page-on-save' => false
+        ];
 
         $media->addButton(dashboardSymbol('settings'), url($settingsUrl), $attr);
     }

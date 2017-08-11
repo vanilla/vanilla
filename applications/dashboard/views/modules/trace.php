@@ -68,7 +68,7 @@
             <tr>
                 <td class="TagColumn">
                     <span
-                        class="Tag Tag-<?php echo Gdn_Format::AlphaNumeric($Type); ?>"><?php echo htmlspecialchars($Type); ?></span>
+                        class="Tag Tag-<?php echo Gdn_Format::alphaNumeric($Type); ?>"><?php echo htmlspecialchars($Type); ?></span>
                 </td>
                 <td>
                     <?php

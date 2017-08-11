@@ -7,15 +7,15 @@
 foreach ($this->DiscussionData->result() as $Discussion) {
     ?>
     <entry>
-        <title type="html"><![CDATA[<?php echo Gdn_Format::RssHtml($Discussion->Name); ?>]]></title>
+        <title type="html"><![CDATA[<?php echo Gdn_Format::rssHtml($Discussion->Name); ?>]]></title>
         <link href="<?php echo $Discussion->Url; ?>"/>
-        <id><?php echo $Discussion->DiscussionID.'@'.Url('/discussions'); ?></id>
+        <id><?php echo $Discussion->DiscussionID.'@'.url('/discussions'); ?></id>
         <author>
             <name><?php echo Gdn_Format::text($Discussion->FirstName); ?></name>
             <uri><?php echo htmlspecialchars(url('/profile/'.$Discussion->InsertUserID.'/'.$Discussion->FirstName, true)); ?></uri>
         </author>
-        <updated><?php echo date('c', Gdn_Format::ToTimeStamp($Discussion->DateLastComment)); ?></updated>
-        <summary><![CDATA[<?php echo Gdn_Format::RssHtml($Discussion->Body, $Discussion->Format); ?>]]></summary>
+        <updated><?php echo date('c', Gdn_Format::toTimeStamp($Discussion->DateLastComment)); ?></updated>
+        <summary><![CDATA[<?php echo Gdn_Format::rssHtml($Discussion->Body, $Discussion->Format); ?>]]></summary>
     </entry>
 <?php
 }

@@ -17,19 +17,19 @@
  */
 class Gdn_Dummy {
 
-    public function __call($Name, $Arguments) {
+    public function __call($name, $arguments) {
         return $this;
     }
 
-    public static function __callStatic($Name, $Arguments) {
+    public static function __callStatic($name, $arguments) {
         return self::getInstance();
     }
 
-    public function __get($Name) {
+    public function __get($name) {
         return $this;
     }
 
-    public function __set($Name, $Value) {
+    public function __set($name, $value) {
         return $this;
     }
 

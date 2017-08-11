@@ -20,11 +20,11 @@ class DebuggerPlugin extends Gdn_Plugin {
     /**
      * Add CSS file to all pages.
      *
-     * @param $Sender
-     * @param $Args
+     * @param $sender
+     * @param $args
      */
-    public function assetModel_styleCss_handler($Sender, $Args) {
-        $Sender->addCssFile('debugger.css', 'plugins/Debugger');
+    public function assetModel_styleCss_handler($sender, $args) {
+        $sender->addCssFile('debugger.css', 'plugins/Debugger');
     }
 
     /**
@@ -34,7 +34,7 @@ class DebuggerPlugin extends Gdn_Plugin {
      */
     public function base_afterBody_handler($Sender) {
         $Session = Gdn::session();
-        if (!Debug() || !$Session->checkPermission('Plugins.Debugger.View') || $Sender->MasterView == 'admin') {
+        if (!debug() || !$Session->checkPermission('Plugins.Debugger.View') || $Sender->MasterView == 'admin') {
             return;
         }
 
@@ -50,7 +50,7 @@ class DebuggerPlugin extends Gdn_Plugin {
     public function base_afterRenderAsset_handler($sender, $args) {
         if (val('AssetName', $args) == 'Content' && $sender->MasterView == 'admin') {
             $session = Gdn::session();
-            if (!Debug() || !$session->checkPermission('Plugins.Debugger.View')) {
+            if (!debug() || !$session->checkPermission('Plugins.Debugger.View')) {
                 return;
             }
             require $sender->fetchViewLocation('Debug', '', 'plugins/Debugger');
@@ -74,58 +74,58 @@ class DebuggerPlugin extends Gdn_Plugin {
     /**
      * Build HTML.
      *
-     * @param $Data
-     * @param string $Indent
+     * @param $data
+     * @param string $indent
      * @return string
      */
-    public static function formatData($Data, $Indent = '') {
-        $Result = '';
-        if (is_array($Data)) {
-            foreach ($Data as $Key => $Value) {
-                if ($Key === null)
-                    $Key = 'NULL';
-                $Result .= "$Indent<b>$Key</b>: ";
+    public static function formatData($data, $indent = '') {
+        $result = '';
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                if ($key === null)
+                    $key = 'NULL';
+                $result .= "$indent<b>$key</b>: ";
 
-                if ($Value === null) {
-                    $Result .= "NULL\n";
-                } elseif (is_numeric($Value) || is_string($Value) || is_bool($Value) || is_null($Value)) {
-                    $Result .= htmlspecialchars(var_export($Value, true))."\n";
+                if ($value === null) {
+                    $result .= "NULL\n";
+                } elseif (is_numeric($value) || is_string($value) || is_bool($value) || is_null($value)) {
+                    $result .= htmlspecialchars(var_export($value, true))."\n";
                 } else {
-                    if (is_a($Value, 'Gdn_DataSet'))
-                        $Result .= "DataSet";
+                    if (is_a($value, 'Gdn_DataSet'))
+                        $result .= "DataSet";
 
-                    $Result .=
+                    $result .=
                         "\n"
-                        .self::formatData($Value, $Indent.'   ');
+                        .self::formatData($value, $indent.'   ');
                 }
             }
-        } elseif (is_a($Data, 'Gdn_DataSet')) {
-            $Data = $Data->result();
-            if (count($Data) == 0)
-                return $Result.'EMPTY<br />';
+        } elseif (is_a($data, 'Gdn_DataSet')) {
+            $data = $data->result();
+            if (count($data) == 0)
+                return $result.'EMPTY<br />';
 
-            $Fields = array_keys((array)reset($Data));
-            $Result .= $Indent.'<b>Count</b>: '.count($Data)."\n"
-                .$Indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $Fields))."\n";
-            return $Result;
-        } elseif (is_a($Data, 'stdClass')) {
-            $Data = (array)$Data;
-            return self::formatData($Data, $Indent);
-        } elseif (is_object($Data)) {
-            $Result .= $Indent.get_class($Data);
+            $fields = array_keys((array)reset($data));
+            $result .= $indent.'<b>Count</b>: '.count($data)."\n"
+                .$indent.'<b>Fields</b>: '.htmlspecialchars(implode(", ", $fields))."\n";
+            return $result;
+        } elseif (is_a($data, 'stdClass')) {
+            $data = (array)$data;
+            return self::formatData($data, $indent);
+        } elseif (is_object($data)) {
+            $result .= $indent.get_class($data);
         } else {
-            return trim(var_export($Data, true));
+            return trim(var_export($data, true));
         }
-        return $Result;
+        return $result;
     }
 
     /**
      *
      *
-     * @param $Sender
+     * @param $sender
      */
-    public function pluginController_debugger_create($Sender) {
-        $Sender->render();
+    public function pluginController_debugger_create($sender) {
+        $sender->render();
     }
 
     /**

@@ -9,8 +9,8 @@
 /**
  * Formats a date.
  *
- * @see Gdn_Format::Date()
+ * @see Gdn_Format::date()
  */
-function smarty_modifier_date($Date, $Format = '') {
-	return Gdn_Format::date($Date, $Format);
+function smarty_modifier_date($date, $format = '') {
+	return Gdn_Format::date($date, $format);
 }

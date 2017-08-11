@@ -10,7 +10,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Type', 'FormType'); ?>
         </div>
         <div class="input-wrap">
-            <?php echo $this->Form->Dropdown('FormType', $this->data('FormTypes')); ?>
+            <?php echo $this->Form->dropdown('FormType', $this->data('FormTypes')); ?>
         </div>
     </div>
     <div class="js-label<?php if ($this->Form->getValue('FormType') == 'DateOfBirth') echo ' Hidden'; ?>">

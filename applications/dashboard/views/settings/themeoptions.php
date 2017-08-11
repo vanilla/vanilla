@@ -38,7 +38,7 @@ echo $this->Form->errors();
             <div class="image-wrap">
                 <?php
                 // Look for a screenshot for for the style.
-                $Screenshot = SafeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.ChangeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']);
+                $Screenshot = safeGlob(PATH_THEMES.DS.$this->data('ThemeFolder').DS.'design'.DS.changeBasename('screenshot.*', $Basename), ['gif', 'jpg', 'png']);
                 if (is_array($Screenshot) && count($Screenshot) > 0) {
                     $Screenshot = basename($Screenshot[0]);
                 } else {
@@ -84,11 +84,11 @@ echo $this->Form->errors();
             <div class="input-wrap">
             <?php switch (strtolower(val('Type', $Options, 'textarea'))) {
                 case 'textbox':
-                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code));
+                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code));
                     break;
                 case 'textarea':
                 default:
-                    echo $this->Form->textBox($this->Form->EscapeString('Text_'.$Code), ['MultiLine' => TRUE]);
+                    echo $this->Form->textBox($this->Form->escapeString('Text_'.$Code), ['MultiLine' => TRUE]);
                     break;
             } ?>
             </div>

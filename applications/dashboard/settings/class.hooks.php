@@ -38,90 +38,90 @@ class DashboardHooks extends Gdn_Plugin {
     /**
      * Fire before every page render.
      *
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      */
-    public function base_render_before($Sender) {
-        $Session = Gdn::session();
+    public function base_render_before($sender) {
+        $session = Gdn::session();
 
 
-        if ($Sender->MasterView == 'admin') {
-            if (val('Form', $Sender)) {
-                $Sender->Form->setStyles('bootstrap');
+        if ($sender->MasterView == 'admin') {
+            if (val('Form', $sender)) {
+                $sender->Form->setStyles('bootstrap');
             }
 
-            $Sender->CssClass = htmlspecialchars($Sender->CssClass);
-            $Sections = Gdn_Theme::section(null, 'get');
-            if (is_array($Sections)) {
-                foreach ($Sections as $Section) {
-                    $Sender->CssClass .= ' Section-'.$Section;
+            $sender->CssClass = htmlspecialchars($sender->CssClass);
+            $sections = Gdn_Theme::section(null, 'get');
+            if (is_array($sections)) {
+                foreach ($sections as $section) {
+                    $sender->CssClass .= ' Section-'.$section;
                 }
             }
 
             // Get our plugin nav items.
             $navAdapter = new NestedCollectionAdapter(DashboardNavModule::getDashboardNav());
-            $Sender->EventArguments['SideMenu'] = $navAdapter;
-            $Sender->fireEvent('GetAppSettingsMenuItems');
+            $sender->EventArguments['SideMenu'] = $navAdapter;
+            $sender->fireEvent('GetAppSettingsMenuItems');
 
-            $Sender->removeJsFile('jquery.popup.js');
-            $Sender->addJsFile('vendors/jquery.checkall.min.js', 'dashboard');
-            $Sender->addJsFile('buttongroup.js', 'dashboard');
-            $Sender->addJsFile('dashboard.js', 'dashboard');
-            $Sender->addJsFile('jquery.expander.js');
-            $Sender->addJsFile('settings.js', 'dashboard');
-            $Sender->addJsFile('vendors/tether.min.js', 'dashboard');
-            $Sender->addJsFile('vendors/bootstrap/util.js', 'dashboard');
-            $Sender->addJsFile('vendors/drop.min.js', 'dashboard');
-            $Sender->addJsFile('vendors/moment.min.js', 'dashboard');
-            $Sender->addJsFile('vendors/daterangepicker.js', 'dashboard');
-            $Sender->addJsFile('vendors/bootstrap/tooltip.js', 'dashboard');
-            $Sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
-            $Sender->addJsFile('vendors/bootstrap/dropdown.js', 'dashboard');
-            $Sender->addJsFile('vendors/bootstrap/collapse.js', 'dashboard');
-            $Sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
-            $Sender->addJsFile('vendors/icheck.min.js', 'dashboard');
-            $Sender->addJsFile('jquery.tablejenga.js', 'dashboard');
-            $Sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
-            $Sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
-            $Sender->addJsFile('vendors/ace/ace.js', 'dashboard');
-            $Sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');
-            $Sender->addCssFile('vendors/tomorrow.css', 'dashboard');
+            $sender->removeJsFile('jquery.popup.js');
+            $sender->addJsFile('vendors/jquery.checkall.min.js', 'dashboard');
+            $sender->addJsFile('buttongroup.js', 'dashboard');
+            $sender->addJsFile('dashboard.js', 'dashboard');
+            $sender->addJsFile('jquery.expander.js');
+            $sender->addJsFile('settings.js', 'dashboard');
+            $sender->addJsFile('vendors/tether.min.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/util.js', 'dashboard');
+            $sender->addJsFile('vendors/drop.min.js', 'dashboard');
+            $sender->addJsFile('vendors/moment.min.js', 'dashboard');
+            $sender->addJsFile('vendors/daterangepicker.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/tooltip.js', 'dashboard');
+            $sender->addJsFile('vendors/clipboard.min.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/dropdown.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/collapse.js', 'dashboard');
+            $sender->addJsFile('vendors/bootstrap/modal.js', 'dashboard');
+            $sender->addJsFile('vendors/icheck.min.js', 'dashboard');
+            $sender->addJsFile('jquery.tablejenga.js', 'dashboard');
+            $sender->addJsFile('jquery.fluidfixed.js', 'dashboard');
+            $sender->addJsFile('vendors/prettify/prettify.js', 'dashboard');
+            $sender->addJsFile('vendors/ace/ace.js', 'dashboard');
+            $sender->addJsFile('vendors/ace/ext-searchbox.js', 'dashboard');
+            $sender->addCssFile('vendors/tomorrow.css', 'dashboard');
         }
 
         // Check the statistics.
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
             Gdn::statistics()->check();
         }
 
         // Inform user of theme previewing
-        if ($Session->isValid()) {
-            $PreviewThemeFolder = htmlspecialchars($Session->getPreference('PreviewThemeFolder', ''));
-            $PreviewMobileThemeFolder = htmlspecialchars($Session->getPreference('PreviewMobileThemeFolder', ''));
-            $PreviewThemeName = htmlspecialchars($Session->getPreference(
+        if ($session->isValid()) {
+            $previewThemeFolder = htmlspecialchars($session->getPreference('PreviewThemeFolder', ''));
+            $previewMobileThemeFolder = htmlspecialchars($session->getPreference('PreviewMobileThemeFolder', ''));
+            $previewThemeName = htmlspecialchars($session->getPreference(
                 'PreviewThemeName',
-                $PreviewThemeFolder
+                $previewThemeFolder
             ));
-            $PreviewMobileThemeName = htmlspecialchars($Session->getPreference(
+            $previewMobileThemeName = htmlspecialchars($session->getPreference(
                 'PreviewMobileThemeName',
-                $PreviewMobileThemeFolder
+                $previewMobileThemeFolder
             ));
 
-            if ($PreviewThemeFolder != '') {
-                $Sender->informMessage(
-                    sprintf(t('You are previewing the %s desktop theme.'), wrap($PreviewThemeName, 'em'))
+            if ($previewThemeFolder != '') {
+                $sender->informMessage(
+                    sprintf(t('You are previewing the %s desktop theme.'), wrap($previewThemeName, 'em'))
                     .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/themes/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .anchor(t('Apply'), 'settings/themes/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
                     .'</div>',
                     'DoNotDismiss'
                 );
             }
 
-            if ($PreviewMobileThemeFolder != '') {
-                $Sender->informMessage(
-                    sprintf(t('You are previewing the %s mobile theme.'), wrap($PreviewMobileThemeName, 'em'))
+            if ($previewMobileThemeFolder != '') {
+                $sender->informMessage(
+                    sprintf(t('You are previewing the %s mobile theme.'), wrap($previewMobileThemeName, 'em'))
                     .'<div class="PreviewThemeButtons">'
-                    .anchor(t('Apply'), 'settings/mobilethemes/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
-                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$PreviewMobileThemeFolder.'/'.$Session->transientKey(), 'PreviewThemeButton')
+                    .anchor(t('Apply'), 'settings/mobilethemes/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
+                    .' '.anchor(t('Cancel'), 'settings/cancelpreview/'.$previewMobileThemeFolder.'/'.$session->transientKey(), 'PreviewThemeButton')
                     .'</div>',
                     'DoNotDismiss'
                 );
@@ -129,113 +129,113 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
 
-        if ($Session->isValid()) {
-            $Confirmed = val('Confirmed', Gdn::session()->User, true);
-            if (UserModel::requireConfirmEmail() && !$Confirmed) {
-                $Message = formatString(t('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
-                $Sender->informMessage($Message, '');
+        if ($session->isValid()) {
+            $confirmed = val('Confirmed', Gdn::session()->User, true);
+            if (UserModel::requireConfirmEmail() && !$confirmed) {
+                $message = formatString(t('You need to confirm your email address.', 'You need to confirm your email address. Click <a href="{/entry/emailconfirmrequest,url}">here</a> to resend the confirmation email.'));
+                $sender->informMessage($message, '');
             }
         }
 
         // Add Message Modules (if necessary)
-        $MessageCache = Gdn::config('Garden.Messages.Cache', []);
-        $Location = $Sender->Application.'/'.substr($Sender->ControllerName, 0, -10).'/'.$Sender->RequestMethod;
-        $Exceptions = ['[Base]'];
+        $messageCache = Gdn::config('Garden.Messages.Cache', []);
+        $location = $sender->Application.'/'.substr($sender->ControllerName, 0, -10).'/'.$sender->RequestMethod;
+        $exceptions = ['[Base]'];
 
-        if (in_array($Sender->MasterView, ['', 'default'])) {
-            $Exceptions[] = '[NonAdmin]';
+        if (in_array($sender->MasterView, ['', 'default'])) {
+            $exceptions[] = '[NonAdmin]';
         }
 
         // SignIn popup is a special case
-        $SignInOnly = ($Sender->deliveryType() == DELIVERY_TYPE_VIEW && $Location == 'Dashboard/entry/signin');
-        if ($SignInOnly) {
-            $Exceptions = [];
+        $signInOnly = ($sender->deliveryType() == DELIVERY_TYPE_VIEW && $location == 'Dashboard/entry/signin');
+        if ($signInOnly) {
+            $exceptions = [];
         }
 
-        if ($Sender->MasterView != 'admin' && !$Sender->data('_NoMessages') && (val('MessagesLoaded', $Sender) != '1' && $Sender->MasterView != 'empty' && ArrayInArray($Exceptions, $MessageCache, false) || InArrayI($Location, $MessageCache))) {
-            $MessageModel = new MessageModel();
-            $MessageData = $MessageModel->getMessagesForLocation($Location, $Exceptions, $Sender->data('Category.CategoryID'));
-            foreach ($MessageData as $Message) {
-                $MessageModule = new MessageModule($Sender, $Message);
-                if ($SignInOnly) { // Insert special messages even in SignIn popup
-                    echo $MessageModule;
-                } elseif ($Sender->deliveryType() == DELIVERY_TYPE_ALL)
-                    $Sender->addModule($MessageModule);
+        if ($sender->MasterView != 'admin' && !$sender->data('_NoMessages') && (val('MessagesLoaded', $sender) != '1' && $sender->MasterView != 'empty' && arrayInArray($exceptions, $messageCache, false) || inArrayI($location, $messageCache))) {
+            $messageModel = new MessageModel();
+            $messageData = $messageModel->getMessagesForLocation($location, $exceptions, $sender->data('Category.CategoryID'));
+            foreach ($messageData as $message) {
+                $messageModule = new MessageModule($sender, $message);
+                if ($signInOnly) { // Insert special messages even in SignIn popup
+                    echo $messageModule;
+                } elseif ($sender->deliveryType() == DELIVERY_TYPE_ALL)
+                    $sender->addModule($messageModule);
             }
-            $Sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
+            $sender->MessagesLoaded = '1'; // Fixes a bug where render gets called more than once and messages are loaded/displayed redundantly.
         }
 
-        if ($Sender->deliveryType() == DELIVERY_TYPE_ALL) {
-            $Gdn_Statistics = Gdn::factory('Statistics');
-            $Gdn_Statistics->check($Sender);
+        if ($sender->deliveryType() == DELIVERY_TYPE_ALL) {
+            $gdn_Statistics = Gdn::factory('Statistics');
+            $gdn_Statistics->check($sender);
         }
 
         // Allow forum embedding
-        if ($Embed = c('Garden.Embed.Allow')) {
+        if ($embed = c('Garden.Embed.Allow')) {
             // Record the remote url where the forum is being embedded.
-            $RemoteUrl = c('Garden.Embed.RemoteUrl');
-            if (!$RemoteUrl) {
-                $RemoteUrl = GetIncomingValue('remote');
-                if ($RemoteUrl) {
-                    saveToConfig('Garden.Embed.RemoteUrl', $RemoteUrl);
+            $remoteUrl = c('Garden.Embed.RemoteUrl');
+            if (!$remoteUrl) {
+                $remoteUrl = getIncomingValue('remote');
+                if ($remoteUrl) {
+                    saveToConfig('Garden.Embed.RemoteUrl', $remoteUrl);
                 }
             }
-            if ($RemoteUrl) {
-                $Sender->addDefinition('RemoteUrl', $RemoteUrl);
+            if ($remoteUrl) {
+                $sender->addDefinition('RemoteUrl', $remoteUrl);
             }
             if ($remoteUrlFormat = c('Garden.Embed.RemoteUrlFormat')) {
-                $Sender->addDefinition('RemoteUrlFormat', $remoteUrlFormat);
+                $sender->addDefinition('RemoteUrlFormat', $remoteUrlFormat);
             }
 
             // Force embedding?
-            if (!IsSearchEngine() && strtolower($Sender->ControllerName) != 'entry') {
-                if (IsMobile()) {
+            if (!isSearchEngine() && strtolower($sender->ControllerName) != 'entry') {
+                if (isMobile()) {
                     $forceEmbedForum = c('Garden.Embed.ForceMobile') ? '1' : '0';
                 } else {
                     $forceEmbedForum = c('Garden.Embed.ForceForum') ? '1' : '0';
                 }
 
-                $Sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
-                $Sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
+                $sender->addDefinition('ForceEmbedForum', $forceEmbedForum);
+                $sender->addDefinition('ForceEmbedDashboard', c('Garden.Embed.ForceDashboard') ? '1' : '0');
             }
 
-            $Sender->addDefinition('Path', Gdn::request()->path());
+            $sender->addDefinition('Path', Gdn::request()->path());
 
             $get = Gdn::request()->get();
             unset($get['p']); // kludge for old index.php?p=/path
-            $Sender->addDefinition('Query', http_build_query($get));
+            $sender->addDefinition('Query', http_build_query($get));
             // $Sender->addDefinition('MasterView', $Sender->MasterView);
-            $Sender->addDefinition('InDashboard', $Sender->MasterView == 'admin' ? '1' : '0');
+            $sender->addDefinition('InDashboard', $sender->MasterView == 'admin' ? '1' : '0');
 
-            if ($Embed === 2) {
-                $Sender->addJsFile('vanilla.embed.local.js');
+            if ($embed === 2) {
+                $sender->addJsFile('vanilla.embed.local.js');
             } else {
-                $Sender->addJsFile('embed_local.js');
+                $sender->addJsFile('embed_local.js');
             }
         } else {
-            $Sender->setHeader('X-Frame-Options', 'SAMEORIGIN');
+            $sender->setHeader('X-Frame-Options', 'SAMEORIGIN');
         }
 
 
         // Allow return to mobile site
-        $ForceNoMobile = val('X-UA-Device-Force', $_COOKIE);
-        if ($ForceNoMobile === 'desktop') {
-            $Sender->addAsset('Foot', wrap(Anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
+        $forceNoMobile = val('X-UA-Device-Force', $_COOKIE);
+        if ($forceNoMobile === 'desktop') {
+            $sender->addAsset('Foot', wrap(anchor(t('Back to Mobile Site'), '/profile/nomobile/1', 'js-hijack'), 'div'), 'MobileLink');
         }
 
         // Allow global translation of TagHint
         if (c('Tagging.Discussions.Enabled')) {
-            $Sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
-            $Sender->addDefinition('TaggingSearchUrl', Gdn::request()->Url('tags/search'));
-            $Sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
-            $Sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
+            $sender->addDefinition('TaggingAdd', Gdn::session()->checkPermission('Vanilla.Tagging.Add'));
+            $sender->addDefinition('TaggingSearchUrl', Gdn::request()->url('tags/search'));
+            $sender->addDefinition('MaxTagsAllowed', c('Vanilla.Tagging.Max', 5));
+            $sender->addDefinition('TagHint', t('TagHint', 'Start to type...'));
         }
 
 
 
         // Add symbols.
-        if ($Sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
-            $Sender->addAsset('Symbols', $Sender->fetchView('symbols', '', 'Dashboard'));
+        if ($sender->deliveryMethod() === DELIVERY_METHOD_XHTML) {
+            $sender->addAsset('Symbols', $sender->fetchView('symbols', '', 'Dashboard'));
         }
     }
 
@@ -340,33 +340,33 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if (version_compare(phpversion(), '5.6') < 0) {
-            $UpgradeMessage = ['Content' => 'Upgrade to <b>PHP 5.6</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
-            $MessageModule = new MessageModule($sender, $UpgradeMessage);
-            $sender->addModule($MessageModule);
+            $upgradeMessage = ['Content' => 'Upgrade to <b>PHP 5.6</b> or higher immediately. Version '.phpversion().' is no longer supported.', 'AssetTarget' => 'Content', 'CssClass' => 'WarningMessage'];
+            $messageModule = new MessageModule($sender, $upgradeMessage);
+            $sender->addModule($messageModule);
         }
 
         $mysqlVersion = gdn::sql()->version();
         if (version_compare($mysqlVersion, '5.6') < 0) {
-            $UpgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
-            $MessageModule = new MessageModule($sender, $UpgradeMessage);
-            $sender->addModule($MessageModule);
+            $upgradeMessage = ['Content' => 'We recommend using <b>MySQL 5.6</b> or higher. Version '.htmlspecialchars($mysqlVersion).' will not support all upcoming Vanilla features.', 'AssetTarget' => 'Content', 'CssClass' => 'InfoMessage'];
+            $messageModule = new MessageModule($sender, $upgradeMessage);
+            $sender->addModule($messageModule);
         }
     }
 
     /**
      * List all tags and allow searching
      *
-     * @param SettingsController $Sender
+     * @param SettingsController $sender
      */
-    public function settingsController_tagging_create($Sender, $Search = null, $Type = null, $Page = null) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function settingsController_tagging_create($sender, $search = null, $type = null, $page = null) {
+        $sender->permission('Garden.Settings.Manage');
 
-        $Sender->title('Tagging');
-        $Sender->setHighlightRoute('settings/tagging');
-        $SQL = Gdn::sql();
+        $sender->title('Tagging');
+        $sender->setHighlightRoute('settings/tagging');
+        $sQL = Gdn::sql();
 
         /** @var Gdn_Form $form */
-        $form = $Sender->Form;
+        $form = $sender->Form;
 
         if ($form->authenticatedPostBack()) {
             $formValue = (bool)$form->getFormValue('Tagging.Discussions.Enabled');
@@ -374,183 +374,183 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         // Get all tag types
-        $TagModel = TagModel::instance();
-        $TagTypes = $TagModel->getTagTypes();
+        $tagModel = TagModel::instance();
+        $tagTypes = $tagModel->getTagTypes();
 
 
-        list($Offset, $Limit) = offsetLimit($Page, 100);
-        $Sender->setData('_Limit', $Limit);
+        list($offset, $limit) = offsetLimit($page, 100);
+        $sender->setData('_Limit', $limit);
 
-        if ($Search) {
-            $SQL->like('Name', $Search, 'right');
+        if ($search) {
+            $sQL->like('Name', $search, 'right');
         }
 
-        $queryType = $Type;
+        $queryType = $type;
 
-        if (strtolower($Type) == 'all' || $Search || $Type === null) {
+        if (strtolower($type) == 'all' || $search || $type === null) {
             $queryType = false;
-            $Type = '';
+            $type = '';
         }
 
         // This type doesn't actually exist, but it will represent the blank types in the column.
-        if (strtolower($Type) == 'tags') {
+        if (strtolower($type) == 'tags') {
             $queryType = '';
         }
 
-        if (!$Search && ($queryType !== false)) {
-            $SQL->where('Type', $queryType);
+        if (!$search && ($queryType !== false)) {
+            $sQL->where('Type', $queryType);
         }
 
-        $TagTypes = array_change_key_case($TagTypes, CASE_LOWER);
+        $tagTypes = array_change_key_case($tagTypes, CASE_LOWER);
 
         // Store type for view
-        $TagType = !empty($Type) ? $Type : 'All';
-        $Sender->setData('_TagType', $TagType);
+        $tagType = !empty($type) ? $type : 'All';
+        $sender->setData('_TagType', $tagType);
 
         // Store tag types
-        $Sender->setData('_TagTypes', $TagTypes);
+        $sender->setData('_TagTypes', $tagTypes);
 
         // Determine if new tags can be added for the current type.
-        $CanAddTags = (!empty($TagTypes[$Type]['addtag']) && $TagTypes[$Type]['addtag']) ? 1 : 0;
-        $CanAddTags &= CheckPermission('Vanilla.Tagging.Add');
+        $canAddTags = (!empty($tagTypes[$type]['addtag']) && $tagTypes[$type]['addtag']) ? 1 : 0;
+        $canAddTags &= checkPermission('Vanilla.Tagging.Add');
 
-        $Sender->setData('_CanAddTags', $CanAddTags);
+        $sender->setData('_CanAddTags', $canAddTags);
 
-        $Data = $SQL
+        $data = $sQL
             ->select('t.*')
             ->from('Tag t')
             ->orderBy('t.CountDiscussions', 'desc')
-            ->limit($Limit, $Offset)
+            ->limit($limit, $offset)
             ->get()->resultArray();
 
-        $Sender->setData('Tags', $Data);
+        $sender->setData('Tags', $data);
 
-        if ($Search) {
-            $SQL->like('Name', $Search, 'right');
+        if ($search) {
+            $sQL->like('Name', $search, 'right');
         }
 
         // Make sure search uses its own search type, so results appear in their own tab.
-        $Sender->Form->Action = url('/settings/tagging/?type='.$TagType);
+        $sender->Form->Action = url('/settings/tagging/?type='.$tagType);
 
         // Search results pagination will mess up a bit, so don't provide a type in the count.
-        $RecordCountWhere = ['Type' => $queryType];
+        $recordCountWhere = ['Type' => $queryType];
         if ($queryType === false) {
-            $RecordCountWhere = [];
+            $recordCountWhere = [];
         }
-        if ($Search) {
-            $RecordCountWhere = [];
+        if ($search) {
+            $recordCountWhere = [];
         }
 
-        $Sender->setData('RecordCount', $SQL->getCount('Tag', $RecordCountWhere));
-        $Sender->render('tagging');
+        $sender->setData('RecordCount', $sQL->getCount('Tag', $recordCountWhere));
+        $sender->render('tagging');
     }
 
     /**
      * Add the tags endpoint to the settingsController
      *
-     * @param SettingsController $Sender
+     * @param SettingsController $sender
      * @param string $action
      *
      */
-    public function settingsController_tags_create($Sender, $action) {
-        $Sender->permission('Garden.Settings.Manage');
+    public function settingsController_tags_create($sender, $action) {
+        $sender->permission('Garden.Settings.Manage');
 
         switch($action) {
             case 'delete':
-                $TagID = val(1, $Sender->RequestArgs);
-                $TagModel = new TagModel();
-                $Tag = $TagModel->getID($TagID, DATASET_TYPE_ARRAY);
+                $tagID = val(1, $sender->RequestArgs);
+                $tagModel = new TagModel();
+                $tag = $tagModel->getID($tagID, DATASET_TYPE_ARRAY);
 
-                if ($Sender->Form->authenticatedPostBack()) {
+                if ($sender->Form->authenticatedPostBack()) {
                     // Delete tag & tag relations.
-                    $SQL = Gdn::sql();
-                    $SQL->delete('TagDiscussion', ['TagID' => $TagID]);
-                    $SQL->delete('Tag', ['TagID' => $TagID]);
+                    $sQL = Gdn::sql();
+                    $sQL->delete('TagDiscussion', ['TagID' => $tagID]);
+                    $sQL->delete('Tag', ['TagID' => $tagID]);
 
-                    $Sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $Tag));
-                    $Sender->jsonTarget("#Tag_{$Tag['TagID']}", null, 'Remove');
+                    $sender->informMessage(formatString(t('<b>{Name}</b> deleted.'), $tag));
+                    $sender->jsonTarget("#Tag_{$tag['TagID']}", null, 'Remove');
                 }
 
-                $Sender->render('blank', 'utility', 'dashboard');
+                $sender->render('blank', 'utility', 'dashboard');
                 break;
             case 'edit':
-                $Sender->setHighlightRoute('settings/tagging');
-                $Sender->title(t('Edit Tag'));
-                $TagID = val(1, $Sender->RequestArgs);
+                $sender->setHighlightRoute('settings/tagging');
+                $sender->title(t('Edit Tag'));
+                $tagID = val(1, $sender->RequestArgs);
 
                 // Set the model on the form.
-                $TagModel = new TagModel;
-                $Sender->Form->setModel($TagModel);
-                $Tag = $TagModel->getID($TagID);
-                $Sender->Form->setData($Tag);
+                $tagModel = new TagModel;
+                $sender->Form->setModel($tagModel);
+                $tag = $tagModel->getID($tagID);
+                $sender->Form->setData($tag);
 
                 // Make sure the form knows which item we are editing.
-                $Sender->Form->addHidden('TagID', $TagID);
+                $sender->Form->addHidden('TagID', $tagID);
 
-                if ($Sender->Form->authenticatedPostBack()) {
+                if ($sender->Form->authenticatedPostBack()) {
                     // Make sure the tag is valid
-                    $TagData = $Sender->Form->getFormValue('Name');
-                    if (!TagModel::validateTag($TagData)) {
-                        $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                    $tagData = $sender->Form->getFormValue('Name');
+                    if (!TagModel::validateTag($tagData)) {
+                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
                     }
 
                     // Make sure that the tag name is not already in use.
-                    if ($TagModel->getWhere(['TagID <>' => $TagID, 'Name' => $TagData])->numRows() > 0) {
-                        $Sender->setData('MergeTagVisible', true);
-                        if (!$Sender->Form->getFormValue('MergeTag')) {
-                            $Sender->Form->addError('The specified tag name is already in use.');
+                    if ($tagModel->getWhere(['TagID <>' => $tagID, 'Name' => $tagData])->numRows() > 0) {
+                        $sender->setData('MergeTagVisible', true);
+                        if (!$sender->Form->getFormValue('MergeTag')) {
+                            $sender->Form->addError('The specified tag name is already in use.');
                         }
                     }
 
-                    if ($Sender->Form->Save()) {
-                        $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->setRedirectTo('/settings/tagging');
+                    if ($sender->Form->save()) {
+                        $sender->informMessage(t('Your changes have been saved.'));
+                        $sender->setRedirectTo('/settings/tagging');
                     }
                 }
 
-                $Sender->render('tags');
+                $sender->render('tags');
                 break;
             case 'add':
             default:
-                $Sender->setHighlightRoute('settings/tagging');
-                $Sender->title('Add Tag');
+                $sender->setHighlightRoute('settings/tagging');
+                $sender->title('Add Tag');
 
                 // Set the model on the form.
-                $TagModel = new TagModel;
-                $Sender->Form->setModel($TagModel);
+                $tagModel = new TagModel;
+                $sender->Form->setModel($tagModel);
 
                 // Add types if allowed to add tags for it, and not '' or 'tags', which
                 // are the same.
-                $TagType = Gdn::request()->get('type');
-                if (strtolower($TagType) != 'tags' && $TagModel->canAddTagForType($TagType)) {
-                    $Sender->Form->addHidden('Type', $TagType, true);
+                $tagType = Gdn::request()->get('type');
+                if (strtolower($tagType) != 'tags' && $tagModel->canAddTagForType($tagType)) {
+                    $sender->Form->addHidden('Type', $tagType, true);
                 }
 
-                if ($Sender->Form->authenticatedPostBack()) {
+                if ($sender->Form->authenticatedPostBack()) {
                     // Make sure the tag is valid
-                    $TagName = $Sender->Form->getFormValue('Name');
-                    if (!TagModel::validateTag($TagName)) {
-                        $Sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
+                    $tagName = $sender->Form->getFormValue('Name');
+                    if (!TagModel::validateTag($tagName)) {
+                        $sender->Form->addError('@'.t('ValidateTag', 'Tags cannot contain commas.'));
                     }
 
-                    $TagType = $Sender->Form->getFormValue('Type');
-                    if (!$TagModel->canAddTagForType($TagType)) {
-                        $Sender->Form->addError('@'.t('ValidateTagType', 'That type does not accept manually adding new tags.'));
+                    $tagType = $sender->Form->getFormValue('Type');
+                    if (!$tagModel->canAddTagForType($tagType)) {
+                        $sender->Form->addError('@'.t('ValidateTagType', 'That type does not accept manually adding new tags.'));
                     }
 
                     // Make sure that the tag name is not already in use.
-                    if ($TagModel->getWhere(['Name' => $TagName])->numRows() > 0) {
-                        $Sender->Form->addError('The specified tag name is already in use.');
+                    if ($tagModel->getWhere(['Name' => $tagName])->numRows() > 0) {
+                        $sender->Form->addError('The specified tag name is already in use.');
                     }
 
-                    $Saved = $Sender->Form->save();
-                    if ($Saved) {
-                        $Sender->informMessage(t('Your changes have been saved.'));
-                        $Sender->setRedirectTo('/settings/tagging');
+                    $saved = $sender->Form->save();
+                    if ($saved) {
+                        $sender->informMessage(t('Your changes have been saved.'));
+                        $sender->setRedirectTo('/settings/tagging');
                     }
                 }
 
-                $Sender->render('tags');
+                $sender->render('tags');
             break;
         }
     }
@@ -569,12 +569,12 @@ class DashboardHooks extends Gdn_Plugin {
         }
 
         if (!filter_var($discussionID, FILTER_VALIDATE_INT)) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         $discussion = DiscussionModel::instance()->getID($discussionID, DATASET_TYPE_ARRAY);
         if (!$discussion) {
-            throw NotFoundException('Discussion');
+            throw notFoundException('Discussion');
         }
 
         $sender->title('Add Tags');
@@ -609,32 +609,32 @@ class DashboardHooks extends Gdn_Plugin {
      * That precludes using Controller->SetHeader.
      * This is done so comment & forum embedding can work in old IE.
      *
-     * @param Gdn_Dispatcher $Sender
+     * @param Gdn_Dispatcher $sender
      */
-    public function gdn_dispatcher_appStartup_handler($Sender) {
+    public function gdn_dispatcher_appStartup_handler($sender) {
         safeHeader('P3P: CP="CAO PSA OUR"', true);
 
-        if ($SSO = Gdn::request()->get('sso')) {
+        if ($sSO = Gdn::request()->get('sso')) {
             saveToConfig('Garden.Registration.SendConnectEmail', false, false);
 
-            $deliveryMethod = $Sender->getDeliveryMethod(Gdn::request());
-            $IsApi = $deliveryMethod === DELIVERY_METHOD_JSON;
+            $deliveryMethod = $sender->getDeliveryMethod(Gdn::request());
+            $isApi = $deliveryMethod === DELIVERY_METHOD_JSON;
 
-            $UserID = false;
+            $userID = false;
             try {
-                $CurrentUserID = Gdn::session()->UserID;
-                $UserID = Gdn::userModel()->sso($SSO);
-            } catch (Exception $Ex) {
-                trace($Ex, TRACE_ERROR);
+                $currentUserID = Gdn::session()->UserID;
+                $userID = Gdn::userModel()->sso($sSO);
+            } catch (Exception $ex) {
+                trace($ex, TRACE_ERROR);
             }
 
-            if ($UserID) {
-                Gdn::session()->start($UserID, !$IsApi, !$IsApi);
-                if ($IsApi) {
+            if ($userID) {
+                Gdn::session()->start($userID, !$isApi, !$isApi);
+                if ($isApi) {
                     Gdn::session()->validateTransientKey(true);
                 }
 
-                if ($UserID != $CurrentUserID) {
+                if ($userID != $currentUserID) {
                     Gdn::userModel()->fireEvent('AfterSignIn');
                 }
             } else {
@@ -647,8 +647,8 @@ class DashboardHooks extends Gdn_Plugin {
 
             // Let's redirect to the same url but without the sso parameter to be sure there will be
             // no leak via the Referer field.
-            $deliveryType = $Sender->getDeliveryType($deliveryMethod);
-            if (!$IsApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
+            $deliveryType = $sender->getDeliveryType($deliveryMethod);
+            if (!$isApi && !Gdn::request()->isPostBack() && $deliveryType !== DELIVERY_TYPE_DATA) {
                 $url = trim(preg_replace('#(\?.*)sso=[^&]*&?(.*)$#', '$1$2', Gdn::request()->pathAndQuery()), '&');
                 redirectTo($url);
             }
@@ -660,11 +660,13 @@ class DashboardHooks extends Gdn_Plugin {
      * Check the access token.
      */
     private function checkAccessToken() {
-        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/') ||
-           ((empty($_SERVER['HTTP_AUTHORIZATION']) || !preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m)) &&
-                empty($_GET['access_token'])
-           )
-        ) {
+        if (!stringBeginsWith(Gdn::request()->getPath(), '/api/')) {
+            return;
+        }
+
+        $hasAuthHeader = (!empty($_SERVER['HTTP_AUTHORIZATION']) && preg_match('`^Bearer\s+(v[a-z]\.[^\s]+)`i', $_SERVER['HTTP_AUTHORIZATION'], $m));
+        $hasTokenParam = !empty($_GET['access_token']);
+        if (!$hasAuthHeader && !$hasTokenParam) {
             return;
         }
 
@@ -675,8 +677,8 @@ class DashboardHooks extends Gdn_Plugin {
             try {
                 $authRow = $model->verify($token, true);
 
-                Gdn::Session()->start($authRow['UserID'], false, false);
-                Gdn::Session()->validateTransientKey(true);
+                Gdn::session()->start($authRow['UserID'], false, false);
+                Gdn::session()->validateTransientKey(true);
             } catch (\Exception $ex) {
                 // Add a psuedo-WWW-Authenticate header. We want the response to know, but don't want to kill everything.
                 $msg = $ex->getMessage();
@@ -705,29 +707,29 @@ class DashboardHooks extends Gdn_Plugin {
     /**
      * Method for plugins that want a friendly /sso method to hook into.
      *
-     * @param RootController $Sender
-     * @param string $Target The url to redirect to after sso.
+     * @param RootController $sender
+     * @param string $target The url to redirect to after sso.
      */
-    public function rootController_sso_create($Sender, $Target = '') {
-        if (!$Target) {
-            $Target = $Sender->Request->get('redirect');
-            if (!$Target) {
-                $Target = '/';
+    public function rootController_sso_create($sender, $target = '') {
+        if (!$target) {
+            $target = $sender->Request->get('redirect');
+            if (!$target) {
+                $target = '/';
             }
         }
 
         // Get the default authentication provider.
-        $DefaultProvider = Gdn_AuthenticationProviderModel::getDefault();
-        $Sender->EventArguments['Target'] = $Target;
-        $Sender->EventArguments['DefaultProvider'] = $DefaultProvider;
-        $Handled = false;
-        $Sender->EventArguments['Handled'] =& $Handled;
+        $defaultProvider = Gdn_AuthenticationProviderModel::getDefault();
+        $sender->EventArguments['Target'] = $target;
+        $sender->EventArguments['DefaultProvider'] = $defaultProvider;
+        $handled = false;
+        $sender->EventArguments['Handled'] =& $handled;
 
-        $Sender->fireEvent('SSO');
+        $sender->fireEvent('SSO');
 
         // If an event handler didn't handle the signin then just redirect to the target.
-        if (!$Handled) {
-            redirectTo($Target);
+        if (!$handled) {
+            redirectTo($target);
         }
     }
 
@@ -766,9 +768,9 @@ class DashboardHooks extends Gdn_Plugin {
         // Add a link to the community home.
         $sender->addLinkToGlobals(t('Community Home'), '/', 'main.home', '', -100, ['icon' => 'home'], false);
         $sender->addGroupToGlobals('', 'etc', '', 100);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && IsMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, ['icon' => 'resize-full']);
-        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), SignOutUrl(), 'etc.signout', '', 100, ['icon' => 'signout']);
-        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), SigninUrl(), 'etc.signin', '', 100, ['icon' => 'signin']);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid() && isMobile(), t('Full Site'), '/profile/nomobile', 'etc.nomobile', 'js-hijack', 100, ['icon' => 'resize-full']);
+        $sender->addLinkToGlobalsIf(Gdn::session()->isValid(), t('Sign Out'), signOutUrl(), 'etc.signout', '', 100, ['icon' => 'signout']);
+        $sender->addLinkToGlobalsIf(!Gdn::session()->isValid(), t('Sign In'), signinUrl(), 'etc.signin', '', 100, ['icon' => 'signin']);
 
         // DEFAULTS
 
@@ -782,8 +784,8 @@ class DashboardHooks extends Gdn_Plugin {
         // Add the moderation items.
         $sender->addGroup(t('Moderation'), 'moderation', 'moderation', 90);
         if (Gdn::session()->checkPermission('Garden.Users.Approve')) {
-            $RoleModel = new RoleModel();
-            $applicant_count = (int)$RoleModel->getApplicantCount();
+            $roleModel = new RoleModel();
+            $applicant_count = (int)$roleModel->getApplicantCount();
             if ($applicant_count > 0 || true) {
                 $sender->addLink(t('Applicants'), '/user/applicants', 'moderation.applicants', 'applicants', [], ['icon' => 'user', 'badge' => $applicant_count]);
             }

@@ -13,55 +13,55 @@
  */
 class VanilliconPlugin extends Gdn_Plugin {
 
-   /**
-    * Set up the plugin.
-    */
+    /**
+     * Set up the plugin.
+     */
     public function setup() {
         $this->structure();
     }
 
-   /**
-    * Perform any necessary database or configuration updates.
-    */
+    /**
+     * Perform any necessary database or configuration updates.
+     */
     public function structure() {
         touchConfig('Plugins.Vanillicon.Type', 'v2');
     }
 
-   /**
-    * Set the vanillicon on the user' profile.
-    *
-    * @param ProfileController $Sender
-    * @param array $Args
-    */
-    public function profileController_afterAddSideMenu_handler($Sender, $Args) {
-        if (!$Sender->User->Photo) {
-            $Sender->User->Photo = userPhotoDefaultUrl($Sender->User, ['Size' => 200]);
+    /**
+     * Set the vanillicon on the user' profile.
+     *
+     * @param ProfileController $sender
+     * @param array $args
+     */
+    public function profileController_afterAddSideMenu_handler($sender, $args) {
+        if (!$sender->User->Photo) {
+            $sender->User->Photo = userPhotoDefaultUrl($sender->User, ['Size' => 200]);
         }
     }
 
-   /**
-    * The settings page for vanillicon.
-    *
-    * @param Gdn_Controller $sender
-    */
+    /**
+     * The settings page for vanillicon.
+     *
+     * @param Gdn_Controller $sender
+     */
     public function settingsController_vanillicon_create($sender) {
         $sender->permission('Garden.Settings.Manage');
         $cf = new ConfigurationModule($sender);
 
         $items = [
-         'v1' => 'Vanillicon 1',
-         'v2' => 'Vanillicon 2'
+            'v1' => 'Vanillicon 1',
+            'v2' => 'Vanillicon 2'
         ];
 
         $cf->initialize([
-         'Plugins.Vanillicon.Type' => [
-            'LabelCode' => 'Vanillicon Set',
-            'Control' => 'radiolist',
-            'Description' => 'Which vanillicon set do you want to use?',
-            'Items' => $items,
-            'Options' => ['display' => 'after'],
-            'Default' => 'v1'
-         ]
+            'Plugins.Vanillicon.Type' => [
+                'LabelCode' => 'Vanillicon Set',
+                'Control' => 'radiolist',
+                'Description' => 'Which vanillicon set do you want to use?',
+                'Items' => $items,
+                'Options' => ['display' => 'after'],
+                'Default' => 'v1'
+            ]
         ]);
 
         
@@ -90,15 +90,15 @@ class VanilliconPlugin extends Gdn_Plugin {
     }
 }
 
-if (!function_exists('UserPhotoDefaultUrl')) {
-   /**
-    * Calculate the user's default photo url.
-    *
-    * @param array|object $user The user to examine.
-    * @param array $options An array of options.
-    * - Size: The size of the photo.
-    * @return string Returns the vanillicon url for the user.
-    */
+if (!function_exists('userPhotoDefaultUrl')) {
+    /**
+     * Calculate the user's default photo url.
+     *
+     * @param array|object $user The user to examine.
+     * @param array $options An array of options.
+     * - Size: The size of the photo.
+     * @return string Returns the vanillicon url for the user.
+     */
     function userPhotoDefaultUrl($user, $options = []) {
         static $iconSize = null, $type = null;
         if ($iconSize === null) {

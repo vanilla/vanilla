@@ -19,12 +19,12 @@ class ConditionModule extends Gdn_Module {
     /**
      *
      *
-     * @param null $Value
+     * @param null $value
      * @return array|null
      */
-    public function conditions($Value = null) {
-        if (is_array($Value)) {
-            $this->_Conditions = $Value;
+    public function conditions($value = null) {
+        if (is_array($value)) {
+            $this->_Conditions = $value;
         } elseif ($this->_Conditions === null) {
             if ($this->_Sender->Form->authenticatedPostBack()) {
                 $this->_Conditions = $this->_FromForm();
@@ -33,85 +33,85 @@ class ConditionModule extends Gdn_Module {
             }
         }
 
-        if ($Value === true) {
+        if ($value === true) {
             // Remove blank conditions from the array. This is used for saving.
-            $Result = [];
-            foreach ($this->_Conditions as $Condition) {
-                if (count($Condition) < 2 || !$Condition[0]) {
+            $result = [];
+            foreach ($this->_Conditions as $condition) {
+                if (count($condition) < 2 || !$condition[0]) {
                     continue;
                 }
-                $Result[] = $Condition;
+                $result[] = $condition;
             }
-            return $Result;
+            return $result;
         }
         return $this->_Conditions;
     }
 
     public function toString() {
-        $Form = $this->_Sender->Form;
+        $form = $this->_Sender->Form;
         $this->_Sender->addJsFile('condition.js');
 
-        if ($Form->authenticatedPostBack()) {
+        if ($form->authenticatedPostBack()) {
             // Grab the conditions from the form and convert them to the conditions array.
-            $this->Conditions($this->_FromForm());
+            $this->conditions($this->_FromForm());
         } else {
         }
 
-        $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::AllTypes());
+        $this->Types = array_merge(['' => '('.sprintf(t('Select a %s'), t('Condition Type', 'Type')).')'], Gdn_Condition::allTypes());
         //die(print_r($this->Types));
 
         // Get all of the permissions that are valid for the permissions dropdown.
-        $PermissionModel = new PermissionModel();
-        $Permissions = $PermissionModel->GetGlobalPermissions(0);
-        $Permissions = array_keys($Permissions);
-        sort($Permissions);
-        $Permissions = array_combine($Permissions, $Permissions);
-        $Permissions = array_merge(['' => '('.sprintf(t('Select a %s'), t('Permission')).')'], $Permissions);
-        $this->Permissions = $Permissions;
+        $permissionModel = new PermissionModel();
+        $permissions = $permissionModel->getGlobalPermissions(0);
+        $permissions = array_keys($permissions);
+        sort($permissions);
+        $permissions = array_combine($permissions, $permissions);
+        $permissions = array_merge(['' => '('.sprintf(t('Select a %s'), t('Permission')).')'], $permissions);
+        $this->Permissions = $permissions;
 
         // Get all of the roles.
-        $RoleModel = new RoleModel();
-        $Roles = $RoleModel->getArray();
-        $Roles = array_merge(['-' => '('.sprintf(t('Select a %s'), t('Role')).')'], $Roles);
-        $this->Roles = $Roles;
+        $roleModel = new RoleModel();
+        $roles = $roleModel->getArray();
+        $roles = array_merge(['-' => '('.sprintf(t('Select a %s'), t('Role')).')'], $roles);
+        $this->Roles = $roles;
 
-        $this->Form = $Form;
-        return parent::ToString();
+        $this->Form = $form;
+        return parent::toString();
     }
 
     /** Grab the values from the form into the conditions array. */
     protected function _FromForm() {
-        $Form = new Gdn_Form();
-        $Px = $this->Prefix;
+        $form = new Gdn_Form();
+        $px = $this->Prefix;
 
-        $Types = (array)$Form->getFormValue($Px.'Type', []);
-        $PermissionFields = (array)$Form->getFormValue($Px.'PermissionField', []);
-        $RoleFields = (array)$Form->getFormValue($Px.'RoleField', []);
-        $Fields = (array)$Form->getFormValue($Px.'Field', []);
-        $Expressions = (array)$Form->getFormValue($Px.'Expr', []);
+        $types = (array)$form->getFormValue($px.'Type', []);
+        $permissionFields = (array)$form->getFormValue($px.'PermissionField', []);
+        $roleFields = (array)$form->getFormValue($px.'RoleField', []);
+        $fields = (array)$form->getFormValue($px.'Field', []);
+        $expressions = (array)$form->getFormValue($px.'Expr', []);
 
-        $Conditions = [];
-        for ($i = 0; $i < count($Types) - 1; $i++) {
-            $Condition = [$Types[$i]];
-            switch ($Types[$i]) {
+        $conditions = [];
+        for ($i = 0; $i < count($types) - 1; $i++) {
+            $condition = [$types[$i]];
+            switch ($types[$i]) {
                 case Gdn_Condition::PERMISSION:
-                    $Condition[1] = val($i, $PermissionFields, '');
+                    $condition[1] = val($i, $permissionFields, '');
                     break;
                 case Gdn_Condition::REQUEST:
-                    $Condition[1] = val($i, $Fields, '');
-                    $Condition[2] = val($i, $Expressions, '');
+                    $condition[1] = val($i, $fields, '');
+                    $condition[2] = val($i, $expressions, '');
                     break;
                 case Gdn_Condition::ROLE:
-                    $Condition[1] = val($i, $RoleFields);
+                    $condition[1] = val($i, $roleFields);
                     break;
                 case '':
-                    $Condition[1] = '';
+                    $condition[1] = '';
                     break;
                 default:
                     continue;
             }
-            $Conditions[] = $Condition;
+            $conditions[] = $condition;
         }
-        return $Conditions;
+        return $conditions;
     }
 }

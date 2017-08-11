@@ -23,10 +23,10 @@ abstract class VanillaModel extends Gdn_Model {
      * @since 2.0.0
      * @access public
      *
-     * @param string $Name Database table name.
+     * @param string $name Database table name.
      */
-    public function __construct($Name = '') {
-        parent::__construct($Name);
+    public function __construct($name = '') {
+        parent::__construct($name);
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class VanillaModel extends Gdn_Model {
 
         // Validate $Type
         if (!in_array($type, ['Comment', 'Discussion'])) {
-            trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
+            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), 'VanillaModel', 'CheckForSpam'), E_USER_ERROR);
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Vanilla', $type);

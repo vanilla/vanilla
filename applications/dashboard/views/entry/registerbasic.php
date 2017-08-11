@@ -34,13 +34,13 @@
                 <?php
                 echo $this->Form->label('Password', 'Password');
                 echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
-                echo $this->Form->Input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
+                echo $this->Form->input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
                 ?>
             </li>
             <li>
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
-                echo $this->Form->Input('PasswordMatch', 'password', ['Wrap' => TRUE]);
+                echo $this->Form->input('PasswordMatch', 'password', ['Wrap' => TRUE]);
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
@@ -60,8 +60,8 @@
 
             <li>
                 <?php
-                echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, ['value' => '1']);
-                echo $this->Form->CheckBox('RememberMe', 'Remember me on this computer', ['value' => '1']);
+                echo $this->Form->checkBox('TermsOfService', '@'.$TermsOfServiceText, ['value' => '1']);
+                echo $this->Form->checkBox('RememberMe', 'Remember me on this computer', ['value' => '1']);
                 ?>
             </li>
             <li class="Buttons">

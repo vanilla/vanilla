@@ -19,8 +19,8 @@
             'confused' => 'confused.png',
             'cookie' => 'cookie.png',
             'cry' => 'cry.png',
-            'dissapointed' => 'dissapointed.png',
-            'dissapointed_relieved' => 'dissapointed_relieved.png',
+            'disappointed' => 'disappointed.png',
+            'disappointed_relieved' => 'disappointed_relieved.png',
             'dizzy' => 'dizzy.png',
             'expressionless' => 'expressionless.png',
             'fearful' => 'fearful.png',
@@ -93,6 +93,8 @@
             '=)' => 'smiley',
             '>_<' => 'rage',
             ':3' => 'blush',
+            'dissapointed' => 'disappointed',
+            'dissapointed_relieved' => 'disappointed_relieved',
         ],
     'editor' =>
         [

@@ -269,9 +269,9 @@ class AuthenticateApiController extends AbstractApiController {
             throw new ClientException('Authentication failed.');
         }
 
-        if ($cleanResponse['authenticationStep'] === 'authenticated') {
+        if ($response['authenticationStep'] === 'authenticated') {
             if (!empty($query['startSession'])) {
-                $this->getSession()->start($cleanResponse['userID']);
+                $this->getSession()->start($response['userID']);
             }
         } else {
             // Store all the information needed for the next authentication step.

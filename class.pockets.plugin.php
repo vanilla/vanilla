@@ -630,7 +630,7 @@ class PocketsPlugin extends Gdn_Plugin {
                 }
             };
 
-            $result = preg_replace_callback('`{{(\w+)}}`', $callback, $result);
+            $result = preg_replace_callback('/{{(\w+)}}/', $callback, $result);
         }
 
         return $result;

@@ -6,6 +6,7 @@
 
 namespace Vanilla;
 
+use Garden\Web\RequestInterface;
 use Vanilla\Models\SSOUserInfo;
 
 abstract class SSOAuthenticator {
@@ -15,7 +16,7 @@ abstract class SSOAuthenticator {
      *
      * Currently maps to "UserAuthenticationProvider.AuthenticationKey".
      *
-     * Extending classes will most likely require to have a dependency on Gdn_Request so that they can
+     * Extending classes will most likely require to have a dependency on RequestInterface so that they can
      * fetch the ID from the URL and throw an exception if it is not found or invalid.
      *
      * @var string
@@ -33,22 +34,21 @@ abstract class SSOAuthenticator {
     /**
      * Authenticator constructor.
      *
-     * @param string $authenticatorID
+     * @param string|array $authenticatorID
      * @param bool $isTrusted
      */
-    function __construct($authenticatorID, $isTrusted) {
+    public function __construct($authenticatorID) {
         $this->authenticatorID = $authenticatorID;
-        $this->isTrusted = $isTrusted;
     }
 
     /**
      * Core implementation of the sso() function.
      *
      * @throw Exception Reason why the authentication failed.
-     * @param Gdn_Request $request
+     * @param RequestInterface $request
      * @return array The user's information.
      */
-    protected abstract function authenticate(Gdn_Request $request);
+    protected abstract function authenticate(RequestInterface $request);
 
     /**
      * Getter of id.
@@ -67,14 +67,14 @@ abstract class SSOAuthenticator {
     /**
      * Returns the sign in URL.
      *
-     * @return string
+     * @return string|false
      */
     public abstract function signInURL();
 
     /**
      * Returns the sign out URL.
      *
-     * @return string
+     * @return string|false
      */
     public abstract function signOutURL();
 
@@ -82,10 +82,10 @@ abstract class SSOAuthenticator {
      * Authenticate an user by using the request's data.
      *
      * @throw Exception Reason why the authentication failed.
-     * @param Gdn_Request $request
+     * @param RequestInterface $request
      * @return SSOUserInfo The user's information.
      */
-    public final function sso(Gdn_Request $request) {
+    public final function sso(RequestInterface $request) {
         $ssoUserInfo = $this->authenticate($request);
         $ssoUserInfo['AuthenticatorID'] = $this->getID();
         $this->validateUserInfo($ssoUserInfo);

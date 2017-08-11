@@ -621,21 +621,32 @@ class PocketsPlugin extends Gdn_Plugin {
         if (is_array($data)) {
             $data = array_change_key_case($data);
 
-            self::pocketStringCb($data, true);
-            $result = preg_replace_callback('`{{(\w+)}}`', ['PocketsPlugin', 'PocketStringCb'], $result);
+            $callback = function ($matches) use ($data) {
+                $key = strtolower($matches[1]);
+                if (isset($data[$key])) {
+                    return $data[$key];
+                } else {
+                    return '';
+                }
+            };
+
+            $result = preg_replace_callback('`{{(\w+)}}`', $callback, $result);
         }
 
         return $result;
     }
 
     /**
+     * DEPRECATED - Callback function for preg_replace_callback
      *
-     *
-     * @param null $match
+     * @deprecated 2.4
+     * @param array|null $match
      * @param bool|false $setArgs
      * @return string
      */
     public static function pocketStringCb($match = null, $setArgs = false) {
+        deprecated(__METHOD__);
+
         static $data;
         if ($setArgs) {
             $data = $match;

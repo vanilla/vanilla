@@ -252,14 +252,14 @@ class CommentsApiController extends AbstractApiController {
             $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
             // Build up the where clause.
-            $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
+            $where = ['DiscussionID' => $query['discussionID'], 'joinUsers' => false];
 
             if (isset($query['insertUserID'])) {
-                $where['insertUserID'] = $query['insertUserID'];
+                $where['InsertUserID'] = $query['insertUserID'];
             }
 
             if (isset($query['after'])) {
-                $where['dateInserted >'] = $query['after'];
+                $where['DateInserted >'] = $query['after'];
             }
 
             $rows = $this->commentModel->getWhere(

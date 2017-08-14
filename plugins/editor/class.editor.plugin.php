@@ -704,12 +704,12 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Endpoint to upload files.
      *
-     * @param PostController $Sender
+     * @param PostController $sender
      * @param array $args Expects the first argument to be the type of the upload, either 'file', 'image', or 'unknown'.
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function postController_editorUpload_create($Sender, $args = array()) {
+    public function postController_editorUpload_create($sender, $args = []) {
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
 
@@ -717,7 +717,7 @@ class EditorPlugin extends Gdn_Plugin {
         // because the methods on the Upload class do not expose all variables.
         $fileData = Gdn::request()->getValueFrom(Gdn_Request::INPUT_FILES, $this->editorFileInputName, false);
 
-        $discussionID = ($Sender->Request->post('DiscussionID')) ? $Sender->Request->post('DiscussionID') : '';
+        $discussionID = ($sender->Request->post('DiscussionID')) ? $sender->Request->post('DiscussionID') : '';
 
         // JSON payload of media info will get sent back to the client.
         $json = array(
@@ -728,7 +728,7 @@ class EditorPlugin extends Gdn_Plugin {
         );
 
         // New upload instance
-        $Upload = new Gdn_Upload();
+        $upload = new Gdn_Upload();
 
         // Upload type is either 'file', for an upload that adds an attachment to the post, or 'image' for an upload
         // that is automatically inserted into the post. If the user uploads using drag-and-drop rather than browsing
@@ -743,7 +743,7 @@ class EditorPlugin extends Gdn_Plugin {
 
         // This will validate, such as size maxes, file extensions. Upon doing
         // this, $_FILES is set as a protected property, so all the other Gdn_Upload methods work on it.
-        $tmpFilePath = $Upload->validateUpload($this->editorFileInputName);
+        $tmpFilePath = $upload->validateUpload($this->editorFileInputName);
 
         // Get base destination path for editor uploads
         $this->editorBaseUploadDestinationDir = $this->getBaseUploadDestinationDir();
@@ -752,8 +752,8 @@ class EditorPlugin extends Gdn_Plugin {
         $canUpload = Gdn_Upload::canUpload($this->editorBaseUploadDestinationDir);
 
         if ($tmpFilePath && $canUpload) {
-            $fileExtension = strtolower($Upload->getUploadedFileExtension());
-            $fileName = $Upload->getUploadedFileName();
+            $fileExtension = strtolower($upload->getUploadedFileExtension());
+            $fileName = $upload->getUploadedFileName();
             list($tmpwidth, $tmpheight, $imageType) = getimagesize($tmpFilePath);
 
             // This will return the absolute destination path, including generated
@@ -782,7 +782,7 @@ class EditorPlugin extends Gdn_Plugin {
                 if ($uploadType === 'unknown') {
                     $uploadType = 'file';
                 }
-                $filePathParsed = $Upload->saveAs(
+                $filePathParsed = $upload->saveAs(
                     $tmpFilePath,
                     $absoluteFileDestination,
                     [
@@ -828,10 +828,10 @@ class EditorPlugin extends Gdn_Plugin {
             }
 
             // Save data to database using model with media table
-            $Model = new MediaModel();
+            $model = new MediaModel();
 
             // Will be passed to model for database insertion/update. All thumb vars will be empty.
-            $Media = array(
+            $media = [
                 'Name' => $fileName,
                 'Type' => $fileData['type'],
                 'Size' => $fileData['size'],
@@ -843,18 +843,18 @@ class EditorPlugin extends Gdn_Plugin {
                 'DateInserted' => date('Y-m-d H:i:s'),
                 'Path' => $filePathParsed['SaveName'],
                 'ThumbPath' => $thumbPathParsed['SaveName']
-            );
+            ];
 
             // Get MediaID and pass it to client in payload.
-            $MediaID = $Model->save($Media);
-            $Media['MediaID'] = $MediaID;
+            $mediaID = $model->save($media);
+            $media['MediaID'] = $mediaID;
 
             if ($generate_thumbnail) {
-                $thumbUrl = url('/utility/mediathumbnail/'.$MediaID, true);
+                $thumbUrl = url('/utility/mediathumbnail/'.$mediaID, true);
             }
 
-            $payload = array(
-                'MediaID' => $MediaID,
+            $payload = [
+                'MediaID' => $mediaID,
                 'Filename' => htmlspecialchars($fileName),
                 'Filesize' => $fileData['size'],
                 'FormatFilesize' => Gdn_Format::bytes($fileData['size'], 1),
@@ -862,13 +862,13 @@ class EditorPlugin extends Gdn_Plugin {
                 'Thumbnail' => '',
                 'FinalImageLocation' => '',
                 'Parsed' => $filePathParsed,
-                'Media' => (array)$Media,
-                'original_url' => $Upload->url($filePathParsed['SaveName']),
+                'Media' => $media,
+                'original_url' => $upload->url($filePathParsed['SaveName']),
                 'thumbnail_url' => $thumbUrl,
                 'original_width' => $imageWidth,
                 'original_height' => $imageHeight,
                 'upload_type' => $uploadType
-            );
+            ];
 
             $json = array(
                 'error' => 0,
@@ -914,9 +914,9 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Remove file from filesystem, and clear db entry.
      *
-     * @param type $FileID
-     * @param type $ForeignID
-     * @param type $ForeignType
+     * @param type $mediaID
+     * @param type $foreignID
+     * @param type $foreignType
      * @return boolean
      */
     protected function deleteEditorUploads($MediaID, $ForeignID = '', $ForeignType = '') {
@@ -1054,8 +1054,8 @@ class EditorPlugin extends Gdn_Plugin {
      * It will first perform a single request against the Media table, then filter out the ones that
      * exist per discussion or comment.
      *
-     * @param multiple $Controller The controller.
-     * @param string $Type The type of row, either discussion or comment.
+     * @param multiple $sender The controller.
+     * @param string $type The type of row, either discussion or comment.
      * @param array|object $row The row of data being attached to.
      */
     protected function attachUploadsToComment($Sender, $Type = 'comment', $row = null) {
@@ -1441,13 +1441,13 @@ class EditorPlugin extends Gdn_Plugin {
     /**
      * Create and display a thumbnail of an uploaded file.
      */
-    public function utilityController_mediaThumbnail_create($sender, $media_id) {
+    public function utilityController_mediaThumbnail_create($sender, $mediaID) {
         // When it makes it into core, it will be available in
         // functions.general.php
         require 'generate_thumbnail.php';
 
         $model = new MediaModel();
-        $media = $model->getID($media_id, DATASET_TYPE_ARRAY);
+        $media = $model->getID($mediaID, DATASET_TYPE_ARRAY);
 
         if (!$media) {
             throw notFoundException('File');
@@ -1484,16 +1484,16 @@ class EditorPlugin extends Gdn_Plugin {
             // same path for each arg in SaveAs. The file will be removed from the local filesystem.
             $parsed = Gdn_Upload::parse($thumb_destination_path);
             $target = $thumb_destination_path; // $parsed['Name'];
-            $Upload = new Gdn_Upload();
-            $filepath_parsed = $Upload->saveAs($thumb_destination_path, $target, array('source' => 'content'));
+            $upload = new Gdn_Upload();
+            $filepath_parsed = $upload->saveAs($thumb_destination_path, $target, ['source' => 'content']);
 
             // Save thumbnail information to DB.
-            $model->save(array(
-                'MediaID' => $media_id,
+            $model->save([
+                'MediaID' => $mediaID,
                 'ThumbWidth' => $thumb_width,
                 'ThumbHeight' => $thumb_height,
                 'ThumbPath' => $filepath_parsed['SaveName']
-            ));
+            ]);
 
             // Remove cloud scratch copy, typically in /uploads/cftemp/ or /uploads/cloudtemp/, if there was actually a file pulled in from cloud storage.
             $uploadFolder = basename(PATH_UPLOADS);
@@ -1504,12 +1504,12 @@ class EditorPlugin extends Gdn_Plugin {
             $url = $filepath_parsed['Url'];
         } else {
             // Fix the thumbnail information so this isn't requested again and again.
-            $model->save(array(
-            'MediaID' => $media_id,
+            $model->save([
+            'MediaID' => $mediaID,
             'ImageWidth' => 0,
             'ImageHeight' => 0,
             'ThumbPath' => ''
-            ));
+            ]);
 
             $url = asset('/plugins/FileUpload/images/file.png');
         }

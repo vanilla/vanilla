@@ -860,7 +860,7 @@ class EditorPlugin extends Gdn_Plugin {
 
             $payload = [
                 'MediaID' => $mediaID,
-                'Filename' => htmlspecialchars($fileName),
+                'Filename' => $media['Name'],
                 'Filesize' => $fileData['size'],
                 'FormatFilesize' => Gdn_Format::bytes($fileData['size'], 1),
                 'type' => $fileData['type'],
@@ -1517,17 +1517,10 @@ class EditorPlugin extends Gdn_Plugin {
         } else {
             // Fix the thumbnail information so this isn't requested again and again.
             $model->save([
-<<<<<<< HEAD
                 'MediaID' => $mediaID,
                 'ImageWidth' => 0,
                 'ImageHeight' => 0,
                 'ThumbPath' => ''
-=======
-            'MediaID' => $mediaID,
-            'ImageWidth' => 0,
-            'ImageHeight' => 0,
-            'ThumbPath' => ''
->>>>>>> 0b0941e1c... Fix coding standard
             ]);
 
             $url = asset('/plugins/FileUpload/images/file.png');

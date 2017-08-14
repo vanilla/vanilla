@@ -351,10 +351,12 @@ class CommentModel extends Gdn_Model {
      * @param int $userID Which user to get comments for.
      * @param int $limit Max number to get.
      * @param int $offset Number to skip.
-     * @param int $lastCommentID A hint for quicker paging.
+     * @param int|bool $lastCommentID A hint for quicker paging.
+     * @param string|null $after Only pull comments following this date.
+     * @param string $order Order comments ascending (asc) or descending (desc) by ID.
      * @return Gdn_DataSet SQL results.
      */
-    public function getByUser2($userID, $limit, $offset, $lastCommentID = false) {
+    public function getByUser2($userID, $limit, $offset, $lastCommentID = false, $after = null, $order = 'desc') {
         $perms = DiscussionModel::categoryPermissions();
 
         if (is_array($perms) && empty($perms)) {
@@ -371,7 +373,11 @@ class CommentModel extends Gdn_Model {
             ->join('Comment c2', 'c.CommentID = c2.CommentID')
             ->join('Discussion d', 'c2.DiscussionID = d.DiscussionID')
             ->where('c.InsertUserID', $userID)
-            ->orderBy('c.CommentID', 'desc');
+            ->orderBy('c.CommentID', $order);
+
+        if ($after) {
+            $this->SQL->where('c.DateInserted >', $after);
+        }
 
         if ($lastCommentID) {
             // The last comment id from the last page was given and can be used as a hint to speed up the query.

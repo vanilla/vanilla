@@ -860,7 +860,7 @@ class EditorPlugin extends Gdn_Plugin {
 
             $payload = [
                 'MediaID' => $mediaID,
-                'Filename' => $media['Name'],
+                'Filename' => htmlspecialchars($fileName),
                 'Filesize' => $fileData['size'],
                 'FormatFilesize' => Gdn_Format::bytes($fileData['size'], 1),
                 'type' => $fileData['type'],
@@ -1453,6 +1453,7 @@ class EditorPlugin extends Gdn_Plugin {
      */
     public function utilityController_mediaThumbnail_create($sender, $mediaID) {
         $sender->permission('Garden.SignIn.Allow');
+
         // When it makes it into core, it will be available in
         // functions.general.php
         require 'generate_thumbnail.php';
@@ -1516,10 +1517,17 @@ class EditorPlugin extends Gdn_Plugin {
         } else {
             // Fix the thumbnail information so this isn't requested again and again.
             $model->save([
+<<<<<<< HEAD
                 'MediaID' => $mediaID,
                 'ImageWidth' => 0,
                 'ImageHeight' => 0,
                 'ThumbPath' => ''
+=======
+            'MediaID' => $mediaID,
+            'ImageWidth' => 0,
+            'ImageHeight' => 0,
+            'ThumbPath' => ''
+>>>>>>> 0b0941e1c... Fix coding standard
             ]);
 
             $url = asset('/plugins/FileUpload/images/file.png');

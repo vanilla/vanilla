@@ -894,11 +894,13 @@ class EditorPlugin extends Gdn_Plugin {
     protected function attachEditorUploads($fileID, $foreignID, $foreignType) {
         // Save data to database using model with media table
         $model = new MediaModel();
+        $media = $model->getID($fileID, DATASET_TYPE_ARRAY);
 
-        $media = $model->getID($fileID);
-        if ($media) {
-            $media->ForeignID = $foreignID;
-            $media->ForeignTable = $foreignType;
+        $isOwner = (!empty($media['InsertUserID']) && Gdn::session()->UserID == $media['InsertUserID']);
+
+        if ($media && $isOwner) {
+            $media['ForeignID'] = $foreignID;
+            $media['ForeignTable'] = $foreignType;
 
             try {
                 $model->save($media);

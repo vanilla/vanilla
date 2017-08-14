@@ -710,6 +710,8 @@ class EditorPlugin extends Gdn_Plugin {
      * @throws Gdn_UserException
      */
     public function postController_editorUpload_create($sender, $args = []) {
+        $sender->permission('Garden.SignIn.Allow');
+
         // @Todo Move to a library/functions file.
         require 'generate_thumbnail.php';
 
@@ -853,9 +855,12 @@ class EditorPlugin extends Gdn_Plugin {
                 $thumbUrl = url('/utility/mediathumbnail/'.$mediaID, true);
             }
 
+            // Escape the media's name.
+            $media['Name'] = htmlspecialchars($media['Name']);
+
             $payload = [
                 'MediaID' => $mediaID,
-                'Filename' => htmlspecialchars($fileName),
+                'Filename' => $media['Name'],
                 'Filesize' => $fileData['size'],
                 'FormatFilesize' => Gdn_Format::bytes($fileData['size'], 1),
                 'type' => $fileData['type'],
@@ -1440,8 +1445,12 @@ class EditorPlugin extends Gdn_Plugin {
 
     /**
      * Create and display a thumbnail of an uploaded file.
+     *
+     * @param Gdn_Controller $sender
+     * @param int $mediaID
      */
     public function utilityController_mediaThumbnail_create($sender, $mediaID) {
+        $sender->permission('Garden.SignIn.Allow');
         // When it makes it into core, it will be available in
         // functions.general.php
         require 'generate_thumbnail.php';
@@ -1505,10 +1514,10 @@ class EditorPlugin extends Gdn_Plugin {
         } else {
             // Fix the thumbnail information so this isn't requested again and again.
             $model->save([
-            'MediaID' => $mediaID,
-            'ImageWidth' => 0,
-            'ImageHeight' => 0,
-            'ThumbPath' => ''
+                'MediaID' => $mediaID,
+                'ImageWidth' => 0,
+                'ImageHeight' => 0,
+                'ThumbPath' => ''
             ]);
 
             $url = asset('/plugins/FileUpload/images/file.png');

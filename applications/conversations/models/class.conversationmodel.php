@@ -774,7 +774,8 @@ class ConversationModel extends ConversationsModel {
 
         // First define the current users in the conversation
         $oldContributorData = $this->getRecipients($conversationID);
-        if (count($oldContributorData) + count($userID) >  self::getMaxRecipients() + 1) {
+        $maxRecipients = self::getMaxRecipients();
+        if ($maxRecipients && (count($oldContributorData) + count($userID) > $maxRecipients + 1)) {
             return false;
         }
 

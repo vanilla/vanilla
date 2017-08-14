@@ -16,5 +16,5 @@ foreach ($Comments as $Comment) {
     if (is_numeric($Comment->CommentID))
         $CurrentOffset++;
     $this->CurrentComment = $Comment;
-    WriteComment($Comment, $this, $Session, $CurrentOffset);
+    writeComment($Comment, $this, $Session, $CurrentOffset);
 }

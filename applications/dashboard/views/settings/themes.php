@@ -28,11 +28,11 @@ helpAsset(t('Need More Help?'), $links);
         </ul>
     </div>
 <?php
-if ($currentTheme = $this->Data('CurrentTheme')) {
+if ($currentTheme = $this->data('CurrentTheme')) {
     echo $currentTheme;
 }
 ?>
-<?php if (count($this->data('AvailableThemes', array())) > 1) { ?>
+<?php if (count($this->data('AvailableThemes', [])) > 1) { ?>
     <div class="BrowseThemes js-themes">
         <ul class="label-selector">
             <?php
@@ -56,20 +56,20 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                 <li class="<?php echo $class; ?> label-selector-item">
                     <div class="theme-wrap">
                         <div class="theme-spacer">
-                            <?php echo img($themeSpacer, array('alt' => $ScreenName, 'class' => 'label-selector-image')); ?>
+                            <?php echo img($themeSpacer, ['alt' => $ScreenName, 'class' => 'label-selector-image']); ?>
                         </div>
                         <div class="image-wrap">
                             <?php if ($PreviewUrl !== FALSE) {
-                                echo Img($PreviewUrl, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
+                                echo img($PreviewUrl, ['alt' => $ScreenName, 'class' => 'label-selector-image']);
                             } else {
-                                echo img($themePlaceholder, array('alt' => $ScreenName, 'class' => 'label-selector-image'));
+                                echo img($themePlaceholder, ['alt' => $ScreenName, 'class' => 'label-selector-image']);
                             } ?>
                             <div class="overlay">
                                 <div class="label-selector-corner-link">
                                     <?php echo anchor(dashboardSymbol('expand', 'icon-16'), 'dashboard/settings/themeinfo/'.$ThemeName, 'js-modal', ['data-css-class' => 'modal-center modal-md', 'data-title' => $ScreenName, 'data-modal-type' => 'noheader']); ?>
                                 </div>
                                 <div class="buttons">
-                                    <?php echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->TransientKey(), 'btn btn-overlay EnableAddon EnableTheme', array('target' => '_top'));
+                                    <?php echo anchor(t('Apply'), 'dashboard/settings/themes/'.$ThemeName.'/'.$Session->transientKey(), 'btn btn-overlay EnableAddon EnableTheme', ['target' => '_top']);
                                     if ($allowPreview) {
                                         echo anchor(t('Preview'), 'dashboard/settings/previewtheme/'.$ThemeName, 'btn btn-overlay js-preview-addon');
                                     }
@@ -116,7 +116,7 @@ if ($currentTheme = $this->Data('CurrentTheme')) {
                             <div class="Alert">
                                 <?php echo anchor(
                                     sprintf(t('%1$s version %2$s is available.'), $ScreenName, $NewVersion),
-                                    CombinePaths(array($AddonUrl, 'find', urlencode($ThemeName)), '/')
+                                    combinePaths([$AddonUrl, 'find', urlencode($ThemeName)], '/')
                                 ); ?>
                             </div>';
                         <?php } ?>

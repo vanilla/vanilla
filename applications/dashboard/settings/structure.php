@@ -35,7 +35,7 @@ $Construct
     ->primaryKey('RoleID')
     ->column('Name', 'varchar(100)')
     ->column('Description', 'varchar(500)', true)
-    ->column('Type', array(RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR), true)
+    ->column('Type', [RoleModel::TYPE_GUEST, RoleModel::TYPE_UNCONFIRMED, RoleModel::TYPE_APPLICANT, RoleModel::TYPE_MEMBER, RoleModel::TYPE_MODERATOR, RoleModel::TYPE_ADMINISTRATOR], true)
     ->column('Sort', 'int', true)
     ->column('Deletable', 'tinyint(1)', '1')
     ->column('CanSession', 'tinyint(1)', '1')
@@ -49,12 +49,12 @@ if (!$RoleTableExists || $Drop) {
     $RoleModel->Database = $Database;
     $RoleModel->SQL = $SQL;
     $Sort = 1;
-    $RoleModel->define(array('Name' => 'Guest', 'Type' => RoleModel::TYPE_GUEST, 'RoleID' => 2, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '0', 'Description' => t('Guest Role Description', 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".')));
-    $RoleModel->define(array('Name' => 'Unconfirmed', 'Type' => RoleModel::TYPE_UNCONFIRMED, 'RoleID' => 3, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => t('Unconfirmed Role Description', 'Users must confirm their emails before becoming full members. They get assigned to this role.')));
-    $RoleModel->define(array('Name' => 'Applicant', 'Type' => RoleModel::TYPE_APPLICANT, 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => t('Applicant Role Description', 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.')));
-    $RoleModel->define(array('Name' => 'Member', 'Type' => RoleModel::TYPE_MEMBER, 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Member Role Description', 'Members can participate in discussions.')));
-    $RoleModel->define(array('Name' => 'Moderator', 'Type' => RoleModel::TYPE_MODERATOR, 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Moderator Role Description', 'Moderators have permission to edit most content.')));
-    $RoleModel->define(array('Name' => 'Administrator', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Administrator Role Description', 'Administrators have permission to do anything.')));
+    $RoleModel->define(['Name' => 'Guest', 'Type' => RoleModel::TYPE_GUEST, 'RoleID' => 2, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '0', 'Description' => t('Guest Role Description', 'Guests can only view content. Anyone browsing the site who is not signed in is considered to be a "Guest".')]);
+    $RoleModel->define(['Name' => 'Unconfirmed', 'Type' => RoleModel::TYPE_UNCONFIRMED, 'RoleID' => 3, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => t('Unconfirmed Role Description', 'Users must confirm their emails before becoming full members. They get assigned to this role.')]);
+    $RoleModel->define(['Name' => 'Applicant', 'Type' => RoleModel::TYPE_APPLICANT, 'RoleID' => 4, 'Sort' => $Sort++, 'Deletable' => '0', 'CanSession' => '1', 'Description' => t('Applicant Role Description', 'Users who have applied for membership, but have not yet been accepted. They have the same permissions as guests.')]);
+    $RoleModel->define(['Name' => 'Member', 'Type' => RoleModel::TYPE_MEMBER, 'RoleID' => 8, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Member Role Description', 'Members can participate in discussions.')]);
+    $RoleModel->define(['Name' => 'Moderator', 'Type' => RoleModel::TYPE_MODERATOR, 'RoleID' => 32, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Moderator Role Description', 'Moderators have permission to edit most content.')]);
+    $RoleModel->define(['Name' => 'Administrator', 'Type' => RoleModel::TYPE_ADMINISTRATOR, 'RoleID' => 16, 'Sort' => $Sort++, 'Deletable' => '1', 'CanSession' => '1', 'Description' => t('Administrator Role Description', 'Administrators have permission to do anything.')]);
 }
 
 // User Table
@@ -77,7 +77,7 @@ $Construct
     ->column('About', 'text', true)
     ->column('Email', 'varchar(100)', false, 'index')
     ->column('ShowEmail', 'tinyint(1)', '0')
-    ->column('Gender', array('u', 'm', 'f'), 'u')
+    ->column('Gender', ['u', 'm', 'f'], 'u')
     ->column('CountVisits', 'int', '0')
     ->column('CountInvitations', 'int', '0')
     ->column('CountNotifications', 'int', null)
@@ -111,14 +111,14 @@ if ($UserExists && !$ConfirmedExists) {
     if (UserModel::requireConfirmEmail() && !empty($ConfirmEmailRoleID)) {
         // Select unconfirmed users
         $Users = Gdn::sql()->select('UserID')->from('UserRole')->where('RoleID', $ConfirmEmailRoleID)->get();
-        $UserIDs = array();
+        $UserIDs = [];
         while ($User = $Users->nextRow(DATASET_TYPE_ARRAY)) {
             $UserIDs[] = $User['UserID'];
         }
 
         // Update
         Gdn::sql()->update('User')->set('Confirmed', 0)->whereIn('UserID', $UserIDs)->put();
-        Gdn::sql()->delete('UserRole', array('RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs));
+        Gdn::sql()->delete('UserRole', ['RoleID' => $ConfirmEmailRoleID, 'UserID' => $UserIDs]);
     }
 }
 
@@ -135,7 +135,7 @@ if ($SystemUserID) {
 
 if (!$SystemUserID) {
     // Try and find a system user.
-    $SystemUserID = Gdn::sql()->getWhere('User', array('Name' => 'System', 'Admin' => 2))->value('UserID');
+    $SystemUserID = Gdn::sql()->getWhere('User', ['Name' => 'System', 'Admin' => 2])->value('UserID');
     if ($SystemUserID) {
         saveToConfig('Garden.SystemUserID', $SystemUserID);
     } else {
@@ -159,7 +159,7 @@ $UserRoleExists = $Construct->tableExists();
 
 $Construct
     ->column('UserID', 'int', false, 'primary')
-    ->column('RoleID', 'int', false, array('primary', 'index'))
+    ->column('RoleID', 'int', false, ['primary', 'index'])
     ->set($Explicit, $Drop);
 
 // Fix old default roles that were stored in the config and user-role table.
@@ -188,14 +188,14 @@ if ($RoleTableExists && $UserRoleExists && $RoleTypeExists) {
         }
     }
 
-    $guestRoleIDs = Gdn::sql()->getWhere('UserRole', array('UserID' => 0))->resultArray();
+    $guestRoleIDs = Gdn::sql()->getWhere('UserRole', ['UserID' => 0])->resultArray();
     if (!empty($guestRoleIDs)) {
         $SQL->update('Role')
             ->set('Type', RoleModel::TYPE_GUEST)
             ->where('RoleID', $types[RoleModel::TYPE_GUEST])
             ->put();
 
-        $SQL->delete('UserRole', array('UserID' => 0));
+        $SQL->delete('UserRole', ['UserID' => 0]);
     }
 }
 
@@ -204,20 +204,20 @@ if (!$UserRoleExists) {
     $adminRoleIDs = RoleModel::getDefaultRoles(RoleModel::TYPE_ADMINISTRATOR);
 
     foreach ($adminRoleIDs as $id) {
-        $SQL->replace('UserRole', array(), array('UserID' => 1, 'RoleID' => $id));
+        $SQL->replace('UserRole', [], ['UserID' => 1, 'RoleID' => $id]);
     }
 }
 
 // User Meta Table
 $Construct->table('UserMeta')
     ->column('UserID', 'int', false, 'primary')
-    ->column('Name', 'varchar(100)', false, array('primary', 'index'))
+    ->column('Name', 'varchar(100)', false, ['primary', 'index'])
     ->column('Value', 'text', true)
     ->set($Explicit, $Drop);
 
 // User Points Table
 $Construct->table('UserPoints')
-    ->column('SlotType', array('d', 'w', 'm', 'y', 'a'), false, 'primary')
+    ->column('SlotType', ['d', 'w', 'm', 'y', 'a'], false, 'primary')
     ->column('TimeSlot', 'datetime', false, 'primary')
     ->column('Source', 'varchar(10)', 'Total', 'primary')
     ->column('CategoryID', 'int', 0, 'primary')
@@ -253,7 +253,7 @@ $Construct->table('UserAuthenticationProvider')
 $Construct->table('UserAuthenticationNonce')
     ->column('Nonce', 'varchar(100)', false, 'primary')
     ->column('Token', 'varchar(128)', false)
-    ->column('Timestamp', 'timestamp', false)
+    ->column('Timestamp', 'timestamp', false, 'index')
     ->set($Explicit, $Drop);
 
 $Construct->table('UserAuthenticationToken')
@@ -261,7 +261,7 @@ $Construct->table('UserAuthenticationToken')
     ->column('ProviderKey', 'varchar(50)', false, 'primary')
     ->column('ForeignUserKey', 'varchar(100)', true)
     ->column('TokenSecret', 'varchar(64)', false)
-    ->column('TokenType', array('request', 'access'), false)
+    ->column('TokenType', ['request', 'access'], false)
     ->column('Authorized', 'tinyint(1)', false)
     ->column('Timestamp', 'timestamp', false)
     ->column('Lifetime', 'int', false)
@@ -281,9 +281,9 @@ $Construct->table('AccessToken')
 // Fix the sync roles config spelling mistake.
 if (c('Garden.SSO.SynchRoles')) {
     saveToConfig(
-        array('Garden.SSO.SynchRoles' => '', 'Garden.SSO.SyncRoles' => c('Garden.SSO.SynchRoles')),
+        ['Garden.SSO.SynchRoles' => '', 'Garden.SSO.SyncRoles' => c('Garden.SSO.SynchRoles')],
         '',
-        array('RemoveEmpty' => true)
+        ['RemoveEmpty' => true]
     );
 }
 
@@ -318,12 +318,12 @@ if ($PermissionModel instanceof PermissionModel) {
         ->column('JunctionTable', 'varchar(100)', true)
         ->column('JunctionColumn', 'varchar(100)', true)
         ->column('JunctionID', 'int', true)
-        // The actual permissions will be added by PermissionModel::Define()
+        // The actual permissions will be added by PermissionModel::define()
         ->set($Explicit, $Drop);
 }
 
 // Define the set of permissions that Garden uses.
-$PermissionModel->define(array(
+$PermissionModel->define([
     'Garden.Email.View' => 'Garden.SignIn.Allow',
     'Garden.Settings.Manage',
     'Garden.Settings.View',
@@ -341,9 +341,9 @@ $PermissionModel->define(array(
     'Garden.PersonalInfo.View' => 'Garden.Moderation.Manage',
     'Garden.AdvancedNotifications.Allow',
     'Garden.Community.Manage' => 'Garden.Settings.Manage'
-));
+]);
 
-$PermissionModel->undefine(array(
+$PermissionModel->undefine([
     'Garden.Applications.Manage',
     'Garden.Email.Manage',
     'Garden.Plugins.Manage',
@@ -351,7 +351,7 @@ $PermissionModel->undefine(array(
     'Garden.Routes.Manage',
     'Garden.Themes.Manage',
     'Garden.Messages.Manage'
-));
+]);
 
 // Invitation Table
 $Construct->table('Invitation')
@@ -387,7 +387,7 @@ $Construct->table('ActivityType')
     ->set($Explicit, $Drop);
 
 // Activity Table
-// Column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
+// column($Name, $Type, $Length = '', $Null = FALSE, $Default = null, $KeyType = FALSE, $AutoIncrement = FALSE)
 
 $Construct->table('Activity');
 $ActivityExists = $Construct->tableExists();
@@ -400,13 +400,13 @@ $DateUpdatedExists = $Construct->columnExists('DateUpdated');
 if ($ActivityExists) {
     $ActivityIndexes = $Construct->indexSqlDb();
 } else {
-    $ActivityIndexes = array();
+    $ActivityIndexes = [];
 }
 
 $Construct
     ->primaryKey('ActivityID')
     ->column('ActivityTypeID', 'int')
-    ->column('NotifyUserID', 'int', 0, array('index.Notify', 'index.Recent', 'index.Feed'))// user being notified or -1: public, -2 mods, -3 admins
+    ->column('NotifyUserID', 'int', 0, ['index.Notify', 'index.Recent', 'index.Feed'])// user being notified or -1: public, -2 mods, -3 admins
     ->column('ActivityUserID', 'int', true, 'index.Feed')
     ->column('RegardingUserID', 'int', true)// deprecated?
     ->column('Photo', 'varchar(255)', true)
@@ -420,7 +420,7 @@ $Construct
     ->column('InsertUserID', 'int', true, 'key')
     ->column('DateInserted', 'datetime')
     ->column('InsertIPAddress', 'ipaddress', true)
-    ->column('DateUpdated', 'datetime', !$DateUpdatedExists, array('index', 'index.Recent', 'index.Feed'))
+    ->column('DateUpdated', 'datetime', !$DateUpdatedExists, ['index', 'index.Recent', 'index.Feed'])
     ->column('Notified', 'tinyint(1)', 0, 'index.Notify')
     ->column('Emailed', 'tinyint(1)', 0)
     ->column('Data', 'text', true)
@@ -439,10 +439,10 @@ if (isset($ActivityIndexes['FK_Activity_RegardingUserID'])) {
 }
 
 if (!$EmailedExists) {
-    $SQL->put('Activity', array('Emailed' => 1));
+    $SQL->put('Activity', ['Emailed' => 1]);
 }
 if (!$NotifiedExists) {
-    $SQL->put('Activity', array('Notified' => 1));
+    $SQL->put('Activity', ['Notified' => 1]);
 }
 
 if (!$DateUpdatedExists) {
@@ -467,7 +467,7 @@ if (!$NotifyUserIDExists && $ActivityExists) {
         ->where('a.NotifyUserID', 0)
         ->put();
 
-    $SQL->delete('Activity', array('NotifyUserID' => 0));
+    $SQL->delete('Activity', ['NotifyUserID' => 0]);
 }
 
 $ActivityCommentExists = $Construct->tableExists('ActivityComment');
@@ -490,7 +490,7 @@ if (!$ActivityCommentExists && $CommentActivityIDExists) {
       from {$Px}Activity
       where CommentActivityID > 0";
     $SQL->query($Q);
-    $SQL->delete('Activity', array('CommentActivityID >' => 0));
+    $SQL->delete('Activity', ['CommentActivityID >' => 0]);
 }
 
 // Insert some activity types
@@ -502,51 +502,51 @@ if (!$ActivityCommentExists && $CommentActivityIDExists) {
 ///  %6 = his/her
 ///  %7 = he/she
 ///  %8 = RouteCode & Route
-if ($SQL->getWhere('ActivityType', array('Name' => 'SignIn'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'SignIn', 'FullHeadline' => '%1$s signed in.', 'ProfileHeadline' => '%1$s signed in.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'SignIn'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'SignIn', 'FullHeadline' => '%1$s signed in.', 'ProfileHeadline' => '%1$s signed in.']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'Join'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'Name' => 'Join', 'FullHeadline' => '%1$s joined.', 'ProfileHeadline' => '%1$s joined.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'Join'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'Name' => 'Join', 'FullHeadline' => '%1$s joined.', 'ProfileHeadline' => '%1$s joined.']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'JoinInvite'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinInvite', 'FullHeadline' => '%1$s accepted %4$s invitation for membership.', 'ProfileHeadline' => '%1$s accepted %4$s invitation for membership.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'JoinInvite'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'Name' => 'JoinInvite', 'FullHeadline' => '%1$s accepted %4$s invitation for membership.', 'ProfileHeadline' => '%1$s accepted %4$s invitation for membership.']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'JoinApproved'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'Name' => 'JoinApproved', 'FullHeadline' => '%1$s approved %4$s membership application.', 'ProfileHeadline' => '%1$s approved %4$s membership application.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'JoinApproved'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'Name' => 'JoinApproved', 'FullHeadline' => '%1$s approved %4$s membership application.', 'ProfileHeadline' => '%1$s approved %4$s membership application.']);
 }
-$SQL->replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%1$s created an account for %3$s.', 'ProfileHeadline' => '%1$s created an account for %3$s.'), array('Name' => 'JoinCreated'), true);
+$SQL->replace('ActivityType', ['AllowComments' => '1', 'FullHeadline' => '%1$s created an account for %3$s.', 'ProfileHeadline' => '%1$s created an account for %3$s.'], ['Name' => 'JoinCreated'], true);
 
-if ($SQL->getWhere('ActivityType', array('Name' => 'AboutUpdate'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'AboutUpdate'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'Name' => 'AboutUpdate', 'FullHeadline' => '%1$s updated %6$s profile.', 'ProfileHeadline' => '%1$s updated %6$s profile.']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'WallComment'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'WallComment'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallComment', 'FullHeadline' => '%1$s wrote on %4$s %5$s.', 'ProfileHeadline' => '%1$s wrote:']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'PictureChange'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'PictureChange'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '1', 'Name' => 'PictureChange', 'FullHeadline' => '%1$s changed %6$s profile picture.', 'ProfileHeadline' => '%1$s changed %6$s profile picture.']);
 }
 //if ($SQL->getWhere('ActivityType', array('Name' => 'RoleChange'))->numRows() == 0)
-$SQL->replace('ActivityType', array('AllowComments' => '1', 'FullHeadline' => '%1$s changed %4$s permissions.', 'ProfileHeadline' => '%1$s changed %4$s permissions.', 'Notify' => '1'), array('Name' => 'RoleChange'), true);
-if ($SQL->getWhere('ActivityType', array('Name' => 'ActivityComment'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'ShowIcon' => '1', 'Name' => 'ActivityComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s', 'RouteCode' => 'activity', 'Notify' => '1'));
+$SQL->replace('ActivityType', ['AllowComments' => '1', 'FullHeadline' => '%1$s changed %4$s permissions.', 'ProfileHeadline' => '%1$s changed %4$s permissions.', 'Notify' => '1'], ['Name' => 'RoleChange'], true);
+if ($SQL->getWhere('ActivityType', ['Name' => 'ActivityComment'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'ShowIcon' => '1', 'Name' => 'ActivityComment', 'FullHeadline' => '%1$s commented on %4$s %8$s.', 'ProfileHeadline' => '%1$s', 'RouteCode' => 'activity', 'Notify' => '1']);
 }
-if ($SQL->getWhere('ActivityType', array('Name' => 'Import'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'Import', 'FullHeadline' => '%1$s imported data.', 'ProfileHeadline' => '%1$s imported data.', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'Import'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'Import', 'FullHeadline' => '%1$s imported data.', 'ProfileHeadline' => '%1$s imported data.', 'Notify' => '1', 'Public' => '0']);
 }
 //if ($SQL->getWhere('ActivityType', array('Name' => 'Banned'))->numRows() == 0)
-$SQL->replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s banned %3$s.', 'ProfileHeadline' => '%1$s banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Banned'), true);
+$SQL->replace('ActivityType', ['AllowComments' => '0', 'FullHeadline' => '%1$s banned %3$s.', 'ProfileHeadline' => '%1$s banned %3$s.', 'Notify' => '0', 'Public' => '1'], ['Name' => 'Banned'], true);
 //if ($SQL->getWhere('ActivityType', array('Name' => 'Unbanned'))->numRows() == 0)
-$SQL->replace('ActivityType', array('AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %3$s.', 'ProfileHeadline' => '%1$s un-banned %3$s.', 'Notify' => '0', 'Public' => '1'), array('Name' => 'Unbanned'), true);
+$SQL->replace('ActivityType', ['AllowComments' => '0', 'FullHeadline' => '%1$s un-banned %3$s.', 'ProfileHeadline' => '%1$s un-banned %3$s.', 'Notify' => '0', 'Public' => '1'], ['Name' => 'Unbanned'], true);
 
 // Applicant activity
-if ($SQL->getWhere('ActivityType', array('Name' => 'Applicant'))->numRows() == 0) {
-    $SQL->insert('ActivityType', array('AllowComments' => '0', 'Name' => 'Applicant', 'FullHeadline' => '%1$s applied for membership.', 'ProfileHeadline' => '%1$s applied for membership.', 'Notify' => '1', 'Public' => '0'));
+if ($SQL->getWhere('ActivityType', ['Name' => 'Applicant'])->numRows() == 0) {
+    $SQL->insert('ActivityType', ['AllowComments' => '0', 'Name' => 'Applicant', 'FullHeadline' => '%1$s applied for membership.', 'ProfileHeadline' => '%1$s applied for membership.', 'Notify' => '1', 'Public' => '0']);
 }
 
-$WallPostType = $SQL->getWhere('ActivityType', array('Name' => 'WallPost'))->firstRow(DATASET_TYPE_ARRAY);
+$WallPostType = $SQL->getWhere('ActivityType', ['Name' => 'WallPost'])->firstRow(DATASET_TYPE_ARRAY);
 if (!$WallPostType) {
-    $WallPostTypeID = $SQL->insert('ActivityType', array('AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallPost', 'FullHeadline' => '%3$s wrote on %2$s %5$s.', 'ProfileHeadline' => '%3$s wrote:'));
-    $WallCommentTypeID = $SQL->getWhere('ActivityType', array('Name' => 'WallComment'))->value('ActivityTypeID');
+    $WallPostTypeID = $SQL->insert('ActivityType', ['AllowComments' => '1', 'ShowIcon' => '1', 'Name' => 'WallPost', 'FullHeadline' => '%3$s wrote on %2$s %5$s.', 'ProfileHeadline' => '%3$s wrote:']);
+    $WallCommentTypeID = $SQL->getWhere('ActivityType', ['Name' => 'WallComment'])->value('ActivityTypeID');
 
     // Update all old wall comments to wall posts.
     $SQL->update('Activity')
@@ -617,17 +617,17 @@ if ($Construct->tableExists('Tag') && $TagCategoryColumnExists) {
         $CategoryID = $Row['CategoryID'];
         $TagID = $Row['FirstTagID'];
         // Get the tags that need to be deleted.
-        $DeleteTags = Gdn::sql()->getWhere('Tag', array('Name' => $Name, 'CategoryID' => $CategoryID, 'TagID <> ' => $TagID))->resultArray();
+        $DeleteTags = Gdn::sql()->getWhere('Tag', ['Name' => $Name, 'CategoryID' => $CategoryID, 'TagID <> ' => $TagID])->resultArray();
         foreach ($DeleteTags as $DRow) {
             // Update all of the discussions to the new tag.
             Gdn::sql()->options('Ignore', true)->put(
                 'TagDiscussion',
-                array('TagID' => $TagID),
-                array('TagID' => $DRow['TagID'])
+                ['TagID' => $TagID],
+                ['TagID' => $DRow['TagID']]
             );
 
             // Delete the tag.
-            Gdn::sql()->delete('Tag', array('TagID' => $DRow['TagID']));
+            Gdn::sql()->delete('Tag', ['TagID' => $DRow['TagID']]);
         }
     }
 }
@@ -641,7 +641,7 @@ $Construct->table('Tag')
     ->column('InsertUserID', 'int', true, 'key')
     ->column('DateInserted', 'datetime')
     ->column('CategoryID', 'int', -1, 'unique')
-    ->Engine('InnoDB')
+    ->engine('InnoDB')
     ->set($Explicit, $Drop);
 
 if (!$FullNameColumnExists) {
@@ -683,8 +683,8 @@ if ($Construct->columnExists('Plugins.Tagging.Add')) {
 
 $Construct->table('Log')
     ->primaryKey('LogID')
-    ->column('Operation', array('Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'), false, 'index')
-    ->column('RecordType', array('Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group', 'Event'), false, 'index')
+    ->column('Operation', ['Delete', 'Edit', 'Spam', 'Moderate', 'Pending', 'Ban', 'Error'], false, 'index')
+    ->column('RecordType', ['Discussion', 'Comment', 'User', 'Registration', 'Activity', 'ActivityComment', 'Configuration', 'Group', 'Event'], false, 'index')
     ->column('TransactionLogID', 'int', null)
     ->column('RecordID', 'int', null, 'index')
     ->column('RecordUserID', 'int', null, 'index')// user responsible for the record; indexed for user deletion
@@ -720,7 +720,7 @@ $Construct->table('Regarding')
 
 $Construct->table('Ban')
     ->primaryKey('BanID')
-    ->column('BanType', array('IPAddress', 'Name', 'Email'), false, 'unique')
+    ->column('BanType', ['IPAddress', 'Name', 'Email'], false, 'unique')
     ->column('BanValue', 'varchar(50)', false, 'unique')
     ->column('Notes', 'varchar(255)', null)
     ->column('CountUsers', 'uint', 0)

@@ -1,7 +1,7 @@
 <?php if (!defined('APPLICATION')) exit();
 
-$Methods = $this->data('Methods', array());
-$SelectedMethod = $this->data('SelectedMethod', array());
+$Methods = $this->data('Methods', []);
+$SelectedMethod = $this->data('SelectedMethod', []);
 $CssClass = count($Methods) > 0 ? ' MultipleEntryMethods' : ' SingleEntryMethod';
 
 // Testing
@@ -22,7 +22,7 @@ echo '</div>';
 // Render the buttons to select other methods of signing in.
 if (count($Methods) > 0) {
     echo '<div class="Methods">'
-        .Wrap(t('Or you can...'), 'div');
+        .wrap(t('Or you can...'), 'div');
 
     foreach ($Methods as $Key => $Method) {
         $CssClass = 'Method Method_'.$Key;

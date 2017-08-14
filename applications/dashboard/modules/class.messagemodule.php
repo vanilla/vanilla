@@ -19,14 +19,14 @@ class MessageModule extends Gdn_Module {
     /**
      *
      *
-     * @param string $Sender
-     * @param bool $Message
+     * @param string $sender
+     * @param bool $message
      */
-    public function __construct($Sender = '', $Message = false) {
-        parent::__construct($Sender);
+    public function __construct($sender = '', $message = false) {
+        parent::__construct($sender);
 
         $this->_ApplicationFolder = 'dashboard';
-        $this->_Message = $Message;
+        $this->_Message = $message;
     }
 
     /**

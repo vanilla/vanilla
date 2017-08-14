@@ -39,18 +39,18 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     /**
      *
      *
-     * @param $Row
+     * @param $row
      */
-    protected static function calculate(&$Row) {
-        if (!$Row) {
+    protected static function calculate(&$row) {
+        if (!$row) {
             return;
         }
 
-        $Attributes = dbdecode($Row['Attributes']);
-        if (is_array($Attributes)) {
-            $Row = array_merge($Attributes, $Row);
+        $attributes = dbdecode($row['Attributes']);
+        if (is_array($attributes)) {
+            $row = array_merge($attributes, $row);
         }
-        unset($Row['Attributes']);
+        unset($row['Attributes']);
     }
 
     /**
@@ -60,11 +60,11 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
      */
     public static function getDefault() {
         if (self::$default === null) {
-            $Rows = self::getWhereStatic(array('IsDefault' => 1));
-            if (empty($Rows)) {
+            $rows = self::getWhereStatic(['IsDefault' => 1]);
+            if (empty($rows)) {
                 self::$default = false;
             } else {
-                self::$default = array_pop($Rows);
+                self::$default = array_pop($rows);
             }
         }
         return self::$default;
@@ -81,83 +81,83 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
             ->from('UserAuthenticationProvider uap');
 
         if (Gdn::session()->isValid()) {
-            $UserID = Gdn::session()->UserID;
+            $userID = Gdn::session()->UserID;
 
             $this->SQL
                 ->select('ua.ForeignUserKey', '', 'UniqueID')
-                ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $UserID", 'left');
+                ->join('UserAuthentication ua', "uap.AuthenticationKey = ua.ProviderKey and ua.UserID = $userID", 'left');
         }
 
-        $Data = $this->SQL->get()->resultArray();
-        $Data = Gdn_DataSet::index($Data, array('AuthenticationKey'));
-        foreach ($Data as &$Row) {
-            self::calculate($Row);
+        $data = $this->SQL->get()->resultArray();
+        $data = Gdn_DataSet::index($data, ['AuthenticationKey']);
+        foreach ($data as &$row) {
+            self::calculate($row);
         }
-        return $Data;
+        return $data;
     }
 
     /**
      *
      *
-     * @param $AuthenticationProviderKey
+     * @param $authenticationProviderKey
      * @return array|bool|stdClass
      */
-    public static function getProviderByKey($AuthenticationProviderKey) {
-        $ProviderData = Gdn::sql()
+    public static function getProviderByKey($authenticationProviderKey) {
+        $providerData = Gdn::sql()
             ->select('uap.*')
             ->from('UserAuthenticationProvider uap')
-            ->where('uap.AuthenticationKey', $AuthenticationProviderKey)
+            ->where('uap.AuthenticationKey', $authenticationProviderKey)
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);
 
-        self::calculate($ProviderData);
+        self::calculate($providerData);
 
-        return $ProviderData;
+        return $providerData;
     }
 
     /**
      *
      *
-     * @param $AuthenticationProviderURL
+     * @param $authenticationProviderURL
      * @return array|bool|stdClass
      */
-    public static function getProviderByURL($AuthenticationProviderURL) {
-        $ProviderData = Gdn::sql()
+    public static function getProviderByURL($authenticationProviderURL) {
+        $providerData = Gdn::sql()
             ->select('uap.*')
             ->from('UserAuthenticationProvider uap')
-            ->where('uap.URL', "%{$AuthenticationProviderURL}%")
+            ->where('uap.URL', "%{$authenticationProviderURL}%")
             ->get()
             ->firstRow(DATASET_TYPE_ARRAY);
 
-        self::calculate($ProviderData);
+        self::calculate($providerData);
 
-        return $ProviderData;
+        return $providerData;
     }
 
     /**
      *
      *
-     * @param $AuthenticationSchemeAlias
-     * @param null $UserID
+     * @param $authenticationSchemeAlias
+     * @param null $userID
      * @return array|bool|stdClass
      */
-    public static function getProviderByScheme($AuthenticationSchemeAlias, $UserID = null) {
-        $ProviderQuery = Gdn::sql()
+    public static function getProviderByScheme($authenticationSchemeAlias, $userID = null) {
+        $providerQuery = Gdn::sql()
             ->select('uap.*')
             ->from('UserAuthenticationProvider uap')
-            ->where('uap.AuthenticationSchemeAlias', $AuthenticationSchemeAlias);
+            ->where('uap.AuthenticationSchemeAlias', $authenticationSchemeAlias);
 
-        if (!is_null($UserID) && $UserID) {
-            $ProviderQuery
+        if (!is_null($userID) && $userID) {
+            $providerQuery
                 ->join('UserAuthentication ua', 'ua.ProviderKey = uap.AuthenticationKey', 'left')
-                ->where('ua.UserID', $UserID);
+                ->where('ua.UserID', $userID);
         }
 
-        $ProviderData = $ProviderQuery->get();
-        if ($ProviderData->numRows()) {
-            $Result = $ProviderData->firstRow(DATASET_TYPE_ARRAY);
-            self::calculate($Result);
-            return $Result;
+        $providerData = $providerQuery->get();
+        if ($providerData->numRows()) {
+            $result = $providerData->firstRow(DATASET_TYPE_ARRAY);
+            self::calculate($result);
+            return $result;
         }
 
         return false;
@@ -166,81 +166,81 @@ class Gdn_AuthenticationProviderModel extends Gdn_Model {
     /**
      *
      *
-     * @param bool $Where
-     * @param string $OrderFields
-     * @param string $OrderDirection
-     * @param bool $Limit
-     * @param bool $Offset
+     * @param bool $where
+     * @param string $orderFields
+     * @param string $orderDirection
+     * @param bool $limit
+     * @param bool $offset
      * @return array|null
      */
-    public static function getWhereStatic($Where = false, $OrderFields = '', $OrderDirection = 'asc', $Limit = false, $Offset = false) {
-        $Data = Gdn::sql()->getWhere('UserAuthenticationProvider', $Where, $OrderFields, $OrderDirection, $Limit, $Offset)->resultArray();
-        foreach ($Data as &$Row) {
-            self::calculate($Row);
+    public static function getWhereStatic($where = false, $orderFields = '', $orderDirection = 'asc', $limit = false, $offset = false) {
+        $data = Gdn::sql()->getWhere('UserAuthenticationProvider', $where, $orderFields, $orderDirection, $limit, $offset)->resultArray();
+        foreach ($data as &$row) {
+            self::calculate($row);
         }
-        return $Data;
+        return $data;
     }
 
     /**
      *
      *
-     * @param array $Data
-     * @param bool $Settings
+     * @param array $data
+     * @param bool $settings
      * @return bool
      */
-    public function save($Data, $Settings = false) {
+    public function save($data, $settings = false) {
         // Grab the current record.
-        $Row = false;
-        if ($id = val('ID', $Settings)) {
-            $Row = $this->getWhere(array($this->PrimaryKey => $id))->firstRow(DATASET_TYPE_ARRAY);
-        } elseif (isset($Data[$this->PrimaryKey])) {
-            $Row = $this->getWhere(array($this->PrimaryKey => $Data[$this->PrimaryKey]))->firstRow(DATASET_TYPE_ARRAY);
-        } elseif ($PK = val('PK', $Settings)) {
-            $Row = $this->getWhere(array($PK => $Data[$PK]))->firstRow(DATASET_TYPE_ARRAY);
+        $row = false;
+        if ($id = val('ID', $settings)) {
+            $row = $this->getWhere([$this->PrimaryKey => $id])->firstRow(DATASET_TYPE_ARRAY);
+        } elseif (isset($data[$this->PrimaryKey])) {
+            $row = $this->getWhere([$this->PrimaryKey => $data[$this->PrimaryKey]])->firstRow(DATASET_TYPE_ARRAY);
+        } elseif ($pK = val('PK', $settings)) {
+            $row = $this->getWhere([$pK => $data[$pK]])->firstRow(DATASET_TYPE_ARRAY);
         }
 
         // Get the columns and put the extended data in the attributes.
         $this->defineSchema();
-        $Columns = $this->Schema->fields();
-        $Remove = array('TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1);
-        $Data = array_diff_key($Data, $Remove);
-        $Attributes = array_diff_key($Data, $Columns);
+        $columns = $this->Schema->fields();
+        $remove = ['TransientKey' => 1, 'hpt' => 1, 'Save' => 1, 'Checkboxes' => 1];
+        $data = array_diff_key($data, $remove);
+        $attributes = array_diff_key($data, $columns);
 
-        if (!empty($Attributes)) {
-            $Data = array_diff_key($Data, $Attributes);
-            $Data['Attributes'] = dbencode($Attributes);
+        if (!empty($attributes)) {
+            $data = array_diff_key($data, $attributes);
+            $data['Attributes'] = dbencode($attributes);
         }
 
-        $Insert = !$Row;
-        if ($Insert) {
-            $this->addInsertFields($Data);
+        $insert = !$row;
+        if ($insert) {
+            $this->addInsertFields($data);
         } else {
-            $this->addUpdateFields($Data);
+            $this->addUpdateFields($data);
         }
 
         // Validate the form posted values
-        if ($this->validate($Data, $Insert) === true) {
+        if ($this->validate($data, $insert) === true) {
             // Clear the default from other authentication providers.
-            $Default = val('IsDefault', $Data);
-            if ($Default) {
+            $default = val('IsDefault', $data);
+            if ($default) {
                 $this->SQL->put(
                     $this->Name,
-                    array('IsDefault' => 0),
-                    array('AuthenticationKey <>' => val('AuthenticationKey', $Data))
+                    ['IsDefault' => 0],
+                    ['AuthenticationKey <>' => val('AuthenticationKey', $data)]
                 );
             }
 
-            $Fields = $this->Validation->validationFields();
-            if ($Insert === false) {
-                $PrimaryKeyVal = $Row[$this->PrimaryKey];
-                $this->update($Fields, array($this->PrimaryKey => $PrimaryKeyVal));
+            $fields = $this->Validation->validationFields();
+            if ($insert === false) {
+                $primaryKeyVal = $row[$this->PrimaryKey];
+                $this->update($fields, [$this->PrimaryKey => $primaryKeyVal]);
 
             } else {
-                $PrimaryKeyVal = $this->insert($Fields);
+                $primaryKeyVal = $this->insert($fields);
             }
         } else {
-            $PrimaryKeyVal = false;
+            $primaryKeyVal = false;
         }
-        return $PrimaryKeyVal;
+        return $primaryKeyVal;
     }
 }

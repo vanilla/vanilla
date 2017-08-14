@@ -19,20 +19,20 @@ class CategoryFollowToggleModule extends Gdn_Module {
      * Set the preference in the user's session.
      */
     public function setToggle() {
-        $Session = Gdn::session();
-        if (!$Session->isValid()) {
+        $session = Gdn::session();
+        if (!$session->isValid()) {
             return;
         }
 
-        $ShowAllCategories = GetIncomingValue('ShowAllCategories', '');
-        if ($ShowAllCategories != '') {
-            $ShowAllCategories = $ShowAllCategories == 'true' ? true : false;
-            $ShowAllCategoriesPref = $Session->GetPreference('ShowAllCategories');
-            if ($ShowAllCategories != $ShowAllCategoriesPref) {
-                $Session->setPreference('ShowAllCategories', $ShowAllCategories);
+        $showAllCategories = getIncomingValue('ShowAllCategories', '');
+        if ($showAllCategories != '') {
+            $showAllCategories = $showAllCategories == 'true' ? true : false;
+            $showAllCategoriesPref = $session->getPreference('ShowAllCategories');
+            if ($showAllCategories != $showAllCategoriesPref) {
+                $session->setPreference('ShowAllCategories', $showAllCategories);
             }
 
-            redirect('/'.ltrim(Gdn::request()->Path(), '/'));
+            redirectTo('/'.ltrim(Gdn::request()->path(), '/'));
         }
     }
 

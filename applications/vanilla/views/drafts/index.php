@@ -4,8 +4,8 @@ include($this->fetchViewLocation('helper_functions', 'discussions', 'vanilla'));
 $Session = Gdn::session();
 $ShowOptions = TRUE;
 $ViewLocation = $this->fetchViewLocation('drafts', 'drafts');
-// WriteFilterTabs($this);
-echo Gdn_Theme::Module('DiscussionFilterModule');
+// writeFilterTabs($this);
+echo Gdn_Theme::module('DiscussionFilterModule');
 if ($this->DraftData->numRows() > 0) {
     echo $this->Pager->toString('less');
     ?>

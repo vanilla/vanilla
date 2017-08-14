@@ -36,10 +36,10 @@ class Gdn_UploadImage extends Gdn_Upload {
             return false;
         }
 
-        $GdInfo = gd_info();
+        $gdInfo = gd_info();
         // Do we have a good version of GD?
-        $GdVersion = preg_replace('/[a-z ()]+/i', '', $GdInfo['GD Version']);
-        if ($GdVersion < 2) {
+        $gdVersion = preg_replace('/[a-z ()]+/i', '', $gdInfo['GD Version']);
+        if ($gdVersion < 2) {
             return false;
         }
 
@@ -51,59 +51,59 @@ class Gdn_UploadImage extends Gdn_Upload {
      */
     public function clear() {
         parent::clear();
-        $this->_AllowedFileExtensions = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico');
+        $this->_AllowedFileExtensions = ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico'];
     }
 
     /**
      * Gets the image size of a file.
      *
-     * @param string $Path The path to the file.
-     * @param string $Filename The name of the file.
+     * @param string $path The path to the file.
+     * @param string $filename The name of the file.
      * @return array An array of [width, height, image type].
      * @since 2.1
      */
-    public static function imageSize($Path, $Filename = false) {
-        if (!$Filename) {
-            $Filename = $Path;
+    public static function imageSize($path, $filename = false) {
+        if (!$filename) {
+            $filename = $path;
         }
 
-        if (in_array(strtolower(pathinfo($Filename, PATHINFO_EXTENSION)), array('gif', 'jpg', 'jpeg', 'png'))) {
-            $ImageSize = @getimagesize($Path);
-            if (!is_array($ImageSize) || !in_array($ImageSize[2], array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG))) {
-                return array(0, 0, false);
+        if (in_array(strtolower(pathinfo($filename, PATHINFO_EXTENSION)), ['gif', 'jpg', 'jpeg', 'png'])) {
+            $imageSize = @getimagesize($path);
+            if (!is_array($imageSize) || !in_array($imageSize[2], [IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG])) {
+                return [0, 0, false];
             }
-            return $ImageSize;
+            return $imageSize;
         }
-        return array(0, 0, false);
+        return [0, 0, false];
     }
 
     /**
      * Validates the uploaded image. Returns the temporary name of the uploaded file.
      */
-    public function validateUpload($InputName, $ThrowError = true) {
+    public function validateUpload($inputName, $throwError = true) {
         if (!function_exists('gd_info')) {
-            throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+            throw new Exception(t('The uploaded file could not be processed because GD is not installed.'));
         }
 
         // Make sure that all standard file upload checks are performed.
-        $TmpFileName = parent::validateUpload($InputName, $ThrowError);
+        $tmpFileName = parent::validateUpload($inputName, $throwError);
 
         // Now perform image-specific checks.
-        if ($TmpFileName) {
-            $Size = getimagesize($TmpFileName);
-            if ($Size === false) {
-                throw new Exception(T('The uploaded file was not an image.'));
+        if ($tmpFileName) {
+            $size = getimagesize($tmpFileName);
+            if ($size === false) {
+                throw new Exception(t('The uploaded file was not an image.'));
             }
         }
 
-        return $TmpFileName;
+        return $tmpFileName;
     }
 
     /**
-     * Saves the specified image at $Target in the specified format with the
+     * Saves the specified image at $target in the specified format with the
      * specified dimensions (or the existing dimensions if height/width are not provided.
      *
-     * @param string The path to the source image. Typically this is the tmp file name returned by $this->ValidateUpload();
+     * @param string The path to the source image. Typically this is the tmp file name returned by $this->validateUpload();
      * @param string The full path to where the image should be saved, including image name.
      * @param int An integer value indicating the maximum allowed height of the image (in pixels).
      * @param int An integer value indicating the maximum allowed width of the image (in pixels).
@@ -114,209 +114,209 @@ class Gdn_UploadImage extends Gdn_Upload {
      *  - <b>SourceX, SourceY</b>: If you want to create a thumbnail that is a crop of the image these are the coordinates of the thumbnail.
      *  - <b>SourceHeight. SourceWidth</b>: If you want to create a thumbnail that is a crop of the image these are it's dimensions.
      */
-    public static function saveImageAs($Source, $Target, $Height = '', $Width = '', $Options = array()) {
-        $Crop = false;
-        $OutputType = '';
-        $ImageQuality = c('Garden.UploadImage.Quality', 100);
+    public static function saveImageAs($source, $target, $height = '', $width = '', $options = []) {
+        $crop = false;
+        $outputType = '';
+        $imageQuality = c('Garden.UploadImage.Quality', 100);
 
         // Make function work like it used to.
-        $Args = func_get_args();
-        $SaveGif = false;
-        if (count($Args) > 5) {
-            $Crop = val(4, $Args, $Crop);
-            $OutputType = val(5, $Args, $OutputType);
-            $ImageQuality = val(6, $Args, $ImageQuality);
-        } elseif (is_bool($Options)) {
-            $Crop = $Options;
+        $args = func_get_args();
+        $saveGif = false;
+        if (count($args) > 5) {
+            $crop = val(4, $args, $crop);
+            $outputType = val(5, $args, $outputType);
+            $imageQuality = val(6, $args, $imageQuality);
+        } elseif (is_bool($options)) {
+            $crop = $options;
         } else {
-            $Crop = val('Crop', $Options, $Crop);
-            $OutputType = val('OutputType', $Options, $OutputType);
-            $ImageQuality = val('ImageQuality', $Options, $ImageQuality);
-            $SaveGif = val('SaveGif', $Options);
+            $crop = val('Crop', $options, $crop);
+            $outputType = val('OutputType', $options, $outputType);
+            $imageQuality = val('ImageQuality', $options, $imageQuality);
+            $saveGif = val('SaveGif', $options);
         }
 
         // Set some boundaries for $ImageQuality
-        if ($ImageQuality < 10) {
-            $ImageQuality = 10;
+        if ($imageQuality < 10) {
+            $imageQuality = 10;
         }
-        if ($ImageQuality > 100 || !is_numeric($ImageQuality)) {
-            $ImageQuality = 100;
+        if ($imageQuality > 100 || !is_numeric($imageQuality)) {
+            $imageQuality = 100;
         }
 
         // Make sure type, height & width are properly defined.
 
         if (!function_exists('gd_info')) {
-            throw new Exception(T('The uploaded file could not be processed because GD is not installed.'));
+            throw new Exception(t('The uploaded file could not be processed because GD is not installed.'));
         }
 
-        $GdInfo = gd_info();
-        $Size = getimagesize($Source);
-        list($WidthSource, $HeightSource, $Type) = $Size;
-        $WidthSource = val('SourceWidth', $Options, $WidthSource);
-        $HeightSource = val('SourceHeight', $Options, $HeightSource);
+        $gdInfo = gd_info();
+        $size = getimagesize($source);
+        list($widthSource, $heightSource, $type) = $size;
+        $widthSource = val('SourceWidth', $options, $widthSource);
+        $heightSource = val('SourceHeight', $options, $heightSource);
 
-        if ($Height == '' || !is_numeric($Height)) {
-            $Height = $HeightSource;
+        if ($height == '' || !is_numeric($height)) {
+            $height = $heightSource;
         }
 
-        if ($Width == '' || !is_numeric($Width)) {
-            $Width = $WidthSource;
+        if ($width == '' || !is_numeric($width)) {
+            $width = $widthSource;
         }
 
-        if (!$OutputType) {
-            $OutputTypes = array(1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico');
-            $OutputType = val($Type, $OutputTypes, 'jpg');
-        } elseif ($Type == 17 && $OutputType != 'ico') {
+        if (!$outputType) {
+            $outputTypes = [1 => 'gif', 2 => 'jpeg', 3 => 'png', 17 => 'ico'];
+            $outputType = val($type, $outputTypes, 'jpg');
+        } elseif ($type == 17 && $outputType != 'ico') {
             // Icons cannot be converted
-            throw new Exception(T('Upload cannot convert icons.'));
+            throw new Exception(t('Upload cannot convert icons.'));
         }
 
         // Figure out the target path.
-        $TargetParsed = Gdn_Upload::parse($Target);
-        $TargetPath = PATH_UPLOADS.'/'.ltrim($TargetParsed['Name'], '/');
+        $targetParsed = Gdn_Upload::parse($target);
+        $targetPath = PATH_UPLOADS.'/'.ltrim($targetParsed['Name'], '/');
 
-        if (!file_exists(dirname($TargetPath))) {
-            mkdir(dirname($TargetPath), 0777, true);
+        if (!file_exists(dirname($targetPath))) {
+            mkdir(dirname($targetPath), 0777, true);
         }
 
         // Don't resize if the source dimensions are smaller than the target dimensions or an icon
-        $XCoord = val('SourceX', $Options, 0);
-        $YCoord = val('SourceY', $Options, 0);
-        if (($HeightSource > $Height || $WidthSource > $Width) && $Type != 17) {
-            $AspectRatio = (float)$WidthSource / $HeightSource;
-            if ($Crop === false) {
-                if (round($Width / $AspectRatio) > $Height) {
-                    $Width = round($Height * $AspectRatio);
+        $xCoord = val('SourceX', $options, 0);
+        $yCoord = val('SourceY', $options, 0);
+        if (($heightSource > $height || $widthSource > $width) && $type != 17) {
+            $aspectRatio = (float)$widthSource / $heightSource;
+            if ($crop === false) {
+                if (round($width / $aspectRatio) > $height) {
+                    $width = round($height * $aspectRatio);
                 } else {
-                    $Height = round($Width / $AspectRatio);
+                    $height = round($width / $aspectRatio);
                 }
             } else {
-                $HeightDiff = $HeightSource - $Height;
-                $WidthDiff = $WidthSource - $Width;
-                if ($WidthDiff > $HeightDiff) {
+                $heightDiff = $heightSource - $height;
+                $widthDiff = $widthSource - $width;
+                if ($widthDiff > $heightDiff) {
                     // Crop the original width down
-                    $NewWidthSource = round(($Width * $HeightSource) / $Height);
+                    $newWidthSource = round(($width * $heightSource) / $height);
 
                     // And set the original x position to the cropped start point.
-                    if (!isset($Options['SourceX'])) {
-                        $XCoord = round(($WidthSource - $NewWidthSource) / 2);
+                    if (!isset($options['SourceX'])) {
+                        $xCoord = round(($widthSource - $newWidthSource) / 2);
                     }
-                    $WidthSource = $NewWidthSource;
+                    $widthSource = $newWidthSource;
                 } else {
                     // Crop the original height down
-                    $NewHeightSource = round(($Height * $WidthSource) / $Width);
+                    $newHeightSource = round(($height * $widthSource) / $width);
 
                     // And set the original y position to the cropped start point.
-                    if (!isset($Options['SourceY'])) {
-                        $YCoord = 0; // crop to top because most portraits show the face at the top.
-                    }                    $HeightSource = $NewHeightSource;
+                    if (!isset($options['SourceY'])) {
+                        $yCoord = 0; // crop to top because most portraits show the face at the top.
+                    }                    $heightSource = $newHeightSource;
                 }
             }
         } else {
             // Neither target dimension is larger than the original, so keep the original dimensions.
-            $Height = $HeightSource;
-            $Width = $WidthSource;
+            $height = $heightSource;
+            $width = $widthSource;
         }
 
-        $Process = true;
-        if ($WidthSource <= $Width && $HeightSource <= $Height && $Type == 1 && $SaveGif) {
-            $Process = false;
+        $process = true;
+        if ($widthSource <= $width && $heightSource <= $height && $type == 1 && $saveGif) {
+            $process = false;
         }
 
         // Never process icons
-        if ($Type == 17) {
-            $Process = false;
+        if ($type == 17) {
+            $process = false;
         }
 
-        if ($Process) {
+        if ($process) {
             // Create GD image from the provided file, but first check if we have the necessary tools
-            $SourceImage = false;
-            switch ($Type) {
+            $sourceImage = false;
+            switch ($type) {
                 case 1:
-                    if (val('GIF Read Support', $GdInfo) || val('GIF Write Support', $GdInfo)) {
-                        $SourceImage = imagecreatefromgif($Source);
+                    if (val('GIF Read Support', $gdInfo) || val('GIF Write Support', $gdInfo)) {
+                        $sourceImage = imagecreatefromgif($source);
                     }
                     break;
                 case 2:
-                    if (val('JPG Support', $GdInfo) || val('JPEG Support', $GdInfo)) {
-                        $SourceImage = imagecreatefromjpeg($Source);
+                    if (val('JPG Support', $gdInfo) || val('JPEG Support', $gdInfo)) {
+                        $sourceImage = imagecreatefromjpeg($source);
                     }
                     break;
                 case 3:
-                    if (val('PNG Support', $GdInfo)) {
-                        $SourceImage = imagecreatefrompng($Source);
-                        imagealphablending($SourceImage, true);
+                    if (val('PNG Support', $gdInfo)) {
+                        $sourceImage = imagecreatefrompng($source);
+                        imagealphablending($sourceImage, true);
                     }
                     break;
             }
 
-            if (!$SourceImage) {
-                throw new Exception(sprintf(T('You cannot save images of this type (%s).'), $Type));
+            if (!$sourceImage) {
+                throw new Exception(sprintf(t('You cannot save images of this type (%s).'), $type));
             }
 
             // Create a new image from the raw source
             if (function_exists('imagecreatetruecolor')) {
-                $TargetImage = imagecreatetruecolor($Width, $Height);    // Only exists if GD2 is installed
+                $targetImage = imagecreatetruecolor($width, $height);    // Only exists if GD2 is installed
             } else {
-                $TargetImage = imagecreate($Width, $Height);             // Always exists if any GD is installed
+                $targetImage = imagecreate($width, $height);             // Always exists if any GD is installed
             }
-            if (in_array($OutputType, ['png', 'ico'])) {
-                imagealphablending($TargetImage, false);
-                imagesavealpha($TargetImage, true);
+            if (in_array($outputType, ['png', 'ico'])) {
+                imagealphablending($targetImage, false);
+                imagesavealpha($targetImage, true);
             }
 
-            imagecopyresampled($TargetImage, $SourceImage, 0, 0, $XCoord, $YCoord, $Width, $Height, $WidthSource, $HeightSource);
-            imagedestroy($SourceImage);
+            imagecopyresampled($targetImage, $sourceImage, 0, 0, $xCoord, $yCoord, $width, $height, $widthSource, $heightSource);
+            imagedestroy($sourceImage);
 
             // Check for EXIF rotation tag, and rotate the image if present
             if (function_exists('exif_read_data') &&
-                (($Type == IMAGETYPE_JPEG) || ($Type == IMAGETYPE_TIFF_II) || ($Type == IMAGETYPE_TIFF_MM))
+                (($type == IMAGETYPE_JPEG) || ($type == IMAGETYPE_TIFF_II) || ($type == IMAGETYPE_TIFF_MM))
             ) {
-                $ImageExif = exif_read_data($Source);
-                if (!empty($ImageExif['Orientation'])) {
-                    switch ($ImageExif['Orientation']) {
+                $imageExif = exif_read_data($source);
+                if (!empty($imageExif['Orientation'])) {
+                    switch ($imageExif['Orientation']) {
                         case 3:
-                            $TargetImage = imagerotate($TargetImage, 180, 0);
+                            $targetImage = imagerotate($targetImage, 180, 0);
                             break;
                         case 6:
-                            $TargetImage = imagerotate($TargetImage, -90, 0);
-                            list($Width, $Height) = array($Height, $Width);
+                            $targetImage = imagerotate($targetImage, -90, 0);
+                            list($width, $height) = [$height, $width];
                             break;
                         case 8:
-                            $TargetImage = imagerotate($TargetImage, 90, 0);
-                            list($Width, $Height) = array($Height, $Width);
+                            $targetImage = imagerotate($targetImage, 90, 0);
+                            list($width, $height) = [$height, $width];
                             break;
                     }
                 }
             }
 
             // No need to check these, if we get here then whichever function we need will be available
-            if ($OutputType == 'gif') {
-                imagegif($TargetImage, $TargetPath);
-            } elseif ($OutputType == 'png') {
-                imagepng($TargetImage, $TargetPath, Gdn_UploadImage::PNG_COMPRESSION);
-            } elseif ($OutputType == 'ico') {
-                self::imageIco($TargetImage, $TargetPath);
+            if ($outputType == 'gif') {
+                imagegif($targetImage, $targetPath);
+            } elseif ($outputType == 'png') {
+                imagepng($targetImage, $targetPath, Gdn_UploadImage::PNG_COMPRESSION);
+            } elseif ($outputType == 'ico') {
+                self::imageIco($targetImage, $targetPath);
             } else {
-                imagejpeg($TargetImage, $TargetPath, $ImageQuality);
+                imagejpeg($targetImage, $targetPath, $imageQuality);
             }
         } else {
-            copy($Source, $TargetPath);
+            copy($source, $targetPath);
         }
 
         // Allow a plugin to move the file to a different location.
-        $Sender = new stdClass();
-        $Sender->EventArguments = array();
-        $Sender->EventArguments['Path'] = $TargetPath;
-        $Parsed = self::parse($TargetPath);
-        $Parsed['Width'] = $Width;
-        $Parsed['Height'] = $Height;
-        $Sender->EventArguments['Parsed'] =& $Parsed;
-        $Sender->EventArguments['Options'] = $Options;
-        $Sender->EventArguments['OriginalFilename'] = val('OriginalFilename', $Options);
-        $Sender->Returns = array();
-        Gdn::pluginManager()->callEventHandlers($Sender, 'Gdn_Upload', 'SaveAs');
-        return $Sender->EventArguments['Parsed'];
+        $sender = new stdClass();
+        $sender->EventArguments = [];
+        $sender->EventArguments['Path'] = $targetPath;
+        $parsed = self::parse($targetPath);
+        $parsed['Width'] = $width;
+        $parsed['Height'] = $height;
+        $sender->EventArguments['Parsed'] =& $parsed;
+        $sender->EventArguments['Options'] = $options;
+        $sender->EventArguments['OriginalFilename'] = val('OriginalFilename', $options);
+        $sender->Returns = [];
+        Gdn::pluginManager()->callEventHandlers($sender, 'Gdn_Upload', 'SaveAs');
+        return $sender->EventArguments['Parsed'];
     }
 
     /**

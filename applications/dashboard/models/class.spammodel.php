@@ -47,79 +47,79 @@ class SpamModel extends Gdn_Pluggable {
 
     /**
      * Check whether or not the record is spam.
-     * @param string $RecordType By default, this should be one of the following:
+     * @param string $recordType By default, this should be one of the following:
      *  - Comment: A comment.
      *  - Discussion: A discussion.
      *  - User: A user registration.
-     * @param array $Data The record data.
-     * @param array $Options Options for fine-tuning this method call.
+     * @param array $data The record data.
+     * @param array $options Options for fine-tuning this method call.
      *  - Log: Log the record if it is found to be spam.
      */
-    public static function isSpam($RecordType, $Data, $Options = array()) {
+    public static function isSpam($recordType, $data, $options = []) {
         if (self::$Disabled) {
             return false;
         }
 
         // Set some information about the user in the data.
-        if ($RecordType == 'Registration') {
-            touchValue('Username', $Data, $Data['Name']);
+        if ($recordType == 'Registration') {
+            touchValue('Username', $data, $data['Name']);
         } else {
-            touchValue('InsertUserID', $Data, Gdn::session()->UserID);
+            touchValue('InsertUserID', $data, Gdn::session()->UserID);
 
-            $User = Gdn::userModel()->getID(val('InsertUserID', $Data), DATASET_TYPE_ARRAY);
+            $user = Gdn::userModel()->getID(val('InsertUserID', $data), DATASET_TYPE_ARRAY);
 
-            if ($User) {
-                $verified = val('Verified', $User);
-                $admin = val('Admin', $User);
+            if ($user) {
+                $verified = val('Verified', $user);
+                $admin = val('Admin', $user);
 
                 if ($verified || $admin) {
                     // The user has been verified or is an admin and isn't a spammer.
                     return false;
                 }
-                touchValue('Username', $Data, $User['Name']);
-                touchValue('Email', $Data, $User['Email']);
-                touchValue('IPAddress', $Data, $User['LastIPAddress']);
+                touchValue('Username', $data, $user['Name']);
+                touchValue('Email', $data, $user['Email']);
+                touchValue('IPAddress', $data, $user['LastIPAddress']);
             }
         }
 
-        if (!isset($Data['Body']) && isset($Data['Story'])) {
-            $Data['Body'] = $Data['Story'];
+        if (!isset($data['Body']) && isset($data['Story'])) {
+            $data['Body'] = $data['Story'];
         }
 
         // Make sure all IP addresses are unpacked.
-        $Data = ipDecodeRecursive($Data);
+        $data = ipDecodeRecursive($data);
 
-        touchValue('IPAddress', $Data, Gdn::request()->ipAddress());
+        touchValue('IPAddress', $data, Gdn::request()->ipAddress());
 
-        $Sp = self::_Instance();
+        $sp = self::_Instance();
 
-        $Sp->EventArguments['RecordType'] = $RecordType;
-        $Sp->EventArguments['Data'] =& $Data;
-        $Sp->EventArguments['Options'] =& $Options;
-        $Sp->EventArguments['IsSpam'] = false;
+        $sp->EventArguments['RecordType'] = $recordType;
+        $sp->EventArguments['Data'] =& $data;
+        $sp->EventArguments['Options'] =& $options;
+        $sp->EventArguments['IsSpam'] = false;
 
-        $Sp->fireEvent('CheckSpam');
-        $Spam = $Sp->EventArguments['IsSpam'];
+        $sp->fireEvent('CheckSpam');
+        $spam = $sp->EventArguments['IsSpam'];
 
         // Log the spam entry.
-        if ($Spam && val('Log', $Options, true)) {
-            $LogOptions = array();
-            switch ($RecordType) {
+        if ($spam && val('Log', $options, true)) {
+            $logOptions = [];
+            switch ($recordType) {
                 case 'Registration':
-                    $LogOptions['GroupBy'] = array('RecordIPAddress');
+                    $logOptions['GroupBy'] = ['RecordIPAddress'];
                     break;
                 case 'Comment':
                 case 'Discussion':
                 case 'Activity':
                 case 'ActivityComment':
-                    $LogOptions['GroupBy'] = array('RecordID');
+                    $logOptions['GroupBy'] = ['RecordID'];
                     break;
             }
 
             // If this is a discussion or a comment, it needs some special handling.
-            if ($RecordType == 'Comment' || $RecordType == 'Discussion') {
+            if ($recordType == 'Comment' || $recordType == 'Discussion') {
                 // Grab the record ID, if available.
-                $recordID = intval(val("{$RecordType}ID", $Data));
+                $recordID = intval(val("{$recordType}ID", $data));
 
                 /**
                  * If we have a valid record ID, run it through flagForReview.  This will allow us to purge existing
@@ -127,16 +127,16 @@ class SpamModel extends Gdn_Pluggable {
                  * just treat it with regular SPAM logging.
                  */
                 if ($recordID) {
-                    self::flagForReview($RecordType, $recordID, $Data);
+                    self::flagForReview($recordType, $recordID, $data);
                 } else {
-                    LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
+                    LogModel::insert('Spam', $recordType, $data, $logOptions);
                 }
             } else {
-                LogModel::insert('Spam', $RecordType, $Data, $LogOptions);
+                LogModel::insert('Spam', $recordType, $data, $logOptions);
             }
         }
 
-        return $Spam;
+        return $spam;
     }
 
     /**
@@ -174,11 +174,11 @@ class SpamModel extends Gdn_Pluggable {
                 } elseif ($row['CountComments'] > 0) {
                     $comments = Gdn::database()->sql()->getWhere(
                         'Comment',
-                        array('DiscussionID' => $id)
+                        ['DiscussionID' => $id]
                     )->resultArray();
 
                     if (!array_key_exists('_Data', $row)) {
-                        $row['_Data'] = array();
+                        $row['_Data'] = [];
                     }
 
                     $row['_Data']['Comment'] = $comments;
@@ -188,14 +188,14 @@ class SpamModel extends Gdn_Pluggable {
                 throw notFoundException($recordType);
         }
 
-        $overrideFields = array('Name', 'Body');
+        $overrideFields = ['Name', 'Body'];
         foreach ($overrideFields as $fieldName) {
             if (($fieldValue = val($fieldName, $data, false)) !== false) {
                 $row[$fieldName] = $fieldValue;
             }
         }
 
-        $logOptions = array('GroupBy' => array('RecordID'));
+        $logOptions = ['GroupBy' => ['RecordID']];
 
         if ($deleteRow) {
             // Remove the record to the log.

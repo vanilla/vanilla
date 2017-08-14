@@ -9,7 +9,7 @@
         <li class="User-Name">
             <?php
             echo $this->Form->label('Username', 'Name');
-            $Attributes = array();
+            $Attributes = [];
 
             if (!$this->data('_CanEditUsername')) {
                 $Attributes['disabled'] = 'disabled';
@@ -31,7 +31,7 @@
 
                 } else {
 
-                    $EmailAttributes = array();
+                    $EmailAttributes = [];
                     if (!$this->data('_CanEditEmail')) {
                         $EmailAttributes['disabled'] = 'disabled';
                     }
@@ -50,7 +50,7 @@
         <?php if ($this->data('_CanEditEmail')): ?>
             <li class="User-ShowEmail">
                 <?php
-                echo $this->Form->CheckBox('ShowEmail', t('Allow other members to see your email?'), array('value' => '1'));
+                echo $this->Form->checkBox('ShowEmail', t('Allow other members to see your email?'), ['value' => '1']);
                 ?>
             </li>
         <?php endif ?>
@@ -58,7 +58,7 @@
         <?php if ($this->data('_CanConfirmEmail')): ?>
             <li class="User-ConfirmEmail">
                 <?php
-                echo $this->Form->CheckBox('ConfirmEmail', t("Confirmed email address"), array('value' => '1'));
+                echo $this->Form->checkBox('ConfirmEmail', t("Confirmed email address"), ['value' => '1']);
                 ?>
             </li>
         <?php endif ?>
@@ -85,5 +85,5 @@
         $this->fireEvent('EditMyAccountAfter');
         ?>
     </ul>
-    <?php echo $this->Form->close('Save', '', array('class' => 'Button Primary')); ?>
+    <?php echo $this->Form->close('Save', '', ['class' => 'Button Primary']); ?>
 </div>

@@ -14,7 +14,7 @@
 class RoutesController extends DashboardController {
 
     /** @var array Models to automatically instantiate. */
-    public $Uses = array('Form');
+    public $Uses = ['Form'];
 
     /**
      * Set menu path. Automatically run on every use.
@@ -48,61 +48,61 @@ class RoutesController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param string $RouteIndex Name of route.
+     * @param string $routeIndex Name of route.
      */
-    public function edit($RouteIndex = false) {
+    public function edit($routeIndex = false) {
         $this->permission('Garden.Settings.Manage');
         $this->setHighlightRoute('dashboard/routes');
-        $this->Route = Gdn::router()->getRoute($RouteIndex);
+        $this->Route = Gdn::router()->getRoute($routeIndex);
 
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array('Route', 'Target', 'Type'));
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField(['Route', 'Target', 'Type']);
 
         // Set the model on the form.
-        $this->Form->setModel($ConfigurationModel);
+        $this->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
         if (!$this->Form->authenticatedPostBack()) {
             // Apply the route info to the form.
             if ($this->Route !== false) {
-                $this->Form->setData(array(
+                $this->Form->setData([
                     'Route' => $this->Route['Route'],
                     'Target' => $this->Route['Destination'],
                     'Type' => $this->Route['Type']
-                ));
+                ]);
             }
         } else {
             // Define some validation rules for the fields being saved
-            $ConfigurationModel->Validation->applyRule('Route', 'Required');
-            $ConfigurationModel->Validation->applyRule('Target', 'Required');
-            $ConfigurationModel->Validation->applyRule('Type', 'Required');
+            $configurationModel->Validation->applyRule('Route', 'Required');
+            $configurationModel->Validation->applyRule('Target', 'Required');
+            $configurationModel->Validation->applyRule('Type', 'Required');
 
             // Validate & Save
-            $FormPostValues = $this->Form->formValues();
+            $formPostValues = $this->Form->formValues();
 
             // Dunno.
             if ($this->Route['Reserved']) {
-                $FormPostValues['Route'] = $this->Route['Route'];
+                $formPostValues['Route'] = $this->Route['Route'];
             }
 
-            if ($ConfigurationModel->validate($FormPostValues)) {
-                $NewRouteName = val('Route', $FormPostValues);
+            if ($configurationModel->validate($formPostValues)) {
+                $newRouteName = val('Route', $formPostValues);
 
-                if ($this->Route !== false && $NewRouteName != $this->Route['Route']) {
+                if ($this->Route !== false && $newRouteName != $this->Route['Route']) {
                     Gdn::router()->deleteRoute($this->Route['Route']);
                 }
 
                 Gdn::router()->setRoute(
-                    $NewRouteName,
-                    val('Target', $FormPostValues),
-                    val('Type', $FormPostValues)
+                    $newRouteName,
+                    val('Target', $formPostValues),
+                    val('Type', $formPostValues)
                 );
 
                 $this->informMessage(t("The route was saved successfully."));
-                $this->RedirectUrl = url('dashboard/routes');
+                $this->setRedirectTo('dashboard/routes');
             } else {
-                $this->Form->setValidationResults($ConfigurationModel->validationResults());
+                $this->Form->setValidationResults($configurationModel->validationResults());
             }
         }
 
@@ -114,21 +114,21 @@ class RoutesController extends DashboardController {
      *
      * @since 2.0.0
      * @access public
-     * @param mixed $RouteIndex Name of route.
-     * @param string $TransientKey Security token.
+     * @param mixed $routeIndex Name of route.
+     * @param string $transientKey Security token.
      */
-    public function delete($RouteIndex = false, $TransientKey = false) {
+    public function delete($routeIndex = false, $transientKey = false) {
         $this->permission('Garden.Settings.Manage');
         $this->deliveryType(DELIVERY_TYPE_BOOL);
-        $Session = Gdn::session();
+        $session = Gdn::session();
 
         // If seeing the form for the first time...
-        if ($TransientKey !== false && $Session->validateTransientKey($TransientKey)) {
-            Gdn::router()->deleteRoute($RouteIndex);
+        if ($transientKey !== false && $session->validateTransientKey($transientKey)) {
+            Gdn::router()->deleteRoute($routeIndex);
         }
 
         if ($this->_DeliveryType === DELIVERY_TYPE_ALL) {
-            redirect('dashboard/routes');
+            redirectTo('dashboard/routes');
         }
 
         $this->render();

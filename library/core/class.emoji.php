@@ -35,7 +35,7 @@ class Emoji {
     protected $archive;
 
     /** @var string The base path where the emoji are located. */
-    protected $assetPath = '/resources/emoji';
+    protected $assetPath;
 
     /** @var string If assetPath is modified, this will hold the original path. */
     protected $assetPathOriginal;
@@ -96,8 +96,10 @@ class Emoji {
      *
      */
     protected function __construct() {
+        $this->assetPath = asset('/resources/emoji', true);
+
         // Initialize the canonical list. (emoji)
-        $this->emoji = array(
+        $this->emoji = [
             // Smileys
             'smile' => 'smile.png',
             'smiley' => 'smiley.png',
@@ -174,7 +176,7 @@ class Emoji {
 
             // Custom icons, canonical naming
             'trollface' => 'trollface.png'
-        );
+        ];
 
         // Some aliases self-referencing the canonical list. Use this syntax.
 
@@ -182,7 +184,7 @@ class Emoji {
         $this->emoji['error'] = &$this->emoji['grey_question'];
 
         // Initialize the alias list. (emoticons)
-        $this->aliases = array(
+        $this->aliases = [
             ':)' => 'smile',
             ':D' => 'lol',
             '=)' => 'smiley',
@@ -203,9 +205,9 @@ class Emoji {
             'o:)' => 'innocent',
             '<3' => 'heart',
             '>:)' => 'naughty'
-        );
+        ];
 
-        $this->archive = array(
+        $this->archive = [
             'disappointed_relieved' => 'disappointed_relieved.png',
             'dizzy_face' => 'dizzy.png',
             'broken_heart' => 'heartbreak.png',
@@ -217,9 +219,9 @@ class Emoji {
             'stuck_out_tongue' => 'tongue.png',
             'stuck_out_tongue_winking_eye' => 'stuck_out_tongue_winking_eye.png',
             'stuck_out_tongue_closed_eyes' => 'stuck_out_tongue_closed_eyes.png',
-        );
+        ];
 
-        $this->editorList = array(
+        $this->editorList = [
             ':)' => 'smile',
             ':D' => 'lol',
             ':(' => 'disappointed',
@@ -236,7 +238,7 @@ class Emoji {
             '<3' => 'heart',
             'o:)' => 'innocent',
             '>:)' => 'naughty'
-        );
+        ];
 
         if (c('Garden.EmojiSet') === 'none') {
             $this->enabled = false;
@@ -256,20 +258,20 @@ class Emoji {
         if ($c && $this->enabled) {
             $emojis = $this->getEmoji();
             $emojiAssetPath = $this->getAssetPath();
-            $emoji = array();
+            $emoji = [];
 
             foreach ($emojis as $name => $data) {
-                $emoji[] = array(
+                $emoji[] = [
                     "name" => "".$name."",
-                    "url" => Asset($emojiAssetPath.'/'.$data)
-                );
+                    "url" => asset($emojiAssetPath.'/'.$data, true)
+                ];
             }
 
-            $emoji = array(
-                'assetPath' => Asset($this->getAssetPath()),
+            $emoji = [
+                'assetPath' => asset($this->getAssetPath(), true),
                 'format' => $this->getFormat(),
                 'emoji' => $this->getEmoji()
-            );
+            ];
 
             $c->addDefinition('emoji', $emoji);
         }
@@ -433,7 +435,7 @@ class Emoji {
      */
     public function setEditorList($value) {
         // Convert the editor list to the proper format.
-        $list = array();
+        $list = [];
         $aliases2 = array_flip($this->aliases);
         foreach ($value as $emoji) {
             if (isset($this->aliases[$emoji])) {
@@ -480,7 +482,7 @@ class Emoji {
         $filename = basename($emoji_path);
         $ext = '.'.pathinfo($filename, PATHINFO_EXTENSION);
         $basename = basename($filename, $ext);
-        $src = asset($emoji_path);
+        $src = asset($emoji_path, true);
 
         $attributes = [$src, $emoji_name, $src, $emoji_name, $dir, $filename, $basename, $ext];
         $attributes = array_map('htmlspecialchars', $attributes);
@@ -551,7 +553,7 @@ class Emoji {
         if (array_key_exists('archive', $manifest)) {
             $this->setArchive($manifest['archive']);
         } else {
-            $this->setArchive(array());
+            $this->setArchive([]);
         }
 
         if (!empty($manifest['format'])) {
@@ -569,15 +571,15 @@ class Emoji {
      * Thanks to punbb 1.3.5 (GPL License) for function, which was largely
      * inspired from their do_smilies function.
      *
-     * @param string $Text The actual user-submitted post
+     * @param string $text The actual user-submitted post
      * @return string Return the emoji-formatted post
      */
-    public function translateToHtml($Text) {
+    public function translateToHtml($text) {
         if (!$this->enabled) {
-            return $Text;
+            return $text;
         }
 
-        $Text = ' '.$Text.' ';
+        $text = ' '.$text.' ';
 
         // First, translate all aliases. Canonical emoji will get translated
         // out of a loop.
@@ -587,11 +589,11 @@ class Emoji {
         foreach ($emojiAliasList as $emojiAlias => $emojiCanonical) {
             $emojiFilePath = $this->getEmojiPath($emojiCanonical);
 
-            if (strpos($Text, htmlentities($emojiAlias)) !== false) {
-                $Text = Gdn_Format::ReplaceButProtectCodeBlocks(
+            if (strpos($text, htmlentities($emojiAlias)) !== false) {
+                $text = Gdn_Format::replaceButProtectCodeBlocks(
                     '`(?<=[>\s]|(&nbsp;))'.preg_quote(htmlentities($emojiAlias), '`').'(?=\W)`m',
                     $this->img($emojiFilePath, $emojiAlias),
-                    $Text
+                    $text
                 );
             }
         }
@@ -601,7 +603,7 @@ class Emoji {
         $rdelim = preg_quote($this->rdelim, '`');
         $emoji = $this;
 
-        $Text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
+        $text = Gdn_Format::replaceButProtectCodeBlocks("`({$ldelim}\S+?{$rdelim})`i", function ($m) use ($emoji) {
             $emoji_name = trim($m[1], ':');
             $emoji_path = $emoji->getEmojiPath($emoji_name);
             if ($emoji_path) {
@@ -609,9 +611,9 @@ class Emoji {
             } else {
                 return $m[0];
             }
-        }, $Text, true);
+        }, $text, true);
 
-        return substr($Text, 1, -1);
+        return substr($text, 1, -1);
     }
 
     /**

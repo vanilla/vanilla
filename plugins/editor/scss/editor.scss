@@ -547,7 +547,8 @@ directly on the iframe's bodybox contenteditable. */
  * Mobile tweaks, specifically for Lithe Mobile
  */
 .editor-mobile {
-  .editor-dropdown-upload {
+  .editor-dropdown-upload,
+  .editor-dropdown-image {
     position: static;
 
     .editor-insert-dialog {

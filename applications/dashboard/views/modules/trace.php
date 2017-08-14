@@ -57,7 +57,7 @@
             list($Message, $Type) = $Trace;
 
             $Var = 'Debug';
-            if (!in_array($Type, array(TRACE_ERROR, TRACE_INFO, TRACE_NOTICE, TRACE_WARNING))) {
+            if (!in_array($Type, [TRACE_ERROR, TRACE_INFO, TRACE_NOTICE, TRACE_WARNING])) {
                 $Var = $Type;
                 $Type = TRACE_INFO;
             } elseif (!$Message) {
@@ -68,7 +68,7 @@
             <tr>
                 <td class="TagColumn">
                     <span
-                        class="Tag Tag-<?php echo Gdn_Format::AlphaNumeric($Type); ?>"><?php echo htmlspecialchars($Type); ?></span>
+                        class="Tag Tag-<?php echo Gdn_Format::alphaNumeric($Type); ?>"><?php echo htmlspecialchars($Type); ?></span>
                 </td>
                 <td>
                     <?php

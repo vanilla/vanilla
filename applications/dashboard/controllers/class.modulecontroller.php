@@ -16,57 +16,57 @@ class ModuleController extends Gdn_Controller {
     /**
      * Creates and renders an instance of a module.
      *
-     * @param string $Module
-     * @param string $AppFolder
-     * @param string $DeliveryType
+     * @param string $module
+     * @param string $appFolder
+     * @param string $deliveryType
      * @throws NotFoundException
      */
-    public function index($Module, $AppFolder = '', $DeliveryType = '') {
-        if (!$DeliveryType) {
+    public function index($module, $appFolder = '', $deliveryType = '') {
+        if (!$deliveryType) {
             $this->deliveryType(DELIVERY_TYPE_VIEW);
         }
 
-        $ModuleClassExists = class_exists($Module);
+        $moduleClassExists = class_exists($module);
 
-        if ($ModuleClassExists) {
+        if ($moduleClassExists) {
             // Make sure that the class implements Gdn_IModule
-            $ReflectionClass = new ReflectionClass($Module);
-            if ($ReflectionClass->implementsInterface("Gdn_IModule")) {
+            $reflectionClass = new ReflectionClass($module);
+            if ($reflectionClass->implementsInterface("Gdn_IModule")) {
                 // Check any incoming app folder against real application list.
                 $appWhitelist = Gdn::applicationManager()->enabledApplicationFolders();
 
                 // Set the proper application folder on this controller so that things render properly.
-                if ($AppFolder && in_array($AppFolder, $appWhitelist)) {
-                    $this->ApplicationFolder = $AppFolder;
+                if ($appFolder && in_array($appFolder, $appWhitelist)) {
+                    $this->ApplicationFolder = $appFolder;
                 } else {
-                    $Filename = str_replace('\\', '/', substr($ReflectionClass->getFileName(), strlen(PATH_ROOT)));
+                    $filename = str_replace('\\', '/', substr($reflectionClass->getFileName(), strlen(PATH_ROOT)));
                     // Figure our the application folder for the module.
-                    $Parts = explode('/', trim($Filename, '/'));
-                    if ($Parts[0] == 'applications' && in_array($Parts[1], $appWhitelist)) {
-                        $this->ApplicationFolder = $Parts[1];
+                    $parts = explode('/', trim($filename, '/'));
+                    if ($parts[0] == 'applications' && in_array($parts[1], $appWhitelist)) {
+                        $this->ApplicationFolder = $parts[1];
                     }
                 }
 
 
-                $ModuleInstance = new $Module($this);
-                $ModuleInstance->Visible = true;
+                $moduleInstance = new $module($this);
+                $moduleInstance->Visible = true;
 
-                $WhiteList = array('Limit', 'Help');
-                foreach ($this->Request->get() as $Key => $Value) {
-                    if (in_array($Key, $WhiteList)) {
+                $whiteList = ['Limit', 'Help'];
+                foreach ($this->Request->get() as $key => $value) {
+                    if (in_array($key, $whiteList)) {
                         // Set a sane max limit for this open-ended way of calling modules.
-                        if ($Key == 'Limit' && $Value > 200) {
+                        if ($key == 'Limit' && $value > 200) {
                             throw new Exception(t('Invalid limit.'), 400);
                         }
-                        $ModuleInstance->$Key = $Value;
+                        $moduleInstance->$key = $value;
                     }
                 }
 
-                $this->setData('_Module', $ModuleInstance);
+                $this->setData('_Module', $moduleInstance);
                 $this->render('Index', false, 'dashboard');
                 return;
             }
         }
-        throw notFoundException(htmlspecialchars($Module));
+        throw notFoundException(htmlspecialchars($module));
     }
 }

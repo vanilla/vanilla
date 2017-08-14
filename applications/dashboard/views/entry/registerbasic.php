@@ -9,7 +9,7 @@
 
         // Make sure to force this form to post to the correct place in case the view is
         // rendered within another view (ie. /dashboard/entry/index/):
-        echo $this->Form->open(array('Action' => url('/entry/register'), 'id' => 'Form_User_Register'));
+        echo $this->Form->open(['Action' => url('/entry/register'), 'id' => 'Form_User_Register']);
         echo $this->Form->errors();
         ?>
         <ul>
@@ -17,7 +17,7 @@
                 <li>
                     <?php
                     echo $this->Form->label('Email', 'Email');
-                    echo $this->Form->textBox('Email', array('type' => 'email', 'Wrap' => TRUE));
+                    echo $this->Form->textBox('Email', ['type' => 'email', 'Wrap' => TRUE]);
                     echo '<span id="EmailUnavailable" class="Incorrect" style="display: none;">'.t('Email Unavailable').'</span>';
                     ?>
                 </li>
@@ -25,7 +25,7 @@
             <li>
                 <?php
                 echo $this->Form->label('Username', 'Name');
-                echo $this->Form->textBox('Name', array('autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE));
+                echo $this->Form->textBox('Name', ['autocorrect' => 'off', 'autocapitalize' => 'off', 'Wrap' => TRUE]);
                 echo '<span id="NameUnavailable" class="Incorrect" style="display: none;">'.t('Name Unavailable').'</span>';
                 ?>
             </li>
@@ -33,14 +33,14 @@
             <li>
                 <?php
                 echo $this->Form->label('Password', 'Password');
-                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', array('class' => 'Gloss'));
-                echo $this->Form->Input('Password', 'password', array('Wrap' => true, 'Strength' => TRUE));
+                echo wrap(sprintf(t('Your password must be at least %d characters long.'), c('Garden.Password.MinLength')).' '.t('For a stronger password, increase its length or combine upper and lowercase letters, digits, and symbols.'), 'div', ['class' => 'Gloss']);
+                echo $this->Form->input('Password', 'password', ['Wrap' => true, 'Strength' => TRUE]);
                 ?>
             </li>
             <li>
                 <?php
                 echo $this->Form->label('Confirm Password', 'PasswordMatch');
-                echo $this->Form->Input('PasswordMatch', 'password', array('Wrap' => TRUE));
+                echo $this->Form->input('PasswordMatch', 'password', ['Wrap' => TRUE]);
                 echo '<span id="PasswordsDontMatch" class="Incorrect" style="display: none;">'.t("Passwords don't match").'</span>';
                 ?>
             </li>
@@ -49,7 +49,7 @@
                 <li>
                     <?php
                     echo $this->Form->label('Why do you want to join?', 'DiscoveryText');
-                    echo $this->Form->textBox('DiscoveryText', array('MultiLine' => true, 'Wrap' => TRUE));
+                    echo $this->Form->textBox('DiscoveryText', ['MultiLine' => true, 'Wrap' => TRUE]);
                     ?>
                 </li>
             <?php endif; ?>
@@ -60,12 +60,12 @@
 
             <li>
                 <?php
-                echo $this->Form->CheckBox('TermsOfService', '@'.$TermsOfServiceText, array('value' => '1'));
-                echo $this->Form->CheckBox('RememberMe', 'Remember me on this computer', array('value' => '1'));
+                echo $this->Form->checkBox('TermsOfService', '@'.$TermsOfServiceText, ['value' => '1']);
+                echo $this->Form->checkBox('RememberMe', 'Remember me on this computer', ['value' => '1']);
                 ?>
             </li>
             <li class="Buttons">
-                <?php echo $this->Form->button('Sign Up', array('class' => 'Button Primary')); ?>
+                <?php echo $this->Form->button('Sign Up', ['class' => 'Button Primary']); ?>
             </li>
         </ul>
         <?php echo $this->Form->close(); ?>

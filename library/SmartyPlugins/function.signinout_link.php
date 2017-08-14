@@ -9,13 +9,13 @@
 /**
  *
  *
- * @param array $Params
- * @param object $Smarty
+ * @param array $params
+ * @param object $smarty
  * @return string
  */
-function smarty_function_signinout_link($Params, &$Smarty) {
-    $Wrap = val('wrap', $Params, 'li');
+function smarty_function_signinout_link($params, &$smarty) {
+    $wrap = val('wrap', $params, 'li');
     return Gdn_Theme::link('signinout',
-        val('text', $Params, ''),
-        val('format', $Params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $Wrap)));
+        val('text', $params, ''),
+        val('format', $params, wrap('<a href="%url" rel="nofollow" class="%class">%text</a>', $wrap)));
 }

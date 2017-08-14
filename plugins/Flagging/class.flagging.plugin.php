@@ -15,49 +15,49 @@ class FlaggingPlugin extends Gdn_Plugin {
             ->from('Flag fl')
             ->get()->firstRow(DATASET_TYPE_ARRAY);
 
-        $LinkText = t('Flagged Content');
+        $linkText = t('Flagged Content');
         if ($flaggedItemsResult['NumFlaggedItems']) {
-            $LinkText .= ' <span class="badge">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
+            $linkText .= ' <span class="badge">'.$flaggedItemsResult['NumFlaggedItems'].'</span>';
         }
         /** @var DashboardNavModule $sender */
-        $sender->addLinkToSectionIf('Garden.Moderation.Manage', 'Moderation', $LinkText, 'plugin/flagging', 'moderation.flagging');
+        $sender->addLinkToSectionIf('Garden.Moderation.Manage', 'Moderation', $linkText, 'plugin/flagging', 'moderation.flagging');
     }
 
     /**
      * Let users with permission choose to receive Flagging emails.
      */
-    public function profileController_afterPreferencesDefined_handler($Sender) {
+    public function profileController_afterPreferencesDefined_handler($sender) {
         if (Gdn::session()->checkPermission('Plugins.Flagging.Notify')) {
-            $Sender->Preferences['Notifications']['Email.Flag'] = t('Notify me when a comment is flagged.');
-            $Sender->Preferences['Notifications']['Popup.Flag'] = t('Notify me when a comment is flagged.');
+            $sender->Preferences['Notifications']['Email.Flag'] = t('Notify me when a comment is flagged.');
+            $sender->Preferences['Notifications']['Popup.Flag'] = t('Notify me when a comment is flagged.');
         }
     }
 
     /**
      * Save Email.Flag preference list in config for easier access.
      */
-    public function userModel_beforeSaveSerialized_handler($Sender) {
+    public function userModel_beforeSaveSerialized_handler($sender) {
         if (Gdn::session()->checkPermission('Plugins.Flagging.Notify')) {
-            if ($Sender->EventArguments['Column'] == 'Preferences' && is_array($Sender->EventArguments['Name'])) {
+            if ($sender->EventArguments['Column'] == 'Preferences' && is_array($sender->EventArguments['Name'])) {
                 // Shorten our arguments
-                $UserID = $Sender->EventArguments['UserID'];
-                $Prefs = $Sender->EventArguments['Name'];
-                $FlagPref = val('Email.Flag', $Prefs, null);
+                $userID = $sender->EventArguments['UserID'];
+                $prefs = $sender->EventArguments['Name'];
+                $flagPref = val('Email.Flag', $prefs, null);
 
-                if ($FlagPref !== null) {
+                if ($flagPref !== null) {
                     // Add or remove user from config array
-                    $NotifyUsers = c('Plugins.Flagging.NotifyUsers', array());
-                    $IsNotified = array_search($UserID, $NotifyUsers); // beware '0' key
-                    if ($IsNotified !== false && !$FlagPref) {
+                    $notifyUsers = c('Plugins.Flagging.NotifyUsers', []);
+                    $isNotified = array_search($userID, $notifyUsers); // beware '0' key
+                    if ($isNotified !== false && !$flagPref) {
                         // Remove from NotifyUsers
-                        unset($NotifyUsers[$IsNotified]);
-                    } elseif ($IsNotified === false && $FlagPref) {
+                        unset($notifyUsers[$isNotified]);
+                    } elseif ($isNotified === false && $flagPref) {
                         // Add to NotifyUsers
-                        $NotifyUsers[] = $UserID;
+                        $notifyUsers[] = $userID;
                     }
 
                     // Save new list of users to notify
-                    saveToConfig('Plugins.Flagging.NotifyUsers', array_values($NotifyUsers));
+                    saveToConfig('Plugins.Flagging.NotifyUsers', array_values($notifyUsers));
                 }
             }
         }
@@ -66,12 +66,12 @@ class FlaggingPlugin extends Gdn_Plugin {
     /**
      * Create virtual Flagging controller.
      */
-    public function pluginController_flagging_create($Sender) {
-        $Sender->permission('Garden.Moderation.Manage');
-        $Sender->title('Content Flagging');
-        $Sender->setHighlightRoute('plugin/flagging');
-        $Sender->Form = new Gdn_Form();
-        $this->dispatch($Sender, $Sender->RequestArgs);
+    public function pluginController_flagging_create($sender) {
+        $sender->permission('Garden.Moderation.Manage');
+        $sender->title('Content Flagging');
+        $sender->setHighlightRoute('plugin/flagging');
+        $sender->Form = new Gdn_Form();
+        $this->dispatch($sender, $sender->RequestArgs);
     }
 
     /**
@@ -79,277 +79,268 @@ class FlaggingPlugin extends Gdn_Plugin {
      *
      * Default method of virtual Flagging controller.
      */
-    public function controller_index($Sender) {
-        $Sender->addCssFile('admin.css');
-        $Sender->addCssFile($this->getResource('design/flagging.css', false, false));
-
-        $Validation = new Gdn_Validation();
-        $ConfigurationModel = new Gdn_ConfigurationModel($Validation);
-        $ConfigurationModel->setField(array(
+    public function controller_index($sender) {
+        $validation = new Gdn_Validation();
+        $configurationModel = new Gdn_ConfigurationModel($validation);
+        $configurationModel->setField([
             'Plugins.Flagging.UseDiscussions',
             'Plugins.Flagging.CategoryID'
-        ));
+        ]);
 
         // Set the model on the form.
-        $Sender->Form->setModel($ConfigurationModel);
+        $sender->Form->setModel($configurationModel);
 
         // If seeing the form for the first time...
-        if ($Sender->Form->authenticatedPostBack() === false) {
+        if ($sender->Form->authenticatedPostBack() === false) {
             // Apply the config settings to the form.
-            $Sender->Form->setData($ConfigurationModel->Data);
+            $sender->Form->setData($configurationModel->Data);
         } else {
-            $Saved = $Sender->Form->save();
-            if ($Saved) {
-                $Sender->informMessage(t("Your changes have been saved."));
+            $saved = $sender->Form->save();
+            if ($saved) {
+                $sender->informMessage(t("Your changes have been saved."));
             }
         }
 
-        $FlaggedItems = Gdn::sql()->select('*')
+        $flaggedItems = Gdn::sql()->select('*')
             ->from('Flag fl')
             ->orderBy('DateInserted', 'DESC')
             ->get();
 
-        $Sender->FlaggedItems = array();
-        while ($Flagged = $FlaggedItems->nextRow(DATASET_TYPE_ARRAY)) {
-            $URL = $Flagged['ForeignURL'];
-            $Index = $Flagged['DateInserted'].'-'.$Flagged['InsertUserID'];
-            $Flagged['EncodedURL'] = str_replace('=', '-', base64_encode($Flagged['ForeignURL']));
-            $Sender->FlaggedItems[$URL][$Index] = $Flagged;
+        $sender->FlaggedItems = [];
+        while ($flagged = $flaggedItems->nextRow(DATASET_TYPE_ARRAY)) {
+            $uRL = $flagged['ForeignURL'];
+            $index = $flagged['DateInserted'].'-'.$flagged['InsertUserID'];
+            $flagged['EncodedURL'] = str_replace('=', '-', base64_encode($flagged['ForeignURL']));
+            $sender->FlaggedItems[$uRL][$index] = $flagged;
         }
-        unset($FlaggedItems);
+        unset($flaggedItems);
 
         Gdn_Theme::section('Moderation');
-        $Sender->render($Sender->fetchViewLocation('flagging', '', 'plugins/Flagging'));
+        $sender->render($sender->fetchViewLocation('flagging', '', 'plugins/Flagging'));
     }
 
     /**
      * Dismiss a flag, then view index.
-     * @param Gdn_Controller $Sender
+     * @param Gdn_Controller $sender
      * @throws Exception
      * @throws Gdn_UserException
      */
-    public function controller_dismiss($Sender) {
+    public function controller_dismiss($sender) {
         if (!Gdn::request()->isAuthenticatedPostBack(true)) {
             throw new Exception('Requires POST', 405);
         }
         if (Gdn::session()->checkPermission('Garden.Moderation.Manage')) {
-            $Arguments = $Sender->RequestArgs;
-            if (sizeof($Arguments) != 2) {
+            $arguments = $sender->RequestArgs;
+            if (sizeof($arguments) != 2) {
                 return;
             }
-            list($Controller, $EncodedURL) = $Arguments;
+            list($controller, $encodedURL) = $arguments;
 
-            $URL = base64_decode(str_replace('-', '=', $EncodedURL));
+            $uRL = base64_decode(str_replace('-', '=', $encodedURL));
 
-            Gdn::sql()->delete('Flag', array(
-                'ForeignURL' => $URL
-            ));
+            Gdn::sql()->delete('Flag', [
+                'ForeignURL' => $uRL
+            ]);
 
-            $Sender->informMessage(sprintf(t('%s dismissed.'), t('Flag')));
+            $sender->informMessage(sprintf(t('%s dismissed.'), t('Flag')));
         }
-        $Sender->render('blank', 'utility', 'dashboard');
-    }
-
-    /**
-     * Add Flagging styling to Discussion.
-     */
-    public function discussionController_beforeCommentsRender_handler($Sender) {
-        $Sender->addCssFile($this->getResource('design/flagging.css', false, false));
+        $sender->render('blank', 'utility', 'dashboard');
     }
 
     /**
      * Add 'Flag' link for discussions.
      */
-    public function discussionController_discussionInfo_handler($Sender, $Args) {
+    public function discussionController_discussionInfo_handler($sender, $args) {
         // Signed in users only. No guest reporting!
         if (Gdn::session()->UserID) {
-            $this->addFlagButton($Sender, $Args, 'discussion');
+            $this->addFlagButton($sender, $args, 'discussion');
         }
     }
 
     /**
      * Add 'Flag' link for comments.
      */
-    public function discussionController_commentInfo_handler($Sender, $Args) {
+    public function discussionController_commentInfo_handler($sender, $args) {
         // Signed in users only. No guest reporting!
         if (Gdn::session()->UserID) {
-            $this->addFlagButton($Sender, $Args);
+            $this->addFlagButton($sender, $args);
         }
     }
 
     /**
      * Output Flag link.
      */
-    protected function addFlagButton($Sender, $Args, $Context = 'comment') {
-        $ElementID = ($Context == 'comment') ? $Args['Comment']->CommentID : $Args['Discussion']->DiscussionID;
+    protected function addFlagButton($sender, $args, $context = 'comment') {
+        $elementID = ($context == 'comment') ? $args['Comment']->CommentID : $args['Discussion']->DiscussionID;
 
-        if (!is_object($Args['Author']) || !isset($Args['Author']->UserID)) {
-            $ElementAuthorID = 0;
-            $ElementAuthor = 'Unknown';
+        if (!is_object($args['Author']) || !isset($args['Author']->UserID)) {
+            $elementAuthorID = 0;
+            $elementAuthor = 'Unknown';
         } else {
-            $ElementAuthorID = $Args['Author']->UserID;
-            $ElementAuthor = $Args['Author']->Name;
+            $elementAuthorID = $args['Author']->UserID;
+            $elementAuthor = $args['Author']->Name;
         }
-        switch ($Context) {
+        switch ($context) {
             case 'comment':
-                $URL = "/discussion/comment/{$ElementID}/#Comment_{$ElementID}";
+                $uRL = "/discussion/comment/{$elementID}/#Comment_{$elementID}";
                 break;
 
             case 'discussion':
-                $URL = "/discussion/{$ElementID}/".Gdn_Format::url($Args['Discussion']->Name);
+                $uRL = "/discussion/{$elementID}/".Gdn_Format::url($args['Discussion']->Name);
                 break;
 
             default:
                 return;
         }
-        $EncodedURL = str_replace('=', '-', base64_encode($URL));
-        $FlagLink = anchor(t('Flag'), "discussion/flag/{$Context}/{$ElementID}/{$ElementAuthorID}/".Gdn_Format::url($ElementAuthor)."/{$EncodedURL}", 'FlagContent Popup');
-        echo wrap($FlagLink, 'span', array('class' => 'MItem CommentFlag'));
+        $encodedURL = str_replace('=', '-', base64_encode($uRL));
+        $flagLink = anchor(t('Flag'), "discussion/flag/{$context}/{$elementID}/{$elementAuthorID}/".Gdn_Format::url($elementAuthor)."/{$encodedURL}", 'FlagContent Popup');
+        echo wrap($flagLink, 'span', ['class' => 'MItem CommentFlag']);
     }
 
     /**
      * Handle flagging process in a discussion.
      */
-    public function discussionController_flag_create($Sender) {
+    public function discussionController_flag_create($sender) {
         // Signed in users only.
-        if (!($UserID = Gdn::session()->UserID)) {
+        if (!($userID = Gdn::session()->UserID)) {
             return;
         }
-        $UserName = Gdn::session()->User->Name;
+        $userName = Gdn::session()->User->Name;
 
-        $Arguments = $Sender->RequestArgs;
-        if (sizeof($Arguments) != 5) {
+        $arguments = $sender->RequestArgs;
+        if (sizeof($arguments) != 5) {
             return;
         }
-        list($Context, $ElementID, $ElementAuthorID, $ElementAuthor, $EncodedURL) = $Arguments;
-        $URL = htmlspecialchars(base64_decode(str_replace('-', '=', $EncodedURL)));
+        list($context, $elementID, $elementAuthorID, $elementAuthor, $encodedURL) = $arguments;
+        $uRL = htmlspecialchars(base64_decode(str_replace('-', '=', $encodedURL)));
 
-        $Sender->setData('Plugin.Flagging.Data', array(
-            'Context' => $Context,
-            'ElementID' => $ElementID,
-            'ElementAuthorID' => $ElementAuthorID,
-            'ElementAuthor' => $ElementAuthor,
-            'URL' => $URL,
-            'UserID' => $UserID,
-            'UserName' => $UserName
-        ));
+        $sender->setData('Plugin.Flagging.Data', [
+            'Context' => $context,
+            'ElementID' => $elementID,
+            'ElementAuthorID' => $elementAuthorID,
+            'ElementAuthor' => $elementAuthor,
+            'URL' => $uRL,
+            'UserID' => $userID,
+            'UserName' => $userName
+        ]);
 
-        if ($Sender->Form->authenticatedPostBack()) {
-            $SQL = Gdn::sql();
-            $Comment = $Sender->Form->getValue('Plugin.Flagging.Reason');
-            $Sender->setData('Plugin.Flagging.Reason', $Comment);
-            $CreateDiscussion = c('Plugins.Flagging.UseDiscussions');
+        if ($sender->Form->authenticatedPostBack()) {
+            $sQL = Gdn::sql();
+            $comment = $sender->Form->getValue('Plugin.Flagging.Reason');
+            $sender->setData('Plugin.Flagging.Reason', $comment);
+            $createDiscussion = c('Plugins.Flagging.UseDiscussions');
 
-            if ($CreateDiscussion) {
+            if ($createDiscussion) {
                 // Category
-                $CategoryID = c('Plugins.Flagging.CategoryID');
+                $categoryID = c('Plugins.Flagging.CategoryID');
 
                 // New discussion name
-                if ($Context == 'comment') {
-                    $Result = $SQL
+                if ($context == 'comment') {
+                    $result = $sQL
                         ->select('d.Name')
                         ->select('c.Body')
                         ->from('Comment c')
                         ->join('Discussion d', 'd.DiscussionID = c.DiscussionID', 'left')
-                        ->where('c.CommentID', $ElementID)
+                        ->where('c.CommentID', $elementID)
                         ->get()
                         ->firstRow();
-                } elseif ($Context == 'discussion') {
-                    $DiscussionModel = new DiscussionModel();
-                    $Result = $DiscussionModel->getID($ElementID);
+                } elseif ($context == 'discussion') {
+                    $discussionModel = new DiscussionModel();
+                    $result = $discussionModel->getID($elementID);
                 }
 
-                $DiscussionName = val('Name', $Result);
-                $PrefixedDiscussionName = t('FlagPrefix', 'FLAG: ').$DiscussionName;
+                $discussionName = val('Name', $result);
+                $prefixedDiscussionName = t('FlagPrefix', 'FLAG: ').$discussionName;
 
                 // Prep data for the template
-                $Sender->setData('Plugin.Flagging.Report', array(
-                    'DiscussionName' => $DiscussionName,
-                    'FlaggedContent' => val('Body', $Result)
-                ));
+                $sender->setData('Plugin.Flagging.Report', [
+                    'DiscussionName' => $discussionName,
+                    'FlaggedContent' => val('Body', $result)
+                ]);
 
                 // Assume no discussion exists
                 $this->DiscussionID = null;
 
                 // Get discussion ID if already flagged
-                $FlagResult = Gdn::sql()
+                $flagResult = Gdn::sql()
                     ->select('DiscussionID')
                     ->from('Flag fl')
-                    ->where('ForeignType', $Context)
-                    ->where('ForeignID', $ElementID)
+                    ->where('ForeignType', $context)
+                    ->where('ForeignID', $elementID)
                     ->get()
                     ->firstRow();
 
-                if ($FlagResult) {
+                if ($flagResult) {
                     // New comment in existing discussion
-                    $DiscussionID = $FlagResult->DiscussionID;
-                    $ReportBody = $Sender->fetchView('reportcomment', '', 'plugins/Flagging');
-                    $SQL->insert('Comment', array(
-                        'DiscussionID' => $DiscussionID,
-                        'InsertUserID' => $UserID,
-                        'Body' => $ReportBody,
+                    $discussionID = $flagResult->DiscussionID;
+                    $reportBody = $sender->fetchView('reportcomment', '', 'plugins/Flagging');
+                    $sQL->insert('Comment', [
+                        'DiscussionID' => $discussionID,
+                        'InsertUserID' => $userID,
+                        'Body' => $reportBody,
                         'Format' => 'Html',
                         'DateInserted' => date('Y-m-d H:i:s')
-                    ));
-                    $CommentModel = new CommentModel();
-                    $CommentModel->updateCommentCount($DiscussionID);
+                    ]);
+                    $commentModel = new CommentModel();
+                    $commentModel->updateCommentCount($discussionID);
                 } else {
                     // New discussion body
-                    $ReportBody = $Sender->fetchView('report', '', 'plugins/Flagging');
-                    $DiscussionID = $SQL->insert('Discussion', array(
-                        'InsertUserID' => $UserID,
-                        'UpdateUserID' => $UserID,
-                        'CategoryID' => $CategoryID,
-                        'Name' => $PrefixedDiscussionName,
-                        'Body' => $ReportBody,
+                    $reportBody = $sender->fetchView('report', '', 'plugins/Flagging');
+                    $discussionID = $sQL->insert('Discussion', [
+                        'InsertUserID' => $userID,
+                        'UpdateUserID' => $userID,
+                        'CategoryID' => $categoryID,
+                        'Name' => $prefixedDiscussionName,
+                        'Body' => $reportBody,
                         'Format' => 'Html',
                         'CountComments' => 1,
                         'DateInserted' => date('Y-m-d H:i:s'),
                         'DateUpdated' => date('Y-m-d H:i:s'),
                         'DateLastComment' => date('Y-m-d H:i:s')
-                    ));
+                    ]);
 
                     // Update discussion count
-                    $DiscussionModel = new DiscussionModel();
-                    $DiscussionModel->updateDiscussionCount($CategoryID);
+                    $discussionModel = new DiscussionModel();
+                    $discussionModel->updateDiscussionCount($categoryID);
                 }
             }
 
             try {
                 // Insert the flag
-                $SQL->insert('Flag', array(
-                    'DiscussionID' => $DiscussionID,
-                    'InsertUserID' => $UserID,
-                    'InsertName' => $UserName,
-                    'AuthorID' => $ElementAuthorID,
-                    'AuthorName' => $ElementAuthor,
-                    'ForeignURL' => $URL,
-                    'ForeignID' => $ElementID,
-                    'ForeignType' => $Context,
-                    'Comment' => $Comment,
+                $sQL->insert('Flag', [
+                    'DiscussionID' => $discussionID,
+                    'InsertUserID' => $userID,
+                    'InsertName' => $userName,
+                    'AuthorID' => $elementAuthorID,
+                    'AuthorName' => $elementAuthor,
+                    'ForeignURL' => $uRL,
+                    'ForeignID' => $elementID,
+                    'ForeignType' => $context,
+                    'Comment' => $comment,
                     'DateInserted' => date('Y-m-d H:i:s')
-                ));
+                ]);
             } catch (Exception $e) {
+                // Suppress exceptions from bubbling up.
             }
 
             // Notify users with permission who've chosen to be notified
-            if (!$FlagResult) { // Only send if this is first time it's being flagged.
-                $Sender->setData('Plugin.Flagging.DiscussionID', $DiscussionID);
-                $Subject = (isset($PrefixedDiscussionName)) ? $PrefixedDiscussionName : t('FlagDiscussion', 'A discussion was flagged');
-                $EmailBody = $Sender->fetchView('reportemail', '', 'plugins/Flagging');
-                $NotifyUsers = c('Plugins.Flagging.NotifyUsers', array());
+            if (!$flagResult) { // Only send if this is first time it's being flagged.
+                $sender->setData('Plugin.Flagging.DiscussionID', $discussionID);
+                $subject = (isset($prefixedDiscussionName)) ? $prefixedDiscussionName : t('FlagDiscussion', 'A discussion was flagged');
+                $emailBody = $sender->fetchView('reportemail', '', 'plugins/Flagging');
+                $notifyUsers = c('Plugins.Flagging.NotifyUsers', []);
 
                 // Send emails
-                $UserModel = new UserModel();
-                foreach ($NotifyUsers as $UserID) {
-                    $User = $UserModel->getID($UserID);
-                    $Email = new Gdn_Email();
-                    $Email->to($User->Email)
-                        ->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $Subject))
-                        ->message($EmailBody);
+                $userModel = new UserModel();
+                foreach ($notifyUsers as $userID) {
+                    $user = $userModel->getID($userID);
+                    $email = new Gdn_Email();
+                    $email->to($user->Email)
+                        ->subject(sprintf(t('[%1$s] %2$s'), Gdn::config('Garden.Title'), $subject))
+                        ->message($emailBody);
 
                     try {
-                        $Email->send();
+                        $email->send();
                     } catch (Exception $e) {
                         if (debug()) {
                             throw $e;
@@ -358,17 +349,17 @@ class FlaggingPlugin extends Gdn_Plugin {
                 }
             }
 
-            $Sender->informMessage(t('FlagSent', "Your complaint has been registered."));
+            $sender->informMessage(t('FlagSent', "Your complaint has been registered."));
         }
-        $Sender->render($Sender->fetchViewLocation('flag', '', 'plugins/Flagging'));
+        $sender->render($sender->fetchViewLocation('flag', '', 'plugins/Flagging'));
     }
 
     /**
      * Database changes needed for this plugin.
      */
     public function structure() {
-        $Structure = Gdn::structure();
-        $Structure
+        $structure = Gdn::structure();
+        $structure
             ->table('Flag')
             ->column('DiscussionID', 'int(11)', true)
             ->column('InsertUserID', 'int(11)', false, 'key')

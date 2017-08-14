@@ -11,7 +11,7 @@ echo $this->Form->errors();
             <?php echo $this->Form->label('Type', 'BanType'); ?>
             </div>
             <div class="input-wrap">
-            <?php echo $this->Form->DropDown('BanType', $this->data('_BanTypes')); ?>
+            <?php echo $this->Form->dropDown('BanType', $this->data('_BanTypes')); ?>
             </div>
         </li>
         <li class="form-group">

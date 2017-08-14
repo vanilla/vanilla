@@ -1,6 +1,6 @@
 <?php if (!defined('APPLICATION')) exit();
-$ShowAllCategoriesPref = Gdn::session()->GetPreference('ShowAllCategories');
-$Url = Gdn::request()->Path();
+$ShowAllCategoriesPref = Gdn::session()->getPreference('ShowAllCategories');
+$Url = Gdn::request()->path();
 ?>
 
 <div class="CategoryFilter">
@@ -9,13 +9,13 @@ $Url = Gdn::request()->Path();
         <?php echo wrap(t('Viewing'), 'span').': '; ?>
         <?php
         if ($ShowAllCategoriesPref):
-            echo wrap(t('all categories'), 'span', array('class' => 'CurrentFilter'));
+            echo wrap(t('all categories'), 'span', ['class' => 'CurrentFilter']);
             echo ' | ';
-            echo wrap(Anchor(t('followed categories'), $Url.'?ShowAllCategories=false'), 'span');
+            echo wrap(anchor(t('followed categories'), $Url.'?ShowAllCategories=false'), 'span');
         else:
-            echo wrap(Anchor(t('all categories'), $Url.'?ShowAllCategories=true'), 'span');
+            echo wrap(anchor(t('all categories'), $Url.'?ShowAllCategories=true'), 'span');
             echo ' | ';
-            echo wrap(t('followed categories'), 'span', array('class' => 'CurrentFilter'));
+            echo wrap(t('followed categories'), 'span', ['class' => 'CurrentFilter']);
         endif;
         ?>
     </div>

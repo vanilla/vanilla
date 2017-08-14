@@ -124,11 +124,11 @@ class Gdn_Request implements RequestInterface {
      * Gets/Sets the domain from the current url. e.g. "http://localhost" in
      * "http://localhost/this/that/garden/index.php?/controller/action/"
      *
-     * @param $Domain optional value to set
+     * @param $domain optional value to set
      * @return string | null
      */
-    public function domain($Domain = null) {
-        return $this->_parsedRequestElement('Domain', $Domain);
+    public function domain($domain = null) {
+        return $this->_parsedRequestElement('Domain', $domain);
     }
 
     /**
@@ -191,7 +191,7 @@ class Gdn_Request implements RequestInterface {
     }
 
     /**
-     * Convenience method for accessing unparsed environment data via Request(ELEMENT) method calls.
+     * Convenience method for accessing unparsed environment data via request(ELEMENT) method calls.
      *
      * @return string
      */
@@ -208,7 +208,7 @@ class Gdn_Request implements RequestInterface {
     /**
      * This method allows requests to export their internal data.
      *
-     * Mostly used in conjunction with FromImport()
+     * Mostly used in conjunction with fromImport()
      *
      * @param $export Data group to export
      * @return mixed
@@ -230,7 +230,7 @@ class Gdn_Request implements RequestInterface {
      * Gets/Sets the optional filename (ContentDisposition) of the output.
      *
      * As with the case above (OutputFormat), this value depends heavily on there being a filename
-     * at the end of the URI. In the example above, Filename() would return 'cashflow2009.pdf'.
+     * at the end of the URI. In the example above, filename() would return 'cashflow2009.pdf'.
      *
      * @param $filename Optional Filename to set.
      * @return string
@@ -329,11 +329,10 @@ class Gdn_Request implements RequestInterface {
      * Get a header value.
      *
      * @param string $header The name of the header.
-     * @param mixed $default The default value if the header does not exist.
-     * @return mixed Returns the header value or {@link $default}.
+     * @return string Returns the header value or an empty string.
      */
-    public function getHeader($header, $default = null) {
-        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), $default);
+    public function getHeader($header) {
+        return $this->getValueFrom(self::INPUT_SERVER, $this->headerKey($header), '');
     }
 
     /**
@@ -343,7 +342,7 @@ class Gdn_Request implements RequestInterface {
      * @return bool Returns **true** if the header exists or **false** otherwise.
      */
     public function hasHeader($header) {
-        return $this->getHeader($header, null) !== null;
+        return !empty($this->getHeader($header));
     }
 
     /**
@@ -880,7 +879,7 @@ class Gdn_Request implements RequestInterface {
         if (preg_match('/^(.+)\.([^.]{1,4})$/', $lastParam, $match)) {
             $this->outputFormat($match[2]);
             $this->filename($match[0]);
-            //$this->Path(implode('/',array_slice($UrlParts, 0, -1)));
+            //$this->path(implode('/',array_slice($UrlParts, 0, -1)));
         }
 
         /**
@@ -1005,9 +1004,9 @@ class Gdn_Request implements RequestInterface {
         // Construct the path and query.
         $result = $this->path();
 
-//      $Filename = $this->Filename();
+//      $Filename = $this->filename();
 //      if ($Filename && $Filename != 'default')
-//         $Result .= ConcatSep('/', $Result, $Filename);
+//         $Result .= concatSep('/', $Result, $Filename);
         $get = $this->getRequestArguments(self::INPUT_GET);
         if (count($get) > 0) {
             // mosullivan 2011-05-04 - There is a bug in this code that causes a qs
@@ -1419,7 +1418,8 @@ class Gdn_Request implements RequestInterface {
         }
         static $rewrite = null;
         if ($rewrite === null) {
-            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', true));
+            // Garden.RewriteUrls is maintained for compatibility but X_REWRITE is what really need to be used.
+            $rewrite = val('X_REWRITE', $_SERVER, c('Garden.RewriteUrls', false));
         }
 
         if (!$allowSSL) {

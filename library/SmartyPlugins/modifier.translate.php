@@ -11,10 +11,10 @@
  *
  * @see t()
  */
-function smarty_modifier_translate($Code, $Default = false) {
-    if ($Default === false) {
-        $Default = $Code;
+function smarty_modifier_translate($code, $default = false) {
+    if ($default === false) {
+        $default = $code;
     }
 
-	return t($Code, $Default);
+	return t($code, $default);
 }

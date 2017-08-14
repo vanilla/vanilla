@@ -26,8 +26,8 @@ abstract class ConversationsModel extends Gdn_Model {
      * @since 2.2
      * @access public
      */
-    public function __construct($Name = '') {
-        parent::__construct($Name);
+    public function __construct($name = '') {
+        parent::__construct($name);
         $this->floodGate = FloodControlHelper::configure($this, 'Conversations', $this->Name);
     }
 
@@ -52,8 +52,8 @@ abstract class ConversationsModel extends Gdn_Model {
         $session = Gdn::session();
 
         // Validate $type
-        if (!in_array($type, array('Conversation', 'ConversationMessage'))) {
-            trigger_error(ErrorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
+        if (!in_array($type, ['Conversation', 'ConversationMessage'])) {
+            trigger_error(errorMessage(sprintf('Spam check type unknown: %s', $type), $this->Name, 'checkForSpam'), E_USER_ERROR);
         }
 
         $storageObject = FloodControlHelper::configure($this, 'Conversations', $type);
@@ -61,38 +61,38 @@ abstract class ConversationsModel extends Gdn_Model {
     }
 
     /**
-     * Get all the members of a conversation from the $ConversationID.
+     * Get all the members of a conversation from the $conversationID.
      *
-     * @param int $ConversationID The conversation ID.
+     * @param int $conversationID The conversation ID.
      *
      * @return array Array of user IDs.
      */
-    public function getConversationMembers($ConversationID) {
-        $ConversationMembers = array();
+    public function getConversationMembers($conversationID) {
+        $conversationMembers = [];
 
-        $UserConversation = new Gdn_Model('UserConversation');
-        $UserMembers = $UserConversation->getWhere(array(
-            'ConversationID' => $ConversationID,
-            'Deleted' => false
-        ))->resultArray();
+        $userConversation = new Gdn_Model('UserConversation');
+        $userMembers = $userConversation->getWhere([
+            'ConversationID' => $conversationID,
+            'Deleted' => false,
+        ])->resultArray();
 
-        if (is_array($UserMembers) && count($UserMembers)) {
-            $ConversationMembers = array_column($UserMembers, 'UserID');
+        if (is_array($userMembers) && count($userMembers)) {
+            $conversationMembers = array_column($userMembers, 'UserID');
         }
 
-        return $ConversationMembers;
+        return $conversationMembers;
     }
 
     /**
      * Check if user posting to the conversation is already a member.
      *
-     * @param int $ConversationID The conversation ID.
-     * @param int $UserID The user id.
+     * @param int $conversationID The conversation ID.
+     * @param int $userID The user id.
      *
      * @return bool
      */
-    public function validConversationMember($ConversationID, $UserID) {
-        $ConversationMembers = $this->getConversationMembers($ConversationID);
-        return (in_array($UserID, $ConversationMembers));
+    public function validConversationMember($conversationID, $userID) {
+        $conversationMembers = $this->getConversationMembers($conversationID);
+        return (in_array($userID, $conversationMembers));
     }
 }

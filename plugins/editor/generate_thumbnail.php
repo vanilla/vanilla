@@ -45,12 +45,12 @@ if (!function_exists('generate_thumbnail')):
     * @php <5.3 Due to anonymous functions
     * @author Dane MacMillan
     */
-   function generate_thumbnail($src, $dst = '', $opts = array()) {
+   function generate_thumbnail($src, $dst = '', $opts = []) {
         // All data being used in this function goes here, so that it can be easily
         // printed out for debugging purposes. The size of this array will
         // depend on how far into the checks it gets, so the values returned are
         // also an indication of the images validity.
-        $data = array();
+        $data = [];
 
         // Anonymous function to translate a human-readable value like
         // 128M, 1G, or 768K to bytes. This is used against php.ini values.
@@ -81,7 +81,7 @@ if (!function_exists('generate_thumbnail')):
         // Based off of Chris Jester-Young's implementation.
         $bytes_to = function($byte_size, $precision = 0) {
             $base = log($byte_size) / log(1024);
-            $suffixes = array('B', 'k', 'M', 'G', 'T');
+            $suffixes = ['B', 'k', 'M', 'G', 'T'];
             $floorbase = (floor($base) >= 0)
             ? floor($base)
             : 0;
@@ -92,7 +92,7 @@ if (!function_exists('generate_thumbnail')):
         // options provided are unreasonable. These can also be used as defaults,
         // though make sure to check against the hard value variables, as the
         // defaults can be overwritten.
-        $data['hard_limits'] = array(
+        $data['hard_limits'] = [
             'max_megapixels' => 10,
             'min_dimension' => 0, // If 0 and no dims defined, source dims used
             'php_memory_limit' => ini_get('memory_limit'),
@@ -100,7 +100,7 @@ if (!function_exists('generate_thumbnail')):
             'php_upload_max_filesize' => ini_get('upload_max_filesize'), // Not used
             'max_filesize_bytes' => 20 * 1024 * 1024, // 20MB
             'quality' => 85 // Not really a hard limit, but default store
-        );
+        ];
 
         // Rely on PHP's ini values for maxes, but if max_filesize_bytes defined
         // in the opts array passed to function, use that. The max_filesize_bytes
@@ -113,7 +113,7 @@ if (!function_exists('generate_thumbnail')):
 
         // Default options--definitive list. If options are passed that do not have
         // a default here, they will be removed.
-        $default_opts = array(
+        $default_opts = [
             // Provide a width or a height. If only one provided, that side controls,
             // while the other side maintains its relative aspect ratio. If both
             // are defined, the image will take those exact dimensions, ignoring
@@ -155,7 +155,7 @@ if (!function_exists('generate_thumbnail')):
             // is useful if you just want to know how much memory a photo will
             // require, or what the result dimensions will be.
             'debug' => false
-        );
+        ];
 
         // Combine user-provided options with defaults, remove any non-valid options.
         // Also, if for some reason the $opts array is fed with valid properties but
@@ -235,7 +235,7 @@ if (!function_exists('generate_thumbnail')):
         // Not all src files necessarily have an extension. For example, PHP creates
         // a temporary file name with no extension, so allow that through. It will
         // get caught later if it's not an image.
-        $data['allowed_files'] = array('jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico', '');
+        $data['allowed_files'] = ['jpg', 'jpeg', 'gif', 'png', 'bmp', 'ico', ''];
         $data['file'] = $src;
 
         // Get path info for source
@@ -522,17 +522,17 @@ if (!function_exists('generate_thumbnail')):
 
             // If words are used to describe crop position, map them accordingly,
             // otherwise the exact x y position will be used.
-            $crop_map_x = array(
+            $crop_map_x = [
                 'left' => 0,
                 'center' => ($data['width'] - $data['result_width']) / 2,
                 'right' => $data['width'] - $data['result_width']
-            );
+            ];
 
-            $crop_map_y = array(
+            $crop_map_y = [
                 'top' => 0,
                 'center' => ($data['height'] - $data['result_height']) / 2,
                 'bottom' => $data['height'] - $data['result_height']
-            );
+            ];
 
             // Get crop coordinates
             $crop_coords = explode(' ', $crop_coords);

@@ -13,29 +13,72 @@
  */
 class CategoryModeratorsModule extends Gdn_Module {
 
-    public function __construct($Sender = '') {
-        parent::__construct($Sender);
-        $this->ModeratorData = false;
+    /**
+     * CategoryModeratorsModule constructor.
+     *
+     * @param object|string $sender
+     * @param bool $applicationFolder
+     */
+    public function __construct($sender = '', $applicationFolder = false) {
+        parent::__construct($sender, $applicationFolder);
     }
 
-    public function getData($Category) {
-        $this->ModeratorData = array($Category);
-        CategoryModel::JoinModerators($this->ModeratorData);
+    /**
+     * Load the data for this module.
+     *
+     * @param array|object|null $category
+     */
+    protected function getData($category = null) {
+        $data = $this->data('Moderators', null);
+
+        // Only attempt to fetch data if we do not already have it.
+        if ($data === null) {
+            $data = false;
+
+            // If we received a category, try to use it. If not, try to pull one from the current controller.
+            if ($category === null) {
+                $controller = Gdn::controller();
+                $category = $controller->data('Category');
+            } elseif (!is_array($category)) {
+                $category = (array)$category;
+            }
+
+            // Moderators are fetched via the PermissionCategoryID property. Make sure we have it.
+            $hasPermissionCategoryID = val('PermissionCategoryID', $category) !== false;
+            if ($hasPermissionCategoryID) {
+                // CategoryModel::joinModerators expects an array of category records.
+                $category = [$category];
+                CategoryModel::joinModerators($category);
+                $moderators = val('Moderators', $category[0]);
+                if (is_array($moderators) && count($moderators) > 0) {
+                    // Success. Stash the moderators.
+                    $data = $moderators;
+                }
+            }
+
+            $this->setData('Moderators', $data);
+        }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function assetTarget() {
         return 'Panel';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function toString() {
-        if (is_array($this->ModeratorData)
-            && count($this->ModeratorData) > 0
-            && is_array($this->ModeratorData[0]->Moderators)
-            && count($this->ModeratorData[0]->Moderators) > 0
-        ) {
-            return parent::ToString();
+        $result = '';
+        $this->getData();
+
+        $moderators = $this->data('Moderators');
+        if (is_array($moderators)) {
+            $result = parent::toString();
         }
 
-        return '';
+        return $result;
     }
 }

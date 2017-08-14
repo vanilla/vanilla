@@ -17,24 +17,24 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     /**
      * We need extra styling on the discussion list view.
      *
-     * @param assetModel $Sender
+     * @param assetModel $sender
      */
-    public function assetModel_styleCss_handler($Sender) {
+    public function assetModel_styleCss_handler($sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
-            $Sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
+            $sender->addCssFile('indexphotos.css', 'plugins/IndexPhotos');
         }
     }
 
     /**
      * Add OP name to start of discussion meta on discussions pages.
      *
-     * @param discussionsController $Sender
-     * @param array $Args
+     * @param discussionsController $sender
+     * @param array $args
      */
-    public function discussionsController_afterDiscussionLabels_handler($Sender, $Args) {
+    public function discussionsController_afterDiscussionLabels_handler($sender, $args) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
-            if (val('FirstUser', $Args)) {
-                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
+            if (val('FirstUser', $args)) {
+                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $args)).'</span>';
             }
         }
     }
@@ -42,13 +42,13 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     /**
      * Add OP name to start of discussion meta on categories pages
      *
-     * @param categoriesController $Sender
-     * @param array $Args
+     * @param categoriesController $sender
+     * @param array $args
      */
-    public function categoriesController_afterDiscussionLabels_handler($Sender, $Args) {
+    public function categoriesController_afterDiscussionLabels_handler($sender, $args) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
-            if (val('FirstUser', $Args)) {
-                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $Args)).'</span>';
+            if (val('FirstUser', $args)) {
+                echo '<span class="MItem DiscussionAuthor">'.userAnchor(val('FirstUser', $args)).'</span>';
             }
         }
     }
@@ -56,31 +56,31 @@ class IndexPhotosPlugin extends Gdn_Plugin {
     /**
      * Show user photos on discussions pages.
      *
-     * @param discussionsController $Sender
+     * @param discussionsController $sender
      */
-    public function discussionsController_beforeDiscussionContent_handler($Sender) {
+    public function discussionsController_beforeDiscussionContent_handler($sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
-            $this->displayPhoto($Sender);
+            $this->displayPhoto($sender);
         }
     }
 
     /**
      * Show user photos on categories pages.
      *
-     * @param categoriesController $Sender
+     * @param categoriesController $sender
      */
-    public function categoriesController_beforeDiscussionContent_handler($Sender) {
+    public function categoriesController_beforeDiscussionContent_handler($sender) {
         if (c('Vanilla.Discussions.Layout') != 'table') {
-            $this->displayPhoto($Sender);
+            $this->displayPhoto($sender);
         }
     }
 
     /**
      * Display user photo for first user in each discussion.
      */
-    protected function displayPhoto($Sender) {
+    protected function displayPhoto($sender) {
         // Build user object & output photo
-        $FirstUser = userBuilder($Sender->EventArguments['Discussion'], 'First');
-        echo userPhoto($FirstUser, array('LinkClass' => 'IndexPhoto'));
+        $firstUser = userBuilder($sender->EventArguments['Discussion'], 'First');
+        echo userPhoto($firstUser, ['LinkClass' => 'IndexPhoto']);
     }
 }

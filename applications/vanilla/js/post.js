@@ -144,10 +144,10 @@ jQuery(document).ready(function($) {
                     $(frm).find('.bodybox-wrap .TextBoxWrapper').hide().after(json.Data);
                     $(frm).trigger('PreviewLoaded', [frm]);
                 } else if (!draft) {
-                    if (json.RedirectUrl) {
+                    if (json.RedirectTo) {
                         $(frm).triggerHandler('complete');
                         // Redirect to the new discussion
-                        document.location = json.RedirectUrl;
+                        document.location = json.RedirectTo;
                     } else {
                         var contentContainer = $("#Content");
 

@@ -25,7 +25,7 @@ if (checkPermission('Garden.Users.Add')) {
         echo $this->Form->searchForm('Keywords', '/user/browse', [], $info);
         ?>
     </div>
-    <?php PagerModule::write(array('Sender' => $this, 'View' => 'pager-dashboard')); ?>
+    <?php PagerModule::write(['Sender' => $this, 'View' => 'pager-dashboard']); ?>
 </div>
     <div class="table-wrap">
         <table id="Users" class="table-data js-tj">

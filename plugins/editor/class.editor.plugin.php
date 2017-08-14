@@ -896,17 +896,19 @@ class EditorPlugin extends Gdn_Plugin {
      * @param string $ForeignType Lowercase.
      * @return bool Whether attach was successful.
      */
-    protected function attachEditorUploads($FileID, $ForeignID, $ForeignType) {
+    protected function attachEditorUploads($fileID, $foreignID, $foreignType) {
         // Save data to database using model with media table
-        $Model = new MediaModel();
+        $model = new MediaModel();
+        $media = $model->getID($fileID, DATASET_TYPE_ARRAY);
 
-        $Media = $Model->getID($FileID);
-        if ($Media) {
-            $Media->ForeignID = $ForeignID;
-            $Media->ForeignTable = $ForeignType;
+        $isOwner = (!empty($media['InsertUserID']) && Gdn::session()->UserID == $media['InsertUserID']);
+
+        if ($media && $isOwner) {
+            $media['ForeignID'] = $foreignID;
+            $media['ForeignTable'] = $foreignType;
 
             try {
-                $Model->save($Media);
+                $model->save($media);
             } catch (Exception $e) {
                 die($e->getMessage());
                 return false;

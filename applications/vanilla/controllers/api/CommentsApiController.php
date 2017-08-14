@@ -220,7 +220,7 @@ class CommentsApiController extends AbstractApiController {
         $this->permission();
 
         $in = $this->schema([
-            'discussionID:i' => 'The discussion ID.',
+            'discussionID:i?' => 'The discussion ID.',
             'page:i?' => [
                 'description' => 'Page number.',
                 'default' => 1,
@@ -233,33 +233,49 @@ class CommentsApiController extends AbstractApiController {
                 'minimum' => 1,
                 'maximum' => 100
             ],
+            'insertUserID:i?' => 'Filter by author.',
             'after:dt?' => 'Get only comments after this date.',
             'expand:b?' => [
                 'description' => 'Expand associated records.',
                 'default' => false
-            ]
-        ], 'in')->setDescription('List comments.');
+            ],
+            'lookup:s?' => 'The field used to lookup comments.'
+        ], 'in')->requireOneOf(['discussionID', 'insertUserID'])->setDescription('List comments.');
         $out = $this->schema([':a' => $this->commentSchema()], 'out');
 
         $query = $in->validate($query);
-        $discussion = $this->discussionByID($query['discussionID']);
-        list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
-        $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-        // Build up the where clause.
-        $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
+        // Lookup by discussion or by user?
+        if (array_key_exists('discussionID', $query)) {
+            $discussion = $this->discussionByID($query['discussionID']);
+            list($offset, $limit) = offsetLimit("p{$query['page']}", $query['limit']);
+            $this->discussionModel->categoryPermission('Vanilla.Discussions.View', $discussion['CategoryID']);
 
-        if (isset($query['after'])) {
-            $where['dateInserted >'] = $query['after'];
+            // Build up the where clause.
+            $where = ['discussionID' => $query['discussionID'], 'joinUsers' => false];
+
+            if (isset($query['insertUserID'])) {
+                $where['insertUserID'] = $query['insertUserID'];
+            }
+
+            if (isset($query['after'])) {
+                $where['dateInserted >'] = $query['after'];
+            }
+
+            $rows = $this->commentModel->getWhere(
+                $where,
+                'DateInserted',
+                'asc',
+                $limit,
+                $offset
+            )->resultArray();
+        } else {
+            $rows = $this->commentModel->getByUser2(
+                $query['insertUserID'],
+                $query['limit'],
+                $query['offset']
+            )->resultArray();
         }
-
-        $rows = $this->commentModel->getWhere(
-            $where,
-            'DateInserted',
-            'asc',
-            $limit,
-            $offset
-        )->resultArray();
 
         if ($query['expand']) {
             $this->userModel->expandUsers($rows, ['InsertUserID']);
